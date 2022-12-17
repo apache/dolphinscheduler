@@ -17,33 +17,32 @@
 
 package org.apache.dolphinscheduler.dao;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.dao.entity.MonitorRecord;
 import org.apache.dolphinscheduler.dao.utils.H2Performance;
 import org.apache.dolphinscheduler.dao.utils.MySQLPerformance;
 import org.apache.dolphinscheduler.dao.utils.PostgreSQLPerformance;
 import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
+import javax.sql.DataSource;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.sql.DataSource;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 @Component
+@RequiredArgsConstructor
 public class MonitorDBDao {
 
     private static final Logger logger = LoggerFactory.getLogger(MonitorDBDao.class);
 
     public static final String VARIABLE_NAME = "variable_name";
 
-    @Autowired
-    private DataSource dataSource;
+    private final DataSource dataSource;
 
     private MonitorRecord getCurrentDbPerformance() {
         try (final Connection conn = dataSource.getConnection()) {

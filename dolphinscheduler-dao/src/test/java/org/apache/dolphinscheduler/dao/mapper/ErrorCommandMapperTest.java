@@ -17,29 +17,28 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.CommandCount;
 import org.apache.dolphinscheduler.dao.entity.ErrorCommand;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 import java.util.List;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
+@RequiredArgsConstructor
 public class ErrorCommandMapperTest extends BaseDaoTest {
 
-    @Autowired
-    private ErrorCommandMapper errorCommandMapper;
+    private final ErrorCommandMapper errorCommandMapper;
 
-    @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private final ProcessDefinitionMapper processDefinitionMapper;
 
     /**
      * insert
+     *
      * @return ErrorCommand
      */
     private ErrorCommand insertOne() {
@@ -73,17 +72,17 @@ public class ErrorCommandMapperTest extends BaseDaoTest {
         errorCommandMapper.updateById(errorCommand);
 
         List<CommandCount> commandCounts = errorCommandMapper.countCommandState(
-                null,
-                null,
-                new Long[0]);
+            null,
+            null,
+            new Long[0]);
 
         Long[] projectCodeArray = new Long[2];
         projectCodeArray[0] = processDefinition.getProjectCode();
         projectCodeArray[1] = 200L;
         List<CommandCount> commandCounts2 = errorCommandMapper.countCommandState(
-                null,
-                null,
-                projectCodeArray);
+            null,
+            null,
+            projectCodeArray);
 
         Assertions.assertNotEquals(commandCounts.size(), 0);
         Assertions.assertNotEquals(commandCounts2.size(), 0);

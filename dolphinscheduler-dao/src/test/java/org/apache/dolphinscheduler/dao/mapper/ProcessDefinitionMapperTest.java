@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
@@ -26,35 +29,26 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-
+@RequiredArgsConstructor
 public class ProcessDefinitionMapperTest extends BaseDaoTest {
 
-    @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private final ProcessDefinitionMapper processDefinitionMapper;
 
-    @Autowired
-    private UserMapper userMapper;
+    private final UserMapper userMapper;
 
-    @Autowired
-    private QueueMapper queueMapper;
+    private final QueueMapper queueMapper;
 
-    @Autowired
-    private TenantMapper tenantMapper;
+    private final TenantMapper tenantMapper;
 
-    @Autowired
-    private ProjectMapper projectMapper;
+    private final ProjectMapper projectMapper;
 
     private AtomicLong atomicLong = new AtomicLong(0);
 
@@ -265,7 +259,7 @@ public class ProcessDefinitionMapperTest extends BaseDaoTest {
         insertOne("def 1");
         Page<ProcessDefinition> page = new Page(1, 3);
         IPage<ProcessDefinition> processDefinitionIPage =
-                processDefinitionMapper.queryDefineListPaging(page, "def", 101, 1010L);
+            processDefinitionMapper.queryDefineListPaging(page, "def", 101, 1010L);
         Assertions.assertNotEquals(processDefinitionIPage.getTotal(), 0);
     }
 
@@ -320,7 +314,7 @@ public class ProcessDefinitionMapperTest extends BaseDaoTest {
         Long[] projectCodes = new Long[1];
         projectCodes[0] = processDefinition.getProjectCode();
         List<DefinitionGroupByUser> processDefinitions =
-                processDefinitionMapper.countDefinitionByProjectCodes(projectCodes);
+            processDefinitionMapper.countDefinitionByProjectCodes(projectCodes);
         Assertions.assertNotEquals(processDefinitions.size(), 0);
     }
 

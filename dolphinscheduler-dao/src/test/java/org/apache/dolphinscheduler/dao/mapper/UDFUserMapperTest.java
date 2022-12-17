@@ -14,35 +14,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.common.enums.UdfType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.UDFUser;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 import java.util.List;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
+@RequiredArgsConstructor
 public class UDFUserMapperTest extends BaseDaoTest {
 
-    @Autowired
-    private UDFUserMapper udfUserMapper;
+    private final UDFUserMapper udfUserMapper;
 
-    @Autowired
-    private UserMapper userMapper;
+    private final UserMapper userMapper;
 
-    @Autowired
-    private UdfFuncMapper udfFuncMapper;
+    private final UdfFuncMapper udfFuncMapper;
 
     /**
      * insert
+     *
      * @return UDFUser
      */
     private UDFUser insertOne() {
@@ -57,8 +56,9 @@ public class UDFUserMapperTest extends BaseDaoTest {
 
     /**
      * insert UDFUser
-     * @param user user
-     * @param udfFunc  udfFunc
+     *
+     * @param user    user
+     * @param udfFunc udfFunc
      * @return UDFUser
      */
     private UDFUser insertOne(User user, UdfFunc udfFunc) {
@@ -73,6 +73,7 @@ public class UDFUserMapperTest extends BaseDaoTest {
 
     /**
      * insert one user
+     *
      * @return User
      */
     private User insertOneUser() {
@@ -91,6 +92,7 @@ public class UDFUserMapperTest extends BaseDaoTest {
 
     /**
      * insert one udf
+     *
      * @return UdfFunc
      */
     private UdfFunc insertOneUdfFunc() {

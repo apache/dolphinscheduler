@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.WarningType;
@@ -26,27 +27,22 @@ import org.apache.dolphinscheduler.dao.entity.ProcessLineage;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 import java.util.List;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
+@RequiredArgsConstructor
 public class WorkFlowLineageMapperTest extends BaseDaoTest {
 
-    @Autowired
-    private WorkFlowLineageMapper workFlowLineageMapper;
+    private final WorkFlowLineageMapper workFlowLineageMapper;
 
-    @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private final ProcessDefinitionMapper processDefinitionMapper;
 
-    @Autowired
-    private ScheduleMapper scheduleMapper;
+    private final ScheduleMapper scheduleMapper;
 
-    @Autowired
-    private ProcessTaskRelationMapper processTaskRelationMapper;
+    private final ProcessTaskRelationMapper processTaskRelationMapper;
 
     /**
      * insert
@@ -72,7 +68,6 @@ public class WorkFlowLineageMapperTest extends BaseDaoTest {
 
     /**
      * insert
-     *
      */
     private void insertOneProcessDefinition() {
         // insertOne
@@ -88,7 +83,6 @@ public class WorkFlowLineageMapperTest extends BaseDaoTest {
 
     /**
      * insert
-     *
      */
     private void insertOneSchedule(int id) {
         // insertOne
@@ -112,7 +106,7 @@ public class WorkFlowLineageMapperTest extends BaseDaoTest {
         insertOneSchedule(processDefinition.getId());
 
         List<WorkFlowLineage> workFlowLineages = workFlowLineageMapper
-                .queryWorkFlowLineageByName(processDefinition.getProjectCode(), processDefinition.getName());
+            .queryWorkFlowLineageByName(processDefinition.getProjectCode(), processDefinition.getName());
         Assertions.assertNotEquals(workFlowLineages.size(), 0);
     }
 
@@ -120,8 +114,8 @@ public class WorkFlowLineageMapperTest extends BaseDaoTest {
     public void testQueryCodeRelation() {
         ProcessTaskRelation processTaskRelation = insertOneProcessTaskRelation();
         List<ProcessLineage> workFlowLineages =
-                workFlowLineageMapper.queryProcessLineageByCode(processTaskRelation.getProjectCode(),
-                        processTaskRelation.getProcessDefinitionCode());
+            workFlowLineageMapper.queryProcessLineageByCode(processTaskRelation.getProjectCode(),
+                processTaskRelation.getProcessDefinitionCode());
         Assertions.assertNotEquals(workFlowLineages.size(), 0);
     }
 
@@ -131,7 +125,7 @@ public class WorkFlowLineageMapperTest extends BaseDaoTest {
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(1L);
         insertOneProcessTaskRelation();
         List<ProcessLineage> workFlowLineages =
-                workFlowLineageMapper.queryProcessLineage(processDefinition.getProjectCode());
+            workFlowLineageMapper.queryProcessLineage(processDefinition.getProjectCode());
         Assertions.assertNotEquals(workFlowLineages.size(), 0);
     }
 
@@ -141,7 +135,7 @@ public class WorkFlowLineageMapperTest extends BaseDaoTest {
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(1L);
         insertOneSchedule(processDefinition.getId());
         WorkFlowLineage workFlowLineages = workFlowLineageMapper
-                .queryWorkFlowLineageByCode(processDefinition.getProjectCode(), processDefinition.getCode());
+            .queryWorkFlowLineageByCode(processDefinition.getProjectCode(), processDefinition.getCode());
         Assertions.assertNotNull(workFlowLineages);
     }
 

@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.dao.repository.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -24,39 +27,33 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
 import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
+import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
-
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-
 @Repository
+@RequiredArgsConstructor
 public class ProcessDefinitionDaoImpl implements ProcessDefinitionDao {
 
-    @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
-    @Autowired
-    private ProcessDefinitionLogMapper processDefinitionLogMapper;
+    private final ProcessDefinitionMapper processDefinitionMapper;
+    private final ProcessDefinitionLogMapper processDefinitionLogMapper;
 
     @Override
     public PageListingResult<ProcessDefinition> listingProcessDefinition(int pageNumber, int pageSize, String searchVal,
                                                                          int userId, long projectCode) {
         Page<ProcessDefinition> page = new Page<>(pageNumber, pageSize);
         IPage<ProcessDefinition> processDefinitions =
-                processDefinitionMapper.queryDefineListPaging(page, searchVal, userId, projectCode);
+            processDefinitionMapper.queryDefineListPaging(page, searchVal, userId, projectCode);
 
         return PageListingResult.<ProcessDefinition>builder()
-                .totalCount(processDefinitions.getTotal())
-                .currentPage(pageNumber)
-                .pageSize(pageSize)
-                .records(processDefinitions.getRecords())
-                .build();
+            .totalCount(processDefinitions.getTotal())
+            .currentPage(pageNumber)
+            .pageSize(pageSize)
+            .records(processDefinitions.getRecords())
+            .build();
     }
 
     @Override
@@ -65,17 +62,17 @@ public class ProcessDefinitionDaoImpl implements ProcessDefinitionDao {
             return new ArrayList<>();
         }
         List<ProcessDefinitionLog> processDefinitionLogs = processInstances
-                .parallelStream()
-                .map(processInstance -> {
-                    ProcessDefinitionLog processDefinitionLog = processDefinitionLogMapper
-                            .queryByDefinitionCodeAndVersion(processInstance.getProcessDefinitionCode(),
-                                    processInstance.getProcessDefinitionVersion());
-                    return processDefinitionLog;
-                })
-                .collect(Collectors.toList());
+            .parallelStream()
+            .map(processInstance -> {
+                ProcessDefinitionLog processDefinitionLog = processDefinitionLogMapper
+                    .queryByDefinitionCodeAndVersion(processInstance.getProcessDefinitionCode(),
+                        processInstance.getProcessDefinitionVersion());
+                return processDefinitionLog;
+            })
+            .collect(Collectors.toList());
 
         List<ProcessDefinition> processDefinitions =
-                processDefinitionLogs.stream().map(log -> (ProcessDefinition) log).collect(Collectors.toList());
+            processDefinitionLogs.stream().map(log -> (ProcessDefinition) log).collect(Collectors.toList());
 
         return processDefinitions;
     }

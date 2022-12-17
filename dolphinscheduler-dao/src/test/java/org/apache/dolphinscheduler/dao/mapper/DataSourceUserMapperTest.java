@@ -17,20 +17,19 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.DatasourceUser;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 import java.util.List;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
+@RequiredArgsConstructor
 public class DataSourceUserMapperTest extends BaseDaoTest {
 
-    @Autowired
-    private DataSourceUserMapper dataSourceUserMapper;
+    private final DataSourceUserMapper dataSourceUserMapper;
 
     /**
      * insert

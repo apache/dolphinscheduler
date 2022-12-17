@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.dao.repository.impl;
 
+import com.google.common.collect.Lists;
+import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -26,37 +28,30 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
-
-import com.google.common.collect.Lists;
-
 /**
  * Task Definition DAO Implementation
  */
 @Repository
+@RequiredArgsConstructor
 public class TaskDefinitionDaoImpl implements TaskDefinitionDao {
 
     private final Logger logger = LoggerFactory.getLogger(TaskDefinitionDaoImpl.class);
 
-    @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private final ProcessDefinitionMapper processDefinitionMapper;
 
-    @Autowired
-    private ProcessTaskRelationLogMapper processTaskRelationLogMapper;
+    private final ProcessTaskRelationLogMapper processTaskRelationLogMapper;
 
-    @Autowired
-    private TaskDefinitionLogMapper taskDefinitionLogMapper;
+    private final TaskDefinitionLogMapper taskDefinitionLogMapper;
 
-    @Autowired
-    private TaskDefinitionMapper taskDefinitionMapper;
+    private final TaskDefinitionMapper taskDefinitionMapper;
 
     @Override
     public List<TaskDefinition> getTaskDefinitionListByDefinition(long processDefinitionCode) {
@@ -67,10 +62,10 @@ public class TaskDefinitionDaoImpl implements TaskDefinitionDao {
         }
 
         List<ProcessTaskRelationLog> processTaskRelations = processTaskRelationLogMapper
-                .queryByProcessCodeAndVersion(processDefinition.getCode(), processDefinition.getVersion());
+            .queryByProcessCodeAndVersion(processDefinition.getCode(), processDefinition.getVersion());
         Set<TaskDefinition> taskDefinitionSet = new HashSet<>();
         processTaskRelations.stream().filter(p -> p.getPostTaskCode() > 0)
-                .forEach(p -> taskDefinitionSet.add(new TaskDefinition(p.getPostTaskCode(), p.getPostTaskVersion())));
+            .forEach(p -> taskDefinitionSet.add(new TaskDefinition(p.getPostTaskCode(), p.getPostTaskVersion())));
 
         if (taskDefinitionSet.isEmpty()) {
             return Lists.newArrayList();

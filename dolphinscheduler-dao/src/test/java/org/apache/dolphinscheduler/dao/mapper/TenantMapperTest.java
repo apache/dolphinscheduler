@@ -14,33 +14,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-
+@RequiredArgsConstructor
 public class TenantMapperTest extends BaseDaoTest {
 
-    @Autowired
-    private TenantMapper tenantMapper;
+    private final TenantMapper tenantMapper;
 
-    @Autowired
-    private QueueMapper queueMapper;
+    private final QueueMapper queueMapper;
 
     /**
      * insert
+     *
      * @return Tenant
      */
     private Tenant insertOne() {
@@ -137,7 +136,7 @@ public class TenantMapperTest extends BaseDaoTest {
 
         // tenant.getTenantCode() used instead of tenant.getTenantName()
         IPage<Tenant> tenantIPage =
-                tenantMapper.queryTenantPaging(page, Collections.singletonList(tenant.getId()), tenant.getTenantCode());
+            tenantMapper.queryTenantPaging(page, Collections.singletonList(tenant.getId()), tenant.getTenantCode());
 
         Assertions.assertNotEquals(tenantIPage.getTotal(), 0);
     }

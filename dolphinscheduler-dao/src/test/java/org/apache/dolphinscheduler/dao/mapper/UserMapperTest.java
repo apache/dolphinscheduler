@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
@@ -37,22 +38,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+@RequiredArgsConstructor
 public class UserMapperTest extends BaseDaoTest {
 
-    @Autowired
-    private UserMapper userMapper;
+    private final UserMapper userMapper;
 
-    @Autowired
-    private AlertGroupMapper alertGroupMapper;
+    private final AlertGroupMapper alertGroupMapper;
 
-    @Autowired
-    private AccessTokenMapper accessTokenMapper;
+    private final AccessTokenMapper accessTokenMapper;
 
-    @Autowired
-    private TenantMapper tenantMapper;
+    private final TenantMapper tenantMapper;
 
-    @Autowired
-    private QueueMapper queueMapper;
+    private final QueueMapper queueMapper;
 
     /**
      * insert one user

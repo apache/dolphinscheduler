@@ -14,30 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
-
-import org.apache.dolphinscheduler.dao.BaseDaoTest;
-import org.apache.dolphinscheduler.dao.entity.DqRule;
-import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
-
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import lombok.RequiredArgsConstructor;
+import org.apache.dolphinscheduler.dao.BaseDaoTest;
+import org.apache.dolphinscheduler.dao.entity.DqRule;
+import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 /**
  * DQC rule mapper UT.
  */
+@RequiredArgsConstructor
 public class DqRuleInputEntryMapperTest extends BaseDaoTest {
 
-    @Autowired
-    private DqRuleInputEntryMapper dqRuleInputEntryMapper;
+    private final DqRuleInputEntryMapper dqRuleInputEntryMapper;
 
-    @Autowired
-    private DqRuleMapper dqRuleMapper;
+    private final DqRuleMapper dqRuleMapper;
 
     @Test
     public void testDqcRulePageList() {
@@ -45,12 +43,12 @@ public class DqRuleInputEntryMapperTest extends BaseDaoTest {
         Page<DqRule> page = new Page<>(1, 10);
 
         IPage<DqRule> dqRulePage =
-                dqRuleMapper.queryRuleListPaging(
-                        page,
-                        "",
-                        -1,
-                        null,
-                        null);
+            dqRuleMapper.queryRuleListPaging(
+                page,
+                "",
+                -1,
+                null,
+                null);
 
         dqRulePage.getRecords().forEach(rule -> {
             final List<DqRuleInputEntry> ruleInputEntryList = dqRuleInputEntryMapper.getRuleInputEntryList(1);

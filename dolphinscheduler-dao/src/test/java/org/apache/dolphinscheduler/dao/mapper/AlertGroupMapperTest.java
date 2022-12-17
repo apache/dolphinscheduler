@@ -17,28 +17,26 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-
 /**
  * AlertGroup mapper test
  */
+@RequiredArgsConstructor
 public class AlertGroupMapperTest extends BaseDaoTest {
 
-    @Autowired
-    private AlertGroupMapper alertGroupMapper;
+    private final AlertGroupMapper alertGroupMapper;
 
     /**
      * test insert
@@ -227,7 +225,7 @@ public class AlertGroupMapperTest extends BaseDaoTest {
      * @return AlertGroup map
      */
     private Map<Integer, AlertGroup> createAlertGroups(
-                                                       Integer count, String groupName) {
+        Integer count, String groupName) {
         Map<Integer, AlertGroup> alertGroupMap = new HashMap<>();
 
         AlertGroup alertGroup = null;

@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
@@ -30,26 +31,23 @@ import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.CommandCount;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
 /**
  * command mapper test
  */
+@RequiredArgsConstructor
 public class CommandMapperTest extends BaseDaoTest {
 
-    @Autowired
-    private CommandMapper commandMapper;
+    private final CommandMapper commandMapper;
 
-    @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private final ProcessDefinitionMapper processDefinitionMapper;
 
     /**
      * test insert
@@ -190,15 +188,16 @@ public class CommandMapperTest extends BaseDaoTest {
 
     /**
      * create command map
-     * @param count map count
-     * @param commandType comman type
+     *
+     * @param count                 map count
+     * @param commandType           comman type
      * @param processDefinitionCode process definition code
      * @return command map
      */
     private CommandCount createCommandMap(
-                                          Integer count,
-                                          CommandType commandType,
-                                          long processDefinitionCode) {
+        Integer count,
+        CommandType commandType,
+        long processDefinitionCode) {
 
         CommandCount commandCount = new CommandCount();
 
@@ -212,7 +211,8 @@ public class CommandMapperTest extends BaseDaoTest {
     }
 
     /**
-     *  create process definition
+     * create process definition
+     *
      * @return process definition
      */
     private ProcessDefinition createProcessDefinition() {
@@ -232,6 +232,7 @@ public class CommandMapperTest extends BaseDaoTest {
 
     /**
      * create command map
+     *
      * @param count map count
      * @return command map
      */
@@ -247,6 +248,7 @@ public class CommandMapperTest extends BaseDaoTest {
 
     /**
      * create command
+     *
      * @return
      */
     private Command createCommand() {
@@ -255,6 +257,7 @@ public class CommandMapperTest extends BaseDaoTest {
 
     /**
      * create command
+     *
      * @return Command
      */
     private Command createCommand(CommandType commandType, long processDefinitionCode) {

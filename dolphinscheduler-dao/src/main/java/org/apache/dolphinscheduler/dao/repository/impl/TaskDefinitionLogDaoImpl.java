@@ -17,12 +17,17 @@
 
 package org.apache.dolphinscheduler.dao.repository.impl;
 
+import com.google.common.collect.Lists;
+import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,26 +36,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
-
-import com.google.common.collect.Lists;
-
 /**
  * Task Definition Log DAP implementation
  */
 @Repository
+@RequiredArgsConstructor
 public class TaskDefinitionLogDaoImpl implements TaskDefinitionLogDao {
 
     private final Logger logger = LoggerFactory.getLogger(TaskDefinitionLogDaoImpl.class);
 
-    @Autowired
-    private TaskDefinitionDao taskDefinitionDao;
+    private final TaskDefinitionDao taskDefinitionDao;
 
-    @Autowired
-    private TaskDefinitionLogMapper taskDefinitionLogMapper;
+    private final TaskDefinitionLogMapper taskDefinitionLogMapper;
 
     @Override
     public List<TaskDefinitionLog> getTaskDefineLogList(List<ProcessTaskRelation> processTaskRelations) {
@@ -58,11 +55,11 @@ public class TaskDefinitionLogDaoImpl implements TaskDefinitionLogDao {
         for (ProcessTaskRelation processTaskRelation : processTaskRelations) {
             if (processTaskRelation.getPreTaskCode() > 0) {
                 taskDefinitionSet.add(new TaskDefinition(processTaskRelation.getPreTaskCode(),
-                        processTaskRelation.getPreTaskVersion()));
+                    processTaskRelation.getPreTaskVersion()));
             }
             if (processTaskRelation.getPostTaskCode() > 0) {
                 taskDefinitionSet.add(new TaskDefinition(processTaskRelation.getPostTaskCode(),
-                        processTaskRelation.getPostTaskVersion()));
+                    processTaskRelation.getPostTaskVersion()));
             }
         }
         if (taskDefinitionSet.isEmpty()) {

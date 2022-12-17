@@ -17,20 +17,19 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 import java.util.List;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
+@RequiredArgsConstructor
 public class ProcessTaskRelationLogMapperTest extends BaseDaoTest {
 
-    @Autowired
-    private ProcessTaskRelationLogMapper processTaskRelationLogMapper;
+    private final ProcessTaskRelationLogMapper processTaskRelationLogMapper;
 
     /**
      * insert
@@ -56,7 +55,7 @@ public class ProcessTaskRelationLogMapperTest extends BaseDaoTest {
     public void testQueryByProcessCodeAndVersion() {
         ProcessTaskRelationLog processTaskRelationLog = insertOne();
         List<ProcessTaskRelationLog> processTaskRelationLogs = processTaskRelationLogMapper
-                .queryByProcessCodeAndVersion(1L, 1);
+            .queryByProcessCodeAndVersion(1L, 1);
         Assertions.assertNotEquals(processTaskRelationLogs.size(), 0);
     }
 

@@ -19,6 +19,9 @@ package org.apache.dolphinscheduler.dao.mapper;
 
 import static java.util.stream.Collectors.toList;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -27,6 +30,8 @@ import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.DatasourceUser;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -35,32 +40,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-
 /**
  * datasource mapper test
  */
+@RequiredArgsConstructor
 public class DataSourceMapperTest extends BaseDaoTest {
 
     /**
      * datasource mapper
      */
-    @Autowired
-    private DataSourceMapper dataSourceMapper;
+    private final DataSourceMapper dataSourceMapper;
 
     /**
      * datasource user relation mapper
      */
-    @Autowired
-    private DataSourceUserMapper dataSourceUserMapper;
+    private final DataSourceUserMapper dataSourceUserMapper;
 
-    @Autowired
-    private UserMapper userMapper;
+    private final UserMapper userMapper;
 
     /**
      * test insert
@@ -126,7 +122,7 @@ public class DataSourceMapperTest extends BaseDaoTest {
         Map<Integer, DataSource> datasourceMap = createDataSourceMap(userId, "test");
 
         List<DataSource> actualDataSources = dataSourceMapper.queryDataSourceByType(
-                0, DbType.MYSQL.ordinal(), Constants.TEST_FLAG_NO);
+            0, DbType.MYSQL.ordinal(), Constants.TEST_FLAG_NO);
 
         Assertions.assertTrue(actualDataSources.size() >= 2);
 
@@ -257,19 +253,19 @@ public class DataSourceMapperTest extends BaseDaoTest {
         Integer[] dataSourceIds = new Integer[]{dataSource.getId(), unauthorizdDataSource.getId()};
 
         List<DataSource> authorizedDataSource =
-                dataSourceMapper.listAuthorizedDataSource(generalUser1.getId(), dataSourceIds);
+            dataSourceMapper.listAuthorizedDataSource(generalUser1.getId(), dataSourceIds);
 
         Assertions.assertEquals(generalUser1.getId().intValue(), dataSource.getUserId());
         Assertions.assertNotEquals(generalUser1.getId().intValue(), unauthorizdDataSource.getUserId());
         Assertions.assertFalse(authorizedDataSource.stream().map(t -> t.getId()).collect(toList())
-                .containsAll(Arrays.asList(dataSourceIds)));
+            .containsAll(Arrays.asList(dataSourceIds)));
 
         // authorize object unauthorizdDataSource to generalUser1
         createUserDataSource(generalUser1, unauthorizdDataSource);
         authorizedDataSource = dataSourceMapper.listAuthorizedDataSource(generalUser1.getId(), dataSourceIds);
 
         Assertions.assertTrue(authorizedDataSource.stream().map(t -> t.getId()).collect(toList())
-                .containsAll(Arrays.asList(dataSourceIds)));
+            .containsAll(Arrays.asList(dataSourceIds)));
     }
 
     @Test
@@ -285,27 +281,28 @@ public class DataSourceMapperTest extends BaseDaoTest {
         List<DataSource> actualDataSources = dataSourceMapper.selectPagingByIds(page, null, null).getRecords();
         Assertions.assertEquals(3, actualDataSources.size());
         Assertions.assertTrue(actualDataSources.stream().map(t -> t.getId()).collect(toList())
-                .containsAll(Arrays.asList(dataSource1ForUser1.getId(), dataSource2ForUser2.getId(),
-                        dataSource3ForUser1.getId())));
+            .containsAll(Arrays.asList(dataSource1ForUser1.getId(), dataSource2ForUser2.getId(),
+                dataSource3ForUser1.getId())));
 
         // select with name
         actualDataSources = dataSourceMapper.selectPagingByIds(page, null, dataSource1ForUser1.getName()).getRecords();
         Assertions.assertEquals(2, actualDataSources.size());
         Assertions.assertTrue(actualDataSources.stream().map(t -> t.getId()).collect(toList())
-                .containsAll(Arrays.asList(dataSource1ForUser1.getId(), dataSource3ForUser1.getId())));
+            .containsAll(Arrays.asList(dataSource1ForUser1.getId(), dataSource3ForUser1.getId())));
 
         // select with dataSourceIds and name
         actualDataSources = dataSourceMapper
-                .selectPagingByIds(page, Arrays.asList(dataSource1ForUser1.getId(), dataSource2ForUser2.getId()),
-                        dataSource1ForUser1.getName())
-                .getRecords();
+            .selectPagingByIds(page, Arrays.asList(dataSource1ForUser1.getId(), dataSource2ForUser2.getId()),
+                dataSource1ForUser1.getName())
+            .getRecords();
         Assertions.assertEquals(1, actualDataSources.size());
         Assertions.assertTrue(actualDataSources.stream().map(t -> t.getId()).collect(toList())
-                .containsAll(Arrays.asList(dataSource1ForUser1.getId())));
+            .containsAll(Arrays.asList(dataSource1ForUser1.getId())));
     }
 
     /**
      * create datasource relation
+     *
      * @param userId
      */
     private Map<Integer, DataSource> createDataSourceMap(Integer userId, String name) {
@@ -335,6 +332,7 @@ public class DataSourceMapperTest extends BaseDaoTest {
 
     /**
      * create datasource map
+     *
      * @param count datasource count
      * @return datasource map
      */
@@ -351,6 +349,7 @@ public class DataSourceMapperTest extends BaseDaoTest {
 
     /**
      * create datasource
+     *
      * @return datasource
      */
     private DataSource createDataSource() {
@@ -359,6 +358,7 @@ public class DataSourceMapperTest extends BaseDaoTest {
 
     /**
      * create datasource
+     *
      * @param name name
      * @return datasource
      */
@@ -368,8 +368,9 @@ public class DataSourceMapperTest extends BaseDaoTest {
 
     /**
      * create datasource
+     *
      * @param userId userId
-     * @param name name
+     * @param name   name
      * @return datasource
      */
     private DataSource createDataSource(Integer userId, String name) {
@@ -391,6 +392,7 @@ public class DataSourceMapperTest extends BaseDaoTest {
 
     /**
      * create general user
+     *
      * @return User
      */
     private User createGeneralUser(String userName) {
@@ -409,7 +411,7 @@ public class DataSourceMapperTest extends BaseDaoTest {
     /**
      * create the relation of user and data source
      *
-     * @param user user
+     * @param user       user
      * @param dataSource data source
      * @return DatasourceUser
      */

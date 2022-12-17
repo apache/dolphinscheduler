@@ -17,16 +17,18 @@
 
 package org.apache.dolphinscheduler.dao.datasource;
 
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.core.MybatisConfiguration;
+import com.baomidou.mybatisplus.core.config.GlobalConfig;
+import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
+import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.mapping.VendorDatabaseIdProvider;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.type.JdbcType;
-
-import java.util.Properties;
-
-import javax.sql.DataSource;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.init.DataSourceScriptDatabaseInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,22 +38,18 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
-import com.baomidou.mybatisplus.annotation.DbType;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.core.MybatisConfiguration;
-import com.baomidou.mybatisplus.core.config.GlobalConfig;
-import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
-import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
-import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
+import javax.sql.DataSource;
+
+import java.util.Properties;
 
 @Configuration
+@RequiredArgsConstructor
 public class SpringConnectionFactory {
 
     /**
      * Inject this field to make sure the database is initialized, this can solve the table not found issue #8432.
      */
-    @Autowired(required = false)
-    public DataSourceScriptDatabaseInitializer dataSourceScriptDatabaseInitializer;
+    public final DataSourceScriptDatabaseInitializer dataSourceScriptDatabaseInitializer;
 
     @Bean
     public MybatisPlusInterceptor paginationInterceptor(DbType dbType) {
@@ -83,7 +81,7 @@ public class SpringConnectionFactory {
         sqlSessionFactoryBean.setTypeAliasesPackage("org.apache.dolphinscheduler.dao.entity");
         ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
         sqlSessionFactoryBean
-                .setMapperLocations(resolver.getResources("org/apache/dolphinscheduler/dao/mapper/*Mapper.xml"));
+            .setMapperLocations(resolver.getResources("org/apache/dolphinscheduler/dao/mapper/*Mapper.xml"));
         sqlSessionFactoryBean.setDatabaseIdProvider(databaseIdProvider());
         return sqlSessionFactoryBean.getObject();
     }
@@ -91,7 +89,7 @@ public class SpringConnectionFactory {
     @Bean
     public GlobalConfig globalConfig() {
         return new GlobalConfig().setDbConfig(new GlobalConfig.DbConfig()
-                .setIdType(IdType.AUTO)).setBanner(false);
+            .setIdType(IdType.AUTO)).setBanner(false);
     }
 
     @Bean

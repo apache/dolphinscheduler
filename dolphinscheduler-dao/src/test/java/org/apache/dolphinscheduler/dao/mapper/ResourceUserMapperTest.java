@@ -14,26 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 import java.util.List;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
+@RequiredArgsConstructor
 public class ResourceUserMapperTest extends BaseDaoTest {
 
-    @Autowired
-    private ResourceUserMapper resourceUserMapper;
+    private final ResourceUserMapper resourceUserMapper;
 
     /**
      * insert
+     *
      * @return ResourcesUser
      */
     private ResourcesUser insertOne() {
@@ -90,8 +91,8 @@ public class ResourceUserMapperTest extends BaseDaoTest {
 
         ResourcesUser queue = insertOne();
         int delete = resourceUserMapper.deleteResourceUser(
-                queue.getUserId(),
-                queue.getResourcesId());
+            queue.getUserId(),
+            queue.getResourcesId());
         Assertions.assertNotEquals(delete, 0);
     }
 
@@ -104,8 +105,8 @@ public class ResourceUserMapperTest extends BaseDaoTest {
         ResourcesUser resourcesUser = insertOne();
         Integer[] resourceIdArray = new Integer[]{resourcesUser.getResourcesId()};
         int delete = resourceUserMapper.deleteResourceUserArray(
-                resourcesUser.getUserId(),
-                resourceIdArray);
+            resourcesUser.getUserId(),
+            resourceIdArray);
         Assertions.assertNotEquals(delete, 0);
     }
 }

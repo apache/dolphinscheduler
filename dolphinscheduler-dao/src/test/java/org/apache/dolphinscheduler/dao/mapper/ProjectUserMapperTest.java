@@ -17,20 +17,19 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 import java.util.List;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
+@RequiredArgsConstructor
 public class ProjectUserMapperTest extends BaseDaoTest {
 
-    @Autowired
-    private ProjectUserMapper projectUserMapper;
+    private final ProjectUserMapper projectUserMapper;
 
     /**
      * insert
@@ -99,7 +98,7 @@ public class ProjectUserMapperTest extends BaseDaoTest {
     public void testQueryProjectRelation() {
         ProjectUser projectUser = insertOne();
         ProjectUser projectUser1 =
-                projectUserMapper.queryProjectRelation(projectUser.getProjectId(), projectUser.getUserId());
+            projectUserMapper.queryProjectRelation(projectUser.getProjectId(), projectUser.getUserId());
         Assertions.assertNotEquals(projectUser1, null);
 
     }

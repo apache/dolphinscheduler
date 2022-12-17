@@ -17,19 +17,18 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
+@RequiredArgsConstructor
 public class ProcessInstanceMapMapperTest extends BaseDaoTest {
 
-    @Autowired
-    private ProcessInstanceMapMapper processInstanceMapMapper;
+    private final ProcessInstanceMapMapper processInstanceMapMapper;
 
     /**
      * insert
@@ -102,12 +101,11 @@ public class ProcessInstanceMapMapperTest extends BaseDaoTest {
         processInstanceMap.setParentProcessInstanceId(100);
         processInstanceMapMapper.updateById(processInstanceMap);
         int delete = processInstanceMapMapper.deleteByParentProcessId(
-                processInstanceMap.getParentProcessInstanceId());
+            processInstanceMap.getParentProcessInstanceId());
         Assertions.assertEquals(1, delete);
     }
 
     /**
-     *
      * test query sub ids by process instance parentId
      */
     @Test
@@ -119,7 +117,7 @@ public class ProcessInstanceMapMapperTest extends BaseDaoTest {
         processInstanceMapMapper.updateById(processInstanceMap);
 
         List<Integer> subIds =
-                processInstanceMapMapper.querySubIdListByParentId(processInstanceMap.getParentProcessInstanceId());
+            processInstanceMapMapper.querySubIdListByParentId(processInstanceMap.getParentProcessInstanceId());
 
         Assertions.assertNotEquals(subIds.size(), 0);
 

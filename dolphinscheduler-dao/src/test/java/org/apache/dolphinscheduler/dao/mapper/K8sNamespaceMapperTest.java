@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
 
@@ -32,10 +33,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+@RequiredArgsConstructor
 public class K8sNamespaceMapperTest extends BaseDaoTest {
 
-    @Autowired
-    K8sNamespaceMapper k8sNamespaceMapper;
+    private final K8sNamespaceMapper k8sNamespaceMapper;
 
     /**
      * insert
