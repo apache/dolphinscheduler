@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.server.worker.registry;
 
 import static org.apache.dolphinscheduler.common.constants.Constants.SLEEP_TIME_MILLIS;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.NodeType;
@@ -30,47 +32,40 @@ import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.server.worker.task.WorkerHeartBeatTask;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
-
-import java.io.IOException;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 
-import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import java.io.IOException;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class WorkerRegistryClient implements AutoCloseable {
 
-    @Autowired
-    private WorkerConfig workerConfig;
+    private final WorkerConfig workerConfig;
 
-    @Autowired
-    private WorkerManagerThread workerManagerThread;
+    private final WorkerManagerThread workerManagerThread;
 
-    @Autowired
-    private RegistryClient registryClient;
+    private final RegistryClient registryClient;
 
-    @Autowired
-    private WorkerConnectStrategy workerConnectStrategy;
+    private final WorkerConnectStrategy workerConnectStrategy;
 
     private WorkerHeartBeatTask workerHeartBeatTask;
 
     @PostConstruct
     public void initWorkRegistry() {
         this.workerHeartBeatTask = new WorkerHeartBeatTask(
-                workerConfig,
-                registryClient,
-                () -> workerManagerThread.getWaitSubmitQueueSize());
+            workerConfig,
+            registryClient,
+            () -> workerManagerThread.getWaitSubmitQueueSize());
     }
 
     public void start() {
         try {
             registry();
             registryClient.addConnectionStateListener(
-                    new WorkerConnectionStateListener(workerConfig, registryClient, workerConnectStrategy));
+                new WorkerConnectionStateListener(workerConfig, registryClient, workerConnectStrategy));
         } catch (Exception ex) {
             throw new RegistryException("Worker registry client start up error", ex);
         }

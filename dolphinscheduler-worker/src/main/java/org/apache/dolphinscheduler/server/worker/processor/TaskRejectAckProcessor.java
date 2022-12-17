@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.server.worker.processor;
 
+import com.google.common.base.Preconditions;
+import io.netty.channel.Channel;
+import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -24,22 +27,17 @@ import org.apache.dolphinscheduler.remote.command.TaskRejectAckCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 import org.apache.dolphinscheduler.service.utils.LoggerUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Preconditions;
-import io.netty.channel.Channel;
-
 @Component
+@RequiredArgsConstructor
 public class TaskRejectAckProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(TaskRejectAckProcessor.class);
 
-    @Autowired
-    private MessageRetryRunner messageRetryRunner;
+    private final MessageRetryRunner messageRetryRunner;
 
     @Override
     public void process(Channel channel, Command command) {

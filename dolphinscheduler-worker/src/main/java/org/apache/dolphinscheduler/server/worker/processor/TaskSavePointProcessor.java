@@ -17,6 +17,11 @@
 
 package org.apache.dolphinscheduler.server.worker.processor;
 
+import com.google.common.base.Preconditions;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -30,22 +35,15 @@ import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecuteRunnable;
 import org.apache.dolphinscheduler.service.utils.LoggerUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.google.common.base.Preconditions;
-
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
 
 /**
  * task save point processor
  */
 @Component
+@RequiredArgsConstructor
 public class TaskSavePointProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(TaskSavePointProcessor.class);
@@ -53,8 +51,7 @@ public class TaskSavePointProcessor implements NettyRequestProcessor {
     /**
      * task execute manager
      */
-    @Autowired
-    private WorkerManagerThread workerManager;
+    private final WorkerManagerThread workerManager;
 
     /**
      * task save point process
@@ -65,9 +62,9 @@ public class TaskSavePointProcessor implements NettyRequestProcessor {
     @Override
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.TASK_SAVEPOINT_REQUEST == command.getType(),
-                String.format("invalid command type : %s", command.getType()));
+            String.format("invalid command type : %s", command.getType()));
         TaskSavePointRequestCommand taskSavePointRequestCommand =
-                JSONUtils.parseObject(command.getBody(), TaskSavePointRequestCommand.class);
+            JSONUtils.parseObject(command.getBody(), TaskSavePointRequestCommand.class);
         if (taskSavePointRequestCommand == null) {
             logger.error("task savepoint request command is null");
             return;
@@ -76,10 +73,10 @@ public class TaskSavePointProcessor implements NettyRequestProcessor {
 
         int taskInstanceId = taskSavePointRequestCommand.getTaskInstanceId();
         TaskExecutionContext taskExecutionContext =
-                TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
+            TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
         if (taskExecutionContext == null) {
             logger.error("taskRequest cache is null, taskInstanceId: {}",
-                    taskSavePointRequestCommand.getTaskInstanceId());
+                taskSavePointRequestCommand.getTaskInstanceId());
             return;
         }
 
@@ -102,10 +99,11 @@ public class TaskSavePointProcessor implements NettyRequestProcessor {
             public void operationComplete(ChannelFuture future) throws Exception {
                 if (!future.isSuccess()) {
                     logger.error("Submit kill response to master error, kill command: {}",
-                            taskSavePointResponseCommand);
-                } else
+                        taskSavePointResponseCommand);
+                } else {
                     logger.info("Submit kill response to master success, kill command: {}",
-                            taskSavePointResponseCommand);
+                        taskSavePointResponseCommand);
+                }
             }
         });
     }

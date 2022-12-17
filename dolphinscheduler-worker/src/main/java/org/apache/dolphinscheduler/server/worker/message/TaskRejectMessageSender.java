@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.message;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskRejectCommand;
@@ -24,18 +25,15 @@ import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcClient;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class TaskRejectMessageSender implements MessageSender<TaskRejectCommand> {
 
-    @Autowired
-    private WorkerRpcClient workerRpcClient;
+    private final WorkerRpcClient workerRpcClient;
 
-    @Autowired
-    private WorkerConfig workerConfig;
+    private final WorkerConfig workerConfig;
 
     @Override
     public void sendMessage(TaskRejectCommand message) throws RemotingException {
@@ -44,8 +42,8 @@ public class TaskRejectMessageSender implements MessageSender<TaskRejectCommand>
 
     public TaskRejectCommand buildMessage(TaskExecutionContext taskExecutionContext, String masterAddress) {
         TaskRejectCommand taskRejectMessage = new TaskRejectCommand(workerConfig.getWorkerAddress(),
-                masterAddress,
-                System.currentTimeMillis());
+            masterAddress,
+            System.currentTimeMillis());
         taskRejectMessage.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
         taskRejectMessage.setProcessInstanceId(taskExecutionContext.getProcessInstanceId());
         taskRejectMessage.setHost(taskExecutionContext.getHost());

@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.rpc;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
@@ -29,45 +30,35 @@ import org.apache.dolphinscheduler.server.worker.processor.TaskKillProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskRejectAckProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskSavePointProcessor;
 import org.apache.dolphinscheduler.service.log.LoggerRequestProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import java.io.Closeable;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 @Service
+@RequiredArgsConstructor
 public class WorkerRpcServer implements Closeable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WorkerRpcServer.class);
 
-    @Autowired
-    private TaskDispatchProcessor taskDispatchProcessor;
+    private final TaskDispatchProcessor taskDispatchProcessor;
 
-    @Autowired
-    private TaskKillProcessor taskKillProcessor;
+    private final TaskKillProcessor taskKillProcessor;
 
-    @Autowired
-    private TaskRejectAckProcessor taskRejectAckProcessor;
+    private final TaskRejectAckProcessor taskRejectAckProcessor;
 
-    @Autowired
-    private TaskSavePointProcessor taskSavePointProcessor;
+    private final TaskSavePointProcessor taskSavePointProcessor;
 
-    @Autowired
-    private TaskExecuteRunningAckProcessor taskExecuteRunningAckProcessor;
+    private final TaskExecuteRunningAckProcessor taskExecuteRunningAckProcessor;
 
-    @Autowired
-    private TaskExecuteResultAckProcessor taskExecuteResultAckProcessor;
+    private final TaskExecuteResultAckProcessor taskExecuteResultAckProcessor;
 
-    @Autowired
-    private HostUpdateProcessor hostUpdateProcessor;
+    private final HostUpdateProcessor hostUpdateProcessor;
 
-    @Autowired
-    private LoggerRequestProcessor loggerRequestProcessor;
+    private final LoggerRequestProcessor loggerRequestProcessor;
 
-    @Autowired
-    private WorkerConfig workerConfig;
+    private final WorkerConfig workerConfig;
 
     private NettyRemotingServer nettyRemotingServer;
 
@@ -79,7 +70,7 @@ public class WorkerRpcServer implements Closeable {
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_DISPATCH_REQUEST, taskDispatchProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_REQUEST, taskKillProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RUNNING_ACK,
-                taskExecuteRunningAckProcessor);
+            taskExecuteRunningAckProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RESULT_ACK, taskExecuteResultAckProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_REJECT_ACK, taskRejectAckProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.PROCESS_HOST_UPDATE_REQUEST, hostUpdateProcessor);

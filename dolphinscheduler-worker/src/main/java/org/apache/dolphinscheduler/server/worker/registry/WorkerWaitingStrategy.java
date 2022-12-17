@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.registry;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleException;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
@@ -27,38 +28,31 @@ import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcServer;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
-
-import java.time.Duration;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+
 @Service
 @ConditionalOnProperty(prefix = "worker.registry-disconnect-strategy", name = "strategy", havingValue = "waiting")
+@RequiredArgsConstructor
 public class WorkerWaitingStrategy implements WorkerConnectStrategy {
 
     private final Logger logger = LoggerFactory.getLogger(WorkerWaitingStrategy.class);
 
-    @Autowired
-    private WorkerConfig workerConfig;
+    private final WorkerConfig workerConfig;
 
-    @Autowired
-    private RegistryClient registryClient;
+    private final RegistryClient registryClient;
 
-    @Autowired
-    private WorkerRpcServer workerRpcServer;
+    private final WorkerRpcServer workerRpcServer;
 
-    @Autowired
-    private WorkerRpcClient workerRpcClient;
+    private final WorkerRpcClient workerRpcClient;
 
-    @Autowired
-    private MessageRetryRunner messageRetryRunner;
+    private final MessageRetryRunner messageRetryRunner;
 
-    @Autowired
-    private WorkerManagerThread workerManagerThread;
+    private final WorkerManagerThread workerManagerThread;
 
     @Override
     public void disconnect() {
@@ -68,16 +62,16 @@ public class WorkerWaitingStrategy implements WorkerConnectStrategy {
             Duration maxWaitingTime = workerConfig.getRegistryDisconnectStrategy().getMaxWaitingTime();
             try {
                 logger.info("Worker disconnect from registry will try to reconnect in {} s",
-                        maxWaitingTime.getSeconds());
+                    maxWaitingTime.getSeconds());
                 registryClient.connectUntilTimeout(maxWaitingTime);
             } catch (RegistryException ex) {
                 throw new ServerLifeCycleException(
-                        String.format("Waiting to reconnect to registry in %s failed", maxWaitingTime), ex);
+                    String.format("Waiting to reconnect to registry in %s failed", maxWaitingTime), ex);
             }
         } catch (ServerLifeCycleException e) {
             String errorMessage = String.format(
-                    "Disconnect from registry and change the current status to waiting error, the current server state is %s, will stop the current server",
-                    ServerLifeCycleManager.getServerStatus());
+                "Disconnect from registry and change the current status to waiting error, the current server state is %s, will stop the current server",
+                ServerLifeCycleManager.getServerStatus());
             logger.error(errorMessage, e);
             registryClient.getStoppable().stop(errorMessage);
         } catch (RegistryException ex) {
@@ -97,11 +91,11 @@ public class WorkerWaitingStrategy implements WorkerConnectStrategy {
             ServerLifeCycleManager.recoverFromWaiting();
             reStartWorkerResource();
             logger.info("Recover from waiting success, the current server status is {}",
-                    ServerLifeCycleManager.getServerStatus());
+                ServerLifeCycleManager.getServerStatus());
         } catch (Exception e) {
             String errorMessage =
-                    String.format("Recover from waiting failed, the current server status is %s, will stop the server",
-                            ServerLifeCycleManager.getServerStatus());
+                String.format("Recover from waiting failed, the current server status is %s, will stop the server",
+                    ServerLifeCycleManager.getServerStatus());
             logger.error(errorMessage, e);
             registryClient.getStoppable().stop(errorMessage);
         }

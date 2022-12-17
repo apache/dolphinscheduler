@@ -17,36 +17,33 @@
 
 package org.apache.dolphinscheduler.server.worker.rpc;
 
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.remote.command.BaseCommand;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 import org.apache.dolphinscheduler.server.worker.message.MessageSender;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-
-import lombok.NonNull;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Component;
-
 @Component
+@RequiredArgsConstructor
 public class WorkerMessageSender {
 
     private final Logger logger = LoggerFactory.getLogger(WorkerMessageSender.class);
 
-    @Autowired
-    private MessageRetryRunner messageRetryRunner;
+    private final MessageRetryRunner messageRetryRunner;
 
-    @Autowired
-    private ApplicationContext applicationContext;
+    private final ApplicationContext applicationContext;
 
     private Map<CommandType, MessageSender> messageSenderMap = new HashMap<>();
 
@@ -54,7 +51,7 @@ public class WorkerMessageSender {
     public void init() {
         Map<String, MessageSender> messageSenders = applicationContext.getBeansOfType(MessageSender.class);
         messageSenders.values().forEach(messageSender -> messageSenderMap.put(messageSender.getMessageType(),
-                messageSender));
+            messageSender));
     }
 
     // todo: use message rather than context
