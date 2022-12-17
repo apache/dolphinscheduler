@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.server.worker.processor;
 
+import com.google.common.base.Preconditions;
+import io.netty.channel.Channel;
+import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
@@ -24,33 +27,28 @@ import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 import org.apache.dolphinscheduler.service.utils.LoggerUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.google.common.base.Preconditions;
-import io.netty.channel.Channel;
 
 /**
  * task execute running ack, from master to worker
  */
 @Component
+@RequiredArgsConstructor
 public class TaskExecuteResultAckProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(TaskExecuteResultAckProcessor.class);
 
-    @Autowired
-    private MessageRetryRunner messageRetryRunner;
+    private final MessageRetryRunner messageRetryRunner;
 
     @Override
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.TASK_EXECUTE_RESULT_ACK == command.getType(),
-                String.format("invalid command type : %s", command.getType()));
+            String.format("invalid command type : %s", command.getType()));
 
         TaskExecuteAckCommand taskExecuteAckMessage = JSONUtils.parseObject(command.getBody(),
-                TaskExecuteAckCommand.class);
+            TaskExecuteAckCommand.class);
 
         if (taskExecuteAckMessage == null) {
             logger.error("task execute response ack command is null");
@@ -62,12 +60,12 @@ public class TaskExecuteResultAckProcessor implements NettyRequestProcessor {
             logger.info("Receive task execute response ack command : {}", taskExecuteAckMessage);
             if (taskExecuteAckMessage.isSuccess()) {
                 messageRetryRunner.removeRetryMessage(taskExecuteAckMessage.getTaskInstanceId(),
-                        CommandType.TASK_EXECUTE_RESULT);
+                    CommandType.TASK_EXECUTE_RESULT);
                 logger.debug("remove REMOTE_CHANNELS, task instance id:{}", taskExecuteAckMessage.getTaskInstanceId());
             } else {
                 // master handle worker response error, will still retry
                 logger.error("Receive task execute result ack message, the message status is not success, message: {}",
-                        taskExecuteAckMessage);
+                    taskExecuteAckMessage);
             }
         } finally {
             LoggerUtils.removeTaskInstanceIdMDC();

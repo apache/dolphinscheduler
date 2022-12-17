@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.server.worker.message;
 
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningCommand;
@@ -24,20 +26,15 @@ import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcClient;
-
-import lombok.NonNull;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class TaskExecuteRunningMessageSender implements MessageSender<TaskExecuteRunningCommand> {
 
-    @Autowired
-    private WorkerRpcClient workerRpcClient;
+    private final WorkerRpcClient workerRpcClient;
 
-    @Autowired
-    private WorkerConfig workerConfig;
+    private final WorkerConfig workerConfig;
 
     @Override
     public void sendMessage(TaskExecuteRunningCommand message) throws RemotingException {
@@ -47,9 +44,9 @@ public class TaskExecuteRunningMessageSender implements MessageSender<TaskExecut
     public TaskExecuteRunningCommand buildMessage(@NonNull TaskExecutionContext taskExecutionContext,
                                                   @NonNull String messageReceiverAddress) {
         TaskExecuteRunningCommand taskExecuteRunningMessage =
-                new TaskExecuteRunningCommand(workerConfig.getWorkerAddress(),
-                        messageReceiverAddress,
-                        System.currentTimeMillis());
+            new TaskExecuteRunningCommand(workerConfig.getWorkerAddress(),
+                messageReceiverAddress,
+                System.currentTimeMillis());
         taskExecuteRunningMessage.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
         taskExecuteRunningMessage.setProcessInstanceId(taskExecutionContext.getProcessInstanceId());
         taskExecuteRunningMessage.setStatus(taskExecutionContext.getCurrentExecutionStatus());

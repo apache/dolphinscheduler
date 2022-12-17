@@ -17,21 +17,20 @@
 
 package org.apache.dolphinscheduler.server.worker.config;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {BeanConfig.class, WorkerConfig.class})
+@RequiredArgsConstructor
 public class BeanConfigTest {
 
-    @Autowired
-    private AlertClientService alertClientService;
+    private final AlertClientService alertClientService;
 
     @Test
     public void alertClientService() {
