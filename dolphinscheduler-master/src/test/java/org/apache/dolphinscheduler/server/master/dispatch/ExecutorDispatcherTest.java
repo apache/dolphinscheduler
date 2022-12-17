@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
@@ -25,13 +26,11 @@ import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteExce
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.processor.TaskDispatchProcessor;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
@@ -39,16 +38,14 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  */
 @ExtendWith(SpringExtension.class)
 @Disabled
+@RequiredArgsConstructor
 public class ExecutorDispatcherTest {
 
-    @Autowired
-    private ExecutorDispatcher executorDispatcher;
+    private final ExecutorDispatcher executorDispatcher;
 
-    @Autowired
-    private WorkerRegistryClient workerRegistryClient;
+    private final WorkerRegistryClient workerRegistryClient;
 
-    @Autowired
-    private WorkerConfig workerConfig;
+    private final WorkerConfig workerConfig;
 
     @Test
     public void testDispatchWithException() throws ExecuteException {
@@ -65,7 +62,7 @@ public class ExecutorDispatcherTest {
         serverConfig.setListenPort(port);
         NettyRemotingServer nettyRemotingServer = new NettyRemotingServer(serverConfig);
         nettyRemotingServer.registerProcessor(CommandType.TASK_DISPATCH_REQUEST, Mockito.mock(
-                TaskDispatchProcessor.class));
+            TaskDispatchProcessor.class));
         nettyRemotingServer.start();
         //
         workerConfig.setListenPort(port);

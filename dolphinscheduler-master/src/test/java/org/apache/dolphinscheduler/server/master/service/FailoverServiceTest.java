@@ -118,7 +118,7 @@ public class FailoverServiceTest {
         given(masterConfig.getMasterAddress()).willReturn(testMasterHost);
         MasterFailoverService masterFailoverService =
                 new MasterFailoverService(registryClient, masterConfig, processService, nettyExecutorManager,
-                        processInstanceExecCacheManager, logClient, taskInstanceDao);
+                        processInstanceExecCacheManager, logClient, taskInstanceDao, processDefinitionDao);
         Field processDefinitionDaoField = masterFailoverService.getClass().getDeclaredField("processDefinitionDao");
         processDefinitionDaoField.setAccessible(true);
         ReflectionUtils.setField(processDefinitionDaoField, masterFailoverService, processDefinitionDao);

@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.rpc;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
@@ -31,54 +32,42 @@ import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProce
 import org.apache.dolphinscheduler.server.master.processor.TaskRecallProcessor;
 import org.apache.dolphinscheduler.server.master.processor.WorkflowExecutingDataRequestProcessor;
 import org.apache.dolphinscheduler.service.log.LoggerRequestProcessor;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
  * Master RPC Server, used to send/receive request to other system.
  */
 @Service
+@RequiredArgsConstructor
 public class MasterRPCServer implements AutoCloseable {
 
     private static final Logger logger = LoggerFactory.getLogger(MasterRPCServer.class);
 
     private NettyRemotingServer nettyRemotingServer;
 
-    @Autowired
-    private MasterConfig masterConfig;
+    private final MasterConfig masterConfig;
 
-    @Autowired
-    private TaskExecuteRunningProcessor taskExecuteRunningProcessor;
+    private final TaskExecuteRunningProcessor taskExecuteRunningProcessor;
 
-    @Autowired
-    private TaskExecuteResponseProcessor taskExecuteResponseProcessor;
+    private final TaskExecuteResponseProcessor taskExecuteResponseProcessor;
 
-    @Autowired
-    private TaskEventProcessor taskEventProcessor;
+    private final TaskEventProcessor taskEventProcessor;
 
-    @Autowired
-    private StateEventProcessor stateEventProcessor;
+    private final StateEventProcessor stateEventProcessor;
 
-    @Autowired
-    private CacheProcessor cacheProcessor;
+    private final CacheProcessor cacheProcessor;
 
-    @Autowired
-    private TaskKillResponseProcessor taskKillResponseProcessor;
+    private final TaskKillResponseProcessor taskKillResponseProcessor;
 
-    @Autowired
-    private TaskRecallProcessor taskRecallProcessor;
+    private final TaskRecallProcessor taskRecallProcessor;
 
-    @Autowired
-    private LoggerRequestProcessor loggerRequestProcessor;
+    private final LoggerRequestProcessor loggerRequestProcessor;
 
-    @Autowired
-    private WorkflowExecutingDataRequestProcessor workflowExecutingDataRequestProcessor;
+    private final WorkflowExecutingDataRequestProcessor workflowExecutingDataRequestProcessor;
 
-    @Autowired
-    private TaskExecuteStartProcessor taskExecuteStartProcessor;
+    private final TaskExecuteStartProcessor taskExecuteStartProcessor;
 
     public void start() {
         logger.info("Starting Master RPC Server...");
@@ -95,7 +84,7 @@ public class MasterRPCServer implements AutoCloseable {
         this.nettyRemotingServer.registerProcessor(CommandType.CACHE_EXPIRE, cacheProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_REJECT, taskRecallProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.WORKFLOW_EXECUTING_DATA_REQUEST,
-                workflowExecutingDataRequestProcessor);
+            workflowExecutingDataRequestProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_START, taskExecuteStartProcessor);
 
         // logger server
