@@ -48,13 +48,14 @@ public class SQLServerDataSourceProcessorTest {
         sqlServerDatasourceParamDTO.setHost("localhost");
         sqlServerDatasourceParamDTO.setPort(1234);
         sqlServerDatasourceParamDTO.setOther(props);
+        sqlServerDatasourceParamDTO.setMode(AzureSQLAuthMode.SQL_PASSWORD);
 
         try (MockedStatic<PasswordUtils> mockedStaticPasswordUtils = Mockito.mockStatic(PasswordUtils.class)) {
             mockedStaticPasswordUtils.when(() -> PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
             AzureSQLConnectionParam connectionParams = (AzureSQLConnectionParam) sqlServerDatasourceProcessor
                     .createConnectionParams(sqlServerDatasourceParamDTO);
             Assertions.assertEquals("jdbc:sqlserver://localhost:1234", connectionParams.getAddress());
-            Assertions.assertEquals("jdbc:sqlserver://localhost:1234;databaseName=default",
+            Assertions.assertEquals("jdbc:sqlserver://localhost:1234;databaseName=default;authentication=SqlPassword",
                     connectionParams.getJdbcUrl());
             Assertions.assertEquals("root", connectionParams.getUser());
         }
