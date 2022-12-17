@@ -574,7 +574,7 @@ The following components are provided under a MIT 2.0 license. See project link 
 The text of each license is also included at licenses/LICENSE-[project].txt.
 
     jul-to-slf4j 1.7.36: https://mvnrepository.com/artifact/org.slf4j/jul-to-slf4j/1.7.36, MIT
-    mssql-jdbc 6.1.0.jre8: https://mvnrepository.com/artifact/com.microsoft.sqlserver/mssql-jdbc/6.1.0.jre8, MIT
+    mssql-jdbc 11.2.1.jre8: https://mvnrepository.com/artifact/com.microsoft.sqlserver/mssql-jdbc/11.2.1.jre8, MIT
     ruamel.yaml 0.17: https://sourceforge.net/projects/ruamel-yaml, MIT
     slf4j-api 1.7.36: https://mvnrepository.com/artifact/org.slf4j/slf4j-api/1.7.36, MIT
     animal-sniffer-annotations 1.19 https://mvnrepository.com/artifact/org.codehaus.mojo/animal-sniffer-annotations/1.19, MIT

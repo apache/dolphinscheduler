@@ -221,7 +221,7 @@ metrics-core-4.2.11.jar
 metrics-spi-2.17.282.jar
 micrometer-core-1.9.3.jar
 micrometer-registry-prometheus-1.9.3.jar
-mssql-jdbc-6.1.0.jre8.jar
+mssql-jdbc-11.2.1.jre8.jar
 mybatis-3.5.10.jar
 mybatis-plus-3.5.2.jar
 mybatis-plus-annotation-3.5.2.jar
