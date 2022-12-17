@@ -17,15 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.azuresql;
 
-import com.google.common.base.Stopwatch;
 import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
 import org.apache.dolphinscheduler.plugin.datasource.azuresql.param.AzureSQLAuthMode;
 import org.apache.dolphinscheduler.plugin.datasource.azuresql.param.AzureSQLConnectionParam;
 import org.apache.dolphinscheduler.plugin.datasource.azuresql.param.AzureSQLDataSourceProcessor;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
 import java.sql.Connection;
@@ -33,6 +30,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Stopwatch;
 
 public class AzureSQLDataSourceClient extends CommonDataSourceClient {
 

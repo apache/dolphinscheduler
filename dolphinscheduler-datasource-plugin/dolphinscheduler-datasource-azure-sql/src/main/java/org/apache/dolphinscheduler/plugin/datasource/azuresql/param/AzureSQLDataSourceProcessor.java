@@ -60,7 +60,8 @@ public class AzureSQLDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
-        AzureSQLDataSourceParamDTO azureSQLDataSourceParamDTO = JSONUtils.parseObject(paramJson, AzureSQLDataSourceParamDTO.class);
+        AzureSQLDataSourceParamDTO azureSQLDataSourceParamDTO =
+                JSONUtils.parseObject(paramJson, AzureSQLDataSourceParamDTO.class);
         checkTrustServerCertificate(azureSQLDataSourceParamDTO);
         return azureSQLDataSourceParamDTO;
     }
@@ -269,9 +270,9 @@ public class AzureSQLDataSourceProcessor extends AbstractDataSourceProcessor {
         return otherMap;
     }
 
-    private void checkTrustServerCertificate(BaseDataSourceParamDTO paramDTO){
+    private void checkTrustServerCertificate(BaseDataSourceParamDTO paramDTO) {
         Map<String, String> other = Optional.ofNullable(paramDTO.getOther()).orElseGet(HashMap::new);
-        other.put("trustServerCertificate","true");
+        other.put("trustServerCertificate", "true");
         paramDTO.setOther(other);
     }
 }
