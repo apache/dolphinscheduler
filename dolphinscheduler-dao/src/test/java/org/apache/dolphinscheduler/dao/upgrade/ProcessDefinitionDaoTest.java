@@ -17,15 +17,16 @@
 
 package org.apache.dolphinscheduler.dao.upgrade;
 
-import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.test.context.ActiveProfiles;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
-import java.util.HashMap;
-import java.util.Map;
+import lombok.RequiredArgsConstructor;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles("h2")
 @RequiredArgsConstructor

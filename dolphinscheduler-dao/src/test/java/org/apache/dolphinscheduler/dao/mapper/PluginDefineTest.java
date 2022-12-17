@@ -17,13 +17,15 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 
 import java.util.List;
+
+import lombok.RequiredArgsConstructor;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 @RequiredArgsConstructor
 public class PluginDefineTest extends BaseDaoTest {
@@ -49,7 +51,7 @@ public class PluginDefineTest extends BaseDaoTest {
     public void testQueryByNameAndType() {
         PluginDefine pluginDefine = createPluginDefine();
         PluginDefine pluginDefineSaved =
-            pluginDefineMapper.queryByNameAndType(pluginDefine.getPluginName(), pluginDefine.getPluginType());
+                pluginDefineMapper.queryByNameAndType(pluginDefine.getPluginName(), pluginDefine.getPluginType());
         Assertions.assertNotNull(pluginDefineSaved);
         Assertions.assertEquals(pluginDefineSaved.getPluginType(), pluginDefine.getPluginType());
         Assertions.assertEquals(pluginDefineSaved.getPluginName(), pluginDefine.getPluginName());

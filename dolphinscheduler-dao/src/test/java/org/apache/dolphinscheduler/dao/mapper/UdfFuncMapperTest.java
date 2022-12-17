@@ -19,23 +19,26 @@ package org.apache.dolphinscheduler.dao.mapper;
 
 import static java.util.stream.Collectors.toList;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.common.enums.UdfType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.UDFUser;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+
+import lombok.RequiredArgsConstructor;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 @RequiredArgsConstructor
 public class UdfFuncMapperTest extends BaseDaoTest {
@@ -194,7 +197,7 @@ public class UdfFuncMapperTest extends BaseDaoTest {
         Page<UdfFunc> page = new Page(1, 3);
 
         IPage<UdfFunc> udfFuncIPage =
-            udfFuncMapper.queryUdfFuncPaging(page, Collections.singletonList(udfFunc.getId()), "");
+                udfFuncMapper.queryUdfFuncPaging(page, Collections.singletonList(udfFunc.getId()), "");
         Assertions.assertNotEquals(udfFuncIPage.getTotal(), 0);
 
     }
@@ -210,7 +213,7 @@ public class UdfFuncMapperTest extends BaseDaoTest {
         UdfFunc udfFunc = insertOne(user);
         // getUdfFuncByType
         List<UdfFunc> udfFuncList =
-            udfFuncMapper.getUdfFuncByType(Collections.singletonList(udfFunc.getId()), udfFunc.getType().ordinal());
+                udfFuncMapper.getUdfFuncByType(Collections.singletonList(udfFunc.getId()), udfFunc.getType().ordinal());
         Assertions.assertNotEquals(udfFuncList.size(), 0);
 
     }
@@ -267,13 +270,13 @@ public class UdfFuncMapperTest extends BaseDaoTest {
         Assertions.assertEquals(generalUser1.getId().intValue(), udfFunc.getUserId());
         Assertions.assertNotEquals(generalUser1.getId().intValue(), unauthorizdUdfFunc.getUserId());
         Assertions.assertFalse(authorizedUdfFunc.stream().map(t -> t.getId()).collect(toList())
-            .containsAll(Arrays.asList(udfFuncIds)));
+                .containsAll(Arrays.asList(udfFuncIds)));
 
         // authorize object unauthorizdUdfFunc to generalUser1
         insertOneUDFUser(generalUser1, unauthorizdUdfFunc);
         authorizedUdfFunc = udfFuncMapper.listAuthorizedUdfFunc(generalUser1.getId(), udfFuncIds);
         Assertions.assertTrue(authorizedUdfFunc.stream().map(t -> t.getId()).collect(toList())
-            .containsAll(Arrays.asList(udfFuncIds)));
+                .containsAll(Arrays.asList(udfFuncIds)));
     }
 
     @Test

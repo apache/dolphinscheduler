@@ -17,10 +17,14 @@
 
 package org.apache.dolphinscheduler.dao;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.ProfileType;
 import org.apache.dolphinscheduler.dao.entity.Alert;
+
+import java.util.List;
+
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,8 +35,6 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @ActiveProfiles(ProfileType.H2)
 @ExtendWith(MockitoExtension.class)
@@ -51,7 +53,7 @@ public class AlertDaoTest {
         Alert alert = new Alert();
         alert.setTitle("Mysql Exception");
         alert.setContent("[\"alarm time：2018-02-05\", \"service name：MYSQL_ALTER\", \"alarm name：MYSQL_ALTER_DUMP\", "
-            + "\"get the alarm exception.！，interface error，exception information：timed out\", \"request address：http://blog.csdn.net/dreamInTheWorld/article/details/78539286\"]");
+                + "\"get the alarm exception.！，interface error，exception information：timed out\", \"request address：http://blog.csdn.net/dreamInTheWorld/article/details/78539286\"]");
         alert.setAlertGroupId(1);
         alert.setAlertStatus(AlertStatus.WAIT_EXECUTION);
         alertDao.addAlert(alert);
@@ -75,9 +77,9 @@ public class AlertDaoTest {
         alertDao.sendServerStoppedAlert(alertGroupId, host, serverType);
         alertDao.sendServerStoppedAlert(alertGroupId, host, serverType);
         long count = alertDao.listPendingAlerts()
-            .stream()
-            .filter(alert -> alert.getContent().contains(host))
-            .count();
+                .stream()
+                .filter(alert -> alert.getContent().contains(host))
+                .count();
         Assertions.assertEquals(1L, count);
     }
 }

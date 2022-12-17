@@ -17,18 +17,21 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.Environment;
+
+import java.util.Date;
+import java.util.List;
+
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Date;
-import java.util.List;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 @RequiredArgsConstructor
 public class EnvironmentMapperTest extends BaseDaoTest {
@@ -170,19 +173,19 @@ public class EnvironmentMapperTest extends BaseDaoTest {
      */
     private String getConfig() {
         return "export HADOOP_HOME=/opt/hadoop-2.6.5\n"
-            + "export HADOOP_CONF_DIR=/etc/hadoop/conf\n"
-            + "export SPARK_HOME=/opt/soft/spark\n"
-            + "export PYTHON_HOME=/opt/soft/python\n"
-            + "export JAVA_HOME=/opt/java/jdk1.8.0_181-amd64\n"
-            + "export HIVE_HOME=/opt/soft/hive\n"
-            + "export FLINK_HOME=/opt/soft/flink\n"
-            + "export DATAX_HOME=/opt/soft/datax\n"
-            + "export YARN_CONF_DIR=\"/etc/hadoop/conf\"\n"
-            + "\n"
-            + "export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH\n"
-            + "\n"
-            + "export HADOOP_CLASSPATH=`hadoop classpath`\n"
-            + "\n"
-            + "#echo \"HADOOP_CLASSPATH=\"$HADOOP_CLASSPATH";
+                + "export HADOOP_CONF_DIR=/etc/hadoop/conf\n"
+                + "export SPARK_HOME=/opt/soft/spark\n"
+                + "export PYTHON_HOME=/opt/soft/python\n"
+                + "export JAVA_HOME=/opt/java/jdk1.8.0_181-amd64\n"
+                + "export HIVE_HOME=/opt/soft/hive\n"
+                + "export FLINK_HOME=/opt/soft/flink\n"
+                + "export DATAX_HOME=/opt/soft/datax\n"
+                + "export YARN_CONF_DIR=\"/etc/hadoop/conf\"\n"
+                + "\n"
+                + "export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH\n"
+                + "\n"
+                + "export HADOOP_CLASSPATH=`hadoop classpath`\n"
+                + "\n"
+                + "#echo \"HADOOP_CLASSPATH=\"$HADOOP_CLASSPATH";
     }
 }

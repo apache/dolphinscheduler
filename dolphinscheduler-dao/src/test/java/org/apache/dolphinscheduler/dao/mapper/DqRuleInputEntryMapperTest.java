@@ -17,15 +17,18 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.DqRule;
 import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
-import org.junit.jupiter.api.Test;
 
 import java.util.List;
+
+import lombok.RequiredArgsConstructor;
+
+import org.junit.jupiter.api.Test;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * DQC rule mapper UT.
@@ -43,12 +46,12 @@ public class DqRuleInputEntryMapperTest extends BaseDaoTest {
         Page<DqRule> page = new Page<>(1, 10);
 
         IPage<DqRule> dqRulePage =
-            dqRuleMapper.queryRuleListPaging(
-                page,
-                "",
-                -1,
-                null,
-                null);
+                dqRuleMapper.queryRuleListPaging(
+                        page,
+                        "",
+                        -1,
+                        null,
+                        null);
 
         dqRulePage.getRecords().forEach(rule -> {
             final List<DqRuleInputEntry> ruleInputEntryList = dqRuleInputEntryMapper.getRuleInputEntryList(1);

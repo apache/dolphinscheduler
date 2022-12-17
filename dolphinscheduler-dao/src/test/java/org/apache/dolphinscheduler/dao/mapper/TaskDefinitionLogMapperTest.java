@@ -17,16 +17,18 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import lombok.RequiredArgsConstructor;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 @RequiredArgsConstructor
 public class TaskDefinitionLogMapperTest extends BaseDaoTest {
@@ -63,7 +65,7 @@ public class TaskDefinitionLogMapperTest extends BaseDaoTest {
     public void testQueryMaxVersionForDefinition() {
         TaskDefinitionLog taskDefinitionLog = insertOne();
         int version = taskDefinitionLogMapper
-            .queryMaxVersionForDefinition(taskDefinitionLog.getCode());
+                .queryMaxVersionForDefinition(taskDefinitionLog.getCode());
         Assertions.assertNotEquals(version, 0);
     }
 
@@ -71,7 +73,7 @@ public class TaskDefinitionLogMapperTest extends BaseDaoTest {
     public void testQueryByDefinitionCodeAndVersion() {
         TaskDefinitionLog taskDefinitionLog = insertOne();
         TaskDefinitionLog tdl = taskDefinitionLogMapper
-            .queryByDefinitionCodeAndVersion(taskDefinitionLog.getCode(), taskDefinitionLog.getVersion());
+                .queryByDefinitionCodeAndVersion(taskDefinitionLog.getCode(), taskDefinitionLog.getVersion());
         Assertions.assertNotNull(tdl);
     }
 

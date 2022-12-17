@@ -17,14 +17,6 @@
 
 package org.apache.dolphinscheduler.dao;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.dolphinscheduler.common.enums.AlertEvent;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.AlertType;
@@ -43,10 +35,10 @@ import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertSendStatusMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -56,6 +48,18 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import lombok.RequiredArgsConstructor;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 
 @Component
 @RequiredArgsConstructor
@@ -123,10 +127,10 @@ public class AlertDao {
      */
     private String generateSign(Alert alert) {
         return Optional.of(alert)
-            .map(Alert::getContent)
-            .map(DigestUtils::sha1Hex)
-            .map(String::toLowerCase)
-            .orElse("");
+                .map(Alert::getContent)
+                .map(DigestUtils::sha1Hex)
+                .map(String::toLowerCase)
+                .orElse("");
     }
 
     /**
@@ -164,9 +168,9 @@ public class AlertDao {
      */
     public void sendServerStoppedAlert(int alertGroupId, String host, String serverType) {
         ServerAlertContent serverStopAlertContent = ServerAlertContent.newBuilder().type(serverType)
-            .host(host)
-            .event(AlertEvent.SERVER_DOWN)
-            .warningLevel(AlertWarnLevel.SERIOUS).build();
+                .host(host)
+                .event(AlertEvent.SERVER_DOWN)
+                .warningLevel(AlertWarnLevel.SERIOUS).build();
         String content = JSONUtils.toJsonString(Lists.newArrayList(serverStopAlertContent));
 
         Alert alert = new Alert();
@@ -182,7 +186,7 @@ public class AlertDao {
         // we use this method to avoid insert duplicate alert(issue #5525)
         // we modified this method to optimize performance(issue #9174)
         Date crashAlarmSuppressionStartTime = Date.from(
-            LocalDateTime.now().plusMinutes(-crashAlarmSuppression).atZone(ZoneId.systemDefault()).toInstant());
+                LocalDateTime.now().plusMinutes(-crashAlarmSuppression).atZone(ZoneId.systemDefault()).toInstant());
         alertMapper.insertAlertWhenServerCrash(alert, crashAlarmSuppressionStartTime);
     }
 
@@ -197,20 +201,20 @@ public class AlertDao {
         Alert alert = new Alert();
         List<ProcessAlertContent> processAlertContentList = new ArrayList<>(1);
         ProcessAlertContent processAlertContent = ProcessAlertContent.builder()
-            .projectCode(projectUser.getProjectCode())
-            .projectName(projectUser.getProjectName())
-            .owner(projectUser.getUserName())
-            .processId(processInstance.getId())
-            .processDefinitionCode(processInstance.getProcessDefinitionCode())
-            .processName(processInstance.getName())
-            .processType(processInstance.getCommandType())
-            .processState(processInstance.getState())
-            .runTimes(processInstance.getRunTimes())
-            .processStartTime(processInstance.getStartTime())
-            .processHost(processInstance.getHost())
-            .event(AlertEvent.TIME_OUT)
-            .warnLevel(AlertWarnLevel.MIDDLE)
-            .build();
+                .projectCode(projectUser.getProjectCode())
+                .projectName(projectUser.getProjectName())
+                .owner(projectUser.getUserName())
+                .processId(processInstance.getId())
+                .processDefinitionCode(processInstance.getProcessDefinitionCode())
+                .processName(processInstance.getName())
+                .processType(processInstance.getCommandType())
+                .processState(processInstance.getState())
+                .runTimes(processInstance.getRunTimes())
+                .processStartTime(processInstance.getStartTime())
+                .processHost(processInstance.getHost())
+                .event(AlertEvent.TIME_OUT)
+                .warnLevel(AlertWarnLevel.MIDDLE)
+                .build();
         processAlertContentList.add(processAlertContent);
         String content = JSONUtils.toJsonString(processAlertContentList);
         alert.setTitle("Process Timeout Warn");
@@ -244,20 +248,20 @@ public class AlertDao {
         Alert alert = new Alert();
         List<ProcessAlertContent> processAlertContentList = new ArrayList<>(1);
         ProcessAlertContent processAlertContent = ProcessAlertContent.builder()
-            .projectCode(projectUser.getProjectCode())
-            .projectName(projectUser.getProjectName())
-            .owner(projectUser.getUserName())
-            .processId(processInstance.getId())
-            .processDefinitionCode(processInstance.getProcessDefinitionCode())
-            .processName(processInstance.getName())
-            .taskCode(taskInstance.getTaskCode())
-            .taskName(taskInstance.getName())
-            .taskType(taskInstance.getTaskType())
-            .taskStartTime(taskInstance.getStartTime())
-            .taskHost(taskInstance.getHost())
-            .event(AlertEvent.TIME_OUT)
-            .warnLevel(AlertWarnLevel.MIDDLE)
-            .build();
+                .projectCode(projectUser.getProjectCode())
+                .projectName(projectUser.getProjectName())
+                .owner(projectUser.getUserName())
+                .processId(processInstance.getId())
+                .processDefinitionCode(processInstance.getProcessDefinitionCode())
+                .processName(processInstance.getName())
+                .taskCode(taskInstance.getTaskCode())
+                .taskName(taskInstance.getName())
+                .taskType(taskInstance.getTaskType())
+                .taskStartTime(taskInstance.getStartTime())
+                .taskHost(taskInstance.getHost())
+                .event(AlertEvent.TIME_OUT)
+                .warnLevel(AlertWarnLevel.MIDDLE)
+                .build();
         processAlertContentList.add(processAlertContent);
         String content = JSONUtils.toJsonString(processAlertContentList);
         alert.setTitle("Task Timeout Warn");
@@ -277,7 +281,7 @@ public class AlertDao {
 
     public List<Alert> listAlerts(int processInstanceId) {
         LambdaQueryWrapper<Alert> wrapper = new QueryWrapper<>(new Alert()).lambda()
-            .eq(Alert::getProcessInstanceId, processInstanceId);
+                .eq(Alert::getProcessInstanceId, processInstanceId);
         return alertMapper.selectList(wrapper);
     }
 
@@ -301,27 +305,11 @@ public class AlertDao {
         if (!Strings.isNullOrEmpty(alertInstanceIdsParam)) {
             String[] idsArray = alertInstanceIdsParam.split(",");
             List<Integer> ids = Arrays.stream(idsArray)
-                .map(s -> Integer.parseInt(s.trim()))
-                .collect(Collectors.toList());
+                    .map(s -> Integer.parseInt(s.trim()))
+                    .collect(Collectors.toList());
             return alertPluginInstanceMapper.queryByIds(ids);
         }
         return null;
-    }
-
-    public AlertPluginInstanceMapper getAlertPluginInstanceMapper() {
-        return alertPluginInstanceMapper;
-    }
-
-    public void setAlertPluginInstanceMapper(AlertPluginInstanceMapper alertPluginInstanceMapper) {
-        this.alertPluginInstanceMapper = alertPluginInstanceMapper;
-    }
-
-    public AlertGroupMapper getAlertGroupMapper() {
-        return alertGroupMapper;
-    }
-
-    public void setAlertGroupMapper(AlertGroupMapper alertGroupMapper) {
-        this.alertGroupMapper = alertGroupMapper;
     }
 
     public void setCrashAlarmSuppression(Integer crashAlarmSuppression) {

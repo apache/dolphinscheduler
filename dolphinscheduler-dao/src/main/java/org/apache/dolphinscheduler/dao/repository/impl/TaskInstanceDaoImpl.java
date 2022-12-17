@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.repository.impl;
 
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
@@ -29,13 +27,18 @@ import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceMapDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Repository;
+
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import lombok.RequiredArgsConstructor;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Repository;
 
 /**
  * Task Instance DAO implementation
@@ -78,9 +81,9 @@ public class TaskInstanceDaoImpl implements TaskInstanceDao {
         WorkflowExecutionStatus processInstanceState = processInstance.getState();
         if (processInstanceState.isFinished() || processInstanceState == WorkflowExecutionStatus.READY_STOP) {
             logger.warn("processInstance: {} state was: {}, skip submit this task, taskCode: {}",
-                processInstance.getId(),
-                processInstanceState,
-                taskInstance.getTaskCode());
+                    processInstance.getId(),
+                    processInstanceState,
+                    taskInstance.getTaskCode());
             return null;
         }
         if (processInstanceState == WorkflowExecutionStatus.READY_PAUSE) {
@@ -104,16 +107,16 @@ public class TaskInstanceDaoImpl implements TaskInstanceDao {
     private TaskExecutionStatus getSubmitTaskState(TaskInstance taskInstance, ProcessInstance processInstance) {
         TaskExecutionStatus state = taskInstance.getState();
         if (state == TaskExecutionStatus.RUNNING_EXECUTION
-            || state == TaskExecutionStatus.DELAY_EXECUTION
-            || state == TaskExecutionStatus.KILL
-            || state == TaskExecutionStatus.DISPATCH) {
+                || state == TaskExecutionStatus.DELAY_EXECUTION
+                || state == TaskExecutionStatus.KILL
+                || state == TaskExecutionStatus.DISPATCH) {
             return state;
         }
 
         if (processInstance.getState() == WorkflowExecutionStatus.READY_PAUSE) {
             state = TaskExecutionStatus.PAUSE;
         } else if (processInstance.getState() == WorkflowExecutionStatus.READY_STOP
-            || !checkProcessStrategy(taskInstance, processInstance)) {
+                || !checkProcessStrategy(taskInstance, processInstance)) {
             state = TaskExecutionStatus.KILL;
         } else {
             state = TaskExecutionStatus.SUBMITTED_SUCCESS;
@@ -127,11 +130,11 @@ public class TaskInstanceDaoImpl implements TaskInstanceDao {
             return true;
         }
         List<TaskInstance> taskInstances =
-            this.findValidTaskListByProcessId(taskInstance.getProcessInstanceId(), taskInstance.getTestFlag());
+                this.findValidTaskListByProcessId(taskInstance.getProcessInstanceId(), taskInstance.getTestFlag());
 
         for (TaskInstance task : taskInstances) {
             if (task.getState() == TaskExecutionStatus.FAILURE
-                && task.getRetryTimes() >= task.getMaxRetryTimes()) {
+                    && task.getRetryTimes() >= task.getMaxRetryTimes()) {
                 return false;
             }
         }
@@ -152,7 +155,7 @@ public class TaskInstanceDaoImpl implements TaskInstanceDao {
     public List<TaskInstance> findPreviousTaskListByWorkProcessId(Integer processInstanceId) {
         ProcessInstance processInstance = processInstanceMapper.selectById(processInstanceId);
         return taskInstanceMapper.findValidTaskListByProcessId(processInstanceId, Flag.NO,
-            processInstance.getTestFlag());
+                processInstance.getTestFlag());
     }
 
     @Override

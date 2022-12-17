@@ -17,8 +17,12 @@
 
 package org.apache.dolphinscheduler.dao.upgrade;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.dao.DaoConfiguration;
+
+import javax.sql.DataSource;
+
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,8 +30,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-
-import javax.sql.DataSource;
 
 @ActiveProfiles("h2")
 @SpringBootTest(classes = DaoConfiguration.class)

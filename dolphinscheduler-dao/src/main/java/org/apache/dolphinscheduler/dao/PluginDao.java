@@ -19,15 +19,17 @@ package org.apache.dolphinscheduler.dao;
 
 import static java.util.Objects.requireNonNull;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 import org.apache.dolphinscheduler.dao.mapper.PluginDefineMapper;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginException;
-import org.springframework.stereotype.Component;
 
 import java.util.Objects;
+
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
@@ -56,25 +58,25 @@ public class PluginDao {
         requireNonNull(pluginDefine.getPluginType(), "pluginType is null");
 
         PluginDefine currPluginDefine =
-            pluginDefineMapper.queryByNameAndType(pluginDefine.getPluginName(), pluginDefine.getPluginType());
+                pluginDefineMapper.queryByNameAndType(pluginDefine.getPluginName(), pluginDefine.getPluginType());
         if (currPluginDefine == null) {
             try {
                 if (pluginDefineMapper.insert(pluginDefine) == 1 && pluginDefine.getId() != null) {
                     return pluginDefine.getId();
                 }
                 throw new TaskPluginException(
-                    String.format("Failed to insert plugin definition, pluginName: %s, pluginType: %s",
-                        pluginDefine.getPluginName(), pluginDefine.getPluginType()));
+                        String.format("Failed to insert plugin definition, pluginName: %s, pluginType: %s",
+                                pluginDefine.getPluginName(), pluginDefine.getPluginType()));
             } catch (TaskPluginException ex) {
                 throw ex;
             } catch (Exception ex) {
                 log.error("Insert plugin definition error, there may already exist a plugin", ex);
                 currPluginDefine = pluginDefineMapper.queryByNameAndType(pluginDefine.getPluginName(),
-                    pluginDefine.getPluginType());
+                        pluginDefine.getPluginType());
                 if (currPluginDefine == null) {
                     throw new TaskPluginException(
-                        String.format("Failed to insert plugin definition, pluginName: %s, pluginType: %s",
-                            pluginDefine.getPluginName(), pluginDefine.getPluginType()));
+                            String.format("Failed to insert plugin definition, pluginName: %s, pluginType: %s",
+                                    pluginDefine.getPluginName(), pluginDefine.getPluginType()));
                 }
             }
         }

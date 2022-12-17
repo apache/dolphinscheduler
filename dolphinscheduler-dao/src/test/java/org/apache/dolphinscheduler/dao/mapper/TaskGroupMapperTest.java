@@ -17,19 +17,22 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.TaskGroup;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 @RequiredArgsConstructor
 public class TaskGroupMapperTest extends BaseDaoTest {
@@ -90,9 +93,9 @@ public class TaskGroupMapperTest extends BaseDaoTest {
         ids.add(1);
         ids.add(2);
         IPage<TaskGroup> taskGroupIPage = taskGroupMapper.queryTaskGroupPaging(
-            page,
-            ids,
-            taskGroup.getName(), taskGroup.getStatus());
+                page,
+                ids,
+                taskGroup.getName(), taskGroup.getStatus());
 
         Assertions.assertEquals(taskGroupIPage.getTotal(), 1);
     }

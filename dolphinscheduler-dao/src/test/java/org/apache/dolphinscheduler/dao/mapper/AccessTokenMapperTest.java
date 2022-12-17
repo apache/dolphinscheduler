@@ -17,16 +17,11 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.AccessToken;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,6 +29,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
+
+import lombok.RequiredArgsConstructor;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * AccessToken mapper test
@@ -183,7 +186,7 @@ public class AccessTokenMapperTest extends BaseDaoTest {
         }
 
         AccessToken resultAccessToken =
-            accessTokenMapper.selectById(accessToken.getId());
+                accessTokenMapper.selectById(accessToken.getId());
         Assertions.assertNull(resultAccessToken);
     }
 
@@ -196,7 +199,7 @@ public class AccessTokenMapperTest extends BaseDaoTest {
      * @throws Exception
      */
     private Map<Integer, AccessToken> createAccessTokens(
-        Integer count, String userName) throws Exception {
+                                                         Integer count, String userName) throws Exception {
 
         User user = createUser(userName);
 

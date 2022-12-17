@@ -17,19 +17,22 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 import java.util.List;
+
+import lombok.RequiredArgsConstructor;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 @RequiredArgsConstructor
 public class ProcessDefinitionLogMapperTest extends BaseDaoTest {
@@ -103,7 +106,7 @@ public class ProcessDefinitionLogMapperTest extends BaseDaoTest {
         userMapper.insert(user);
 
         List<ProcessDefinitionLog> processDefinitionLogs = processDefinitionLogMapper
-            .queryByDefinitionName(1L, "def 1");
+                .queryByDefinitionName(1L, "def 1");
         Assertions.assertEquals(1, processDefinitionLogs.size());
 
     }
@@ -113,7 +116,7 @@ public class ProcessDefinitionLogMapperTest extends BaseDaoTest {
         insertOne();
 
         List<ProcessDefinitionLog> processDefinitionLogs = processDefinitionLogMapper
-            .queryByDefinitionCode(1L);
+                .queryByDefinitionCode(1L);
         Assertions.assertNotEquals(0, processDefinitionLogs.size());
     }
 
@@ -122,7 +125,7 @@ public class ProcessDefinitionLogMapperTest extends BaseDaoTest {
         insertOne();
 
         ProcessDefinitionLog processDefinitionLogs = processDefinitionLogMapper
-            .queryByDefinitionCodeAndVersion(1L, 1);
+                .queryByDefinitionCodeAndVersion(1L, 1);
         Assertions.assertNotEquals(null, processDefinitionLogs);
     }
 
@@ -140,7 +143,7 @@ public class ProcessDefinitionLogMapperTest extends BaseDaoTest {
         insertOne();
         Page<ProcessDefinitionLog> page = new Page(1, 3);
         IPage<ProcessDefinitionLog> processDefinitionLogs =
-            processDefinitionLogMapper.queryProcessDefinitionVersionsPaging(page, 1L, 1L);
+                processDefinitionLogMapper.queryProcessDefinitionVersionsPaging(page, 1L, 1L);
         Assertions.assertNotEquals(processDefinitionLogs.getTotal(), 0);
     }
 
