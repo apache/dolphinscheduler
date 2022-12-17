@@ -17,19 +17,18 @@
 
 package org.apache.dolphinscheduler.tools.demo;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-
+@RequiredArgsConstructor
 public class CreateDemoTenant {
 
     private static final Logger logger = LoggerFactory.getLogger(CreateDemoTenant.class);
-    @Autowired
     private TenantMapper tenantMapper;
 
     public void createTenantCode(String tenantCode) {

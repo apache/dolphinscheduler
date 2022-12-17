@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.service.cache.impl;
 
+import io.netty.channel.Channel;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
@@ -26,18 +28,12 @@ import org.apache.dolphinscheduler.remote.processor.NettyRemoteChannel;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.cache.CacheNotifyService;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
-
-import org.apache.commons.collections4.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import io.netty.channel.Channel;
 
 /**
  * cache notify service
@@ -47,8 +43,7 @@ public class CacheNotifyServiceImpl implements CacheNotifyService {
 
     private final Logger logger = LoggerFactory.getLogger(CacheNotifyServiceImpl.class);
 
-    @Autowired
-    private RegistryClient registryClient;
+    private final RegistryClient registryClient;
 
     /**
      * remote channels
@@ -60,7 +55,8 @@ public class CacheNotifyServiceImpl implements CacheNotifyService {
      */
     private final NettyRemotingClient nettyRemotingClient;
 
-    public CacheNotifyServiceImpl() {
+    public CacheNotifyServiceImpl(RegistryClient registryClient) {
+        this.registryClient = registryClient;
         final NettyClientConfig clientConfig = new NettyClientConfig();
         this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
     }

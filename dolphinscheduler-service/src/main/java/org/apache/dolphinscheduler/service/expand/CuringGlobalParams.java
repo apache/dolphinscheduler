@@ -20,6 +20,9 @@ package org.apache.dolphinscheduler.service.expand;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_TASK_EXECUTE_PATH;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_TASK_INSTANCE_ID;
 
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.constants.DateConstants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -33,8 +36,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
-
-import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -44,16 +46,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import lombok.NonNull;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 @Component
+@RequiredArgsConstructor
 public class CuringGlobalParams implements CuringParamsService {
 
-    @Autowired
-    private TimePlaceholderResolverExpandService timePlaceholderResolverExpandService;
+    private final TimePlaceholderResolverExpandService timePlaceholderResolverExpandService;
 
     @Override
     public String convertParameterPlaceholders(String val, Map<String, String> allParamMap) {
@@ -72,6 +69,7 @@ public class CuringGlobalParams implements CuringParamsService {
 
     /**
      * here it is judged whether external expansion calculation is required and the calculation result is obtained
+     *
      * @param processInstanceId
      * @param globalParamMap
      * @param globalParamList
@@ -181,7 +179,7 @@ public class CuringGlobalParams implements CuringParamsService {
             Property property = en.getValue();
 
             if (StringUtils.isNotEmpty(property.getValue())
-                    && property.getValue().startsWith(Constants.FUNCTION_START_WITH)) {
+                && property.getValue().startsWith(Constants.FUNCTION_START_WITH)) {
                 /**
                  *  local parameter refers to global parameter with the same name
                  *  note: the global parameters of the process instance here are solidified parameters,
@@ -216,7 +214,7 @@ public class CuringGlobalParams implements CuringParamsService {
         if (globalParamsStr != null) {
             List<Property> globalParamsList = JSONUtils.toList(globalParamsStr, Property.class);
             globalParamsMap
-                    .putAll(globalParamsList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue)));
+                .putAll(globalParamsList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue)));
         }
         return globalParamsMap;
     }
