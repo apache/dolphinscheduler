@@ -234,14 +234,14 @@ public class AzureSQLDataSourceProcessor extends AbstractDataSourceProcessor {
             case SQL_PASSWORD:
             case AD_PASSWORD:
             case AD_SERVICE_PRINCIPAL:
-                return jdbcUrl + ";authentication=" + param.getMode().getDescp();
+                return String.format("%s;%s=%s", jdbcUrl, "authentication", param.getMode().getDescp());
             case AD_MSI:
                 if (StringUtils.isEmpty(param.getMSIClientId())) {
-                    return jdbcUrl + ";authentication=" + param.getMode().getDescp();
+                    return String.format("%s;%s=%s", jdbcUrl, "authentication", param.getMode().getDescp());
                 } else {
                     // write MSIClientId inside jdbc URL so no need MSIClientId in the AzureSQLConnectionParam
-                    return jdbcUrl + ";authentication=" + param.getMode().getDescp()
-                            + ";MSIClientId=" + param.getMSIClientId();
+                    return String.format("%s;%s=%s;%s=%s", jdbcUrl, "authentication", param.getMode().getDescp(),
+                            "MSIClientId", param.getMSIClientId());
                 }
             case ACCESSTOKEN:
             default:
@@ -270,6 +270,10 @@ public class AzureSQLDataSourceProcessor extends AbstractDataSourceProcessor {
         return otherMap;
     }
 
+    /**
+     * by default, add {"trustServerCertificate":true} to other to deal with SSL trust issue
+     * @param paramDTO
+     */
     private void checkTrustServerCertificate(BaseDataSourceParamDTO paramDTO) {
         Map<String, String> other = Optional.ofNullable(paramDTO.getOther()).orElseGet(HashMap::new);
         other.put("trustServerCertificate", "true");
