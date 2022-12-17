@@ -75,7 +75,7 @@ public class AzureSQLDataSourceProcessor extends AbstractDataSourceProcessor {
         AzureSQLDataSourceParamDTO azureSQLDatasourceParamDTO = new AzureSQLDataSourceParamDTO();
         azureSQLDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
         azureSQLDatasourceParamDTO.setUserName(connectionParams.getUser());
-        azureSQLDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
+        azureSQLDatasourceParamDTO.setOther(connectionParams.getOther());
         azureSQLDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
         azureSQLDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
         azureSQLDatasourceParamDTO.setMode(connectionParams.getMode());
@@ -112,12 +112,11 @@ public class AzureSQLDataSourceProcessor extends AbstractDataSourceProcessor {
         azureSQLConnectionParam.setDatabase(azureSQLParam.getDatabase());
         // deal with authentication mode
         azureSQLConnectionParam.setJdbcUrl(processAuthMode(jdbcUrl, azureSQLParam));
-        azureSQLConnectionParam.setOther(transformOther(azureSQLParam.getOther()));
+        azureSQLConnectionParam.setOther(azureSQLParam.getOther());
         azureSQLConnectionParam.setUser(azureSQLParam.getUserName());
         azureSQLConnectionParam.setPassword(PasswordUtils.encodePassword(azureSQLParam.getPassword()));
         azureSQLConnectionParam.setDriverClassName(getDatasourceDriver());
         azureSQLConnectionParam.setValidationQuery(getValidationQuery());
-        azureSQLConnectionParam.setProps(azureSQLParam.getOther());
         azureSQLConnectionParam.setMode(azureSQLParam.getMode());
 
         return azureSQLConnectionParam;
@@ -142,7 +141,7 @@ public class AzureSQLDataSourceProcessor extends AbstractDataSourceProcessor {
     public String getJdbcUrl(ConnectionParam connectionParam) {
         AzureSQLConnectionParam azureSQLConnectionParam = (AzureSQLConnectionParam) connectionParam;
 
-        if (!StringUtils.isEmpty(azureSQLConnectionParam.getOther())) {
+        if (MapUtils.isNotEmpty(azureSQLConnectionParam.getOther())) {
             return String.format("%s;%s", azureSQLConnectionParam.getJdbcUrl(), azureSQLConnectionParam.getOther());
         }
         return azureSQLConnectionParam.getJdbcUrl();
@@ -185,12 +184,11 @@ public class AzureSQLDataSourceProcessor extends AbstractDataSourceProcessor {
         azureSQLConnectionParam.setDatabase(azureSQLParam.getDatabase());
         // use jdbc url to store host
         azureSQLConnectionParam.setJdbcUrl(azureSQLParam.getHost());
-        azureSQLConnectionParam.setOther(transformOther(azureSQLParam.getOther()));
+        azureSQLConnectionParam.setOther(azureSQLParam.getOther());
         azureSQLConnectionParam.setUser(azureSQLParam.getUserName());
         azureSQLConnectionParam.setPassword(PasswordUtils.encodePassword(azureSQLParam.getPassword()));
         azureSQLConnectionParam.setDriverClassName(getDatasourceDriver());
         azureSQLConnectionParam.setValidationQuery(getValidationQuery());
-        azureSQLConnectionParam.setProps(azureSQLParam.getOther());
         azureSQLConnectionParam.setEndpoint(azureSQLParam.getEndpoint());
         return azureSQLConnectionParam;
     }
@@ -248,26 +246,6 @@ public class AzureSQLDataSourceProcessor extends AbstractDataSourceProcessor {
                 return jdbcUrl;
         }
 
-    }
-
-    private String transformOther(Map<String, String> otherMap) {
-        if (MapUtils.isEmpty(otherMap)) {
-            return null;
-        }
-        StringBuilder stringBuilder = new StringBuilder();
-        otherMap.forEach((key, value) -> stringBuilder.append(String.format("%s=%s;", key, value)));
-        return stringBuilder.toString();
-    }
-
-    private Map<String, String> parseOther(String other) {
-        if (StringUtils.isEmpty(other)) {
-            return null;
-        }
-        Map<String, String> otherMap = new LinkedHashMap<>();
-        for (String config : other.split(";")) {
-            otherMap.put(config.split("=")[0], config.split("=")[1]);
-        }
-        return otherMap;
     }
 
     /**
