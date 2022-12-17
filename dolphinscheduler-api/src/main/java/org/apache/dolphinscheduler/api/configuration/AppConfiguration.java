@@ -23,7 +23,8 @@ import org.apache.dolphinscheduler.api.interceptor.RateLimitInterceptor;
 
 import java.util.Locale;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -41,6 +42,7 @@ import org.springframework.web.servlet.i18n.CookieLocaleResolver;
  * application configuration
  */
 @Configuration
+@RequiredArgsConstructor
 public class AppConfiguration implements WebMvcConfigurer {
 
     public static final String LOGIN_INTERCEPTOR_PATH_PATTERN = "/**/*";
@@ -49,8 +51,7 @@ public class AppConfiguration implements WebMvcConfigurer {
     public static final String PATH_PATTERN = "/**";
     public static final String LOCALE_LANGUAGE_COOKIE = "language";
 
-    @Autowired
-    private TrafficConfiguration trafficConfiguration;
+    private final TrafficConfiguration trafficConfiguration;
 
     @Bean
     public CorsFilter corsFilter() {

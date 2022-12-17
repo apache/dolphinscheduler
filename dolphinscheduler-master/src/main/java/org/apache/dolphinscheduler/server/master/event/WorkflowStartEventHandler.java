@@ -27,27 +27,25 @@ import org.apache.dolphinscheduler.server.master.runner.WorkflowSubmitStatue;
 
 import java.util.concurrent.CompletableFuture;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class WorkflowStartEventHandler implements WorkflowEventHandler {
 
     private final Logger logger = LoggerFactory.getLogger(WorkflowStartEventHandler.class);
 
-    @Autowired
-    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private final ProcessInstanceExecCacheManager processInstanceExecCacheManager;
 
-    @Autowired
-    private StateWheelExecuteThread stateWheelExecuteThread;
+    private final StateWheelExecuteThread stateWheelExecuteThread;
 
-    @Autowired
-    private WorkflowExecuteThreadPool workflowExecuteThreadPool;
+    private final WorkflowExecuteThreadPool workflowExecuteThreadPool;
 
-    @Autowired
-    private WorkflowEventQueue workflowEventQueue;
+    private final WorkflowEventQueue workflowEventQueue;
 
     @Override
     public void handleWorkflowEvent(final WorkflowEvent workflowEvent) throws WorkflowEventHandleError {

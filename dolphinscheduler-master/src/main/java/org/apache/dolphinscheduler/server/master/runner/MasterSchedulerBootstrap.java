@@ -55,7 +55,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -66,57 +65,66 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
 
     private static final Logger logger = LoggerFactory.getLogger(MasterSchedulerBootstrap.class);
 
-    @Autowired
-    private ProcessService processService;
+    private final ProcessService processService;
 
-    @Autowired
-    private CommandService commandService;
+    private final CommandService commandService;
 
-    @Autowired
-    private ProcessInstanceDao processInstanceDao;
+    private final ProcessInstanceDao processInstanceDao;
 
-    @Autowired
-    private TaskInstanceDao taskInstanceDao;
+    private final TaskInstanceDao taskInstanceDao;
 
-    @Autowired
-    private TaskDefinitionLogDao taskDefinitionLogDao;
+    private final TaskDefinitionLogDao taskDefinitionLogDao;
 
-    @Autowired
-    private MasterConfig masterConfig;
+    private final MasterConfig masterConfig;
 
-    @Autowired
-    private ProcessAlertManager processAlertManager;
+    private final ProcessAlertManager processAlertManager;
 
-    @Autowired
-    private NettyExecutorManager nettyExecutorManager;
+    private final NettyExecutorManager nettyExecutorManager;
 
     /**
      * master prepare exec service
      */
     private ThreadPoolExecutor masterPrepareExecService;
 
-    @Autowired
-    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private final ProcessInstanceExecCacheManager processInstanceExecCacheManager;
 
-    @Autowired
-    private StateWheelExecuteThread stateWheelExecuteThread;
+    private final StateWheelExecuteThread stateWheelExecuteThread;
 
-    @Autowired
-    private CuringParamsService curingGlobalParamsService;
+    private final CuringParamsService curingGlobalParamsService;
 
-    @Autowired
-    private WorkflowEventQueue workflowEventQueue;
+    private final WorkflowEventQueue workflowEventQueue;
 
-    @Autowired
-    private WorkflowEventLooper workflowEventLooper;
+    private final WorkflowEventLooper workflowEventLooper;
 
-    @Autowired
-    private ServerNodeManager serverNodeManager;
+    private final ServerNodeManager serverNodeManager;
 
     private String masterAddress;
 
-    protected MasterSchedulerBootstrap() {
+    protected MasterSchedulerBootstrap(ProcessService processService, CommandService commandService,
+                                       ProcessInstanceDao processInstanceDao, TaskInstanceDao taskInstanceDao,
+                                       TaskDefinitionLogDao taskDefinitionLogDao, MasterConfig masterConfig,
+                                       ProcessAlertManager processAlertManager,
+                                       NettyExecutorManager nettyExecutorManager,
+                                       ProcessInstanceExecCacheManager processInstanceExecCacheManager,
+                                       StateWheelExecuteThread stateWheelExecuteThread,
+                                       CuringParamsService curingGlobalParamsService,
+                                       WorkflowEventQueue workflowEventQueue, WorkflowEventLooper workflowEventLooper,
+                                       ServerNodeManager serverNodeManager) {
         super("MasterCommandLoopThread");
+        this.processService = processService;
+        this.commandService = commandService;
+        this.processInstanceDao = processInstanceDao;
+        this.taskInstanceDao = taskInstanceDao;
+        this.taskDefinitionLogDao = taskDefinitionLogDao;
+        this.masterConfig = masterConfig;
+        this.processAlertManager = processAlertManager;
+        this.nettyExecutorManager = nettyExecutorManager;
+        this.processInstanceExecCacheManager = processInstanceExecCacheManager;
+        this.stateWheelExecuteThread = stateWheelExecuteThread;
+        this.curingGlobalParamsService = curingGlobalParamsService;
+        this.workflowEventQueue = workflowEventQueue;
+        this.workflowEventLooper = workflowEventLooper;
+        this.serverNodeManager = serverNodeManager;
     }
 
     /**

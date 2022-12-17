@@ -17,8 +17,10 @@
 
 package org.apache.dolphinscheduler.server.worker.config;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.service.alert.AlertClientService;
+
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

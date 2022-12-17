@@ -34,7 +34,8 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,18 +60,18 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "ACCESS_TOKEN_TAG")
 @RestController
 @RequestMapping("/access-tokens")
+@RequiredArgsConstructor
 public class AccessTokenController extends BaseController {
 
-    @Autowired
-    private AccessTokenService accessTokenService;
+    private final AccessTokenService accessTokenService;
 
     /**
      * create token
      *
-     * @param loginUser login user
-     * @param userId token for user id
+     * @param loginUser  login user
+     * @param userId     token for user id
      * @param expireTime expire time for the token
-     * @param token token string (if it is absent, it will be automatically generated)
+     * @param token      token string (if it is absent, it will be automatically generated)
      * @return create result state code
      */
     @Operation(summary = "createToken", description = "CREATE_TOKEN_NOTES")
@@ -94,8 +95,8 @@ public class AccessTokenController extends BaseController {
     /**
      * generate token string
      *
-     * @param loginUser login user
-     * @param userId token for user
+     * @param loginUser  login user
+     * @param userId     token for user
      * @param expireTime expire time
      * @return token string
      */
@@ -115,9 +116,9 @@ public class AccessTokenController extends BaseController {
      * query access token list paging
      *
      * @param loginUser login user
-     * @param pageNo page number
+     * @param pageNo    page number
      * @param searchVal search value
-     * @param pageSize page size
+     * @param pageSize  page size
      * @return token list of page number and page size
      */
     @Operation(summary = "queryAccessTokenList", description = "QUERY_ACCESS_TOKEN_LIST_NOTES")
@@ -148,7 +149,7 @@ public class AccessTokenController extends BaseController {
      * query access token for specified user
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return token list for specified user
      */
     @Operation(summary = "queryAccessTokenByUser", description = "QUERY_ACCESS_TOKEN_BY_USER_NOTES")
@@ -169,7 +170,7 @@ public class AccessTokenController extends BaseController {
      * delete access token by id
      *
      * @param loginUser login user
-     * @param id token id
+     * @param id        token id
      * @return delete result code
      */
     @Parameter(hidden = true)
@@ -186,11 +187,11 @@ public class AccessTokenController extends BaseController {
     /**
      * update token
      *
-     * @param loginUser login user
-     * @param id token id
-     * @param userId token for user
+     * @param loginUser  login user
+     * @param id         token id
+     * @param userId     token for user
      * @param expireTime token expire time
-     * @param token token string (if it is absent, it will be automatically generated)
+     * @param token      token string (if it is absent, it will be automatically generated)
      * @return updated access token entity
      */
     @Operation(summary = "updateToken", description = "UPDATE_TOKEN_NOTES")

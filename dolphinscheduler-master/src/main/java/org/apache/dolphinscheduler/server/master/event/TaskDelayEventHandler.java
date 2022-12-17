@@ -31,27 +31,25 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.Optional;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class TaskDelayEventHandler implements TaskEventHandler {
 
     private final Logger logger = LoggerFactory.getLogger(TaskDelayEventHandler.class);
 
-    @Autowired
-    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private final ProcessInstanceExecCacheManager processInstanceExecCacheManager;
 
-    @Autowired
-    private ProcessService processService;
+    private final ProcessService processService;
 
-    @Autowired
-    private TaskInstanceDao taskInstanceDao;
+    private final TaskInstanceDao taskInstanceDao;
 
-    @Autowired
-    private WorkflowExecuteThreadPool workflowExecuteThreadPool;
+    private final WorkflowExecuteThreadPool workflowExecuteThreadPool;
 
     @Override
     public void handleTaskEvent(TaskEvent taskEvent) throws TaskEventHandleError {

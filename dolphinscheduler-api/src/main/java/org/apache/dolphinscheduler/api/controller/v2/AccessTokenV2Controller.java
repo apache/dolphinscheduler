@@ -29,7 +29,8 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
@@ -49,10 +50,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "ACCESS_TOKEN_TAG")
 @RestController
 @RequestMapping("/v2/access-tokens")
+@RequiredArgsConstructor
 public class AccessTokenV2Controller extends BaseController {
 
-    @Autowired
-    private AccessTokenService accessTokenService;
+    private final AccessTokenService accessTokenService;
 
     /**
      * create token

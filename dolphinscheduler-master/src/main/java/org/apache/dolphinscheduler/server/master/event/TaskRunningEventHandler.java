@@ -30,24 +30,23 @@ import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPoo
 
 import java.util.Optional;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class TaskRunningEventHandler implements TaskEventHandler {
 
     private final Logger logger = LoggerFactory.getLogger(TaskRunningEventHandler.class);
 
-    @Autowired
-    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private final ProcessInstanceExecCacheManager processInstanceExecCacheManager;
 
-    @Autowired
-    private WorkflowExecuteThreadPool workflowExecuteThreadPool;
+    private final WorkflowExecuteThreadPool workflowExecuteThreadPool;
 
-    @Autowired
-    private TaskInstanceDao taskInstanceDao;
+    private final TaskInstanceDao taskInstanceDao;
 
     @Override
     public void handleTaskEvent(TaskEvent taskEvent) throws TaskEventHandleError {

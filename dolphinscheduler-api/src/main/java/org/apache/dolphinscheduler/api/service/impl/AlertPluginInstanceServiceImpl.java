@@ -50,9 +50,10 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -64,25 +65,23 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  */
 @Service
 @Lazy
+@RequiredArgsConstructor
 public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements AlertPluginInstanceService {
 
     private static final Logger logger = LoggerFactory.getLogger(AlertPluginInstanceServiceImpl.class);
 
-    @Autowired
-    private AlertPluginInstanceMapper alertPluginInstanceMapper;
+    private final AlertPluginInstanceMapper alertPluginInstanceMapper;
 
-    @Autowired
-    private PluginDefineMapper pluginDefineMapper;
+    private final PluginDefineMapper pluginDefineMapper;
 
-    @Autowired
-    private AlertGroupMapper alertGroupMapper;
+    private final AlertGroupMapper alertGroupMapper;
 
     /**
      * creat alert plugin instance
      *
-     * @param loginUser login user
-     * @param pluginDefineId plugin define id
-     * @param instanceName instance name
+     * @param loginUser            login user
+     * @param pluginDefineId       plugin define id
+     * @param instanceName         instance name
      * @param pluginInstanceParams plugin instance params
      */
     @Override
@@ -121,9 +120,9 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
     /**
      * update alert plugin instance
      *
-     * @param loginUser login user
-     * @param pluginInstanceId plugin instance id
-     * @param instanceName instance name
+     * @param loginUser            login user
+     * @param pluginInstanceId     plugin instance id
+     * @param instanceName         instance name
      * @param pluginInstanceParams plugin instance params
      */
     @Override
@@ -158,7 +157,7 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
      * delete alert plugin instance
      *
      * @param loginUser login user
-     * @param id id
+     * @param id        id
      * @return result
      */
     @Override
@@ -189,7 +188,7 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
      * get alert plugin instance
      *
      * @param loginUser login user
-     * @param id get id
+     * @param id        get id
      * @return alert plugin
      */
     @Override
@@ -294,7 +293,7 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
      * parse To Plugin Ui Params
      *
      * @param pluginParamsMapString k-v data
-     * @param pluginUiParams Complete parameters(include ui)
+     * @param pluginUiParams        Complete parameters(include ui)
      * @return Complete parameters list(include ui)
      */
     private String parseToPluginUiParams(String pluginParamsMapString, String pluginUiParams) {

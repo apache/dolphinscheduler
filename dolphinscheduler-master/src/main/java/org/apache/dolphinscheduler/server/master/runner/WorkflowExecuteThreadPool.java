@@ -39,10 +39,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.PostConstruct;
 
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFuture;
@@ -54,24 +54,20 @@ import com.google.common.base.Strings;
  * Used to execute {@link WorkflowExecuteRunnable}.
  */
 @Component
+@RequiredArgsConstructor
 public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
 
     private static final Logger logger = LoggerFactory.getLogger(WorkflowExecuteThreadPool.class);
 
-    @Autowired
-    private MasterConfig masterConfig;
+    private final MasterConfig masterConfig;
 
-    @Autowired
-    private ProcessService processService;
+    private final ProcessService processService;
 
-    @Autowired
-    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private final ProcessInstanceExecCacheManager processInstanceExecCacheManager;
 
-    @Autowired
-    private StateEventCallbackService stateEventCallbackService;
+    private final StateEventCallbackService stateEventCallbackService;
 
-    @Autowired
-    private StateWheelExecuteThread stateWheelExecuteThread;
+    private final StateWheelExecuteThread stateWheelExecuteThread;
 
     /**
      * multi-thread filter, avoid handling workflow at the same time

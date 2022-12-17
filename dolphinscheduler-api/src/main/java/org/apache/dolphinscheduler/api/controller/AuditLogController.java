@@ -28,7 +28,8 @@ import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.common.enums.AuditResourceType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
@@ -46,23 +47,23 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "AUDIT_LOG_TAG")
 @RestController
 @RequestMapping("projects/audit")
+@RequiredArgsConstructor
 public class AuditLogController extends BaseController {
 
-    @Autowired
-    AuditService auditService;
+    private final AuditService auditService;
 
     /**
      * query audit log list paging
      *
-     * @param loginUser         login user
-     * @param pageNo            page number
-     * @param resourceType     resource type
-     * @param operationType     operation type
-     * @param startDate         start time
-     * @param endDate           end time
-     * @param userName          user name
-     * @param pageSize          page size
-     * @return      audit log content
+     * @param loginUser     login user
+     * @param pageNo        page number
+     * @param resourceType  resource type
+     * @param operationType operation type
+     * @param startDate     start time
+     * @param endDate       end time
+     * @param userName      user name
+     * @param pageSize      page size
+     * @return audit log content
      */
     @Operation(summary = "queryAuditLogListPaging", description = "QUERY_AUDIT_LOG")
     @Parameters({

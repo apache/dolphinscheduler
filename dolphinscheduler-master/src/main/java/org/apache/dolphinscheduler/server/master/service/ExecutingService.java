@@ -32,21 +32,22 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Optional;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
  * executing service, to query executing data from memory, such workflow instance
  */
 @Component
+@RequiredArgsConstructor
 public class ExecutingService {
 
     private static final Logger logger = LoggerFactory.getLogger(WorkflowExecuteController.class);
 
-    @Autowired
-    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private final ProcessInstanceExecCacheManager processInstanceExecCacheManager;
 
     public Optional<WorkflowExecuteDto> queryWorkflowExecutingData(Integer processInstanceId) {
         WorkflowExecuteRunnable workflowExecuteRunnable =

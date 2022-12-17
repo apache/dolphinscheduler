@@ -30,32 +30,30 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 
 @Component
+@RequiredArgsConstructor
 public class TaskExecuteThreadPool extends ThreadPoolTaskExecutor {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskExecuteThreadPool.class);
 
     private final ConcurrentHashMap<String, TaskExecuteRunnable> multiThreadFilterMap = new ConcurrentHashMap<>();
 
-    @Autowired
-    private MasterConfig masterConfig;
+    private final MasterConfig masterConfig;
 
-    @Autowired
-    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private final ProcessInstanceExecCacheManager processInstanceExecCacheManager;
 
-    @Autowired
-    private List<TaskEventHandler> taskEventHandlerList;
+    private final List<TaskEventHandler> taskEventHandlerList;
 
-    @Autowired
-    private StreamTaskInstanceExecCacheManager streamTaskInstanceExecCacheManager;
+    private final StreamTaskInstanceExecCacheManager streamTaskInstanceExecCacheManager;
 
     private Map<TaskEventType, TaskEventHandler> taskEventHandlerMap = new HashMap<>();
 

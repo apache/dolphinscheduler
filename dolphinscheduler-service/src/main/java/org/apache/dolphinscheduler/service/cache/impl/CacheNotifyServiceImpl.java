@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.service.cache.impl;
 
-import io.netty.channel.Channel;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
@@ -28,12 +26,17 @@ import org.apache.dolphinscheduler.remote.processor.NettyRemoteChannel;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.cache.CacheNotifyService;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
+
+import org.apache.commons.collections4.CollectionUtils;
+
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
+import io.netty.channel.Channel;
 
 /**
  * cache notify service

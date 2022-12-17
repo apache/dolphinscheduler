@@ -28,9 +28,10 @@ import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import java.util.List;
 import java.util.Map;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -41,15 +42,14 @@ import org.springframework.context.event.EventListener;
 @ServletComponentScan
 @SpringBootApplication
 @ComponentScan("org.apache.dolphinscheduler")
+@RequiredArgsConstructor
 public class ApiApplicationServer {
 
     private final Logger logger = LoggerFactory.getLogger(ApiApplicationServer.class);
 
-    @Autowired
-    private TaskPluginManager taskPluginManager;
+    private final TaskPluginManager taskPluginManager;
 
-    @Autowired
-    private PluginDao pluginDao;
+    private final PluginDao pluginDao;
 
     public static void main(String[] args) {
         SpringApplication.run(ApiApplicationServer.class);

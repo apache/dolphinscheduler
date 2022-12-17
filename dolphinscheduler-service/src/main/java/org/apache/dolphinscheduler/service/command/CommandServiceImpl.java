@@ -21,12 +21,6 @@ import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.C
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.collect.Lists;
-import io.micrometer.core.annotation.Counted;
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
@@ -46,16 +40,26 @@ import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.service.utils.ParamUtils;
-import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import lombok.RequiredArgsConstructor;
+
+import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.collect.Lists;
+import io.micrometer.core.annotation.Counted;
 
 /**
  * Command Service implementation
@@ -92,8 +96,8 @@ public class CommandServiceImpl implements CommandService {
         Schedule schedule = scheduleMapper.queryByProcessDefinitionCode(command.getProcessDefinitionCode());
         if (schedule != null) {
             Map<String, String> commandParams =
-                StringUtils.isNotBlank(command.getCommandParam()) ? JSONUtils.toMap(command.getCommandParam())
-                    : new HashMap<>();
+                    StringUtils.isNotBlank(command.getCommandParam()) ? JSONUtils.toMap(command.getCommandParam())
+                            : new HashMap<>();
             commandParams.put(Constants.SCHEDULE_TIMEZONE, schedule.getTimezoneId());
             command.setCommandParam(JSONUtils.toJsonString(commandParams));
         }
@@ -134,7 +138,7 @@ public class CommandServiceImpl implements CommandService {
             }
             ObjectNode tempObj = JSONUtils.parseObject(tmpCommand.getCommandParam());
             if (tempObj != null
-                && processInstanceId == tempObj.path(CMD_PARAM_RECOVER_PROCESS_ID_STRING).asInt()) {
+                    && processInstanceId == tempObj.path(CMD_PARAM_RECOVER_PROCESS_ID_STRING).asInt()) {
                 isNeedCreate = false;
                 break;
             }
@@ -156,22 +160,22 @@ public class CommandServiceImpl implements CommandService {
         // process instance quit by "waiting thread" state
         if (originCommand == null) {
             Command command = new Command(
-                CommandType.RECOVER_WAITING_THREAD,
-                processInstance.getTaskDependType(),
-                processInstance.getFailureStrategy(),
-                processInstance.getExecutorId(),
-                processInstance.getProcessDefinition().getCode(),
-                JSONUtils.toJsonString(cmdParam),
-                processInstance.getWarningType(),
-                processInstance.getWarningGroupId(),
-                processInstance.getScheduleTime(),
-                processInstance.getWorkerGroup(),
-                processInstance.getEnvironmentCode(),
-                processInstance.getProcessInstancePriority(),
-                processInstance.getDryRun(),
-                processInstance.getId(),
-                processInstance.getProcessDefinitionVersion(),
-                processInstance.getTestFlag());
+                    CommandType.RECOVER_WAITING_THREAD,
+                    processInstance.getTaskDependType(),
+                    processInstance.getFailureStrategy(),
+                    processInstance.getExecutorId(),
+                    processInstance.getProcessDefinition().getCode(),
+                    JSONUtils.toJsonString(cmdParam),
+                    processInstance.getWarningType(),
+                    processInstance.getWarningGroupId(),
+                    processInstance.getScheduleTime(),
+                    processInstance.getWorkerGroup(),
+                    processInstance.getEnvironmentCode(),
+                    processInstance.getProcessInstancePriority(),
+                    processInstance.getDryRun(),
+                    processInstance.getId(),
+                    processInstance.getProcessDefinitionVersion(),
+                    processInstance.getTestFlag());
             upsertCommand(command);
             return;
         }
@@ -209,8 +213,8 @@ public class CommandServiceImpl implements CommandService {
         if (subProcessParam.containsKey(CMD_PARAM_SUB_PROCESS_DEFINE_CODE)) {
             try {
                 childDefineCode =
-                    Long.parseLong(
-                        String.valueOf(subProcessParam.get(CMD_PARAM_SUB_PROCESS_DEFINE_CODE)));
+                        Long.parseLong(
+                                String.valueOf(subProcessParam.get(CMD_PARAM_SUB_PROCESS_DEFINE_CODE)));
             } catch (NumberFormatException nfe) {
                 logger.error("processDefinitionCode is not a number", nfe);
                 return null;
@@ -232,24 +236,24 @@ public class CommandServiceImpl implements CommandService {
         }
         String processParam = ParamUtils.getSubWorkFlowParam(instanceMap, parentProcessInstance, fatherParams);
         int subProcessInstanceId =
-            childInstance == null ? 0 : (childInstance.getId() == null ? 0 : childInstance.getId());
+                childInstance == null ? 0 : (childInstance.getId() == null ? 0 : childInstance.getId());
         return new Command(
-            commandType,
-            TaskDependType.TASK_POST,
-            parentProcessInstance.getFailureStrategy(),
-            parentProcessInstance.getExecutorId(),
-            subProcessDefinition.getCode(),
-            processParam,
-            parentProcessInstance.getWarningType(),
-            parentProcessInstance.getWarningGroupId(),
-            parentProcessInstance.getScheduleTime(),
-            task.getWorkerGroup(),
-            task.getEnvironmentCode(),
-            parentProcessInstance.getProcessInstancePriority(),
-            parentProcessInstance.getDryRun(),
-            subProcessInstanceId,
-            subProcessDefinition.getVersion(),
-            parentProcessInstance.getTestFlag());
+                commandType,
+                TaskDependType.TASK_POST,
+                parentProcessInstance.getFailureStrategy(),
+                parentProcessInstance.getExecutorId(),
+                subProcessDefinition.getCode(),
+                processParam,
+                parentProcessInstance.getWarningType(),
+                parentProcessInstance.getWarningGroupId(),
+                parentProcessInstance.getScheduleTime(),
+                task.getWorkerGroup(),
+                task.getEnvironmentCode(),
+                parentProcessInstance.getProcessInstancePriority(),
+                parentProcessInstance.getDryRun(),
+                subProcessInstanceId,
+                subProcessDefinition.getVersion(),
+                parentProcessInstance.getTestFlag());
     }
 
     /**

@@ -33,29 +33,25 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class TaskResultEventHandler implements TaskEventHandler {
 
-    @Autowired
-    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private final ProcessInstanceExecCacheManager processInstanceExecCacheManager;
 
-    @Autowired
-    private WorkflowExecuteThreadPool workflowExecuteThreadPool;
+    private final WorkflowExecuteThreadPool workflowExecuteThreadPool;
 
-    @Autowired
-    private DataQualityResultOperator dataQualityResultOperator;
+    private final DataQualityResultOperator dataQualityResultOperator;
 
-    @Autowired
-    private ProcessService processService;
+    private final ProcessService processService;
 
-    @Autowired
-    private TaskInstanceDao taskInstanceDao;
+    private final TaskInstanceDao taskInstanceDao;
 
-    @Autowired
-    private MasterConfig masterConfig;
+    private final MasterConfig masterConfig;
 
     @Override
     public void handleTaskEvent(TaskEvent taskEvent) throws TaskEventHandleError, TaskEventHandleException {

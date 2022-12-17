@@ -17,11 +17,6 @@
 
 package org.apache.dolphinscheduler.server.worker.processor;
 
-import com.google.common.base.Preconditions;
-import io.micrometer.core.annotation.Counted;
-import io.micrometer.core.annotation.Timed;
-import io.netty.channel.Channel;
-import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -42,9 +37,18 @@ import org.apache.dolphinscheduler.service.storage.StorageOperate;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.apache.dolphinscheduler.service.utils.LogUtils;
 import org.apache.dolphinscheduler.service.utils.LoggerUtils;
+
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import com.google.common.base.Preconditions;
+
+import io.micrometer.core.annotation.Counted;
+import io.micrometer.core.annotation.Timed;
+import io.netty.channel.Channel;
 
 /**
  * Used to handle {@link CommandType#TASK_DISPATCH_REQUEST}
@@ -81,7 +85,7 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
     @Override
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.TASK_DISPATCH_REQUEST == command.getType(),
-            String.format("invalid command type : %s", command.getType()));
+                String.format("invalid command type : %s", command.getType()));
 
         TaskDispatchCommand taskDispatchCommand = JSONUtils.parseObject(command.getBody(), TaskDispatchCommand.class);
 
@@ -100,7 +104,7 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
         }
         try {
             LoggerUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(),
-                taskExecutionContext.getTaskInstanceId());
+                    taskExecutionContext.getTaskInstanceId());
             TaskMetrics.incrTaskTypeExecuteCount(taskExecutionContext.getTaskType());
             // set cache, it will be used when kill task
             TaskExecutionContextCacheManager.cacheTaskExecutionContext(taskExecutionContext);
@@ -109,36 +113,36 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
 
             // delay task process
             long remainTime =
-                DateUtils.getRemainTime(DateUtils.timeStampToDate(taskExecutionContext.getFirstSubmitTime()),
-                    taskExecutionContext.getDelayTime() * 60L);
+                    DateUtils.getRemainTime(DateUtils.timeStampToDate(taskExecutionContext.getFirstSubmitTime()),
+                            taskExecutionContext.getDelayTime() * 60L);
             if (remainTime > 0) {
                 logger.info("Current taskInstance is choose delay execution, delay time: {}s", remainTime);
                 taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.DELAY_EXECUTION);
                 workerMessageSender.sendMessage(taskExecutionContext, workflowMasterAddress,
-                    CommandType.TASK_EXECUTE_RESULT);
+                        CommandType.TASK_EXECUTE_RESULT);
             }
 
             WorkerDelayTaskExecuteRunnable workerTaskExecuteRunnable = WorkerTaskExecuteRunnableFactoryBuilder
-                .createWorkerDelayTaskExecuteRunnableFactory(
-                    taskExecutionContext,
-                    workerConfig,
-                    workflowMasterAddress,
-                    workerMessageSender,
-                    alertClientService,
-                    taskPluginManager,
-                    storageOperate)
-                .createWorkerTaskExecuteRunnable();
+                    .createWorkerDelayTaskExecuteRunnableFactory(
+                            taskExecutionContext,
+                            workerConfig,
+                            workflowMasterAddress,
+                            workerMessageSender,
+                            alertClientService,
+                            taskPluginManager,
+                            storageOperate)
+                    .createWorkerTaskExecuteRunnable();
             // submit task to manager
             boolean offer = workerManager.offer(workerTaskExecuteRunnable);
             if (!offer) {
                 logger.warn(
-                    "submit task to wait queue error, queue is full, current queue size is {}, will send a task reject message to master",
-                    workerManager.getWaitSubmitQueueSize());
+                        "submit task to wait queue error, queue is full, current queue size is {}, will send a task reject message to master",
+                        workerManager.getWaitSubmitQueueSize());
                 workerMessageSender.sendMessageWithRetry(taskExecutionContext, workflowMasterAddress,
-                    CommandType.TASK_REJECT);
+                        CommandType.TASK_REJECT);
             } else {
                 logger.info("Submit task to wait queue success, current queue size is {}",
-                    workerManager.getWaitSubmitQueueSize());
+                        workerManager.getWaitSubmitQueueSize());
             }
         } finally {
             LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();

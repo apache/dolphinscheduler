@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.server.worker;
 
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
@@ -36,6 +34,15 @@ import org.apache.dolphinscheduler.service.alert.AlertClientService;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.apache.dolphinscheduler.service.utils.LoggerUtils;
+
+import org.apache.commons.collections4.CollectionUtils;
+
+import java.util.Collection;
+
+import javax.annotation.PostConstruct;
+
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -44,17 +51,13 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import javax.annotation.PostConstruct;
-
-import java.util.Collection;
-
 @SpringBootApplication
 @EnableTransactionManagement
 @ComponentScan(basePackages = "org.apache.dolphinscheduler", excludeFilters = {
-    @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
-        "org.apache.dolphinscheduler.service.process.*",
-        "org.apache.dolphinscheduler.service.queue.*",
-    })
+        @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
+                "org.apache.dolphinscheduler.service.process.*",
+                "org.apache.dolphinscheduler.service.queue.*",
+        })
 })
 @RequiredArgsConstructor
 public class WorkerServer implements IStoppable {
@@ -133,10 +136,10 @@ public class WorkerServer implements IStoppable {
         ThreadUtils.sleep(Constants.SERVER_CLOSE_WAIT_TIME.toMillis());
 
         try (
-            WorkerRpcServer closedWorkerRpcServer = workerRpcServer;
-            WorkerRegistryClient closedRegistryClient = workerRegistryClient;
-            AlertClientService closedAlertClientService = alertClientService;
-            SpringApplicationContext closedSpringContext = springApplicationContext;) {
+                WorkerRpcServer closedWorkerRpcServer = workerRpcServer;
+                WorkerRegistryClient closedRegistryClient = workerRegistryClient;
+                AlertClientService closedAlertClientService = alertClientService;
+                SpringApplicationContext closedSpringContext = springApplicationContext;) {
             logger.info("Worker server is stopping, current cause : {}", cause);
             // kill running tasks
             this.killAllRunningTasks();
@@ -166,7 +169,7 @@ public class WorkerServer implements IStoppable {
             // kill task when it's not finished yet
             try {
                 LoggerUtils.setWorkflowAndTaskInstanceIDMDC(taskRequest.getProcessInstanceId(),
-                    taskRequest.getTaskInstanceId());
+                        taskRequest.getTaskInstanceId());
                 if (ProcessUtils.kill(taskRequest)) {
                     killNumber++;
                 }
@@ -175,6 +178,6 @@ public class WorkerServer implements IStoppable {
             }
         }
         logger.info("Worker after kill all cache task, task size: {}, killed number: {}", taskRequests.size(),
-            killNumber);
+                killNumber);
     }
 }

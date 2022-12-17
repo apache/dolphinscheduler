@@ -26,9 +26,10 @@ import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
 import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
@@ -38,12 +39,12 @@ import io.netty.channel.Channel;
  * task execute response processor
  */
 @Component
+@RequiredArgsConstructor
 public class TaskExecuteResponseProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(TaskExecuteResponseProcessor.class);
 
-    @Autowired
-    private TaskEventService taskEventService;
+    private final TaskEventService taskEventService;
 
     /**
      * task final result response

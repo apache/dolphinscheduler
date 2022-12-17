@@ -19,8 +19,6 @@ package org.apache.dolphinscheduler.server.worker.registry;
 
 import static org.apache.dolphinscheduler.common.constants.Constants.SLEEP_TIME_MILLIS;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.NodeType;
@@ -32,11 +30,15 @@ import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.server.worker.task.WorkerHeartBeatTask;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
-import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 
 import javax.annotation.PostConstruct;
 
-import java.io.IOException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
@@ -56,16 +58,16 @@ public class WorkerRegistryClient implements AutoCloseable {
     @PostConstruct
     public void initWorkRegistry() {
         this.workerHeartBeatTask = new WorkerHeartBeatTask(
-            workerConfig,
-            registryClient,
-            () -> workerManagerThread.getWaitSubmitQueueSize());
+                workerConfig,
+                registryClient,
+                () -> workerManagerThread.getWaitSubmitQueueSize());
     }
 
     public void start() {
         try {
             registry();
             registryClient.addConnectionStateListener(
-                new WorkerConnectionStateListener(workerConfig, registryClient, workerConnectStrategy));
+                    new WorkerConnectionStateListener(workerConfig, registryClient, workerConnectStrategy));
         } catch (Exception ex) {
             throw new RegistryException("Worker registry client start up error", ex);
         }

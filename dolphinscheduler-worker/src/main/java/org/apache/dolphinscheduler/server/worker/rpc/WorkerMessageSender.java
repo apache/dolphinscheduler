@@ -17,23 +17,25 @@
 
 package org.apache.dolphinscheduler.server.worker.rpc;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.remote.command.BaseCommand;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 import org.apache.dolphinscheduler.server.worker.message.MessageSender;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.annotation.PostConstruct;
+
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -51,7 +53,7 @@ public class WorkerMessageSender {
     public void init() {
         Map<String, MessageSender> messageSenders = applicationContext.getBeansOfType(MessageSender.class);
         messageSenders.values().forEach(messageSender -> messageSenderMap.put(messageSender.getMessageType(),
-            messageSender));
+                messageSender));
     }
 
     // todo: use message rather than context

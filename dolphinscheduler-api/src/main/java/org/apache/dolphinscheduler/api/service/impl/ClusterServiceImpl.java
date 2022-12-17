@@ -44,10 +44,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,18 +60,17 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * cluster definition service impl
  */
 @Service
+@RequiredArgsConstructor
 public class ClusterServiceImpl extends BaseServiceImpl implements ClusterService {
 
     private static final Logger logger = LoggerFactory.getLogger(ClusterServiceImpl.class);
 
-    @Autowired
-    private ClusterMapper clusterMapper;
+    private final ClusterMapper clusterMapper;
 
-    @Autowired
-    private K8sManager k8sManager;
+    private final K8sManager k8sManager;
 
-    @Autowired
-    private K8sNamespaceMapper k8sNamespaceMapper;
+    private final K8sNamespaceMapper k8sNamespaceMapper;
+
     /**
      * create cluster
      *

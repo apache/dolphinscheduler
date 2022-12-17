@@ -23,11 +23,12 @@ import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.cache.StreamTaskInstanceExecCacheManager;
 import org.apache.dolphinscheduler.service.utils.LoggerUtils;
+
+import java.util.concurrent.TimeUnit;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
-import java.util.concurrent.TimeUnit;
 
 @Service
 public class EventExecuteService extends BaseDaemonThread {
@@ -42,7 +43,10 @@ public class EventExecuteService extends BaseDaemonThread {
 
     private final StreamTaskExecuteThreadPool streamTaskExecuteThreadPool;
 
-    protected EventExecuteService(ProcessInstanceExecCacheManager processInstanceExecCacheManager, StreamTaskInstanceExecCacheManager streamTaskInstanceExecCacheManager, WorkflowExecuteThreadPool workflowExecuteThreadPool, StreamTaskExecuteThreadPool streamTaskExecuteThreadPool) {
+    protected EventExecuteService(ProcessInstanceExecCacheManager processInstanceExecCacheManager,
+                                  StreamTaskInstanceExecCacheManager streamTaskInstanceExecCacheManager,
+                                  WorkflowExecuteThreadPool workflowExecuteThreadPool,
+                                  StreamTaskExecuteThreadPool streamTaskExecuteThreadPool) {
         super("EventServiceStarted");
         this.processInstanceExecCacheManager = processInstanceExecCacheManager;
         this.streamTaskInstanceExecCacheManager = streamTaskInstanceExecCacheManager;

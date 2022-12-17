@@ -37,28 +37,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 @Service
+@RequiredArgsConstructor
 public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
 
-    @Autowired
-    private AuditLogMapper auditLogMapper;
+    private final AuditLogMapper auditLogMapper;
 
-    @Autowired
-    private AuditPublishService publishService;
+    private final AuditPublishService publishService;
 
     /**
      * add new audit log
      *
-     * @param user                  login user
-     * @param resourceType          resource type
-     * @param resourceId            resource id
-     * @param operation             operation type
+     * @param user         login user
+     * @param resourceType resource type
+     * @param resourceId   resource id
+     * @param operation    operation type
      */
     @Override
     public void addAudit(User user, AuditResourceType resourceType, Integer resourceId, AuditOperationType operation) {
@@ -68,15 +68,15 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
     /**
      * query audit log paging
      *
-     * @param loginUser         login user
-     * @param resourceType      resource type
-     * @param operationType     operation type
-     * @param startDate         start time
-     * @param endDate           end time
-     * @param userName          query user name
-     * @param pageNo            page number
-     * @param pageSize          page size
-     * @return  audit log string data
+     * @param loginUser     login user
+     * @param resourceType  resource type
+     * @param operationType operation type
+     * @param startDate     start time
+     * @param endDate       end time
+     * @param userName      query user name
+     * @param pageNo        page number
+     * @param pageSize      page size
+     * @return audit log string data
      */
     @Override
     public Result queryLogListPaging(User loginUser, AuditResourceType resourceType,

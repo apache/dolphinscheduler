@@ -17,10 +17,12 @@
 
 package org.apache.dolphinscheduler.server.worker.registry;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.registry.api.StrategyType;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
+
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -39,7 +41,7 @@ public class WorkerStopStrategy implements WorkerConnectStrategy {
     @Override
     public void disconnect() {
         registryClient.getStoppable()
-            .stop("Worker disconnected from registry, will stop myself due to the stop strategy");
+                .stop("Worker disconnected from registry, will stop myself due to the stop strategy");
     }
 
     @Override

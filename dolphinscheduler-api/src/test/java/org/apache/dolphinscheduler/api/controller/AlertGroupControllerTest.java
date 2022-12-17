@@ -32,12 +32,13 @@ import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 
 import java.util.Date;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
@@ -48,14 +49,14 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 /**
  * alert group controller test
  */
+@RequiredArgsConstructor
 public class AlertGroupControllerTest extends AbstractControllerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(AlertGroupController.class);
 
     private static final String defaultTestAlertGroupName = "cxc test group name";
 
-    @Autowired
-    AlertGroupMapper alertGroupMapper;
+    private final AlertGroupMapper alertGroupMapper;
 
     private int createEntity() {
         AlertGroup alertGroup = new AlertGroup();

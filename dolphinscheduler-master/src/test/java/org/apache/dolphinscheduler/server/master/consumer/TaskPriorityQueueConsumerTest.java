@@ -38,6 +38,8 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,27 +47,22 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @Disabled
+@RequiredArgsConstructor
 public class TaskPriorityQueueConsumerTest {
 
-    @Autowired
-    private TaskPriorityQueue<TaskPriority> taskPriorityQueue;
+    private final TaskPriorityQueue<TaskPriority> taskPriorityQueue;
 
-    @Autowired
-    private TaskPriorityQueueConsumer taskPriorityQueueConsumer;
+    private final TaskPriorityQueueConsumer taskPriorityQueueConsumer;
 
-    @Autowired
-    private ProcessService processService;
+    private final ProcessService processService;
 
-    @Autowired
-    private TaskInstanceDao taskInstanceDao;
+    private final TaskInstanceDao taskInstanceDao;
 
-    @Autowired
-    private ExecutorDispatcher dispatcher;
+    private final ExecutorDispatcher dispatcher;
 
     @BeforeEach
     public void init() {

@@ -61,13 +61,15 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PreDestroy;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class ServerNodeManager implements InitializingBean {
 
     private final Logger logger = LoggerFactory.getLogger(ServerNodeManager.class);
@@ -96,19 +98,15 @@ public class ServerNodeManager implements InitializingBean {
      */
     private ScheduledExecutorService executorService;
 
-    @Autowired
-    private RegistryClient registryClient;
+    private final RegistryClient registryClient;
 
-    @Autowired
-    private WorkerGroupMapper workerGroupMapper;
+    private final WorkerGroupMapper workerGroupMapper;
 
     private final MasterPriorityQueue masterPriorityQueue = new MasterPriorityQueue();
 
-    @Autowired
-    private AlertDao alertDao;
+    private final AlertDao alertDao;
 
-    @Autowired
-    private MasterConfig masterConfig;
+    private final MasterConfig masterConfig;
 
     private final List<WorkerInfoChangeListener> workerInfoChangeListeners = new ArrayList<>();
 

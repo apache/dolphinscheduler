@@ -21,9 +21,10 @@ import org.apache.dolphinscheduler.registry.api.StrategyType;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
@@ -32,14 +33,13 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @ConditionalOnProperty(prefix = "master.registry-disconnect-strategy", name = "strategy", havingValue = "stop", matchIfMissing = true)
+@RequiredArgsConstructor
 public class MasterStopStrategy implements MasterConnectStrategy {
 
     private final Logger logger = LoggerFactory.getLogger(MasterStopStrategy.class);
 
-    @Autowired
-    private RegistryClient registryClient;
-    @Autowired
-    private MasterConfig masterConfig;
+    private final RegistryClient registryClient;
+    private final MasterConfig masterConfig;
 
     @Override
     public void disconnect() {

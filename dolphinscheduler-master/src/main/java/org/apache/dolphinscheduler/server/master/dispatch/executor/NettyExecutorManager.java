@@ -42,7 +42,6 @@ import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -56,14 +55,11 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
     /**
      * server node manager
      */
-    @Autowired
-    private ServerNodeManager serverNodeManager;
+    private final ServerNodeManager serverNodeManager;
 
-    @Autowired
-    private TaskKillResponseProcessor taskKillResponseProcessor;
+    private final TaskKillResponseProcessor taskKillResponseProcessor;
 
-    @Autowired
-    private TaskRecallProcessor taskRecallProcessor;
+    private final TaskRecallProcessor taskRecallProcessor;
 
     /**
      * netty remote client
@@ -72,8 +68,17 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
 
     /**
      * constructor
+     *
+     * @param serverNodeManager
+     * @param taskKillResponseProcessor
+     * @param taskRecallProcessor
      */
-    public NettyExecutorManager() {
+    public NettyExecutorManager(ServerNodeManager serverNodeManager,
+                                TaskKillResponseProcessor taskKillResponseProcessor,
+                                TaskRecallProcessor taskRecallProcessor) {
+        this.serverNodeManager = serverNodeManager;
+        this.taskKillResponseProcessor = taskKillResponseProcessor;
+        this.taskRecallProcessor = taskRecallProcessor;
         final NettyClientConfig clientConfig = new NettyClientConfig();
         this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
     }
@@ -141,7 +146,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
     /**
      * execute logic
      *
-     * @param host host
+     * @param host    host
      * @param command command
      * @throws ExecuteException if error throws ExecuteException
      */

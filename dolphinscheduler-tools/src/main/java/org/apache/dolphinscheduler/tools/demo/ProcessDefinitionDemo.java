@@ -22,7 +22,6 @@ import static org.apache.dolphinscheduler.common.enums.Flag.YES;
 import static org.apache.dolphinscheduler.common.enums.Priority.MEDIUM;
 import static org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum.PARALLEL;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -37,15 +36,18 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
+
+import lombok.RequiredArgsConstructor;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
@@ -80,15 +82,15 @@ public class ProcessDefinitionDemo {
         }
         try {
             project = Project
-                .builder()
-                .name("demo")
-                .code(CodeGenerateUtils.getInstance().genCode())
-                .description("")
-                .userId(loginUser.getId())
-                .userName(loginUser.getUserName())
-                .createTime(now)
-                .updateTime(now)
-                .build();
+                    .builder()
+                    .name("demo")
+                    .code(CodeGenerateUtils.getInstance().genCode())
+                    .description("")
+                    .userId(loginUser.getId())
+                    .userName(loginUser.getUserName())
+                    .createTime(now)
+                    .updateTime(now)
+                    .build();
         } catch (CodeGenerateUtils.CodeGenerateException e) {
             logger.error("create project error", e);
         }
@@ -145,7 +147,7 @@ public class ProcessDefinitionDemo {
         LinkedHashMap<String, Object> switchProcess = (LinkedHashMap<String, Object>) switchResult.getData();
         String switchProcessCode = String.valueOf(switchProcess.get("code"));
         ProxyResult dependentResult =
-            dependentProxyResultDemo(token, projectCode, tenantCode, subProcessCode, switchProcessCode);
+                dependentProxyResultDemo(token, projectCode, tenantCode, subProcessCode, switchProcessCode);
         logger.info("create dependent demo {}", dependentResult.getMsg());
 
         // parameter context demo
@@ -216,20 +218,20 @@ public class ProcessDefinitionDemo {
         taskDefinitionLogFirst.setName("Clear log node");
         taskDefinitionLogFirst.setDescription("");
         taskDefinitionLogFirst.setTaskParams("{\"localParams\":[],\"rawScript\":\"cd cd " + absolutePath
-            + "\\r\\nfind ./logs/ -mtime +30 -name \\\"*.log\\\" -exec rm -rf {} \\\\;\",\"resourceList\":[]}");
+                + "\\r\\nfind ./logs/ -mtime +30 -name \\\"*.log\\\" -exec rm -rf {} \\\\;\",\"resourceList\":[]}");
 
         String taskDefinitionJson = JSONUtils.toJsonString(taskDefinitionLogs);
 
         ProxyResult ProxyResult = proxyProcessDefinitionController.createProcessDefinition(token, projectCode,
-            processDefinitionLog.getName(),
-            processDefinitionLog.getDescription(),
-            processDefinitionLog.getGlobalParams(),
-            processDefinitionLog.getLocations(),
-            processDefinitionLog.getTimeout(),
-            tenantCode,
-            taskRelationJson,
-            taskDefinitionJson,
-            PARALLEL);
+                processDefinitionLog.getName(),
+                processDefinitionLog.getDescription(),
+                processDefinitionLog.getGlobalParams(),
+                processDefinitionLog.getLocations(),
+                processDefinitionLog.getTimeout(),
+                tenantCode,
+                taskRelationJson,
+                taskDefinitionJson,
+                PARALLEL);
         return ProxyResult;
     }
 
@@ -296,13 +298,13 @@ public class ProcessDefinitionDemo {
         taskDefinitionLogFirst.setCode(taskCodes.get(0));
         taskDefinitionLogFirst.setName("Weekly report task");
         taskDefinitionLogFirst.setDescription(
-            "The weekly report task requires the demo_shell and demo_switch tasks to be successfully executed every day of the last week");
+                "The weekly report task requires the demo_shell and demo_switch tasks to be successfully executed every day of the last week");
         taskDefinitionLogFirst.setTaskParams(
-            "{\"localParams\":[],\"resourceList\":[],\"dependence\":{\"relation\":\"AND\",\"dependTaskList\":[{\"relation\":\"AND\",\"dependItemList\":[{\"projectCode\":"
-                + projectCode + ",\"definitionCode\":" + shellProcessCode
-                + ",\"depTaskCode\":0,\"cycle\":\"day\",\"dateValue\":\"last1Days\",\"state\":null},{\"projectCode\":"
-                + projectCode + ",\"definitionCode\":" + switchProcessCode
-                + ",\"depTaskCode\":0,\"cycle\":\"day\",\"dateValue\":\"last1Days\",\"state\":null}]}]}}");
+                "{\"localParams\":[],\"resourceList\":[],\"dependence\":{\"relation\":\"AND\",\"dependTaskList\":[{\"relation\":\"AND\",\"dependItemList\":[{\"projectCode\":"
+                        + projectCode + ",\"definitionCode\":" + shellProcessCode
+                        + ",\"depTaskCode\":0,\"cycle\":\"day\",\"dateValue\":\"last1Days\",\"state\":null},{\"projectCode\":"
+                        + projectCode + ",\"definitionCode\":" + switchProcessCode
+                        + ",\"depTaskCode\":0,\"cycle\":\"day\",\"dateValue\":\"last1Days\",\"state\":null}]}]}}");
         taskDefinitionLogFirst.setTaskType("DEPENDENT");
 
         TaskDefinitionLog taskDefinitionLogSecond = taskDefinitionLogs.get(1);
@@ -310,20 +312,20 @@ public class ProcessDefinitionDemo {
         taskDefinitionLogSecond.setName("Weekly Report Task Result");
         taskDefinitionLogSecond.setDescription("Result report after the completion of the weekly report task");
         taskDefinitionLogSecond
-            .setTaskParams("{\"localParams\":[],\"rawScript\":\"echo \\\"end of report\\\"\",\"resourceList\":[]}");
+                .setTaskParams("{\"localParams\":[],\"rawScript\":\"echo \\\"end of report\\\"\",\"resourceList\":[]}");
         taskDefinitionLogSecond.setTaskType("SHELL");
         String taskDefinitionJson = JSONUtils.toJsonString(taskDefinitionLogs);
 
         ProxyResult ProxyResult = proxyProcessDefinitionController.createProcessDefinition(token, projectCode,
-            processDefinitionLog.getName(),
-            processDefinitionLog.getDescription(),
-            processDefinitionLog.getGlobalParams(),
-            processDefinitionLog.getLocations(),
-            processDefinitionLog.getTimeout(),
-            tenantCode,
-            taskRelationJson,
-            taskDefinitionJson,
-            PARALLEL);
+                processDefinitionLog.getName(),
+                processDefinitionLog.getDescription(),
+                processDefinitionLog.getGlobalParams(),
+                processDefinitionLog.getLocations(),
+                processDefinitionLog.getTimeout(),
+                tenantCode,
+                taskRelationJson,
+                taskDefinitionJson,
+                PARALLEL);
         return ProxyResult;
     }
 
@@ -391,26 +393,26 @@ public class ProcessDefinitionDemo {
         taskDefinitionLogFirst.setName("Upstream task node");
         taskDefinitionLogFirst.setDescription("Create a local parameter and pass the assignment to the downstream");
         taskDefinitionLogFirst.setTaskParams(
-            "{\"localParams\":[{\"prop\":\"value\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"0\"},{\"prop\":\"output\",\"direct\":\"OUT\",\"type\":\"VARCHAR\",\"value\":\"\"}],\"rawScript\":\"echo \\\"====Node start====\\\"\\r\\necho '${setValue(output=1)}'\\r\\n\\r\\necho ${output}\\r\\necho ${value}\\r\\n\\r\\necho \\\"====Node end====\\\"\",\"resourceList\":[]}");
+                "{\"localParams\":[{\"prop\":\"value\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"0\"},{\"prop\":\"output\",\"direct\":\"OUT\",\"type\":\"VARCHAR\",\"value\":\"\"}],\"rawScript\":\"echo \\\"====Node start====\\\"\\r\\necho '${setValue(output=1)}'\\r\\n\\r\\necho ${output}\\r\\necho ${value}\\r\\n\\r\\necho \\\"====Node end====\\\"\",\"resourceList\":[]}");
 
         TaskDefinitionLog taskDefinitionLogSecond = taskDefinitionLogs.get(1);
         taskDefinitionLogSecond.setCode(taskCodes.get(1));
         taskDefinitionLogSecond.setName("Downstream task node");
         taskDefinitionLogSecond.setDescription("Test outputs the parameters passed by the upstream task");
         taskDefinitionLogSecond.setTaskParams(
-            "{\"localParams\":[],\"rawScript\":\"echo \\\"====node start====\\\"\\r\\n\\r\\necho ${output}\\r\\n\\r\\necho ${value}\\r\\n\\r\\necho \\\"====Node end====\\\"\",\"resourceList\":[]}");
+                "{\"localParams\":[],\"rawScript\":\"echo \\\"====node start====\\\"\\r\\n\\r\\necho ${output}\\r\\n\\r\\necho ${value}\\r\\n\\r\\necho \\\"====Node end====\\\"\",\"resourceList\":[]}");
         String taskDefinitionJson = JSONUtils.toJsonString(taskDefinitionLogs);
 
         ProxyResult ProxyResult = proxyProcessDefinitionController.createProcessDefinition(token, projectCode,
-            processDefinitionLog.getName(),
-            processDefinitionLog.getDescription(),
-            processDefinitionLog.getGlobalParams(),
-            processDefinitionLog.getLocations(),
-            processDefinitionLog.getTimeout(),
-            tenantCode,
-            taskRelationJson,
-            taskDefinitionJson,
-            PARALLEL);
+                processDefinitionLog.getName(),
+                processDefinitionLog.getDescription(),
+                processDefinitionLog.getGlobalParams(),
+                processDefinitionLog.getLocations(),
+                processDefinitionLog.getTimeout(),
+                tenantCode,
+                taskRelationJson,
+                taskDefinitionJson,
+                PARALLEL);
         return ProxyResult;
     }
 
@@ -490,8 +492,8 @@ public class ProcessDefinitionDemo {
         taskDefinitionLogFirst.setName("condition");
         taskDefinitionLogFirst.setDescription("head is the status of success, tail is the status of failure");
         taskDefinitionLogFirst.setTaskParams(
-            "{\"localParams\":[],\"resourceList\":[],\"dependence\":{\"relation\":\"AND\",\"dependTaskList\":[]},\"conditionResult\":{\"successNode\":["
-                + taskCodeThird + "],\"failedNode\":[" + taskCodeFourth + "]}}");
+                "{\"localParams\":[],\"resourceList\":[],\"dependence\":{\"relation\":\"AND\",\"dependTaskList\":[]},\"conditionResult\":{\"successNode\":["
+                        + taskCodeThird + "],\"failedNode\":[" + taskCodeFourth + "]}}");
         taskDefinitionLogFirst.setTaskType("CONDITIONS");
 
         TaskDefinitionLog taskDefinitionLogSecond = taskDefinitionLogs.get(1);
@@ -499,7 +501,7 @@ public class ProcessDefinitionDemo {
         taskDefinitionLogSecond.setName("coin");
         taskDefinitionLogSecond.setDescription("Toss a coin");
         taskDefinitionLogSecond
-            .setTaskParams("{\"localParams\":[],\"rawScript\":\"echo \\\"Start\\\"\",\"resourceList\":[]}");
+                .setTaskParams("{\"localParams\":[],\"rawScript\":\"echo \\\"Start\\\"\",\"resourceList\":[]}");
         taskDefinitionLogSecond.setTaskType("SHELL");
 
         TaskDefinitionLog taskDefinitionLogThird = taskDefinitionLogs.get(2);
@@ -507,7 +509,7 @@ public class ProcessDefinitionDemo {
         taskDefinitionLogThird.setName("head");
         taskDefinitionLogThird.setDescription("Choose to learn if the result is head");
         taskDefinitionLogThird.setTaskParams(
-            "{\"localParams\":[],\"rawScript\":\"echo \\\"Start learning\\\"\",\"resourceList\":[]}");
+                "{\"localParams\":[],\"rawScript\":\"echo \\\"Start learning\\\"\",\"resourceList\":[]}");
         taskDefinitionLogThird.setTaskType("SHELL");
 
         TaskDefinitionLog taskDefinitionLogFourth = taskDefinitionLogs.get(3);
@@ -515,20 +517,20 @@ public class ProcessDefinitionDemo {
         taskDefinitionLogFourth.setName("tail");
         taskDefinitionLogFourth.setDescription("Choose to play if the result is tail");
         taskDefinitionLogFourth
-            .setTaskParams("{\"localParams\":[],\"rawScript\":\"echo \\\"Start playing\\\"\",\"resourceList\":[]}");
+                .setTaskParams("{\"localParams\":[],\"rawScript\":\"echo \\\"Start playing\\\"\",\"resourceList\":[]}");
         taskDefinitionLogFourth.setTaskType("SHELL");
         String taskDefinitionJson = JSONUtils.toJsonString(taskDefinitionLogs);
 
         ProxyResult ProxyResult = proxyProcessDefinitionController.createProcessDefinition(token, projectCode,
-            processDefinitionLog.getName(),
-            processDefinitionLog.getDescription(),
-            processDefinitionLog.getGlobalParams(),
-            processDefinitionLog.getLocations(),
-            processDefinitionLog.getTimeout(),
-            tenantCode,
-            taskRelationJson,
-            taskDefinitionJson,
-            PARALLEL);
+                processDefinitionLog.getName(),
+                processDefinitionLog.getDescription(),
+                processDefinitionLog.getGlobalParams(),
+                processDefinitionLog.getLocations(),
+                processDefinitionLog.getTimeout(),
+                tenantCode,
+                taskRelationJson,
+                taskDefinitionJson,
+                PARALLEL);
         return ProxyResult;
     }
 
@@ -607,11 +609,11 @@ public class ProcessDefinitionDemo {
         taskDefinitionLogFirst.setCode(taskCodes.get(0));
         taskDefinitionLogFirst.setName("switch node");
         taskDefinitionLogFirst.setDescription(
-            "The global parameter is to execute TaskA for A, and for B to execute TaskB, otherwise the default task is executed");
+                "The global parameter is to execute TaskA for A, and for B to execute TaskB, otherwise the default task is executed");
         taskDefinitionLogFirst.setTaskParams(
-            "{\"localParams\":[],\"rawScript\":\"\",\"resourceList\":[],\"switchResult\":{\"dependTaskList\":[{\"condition\":\"${switchValue} == \\\"A\\\"\",\"nextNode\":"
-                + taskCodeThird + "},{\"condition\":\"${switchValue} == \\\"B\\\"\",\"nextNode\":"
-                + taskCodeFourth + "}],\"nextNode\":" + taskCodeSecond + "}}");
+                "{\"localParams\":[],\"rawScript\":\"\",\"resourceList\":[],\"switchResult\":{\"dependTaskList\":[{\"condition\":\"${switchValue} == \\\"A\\\"\",\"nextNode\":"
+                        + taskCodeThird + "},{\"condition\":\"${switchValue} == \\\"B\\\"\",\"nextNode\":"
+                        + taskCodeFourth + "}],\"nextNode\":" + taskCodeSecond + "}}");
         taskDefinitionLogFirst.setTaskType("SWITCH");
 
         TaskDefinitionLog taskDefinitionLogSecond = taskDefinitionLogs.get(1);
@@ -619,7 +621,7 @@ public class ProcessDefinitionDemo {
         taskDefinitionLogSecond.setName("default");
         taskDefinitionLogSecond.setDescription("executed default task");
         taskDefinitionLogSecond
-            .setTaskParams("{\"localParams\":[],\"rawScript\":\"echo \\\"default\\\"\",\"resourceList\":[]}");
+                .setTaskParams("{\"localParams\":[],\"rawScript\":\"echo \\\"default\\\"\",\"resourceList\":[]}");
         taskDefinitionLogSecond.setTaskType("SHELL");
 
         TaskDefinitionLog taskDefinitionLogThird = taskDefinitionLogs.get(2);
@@ -627,7 +629,7 @@ public class ProcessDefinitionDemo {
         taskDefinitionLogThird.setName("TaskA");
         taskDefinitionLogThird.setDescription("execute TaskA");
         taskDefinitionLogThird
-            .setTaskParams("{\"localParams\":[],\"rawScript\":\"echo \\\"TaskA\\\"\",\"resourceList\":[]}");
+                .setTaskParams("{\"localParams\":[],\"rawScript\":\"echo \\\"TaskA\\\"\",\"resourceList\":[]}");
         taskDefinitionLogThird.setTaskType("SHELL");
 
         TaskDefinitionLog taskDefinitionLogFourth = taskDefinitionLogs.get(3);
@@ -635,20 +637,20 @@ public class ProcessDefinitionDemo {
         taskDefinitionLogFourth.setName("TaskB");
         taskDefinitionLogFourth.setDescription("execute TaskB");
         taskDefinitionLogFourth
-            .setTaskParams("{\"localParams\":[],\"rawScript\":\"echo \\\"TaskB\\\"\",\"resourceList\":[]}");
+                .setTaskParams("{\"localParams\":[],\"rawScript\":\"echo \\\"TaskB\\\"\",\"resourceList\":[]}");
         taskDefinitionLogFourth.setTaskType("SHELL");
         String taskDefinitionJson = JSONUtils.toJsonString(taskDefinitionLogs);
 
         ProxyResult ProxyResult = proxyProcessDefinitionController.createProcessDefinition(token, projectCode,
-            processDefinitionLog.getName(),
-            processDefinitionLog.getDescription(),
-            processDefinitionLog.getGlobalParams(),
-            processDefinitionLog.getLocations(),
-            processDefinitionLog.getTimeout(),
-            tenantCode,
-            taskRelationJson,
-            taskDefinitionJson,
-            PARALLEL);
+                processDefinitionLog.getName(),
+                processDefinitionLog.getDescription(),
+                processDefinitionLog.getGlobalParams(),
+                processDefinitionLog.getLocations(),
+                processDefinitionLog.getTimeout(),
+                tenantCode,
+                taskRelationJson,
+                taskDefinitionJson,
+                PARALLEL);
         return ProxyResult;
     }
 
@@ -722,33 +724,33 @@ public class ProcessDefinitionDemo {
         taskDefinitionLogFirst.setName("001");
         taskDefinitionLogFirst.setDescription("Make production order");
         taskDefinitionLogFirst
-            .setTaskParams("{\"localParams\":[],\"rawScript\":\"echo \\\"start\\\"\",\"resourceList\":[]}");
+                .setTaskParams("{\"localParams\":[],\"rawScript\":\"echo \\\"start\\\"\",\"resourceList\":[]}");
 
         TaskDefinitionLog taskDefinitionLogSecond = taskDefinitionLogs.get(1);
         taskDefinitionLogSecond.setCode(taskCodes.get(1));
         taskDefinitionLogSecond.setName("002");
         taskDefinitionLogSecond.setDescription("Get Information Processing");
         taskDefinitionLogSecond
-            .setTaskParams("{\"localParams\":[],\"rawScript\":\"echo ${resources}\",\"resourceList\":[]}");
+                .setTaskParams("{\"localParams\":[],\"rawScript\":\"echo ${resources}\",\"resourceList\":[]}");
 
         TaskDefinitionLog taskDefinitionLogThird = taskDefinitionLogs.get(2);
         taskDefinitionLogThird.setCode(taskCodes.get(2));
         taskDefinitionLogThird.setName("003");
         taskDefinitionLogThird.setDescription("Sell after completion");
         taskDefinitionLogThird
-            .setTaskParams("{\"localParams\":[],\"rawScript\":\"echo \\\"end\\\"\",\"resourceList\":[]}");
+                .setTaskParams("{\"localParams\":[],\"rawScript\":\"echo \\\"end\\\"\",\"resourceList\":[]}");
         String taskDefinitionJson = JSONUtils.toJsonString(taskDefinitionLogs);
 
         ProxyResult ProxyResult = proxyProcessDefinitionController.createProcessDefinition(token, projectCode,
-            processDefinitionLog.getName(),
-            processDefinitionLog.getDescription(),
-            processDefinitionLog.getGlobalParams(),
-            processDefinitionLog.getLocations(),
-            processDefinitionLog.getTimeout(),
-            tenantCode,
-            taskRelationJson,
-            taskDefinitionJson,
-            PARALLEL);
+                processDefinitionLog.getName(),
+                processDefinitionLog.getDescription(),
+                processDefinitionLog.getGlobalParams(),
+                processDefinitionLog.getLocations(),
+                processDefinitionLog.getTimeout(),
+                tenantCode,
+                taskRelationJson,
+                taskDefinitionJson,
+                PARALLEL);
         return ProxyResult;
     }
 
@@ -809,20 +811,20 @@ public class ProcessDefinitionDemo {
         taskDefinitionLogFirst.setName("subprocess node");
         taskDefinitionLogFirst.setDescription("Enter the demo_shell subnode");
         taskDefinitionLogFirst.setTaskParams(
-            "{\"localParams\":[],\"resourceList\":[],\"processDefinitionCode\":" + subProcessCode + "}");
+                "{\"localParams\":[],\"resourceList\":[],\"processDefinitionCode\":" + subProcessCode + "}");
 
         String taskDefinitionJson = JSONUtils.toJsonString(taskDefinitionLogs);
 
         ProxyResult ProxyResult = proxyProcessDefinitionController.createProcessDefinition(token, projectCode,
-            processDefinitionLog.getName(),
-            processDefinitionLog.getDescription(),
-            processDefinitionLog.getGlobalParams(),
-            processDefinitionLog.getLocations(),
-            processDefinitionLog.getTimeout(),
-            tenantCode,
-            taskRelationJson,
-            taskDefinitionJson,
-            PARALLEL);
+                processDefinitionLog.getName(),
+                processDefinitionLog.getDescription(),
+                processDefinitionLog.getGlobalParams(),
+                processDefinitionLog.getLocations(),
+                processDefinitionLog.getTimeout(),
+                tenantCode,
+                taskRelationJson,
+                taskDefinitionJson,
+                PARALLEL);
         return ProxyResult;
     }
 

@@ -22,9 +22,10 @@ import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 
 import javax.annotation.PostConstruct;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFuture;
@@ -34,12 +35,12 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
  * Used to execute {@link StreamTaskExecuteRunnable}.
  */
 @Component
+@RequiredArgsConstructor
 public class StreamTaskExecuteThreadPool extends ThreadPoolTaskExecutor {
 
     private static final Logger logger = LoggerFactory.getLogger(StreamTaskExecuteThreadPool.class);
 
-    @Autowired
-    private MasterConfig masterConfig;
+    private final MasterConfig masterConfig;
 
     @PostConstruct
     private void init() {

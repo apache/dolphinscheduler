@@ -34,14 +34,16 @@ import java.util.concurrent.LinkedBlockingQueue;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import io.netty.channel.Channel;
 
 @Component
+@RequiredArgsConstructor
 public class StateEventResponseService {
 
     /**
@@ -59,11 +61,9 @@ public class StateEventResponseService {
      */
     private Thread responseWorker;
 
-    @Autowired
-    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private final ProcessInstanceExecCacheManager processInstanceExecCacheManager;
 
-    @Autowired
-    private WorkflowExecuteThreadPool workflowExecuteThreadPool;
+    private final WorkflowExecuteThreadPool workflowExecuteThreadPool;
 
     @PostConstruct
     public void start() {
