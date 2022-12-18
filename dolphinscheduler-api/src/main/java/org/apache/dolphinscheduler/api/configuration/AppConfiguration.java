@@ -17,12 +17,16 @@
 
 package org.apache.dolphinscheduler.api.configuration;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.api.interceptor.LocaleChangeInterceptor;
 import org.apache.dolphinscheduler.api.interceptor.LoginHandlerInterceptor;
 import org.apache.dolphinscheduler.api.interceptor.RateLimitInterceptor;
 import org.apache.dolphinscheduler.api.security.Authenticator;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+
+import java.util.Locale;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -35,8 +39,6 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
-
-import java.util.Locale;
 
 /**
  * application configuration
@@ -105,10 +107,10 @@ public class AppConfiguration implements WebMvcConfigurer {
             registry.addInterceptor(createRateLimitInterceptor());
         }
         registry.addInterceptor(loginInterceptor)
-            .addPathPatterns(LOGIN_INTERCEPTOR_PATH_PATTERN)
-            .excludePathPatterns(LOGIN_PATH_PATTERN, REGISTER_PATH_PATTERN,
-                "/swagger-resources/**", "/webjars/**", "/v3/api-docs/**", "/api-docs/**", "/swagger-ui.html",
-                "/doc.html", "/swagger-ui/**", "*.html", "/ui/**", "/error");
+                .addPathPatterns(LOGIN_INTERCEPTOR_PATH_PATTERN)
+                .excludePathPatterns(LOGIN_PATH_PATTERN, REGISTER_PATH_PATTERN,
+                        "/swagger-resources/**", "/webjars/**", "/v3/api-docs/**", "/api-docs/**", "/swagger-ui.html",
+                        "/doc.html", "/swagger-ui/**", "*.html", "/ui/**", "/error");
     }
 
     @Override

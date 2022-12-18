@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.executor;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -34,6 +33,9 @@ import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionConte
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
 import org.apache.dolphinscheduler.server.worker.processor.TaskDispatchProcessor;
+
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -60,8 +62,8 @@ public class NettyExecutorManagerTest {
         serverConfig.setListenPort(30000);
         NettyRemotingServer nettyRemotingServer = new NettyRemotingServer(serverConfig);
         nettyRemotingServer.registerProcessor(
-            org.apache.dolphinscheduler.remote.command.CommandType.TASK_DISPATCH_REQUEST,
-            taskDispatchProcessor);
+                org.apache.dolphinscheduler.remote.command.CommandType.TASK_DISPATCH_REQUEST,
+                taskDispatchProcessor);
         nettyRemotingServer.start();
         TaskInstance taskInstance = Mockito.mock(TaskInstance.class);
         ProcessDefinition processDefinition = Mockito.mock(ProcessDefinition.class);
@@ -69,10 +71,10 @@ public class NettyExecutorManagerTest {
         processInstance.setCommandType(CommandType.COMPLEMENT_DATA);
         taskInstance.setProcessInstance(processInstance);
         TaskExecutionContext context = TaskExecutionContextBuilder.get()
-            .buildTaskInstanceRelatedInfo(taskInstance)
-            .buildProcessInstanceRelatedInfo(processInstance)
-            .buildProcessDefinitionRelatedInfo(processDefinition)
-            .create();
+                .buildTaskInstanceRelatedInfo(taskInstance)
+                .buildProcessInstanceRelatedInfo(processInstance)
+                .buildProcessDefinitionRelatedInfo(processDefinition)
+                .create();
         ExecutionContext executionContext = new ExecutionContext(toCommand(context), ExecutorType.WORKER, taskInstance);
         executionContext.setHost(Host.of(NetUtils.getAddr(serverConfig.getListenPort())));
         Boolean execute = nettyExecutorManager.execute(executionContext);
@@ -88,10 +90,10 @@ public class NettyExecutorManagerTest {
         processInstance.setCommandType(CommandType.COMPLEMENT_DATA);
         taskInstance.setProcessInstance(processInstance);
         TaskExecutionContext context = TaskExecutionContextBuilder.get()
-            .buildTaskInstanceRelatedInfo(taskInstance)
-            .buildProcessInstanceRelatedInfo(processInstance)
-            .buildProcessDefinitionRelatedInfo(processDefinition)
-            .create();
+                .buildTaskInstanceRelatedInfo(taskInstance)
+                .buildProcessInstanceRelatedInfo(processInstance)
+                .buildProcessDefinitionRelatedInfo(processDefinition)
+                .create();
         ExecutionContext executionContext = new ExecutionContext(toCommand(context), ExecutorType.WORKER, taskInstance);
         executionContext.setHost(Host.of(NetUtils.getAddr(4444)));
         Assertions.assertThrows(ExecuteException.class, () -> {
@@ -102,9 +104,9 @@ public class NettyExecutorManagerTest {
 
     private Command toCommand(TaskExecutionContext taskExecutionContext) {
         TaskDispatchCommand requestCommand = new TaskDispatchCommand(taskExecutionContext,
-            "127.0.0.1:5678",
-            "127.0.0.1:1234",
-            System.currentTimeMillis());
+                "127.0.0.1:5678",
+                "127.0.0.1:1234",
+                System.currentTimeMillis());
         return requestCommand.convert2Command();
     }
 }

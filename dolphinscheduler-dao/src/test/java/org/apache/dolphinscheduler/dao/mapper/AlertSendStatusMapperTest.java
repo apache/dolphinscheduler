@@ -17,11 +17,13 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.AlertSendStatus;
+
+import lombok.RequiredArgsConstructor;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -17,10 +17,12 @@
 
 package org.apache.dolphinscheduler.api.security;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.security.impl.ldap.LdapAuthenticator;
 import org.apache.dolphinscheduler.api.security.impl.ldap.LdapService;
 import org.apache.dolphinscheduler.api.security.impl.pwd.PasswordAuthenticator;
+
+import org.apache.commons.lang3.StringUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;

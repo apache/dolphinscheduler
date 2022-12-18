@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.api.security.impl.pwd;
 
 import static org.mockito.Mockito.when;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.api.controller.AbstractControllerTest;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.SessionService;
@@ -27,6 +26,14 @@ import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.Session;
 import org.apache.dolphinscheduler.dao.entity.User;
+
+import java.util.Date;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
+
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,11 +43,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.test.mock.mockito.MockBean;
-
-import javax.servlet.http.HttpServletRequest;
-
-import java.util.Date;
-import java.util.UUID;
 
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class PasswordAuthenticatorTest extends AbstractControllerTest {

@@ -17,9 +17,11 @@
 
 package org.apache.dolphinscheduler.api.security;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.api.controller.AbstractControllerTest;
 import org.apache.dolphinscheduler.api.security.impl.ldap.LdapService;
+
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

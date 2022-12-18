@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.consumer;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
@@ -35,6 +34,12 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
 import org.apache.dolphinscheduler.spi.enums.DbType;
+
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,9 +49,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 @ExtendWith(SpringExtension.class)
 @Disabled
@@ -134,10 +136,10 @@ public class TaskPriorityQueueConsumerTest {
         dataSource.setType(DbType.MYSQL);
         dataSource.setUserId(2);
         dataSource.setConnectionParams("{\"address\":\"jdbc:mysql://192.168.221.185:3306\","
-            + "\"database\":\"dolphinscheduler_qiaozhanwei\","
-            + "\"jdbcUrl\":\"jdbc:mysql://192.168.221.185:3306/dolphinscheduler_qiaozhanwei\","
-            + "\"user\":\"root\","
-            + "\"password\":\"root@123\"}");
+                + "\"database\":\"dolphinscheduler_qiaozhanwei\","
+                + "\"jdbcUrl\":\"jdbc:mysql://192.168.221.185:3306/dolphinscheduler_qiaozhanwei\","
+                + "\"user\":\"root\","
+                + "\"password\":\"root@123\"}");
         dataSource.setCreateTime(new Date());
         dataSource.setUpdateTime(new Date());
 
@@ -175,10 +177,10 @@ public class TaskPriorityQueueConsumerTest {
         dataSource.setType(DbType.MYSQL);
         dataSource.setUserId(2);
         dataSource.setConnectionParams("{\"address\":\"jdbc:mysql://192.168.221.185:3306\","
-            + "\"database\":\"dolphinscheduler_qiaozhanwei\","
-            + "\"jdbcUrl\":\"jdbc:mysql://192.168.221.185:3306/dolphinscheduler_qiaozhanwei\","
-            + "\"user\":\"root\","
-            + "\"password\":\"root@123\"}");
+                + "\"database\":\"dolphinscheduler_qiaozhanwei\","
+                + "\"jdbcUrl\":\"jdbc:mysql://192.168.221.185:3306/dolphinscheduler_qiaozhanwei\","
+                + "\"user\":\"root\","
+                + "\"password\":\"root@123\"}");
         dataSource.setCreateTime(new Date());
         dataSource.setUpdateTime(new Date());
         Mockito.doReturn(dataSource).when(processService).findDataSourceById(80);
@@ -214,10 +216,10 @@ public class TaskPriorityQueueConsumerTest {
         dataSource.setType(DbType.MYSQL);
         dataSource.setUserId(2);
         dataSource.setConnectionParams("{\"address\":\"jdbc:mysql://192.168.221.185:3306\","
-            + "\"database\":\"dolphinscheduler_qiaozhanwei\","
-            + "\"jdbcUrl\":\"jdbc:mysql://192.168.221.185:3306/dolphinscheduler_qiaozhanwei\","
-            + "\"user\":\"root\","
-            + "\"password\":\"root@123\"}");
+                + "\"database\":\"dolphinscheduler_qiaozhanwei\","
+                + "\"jdbcUrl\":\"jdbc:mysql://192.168.221.185:3306/dolphinscheduler_qiaozhanwei\","
+                + "\"user\":\"root\","
+                + "\"password\":\"root@123\"}");
         dataSource.setCreateTime(new Date());
         dataSource.setUpdateTime(new Date());
         Mockito.doReturn(dataSource).when(processService).findDataSourceById(1);

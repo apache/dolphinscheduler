@@ -17,10 +17,12 @@
 
 package org.apache.dolphinscheduler.api.security.impl.ldap;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.common.enums.ProfileType;
 import org.apache.dolphinscheduler.common.enums.UserType;
+
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -35,15 +37,15 @@ import org.springframework.test.context.TestPropertySource;
 @ActiveProfiles(ProfileType.H2)
 @SpringBootTest(classes = ApiApplicationServer.class)
 @TestPropertySource(properties = {
-    "security.authentication.type=LDAP",
-    "security.authentication.ldap.user.admin=read-only-admin",
-    "security.authentication.ldap.urls=ldap://ldap.forumsys.com:389/",
-    "security.authentication.ldap.base-dn=dc=example,dc=com",
-    "security.authentication.ldap.username=cn=read-only-admin,dc=example,dc=com",
-    "security.authentication.ldap.password=password",
-    "security.authentication.ldap.user.identity-attribute=uid",
-    "security.authentication.ldap.user.email-attribute=mail",
-    "security.authentication.ldap.user.not-exist-action=CREATE",
+        "security.authentication.type=LDAP",
+        "security.authentication.ldap.user.admin=read-only-admin",
+        "security.authentication.ldap.urls=ldap://ldap.forumsys.com:389/",
+        "security.authentication.ldap.base-dn=dc=example,dc=com",
+        "security.authentication.ldap.username=cn=read-only-admin,dc=example,dc=com",
+        "security.authentication.ldap.password=password",
+        "security.authentication.ldap.user.identity-attribute=uid",
+        "security.authentication.ldap.user.email-attribute=mail",
+        "security.authentication.ldap.user.not-exist-action=CREATE",
 })
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class LdapServiceTest {
