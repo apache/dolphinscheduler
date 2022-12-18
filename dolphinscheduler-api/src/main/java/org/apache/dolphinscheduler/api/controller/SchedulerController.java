@@ -41,7 +41,8 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -66,6 +67,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "SCHEDULE_TAG")
 @RestController
 @RequestMapping("/projects/{projectCode}/schedules")
+@RequiredArgsConstructor
 public class SchedulerController extends BaseController {
 
     public static final String DEFAULT_WARNING_TYPE = "NONE";
@@ -73,8 +75,7 @@ public class SchedulerController extends BaseController {
     public static final String DEFAULT_FAILURE_POLICY = "CONTINUE";
     public static final String DEFAULT_PROCESS_INSTANCE_PRIORITY = "MEDIUM";
 
-    @Autowired
-    private SchedulerService schedulerService;
+    private final SchedulerService schedulerService;
 
     /**
      * create schedule

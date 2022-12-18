@@ -21,11 +21,12 @@ import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.common.enums.ProfileType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -45,10 +46,10 @@ import org.springframework.test.context.TestPropertySource;
         "security.authentication.ldap.user.email-attribute=mail",
         "security.authentication.ldap.user.not-exist-action=CREATE",
 })
+@RequiredArgsConstructor
 public class LdapServiceTest {
 
-    @Autowired
-    protected AutowireCapableBeanFactory beanFactory;
+    protected final AutowireCapableBeanFactory beanFactory;
 
     private LdapService ldapService;
 

@@ -74,9 +74,10 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -87,48 +88,36 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * users service impl
  */
 @Service
+@RequiredArgsConstructor
 public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
     private static final Logger logger = LoggerFactory.getLogger(UsersServiceImpl.class);
 
-    @Autowired
-    private AccessTokenMapper accessTokenMapper;
+    private final AccessTokenMapper accessTokenMapper;
 
-    @Autowired
-    private UserMapper userMapper;
+    private final UserMapper userMapper;
 
-    @Autowired
-    private TenantMapper tenantMapper;
+    private final TenantMapper tenantMapper;
 
-    @Autowired
-    private ProjectUserMapper projectUserMapper;
+    private final ProjectUserMapper projectUserMapper;
 
-    @Autowired
-    private ResourceUserMapper resourceUserMapper;
+    private final ResourceUserMapper resourceUserMapper;
 
-    @Autowired
-    private ResourceMapper resourceMapper;
+    private final ResourceMapper resourceMapper;
 
-    @Autowired
-    private DataSourceUserMapper datasourceUserMapper;
+    private final DataSourceUserMapper datasourceUserMapper;
 
-    @Autowired
-    private UDFUserMapper udfUserMapper;
+    private final UDFUserMapper udfUserMapper;
 
-    @Autowired
-    private AlertGroupMapper alertGroupMapper;
+    private final AlertGroupMapper alertGroupMapper;
 
-    @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private final ProcessDefinitionMapper processDefinitionMapper;
 
-    @Autowired
-    private ProjectMapper projectMapper;
+    private final ProjectMapper projectMapper;
 
-    @Autowired(required = false)
-    private StorageOperate storageOperate;
+    private final StorageOperate storageOperate;
 
-    @Autowired
-    private K8sNamespaceUserMapper k8sNamespaceUserMapper;
+    private final K8sNamespaceUserMapper k8sNamespaceUserMapper;
 
     /**
      * create user, only system admin have permission
@@ -535,9 +524,10 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
     /**
      * revoke the project permission for specified user by id
-     * @param loginUser     Login user
-     * @param userId        User id
-     * @param projectIds   project id array
+     *
+     * @param loginUser  Login user
+     * @param userId     User id
+     * @param projectIds project id array
      * @return
      */
     @Override
@@ -580,8 +570,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     /**
      * grant project with read permission
      *
-     * @param loginUser login user
-     * @param userId user id
+     * @param loginUser  login user
+     * @param userId     user id
      * @param projectIds project id array
      * @return grant result code
      */

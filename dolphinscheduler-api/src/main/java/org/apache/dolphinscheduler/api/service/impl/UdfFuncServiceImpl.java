@@ -41,9 +41,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,21 +55,18 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * udf func service impl
  */
 @Service
+@RequiredArgsConstructor
 public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncService {
 
     private static final Logger logger = LoggerFactory.getLogger(UdfFuncServiceImpl.class);
 
-    @Autowired
-    private ResourceMapper resourceMapper;
+    private final ResourceMapper resourceMapper;
 
-    @Autowired
-    private UdfFuncMapper udfFuncMapper;
+    private final UdfFuncMapper udfFuncMapper;
 
-    @Autowired
-    private UDFUserMapper udfUserMapper;
+    private final UDFUserMapper udfUserMapper;
 
-    @Autowired(required = false)
-    private StorageOperate storageOperate;
+    private final StorageOperate storageOperate;
 
     /**
      * create udf function

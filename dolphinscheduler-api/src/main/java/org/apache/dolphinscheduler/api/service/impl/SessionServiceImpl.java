@@ -34,9 +34,10 @@ import java.util.UUID;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.WebUtils;
@@ -45,12 +46,12 @@ import org.springframework.web.util.WebUtils;
  * session service implement
  */
 @Service
+@RequiredArgsConstructor
 public class SessionServiceImpl extends BaseServiceImpl implements SessionService {
 
     private static final Logger logger = LoggerFactory.getLogger(SessionService.class);
 
-    @Autowired
-    private SessionMapper sessionMapper;
+    private final SessionMapper sessionMapper;
 
     /**
      * get user session from request
@@ -84,7 +85,7 @@ public class SessionServiceImpl extends BaseServiceImpl implements SessionServic
      * create session
      *
      * @param user user
-     * @param ip ip
+     * @param ip   ip
      * @return session string
      */
     @Override
@@ -142,7 +143,7 @@ public class SessionServiceImpl extends BaseServiceImpl implements SessionServic
      * sign out
      * remove ip restrictions
      *
-     * @param ip no use
+     * @param ip        no use
      * @param loginUser login user
      */
     @Override

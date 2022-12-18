@@ -34,7 +34,8 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -56,10 +57,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "ENVIRONMENT_TAG")
 @RestController
 @RequestMapping("environment")
+@RequiredArgsConstructor
 public class EnvironmentController extends BaseController {
 
-    @Autowired
-    private EnvironmentService environmentService;
+    private final EnvironmentService environmentService;
 
     /**
      * create environment

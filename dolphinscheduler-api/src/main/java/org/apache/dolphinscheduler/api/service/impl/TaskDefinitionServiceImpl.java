@@ -82,9 +82,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -96,47 +97,38 @@ import com.google.common.collect.Lists;
  * task definition service impl
  */
 @Service
+@RequiredArgsConstructor
 public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDefinitionService {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskDefinitionServiceImpl.class);
 
     private static final String RELEASESTATE = "releaseState";
 
-    @Autowired
-    private ProjectMapper projectMapper;
+    private final ProjectMapper projectMapper;
 
-    @Autowired
-    private ProjectService projectService;
+    private final ProjectService projectService;
 
-    @Autowired
-    private TaskDefinitionMapper taskDefinitionMapper;
+    private final TaskDefinitionMapper taskDefinitionMapper;
 
-    @Autowired
-    private TaskDefinitionLogMapper taskDefinitionLogMapper;
+    private final TaskDefinitionLogMapper taskDefinitionLogMapper;
 
-    @Autowired
-    private ProcessTaskRelationMapper processTaskRelationMapper;
+    private final ProcessTaskRelationMapper processTaskRelationMapper;
 
-    @Autowired
-    private ProcessTaskRelationService processTaskRelationService;
+    private final ProcessTaskRelationService processTaskRelationService;
 
-    @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private final ProcessDefinitionMapper processDefinitionMapper;
 
-    @Autowired
-    private ProcessService processService;
+    private final ProcessService processService;
 
-    @Autowired
-    private TaskPluginManager taskPluginManager;
+    private final TaskPluginManager taskPluginManager;
 
-    @Autowired
-    private ProcessDefinitionService processDefinitionService;
+    private final ProcessDefinitionService processDefinitionService;
 
     /**
      * create task definition
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser          login user
+     * @param projectCode        project code
      * @param taskDefinitionJson task definition json
      */
     @Transactional
@@ -231,7 +223,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     /**
      * Create resource task definition
      *
-     * @param loginUser login user
+     * @param loginUser         login user
      * @param taskCreateRequest task definition json
      * @return new TaskDefinition have created
      */
@@ -275,11 +267,11 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     /**
      * create single task definition that binds the workflow
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser             login user
+     * @param projectCode           project code
      * @param processDefinitionCode process definition code
      * @param taskDefinitionJsonObj task definition json object
-     * @param upstreamCodes upstream task codes, sep comma
+     * @param upstreamCodes         upstream task codes, sep comma
      * @return create result code
      */
     @Transactional
@@ -379,10 +371,11 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                     processDefinition.getCode(), processDefinition.getVersion());
             putMsg(result, Status.CREATE_PROCESS_TASK_RELATION_ERROR);
             throw new ServiceException(Status.CREATE_PROCESS_TASK_RELATION_ERROR);
-        } else
+        } else {
             logger.info(
                     "Save new version process task relations complete, processDefinitionCode:{}, processDefinitionVersion:{}.",
                     processDefinition.getCode(), processDefinition.getVersion());
+        }
 
         int saveTaskResult =
                 processService.saveTaskDefine(loginUser, projectCode, Lists.newArrayList(taskDefinition), Boolean.TRUE);
@@ -391,9 +384,10 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                     taskDefinition.getCode());
             putMsg(result, Status.CREATE_TASK_DEFINITION_ERROR);
             throw new ServiceException(Status.CREATE_TASK_DEFINITION_ERROR);
-        } else
+        } else {
             logger.info("Save task definition complete, projectCode:{}, taskDefinitionCode:{}.", projectCode,
                     taskDefinition.getCode());
+        }
         putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, taskDefinition);
         return result;
@@ -402,10 +396,10 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     /**
      * query task definition
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
      * @param processCode process code
-     * @param taskName task name
+     * @param taskName    task name
      */
     @Override
     public Map<String, Object> queryTaskDefinitionByName(User loginUser, long projectCode, long processCode,
@@ -463,12 +457,12 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
 
     /**
      * Delete resource task definition by code
-     *
+     * <p>
      * Only task release state offline and no downstream tasks can be deleted, will also remove the exists
      * task relation [upstreamTaskCode, taskCode]
      *
      * @param loginUser login user
-     * @param taskCode task code
+     * @param taskCode  task code
      */
     @Transactional
     @Override
@@ -513,10 +507,11 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             logger.error("Update process definition error, projectCode:{}, processDefinitionCode:{}.",
                     processDefinition.getProjectCode(), processDefinitionCode);
             throw new ServiceException(Status.UPDATE_PROCESS_DEFINITION_ERROR);
-        } else
+        } else {
             logger.info(
                     "Save new version process definition complete, projectCode:{}, processDefinitionCode:{}, newVersion:{}.",
                     processDefinition.getProjectCode(), processDefinitionCode, insertVersion);
+        }
         List<ProcessTaskRelationLog> relationLogs =
                 processTaskRelationList.stream().map(ProcessTaskRelationLog::new).collect(Collectors.toList());
         int insertResult = processService.saveTaskRelation(loginUser, processDefinition.getProjectCode(),
@@ -536,9 +531,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     /**
      * update task definition
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param taskCode task code
+     * @param loginUser             login user
+     * @param projectCode           project code
+     * @param taskCode              task code
      * @param taskDefinitionJsonObj task definition json object
      */
     @Transactional
@@ -594,8 +589,8 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     /**
      * update task definition
      *
-     * @param loginUser login user
-     * @param taskCode task code
+     * @param loginUser         login user
+     * @param taskCode          task code
      * @param taskUpdateRequest task definition json object
      * @return new TaskDefinition have updated
      */
@@ -646,7 +641,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
      * Get resource task definition by code
      *
      * @param loginUser login user
-     * @param taskCode task code
+     * @param taskCode  task code
      * @return TaskDefinition
      */
     @Override
@@ -664,7 +659,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     /**
      * Get resource task definition according to query parameter
      *
-     * @param loginUser login user
+     * @param loginUser         login user
      * @param taskFilterRequest taskFilterRequest object you want to filter the resource task definitions
      * @return TaskDefinitions of page
      */
@@ -768,10 +763,11 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                     projectCode, taskCode);
             putMsg(result, Status.UPDATE_TASK_DEFINITION_ERROR);
             throw new ServiceException(Status.UPDATE_TASK_DEFINITION_ERROR);
-        } else
+        } else {
             logger.info(
                     "Update task definition and definitionLog complete, projectCode:{}, taskDefinitionCode:{}, newTaskVersion:{}.",
                     projectCode, taskCode, taskDefinitionToUpdate.getVersion());
+        }
         // update process task relation
         List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper
                 .queryByTaskCode(taskDefinitionToUpdate.getCode());
@@ -797,11 +793,11 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     /**
      * update task definition and upstream
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param taskCode task definition code
+     * @param loginUser             login user
+     * @param projectCode           project code
+     * @param taskCode              task definition code
      * @param taskDefinitionJsonObj task definition json object
-     * @param upstreamCodes upstream task codes, sep comma
+     * @param upstreamCodes         upstream task codes, sep comma
      * @return update result code
      */
     @Override
@@ -888,10 +884,10 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     /**
      * switch task definition
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param taskCode task code
-     * @param version the version user want to switch
+     * @param taskCode    task code
+     * @param version     the version user want to switch
      */
     @Transactional
     @Override
@@ -1147,9 +1143,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     /**
      * release task definition
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param code task definition code
+     * @param loginUser    login user
+     * @param projectCode  project code
+     * @param code         task definition code
      * @param releaseState releaseState
      * @return update result code
      */

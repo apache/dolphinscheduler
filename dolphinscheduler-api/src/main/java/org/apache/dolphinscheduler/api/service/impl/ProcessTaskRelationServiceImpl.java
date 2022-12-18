@@ -60,9 +60,10 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -74,36 +75,28 @@ import com.google.common.collect.Lists;
  * process task relation service impl
  */
 @Service
+@RequiredArgsConstructor
 public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements ProcessTaskRelationService {
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessTaskRelationServiceImpl.class);
 
-    @Autowired
-    private ProjectMapper projectMapper;
+    private final ProjectMapper projectMapper;
 
-    @Autowired
-    private ProjectService projectService;
+    private final ProjectService projectService;
 
-    @Autowired
-    private ProcessTaskRelationMapper processTaskRelationMapper;
+    private final ProcessTaskRelationMapper processTaskRelationMapper;
 
-    @Autowired
-    private TaskDefinitionLogMapper taskDefinitionLogMapper;
+    private final TaskDefinitionLogMapper taskDefinitionLogMapper;
 
-    @Autowired
-    private TaskDefinitionMapper taskDefinitionMapper;
+    private final TaskDefinitionMapper taskDefinitionMapper;
 
-    @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private final ProcessDefinitionMapper processDefinitionMapper;
 
-    @Autowired
-    private ProcessDefinitionLogMapper processDefinitionLogMapper;
+    private final ProcessDefinitionLogMapper processDefinitionLogMapper;
 
-    @Autowired
-    private ProcessService processService;
+    private final ProcessService processService;
 
-    @Autowired
-    private ProcessTaskRelationLogMapper processTaskRelationLogMapper;
+    private final ProcessTaskRelationLogMapper processTaskRelationLogMapper;
 
     /**
      * create process task relation
@@ -226,7 +219,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
     /**
      * create resource process task relation
      *
-     * @param loginUser login user
+     * @param loginUser                 login user
      * @param taskRelationCreateRequest project code
      * @return ProcessTaskRelation object
      */
@@ -282,10 +275,11 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
                     processDefinition.getProjectCode(), processDefinition.getCode());
             putMsg(result, Status.UPDATE_PROCESS_DEFINITION_ERROR);
             throw new ServiceException(Status.UPDATE_PROCESS_DEFINITION_ERROR);
-        } else
+        } else {
             logger.info(
                     "Update process definition complete, new version is {}, projectCode:{}, processDefinitionCode:{}.",
                     insertVersion, processDefinition.getProjectCode(), processDefinition.getCode());
+        }
         processDefinition.setVersion(insertVersion);
     }
 
@@ -363,9 +357,10 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
                 logger.error("Delete task definition error, taskDefinitionCode:{}.", taskCode);
                 putMsg(result, Status.DELETE_TASK_DEFINE_BY_CODE_ERROR);
                 throw new ServiceException(Status.DELETE_TASK_DEFINE_BY_CODE_ERROR);
-            } else
+            } else {
                 logger.info("Delete {} type task definition complete, taskDefinitionCode:{}.",
                         taskDefinition.getTaskType(), taskCode);
+            }
         }
         putMsg(result, Status.SUCCESS);
         return result;
@@ -374,8 +369,8 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
     /**
      * delete process task relation, will delete exists relation preTaskCode -> postTaskCode, throw error if not exists
      *
-     * @param loginUser login user
-     * @param preTaskCode relation upstream code
+     * @param loginUser    login user
+     * @param preTaskCode  relation upstream code
      * @param postTaskCode relation downstream code
      */
     @Override
@@ -406,9 +401,9 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
     /**
      * delete process task relation, will delete exists relation upstream -> downstream, throw error if not exists
      *
-     * @param loginUser login user
-     * @param taskCode relation upstream code
-     * @param needSyncDag needSyncDag
+     * @param loginUser                         login user
+     * @param taskCode                          relation upstream code
+     * @param needSyncDag                       needSyncDag
      * @param taskRelationUpdateUpstreamRequest relation downstream code
      */
     @Override
@@ -891,10 +886,11 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
                                 processTaskRelation.getId(), preTaskCode, postTaskCode);
                         putMsg(result, Status.DELETE_EDGE_ERROR);
                         throw new ServiceException(Status.DELETE_EDGE_ERROR);
-                    } else
+                    } else {
                         logger.info(
                                 "Delete task relation edge complete, processTaskRelationId:{}, preTaskCode:{}, postTaskCode:{}",
                                 processTaskRelation.getId(), preTaskCode, postTaskCode);
+                    }
                     processTaskRelationList.remove(processTaskRelation);
                 }
             }

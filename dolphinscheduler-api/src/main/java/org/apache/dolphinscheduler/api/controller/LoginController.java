@@ -39,7 +39,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -58,21 +59,20 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "LOGIN_TAG")
 @RestController
 @RequestMapping("")
+@RequiredArgsConstructor
 public class LoginController extends BaseController {
 
-    @Autowired
-    private SessionService sessionService;
+    private final SessionService sessionService;
 
-    @Autowired
-    private Authenticator authenticator;
+    private final Authenticator authenticator;
 
     /**
      * login
      *
-     * @param userName user name
+     * @param userName     user name
      * @param userPassword user password
-     * @param request request
-     * @param response response
+     * @param request      request
+     * @param response     response
      * @return login result
      */
     @Operation(summary = "login", description = "LOGIN_NOTES")
@@ -120,7 +120,7 @@ public class LoginController extends BaseController {
      * sign out
      *
      * @param loginUser login user
-     * @param request request
+     * @param request   request
      * @return sign out result
      */
     @Operation(summary = "signOut", description = "SIGNOUT_NOTES")

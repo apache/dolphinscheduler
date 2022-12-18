@@ -60,9 +60,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,15 +76,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * data source service impl
  */
 @Service
+@RequiredArgsConstructor
 public class DataSourceServiceImpl extends BaseServiceImpl implements DataSourceService {
 
     private static final Logger logger = LoggerFactory.getLogger(DataSourceServiceImpl.class);
 
-    @Autowired
-    private DataSourceMapper dataSourceMapper;
+    private final DataSourceMapper dataSourceMapper;
 
-    @Autowired
-    private DataSourceUserMapper datasourceUserMapper;
+    private final DataSourceUserMapper datasourceUserMapper;
 
     private static final String TABLE = "TABLE";
     private static final String VIEW = "VIEW";
@@ -94,7 +94,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     /**
      * create data source
      *
-     * @param loginUser login user
+     * @param loginUser       login user
      * @param datasourceParam datasource parameters
      * @return create result code
      */
@@ -154,7 +154,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * updateProcessInstance datasource
      *
      * @param loginUser login user
-     * @param id data source id
+     * @param id        data source id
      * @return update result code
      */
     @Override
@@ -261,8 +261,8 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param pageNo    page number
+     * @param pageSize  page size
      * @return data source list page
      */
     @Override
@@ -319,7 +319,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * query data resource list
      *
      * @param loginUser login user
-     * @param type data source type
+     * @param type      data source type
      * @return data source list page
      */
     @Override
@@ -371,7 +371,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     /**
      * check connection
      *
-     * @param type data source type
+     * @param type            data source type
      * @param connectionParam connectionParam
      * @return true if connect successfully, otherwise false
      * @return true if connect successfully, otherwise false
@@ -422,7 +422,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     /**
      * delete datasource
      *
-     * @param loginUser login user
+     * @param loginUser    login user
      * @param datasourceId data source id
      * @return delete result code
      */
@@ -459,7 +459,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * unauthorized datasource
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return unauthed data source result code
      */
     @Override
@@ -496,7 +496,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * authorized datasource
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return authorized result code
      */
     @Override
@@ -693,6 +693,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             }
         }
     }
+
     private void clearBindTestId(Integer bindTestId) {
         dataSourceMapper.clearBindTestId(bindTestId);
     }

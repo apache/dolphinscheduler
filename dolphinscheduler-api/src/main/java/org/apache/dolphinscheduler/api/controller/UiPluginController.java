@@ -29,7 +29,8 @@ import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -54,10 +55,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "UI_PLUGINS_TAG")
 @RestController
 @RequestMapping("ui-plugins")
+@RequiredArgsConstructor
 public class UiPluginController extends BaseController {
 
-    @Autowired
-    UiPluginService uiPluginService;
+    private final UiPluginService uiPluginService;
 
     @Operation(summary = "queryUiPluginsByType", description = "QUERY_UI_PLUGINS_BY_TYPE")
     @Parameters({

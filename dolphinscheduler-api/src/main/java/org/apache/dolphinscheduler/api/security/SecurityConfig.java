@@ -24,7 +24,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.annotation.Bean;
@@ -38,10 +37,9 @@ public class SecurityConfig {
     @Value("${security.authentication.type:PASSWORD}")
     private String type;
 
-    private AutowireCapableBeanFactory beanFactory;
+    private final AutowireCapableBeanFactory beanFactory;
     private AuthenticationType authenticationType;
 
-    @Autowired
     public SecurityConfig(AutowireCapableBeanFactory beanFactory) {
         this.beanFactory = beanFactory;
     }

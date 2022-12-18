@@ -32,22 +32,23 @@ import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+@RequiredArgsConstructor
 public class PasswordAuthenticatorTest extends AbstractControllerTest {
 
     private static Logger logger = LoggerFactory.getLogger(PasswordAuthenticatorTest.class);
 
-    @Autowired
-    private AutowireCapableBeanFactory beanFactory;
+    private final AutowireCapableBeanFactory beanFactory;
     @MockBean
     private SessionService sessionService;
     @MockBean

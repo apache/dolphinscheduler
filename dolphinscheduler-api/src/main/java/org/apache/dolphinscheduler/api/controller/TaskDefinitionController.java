@@ -43,7 +43,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -68,16 +69,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "TASK_DEFINITION_TAG")
 @RestController
 @RequestMapping("projects/{projectCode}/task-definition")
+@RequiredArgsConstructor
 public class TaskDefinitionController extends BaseController {
 
-    @Autowired
-    private TaskDefinitionService taskDefinitionService;
+    private final TaskDefinitionService taskDefinitionService;
 
     /**
      * create task definition
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser          login user
+     * @param projectCode        project code
      * @param taskDefinitionJson task definition json
      * @return create result code
      */
@@ -132,9 +133,9 @@ public class TaskDefinitionController extends BaseController {
     /**
      * update task definition
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param code task definition code
+     * @param loginUser             login user
+     * @param projectCode           project code
+     * @param code                  task definition code
      * @param taskDefinitionJsonObj task definition json object
      * @return update result code
      */
@@ -191,12 +192,12 @@ public class TaskDefinitionController extends BaseController {
     /**
      * query task definition version paging list info
      *
-     * @param loginUser login user info
+     * @param loginUser   login user info
      * @param projectCode project code
-     * @param code task definition code
-     * @param pageNo the task definition version list current page number
-     * @param pageSize the task definition version list page size
-     * @param code the task definition code
+     * @param code        task definition code
+     * @param pageNo      the task definition version list current page number
+     * @param pageSize    the task definition version list page size
+     * @param code        the task definition code
      * @return the task definition version list
      */
     @Operation(summary = "queryVersions", description = "QUERY_TASK_DEFINITION_VERSIONS_NOTES")
@@ -224,10 +225,10 @@ public class TaskDefinitionController extends BaseController {
     /**
      * switch task definition version
      *
-     * @param loginUser login user info
+     * @param loginUser   login user info
      * @param projectCode project code
-     * @param code the task definition code
-     * @param version the version user want to switch
+     * @param code        the task definition code
+     * @param version     the version user want to switch
      * @return switch version result code
      */
     @Operation(summary = "switchVersion", description = "SWITCH_TASK_DEFINITION_VERSION_NOTES")
@@ -250,10 +251,10 @@ public class TaskDefinitionController extends BaseController {
     /**
      * delete the certain task definition version by version and code
      *
-     * @param loginUser login user info
+     * @param loginUser   login user info
      * @param projectCode project code
-     * @param code the task definition code
-     * @param version the task definition version user want to delete
+     * @param code        the task definition code
+     * @param version     the task definition version user want to delete
      * @return delete version result code
      */
     @Operation(summary = "deleteVersion", description = "DELETE_TASK_DEFINITION_VERSION_NOTES")
@@ -277,9 +278,9 @@ public class TaskDefinitionController extends BaseController {
     /**
      * delete task definition by code
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param code the task definition code
+     * @param code        the task definition code
      * @return delete result code
      */
     @Operation(summary = "deleteTaskDefinition", description = "DELETE_TASK_DEFINITION_BY_CODE_NOTES")
@@ -300,9 +301,9 @@ public class TaskDefinitionController extends BaseController {
     /**
      * query detail of task definition by code
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param code the task definition code
+     * @param code        the task definition code
      * @return task definition detail
      */
     @Operation(summary = "queryTaskDefinitionByCode", description = "QUERY_TASK_DEFINITION_DETAIL_NOTES")
@@ -323,14 +324,14 @@ public class TaskDefinitionController extends BaseController {
     /**
      * query task definition list paging
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser          login user
+     * @param projectCode        project code
      * @param searchWorkflowName searchWorkflowName
-     * @param searchTaskName searchTaskName
-     * @param taskType taskType
-     * @param taskExecuteType taskExecuteType
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param searchTaskName     searchTaskName
+     * @param taskType           taskType
+     * @param taskExecuteType    taskExecuteType
+     * @param pageNo             page number
+     * @param pageSize           page size
      * @return task definition page
      */
     @Operation(summary = "queryTaskDefinitionListPaging", description = "QUERY_TASK_DEFINITION_LIST_PAGING_NOTES")
@@ -367,7 +368,7 @@ public class TaskDefinitionController extends BaseController {
      * gen task code list
      *
      * @param loginUser login user
-     * @param genNum gen num
+     * @param genNum    gen num
      * @return task code list
      */
     @Operation(summary = "genTaskCodeList", description = "GEN_TASK_CODE_LIST_NOTES")
@@ -387,9 +388,9 @@ public class TaskDefinitionController extends BaseController {
     /**
      * release task definition
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param code task definition code
+     * @param loginUser    login user
+     * @param projectCode  project code
+     * @param code         task definition code
      * @param releaseState releaseState
      * @return update result code
      */

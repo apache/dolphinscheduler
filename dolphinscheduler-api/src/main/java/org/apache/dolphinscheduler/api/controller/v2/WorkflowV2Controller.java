@@ -35,7 +35,8 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -60,10 +61,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "WORKFLOW_TAG_V2")
 @RestController
 @RequestMapping("/v2/workflows")
+@RequiredArgsConstructor
 public class WorkflowV2Controller extends BaseController {
 
-    @Autowired
-    private ProcessDefinitionService processDefinitionService;
+    private final ProcessDefinitionService processDefinitionService;
 
     /**
      * Create resource workflow
@@ -108,8 +109,8 @@ public class WorkflowV2Controller extends BaseController {
     /**
      * Update resource workflow
      *
-     * @param loginUser        login user
-     * @param code             workflow resource code you want to update
+     * @param loginUser             login user
+     * @param code                  workflow resource code you want to update
      * @param workflowUpdateRequest workflowUpdateRequest
      * @return ResourceResponse object updated
      */
@@ -129,8 +130,8 @@ public class WorkflowV2Controller extends BaseController {
     /**
      * Get resource workflow
      *
-     * @param loginUser        login user
-     * @param code             workflow resource code you want to update
+     * @param loginUser login user
+     * @param code      workflow resource code you want to update
      * @return ResourceResponse object get from condition
      */
     @Operation(summary = "get", description = "GET_WORKFLOWS_NOTES")
@@ -147,7 +148,7 @@ public class WorkflowV2Controller extends BaseController {
     /**
      * Get resource workflows according to query parameter
      *
-     * @param loginUser        login user
+     * @param loginUser             login user
      * @param workflowFilterRequest workflowFilterRequest
      * @return PageResourceResponse from condition
      */

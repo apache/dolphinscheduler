@@ -36,6 +36,8 @@ import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,7 +45,6 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
@@ -59,11 +60,11 @@ import org.springframework.test.context.TestPropertySource;
         "security.authentication.ldap.user.email-attribute=mail",
         "security.authentication.ldap.user.not-exist-action=CREATE",
 })
+@RequiredArgsConstructor
 public class LdapAuthenticatorTest extends AbstractControllerTest {
 
     private static Logger logger = LoggerFactory.getLogger(LdapAuthenticatorTest.class);
-    @Autowired
-    protected AutowireCapableBeanFactory beanFactory;
+    protected final AutowireCapableBeanFactory beanFactory;
     @MockBean(name = "ldapService")
     private LdapService ldapService;
     @MockBean(name = "sessionServiceImpl")

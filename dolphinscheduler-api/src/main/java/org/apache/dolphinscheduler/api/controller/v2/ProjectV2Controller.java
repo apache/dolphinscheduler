@@ -46,7 +46,8 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -72,10 +73,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "PROJECT_TAG")
 @RestController
 @RequestMapping("/v2/projects")
+@RequiredArgsConstructor
 public class ProjectV2Controller extends BaseController {
 
-    @Autowired
-    private ProjectService projectService;
+    private final ProjectService projectService;
 
     /**
      * create project

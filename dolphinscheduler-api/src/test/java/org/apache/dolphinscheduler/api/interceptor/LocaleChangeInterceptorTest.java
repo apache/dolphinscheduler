@@ -22,15 +22,16 @@ import org.apache.dolphinscheduler.api.controller.AbstractControllerTest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 
+@RequiredArgsConstructor
 public class LocaleChangeInterceptorTest extends AbstractControllerTest {
 
-    @Autowired
-    LocaleChangeInterceptor interceptor;
+    private final LocaleChangeInterceptor interceptor;
 
     @Test
     public void testPreHandle() {

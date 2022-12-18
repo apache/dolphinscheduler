@@ -28,7 +28,8 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.ResponseTaskLog;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,18 +54,18 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "LOGGER_TAG")
 @RestController
 @RequestMapping("/log")
+@RequiredArgsConstructor
 public class LoggerController extends BaseController {
 
-    @Autowired
-    private LoggerService loggerService;
+    private final LoggerService loggerService;
 
     /**
      * query task log
      *
-     * @param loginUser login user
+     * @param loginUser      login user
      * @param taskInstanceId task instance id
-     * @param skipNum skip number
-     * @param limit limit
+     * @param skipNum        skip number
+     * @param limit          limit
      * @return task log content
      */
     @Operation(summary = "queryLog", description = "QUERY_TASK_INSTANCE_LOG_NOTES")
@@ -87,7 +88,7 @@ public class LoggerController extends BaseController {
     /**
      * download log file
      *
-     * @param loginUser login user
+     * @param loginUser      login user
      * @param taskInstanceId task instance id
      * @return log file content
      */
@@ -113,7 +114,7 @@ public class LoggerController extends BaseController {
      * query task log in specified project
      *
      * @param loginUser      login user
-     * @param projectCode project code
+     * @param projectCode    project code
      * @param taskInstanceId task instance id
      * @param skipNum        skip number
      * @param limit          limit

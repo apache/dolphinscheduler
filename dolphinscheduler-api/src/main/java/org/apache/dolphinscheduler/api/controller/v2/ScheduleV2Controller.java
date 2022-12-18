@@ -36,7 +36,8 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -61,10 +62,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "SCHEDULER_TAG")
 @RestController
 @RequestMapping("/v2/schedules")
+@RequiredArgsConstructor
 public class ScheduleV2Controller extends BaseController {
 
-    @Autowired
-    private SchedulerService schedulerService;
+    private final SchedulerService schedulerService;
 
     /**
      * Create resource schedule

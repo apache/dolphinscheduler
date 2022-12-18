@@ -20,14 +20,15 @@ package org.apache.dolphinscheduler.api.audit;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
 import org.apache.dolphinscheduler.dao.mapper.AuditLogMapper;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class AuditSubscriberImpl implements AuditSubscriber {
 
-    @Autowired
-    private AuditLogMapper logMapper;
+    private final AuditLogMapper logMapper;
 
     @Override
     public void execute(AuditMessage message) {

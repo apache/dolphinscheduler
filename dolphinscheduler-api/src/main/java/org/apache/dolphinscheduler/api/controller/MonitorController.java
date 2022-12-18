@@ -30,7 +30,8 @@ import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
@@ -48,10 +49,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "MONITOR_TAG")
 @RestController
 @RequestMapping("/monitor")
+@RequiredArgsConstructor
 public class MonitorController extends BaseController {
 
-    @Autowired
-    private MonitorService monitorService;
+    private final MonitorService monitorService;
 
     /**
      * master list

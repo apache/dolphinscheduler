@@ -73,11 +73,11 @@ import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import org.quartz.CronExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -86,39 +86,30 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cronutils.model.Cron;
 
 @Service
+@RequiredArgsConstructor
 public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerService {
 
     private static final Logger logger = LoggerFactory.getLogger(SchedulerServiceImpl.class);
 
-    @Autowired
-    private ProjectService projectService;
+    private final ProjectService projectService;
 
-    @Autowired
-    private ExecutorService executorService;
+    private final ExecutorService executorService;
 
-    @Autowired
-    private MonitorService monitorService;
+    private final MonitorService monitorService;
 
-    @Autowired
-    private ProcessService processService;
+    private final ProcessService processService;
 
-    @Autowired
-    private ScheduleMapper scheduleMapper;
+    private final ScheduleMapper scheduleMapper;
 
-    @Autowired
-    private ProjectMapper projectMapper;
+    private final ProjectMapper projectMapper;
 
-    @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private final ProcessDefinitionMapper processDefinitionMapper;
 
-    @Autowired
-    private SchedulerApi schedulerApi;
+    private final SchedulerApi schedulerApi;
 
-    @Autowired
-    private ProcessTaskRelationMapper processTaskRelationMapper;
+    private final ProcessTaskRelationMapper processTaskRelationMapper;
 
-    @Autowired
-    private EnvironmentMapper environmentMapper;
+    private final EnvironmentMapper environmentMapper;
 
     /**
      * save schedule

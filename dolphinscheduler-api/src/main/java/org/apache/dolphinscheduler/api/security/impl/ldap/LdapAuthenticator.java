@@ -20,12 +20,12 @@ package org.apache.dolphinscheduler.api.security.impl.ldap;
 import org.apache.dolphinscheduler.api.security.impl.AbstractAuthenticator;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 public class LdapAuthenticator extends AbstractAuthenticator {
 
-    @Autowired
-    LdapService ldapService;
+    private final LdapService ldapService;
 
     @Override
     public User login(String userId, String password, String extra) {

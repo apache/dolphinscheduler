@@ -33,31 +33,31 @@ import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
  * login interceptor, must log in first
  */
+@RequiredArgsConstructor
 public class LoginHandlerInterceptor implements HandlerInterceptor {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginHandlerInterceptor.class);
 
-    @Autowired
-    private UserMapper userMapper;
+    private final UserMapper userMapper;
 
-    @Autowired
-    private Authenticator authenticator;
+    private final Authenticator authenticator;
 
     /**
      * Intercept the execution of a handler. Called after HandlerMapping determined
      *
-     * @param request current HTTP request
+     * @param request  current HTTP request
      * @param response current HTTP response
-     * @param handler chosen handler to execute, for type and/or instance evaluation
+     * @param handler  chosen handler to execute, for type and/or instance evaluation
      * @return boolean true or false
      */
     @Override

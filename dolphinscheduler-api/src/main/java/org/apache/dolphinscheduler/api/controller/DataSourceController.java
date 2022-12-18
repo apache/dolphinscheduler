@@ -46,7 +46,8 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -72,10 +73,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "DATA_SOURCE_TAG")
 @RestController
 @RequestMapping("datasources")
+@RequiredArgsConstructor
 public class DataSourceController extends BaseController {
 
-    @Autowired
-    private DataSourceService dataSourceService;
+    private final DataSourceService dataSourceService;
 
     /**
      * create data source

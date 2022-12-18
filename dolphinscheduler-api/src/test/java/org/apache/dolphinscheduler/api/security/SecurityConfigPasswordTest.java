@@ -19,18 +19,19 @@ package org.apache.dolphinscheduler.api.security;
 
 import org.apache.dolphinscheduler.api.controller.AbstractControllerTest;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.TestPropertySource;
 
 @TestPropertySource(properties = {
         "security.authentication.type=PASSWORD",
 })
+@RequiredArgsConstructor
 public class SecurityConfigPasswordTest extends AbstractControllerTest {
 
-    @Autowired
-    private SecurityConfig securityConfig;
+    private final SecurityConfig securityConfig;
 
     @Test
     public void testAuthenticator() {

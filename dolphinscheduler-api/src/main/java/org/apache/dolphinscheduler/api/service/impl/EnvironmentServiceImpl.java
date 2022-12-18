@@ -55,10 +55,11 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -72,26 +73,24 @@ import com.fasterxml.jackson.core.type.TypeReference;
  * task definition service impl
  */
 @Service
+@RequiredArgsConstructor
 public class EnvironmentServiceImpl extends BaseServiceImpl implements EnvironmentService {
 
     private static final Logger logger = LoggerFactory.getLogger(EnvironmentServiceImpl.class);
 
-    @Autowired
-    private EnvironmentMapper environmentMapper;
+    private final EnvironmentMapper environmentMapper;
 
-    @Autowired
-    private EnvironmentWorkerGroupRelationMapper relationMapper;
+    private final EnvironmentWorkerGroupRelationMapper relationMapper;
 
-    @Autowired
-    private TaskDefinitionMapper taskDefinitionMapper;
+    private final TaskDefinitionMapper taskDefinitionMapper;
 
     /**
      * create environment
      *
-     * @param loginUser login user
-     * @param name environment name
-     * @param config environment config
-     * @param desc environment desc
+     * @param loginUser    login user
+     * @param name         environment name
+     * @param config       environment config
+     * @param desc         environment desc
      * @param workerGroups worker groups
      */
     @Override
@@ -175,9 +174,9 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
     /**
      * query environment paging
      *
-     * @param pageNo page number
+     * @param pageNo    page number
      * @param searchVal search value
-     * @param pageSize page size
+     * @param pageSize  page size
      * @return environment list page
      */
     @Override
@@ -320,7 +319,7 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
      * delete environment
      *
      * @param loginUser login user
-     * @param code environment code
+     * @param code      environment code
      */
     @Transactional
     @Override
@@ -358,11 +357,11 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
     /**
      * update environment
      *
-     * @param loginUser login user
-     * @param code environment code
-     * @param name environment name
-     * @param config environment config
-     * @param desc environment desc
+     * @param loginUser    login user
+     * @param code         environment code
+     * @param name         environment name
+     * @param config       environment config
+     * @param desc         environment desc
      * @param workerGroups worker groups
      */
     @Transactional

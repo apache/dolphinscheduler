@@ -36,7 +36,8 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -61,10 +62,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "TASK_DEFINITION_TAG")
 @RestController
 @RequestMapping("v2/tasks")
+@RequiredArgsConstructor
 public class TaskDefinitionV2Controller extends BaseController {
 
-    @Autowired
-    private TaskDefinitionService taskDefinitionService;
+    private final TaskDefinitionService taskDefinitionService;
 
     /**
      * Create resource task definition

@@ -64,9 +64,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -80,24 +81,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * DqRuleServiceImpl
  */
 @Service
+@RequiredArgsConstructor
 public class DqRuleServiceImpl extends BaseServiceImpl implements DqRuleService {
 
     private final Logger logger = LoggerFactory.getLogger(DqRuleServiceImpl.class);
 
-    @Autowired
-    private DqRuleMapper dqRuleMapper;
+    private final DqRuleMapper dqRuleMapper;
 
-    @Autowired
-    private DqRuleInputEntryMapper dqRuleInputEntryMapper;
+    private final DqRuleInputEntryMapper dqRuleInputEntryMapper;
 
-    @Autowired
-    private DqRuleExecuteSqlMapper dqRuleExecuteSqlMapper;
+    private final DqRuleExecuteSqlMapper dqRuleExecuteSqlMapper;
 
-    @Autowired
-    private DataSourceMapper dataSourceMapper;
+    private final DataSourceMapper dataSourceMapper;
 
-    @Autowired
-    private DqComparisonTypeMapper dqComparisonTypeMapper;
+    private final DqComparisonTypeMapper dqComparisonTypeMapper;
 
     @Override
     public Map<String, Object> getRuleFormCreateJsonById(int id) {

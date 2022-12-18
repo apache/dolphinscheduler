@@ -78,12 +78,14 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class PythonGateway {
 
     private static final Logger logger = LoggerFactory.getLogger(PythonGateway.class);
@@ -100,53 +102,37 @@ public class PythonGateway {
     // We use admin user's user_id to skip some permission issue from python gateway service
     private static final int ADMIN_USER_ID = 1;
 
-    @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private final ProcessDefinitionMapper processDefinitionMapper;
 
-    @Autowired
-    private ProjectService projectService;
+    private final ProjectService projectService;
 
-    @Autowired
-    private TenantService tenantService;
+    private final TenantService tenantService;
 
-    @Autowired
-    private EnvironmentService environmentService;
+    private final EnvironmentService environmentService;
 
-    @Autowired
-    private ExecutorService executorService;
+    private final ExecutorService executorService;
 
-    @Autowired
-    private ProcessDefinitionService processDefinitionService;
+    private final ProcessDefinitionService processDefinitionService;
 
-    @Autowired
-    private TaskDefinitionService taskDefinitionService;
+    private final TaskDefinitionService taskDefinitionService;
 
-    @Autowired
-    private UsersService usersService;
+    private final UsersService usersService;
 
-    @Autowired
-    private ResourcesService resourceService;
+    private final ResourcesService resourceService;
 
-    @Autowired
-    private ProjectMapper projectMapper;
+    private final ProjectMapper projectMapper;
 
-    @Autowired
-    private TaskDefinitionMapper taskDefinitionMapper;
+    private final TaskDefinitionMapper taskDefinitionMapper;
 
-    @Autowired
-    private SchedulerService schedulerService;
+    private final SchedulerService schedulerService;
 
-    @Autowired
-    private ScheduleMapper scheduleMapper;
+    private final ScheduleMapper scheduleMapper;
 
-    @Autowired
-    private DataSourceMapper dataSourceMapper;
+    private final DataSourceMapper dataSourceMapper;
 
-    @Autowired
-    private PythonGatewayConfiguration pythonGatewayConfiguration;
+    private final PythonGatewayConfiguration pythonGatewayConfiguration;
 
-    @Autowired
-    private ProjectUserMapper projectUserMapper;
+    private final ProjectUserMapper projectUserMapper;
 
     // TODO replace this user to build in admin user if we make sure build in one could not be change
     private final User dummyAdminUser = new User() {
@@ -214,22 +200,22 @@ public class PythonGateway {
      * If workflow do not exists in Project=`projectCode` would create a new one
      * If workflow already exists in Project=`projectCode` would update it
      *
-     * @param userName user name who create or update workflow
-     * @param projectName project name which workflow belongs to
-     * @param name workflow name
-     * @param description description
-     * @param globalParams global params
-     * @param schedule schedule for workflow, will not set schedule if null,
-     * and if would always fresh exists schedule if not null
-     * @param warningType warning type
-     * @param warningGroupId warning group id
-     * @param timeout timeout for workflow working, if running time longer than timeout,
-     * task will mark as fail
-     * @param workerGroup run task in which worker group
-     * @param tenantCode tenantCode
-     * @param taskRelationJson relation json for nodes
+     * @param userName           user name who create or update workflow
+     * @param projectName        project name which workflow belongs to
+     * @param name               workflow name
+     * @param description        description
+     * @param globalParams       global params
+     * @param schedule           schedule for workflow, will not set schedule if null,
+     *                           and if would always fresh exists schedule if not null
+     * @param warningType        warning type
+     * @param warningGroupId     warning group id
+     * @param timeout            timeout for workflow working, if running time longer than timeout,
+     *                           task will mark as fail
+     * @param workerGroup        run task in which worker group
+     * @param tenantCode         tenantCode
+     * @param taskRelationJson   relation json for nodes
      * @param taskDefinitionJson taskDefinitionJson
-     * @param otherParamsJson otherParamsJson handle other params
+     * @param otherParamsJson    otherParamsJson handle other params
      * @return create result code
      */
     public Long createOrUpdateWorkflow(String userName,
@@ -287,8 +273,8 @@ public class PythonGateway {
     /**
      * get workflow
      *
-     * @param user user who create or update schedule
-     * @param projectCode project which workflow belongs to
+     * @param user         user who create or update schedule
+     * @param projectCode  project which workflow belongs to
      * @param workflowName workflow name
      */
     private ProcessDefinition getWorkflow(User user, long projectCode, String workflowName) {
@@ -314,12 +300,12 @@ public class PythonGateway {
      * It would always use latest schedule define in workflow-as-code, and set schedule online when
      * it's not null
      *
-     * @param user user who create or update schedule
-     * @param projectCode project which workflow belongs to
-     * @param workflowCode workflow code
-     * @param schedule schedule expression
-     * @param workerGroup work group
-     * @param warningType warning type
+     * @param user           user who create or update schedule
+     * @param projectCode    project which workflow belongs to
+     * @param workflowCode   workflow code
+     * @param schedule       schedule expression
+     * @param workerGroup    work group
+     * @param warningType    warning type
      * @param warningGroupId warning group id
      */
     private void createOrUpdateSchedule(User user,
@@ -515,8 +501,8 @@ public class PythonGateway {
      * Get workflow object by given workflow name. It returns map contain workflow id, name, code.
      * Useful in Python API create subProcess task which need workflow information.
      *
-     * @param userName user who create or update schedule
-     * @param projectName project name which workflow belongs to
+     * @param userName     user who create or update schedule
+     * @param projectName  project name which workflow belongs to
      * @param workflowName workflow name
      */
     public Map<String, Object> getWorkflowInfo(String userName, String projectName,
@@ -548,9 +534,9 @@ public class PythonGateway {
      * Get project, workflow, task code.
      * Useful in Python API create dependent task which need workflow information.
      *
-     * @param projectName project name which workflow belongs to
+     * @param projectName  project name which workflow belongs to
      * @param workflowName workflow name
-     * @param taskName task name
+     * @param taskName     task name
      */
     public Map<String, Object> getDependentInfo(String projectName, String workflowName, String taskName) {
         Map<String, Object> result = new HashMap<>();
@@ -586,7 +572,7 @@ public class PythonGateway {
      * Useful in Python API create flink or spark task which need workflow information.
      *
      * @param programType program type one of SCALA, JAVA and PYTHON
-     * @param fullName full name of the resource
+     * @param fullName    full name of the resource
      */
     public Map<String, Object> getResourcesFileInfo(String programType, String fullName) {
         Map<String, Object> result = new HashMap<>();
@@ -646,8 +632,8 @@ public class PythonGateway {
      * create or update resource.
      * If the folder is not already created, it will be
      *
-     * @param userName user who create or update resource
-     * @param fullName The fullname of resource.Includes path and suffix.
+     * @param userName        user who create or update resource
+     * @param fullName        The fullname of resource.Includes path and suffix.
      * @param resourceContent content of resource
      * @return StorageEntity object which contains necessary information about resource
      */

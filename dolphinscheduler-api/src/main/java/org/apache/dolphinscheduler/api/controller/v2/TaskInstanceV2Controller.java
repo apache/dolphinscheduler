@@ -37,7 +37,8 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -59,10 +60,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "TASK_INSTANCE_TAG")
 @RestController
 @RequestMapping("/v2/projects/{projectCode}/task-instances")
+@RequiredArgsConstructor
 public class TaskInstanceV2Controller extends BaseController {
 
-    @Autowired
-    private TaskInstanceService taskInstanceService;
+    private final TaskInstanceService taskInstanceService;
 
     /**
      * query task list paging
@@ -113,9 +114,9 @@ public class TaskInstanceV2Controller extends BaseController {
     /**
      * task savepoint, for stream task
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param id task instance id
+     * @param id          task instance id
      * @return the result code and msg
      */
     @Operation(summary = "savepoint", description = "TASK_SAVEPOINT")
@@ -135,9 +136,9 @@ public class TaskInstanceV2Controller extends BaseController {
     /**
      * task stop, for stream task
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param id task instance id
+     * @param id          task instance id
      * @return the result code and msg
      */
     @Operation(summary = "stop", description = "TASK_INSTANCE_STOP")
@@ -180,9 +181,9 @@ public class TaskInstanceV2Controller extends BaseController {
     /**
      * query taskInstance by taskInstanceCode
      *
-     * @param loginUser   login user
-     * @param projectCode project code
-     * @param taskInstanceId  taskInstance Id
+     * @param loginUser      login user
+     * @param projectCode    project code
+     * @param taskInstanceId taskInstance Id
      * @return the result code and msg
      */
     @Operation(summary = "queryOneTaskInstance", description = "QUERY_ONE_TASK_INSTANCE")

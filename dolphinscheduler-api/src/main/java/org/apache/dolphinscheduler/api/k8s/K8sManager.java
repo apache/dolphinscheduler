@@ -25,9 +25,10 @@ import org.apache.dolphinscheduler.service.utils.ClusterConfUtils;
 import java.util.Hashtable;
 import java.util.Map;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import io.fabric8.kubernetes.client.Config;
@@ -38,6 +39,7 @@ import io.fabric8.kubernetes.client.KubernetesClient;
  * use multiple environment feature
  */
 @Component
+@RequiredArgsConstructor
 public class K8sManager {
 
     private static final Logger logger = LoggerFactory.getLogger(K8sManager.class);
@@ -46,8 +48,7 @@ public class K8sManager {
      */
     private static Map<Long, KubernetesClient> clientMap = new Hashtable<>();
 
-    @Autowired
-    private ClusterMapper clusterMapper;
+    private final ClusterMapper clusterMapper;
 
     /**
      * get k8s client for api use

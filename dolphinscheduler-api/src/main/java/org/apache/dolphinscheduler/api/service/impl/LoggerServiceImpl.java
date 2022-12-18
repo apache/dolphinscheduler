@@ -42,9 +42,10 @@ import org.apache.commons.lang3.StringUtils;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.common.primitives.Bytes;
@@ -53,34 +54,30 @@ import com.google.common.primitives.Bytes;
  * logger service impl
  */
 @Service
+@RequiredArgsConstructor
 public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService {
 
     private static final Logger logger = LoggerFactory.getLogger(LoggerServiceImpl.class);
 
     private static final String LOG_HEAD_FORMAT = "[LOG-PATH]: %s, [HOST]:  %s%s";
 
-    @Autowired
-    private TaskInstanceDao taskInstanceDao;
+    private final TaskInstanceDao taskInstanceDao;
 
-    @Autowired
-    private LogClient logClient;
+    private final LogClient logClient;
 
-    @Autowired
-    ProjectMapper projectMapper;
+    private final ProjectMapper projectMapper;
 
-    @Autowired
-    ProjectService projectService;
+    private final ProjectService projectService;
 
-    @Autowired
-    TaskDefinitionMapper taskDefinitionMapper;
+    private final TaskDefinitionMapper taskDefinitionMapper;
 
     /**
      * view log
      *
      * @param loginUser   login user
-     * @param taskInstId task instance id
+     * @param taskInstId  task instance id
      * @param skipLineNum skip line number
-     * @param limit limit
+     * @param limit       limit
      * @return log string data
      */
     @Override
@@ -109,7 +106,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
     /**
      * get log size
      *
-     * @param loginUser   login user
+     * @param loginUser  login user
      * @param taskInstId task instance id
      * @return log byte array
      */
@@ -192,9 +189,9 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
     /**
      * query log
      *
-     * @param taskInstance  task instance
-     * @param skipLineNum skip line number
-     * @param limit       limit
+     * @param taskInstance task instance
+     * @param skipLineNum  skip line number
+     * @param limit        limit
      * @return log string data
      */
     private String queryLog(TaskInstance taskInstance, int skipLineNum, int limit) {
