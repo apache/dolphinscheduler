@@ -28,7 +28,7 @@ import org.springframework.test.context.TestPropertySource;
 @TestPropertySource(properties = {
         "security.authentication.type=PASSWORD",
 })
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class SecurityConfigPasswordTest extends AbstractControllerTest {
 
     private final SecurityConfig securityConfig;

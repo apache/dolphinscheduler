@@ -60,7 +60,7 @@ import org.springframework.test.context.TestPropertySource;
         "security.authentication.ldap.user.email-attribute=mail",
         "security.authentication.ldap.user.not-exist-action=CREATE",
 })
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class LdapAuthenticatorTest extends AbstractControllerTest {
 
     private static Logger logger = LoggerFactory.getLogger(LdapAuthenticatorTest.class);

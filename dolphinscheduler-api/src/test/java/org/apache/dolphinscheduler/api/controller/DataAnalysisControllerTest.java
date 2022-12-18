@@ -43,7 +43,7 @@ import org.springframework.util.MultiValueMap;
 /**
  * data analysis controller test
  */
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class DataAnalysisControllerTest extends AbstractControllerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(DataAnalysisControllerTest.class);

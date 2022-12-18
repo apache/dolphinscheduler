@@ -38,7 +38,7 @@ import org.junit.jupiter.api.Test;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ProcessInstanceMapperTest extends BaseDaoTest {
 
     private final ProcessInstanceMapper processInstanceMapper;

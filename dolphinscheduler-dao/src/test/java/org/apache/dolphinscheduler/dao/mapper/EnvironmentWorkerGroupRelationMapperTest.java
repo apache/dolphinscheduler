@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class EnvironmentWorkerGroupRelationMapperTest extends BaseDaoTest {
 
     private final EnvironmentWorkerGroupRelationMapper environmentWorkerGroupRelationMapper;

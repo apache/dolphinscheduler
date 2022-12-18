@@ -34,7 +34,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 /**
  * AlertPluginInstanceMapper mapper test
  */
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class AlertPluginInstanceMapperTest extends BaseDaoTest {
 
     private final AlertPluginInstanceMapper alertPluginInstanceMapper;

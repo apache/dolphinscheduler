@@ -53,7 +53,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @Rollback
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class LoginHandlerInterceptorTest {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginHandlerInterceptorTest.class);

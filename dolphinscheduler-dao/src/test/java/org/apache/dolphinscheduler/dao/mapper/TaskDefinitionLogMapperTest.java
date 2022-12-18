@@ -30,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class TaskDefinitionLogMapperTest extends BaseDaoTest {
 
     private final TaskDefinitionLogMapper taskDefinitionLogMapper;

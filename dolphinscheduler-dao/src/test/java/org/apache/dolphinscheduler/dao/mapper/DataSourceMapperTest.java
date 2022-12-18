@@ -46,7 +46,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 /**
  * datasource mapper test
  */
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class DataSourceMapperTest extends BaseDaoTest {
 
     /**

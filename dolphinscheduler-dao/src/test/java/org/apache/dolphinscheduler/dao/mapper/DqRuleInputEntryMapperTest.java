@@ -33,7 +33,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 /**
  * DQC rule mapper UT.
  */
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class DqRuleInputEntryMapperTest extends BaseDaoTest {
 
     private final DqRuleInputEntryMapper dqRuleInputEntryMapper;

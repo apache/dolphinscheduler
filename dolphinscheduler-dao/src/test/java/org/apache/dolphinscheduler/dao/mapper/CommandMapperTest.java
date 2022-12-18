@@ -44,7 +44,7 @@ import org.junit.jupiter.api.Test;
 /**
  * command mapper test
  */
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class CommandMapperTest extends BaseDaoTest {
 
     private final CommandMapper commandMapper;

@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 /**
  * AlertSendStatus mapper test
  */
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class AlertSendStatusMapperTest extends BaseDaoTest {
 
     private final AlertSendStatusMapper alertSendStatusMapper;

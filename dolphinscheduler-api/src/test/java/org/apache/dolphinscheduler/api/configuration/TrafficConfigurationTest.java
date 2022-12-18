@@ -25,8 +25,9 @@ import lombok.RequiredArgsConstructor;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class TrafficConfigurationTest extends AbstractControllerTest {
 
     private final TrafficConfiguration trafficConfiguration;

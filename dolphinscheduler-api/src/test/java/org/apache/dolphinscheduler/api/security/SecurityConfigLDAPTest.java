@@ -29,7 +29,7 @@ import org.springframework.test.context.TestPropertySource;
 @TestPropertySource(properties = {
         "security.authentication.type=LDAP",
 })
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class SecurityConfigLDAPTest extends AbstractControllerTest {
 
     private final SecurityConfig securityConfig;

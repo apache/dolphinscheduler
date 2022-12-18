@@ -29,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -36,7 +37,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 /**
  * AlertGroup mapper test
  */
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class AlertGroupMapperTest extends BaseDaoTest {
 
     private final AlertGroupMapper alertGroupMapper;

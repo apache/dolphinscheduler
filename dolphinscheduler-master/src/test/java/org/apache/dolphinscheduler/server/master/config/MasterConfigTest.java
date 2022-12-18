@@ -29,7 +29,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ActiveProfiles("master")
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = MasterConfig.class)
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class MasterConfigTest {
 
     private final MasterConfig masterConfig;

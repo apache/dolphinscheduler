@@ -49,7 +49,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 /**
  * alert group controller test
  */
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class AlertGroupControllerTest extends AbstractControllerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(AlertGroupController.class);

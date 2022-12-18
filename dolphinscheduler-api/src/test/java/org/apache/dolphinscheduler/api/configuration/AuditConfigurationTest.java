@@ -26,7 +26,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles("audit")
 @SpringBootTest(classes = AuditConfiguration.class)
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class AuditConfigurationTest {
 
     private final AuditConfiguration auditConfiguration;

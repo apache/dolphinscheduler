@@ -40,7 +40,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  */
 @ExtendWith(SpringExtension.class)
 @Disabled
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ExecutorDispatcherTest {
 
     private final ExecutorDispatcher executorDispatcher;

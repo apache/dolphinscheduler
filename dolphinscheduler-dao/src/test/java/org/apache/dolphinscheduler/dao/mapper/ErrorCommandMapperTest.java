@@ -31,7 +31,7 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ErrorCommandMapperTest extends BaseDaoTest {
 
     private final ErrorCommandMapper errorCommandMapper;
