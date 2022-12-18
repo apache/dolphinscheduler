@@ -95,6 +95,7 @@
         on def.project_code = p.code
         left join t_ds_process_instance inst
         on inst.process_definition_code = def.code
+        and inst.process_definition_version = def.version
         and inst.state = 1
         where 1=1
         <if test="projectsIds != null and projectsIds.size() > 0">
