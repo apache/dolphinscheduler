@@ -24,6 +24,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,10 +33,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class QueueMapperTest extends BaseDaoTest {
 
-    @Autowired
-    private QueueMapper queueMapper;
+    private final QueueMapper queueMapper;
 
     /**
      * insert

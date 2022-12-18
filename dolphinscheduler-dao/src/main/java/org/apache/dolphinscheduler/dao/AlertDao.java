@@ -49,9 +49,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -61,6 +62,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 @Component
+@RequiredArgsConstructor
 public class AlertDao {
 
     /**
@@ -73,17 +75,13 @@ public class AlertDao {
     @Value("${alert.alarm-suppression.crash:60}")
     private Integer crashAlarmSuppression;
 
-    @Autowired
-    private AlertMapper alertMapper;
+    private final AlertMapper alertMapper;
 
-    @Autowired
-    private AlertPluginInstanceMapper alertPluginInstanceMapper;
+    private final AlertPluginInstanceMapper alertPluginInstanceMapper;
 
-    @Autowired
-    private AlertGroupMapper alertGroupMapper;
+    private final AlertGroupMapper alertGroupMapper;
 
-    @Autowired
-    private AlertSendStatusMapper alertSendStatusMapper;
+    private final AlertSendStatusMapper alertSendStatusMapper;
 
     /**
      * insert alert
@@ -108,8 +106,8 @@ public class AlertDao {
      * update alert sending(execution) status
      *
      * @param alertStatus alertStatus
-     * @param log alert results json
-     * @param id id
+     * @param log         alert results json
+     * @param id          id
      * @return update alert result
      */
     public int updateAlert(AlertStatus alertStatus, String log, int id) {
@@ -138,9 +136,9 @@ public class AlertDao {
     /**
      * add AlertSendStatus
      *
-     * @param sendStatus alert send status
-     * @param log log
-     * @param alertId alert id
+     * @param sendStatus            alert send status
+     * @param log                   log
+     * @param alertId               alert id
      * @param alertPluginInstanceId alert plugin instance id
      * @return insert count
      */
@@ -196,7 +194,7 @@ public class AlertDao {
      * process time out alert
      *
      * @param processInstance processInstance
-     * @param projectUser projectUser
+     * @param projectUser     projectUser
      */
     public void sendProcessTimeoutAlert(ProcessInstance processInstance, ProjectUser projectUser) {
         int alertGroupId = processInstance.getWarningGroupId();
@@ -242,8 +240,8 @@ public class AlertDao {
      * task timeout warn
      *
      * @param processInstance processInstanceId
-     * @param taskInstance taskInstance
-     * @param projectUser projectUser
+     * @param taskInstance    taskInstance
+     * @param projectUser     projectUser
      */
     public void sendTaskTimeoutAlert(ProcessInstance processInstance, TaskInstance taskInstance,
                                      ProjectUser projectUser) {
@@ -312,22 +310,6 @@ public class AlertDao {
             return alertPluginInstanceMapper.queryByIds(ids);
         }
         return null;
-    }
-
-    public AlertPluginInstanceMapper getAlertPluginInstanceMapper() {
-        return alertPluginInstanceMapper;
-    }
-
-    public void setAlertPluginInstanceMapper(AlertPluginInstanceMapper alertPluginInstanceMapper) {
-        this.alertPluginInstanceMapper = alertPluginInstanceMapper;
-    }
-
-    public AlertGroupMapper getAlertGroupMapper() {
-        return alertGroupMapper;
-    }
-
-    public void setAlertGroupMapper(AlertGroupMapper alertGroupMapper) {
-        this.alertGroupMapper = alertGroupMapper;
     }
 
     public void setCrashAlarmSuppression(Integer crashAlarmSuppression) {

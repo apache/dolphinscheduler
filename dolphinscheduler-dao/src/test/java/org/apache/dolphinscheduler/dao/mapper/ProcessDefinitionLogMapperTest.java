@@ -26,6 +26,8 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import java.util.Date;
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,16 +35,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ProcessDefinitionLogMapperTest extends BaseDaoTest {
 
-    @Autowired
-    private UserMapper userMapper;
+    private final UserMapper userMapper;
 
-    @Autowired
-    private ProjectMapper projectMapper;
+    private final ProjectMapper projectMapper;
 
-    @Autowired
-    private ProcessDefinitionLogMapper processDefinitionLogMapper;
+    private final ProcessDefinitionLogMapper processDefinitionLogMapper;
 
     /**
      * insert

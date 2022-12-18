@@ -30,23 +30,22 @@ import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
 import java.util.Date;
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class WorkFlowLineageMapperTest extends BaseDaoTest {
 
-    @Autowired
-    private WorkFlowLineageMapper workFlowLineageMapper;
+    private final WorkFlowLineageMapper workFlowLineageMapper;
 
-    @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private final ProcessDefinitionMapper processDefinitionMapper;
 
-    @Autowired
-    private ScheduleMapper scheduleMapper;
+    private final ScheduleMapper scheduleMapper;
 
-    @Autowired
-    private ProcessTaskRelationMapper processTaskRelationMapper;
+    private final ProcessTaskRelationMapper processTaskRelationMapper;
 
     /**
      * insert
@@ -72,7 +71,6 @@ public class WorkFlowLineageMapperTest extends BaseDaoTest {
 
     /**
      * insert
-     *
      */
     private void insertOneProcessDefinition() {
         // insertOne
@@ -88,7 +86,6 @@ public class WorkFlowLineageMapperTest extends BaseDaoTest {
 
     /**
      * insert
-     *
      */
     private void insertOneSchedule(int id) {
         // insertOne

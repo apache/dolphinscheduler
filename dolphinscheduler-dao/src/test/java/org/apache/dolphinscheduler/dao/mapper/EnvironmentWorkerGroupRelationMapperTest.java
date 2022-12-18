@@ -23,16 +23,18 @@ import org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation;
 import java.util.Date;
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class EnvironmentWorkerGroupRelationMapperTest extends BaseDaoTest {
 
-    @Autowired
-    private EnvironmentWorkerGroupRelationMapper environmentWorkerGroupRelationMapper;
+    private final EnvironmentWorkerGroupRelationMapper environmentWorkerGroupRelationMapper;
 
     @BeforeEach
     public void setUp() {

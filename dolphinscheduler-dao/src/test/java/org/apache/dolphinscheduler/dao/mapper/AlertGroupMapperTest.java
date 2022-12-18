@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,10 +37,10 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 /**
  * AlertGroup mapper test
  */
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class AlertGroupMapperTest extends BaseDaoTest {
 
-    @Autowired
-    private AlertGroupMapper alertGroupMapper;
+    private final AlertGroupMapper alertGroupMapper;
 
     /**
      * test insert

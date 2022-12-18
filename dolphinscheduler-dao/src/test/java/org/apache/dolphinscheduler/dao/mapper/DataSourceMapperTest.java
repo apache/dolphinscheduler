@@ -35,6 +35,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,22 +47,20 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 /**
  * datasource mapper test
  */
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class DataSourceMapperTest extends BaseDaoTest {
 
     /**
      * datasource mapper
      */
-    @Autowired
-    private DataSourceMapper dataSourceMapper;
+    private final DataSourceMapper dataSourceMapper;
 
     /**
      * datasource user relation mapper
      */
-    @Autowired
-    private DataSourceUserMapper dataSourceUserMapper;
+    private final DataSourceUserMapper dataSourceUserMapper;
 
-    @Autowired
-    private UserMapper userMapper;
+    private final UserMapper userMapper;
 
     /**
      * test insert
@@ -306,6 +306,7 @@ public class DataSourceMapperTest extends BaseDaoTest {
 
     /**
      * create datasource relation
+     *
      * @param userId
      */
     private Map<Integer, DataSource> createDataSourceMap(Integer userId, String name) {
@@ -335,6 +336,7 @@ public class DataSourceMapperTest extends BaseDaoTest {
 
     /**
      * create datasource map
+     *
      * @param count datasource count
      * @return datasource map
      */
@@ -351,6 +353,7 @@ public class DataSourceMapperTest extends BaseDaoTest {
 
     /**
      * create datasource
+     *
      * @return datasource
      */
     private DataSource createDataSource() {
@@ -359,6 +362,7 @@ public class DataSourceMapperTest extends BaseDaoTest {
 
     /**
      * create datasource
+     *
      * @param name name
      * @return datasource
      */
@@ -368,8 +372,9 @@ public class DataSourceMapperTest extends BaseDaoTest {
 
     /**
      * create datasource
+     *
      * @param userId userId
-     * @param name name
+     * @param name   name
      * @return datasource
      */
     private DataSource createDataSource(Integer userId, String name) {
@@ -391,6 +396,7 @@ public class DataSourceMapperTest extends BaseDaoTest {
 
     /**
      * create general user
+     *
      * @return User
      */
     private User createGeneralUser(String userName) {
@@ -409,7 +415,7 @@ public class DataSourceMapperTest extends BaseDaoTest {
     /**
      * create the relation of user and data source
      *
-     * @param user user
+     * @param user       user
      * @param dataSource data source
      * @return DatasourceUser
      */

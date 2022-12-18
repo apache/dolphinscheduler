@@ -26,7 +26,8 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.boot.jdbc.init.DataSourceScriptDatabaseInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -45,13 +46,13 @@ import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerIntercept
 import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 
 @Configuration
+@RequiredArgsConstructor
 public class SpringConnectionFactory {
 
     /**
      * Inject this field to make sure the database is initialized, this can solve the table not found issue #8432.
      */
-    @Autowired(required = false)
-    public DataSourceScriptDatabaseInitializer dataSourceScriptDatabaseInitializer;
+    public final DataSourceScriptDatabaseInitializer dataSourceScriptDatabaseInitializer;
 
     @Bean
     public MybatisPlusInterceptor paginationInterceptor(DbType dbType) {

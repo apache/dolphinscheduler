@@ -28,20 +28,20 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class TaskDefinitionMapperTest extends BaseDaoTest {
 
-    @Autowired
-    private TaskDefinitionMapper taskDefinitionMapper;
+    private final TaskDefinitionMapper taskDefinitionMapper;
 
-    @Autowired
-    private ProcessTaskRelationMapper processTaskRelationMapper;
+    private final ProcessTaskRelationMapper processTaskRelationMapper;
 
-    @Autowired
-    private UserMapper userMapper;
+    private final UserMapper userMapper;
 
     public TaskDefinition insertOne() {
         return insertOne(99);

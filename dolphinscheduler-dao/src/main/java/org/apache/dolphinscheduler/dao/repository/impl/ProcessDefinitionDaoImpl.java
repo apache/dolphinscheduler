@@ -30,19 +30,19 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Repository;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 @Repository
+@RequiredArgsConstructor
 public class ProcessDefinitionDaoImpl implements ProcessDefinitionDao {
 
-    @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
-    @Autowired
-    private ProcessDefinitionLogMapper processDefinitionLogMapper;
+    private final ProcessDefinitionMapper processDefinitionMapper;
+    private final ProcessDefinitionLogMapper processDefinitionLogMapper;
 
     @Override
     public PageListingResult<ProcessDefinition> listingProcessDefinition(int pageNumber, int pageSize, String searchVal,

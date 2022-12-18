@@ -23,6 +23,8 @@ import org.apache.dolphinscheduler.dao.entity.Alert;
 
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,10 +44,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @Rollback
 @EnableTransactionManagement
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class AlertDaoTest {
 
-    @Autowired
-    private AlertDao alertDao;
+    private final AlertDao alertDao;
 
     @Test
     public void testAlertDao() {

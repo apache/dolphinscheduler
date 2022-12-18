@@ -31,9 +31,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.google.common.collect.Lists;
@@ -42,15 +43,14 @@ import com.google.common.collect.Lists;
  * Task Definition Log DAP implementation
  */
 @Repository
+@RequiredArgsConstructor
 public class TaskDefinitionLogDaoImpl implements TaskDefinitionLogDao {
 
     private final Logger logger = LoggerFactory.getLogger(TaskDefinitionLogDaoImpl.class);
 
-    @Autowired
-    private TaskDefinitionDao taskDefinitionDao;
+    private final TaskDefinitionDao taskDefinitionDao;
 
-    @Autowired
-    private TaskDefinitionLogMapper taskDefinitionLogMapper;
+    private final TaskDefinitionLogMapper taskDefinitionLogMapper;
 
     @Override
     public List<TaskDefinitionLog> getTaskDefineLogList(List<ProcessTaskRelation> processTaskRelations) {

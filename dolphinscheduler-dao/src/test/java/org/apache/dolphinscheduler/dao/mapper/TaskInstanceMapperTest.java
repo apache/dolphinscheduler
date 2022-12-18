@@ -31,6 +31,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,16 +40,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class TaskInstanceMapperTest extends BaseDaoTest {
 
-    @Autowired
-    private TaskInstanceMapper taskInstanceMapper;
+    private final TaskInstanceMapper taskInstanceMapper;
 
-    @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private final ProcessDefinitionMapper processDefinitionMapper;
 
-    @Autowired
-    private ProcessInstanceMapper processInstanceMapper;
+    private final ProcessInstanceMapper processInstanceMapper;
 
     /**
      * insert

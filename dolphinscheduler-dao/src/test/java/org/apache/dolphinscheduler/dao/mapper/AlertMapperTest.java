@@ -28,6 +28,8 @@ import org.apache.commons.codec.digest.DigestUtils;
 import java.util.HashMap;
 import java.util.Map;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,10 +37,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * alert mapper test
  */
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class AlertMapperTest extends BaseDaoTest {
 
-    @Autowired
-    private AlertMapper alertMapper;
+    private final AlertMapper alertMapper;
 
     /**
      * test insert

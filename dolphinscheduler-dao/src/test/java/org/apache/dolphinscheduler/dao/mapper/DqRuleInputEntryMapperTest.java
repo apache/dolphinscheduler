@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
@@ -21,6 +22,8 @@ import org.apache.dolphinscheduler.dao.entity.DqRule;
 import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
 
 import java.util.List;
+
+import lombok.RequiredArgsConstructor;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,13 +34,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 /**
  * DQC rule mapper UT.
  */
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class DqRuleInputEntryMapperTest extends BaseDaoTest {
 
-    @Autowired
-    private DqRuleInputEntryMapper dqRuleInputEntryMapper;
+    private final DqRuleInputEntryMapper dqRuleInputEntryMapper;
 
-    @Autowired
-    private DqRuleMapper dqRuleMapper;
+    private final DqRuleMapper dqRuleMapper;
 
     @Test
     public void testDqcRulePageList() {

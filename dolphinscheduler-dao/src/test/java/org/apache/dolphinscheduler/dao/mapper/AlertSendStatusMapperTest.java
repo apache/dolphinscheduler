@@ -22,6 +22,8 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.AlertSendStatus;
 
+import lombok.RequiredArgsConstructor;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,10 +31,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * AlertSendStatus mapper test
  */
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class AlertSendStatusMapperTest extends BaseDaoTest {
 
-    @Autowired
-    private AlertSendStatusMapper alertSendStatusMapper;
+    private final AlertSendStatusMapper alertSendStatusMapper;
 
     /**
      * test insert

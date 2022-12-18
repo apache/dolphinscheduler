@@ -23,14 +23,16 @@ import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import java.util.Date;
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ProjectUserMapperTest extends BaseDaoTest {
 
-    @Autowired
-    private ProjectUserMapper projectUserMapper;
+    private final ProjectUserMapper projectUserMapper;
 
     /**
      * insert

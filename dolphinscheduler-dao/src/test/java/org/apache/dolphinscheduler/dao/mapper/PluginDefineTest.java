@@ -22,14 +22,16 @@ import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class PluginDefineTest extends BaseDaoTest {
 
-    @Autowired
-    private PluginDefineMapper pluginDefineMapper;
+    private final PluginDefineMapper pluginDefineMapper;
 
     @Test
     public void testQueryAllPluginDefineList() {

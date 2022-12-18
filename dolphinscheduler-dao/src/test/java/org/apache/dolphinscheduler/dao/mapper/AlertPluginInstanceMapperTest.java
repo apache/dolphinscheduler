@@ -23,6 +23,8 @@ import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,13 +35,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 /**
  * AlertPluginInstanceMapper mapper test
  */
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class AlertPluginInstanceMapperTest extends BaseDaoTest {
 
-    @Autowired
-    private AlertPluginInstanceMapper alertPluginInstanceMapper;
+    private final AlertPluginInstanceMapper alertPluginInstanceMapper;
 
-    @Autowired
-    private PluginDefineMapper pluginDefineMapper;
+    private final PluginDefineMapper pluginDefineMapper;
 
     /**
      * Test function queryAllAlertPluginInstanceList behavior with different size.

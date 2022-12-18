@@ -14,11 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.upgrade;
 
 import org.apache.dolphinscheduler.dao.DaoConfiguration;
 
 import javax.sql.DataSource;
+
+import lombok.RequiredArgsConstructor;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -33,10 +36,10 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest(classes = DaoConfiguration.class)
 @ExtendWith(MockitoExtension.class)
 @SpringBootApplication(scanBasePackageClasses = DaoConfiguration.class)
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class WorkerGroupDaoTest {
 
-    @Autowired
-    protected DataSource dataSource;
+    protected final DataSource dataSource;
 
     @Test
     public void testQueryQueryAllOldWorkerGroupException() throws Exception {

@@ -34,27 +34,26 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 /**
  * Task Instance DAO implementation
  */
 @Repository
+@RequiredArgsConstructor
 public class TaskInstanceDaoImpl implements TaskInstanceDao {
 
     private final Logger logger = LoggerFactory.getLogger(TaskInstanceDaoImpl.class);
 
-    @Autowired
-    private TaskInstanceMapper taskInstanceMapper;
+    private final TaskInstanceMapper taskInstanceMapper;
 
-    @Autowired
-    private ProcessInstanceMapper processInstanceMapper;
+    private final ProcessInstanceMapper processInstanceMapper;
 
-    @Autowired
-    private ProcessInstanceMapDao processInstanceMapDao;
+    private final ProcessInstanceMapDao processInstanceMapDao;
 
     @Override
     public boolean upsertTaskInstance(TaskInstance taskInstance) {

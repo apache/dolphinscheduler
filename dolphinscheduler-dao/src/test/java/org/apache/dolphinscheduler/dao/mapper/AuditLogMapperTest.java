@@ -22,6 +22,8 @@ import org.apache.dolphinscheduler.dao.entity.AuditLog;
 
 import java.util.Date;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,13 +31,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class AuditLogMapperTest extends BaseDaoTest {
 
-    @Autowired
-    AuditLogMapper logMapper;
+    private final AuditLogMapper logMapper;
 
     /**
      * insert
+     *
      * @return
      */
     private void insertOne() {

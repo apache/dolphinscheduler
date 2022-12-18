@@ -26,20 +26,22 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import java.util.Date;
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ErrorCommandMapperTest extends BaseDaoTest {
 
-    @Autowired
-    private ErrorCommandMapper errorCommandMapper;
+    private final ErrorCommandMapper errorCommandMapper;
 
-    @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private final ProcessDefinitionMapper processDefinitionMapper;
 
     /**
      * insert
+     *
      * @return ErrorCommand
      */
     private ErrorCommand insertOne() {

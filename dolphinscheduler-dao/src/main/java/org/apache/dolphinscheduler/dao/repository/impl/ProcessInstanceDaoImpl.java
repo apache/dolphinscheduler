@@ -22,17 +22,17 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @Slf4j
 @Repository
+@RequiredArgsConstructor
 public class ProcessInstanceDaoImpl implements ProcessInstanceDao {
 
-    @Autowired
-    private ProcessInstanceMapper processInstanceMapper;
+    private final ProcessInstanceMapper processInstanceMapper;
 
     @Override
     public int insertProcessInstance(ProcessInstance processInstance) {

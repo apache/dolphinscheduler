@@ -23,6 +23,8 @@ import org.apache.dolphinscheduler.dao.entity.Cluster;
 import java.util.Date;
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,10 +34,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ClusterMapperTest extends BaseDaoTest {
 
-    @Autowired
-    ClusterMapper clusterMapper;
+    private final ClusterMapper clusterMapper;
 
     /**
      * insert

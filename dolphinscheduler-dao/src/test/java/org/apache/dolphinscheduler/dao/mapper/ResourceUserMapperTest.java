@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -23,17 +24,20 @@ import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
 import java.util.Date;
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ResourceUserMapperTest extends BaseDaoTest {
 
-    @Autowired
-    private ResourceUserMapper resourceUserMapper;
+    private final ResourceUserMapper resourceUserMapper;
 
     /**
      * insert
+     *
      * @return ResourcesUser
      */
     private ResourcesUser insertOne() {

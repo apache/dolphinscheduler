@@ -30,20 +30,21 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class MonitorDBDao {
 
     private static final Logger logger = LoggerFactory.getLogger(MonitorDBDao.class);
 
     public static final String VARIABLE_NAME = "variable_name";
 
-    @Autowired
-    private DataSource dataSource;
+    private final DataSource dataSource;
 
     private MonitorRecord getCurrentDbPerformance() {
         try (final Connection conn = dataSource.getConnection()) {

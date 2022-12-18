@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -33,12 +35,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class TaskGroupMapperTest extends BaseDaoTest {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskGroupMapperTest.class);
 
-    @Autowired
-    TaskGroupMapper taskGroupMapper;
+    private final TaskGroupMapper taskGroupMapper;
 
     /**
      * test insert

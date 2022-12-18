@@ -22,14 +22,16 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
 
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ProcessInstanceMapMapperTest extends BaseDaoTest {
 
-    @Autowired
-    private ProcessInstanceMapMapper processInstanceMapMapper;
+    private final ProcessInstanceMapMapper processInstanceMapMapper;
 
     /**
      * insert
@@ -107,7 +109,6 @@ public class ProcessInstanceMapMapperTest extends BaseDaoTest {
     }
 
     /**
-     *
      * test query sub ids by process instance parentId
      */
     @Test

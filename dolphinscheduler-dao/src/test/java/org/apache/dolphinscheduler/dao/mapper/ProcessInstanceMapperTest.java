@@ -30,6 +30,8 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import java.util.Date;
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,16 +39,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ProcessInstanceMapperTest extends BaseDaoTest {
 
-    @Autowired
-    private ProcessInstanceMapper processInstanceMapper;
+    private final ProcessInstanceMapper processInstanceMapper;
 
-    @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private final ProcessDefinitionMapper processDefinitionMapper;
 
-    @Autowired
-    private ProjectMapper projectMapper;
+    private final ProjectMapper projectMapper;
 
     /**
      * insert process instance with specified start time and end time,set state to SUCCESS

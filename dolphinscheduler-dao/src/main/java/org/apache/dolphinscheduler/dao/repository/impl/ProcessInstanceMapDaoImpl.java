@@ -22,18 +22,18 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceMapDao;
 
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 /**
  * Process Instance Map Dao implementation
  */
 @Repository
+@RequiredArgsConstructor
 public class ProcessInstanceMapDaoImpl implements ProcessInstanceMapDao {
 
-    @Autowired
-    private ProcessInstanceMapMapper processInstanceMapMapper;
+    private final ProcessInstanceMapMapper processInstanceMapMapper;
 
     @Override
     public int updateWorkProcessInstanceMap(ProcessInstanceMap processInstanceMap) {

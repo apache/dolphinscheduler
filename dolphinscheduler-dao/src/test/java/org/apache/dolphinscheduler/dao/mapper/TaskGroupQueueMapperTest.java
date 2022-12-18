@@ -24,14 +24,16 @@ import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import java.util.Date;
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class TaskGroupQueueMapperTest extends BaseDaoTest {
 
-    @Autowired
-    TaskGroupQueueMapper taskGroupQueueMapper;
+    private final TaskGroupQueueMapper taskGroupQueueMapper;
 
     int userId = 1;
 

@@ -30,6 +30,8 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,13 +42,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 /**
  * AccessToken mapper test
  */
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class AccessTokenMapperTest extends BaseDaoTest {
 
-    @Autowired
-    private AccessTokenMapper accessTokenMapper;
+    private final AccessTokenMapper accessTokenMapper;
 
-    @Autowired
-    private UserMapper userMapper;
+    private final UserMapper userMapper;
 
     /**
      * test insert

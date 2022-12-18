@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
 
 import static java.util.stream.Collectors.toList;
@@ -31,6 +32,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,16 +41,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class UdfFuncMapperTest extends BaseDaoTest {
 
-    @Autowired
-    private UserMapper userMapper;
+    private final UserMapper userMapper;
 
-    @Autowired
-    private UdfFuncMapper udfFuncMapper;
+    private final UdfFuncMapper udfFuncMapper;
 
-    @Autowired
-    private UDFUserMapper udfUserMapper;
+    private final UDFUserMapper udfUserMapper;
 
     /**
      * insert one udf
