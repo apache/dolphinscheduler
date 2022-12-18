@@ -15,42 +15,15 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.enums;
+import { useI18n } from 'vue-i18n'
+import type { IJsonItem } from '../types'
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
-
-/**
- * have_script
- * have_file
- * can_retry
- * have_arr_variables
- * have_map_variables
- * have_alert
- * is_cache
- */
-public enum Flag {
-
-    /**
-     * 0 no
-     * 1 yes
-     */
-    NO(0, "no"),
-    YES(1, "yes");
-
-    Flag(int code, String descp) {
-        this.code = code;
-        this.descp = descp;
-    }
-
-    @EnumValue
-    private final int code;
-    private final String descp;
-
-    public int getCode() {
-        return code;
-    }
-
-    public String getDescp() {
-        return descp;
+export function useCache(): IJsonItem {
+    const { t } = useI18n()
+    return {
+        type: 'switch',
+        field: 'isCache',
+        name: t('project.node.is_cache'),
+        span: 12
     }
 }
