@@ -188,7 +188,7 @@ public class AzureSQLDataSourceProcessor extends AbstractDataSourceProcessor {
         return azureSQLConnectionParam;
     }
 
-    public static Connection tokenGetConnection(AzureSQLConnectionParam param)  {
+    public static Connection tokenGetConnection(AzureSQLConnectionParam param) {
         String spn = DataSourceConstants.AZURE_SQL_DATABASE_SPN;
         String stsURL = param.getEndpoint(); // Replace with your STS URL.
         String clientId = param.getUser(); // Replace with your client ID.
