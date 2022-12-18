@@ -28,7 +28,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -36,20 +35,23 @@ public class EventExecuteService extends BaseDaemonThread {
 
     private static final Logger logger = LoggerFactory.getLogger(EventExecuteService.class);
 
-    @Autowired
-    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private final ProcessInstanceExecCacheManager processInstanceExecCacheManager;
 
-    @Autowired
-    private StreamTaskInstanceExecCacheManager streamTaskInstanceExecCacheManager;
+    private final StreamTaskInstanceExecCacheManager streamTaskInstanceExecCacheManager;
 
-    @Autowired
-    private WorkflowExecuteThreadPool workflowExecuteThreadPool;
+    private final WorkflowExecuteThreadPool workflowExecuteThreadPool;
 
-    @Autowired
-    private StreamTaskExecuteThreadPool streamTaskExecuteThreadPool;
+    private final StreamTaskExecuteThreadPool streamTaskExecuteThreadPool;
 
-    protected EventExecuteService() {
+    protected EventExecuteService(ProcessInstanceExecCacheManager processInstanceExecCacheManager,
+                                  StreamTaskInstanceExecCacheManager streamTaskInstanceExecCacheManager,
+                                  WorkflowExecuteThreadPool workflowExecuteThreadPool,
+                                  StreamTaskExecuteThreadPool streamTaskExecuteThreadPool) {
         super("EventServiceStarted");
+        this.processInstanceExecCacheManager = processInstanceExecCacheManager;
+        this.streamTaskInstanceExecCacheManager = streamTaskInstanceExecCacheManager;
+        this.workflowExecuteThreadPool = workflowExecuteThreadPool;
+        this.streamTaskExecuteThreadPool = streamTaskExecuteThreadPool;
     }
 
     @Override

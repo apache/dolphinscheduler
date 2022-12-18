@@ -37,7 +37,6 @@ import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -45,16 +44,17 @@ public class WorkflowEventLooper extends BaseDaemonThread {
 
     private final Logger logger = LoggerFactory.getLogger(WorkflowEventLooper.class);
 
-    @Autowired
-    private WorkflowEventQueue workflowEventQueue;
+    private final WorkflowEventQueue workflowEventQueue;
 
-    @Autowired
-    private List<WorkflowEventHandler> workflowEventHandlerList;
+    private final List<WorkflowEventHandler> workflowEventHandlerList;
 
     private final Map<WorkflowEventType, WorkflowEventHandler> workflowEventHandlerMap = new HashMap<>();
 
-    protected WorkflowEventLooper() {
+    protected WorkflowEventLooper(WorkflowEventQueue workflowEventQueue,
+                                  List<WorkflowEventHandler> workflowEventHandlerList) {
         super("WorkflowEventLooper");
+        this.workflowEventQueue = workflowEventQueue;
+        this.workflowEventHandlerList = workflowEventHandlerList;
     }
 
     @PostConstruct

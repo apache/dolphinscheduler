@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.server.master.dispatch.host;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostSelector;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,14 +30,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class HostManagerConfig {
 
-    private AutowireCapableBeanFactory beanFactory;
+    private final AutowireCapableBeanFactory beanFactory;
 
-    @Autowired
-    private MasterConfig masterConfig;
+    private final MasterConfig masterConfig;
 
-    @Autowired
-    public HostManagerConfig(AutowireCapableBeanFactory beanFactory) {
+    public HostManagerConfig(AutowireCapableBeanFactory beanFactory, MasterConfig masterConfig) {
         this.beanFactory = beanFactory;
+        this.masterConfig = masterConfig;
     }
 
     @Bean

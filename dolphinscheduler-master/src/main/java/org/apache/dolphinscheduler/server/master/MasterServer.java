@@ -32,10 +32,11 @@ import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 
 import javax.annotation.PostConstruct;
 
+import lombok.RequiredArgsConstructor;
+
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
@@ -46,33 +47,26 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @ComponentScan("org.apache.dolphinscheduler")
 @EnableTransactionManagement
 @EnableCaching
+@RequiredArgsConstructor
 public class MasterServer implements IStoppable {
 
     private static final Logger logger = LoggerFactory.getLogger(MasterServer.class);
 
-    @Autowired
-    private SpringApplicationContext springApplicationContext;
+    private final SpringApplicationContext springApplicationContext;
 
-    @Autowired
-    private MasterRegistryClient masterRegistryClient;
+    private final MasterRegistryClient masterRegistryClient;
 
-    @Autowired
-    private TaskPluginManager taskPluginManager;
+    private final TaskPluginManager taskPluginManager;
 
-    @Autowired
-    private MasterSchedulerBootstrap masterSchedulerBootstrap;
+    private final MasterSchedulerBootstrap masterSchedulerBootstrap;
 
-    @Autowired
-    private SchedulerApi schedulerApi;
+    private final SchedulerApi schedulerApi;
 
-    @Autowired
-    private EventExecuteService eventExecuteService;
+    private final EventExecuteService eventExecuteService;
 
-    @Autowired
-    private FailoverExecuteThread failoverExecuteThread;
+    private final FailoverExecuteThread failoverExecuteThread;
 
-    @Autowired
-    private MasterRPCServer masterRPCServer;
+    private final MasterRPCServer masterRPCServer;
 
     public static void main(String[] args) {
         Thread.currentThread().setName(Constants.THREAD_NAME_MASTER_SERVER);

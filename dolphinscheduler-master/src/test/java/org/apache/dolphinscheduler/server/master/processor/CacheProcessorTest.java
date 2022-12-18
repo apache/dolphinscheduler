@@ -40,14 +40,14 @@ import io.netty.channel.Channel;
 @ExtendWith(MockitoExtension.class)
 public class CacheProcessorTest {
 
-    @InjectMocks
-    private CacheProcessor cacheProcessor = new CacheProcessor();
-
     @Mock
     private Channel channel;
 
     @Mock
     private CacheManager cacheManager;
+
+    @InjectMocks
+    private CacheProcessor cacheProcessor = new CacheProcessor(cacheManager);
 
     @Mock
     private Cache cache;

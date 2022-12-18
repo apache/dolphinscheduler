@@ -33,29 +33,30 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.math.BigDecimal;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
  * DataQualityResultOperator
  */
 @Component
+@RequiredArgsConstructor
 public class DataQualityResultOperator {
 
     private final Logger logger = LoggerFactory.getLogger(DataQualityResultOperator.class);
 
-    @Autowired
-    private ProcessService processService;
+    private final ProcessService processService;
 
-    @Autowired
-    private ProcessAlertManager alertManager;
+    private final ProcessAlertManager alertManager;
 
     /**
      * When the task type is data quality, it will get the statistics value、comparison value、
      * threshold、check type、operator and failure strategy，use the formula that
      * {check type} {operator} {threshold} to get dqc result . If result is failure, it will alert or block
+     *
      * @param taskResponseEvent
      * @param taskInstance
      */
@@ -87,6 +88,7 @@ public class DataQualityResultOperator {
     /**
      * get the data quality check result
      * and if the result is failure that will alert or block
+     *
      * @param taskResponseEvent
      * @param dqExecuteResult
      * @param processInstance
@@ -120,6 +122,7 @@ public class DataQualityResultOperator {
 
     /**
      * It is used to judge whether the result of the data quality task is failed
+     *
      * @param dqExecuteResult
      * @return
      */

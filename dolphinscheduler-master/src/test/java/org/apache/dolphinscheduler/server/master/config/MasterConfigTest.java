@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.config;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,10 +30,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ActiveProfiles("master")
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = MasterConfig.class)
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class MasterConfigTest {
 
-    @Autowired
-    private MasterConfig masterConfig;
+    private final MasterConfig masterConfig;
 
     @Test
     public void getMasterDispatchTaskNumber() {

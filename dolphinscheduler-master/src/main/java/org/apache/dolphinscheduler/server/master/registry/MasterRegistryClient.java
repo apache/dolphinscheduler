@@ -33,9 +33,10 @@ import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import org.apache.commons.lang3.StringUtils;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -43,21 +44,18 @@ import org.springframework.stereotype.Component;
  * <p>When the Master node startup, it will register in registry center. And start a {@link MasterHeartBeatTask} to update its metadata in registry.
  */
 @Component
+@RequiredArgsConstructor
 public class MasterRegistryClient implements AutoCloseable {
 
     private static final Logger logger = LoggerFactory.getLogger(MasterRegistryClient.class);
 
-    @Autowired
-    private FailoverService failoverService;
+    private final FailoverService failoverService;
 
-    @Autowired
-    private RegistryClient registryClient;
+    private final RegistryClient registryClient;
 
-    @Autowired
-    private MasterConfig masterConfig;
+    private final MasterConfig masterConfig;
 
-    @Autowired
-    private MasterConnectStrategy masterConnectStrategy;
+    private final MasterConnectStrategy masterConnectStrategy;
 
     private MasterHeartBeatTask masterHeartBeatTask;
 
@@ -87,7 +85,7 @@ public class MasterRegistryClient implements AutoCloseable {
     /**
      * remove master node path
      *
-     * @param path node path
+     * @param path     node path
      * @param nodeType node type
      * @param failover is failover
      */

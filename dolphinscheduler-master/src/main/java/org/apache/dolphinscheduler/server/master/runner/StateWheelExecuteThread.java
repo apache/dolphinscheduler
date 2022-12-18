@@ -44,8 +44,6 @@ import lombok.NonNull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 /**
@@ -80,18 +78,18 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
      */
     private final ConcurrentLinkedQueue<TaskInstanceKey> taskInstanceStateCheckList = new ConcurrentLinkedQueue<>();
 
-    @Autowired
-    private MasterConfig masterConfig;
+    private final MasterConfig masterConfig;
 
-    @Lazy
-    @Autowired
-    private WorkflowExecuteThreadPool workflowExecuteThreadPool;
+    private final WorkflowExecuteThreadPool workflowExecuteThreadPool;
 
-    @Autowired
-    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private final ProcessInstanceExecCacheManager processInstanceExecCacheManager;
 
-    protected StateWheelExecuteThread() {
+    protected StateWheelExecuteThread(MasterConfig masterConfig, WorkflowExecuteThreadPool workflowExecuteThreadPool,
+                                      ProcessInstanceExecCacheManager processInstanceExecCacheManager) {
         super("StateWheelExecuteThread");
+        this.masterConfig = masterConfig;
+        this.workflowExecuteThreadPool = workflowExecuteThreadPool;
+        this.processInstanceExecCacheManager = processInstanceExecCacheManager;
     }
 
     @PostConstruct

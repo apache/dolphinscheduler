@@ -27,9 +27,10 @@ import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.master.runner.StreamTaskExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.StreamTaskExecuteThreadPool;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
@@ -39,15 +40,14 @@ import io.netty.channel.Channel;
  * task execute start processor, from api to master
  */
 @Component
+@RequiredArgsConstructor
 public class TaskExecuteStartProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(TaskExecuteStartProcessor.class);
 
-    @Autowired
-    private StreamTaskExecuteThreadPool streamTaskExecuteThreadPool;
+    private final StreamTaskExecuteThreadPool streamTaskExecuteThreadPool;
 
-    @Autowired
-    private TaskDefinitionDao taskDefinitionDao;
+    private final TaskDefinitionDao taskDefinitionDao;
 
     @Override
     public void process(Channel channel, Command command) {

@@ -26,7 +26,6 @@ import org.apache.dolphinscheduler.server.master.service.MasterFailoverService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -34,17 +33,17 @@ public class FailoverExecuteThread extends BaseDaemonThread {
 
     private static final Logger logger = LoggerFactory.getLogger(FailoverExecuteThread.class);
 
-    @Autowired
-    private MasterConfig masterConfig;
+    private final MasterConfig masterConfig;
 
     /**
      * failover service
      */
-    @Autowired
-    private MasterFailoverService masterFailoverService;
+    private final MasterFailoverService masterFailoverService;
 
-    protected FailoverExecuteThread() {
+    protected FailoverExecuteThread(MasterConfig masterConfig, MasterFailoverService masterFailoverService) {
         super("FailoverExecuteThread");
+        this.masterConfig = masterConfig;
+        this.masterFailoverService = masterFailoverService;
     }
 
     @Override

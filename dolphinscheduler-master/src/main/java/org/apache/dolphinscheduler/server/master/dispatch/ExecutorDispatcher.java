@@ -32,7 +32,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -46,14 +45,12 @@ public class ExecutorDispatcher implements InitializingBean {
     /**
      * netty executor manager
      */
-    @Autowired
-    private NettyExecutorManager nettyExecutorManager;
+    private final NettyExecutorManager nettyExecutorManager;
 
     /**
      * round robin host manager
      */
-    @Autowired
-    private HostManager hostManager;
+    private final HostManager hostManager;
 
     /**
      * executor manager
@@ -62,8 +59,13 @@ public class ExecutorDispatcher implements InitializingBean {
 
     /**
      * constructor
+     *
+     * @param nettyExecutorManager
+     * @param hostManager
      */
-    public ExecutorDispatcher() {
+    public ExecutorDispatcher(NettyExecutorManager nettyExecutorManager, HostManager hostManager) {
+        this.nettyExecutorManager = nettyExecutorManager;
+        this.hostManager = hostManager;
         this.executorManagers = new ConcurrentHashMap<>();
     }
 
@@ -100,6 +102,7 @@ public class ExecutorDispatcher implements InitializingBean {
 
     /**
      * register init
+     *
      * @throws Exception if error throws Exception
      */
     @Override
@@ -109,8 +112,9 @@ public class ExecutorDispatcher implements InitializingBean {
     }
 
     /**
-     *  register
-     * @param type executor type
+     * register
+     *
+     * @param type            executor type
      * @param executorManager executorManager
      */
     public void register(ExecutorType type, ExecutorManager executorManager) {

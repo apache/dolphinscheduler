@@ -55,7 +55,6 @@ import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -72,43 +71,46 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
     /**
      * taskUpdateQueue
      */
-    @Autowired
-    private TaskPriorityQueue<TaskPriority> taskPriorityQueue;
+    private final TaskPriorityQueue<TaskPriority> taskPriorityQueue;
 
-    @Autowired
-    private TaskInstanceDao taskInstanceDao;
+    private final TaskInstanceDao taskInstanceDao;
 
     /**
      * executor dispatcher
      */
-    @Autowired
-    private ExecutorDispatcher dispatcher;
+    private final ExecutorDispatcher dispatcher;
 
     /**
      * processInstance cache manager
      */
-    @Autowired
-    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private final ProcessInstanceExecCacheManager processInstanceExecCacheManager;
 
     /**
      * master config
      */
-    @Autowired
-    private MasterConfig masterConfig;
+    private final MasterConfig masterConfig;
 
     /**
      * task response service
      */
-    @Autowired
-    private TaskEventService taskEventService;
+    private final TaskEventService taskEventService;
 
     /**
      * consumer thread pool
      */
     private ThreadPoolExecutor consumerThreadPoolExecutor;
 
-    protected TaskPriorityQueueConsumer() {
+    protected TaskPriorityQueueConsumer(TaskPriorityQueue<TaskPriority> taskPriorityQueue,
+                                        TaskInstanceDao taskInstanceDao, ExecutorDispatcher dispatcher,
+                                        ProcessInstanceExecCacheManager processInstanceExecCacheManager,
+                                        MasterConfig masterConfig, TaskEventService taskEventService) {
         super("TaskPriorityQueueConsumeThread");
+        this.taskPriorityQueue = taskPriorityQueue;
+        this.taskInstanceDao = taskInstanceDao;
+        this.dispatcher = dispatcher;
+        this.processInstanceExecCacheManager = processInstanceExecCacheManager;
+        this.masterConfig = masterConfig;
+        this.taskEventService = taskEventService;
     }
 
     @PostConstruct

@@ -32,9 +32,10 @@ import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import java.time.Duration;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
@@ -43,22 +44,17 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @ConditionalOnProperty(prefix = "master.registry-disconnect-strategy", name = "strategy", havingValue = "waiting")
+@RequiredArgsConstructor
 public class MasterWaitingStrategy implements MasterConnectStrategy {
 
     private final Logger logger = LoggerFactory.getLogger(MasterWaitingStrategy.class);
 
-    @Autowired
-    private MasterConfig masterConfig;
-    @Autowired
-    private RegistryClient registryClient;
-    @Autowired
-    private MasterRPCServer masterRPCServer;
-    @Autowired
-    private WorkflowEventQueue workflowEventQueue;
-    @Autowired
-    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
-    @Autowired
-    private StateWheelExecuteThread stateWheelExecuteThread;
+    private final MasterConfig masterConfig;
+    private final RegistryClient registryClient;
+    private final MasterRPCServer masterRPCServer;
+    private final WorkflowEventQueue workflowEventQueue;
+    private final ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private final StateWheelExecuteThread stateWheelExecuteThread;
 
     @Override
     public void disconnect() {

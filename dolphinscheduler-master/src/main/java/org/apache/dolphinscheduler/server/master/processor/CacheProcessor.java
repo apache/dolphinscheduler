@@ -24,9 +24,10 @@ import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
@@ -38,12 +39,12 @@ import io.netty.channel.Channel;
  * cache process from master/api
  */
 @Component
+@RequiredArgsConstructor
 public class CacheProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(CacheProcessor.class);
 
-    @Autowired
-    private CacheManager cacheManager;
+    private final CacheManager cacheManager;
 
     @Override
     public void process(Channel channel, Command command) {

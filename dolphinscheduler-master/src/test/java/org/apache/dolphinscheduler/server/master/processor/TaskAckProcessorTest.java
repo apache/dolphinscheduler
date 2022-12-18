@@ -61,7 +61,7 @@ public class TaskAckProcessorTest {
         mockedStaticSpringApplicationContext.when(() -> SpringApplicationContext.getBean(ProcessService.class))
                 .thenReturn(processService);
 
-        taskExecuteRunningProcessor = new TaskExecuteRunningProcessor();
+        taskExecuteRunningProcessor = new TaskExecuteRunningProcessor(taskEventService);
 
         channel = Mockito.mock(Channel.class);
         taskResponseEvent = Mockito.mock(TaskEvent.class);

@@ -22,7 +22,8 @@ import org.apache.dolphinscheduler.server.master.service.ExecutingService;
 
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,13 +33,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/workflow/execute")
+@RequiredArgsConstructor
 public class WorkflowExecuteController {
 
-    @Autowired
-    private ExecutingService executingService;
+    private final ExecutingService executingService;
 
     /**
      * query workflow execute data in memory
+     *
      * @param processInstanceId
      * @return
      */

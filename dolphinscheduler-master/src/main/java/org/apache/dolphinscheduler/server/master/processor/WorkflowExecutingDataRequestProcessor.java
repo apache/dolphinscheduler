@@ -28,9 +28,10 @@ import org.apache.dolphinscheduler.server.master.service.ExecutingService;
 
 import java.util.Optional;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
@@ -40,12 +41,12 @@ import io.netty.channel.Channel;
  * workflow executing data process from api/master
  */
 @Component
+@RequiredArgsConstructor
 public class WorkflowExecutingDataRequestProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(WorkflowExecutingDataRequestProcessor.class);
 
-    @Autowired
-    private ExecutingService executingService;
+    private final ExecutingService executingService;
 
     @Override
     public void process(Channel channel, Command command) {

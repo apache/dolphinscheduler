@@ -59,7 +59,6 @@ import lombok.NonNull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import io.micrometer.core.annotation.Counted;
@@ -82,8 +81,7 @@ public class MasterFailoverService {
 
     private final TaskInstanceDao taskInstanceDao;
 
-    @Autowired
-    private ProcessDefinitionDao processDefinitionDao;
+    private final ProcessDefinitionDao processDefinitionDao;
 
     public MasterFailoverService(@NonNull RegistryClient registryClient,
                                  @NonNull MasterConfig masterConfig,
@@ -91,7 +89,7 @@ public class MasterFailoverService {
                                  @NonNull NettyExecutorManager nettyExecutorManager,
                                  @NonNull ProcessInstanceExecCacheManager processInstanceExecCacheManager,
                                  @NonNull LogClient logClient,
-                                 @NonNull TaskInstanceDao taskInstanceDao) {
+                                 @NonNull TaskInstanceDao taskInstanceDao, ProcessDefinitionDao processDefinitionDao) {
         this.registryClient = registryClient;
         this.masterConfig = masterConfig;
         this.processService = processService;
@@ -100,6 +98,7 @@ public class MasterFailoverService {
         this.processInstanceExecCacheManager = processInstanceExecCacheManager;
         this.logClient = logClient;
         this.taskInstanceDao = taskInstanceDao;
+        this.processDefinitionDao = processDefinitionDao;
     }
 
     /**

@@ -34,6 +34,8 @@ import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
 import org.apache.dolphinscheduler.server.worker.processor.TaskDispatchProcessor;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -47,10 +49,13 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  */
 @ExtendWith(SpringExtension.class)
 @Disabled
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class NettyExecutorManagerTest {
 
-    @Autowired
-    private NettyExecutorManager nettyExecutorManager;
+    private final NettyExecutorManager nettyExecutorManager;
+
+    private final TaskDispatchProcessor taskDispatchProcessor;
+
     @Test
     public void testExecute() throws ExecuteException {
         final NettyServerConfig serverConfig = new NettyServerConfig();
@@ -58,7 +63,7 @@ public class NettyExecutorManagerTest {
         NettyRemotingServer nettyRemotingServer = new NettyRemotingServer(serverConfig);
         nettyRemotingServer.registerProcessor(
                 org.apache.dolphinscheduler.remote.command.CommandType.TASK_DISPATCH_REQUEST,
-                new TaskDispatchProcessor());
+                taskDispatchProcessor);
         nettyRemotingServer.start();
         TaskInstance taskInstance = Mockito.mock(TaskInstance.class);
         ProcessDefinition processDefinition = Mockito.mock(ProcessDefinition.class);
@@ -96,6 +101,7 @@ public class NettyExecutorManagerTest {
         });
 
     }
+
     private Command toCommand(TaskExecutionContext taskExecutionContext) {
         TaskDispatchCommand requestCommand = new TaskDispatchCommand(taskExecutionContext,
                 "127.0.0.1:5678",
