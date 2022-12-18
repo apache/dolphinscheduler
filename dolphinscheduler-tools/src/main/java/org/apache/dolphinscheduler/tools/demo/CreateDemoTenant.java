@@ -22,14 +22,15 @@ import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 
 import java.util.Date;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
+@RequiredArgsConstructor
 public class CreateDemoTenant {
 
     private static final Logger logger = LoggerFactory.getLogger(CreateDemoTenant.class);
-    @Autowired
     private TenantMapper tenantMapper;
 
     public void createTenantCode(String tenantCode) {

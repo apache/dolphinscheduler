@@ -42,13 +42,15 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class ProcessDefinitionDemo {
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessDefinitionDemo.class);
@@ -56,17 +58,13 @@ public class ProcessDefinitionDemo {
     @Value("${demo.tenant-code}")
     private String tenantCode;
 
-    @Autowired
-    private ProjectMapper projectMapper;
+    private final ProjectMapper projectMapper;
 
-    @Autowired
-    private UserMapper userMapper;
+    private final UserMapper userMapper;
 
-    @Autowired
-    private AccessTokenMapper accessTokenMapper;
+    private final AccessTokenMapper accessTokenMapper;
 
-    @Autowired
-    private ProxyProcessDefinitionController proxyProcessDefinitionController;
+    private final ProxyProcessDefinitionController proxyProcessDefinitionController;
 
     public void createProcessDefinitionDemo() throws Exception {
         // get user
@@ -236,6 +234,7 @@ public class ProcessDefinitionDemo {
                 PARALLEL);
         return ProxyResult;
     }
+
     public ProxyResult dependentProxyResultDemo(String token, long projectCode, String tenantCode,
                                                 String shellProcessCode, String switchProcessCode) {
 
@@ -329,6 +328,7 @@ public class ProcessDefinitionDemo {
                 PARALLEL);
         return ProxyResult;
     }
+
     public ProxyResult parameterContextDemo(String token, long projectCode, String tenantCode) {
 
         // get demo taskcode
@@ -415,6 +415,7 @@ public class ProcessDefinitionDemo {
                 PARALLEL);
         return ProxyResult;
     }
+
     public ProxyResult conditionDemo(String token, long projectCode, String tenantCode) {
 
         // get demo taskcode
@@ -532,6 +533,7 @@ public class ProcessDefinitionDemo {
                 PARALLEL);
         return ProxyResult;
     }
+
     public ProxyResult swicthDemo(String token, long projectCode, String tenantCode) {
 
         // get demo taskcode
@@ -651,6 +653,7 @@ public class ProcessDefinitionDemo {
                 PARALLEL);
         return ProxyResult;
     }
+
     public ProxyResult shellDemo(String token, long projectCode, String tenantCode) {
 
         // get demo taskcode
@@ -750,6 +753,7 @@ public class ProcessDefinitionDemo {
                 PARALLEL);
         return ProxyResult;
     }
+
     public ProxyResult subProcessDemo(String token, long projectCode, String tenantCode, String subProcessCode) {
 
         // get demo taskcode
