@@ -80,7 +80,7 @@ public class AzureSQLDataSourceProcessor extends AbstractDataSourceProcessor {
         azureSQLDatasourceParamDTO.setMode(connectionParams.getMode());
         switch (azureSQLDatasourceParamDTO.getMode()) {
             case AD_MSI:
-                if (!StringUtils.isEmpty(connectionParams.getMSIClientId())) {
+                if (StringUtils.isNotEmpty(connectionParams.getMSIClientId())) {
                     azureSQLDatasourceParamDTO.setMSIClientId(connectionParams.getMSIClientId());
                 }
                 break;
