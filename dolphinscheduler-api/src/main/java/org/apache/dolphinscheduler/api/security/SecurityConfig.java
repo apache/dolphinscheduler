@@ -17,11 +17,10 @@
 
 package org.apache.dolphinscheduler.api.security;
 
-import org.apache.dolphinscheduler.api.security.impl.ldap.LdapAuthenticator;
-import org.apache.dolphinscheduler.api.security.impl.pwd.PasswordAuthenticator;
-
 import org.apache.commons.lang3.StringUtils;
-
+import org.apache.dolphinscheduler.api.security.impl.ldap.LdapAuthenticator;
+import org.apache.dolphinscheduler.api.security.impl.ldap.LdapService;
+import org.apache.dolphinscheduler.api.security.impl.pwd.PasswordAuthenticator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,9 +38,11 @@ public class SecurityConfig {
 
     private final AutowireCapableBeanFactory beanFactory;
     private AuthenticationType authenticationType;
+    private final LdapService ldapService;
 
-    public SecurityConfig(AutowireCapableBeanFactory beanFactory) {
+    public SecurityConfig(AutowireCapableBeanFactory beanFactory, LdapService ldapService) {
         this.beanFactory = beanFactory;
+        this.ldapService = ldapService;
     }
 
     private void setAuthenticationType(String type) {
@@ -63,7 +64,7 @@ public class SecurityConfig {
                 authenticator = new PasswordAuthenticator();
                 break;
             case LDAP:
-                authenticator = new LdapAuthenticator();
+                authenticator = new LdapAuthenticator(ldapService);
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + authenticationType);

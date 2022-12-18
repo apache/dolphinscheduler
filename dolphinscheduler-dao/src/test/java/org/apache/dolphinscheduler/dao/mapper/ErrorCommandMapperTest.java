@@ -17,19 +17,18 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.CommandCount;
 import org.apache.dolphinscheduler.dao.entity.ErrorCommand;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
 import java.util.List;
-
-import lombok.RequiredArgsConstructor;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ErrorCommandMapperTest extends BaseDaoTest {

@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.scheduler.quartz;
 
 import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
 
+import org.quartz.Scheduler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -26,7 +27,7 @@ import org.springframework.context.annotation.Configuration;
 public class QuartzSchedulerConfiguration {
 
     @Bean
-    public SchedulerApi schedulerApi() {
-        return new QuartzScheduler();
+    public SchedulerApi schedulerApi(Scheduler scheduler) {
+        return new QuartzScheduler(scheduler);
     }
 }

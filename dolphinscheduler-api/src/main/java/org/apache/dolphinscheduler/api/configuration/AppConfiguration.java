@@ -17,14 +17,12 @@
 
 package org.apache.dolphinscheduler.api.configuration;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.api.interceptor.LocaleChangeInterceptor;
 import org.apache.dolphinscheduler.api.interceptor.LoginHandlerInterceptor;
 import org.apache.dolphinscheduler.api.interceptor.RateLimitInterceptor;
-
-import java.util.Locale;
-
-import lombok.RequiredArgsConstructor;
-
+import org.apache.dolphinscheduler.api.security.Authenticator;
+import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -37,6 +35,8 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
+
+import java.util.Locale;
 
 /**
  * application configuration
@@ -53,6 +53,8 @@ public class AppConfiguration implements WebMvcConfigurer {
 
     private final TrafficConfiguration trafficConfiguration;
 
+    private final LoginHandlerInterceptor loginInterceptor;
+
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
@@ -65,12 +67,13 @@ public class AppConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
-    public LoginHandlerInterceptor loginInterceptor() {
-        return new LoginHandlerInterceptor();
+    public LoginHandlerInterceptor loginInterceptor(UserMapper userMapper, Authenticator authenticator) {
+        return new LoginHandlerInterceptor(userMapper, authenticator);
     }
 
     /**
      * Cookie
+     *
      * @return local resolver
      */
     @Bean(name = "localeResolver")
@@ -101,11 +104,11 @@ public class AppConfiguration implements WebMvcConfigurer {
         if (trafficConfiguration.isGlobalSwitch() || trafficConfiguration.isTenantSwitch()) {
             registry.addInterceptor(createRateLimitInterceptor());
         }
-        registry.addInterceptor(loginInterceptor())
-                .addPathPatterns(LOGIN_INTERCEPTOR_PATH_PATTERN)
-                .excludePathPatterns(LOGIN_PATH_PATTERN, REGISTER_PATH_PATTERN,
-                        "/swagger-resources/**", "/webjars/**", "/v3/api-docs/**", "/api-docs/**", "/swagger-ui.html",
-                        "/doc.html", "/swagger-ui/**", "*.html", "/ui/**", "/error");
+        registry.addInterceptor(loginInterceptor)
+            .addPathPatterns(LOGIN_INTERCEPTOR_PATH_PATTERN)
+            .excludePathPatterns(LOGIN_PATH_PATTERN, REGISTER_PATH_PATTERN,
+                "/swagger-resources/**", "/webjars/**", "/v3/api-docs/**", "/api-docs/**", "/swagger-ui.html",
+                "/doc.html", "/swagger-ui/**", "*.html", "/ui/**", "/error");
     }
 
     @Override

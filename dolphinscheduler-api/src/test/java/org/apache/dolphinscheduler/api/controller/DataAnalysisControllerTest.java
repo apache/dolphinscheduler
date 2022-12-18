@@ -22,23 +22,22 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-
-import java.util.Date;
-
-import lombok.RequiredArgsConstructor;
-
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+
+import java.util.Date;
 
 /**
  * data analysis controller test
@@ -71,9 +70,9 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(get("/projects/analysis/task-state-count")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -93,9 +92,9 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(get("/projects/analysis/process-state-count")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -112,9 +111,9 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(get("/projects/analysis/define-user-count")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -124,9 +123,9 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
     public void testCountCommandState() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/projects/analysis/command-state-count")
                 .header("sessionId", sessionId))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
         logger.info(mvcResult.getResponse().getContentAsString());
@@ -136,9 +135,9 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
     public void testCountQueueState() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/projects/analysis/queue-count")
                 .header("sessionId", sessionId))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
         logger.info(mvcResult.getResponse().getContentAsString());

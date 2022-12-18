@@ -17,17 +17,16 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
-
-import java.util.Date;
-import java.util.List;
-
-import lombok.RequiredArgsConstructor;
-
 import org.assertj.core.util.Arrays;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Date;
+import java.util.List;
 
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ProcessTaskRelationMapperTest extends BaseDaoTest {

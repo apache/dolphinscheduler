@@ -24,11 +24,6 @@ import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -36,6 +31,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * ProcessAlertManager Test
@@ -45,11 +44,11 @@ public class ProcessAlertManagerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessAlertManagerTest.class);
 
-    @InjectMocks
-    ProcessAlertManager processAlertManager = new ProcessAlertManager();
-
     @Mock
     private AlertDao alertDao;
+
+    @InjectMocks
+    ProcessAlertManager processAlertManager = new ProcessAlertManager(alertDao);
 
     /**
      * send worker alert fault tolerance

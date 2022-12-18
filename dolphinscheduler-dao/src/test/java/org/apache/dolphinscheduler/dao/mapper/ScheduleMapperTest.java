@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.WarningType;
@@ -25,17 +28,12 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
 import java.util.List;
-
-import lombok.RequiredArgsConstructor;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ScheduleMapperTest extends BaseDaoTest {
@@ -136,7 +134,7 @@ public class ScheduleMapperTest extends BaseDaoTest {
 
         Page<Schedule> page = new Page(1, 3);
         IPage<Schedule> scheduleIPage = scheduleMapper.queryByProcessDefineCodePaging(page,
-                processDefinition.getCode(), "");
+            processDefinition.getCode(), "");
         Assertions.assertNotEquals(scheduleIPage.getSize(), 0);
     }
 
@@ -174,7 +172,7 @@ public class ScheduleMapperTest extends BaseDaoTest {
 
         Page<Schedule> page = new Page(1, 3);
         List<Schedule> schedules = scheduleMapper.querySchedulerListByProjectName(
-                project.getName());
+            project.getName());
 
         Assertions.assertNotEquals(schedules.size(), 0);
     }
@@ -191,7 +189,7 @@ public class ScheduleMapperTest extends BaseDaoTest {
         scheduleMapper.updateById(schedule);
 
         List<Schedule> schedules =
-                scheduleMapper.selectAllByProcessDefineArray(new long[]{schedule.getProcessDefinitionCode()});
+            scheduleMapper.selectAllByProcessDefineArray(new long[]{schedule.getProcessDefinitionCode()});
         Assertions.assertNotEquals(schedules.size(), 0);
     }
 

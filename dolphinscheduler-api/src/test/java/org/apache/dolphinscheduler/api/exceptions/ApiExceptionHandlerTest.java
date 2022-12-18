@@ -22,19 +22,18 @@ import org.apache.dolphinscheduler.api.controller.ProcessDefinitionController;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.User;
-
-import java.lang.reflect.Method;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.method.HandlerMethod;
+
+import java.lang.reflect.Method;
 
 public class ApiExceptionHandlerTest {
 
     @Test
     public void exceptionHandler() throws NoSuchMethodException {
         ApiExceptionHandler handler = new ApiExceptionHandler();
-        AccessTokenController controller = new AccessTokenController();
+        AccessTokenController controller = new AccessTokenController(null);
         Method method =
                 controller.getClass().getMethod("createToken", User.class, int.class, String.class, String.class);
         HandlerMethod hm = new HandlerMethod(controller, method);
@@ -45,7 +44,7 @@ public class ApiExceptionHandlerTest {
     @Test
     public void exceptionHandlerRuntime() throws NoSuchMethodException {
         ApiExceptionHandler handler = new ApiExceptionHandler();
-        ProcessDefinitionController controller = new ProcessDefinitionController();
+        ProcessDefinitionController controller = new ProcessDefinitionController(null);
         Method method =
                 controller.getClass().getMethod("queryAllProcessDefinitionByProjectCode", User.class, long.class);
         HandlerMethod hm = new HandlerMethod(controller, method);

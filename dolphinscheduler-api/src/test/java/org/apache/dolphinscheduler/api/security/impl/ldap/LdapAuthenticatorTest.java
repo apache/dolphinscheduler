@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.security.impl.ldap;
 
 import static org.mockito.Mockito.when;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.api.controller.AbstractControllerTest;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.security.LdapUserNotExistActionType;
@@ -29,15 +30,6 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Session;
 import org.apache.dolphinscheduler.dao.entity.User;
-
-import java.util.Date;
-import java.util.Map;
-import java.util.UUID;
-
-import javax.servlet.http.HttpServletRequest;
-
-import lombok.RequiredArgsConstructor;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,20 +37,27 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 
+import javax.servlet.http.HttpServletRequest;
+
+import java.util.Date;
+import java.util.Map;
+import java.util.UUID;
+
 @TestPropertySource(properties = {
-        "security.authentication.type=LDAP",
-        "security.authentication.ldap.user.admin=read-only-admin",
-        "security.authentication.ldap.urls=ldap://ldap.forumsys.com:389/",
-        "security.authentication.ldap.base-dn=dc=example,dc=com",
-        "security.authentication.ldap.username=cn=read-only-admin,dc=example,dc=com",
-        "security.authentication.ldap.password=password",
-        "security.authentication.ldap.user.identity-attribute=uid",
-        "security.authentication.ldap.user.email-attribute=mail",
-        "security.authentication.ldap.user.not-exist-action=CREATE",
+    "security.authentication.type=LDAP",
+    "security.authentication.ldap.user.admin=read-only-admin",
+    "security.authentication.ldap.urls=ldap://ldap.forumsys.com:389/",
+    "security.authentication.ldap.base-dn=dc=example,dc=com",
+    "security.authentication.ldap.username=cn=read-only-admin,dc=example,dc=com",
+    "security.authentication.ldap.password=password",
+    "security.authentication.ldap.user.identity-attribute=uid",
+    "security.authentication.ldap.user.email-attribute=mail",
+    "security.authentication.ldap.user.not-exist-action=CREATE",
 })
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class LdapAuthenticatorTest extends AbstractControllerTest {
@@ -71,7 +70,6 @@ public class LdapAuthenticatorTest extends AbstractControllerTest {
     private SessionService sessionService;
     @Spy
     private UsersService usersService;
-
     private LdapAuthenticator ldapAuthenticator;
 
     // test param
@@ -87,7 +85,7 @@ public class LdapAuthenticatorTest extends AbstractControllerTest {
     @Override
     @BeforeEach
     public void setUp() {
-        ldapAuthenticator = new LdapAuthenticator();
+        ldapAuthenticator = new LdapAuthenticator(ldapService);
         beanFactory.autowireBean(ldapAuthenticator);
 
         mockUser = new User();
