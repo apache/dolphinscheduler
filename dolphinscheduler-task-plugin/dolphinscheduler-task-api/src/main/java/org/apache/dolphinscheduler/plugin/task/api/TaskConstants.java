@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.api;
 
 import java.time.Duration;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import com.google.common.collect.Sets;
 
@@ -473,7 +474,7 @@ public class TaskConstants {
     public static final int LOG_LINES = 500;
     public static final String NAMESPACE_NAME = "name";
     public static final String CLUSTER = "cluster";
-    public static final String COMMAND_SPLIT_REGEX = "[^\\s\"'`]+|\"([^\"]+)\"|'([^']+)'|`([^`]+)`";
+    public static final Pattern COMMAND_SPLIT_REGEX = Pattern.compile("[^\\s\"'`]+|\"([^\"]+)\"|'([^']+)'|`([^`]+)`");
 
     /**
      * conda config used by jupyter task plugin
