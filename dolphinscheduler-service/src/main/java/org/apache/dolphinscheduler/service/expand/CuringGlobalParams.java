@@ -45,15 +45,15 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class CuringGlobalParams implements CuringParamsService {
 
-    @Autowired
-    private TimePlaceholderResolverExpandService timePlaceholderResolverExpandService;
+    private final TimePlaceholderResolverExpandService timePlaceholderResolverExpandService;
 
     @Override
     public String convertParameterPlaceholders(String val, Map<String, String> allParamMap) {
@@ -72,6 +72,7 @@ public class CuringGlobalParams implements CuringParamsService {
 
     /**
      * here it is judged whether external expansion calculation is required and the calculation result is obtained
+     *
      * @param processInstanceId
      * @param globalParamMap
      * @param globalParamList

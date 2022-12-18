@@ -39,15 +39,17 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
  * process alert manager
  */
 @Component
+@RequiredArgsConstructor
 public class ProcessAlertManager {
 
     /**
@@ -58,8 +60,7 @@ public class ProcessAlertManager {
     /**
      * alert dao
      */
-    @Autowired
-    private AlertDao alertDao;
+    private final AlertDao alertDao;
 
     /**
      * command type convert chinese
@@ -98,7 +99,7 @@ public class ProcessAlertManager {
      * get process instance content
      *
      * @param processInstance process instance
-     * @param taskInstances task instance list
+     * @param taskInstances   task instance list
      * @return process instance format content
      */
     public String getContentProcessInstance(ProcessInstance processInstance,
@@ -159,7 +160,7 @@ public class ProcessAlertManager {
     /**
      * getting worker fault tolerant content
      *
-     * @param processInstance process instance
+     * @param processInstance   process instance
      * @param toleranceTaskList tolerance task list
      * @return worker tolerance content
      */
@@ -185,7 +186,7 @@ public class ProcessAlertManager {
     /**
      * send worker alert fault tolerance
      *
-     * @param processInstance process instance
+     * @param processInstance   process instance
      * @param toleranceTaskList tolerance task list
      */
     public void sendAlertWorkerToleranceFault(ProcessInstance processInstance, List<TaskInstance> toleranceTaskList) {
@@ -211,7 +212,7 @@ public class ProcessAlertManager {
      * send process instance alert
      *
      * @param processInstance process instance
-     * @param taskInstances task instance list
+     * @param taskInstances   task instance list
      */
     public void sendAlertProcessInstance(ProcessInstance processInstance,
                                          List<TaskInstance> taskInstances,
@@ -340,6 +341,7 @@ public class ProcessAlertManager {
 
     /**
      * getDataQualityAlterContent
+     *
      * @param result DqExecuteResult
      * @return String String
      */
@@ -371,6 +373,7 @@ public class ProcessAlertManager {
 
     /**
      * getTaskAlterContent
+     *
      * @param taskInstance TaskInstance
      * @return String String
      */
@@ -398,11 +401,10 @@ public class ProcessAlertManager {
     }
 
     /**
-     *
      * check node type and process blocking flag, then insert a block record into db
      *
      * @param processInstance process instance
-     * @param projectUser the project owner
+     * @param projectUser     the project owner
      */
     public void sendProcessBlockingAlert(ProcessInstance processInstance,
                                          ProjectUser projectUser) {

@@ -34,7 +34,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import io.netty.channel.Channel;
@@ -47,8 +46,7 @@ public class CacheNotifyServiceImpl implements CacheNotifyService {
 
     private final Logger logger = LoggerFactory.getLogger(CacheNotifyServiceImpl.class);
 
-    @Autowired
-    private RegistryClient registryClient;
+    private final RegistryClient registryClient;
 
     /**
      * remote channels
@@ -60,7 +58,8 @@ public class CacheNotifyServiceImpl implements CacheNotifyService {
      */
     private final NettyRemotingClient nettyRemotingClient;
 
-    public CacheNotifyServiceImpl() {
+    public CacheNotifyServiceImpl(RegistryClient registryClient) {
+        this.registryClient = registryClient;
         final NettyClientConfig clientConfig = new NettyClientConfig();
         this.nettyRemotingClient = new NettyRemotingClient(clientConfig);
     }

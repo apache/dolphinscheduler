@@ -45,11 +45,11 @@ public class ProcessAlertManagerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessAlertManagerTest.class);
 
-    @InjectMocks
-    ProcessAlertManager processAlertManager = new ProcessAlertManager();
-
     @Mock
     private AlertDao alertDao;
+
+    @InjectMocks
+    ProcessAlertManager processAlertManager = new ProcessAlertManager(alertDao);
 
     /**
      * send worker alert fault tolerance

@@ -163,9 +163,10 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -180,133 +181,93 @@ import com.google.common.collect.Lists;
  * process relative dao that some mappers in this.
  */
 @Component
+@RequiredArgsConstructor
 public class ProcessServiceImpl implements ProcessService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Autowired
-    private UserMapper userMapper;
+    private final UserMapper userMapper;
 
-    @Autowired
-    private ProcessDefinitionMapper processDefineMapper;
+    private final ProcessDefinitionMapper processDefineMapper;
 
-    @Autowired
-    private ProcessDefinitionLogMapper processDefineLogMapper;
+    private final ProcessDefinitionLogMapper processDefineLogMapper;
 
     // todo replace with processInstanceDao
-    @Autowired
-    private ProcessInstanceMapper processInstanceMapper;
+    private final ProcessInstanceMapper processInstanceMapper;
 
-    @Autowired
-    private ProcessInstanceDao processInstanceDao;
+    private final ProcessInstanceDao processInstanceDao;
 
-    @Autowired
-    private TaskDefinitionDao taskDefinitionDao;
+    private final TaskDefinitionDao taskDefinitionDao;
 
-    @Autowired
-    private TaskInstanceDao taskInstanceDao;
+    private final TaskInstanceDao taskInstanceDao;
 
-    @Autowired
-    private TaskDefinitionLogDao taskDefinitionLogDao;
+    private final TaskDefinitionLogDao taskDefinitionLogDao;
 
-    @Autowired
-    private ProcessInstanceMapDao processInstanceMapDao;
+    private final ProcessInstanceMapDao processInstanceMapDao;
 
-    @Autowired
-    private DataSourceMapper dataSourceMapper;
+    private final DataSourceMapper dataSourceMapper;
 
-    @Autowired
-    private ProcessInstanceMapMapper processInstanceMapMapper;
+    private final ProcessInstanceMapMapper processInstanceMapMapper;
 
-    @Autowired
-    private TaskInstanceMapper taskInstanceMapper;
+    private final TaskInstanceMapper taskInstanceMapper;
 
-    @Autowired
-    private CommandMapper commandMapper;
+    private final CommandMapper commandMapper;
 
-    @Autowired
-    private ScheduleMapper scheduleMapper;
+    private final ScheduleMapper scheduleMapper;
 
-    @Autowired
-    private UdfFuncMapper udfFuncMapper;
+    private final UdfFuncMapper udfFuncMapper;
 
-    @Autowired
-    private ResourceMapper resourceMapper;
+    private final ResourceMapper resourceMapper;
 
-    @Autowired
-    private ResourceTaskMapper resourceTaskMapper;
+    private final ResourceTaskMapper resourceTaskMapper;
 
-    @Autowired
-    private ResourceUserMapper resourceUserMapper;
+    private final ResourceUserMapper resourceUserMapper;
 
-    @Autowired
-    private ErrorCommandMapper errorCommandMapper;
+    private final ErrorCommandMapper errorCommandMapper;
 
-    @Autowired
-    private TenantMapper tenantMapper;
+    private final TenantMapper tenantMapper;
 
-    @Autowired
-    private ProjectMapper projectMapper;
+    private final ProjectMapper projectMapper;
 
-    @Autowired
-    private DqExecuteResultMapper dqExecuteResultMapper;
+    private final DqExecuteResultMapper dqExecuteResultMapper;
 
-    @Autowired
-    private DqRuleMapper dqRuleMapper;
+    private final DqRuleMapper dqRuleMapper;
 
-    @Autowired
-    private DqRuleInputEntryMapper dqRuleInputEntryMapper;
+    private final DqRuleInputEntryMapper dqRuleInputEntryMapper;
 
-    @Autowired
-    private DqRuleExecuteSqlMapper dqRuleExecuteSqlMapper;
+    private final DqRuleExecuteSqlMapper dqRuleExecuteSqlMapper;
 
-    @Autowired
-    private DqComparisonTypeMapper dqComparisonTypeMapper;
+    private final DqComparisonTypeMapper dqComparisonTypeMapper;
 
-    @Autowired
-    private DqTaskStatisticsValueMapper dqTaskStatisticsValueMapper;
+    private final DqTaskStatisticsValueMapper dqTaskStatisticsValueMapper;
 
-    @Autowired
-    private TaskDefinitionMapper taskDefinitionMapper;
+    private final TaskDefinitionMapper taskDefinitionMapper;
 
-    @Autowired
-    private TaskDefinitionLogMapper taskDefinitionLogMapper;
+    private final TaskDefinitionLogMapper taskDefinitionLogMapper;
 
-    @Autowired
-    private ProcessTaskRelationMapper processTaskRelationMapper;
+    private final ProcessTaskRelationMapper processTaskRelationMapper;
 
-    @Autowired
-    private ProcessTaskRelationLogMapper processTaskRelationLogMapper;
+    private final ProcessTaskRelationLogMapper processTaskRelationLogMapper;
 
-    @Autowired
-    StateEventCallbackService stateEventCallbackService;
+    private final StateEventCallbackService stateEventCallbackService;
 
-    @Autowired
-    private EnvironmentMapper environmentMapper;
+    private final EnvironmentMapper environmentMapper;
 
-    @Autowired
-    private TaskGroupQueueMapper taskGroupQueueMapper;
+    private final TaskGroupQueueMapper taskGroupQueueMapper;
 
-    @Autowired
-    private TaskGroupMapper taskGroupMapper;
+    private final TaskGroupMapper taskGroupMapper;
 
-    @Autowired
-    private WorkFlowLineageMapper workFlowLineageMapper;
+    private final WorkFlowLineageMapper workFlowLineageMapper;
 
-    @Autowired
-    private TaskPluginManager taskPluginManager;
+    private final TaskPluginManager taskPluginManager;
 
-    @Autowired
-    private ClusterMapper clusterMapper;
+    private final ClusterMapper clusterMapper;
 
-    @Autowired
-    private CuringParamsService curingGlobalParamsService;
+    private final CuringParamsService curingGlobalParamsService;
 
-    @Autowired
-    private LogClient logClient;
+    private final LogClient logClient;
 
-    @Autowired
-    private CommandService commandService;
+    private final CommandService commandService;
 
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
@@ -2695,8 +2656,9 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public Integer queryTestDataSourceId(Integer onlineDataSourceId) {
         Integer testDataSourceId = dataSourceMapper.queryTestDataSourceId(onlineDataSourceId);
-        if (testDataSourceId != null)
+        if (testDataSourceId != null) {
             return testDataSourceId;
+        }
         return null;
     }
 
