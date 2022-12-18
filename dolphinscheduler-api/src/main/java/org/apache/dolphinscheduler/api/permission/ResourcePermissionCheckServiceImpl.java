@@ -79,21 +79,22 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class ResourcePermissionCheckServiceImpl
         implements
             ResourcePermissionCheckService<Object>,
             ApplicationContextAware {
 
-    @Autowired
-    private ProcessService processService;
+    private final ProcessService processService;
 
     public static final Map<AuthorizationType, ResourceAcquisitionAndPermissionCheck<?>> RESOURCE_LIST_MAP =
             new ConcurrentHashMap<>();
@@ -530,6 +531,7 @@ public class ResourcePermissionCheckServiceImpl
 
         /**
          * authorization types
+         *
          * @return
          */
         List<AuthorizationType> authorizationTypes();
@@ -544,6 +546,7 @@ public class ResourcePermissionCheckServiceImpl
 
         /**
          * permission check
+         *
          * @param userId
          * @return
          */

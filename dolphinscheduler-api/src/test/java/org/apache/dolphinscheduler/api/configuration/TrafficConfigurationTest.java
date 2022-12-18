@@ -21,14 +21,16 @@ import org.apache.dolphinscheduler.api.controller.AbstractControllerTest;
 
 import org.apache.commons.collections4.MapUtils;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class TrafficConfigurationTest extends AbstractControllerTest {
 
-    @Autowired
-    private TrafficConfiguration trafficConfiguration;
+    private final TrafficConfiguration trafficConfiguration;
 
     @Test
     public void isTrafficGlobalControlSwitch() {

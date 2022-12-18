@@ -41,9 +41,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -53,20 +54,20 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * access token service impl
  */
 @Service
+@RequiredArgsConstructor
 public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTokenService {
 
     private static final Logger logger = LoggerFactory.getLogger(AccessTokenServiceImpl.class);
 
-    @Autowired
-    private AccessTokenMapper accessTokenMapper;
+    private final AccessTokenMapper accessTokenMapper;
 
     /**
      * query access token list
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param pageNo    page number
+     * @param pageSize  page size
      * @return token list for page number and page size
      */
     @Override
@@ -90,7 +91,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
      * query access token for specified user
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return token list for specified user
      */
     @Override
@@ -113,10 +114,10 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
     /**
      * create token
      *
-     * @param loginUser loginUser
-     * @param userId token for user
+     * @param loginUser  loginUser
+     * @param userId     token for user
      * @param expireTime token expire time
-     * @param token token string (if it is absent, it will be automatically generated)
+     * @param token      token string (if it is absent, it will be automatically generated)
      * @return create result code
      */
     @SuppressWarnings("checkstyle:WhitespaceAround")
@@ -168,7 +169,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
      * generate token
      *
      * @param loginUser
-     * @param userId token for user
+     * @param userId     token for user
      * @param expireTime token expire time
      * @return token string
      */
@@ -185,7 +186,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
      * delete access token
      *
      * @param loginUser login user
-     * @param id token id
+     * @param id        token id
      * @return delete result code
      */
     @Override
@@ -216,10 +217,10 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
     /**
      * update token by id
      *
-     * @param id token id
-     * @param userId token for user
+     * @param id         token id
+     * @param userId     token for user
      * @param expireTime token expire time
-     * @param token token string (if it is absent, it will be automatically generated)
+     * @param token      token string (if it is absent, it will be automatically generated)
      * @return updated access token entity
      */
     @Override

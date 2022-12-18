@@ -59,9 +59,10 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.IOException;
 import java.util.Map;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -91,22 +92,21 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "RESOURCES_TAG")
 @RestController
 @RequestMapping("resources")
+@RequiredArgsConstructor
 public class ResourcesController extends BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(ResourcesController.class);
 
-    @Autowired
-    private ResourcesService resourceService;
-    @Autowired
-    private UdfFuncService udfFuncService;
+    private final ResourcesService resourceService;
+    private final UdfFuncService udfFuncService;
 
     /**
-     * @param loginUser login user
-     * @param type type
-     * @param alias alias
+     * @param loginUser   login user
+     * @param type        type
+     * @param alias       alias
      * @param description description
-     * @param pid parent id
-     * @param currentDir current directory
+     * @param pid         parent id
+     * @param currentDir  current directory
      * @return create result code
      */
     @Operation(summary = "createDirectory", description = "CREATE_RESOURCE_NOTES")
@@ -159,11 +159,11 @@ public class ResourcesController extends BaseController {
     /**
      * update resource
      *
-     * @param loginUser login user
-     * @param alias alias
-     * @param type resource type
+     * @param loginUser   login user
+     * @param alias       alias
+     * @param type        resource type
      * @param description description
-     * @param file resource file
+     * @param file        resource file
      * @return update result code
      */
     @Operation(summary = "updateResource", description = "UPDATE_RESOURCE_NOTES")
@@ -192,7 +192,7 @@ public class ResourcesController extends BaseController {
      * query resources list
      *
      * @param loginUser login user
-     * @param type resource type
+     * @param type      resource type
      * @return resource list
      */
     @Operation(summary = "queryResourceList", description = "QUERY_RESOURCE_LIST_NOTES")
@@ -215,10 +215,10 @@ public class ResourcesController extends BaseController {
      * query resources list paging
      *
      * @param loginUser login user
-     * @param type resource type
+     * @param type      resource type
      * @param searchVal search value
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param pageNo    page number
+     * @param pageSize  page size
      * @return resource list page
      */
     @Operation(summary = "queryResourceListPaging", description = "QUERY_RESOURCE_LIST_PAGING_NOTES")
@@ -294,8 +294,8 @@ public class ResourcesController extends BaseController {
      * verify resource by alias and type
      *
      * @param loginUser login user
-     * @param fullName resource full name
-     * @param type resource type
+     * @param fullName  resource full name
+     * @param type      resource type
      * @return true if the resource name not exists, otherwise return false
      */
     @Operation(summary = "verifyResourceName", description = "VERIFY_RESOURCE_NAME_NOTES")
@@ -317,7 +317,7 @@ public class ResourcesController extends BaseController {
      * query resources by type
      *
      * @param loginUser login user
-     * @param type resource type
+     * @param type      resource type
      * @return resource list
      */
     @Operation(summary = "queryResourceByProgramType", description = "QUERY_RESOURCE_LIST_NOTES")
@@ -337,10 +337,10 @@ public class ResourcesController extends BaseController {
     /**
      * query resource by file name and type
      *
-     * @param loginUser login user
-     * @param fileName resource full name
+     * @param loginUser  login user
+     * @param fileName   resource full name
      * @param tenantCode tenantcode of the owner of the resource
-     * @param type resource type
+     * @param type       resource type
      * @return true if the resource name not exists, otherwise return false
      */
     @Operation(summary = "queryResourceByFileName", description = "QUERY_BY_RESOURCE_FILE_NAME")
@@ -364,9 +364,9 @@ public class ResourcesController extends BaseController {
     /**
      * view resource file online
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param skipLineNum skip line number
-     * @param limit limit
+     * @param limit       limit
      * @return resource content
      */
     @Operation(summary = "viewResource", description = "VIEW_RESOURCE_BY_ID_NOTES")
@@ -423,7 +423,7 @@ public class ResourcesController extends BaseController {
      * edit resource file online
      *
      * @param loginUser login user
-     * @param content content
+     * @param content   content
      * @return update result code
      */
     @Operation(summary = "updateResourceContent", description = "UPDATE_RESOURCE_NOTES")
@@ -475,13 +475,13 @@ public class ResourcesController extends BaseController {
     /**
      * create udf function
      *
-     * @param loginUser login user
-     * @param type udf type
-     * @param funcName function name
-     * @param argTypes argument types
-     * @param database database
+     * @param loginUser   login user
+     * @param type        udf type
+     * @param funcName    function name
+     * @param argTypes    argument types
+     * @param database    database
      * @param description description
-     * @param className class name
+     * @param className   class name
      * @return create result code
      */
     @Operation(summary = "createUdfFunc", description = "CREATE_UDF_FUNCTION_NOTES")
@@ -516,7 +516,7 @@ public class ResourcesController extends BaseController {
      * view udf function
      *
      * @param loginUser login user
-     * @param id udf function id
+     * @param id        udf function id
      * @return udf function detail
      */
     @Operation(summary = "viewUIUdfFunction", description = "VIEW_UDF_FUNCTION_NOTES")
@@ -536,14 +536,14 @@ public class ResourcesController extends BaseController {
     /**
      * update udf function
      *
-     * @param loginUser login user
-     * @param type resource type
-     * @param funcName function name
-     * @param argTypes argument types
-     * @param database data base
+     * @param loginUser   login user
+     * @param type        resource type
+     * @param funcName    function name
+     * @param argTypes    argument types
+     * @param database    data base
      * @param description description
-     * @param className class name
-     * @param udfFuncId udf function id
+     * @param className   class name
+     * @param udfFuncId   udf function id
      * @return update result code
      */
     @Operation(summary = "updateUdfFunc", description = "UPDATE_UDF_FUNCTION_NOTES")
@@ -577,8 +577,8 @@ public class ResourcesController extends BaseController {
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param pageNo    page number
+     * @param pageSize  page size
      * @return udf function list page
      */
     @Operation(summary = "queryUdfFuncListPaging", description = "QUERY_UDF_FUNCTION_LIST_PAGING_NOTES")
@@ -606,7 +606,7 @@ public class ResourcesController extends BaseController {
      * query udf func list by type
      *
      * @param loginUser login user
-     * @param type resource type
+     * @param type      resource type
      * @return resource list
      */
     @Operation(summary = "queryUdfFuncList", description = "QUERY_UDF_FUNC_LIST_NOTES")
@@ -626,7 +626,7 @@ public class ResourcesController extends BaseController {
      * verify udf function name can use or not
      *
      * @param loginUser login user
-     * @param name name
+     * @param name      name
      * @return true if the name can user, otherwise return false
      */
     @Operation(summary = "verifyUdfFuncName", description = "VERIFY_UDF_FUNCTION_NAME_NOTES")
@@ -667,7 +667,7 @@ public class ResourcesController extends BaseController {
      * authorized file resource list
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return authorized result
      */
     @Operation(summary = "authorizedFile", description = "AUTHORIZED_FILE_NOTES")
@@ -688,7 +688,7 @@ public class ResourcesController extends BaseController {
      * unauthorized file resource list
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return unauthorized result code
      */
     @Operation(summary = "authorizeResourceTree", description = "AUTHORIZE_RESOURCE_TREE_NOTES")
@@ -709,7 +709,7 @@ public class ResourcesController extends BaseController {
      * unauthorized udf function
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return unauthorized result code
      */
     @Operation(summary = "unauthUDFFunc", description = "UNAUTHORIZED_UDF_FUNC_NOTES")
@@ -731,7 +731,7 @@ public class ResourcesController extends BaseController {
      * authorized udf function
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return authorized result code
      */
     @Operation(summary = "authUDFFunc", description = "AUTHORIZED_UDF_FUNC_NOTES")
@@ -752,7 +752,7 @@ public class ResourcesController extends BaseController {
      * query a resource by resource full name
      *
      * @param loginUser login user
-     * @param fullName resource full name
+     * @param fullName  resource full name
      * @return resource
      */
     @Operation(summary = "queryResourceByFullName", description = "QUERY_BY_RESOURCE_FULL_NAME")

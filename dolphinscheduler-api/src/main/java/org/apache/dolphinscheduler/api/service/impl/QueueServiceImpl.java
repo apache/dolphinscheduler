@@ -42,9 +42,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,15 +56,14 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * queue service impl
  */
 @Service
+@RequiredArgsConstructor
 public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
 
     private static final Logger logger = LoggerFactory.getLogger(QueueServiceImpl.class);
 
-    @Autowired
-    private QueueMapper queueMapper;
+    private final QueueMapper queueMapper;
 
-    @Autowired
-    private UserMapper userMapper;
+    private final UserMapper userMapper;
 
     /**
      * Check the queue new object valid or not
@@ -135,9 +135,9 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * query queue list paging
      *
      * @param loginUser login user
-     * @param pageNo page number
+     * @param pageNo    page number
      * @param searchVal search value
-     * @param pageSize page size
+     * @param pageSize  page size
      * @return queue list
      */
     @Override
@@ -166,7 +166,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * create queue
      *
      * @param loginUser login user
-     * @param queue queue
+     * @param queue     queue
      * @param queueName queue name
      * @return create result
      */
@@ -194,8 +194,8 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * update queue
      *
      * @param loginUser login user
-     * @param queue queue
-     * @param id queue id
+     * @param queue     queue
+     * @param id        queue id
      * @param queueName queue name
      * @return update result code
      */
@@ -227,7 +227,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     /**
      * verify queue and queueName
      *
-     * @param queue queue
+     * @param queue     queue
      * @param queueName queue name
      * @return true if the queue name not exists, otherwise return false
      */
@@ -279,10 +279,10 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
 
     /**
      * Make sure queue with given name exists, and create the queue if not exists
-     *
+     * <p>
      * ONLY for python gateway server, and should not use this in web ui function
      *
-     * @param queue queue value
+     * @param queue     queue value
      * @param queueName queue name
      * @return Queue object
      */

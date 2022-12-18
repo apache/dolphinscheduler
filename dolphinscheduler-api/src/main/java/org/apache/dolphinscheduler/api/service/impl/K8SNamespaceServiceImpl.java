@@ -43,9 +43,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -55,6 +56,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * k8s namespace service impl
  */
 @Service
+@RequiredArgsConstructor
 public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNamespaceService {
 
     private static final Logger logger = LoggerFactory.getLogger(K8SNamespaceServiceImpl.class);
@@ -69,14 +71,11 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
             + "    ${limitCpu}\n"
             + "    ${limitMemory}\n";
 
-    @Autowired
-    private K8sNamespaceMapper k8sNamespaceMapper;
+    private final K8sNamespaceMapper k8sNamespaceMapper;
 
-    @Autowired
-    private K8sClientService k8sClientService;
+    private final K8sClientService k8sClientService;
 
-    @Autowired
-    private ClusterMapper clusterMapper;
+    private final ClusterMapper clusterMapper;
 
     /**
      * query namespace list paging

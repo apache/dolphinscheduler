@@ -31,7 +31,8 @@ import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -55,17 +56,17 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "WORKFLOW_INSTANCE_TAG_V2")
 @RestController
 @RequestMapping("/v2/workflow-instances")
+@RequiredArgsConstructor
 public class WorkflowInstanceV2Controller extends BaseController {
 
-    @Autowired
-    private ProcessInstanceService processInstanceService;
+    private final ProcessInstanceService processInstanceService;
 
-    @Autowired
-    private ExecutorService execService;
+    private final ExecutorService execService;
 
     /**
      * query workflow instance list paging
-     * @param loginUser login user
+     *
+     * @param loginUser                    login user
      * @param workflowInstanceQueryRequest workflowInstanceQueryRequest
      * @return workflow instance list
      */
@@ -89,8 +90,8 @@ public class WorkflowInstanceV2Controller extends BaseController {
     /**
      * Query workflowInstance by id
      *
-     * @param loginUser login user
-     * @param workflowInstanceId      workflow instance id
+     * @param loginUser          login user
+     * @param workflowInstanceId workflow instance id
      * @return Result result object query
      */
     @Operation(summary = "queryWorkflowInstanceById", description = "QUERY_WORKFLOW_INSTANCE_BY_ID")
@@ -110,8 +111,8 @@ public class WorkflowInstanceV2Controller extends BaseController {
     /**
      * Delete workflowInstance by id
      *
-     * @param loginUser login user
-     * @param workflowInstanceId      workflow instance code
+     * @param loginUser          login user
+     * @param workflowInstanceId workflow instance code
      * @return Result result object delete
      */
     @Operation(summary = "delete", description = "DELETE_WORKFLOWS_INSTANCE_NOTES")
@@ -131,9 +132,9 @@ public class WorkflowInstanceV2Controller extends BaseController {
     /**
      * do action to workflow instance: pause, stop, repeat, recover from pause, recover from stop
      *
-     * @param loginUser login user
+     * @param loginUser          login user
      * @param workflowInstanceId workflow instance id
-     * @param executeType execute type
+     * @param executeType        execute type
      * @return execute result code
      */
     @Operation(summary = "execute", description = "EXECUTE_ACTION_TO_WORKFLOW_INSTANCE_NOTES")

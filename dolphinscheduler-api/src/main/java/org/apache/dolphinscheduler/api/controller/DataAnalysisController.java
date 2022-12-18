@@ -32,7 +32,8 @@ import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
@@ -53,17 +54,17 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "DATA_ANALYSIS_TAG")
 @RestController
 @RequestMapping("projects/analysis")
+@RequiredArgsConstructor
 public class DataAnalysisController extends BaseController {
 
-    @Autowired
-    DataAnalysisService dataAnalysisService;
+    private final DataAnalysisService dataAnalysisService;
 
     /**
      * statistical task instance status data
      *
-     * @param loginUser login user
-     * @param startDate count start date
-     * @param endDate count end date
+     * @param loginUser   login user
+     * @param startDate   count start date
+     * @param endDate     count end date
      * @param projectCode project code
      * @return task instance count data
      */
@@ -90,9 +91,9 @@ public class DataAnalysisController extends BaseController {
     /**
      * statistical process instance status data
      *
-     * @param loginUser login user
-     * @param startDate start date
-     * @param endDate end date
+     * @param loginUser   login user
+     * @param startDate   start date
+     * @param endDate     end date
      * @param projectCode project code
      * @return process instance data
      */
@@ -119,7 +120,7 @@ public class DataAnalysisController extends BaseController {
     /**
      * statistics the process definition quantities of certain person
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
      * @return definition count in project code
      */

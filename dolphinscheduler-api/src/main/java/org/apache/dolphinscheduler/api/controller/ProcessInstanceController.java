@@ -37,9 +37,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -64,27 +65,27 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "PROCESS_INSTANCE_TAG")
 @RestController
 @RequestMapping("/projects/{projectCode}/process-instances")
+@RequiredArgsConstructor
 public class ProcessInstanceController extends BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessInstanceController.class);
 
-    @Autowired
-    private ProcessInstanceService processInstanceService;
+    private final ProcessInstanceService processInstanceService;
 
     /**
      * query process instance list paging
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param loginUser         login user
+     * @param projectCode       project code
+     * @param pageNo            page number
+     * @param pageSize          page size
      * @param processDefineCode process definition code
-     * @param searchVal search value
-     * @param stateType state type
-     * @param host host
-     * @param startTime start time
-     * @param endTime end time
-     * @param otherParamsJson otherParamsJson handle other params
+     * @param searchVal         search value
+     * @param stateType         state type
+     * @param host              host
+     * @param startTime         start time
+     * @param endTime           end time
+     * @param otherParamsJson   otherParamsJson handle other params
      * @return process instance list
      */
     @Operation(summary = "queryProcessInstanceListPaging", description = "QUERY_PROCESS_INSTANCE_LIST_NOTES")
@@ -130,9 +131,9 @@ public class ProcessInstanceController extends BaseController {
     /**
      * query task list by process instance id
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param id process instance id
+     * @param id          process instance id
      * @return task list for the process instance
      */
     @Operation(summary = "queryTaskListByProcessId", description = "QUERY_TASK_LIST_BY_PROCESS_INSTANCE_ID_NOTES")
@@ -153,15 +154,15 @@ public class ProcessInstanceController extends BaseController {
     /**
      * update process instance
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param taskRelationJson process task relation json
+     * @param loginUser          login user
+     * @param projectCode        project code
+     * @param taskRelationJson   process task relation json
      * @param taskDefinitionJson taskDefinitionJson
-     * @param id process instance id
-     * @param scheduleTime schedule time
-     * @param syncDefine sync define
-     * @param locations locations
-     * @param tenantCode tenantCode
+     * @param id                 process instance id
+     * @param scheduleTime       schedule time
+     * @param syncDefine         sync define
+     * @param locations          locations
+     * @param tenantCode         tenantCode
      * @return update result code
      */
     @Operation(summary = "updateProcessInstance", description = "UPDATE_PROCESS_INSTANCE_NOTES")
@@ -200,9 +201,9 @@ public class ProcessInstanceController extends BaseController {
     /**
      * query process instance by id
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param id process instance id
+     * @param id          process instance id
      * @return process instance detail
      */
     @Operation(summary = "queryProcessInstanceById", description = "QUERY_PROCESS_INSTANCE_BY_ID_NOTES")
@@ -223,11 +224,11 @@ public class ProcessInstanceController extends BaseController {
     /**
      * query top n process instance order by running duration
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param size number of process instance
-     * @param startTime start time
-     * @param endTime end time
+     * @param size        number of process instance
+     * @param startTime   start time
+     * @param endTime     end time
      * @return list of process instance
      */
     @Operation(summary = "queryTopNLongestRunningProcessInstance", description = "QUERY_TOPN_LONGEST_RUNNING_PROCESS_INSTANCE_NOTES")
@@ -254,9 +255,9 @@ public class ProcessInstanceController extends BaseController {
      * delete process instance by id, at the same time,
      * delete task instance and their mapping relation data
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param id process instance id
+     * @param id          process instance id
      * @return delete result code
      */
     @Operation(summary = "deleteProcessInstanceById", description = "DELETE_PROCESS_INSTANCE_BY_ID_NOTES")
@@ -277,9 +278,9 @@ public class ProcessInstanceController extends BaseController {
     /**
      * query sub process instance detail info by task id
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param taskId task id
+     * @param taskId      task id
      * @return sub process instance detail
      */
     @Operation(summary = "querySubProcessInstanceByTaskCode", description = "QUERY_SUBPROCESS_INSTANCE_BY_TASK_CODE_NOTES")
@@ -301,9 +302,9 @@ public class ProcessInstanceController extends BaseController {
     /**
      * query parent process instance detail info by sub process instance id
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param subId sub process id
+     * @param subId       sub process id
      * @return parent instance detail
      */
     @Operation(summary = "queryParentInstanceBySubId", description = "QUERY_PARENT_PROCESS_INSTANCE_BY_SUB_PROCESS_INSTANCE_ID_NOTES")
@@ -325,7 +326,7 @@ public class ProcessInstanceController extends BaseController {
      * query process instance global variables and local variables
      *
      * @param loginUser login user
-     * @param id process instance id
+     * @param id        process instance id
      * @return variables data
      */
     @Operation(summary = "viewVariables", description = "QUERY_PROCESS_INSTANCE_GLOBAL_VARIABLES_AND_LOCAL_VARIABLES_NOTES")
@@ -346,9 +347,9 @@ public class ProcessInstanceController extends BaseController {
     /**
      * encapsulation gantt structure
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param id process instance id
+     * @param id          process instance id
      * @return gantt tree data
      */
     @Operation(summary = "vieGanttTree", description = "VIEW_GANTT_NOTES")
@@ -370,8 +371,8 @@ public class ProcessInstanceController extends BaseController {
      * batch delete process instance by ids, at the same time,
      * delete task instance and their mapping relation data
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser          login user
+     * @param projectCode        project code
      * @param processInstanceIds process instance id
      * @return delete result code
      */

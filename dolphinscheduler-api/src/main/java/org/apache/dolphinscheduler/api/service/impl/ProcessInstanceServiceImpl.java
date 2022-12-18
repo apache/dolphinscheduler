@@ -98,9 +98,10 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -112,6 +113,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * process instance service impl
  */
 @Service
+@RequiredArgsConstructor
 public class ProcessInstanceServiceImpl extends BaseServiceImpl implements ProcessInstanceService {
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessInstanceServiceImpl.class);
@@ -120,62 +122,43 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
 
     public static final String LOCAL_PARAMS_LIST = "localParamsList";
 
-    @Autowired
-    ProjectMapper projectMapper;
+    private final ProjectMapper projectMapper;
 
-    @Autowired
-    ProjectService projectService;
+    private final ProjectService projectService;
 
-    @Autowired
-    ProcessService processService;
+    private final ProcessService processService;
 
-    @Autowired
-    TaskInstanceDao taskInstanceDao;
+    private final TaskInstanceDao taskInstanceDao;
 
-    @Autowired
-    ProcessInstanceMapper processInstanceMapper;
+    private final ProcessInstanceMapper processInstanceMapper;
 
-    @Autowired
-    ProcessInstanceDao processInstanceDao;
+    private final ProcessInstanceDao processInstanceDao;
 
-    @Autowired
-    ProcessDefinitionMapper processDefineMapper;
+    private final ProcessDefinitionMapper processDefineMapper;
 
-    @Autowired
-    ProcessDefinitionService processDefinitionService;
+    private final ProcessDefinitionService processDefinitionService;
 
-    @Autowired
-    ExecutorService execService;
+    private final ExecutorService execService;
 
-    @Autowired
-    TaskInstanceMapper taskInstanceMapper;
+    private final TaskInstanceMapper taskInstanceMapper;
 
-    @Autowired
-    LoggerService loggerService;
+    private final LoggerService loggerService;
 
-    @Autowired
-    ProcessDefinitionLogMapper processDefinitionLogMapper;
+    private final ProcessDefinitionLogMapper processDefinitionLogMapper;
 
-    @Autowired
-    TaskDefinitionLogMapper taskDefinitionLogMapper;
+    private final TaskDefinitionLogMapper taskDefinitionLogMapper;
 
-    @Autowired
-    UsersService usersService;
+    private final UsersService usersService;
 
-    @Autowired
-    private TenantMapper tenantMapper;
+    private final TenantMapper tenantMapper;
 
-    @Autowired
-    TaskDefinitionMapper taskDefinitionMapper;
+    private final TaskDefinitionMapper taskDefinitionMapper;
 
-    @Autowired
-    private TaskPluginManager taskPluginManager;
+    private final TaskPluginManager taskPluginManager;
 
-    @Autowired
-    private ScheduleMapper scheduleMapper;
+    private final ScheduleMapper scheduleMapper;
 
-    @Autowired
-    private CuringParamsService curingGlobalParamsService;
+    private final CuringParamsService curingGlobalParamsService;
 
     /**
      * return top n SUCCESS process instance order by running time which started between startTime and endTime

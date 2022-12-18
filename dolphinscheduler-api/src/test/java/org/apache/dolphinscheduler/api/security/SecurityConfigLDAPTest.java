@@ -20,6 +20,8 @@ package org.apache.dolphinscheduler.api.security;
 import org.apache.dolphinscheduler.api.controller.AbstractControllerTest;
 import org.apache.dolphinscheduler.api.security.impl.ldap.LdapService;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,13 +30,12 @@ import org.springframework.test.context.TestPropertySource;
 @TestPropertySource(properties = {
         "security.authentication.type=LDAP",
 })
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class SecurityConfigLDAPTest extends AbstractControllerTest {
 
-    @Autowired
-    private SecurityConfig securityConfig;
+    private final SecurityConfig securityConfig;
 
-    @Autowired
-    private LdapService ldapService;
+    private final LdapService ldapService;
 
     @Test
     public void testAuthenticator() {

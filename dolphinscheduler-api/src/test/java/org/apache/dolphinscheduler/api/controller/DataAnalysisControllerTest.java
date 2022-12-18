@@ -30,6 +30,8 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 
 import java.util.Date;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,12 +44,12 @@ import org.springframework.util.MultiValueMap;
 /**
  * data analysis controller test
  */
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class DataAnalysisControllerTest extends AbstractControllerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(DataAnalysisControllerTest.class);
 
-    @Autowired
-    private ProjectMapper projectMapper;
+    private final ProjectMapper projectMapper;
 
     private int createProject() {
         Project project = new Project();

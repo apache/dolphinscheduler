@@ -33,6 +33,8 @@ import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -52,12 +54,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @Rollback
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class LoginHandlerInterceptorTest {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginHandlerInterceptorTest.class);
 
-    @Autowired
-    LoginHandlerInterceptor interceptor;
+    private final LoginHandlerInterceptor interceptor;
     @MockBean(name = "authenticator")
     private Authenticator authenticator;
     @MockBean(name = "userMapper")

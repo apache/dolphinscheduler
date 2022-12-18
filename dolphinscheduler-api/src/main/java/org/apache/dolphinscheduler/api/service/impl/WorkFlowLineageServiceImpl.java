@@ -52,9 +52,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -62,21 +63,18 @@ import org.springframework.util.CollectionUtils;
  * work flow lineage service impl
  */
 @Service
+@RequiredArgsConstructor
 public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkFlowLineageService {
 
     private static final Logger logger = LoggerFactory.getLogger(WorkFlowLineageServiceImpl.class);
 
-    @Autowired
-    private WorkFlowLineageMapper workFlowLineageMapper;
+    private final WorkFlowLineageMapper workFlowLineageMapper;
 
-    @Autowired
-    private ProjectMapper projectMapper;
+    private final ProjectMapper projectMapper;
 
-    @Autowired
-    private TaskDefinitionLogMapper taskDefinitionLogMapper;
+    private final TaskDefinitionLogMapper taskDefinitionLogMapper;
 
-    @Autowired
-    private TaskDefinitionMapper taskDefinitionMapper;
+    private final TaskDefinitionMapper taskDefinitionMapper;
 
     @Override
     public Map<String, Object> queryWorkFlowLineageByName(long projectCode, String workFlowName) {
@@ -256,9 +254,9 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
     /**
      * Query and return tasks dependence with string format, is a wrapper of queryTaskDepOnTask and task query method.
      *
-     * @param projectCode Project code want to query tasks dependence
+     * @param projectCode           Project code want to query tasks dependence
      * @param processDefinitionCode Process definition code want to query tasks dependence
-     * @param taskCode Task code want to query tasks dependence
+     * @param taskCode              Task code want to query tasks dependence
      * @return Optional of formatter message
      */
     @Override
@@ -280,7 +278,7 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
     /**
      * Query tasks depend on process definition, include upstream or downstream
      *
-     * @param projectCode Project code want to query tasks dependence
+     * @param projectCode           Project code want to query tasks dependence
      * @param processDefinitionCode Process definition code want to query tasks dependence
      * @return Set of TaskMainInfo
      */

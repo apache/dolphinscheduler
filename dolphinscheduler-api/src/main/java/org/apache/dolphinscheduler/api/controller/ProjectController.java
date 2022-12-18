@@ -35,9 +35,10 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -62,12 +63,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "PROJECT_TAG")
 @RestController
 @RequestMapping("projects")
+@RequiredArgsConstructor
 public class ProjectController extends BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(ProjectController.class);
 
-    @Autowired
-    private ProjectService projectService;
+    private final ProjectService projectService;
 
     /**
      * create project
@@ -177,11 +178,11 @@ public class ProjectController extends BaseController {
     /**
      * query project with authorized level list paging
      *
-     * @param userId user id
+     * @param userId    user id
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageSize page size
-     * @param pageNo page number
+     * @param pageSize  page size
+     * @param pageNo    page number
      * @return project list which with the login user's authorized level
      */
     @Operation(summary = "queryProjectWithAuthorizedLevelListPaging", description = "QUERY_PROJECT_WITH_AUTH_LEVEL_LIST_PAGING_NOTES")
@@ -275,7 +276,7 @@ public class ProjectController extends BaseController {
      * query all project with authorized level
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return All projects with users' authorized level for them
      */
     @Operation(summary = "queryProjectWithAuthorizedLevel", description = "QUERY_PROJECT_AUTHORIZED_LEVEL")

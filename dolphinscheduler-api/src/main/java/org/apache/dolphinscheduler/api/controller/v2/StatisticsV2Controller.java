@@ -37,7 +37,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -50,19 +51,21 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 /**
  * StatisticsV2 controller
  */
 @Tag(name = "STATISTICS_V2")
 @RestController
 @RequestMapping("/v2/statistics")
+@RequiredArgsConstructor
 public class StatisticsV2Controller extends BaseController {
 
-    @Autowired
-    private DataAnalysisService dataAnalysisService;
+    private final DataAnalysisService dataAnalysisService;
 
     /**
      * query all workflow count
+     *
      * @param loginUser login user
      * @return workflow count
      */
@@ -78,7 +81,8 @@ public class StatisticsV2Controller extends BaseController {
 
     /**
      * query all workflow states count
-     * @param loginUser login user
+     *
+     * @param loginUser              login user
      * @param statisticsStateRequest statisticsStateRequest
      * @return workflow states count
      */
@@ -96,7 +100,8 @@ public class StatisticsV2Controller extends BaseController {
 
     /**
      * query one workflow states count
-     * @param loginUser login user
+     *
+     * @param loginUser    login user
      * @param workflowCode workflowCode
      * @return workflow states count
      */
@@ -114,7 +119,8 @@ public class StatisticsV2Controller extends BaseController {
 
     /**
      * query all task states count
-     * @param loginUser login user
+     *
+     * @param loginUser              login user
      * @param statisticsStateRequest statisticsStateRequest
      * @return tasks states count
      */
@@ -132,8 +138,9 @@ public class StatisticsV2Controller extends BaseController {
 
     /**
      * query one task states count
+     *
      * @param loginUser login user
-     * @param taskCode taskCode
+     * @param taskCode  taskCode
      * @return tasks states count
      */
     @Operation(summary = "queryOneTaskStatesCount", description = "QUERY_ONE_TASK_STATES_COUNT")
@@ -150,7 +157,8 @@ public class StatisticsV2Controller extends BaseController {
 
     /**
      * statistics the workflow quantities of certain user
-     * @param loginUser login user
+     *
+     * @param loginUser              login user
      * @param statisticsStateRequest statisticsStateRequest
      * @return workflow count in project code
      */
@@ -172,8 +180,9 @@ public class StatisticsV2Controller extends BaseController {
 
     /**
      * statistics the workflow quantities of certain userId
+     *
      * @param loginUser login user
-     * @param userId userId
+     * @param userId    userId
      * @return workflow count in project code
      */
     @Operation(summary = "countDefinitionV2ByUser", description = "COUNT_PROCESS_DEFINITION_V2_BY_USER_NOTES")
@@ -186,13 +195,15 @@ public class StatisticsV2Controller extends BaseController {
         Map<String, Object> result = dataAnalysisService.countDefinitionByUserV2(loginUser, null, userId, null);
         return returnDataList(result);
     }
+
     /**
      * statistics the workflow quantities of certain userId and releaseState
-    * @param loginUser login user
-    * @param userId userId
-    * @param releaseState releaseState
-    * @return workflow count in project code
-    */
+     *
+     * @param loginUser    login user
+     * @param userId       userId
+     * @param releaseState releaseState
+     * @return workflow count in project code
+     */
     @Operation(summary = "countDefinitionV2ByUser", description = "COUNT_PROCESS_DEFINITION_V2_BY_USER_NOTES")
     @GetMapping(value = "/workflows/users/{userId}/{releaseState}/count")
     @ResponseStatus(HttpStatus.OK)

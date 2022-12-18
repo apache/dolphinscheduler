@@ -63,45 +63,39 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
  * data analysis service impl
  */
 @Service
+@RequiredArgsConstructor
 public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnalysisService {
 
     private static final Logger logger = LoggerFactory.getLogger(DataAnalysisServiceImpl.class);
 
-    @Autowired
-    private ProjectMapper projectMapper;
+    private final ProjectMapper projectMapper;
 
-    @Autowired
-    private ProjectService projectService;
+    private final ProjectService projectService;
 
-    @Autowired
-    private ProcessInstanceMapper processInstanceMapper;
+    private final ProcessInstanceMapper processInstanceMapper;
 
-    @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private final ProcessDefinitionMapper processDefinitionMapper;
 
-    @Autowired
-    private CommandMapper commandMapper;
+    private final CommandMapper commandMapper;
 
-    @Autowired
-    private ErrorCommandMapper errorCommandMapper;
+    private final ErrorCommandMapper errorCommandMapper;
 
-    @Autowired
-    private TaskInstanceMapper taskInstanceMapper;
+    private final TaskInstanceMapper taskInstanceMapper;
 
-    @Autowired
-    private TaskDefinitionMapper taskDefinitionMapper;
+    private final TaskDefinitionMapper taskDefinitionMapper;
 
-    @Autowired
-    private ProcessTaskRelationMapper relationMapper;
+    private final ProcessTaskRelationMapper relationMapper;
+
     /**
      * statistical task instance status data
      *
@@ -359,6 +353,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
 
         return startTimeStates.orElse(null);
     }
+
     /**
      * query all workflow count
      *
@@ -383,7 +378,8 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
 
     /**
      * query all workflow states count
-     * @param loginUser login user
+     *
+     * @param loginUser              login user
      * @param statisticsStateRequest statisticsStateRequest
      * @return workflow states count
      */
@@ -434,7 +430,8 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
 
     /**
      * query one workflow states count
-     * @param loginUser login user
+     *
+     * @param loginUser    login user
      * @param workflowCode workflowCode
      * @return workflow states count
      */
@@ -458,7 +455,8 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
 
     /**
      * query all task states count
-     * @param loginUser login user
+     *
+     * @param loginUser              login user
      * @param statisticsStateRequest statisticsStateRequest
      * @return tasks states count
      */
@@ -528,8 +526,9 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
 
     /**
      * query one task states count
+     *
      * @param loginUser login user
-     * @param taskCode taskCode
+     * @param taskCode  taskCode
      * @return tasks states count
      */
     @Override

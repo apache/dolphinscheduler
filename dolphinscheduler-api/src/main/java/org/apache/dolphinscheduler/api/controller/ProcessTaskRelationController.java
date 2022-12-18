@@ -33,7 +33,8 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -57,10 +58,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "PROCESS_TASK_RELATION_TAG")
 @RestController
 @RequestMapping("projects/{projectCode}/process-task-relation")
+@RequiredArgsConstructor
 public class ProcessTaskRelationController extends BaseController {
 
-    @Autowired
-    private ProcessTaskRelationService processTaskRelationService;
+    private final ProcessTaskRelationService processTaskRelationService;
 
     /**
      * create process task relation

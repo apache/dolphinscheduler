@@ -55,9 +55,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,35 +68,30 @@ import com.facebook.presto.jdbc.internal.guava.base.Strings;
  * worker group service impl
  */
 @Service
+@RequiredArgsConstructor
 public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGroupService {
 
     private static final Logger logger = LoggerFactory.getLogger(WorkerGroupServiceImpl.class);
 
-    @Autowired
-    private WorkerGroupMapper workerGroupMapper;
+    private final WorkerGroupMapper workerGroupMapper;
 
-    @Autowired
-    private ProcessInstanceMapper processInstanceMapper;
+    private final ProcessInstanceMapper processInstanceMapper;
 
-    @Autowired
-    private RegistryClient registryClient;
+    private final RegistryClient registryClient;
 
-    @Autowired
-    private EnvironmentWorkerGroupRelationMapper environmentWorkerGroupRelationMapper;
+    private final EnvironmentWorkerGroupRelationMapper environmentWorkerGroupRelationMapper;
 
-    @Autowired
-    private ProcessService processService;
+    private final ProcessService processService;
 
-    @Autowired
-    private ScheduleMapper scheduleMapper;
+    private final ScheduleMapper scheduleMapper;
 
     /**
      * create or update a worker group
      *
      * @param loginUser login user
-     * @param id worker group id
-     * @param name worker group name
-     * @param addrList addr list
+     * @param id        worker group id
+     * @param name      worker group name
+     * @param addrList  addr list
      * @return create or update result code
      */
     @Override
@@ -201,9 +197,9 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
      * query worker group paging
      *
      * @param loginUser login user
-     * @param pageNo page number
+     * @param pageNo    page number
      * @param searchVal search value
-     * @param pageSize page size
+     * @param pageSize  page size
      * @return worker group list page
      */
     @Override

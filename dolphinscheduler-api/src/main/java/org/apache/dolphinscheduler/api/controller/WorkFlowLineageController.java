@@ -36,9 +36,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -61,12 +62,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "WORK_FLOW_LINEAGE_TAG")
 @RestController
 @RequestMapping("projects/{projectCode}/lineages")
+@RequiredArgsConstructor
 public class WorkFlowLineageController extends BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(WorkFlowLineageController.class);
 
-    @Autowired
-    private WorkFlowLineageService workFlowLineageService;
+    private final WorkFlowLineageService workFlowLineageService;
 
     @Operation(summary = "queryLineageByWorkFlowName", description = "QUERY_WORKFLOW_LINEAGE_BY_NAME_NOTES")
     @GetMapping(value = "/query-by-name")
@@ -119,10 +120,10 @@ public class WorkFlowLineageController extends BaseController {
     /**
      * Whether task can be deleted or not, avoiding task depend on other task of process definition delete by accident.
      *
-     * @param loginUser login user
-     * @param projectCode project codes which taskCode belong
+     * @param loginUser             login user
+     * @param projectCode           project codes which taskCode belong
      * @param processDefinitionCode project code which taskCode belong
-     * @param taskCode task definition code
+     * @param taskCode              task definition code
      * @return Result of task can be delete or not
      */
     @Operation(summary = "verifyTaskCanDelete", description = "VERIFY_TASK_CAN_DELETE")

@@ -22,7 +22,8 @@ import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
 
@@ -36,11 +37,11 @@ import io.fabric8.kubernetes.client.KubernetesClient;
  * Encapsulates all client-related operations, not involving the db
  */
 @Component
+@RequiredArgsConstructor
 public class K8sClientService {
 
     private static Yaml yaml = new Yaml();
-    @Autowired
-    private K8sManager k8sManager;
+    private final K8sManager k8sManager;
 
     public ResourceQuota upsertNamespaceAndResourceToK8s(K8sNamespace k8sNamespace,
                                                          String yamlStr) throws RemotingException {

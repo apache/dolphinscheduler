@@ -33,7 +33,8 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
@@ -54,13 +55,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "DATA_QUALITY_TAG")
 @RestController
 @RequestMapping("/data-quality")
+@RequiredArgsConstructor
 public class DataQualityController extends BaseController {
 
-    @Autowired
-    private DqRuleService dqRuleService;
+    private final DqRuleService dqRuleService;
 
-    @Autowired
-    private DqExecuteResultService dqExecuteResultService;
+    private final DqExecuteResultService dqExecuteResultService;
 
     /**
      * get rule from-create json

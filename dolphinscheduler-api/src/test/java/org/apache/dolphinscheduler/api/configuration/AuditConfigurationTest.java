@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.api.configuration;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,10 +27,10 @@ import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles("audit")
 @SpringBootTest(classes = AuditConfiguration.class)
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class AuditConfigurationTest {
 
-    @Autowired
-    private AuditConfiguration auditConfiguration;
+    private final AuditConfiguration auditConfiguration;
 
     @Test
     public void isAuditGlobalControlSwitch() {

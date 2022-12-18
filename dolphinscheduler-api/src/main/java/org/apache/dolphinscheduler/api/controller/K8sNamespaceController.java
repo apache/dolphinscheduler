@@ -38,7 +38,8 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -62,10 +63,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "K8S_NAMESPACE_TAG")
 @RestController
 @RequestMapping("/k8s-namespace")
+@RequiredArgsConstructor
 public class K8sNamespaceController extends BaseController {
 
-    @Autowired
-    private K8sNamespaceService k8sNamespaceService;
+    private final K8sNamespaceService k8sNamespaceService;
 
     /**
      * query namespace list paging

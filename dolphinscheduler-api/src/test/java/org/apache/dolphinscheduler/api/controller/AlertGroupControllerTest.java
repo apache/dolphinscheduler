@@ -32,6 +32,8 @@ import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 
 import java.util.Date;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -48,14 +50,14 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 /**
  * alert group controller test
  */
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class AlertGroupControllerTest extends AbstractControllerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(AlertGroupController.class);
 
     private static final String defaultTestAlertGroupName = "cxc test group name";
 
-    @Autowired
-    AlertGroupMapper alertGroupMapper;
+    private final AlertGroupMapper alertGroupMapper;
 
     private int createEntity() {
         AlertGroup alertGroup = new AlertGroup();

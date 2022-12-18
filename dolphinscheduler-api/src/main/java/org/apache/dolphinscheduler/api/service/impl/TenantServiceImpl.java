@@ -54,9 +54,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,27 +68,22 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * tenant service impl
  */
 @Service
+@RequiredArgsConstructor
 public class TenantServiceImpl extends BaseServiceImpl implements TenantService {
 
     private static final Logger logger = LoggerFactory.getLogger(TenantServiceImpl.class);
 
-    @Autowired
-    private TenantMapper tenantMapper;
+    private final TenantMapper tenantMapper;
 
-    @Autowired
-    private ProcessInstanceMapper processInstanceMapper;
+    private final ProcessInstanceMapper processInstanceMapper;
 
-    @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private final ProcessDefinitionMapper processDefinitionMapper;
 
-    @Autowired
-    private UserMapper userMapper;
+    private final UserMapper userMapper;
 
-    @Autowired
-    private QueueService queueService;
+    private final QueueService queueService;
 
-    @Autowired(required = false)
-    private StorageOperate storageOperate;
+    private final StorageOperate storageOperate;
 
     /**
      * Check the tenant new object valid or not
@@ -134,10 +130,10 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     /**
      * create tenant
      *
-     * @param loginUser login user
+     * @param loginUser  login user
      * @param tenantCode tenant code
-     * @param queueId queue id
-     * @param desc description
+     * @param queueId    queue id
+     * @param desc       description
      * @return create result code
      * @throws Exception exception
      */
@@ -206,11 +202,11 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     /**
      * updateProcessInstance tenant
      *
-     * @param loginUser login user
-     * @param id tenant id
+     * @param loginUser  login user
+     * @param id         tenant id
      * @param tenantCode tenant code
-     * @param queueId queue id
-     * @param desc description
+     * @param queueId    queue id
+     * @param desc       description
      * @return update result code
      * @throws Exception exception
      */
@@ -253,7 +249,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      * delete tenant
      *
      * @param loginUser login user
-     * @param id tenant id
+     * @param id        tenant id
      * @return delete result code
      * @throws Exception exception
      */
@@ -388,9 +384,9 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      * ONLY for python gateway server, and should not use this in web ui function
      *
      * @param tenantCode tenant code
-     * @param desc The description of tenant object
-     * @param queue The value of queue which current tenant belong
-     * @param queueName The name of queue which current tenant belong
+     * @param desc       The description of tenant object
+     * @param queue      The value of queue which current tenant belong
+     * @param queueName  The name of queue which current tenant belong
      * @return Tenant object
      */
     @Override

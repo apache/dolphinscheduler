@@ -52,9 +52,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,33 +66,26 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * task instance service impl
  */
 @Service
+@RequiredArgsConstructor
 public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInstanceService {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskInstanceServiceImpl.class);
 
-    @Autowired
-    ProjectMapper projectMapper;
+    private final ProjectMapper projectMapper;
 
-    @Autowired
-    ProjectService projectService;
+    private final ProjectService projectService;
 
-    @Autowired
-    ProcessService processService;
+    private final ProcessService processService;
 
-    @Autowired
-    TaskInstanceMapper taskInstanceMapper;
+    private final TaskInstanceMapper taskInstanceMapper;
 
-    @Autowired
-    ProcessInstanceService processInstanceService;
+    private final ProcessInstanceService processInstanceService;
 
-    @Autowired
-    UsersService usersService;
+    private final UsersService usersService;
 
-    @Autowired
-    TaskDefinitionMapper taskDefinitionMapper;
+    private final TaskDefinitionMapper taskDefinitionMapper;
 
-    @Autowired
-    private StateEventCallbackService stateEventCallbackService;
+    private final StateEventCallbackService stateEventCallbackService;
 
     /**
      * query task list by project, process instance, task name, task start time, task end time, task status, keyword paging

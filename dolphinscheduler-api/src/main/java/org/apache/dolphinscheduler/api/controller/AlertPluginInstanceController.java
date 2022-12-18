@@ -35,9 +35,10 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import java.util.Map;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -62,12 +63,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "ALERT_PLUGIN_INSTANCE_TAG")
 @RestController
 @RequestMapping("alert-plugin-instances")
+@RequiredArgsConstructor
 public class AlertPluginInstanceController extends BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(AlertPluginInstanceController.class);
 
-    @Autowired
-    private AlertPluginInstanceService alertPluginInstanceService;
+    private final AlertPluginInstanceService alertPluginInstanceService;
 
     /**
      * create alert plugin instance

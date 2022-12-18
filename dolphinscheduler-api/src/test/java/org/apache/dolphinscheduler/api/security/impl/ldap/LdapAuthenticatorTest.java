@@ -36,6 +36,8 @@ import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
+import lombok.RequiredArgsConstructor;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -59,18 +61,17 @@ import org.springframework.test.context.TestPropertySource;
         "security.authentication.ldap.user.email-attribute=mail",
         "security.authentication.ldap.user.not-exist-action=CREATE",
 })
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class LdapAuthenticatorTest extends AbstractControllerTest {
 
     private static Logger logger = LoggerFactory.getLogger(LdapAuthenticatorTest.class);
-    @Autowired
-    protected AutowireCapableBeanFactory beanFactory;
+    protected final AutowireCapableBeanFactory beanFactory;
     @MockBean(name = "ldapService")
     private LdapService ldapService;
     @MockBean(name = "sessionServiceImpl")
     private SessionService sessionService;
     @Spy
     private UsersService usersService;
-
     private LdapAuthenticator ldapAuthenticator;
 
     // test param
@@ -86,7 +87,7 @@ public class LdapAuthenticatorTest extends AbstractControllerTest {
     @Override
     @BeforeEach
     public void setUp() {
-        ldapAuthenticator = new LdapAuthenticator();
+        ldapAuthenticator = new LdapAuthenticator(ldapService);
         beanFactory.autowireBean(ldapAuthenticator);
 
         mockUser = new User();

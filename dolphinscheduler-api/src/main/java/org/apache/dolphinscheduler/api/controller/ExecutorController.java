@@ -51,9 +51,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -76,32 +77,32 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "EXECUTOR_TAG")
 @RestController
 @RequestMapping("projects/{projectCode}/executors")
+@RequiredArgsConstructor
 public class ExecutorController extends BaseController {
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessInstanceController.class);
 
-    @Autowired
-    private ExecutorService execService;
+    private final ExecutorService execService;
 
     /**
      * execute process instance
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param processDefinitionCode process definition code
-     * @param scheduleTime schedule time when CommandType is COMPLEMENT_DATA  there are two ways to transfer parameters 1.date range, for example:{"complementStartDate":"2022-01-01 12:12:12","complementEndDate":"2022-01-6 12:12:12"} 2.manual input,  for example:{"complementScheduleDateList":"2022-01-01 00:00:00,2022-01-02 12:12:12,2022-01-03 12:12:12"}
-     * @param failureStrategy failure strategy
-     * @param startNodeList start nodes list
-     * @param taskDependType task depend type
-     * @param execType execute type
-     * @param warningType warning type
-     * @param warningGroupId warning group id
-     * @param runMode run mode
-     * @param processInstancePriority process instance priority
-     * @param workerGroup worker group
-     * @param timeout timeout
+     * @param loginUser                 login user
+     * @param projectCode               project code
+     * @param processDefinitionCode     process definition code
+     * @param scheduleTime              schedule time when CommandType is COMPLEMENT_DATA  there are two ways to transfer parameters 1.date range, for example:{"complementStartDate":"2022-01-01 12:12:12","complementEndDate":"2022-01-6 12:12:12"} 2.manual input,  for example:{"complementScheduleDateList":"2022-01-01 00:00:00,2022-01-02 12:12:12,2022-01-03 12:12:12"}
+     * @param failureStrategy           failure strategy
+     * @param startNodeList             start nodes list
+     * @param taskDependType            task depend type
+     * @param execType                  execute type
+     * @param warningType               warning type
+     * @param warningGroupId            warning group id
+     * @param runMode                   run mode
+     * @param processInstancePriority   process instance priority
+     * @param workerGroup               worker group
+     * @param timeout                   timeout
      * @param expectedParallelismNumber the expected parallelism number when execute complement in parallel mode
-     * @param testFlag testFlag
+     * @param testFlag                  testFlag
      * @return start process result code
      */
     @Operation(summary = "startProcessInstance", description = "RUN_PROCESS_INSTANCE_NOTES")
@@ -174,22 +175,22 @@ public class ExecutorController extends BaseController {
      * If any processDefinitionCode cannot be found, the failure information is returned and the status is set to
      * failed. The successful task will run normally and will not stop
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param processDefinitionCodes process definition codes
-     * @param scheduleTime schedule time
-     * @param failureStrategy failure strategy
-     * @param startNodeList start nodes list
-     * @param taskDependType task depend type
-     * @param execType execute type
-     * @param warningType warning type
-     * @param warningGroupId warning group id
-     * @param runMode run mode
-     * @param processInstancePriority process instance priority
-     * @param workerGroup worker group
-     * @param timeout timeout
+     * @param loginUser                 login user
+     * @param projectCode               project code
+     * @param processDefinitionCodes    process definition codes
+     * @param scheduleTime              schedule time
+     * @param failureStrategy           failure strategy
+     * @param startNodeList             start nodes list
+     * @param taskDependType            task depend type
+     * @param execType                  execute type
+     * @param warningType               warning type
+     * @param warningGroupId            warning group id
+     * @param runMode                   run mode
+     * @param processInstancePriority   process instance priority
+     * @param workerGroup               worker group
+     * @param timeout                   timeout
      * @param expectedParallelismNumber the expected parallelism number when execute complement in parallel mode
-     * @param testFlag testFlag
+     * @param testFlag                  testFlag
      * @return start process result code
      */
     @Operation(summary = "batchStartProcessInstance", description = "BATCH_RUN_PROCESS_INSTANCE_NOTES")
@@ -287,10 +288,10 @@ public class ExecutorController extends BaseController {
     /**
      * do action to process instance: pause, stop, repeat, recover from pause, recover from stop
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser         login user
+     * @param projectCode       project code
      * @param processInstanceId process instance id
-     * @param executeType execute type
+     * @param executeType       execute type
      * @return execute result code
      */
     @Operation(summary = "execute", description = "EXECUTE_ACTION_TO_PROCESS_INSTANCE_NOTES")
@@ -315,10 +316,10 @@ public class ExecutorController extends BaseController {
     /**
      * batch execute and do action to process instance
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser          login user
+     * @param projectCode        project code
      * @param processInstanceIds process instance ids, delimiter by "," if more than one id
-     * @param executeType execute type
+     * @param executeType        execute type
      * @return execute result code
      */
     @Operation(summary = "batchExecute", description = "BATCH_EXECUTE_ACTION_TO_PROCESS_INSTANCE_NOTES")
@@ -349,9 +350,10 @@ public class ExecutorController extends BaseController {
                         logger.error("Start to execute process instance error, projectCode:{}, processInstanceId:{}.",
                                 projectCode, processInstanceId);
                         executeFailedIdList.add((String) singleResult.get(Constants.MSG));
-                    } else
+                    } else {
                         logger.info("Start to execute process instance complete, projectCode:{}, processInstanceId:{}.",
                                 projectCode, processInstanceId);
+                    }
                 } catch (Exception e) {
                     executeFailedIdList
                             .add(MessageFormat.format(Status.PROCESS_INSTANCE_ERROR.getMsg(), strProcessInstanceId));
@@ -405,12 +407,12 @@ public class ExecutorController extends BaseController {
     /**
      * execute task instance
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param code taskDefinitionCode
-     * @param version taskDefinitionVersion
+     * @param loginUser      login user
+     * @param projectCode    project code
+     * @param code           taskDefinitionCode
+     * @param version        taskDefinitionVersion
      * @param warningGroupId warning group id
-     * @param workerGroup worker group
+     * @param workerGroup    worker group
      * @return start task result code
      */
     @Operation(summary = "startTaskInstance", description = "RUN_TASK_INSTANCE_NOTES")
@@ -454,11 +456,11 @@ public class ExecutorController extends BaseController {
     /**
      * do action to process instance: pause, stop, repeat, recover from pause, recover from stop
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser         login user
+     * @param projectCode       project code
      * @param processInstanceId process instance id
-     * @param startNodeList start node list
-     * @param taskDependType task depend type
+     * @param startNodeList     start node list
+     * @param taskDependType    task depend type
      * @return execute result code
      */
     @Operation(summary = "execute-task", description = "EXECUTE_ACTION_TO_PROCESS_INSTANCE_NOTES")

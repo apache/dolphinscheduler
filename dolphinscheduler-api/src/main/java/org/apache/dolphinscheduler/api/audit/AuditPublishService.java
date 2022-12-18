@@ -25,21 +25,21 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.annotation.PostConstruct;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class AuditPublishService {
 
     private BlockingQueue<AuditMessage> auditMessageQueue = new LinkedBlockingQueue<>();
 
-    @Autowired
-    private List<AuditSubscriber> subscribers;
+    private final List<AuditSubscriber> subscribers;
 
-    @Autowired
-    private AuditConfiguration auditConfiguration;
+    private final AuditConfiguration auditConfiguration;
 
     private static final Logger logger = LoggerFactory.getLogger(AuditPublishService.class);
 
@@ -68,7 +68,7 @@ public class AuditPublishService {
     }
 
     /**
-     *  subscribers execute the message processor method
+     * subscribers execute the message processor method
      */
     private void doPublish() {
         AuditMessage message = null;

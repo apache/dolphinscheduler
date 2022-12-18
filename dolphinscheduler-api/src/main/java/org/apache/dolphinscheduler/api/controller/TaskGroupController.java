@@ -34,7 +34,8 @@ import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -56,10 +57,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "TASK_GROUP_TAG")
 @RestController
 @RequestMapping("/task-group")
+@RequiredArgsConstructor
 public class TaskGroupController extends BaseController {
 
-    @Autowired
-    private TaskGroupService taskGroupService;
+    private final TaskGroupService taskGroupService;
+
+    private final TaskGroupQueueService taskGroupQueueService;
 
     /**
      * query task group list
@@ -292,9 +295,6 @@ public class TaskGroupController extends BaseController {
         Map<String, Object> result = taskGroupService.modifyPriority(loginUser, queueId, priority);
         return returnDataList(result);
     }
-
-    @Autowired
-    private TaskGroupQueueService taskGroupQueueService;
 
     /**
      * query task group queue list paging

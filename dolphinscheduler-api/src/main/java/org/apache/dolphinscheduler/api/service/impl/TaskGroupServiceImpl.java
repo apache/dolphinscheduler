@@ -41,9 +41,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,19 +56,16 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * task Group Service
  */
 @Service
+@RequiredArgsConstructor
 public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupService {
 
-    @Autowired
-    private TaskGroupMapper taskGroupMapper;
+    private final TaskGroupMapper taskGroupMapper;
 
-    @Autowired
-    private TaskGroupQueueService taskGroupQueueService;
+    private final TaskGroupQueueService taskGroupQueueService;
 
-    @Autowired
-    private ProcessService processService;
+    private final ProcessService processService;
 
-    @Autowired
-    private ExecutorService executorService;
+    private final ExecutorService executorService;
 
     private static final Logger logger = LoggerFactory.getLogger(TaskGroupServiceImpl.class);
 
@@ -246,9 +244,9 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
     /**
      * query all task group by name
      *
-     * @param loginUser login user
-     * @param pageNo    page no
-     * @param pageSize  page size
+     * @param loginUser   login user
+     * @param pageNo      page no
+     * @param pageSize    page size
      * @param projectCode project code
      * @return the result code and msg
      */
@@ -353,10 +351,11 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         }
         taskGroup.setStatus(Flag.NO.getCode());
         int update = taskGroupMapper.updateById(taskGroup);
-        if (update > 0)
+        if (update > 0) {
             logger.info("Task group close complete, taskGroupId:{}.", id);
-        else
+        } else {
             logger.error("Task group close error, taskGroupId:{}.", id);
+        }
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -387,10 +386,11 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         taskGroup.setStatus(Flag.YES.getCode());
         taskGroup.setUpdateTime(new Date(System.currentTimeMillis()));
         int update = taskGroupMapper.updateById(taskGroup);
-        if (update > 0)
+        if (update > 0) {
             logger.info("Task group start complete, taskGroupId:{}.", id);
-        else
+        } else {
             logger.error("Task group start error, taskGroupId:{}.", id);
+        }
         putMsg(result, Status.SUCCESS);
         return result;
     }

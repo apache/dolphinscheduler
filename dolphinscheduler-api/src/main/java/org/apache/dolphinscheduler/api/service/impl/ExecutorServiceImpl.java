@@ -101,9 +101,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -113,54 +114,40 @@ import com.google.common.collect.Lists;
  * executor service impl
  */
 @Service
+@RequiredArgsConstructor
 public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorService {
 
     private static final Logger logger = LoggerFactory.getLogger(ExecutorServiceImpl.class);
 
-    @Autowired
-    private ProjectMapper projectMapper;
+    private final ProjectMapper projectMapper;
 
-    @Autowired
-    private ProjectService projectService;
+    private final ProjectService projectService;
 
-    @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private final ProcessDefinitionMapper processDefinitionMapper;
 
-    @Autowired
-    ProcessDefinitionMapper processDefineMapper;
+    private final ProcessDefinitionMapper processDefineMapper;
 
-    @Autowired
-    private MonitorService monitorService;
+    private final MonitorService monitorService;
 
-    @Autowired
-    private ProcessInstanceMapper processInstanceMapper;
+    private final ProcessInstanceMapper processInstanceMapper;
 
-    @Autowired
-    private ProcessService processService;
+    private final ProcessService processService;
 
-    @Autowired
-    private CommandService commandService;
+    private final CommandService commandService;
 
-    @Autowired
-    private ProcessInstanceDao processInstanceDao;
+    private final ProcessInstanceDao processInstanceDao;
 
-    @Autowired
-    private TaskDefinitionLogMapper taskDefinitionLogMapper;
+    private final TaskDefinitionLogMapper taskDefinitionLogMapper;
 
-    @Autowired
-    private StateEventCallbackService stateEventCallbackService;
+    private final StateEventCallbackService stateEventCallbackService;
 
-    @Autowired
-    private TaskDefinitionMapper taskDefinitionMapper;
+    private final TaskDefinitionMapper taskDefinitionMapper;
 
-    @Autowired
-    private ProcessTaskRelationMapper processTaskRelationMapper;
+    private final ProcessTaskRelationMapper processTaskRelationMapper;
 
-    @Autowired
-    private TaskGroupQueueMapper taskGroupQueueMapper;
+    private final TaskGroupQueueMapper taskGroupQueueMapper;
 
-    @Autowired
-    private WorkerGroupService workerGroupService;
+    private final WorkerGroupService workerGroupService;
 
     /**
      * execute process instance
@@ -182,7 +169,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @param timeout                   timeout
      * @param startParams               the global param values which pass to new process instance
      * @param expectedParallelismNumber the expected parallelism number when execute complement in parallel mode
-     * @param testFlag testFlag
+     * @param testFlag                  testFlag
      * @return execute process instance code
      */
     @Override
@@ -363,8 +350,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
     /**
      * do action to process instance：pause, stop, repeat, recover from pause, recover from stop，rerun failed task
-    
-    
      *
      * @param loginUser         login user
      * @param projectCode       project code
@@ -475,12 +460,10 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
     /**
      * do action to workflow instance：pause, stop, repeat, recover from pause, recover from stop，rerun failed task
-    
-    
      *
-     * @param loginUser         login user
+     * @param loginUser          login user
      * @param workflowInstanceId workflow instance id
-     * @param executeType       execute type
+     * @param executeType        execute type
      * @return execute result code
      */
     @Override
@@ -495,11 +478,11 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     /**
      * do action to execute task in process instance
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser         login user
+     * @param projectCode       project code
      * @param processInstanceId process instance id
-     * @param startNodeList start node list
-     * @param taskDependType task depend type
+     * @param startNodeList     start node list
+     * @param taskDependType    task depend type
      * @return execute result code
      */
     @Override
@@ -1242,6 +1225,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
     /**
      * query executing data of processInstance by master
+     *
      * @param processInstanceId
      * @return
      */

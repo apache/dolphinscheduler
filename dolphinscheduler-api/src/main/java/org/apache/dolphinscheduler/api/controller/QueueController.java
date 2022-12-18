@@ -30,7 +30,8 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -54,10 +55,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "QUEUE_TAG")
 @RestController
 @RequestMapping("/queues")
+@RequiredArgsConstructor
 public class QueueController extends BaseController {
 
-    @Autowired
-    private QueueService queueService;
+    private final QueueService queueService;
 
     /**
      * query queue list
