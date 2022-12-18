@@ -17,11 +17,11 @@
 
 package org.apache.dolphinscheduler.server.master.processor;
 
-import io.netty.channel.Channel;
 import org.apache.dolphinscheduler.common.enums.CacheType;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.remote.command.CacheExpireCommand;
 import org.apache.dolphinscheduler.remote.command.Command;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,6 +31,8 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+
+import io.netty.channel.Channel;
 
 /**
  * task ack processor test
