@@ -32,6 +32,8 @@ import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import lombok.RequiredArgsConstructor;
+
 import org.quartz.CronTrigger;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
@@ -39,16 +41,15 @@ import org.quartz.Scheduler;
 import org.quartz.TriggerKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.base.Strings;
 
+@RequiredArgsConstructor
 public class QuartzScheduler implements SchedulerApi {
 
     private static final Logger logger = LoggerFactory.getLogger(QuartzScheduler.class);
 
-    @Autowired
-    private Scheduler scheduler;
+    private final Scheduler scheduler;
 
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
 

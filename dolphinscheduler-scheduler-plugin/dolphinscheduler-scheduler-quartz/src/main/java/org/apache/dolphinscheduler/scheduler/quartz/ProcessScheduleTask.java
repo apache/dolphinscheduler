@@ -31,27 +31,27 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 
+import lombok.RequiredArgsConstructor;
+
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
 
+@RequiredArgsConstructor
 public class ProcessScheduleTask extends QuartzJobBean {
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessScheduleTask.class);
 
-    @Autowired
-    private ProcessService processService;
+    private final ProcessService processService;
 
-    @Autowired
-    private CommandService commandService;
+    private final CommandService commandService;
 
     @Counted(value = "ds.master.quartz.job.executed")
     @Timed(value = "ds.master.quartz.job.execution.time", percentiles = {0.5, 0.75, 0.95, 0.99}, histogram = true)
