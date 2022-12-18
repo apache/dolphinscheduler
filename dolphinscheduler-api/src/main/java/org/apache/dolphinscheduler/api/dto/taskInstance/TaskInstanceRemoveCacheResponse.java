@@ -15,42 +15,30 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.enums;
+package org.apache.dolphinscheduler.api.dto.taskInstance;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
+import org.apache.dolphinscheduler.api.utils.Result;
+
+import lombok.Data;
 
 /**
- * have_script
- * have_file
- * can_retry
- * have_arr_variables
- * have_map_variables
- * have_alert
- * is_cache
+ * task instance success response
  */
-public enum Flag {
+@Data
+public class TaskInstanceRemoveCacheResponse extends Result {
 
-    /**
-     * 0 no
-     * 1 yes
-     */
-    NO(0, "no"),
-    YES(1, "yes");
+    private String cacheKey;
 
-    Flag(int code, String descp) {
-        this.code = code;
-        this.descp = descp;
+    public TaskInstanceRemoveCacheResponse(Result result) {
+        super();
+        this.setCode(result.getCode());
+        this.setMsg(result.getMsg());
     }
 
-    @EnumValue
-    private final int code;
-    private final String descp;
-
-    public int getCode() {
-        return code;
-    }
-
-    public String getDescp() {
-        return descp;
+    public TaskInstanceRemoveCacheResponse(Result result, String cacheKey) {
+        super();
+        this.setCode(result.getCode());
+        this.setMsg(result.getMsg());
+        this.cacheKey = cacheKey;
     }
 }

@@ -56,6 +56,7 @@ import { useAsyncState } from '@vueuse/core'
 import utils from '@/utils'
 import { useUISettingStore } from '@/store/ui-setting/ui-setting'
 import { executeTask } from '@/service/modules/executors'
+import { removeTaskInstanceCache } from '@/service/modules/task-instances'
 
 const props = {
   // If this prop is passed, it means from definition detail
@@ -305,6 +306,12 @@ export default defineComponent({
         })
     }
 
+    const handleRemoveTaskInstanceCache = (taskId: number) => {
+      removeTaskInstanceCache(props.projectCode, taskId).then(() => {
+        window.$message.success(t('project.workflow.success'))
+      })
+    }
+
     const downloadLogs = () => {
       utils.downloadFile('log/download-log', {
         taskInstanceId: nodeVariables.logTaskId
@@ -418,6 +425,7 @@ export default defineComponent({
           onRemoveTasks={removeTasks}
           onViewLog={handleViewLog}
           onExecuteTask={handleExecuteTask}
+          onRemoveTaskInstanceCache={handleRemoveTaskInstanceCache}
         />
         {!!props.definition && (
           <StartModal

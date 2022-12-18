@@ -78,6 +78,8 @@ public class TaskNode {
      */
     private String runFlag;
 
+    private int isCache;
+
     /**
      * the front field
      */
@@ -276,6 +278,14 @@ public class TaskNode {
 
     public void setRunFlag(String runFlag) {
         this.runFlag = runFlag;
+    }
+
+    public int getIsCache() {
+        return isCache;
+    }
+
+    public void setIsCache(int isCache) {
+        this.isCache = isCache;
     }
 
     public boolean isForbidden() {

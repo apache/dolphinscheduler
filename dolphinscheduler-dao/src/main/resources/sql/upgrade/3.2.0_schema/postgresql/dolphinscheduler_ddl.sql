@@ -119,3 +119,17 @@ d//
 delimiter ;
 select uc_dolphin_T_t_ds_task_instance_R_test_flag();
 DROP FUNCTION uc_dolphin_T_t_ds_task_instance_R_test_flag();
+
+ALTER TABLE t_ds_task_definition DROP COLUMN IF EXISTS is_cache;
+ALTER TABLE t_ds_task_definition ADD COLUMN IF NOT EXISTS is_cache int DEFAULT '0';
+
+ALTER TABLE t_ds_task_definition_log DROP COLUMN IF EXISTS is_cache;
+ALTER TABLE t_ds_task_definition_log ADD COLUMN IF NOT EXISTS is_cache int DEFAULT '0';
+
+ALTER TABLE t_ds_task_instance DROP COLUMN IF EXISTS is_cache;
+ALTER TABLE t_ds_task_instance ADD COLUMN IF NOT EXISTS is_cache int DEFAULT '0';
+
+ALTER TABLE t_ds_task_instance ADD COLUMN IF NOT EXISTS cache_key varchar(200) DEFAULT NULL;
+ALTER TABLE t_ds_task_instance DROP COLUMN IF EXISTS cacke_key;
+
+CREATE INDEX IF NOT EXISTS idx_cache_key ON t_ds_task_instance USING Btree("cache_key");

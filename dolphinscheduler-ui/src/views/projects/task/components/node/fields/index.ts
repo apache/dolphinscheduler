@@ -17,6 +17,7 @@
 
 export { useName } from './use-name'
 export { useRunFlag } from './use-run-flag'
+export { useCache } from './use-cache'
 export { useDescription } from './use-description'
 export { useTaskPriority } from './use-task-priority'
 export { useWorkerGroup } from './use-worker-group'

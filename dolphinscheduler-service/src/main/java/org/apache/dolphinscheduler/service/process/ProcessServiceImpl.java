@@ -2328,6 +2328,7 @@ public class ProcessServiceImpl implements ProcessService {
                 taskNode.setCpuQuota(taskDefinitionLog.getCpuQuota());
                 taskNode.setMemoryMax(taskDefinitionLog.getMemoryMax());
                 taskNode.setTaskExecuteType(taskDefinitionLog.getTaskExecuteType());
+                taskNode.setIsCache(taskDefinitionLog.getIsCache().getCode());
                 taskNodeList.add(taskNode);
             }
         }

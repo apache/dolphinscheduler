@@ -40,6 +40,7 @@ import java.util.Map;
 
 import lombok.Data;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -186,6 +187,17 @@ public class TaskInstance implements Serializable {
      * flag
      */
     private Flag flag;
+
+    /**
+     * task is cache: yes/no
+     */
+    private Flag isCache;
+
+    /**
+     * cache_key
+     */
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
+    private String cacheKey;
 
     /**
      * dependency
@@ -409,4 +421,5 @@ public class TaskInstance implements Serializable {
         // task retry does not over time, return false
         return getRetryInterval() * SEC_2_MINUTES_TIME_UNIT < failedTimeInterval;
     }
+
 }
