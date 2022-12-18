@@ -26,18 +26,17 @@ import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcClient;
 
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class TaskExecuteRunningMessageSender implements MessageSender<TaskExecuteRunningCommand> {
 
-    @Autowired
-    private WorkerRpcClient workerRpcClient;
+    private final WorkerRpcClient workerRpcClient;
 
-    @Autowired
-    private WorkerConfig workerConfig;
+    private final WorkerConfig workerConfig;
 
     @Override
     public void sendMessage(TaskExecuteRunningCommand message) throws RemotingException {

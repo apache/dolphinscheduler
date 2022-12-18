@@ -30,23 +30,22 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class WorkerMessageSender {
 
     private final Logger logger = LoggerFactory.getLogger(WorkerMessageSender.class);
 
-    @Autowired
-    private MessageRetryRunner messageRetryRunner;
+    private final MessageRetryRunner messageRetryRunner;
 
-    @Autowired
-    private ApplicationContext applicationContext;
+    private final ApplicationContext applicationContext;
 
     private Map<CommandType, MessageSender> messageSenderMap = new HashMap<>();
 

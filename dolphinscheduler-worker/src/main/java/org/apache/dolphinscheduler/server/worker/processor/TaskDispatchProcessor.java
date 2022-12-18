@@ -38,9 +38,10 @@ import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.apache.dolphinscheduler.service.utils.LogUtils;
 import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
@@ -53,36 +54,31 @@ import io.netty.channel.Channel;
  * Used to handle {@link CommandType#TASK_DISPATCH_REQUEST}
  */
 @Component
+@RequiredArgsConstructor
 public class TaskDispatchProcessor implements NettyRequestProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskDispatchProcessor.class);
 
-    @Autowired
-    private WorkerConfig workerConfig;
+    private final WorkerConfig workerConfig;
 
     /**
      * task callback service
      */
-    @Autowired
-    private WorkerMessageSender workerMessageSender;
+    private final WorkerMessageSender workerMessageSender;
 
     /**
      * alert client service
      */
-    @Autowired
-    private AlertClientService alertClientService;
+    private final AlertClientService alertClientService;
 
-    @Autowired
-    private TaskPluginManager taskPluginManager;
+    private final TaskPluginManager taskPluginManager;
 
     /**
      * task execute manager
      */
-    @Autowired
-    private WorkerManagerThread workerManager;
+    private final WorkerManagerThread workerManager;
 
-    @Autowired(required = false)
-    private StorageOperate storageOperate;
+    private final StorageOperate storageOperate;
 
     @Counted(value = "ds.task.execution.count", description = "task execute total count")
     @Timed(value = "ds.task.execution.duration", percentiles = {0.5, 0.75, 0.95, 0.99}, histogram = true)

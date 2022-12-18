@@ -38,7 +38,6 @@ import lombok.NonNull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
@@ -47,14 +46,14 @@ public class MessageRetryRunner extends BaseDaemonThread {
 
     private final Logger logger = LoggerFactory.getLogger(MessageRetryRunner.class);
 
-    protected MessageRetryRunner() {
+    protected MessageRetryRunner(ApplicationContext applicationContext) {
         super("WorkerMessageRetryRunnerThread");
+        this.applicationContext = applicationContext;
     }
 
     private static long MESSAGE_RETRY_WINDOW = Duration.ofMinutes(5L).toMillis();
 
-    @Autowired
-    private ApplicationContext applicationContext;
+    private final ApplicationContext applicationContext;
 
     private Map<CommandType, MessageSender<BaseCommand>> messageSenderMap = new HashMap<>();
 

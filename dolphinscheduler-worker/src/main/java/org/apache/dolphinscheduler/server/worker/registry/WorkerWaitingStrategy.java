@@ -30,35 +30,31 @@ import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import java.time.Duration;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 @Service
 @ConditionalOnProperty(prefix = "worker.registry-disconnect-strategy", name = "strategy", havingValue = "waiting")
+@RequiredArgsConstructor
 public class WorkerWaitingStrategy implements WorkerConnectStrategy {
 
     private final Logger logger = LoggerFactory.getLogger(WorkerWaitingStrategy.class);
 
-    @Autowired
-    private WorkerConfig workerConfig;
+    private final WorkerConfig workerConfig;
 
-    @Autowired
-    private RegistryClient registryClient;
+    private final RegistryClient registryClient;
 
-    @Autowired
-    private WorkerRpcServer workerRpcServer;
+    private final WorkerRpcServer workerRpcServer;
 
-    @Autowired
-    private WorkerRpcClient workerRpcClient;
+    private final WorkerRpcClient workerRpcClient;
 
-    @Autowired
-    private MessageRetryRunner messageRetryRunner;
+    private final MessageRetryRunner messageRetryRunner;
 
-    @Autowired
-    private WorkerManagerThread workerManagerThread;
+    private final WorkerManagerThread workerManagerThread;
 
     @Override
     public void disconnect() {

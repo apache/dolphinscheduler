@@ -27,27 +27,26 @@ import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteResultAckP
 import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteRunningAckProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskRejectAckProcessor;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
  * This rpc client is only used to send message, will not receive message, all response message should send to {@link WorkerRpcServer}.
  */
 @Component
+@RequiredArgsConstructor
 public class WorkerRpcClient implements AutoCloseable {
 
     private final Logger logger = LoggerFactory.getLogger(WorkerRpcClient.class);
 
-    @Autowired
-    private TaskExecuteRunningAckProcessor taskExecuteRunningAckProcessor;
+    private final TaskExecuteRunningAckProcessor taskExecuteRunningAckProcessor;
 
-    @Autowired
-    private TaskExecuteResultAckProcessor taskExecuteResultAckProcessor;
+    private final TaskExecuteResultAckProcessor taskExecuteResultAckProcessor;
 
-    @Autowired
-    private TaskRejectAckProcessor taskRejectAckProcessor;
+    private final TaskRejectAckProcessor taskRejectAckProcessor;
 
     private NettyRemotingClient nettyRemotingClient;
 

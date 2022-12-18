@@ -41,9 +41,10 @@ import java.util.Collection;
 
 import javax.annotation.PostConstruct;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
@@ -58,6 +59,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
                 "org.apache.dolphinscheduler.service.queue.*",
         })
 })
+@RequiredArgsConstructor
 public class WorkerServer implements IStoppable {
 
     /**
@@ -69,38 +71,29 @@ public class WorkerServer implements IStoppable {
      * spring application context
      * only use it for initialization
      */
-    @Autowired
-    private SpringApplicationContext springApplicationContext;
+    private final SpringApplicationContext springApplicationContext;
 
     /**
      * alert model netty remote server
      */
-    @Autowired
-    private AlertClientService alertClientService;
+    private final AlertClientService alertClientService;
 
-    @Autowired
-    private WorkerManagerThread workerManagerThread;
+    private final WorkerManagerThread workerManagerThread;
 
     /**
      * worker registry
      */
-    @Autowired
-    private WorkerRegistryClient workerRegistryClient;
+    private final WorkerRegistryClient workerRegistryClient;
 
-    @Autowired
-    private TaskPluginManager taskPluginManager;
+    private final TaskPluginManager taskPluginManager;
 
-    @Autowired
-    private WorkerRpcServer workerRpcServer;
+    private final WorkerRpcServer workerRpcServer;
 
-    @Autowired
-    private WorkerRpcClient workerRpcClient;
+    private final WorkerRpcClient workerRpcClient;
 
-    @Autowired
-    private MessageRetryRunner messageRetryRunner;
+    private final MessageRetryRunner messageRetryRunner;
 
-    @Autowired
-    private WorkerConfig workerConfig;
+    private final WorkerConfig workerConfig;
 
     /**
      * worker server startup, not use web service

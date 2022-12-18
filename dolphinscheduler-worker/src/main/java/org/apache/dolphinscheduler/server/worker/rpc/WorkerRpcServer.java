@@ -32,42 +32,35 @@ import org.apache.dolphinscheduler.service.log.LoggerRequestProcessor;
 
 import java.io.Closeable;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class WorkerRpcServer implements Closeable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WorkerRpcServer.class);
 
-    @Autowired
-    private TaskDispatchProcessor taskDispatchProcessor;
+    private final TaskDispatchProcessor taskDispatchProcessor;
 
-    @Autowired
-    private TaskKillProcessor taskKillProcessor;
+    private final TaskKillProcessor taskKillProcessor;
 
-    @Autowired
-    private TaskRejectAckProcessor taskRejectAckProcessor;
+    private final TaskRejectAckProcessor taskRejectAckProcessor;
 
-    @Autowired
-    private TaskSavePointProcessor taskSavePointProcessor;
+    private final TaskSavePointProcessor taskSavePointProcessor;
 
-    @Autowired
-    private TaskExecuteRunningAckProcessor taskExecuteRunningAckProcessor;
+    private final TaskExecuteRunningAckProcessor taskExecuteRunningAckProcessor;
 
-    @Autowired
-    private TaskExecuteResultAckProcessor taskExecuteResultAckProcessor;
+    private final TaskExecuteResultAckProcessor taskExecuteResultAckProcessor;
 
-    @Autowired
-    private HostUpdateProcessor hostUpdateProcessor;
+    private final HostUpdateProcessor hostUpdateProcessor;
 
-    @Autowired
-    private LoggerRequestProcessor loggerRequestProcessor;
+    private final LoggerRequestProcessor loggerRequestProcessor;
 
-    @Autowired
-    private WorkerConfig workerConfig;
+    private final WorkerConfig workerConfig;
 
     private NettyRemotingServer nettyRemotingServer;
 

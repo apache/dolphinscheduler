@@ -42,9 +42,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
@@ -60,18 +61,16 @@ import io.netty.channel.ChannelFutureListener;
  * task kill processor
  */
 @Component
+@RequiredArgsConstructor
 public class TaskKillProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(TaskKillProcessor.class);
 
-    @Autowired
-    private WorkerManagerThread workerManager;
+    private final WorkerManagerThread workerManager;
 
-    @Autowired
-    private MessageRetryRunner messageRetryRunner;
+    private final MessageRetryRunner messageRetryRunner;
 
-    @Autowired
-    private LogClient logClient;
+    private final LogClient logClient;
 
     /**
      * task kill process
@@ -170,6 +169,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
 
     /**
      * kill task by cancel application
+     *
      * @param taskInstanceId
      */
     protected void cancelApplication(int taskInstanceId) {
@@ -193,6 +193,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
 
     /**
      * kill system process
+     *
      * @param tenantCode
      * @param processId
      */
@@ -219,8 +220,8 @@ public class TaskKillProcessor implements NettyRequestProcessor {
     /**
      * kill yarn job
      *
-     * @param host host
-     * @param logPath logPath
+     * @param host        host
+     * @param logPath     logPath
      * @param executePath executePath
      * @param tenantCode  tenantCode
      * @return Pair<Boolean, List < String>> yarn kill result

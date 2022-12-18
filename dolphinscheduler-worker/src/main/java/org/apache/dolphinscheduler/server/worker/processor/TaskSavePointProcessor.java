@@ -31,9 +31,10 @@ import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecuteRunnable;
 import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 
+import lombok.RequiredArgsConstructor;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
@@ -46,6 +47,7 @@ import io.netty.channel.ChannelFutureListener;
  * task save point processor
  */
 @Component
+@RequiredArgsConstructor
 public class TaskSavePointProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(TaskSavePointProcessor.class);
@@ -53,8 +55,7 @@ public class TaskSavePointProcessor implements NettyRequestProcessor {
     /**
      * task execute manager
      */
-    @Autowired
-    private WorkerManagerThread workerManager;
+    private final WorkerManagerThread workerManager;
 
     /**
      * task save point process
@@ -103,9 +104,10 @@ public class TaskSavePointProcessor implements NettyRequestProcessor {
                 if (!future.isSuccess()) {
                     logger.error("Submit kill response to master error, kill command: {}",
                             taskSavePointResponseCommand);
-                } else
+                } else {
                     logger.info("Submit kill response to master success, kill command: {}",
                             taskSavePointResponseCommand);
+                }
             }
         });
     }
