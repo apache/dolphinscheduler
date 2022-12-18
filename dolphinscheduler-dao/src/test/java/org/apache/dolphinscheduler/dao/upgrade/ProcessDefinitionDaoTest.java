@@ -20,8 +20,6 @@ package org.apache.dolphinscheduler.dao.upgrade;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.sql.DataSource;
-
 import lombok.RequiredArgsConstructor;
 
 import org.junit.jupiter.api.Assertions;
@@ -33,7 +31,6 @@ import org.springframework.test.context.ActiveProfiles;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ProcessDefinitionDaoTest {
 
-    private final DataSource dataSource;
     final ProcessDefinitionDao processDefinitionDao = new ProcessDefinitionDao();
 
     @Test
