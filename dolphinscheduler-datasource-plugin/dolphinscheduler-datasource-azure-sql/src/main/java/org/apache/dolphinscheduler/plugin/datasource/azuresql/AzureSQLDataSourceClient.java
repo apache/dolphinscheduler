@@ -50,11 +50,7 @@ public class AzureSQLDataSourceClient extends CommonDataSourceClient {
         if (!connectionParam.getMode().equals(AzureSQLAuthMode.ACCESSTOKEN)) {
             return super.getConnection();
         }
-        try {
-            return AzureSQLDataSourceProcessor.tokenGetConnection(connectionParam);
-        } catch (MalformedURLException | ExecutionException | InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        return AzureSQLDataSourceProcessor.tokenGetConnection(connectionParam);
     }
 
     @Override

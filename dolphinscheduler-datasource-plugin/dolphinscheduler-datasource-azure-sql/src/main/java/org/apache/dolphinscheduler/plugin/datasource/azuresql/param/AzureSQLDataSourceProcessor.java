@@ -151,11 +151,7 @@ public class AzureSQLDataSourceProcessor extends AbstractDataSourceProcessor {
         AzureSQLConnectionParam azureSQLConnectionParam = (AzureSQLConnectionParam) connectionParam;
         // token access way
         if (azureSQLConnectionParam.getMode().equals(AzureSQLAuthMode.ACCESSTOKEN)) {
-            try {
-                return tokenGetConnection(azureSQLConnectionParam);
-            } catch (MalformedURLException | ExecutionException | InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+            return tokenGetConnection(azureSQLConnectionParam);
         }
         // normal way
         Class.forName(getDatasourceDriver());
@@ -192,7 +188,7 @@ public class AzureSQLDataSourceProcessor extends AbstractDataSourceProcessor {
         return azureSQLConnectionParam;
     }
 
-    public static Connection tokenGetConnection(AzureSQLConnectionParam param) throws MalformedURLException, ExecutionException, InterruptedException {
+    public static Connection tokenGetConnection(AzureSQLConnectionParam param)  {
         String spn = DataSourceConstants.AZURE_SQL_DATABASE_SPN;
         String stsURL = param.getEndpoint(); // Replace with your STS URL.
         String clientId = param.getUser(); // Replace with your client ID.
@@ -204,11 +200,21 @@ public class AzureSQLDataSourceProcessor extends AbstractDataSourceProcessor {
 
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         IClientCredential credential = ClientCredentialFactory.createFromSecret(clientSecret);
-        ConfidentialClientApplication clientApplication = ConfidentialClientApplication
-                .builder(clientId, credential).executorService(executorService).authority(stsURL).build();
+        ConfidentialClientApplication clientApplication;
+        try {
+            clientApplication = ConfidentialClientApplication
+                    .builder(clientId, credential).executorService(executorService).authority(stsURL).build();
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
         CompletableFuture<IAuthenticationResult> future = clientApplication
                 .acquireToken(ClientCredentialParameters.builder(scopes).build());
-        IAuthenticationResult authenticationResult = future.get();
+        IAuthenticationResult authenticationResult;
+        try {
+            authenticationResult = future.get();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
         String accessToken = authenticationResult.accessToken();
 
         // Connect with the access token.
