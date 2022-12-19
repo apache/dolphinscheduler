@@ -183,7 +183,6 @@ public interface UserMapper extends BaseMapper<User> {
      * query User and task flow binding relationship
      * @return
      */
-    List<UserWithProcessDefinitionCode> queryUserWithProcessDefinitionCode(
-            @Param("processDefinitionCodes") List<Long> processDefinitionCodes);
+    List<UserWithProcessDefinitionCode> queryUserWithProcessDefinitionCode(@Param("processDefinitionCodes") List<Long> processDefinitionCodes);
 
 }
