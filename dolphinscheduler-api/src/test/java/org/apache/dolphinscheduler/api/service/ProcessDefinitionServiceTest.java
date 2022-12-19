@@ -271,8 +271,10 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         String user2 = "user2";
         Mockito.when(userMapper.queryUserWithProcessDefinitionCode(processDefinitionCodes))
                 .thenReturn(Arrays.asList(
-                        UserWithProcessDefinitionCode.builder().processDefinitionCode(processDefinitionCode1).userName(user1).build(),
-                        UserWithProcessDefinitionCode.builder().processDefinitionCode(processDefinitionCode2).userName(user2).build()));
+                        UserWithProcessDefinitionCode.builder()
+                                .processDefinitionCode(processDefinitionCode1).userName(user1).build(),
+                        UserWithProcessDefinitionCode.builder()
+                                .processDefinitionCode(processDefinitionCode2).userName(user2).build()));
         Schedule schedule1 = new Schedule();
         schedule1.setProcessDefinitionCode(processDefinitionCode1);
         schedule1.setReleaseState(ReleaseState.ONLINE);
