@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.User;
-
 import org.apache.dolphinscheduler.dao.entity.UserWithProcessDefinitionCode;
+
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
