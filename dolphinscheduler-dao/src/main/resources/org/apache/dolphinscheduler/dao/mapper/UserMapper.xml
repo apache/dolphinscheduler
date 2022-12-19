@@ -143,4 +143,23 @@
         from t_ds_user
         where state = 1
     </select>
+    <select id="queryUserWithProcessDefinitionCode" resultType="org.apache.dolphinscheduler.dao.entity.UserWithProcessDefinitionCode">
+        select
+        dl.code as process_definition_code,
+        u.id as user_id,
+        u.user_name
+        from t_ds_process_definition_log dl
+        inner join t_ds_process_definition pd
+        on pd.code = dl.code
+        and pd.version = dl.version
+        inner join t_ds_user u
+        on dl.operator = u.id
+        <if test="processDefinitionCodes != null and processDefinitionCodes.size() != 0">
+            where dl.code in
+            <foreach item="code" collection="processDefinitionCodes" open="(" separator="," close=")">
+                #{code}
+            </foreach>
+        </if>
+        group by dl.code, u.id
+    </select>
 </mapper>

@@ -96,6 +96,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskMainInfo;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.UserWithProcessDefinitionCode;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
@@ -592,13 +593,12 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         Map<Long, Schedule> scheduleMap = schedulerService.queryScheduleByProcessDefinitionCodes(processDefinitionCodes)
                 .stream()
                 .collect(Collectors.toMap(Schedule::getProcessDefinitionCode, Function.identity()));
-
+        List<UserWithProcessDefinitionCode> userWithCodes = userMapper.queryUserWithProcessDefinitionCode(
+                processDefinitionCodes);
         for (ProcessDefinition pd : processDefinitions) {
-            // todo: use batch query
-            ProcessDefinitionLog processDefinitionLog =
-                    processDefinitionLogMapper.queryByDefinitionCodeAndVersion(pd.getCode(), pd.getVersion());
-            User user = userMapper.selectById(processDefinitionLog.getOperator());
-            pd.setModifyBy(user.getUserName());
+            userWithCodes.stream()
+                    .filter(userWithCode -> userWithCode.getProcessDefinitionCode() == pd.getCode())
+                    .findAny().ifPresent(userWithCode -> pd.setModifyBy(userWithCode.getUserName()));
             Schedule schedule = scheduleMap.get(pd.getCode());
             pd.setScheduleReleaseState(schedule == null ? null : schedule.getReleaseState());
         }
