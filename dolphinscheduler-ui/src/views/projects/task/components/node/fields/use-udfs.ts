@@ -23,12 +23,15 @@ export function useUdfs(model: { [field: string]: any }): IJsonItem {
   const { t } = useI18n()
   const options = ref([])
   const loading = ref(false)
-  const span = computed(() => (['HIVE', 'SPARK'].includes(model.type) ? 24 : 0))
+  const span = computed(() =>
+    ['HIVE', 'SPARK', 'KYUUBI'].includes(model.type) ? 24 : 0
+  )
 
   const getUdfs = async () => {
     if (loading.value) return
     loading.value = true
-    const res = await queryUdfFuncList({ type: model.type })
+    const type = model.type === 'KYUUBI' ? 'HIVE' : model.type
+    const res = await queryUdfFuncList({ type })
     options.value = res.map((udf: { id: number; funcName: string }) => ({
       value: String(udf.id),
       label: udf.funcName
@@ -39,7 +42,7 @@ export function useUdfs(model: { [field: string]: any }): IJsonItem {
   watch(
     () => model.type,
     (value) => {
-      if (['HIVE', 'SPARK'].includes(value)) {
+      if (['HIVE', 'SPARK', 'KYUUBI'].includes(value)) {
         getUdfs()
       }
     }
