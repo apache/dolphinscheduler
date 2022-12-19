@@ -220,7 +220,6 @@ public class PythonGateway {
      * @param timeout timeout for workflow working, if running time longer than timeout,
      * task will mark as fail
      * @param workerGroup run task in which worker group
-     * @param tenantCode tenantCode
      * @param taskRelationJson relation json for nodes
      * @param taskDefinitionJson taskDefinitionJson
      * @param otherParamsJson otherParamsJson handle other params
@@ -236,13 +235,16 @@ public class PythonGateway {
                                        int warningGroupId,
                                        int timeout,
                                        String workerGroup,
-                                       String tenantCode,
                                        int releaseState,
                                        String taskRelationJson,
                                        String taskDefinitionJson,
                                        String otherParamsJson,
                                        String executionType) {
         User user = usersService.queryUser(userName);
+        if (user.getTenantCode() == null) {
+            throw new RuntimeException("Can not create or update workflow for user who not related to any tenant.");
+        }
+
         Project project = projectMapper.queryByName(projectName);
         long projectCode = project.getCode();
 
@@ -257,12 +259,12 @@ public class PythonGateway {
                     ReleaseState.OFFLINE);
             processDefinitionService.updateProcessDefinition(user, projectCode, name,
                     processDefinitionCode, description, globalParams,
-                    null, timeout, tenantCode, taskRelationJson, taskDefinitionJson, otherParamsJson,
+                    null, timeout, user.getTenantCode(), taskRelationJson, taskDefinitionJson, otherParamsJson,
                     executionTypeEnum);
         } else {
             Map<String, Object> result = processDefinitionService.createProcessDefinition(user, projectCode, name,
                     description, globalParams,
-                    null, timeout, tenantCode, taskRelationJson, taskDefinitionJson, otherParamsJson,
+                    null, timeout, user.getTenantCode(), taskRelationJson, taskDefinitionJson, otherParamsJson,
                     executionTypeEnum);
             processDefinition = (ProcessDefinition) result.get(Constants.DATA_LIST);
             processDefinitionCode = processDefinition.getCode();
