@@ -103,6 +103,9 @@ export default {
     backward_execution: 'Backward execution',
     forward_execution: 'Forward execution',
     current_node_execution: 'Execute only the current node',
+    backward_execution_task: 'Run backwards',
+    forward_execution_task: 'Run forwards',
+    current_node_execution_task: 'Run',
     notification_strategy: 'Notification Strategy',
     workflow_priority: 'Workflow Priority',
     worker_group: 'Worker Group',
@@ -158,6 +161,7 @@ export default {
     pause: 'Pause',
     recovery_waiting_thread: 'Recovery waiting thread',
     recover_serial_wait: 'Recover serial wait',
+    execute_task: 'Execute the specified task',
     recovery_suspend: 'Recovery Suspend',
     recovery_failed: 'Recovery Failed',
     gantt: 'Gantt',
@@ -273,7 +277,8 @@ export default {
     alarm_group: 'Alarm group',
     startup_parameter: 'Startup Parameter',
     whether_dry_run: 'Whether Dry-Run',
-    please_choose: 'Please Choose'
+    please_choose: 'Please Choose',
+    remove_task_cache: 'Clear cache'
   },
   dag: {
     create: 'Create Workflow',
@@ -321,6 +326,7 @@ export default {
     online: 'Online'
   },
   node: {
+    is_cache: "Cache Execution",
     jvm_args: 'Java VM Parameters',
     jvm_args_tips: 'Please enter virtual machine parameters',
     run_type: 'Run Type',

@@ -196,16 +196,12 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         taskExecutionContext.setStartTime(taskStartTime);
         logger.info("Set task startTime: {}", taskStartTime);
 
-        String systemEnvPath = CommonUtils.getSystemEnvPath();
-        taskExecutionContext.setEnvFile(systemEnvPath);
-        logger.info("Set task envFile: {}", systemEnvPath);
-
         String taskAppId = String.format("%s_%s", taskExecutionContext.getProcessInstanceId(),
                 taskExecutionContext.getTaskInstanceId());
         taskExecutionContext.setTaskAppId(taskAppId);
         logger.info("Set task appId: {}", taskAppId);
 
-        logger.info("End initialize task");
+        logger.info("End initialize task {}", JSONUtils.toPrettyJsonString(taskExecutionContext));
     }
 
     protected void beforeExecute() {

@@ -53,9 +53,9 @@ public class FlinkTask extends AbstractYarnTask {
 
     @Override
     public void init() {
-        logger.info("flink task params {}", taskExecutionContext.getTaskParams());
 
         flinkParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), FlinkParameters.class);
+        logger.info("Initialize flink task params {}", JSONUtils.toPrettyJsonString(flinkParameters));
 
         if (flinkParameters == null || !flinkParameters.checkParameters()) {
             throw new RuntimeException("flink task params is not valid");

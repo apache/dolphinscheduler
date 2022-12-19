@@ -105,6 +105,9 @@ export default {
     backward_execution: '向后执行',
     forward_execution: '向前执行',
     current_node_execution: '仅执行当前节点',
+    backward_execution_task: '向后运行',
+    forward_execution_task: '向前运行',
+    current_node_execution_task: '运行',
     notification_strategy: '通知策略',
     workflow_priority: '流程优先级',
     worker_group: 'Worker分组',
@@ -160,6 +163,7 @@ export default {
     pause: '暂停',
     recovery_waiting_thread: '恢复等待线程',
     recover_serial_wait: '串行恢复',
+    execute_task: '执行指定任务',
     recovery_suspend: '恢复运行',
     recovery_failed: '重跑失败任务',
     gantt: '甘特图',
@@ -274,7 +278,8 @@ export default {
     alarm_group: '告警组',
     startup_parameter: '启动参数',
     whether_dry_run: '是否空跑',
-    please_choose: '请选择'
+    please_choose: '请选择',
+    remove_task_cache: '清除缓存'
   },
   dag: {
     create: '创建工作流',
@@ -322,6 +327,7 @@ export default {
     online: '已上线'
   },
   node: {
+    is_cache: "缓存执行",
     is_module_path: '使用模块路径',
     run_type: '运行类型',
     jvm_args: '虚拟机参数',
