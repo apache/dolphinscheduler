@@ -17,12 +17,14 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
+import lombok.Builder;
 import lombok.Data;
 
 /**
  * User and task flow binding relationship
  */
 @Data
+@Builder
 public class UserWithProcessDefinitionCode {
 
     private long processDefinitionCode;
