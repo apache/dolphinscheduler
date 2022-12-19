@@ -43,6 +43,7 @@
         <module>dolphinscheduler-datasource-athena</module>
         <module>dolphinscheduler-datasource-trino</module>
         <module>dolphinscheduler-datasource-starrocks</module>
+        <module>dolphinscheduler-datasource-azure-sql</module>
     </modules>
 
     <dependencyManagement>

@@ -95,4 +95,11 @@ public class DataSourceConstants {
     public static final String SPRING_DATASOURCE_MAX_ACTIVE = "spring.datasource.maxActive";
 
     public static final String SPRING_DATASOURCE_TEST_ON_BORROW = "spring.datasource.testOnBorrow";
+
+    /**
+     * azure static websites
+     */
+    public static final String AZURE_SQL_DATABASE_SPN = "https://database.windows.net/";
+    public static final String AZURE_SQL_DATABASE_TOKEN_SCOPE = "/.default";
+
 }
