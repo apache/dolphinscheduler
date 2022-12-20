@@ -29,6 +29,8 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.util.Map;
 
+import javax.servlet.http.Cookie;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -37,8 +39,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-
-import javax.servlet.http.Cookie;
 
 /**
  * login controller test
@@ -73,8 +73,8 @@ public class LoginControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/signOut")
                 .header("sessionId", sessionId)
-                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
-                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

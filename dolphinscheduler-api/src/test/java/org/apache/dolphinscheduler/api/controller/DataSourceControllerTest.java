@@ -31,6 +31,8 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.util.HashMap;
 
+import javax.servlet.http.Cookie;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,8 +46,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-
-import javax.servlet.http.Cookie;
 
 /**
  * data source controller test
@@ -81,8 +81,8 @@ public class DataSourceControllerTest extends AbstractControllerTest {
         paramsMap.put("bindTestId", null);
         MvcResult mvcResult = mockMvc.perform(post("/datasources")
                 .header("sessionId", sessionId)
-                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
-                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JSONUtils.toJsonString(paramsMap)))
                 .andExpect(status().isCreated())
@@ -112,8 +112,8 @@ public class DataSourceControllerTest extends AbstractControllerTest {
         paramsMap.put("bindTestId", 1);
         MvcResult mvcResult = mockMvc.perform(put("/datasources/2")
                 .header("sessionId", sessionId)
-                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
-                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .content(JSONUtils.toJsonString(paramsMap)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -188,8 +188,8 @@ public class DataSourceControllerTest extends AbstractControllerTest {
         paramsMap.put("bindTestId", null);
         MvcResult mvcResult = mockMvc.perform(post("/datasources/connect")
                 .header("sessionId", sessionId)
-                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
-                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .content(JSONUtils.toJsonString(paramsMap)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -277,8 +277,8 @@ public class DataSourceControllerTest extends AbstractControllerTest {
     public void testDelete() throws Exception {
         MvcResult mvcResult = mockMvc.perform(delete("/datasources/2")
                 .header("sessionId", sessionId)
-                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
-                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken))
+                .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken))
 
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

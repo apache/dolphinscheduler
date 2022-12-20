@@ -30,6 +30,8 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.Cookie;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -39,8 +41,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-
-import javax.servlet.http.Cookie;
 
 /**
  * users controller test
@@ -61,8 +61,8 @@ public class UsersControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/users/create")
                 .header(SESSION_ID, sessionId)
-                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
-                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -86,8 +86,8 @@ public class UsersControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/users/update")
                 .header(SESSION_ID, sessionId)
-                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
-                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -105,8 +105,8 @@ public class UsersControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/users/grant-project")
                 .header(SESSION_ID, sessionId)
-                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
-                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -126,7 +126,7 @@ public class UsersControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = this.mockMvc
                 .perform(post("/users/grant-project-by-code")
                         .header(SESSION_ID, this.sessionId)
-                                                .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
                         .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                         .params(paramsMap))
                 .andExpect(status().isOk())
@@ -146,8 +146,8 @@ public class UsersControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = this.mockMvc.perform(post("/users/revoke-project")
                 .header(SESSION_ID, this.sessionId)
-                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
-                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -166,8 +166,8 @@ public class UsersControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/users/grant-file")
                 .header(SESSION_ID, sessionId)
-                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
-                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -186,8 +186,8 @@ public class UsersControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/users/grant-udf-func")
                 .header(SESSION_ID, sessionId)
-                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
-                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -206,8 +206,8 @@ public class UsersControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/users/grant-datasource")
                 .header(SESSION_ID, sessionId)
-                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
-                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -309,8 +309,8 @@ public class UsersControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/users/delete")
                 .header(SESSION_ID, sessionId)
-                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
-                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -345,8 +345,8 @@ public class UsersControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/users/register")
                 .header(SESSION_ID, sessionId)
-                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
-                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -364,8 +364,8 @@ public class UsersControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/users/activate")
                 .header(SESSION_ID, sessionId)
-                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
-                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -384,8 +384,8 @@ public class UsersControllerTest extends AbstractControllerTest {
         String jsonUserNames = JSONUtils.toJsonString(userNames);
         MvcResult mvcResult = mockMvc.perform(post("/users/batch/activate")
                 .header(SESSION_ID, sessionId)
-                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
-                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonUserNames))
                 .andExpect(status().isOk())

@@ -1,6 +1,13 @@
 package org.apache.dolphinscheduler.api.security;
 
 import org.apache.dolphinscheduler.api.controller.LoginController;
+
+import java.util.UUID;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
@@ -8,12 +15,8 @@ import org.springframework.security.web.csrf.DefaultCsrfToken;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.WebUtils;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.UUID;
-
 public final class LoginCsrfTokenRepository implements CsrfTokenRepository {
+
     public static final String PARAMETER_NAME = "_csrf";
     public static final String HEADER_NAME = "X-XSRF-TOKEN";
     public static final String COOKIE_NAME = "csrfToken";
@@ -50,8 +53,7 @@ public final class LoginCsrfTokenRepository implements CsrfTokenRepository {
             return null;
         } else {
             String token = cookie.getValue();
-            return !StringUtils.hasLength(token) ? null : new DefaultCsrfToken(HEADER_NAME
-                    , PARAMETER_NAME, token);
+            return !StringUtils.hasLength(token) ? null : new DefaultCsrfToken(HEADER_NAME, PARAMETER_NAME, token);
         }
     }
 

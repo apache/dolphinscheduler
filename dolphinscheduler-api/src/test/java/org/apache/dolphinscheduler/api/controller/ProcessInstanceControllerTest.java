@@ -35,6 +35,8 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.Cookie;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -43,8 +45,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-
-import javax.servlet.http.Cookie;
 
 /**
  * process instance controller test
@@ -75,8 +75,8 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
         paramsMap.add("pageSize", "2");
 
         MvcResult mvcResult = mockMvc.perform(get("/projects/1113/process-instances")
-                .header("sessionId", sessionId)                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
-                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                .header("sessionId", sessionId).cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -132,8 +132,8 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
         paramsMap.add("tenantCode", "123");
 
         MvcResult mvcResult = mockMvc.perform(put("/projects/{projectCode}/process-instances/{id}", "1113", "123")
-                .header("sessionId", sessionId)                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
-                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                .header("sessionId", sessionId).cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -170,7 +170,8 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc
                 .perform(get("/projects/{projectCode}/process-instances/query-sub-by-parent", "1113")
-                        .header(SESSION_ID, sessionId)                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(SESSION_ID, sessionId)
+                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
                         .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                         .param("taskId", "1203"))
                 .andExpect(status().isOk())
@@ -193,7 +194,7 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc
                 .perform(get("/projects/{projectCode}/process-instances/query-parent-by-sub", "1113")
                         .header(SESSION_ID, sessionId)
-                                                .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
                         .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                         .param("subId", "1204"))
                 .andExpect(status().isOk())
@@ -232,8 +233,8 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(delete("/projects/{projectCode}/process-instances/{id}", "1113", "123")
                 .header(SESSION_ID, sessionId)
-                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
-                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken))
+                .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -252,8 +253,8 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
                 processInstanceService.deleteProcessInstanceById(Mockito.any(), Mockito.anyLong(), Mockito.anyInt()))
                 .thenReturn(mockResult);
         MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/process-instances/batch-delete", "1113")
-                .header(SESSION_ID, sessionId)                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
-                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                .header(SESSION_ID, sessionId).cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .param("processInstanceIds", "1205,1206"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
