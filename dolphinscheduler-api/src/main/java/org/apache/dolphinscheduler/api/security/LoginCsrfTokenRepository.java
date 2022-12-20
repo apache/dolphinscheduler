@@ -78,5 +78,4 @@ public final class LoginCsrfTokenRepository implements CsrfTokenRepository {
         return UUID.randomUUID().toString();
     }
 
-
 }
