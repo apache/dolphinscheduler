@@ -77,7 +77,6 @@ service.interceptors.request.use((config: AxiosRequestConfig<any>) => {
   config.headers && (config.headers.sessionId = userStore.getSessionId)
   config.headers && (config.headers['X-XSRF-TOKEN'] = csrfTokenStore.getCsrfToken)
   const language = cookies.get('language')
-  const sessionId = cookies.get('sessionId')
   config.headers = config.headers || {}
   if (language) config.headers.language = language
   return config
