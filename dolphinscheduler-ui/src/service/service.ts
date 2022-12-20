@@ -18,6 +18,7 @@
 import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
 import { useUserStore } from '@/store/user/user'
 import { useUISettingStore } from '@/store/ui-setting/ui-setting'
+import { useCsrfTokenStore } from '@/store/csrf-token/csrf-token'
 import qs from 'qs'
 import _ from 'lodash'
 import cookies from 'js-cookie'
@@ -26,6 +27,7 @@ import utils from '@/utils'
 
 const userStore = useUserStore()
 const uiSettingStore = useUISettingStore()
+const csrfTokenStore = useCsrfTokenStore()
 
 /**
  * @description Log and display errors
@@ -73,13 +75,11 @@ const err = (err: AxiosError): Promise<AxiosError> => {
 
 service.interceptors.request.use((config: AxiosRequestConfig<any>) => {
   config.headers && (config.headers.sessionId = userStore.getSessionId)
+  config.headers && (config.headers['X-XSRF-TOKEN'] = csrfTokenStore.getCsrfToken)
   const language = cookies.get('language')
   const sessionId = cookies.get('sessionId')
   config.headers = config.headers || {}
   if (language) config.headers.language = language
-  if (sessionId) {
-    config.headers['X-CSRF-TOKEN'] = sessionId.split('').reverse().join('')
-  }
   return config
 }, err)
 

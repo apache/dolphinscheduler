@@ -25,6 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.security.LoginCsrfTokenRepository;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
@@ -39,6 +40,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+
+import javax.servlet.http.Cookie;
 
 public class TenantControllerTest extends AbstractControllerTest {
 
@@ -58,7 +61,8 @@ public class TenantControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/tenants")
                 .header(SESSION_ID, sessionId)
-                .header("X-CSRF-TOKEN", csrfToken)
+                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -99,7 +103,8 @@ public class TenantControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(put("/tenants/{id}", 9)
                 .header(SESSION_ID, sessionId)
-                .header("X-CSRF-TOKEN", csrfToken)
+                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -152,7 +157,8 @@ public class TenantControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(get("/tenants/list")
                 .header(SESSION_ID, sessionId)
-                .header("X-CSRF-TOKEN", csrfToken))
+                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -170,7 +176,8 @@ public class TenantControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(delete("/tenants/{id}", 64)
                 .header(SESSION_ID, sessionId)
-                .header("X-CSRF-TOKEN", csrfToken)
+                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

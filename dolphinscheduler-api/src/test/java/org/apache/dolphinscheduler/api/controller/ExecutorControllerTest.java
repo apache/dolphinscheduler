@@ -27,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.security.LoginCsrfTokenRepository;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -51,6 +52,8 @@ import org.springframework.util.MultiValueMap;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+
+import javax.servlet.http.Cookie;
 
 /**
  * executor controller test
@@ -121,7 +124,8 @@ public class ExecutorControllerTest extends AbstractControllerTest {
         // When
         final MvcResult mvcResult = mockMvc
                 .perform(post("/projects/{projectCode}/executors/start-process-instance", projectCode)
-                        .header("sessionId", sessionId).header("X-CSRF-TOKEN", csrfToken)
+                        .header("sessionId", sessionId)                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                         .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -164,7 +168,8 @@ public class ExecutorControllerTest extends AbstractControllerTest {
         // When
         final MvcResult mvcResult = mockMvc
                 .perform(post("/projects/{projectCode}/executors/start-process-instance", projectCode)
-                        .header("sessionId", sessionId).header("X-CSRF-TOKEN", csrfToken)
+                        .header("sessionId", sessionId)                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                         .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -206,7 +211,8 @@ public class ExecutorControllerTest extends AbstractControllerTest {
         // When
         final MvcResult mvcResult = mockMvc
                 .perform(post("/projects/{projectCode}/executors/start-process-instance", projectCode)
-                        .header("sessionId", sessionId).header("X-CSRF-TOKEN", csrfToken)
+                        .header("sessionId", sessionId)                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                         .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -235,7 +241,8 @@ public class ExecutorControllerTest extends AbstractControllerTest {
         // When
         final MvcResult mvcResult = mockMvc
                 .perform(post("/projects/{projectCode}/executors/start-process-instance", projectCode)
-                        .header("sessionId", sessionId).header("X-CSRF-TOKEN", csrfToken)
+                        .header("sessionId", sessionId)                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                         .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -268,7 +275,8 @@ public class ExecutorControllerTest extends AbstractControllerTest {
 
         // When
         final MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/executors/execute", projectCode)
-                .header("sessionId", sessionId).header("X-CSRF-TOKEN", csrfToken)
+                .header("sessionId", sessionId)                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -286,7 +294,8 @@ public class ExecutorControllerTest extends AbstractControllerTest {
                 .thenReturn(executeServiceResult);
         // When
         final MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/executors/start-check", projectCode)
-                .header(SESSION_ID, sessionId).header("X-CSRF-TOKEN", csrfToken)
+                .header(SESSION_ID, sessionId)                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .param("processDefinitionCode", String.valueOf(processDefinitionCode)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

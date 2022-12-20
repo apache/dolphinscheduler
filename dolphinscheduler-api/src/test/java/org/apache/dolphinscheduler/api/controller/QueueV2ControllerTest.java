@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.api.dto.queue.QueueQueryRequest;
 import org.apache.dolphinscheduler.api.dto.queue.QueueUpdateRequest;
 import org.apache.dolphinscheduler.api.dto.queue.QueueVerifyRequest;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.security.LoginCsrfTokenRepository;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
@@ -36,6 +37,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
+
+import javax.servlet.http.Cookie;
 
 /**
  * queue v2 controller test
@@ -73,7 +76,9 @@ public class QueueV2ControllerTest extends AbstractControllerTest {
         queueQueryRequest.setPageSize(20);
 
         MvcResult mvcResult = mockMvc.perform(get("/v2/queues")
-                .header(SESSION_ID, sessionId).header("X-CSRF-TOKEN", csrfToken)
+                .header(SESSION_ID, sessionId)
+                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .accept(MediaType.ALL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JSONUtils.toJsonString(queueQueryRequest)))
@@ -92,7 +97,8 @@ public class QueueV2ControllerTest extends AbstractControllerTest {
         queueCreateRequest.setQueueName(QUEUE_NAME_CREATE_NAME);
         MvcResult mvcResult = mockMvc.perform(post("/v2/queues")
                 .header(SESSION_ID, sessionId)
-                .header("X-CSRF-TOKEN", csrfToken)
+                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .accept(MediaType.ALL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JSONUtils.toJsonString(queueCreateRequest)))
@@ -112,7 +118,8 @@ public class QueueV2ControllerTest extends AbstractControllerTest {
         queueUpdateRequest.setQueueName(QUEUE_NAME_MODIFY_NAME);
         MvcResult mvcResult = mockMvc.perform(put("/v2/queues/{id}", 1)
                 .header(SESSION_ID, sessionId)
-                .header("X-CSRF-TOKEN", csrfToken)
+                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .accept(MediaType.ALL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JSONUtils.toJsonString(queueUpdateRequest)))
@@ -133,7 +140,8 @@ public class QueueV2ControllerTest extends AbstractControllerTest {
         queueVerifyRequest.setQueueName(NOT_EXISTS_NAME);
         MvcResult mvcResult = mockMvc.perform(post("/v2/queues/verify")
                 .header(SESSION_ID, sessionId)
-                .header("X-CSRF-TOKEN", csrfToken)
+                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .accept(MediaType.ALL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JSONUtils.toJsonString(queueVerifyRequest)))
@@ -149,7 +157,8 @@ public class QueueV2ControllerTest extends AbstractControllerTest {
         queueVerifyRequest.setQueueName(QUEUE_NAME_CREATE_NAME);
         mvcResult = mockMvc.perform(post("/v2/queues/verify")
                 .header(SESSION_ID, sessionId)
-                .header("X-CSRF-TOKEN", csrfToken)
+                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .accept(MediaType.ALL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JSONUtils.toJsonString(queueVerifyRequest)))
@@ -164,7 +173,8 @@ public class QueueV2ControllerTest extends AbstractControllerTest {
         queueVerifyRequest.setQueueName(NOT_EXISTS_NAME);
         mvcResult = mockMvc.perform(post("/v2/queues/verify")
                 .header(SESSION_ID, sessionId)
-                .header("X-CSRF-TOKEN", csrfToken)
+                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .accept(MediaType.ALL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JSONUtils.toJsonString(queueVerifyRequest)))

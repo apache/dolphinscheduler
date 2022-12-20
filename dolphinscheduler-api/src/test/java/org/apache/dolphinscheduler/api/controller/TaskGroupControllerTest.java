@@ -22,6 +22,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.apache.dolphinscheduler.api.security.LoginCsrfTokenRepository;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
@@ -33,6 +34,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+
+import javax.servlet.http.Cookie;
 
 /**
  * queue controller test
@@ -107,7 +110,8 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/task-group/create")
                 .header(SESSION_ID, sessionId)
-                .header("X-CSRF-TOKEN", csrfToken)
+                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -124,7 +128,8 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult1 = mockMvc.perform(post("/task-group/create")
                 .header(SESSION_ID, sessionId)
-                .header("X-CSRF-TOKEN", csrfToken)
+                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -145,7 +150,8 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/task-group/update")
                 .header(SESSION_ID, sessionId)
-                .header("X-CSRF-TOKEN", csrfToken)
+                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -164,7 +170,8 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
         paramsMap.add("id", "1");
         MvcResult mvcResult = mockMvc.perform(post("/task-group/close-task-group")
                 .header(SESSION_ID, sessionId)
-                .header("X-CSRF-TOKEN", csrfToken)
+                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -179,7 +186,8 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
         paramsMap.add("id", "1");
         MvcResult mvcResult1 = mockMvc.perform(post("/task-group/start-task-group")
                 .header(SESSION_ID, sessionId)
-                .header("X-CSRF-TOKEN", csrfToken)
+                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

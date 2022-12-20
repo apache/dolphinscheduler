@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.controller;
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.controller.AbstractControllerTest.RegistryServer;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.security.LoginCsrfTokenRepository;
 import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -33,6 +34,7 @@ import org.apache.curator.test.TestingServer;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.annotation.PostConstruct;
 
@@ -45,6 +47,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
+
+
 
 /**
  * abstract controller test
@@ -93,7 +97,7 @@ public abstract class AbstractControllerTest {
     }
 
     private String generateCsrfToken(String sessionId) {
-        return new StringBuilder(sessionId).reverse().toString();
+        return UUID.randomUUID().toString();
     }
 
     public Map<String, Object> success() {

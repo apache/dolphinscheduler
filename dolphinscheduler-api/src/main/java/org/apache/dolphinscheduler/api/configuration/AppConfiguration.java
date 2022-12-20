@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.api.configuration;
 
-import org.apache.dolphinscheduler.api.interceptor.CsrfTokenInterceptor;
+
 import org.apache.dolphinscheduler.api.interceptor.LocaleChangeInterceptor;
 import org.apache.dolphinscheduler.api.interceptor.LoginHandlerInterceptor;
 import org.apache.dolphinscheduler.api.interceptor.RateLimitInterceptor;
@@ -77,11 +77,6 @@ public class AppConfiguration implements WebMvcConfigurer {
         return new LoginHandlerInterceptor();
     }
 
-    @Bean
-    public CsrfTokenInterceptor csrfInterceptor() {
-        return new CsrfTokenInterceptor();
-    }
-
     /**
      * Cookie
      * @return local resolver
@@ -121,14 +116,6 @@ public class AppConfiguration implements WebMvcConfigurer {
                         new String[]{LOGIN_PATH_PATTERN, REGISTER_PATH_PATTERN, DOC_PATH_PATTERN,
                                 HTML_PATH_PATTERN, WEBJARS_PATH_PATTERN, UI_PATH_PATTERN, ERROR_PATH_PATTERN},
                         SWAGGER_PATH_PATTERNS));
-
-        registry.addInterceptor(csrfInterceptor())
-                .addPathPatterns(LOGIN_INTERCEPTOR_PATH_PATTERN)
-                .excludePathPatterns(ArrayUtil.add(
-                        new String[]{LOGIN_PATH_PATTERN, REGISTER_PATH_PATTERN, DOC_PATH_PATTERN,
-                                HTML_PATH_PATTERN, WEBJARS_PATH_PATTERN, UI_PATH_PATTERN, ERROR_PATH_PATTERN},
-                        SWAGGER_PATH_PATTERNS));
-
     }
 
     @Override

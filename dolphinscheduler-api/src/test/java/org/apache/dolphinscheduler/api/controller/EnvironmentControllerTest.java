@@ -23,6 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.security.LoginCsrfTokenRepository;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
@@ -39,6 +40,8 @@ import org.springframework.util.MultiValueMap;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.base.Preconditions;
+
+import javax.servlet.http.Cookie;
 
 public class EnvironmentControllerTest extends AbstractControllerTest {
 
@@ -72,7 +75,8 @@ public class EnvironmentControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/environment/create")
                 .header(SESSION_ID, sessionId)
-                .header("X-CSRF-TOKEN", csrfToken)
+                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -99,7 +103,8 @@ public class EnvironmentControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/environment/update")
                 .header(SESSION_ID, sessionId)
-                .header("X-CSRF-TOKEN", csrfToken)
+                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -119,7 +124,8 @@ public class EnvironmentControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(get("/environment/query-by-code")
                 .header(SESSION_ID, sessionId)
-                .header("X-CSRF-TOKEN", csrfToken)
+                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -143,7 +149,8 @@ public class EnvironmentControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(get("/environment/list-paging")
                 .header(SESSION_ID, sessionId)
-                .header("X-CSRF-TOKEN", csrfToken)
+                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -161,7 +168,6 @@ public class EnvironmentControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(get("/environment/query-environment-list")
                 .header(SESSION_ID, sessionId)
-                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -181,7 +187,8 @@ public class EnvironmentControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/environment/verify-environment")
                 .header(SESSION_ID, sessionId)
-                .header("X-CSRF-TOKEN", csrfToken)
+                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -202,7 +209,8 @@ public class EnvironmentControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/environment/delete")
                 .header(SESSION_ID, sessionId)
-                .header("X-CSRF-TOKEN", csrfToken)
+                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

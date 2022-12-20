@@ -24,16 +24,11 @@ import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponseBody;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.testcontainers.shaded.okhttp3.FormBody;
-import org.testcontainers.shaded.okhttp3.Headers;
-import org.testcontainers.shaded.okhttp3.MediaType;
-import org.testcontainers.shaded.okhttp3.OkHttpClient;
-import org.testcontainers.shaded.okhttp3.Request;
-import org.testcontainers.shaded.okhttp3.RequestBody;
-import org.testcontainers.shaded.okhttp3.Response;
+import org.testcontainers.shaded.okhttp3.*;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +40,11 @@ public class RequestClient {
 
     public RequestClient() {
         this.httpClient = new OkHttpClient();
+    }
+
+    private void setCsrfToken(Map<String, String> headers){
+        headers.put("Cookie","csrfToken=4182caff-edf7-48e1-a29f-93b56d03295a;");
+        headers.put("X-XSRF-TOKEN","4182caff-edf7-48e1-a29f-93b56d03295a");
     }
 
     @SneakyThrows
@@ -102,7 +102,7 @@ public class RequestClient {
         if (headers == null) {
             headers = new HashMap<>();
         }
-
+        setCsrfToken(headers);
         String requestUrl = String.format("%s%s", Constants.DOLPHINSCHEDULER_API_URL, url);
 
         headers.put("Content-Type", Constants.REQUEST_CONTENT_TYPE);
@@ -139,7 +139,7 @@ public class RequestClient {
         if (headers == null) {
             headers = new HashMap<>();
         }
-
+        setCsrfToken(headers);
         String requestUrl = String.format("%s%s", Constants.DOLPHINSCHEDULER_API_URL, url);
 
         headers.put("Content-Type", Constants.REQUEST_CONTENT_TYPE);

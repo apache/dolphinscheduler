@@ -15,15 +15,23 @@
  * limitations under the License.
  */
 
-interface LoginReq {
-  userName: string
-  userPassword: string
-}
+import { defineStore } from 'pinia'
+import { CsrfTokenStore } from './types'
 
-interface LoginRes {
-  securityConfigType: string
-  sessionId: string,
-  csrfToken: string,
-}
-
-export { LoginReq, LoginRes }
+export const useCsrfTokenStore = defineStore({
+    id: 'csrf-token',
+    state: (): CsrfTokenStore => ({
+        csrfToken: "",
+    }),
+    persist: true,
+    getters: {
+        getCsrfToken(): string {
+            return this.csrfToken
+        },
+    },
+    actions: {
+        setCsrfToken(csrfToken: string): void {
+            this.csrfToken = csrfToken
+        },
+    }
+})

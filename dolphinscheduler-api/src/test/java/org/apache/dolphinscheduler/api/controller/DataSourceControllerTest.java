@@ -25,6 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.security.LoginCsrfTokenRepository;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
@@ -43,6 +44,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+
+import javax.servlet.http.Cookie;
 
 /**
  * data source controller test
@@ -78,7 +81,8 @@ public class DataSourceControllerTest extends AbstractControllerTest {
         paramsMap.put("bindTestId", null);
         MvcResult mvcResult = mockMvc.perform(post("/datasources")
                 .header("sessionId", sessionId)
-                .header("X-CSRF-TOKEN", csrfToken)
+                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JSONUtils.toJsonString(paramsMap)))
                 .andExpect(status().isCreated())
@@ -108,7 +112,8 @@ public class DataSourceControllerTest extends AbstractControllerTest {
         paramsMap.put("bindTestId", 1);
         MvcResult mvcResult = mockMvc.perform(put("/datasources/2")
                 .header("sessionId", sessionId)
-                .header("X-CSRF-TOKEN", csrfToken)
+                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .content(JSONUtils.toJsonString(paramsMap)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -141,7 +146,6 @@ public class DataSourceControllerTest extends AbstractControllerTest {
         paramsMap.add("testFlag", "0");
         MvcResult mvcResult = mockMvc.perform(get("/datasources/list")
                 .header("sessionId", sessionId)
-                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -159,7 +163,6 @@ public class DataSourceControllerTest extends AbstractControllerTest {
         paramsMap.add("pageSize", "1");
         MvcResult mvcResult = mockMvc.perform(get("/datasources")
                 .header("sessionId", sessionId)
-                .header("X-CSRF-TOKEN", csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -185,7 +188,8 @@ public class DataSourceControllerTest extends AbstractControllerTest {
         paramsMap.put("bindTestId", null);
         MvcResult mvcResult = mockMvc.perform(post("/datasources/connect")
                 .header("sessionId", sessionId)
-                .header("X-CSRF-TOKEN", csrfToken)
+                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .content(JSONUtils.toJsonString(paramsMap)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -272,7 +276,10 @@ public class DataSourceControllerTest extends AbstractControllerTest {
     @Test
     public void testDelete() throws Exception {
         MvcResult mvcResult = mockMvc.perform(delete("/datasources/2")
-                .header("sessionId", sessionId))
+                .header("sessionId", sessionId)
+                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken))
+
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();

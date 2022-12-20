@@ -22,6 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.security.LoginCsrfTokenRepository;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
@@ -34,6 +35,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
+
+import javax.servlet.http.Cookie;
 
 /**
  * access token v2 controller test
@@ -50,7 +53,8 @@ public class AccessTokenV2ControllerTest extends AbstractControllerTest {
         paramsMap.put("token", "607f5aeaaa2093dbdff5d5522ce00510");
         MvcResult mvcResult = mockMvc.perform(post("/v2/access-tokens")
                 .header("sessionId", sessionId)
-                .header("X-CSRF-TOKEN", csrfToken)
+                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JSONUtils.toJsonString(paramsMap)))
                 .andExpect(status().isCreated())
@@ -71,7 +75,8 @@ public class AccessTokenV2ControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = this.mockMvc
                 .perform(post("/v2/access-tokens")
                         .header("sessionId", this.sessionId)
-                        .header("X-CSRF-TOKEN", csrfToken)
+                                                .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(JSONUtils.toJsonString(paramsMap)))
                 .andExpect(status().isCreated())
@@ -91,7 +96,8 @@ public class AccessTokenV2ControllerTest extends AbstractControllerTest {
         paramsMap.put("token", "507f5aeaaa2093dbdff5d5522ce00510");
         MvcResult mvcResult = mockMvc.perform(post("/v2/access-tokens")
                 .header("sessionId", sessionId)
-                .header("X-CSRF-TOKEN", csrfToken)
+                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JSONUtils.toJsonString(paramsMap)))
                 .andExpect(status().isCreated())

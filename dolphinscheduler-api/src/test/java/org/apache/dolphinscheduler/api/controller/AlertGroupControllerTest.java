@@ -25,6 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.security.LoginCsrfTokenRepository;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
@@ -44,6 +45,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+
+import javax.servlet.http.Cookie;
 
 /**
  * alert group controller test
@@ -80,8 +83,10 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
         paramsMap.add("description", "cxc junit test alert description");
         paramsMap.add("alertInstanceIds", "");
         MvcResult mvcResult = mockMvc.perform(post("/alert-groups")
-                .header("sessionId", sessionId).header("X-CSRF-TOKEN", csrfToken)
-                .header("X-CSRF-TOKEN", csrfToken)
+                .header("sessionId", sessionId)                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -96,8 +101,10 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
         createEntity();
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         MvcResult mvcResult = mockMvc.perform(get("/alert-groups/list")
-                .header("sessionId", sessionId).header("X-CSRF-TOKEN", csrfToken)
-                .header("X-CSRF-TOKEN", csrfToken)
+                .header("sessionId", sessionId)                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -116,8 +123,9 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
         paramsMap.add("searchVal", "email");
         paramsMap.add("pageSize", "1");
         MvcResult mvcResult = mockMvc.perform(get("/alert-groups")
-                .header("sessionId", sessionId).header("X-CSRF-TOKEN", csrfToken)
-                .header("X-CSRF-TOKEN", csrfToken)
+                .header("sessionId", sessionId)
+                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -133,8 +141,10 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("id", Integer.toString(entityId));
         MvcResult mvcResult = mockMvc.perform(post("/alert-groups/query")
-                .header("sessionId", sessionId).header("X-CSRF-TOKEN", csrfToken)
-                .header("X-CSRF-TOKEN", csrfToken)
+                .header("sessionId", sessionId)                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -153,8 +163,10 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
         paramsMap.add("description", "update alter group");
         paramsMap.add("alertInstanceIds", "");
         MvcResult mvcResult = mockMvc.perform(put("/alert-groups/" + entityId)
-                .header("sessionId", sessionId).header("X-CSRF-TOKEN", csrfToken)
-                .header("X-CSRF-TOKEN", csrfToken)
+                .header("sessionId", sessionId)                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -169,8 +181,10 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("groupName", defaultTestAlertGroupName);
         MvcResult mvcResult = mockMvc.perform(get("/alert-groups/verify-name")
-                .header("sessionId", sessionId).header("X-CSRF-TOKEN", csrfToken)
-                .header("X-CSRF-TOKEN", csrfToken)
+                .header("sessionId", sessionId)                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -185,8 +199,10 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("groupName", "cxc test group name xx");
         MvcResult mvcResult = mockMvc.perform(get("/alert-groups/verify-name")
-                .header("sessionId", sessionId).header("X-CSRF-TOKEN", csrfToken)
-                .header("X-CSRF-TOKEN", csrfToken)
+                .header("sessionId", sessionId)                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -201,8 +217,10 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
         int entityId = createEntity();
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         MvcResult mvcResult = mockMvc.perform(delete("/alert-groups/" + entityId)
-                .header("sessionId", sessionId).header("X-CSRF-TOKEN", csrfToken)
-                .header("X-CSRF-TOKEN", csrfToken)
+                .header("sessionId", sessionId)                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -216,8 +234,10 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
     public void test090DelAlertGroupById() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         MvcResult mvcResult = mockMvc.perform(delete("/alert-groups/1")
-                .header("sessionId", sessionId).header("X-CSRF-TOKEN", csrfToken)
-                .header("X-CSRF-TOKEN", csrfToken)
+                .header("sessionId", sessionId)                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
+                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

@@ -15,15 +15,20 @@
  * limitations under the License.
  */
 
-interface LoginReq {
-  userName: string
-  userPassword: string
-}
+package org.apache.dolphinscheduler.api.configuration;
 
-interface LoginRes {
-  securityConfigType: string
-  sessionId: string,
-  csrfToken: string,
-}
 
-export { LoginReq, LoginRes }
+import org.apache.dolphinscheduler.api.security.LoginCsrfTokenRepository;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+
+@Configuration
+public class CsrfConfiguration extends WebSecurityConfigurerAdapter {
+
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.csrf().ignoringAntMatchers("/login").csrfTokenRepository(new LoginCsrfTokenRepository());
+    }
+}
