@@ -38,13 +38,11 @@ public final class LoginCsrfTokenRepository implements CsrfTokenRepository {
     public static final String HEADER_NAME = "X-XSRF-TOKEN";
     public static final String COOKIE_NAME = "csrfToken";
 
-    public LoginCsrfTokenRepository() {
-    }
-
     /**
      * The csrf token will be generated in {@link CsrfFilter}
      * @param request http servlet request
      */
+    @Override
     public CsrfToken generateToken(HttpServletRequest request) {
         return new DefaultCsrfToken(HEADER_NAME, PARAMETER_NAME, createNewToken());
     }
@@ -55,8 +53,9 @@ public final class LoginCsrfTokenRepository implements CsrfTokenRepository {
      * @param request http servlet request
      * @param response http servlet response
      */
+    @Override
     public void saveToken(CsrfToken token, HttpServletRequest request, HttpServletResponse response) {
-
+        // none
     }
 
     /**
@@ -64,6 +63,7 @@ public final class LoginCsrfTokenRepository implements CsrfTokenRepository {
      * @param request http servlet request
      * @return csrf token
      */
+    @Override
     public CsrfToken loadToken(HttpServletRequest request) {
         Cookie cookie = WebUtils.getCookie(request, COOKIE_NAME);
         if (cookie == null) {
