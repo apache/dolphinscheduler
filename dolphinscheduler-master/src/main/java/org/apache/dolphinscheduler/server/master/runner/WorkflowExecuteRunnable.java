@@ -991,7 +991,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
 
             // if we use task group, then need to acquire the task group resource
             // if there is no resource the current task instance will not be dispatched
-            // it will be weakup when other tasks release the resource.
+            // it will be wakeup when other tasks release the resource.
             int taskGroupId = taskInstance.getTaskGroupId();
             if (taskGroupId > 0) {
                 boolean acquireTaskGroup = processService.acquireTaskGroup(taskInstance.getId(),
