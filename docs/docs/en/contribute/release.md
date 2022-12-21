@@ -352,7 +352,7 @@ Decompress `apache-dolphinscheduler-<VERSION>-src.tar.gz` then check the followi
 
 #### Check binary packages
 
-Decompress `apache-dolphinscheduler-<VERSION>-src.tar.gz` to check the following items:
+Decompress `apache-dolphinscheduler-<VERSION>-bin.tar.gz` to check the following items:
 
 - `LICENSE` and `NOTICE` files exist
 - Correct year in `NOTICE` file
