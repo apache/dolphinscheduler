@@ -358,7 +358,7 @@ svn --username="${A_USERNAME}" commit -m "release ${VERSION}"
 
 #### 检查二进制包的文件内容
 
-解压缩`apache-dolphinscheduler-<VERSION>-src.tar.gz`进行如下检查:
+解压缩`apache-dolphinscheduler-<VERSION>-bin.tar.gz`进行如下检查:
 
 - 存在`LICENSE`和`NOTICE`文件
 - 所有文本文件开头都有 ASF 许可证
