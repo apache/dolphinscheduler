@@ -1115,7 +1115,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         newTaskInstance.setProcessDefine(taskInstance.getProcessDefine());
         newTaskInstance.setProcessInstance(processInstance);
         newTaskInstance.setRetryTimes(taskInstance.getRetryTimes() + 1);
-        // todo relative funtion: TaskInstance.retryTaskIntervalOverTime
+        // todo relative function: TaskInstance.retryTaskIntervalOverTime
         newTaskInstance.setState(taskInstance.getState());
         newTaskInstance.setEndTime(taskInstance.getEndTime());
 
