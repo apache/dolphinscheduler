@@ -24,6 +24,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
+import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceRemoveCacheResponse;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.TaskInstanceServiceImpl;
@@ -40,6 +41,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -92,6 +94,9 @@ public class TaskInstanceServiceTest {
 
     @Mock
     TaskDefinitionMapper taskDefinitionMapper;
+
+    @Mock
+    TaskInstanceDao taskInstanceDao;
 
     @Test
     public void queryTaskListPaging() {
@@ -339,6 +344,32 @@ public class TaskInstanceServiceTest {
         when(projectService.checkProjectAndAuth(user, project, projectCode, FORCED_SUCCESS)).thenReturn(result);
         Result successRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
         Assertions.assertEquals(Status.SUCCESS.getCode(), successRes.getCode().intValue());
+
+    }
+
+    @Test
+    public void testRemoveTaskInstanceCache() {
+        User user = getAdminUser();
+        long projectCode = 1L;
+        Project project = getProject(projectCode);
+        int taskId = 1;
+        TaskInstance task = getTaskInstance();
+        String cacheKey = "950311f3597f9198976cd3fd69e208e5b9ba6750";
+        task.setCacheKey(cacheKey);
+
+        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
+        when(taskInstanceMapper.selectById(1)).thenReturn(task);
+        when(taskInstanceDao.findTaskInstanceByCacheKey(cacheKey)).thenReturn(task, null);
+        when(taskInstanceDao.updateTaskInstance(task)).thenReturn(true);
+
+        TaskInstanceRemoveCacheResponse response =
+                taskInstanceService.removeTaskInstanceCache(user, projectCode, taskId);
+        Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode());
+
+        when(taskInstanceMapper.selectById(1)).thenReturn(null);
+        TaskInstanceRemoveCacheResponse responseNotFoundTask =
+                taskInstanceService.removeTaskInstanceCache(user, projectCode, taskId);
+        Assertions.assertEquals(Status.TASK_INSTANCE_NOT_FOUND.getCode(), responseNotFoundTask.getCode());
 
     }
 }
