@@ -26,10 +26,8 @@ import {
   CheckCircleFilled,
   Loading3QuartersOutlined,
   PauseCircleFilled,
-  ClockCircleOutlined,
   StopFilled,
   StopOutlined,
-  GlobalOutlined,
   IssuesCloseOutlined,
   SendOutlined,
   HistoryOutlined
