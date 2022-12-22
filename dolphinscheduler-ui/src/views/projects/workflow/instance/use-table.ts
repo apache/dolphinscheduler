@@ -21,7 +21,7 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import ButtonLink from '@/components/button-link'
 import { RowKey } from 'naive-ui/lib/data-table/src/interface'
-import { NEllipsis} from 'naive-ui'
+import {NEllipsis, NIcon, NSpin, NTooltip} from 'naive-ui'
 import {
   queryProcessInstanceListPaging,
   deleteProcessInstanceById,
@@ -31,9 +31,8 @@ import { execute } from '@/service/modules/executors'
 import TableAction from './components/table-action'
 import {
   renderTableTime,
-  runningType
+  runningType, workflowExecutionState
 } from '@/common/common'
-import { renderStateCell } from '../../task/instance/use-table'
 import {
   COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
@@ -44,6 +43,7 @@ import type { IWorkflowInstance } from '@/service/modules/process-instances/type
 import type { ICountDownParam } from './types'
 import type { ExecuteReq } from '@/service/modules/executors/types'
 import {renderEnvironmentalDistinctionCell} from "@/utils/environmental-distinction";
+import { IWorkflowExecutionState } from "@/common/types";
 
 export function useTable() {
   const { t } = useI18n()
@@ -117,7 +117,7 @@ export function useTable() {
         key: 'state',
         ...COLUMN_WIDTH_CONFIG['state'],
         className: 'workflow-status',
-        render: (_row: IWorkflowInstance) => renderStateCell(_row.state, t)
+        render: (_row: IWorkflowInstance) => renderWorkflowStateCell(_row.state, t)
       },
       {
         title: t('project.workflow.operating_environment'),
@@ -358,4 +358,30 @@ export function useTable() {
     getTableData,
     batchDeleteInstance
   }
+}
+
+export function renderWorkflowStateCell(state: IWorkflowExecutionState, t: Function) {
+  if (!state) return ''
+
+  const stateOption = workflowExecutionState(t)[state]
+
+  const Icon = h(
+      NIcon,
+      {
+        color: stateOption.color,
+        class: stateOption.classNames,
+        style: {
+          display: 'flex'
+        },
+        size: 20
+      },
+      () => h(stateOption.icon)
+  )
+  return h(NTooltip, null, {
+    trigger: () => {
+      if (!stateOption.isSpin) return Icon
+      return h(NSpin, { size: 20 }, { icon: () => Icon })
+    },
+    default: () => stateOption.desc
+  })
 }
