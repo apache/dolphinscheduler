@@ -299,6 +299,10 @@ export default {
                                 title: 'Amazon Athena',
                                 link: '/en-us/docs/dev/user_doc/guide/datasource/athena.html',
                             },
+                            {
+                                title: 'Azure SQL Database',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/azure-sql.html',
+                            },
                         ],
                     },
                     {
@@ -925,6 +929,10 @@ export default {
                             {
                                 title: 'Amazon Athena',
                                 link: '/zh-cn/docs/dev/user_doc/guide/datasource/athena.html',
+                            },
+                            {
+                                title: 'Azure SQL Database',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/azure-sql.html',
                             },
                         ],
                     },
