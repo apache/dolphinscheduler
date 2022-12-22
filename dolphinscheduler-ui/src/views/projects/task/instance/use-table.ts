@@ -270,6 +270,7 @@ export function useTable() {
                         circle: true,
                         type: 'info',
                         size: 'small',
+                        disabled: !row.host,
                         onClick: () => downloadLog(row.id)
                       },
                       {

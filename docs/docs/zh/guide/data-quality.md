@@ -45,7 +45,7 @@ data-quality.jar.name=dolphinscheduler-data-quality-dev-SNAPSHOT.jar
   - 源表总行数
   - 目标表总行数
 - 例子
-  - 校验方式为：[Expected-Actual][期望值-实际值]
+  - 校验方式为：[Actual-Expected][实际值-期望值]
   - [操作符]：>
   - [阈值]：0
   - 期望值类型：固定值=9。

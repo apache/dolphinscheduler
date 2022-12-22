@@ -31,6 +31,8 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.google.common.collect.ImmutableMap;
+
 @ExtendWith(MockitoExtension.class)
 public class Db2DataSourceProcessorTest {
 
@@ -78,7 +80,10 @@ public class Db2DataSourceProcessorTest {
     public void testGetJdbcUrl() {
         Db2ConnectionParam db2ConnectionParam = new Db2ConnectionParam();
         db2ConnectionParam.setJdbcUrl("jdbc:db2://localhost:5142/default");
-        db2ConnectionParam.setOther("other=other");
+        ImmutableMap<String, String> map = new ImmutableMap.Builder<String, String>()
+                .put("other", "other")
+                .build();
+        db2ConnectionParam.setOther(map);
         String jdbcUrl = db2DatasourceProcessor.getJdbcUrl(db2ConnectionParam);
         Assertions.assertEquals("jdbc:db2://localhost:5142/default;other=other", jdbcUrl);
     }

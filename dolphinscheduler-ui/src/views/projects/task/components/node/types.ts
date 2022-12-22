@@ -33,9 +33,10 @@ export type {
 export type { IResource, ProgramType, IMainJar } from '@/store/project/types'
 export type { ITaskState } from '@/common/types'
 
+export type RelationType = 'AND' | 'OR'
+
 type SourceType = 'MYSQL' | 'HDFS' | 'HIVE'
 type ModelType = 'import' | 'export'
-type RelationType = 'AND' | 'OR'
 type ITaskType = TaskType
 type IDateType = 'hour' | 'day' | 'week' | 'month'
 
@@ -433,6 +434,7 @@ interface INodeData
   cpuQuota?: number
   memoryMax?: number
   flag?: 'YES' | 'NO'
+  isCache?: boolean
   taskGroupId?: number
   taskGroupPriority?: number
   taskPriority?: string
@@ -464,10 +466,11 @@ interface INodeData
 interface ITaskData
   extends Omit<
     INodeData,
-    'timeoutFlag' | 'taskPriority' | 'timeoutNotifyStrategy'
+    'isCache' | 'timeoutFlag' | 'taskPriority' | 'timeoutNotifyStrategy'
   > {
   name?: string
   taskPriority?: string
+  isCache?: "YES" | "NO"
   timeoutFlag?: 'OPEN' | 'CLOSE'
   timeoutNotifyStrategy?: string | []
   taskParams?: ITaskParams
