@@ -18,12 +18,12 @@
 package org.apache.dolphinscheduler.server.worker.runner;
 
 import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
-import org.apache.dolphinscheduler.service.alert.AlertClientService;
-import org.apache.dolphinscheduler.service.storage.StorageOperate;
-import org.apache.dolphinscheduler.service.task.TaskPluginManager;
+import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcClient;
 
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
@@ -38,11 +38,16 @@ public abstract class WorkerDelayTaskExecuteRunnable extends WorkerTaskExecuteRu
                                              @NonNull WorkerConfig workerConfig,
                                              @NonNull String masterAddress,
                                              @NonNull WorkerMessageSender workerMessageSender,
-                                             @NonNull AlertClientService alertClientService,
+                                             @NonNull WorkerRpcClient workerRpcClient,
                                              @NonNull TaskPluginManager taskPluginManager,
                                              @Nullable StorageOperate storageOperate) {
-        super(taskExecutionContext, workerConfig, masterAddress, workerMessageSender, alertClientService,
-                taskPluginManager, storageOperate);
+        super(taskExecutionContext,
+                workerConfig,
+                masterAddress,
+                workerMessageSender,
+                workerRpcClient,
+                taskPluginManager,
+                storageOperate);
     }
 
     @Override

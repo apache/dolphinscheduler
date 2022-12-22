@@ -35,18 +35,14 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 /**
- * logger utils
+ * Please use {@link org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils}.
  */
+@Deprecated
 @UtilityClass
 public class LoggerUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(LoggerUtils.class);
 
-    /**
-     * build job id
-     *
-     * @return task id format
-     */
     public static String buildTaskId(Date firstSubmitTime,
                                      Long processDefineCode,
                                      int processDefineVersion,
@@ -79,28 +75,46 @@ public class LoggerUtils {
         return "";
     }
 
+    /**
+     * Please use {@link org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils}
+     */
     public static void setWorkflowAndTaskInstanceIDMDC(Integer workflowInstanceId, Integer taskInstanceId) {
         setWorkflowInstanceIdMDC(workflowInstanceId);
         setTaskInstanceIdMDC(taskInstanceId);
     }
 
+    /**
+     * Please use {@link org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils}
+     */
     public static void setWorkflowInstanceIdMDC(Integer workflowInstanceId) {
         MDC.put(Constants.WORKFLOW_INSTANCE_ID_MDC_KEY, String.valueOf(workflowInstanceId));
     }
 
+    /**
+     * Please use {@link org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils}
+     */
     public static void setTaskInstanceIdMDC(Integer taskInstanceId) {
         MDC.put(Constants.TASK_INSTANCE_ID_MDC_KEY, String.valueOf(taskInstanceId));
     }
 
+    /**
+     * Please use {@link org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils}
+     */
     public static void removeWorkflowAndTaskInstanceIdMDC() {
         removeWorkflowInstanceIdMDC();
         removeTaskInstanceIdMDC();
     }
 
+    /**
+     * Please use {@link org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils}
+     */
     public static void removeWorkflowInstanceIdMDC() {
         MDC.remove(Constants.WORKFLOW_INSTANCE_ID_MDC_KEY);
     }
 
+    /**
+     * Please use {@link org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils}
+     */
     public static void removeTaskInstanceIdMDC() {
         MDC.remove(Constants.TASK_INSTANCE_ID_MDC_KEY);
     }

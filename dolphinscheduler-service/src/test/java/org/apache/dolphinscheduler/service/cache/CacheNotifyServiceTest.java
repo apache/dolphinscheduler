@@ -21,13 +21,13 @@ import org.apache.dolphinscheduler.common.enums.CacheType;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CacheExpireCommand;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.apache.dolphinscheduler.service.cache.impl.CacheNotifyServiceImpl;
-import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.log.ViewLogRequestCommand;
+import org.apache.dolphinscheduler.remote.processor.LoggerRequestProcessor;
 import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 
 import org.junit.jupiter.api.AfterEach;

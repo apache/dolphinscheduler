@@ -25,11 +25,11 @@ import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.server.worker.task.WorkerHeartBeatTask;
-import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import java.io.IOException;
 
@@ -70,7 +70,7 @@ public class WorkerRegistryClient implements AutoCloseable {
         try {
             registry();
             registryClient.addConnectionStateListener(
-                    new WorkerConnectionStateListener(workerConfig, registryClient, workerConnectStrategy));
+                    new WorkerConnectionStateListener(workerConfig, workerConnectStrategy));
         } catch (Exception ex) {
             throw new RegistryException("Worker registry client start up error", ex);
         }

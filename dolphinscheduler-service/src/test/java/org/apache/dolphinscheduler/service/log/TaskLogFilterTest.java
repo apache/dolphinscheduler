@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.service.log;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.log.TaskLogFilter;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

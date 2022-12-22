@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.plugin.task.api.stream.StreamTask;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskSavePointRequestCommand;
@@ -29,7 +30,6 @@ import org.apache.dolphinscheduler.remote.command.TaskSavePointResponseCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecuteRunnable;
-import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,12 +84,12 @@ public class TaskSavePointProcessor implements NettyRequestProcessor {
         }
 
         try {
-            LoggerUtils.setTaskInstanceIdMDC(taskInstanceId);
+            LogUtils.setTaskInstanceIdMDC(taskInstanceId);
             doSavePoint(taskInstanceId);
 
             sendTaskSavePointResponseCommand(channel, taskExecutionContext);
         } finally {
-            LoggerUtils.removeTaskInstanceIdMDC();
+            LogUtils.removeTaskInstanceIdMDC();
         }
     }
 

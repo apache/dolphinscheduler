@@ -20,9 +20,9 @@ package org.apache.dolphinscheduler.server.worker.message;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.remote.command.BaseCommand;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 
 import org.apache.commons.collections4.MapUtils;
 
@@ -119,7 +119,7 @@ public class MessageRetryRunner extends BaseDaemonThread {
                         iterator.remove();
                         continue;
                     }
-                    LoggerUtils.setTaskInstanceIdMDC(taskInstanceId);
+                    LogUtils.setTaskInstanceIdMDC(taskInstanceId);
                     try {
                         for (Map.Entry<CommandType, BaseCommand> messageEntry : retryMessageMap.entrySet()) {
                             CommandType messageType = messageEntry.getKey();
@@ -134,7 +134,7 @@ public class MessageRetryRunner extends BaseDaemonThread {
                     } catch (Exception e) {
                         logger.warn("Retry send message to master error", e);
                     } finally {
-                        LoggerUtils.removeTaskInstanceIdMDC();
+                        LogUtils.removeTaskInstanceIdMDC();
                     }
                 }
                 Thread.sleep(Constants.SLEEP_TIME_MILLIS);

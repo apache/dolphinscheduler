@@ -199,8 +199,8 @@ In the early schedule design, if there is no priority design and use the fair sc
 ```xml
 <conversionRule conversionWord="message" converterClass="org.apache.dolphinscheduler.common.log.SensitiveDataConverter"/>
 <appender name="TASKLOGFILE" class="ch.qos.logback.classic.sift.SiftingAppender">
-    <filter class="org.apache.dolphinscheduler.service.log.TaskLogFilter"/>
-    <Discriminator class="org.apache.dolphinscheduler.service.log.TaskLogDiscriminator">
+    <filter class="org.apache.dolphinscheduler.plugin.task.api.log.TaskLogFilter"/>
+    <Discriminator class="org.apache.dolphinscheduler.plugin.task.api.log.TaskLogDiscriminator">
         <key>taskAppId</key>
         <logBase>${log.base}</logBase>
     </Discriminator>

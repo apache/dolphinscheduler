@@ -18,12 +18,12 @@
 package org.apache.dolphinscheduler.server.worker.processor;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningAckMessage;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
-import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +56,7 @@ public class TaskExecuteRunningAckProcessor implements NettyRequestProcessor {
             return;
         }
         try {
-            LoggerUtils.setTaskInstanceIdMDC(runningAckCommand.getTaskInstanceId());
+            LogUtils.setTaskInstanceIdMDC(runningAckCommand.getTaskInstanceId());
             logger.info("task execute running ack command : {}", runningAckCommand);
 
             if (runningAckCommand.isSuccess()) {
@@ -64,7 +64,7 @@ public class TaskExecuteRunningAckProcessor implements NettyRequestProcessor {
                         CommandType.TASK_EXECUTE_RUNNING);
             }
         } finally {
-            LoggerUtils.removeTaskInstanceIdMDC();
+            LogUtils.removeTaskInstanceIdMDC();
         }
     }
 

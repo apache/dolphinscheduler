@@ -28,6 +28,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LOGIN_US
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LOGIN_USER_KEY_TAB_USERNAME;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RESOURCE_UPLOAD_PATH;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 
@@ -44,6 +45,15 @@ public class CommonUtils {
 
     private CommonUtils() {
         throw new UnsupportedOperationException("Construct CommonUtils");
+    }
+
+    private static final boolean IS_DEVELOP_MODE = PropertyUtils.getBoolean(Constants.DEVELOPMENT_STATE, true);
+
+    /**
+     * @return is develop mode
+     */
+    public static boolean isDevelopMode() {
+        return IS_DEVELOP_MODE;
     }
 
     /**

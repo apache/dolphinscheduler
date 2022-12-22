@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.api.dto.resources.DeleteDataTransferResponse;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.service.storage.StorageEntity;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import java.io.IOException;
