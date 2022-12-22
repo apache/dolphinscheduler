@@ -6,7 +6,7 @@
 
 ![sqlpassword](../../../../img/new_ui/dev/datasource/azuresql-server.png)
 
-Use Azure SQL server username and password to login
+Use Azure SQL server username and password to login.
 
 |       **Datasource**       |                                                                   **Description**                                                                    |
 |----------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -52,7 +52,7 @@ Prerequisites: set Azure virtual machine to be the admin of the Azure SQL server
 
 ![principal](../../../../img/new_ui/dev/datasource/azuresql-principal.png)
 
-Use application (client) ID and secret to login
+Use application (client) ID and secret to login.
 Prerequisites: set application to be the admin of the Azure SQL server. Meanwhile, apply for client secret for the application and use both secret and ID to login.
 
 ![principal2](../../../../img/new_ui/dev/datasource/azuresql-principal2.png)
