@@ -154,6 +154,12 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
     private DAG<String, TaskNode, TaskNodeRelation> dag;
 
     /**
+     * full task node map, key is task node id, value is task node
+     * # TODO: This field can be removed later if the dag is complete
+     */
+    private Map<Long, TaskNode> taskNodesMap;
+
+    /**
      * unique key of workflow
      */
     private String key;
@@ -808,6 +814,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                 forbiddenTaskMap.put(taskNode.getCode(), taskNode);
             }
         });
+
+        taskNodesMap = taskNodeList.stream().collect(Collectors.toMap(TaskNode::getCode, taskNode -> taskNode));
 
         // generate process to get DAG info
         List<String> recoveryNodeCodeList = getRecoveryNodeCodeList(recoverNodeList);
@@ -1857,8 +1865,10 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             // init varPool only this task is the first time running
             if (task.isFirstRun()) {
                 // get pre task ,get all the task varPool to this task
-                Set<String> preTask = dag.getPreviousNodes(Long.toString(task.getTaskCode()));
-                getPreVarPool(task, preTask);
+                // Do not use dag.getPreviousNodes because of the dag may be miss the upstream node
+                String preTasks = taskNodesMap.get(task.getTaskCode()).getPreTasks();
+                Set<String> preTaskList = new HashSet<>(JSONUtils.toList(preTasks, String.class));
+                getPreVarPool(task, preTaskList);
             }
             DependResult dependResult = getDependResultForTask(task);
             if (DependResult.SUCCESS == dependResult) {
