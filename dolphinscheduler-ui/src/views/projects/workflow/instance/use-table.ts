@@ -31,7 +31,7 @@ import { execute } from '@/service/modules/executors'
 import TableAction from './components/table-action'
 import {
   renderTableTime,
-  runningType, tasksState, workflowExecutionState
+  runningType, workflowExecutionState
 } from '@/common/common'
 import {
   COLUMN_WIDTH_CONFIG,
@@ -43,7 +43,7 @@ import type { IWorkflowInstance } from '@/service/modules/process-instances/type
 import type { ICountDownParam } from './types'
 import type { ExecuteReq } from '@/service/modules/executors/types'
 import {renderEnvironmentalDistinctionCell} from "@/utils/environmental-distinction";
-import {ITaskState, IWorkflowExecutionState} from "@/common/types";
+import { IWorkflowExecutionState } from "@/common/types";
 
 export function useTable() {
   const { t } = useI18n()
