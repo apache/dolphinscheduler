@@ -51,12 +51,6 @@ public final class Constants {
 
     public static final String RESOURCE_TYPE_UDF = "udfs";
 
-    public static final String STORAGE_S3 = "S3";
-
-    public static final String STORAGE_OSS = "OSS";
-
-    public static final String STORAGE_HDFS = "HDFS";
-
     public static final String EMPTY_STRING = "";
 
     /**

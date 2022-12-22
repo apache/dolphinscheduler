@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.master.rpc;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
+import org.apache.dolphinscheduler.remote.processor.LoggerRequestProcessor;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.processor.CacheProcessor;
 import org.apache.dolphinscheduler.server.master.processor.StateEventProcessor;
@@ -30,7 +31,6 @@ import org.apache.dolphinscheduler.server.master.processor.TaskExecuteStartProce
 import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskRecallProcessor;
 import org.apache.dolphinscheduler.server.master.processor.WorkflowExecutingDataRequestProcessor;
-import org.apache.dolphinscheduler.service.log.LoggerRequestProcessor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
