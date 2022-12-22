@@ -1125,15 +1125,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                         CronUtils.getMaxCycle(schedules.get(0).getCrontab()), dependentCommand.getWorkerGroup());
         dependentCommand.setTaskDependType(TaskDependType.TASK_POST);
         for (DependentProcessDefinition dependentProcessDefinition : dependentProcessDefinitionList) {
-
-            long processDefinitionCode = dependentProcessDefinition.getProcessDefinitionCode();
-            ProcessDefinition processDefinition = processService.findProcessDefinitionByCode(processDefinitionCode);
-
-            //skip complement when process is not online
-            if ( !ReleaseState.ONLINE.equals(processDefinition.getReleaseState())) {
-                logger.info("Skip complement dependent command,processDefinition is not online, processDefinitionCode:{}.", processDefinitionCode);
-                continue;
-            }
             // If the id is Integer, the auto-increment id will be obtained by mybatis-plus
             // and causing duplicate when clone it.
             dependentCommand.setId(null);
@@ -1145,19 +1136,21 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             dependentCommand.setCommandParam(JSONUtils.toJsonString(cmdParam));
             logger.info("Creating complement dependent command, commandInfo:{}.", command);
             dependentProcessDefinitionCreateCount += commandService.createCommand(dependentCommand);
+            //get all of dependent
+            dependentProcessDefinitionCreateCount += createComplementDependentCommand(schedules, dependentCommand);
         }
 
         return dependentProcessDefinitionCreateCount;
     }
 
     /**
-     * get complement dependent process definition list
+     * get complement dependent online process definition list
      */
     private List<DependentProcessDefinition> getComplementDependentDefinitionList(long processDefinitionCode,
                                                                                   CycleEnum processDefinitionCycle,
                                                                                   String workerGroup) {
         List<DependentProcessDefinition> dependentProcessDefinitionList =
-                processService.queryDependentProcessDefinitionByProcessDefinitionCode(processDefinitionCode);
+                processService.queryDependentOnlineProcessDefinitionByProcessDefinitionCode(processDefinitionCode);
 
         return checkDependentProcessDefinitionValid(dependentProcessDefinitionList, processDefinitionCycle,
                 workerGroup, processDefinitionCode);

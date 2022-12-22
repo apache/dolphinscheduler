@@ -1573,6 +1573,17 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     /**
+     * query dependent online process definition by process definition code
+     *
+     * @param processDefinitionCode processDefinitionCode
+     * @see DependentProcessDefinition
+     */
+    @Override
+    public List<DependentProcessDefinition> queryDependentOnlineProcessDefinitionByProcessDefinitionCode(long processDefinitionCode) {
+        return workFlowLineageMapper.queryDependentOnlineProcessDefinitionByProcessDefinitionCode(processDefinitionCode);
+    }
+
+    /**
      * query need failover process instance
      *
      * @param host host

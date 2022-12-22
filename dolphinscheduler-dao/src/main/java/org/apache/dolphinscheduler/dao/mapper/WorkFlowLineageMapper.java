@@ -90,6 +90,13 @@ public interface WorkFlowLineageMapper {
     List<DependentProcessDefinition> queryDependentProcessDefinitionByProcessDefinitionCode(@Param("code") long code);
 
     /**
+     * query process definition by name
+     *
+     * @return dependent online process definition
+     */
+    List<DependentProcessDefinition> queryDependentOnlineProcessDefinitionByProcessDefinitionCode(@Param("code") long code);
+
+    /**
      * query downstream work flow lineage by process definition code
      *
      * @return dependent process definition

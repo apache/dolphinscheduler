@@ -119,6 +119,8 @@ public interface ProcessService {
 
     List<DependentProcessDefinition> queryDependentProcessDefinitionByProcessDefinitionCode(long processDefinitionCode);
 
+    List<DependentProcessDefinition> queryDependentOnlineProcessDefinitionByProcessDefinitionCode(long processDefinitionCode);
+
     List<ProcessInstance> queryNeedFailoverProcessInstances(String host);
 
     List<String> queryNeedFailoverProcessInstanceHost();
