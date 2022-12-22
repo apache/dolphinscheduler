@@ -597,8 +597,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             // todo: use batch query
             ProcessDefinitionLog processDefinitionLog =
                     processDefinitionLogMapper.queryByDefinitionCodeAndVersion(pd.getCode(), pd.getVersion());
-            User user = userMapper.selectById(processDefinitionLog.getOperator());
-            pd.setModifyBy(user.getUserName());
+            User modifiedUser = userMapper.selectById(processDefinitionLog.getOperator());
+            pd.setModifyBy(modifiedUser.getUserName());
+            User createUser = userMapper.selectById(processDefinitionLog.getUserId());
+            pd.setUserName(createUser.getUserName());
             Schedule schedule = scheduleMap.get(pd.getCode());
             pd.setScheduleReleaseState(schedule == null ? null : schedule.getReleaseState());
         }
