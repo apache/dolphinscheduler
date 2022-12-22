@@ -45,6 +45,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LOCAL_PA
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SQL;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.dolphinscheduler.api.dto.DagDataSchedule;
 import org.apache.dolphinscheduler.api.dto.ScheduleParam;
 import org.apache.dolphinscheduler.api.dto.treeview.Instance;
@@ -593,14 +594,15 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 .stream()
                 .collect(Collectors.toMap(Schedule::getProcessDefinitionCode, Function.identity()));
 
+        Map<Integer, String> userMap = userMapper.selectList(new QueryWrapper<>()).stream()
+            .collect(Collectors.toMap(User::getId, User::getUserName));
+
         for (ProcessDefinition pd : processDefinitions) {
             // todo: use batch query
             ProcessDefinitionLog processDefinitionLog =
                     processDefinitionLogMapper.queryByDefinitionCodeAndVersion(pd.getCode(), pd.getVersion());
-            User modifiedUser = userMapper.selectById(processDefinitionLog.getOperator());
-            pd.setModifyBy(modifiedUser.getUserName());
-            User createUser = userMapper.selectById(processDefinitionLog.getUserId());
-            pd.setUserName(createUser.getUserName());
+            pd.setModifyBy(userMap.get(processDefinitionLog.getOperator()));
+            pd.setUserName(userMap.get(pd.getUserId()));
             Schedule schedule = scheduleMap.get(pd.getCode());
             pd.setScheduleReleaseState(schedule == null ? null : schedule.getReleaseState());
         }
