@@ -67,6 +67,14 @@ public interface TaskInstanceDao {
     List<TaskInstance> findValidTaskListByProcessId(Integer processInstanceId, int testFlag);
 
     /**
+     * Query list of task instance by process instance id and task code
+     * @param processInstanceId processInstanceId
+     * @param taskCode task code
+     * @return list of valid task instance
+     */
+    TaskInstance findTaskByInstanceIdAndCode(Integer processInstanceId, Long taskCode);
+
+    /**
      * find previous task list by work process id
      * @param processInstanceId processInstanceId
      * @return task instance list
@@ -79,6 +87,20 @@ public interface TaskInstanceDao {
      * @return task instance
      */
     TaskInstance findTaskInstanceById(Integer taskId);
+
+    /**
+     * find task instance by cache_key
+     * @param cacheKey cache key
+     * @return task instance
+     */
+    TaskInstance findTaskInstanceByCacheKey(String cacheKey);
+
+    /**
+     * clear task instance cache by cache_key
+     * @param cacheKey cache key
+     * @return task instance
+     */
+    Boolean clearCacheByCacheKey(String cacheKey);
 
     /**
      * find task instance list by id list

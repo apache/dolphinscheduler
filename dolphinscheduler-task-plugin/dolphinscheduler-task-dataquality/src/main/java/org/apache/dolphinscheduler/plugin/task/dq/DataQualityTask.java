@@ -82,10 +82,10 @@ public class DataQualityTask extends AbstractYarnTask {
 
     @Override
     public void init() {
-        logger.info("data quality task params {}", dqTaskExecutionContext.getTaskParams());
 
         dataQualityParameters =
                 JSONUtils.parseObject(dqTaskExecutionContext.getTaskParams(), DataQualityParameters.class);
+        logger.info("Initialize data quality task params {}", JSONUtils.toPrettyJsonString(dataQualityParameters));
 
         if (null == dataQualityParameters) {
             logger.error("data quality params is null");

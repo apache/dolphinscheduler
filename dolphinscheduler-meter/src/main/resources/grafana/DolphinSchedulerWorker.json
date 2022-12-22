@@ -179,7 +179,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "process_start_time_seconds{}",
+          "expr": "process_start_time_seconds{application=\"worker-server\"}",
           "refId": "A"
         }
       ],

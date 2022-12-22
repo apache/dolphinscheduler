@@ -20,7 +20,7 @@ import { NInput, NButton, NDatePicker, NSelect, NIcon, NSpace } from 'naive-ui'
 import { defineComponent, getCurrentInstance, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { format } from 'date-fns'
-import { stateType } from '@/common/common'
+import { workflowExecutionStateType } from '@/common/common'
 
 export default defineComponent({
   name: 'ProcessInstanceCondition',
@@ -88,7 +88,7 @@ export default defineComponent({
   },
   render() {
     const { t } = useI18n()
-    const options = stateType(t)
+    const options = workflowExecutionStateType(t)
 
     return (
       <NSpace justify='end'>
