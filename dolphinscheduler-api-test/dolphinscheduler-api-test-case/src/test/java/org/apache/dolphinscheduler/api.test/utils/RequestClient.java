@@ -19,19 +19,22 @@
 
 package org.apache.dolphinscheduler.api.test.utils;
 
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dolphinscheduler.api.test.core.Constants;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponseBody;
+import org.testcontainers.shaded.okhttp3.FormBody;
+import org.testcontainers.shaded.okhttp3.Headers;
+import org.testcontainers.shaded.okhttp3.MediaType;
+import org.testcontainers.shaded.okhttp3.OkHttpClient;
+import org.testcontainers.shaded.okhttp3.Request;
+import org.testcontainers.shaded.okhttp3.RequestBody;
+import org.testcontainers.shaded.okhttp3.Response;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
-import org.testcontainers.shaded.okhttp3.*;
-
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class RequestClient {
