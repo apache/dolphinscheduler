@@ -273,7 +273,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             putMsg(result, Status.MASTER_NOT_EXISTS);
             return false;
         }
-        return true;
+        return true;gi
     }
 
     /**
