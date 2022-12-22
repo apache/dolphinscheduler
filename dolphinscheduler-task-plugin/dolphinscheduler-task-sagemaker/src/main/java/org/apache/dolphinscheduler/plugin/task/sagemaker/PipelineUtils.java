@@ -72,7 +72,7 @@ public class PipelineUtils {
             logger.info("check Pipeline Steps running");
             listPipelineExecutionSteps(client, pipelineId);
             ThreadUtils.sleep(SagemakerConstants.CHECK_PIPELINE_EXECUTION_STATUS_INTERVAL);
-            describePipelineExecution(client, pipelineId);
+            pipelineStatus = describePipelineExecution(client, pipelineId);
         }
 
         int exitStatusCode = TaskConstants.EXIT_CODE_FAILURE;
