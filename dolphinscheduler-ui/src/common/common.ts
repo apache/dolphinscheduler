@@ -26,10 +26,8 @@ import {
   CheckCircleFilled,
   Loading3QuartersOutlined,
   PauseCircleFilled,
-  ClockCircleOutlined,
   StopFilled,
   StopOutlined,
-  GlobalOutlined,
   IssuesCloseOutlined,
   SendOutlined,
   HistoryOutlined
@@ -210,14 +208,6 @@ export const tasksState = (t: any): ITaskStateConfig => ({
     isSpin: true,
     classNames: 'running_execution'
   },
-  READY_PAUSE: {
-    id: 2,
-    desc: `${t('project.workflow.ready_to_pause')}`,
-    color: '#07b1a3',
-    icon: SettingOutlined,
-    isSpin: false,
-    classNames: 'ready_pause'
-  },
   PAUSE: {
     id: 3,
     desc: `${t('project.workflow.pause')}`,
@@ -225,22 +215,6 @@ export const tasksState = (t: any): ITaskStateConfig => ({
     icon: PauseCircleOutlined,
     isSpin: false,
     classNames: 'pause'
-  },
-  READY_STOP: {
-    id: 4,
-    desc: `${t('project.workflow.ready_to_stop')}`,
-    color: '#FE0402',
-    icon: StopFilled,
-    isSpin: false,
-    classNames: 'ready_stop'
-  },
-  STOP: {
-    id: 5,
-    desc: `${t('project.workflow.stop')}`,
-    color: '#e90101',
-    icon: StopOutlined,
-    isSpin: false,
-    classNames: 'stop'
   },
   FAILURE: {
     id: 6,
@@ -274,22 +248,6 @@ export const tasksState = (t: any): ITaskStateConfig => ({
     isSpin: false,
     classNames: 'kill'
   },
-  WAITING_THREAD: {
-    id: 10,
-    desc: `${t('project.workflow.waiting_for_thread')}`,
-    color: '#912eed',
-    icon: ClockCircleOutlined,
-    isSpin: false,
-    classNames: 'waiting_thread'
-  },
-  WAITING_DEPEND: {
-    id: 11,
-    desc: `${t('project.workflow.waiting_for_dependence')}`,
-    color: '#5101be',
-    icon: GlobalOutlined,
-    isSpin: false,
-    classNames: 'waiting_depend'
-  },
   DELAY_EXECUTION: {
     id: 12,
     desc: `${t('project.workflow.delay_execution')}`,
@@ -306,30 +264,14 @@ export const tasksState = (t: any): ITaskStateConfig => ({
     isSpin: false,
     classNames: 'forced_success'
   },
-  SERIAL_WAIT: {
-    id: 14,
-    desc: `${t('project.workflow.serial_wait')}`,
-    color: '#5102ce',
-    icon: Loading3QuartersOutlined,
-    isSpin: true,
-    classNames: 'serial_wait'
-  },
   DISPATCH: {
-    id: 15,
+    id: 17,
     desc: `${t('project.workflow.dispatch')}`,
     color: '#5101be',
     icon: SendOutlined,
     isSpin: false,
     classNames: 'dispatch'
   },
-  PENDING: {
-    id: 18,
-    desc: `${t('project.workflow.pending')}`,
-    color: '#5101be',
-    icon: HistoryOutlined,
-    isSpin: false,
-    classNames: 'pending'
-  }
 })
 
 /**
