@@ -63,9 +63,9 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -214,8 +214,10 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                                                           String upstreamCodes) {
         TaskRelationUpdateUpstreamRequest taskRelationUpdateUpstreamRequest = new TaskRelationUpdateUpstreamRequest();
         taskRelationUpdateUpstreamRequest.setWorkflowCode(workflowCode);
-        taskRelationUpdateUpstreamRequest.setUpstreams(upstreamCodes);
-        return processTaskRelationService.updateUpstreamTaskDefinition(user, taskCode,
+        if (upstreamCodes != null) {
+            taskRelationUpdateUpstreamRequest.setUpstreams(upstreamCodes);
+        }
+        return processTaskRelationService.updateUpstreamTaskDefinitionWithSyncDag(user, taskCode, Boolean.FALSE,
                 taskRelationUpdateUpstreamRequest);
     }
 
@@ -498,9 +500,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
     }
 
-    private void updateDag(User loginUser, long processDefinitionCode,
-                           List<ProcessTaskRelation> processTaskRelationList,
-                           List<TaskDefinitionLog> taskDefinitionLogs) {
+    public void updateDag(User loginUser, long processDefinitionCode,
+                          List<ProcessTaskRelation> processTaskRelationList,
+                          List<TaskDefinitionLog> taskDefinitionLogs) {
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
         if (processDefinition == null) {
             logger.error("Process definition does not exist, processDefinitionCode:{}.", processDefinitionCode);
@@ -625,6 +627,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
 
         List<ProcessTaskRelation> taskRelationList =
                 processTaskRelationMapper.queryUpstreamByCode(taskDefinitionUpdate.getProjectCode(), taskCode);
+
         if (CollectionUtils.isNotEmpty(taskRelationList)) {
             logger.info(
                     "Task definition has upstream tasks, start handle them after update task, taskDefinitionCode:{}.",
@@ -634,10 +637,8 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                     .queryByProcessCode(taskDefinitionUpdate.getProjectCode(), processDefinitionCode);
             updateDag(loginUser, processDefinitionCode, processTaskRelations, Lists.newArrayList(taskDefinitionLog));
         }
-
         this.updateTaskUpstreams(loginUser, taskUpdateRequest.getWorkflowCode(), taskDefinitionUpdate.getCode(),
                 taskUpdateRequest.getUpstreamTasksCodes());
-
         return taskDefinitionUpdate;
     }
 
@@ -1107,9 +1108,12 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                     return v;
                 });
             }
+
             // because taskMainInfoMap's value is TaskMainInfo,
             // TaskMainInfo have task code info, so only need gain taskMainInfoMap's values
-            taskMainInfoIPage.setRecords(Lists.newArrayList(taskMainInfoMap.values()));
+            List<TaskMainInfo> resultRecords = Lists.newArrayList(taskMainInfoMap.values());
+            resultRecords.sort((o1, o2) -> o2.getTaskUpdateTime().compareTo(o1.getTaskUpdateTime()));
+            taskMainInfoIPage.setRecords(resultRecords);
         }
     }
 

@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -148,6 +149,11 @@ public class TaskInstanceDaoImpl implements TaskInstanceDao {
     }
 
     @Override
+    public TaskInstance findTaskByInstanceIdAndCode(Integer processInstanceId, Long taskCode) {
+        return taskInstanceMapper.queryByInstanceIdAndCode(processInstanceId, taskCode);
+    }
+
+    @Override
     public List<TaskInstance> findPreviousTaskListByWorkProcessId(Integer processInstanceId) {
         ProcessInstance processInstance = processInstanceMapper.selectById(processInstanceId);
         return taskInstanceMapper.findValidTaskListByProcessId(processInstanceId, Flag.NO,
@@ -157,6 +163,25 @@ public class TaskInstanceDaoImpl implements TaskInstanceDao {
     @Override
     public TaskInstance findTaskInstanceById(Integer taskId) {
         return taskInstanceMapper.selectById(taskId);
+    }
+
+    @Override
+    public TaskInstance findTaskInstanceByCacheKey(String cacheKey) {
+        if (StringUtils.isEmpty(cacheKey)) {
+            return null;
+        }
+        return taskInstanceMapper.queryByCacheKey(cacheKey);
+    }
+
+    @Override
+    public Boolean clearCacheByCacheKey(String cacheKey) {
+        try {
+            taskInstanceMapper.clearCacheByCacheKey(cacheKey);
+            return true;
+        } catch (Exception e) {
+            logger.error("clear cache by cacheKey failed", e);
+            return false;
+        }
     }
 
     @Override

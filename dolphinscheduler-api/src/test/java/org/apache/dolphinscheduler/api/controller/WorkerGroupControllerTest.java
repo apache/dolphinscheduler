@@ -30,7 +30,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
-import org.apache.dolphinscheduler.service.registry.RegistryClient;
+import org.apache.dolphinscheduler.registry.api.RegistryClient;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -66,6 +66,7 @@ export function useDms({
       Fields.useName(from),
       ...extra,
       Fields.useRunFlag(),
+      Fields.useCache(),
       Fields.useDescription(),
       Fields.useTaskPriority(),
       Fields.useWorkerGroup(),

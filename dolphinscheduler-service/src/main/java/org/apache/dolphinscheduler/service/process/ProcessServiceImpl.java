@@ -116,6 +116,7 @@ import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.DqRuleUtils;
+import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqTaskState;
@@ -137,7 +138,6 @@ import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.log.LogClient;
 import org.apache.dolphinscheduler.service.model.TaskNode;
-import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.apache.dolphinscheduler.service.utils.ClusterConfUtils;
 import org.apache.dolphinscheduler.service.utils.DagHelper;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
@@ -889,6 +889,12 @@ public class ProcessServiceImpl implements ProcessService {
                     cmdParam.remove(CommandKeyConstants.CMD_PARAM_RECOVERY_START_NODE_STRING);
                     processInstance.setCommandParam(JSONUtils.toJsonString(cmdParam));
                 }
+                // delete the StartNodeList from command parameter if last execution is only execute specified tasks
+                if (processInstance.getCommandType().equals(CommandType.EXECUTE_TASK)) {
+                    cmdParam.remove(CommandKeyConstants.CMD_PARAM_START_NODES);
+                    processInstance.setCommandParam(JSONUtils.toJsonString(cmdParam));
+                    processInstance.setTaskDependType(command.getTaskDependType());
+                }
                 // delete all the valid tasks when repeat running
                 List<TaskInstance> validTaskList =
                         taskInstanceDao.findValidTaskListByProcessId(processInstance.getId(),
@@ -904,6 +910,11 @@ public class ProcessServiceImpl implements ProcessService {
                 initComplementDataParam(processDefinition, processInstance, cmdParam);
                 break;
             case SCHEDULER:
+                break;
+            case EXECUTE_TASK:
+                processInstance.setRunTimes(runTime + 1);
+                processInstance.setTaskDependType(command.getTaskDependType());
+                processInstance.setCommandParam(JSONUtils.toJsonString(cmdParam));
                 break;
             default:
                 break;
@@ -2035,8 +2046,13 @@ public class ProcessServiceImpl implements ProcessService {
         // and update the origin one if exist
         int updateResult = 0;
         int insertResult = 0;
-        if (CollectionUtils.isNotEmpty(newTaskDefinitionLogs)) {
-            insertResult += taskDefinitionLogMapper.batchInsert(newTaskDefinitionLogs);
+
+        // only insert new task definitions if they not in updateTaskDefinitionLogs
+        List<TaskDefinitionLog> newInsertTaskDefinitionLogs = newTaskDefinitionLogs.stream()
+                .filter(taskDefinitionLog -> !updateTaskDefinitionLogs.contains(taskDefinitionLog))
+                .collect(Collectors.toList());
+        if (CollectionUtils.isNotEmpty(newInsertTaskDefinitionLogs)) {
+            insertResult = taskDefinitionLogMapper.batchInsert(newInsertTaskDefinitionLogs);
         }
         if (CollectionUtils.isNotEmpty(updateTaskDefinitionLogs)) {
             insertResult += taskDefinitionLogMapper.batchInsert(updateTaskDefinitionLogs);
@@ -2312,6 +2328,7 @@ public class ProcessServiceImpl implements ProcessService {
                 taskNode.setCpuQuota(taskDefinitionLog.getCpuQuota());
                 taskNode.setMemoryMax(taskDefinitionLog.getMemoryMax());
                 taskNode.setTaskExecuteType(taskDefinitionLog.getTaskExecuteType());
+                taskNode.setIsCache(taskDefinitionLog.getIsCache().getCode());
                 taskNodeList.add(taskNode);
             }
         }

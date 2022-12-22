@@ -154,10 +154,10 @@ it to bash variable for easier use.
 
 ```shell
 VERSION=<THE-VERSION-YOU-RELEASE>
-SOURCE_CODE_DIR=<YOUR-SOURCE-CODE-ROOT-DIR>  # the directory of your source code hold, the location of parent pom.xml instead of binary package 
+SOURCE_CODE_DIR=<YOUR-SOURCE-CODE-ROOT-DIR>  # the directory of your source code hold, the location of parent pom.xml instead of binary package
 
 GH_USERNAME=<YOUR-GITHUB-USERNAME>
-GH_REMOTE=<GITHUB-REMOTE>  # we use `upstream` or `origin` mostly base on your release environment 
+GH_REMOTE=<GITHUB-REMOTE>  # we use `upstream` or `origin` mostly base on your release environment
 
 A_USERNAME=<YOUR-APACHE-USERNAME>
 SVN_DIR=<PATH-TO-SVN-ROOT>  # to keep binary package checkout from SVN, the sub path end with `/dolphinscheduler/dev` and `/dolphinscheduler/release` will be create
@@ -185,7 +185,7 @@ We need to update some documentation before the Maven release. For example, to r
     - `Chart.yaml`: `appVersion` and `version` needs to be updated to x.y.z
     - `values.yaml`: `image.tag` needs to be updated to x.y.z
 - Version in the docs:
-  - Change the placeholder `<version>`(except `pom`)  to the `x.y.z` in directory `docs`
+  - Change the placeholder `<version>`(except `pom`) to the `x.y.z` in directory `docs`
   - Add new history version
     - `docs/docs/en/history-versions.md` and `docs/docs/zh/history-versions.md`: Add the new version and link for `x.y.z`
   - `docs/configs/docsdev.js`: change `/dev/` to `/x.y.z/`, **DO NOT** change this filename, is will be auto change by website tools.
@@ -211,9 +211,9 @@ git push "${GH_REMOTE}" "${VERSION}"-release
 mvn release:prepare -Prelease -Darguments="-Dmaven.test.skip=true -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true -Dspotless.check.skip=true" -DautoVersionSubmodules=true -DdryRun=true -Dusername="${GH_USERNAME}"
 ```
 
-* `-Prelease`: choose release profile, which will pack all the source codes, jar files and executable binary packages.
-* `-DautoVersionSubmodules=true`: it can make the version number is inputted only once and not for each sub-module.
-* `-DdryRun=true`: dry run which means not to generate or submit new version number and new tag.
+- `-Prelease`: choose release profile, which will pack all the source codes, jar files and executable binary packages.
+- `-DautoVersionSubmodules=true`: it can make the version number is inputted only once and not for each sub-module.
+- `-DdryRun=true`: dry run which means not to generate or submit new version number and new tag.
 
 #### Maven Release Check Prepare
 
@@ -231,7 +231,7 @@ mvn release:prepare -Prelease -Darguments="-Dmaven.test.skip=true -Dcheckstyle.s
 
 It is basically the same as the previous rehearsal command, but deleting `-DdryRun=true` parameter.
 
-* `-DpushChanges=false`: do not submit the edited version number and tag to GitHub automatically.
+- `-DpushChanges=false`: do not submit the edited version number and tag to GitHub automatically.
 
 > Note: You have to config your git `user.name` and `user.password` by command `git config --global user.email "you@example.com"`
 > and `git config --global user.name "Your Name"` if you meet some mistake like **Please tell me who you are.**
@@ -305,7 +305,7 @@ svn --username="${A_USERNAME}" commit -m "new key <YOUR-GPG-KEY-ID> add"
 
 #### Add Release Content to SVN
 
-Create folder by version number, and move the  source code packages, binary packages and executable binary packages to SVN working directory.
+Create folder by version number, and move the source code packages, binary packages and executable binary packages to SVN working directory.
 
 ```shell
 mkdir -p "${SVN_DIR_DEV}/${VERSION}"
@@ -341,18 +341,18 @@ svn --username="${A_USERNAME}" commit -m "release ${VERSION}"
 
 Decompress `apache-dolphinscheduler-<VERSION>-src.tar.gz` then check the following items:
 
-* Check whether source tarball is oversized for including nonessential files
-* `LICENSE` and `NOTICE` files exist
-* Correct year in `NOTICE` file
-* There is only text files but no binary files
-* All source files have ASF headers
-* Codes can be compiled and pass the unit tests (mvn install)
-* The contents of the release match with what's tagged in version control (diff -r a verify_dir tag_dir)
-* Check if there is any extra files or folders, empty folders for example
+- Check whether source tarball is oversized for including nonessential files
+- `LICENSE` and `NOTICE` files exist
+- Correct year in `NOTICE` file
+- There is only text files but no binary files
+- All source files have ASF headers
+- Codes can be compiled and pass the unit tests (mvn install)
+- The contents of the release match with what's tagged in version control (diff -r a verify_dir tag_dir)
+- Check if there is any extra files or folders, empty folders for example
 
 #### Check binary packages
 
-Decompress `apache-dolphinscheduler-<VERSION>-src.tar.gz` to check the following items:
+Decompress `apache-dolphinscheduler-<VERSION>-bin.tar.gz` to check the following items:
 
 - `LICENSE` and `NOTICE` files exist
 - Correct year in `NOTICE` file
@@ -375,7 +375,7 @@ It should be done before vote mail because we need the release note in the mail.
 
 ### Vote procedure
 
-DolphinScheduler community vote: send the vote e-mail to `dev@dolphinscheduler.apache.org`.  PMC needs to check the
+DolphinScheduler community vote: send the vote e-mail to `dev@dolphinscheduler.apache.org`. PMC needs to check the
 rightness of the version according to the document before they vote. After at least 72 hours and with at least 3
 `+1 and no -1 PMC member` votes, it can come to the next stage of the vote.
 
@@ -410,7 +410,7 @@ Release Commit ID: https://github.com/apache/dolphinscheduler/commit/<SHA-VALUE>
 
 Keys to verify the Release Candidate: https://downloads.apache.org/dolphinscheduler/KEYS
 
-Look at here for how to verify this release candidate: https://dolphinscheduler.apache.org/en-us/docs/latest/user_doc/contribute/release/release.html
+Look at here for how to verify this release candidate: https://github.com/apache/dolphinscheduler/blob/dev/docs/docs/en/contribute/release.md
 
 The vote will be open for at least 72 hours or until necessary number of votes are reached.
 
@@ -467,7 +467,7 @@ svn mv -m "release ${VERSION}" https://dist.apache.org/repos/dist/dev/dolphinsch
 # remove old release directory
 svn delete -m "remove old release" https://dist.apache.org/repos/dist/release/dolphinscheduler/<PREVIOUS-RELEASE-VERSION>
 
-# Remove prepare branch 
+# Remove prepare branch
 cd "${SOURCE_CODE_DIR}"
 git push --delete "${GH_REMOTE}" "${VERSION}-prepare"
 ```
@@ -497,7 +497,7 @@ the release version is `<VERSION>`, the following updates are required(note it w
 we already have the exists CI to publish the latest Docker image to GitHub container register with [config](https://github.com/apache/dolphinscheduler/blob/d80cf21456265c9d84e642bdb4db4067c7577fc6/.github/workflows/publish-docker.yaml#L55-L63).
 We could reuse the main command the CI run and publish our Docker images to Docker Hub by single command.
 
-It is highly recommended to build  and test docker images locally first before push to docker hub
+It is highly recommended to build and test docker images locally first before push to docker hub
 
 ```shell
 # Checkout and create to target tag
@@ -564,7 +564,7 @@ Dolphin Scheduler is a distributed and easy-to-extend visual workflow scheduler 
 dedicated to solving the complex task dependencies in data processing, making the scheduler system out of the box for data processing.
 
 
-Download Links: https://dolphinscheduler.apache.org/en-us/download/download.html
+Download Links: https://dolphinscheduler.apache.org/#/en-us/download
 
 Release Notes: https://github.com/apache/dolphinscheduler/releases/tag/<VERSION>
 
@@ -573,17 +573,17 @@ Website: https://dolphinscheduler.apache.org/
 DolphinScheduler Resources:
 - Issue: https://github.com/apache/dolphinscheduler/issues/
 - Mailing list: dev@dolphinscheduler.apache.org
-- Documents: https://dolphinscheduler.apache.org/zh-cn/docs/<VERSION>/user_doc/about/introduction.html
+- Documents: https://dolphinscheduler.apache.org/#/zh-cn/docs/<VERSION>/about/introduction
 ```
 
 ## News
 
 After all set, an article should be written and publish it to the community, it should include:
 
-* What is the major purpose of the version, feature add, bugfix, or both
-* Major new features and how to use it, better with picture or gif
-* Major bugfix and make what different from previous version, better with picture or gif
-* All contributors since previous release
+- What is the major purpose of the version, feature add, bugfix, or both
+- Major new features and how to use it, better with picture or gif
+- Major bugfix and make what different from previous version, better with picture or gif
+- All contributors since previous release
 
 ### Get All Contributors
 
