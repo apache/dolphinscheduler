@@ -61,6 +61,11 @@ public abstract class AbstractTask {
     protected int processId;
 
     /**
+     * SHELL process
+     */
+    protected Process process;
+
+    /**
      * SHELL result string
      */
     protected String resultString;
@@ -129,6 +134,14 @@ public abstract class AbstractTask {
 
     public void setProcessId(int processId) {
         this.processId = processId;
+    }
+
+    public Process getProcess() {
+        return process;
+    }
+
+    public void setProcess(Process process) {
+        this.process = process;
     }
 
     public String getResultString() {
@@ -245,5 +258,17 @@ public abstract class AbstractTask {
             }
 
         }
+    }
+
+    /**
+     * submitting process exit after summit task
+     * @return
+     */
+    public boolean exitAfterSubmitTask() {
+        return false;
+    }
+
+    protected boolean oneAppIdPerTask() {
+        return false;
     }
 }

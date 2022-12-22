@@ -125,6 +125,7 @@ public class MlflowTask extends AbstractTask {
             }
             setExitStatusCode(exitCode);
             setProcessId(commandExecuteResult.getProcessId());
+            setProcess(commandExecuteResult.getProcess());
             mlflowParameters.dealOutParam(shellCommandExecutor.getVarPool());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

@@ -38,6 +38,8 @@ import org.apache.dolphinscheduler.service.log.LogClient;
 import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 import org.apache.dolphinscheduler.service.utils.ProcessUtils;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -97,6 +99,22 @@ public class TaskKillProcessor implements NettyRequestProcessor {
                     TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
             if (taskExecutionContext == null) {
                 logger.error("taskRequest cache is null, taskInstanceId: {}", killCommand.getTaskInstanceId());
+                return;
+            }
+
+            if (StringUtils.isNotEmpty(taskExecutionContext.getAppIds())) {
+                logger.info("kill yarn task by appid {}", taskExecutionContext.getAppIds());
+                List<String> appIds = Arrays.asList(taskExecutionContext.getAppIds().split(TaskConstants.COMMA));
+                ProcessUtils.cancelApplication(appIds, logger, taskExecutionContext.getTenantCode(),
+                        taskExecutionContext.getExecutePath());
+                killProcess(taskExecutionContext.getTenantCode(), taskExecutionContext.getProcessId());
+                taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.KILL);
+                sendTaskKillResponseCommand(channel, taskExecutionContext);
+
+                TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+                messageRetryRunner.removeRetryMessages(taskExecutionContext.getTaskInstanceId());
+
+                logger.info("remove REMOTE_CHANNELS, task instance id:{}", killCommand.getTaskInstanceId());
                 return;
             }
 

@@ -163,6 +163,7 @@ public class DataxTask extends AbstractTask {
 
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
             setProcessId(commandExecuteResult.getProcessId());
+            setProcess(commandExecuteResult.getProcess());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             logger.error("The current DataX task has been interrupted", e);

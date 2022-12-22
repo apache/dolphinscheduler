@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.server.master.service;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.model.Server;
@@ -169,25 +168,19 @@ public class WorkerFailoverService {
 
         taskInstance.setProcessInstance(processInstance);
 
-        if (!isMasterTask) {
-            LOGGER.info("The failover taskInstance is not master task");
-            TaskExecutionContext taskExecutionContext = TaskExecutionContextBuilder.get()
-                    .buildTaskInstanceRelatedInfo(taskInstance)
-                    .buildProcessInstanceRelatedInfo(processInstance)
-                    .buildProcessDefinitionRelatedInfo(processInstance.getProcessDefinition())
-                    .create();
+        TaskExecutionContext taskExecutionContext = TaskExecutionContextBuilder.get()
+                .buildTaskInstanceRelatedInfo(taskInstance)
+                .buildProcessInstanceRelatedInfo(processInstance)
+                .buildProcessDefinitionRelatedInfo(processInstance.getProcessDefinition())
+                .create();
 
-            if (masterConfig.isKillYarnJobWhenTaskFailover()) {
-                // only kill yarn job if exists , the local thread has exited
-                LOGGER.info("TaskInstance failover begin kill the task related yarn job");
-                ProcessUtils.killYarnJob(logClient, taskExecutionContext);
-            }
-        } else {
-            LOGGER.info("The failover taskInstance is a master task");
+        if (StringUtils.isEmpty(taskInstance.getAppLink()) && taskInstance.getPid() > 0) {
+            // can not recover from yarn, kill task to avoid duplicate task
+            ProcessUtils.killTaskByProcessId(taskExecutionContext);
         }
+        LOGGER.info("The failover taskInstance {} state change to NEED_FAULT_TOLERANCE", taskInstance);
 
         taskInstance.setState(TaskExecutionStatus.NEED_FAULT_TOLERANCE);
-        taskInstance.setFlag(Flag.NO);
         taskInstanceDao.upsertTaskInstance(taskInstance);
 
         TaskStateEvent stateEvent = TaskStateEvent.builder()

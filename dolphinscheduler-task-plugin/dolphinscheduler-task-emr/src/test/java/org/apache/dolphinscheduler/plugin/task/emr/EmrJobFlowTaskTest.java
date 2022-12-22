@@ -21,6 +21,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_COD
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
@@ -96,28 +97,26 @@ public class EmrJobFlowTaskTest {
     private EmrJobFlowTask emrJobFlowTask;
     private AmazonElasticMapReduce emrClient;
     private Cluster cluster;
-    private TaskCallBack taskCallBack = (taskInstanceId, appIds) -> {
-
-    };
+    private TaskCallBack taskCallBack = mock(TaskCallBack.class);
 
     @BeforeEach
     public void before() throws Exception {
         String emrParameters = buildEmrTaskParameters();
-        TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
+        TaskExecutionContext taskExecutionContext = mock(TaskExecutionContext.class);
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(emrParameters);
         emrJobFlowTask = Mockito.spy(new EmrJobFlowTask(taskExecutionContext));
 
         // mock emrClient and behavior
-        emrClient = Mockito.mock(AmazonElasticMapReduce.class);
-        RunJobFlowResult runJobFlowResult = Mockito.mock(RunJobFlowResult.class);
+        emrClient = mock(AmazonElasticMapReduce.class);
+        RunJobFlowResult runJobFlowResult = mock(RunJobFlowResult.class);
         Mockito.lenient().when(emrClient.runJobFlow(any())).thenReturn(runJobFlowResult);
         Mockito.lenient().when(runJobFlowResult.getJobFlowId()).thenReturn("xx");
         Mockito.doReturn(emrClient).when(emrJobFlowTask).createEmrClient();
-        DescribeClusterResult describeClusterResult = Mockito.mock(DescribeClusterResult.class);
+        DescribeClusterResult describeClusterResult = mock(DescribeClusterResult.class);
         Mockito.lenient().when(emrClient.describeCluster(any())).thenReturn(describeClusterResult);
 
         // mock cluster
-        cluster = Mockito.mock(Cluster.class);
+        cluster = mock(Cluster.class);
         Mockito.lenient().when(describeClusterResult.getCluster()).thenReturn(cluster);
 
         emrJobFlowTask.init();

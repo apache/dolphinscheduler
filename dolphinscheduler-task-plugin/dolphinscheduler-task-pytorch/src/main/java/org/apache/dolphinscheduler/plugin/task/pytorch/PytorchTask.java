@@ -72,6 +72,7 @@ public class PytorchTask extends AbstractTask {
             TaskResponse taskResponse = shellCommandExecutor.run(command);
             setExitStatusCode(taskResponse.getExitStatusCode());
             setProcessId(taskResponse.getProcessId());
+            setProcess(taskResponse.getProcess());
             setVarPool(shellCommandExecutor.getVarPool());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

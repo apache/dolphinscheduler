@@ -80,7 +80,7 @@ public enum TaskExecutionStatus {
     }
 
     public boolean isFailure() {
-        return this == TaskExecutionStatus.FAILURE || this == NEED_FAULT_TOLERANCE;
+        return this == TaskExecutionStatus.FAILURE;
     }
 
     public boolean isPause() {

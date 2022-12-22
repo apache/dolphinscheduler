@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.List;
+import java.util.Set;
 
 public abstract class AbstractRemoteTask extends AbstractTask {
 
@@ -39,7 +39,7 @@ public abstract class AbstractRemoteTask extends AbstractTask {
         this.cancelApplication();
     }
 
-    public abstract List<String> getApplicationIds() throws TaskException;
+    public abstract Set<String> getApplicationIds() throws TaskException;
 
     public abstract void cancelApplication() throws TaskException;
 

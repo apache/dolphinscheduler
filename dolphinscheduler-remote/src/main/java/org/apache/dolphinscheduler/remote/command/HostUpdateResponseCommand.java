@@ -21,6 +21,9 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.io.Serializable;
 
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
 public class HostUpdateResponseCommand implements Serializable {
 
     private int taskInstanceId;
@@ -67,6 +70,14 @@ public class HostUpdateResponseCommand implements Serializable {
     public Command convert2Command() {
         Command command = new Command();
         command.setType(CommandType.PROCESS_HOST_UPDATE_REQUEST);
+        byte[] body = JSONUtils.toJsonByteArray(this);
+        command.setBody(body);
+        return command;
+    }
+
+    public Command convert2ResponseCommand(long opaque) {
+        Command command = new Command(opaque);
+        command.setType(CommandType.PROCESS_HOST_UPDATE_RESPONSE);
         byte[] body = JSONUtils.toJsonByteArray(this);
         command.setBody(body);
         return command;

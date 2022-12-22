@@ -122,6 +122,7 @@ public class ChunJunTask extends AbstractTask {
             // todo get applicationId
             setAppIds(String.join(TaskConstants.COMMA, Collections.emptySet()));
             setProcessId(commandExecuteResult.getProcessId());
+            setProcess(commandExecuteResult.getProcess());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             logger.error("The current ChunJun Task has been interrupted", e);

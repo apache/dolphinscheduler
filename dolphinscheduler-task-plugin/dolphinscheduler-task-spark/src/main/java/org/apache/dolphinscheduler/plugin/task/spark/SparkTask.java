@@ -138,6 +138,10 @@ public class SparkTask extends AbstractYarnTask {
         }
         args.add(deployMode);
 
+        if (SparkConstants.DEPLOY_MODE_CLUSTER.equals(deployMode)) {
+            args.add("--conf spark.yarn.submit.waitAppCompletion=false");
+        }
+
         ProgramType programType = sparkParameters.getProgramType();
         String mainClass = sparkParameters.getMainClass();
         if (programType != ProgramType.PYTHON && programType != ProgramType.SQL && StringUtils.isNotEmpty(mainClass)) {
@@ -272,5 +276,12 @@ public class SparkTask extends AbstractYarnTask {
     @Override
     public AbstractParameters getParameters() {
         return sparkParameters;
+    }
+
+    @Override
+    public boolean exitAfterSubmitTask() {
+        String deployMode = StringUtils.isNotEmpty(sparkParameters.getDeployMode()) ? sparkParameters.getDeployMode()
+                : SparkConstants.DEPLOY_MODE_LOCAL;
+        return SparkConstants.DEPLOY_MODE_CLUSTER.equals(deployMode);
     }
 }

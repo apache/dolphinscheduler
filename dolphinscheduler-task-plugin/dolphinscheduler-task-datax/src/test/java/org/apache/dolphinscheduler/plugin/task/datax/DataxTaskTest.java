@@ -67,8 +67,7 @@ public class DataxTaskTest {
 
     private DataxTask dataxTask;
 
-    private final TaskCallBack taskCallBack = (taskInstanceId, appIds) -> {
-    };
+    private TaskCallBack taskCallBack = mock(TaskCallBack.class);
 
     @BeforeEach
     public void before() throws Exception {

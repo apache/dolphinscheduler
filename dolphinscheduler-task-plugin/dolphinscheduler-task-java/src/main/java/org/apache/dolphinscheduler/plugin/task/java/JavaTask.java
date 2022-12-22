@@ -147,6 +147,7 @@ public class JavaTask extends AbstractTask {
             setExitStatusCode(taskResponse.getExitStatusCode());
             setAppIds(taskResponse.getAppIds());
             setProcessId(taskResponse.getProcessId());
+            setProcess(taskResponse.getProcess());
             setVarPool(shellCommandExecutor.getVarPool());
         } catch (InterruptedException e) {
             logger.error("java task interrupted ", e);

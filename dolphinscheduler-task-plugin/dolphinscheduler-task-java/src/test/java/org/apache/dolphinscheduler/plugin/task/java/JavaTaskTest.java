@@ -21,6 +21,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.enums.DataType.VARCHAR
 import static org.apache.dolphinscheduler.plugin.task.api.enums.Direct.IN;
 import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.RUN_TYPE_JAR;
 import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.RUN_TYPE_JAVA;
+import static org.mockito.Mockito.mock;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
@@ -44,9 +45,7 @@ import org.junit.jupiter.api.Test;
 
 public class JavaTaskTest {
 
-    private TaskCallBack taskCallBack = (taskInstanceId, appIds) -> {
-
-    };
+    private TaskCallBack taskCallBack = mock(TaskCallBack.class);
 
     @Test
     public void testGetPubllicClassName() {

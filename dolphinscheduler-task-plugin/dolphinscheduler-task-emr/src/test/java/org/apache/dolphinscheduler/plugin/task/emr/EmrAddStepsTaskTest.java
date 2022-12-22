@@ -21,6 +21,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_COD
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
@@ -74,32 +75,30 @@ public class EmrAddStepsTaskTest {
     private EmrAddStepsTask emrAddStepsTask;
     private AmazonElasticMapReduce emrClient;
     private Step step;
-    private TaskCallBack taskCallBack = (taskInstanceId, appIds) -> {
-
-    };
+    private TaskCallBack taskCallBack = mock(TaskCallBack.class);
 
     @BeforeEach
     public void before() throws Exception {
         // mock EmrParameters and EmrAddStepsTask
         EmrParameters emrParameters = buildEmrTaskParameters();
         String emrParametersString = JSONUtils.toJsonString(emrParameters);
-        TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
+        TaskExecutionContext taskExecutionContext = mock(TaskExecutionContext.class);
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(emrParametersString);
         emrAddStepsTask = Mockito.spy(new EmrAddStepsTask(taskExecutionContext));
 
         // mock emrClient and behavior
-        emrClient = Mockito.mock(AmazonElasticMapReduce.class);
+        emrClient = mock(AmazonElasticMapReduce.class);
 
-        AddJobFlowStepsResult addJobFlowStepsResult = Mockito.mock(AddJobFlowStepsResult.class);
+        AddJobFlowStepsResult addJobFlowStepsResult = mock(AddJobFlowStepsResult.class);
         Mockito.lenient().when(emrClient.addJobFlowSteps(any())).thenReturn(addJobFlowStepsResult);
         Mockito.lenient().when(addJobFlowStepsResult.getStepIds()).thenReturn(Collections.singletonList("step-xx"));
 
         Mockito.doReturn(emrClient).when(emrAddStepsTask).createEmrClient();
-        DescribeStepResult describeStepResult = Mockito.mock(DescribeStepResult.class);
+        DescribeStepResult describeStepResult = mock(DescribeStepResult.class);
         Mockito.lenient().when(emrClient.describeStep(any())).thenReturn(describeStepResult);
 
         // mock step
-        step = Mockito.mock(Step.class);
+        step = mock(Step.class);
         Mockito.lenient().when(describeStepResult.getStep()).thenReturn(step);
 
         emrAddStepsTask.init();
@@ -119,7 +118,7 @@ public class EmrAddStepsTaskTest {
         // mock EmrParameters and EmrAddStepsTask
         EmrParameters emrParameters = buildErrorEmrTaskParameters();
         String emrParametersString = JSONUtils.toJsonString(emrParameters);
-        TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
+        TaskExecutionContext taskExecutionContext = mock(TaskExecutionContext.class);
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(emrParametersString);
         emrAddStepsTask = Mockito.spy(new EmrAddStepsTask(taskExecutionContext));
         Mockito.doReturn(emrClient).when(emrAddStepsTask).createEmrClient();
