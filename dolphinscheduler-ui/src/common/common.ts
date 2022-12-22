@@ -36,7 +36,7 @@ import {
 } from '@vicons/antd'
 import { format, parseISO } from 'date-fns'
 import _ from 'lodash'
-import { ITaskStateConfig } from './types'
+import { ITaskStateConfig, IWorkflowExecutionStateConfig } from './types'
 /**
  * Intelligent display kb m
  */
@@ -141,6 +141,21 @@ export const stateType = (t: any) => [
     label: item.desc
   }))
 ]
+
+/**
+ * State code table
+ */
+export const workflowExecutionStateType = (t: any) => [
+  {
+    value: '',
+    label: `${t('project.workflow.all_status')}`
+  },
+  ...Object.entries(workflowExecutionState(t)).map(([key, item]) => ({
+    value: key,
+    label: item.desc
+  }))
+]
+
 
 /**
  * Stream task state
@@ -310,6 +325,113 @@ export const tasksState = (t: any): ITaskStateConfig => ({
   PENDING: {
     id: 18,
     desc: `${t('project.workflow.pending')}`,
+    color: '#5101be',
+    icon: HistoryOutlined,
+    isSpin: false,
+    classNames: 'pending'
+  }
+})
+
+/**
+ * Workflow execution status
+ * @id id
+ * @desc tooltip
+ * @color color
+ * @icon icon
+ * @isSpin is loading (Need to execute the code block to write if judgment)
+ */
+export const workflowExecutionState = (t: any): IWorkflowExecutionStateConfig => ({
+  SUBMITTED_SUCCESS: {
+    id: 0,
+    desc: `${t('project.workflow.submit_success')}`,
+    color: '#A9A9A9',
+    icon: IssuesCloseOutlined,
+    isSpin: false,
+    classNames: 'submitted_success'
+  },
+  RUNNING_EXECUTION: {
+    id: 1,
+    desc: `${t('project.workflow.executing')}`,
+    color: '#0097e0',
+    icon: SettingFilled,
+    isSpin: true,
+    classNames: 'running_execution'
+  },
+  READY_PAUSE: {
+    id: 2,
+    desc: `${t('project.workflow.ready_to_pause')}`,
+    color: '#07b1a3',
+    icon: SettingOutlined,
+    isSpin: false,
+    classNames: 'ready_pause'
+  },
+  PAUSE: {
+    id: 3,
+    desc: `${t('project.workflow.pause')}`,
+    color: '#057c72',
+    icon: PauseCircleOutlined,
+    isSpin: false,
+    classNames: 'pause'
+  },
+  READY_STOP: {
+    id: 4,
+    desc: `${t('project.workflow.ready_to_stop')}`,
+    color: '#FE0402',
+    icon: StopFilled,
+    isSpin: false,
+    classNames: 'ready_stop'
+  },
+  STOP: {
+    id: 5,
+    desc: `${t('project.workflow.stop')}`,
+    color: '#e90101',
+    icon: StopOutlined,
+    isSpin: false,
+    classNames: 'stop'
+  },
+  FAILURE: {
+    id: 6,
+    desc: `${t('project.workflow.failed')}`,
+    color: '#000000',
+    icon: CloseCircleOutlined,
+    isSpin: false,
+    classNames: 'failed'
+  },
+  SUCCESS: {
+    id: 7,
+    desc: `${t('project.workflow.success')}`,
+    color: '#95DF96',
+    icon: CheckCircleOutlined,
+    isSpin: false,
+    classNames: 'success'
+  },
+  DELAY_EXECUTION: {
+    id: 12,
+    desc: `${t('project.workflow.delay_execution')}`,
+    color: '#5102ce',
+    icon: PauseCircleFilled,
+    isSpin: false,
+    classNames: 'delay_execution'
+  },
+  SERIAL_WAIT: {
+    id: 14,
+    desc: `${t('project.workflow.serial_wait')}`,
+    color: '#5102ce',
+    icon: Loading3QuartersOutlined,
+    isSpin: true,
+    classNames: 'serial_wait'
+  },
+  READY_BLOCK: {
+    id: 15,
+    desc: `${t('project.workflow.ready_to_block')}`,
+    color: '#5101be',
+    icon: SendOutlined,
+    isSpin: false,
+    classNames: 'pending'
+  },
+  BLOCK: {
+    id: 16,
+    desc: `${t('project.workflow.block')}`,
     color: '#5101be',
     icon: HistoryOutlined,
     isSpin: false,

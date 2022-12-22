@@ -213,7 +213,9 @@ export default {
     project_tips: '请选择项目',
     workflow_relation_no_data_result_title: '工作流关系不存在',
     workflow_relation_no_data_result_desc:
-      '目前没有任何工作流，请先创建工作流，再访问该页面'
+      '目前没有任何工作流，请先创建工作流，再访问该页面',
+    ready_to_block: '准备锁定',
+    block: '锁定',
   },
   task: {
     on_line: '线上',
