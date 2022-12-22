@@ -595,7 +595,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 .collect(Collectors.toMap(Schedule::getProcessDefinitionCode, Function.identity()));
 
         Map<Integer, String> userMap = userMapper.selectList(new QueryWrapper<>()).stream()
-            .collect(Collectors.toMap(User::getId, User::getUserName));
+                .collect(Collectors.toMap(User::getId, User::getUserName));
 
         for (ProcessDefinition pd : processDefinitions) {
             // todo: use batch query
