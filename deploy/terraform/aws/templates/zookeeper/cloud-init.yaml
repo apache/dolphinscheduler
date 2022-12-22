@@ -1,0 +1,46 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+#cloud-config
+
+package_update: true
+package_upgrade: true
+
+groups:
+  - docker
+
+users:
+  - name: docker
+    shell: /bin/bash
+    primary_group: docker
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    ssh_authorized_keys:
+      - ${ssh_public_key}
+  - name: root
+    ssh_authorized_keys:
+      - ${ssh_public_key}
+
+system_info:
+  default_user:
+    groups: [docker]
+
+packages:
+  - docker
+
+runcmd:
+  - sudo systemctl enable docker
+  - sudo systemctl start docker
