@@ -35,8 +35,33 @@ export type ITaskState =
   | 'DISPATCH'
   | 'PENDING'
 
+export type IWorkflowExecutionState =
+  | 'SUBMITTED_SUCCESS'
+  | 'RUNNING_EXECUTION'
+  | 'READY_PAUSE'
+  | 'PAUSE'
+  | 'READY_STOP'
+  | 'STOP'
+  | 'FAILURE'
+  | 'SUCCESS'
+  | 'DELAY_EXECUTION'
+  | 'SERIAL_WAIT'
+  | 'READY_BLOCK'
+  | 'BLOCK'
+
 export type ITaskStateConfig = {
   [key in ITaskState]: {
+    id: number
+    desc: string
+    color: string
+    icon: Component
+    isSpin: boolean
+    classNames?: string
+  }
+}
+
+export type IWorkflowExecutionStateConfig = {
+  [key in IWorkflowExecutionState]: {
     id: number
     desc: string
     color: string
