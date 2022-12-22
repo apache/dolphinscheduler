@@ -64,9 +64,7 @@ public class ZeppelinTaskTest {
     private ZeppelinTask zeppelinTask;
     private ParagraphResult paragraphResult;
     private NoteResult noteResult;
-    private TaskCallBack taskCallBack = (taskInstanceId, appIds) -> {
-
-    };
+    private TaskCallBack taskCallBack = mock(TaskCallBack.class);
 
     @BeforeEach
     public void before() throws Exception {

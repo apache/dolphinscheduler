@@ -17,15 +17,21 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
-import static org.apache.dolphinscheduler.common.constants.Constants.APPID_COLLECT;
-import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_COLLECT_WAY;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
-import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 
-import java.util.List;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
 
 /**
@@ -58,13 +64,68 @@ public abstract class AbstractYarnTask extends AbstractRemoteTask {
     // todo split handle to submit and track
     @Override
     public void handle(TaskCallBack taskCallBack) throws TaskException {
+        // not retry submit task if appId exists
+        if (StringUtils.isNotEmpty(taskRequest.getAppIds())) {
+            logger.info("task {} has already been submitted before", taskRequest);
+            setExitStatusCode(TaskConstants.EXIT_CODE_SUCCESS);
+            setAppIds(taskRequest.getAppIds());
+            setProcessId(taskRequest.getProcessId());
+            taskRequest.getCompletedCollectAppId().complete(true);
+            taskCallBack.sendRunningInfo(taskRequest);
+            return;
+        }
+
         try {
+
             // SHELL task exit code
-            TaskResponse response = shellCommandExecutor.run(buildCommand());
+            TaskResponse response = shellCommandExecutor.run(buildCommand(), exitAfterSubmitTask(), oneAppIdPerTask());
             setExitStatusCode(response.getExitStatusCode());
             // set appIds
             setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
             setProcessId(response.getProcessId());
+            setProcess(response.getProcess());
+            // send process id to master to kill process when worker crashes before get appId
+            // if process exit after submit, process id is 0, not usable
+            if (getProcessId() > 0) {
+                taskRequest.setProcessId(getProcessId());
+                taskCallBack.sendRunningInfo(taskRequest);
+            }
+            // wait appId, report status with appId in time
+            Set<String> appIds = getApplicationIds();
+            if (appIds.size() > 0) {
+                setAppIds(String.join(TaskConstants.COMMA, appIds));
+                taskCallBack.sendRunningInfo(taskRequest);
+            }
+
+            if (Objects.nonNull(response.getProcess()) && exitAfterSubmitTask()) {
+                // monitor by app id
+                long startTime = System.currentTimeMillis();
+                long remainTime = taskRequest.getRemainTime();
+
+                boolean status = false;
+                try {
+                    status = response.getProcess().waitFor(remainTime, TimeUnit.SECONDS);
+                } catch (InterruptedException e) {
+                    logger.info("process {} interrupted", getProcessId());
+                }
+                if (status) {
+
+                    // SHELL task state
+                    setExitStatusCode(response.getProcess().exitValue());
+
+                } else {
+                    logger.error("process has failure, the task timeout configuration value is:{}, ready to kill ...",
+                            taskRequest.getTaskTimeout());
+                    ProcessUtils.kill(taskRequest);
+                    setExitStatusCode(EXIT_CODE_FAILURE);
+                }
+                logger.info(
+                        "waiting process exit, execute path:{}, processId:{} ,exitStatusCode:{}, processWaitForStatus:{}, take {}",
+                        taskRequest.getExecutePath(), taskRequest.getProcessId(), getExitStatusCode(), status,
+                        System.currentTimeMillis() - startTime);
+
+            }
+
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
             logger.info("The current yarn task has been interrupted", ex);
@@ -110,9 +171,23 @@ public abstract class AbstractYarnTask extends AbstractRemoteTask {
      * @throws TaskException
      */
     @Override
-    public List<String> getApplicationIds() throws TaskException {
-        return LogUtils.getAppIds(taskRequest.getLogPath(), taskRequest.getAppInfoPath(),
-                PropertyUtils.getString(APPID_COLLECT, DEFAULT_COLLECT_WAY));
+    public Set<String> getApplicationIds() throws TaskException {
+        Set<String> appIds = new HashSet<>();
+        long startTime = System.currentTimeMillis();
+        logger.info("task {} waiting collect appId ", taskRequest.getTaskInstanceId());
+        try {
+            taskRequest.getCompletedCollectAppId().get(5, TimeUnit.MINUTES);
+        } catch (InterruptedException | TimeoutException | ExecutionException e) {
+            logger.error("collect app id error.", e);
+        }
+        logger.info("task {} complete collect appId, take {} ", taskRequest.getTaskInstanceId(),
+                System.currentTimeMillis() - startTime);
+
+        if (StringUtils.isNotEmpty(taskRequest.getAppIds())) {
+            appIds.addAll(Arrays.asList(taskRequest.getAppIds().split(Constants.COMMA)));
+        }
+
+        return appIds;
     }
 
     /**

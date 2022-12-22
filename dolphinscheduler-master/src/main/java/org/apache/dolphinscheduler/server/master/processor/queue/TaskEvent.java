@@ -120,6 +120,7 @@ public class TaskEvent {
         event.setChannel(channel);
         event.setWorkerAddress(workerAddress);
         event.setEvent(TaskEventType.RUNNING);
+        event.setProcessId(command.getProcessId());
         return event;
     }
 

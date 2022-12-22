@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class HiveCliTask extends AbstractRemoteTask {
 
@@ -57,8 +58,8 @@ public class HiveCliTask extends AbstractRemoteTask {
     }
 
     @Override
-    public List<String> getApplicationIds() throws TaskException {
-        return Collections.emptyList();
+    public Set<String> getApplicationIds() throws TaskException {
+        return Collections.emptySet();
     }
 
     @Override
@@ -80,6 +81,7 @@ public class HiveCliTask extends AbstractRemoteTask {
             setExitStatusCode(taskResponse.getExitStatusCode());
             setAppIds(taskResponse.getAppIds());
             setProcessId(taskResponse.getProcessId());
+            setProcess(taskResponse.getProcess());
             setVarPool(shellCommandExecutor.getVarPool());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

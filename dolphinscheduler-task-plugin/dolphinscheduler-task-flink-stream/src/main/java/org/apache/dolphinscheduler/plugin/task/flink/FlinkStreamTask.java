@@ -30,6 +30,7 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 public class FlinkStreamTask extends FlinkTask implements StreamTask {
 
@@ -95,7 +96,7 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
 
     @Override
     public void cancelApplication() throws TaskException {
-        List<String> appIds = getApplicationIds();
+        Set<String> appIds = getApplicationIds();
         if (CollectionUtils.isEmpty(appIds)) {
             logger.error("can not get appId, taskInstanceId:{}", taskExecutionContext.getTaskInstanceId());
             return;
@@ -116,7 +117,7 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
 
     @Override
     public void savePoint() throws Exception {
-        List<String> appIds = getApplicationIds();
+        Set<String> appIds = getApplicationIds();
         if (CollectionUtils.isEmpty(appIds)) {
             logger.warn("can not get appId, taskInstanceId:{}", taskExecutionContext.getTaskInstanceId());
             return;

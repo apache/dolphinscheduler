@@ -113,6 +113,7 @@ public class PythonTask extends AbstractTask {
             TaskResponse taskResponse = shellCommandExecutor.run(command);
             setExitStatusCode(taskResponse.getExitStatusCode());
             setProcessId(taskResponse.getProcessId());
+            setProcess(taskResponse.getProcess());
             setVarPool(shellCommandExecutor.getVarPool());
             pythonParameters.dealOutParam(shellCommandExecutor.getVarPool());
         } catch (Exception e) {

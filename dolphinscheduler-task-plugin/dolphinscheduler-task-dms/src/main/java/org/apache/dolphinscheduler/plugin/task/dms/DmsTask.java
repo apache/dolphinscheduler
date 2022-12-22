@@ -34,7 +34,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 
 import com.amazonaws.services.databasemigrationservice.model.InvalidResourceStateException;
 import com.amazonaws.services.databasemigrationservice.model.ReplicationTask;
@@ -77,8 +77,8 @@ public class DmsTask extends AbstractRemoteTask {
     }
 
     @Override
-    public List<String> getApplicationIds() throws TaskException {
-        return Collections.emptyList();
+    public Set<String> getApplicationIds() throws TaskException {
+        return Collections.emptySet();
     }
 
     @Override

@@ -166,6 +166,31 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
     }
 
     /**
+     * sync execute command
+     * @param host
+     * @param command
+     * @param timeoutMillis
+     * @return
+     * @throws ExecuteException
+     */
+    public Command doSyncExecute(final Host host, final Command command, long timeoutMillis) throws ExecuteException {
+        // retry count，default retry 3
+        int retryCount = 3;
+        do {
+            try {
+                return nettyRemotingClient.sendSync(host, command, timeoutMillis);
+            } catch (Exception ex) {
+                logger.error(String.format("send command : %s to %s error", command, host), ex);
+                retryCount--;
+                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
+            }
+        } while (retryCount >= 0);
+
+        throw new ExecuteException(String.format("send command : %s to %s error", command, host));
+
+    }
+
+    /**
      * get all nodes
      *
      * @param context context

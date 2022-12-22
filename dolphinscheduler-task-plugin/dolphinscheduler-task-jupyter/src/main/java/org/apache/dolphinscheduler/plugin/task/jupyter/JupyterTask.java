@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -59,8 +60,8 @@ public class JupyterTask extends AbstractRemoteTask {
     }
 
     @Override
-    public List<String> getApplicationIds() throws TaskException {
-        return Collections.emptyList();
+    public Set<String> getApplicationIds() throws TaskException {
+        return Collections.emptySet();
     }
 
     @Override
@@ -87,6 +88,7 @@ public class JupyterTask extends AbstractRemoteTask {
             setExitStatusCode(response.getExitStatusCode());
             setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
             setProcessId(response.getProcessId());
+            setProcess(response.getProcess());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             logger.error("The current Jupyter task has been interrupted", e);

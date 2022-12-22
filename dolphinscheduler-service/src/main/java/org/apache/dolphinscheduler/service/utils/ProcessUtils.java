@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.service.utils;
 
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.COLON;
+
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
@@ -187,6 +189,42 @@ public class ProcessUtils {
     }
 
     /**
+     * get remote host pids str
+     * @param host
+     * @param processId
+     * @return
+     * @throws Exception
+     */
+    public static String getHostPidsStr(String host, int processId) throws Exception {
+        List<String> pidList = new ArrayList<>();
+        Matcher mat = null;
+        // pstree pid get sub pids
+
+        if (SystemUtils.IS_OS_MAC) {
+            logger.debug("remote get pids: {}", String.format("ssh %s %s -sp %d", host, Constants.PSTREE, processId));
+            String pids = OSUtils.exeCmd(String.format("ssh %s %s -sp %d", host, Constants.PSTREE, processId));
+            if (null != pids) {
+                mat = MACPATTERN.matcher(pids);
+            }
+        } else {
+            logger.debug("remote get pids: {}", String.format("ssh %s %s -sp %d", host, Constants.PSTREE, processId));
+            String pids = OSUtils.exeCmd(String.format("ssh %s %s -p %d", host, Constants.PSTREE, processId));
+            mat = WINDOWSATTERN.matcher(pids);
+        }
+
+        if (null != mat) {
+            while (mat.find()) {
+                pidList.add(mat.group(1));
+            }
+        }
+
+        if (OSUtils.isSudoEnable() && !pidList.isEmpty()) {
+            pidList = pidList.subList(1, pidList.size());
+        }
+        return String.join(" ", pidList).trim();
+    }
+
+    /**
      * find logs and kill yarn tasks.
      *
      * @param taskExecutionContext taskExecutionContext
@@ -225,5 +263,26 @@ public class ProcessUtils {
             logger.error("Kill yarn job failure, taskInstanceId: {}", taskExecutionContext.getTaskInstanceId(), e);
         }
         return Collections.emptyList();
+    }
+
+    public static void killTaskByProcessId(@NonNull TaskExecutionContext taskExecutionContext) {
+        try {
+            if (taskExecutionContext.getProcessId() <= 0) {
+                return;
+            }
+            String host = taskExecutionContext.getHost().split(COLON)[0];
+            String pidStr = getHostPidsStr(host, taskExecutionContext.getProcessId());
+            if (StringUtils.isNotEmpty(pidStr)) {
+                String command =
+                        String.format("ssh %s sudo -u %s kill -9 %s", host, taskExecutionContext.getTenantCode(),
+                                pidStr);
+                logger.info("ssh kill task command: {}", command);
+                org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils.exeCmd(command);
+            }
+
+        } catch (Exception e) {
+            logger.error("kill task by process id {} error: ", taskExecutionContext.getProcessId(), e);
+        }
+
     }
 }

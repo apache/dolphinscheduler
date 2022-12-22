@@ -59,4 +59,9 @@ public class TaskCallbackImpl implements TaskCallBack {
         taskExecutionContext.setAppIds(applicationInfo.getAppIds());
         workerMessageSender.sendMessageWithRetry(taskExecutionContext, masterAddress, CommandType.TASK_EXECUTE_RUNNING);
     }
+
+    @Override
+    public void sendRunningInfo(TaskExecutionContext taskExecutionContext) {
+        workerMessageSender.sendMessageWithRetry(taskExecutionContext, masterAddress, CommandType.TASK_EXECUTE_RUNNING);
+    }
 }

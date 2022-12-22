@@ -44,6 +44,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.java_websocket.client.WebSocketClient;
@@ -68,8 +69,8 @@ public class PigeonTask extends AbstractRemoteTask {
     }
 
     @Override
-    public List<String> getApplicationIds() throws TaskException {
-        return Collections.emptyList();
+    public Set<String> getApplicationIds() throws TaskException {
+        return Collections.emptySet();
     }
 
     @Override
