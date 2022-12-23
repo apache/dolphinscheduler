@@ -42,7 +42,7 @@ export PYTHON_HOME=${PYTHON_HOME:-/opt/soft/python}
 export HIVE_HOME=${HIVE_HOME:-/opt/soft/hive}
 export FLINK_HOME=${FLINK_HOME:-/opt/soft/flink}
 export DATAX_HOME=${DATAX_HOME:-/opt/soft/datax}
-export SQOOP_HOME=${DATAX_HOME:-/opt/soft/sqoop}
+export SQOOP_HOME=${SQOOP_HOME:-/opt/soft/sqoop}
 
 export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$SQOOP_HOME/bin:$PATH
 
