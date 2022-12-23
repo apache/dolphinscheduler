@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.registry.api.ConnectionListener;
 import org.apache.dolphinscheduler.registry.api.ConnectionState;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
-import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import lombok.NonNull;
 
@@ -32,14 +31,11 @@ public class WorkerConnectionStateListener implements ConnectionListener {
 
     private final Logger logger = LoggerFactory.getLogger(WorkerConnectionStateListener.class);
     private final WorkerConfig workerConfig;
-    private final RegistryClient registryClient;
     private final WorkerConnectStrategy workerConnectStrategy;
 
     public WorkerConnectionStateListener(@NonNull WorkerConfig workerConfig,
-                                         @NonNull RegistryClient registryClient,
                                          @NonNull WorkerConnectStrategy workerConnectStrategy) {
         this.workerConfig = workerConfig;
-        this.registryClient = registryClient;
         this.workerConnectStrategy = workerConnectStrategy;
     }
 
