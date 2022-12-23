@@ -289,7 +289,6 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
                 .thenReturn(Arrays.asList(schedule1, schedule2));
         PageInfo<ProcessDefinition> pageInfo = processDefinitionService.queryProcessDefinitionListPaging(
                 user, project.getCode(), "", "", 1, 0, 10);
-
         Assertions.assertNotNull(pageInfo);
         ProcessDefinition pd1 = pageInfo.getTotalList().stream()
                 .filter(pd -> pd.getCode() == processDefinitionCode1).findFirst().orElse(null);
