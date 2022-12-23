@@ -59,6 +59,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskMainInfo;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.UserWithProcessDefinitionCode;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
@@ -228,7 +229,6 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
     @Test
     public void testQueryProcessDefinitionListPaging() {
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
-        Mockito.when(userMapper.selectList(Mockito.any())).thenReturn(Lists.newArrayList());
 
         Project project = getProject(projectCode);
 
@@ -248,8 +248,15 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(user, project,
                 WORKFLOW_DEFINITION);
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
+        long processDefinitionCode1 = 1L;
+        long processDefinitionCode2 = 2L;
+        List<ProcessDefinition> processDefinitions = Arrays.asList(
+                ProcessDefinition.builder().version(1).code(processDefinitionCode1).build(),
+                ProcessDefinition.builder().version(1).code(processDefinitionCode2).build());
+        List<Long> processDefinitionCodes = processDefinitions.stream()
+                .map(ProcessDefinition::getCode).collect(Collectors.toList());
         PageListingResult<ProcessDefinition> pageListingResult = PageListingResult.<ProcessDefinition>builder()
-                .records(Collections.emptyList())
+                .records(processDefinitions)
                 .currentPage(1)
                 .pageSize(10)
                 .totalCount(30)
@@ -260,11 +267,33 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
                 Mockito.eq(""),
                 Mockito.eq(1),
                 Mockito.eq(project.getCode()))).thenReturn(pageListingResult);
-
+        String user1 = "user1";
+        String user2 = "user2";
+        Mockito.when(userMapper.queryUserWithProcessDefinitionCode(processDefinitionCodes))
+                .thenReturn(Arrays.asList(
+                        UserWithProcessDefinitionCode.builder()
+                                .processDefinitionCode(processDefinitionCode1)
+                                .processDefinitionVersion(1)
+                                .modifierName(user1).build(),
+                        UserWithProcessDefinitionCode.builder()
+                                .processDefinitionCode(processDefinitionCode2)
+                                .processDefinitionVersion(1)
+                                .modifierName(user2).build()));
+        Schedule schedule1 = new Schedule();
+        schedule1.setProcessDefinitionCode(processDefinitionCode1);
+        schedule1.setReleaseState(ReleaseState.ONLINE);
+        Schedule schedule2 = new Schedule();
+        schedule2.setProcessDefinitionCode(processDefinitionCode2);
+        schedule2.setReleaseState(ReleaseState.ONLINE);
+        Mockito.when(schedulerService.queryScheduleByProcessDefinitionCodes(processDefinitionCodes))
+                .thenReturn(Arrays.asList(schedule1, schedule2));
         PageInfo<ProcessDefinition> pageInfo = processDefinitionService.queryProcessDefinitionListPaging(
                 user, project.getCode(), "", "", 1, 0, 10);
-
         Assertions.assertNotNull(pageInfo);
+        ProcessDefinition pd1 = pageInfo.getTotalList().stream()
+                .filter(pd -> pd.getCode() == processDefinitionCode1).findFirst().orElse(null);
+        assert pd1 != null;
+        Assertions.assertEquals(pd1.getModifyBy(), user1);
     }
 
     @Test
