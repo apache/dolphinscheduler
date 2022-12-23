@@ -240,16 +240,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             return result;
         }
 
-        long triggerCode = 0L;
-        try {
-            triggerCode = CodeGenerateUtils.getInstance().genCode();
-        } catch (CodeGenerateUtils.CodeGenerateException e) {
-            logger.error("Trigger code get error, ", e);
-        }
-        if (triggerCode == 0L) {
-            putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS, "Error generating trigger code");
-            return result;
-        }
+        long triggerCode = CodeGenerateUtils.getInstance().genCode();
 
         /**
          * create command
