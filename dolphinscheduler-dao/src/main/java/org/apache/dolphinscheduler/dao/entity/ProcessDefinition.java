@@ -121,7 +121,7 @@ public class ProcessDefinition {
     private int userId;
 
     /**
-     * user name
+     * create user name
      */
     @TableField(exist = false)
     private String userName;
