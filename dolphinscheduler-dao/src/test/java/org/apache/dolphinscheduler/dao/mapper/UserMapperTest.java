@@ -333,7 +333,7 @@ public class UserMapperTest extends BaseDaoTest {
     @Test
     public void testQueryUserWithProcessDefinitionCode() {
         User user = insertOne();
-        insertProcessDefinition();
+        insertProcessDefinition(user.getId());
         ProcessDefinitionLog log = insertProcessDefinitionLog(user.getId());
         long processDefinitionCode = log.getCode();
         List<UserWithProcessDefinitionCode> userWithCodes = userMapper.queryUserWithProcessDefinitionCode(
@@ -342,7 +342,7 @@ public class UserMapperTest extends BaseDaoTest {
                 .filter(code -> code.getProcessDefinitionCode() == processDefinitionCode)
                 .findAny().orElse(null);
         assert userWithCode != null;
-        Assertions.assertEquals(userWithCode.getUserId(), user.getId());
+        Assertions.assertEquals(userWithCode.getCreatorId(), user.getId());
     }
 
     private ProcessDefinitionLog insertProcessDefinitionLog(int operator) {
@@ -351,7 +351,7 @@ public class UserMapperTest extends BaseDaoTest {
         processDefinitionLog.setCode(199L);
         processDefinitionLog.setName("def 1");
         processDefinitionLog.setProjectCode(1L);
-        processDefinitionLog.setUserId(101);
+        processDefinitionLog.setUserId(operator);
         processDefinitionLog.setVersion(10);
         processDefinitionLog.setUpdateTime(new Date());
         processDefinitionLog.setCreateTime(new Date());
@@ -360,14 +360,14 @@ public class UserMapperTest extends BaseDaoTest {
         return processDefinitionLog;
     }
 
-    private ProcessDefinition insertProcessDefinition() {
+    private ProcessDefinition insertProcessDefinition(int operator) {
         // insertOne
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setCode(199L);
         processDefinition.setName("process-name");
         processDefinition.setProjectCode(1010L);
         processDefinition.setVersion(10);
-        processDefinition.setUserId(101);
+        processDefinition.setUserId(operator);
         processDefinition.setUpdateTime(new Date());
         processDefinition.setCreateTime(new Date());
         processDefinitionMapper.insert(processDefinition);

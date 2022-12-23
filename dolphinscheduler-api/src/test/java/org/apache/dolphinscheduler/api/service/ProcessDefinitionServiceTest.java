@@ -229,7 +229,6 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
     @Test
     public void testQueryProcessDefinitionListPaging() {
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
-        Mockito.when(userMapper.selectList(Mockito.any())).thenReturn(Lists.newArrayList());
 
         Project project = getProject(projectCode);
 
@@ -275,11 +274,11 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
                         UserWithProcessDefinitionCode.builder()
                                 .processDefinitionCode(processDefinitionCode1)
                                 .processDefinitionVersion(1)
-                                .userName(user1).build(),
+                                .modifierName(user1).build(),
                         UserWithProcessDefinitionCode.builder()
                                 .processDefinitionCode(processDefinitionCode2)
                                 .processDefinitionVersion(1)
-                                .userName(user2).build()));
+                                .modifierName(user2).build()));
         Schedule schedule1 = new Schedule();
         schedule1.setProcessDefinitionCode(processDefinitionCode1);
         schedule1.setReleaseState(ReleaseState.ONLINE);

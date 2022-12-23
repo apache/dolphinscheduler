@@ -31,8 +31,12 @@ public class UserWithProcessDefinitionCode {
 
     private int processDefinitionVersion;
 
-    private Integer userId;
+    private Integer modifierId;
 
-    private String userName;
+    private String modifierName;
+
+    private Integer creatorId;
+
+    private String creatorName;
 
 }
