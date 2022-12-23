@@ -137,4 +137,10 @@ public class Schedule {
      * environment code
      */
     private Long environmentCode;
+
+    /**
+     * environment name
+     */
+    @TableField(exist = false)
+    private String environmentName;
 }

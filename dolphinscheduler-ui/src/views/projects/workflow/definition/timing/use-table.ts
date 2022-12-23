@@ -124,6 +124,16 @@ export function useTable() {
             : t('project.workflow.down_line')
       },
       {
+        title: t('project.workflow.worker_group'),
+        key: 'workerGroup',
+        width: 140
+      },
+      {
+        title: t('project.workflow.environment_name'),
+        key: 'environmentName',
+        width: 160
+      },
+      {
         title: t('project.workflow.create_time'),
         key: 'createTime',
         ...COLUMN_WIDTH_CONFIG['time']
