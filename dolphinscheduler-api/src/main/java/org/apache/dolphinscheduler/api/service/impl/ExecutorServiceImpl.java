@@ -1148,7 +1148,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                                                                   CycleEnum processDefinitionCycle,
                                                                                   String workerGroup) {
         List<DependentProcessDefinition> dependentProcessDefinitionList =
-                processService.queryDependentOnlineProcessDefinitionByProcessDefinitionCode(processDefinitionCode);
+                processService.queryDependentProcessDefinitionByProcessDefinitionCode(processDefinitionCode);
 
         return checkDependentProcessDefinitionValid(dependentProcessDefinitionList, processDefinitionCycle,
                 workerGroup, processDefinitionCode);
