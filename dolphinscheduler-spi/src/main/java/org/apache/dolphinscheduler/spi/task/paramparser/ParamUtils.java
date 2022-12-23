@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.spi.task.paramparser;
 
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.PARAMETER_TASK_EXECUTE_PATH;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.PARAMETER_TASK_INSTANCE_ID;
-
+import static org.apache.dolphinscheduler.spi.utils.Constants.START_UP_PARAMS_PREFIX;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.dolphinscheduler.spi.enums.CommandType;
 import org.apache.dolphinscheduler.spi.enums.DataType;
@@ -99,6 +99,10 @@ public class ParamUtils {
             Map.Entry<String, Property> en = iter.next();
             Property property = en.getValue();
 
+            if (property.getProp().startsWith(START_UP_PARAMS_PREFIX)) {
+                property.setProp(property.getProp().replaceFirst(START_UP_PARAMS_PREFIX, ""));
+                globalParams.put(property.getProp(), property);
+            }
             if (StringUtils.isNotEmpty(property.getValue())
                     && property.getValue().startsWith("$")) {
                 /**

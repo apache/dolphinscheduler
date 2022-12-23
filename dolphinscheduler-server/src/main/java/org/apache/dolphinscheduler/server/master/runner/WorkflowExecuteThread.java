@@ -23,9 +23,11 @@ import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVERY_ST
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODES;
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
 import static org.apache.dolphinscheduler.common.Constants.SEC_2_MINUTES_TIME_UNIT;
+import static org.apache.dolphinscheduler.common.Constants.START_UP_PARAMS_PREFIX;
 import static org.apache.dolphinscheduler.common.enums.DataType.VARCHAR;
 import static org.apache.dolphinscheduler.common.enums.Direct.IN;
 
+import org.apache.commons.collections4.MapUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.DependResult;
@@ -1646,20 +1648,12 @@ public class WorkflowExecuteThread implements Runnable {
         // set start param into global params
         Map<String, String> globalMap = processDefinition.getGlobalParamMap();
         List<Property> globalParamList = processDefinition.getGlobalParamList();
-        if (startParamMap.size() > 0 && globalMap != null) {
-            // start param to overwrite global param
-            for (Map.Entry<String, String> param : globalMap.entrySet()) {
-                String val = startParamMap.get(param.getKey());
-                if (val != null) {
-                    param.setValue(val);
-                }
-            }
-            //start param to create new global param if global not exist
-            for (Map.Entry<String, String> startParam : startParamMap.entrySet()) {
-                if (!globalMap.containsKey(startParam.getKey())) {
-                    globalMap.put(startParam.getKey(), startParam.getValue());
-                    globalParamList.add(new Property(startParam.getKey(), IN, VARCHAR, startParam.getValue()));
-                }
+        if (MapUtils.isNotEmpty(startParamMap) && globalMap != null) {
+            // start param to create new global param if global not exist, rather overwrite global param
+            for (Entry<String, String> startParam : startParamMap.entrySet()) {
+                String tmpStartParamKey = START_UP_PARAMS_PREFIX + startParam.getKey();
+                globalMap.put(tmpStartParamKey, startParam.getValue());
+                globalParamList.add(new Property(tmpStartParamKey, IN, VARCHAR, startParam.getValue()));
             }
         }
     }
