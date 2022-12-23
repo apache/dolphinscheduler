@@ -575,6 +575,7 @@ public class UsersServiceTest {
     private User getLoginUser() {
         User loginUser = new User();
         loginUser.setId(1);
+        loginUser.setTenantId(1);
         loginUser.setUserType(UserType.ADMIN_USER);
         return loginUser;
     }
@@ -583,6 +584,7 @@ public class UsersServiceTest {
     public void getUserInfo() {
         User loginUser = new User();
         loginUser.setUserName("admin");
+        loginUser.setTenantId(1);
         loginUser.setUserType(UserType.ADMIN_USER);
         // get admin user
         Map<String, Object> result = usersService.getUserInfo(loginUser);
@@ -596,7 +598,7 @@ public class UsersServiceTest {
         loginUser.setUserType(null);
         loginUser.setId(1);
         when(userMapper.queryDetailsById(1)).thenReturn(getGeneralUser());
-        when(alertGroupMapper.queryByUserId(1)).thenReturn(getAlertGroups());
+        when(alertGroupMapper.queryByTenantId(loginUser.getTenantId())).thenReturn(getAlertGroups());
         result = usersService.getUserInfo(loginUser);
         logger.info(result.toString());
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));

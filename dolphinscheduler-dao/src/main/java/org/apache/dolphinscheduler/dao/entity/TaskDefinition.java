@@ -223,6 +223,9 @@ public class TaskDefinition {
      */
     private TaskExecuteType taskExecuteType;
 
+    @TableField("tenant_id")
+    private Integer tenantId;
+
     public TaskDefinition() {
     }
 

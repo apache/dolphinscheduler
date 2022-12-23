@@ -63,6 +63,8 @@ public class AlertSenderServiceTest {
     @InjectMocks
     private AlertSenderService alertSenderService;
 
+    Integer tenantId = 1;
+
     @BeforeEach
     public void before() {
         MockitoAnnotations.initMocks(this);
@@ -91,7 +93,7 @@ public class AlertSenderServiceTest {
         String pluginInstanceName = "alert-instance-mail";
         List<AlertPluginInstance> alertInstanceList = new ArrayList<>();
         AlertPluginInstance alertPluginInstance = new AlertPluginInstance(
-                pluginDefineId, pluginInstanceParams, pluginInstanceName);
+                pluginDefineId, pluginInstanceParams, pluginInstanceName, this.tenantId);
         alertPluginInstance.setId(1);
         alertInstanceList.add(alertPluginInstance);
         when(alertDao.listInstanceByAlertGroupId(1)).thenReturn(alertInstanceList);
@@ -168,7 +170,7 @@ public class AlertSenderServiceTest {
         String pluginInstanceName = "alert-instance-mail";
         List<AlertPluginInstance> alertInstanceList = new ArrayList<>();
         AlertPluginInstance alertPluginInstance = new AlertPluginInstance(
-                pluginDefineId, pluginInstanceParams, pluginInstanceName);
+                pluginDefineId, pluginInstanceParams, pluginInstanceName, this.tenantId);
         alertInstanceList.add(alertPluginInstance);
         when(alertDao.listInstanceByAlertGroupId(alertGroupId)).thenReturn(alertInstanceList);
 

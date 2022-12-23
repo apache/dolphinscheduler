@@ -18,6 +18,7 @@
 import { reactive, ref, SetupContext } from 'vue'
 import { useAsyncState } from '@vueuse/core'
 import { queryList } from '@/service/modules/queues'
+import { queryAllProjectList } from '@/service/modules/projects'
 import {
   verifyTenantCode,
   createTenant,
@@ -37,7 +38,9 @@ export function useModalData(
       tenantCode: ref(''),
       description: ref(''),
       queueId: ref<number | null>(null),
-      generalOptions: []
+      projectId: ref<number | null>(null),
+      generalOptions: [],
+      projectOptions:[]
     },
     saving: false,
     rules: {
@@ -74,6 +77,23 @@ export function useModalData(
     return state
   }
 
+  const getProjectListData = () => {
+    const { state } = useAsyncState(
+      queryAllProjectList().then((res: any) => {
+        variables.model.projectOptions = res.map((item: any) => {
+          return {
+            label: item.name,
+            value: item.id
+          }
+        })
+        variables.model.queueId = res[0].id
+      }),
+      {}
+    )
+
+    return state
+  }
+
   const handleValidate = async (statusRef: number) => {
     await variables.tenantFormRef.validate()
 
@@ -94,6 +114,7 @@ export function useModalData(
         const data = {
           tenantCode: variables.model.tenantCode,
           queueId: variables.model.queueId as number,
+          projectId: variables.model.projectId as number,
           description: variables.model.description
         }
         createTenant(data).then(
@@ -101,6 +122,7 @@ export function useModalData(
             variables.model.tenantCode = ''
             variables.model.description = ''
             variables.model.queueId = null
+            variables.model.projectId = null
             ctx.emit('confirmModal', props.showModalRef)
           },
           (unused: any) => {
@@ -115,6 +137,7 @@ export function useModalData(
     const data = {
       tenantCode: variables.model.tenantCode,
       queueId: variables.model.queueId,
+      proectId: variables.model.projectId,
       description: variables.model.description,
       id: variables.model.id
     }
@@ -126,6 +149,7 @@ export function useModalData(
   return {
     variables,
     getListData,
+    getProjectListData,
     handleValidate
   }
 }

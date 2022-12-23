@@ -64,13 +64,6 @@ export function queryAllProjectList(): any {
   })
 }
 
-export function queryUnauthorizedProject(params: UserIdReq): any {
-  return axios({
-    url: '/projects/unauth-project',
-    method: 'get',
-    params
-  })
-}
 
 export function queryProjectWithAuthorizedLevel(params: UserIdReq): any {
   return axios({

@@ -77,7 +77,7 @@ interface ListAllReq extends UserReq {
   queueName?: string
   tenantCode?: string
   updateTime?: string
-  userType?: 'ADMIN_USER' | 'GENERAL_USER'
+  userType?: 'ADMIN_USER' | 'GENERAL_USER' | 'PROJECT_ADMIN'
 }
 
 interface ListReq {

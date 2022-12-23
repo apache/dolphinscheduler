@@ -94,5 +94,5 @@ public interface AlertGroupService {
      * @param groupName group name
      * @return check result code
      */
-    boolean existGroupName(String groupName);
+    boolean existGroupName(String groupName, User loginUser);
 }

@@ -28,7 +28,8 @@ public enum UserType {
      * 0 admin user; 1 general user
      */
     ADMIN_USER(0, "admin user"),
-    GENERAL_USER(1, "general user");
+    GENERAL_USER(1, "general user"),
+    PROJECT_ADMIN(2, "project admin");
 
     UserType(int code, String descp) {
         this.code = code;

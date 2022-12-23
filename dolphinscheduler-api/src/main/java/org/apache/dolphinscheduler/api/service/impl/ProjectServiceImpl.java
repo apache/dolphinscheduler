@@ -666,23 +666,6 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     }
 
     /**
-     * query authorized project
-     *
-     * @param loginUser login user
-     * @return projects which the user have permission to see, Except for items created by this user
-     */
-    @Override
-    public Map<String, Object> queryProjectCreatedByUser(User loginUser) {
-        Map<String, Object> result = new HashMap<>();
-
-        List<Project> projects = projectMapper.queryProjectCreatedByUser(loginUser.getId());
-        result.put(Constants.DATA_LIST, projects);
-        putMsg(result, Status.SUCCESS);
-
-        return result;
-    }
-
-    /**
      * query authorized and user create project list by user
      *
      * @param loginUser login user
@@ -754,8 +737,10 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     @Override
     public Result queryAllProjectList(User user) {
         Result result = new Result();
+
+        Integer id = user.getUserType() == UserType.ADMIN_USER ? 0 : user.getId();
         List<Project> projects =
-                projectMapper.queryAllProject(user.getUserType() == UserType.ADMIN_USER ? 0 : user.getId());
+                projectMapper.queryAllProject(id);
 
         result.setData(projects);
         putMsg(result, Status.SUCCESS);

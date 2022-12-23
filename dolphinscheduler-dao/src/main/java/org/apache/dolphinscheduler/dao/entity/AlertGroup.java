@@ -66,6 +66,9 @@ public class AlertGroup {
     @TableField(value = "create_user_id")
     private int createUserId;
 
+    @TableField("tenant_id")
+    private Integer tenantId;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -80,7 +83,7 @@ public class AlertGroup {
         if (id != that.id) {
             return false;
         }
-        if (createUserId != that.createUserId) {
+        if (tenantId != that.tenantId) {
             return false;
         }
         if (groupName != null ? !groupName.equals(that.groupName) : that.groupName != null) {
@@ -101,7 +104,7 @@ public class AlertGroup {
     @Override
     public int hashCode() {
         int result = id;
-        result = 31 * result + createUserId;
+        result = 31 * result + tenantId;
         result = 31 * result + (groupName != null ? groupName.hashCode() : 0);
         result = 31 * result + (alertInstanceIds != null ? alertInstanceIds.hashCode() : 0);
         result = 31 * result + (description != null ? description.hashCode() : 0);

@@ -45,7 +45,7 @@ const TenantModal = defineComponent({
   },
   emits: ['cancelModal', 'confirmModal'],
   setup(props, ctx) {
-    const { variables, getListData, handleValidate } = useModalData(props, ctx)
+    const { variables, getListData,getProjectListData, handleValidate } = useModalData(props, ctx)
     const { t } = useI18n()
 
     const cancelModal = () => {
@@ -65,7 +65,7 @@ const TenantModal = defineComponent({
     watch(
       () => props.showModalRef,
       () => {
-        props.showModalRef && getListData(props.statusRef)
+        props.showModalRef && getListData(props.statusRef) && getProjectListData()
       }
     )
 
@@ -76,11 +76,14 @@ const TenantModal = defineComponent({
           variables.model.tenantCode = ''
           variables.model.description = ''
           variables.model.queueId = null
+          variables.model.projectId = null
         } else {
           variables.model.id = props.row.id
           variables.model.tenantCode = props.row.tenantCode
           variables.model.queueId = props.row.queueId
+          variables.model.projectId = props.row.projectId
           variables.model.description = props.row.description
+
         }
       }
     )
@@ -91,6 +94,7 @@ const TenantModal = defineComponent({
         variables.model.id = props.row.id
         variables.model.tenantCode = props.row.tenantCode
         variables.model.queueId = props.row.queueId
+        variables.model.projectId = props.row.projectId
         variables.model.description = props.row.description
       }
     )
@@ -145,6 +149,17 @@ const TenantModal = defineComponent({
                     placeholder={t('security.tenant.queue_name_tips')}
                     options={this.model.generalOptions}
                     v-model={[this.model.queueId, 'value']}
+                  />
+                </NFormItem>
+                <NFormItem
+                  label={t('security.user.project')}
+                  path='project'
+                >
+                  <NSelect
+                    class='select-queue'
+                    placeholder={t('security.user.project_name_tips')}
+                    options={this.model.projectOptions}
+                    v-model={[this.model.projectId, 'value']}
                   />
                 </NFormItem>
                 <NFormItem

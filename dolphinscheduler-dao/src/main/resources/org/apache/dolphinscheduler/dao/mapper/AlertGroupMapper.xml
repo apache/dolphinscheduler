@@ -20,7 +20,7 @@
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper">
     <sql id="baseSql">
         id
-        , group_name, description,alert_instance_ids, create_user_id,create_time, update_time
+        , group_name, description,alert_instance_ids, create_user_id,create_time, update_time, tenant_id
     </sql>
     <select id="queryAlertGroupPage" resultType="org.apache.dolphinscheduler.dao.entity.AlertGroup">
         select
@@ -54,20 +54,20 @@
         select
         <include refid="baseSql"/>
         from t_ds_alertgroup
-        where group_name=#{groupName}
+        where group_name=#{groupName} and tenant_id = #{tenantId}
     </select>
 
     <select id="existGroupName" resultType="java.lang.Boolean">
         select 1
         from t_ds_alertgroup
-        where group_name=#{groupName} limit 1
+        where group_name=#{groupName} and tenant_id = #{tenantId} limit 1
     </select>
 
-    <select id="queryByUserId" resultType="org.apache.dolphinscheduler.dao.entity.AlertGroup">
+    <select id="queryByTenantId" resultType="org.apache.dolphinscheduler.dao.entity.AlertGroup">
         select
         <include refid="baseSql"/>
         from t_ds_alertgroup
-        where create_user_id = #{userId}
+        where tenant_id = #{tenantId}
     </select>
 
     <select id="queryAllGroupList" resultType="org.apache.dolphinscheduler.dao.entity.AlertGroup">

@@ -448,9 +448,10 @@ public class PythonGateway {
         return (Tenant) tenantService.queryByTenantCode(tenantCode).get(Constants.DATA_LIST);
     }
 
-    public void updateTenant(String userName, int id, String tenantCode, int queueId, String desc) throws Exception {
+    public void updateTenant(String userName, int id, String tenantCode, int queueId, int projectId,
+                             String desc) throws Exception {
         User user = usersService.queryUser(userName);
-        tenantService.updateTenant(user, id, tenantCode, queueId, desc);
+        tenantService.updateTenant(user, id, tenantCode, queueId, projectId, desc);
     }
 
     public void deleteTenantById(String userName, Integer tenantId) throws Exception {

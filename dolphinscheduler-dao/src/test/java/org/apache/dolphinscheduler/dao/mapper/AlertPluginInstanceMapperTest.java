@@ -41,20 +41,23 @@ public class AlertPluginInstanceMapperTest extends BaseDaoTest {
     @Autowired
     private PluginDefineMapper pluginDefineMapper;
 
+    Integer tenantId = 1;
+
     /**
      * Test function queryAllAlertPluginInstanceList behavior with different size.
      */
     @Test
     public void testQueryAllAlertPluginInstanceList() {
-        List<AlertPluginInstance> withoutSingleOne = alertPluginInstanceMapper.queryAllAlertPluginInstanceList();
+        List<AlertPluginInstance> withoutSingleOne =
+                alertPluginInstanceMapper.queryAllAlertPluginInstanceList(tenantId);
         Assertions.assertEquals(0, withoutSingleOne.size());
 
         createAlertPluginInstance("test_instance_1");
-        List<AlertPluginInstance> withExactlyOne = alertPluginInstanceMapper.queryAllAlertPluginInstanceList();
+        List<AlertPluginInstance> withExactlyOne = alertPluginInstanceMapper.queryAllAlertPluginInstanceList(tenantId);
         Assertions.assertEquals(1, withExactlyOne.size());
 
         createAlertPluginInstance("test_instance_2");
-        List<AlertPluginInstance> withExactlyTwo = alertPluginInstanceMapper.queryAllAlertPluginInstanceList();
+        List<AlertPluginInstance> withExactlyTwo = alertPluginInstanceMapper.queryAllAlertPluginInstanceList(tenantId);
         Assertions.assertEquals(2, withExactlyTwo.size());
     }
 
@@ -64,9 +67,9 @@ public class AlertPluginInstanceMapperTest extends BaseDaoTest {
     @Test
     public void testExistInstanceName() {
         String instanceName = "test_instance";
-        Assertions.assertNull(alertPluginInstanceMapper.existInstanceName(instanceName));
+        Assertions.assertNull(alertPluginInstanceMapper.existInstanceName(instanceName, tenantId));
         createAlertPluginInstance(instanceName);
-        Assertions.assertTrue(alertPluginInstanceMapper.existInstanceName(instanceName));
+        Assertions.assertTrue(alertPluginInstanceMapper.existInstanceName(instanceName, tenantId));
     }
 
     /**
@@ -78,10 +81,12 @@ public class AlertPluginInstanceMapperTest extends BaseDaoTest {
         createAlertPluginInstance("test_no_instance");
 
         Page<AlertPluginInstance> page = new Page<>(1, 10);
-        IPage<AlertPluginInstance> matchTwoRecord = alertPluginInstanceMapper.queryByInstanceNamePage(page, "test");
+        IPage<AlertPluginInstance> matchTwoRecord =
+                alertPluginInstanceMapper.queryByInstanceNamePage(page, "test", tenantId);
         Assertions.assertEquals(2, matchTwoRecord.getTotal());
 
-        IPage<AlertPluginInstance> matchOneRecord = alertPluginInstanceMapper.queryByInstanceNamePage(page, "pattern");
+        IPage<AlertPluginInstance> matchOneRecord =
+                alertPluginInstanceMapper.queryByInstanceNamePage(page, "pattern", tenantId);
         Assertions.assertEquals(1, matchOneRecord.getTotal());
     }
 
@@ -90,7 +95,8 @@ public class AlertPluginInstanceMapperTest extends BaseDaoTest {
      */
     private void createAlertPluginInstance(String alterPluginInsName) {
         PluginDefine pluginDefine = makeSurePluginDefineExists();
-        AlertPluginInstance alertPluginInstance = new AlertPluginInstance(pluginDefine.getId(), "", alterPluginInsName);
+        AlertPluginInstance alertPluginInstance =
+                new AlertPluginInstance(pluginDefine.getId(), "", alterPluginInsName, tenantId);
         alertPluginInstanceMapper.insert(alertPluginInstance);
     }
 

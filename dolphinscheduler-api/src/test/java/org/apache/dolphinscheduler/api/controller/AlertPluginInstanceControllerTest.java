@@ -163,7 +163,7 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
     @Test
     public void testGetAlertPluginInstanceList() throws Exception {
         // Given
-        when(alertPluginInstanceService.queryAll())
+        when(alertPluginInstanceService.queryAll(this.user))
                 .thenReturn(alertPluginInstanceServiceResult);
 
         // When
@@ -186,7 +186,7 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
         paramsMap.add("pluginDefineId", String.valueOf(pluginDefineId));
         paramsMap.add("alertInstanceName", instanceName);
 
-        when(alertPluginInstanceService.checkExistPluginInstanceName(eq(instanceName)))
+        when(alertPluginInstanceService.checkExistPluginInstanceName(eq(instanceName), this.user))
                 .thenReturn(false);
 
         Result expectResponseContent = JSONUtils.parseObject(
@@ -213,7 +213,7 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
         paramsMap.add("pluginDefineId", String.valueOf(pluginDefineId));
         paramsMap.add("alertInstanceName", instanceName);
 
-        when(alertPluginInstanceService.checkExistPluginInstanceName(eq(instanceName)))
+        when(alertPluginInstanceService.checkExistPluginInstanceName(eq(instanceName), this.user))
                 .thenReturn(true);
 
         Result expectResponseContent = JSONUtils.parseObject(

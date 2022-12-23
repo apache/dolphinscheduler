@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.security.Authenticator;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.thread.RequestContext;
 import org.apache.dolphinscheduler.common.thread.ThreadLocalContext;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
@@ -88,6 +89,7 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
             logger.info(Status.USER_DISABLED.getMsg());
             return false;
         }
+        RequestContext.setLoginUser(user);
         request.setAttribute(Constants.SESSION_USER, user);
         ThreadLocalContext.getTimezoneThreadLocal().set(user.getTimeZone());
         return true;
@@ -96,6 +98,7 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
                            ModelAndView modelAndView) throws Exception {
+        RequestContext.clear();
         ThreadLocalContext.getTimezoneThreadLocal().remove();
     }
 }

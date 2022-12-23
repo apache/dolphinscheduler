@@ -17,11 +17,6 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_GROUP_CREATE;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_GROUP_DELETE;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_GROUP_UPDATE;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_GROUP_VIEW;
-
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.AlertGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -73,18 +68,9 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
     @Override
     public Map<String, Object> queryAlertgroup(User loginUser) {
         HashMap<String, Object> result = new HashMap<>();
-        List<AlertGroup> alertGroups;
-        if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
-            alertGroups = alertGroupMapper.queryAllGroupList();
-        } else {
-            Set<Integer> ids = resourcePermissionCheckService
-                    .userOwnedResourceIdsAcquisition(AuthorizationType.ALERT_GROUP, loginUser.getId(), logger);
-            if (ids.isEmpty()) {
-                result.put(Constants.DATA_LIST, Collections.emptyList());
-                putMsg(result, Status.SUCCESS);
-                return result;
-            }
-            alertGroups = alertGroupMapper.selectBatchIds(ids);
+        List<AlertGroup> alertGroups = this.alertGroupMapper.queryByTenantId(loginUser.getTenantId());
+        if (alertGroups == null) {
+            alertGroups = new ArrayList<>();
         }
         result.put(Constants.DATA_LIST, alertGroups);
         putMsg(result, Status.SUCCESS);
@@ -103,11 +89,6 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
-        // only admin can operate
-        if (!canOperatorPermissions(loginUser, new Object[]{id}, AuthorizationType.ALERT_GROUP, ALERT_GROUP_VIEW)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
-        }
         // check if exist
         AlertGroup alertGroup = alertGroupMapper.selectById(id);
         if (alertGroup == null) {
@@ -169,8 +150,8 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
     public Map<String, Object> createAlertgroup(User loginUser, String groupName, String desc,
                                                 String alertInstanceIds) {
         Map<String, Object> result = new HashMap<>();
-        // only admin can operate
-        if (!canOperatorPermissions(loginUser, null, AuthorizationType.ALERT_GROUP, ALERT_GROUP_CREATE)) {
+        // only admin and project admin can operate
+        if (loginUser.getUserType() == UserType.GENERAL_USER) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -188,6 +169,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
         alertGroup.setCreateTime(now);
         alertGroup.setUpdateTime(now);
         alertGroup.setCreateUserId(loginUser.getId());
+        alertGroup.setTenantId(loginUser.getTenantId());
 
         // insert
         try {
@@ -225,7 +207,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
                                                 String alertInstanceIds) {
         Map<String, Object> result = new HashMap<>();
 
-        if (!canOperatorPermissions(loginUser, new Object[]{id}, AuthorizationType.ALERT_GROUP, ALERT_GROUP_UPDATE)) {
+        if (loginUser.getUserType() == UserType.GENERAL_USER) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -250,6 +232,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
         }
         alertGroup.setDescription(desc);
         alertGroup.setUpdateTime(now);
+        alertGroup.setTenantId(loginUser.getTenantId());
         alertGroup.setCreateUserId(loginUser.getId());
         alertGroup.setAlertInstanceIds(alertInstanceIds);
         try {
@@ -276,8 +259,8 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
-        // only admin can operate
-        if (!canOperatorPermissions(loginUser, new Object[]{id}, AuthorizationType.ALERT_GROUP, ALERT_GROUP_DELETE)) {
+        // only admin and project admin can operate
+        if (loginUser.getUserType() == UserType.GENERAL_USER) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -310,7 +293,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
      * @return check result code
      */
     @Override
-    public boolean existGroupName(String groupName) {
-        return alertGroupMapper.existGroupName(groupName) == Boolean.TRUE;
+    public boolean existGroupName(String groupName, User loginUser) {
+        return alertGroupMapper.existGroupName(groupName, loginUser.getTenantId()) == Boolean.TRUE;
     }
 }

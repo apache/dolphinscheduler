@@ -160,6 +160,7 @@ public class AlertPluginInstanceServiceTest {
         user = new User();
         user.setUserType(UserType.ADMIN_USER);
         user.setId(1);
+        user.setTenantId(1);
         AlertPluginInstance alertPluginInstance = new AlertPluginInstance();
         alertPluginInstance.setPluginInstanceParams("test1");
         alertPluginInstance.setPluginDefineId(1);
@@ -171,7 +172,7 @@ public class AlertPluginInstanceServiceTest {
 
     @Test
     public void testCreate() {
-        Mockito.when(alertPluginInstanceMapper.existInstanceName("test")).thenReturn(true);
+        Mockito.when(alertPluginInstanceMapper.existInstanceName("test", this.user.getTenantId())).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ALERT_PLUGIN_INSTANCE,
                 1, ALART_INSTANCE_CREATE, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_PLUGIN_INSTANCE,
@@ -222,13 +223,15 @@ public class AlertPluginInstanceServiceTest {
         alertPluginInstance.setPluginDefineId(1);
         alertPluginInstance.setPluginInstanceParams(paramsMap);
         alertPluginInstance.setInstanceName("test");
+        alertPluginInstance.setTenantId(this.user.getTenantId());
         PluginDefine pluginDefine = new PluginDefine("script", "script", uiParams);
         pluginDefine.setId(1);
         List<PluginDefine> pluginDefines = Collections.singletonList(pluginDefine);
         List<AlertPluginInstance> pluginInstanceList = Collections.singletonList(alertPluginInstance);
-        Mockito.when(alertPluginInstanceMapper.queryAllAlertPluginInstanceList()).thenReturn(pluginInstanceList);
+        Mockito.when(alertPluginInstanceMapper.queryAllAlertPluginInstanceList(this.user.getTenantId()))
+                .thenReturn(pluginInstanceList);
         Mockito.when(pluginDefineMapper.queryAllPluginDefineList()).thenReturn(pluginDefines);
-        Map<String, Object> result = alertPluginInstanceService.queryAll();
+        Map<String, Object> result = alertPluginInstanceService.queryAll(this.user);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 

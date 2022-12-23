@@ -51,4 +51,7 @@ public class WorkerGroup {
 
     private String otherParamsJson;
 
+    @TableField("tenant_id")
+    private Integer tenantId;
+
 }

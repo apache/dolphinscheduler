@@ -86,10 +86,12 @@ public class WorkerGroupController extends BaseController {
                                   @RequestParam(value = "id", required = false, defaultValue = "0") int id,
                                   @RequestParam(value = "name") String name,
                                   @RequestParam(value = "addrList") String addrList,
+                                  @RequestParam(value = "tenantCode") String tenantCode,
                                   @RequestParam(value = "description", required = false, defaultValue = "") String description,
                                   @RequestParam(value = "otherParamsJson", required = false, defaultValue = "") String otherParamsJson) {
         Map<String, Object> result =
-                workerGroupService.saveWorkerGroup(loginUser, id, name, addrList, description, otherParamsJson);
+                workerGroupService.saveWorkerGroup(loginUser, id, name, addrList, description, otherParamsJson,
+                        tenantCode);
         return returnDataList(result);
     }
 

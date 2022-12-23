@@ -67,23 +67,29 @@ public class AlertPluginInstance {
     @TableField("update_time")
     private Date updateTime;
 
+    @TableField("tenant_id")
+    private Integer tenantId;
+
     public AlertPluginInstance() {
         this.createTime = new Date();
         this.updateTime = new Date();
     }
 
-    public AlertPluginInstance(int pluginDefineId, String pluginInstanceParams, String instanceName) {
+    public AlertPluginInstance(int pluginDefineId, String pluginInstanceParams, String instanceName, Integer tenantId) {
         this.pluginDefineId = pluginDefineId;
         this.pluginInstanceParams = pluginInstanceParams;
         this.createTime = new Date();
         this.updateTime = new Date();
         this.instanceName = instanceName;
+        this.tenantId = tenantId;
     }
 
-    public AlertPluginInstance(int id, String pluginInstanceParams, String instanceName, Date updateDate) {
+    public AlertPluginInstance(int id, String pluginInstanceParams, String instanceName, Date updateDate,
+                               Integer tenantId) {
         this.id = id;
         this.pluginInstanceParams = pluginInstanceParams;
         this.updateTime = updateDate;
         this.instanceName = instanceName;
+        this.tenantId = tenantId;
     }
 }

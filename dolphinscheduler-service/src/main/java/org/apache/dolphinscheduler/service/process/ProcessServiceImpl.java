@@ -1995,6 +1995,7 @@ public class ProcessServiceImpl implements ProcessService {
             taskDefinitionLog.setProjectCode(projectCode);
             taskDefinitionLog.setUpdateTime(now);
             taskDefinitionLog.setOperateTime(now);
+            taskDefinitionLog.setTenantId(operator.getTenantId());
             taskDefinitionLog.setOperator(operator.getId());
             if (taskDefinitionLog.getCode() == 0) {
                 taskDefinitionLog.setCode(CodeGenerateUtils.getInstance().genCode());

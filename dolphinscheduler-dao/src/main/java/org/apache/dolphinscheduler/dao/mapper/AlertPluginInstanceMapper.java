@@ -34,7 +34,7 @@ public interface AlertPluginInstanceMapper extends BaseMapper<AlertPluginInstanc
      *
      * @return AlertPluginInstance list
      */
-    List<AlertPluginInstance> queryAllAlertPluginInstanceList();
+    List<AlertPluginInstance> queryAllAlertPluginInstanceList(@Param("tenantId") Integer tenantId);
 
     /**
      * query by alert group id
@@ -50,12 +50,13 @@ public interface AlertPluginInstanceMapper extends BaseMapper<AlertPluginInstanc
      * @param instanceName         Alert plugin name
      * @return alertPluginInstance Ipage
      */
-    IPage<AlertPluginInstance> queryByInstanceNamePage(Page page, @Param("instanceName") String instanceName);
+    IPage<AlertPluginInstance> queryByInstanceNamePage(Page page, @Param("instanceName") String instanceName,
+                                                       @Param("tenantId") Integer tenantId);
 
     /**
      *
      * @param instanceName instanceName
      * @return if exist return true else return null
      */
-    Boolean existInstanceName(@Param("instanceName") String instanceName);
+    Boolean existInstanceName(@Param("instanceName") String instanceName, @Param("tenantId") Integer tenantId);
 }

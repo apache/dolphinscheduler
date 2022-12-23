@@ -239,12 +239,13 @@ public class AlertGroupServiceTest {
     @Test
     public void testVerifyGroupName() {
         // group name not exist
-        boolean result = alertGroupService.existGroupName(groupName);
+        User loginUser = this.getLoginUser();
+        boolean result = alertGroupService.existGroupName(groupName, loginUser);
         Assertions.assertFalse(result);
-        Mockito.when(alertGroupMapper.existGroupName(groupName)).thenReturn(true);
+        Mockito.when(alertGroupMapper.existGroupName(groupName, loginUser.getTenantId())).thenReturn(true);
 
         // group name exist
-        result = alertGroupService.existGroupName(groupName);
+        result = alertGroupService.existGroupName(groupName, loginUser);
         Assertions.assertTrue(result);
     }
 
@@ -256,6 +257,7 @@ public class AlertGroupServiceTest {
         User loginUser = new User();
         loginUser.setUserType(UserType.ADMIN_USER);
         loginUser.setId(99999999);
+        loginUser.setTenantId(1);
         return loginUser;
     }
 

@@ -167,6 +167,7 @@ export default {
     user_type: 'User Type',
     ordinary_user: 'Ordinary users',
     administrator: 'Administrator',
+    project_admin: 'Project admin',
     tenant_code: 'Tenant',
     tenant_id_tips: 'Please select tenant',
     queue: 'Queue',

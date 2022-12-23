@@ -146,6 +146,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     public Map<String, Object> createTenant(User loginUser,
                                             String tenantCode,
                                             int queueId,
+                                            int projectId,
                                             String desc) throws Exception {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
@@ -215,7 +216,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      * @throws Exception exception
      */
     @Override
-    public Map<String, Object> updateTenant(User loginUser, int id, String tenantCode, int queueId,
+    public Map<String, Object> updateTenant(User loginUser, int id, String tenantCode, int queueId, int projectId,
                                             String desc) throws Exception {
 
         Map<String, Object> result = new HashMap<>();

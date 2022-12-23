@@ -41,7 +41,7 @@ public interface WorkerGroupService {
      * @return create or update result code
      */
     Map<String, Object> saveWorkerGroup(User loginUser, int id, String name, String addrList, String description,
-                                        String otherParamsJson);
+                                        String otherParamsJson, String tenantCode);
 
     /**
      * Query worker group paging

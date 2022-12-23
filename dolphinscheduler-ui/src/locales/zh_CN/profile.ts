@@ -27,6 +27,7 @@ export default {
   update_time: '更新时间',
   administrator: '管理员',
   ordinary_user: '普通用户',
+  project_admin: '项目管理员',
   edit_profile: '编辑用户',
   username_tips: '请输入用户名',
   email_tips: '请输入邮箱',

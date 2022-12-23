@@ -41,6 +41,7 @@ public interface TenantService {
     Map<String, Object> createTenant(User loginUser,
                                      String tenantCode,
                                      int queueId,
+                                     int projectId,
                                      String desc) throws Exception;
 
     /**
@@ -65,7 +66,7 @@ public interface TenantService {
      * @return update result code
      * @throws Exception exception
      */
-    Map<String, Object> updateTenant(User loginUser, int id, String tenantCode, int queueId,
+    Map<String, Object> updateTenant(User loginUser, int id, String tenantCode, int queueId, int projectId,
                                      String desc) throws Exception;
 
     /**

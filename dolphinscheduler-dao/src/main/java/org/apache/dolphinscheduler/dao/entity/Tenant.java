@@ -51,6 +51,14 @@ public class Tenant {
      */
     private int queueId;
 
+    private int projectId;
+
+    /**
+     * queue name
+     */
+    @TableField(exist = false)
+    private String projectName;
+
     /**
      * queue name
      */

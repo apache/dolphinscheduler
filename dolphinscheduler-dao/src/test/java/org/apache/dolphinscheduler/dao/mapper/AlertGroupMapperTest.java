@@ -40,6 +40,8 @@ public class AlertGroupMapperTest extends BaseDaoTest {
     @Autowired
     private AlertGroupMapper alertGroupMapper;
 
+    private Integer tenantId = 1;
+
     /**
      * test insert
      */
@@ -137,7 +139,7 @@ public class AlertGroupMapperTest extends BaseDaoTest {
 
         Map<Integer, AlertGroup> alertGroupMap = createAlertGroups(count, groupName);
 
-        List<AlertGroup> alertGroupList = alertGroupMapper.queryByGroupName("testGroup");
+        List<AlertGroup> alertGroupList = alertGroupMapper.queryByGroupName("testGroup", this.tenantId);
 
         compareAlertGroups(alertGroupMap, alertGroupList);
     }
@@ -147,7 +149,7 @@ public class AlertGroupMapperTest extends BaseDaoTest {
         String groupName = "testGroup";
         createAlertGroups(1, groupName);
 
-        Assertions.assertTrue(alertGroupMapper.existGroupName(groupName));
+        Assertions.assertTrue(alertGroupMapper.existGroupName(groupName, this.tenantId));
     }
 
     /**
@@ -213,7 +215,7 @@ public class AlertGroupMapperTest extends BaseDaoTest {
 
         alertGroup.setCreateTime(DateUtils.getCurrentDate());
         alertGroup.setUpdateTime(DateUtils.getCurrentDate());
-
+        alertGroup.setTenantId(tenantId);
         alertGroupMapper.insert(alertGroup);
 
         return alertGroup;

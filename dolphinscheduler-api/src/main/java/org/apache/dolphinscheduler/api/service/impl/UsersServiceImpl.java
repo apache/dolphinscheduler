@@ -1059,7 +1059,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         } else {
             user = userMapper.queryDetailsById(loginUser.getId());
 
-            List<AlertGroup> alertGroups = alertGroupMapper.queryByUserId(loginUser.getId());
+            List<AlertGroup> alertGroups = alertGroupMapper.queryByTenantId(loginUser.getTenantId());
 
             StringBuilder sb = new StringBuilder();
 

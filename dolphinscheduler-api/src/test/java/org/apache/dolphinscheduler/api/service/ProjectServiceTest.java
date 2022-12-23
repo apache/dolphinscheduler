@@ -413,22 +413,6 @@ public class ProjectServiceTest {
     }
 
     @Test
-    public void testQueryCreatedProject() {
-
-        User loginUser = getLoginUser();
-
-        Mockito.when(projectMapper.queryProjectCreatedByUser(1)).thenReturn(getList());
-
-        // success
-        loginUser.setUserType(UserType.ADMIN_USER);
-        Map<String, Object> result = projectService.queryProjectCreatedByUser(loginUser);
-        logger.info(result.toString());
-        List<Project> projects = (List<Project>) result.get(Constants.DATA_LIST);
-        Assertions.assertTrue(CollectionUtils.isNotEmpty(projects));
-
-    }
-
-    @Test
     public void testQueryProjectCreatedAndAuthorizedByUser() {
 
         Result result;
