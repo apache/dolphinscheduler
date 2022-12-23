@@ -89,7 +89,6 @@ public interface WorkFlowLineageMapper {
      */
     List<DependentProcessDefinition> queryDependentProcessDefinitionByProcessDefinitionCode(@Param("code") long code);
 
-
     /**
      * query downstream work flow lineage by process definition code
      *
