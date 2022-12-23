@@ -64,6 +64,7 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.process.TriggerRelationService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -74,7 +75,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.apache.dolphinscheduler.service.process.TriggerRelationService;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -222,7 +222,7 @@ public class ExecutorServiceTest {
         Mockito.when(taskGroupQueueMapper.selectById(1)).thenReturn(taskGroupQueue);
         Mockito.when(processInstanceMapper.selectById(1)).thenReturn(processInstance);
         Mockito.when(triggerRelationService.saveProcessInstanceTrigger(Mockito.any(), Mockito.any()))
-            .thenReturn(1);
+                .thenReturn(1);
     }
 
     @Test
