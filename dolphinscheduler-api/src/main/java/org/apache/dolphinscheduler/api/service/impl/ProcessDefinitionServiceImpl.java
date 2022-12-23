@@ -602,7 +602,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     .findAny().ifPresent(userWithCode -> {
                         pd.setModifyBy(userWithCode.getModifierName());
                         pd.setUserName(userWithCode.getCreatorName());
-            });
+                    });
             Schedule schedule = scheduleMap.get(pd.getCode());
             pd.setScheduleReleaseState(schedule == null ? null : schedule.getReleaseState());
         }
