@@ -1136,7 +1136,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             dependentCommand.setCommandParam(JSONUtils.toJsonString(cmdParam));
             logger.info("Creating complement dependent command, commandInfo:{}.", command);
             dependentProcessDefinitionCreateCount += commandService.createCommand(dependentCommand);
-            //get all of dependent
+            //create downstream dependent command
             dependentProcessDefinitionCreateCount += createComplementDependentCommand(schedules, dependentCommand);
         }
 
