@@ -29,6 +29,8 @@ public class UserWithProcessDefinitionCode {
 
     private long processDefinitionCode;
 
+    private int processDefinitionVersion;
+
     private Integer userId;
 
     private String userName;

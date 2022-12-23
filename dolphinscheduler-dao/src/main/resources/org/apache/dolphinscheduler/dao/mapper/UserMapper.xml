@@ -146,6 +146,7 @@
     <select id="queryUserWithProcessDefinitionCode" resultType="org.apache.dolphinscheduler.dao.entity.UserWithProcessDefinitionCode">
         select
         dl.code as process_definition_code,
+        pd.version as process_definition_version,
         u.id as user_id,
         u.user_name
         from t_ds_process_definition_log dl

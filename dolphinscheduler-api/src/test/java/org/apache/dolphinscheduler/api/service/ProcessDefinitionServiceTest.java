@@ -251,8 +251,8 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         long processDefinitionCode1 = 1L;
         long processDefinitionCode2 = 2L;
         List<ProcessDefinition> processDefinitions = Arrays.asList(
-                ProcessDefinition.builder().code(processDefinitionCode1).build(),
-                ProcessDefinition.builder().code(processDefinitionCode2).build());
+                ProcessDefinition.builder().version(1).code(processDefinitionCode1).build(),
+                ProcessDefinition.builder().version(1).code(processDefinitionCode2).build());
         List<Long> processDefinitionCodes = processDefinitions.stream()
                 .map(ProcessDefinition::getCode).collect(Collectors.toList());
         PageListingResult<ProcessDefinition> pageListingResult = PageListingResult.<ProcessDefinition>builder()
@@ -272,9 +272,13 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         Mockito.when(userMapper.queryUserWithProcessDefinitionCode(processDefinitionCodes))
                 .thenReturn(Arrays.asList(
                         UserWithProcessDefinitionCode.builder()
-                                .processDefinitionCode(processDefinitionCode1).userName(user1).build(),
+                                .processDefinitionCode(processDefinitionCode1)
+                                .processDefinitionVersion(1)
+                                .userName(user1).build(),
                         UserWithProcessDefinitionCode.builder()
-                                .processDefinitionCode(processDefinitionCode2).userName(user2).build()));
+                                .processDefinitionCode(processDefinitionCode2)
+                                .processDefinitionVersion(1)
+                                .userName(user2).build()));
         Schedule schedule1 = new Schedule();
         schedule1.setProcessDefinitionCode(processDefinitionCode1);
         schedule1.setReleaseState(ReleaseState.ONLINE);

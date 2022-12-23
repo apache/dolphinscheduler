@@ -597,7 +597,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 processDefinitionCodes);
         for (ProcessDefinition pd : processDefinitions) {
             userWithCodes.stream()
-                    .filter(userWithCode -> userWithCode.getProcessDefinitionCode() == pd.getCode())
+                    .filter(userWithCode -> userWithCode.getProcessDefinitionCode() == pd.getCode()
+                            && userWithCode.getProcessDefinitionVersion() == pd.getVersion())
                     .findAny().ifPresent(userWithCode -> pd.setModifyBy(userWithCode.getUserName()));
             Schedule schedule = scheduleMap.get(pd.getCode());
             pd.setScheduleReleaseState(schedule == null ? null : schedule.getReleaseState());
