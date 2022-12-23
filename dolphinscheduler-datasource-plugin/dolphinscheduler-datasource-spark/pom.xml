@@ -43,6 +43,7 @@
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-datasource-hive</artifactId>
+            <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
 

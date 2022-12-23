@@ -143,6 +143,7 @@ export default {
     switch_version: 'Switch To This Version',
     confirm_switch_version: 'Confirm Switch To This Version?',
     current_version: 'Current Version',
+    run_type: 'Run Type',
     scheduling_time: 'Scheduling Time',
     duration: 'Duration',
     run_times: 'Run Times',
@@ -212,7 +213,9 @@ export default {
     workflow_relation_no_data_result_title:
       'Can not find any relations of workflows.',
     workflow_relation_no_data_result_desc:
-      'There is not any workflows. Please create a workflow, and then visit this page again.'
+      'There is not any workflows. Please create a workflow, and then visit this page again.',
+    ready_to_block: 'Ready to block',
+    block: 'Block',
   },
   task: {
     on_line: 'Online',
@@ -277,7 +280,8 @@ export default {
     alarm_group: 'Alarm group',
     startup_parameter: 'Startup Parameter',
     whether_dry_run: 'Whether Dry-Run',
-    please_choose: 'Please Choose'
+    please_choose: 'Please Choose',
+    remove_task_cache: 'Clear cache'
   },
   dag: {
     create: 'Create Workflow',
@@ -325,6 +329,7 @@ export default {
     online: 'Online'
   },
   node: {
+    is_cache: "Cache Execution",
     jvm_args: 'Java VM Parameters',
     jvm_args_tips: 'Please enter virtual machine parameters',
     run_type: 'Run Type',
@@ -729,7 +734,7 @@ export default {
     mlflow_deployModelKey: 'Model-URI',
     mlflow_deployPort: 'Port',
     mlflowProjectRepository: 'Repository',
-    mlflowProjectRepository_tips: 'git respository or path on worker',
+    mlflowProjectRepository_tips: 'git repository or path on worker',
     mlflowProjectVersion: 'Project Version',
     mlflowProjectVersion_tips: 'git version',
     mlflow_cpuLimit: 'Max Cpu Limit',

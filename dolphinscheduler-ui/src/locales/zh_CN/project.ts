@@ -213,7 +213,9 @@ export default {
     project_tips: '请选择项目',
     workflow_relation_no_data_result_title: '工作流关系不存在',
     workflow_relation_no_data_result_desc:
-      '目前没有任何工作流，请先创建工作流，再访问该页面'
+      '目前没有任何工作流，请先创建工作流，再访问该页面',
+    ready_to_block: '准备锁定',
+    block: '锁定',
   },
   task: {
     on_line: '线上',
@@ -278,7 +280,8 @@ export default {
     alarm_group: '告警组',
     startup_parameter: '启动参数',
     whether_dry_run: '是否空跑',
-    please_choose: '请选择'
+    please_choose: '请选择',
+    remove_task_cache: '清除缓存'
   },
   dag: {
     create: '创建工作流',
@@ -326,6 +329,7 @@ export default {
     online: '已上线'
   },
   node: {
+    is_cache: "缓存执行",
     is_module_path: '使用模块路径',
     run_type: '运行类型',
     jvm_args: '虚拟机参数',
