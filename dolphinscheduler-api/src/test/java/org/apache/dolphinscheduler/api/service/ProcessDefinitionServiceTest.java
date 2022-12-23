@@ -229,6 +229,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
     @Test
     public void testQueryProcessDefinitionListPaging() {
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
+        Mockito.when(userMapper.selectList(Mockito.any())).thenReturn(Lists.newArrayList());
 
         Project project = getProject(projectCode);
 
