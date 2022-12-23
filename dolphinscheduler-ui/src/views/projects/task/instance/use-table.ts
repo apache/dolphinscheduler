@@ -114,12 +114,14 @@ export function useTable() {
           h(
             ButtonLink,
             {
-              onClick: () =>
-                void router.push({
+              onClick: () => {
+                let routeUrl = router.resolve({
                   name: 'workflow-instance-detail',
                   params: { id: row.processInstanceId },
                   query: { code: projectCode }
                 })
+                window.open(routeUrl.href, '_blank')
+              }
             },
             {
               default: () =>
