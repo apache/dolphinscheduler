@@ -74,6 +74,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.dolphinscheduler.service.process.TriggerRelationService;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -140,6 +141,9 @@ public class ExecutorServiceTest {
 
     @Mock
     private ProcessInstanceMapper processInstanceMapper;
+
+    @Mock
+    private TriggerRelationService triggerRelationService;
 
     private int processDefinitionId = 1;
 
@@ -217,6 +221,8 @@ public class ExecutorServiceTest {
         Mockito.when(processService.findProcessDefinition(1L, 1)).thenReturn(processDefinition);
         Mockito.when(taskGroupQueueMapper.selectById(1)).thenReturn(taskGroupQueue);
         Mockito.when(processInstanceMapper.selectById(1)).thenReturn(processInstance);
+        Mockito.when(triggerRelationService.saveProcessInstanceTrigger(Mockito.any(), Mockito.any()))
+            .thenReturn(1);
     }
 
     @Test
