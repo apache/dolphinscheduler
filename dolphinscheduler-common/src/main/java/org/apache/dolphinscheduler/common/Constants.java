@@ -936,9 +936,10 @@ public final class Constants {
     public static final String LOCALE_LANGUAGE = "language";
 
     /**
-     * startup parameter prefix
+     * temporary parameter prefix
      */
     public static final String START_UP_PARAMS_PREFIX = "startup-";
+    public static final String GLOBAL_PARAMS_PREFIX = "global-";
 
     /**
      * driver

@@ -24,6 +24,7 @@ import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODES
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
 import static org.apache.dolphinscheduler.common.Constants.SEC_2_MINUTES_TIME_UNIT;
 import static org.apache.dolphinscheduler.common.Constants.START_UP_PARAMS_PREFIX;
+import static org.apache.dolphinscheduler.common.Constants.GLOBAL_PARAMS_PREFIX;
 import static org.apache.dolphinscheduler.common.enums.DataType.VARCHAR;
 import static org.apache.dolphinscheduler.common.enums.Direct.IN;
 
@@ -1645,16 +1646,22 @@ public class WorkflowExecuteThread implements Runnable {
             fatherParamMap = JSONUtils.toMap(fatherParamJson);
         }
         startParamMap.putAll(fatherParamMap);
-        // set start param into global params
         Map<String, String> globalMap = processDefinition.getGlobalParamMap();
         List<Property> globalParamList = processDefinition.getGlobalParamList();
         if (MapUtils.isNotEmpty(startParamMap) && globalMap != null) {
-            // start param to create new global param if global not exist, rather overwrite global param
+            Map<String, String> tempGlobalMap = new HashMap<>();
+            // add prefix for global params
+            for (Map.Entry<String, String> param : globalMap.entrySet()) {
+                tempGlobalMap.put(GLOBAL_PARAMS_PREFIX+ param.getKey(), param.getValue());
+            }
+            globalParamList.forEach(property -> property.setProp(GLOBAL_PARAMS_PREFIX + property.getProp()));
+            // set start param into global params, add prefix for startup params
             for (Entry<String, String> startParam : startParamMap.entrySet()) {
                 String tmpStartParamKey = START_UP_PARAMS_PREFIX + startParam.getKey();
-                globalMap.put(tmpStartParamKey, startParam.getValue());
+                tempGlobalMap.put(tmpStartParamKey, startParam.getValue());
                 globalParamList.add(new Property(tmpStartParamKey, IN, VARCHAR, startParam.getValue()));
             }
+            processDefinition.setGlobalParamMap(tempGlobalMap);
         }
     }
 }
