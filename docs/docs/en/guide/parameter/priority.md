@@ -8,7 +8,7 @@ DolphinScheduler has three parameter types:
 
 The user can define part of the parameters when creating workflow definitions.
 
-As there are multiple sources of the parameter value, it will raise parameter priority issues when the parameter name is the same. The priority of DolphinScheduler parameters from high to low is: `Local Parameter > Parameter Context > Global Parameter`.
+As there are multiple sources of the parameter value, it will raise parameter priority issues when the parameter name is the same. The priority of DolphinScheduler parameters from high to low is: `Startup Parameter > Local Parameter > Parameter Context > Global Parameter`.
 
 In the case of upstream tasks can pass parameters to the downstream, there may be multiple tasks upstream that pass the same parameter name:
 
