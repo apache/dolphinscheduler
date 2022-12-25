@@ -182,7 +182,6 @@
         <if test="startTime != null and endTime != null">
             and t.start_time <![CDATA[ >= ]]> #{startTime} and t.start_time <![CDATA[ <= ]]> #{endTime}
         </if>
-
         <if test="projectCodes != null and projectCodes.length != 0">
             and d.project_code in
             <foreach collection="projectCodes" index="index" item="i" open="(" close=")" separator=",">
