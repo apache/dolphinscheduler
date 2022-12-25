@@ -26,9 +26,14 @@ import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_SUB_PROCESS_PARENT_INSTANCE_ID;
 import static org.apache.dolphinscheduler.common.Constants.LOCAL_PARAMS;
+import static org.apache.dolphinscheduler.common.Constants.START_UP_PARAMS_PREFIX;
+import static org.apache.dolphinscheduler.common.Constants.GLOBAL_PARAMS_PREFIX;
 
 import static java.util.stream.Collectors.toSet;
+import static org.apache.dolphinscheduler.common.enums.DataType.VARCHAR;
+import static org.apache.dolphinscheduler.common.enums.Direct.IN;
 
+import org.apache.commons.collections4.MapUtils;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -653,15 +658,22 @@ public class ProcessService {
             fatherParamMap = JSONUtils.toMap(fatherParamJson);
         }
         startParamMap.putAll(fatherParamMap);
-        // set start param into global params
-        if (startParamMap.size() > 0
-                && processDefinition.getGlobalParamMap() != null) {
-            for (Map.Entry<String, String> param : processDefinition.getGlobalParamMap().entrySet()) {
-                String val = startParamMap.get(param.getKey());
-                if (val != null) {
-                    param.setValue(val);
-                }
+        Map<String, String> globalMap = processDefinition.getGlobalParamMap();
+        List<Property> globalParamList = processDefinition.getGlobalParamList();
+        if (MapUtils.isNotEmpty(startParamMap) && globalMap != null) {
+            Map<String, String> tempGlobalMap = new HashMap<>();
+            // add prefix for global params
+            for (Map.Entry<String, String> param : globalMap.entrySet()) {
+                tempGlobalMap.put(GLOBAL_PARAMS_PREFIX + param.getKey(), param.getValue());
             }
+            globalParamList.forEach(property -> property.setProp(GLOBAL_PARAMS_PREFIX + property.getProp()));
+            // set start param into global params, add prefix for startup params
+            for (Entry<String, String> startParam : startParamMap.entrySet()) {
+                String tmpStartParamKey = START_UP_PARAMS_PREFIX + startParam.getKey();
+                tempGlobalMap.put(tmpStartParamKey, startParam.getValue());
+                globalParamList.add(new Property(tmpStartParamKey, IN, VARCHAR, startParam.getValue()));
+            }
+            processDefinition.setGlobalParamMap(tempGlobalMap);
         }
     }
 

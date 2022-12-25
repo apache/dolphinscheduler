@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.spi.task.paramparser;
 
+import static org.apache.dolphinscheduler.spi.utils.Constants.GLOBAL_PARAMS_PREFIX;
+import static org.apache.dolphinscheduler.spi.utils.Constants.START_UP_PARAMS_PREFIX;
+
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -92,7 +95,9 @@ public class PlaceholderUtils {
         @Override
         public String resolvePlaceholder(String placeholderName) {
             try {
-                return paramsMap.get(placeholderName);
+                String startUpPlaceholderName = START_UP_PARAMS_PREFIX + placeholderName;
+                String globalPlaceholderName = GLOBAL_PARAMS_PREFIX + placeholderName;
+                return paramsMap.getOrDefault(startUpPlaceholderName, paramsMap.getOrDefault(placeholderName, paramsMap.getOrDefault(globalPlaceholderName, null)));
             } catch (Exception ex) {
                 logger.error("resolve placeholder '{}' in [ {} ]", placeholderName, value, ex);
                 return null;

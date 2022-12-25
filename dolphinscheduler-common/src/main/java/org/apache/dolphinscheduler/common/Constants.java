@@ -936,6 +936,12 @@ public final class Constants {
     public static final String LOCALE_LANGUAGE = "language";
 
     /**
+     * temporary parameter prefix
+     */
+    public static final String START_UP_PARAMS_PREFIX = "startup-";
+    public static final String GLOBAL_PARAMS_PREFIX = "global-";
+
+    /**
      * driver
      */
     public static final String ORG_POSTGRESQL_DRIVER = "org.postgresql.Driver";

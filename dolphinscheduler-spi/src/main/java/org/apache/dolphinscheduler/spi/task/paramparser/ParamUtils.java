@@ -19,7 +19,9 @@ package org.apache.dolphinscheduler.spi.task.paramparser;
 
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.PARAMETER_TASK_EXECUTE_PATH;
 import static org.apache.dolphinscheduler.spi.task.TaskConstants.PARAMETER_TASK_INSTANCE_ID;
-
+import static org.apache.dolphinscheduler.spi.utils.Constants.GLOBAL_PARAMS_PREFIX;
+import static org.apache.dolphinscheduler.spi.utils.Constants.START_UP_PARAMS_PREFIX;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.dolphinscheduler.spi.enums.CommandType;
 import org.apache.dolphinscheduler.spi.enums.DataType;
 import org.apache.dolphinscheduler.spi.task.AbstractParameters;
@@ -60,12 +62,14 @@ public class ParamUtils {
         CommandType commandType = CommandType.of(taskExecutionContext.getCmdTypeIfComplement());
         Date scheduleTime = taskExecutionContext.getScheduleTime();
 
+        Map<String, Property> convertedParams = new HashMap<>();
+
         // combining local and global parameters
         Map<String, Property> localParams = parameters.getLocalParametersMap();
 
         Map<String, Property> varParams = parameters.getVarPoolMap();
 
-        if (globalParams == null && localParams == null) {
+        if (MapUtils.isEmpty(globalParams) && MapUtils.isEmpty(localParams)) {
             return null;
         }
         // if it is a complement,
@@ -75,8 +79,7 @@ public class ParamUtils {
                 .getBusinessTime(commandType,
                         scheduleTime);
 
-        if (globalParamsMap != null) {
-
+        if (MapUtils.isNotEmpty(globalParamsMap)) {
             params.putAll(globalParamsMap);
         }
 
@@ -87,12 +90,19 @@ public class ParamUtils {
 
         if (globalParams != null && localParams != null) {
             globalParams.putAll(localParams);
+            for (Map.Entry<String, Property> entry : localParams.entrySet()) {
+                convertedParams.put(entry.getKey(), entry.getValue());
+            }
         } else if (globalParams == null && localParams != null) {
             globalParams = localParams;
+            convertedParams = localParams;
         }
         if (varParams != null) {
             varParams.putAll(globalParams);
             globalParams = varParams;
+            for (Map.Entry<String, Property> entry : varParams.entrySet()) {
+                convertedParams.put(entry.getKey(), entry.getValue());
+            }
         }
         Iterator<Map.Entry<String, Property>> iter = globalParams.entrySet().iterator();
         while (iter.hasNext()) {
@@ -111,9 +121,20 @@ public class ParamUtils {
                 val  = ParameterUtils.convertParameterPlaceholders(val, params);
                 property.setValue(val);
             }
+
+            if (property.getProp().startsWith(START_UP_PARAMS_PREFIX)) {
+                property.setProp(property.getProp().replaceFirst(START_UP_PARAMS_PREFIX, ""));
+                convertedParams.put(property.getProp(), property);
+            } else if (property.getProp().startsWith(GLOBAL_PARAMS_PREFIX)) {
+                String prop = property.getProp().replaceFirst(GLOBAL_PARAMS_PREFIX, "");
+                if (!convertedParams.containsKey(prop)) {
+                    property.setProp(prop);
+                    convertedParams.put(prop, property);
+                }
+            }
         }
 
-        return globalParams;
+        return convertedParams;
     }
 
     /**
