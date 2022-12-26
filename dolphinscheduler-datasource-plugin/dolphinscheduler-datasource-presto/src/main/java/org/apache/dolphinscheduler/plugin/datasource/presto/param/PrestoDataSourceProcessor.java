@@ -29,13 +29,11 @@ import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,7 +59,7 @@ public class PrestoDataSourceProcessor extends AbstractDataSourceProcessor {
         prestoDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
         prestoDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
         prestoDatasourceParamDTO.setUserName(connectionParams.getUser());
-        prestoDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
+        prestoDatasourceParamDTO.setOther(connectionParams.getOther());
 
         return prestoDatasourceParamDTO;
     }
@@ -76,13 +74,12 @@ public class PrestoDataSourceProcessor extends AbstractDataSourceProcessor {
         PrestoConnectionParam prestoConnectionParam = new PrestoConnectionParam();
         prestoConnectionParam.setUser(prestoParam.getUserName());
         prestoConnectionParam.setPassword(PasswordUtils.encodePassword(prestoParam.getPassword()));
-        prestoConnectionParam.setOther(transformOther(prestoParam.getOther()));
+        prestoConnectionParam.setOther(prestoParam.getOther());
         prestoConnectionParam.setAddress(address);
         prestoConnectionParam.setJdbcUrl(jdbcUrl);
         prestoConnectionParam.setDatabase(prestoParam.getDatabase());
         prestoConnectionParam.setDriverClassName(getDatasourceDriver());
         prestoConnectionParam.setValidationQuery(getValidationQuery());
-        prestoConnectionParam.setProps(prestoParam.getOther());
 
         return prestoConnectionParam;
     }
@@ -105,8 +102,9 @@ public class PrestoDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public String getJdbcUrl(ConnectionParam connectionParam) {
         PrestoConnectionParam prestoConnectionParam = (PrestoConnectionParam) connectionParam;
-        if (!StringUtils.isEmpty(prestoConnectionParam.getOther())) {
-            return String.format("%s?%s", prestoConnectionParam.getJdbcUrl(), prestoConnectionParam.getOther());
+        if (MapUtils.isNotEmpty(prestoConnectionParam.getOther())) {
+            return String.format("%s?%s", prestoConnectionParam.getJdbcUrl(),
+                    transformOther(prestoConnectionParam.getOther()));
         }
         return prestoConnectionParam.getJdbcUrl();
     }
@@ -138,15 +136,4 @@ public class PrestoDataSourceProcessor extends AbstractDataSourceProcessor {
         return null;
     }
 
-    private Map<String, String> parseOther(String other) {
-        if (StringUtils.isEmpty(other)) {
-            return null;
-        }
-        Map<String, String> otherMap = new LinkedHashMap<>();
-        String[] configs = other.split("&");
-        for (String config : configs) {
-            otherMap.put(config.split("=")[0], config.split("=")[1]);
-        }
-        return otherMap;
-    }
 }

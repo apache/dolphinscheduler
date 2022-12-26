@@ -40,11 +40,11 @@ import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
-import org.apache.dolphinscheduler.service.storage.StorageEntity;
-import org.apache.dolphinscheduler.service.storage.StorageOperate;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -125,6 +125,8 @@ public class ResourcesServiceTest {
     private MockedStatic<org.apache.dolphinscheduler.api.utils.FileUtils> mockedStaticDolphinschedulerFileUtils;
 
     private MockedStatic<PropertyUtils> mockedStaticPropertyUtils;
+
+    private Throwable exception;
 
     @BeforeEach
     public void setUp() {
@@ -570,66 +572,28 @@ public class ResourcesServiceTest {
     }
 
     @Test
-    public void testOnlineCreateResourceWithDir() {
+    public void testCreateOrUpdateResource() throws Exception {
+        Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
         User user = getUser();
-        user.setId(1);
+        Mockito.when(userMapper.queryByUserNameAccurately(user.getUserName())).thenReturn(getUser());
 
-        String dir1Path = "/dir1";
-        String dir2Path = "/dir2";
-        String resourceDir = dir1Path + dir2Path;
-        String resourceName = "test";
-        String resourceSuffix = "py";
-        String desc = "desc";
-        String content = "content";
-        String fullName = resourceDir + "/" + resourceName + "." + resourceSuffix;
+        // RESOURCE_SUFFIX_NOT_SUPPORT_VIEW
+        exception = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> resourcesService.createOrUpdateResource(user.getUserName(), "filename", "my-content"));
+        Assertions.assertTrue(
+                exception.getMessage().contains("Not allow create or update resources without extension name"));
 
-        Resource dir1 = new Resource();
-        dir1.setFullName(dir1Path);
-        dir1.setId(1);
-        dir1.setUserId(user.getId());
-        Resource dir2 = new Resource();
-        dir2.setFullName(resourceDir);
-        dir2.setUserId(user.getId());
-
-        Mockito.when(storageOperate.getDir(ResourceType.FILE, "123")).thenReturn("/dolphinscheduler/123/resources/");
-        Mockito.when(storageOperate.getResDir("123")).thenReturn("/dolphinscheduler/123/resources/");
+        // SUCCESS
+        Mockito.when(storageOperate.getResDir(user.getTenantCode())).thenReturn("/dolphinscheduler/123/resources/");
         Mockito.when(FileUtils.getUploadFilename(Mockito.anyString(), Mockito.anyString())).thenReturn("test");
         Mockito.when(FileUtils.writeContent2File(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
-        try {
-            Mockito.when(storageOperate.mkdir("123", "/dolphinscheduler/123/resources" + dir1Path)).thenReturn(true);
-            Mockito.when(storageOperate.mkdir("123", "/dolphinscheduler/123/resources" + dir2Path)).thenReturn(true);
-        } catch (IOException e) {
-            logger.error("create resource directory {} failed", fullName);
-        }
-        Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
-        Mockito.when(userMapper.selectById(user.getId())).thenReturn(getUser());
-        Mockito.when(tenantMapper.queryById(user.getTenantId())).thenReturn(getTenant());
-        Result<Object> result = resourcesService.onlineCreateOrUpdateResourceWithDir(user, fullName, desc, content);
-        Assertions.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
+        Mockito.when(storageOperate.getFileStatus(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
+                Mockito.any())).thenReturn(getStorageEntityResource());
+        StorageEntity storageEntity =
+                resourcesService.createOrUpdateResource(user.getUserName(), "filename.txt", "my-content");
+        Assertions.assertNotNull(storageEntity);
+        Assertions.assertEquals("/dolphinscheduler/123/resources/ResourcesServiceTest", storageEntity.getFullName());
     }
-
-    // TODO: revise this testcase after modifying PythonGateway.java
-    // @Test
-    // public void testQueryResourcesFileInfo() {
-    // User user = getUser();
-    // String userName = "test-user";
-    // Mockito.when(userMapper.queryByUserNameAccurately(userName)).thenReturn(user);
-    // Resource file = new Resource();
-    // file.setFullName("/dir/file1.py");
-    // file.setId(1);
-    // Mockito.when(resourcesMapper.queryResource(file.getFullName(), ResourceType.FILE.ordinal()))
-    // .thenReturn(Collections.singletonList(file));
-    // Mockito.when(resourcePermissionCheckService.operationPermissionCheck(
-    // AuthorizationType.RESOURCE_FILE_ID, null, user.getId(), ApiFuncIdentificationConstant.FILE_VIEW,
-    // serviceLogger)).thenReturn(true);
-    // Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(
-    // AuthorizationType.RESOURCE_FILE_ID, new Object[]{file.getId()}, user.getId(), serviceLogger))
-    // .thenReturn(true);
-    // Mockito.when(userMapper.selectById(1)).thenReturn(getUser());
-    // Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
-    // Resource result = resourcesService.queryResourcesFileInfo(userName, file.getFullName());
-    // Assertions.assertEquals(file.getFullName(), result.getFullName());
-    // }
 
     @Test
     public void testUpdateResourceContent() {

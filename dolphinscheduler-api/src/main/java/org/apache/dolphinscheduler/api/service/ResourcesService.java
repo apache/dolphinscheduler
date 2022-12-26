@@ -20,8 +20,8 @@ package org.apache.dolphinscheduler.api.service;
 import org.apache.dolphinscheduler.api.dto.resources.DeleteDataTransferResponse;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
-import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import java.io.IOException;
@@ -170,28 +170,13 @@ public interface ResourcesService {
 
     /**
      * create or update resource.
-     * If the folder is not already created, it will be
-     *
-     * @param loginUser user who create or update resource
-     * @param fileFullName The full name of resource.Includes path and suffix.
-     * @param desc description of resource
-     * @param content content of resource
-     * @return create result code
-     */
-    Result<Object> onlineCreateOrUpdateResourceWithDir(User loginUser, String fileFullName, String desc,
-                                                       String content);
-
-    /**
-     * create or update resource.
-     * If the folder is not already created, it will be
+     * If the folder is not already created, it will be ignored and directly create the new file
      *
      * @param userName user who create or update resource
      * @param fullName The fullname of resource.Includes path and suffix.
-     * @param description description of resource
      * @param resourceContent content of resource
-     * @return id of resource
      */
-    Integer createOrUpdateResource(String userName, String fullName, String description, String resourceContent);
+    StorageEntity createOrUpdateResource(String userName, String fullName, String resourceContent) throws Exception;
 
     /**
      * updateProcessInstance resource
@@ -229,7 +214,7 @@ public interface ResourcesService {
      * @param userName user who query resource
      * @param fullName full name of the resource
      */
-    Resource queryResourcesFileInfo(String userName, String fullName);
+    StorageEntity queryFileStatus(String userName, String fullName) throws Exception;
 
     /**
      * delete DATA_TRANSFER data in resource center

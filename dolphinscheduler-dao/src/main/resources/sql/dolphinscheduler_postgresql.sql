@@ -398,6 +398,7 @@ CREATE TABLE t_ds_task_definition (
   task_execute_type int DEFAULT '0',
   task_params text ,
   flag int DEFAULT NULL ,
+  is_cache int DEFAULT '0',
   task_priority int DEFAULT '2' ,
   worker_group varchar(255) DEFAULT NULL ,
   environment_code bigint DEFAULT '-1',
@@ -436,6 +437,7 @@ CREATE TABLE t_ds_task_definition_log (
   task_execute_type int DEFAULT '0',
   task_params text ,
   flag int DEFAULT NULL ,
+  is_cache int DEFAULT '0' ,
   task_priority int DEFAULT '2' ,
   worker_group varchar(255) DEFAULT NULL ,
   environment_code bigint DEFAULT '-1',
@@ -777,6 +779,8 @@ CREATE TABLE t_ds_task_instance (
   app_link text ,
   task_params text ,
   flag int DEFAULT '1' ,
+  is_cache int DEFAULT '0',
+  cache_key varchar(200) DEFAULT NULL,
   retry_interval int DEFAULT NULL ,
   max_retry_times int DEFAULT NULL ,
   task_instance_priority int DEFAULT NULL ,
@@ -796,6 +800,7 @@ CREATE TABLE t_ds_task_instance (
 ) ;
 
 create index idx_task_instance_code_version on t_ds_task_instance (task_code, task_definition_version);
+create index idx_cache_key on t_ds_task_instance (cache_key);
 
 --
 -- Table structure for table t_ds_tenant
@@ -983,7 +988,7 @@ VALUES ('admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '0',
 
 -- Records of t_ds_alertgroup, default admin warning group
 INSERT INTO t_ds_alertgroup(alert_instance_ids, create_user_id, group_name, description, create_time, update_time)
-VALUES ('1,2', 1, 'default admin warning group', 'default admin warning group', '2018-11-29 10:20:39', '2018-11-29 10:20:39');
+VALUES (NULL, 1, 'default admin warning group', 'default admin warning group', '2018-11-29 10:20:39', '2018-11-29 10:20:39');
 
 -- Records of t_ds_queue,default queue name : default
 INSERT INTO t_ds_queue(queue_name, queue, create_time, update_time)

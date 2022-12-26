@@ -65,7 +65,6 @@ public class WorkflowStartEventHandler implements WorkflowEventHandler {
         CompletableFuture.supplyAsync(workflowExecuteRunnable::call, workflowExecuteThreadPool)
                 .thenAccept(workflowSubmitStatue -> {
                     if (WorkflowSubmitStatue.SUCCESS == workflowSubmitStatue) {
-                        // submit failed will resend the event to workflow event queue
                         logger.info("Success submit the workflow instance");
                         if (processInstance.getTimeout() > 0) {
                             stateWheelExecuteThread.addProcess4TimeoutCheck(processInstance);
@@ -86,6 +85,7 @@ public class WorkflowStartEventHandler implements WorkflowEventHandler {
                             workflowExecuteRunnable.addStateEvent(stateEvent);
                         }
                     } else {
+                        // submit failed will resend the event to workflow event queue
                         logger.error("Failed to submit the workflow instance, will resend the workflow start event: {}",
                                 workflowEvent);
                         workflowEventQueue.addEvent(workflowEvent);

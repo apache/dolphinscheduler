@@ -30,7 +30,7 @@ public enum ExecuteType {
      * 4 stop
      * 5 pause
      */
-    NONE, REPEAT_RUNNING, RECOVER_SUSPENDED_PROCESS, START_FAILURE_TASK_PROCESS, STOP, PAUSE;
+    NONE, REPEAT_RUNNING, RECOVER_SUSPENDED_PROCESS, START_FAILURE_TASK_PROCESS, STOP, PAUSE, EXECUTE_TASK;
 
     public static ExecuteType getEnum(int value) {
         for (ExecuteType e : ExecuteType.values()) {

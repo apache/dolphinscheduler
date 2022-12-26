@@ -33,6 +33,8 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.google.common.collect.ImmutableMap;
+
 @ExtendWith(MockitoExtension.class)
 public class PostgreSQLDataSourceProcessorTest {
 
@@ -79,10 +81,13 @@ public class PostgreSQLDataSourceProcessorTest {
     public void testGetJdbcUrl() {
         PostgreSQLConnectionParam postgreSqlConnectionParam = new PostgreSQLConnectionParam();
         postgreSqlConnectionParam.setJdbcUrl("jdbc:postgresql://localhost:3308/default");
-        postgreSqlConnectionParam.setOther("other");
+        ImmutableMap<String, String> map = new ImmutableMap.Builder<String, String>()
+                .put("other", "other")
+                .build();
+        postgreSqlConnectionParam.setOther(map);
 
         String jdbcUrl = postgreSqlDatasourceProcessor.getJdbcUrl(postgreSqlConnectionParam);
-        Assertions.assertEquals("jdbc:postgresql://localhost:3308/default?other", jdbcUrl);
+        Assertions.assertEquals("jdbc:postgresql://localhost:3308/default?other=other", jdbcUrl);
 
     }
 

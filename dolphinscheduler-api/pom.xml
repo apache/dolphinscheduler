@@ -75,7 +75,11 @@
         </dependency>
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-scheduler-quartz</artifactId>
+            <artifactId>dolphinscheduler-scheduler-all</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-storage-all</artifactId>
         </dependency>
 
         <dependency>

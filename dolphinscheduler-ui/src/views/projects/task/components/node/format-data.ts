@@ -22,7 +22,9 @@ import type {
   ITaskParams,
   ISqoopTargetParams,
   ISqoopSourceParams,
-  ILocalParam
+  ILocalParam,
+  IDependTask,
+  RelationType
 } from './types'
 
 export function formatParams(data: INodeData): {
@@ -476,6 +478,7 @@ export function formatParams(data: INodeData): {
         : '0',
       failRetryTimes: data.failRetryTimes ? String(data.failRetryTimes) : '0',
       flag: data.flag,
+      isCache: data.isCache ? "YES" : "NO",
       name: data.name,
       taskGroupId: data.taskGroupId,
       taskGroupPriority: data.taskGroupPriority,
@@ -524,6 +527,7 @@ export function formatModel(data: ITaskData) {
     ...omit(data.taskParams, ['resourceList', 'mainJar', 'localParams']),
     environmentCode: data.environmentCode === -1 ? null : data.environmentCode,
     timeoutFlag: data.timeoutFlag === 'OPEN',
+    isCache: data.isCache === 'YES',
     timeoutNotifyStrategy: data.timeoutNotifyStrategy
       ? [data.timeoutNotifyStrategy]
       : [],
@@ -625,9 +629,11 @@ export function formatModel(data: ITaskData) {
   }
 
   if (data.taskParams?.dependence) {
-    params.dependTaskList = data.taskParams?.dependence.dependTaskList || []
-    params.relation = data.taskParams?.dependence.relation
+    const dependence: { relation?: RelationType, dependTaskList?: IDependTask[] } = JSON.parse(JSON.stringify(data.taskParams.dependence))
+    params.dependTaskList = dependence.dependTaskList || []
+    params.relation = dependence.relation
   }
+
   if (data.taskParams?.ruleInputParameter) {
     params.check_type = data.taskParams.ruleInputParameter.check_type
     params.comparison_execute_sql =

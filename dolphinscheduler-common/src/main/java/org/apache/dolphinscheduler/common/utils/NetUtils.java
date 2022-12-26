@@ -21,7 +21,7 @@ import static java.util.Collections.emptyList;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.http.conn.util.InetAddressUtils;
 
 import java.io.IOException;
