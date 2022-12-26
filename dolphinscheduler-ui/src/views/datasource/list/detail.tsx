@@ -361,7 +361,7 @@ const DetailModal = defineComponent({
                   detailForm.type === 'PRESTO'? 
                   <NFormItem
                   label={t('datasource.database_schema')}
-                  path='database'
+                  path='schema'
                   show-require-mark={requiredDataBase}
                   >
                     <NInput
