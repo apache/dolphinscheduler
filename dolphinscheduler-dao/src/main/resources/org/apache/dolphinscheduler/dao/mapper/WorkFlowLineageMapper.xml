@@ -161,6 +161,7 @@
             AND a.task_params LIKE concat('%', #{code}, '%')
         </if>
         AND a.task_type = 'DEPENDENT'
+        AND c.release_state = 1
     </select>
 
     <select id="queryTaskSubProcessDepOnProcess" resultType="org.apache.dolphinscheduler.dao.entity.TaskMainInfo">
