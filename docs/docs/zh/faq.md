@@ -269,9 +269,9 @@ A： 将 hive pom
 
 ## Q：如何增加一台工作服务器
 
-A： 1，参考官网[部署文档](https://dolphinscheduler.apache.org/#/zh-cn/docs/3.1.2/installation/cluster) 1.3 小节，创建部署用户和 hosts 映射
+A： 1，参考官网[部署文档](https://dolphinscheduler.apache.org/zh-cn/docs/3.1.2/installation/cluster) 1.3 小节，创建部署用户和 hosts 映射
 
-​ 2，参考官网[部署文档](https://dolphinscheduler.apache.org/#/zh-cn/docs/3.1.2/installation/cluster) 1.4 小节，配置 hosts 映射和 ssh 打通及修改目录权限.
+​ 2，参考官网[部署文档](https://dolphinscheduler.apache.org/zh-cn/docs/3.1.2/installation/cluster) 1.4 小节，配置 hosts 映射和 ssh 打通及修改目录权限.
 ​ 1.4 小节的最后一步是在当前新增机器上执行的，即需要给部署目录部署用户的权限
 
 ​ 3，复制正在运行的服务器上的部署目录到新机器的同样的部署目录下
@@ -722,14 +722,15 @@ A：在 3.0.0-alpha 版本之后，Python gateway server 集成到 api server �
 
 ## Q: 缓存执行时怎么判断任务已经存在缓存过的任务，即如何判断一个任务可以使用另外一个任务的运行结果？
 
-A: 对于标识为`缓存执行`的任务, 当任务启动时会生成一个缓存key, 该key由以下字段组合哈希得到：
+A: 对于标识为`缓存执行`的任务, 当任务启动时会生成一个缓存 key, 该 key 由以下字段组合哈希得到：
 
-- 任务定义：任务实例对应的任务定义的id
+- 任务定义：任务实例对应的任务定义的 id
 - 任务的版本：任务实例对应的任务定义的版本
 - 任务输入的参数：包括上游节点和全局参数传入的参数中，被任务定义的参数列表所引用和任务定义中使用`${}`引用的参数
 - 环境配置: 环境名称下具体的环境配置内容，具体为安全中心环境管理中的实际配置内容
 
-当缓存标识的任务运行时，会查找数据库中是否用相同缓存key的数据，
+当缓存标识的任务运行时，会查找数据库中是否用相同缓存 key 的数据，
+
 - 若有则复制该任务实例并进行相应数据的更新
 - 若无，则任务照常运行，并在任务完成时将任务实例的数据存入缓存
 
