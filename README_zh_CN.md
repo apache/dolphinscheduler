@@ -53,11 +53,11 @@ DolphinScheduler的工作计划：<a href="https://github.com/apache/dolphinsche
 
 ## 快速试用 Docker
 
-请参考官方文档: [快速试用 Docker 部署](https://dolphinscheduler.apache.org/#/zh-cn/docs/3.0.3/guide/start/docker)
+请参考官方文档: [快速试用 Docker 部署](https://dolphinscheduler.apache.org/zh-cn/docs/3.0.3/guide/start/docker)
 
 ## 快速试用 Kubernetes
 
-请参考官方文档: [快速试用 Kubernetes 部署](http://dolphinscheduler.apache.org/#/zh-cn/docs/3.0.3/guide/installation/kubernetes)
+请参考官方文档: [快速试用 Kubernetes 部署](https://dolphinscheduler.apache.org/zh-cn/docs/3.0.3/guide/installation/kubernetes)
 
 ## 如何构建
 

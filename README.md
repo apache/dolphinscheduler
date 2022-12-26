@@ -55,11 +55,11 @@ supports custom task type
 
 ## QuickStart in Docker
 
-Please refer the official website document: [QuickStart in Docker](https://dolphinscheduler.apache.org/en-us/docs/3.0.2/user_doc/guide/start/docker.html)
+Please refer the official website document: [QuickStart in Docker](https://dolphinscheduler.apache.org/en-us/docs/3.0.3/guide/start/docker)
 
 ## QuickStart in Kubernetes
 
-Please refer to the official website document: [QuickStart in Kubernetes](https://dolphinscheduler.apache.org/en-us/docs/3.0.2/user_doc/guide/installation/kubernetes.html)
+Please refer to the official website document: [QuickStart in Kubernetes](https://dolphinscheduler.apache.org/en-us/docs/3.0.3/guide/installation/kubernetes)
 
 ## How to Build
 

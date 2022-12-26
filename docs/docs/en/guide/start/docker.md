@@ -45,7 +45,7 @@ modify docker-compose's free memory up to 4 GB.
     - Hyper-V mode: Click `Docker Desktop -> Settings -> Resources -> Memory` modified it
     - WSL 2 mode: see [WSL 2 utility VM](https://docs.microsoft.com/zh-cn/windows/wsl/wsl-config#configure-global-options-with-wslconfig) for more detail.
 
-After complete the configuration, we can get the `docker-compose.yaml` file from [download page](https://dolphinscheduler.apache.org/#/en-us/download)
+After complete the configuration, we can get the `docker-compose.yaml` file from [download page](https://dolphinscheduler.apache.org/en-us/download)
 form its source package, and make sure you get the right version. After download the package, you can run the commands as below.
 
 ```shell
