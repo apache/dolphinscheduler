@@ -15,9 +15,6 @@
 # limitations under the License.
 #
 
-Python:
-  - any: ['dolphinscheduler-python/**/*']
-
 backend:
   - 'dolphinscheduler-alert/**/*'
   - 'dolphinscheduler-api/**/*'
@@ -40,7 +37,6 @@ backend:
 
 document:
   - 'docs/**/*'
-  - 'dolphinscheduler-python/pydolphinscheduler/docs/**/*'
 
 CI&CD:
   - any: ['.github/**/*']

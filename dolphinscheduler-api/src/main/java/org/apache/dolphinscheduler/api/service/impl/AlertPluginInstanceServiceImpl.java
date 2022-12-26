@@ -38,7 +38,7 @@ import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.PluginDefineMapper;
 import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -102,7 +102,7 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
         if (alertPluginInstanceMapper.existInstanceName(alertPluginInstance.getInstanceName()) == Boolean.TRUE) {
             logger.error("Plugin instance with the same name already exists, name:{}.",
                     alertPluginInstance.getInstanceName());
-            putMsg(result, Status.PLUGIN_INSTANCE_ALREADY_EXIT);
+            putMsg(result, Status.PLUGIN_INSTANCE_ALREADY_EXISTS);
             return result;
         }
 

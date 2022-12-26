@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.service.utils;
 import org.apache.dolphinscheduler.common.constants.DateConstants;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.service.log.TaskLogDiscriminator;
+import org.apache.dolphinscheduler.plugin.task.api.log.TaskLogDiscriminator;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;

@@ -6,6 +6,7 @@
 .DS_Store
 .target
 .idea/
+!.idea/icon.png
 .run/
 target/
 dist/
@@ -38,6 +39,7 @@ config.gypi
 test/coverage
 /docs/zh_CN/介绍
 /docs/zh_CN/贡献代码.md
+derby.log
 dolphinscheduler-common/src/main/resources/zookeeper.properties
 dolphinscheduler-dao/src/main/resources/dao/data_source.properties
 dolphinscheduler-alert/logs/
@@ -50,18 +52,3 @@ dolphinscheduler-common/test
 dolphinscheduler-worker/logs
 dolphinscheduler-master/logs
 dolphinscheduler-api/logs
-
-# ------------------
-# pydolphinscheduler
-# ------------------
-# Cache
-__pycache__/
-.tox/
-
-# Build
-build/
-*egg-info/
-
-# Test coverage
-.coverage
-htmlcov/

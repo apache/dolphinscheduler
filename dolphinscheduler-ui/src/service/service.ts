@@ -17,6 +17,7 @@
 
 import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
 import { useUserStore } from '@/store/user/user'
+import { useUISettingStore } from '@/store/ui-setting/ui-setting'
 import qs from 'qs'
 import _ from 'lodash'
 import cookies from 'js-cookie'
@@ -24,6 +25,7 @@ import router from '@/router'
 import utils from '@/utils'
 
 const userStore = useUserStore()
+const uiSettingStore = useUISettingStore()
 
 /**
  * @description Log and display errors
@@ -43,7 +45,7 @@ const baseRequestConfig: AxiosRequestConfig = {
     import.meta.env.MODE === 'development'
       ? '/dolphinscheduler'
       : import.meta.env.VITE_APP_PROD_WEB_URL + '/dolphinscheduler',
-  timeout: 15000,
+  timeout: uiSettingStore.getApiTimer ? uiSettingStore.getApiTimer : 20000,
   transformRequest: (params) => {
     if (_.isPlainObject(params)) {
       return qs.stringify(params, { arrayFormat: 'repeat' })

@@ -30,10 +30,10 @@ import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.MonitorDBDao;
 import org.apache.dolphinscheduler.dao.entity.MonitorRecord;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.service.registry.RegistryClient;
+import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -132,7 +132,7 @@ public class MonitorServiceTest {
     }
 
     private void mockPermissionCheck(String permissionKey, boolean result) {
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.MONITOR, null, 1,
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.MONITOR, 1,
                 permissionKey, serviceLogger)).thenReturn(result);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.MONITOR, null, 0,
                 serviceLogger)).thenReturn(true);

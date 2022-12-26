@@ -36,7 +36,11 @@ export default {
     delete: '删除',
     confirm: '确定',
     cancel: '取消',
-    delete_confirm: '确定删除吗?'
+    delete_confirm: '确定删除吗?',
+    authorize_level:'权限等级',
+    no_permission: '无权限',
+    read_permission: '读权限',
+    all_permission: '所有权限',
   },
   workflow: {
     on_line: '线上',
@@ -101,6 +105,9 @@ export default {
     backward_execution: '向后执行',
     forward_execution: '向前执行',
     current_node_execution: '仅执行当前节点',
+    backward_execution_task: '向后运行',
+    forward_execution_task: '向前运行',
+    current_node_execution_task: '运行',
     notification_strategy: '通知策略',
     workflow_priority: '流程优先级',
     worker_group: 'Worker分组',
@@ -156,6 +163,7 @@ export default {
     pause: '暂停',
     recovery_waiting_thread: '恢复等待线程',
     recover_serial_wait: '串行恢复',
+    execute_task: '执行指定任务',
     recovery_suspend: '恢复运行',
     recovery_failed: '重跑失败任务',
     gantt: '甘特图',
@@ -205,7 +213,9 @@ export default {
     project_tips: '请选择项目',
     workflow_relation_no_data_result_title: '工作流关系不存在',
     workflow_relation_no_data_result_desc:
-      '目前没有任何工作流，请先创建工作流，再访问该页面'
+      '目前没有任何工作流，请先创建工作流，再访问该页面',
+    ready_to_block: '准备锁定',
+    block: '锁定',
   },
   task: {
     on_line: '线上',
@@ -270,7 +280,8 @@ export default {
     alarm_group: '告警组',
     startup_parameter: '启动参数',
     whether_dry_run: '是否空跑',
-    please_choose: '请选择'
+    please_choose: '请选择',
+    remove_task_cache: '清除缓存'
   },
   dag: {
     create: '创建工作流',
@@ -318,6 +329,7 @@ export default {
     online: '已上线'
   },
   node: {
+    is_cache: "缓存执行",
     is_module_path: '使用模块路径',
     run_type: '运行类型',
     jvm_args: '虚拟机参数',
@@ -363,6 +375,8 @@ export default {
     mb: 'MB',
     image: '镜像',
     image_tips: '请输入镜像',
+    command: '容器执行命令',
+    command_tips: '请输入容器执行命令，例如：/bin/echo hello world',
     min_memory_tips: '请输入最小内存',
     state: '状态',
     branch_flow: '分支流转',

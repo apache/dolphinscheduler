@@ -53,10 +53,11 @@ public class MysqlRegistry implements Registry {
     private final EphemeralDateManager ephemeralDateManager;
     private final SubscribeDataManager subscribeDataManager;
     private final RegistryLockManager registryLockManager;
-    private final MysqlOperator mysqlOperator;
+    private MysqlOperator mysqlOperator;
 
-    public MysqlRegistry(MysqlRegistryProperties mysqlRegistryProperties) {
-        this.mysqlOperator = new MysqlOperator(mysqlRegistryProperties);
+    public MysqlRegistry(MysqlRegistryProperties mysqlRegistryProperties,
+                         MysqlOperator mysqlOperator) {
+        this.mysqlOperator = mysqlOperator;
         mysqlOperator.clearExpireLock();
         mysqlOperator.clearExpireEphemeralDate();
         this.mysqlRegistryProperties = mysqlRegistryProperties;
@@ -138,8 +139,7 @@ public class MysqlRegistry implements Registry {
     @Override
     public void delete(String key) {
         try {
-            mysqlOperator.deleteEphemeralData(key);
-            mysqlOperator.deletePersistentData(key);
+            mysqlOperator.deleteDataByKey(key);
         } catch (Exception e) {
             throw new RegistryException(String.format("Delete key: %s error", key), e);
         }
@@ -188,8 +188,7 @@ public class MysqlRegistry implements Registry {
         try (
                 EphemeralDateManager closed1 = ephemeralDateManager;
                 SubscribeDataManager close2 = subscribeDataManager;
-                RegistryLockManager close3 = registryLockManager;
-                MysqlOperator closed4 = mysqlOperator) {
+                RegistryLockManager close3 = registryLockManager) {
         } catch (Exception e) {
             LOGGER.error("Close Mysql Registry error", e);
         }

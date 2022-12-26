@@ -17,12 +17,17 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
+import static org.apache.dolphinscheduler.common.constants.Constants.APPID_COLLECT;
+import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_COLLECT_WAY;
+import static org.apache.dolphinscheduler.common.constants.Constants.DRY_RUN_FLAG_YES;
 import static org.apache.dolphinscheduler.common.constants.Constants.SINGLE_SLASH;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
@@ -31,19 +36,22 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginException;
+import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
 import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.alert.AlertSendRequestCommand;
+import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
+import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
+import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcClient;
 import org.apache.dolphinscheduler.server.worker.utils.TaskExecutionCheckerUtils;
-import org.apache.dolphinscheduler.service.alert.AlertClientService;
-import org.apache.dolphinscheduler.service.storage.StorageOperate;
-import org.apache.dolphinscheduler.service.task.TaskPluginManager;
-import org.apache.dolphinscheduler.service.utils.CommonUtils;
-import org.apache.dolphinscheduler.service.utils.LoggerUtils;
-import org.apache.dolphinscheduler.service.utils.ProcessUtils;
+import org.apache.dolphinscheduler.server.worker.utils.TaskFilesTransferUtils;
+
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -57,7 +65,6 @@ import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.google.common.base.Strings;
 
 public abstract class WorkerTaskExecuteRunnable implements Runnable {
@@ -69,9 +76,9 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
     protected final WorkerConfig workerConfig;
     protected final String masterAddress;
     protected final WorkerMessageSender workerMessageSender;
-    protected final AlertClientService alertClientService;
     protected final TaskPluginManager taskPluginManager;
     protected final @Nullable StorageOperate storageOperate;
+    protected final WorkerRpcClient workerRpcClient;
 
     protected @Nullable AbstractTask task;
 
@@ -80,18 +87,18 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
                                         @NonNull WorkerConfig workerConfig,
                                         @NonNull String masterAddress,
                                         @NonNull WorkerMessageSender workerMessageSender,
-                                        @NonNull AlertClientService alertClientService,
+                                        @NonNull WorkerRpcClient workerRpcClient,
                                         @NonNull TaskPluginManager taskPluginManager,
                                         @Nullable StorageOperate storageOperate) {
         this.taskExecutionContext = taskExecutionContext;
         this.workerConfig = workerConfig;
         this.masterAddress = masterAddress;
         this.workerMessageSender = workerMessageSender;
-        this.alertClientService = alertClientService;
+        this.workerRpcClient = workerRpcClient;
         this.taskPluginManager = taskPluginManager;
         this.storageOperate = storageOperate;
         String taskLogName =
-                LoggerUtils.buildTaskId(DateUtils.timeStampToDate(taskExecutionContext.getFirstSubmitTime()),
+                LogUtils.buildTaskId(DateUtils.timeStampToDate(taskExecutionContext.getFirstSubmitTime()),
                         taskExecutionContext.getProcessDefineCode(),
                         taskExecutionContext.getProcessDefineVersion(),
                         taskExecutionContext.getProcessInstanceId(),
@@ -131,7 +138,9 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         if (task != null) {
             try {
                 task.cancel();
-                List<String> appIds = LogUtils.getAppIdsFromLogFile(taskExecutionContext.getLogPath());
+                List<String> appIds =
+                        LogUtils.getAppIds(taskExecutionContext.getLogPath(), taskExecutionContext.getExecutePath(),
+                                PropertyUtils.getString(APPID_COLLECT, DEFAULT_COLLECT_WAY));
                 if (CollectionUtils.isNotEmpty(appIds)) {
                     ProcessUtils.cancelApplication(appIds, logger, taskExecutionContext.getTenantCode(),
                             taskExecutionContext.getExecutePath());
@@ -150,13 +159,13 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
             // set the thread name to make sure the log be written to the task log file
             Thread.currentThread().setName(taskExecutionContext.getTaskLogName());
 
-            LoggerUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(),
+            LogUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(),
                     taskExecutionContext.getTaskInstanceId());
             logger.info("Begin to pulling task");
 
             initializeTask();
 
-            if (Constants.DRY_RUN_FLAG_YES == taskExecutionContext.getDryRun()) {
+            if (DRY_RUN_FLAG_YES == taskExecutionContext.getDryRun()) {
                 taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.SUCCESS);
                 taskExecutionContext.setEndTime(System.currentTimeMillis());
                 TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
@@ -179,7 +188,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
             logger.error("Task execute failed, due to meet an exception", ex);
             afterThrowing(ex);
         } finally {
-            LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
+            LogUtils.removeWorkflowAndTaskInstanceIdMDC();
         }
     }
 
@@ -190,16 +199,12 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         taskExecutionContext.setStartTime(taskStartTime);
         logger.info("Set task startTime: {}", taskStartTime);
 
-        String systemEnvPath = CommonUtils.getSystemEnvPath();
-        taskExecutionContext.setEnvFile(systemEnvPath);
-        logger.info("Set task envFile: {}", systemEnvPath);
-
         String taskAppId = String.format("%s_%s", taskExecutionContext.getProcessInstanceId(),
                 taskExecutionContext.getTaskInstanceId());
         taskExecutionContext.setTaskAppId(taskAppId);
         logger.info("Set task appId: {}", taskAppId);
 
-        logger.info("End initialize task");
+        logger.info("End initialize task {}", JSONUtils.toPrettyJsonString(taskExecutionContext));
     }
 
     protected void beforeExecute() {
@@ -215,6 +220,8 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
 
         TaskExecutionCheckerUtils.downloadResourcesIfNeeded(storageOperate, taskExecutionContext, logger);
         logger.info("Resources:{} check success", taskExecutionContext.getResources());
+
+        TaskFilesTransferUtils.downloadUpstreamFiles(taskExecutionContext, storageOperate);
 
         TaskChannel taskChannel = taskPluginManager.getTaskChannelMap().get(taskExecutionContext.getTaskType());
         if (null == taskChannel) {
@@ -245,9 +252,17 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         TaskAlertInfo taskAlertInfo = task.getTaskAlertInfo();
         int strategy =
                 status == TaskExecutionStatus.SUCCESS ? WarningType.SUCCESS.getCode() : WarningType.FAILURE.getCode();
-        alertClientService.sendAlert(taskAlertInfo.getAlertGroupId(), taskAlertInfo.getTitle(),
-                taskAlertInfo.getContent(), strategy);
-        logger.info("Success send alert");
+        AlertSendRequestCommand alertCommand = new AlertSendRequestCommand(
+                taskAlertInfo.getAlertGroupId(),
+                taskAlertInfo.getTitle(),
+                taskAlertInfo.getContent(),
+                strategy);
+        try {
+            workerRpcClient.send(Host.of(workerConfig.getAlertListenHost()), alertCommand.convert2Command());
+            logger.info("Success send alert");
+        } catch (RemotingException e) {
+            logger.error("Send alert failed, alertCommand: {}", alertCommand, e);
+        }
     }
 
     protected void sendTaskResult() {
@@ -256,6 +271,8 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         taskExecutionContext.setProcessId(task.getProcessId());
         taskExecutionContext.setAppIds(task.getAppIds());
         taskExecutionContext.setVarPool(JSONUtils.toJsonString(task.getParameters().getVarPool()));
+        // upload out files and modify the "OUT FILE" property in VarPool
+        TaskFilesTransferUtils.uploadOutputFiles(taskExecutionContext, storageOperate);
         workerMessageSender.sendMessageWithRetry(taskExecutionContext, masterAddress, CommandType.TASK_EXECUTE_RESULT);
 
         logger.info("Send task execute result to master, the current task status: {}",
@@ -263,7 +280,6 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
     }
 
     protected void clearTaskExecPathIfNeeded() {
-
         String execLocalPath = taskExecutionContext.getExecutePath();
         if (!CommonUtils.isDevelopMode()) {
             logger.info("The current execute mode isn't develop mode, will clear the task execute file: {}",

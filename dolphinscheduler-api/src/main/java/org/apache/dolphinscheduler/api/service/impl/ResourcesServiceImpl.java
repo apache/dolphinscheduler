@@ -19,13 +19,13 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import static org.apache.dolphinscheduler.common.constants.Constants.ALIAS;
 import static org.apache.dolphinscheduler.common.constants.Constants.CONTENT;
-import static org.apache.dolphinscheduler.common.constants.Constants.EMPTY_STRING;
 import static org.apache.dolphinscheduler.common.constants.Constants.FOLDER_SEPARATOR;
 import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_SS;
 import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_S_S;
 import static org.apache.dolphinscheduler.common.constants.Constants.JAR;
 import static org.apache.dolphinscheduler.common.constants.Constants.PERIOD;
 
+import org.apache.dolphinscheduler.api.dto.resources.DeleteDataTransferResponse;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.dto.resources.filter.ResourceFilter;
 import org.apache.dolphinscheduler.api.dto.resources.visitor.ResourceTreeVisitor;
@@ -61,19 +61,20 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.storage.StorageEntity;
-import org.apache.dolphinscheduler.service.storage.StorageOperate;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
-import org.apache.commons.beanutils.BeanMap;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
 import java.io.IOException;
-import java.rmi.ServerException;
 import java.text.MessageFormat;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -804,6 +805,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @param loginUser login user
      * @param fullName  full name
      * @param file      file
+     * @param type      resource type
+     * @return upload success return true, otherwise false
      */
     private boolean upload(User loginUser, String fullName, MultipartFile file, ResourceType type) {
         // save to local
@@ -1493,103 +1496,25 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         return result;
     }
 
-    /**
-     * create or update resource.
-     * If the folder is not already created, it will be
-     *
-     * @param loginUser user who create or update resource
-     * @param fileFullName The full name of resource.Includes path and suffix.
-     * @param desc description of resource
-     * @param content content of resource
-     * @return create result code
-     */
     @Override
     @Transactional
-    public Result<Object> onlineCreateOrUpdateResourceWithDir(User loginUser, String fileFullName, String desc,
-                                                              String content) {
-        // TODO: need update to third party service
-        if (checkResourceExists(fileFullName)) {
-            Resource resource = resourcesMapper.queryResource(fileFullName, ResourceType.FILE.ordinal()).get(0);
-            Result<Object> result = this.updateResourceContent(loginUser, fileFullName,
-                    resource.getUserName(), content);
-            if (result.getCode() == Status.SUCCESS.getCode()) {
-                resource.setDescription(desc);
-                Map<String, Object> resultMap = new HashMap<>();
-                for (Map.Entry<Object, Object> entry : new BeanMap(resource).entrySet()) {
-                    if (!Constants.CLASS.equalsIgnoreCase(entry.getKey().toString())) {
-                        resultMap.put(entry.getKey().toString(), entry.getValue());
-                    }
-                }
-                result.setData(resultMap);
-            }
-            return result;
-        } else {
-            String resourceSuffix = fileFullName.substring(fileFullName.indexOf(PERIOD) + 1);
-            String fileNameWithSuffix = fileFullName.substring(fileFullName.lastIndexOf(FOLDER_SEPARATOR) + 1);
-            String resourceDir = fileFullName.replace(fileNameWithSuffix, EMPTY_STRING);
-            String resourceName = fileNameWithSuffix.replace(PERIOD + resourceSuffix, EMPTY_STRING);
-            String[] dirNames = resourceDir.split(FOLDER_SEPARATOR);
-            int pid = -1;
-            StringBuilder currDirPath = new StringBuilder();
-            for (String dirName : dirNames) {
-                if (StringUtils.isNotEmpty(dirName)) {
-                    pid = queryOrCreateDirId(loginUser, pid, currDirPath.toString(), dirName);
-                    currDirPath.append(FOLDER_SEPARATOR).append(dirName);
-                }
-            }
-            return this.onlineCreateResource(
-                    loginUser, ResourceType.FILE, resourceName, resourceSuffix, desc, content,
-                    currDirPath.toString());
-        }
-    }
-
-    @Override
-    @Transactional
-    public Integer createOrUpdateResource(String userName, String fullName, String description,
-                                          String resourceContent) {
+    public StorageEntity createOrUpdateResource(String userName, String filepath,
+                                                String resourceContent) throws Exception {
         User user = userMapper.queryByUserNameAccurately(userName);
-        int suffixLabelIndex = fullName.indexOf(PERIOD);
+        int suffixLabelIndex = filepath.indexOf(PERIOD);
         if (suffixLabelIndex == -1) {
-            String msg = String.format("The suffix of file can not be empty, fullName:%s.", fullName);
-            logger.warn(msg);
-            throw new IllegalArgumentException(msg);
+            throw new IllegalArgumentException(String
+                    .format("Not allow create or update resources without extension name, filepath: %s", filepath));
         }
-        if (!fullName.startsWith(FOLDER_SEPARATOR)) {
-            fullName = FOLDER_SEPARATOR + fullName;
-        }
-        Result<Object> createResult = onlineCreateOrUpdateResourceWithDir(
-                user, fullName, description, resourceContent);
-        if (createResult.getCode() == Status.SUCCESS.getCode()) {
-            Map<String, Object> resultMap = (Map<String, Object>) createResult.getData();
-            return (int) resultMap.get("id");
-        }
-        String msg = String.format("Create or update resource error, resourceName:%s.", fullName);
-        logger.error(msg);
-        throw new IllegalArgumentException(msg);
-    }
 
-    private int queryOrCreateDirId(User user, int pid, String currentDir, String dirName) {
-        String dirFullName = currentDir + FOLDER_SEPARATOR + dirName;
-        if (checkResourceExists(dirFullName)) {
-            List<Resource> resourceList = resourcesMapper.queryResource(dirFullName, ResourceType.FILE.ordinal());
-            return resourceList.get(0).getId();
-        } else {
-            // create dir
-            Result<Object> createDirResult = this.createDirectory(
-                    user, dirName, EMPTY_STRING, ResourceType.FILE, pid, currentDir);
-            if (createDirResult.getCode() == Status.SUCCESS.getCode()) {
-                // Map<String, Object> resultMap = (Map<String, Object>) createDirResult.getData();
-                // return resultMap.get("id") == null ? -1 : (Integer) resultMap.get("id");
+        String defaultPath = storageOperate.getResDir(user.getTenantCode());
+        String fullName = defaultPath + filepath;
 
-                // Since resource is kept in third party services, its id will always be -1.
-                return -1;
-
-            } else {
-                String msg = String.format("Create dir error,  dirFullName:%s.", dirFullName);
-                logger.error(msg);
-                throw new IllegalArgumentException(msg);
-            }
+        Result<Object> result = uploadContentToStorage(user, fullName, user.getTenantCode(), resourceContent);
+        if (result.getCode() != Status.SUCCESS.getCode()) {
+            throw new ServiceException(result.getMsg());
         }
+        return storageOperate.getFileStatus(fullName, defaultPath, user.getTenantCode(), ResourceType.FILE);
     }
 
     private void permissionPostHandle(ResourceType resourceType, User loginUser, Integer resourceId) {
@@ -1813,7 +1738,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         } catch (IOException e) {
             logger.error("Download resource error, the path is {}, and local filename is {}, the error message is {}",
                     fullName, localFileName, e.getMessage());
-            throw new ServerException("Download the resource file failed ,it may be related to your storage");
+            throw new ServiceException("Download the resource file failed ,it may be related to your storage");
         }
     }
 
@@ -1827,7 +1752,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Map<String, Object> authorizeResourceTree(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
-        if (!resourcePermissionCheckService.functionDisabled()) {
+        if (resourcePermissionCheckService.functionDisabled()) {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
@@ -1858,17 +1783,71 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     }
 
     @Override
-    public Resource queryResourcesFileInfo(String userName, String fileName) {
+    public StorageEntity queryFileStatus(String userName, String fileName) throws Exception {
         // TODO: It is used in PythonGateway, should be revised
         User user = userMapper.queryByUserNameAccurately(userName);
-        Result<Object> resourceResponse = this.queryResourceByFileName(user, fileName, ResourceType.FILE, "");
-        if (resourceResponse.getCode() != Status.SUCCESS.getCode()) {
-            String msg =
-                    String.format("Query resource by fullName failed, userName:%s, fullName:%s", userName, fileName);
-            logger.error(msg);
-            throw new IllegalArgumentException(msg);
+
+        String defaultPath = storageOperate.getResDir(user.getTenantCode());
+        return storageOperate.getFileStatus(defaultPath + fileName, defaultPath, user.getTenantCode(),
+                ResourceType.FILE);
+    }
+
+    @Override
+    public DeleteDataTransferResponse deleteDataTransferData(User loginUser, Integer days) {
+        DeleteDataTransferResponse result = new DeleteDataTransferResponse();
+
+        User user = userMapper.selectById(loginUser.getId());
+        if (user == null) {
+            logger.error("user {} not exists", loginUser.getId());
+            putMsg(result, Status.USER_NOT_EXIST, loginUser.getId());
+            return result;
         }
-        return (Resource) resourceResponse.getData();
+
+        Tenant tenant = tenantMapper.queryById(user.getTenantId());
+        if (tenant == null) {
+            logger.error("tenant not exists");
+            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
+            return result;
+        }
+
+        String tenantCode = tenant.getTenantCode();
+
+        String baseFolder = storageOperate.getResourceFileName(tenantCode, "DATA_TRANSFER");
+
+        LocalDateTime now = LocalDateTime.now();
+        now = now.minus(days, ChronoUnit.DAYS);
+        String deleteDate = now.toLocalDate().toString().replace("-", "");
+        List<StorageEntity> storageEntities;
+        try {
+            storageEntities = new ArrayList<>(
+                    storageOperate.listFilesStatus(baseFolder, baseFolder, tenantCode, ResourceType.FILE));
+        } catch (Exception e) {
+            logger.error("delete data transfer data error", e);
+            putMsg(result, Status.DELETE_RESOURCE_ERROR);
+            return result;
+        }
+
+        List<String> successList = new ArrayList<>();
+        List<String> failList = new ArrayList<>();
+
+        for (StorageEntity storageEntity : storageEntities) {
+            File path = new File(storageEntity.getFullName());
+            String date = path.getName();
+            if (date.compareTo(deleteDate) <= 0) {
+                try {
+                    storageOperate.delete(storageEntity.getFullName(), true);
+                    successList.add(storageEntity.getFullName());
+                } catch (Exception ex) {
+                    logger.error("delete data transfer data {} error, please delete it manually", date, ex);
+                    failList.add(storageEntity.getFullName());
+                }
+            }
+        }
+
+        result.setSuccessList(successList);
+        result.setFailedList(failList);
+        putMsg(result, Status.SUCCESS);
+        return result;
     }
 
     /**
@@ -1919,7 +1898,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Map<String, Object> unauthorizedUDFFunction(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
-        if (!resourcePermissionCheckService.functionDisabled()) {
+        if (resourcePermissionCheckService.functionDisabled()) {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
@@ -1957,7 +1936,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Map<String, Object> authorizedUDFFunction(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
-        if (!resourcePermissionCheckService.functionDisabled()) {
+        if (resourcePermissionCheckService.functionDisabled()) {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
@@ -1977,7 +1956,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Map<String, Object> authorizedFile(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
-        if (!resourcePermissionCheckService.functionDisabled()) {
+        if (resourcePermissionCheckService.functionDisabled()) {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }

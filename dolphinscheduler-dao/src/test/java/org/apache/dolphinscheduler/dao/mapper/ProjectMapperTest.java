@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -217,14 +216,41 @@ public class ProjectMapperTest extends BaseDaoTest {
         Assertions.assertNotEquals(allProject.size(), 0);
     }
 
-    /**
-     * test query project permission
-     */
+    private Project insertProject(long projectCode, String projectName, int userId) {
+        Project project = new Project();
+        project.setName(projectName);
+        project.setUserId(userId);
+        project.setCode(projectCode);
+        project.setCreateTime(new Date());
+        project.setUpdateTime(new Date());
+        projectMapper.insert(project);
+        return project;
+    }
+
     @Test
     public void testListAuthorizedProjects() {
-        Project project = insertOne();
-        List<Project> projects = projectMapper.listAuthorizedProjects(1, Collections.singletonList(project.getId()));
-        Assertions.assertEquals(projects.size(), 0);
+        User user = new User();
+        user.setUserName("ut user");
+        userMapper.insert(user);
+
+        // project1: created by user
+        insertProject(1, "project 1", user.getId());
+
+        // project2: not created by user
+        insertProject(2, "project 2", user.getId() + 1);
+
+        // project3: not created by user but is authorized to user
+        Project project3 = insertProject(3, "project 3", user.getId() + 1);
+        ProjectUser projectUser = new ProjectUser();
+        projectUser.setProjectId(project3.getId());
+        projectUser.setUserId(user.getId());
+        projectUser.setCreateTime(new Date());
+        projectUser.setUpdateTime(new Date());
+        projectUserMapper.insert(projectUser);
+
+        List<Project> projects = projectMapper.listAuthorizedProjects(user.getId(), null);
+
+        Assertions.assertEquals(projects.size(), 2);
     }
 
 }

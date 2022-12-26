@@ -80,9 +80,8 @@ public class PrestoDataSourceProcessorTest {
     @Test
     public void testGetJdbcUrl() {
         PrestoConnectionParam prestoConnectionParam = new PrestoConnectionParam();
-        prestoConnectionParam.setJdbcUrl("jdbc:postgresql://localhost:1234/hive/default");
-        prestoConnectionParam.setOther("other");
-        Assertions.assertEquals("jdbc:postgresql://localhost:1234/hive/default?other",
+        prestoConnectionParam.setJdbcUrl("jdbc:postgresql://localhost:1234/default");
+        Assertions.assertEquals("jdbc:postgresql://localhost:1234/default",
                 prestoDatasourceProcessor.getJdbcUrl(prestoConnectionParam));
 
     }

@@ -19,7 +19,8 @@ import { defineComponent, PropType, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { SettingOutlined } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
-import { NMenu, NSpace, NButton, NIcon } from 'naive-ui'
+import { NMenu, NButton, NIcon } from 'naive-ui'
+import styles from './index.module.scss'
 import Logo from '../logo'
 import Locales from '../locales'
 import Timezone from '../timezone'
@@ -71,19 +72,17 @@ const Navbar = defineComponent({
   },
   render() {
     return (
-      <NSpace style='height: 65px' justify='space-between' align='center'>
-        <NSpace align='center'>
-          <NSpace>
-            <Logo />
-            <NMenu
-              value={this.menuKey}
-              mode='horizontal'
-              options={this.headerMenuOptions}
-              onUpdateValue={this.handleMenuClick}
-            />
-          </NSpace>
-        </NSpace>
-        <NSpace align='center'>
+      <div class={styles.container}>
+        <Logo />
+        <div class={styles.nav}>
+          <NMenu
+            value={this.menuKey}
+            mode='horizontal'
+            options={this.headerMenuOptions}
+            onUpdateValue={this.handleMenuClick}
+          />
+        </div>
+        <div class={styles.settings}>
           <NButton quaternary onClick={this.handleUISettingClick}>
             {{
               icon: () => <NIcon size='16'>
@@ -96,8 +95,8 @@ const Navbar = defineComponent({
           <Locales localesOptions={this.localesOptions} />
           <Timezone timezoneOptions={this.timezoneOptions} />
           <User userDropdownOptions={this.userDropdownOptions} />
-        </NSpace>
-      </NSpace>
+        </div>
+      </div>
     )
   }
 })

@@ -53,7 +53,8 @@ public class K8sTask extends AbstractK8sTask {
         super(taskRequest);
         this.taskExecutionContext = taskRequest;
         this.k8sTaskParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), K8sTaskParameters.class);
-        if (!k8sTaskParameters.checkParameters()) {
+        logger.info("Initialize k8s task parameters {}", JSONUtils.toPrettyJsonString(k8sTaskParameters));
+        if (k8sTaskParameters == null || !k8sTaskParameters.checkParameters()) {
             throw new TaskException("K8S task params is not valid");
         }
     }
@@ -81,6 +82,7 @@ public class K8sTask extends AbstractK8sTask {
         k8sTaskMainParameters.setMinCpuCores(k8sTaskParameters.getMinCpuCores());
         k8sTaskMainParameters.setMinMemorySpace(k8sTaskParameters.getMinMemorySpace());
         k8sTaskMainParameters.setParamsMap(ParamUtils.convert(paramsMap));
+        k8sTaskMainParameters.setCommand(k8sTaskParameters.getCommand());
         return JSONUtils.toJsonString(k8sTaskMainParameters);
     }
 

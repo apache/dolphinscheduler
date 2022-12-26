@@ -19,6 +19,7 @@ export default {
   refresh_time: '自动刷新时间',
   experimental_feature: '实验性功能',
   request_settings: '请求设置',
-  dynamic_task_component: '动态任务组件'
+  dynamic_task_component: '动态任务组件',
+  api_timeout: '接口超时时间',
+  millisecond: '毫秒'
 }
-  

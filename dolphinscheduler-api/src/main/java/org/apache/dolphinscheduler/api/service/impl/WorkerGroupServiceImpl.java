@@ -28,18 +28,20 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
+import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
+import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -79,6 +81,9 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     private RegistryClient registryClient;
 
     @Autowired
+    private EnvironmentWorkerGroupRelationMapper environmentWorkerGroupRelationMapper;
+
+    @Autowired
     private ProcessService processService;
 
     @Autowired
@@ -108,15 +113,11 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             return result;
         }
         Date now = new Date();
-        WorkerGroup workerGroup;
+        WorkerGroup workerGroup = null;
         if (id != 0) {
             workerGroup = workerGroupMapper.selectById(id);
-            // check exist
-            if (workerGroup == null) {
-                workerGroup = new WorkerGroup();
-                workerGroup.setCreateTime(now);
-            }
-        } else {
+        }
+        if (workerGroup == null) {
             workerGroup = new WorkerGroup();
             workerGroup.setCreateTime(now);
         }
@@ -160,23 +161,21 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
      * @return boolean
      */
     private boolean checkWorkerGroupNameExists(WorkerGroup workerGroup) {
+        // check database
         List<WorkerGroup> workerGroupList = workerGroupMapper.queryWorkerGroupByName(workerGroup.getName());
         if (CollectionUtils.isNotEmpty(workerGroupList)) {
-            // new group has same name
+            // create group, the same group name exists in the database
             if (workerGroup.getId() == null) {
                 return true;
             }
-            // check group id
-            for (WorkerGroup group : workerGroupList) {
-                if (Objects.equals(group.getId(), workerGroup.getId())) {
-                    return true;
-                }
+            // update group, the database exists with the same group name except itself
+            Optional<WorkerGroup> sameNameWorkGroupOptional = workerGroupList.stream()
+                    .filter(group -> !Objects.equals(group.getId(), workerGroup.getId())).findFirst();
+            if (sameNameWorkGroupOptional.isPresent()) {
+                return true;
             }
         }
-        // check zookeeper
-        String workerGroupPath =
-                Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS + Constants.SINGLE_SLASH + workerGroup.getName();
-        return registryClient.exists(workerGroupPath);
+        return false;
     }
 
     /**
@@ -341,6 +340,13 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
                     "Delete worker group failed because there are {} processInstances are using it, processInstanceIds:{}.",
                     processInstances.size(), processInstanceIds);
             putMsg(result, Status.DELETE_WORKER_GROUP_BY_ID_FAIL, processInstances.size());
+            return result;
+        }
+        List<EnvironmentWorkerGroupRelation> environmentWorkerGroupRelationList =
+                environmentWorkerGroupRelationMapper.queryByWorkerGroupName(workerGroup.getName());
+        if (CollectionUtils.isNotEmpty(environmentWorkerGroupRelationList)) {
+            putMsg(result, Status.DELETE_WORKER_GROUP_BY_ID_FAIL_ENV, environmentWorkerGroupRelationList.size(),
+                    workerGroup.getName());
             return result;
         }
         workerGroupMapper.deleteById(id);
