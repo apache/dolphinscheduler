@@ -77,7 +77,7 @@ export function useModalData(
     return state
   }
 
-  const getProjectListData = () => {
+  const getProjectListData = (status: number) => {
     const { state } = useAsyncState(
       queryAllProjectList().then((res: any) => {
         variables.model.projectOptions = res.map((item: any) => {
@@ -86,7 +86,10 @@ export function useModalData(
             value: item.id
           }
         })
-        variables.model.queueId = res[0].id
+        if (status === 0) {
+          variables.model.projectId = res[0].id
+        }
+        
       }),
       {}
     )
@@ -137,7 +140,7 @@ export function useModalData(
     const data = {
       tenantCode: variables.model.tenantCode,
       queueId: variables.model.queueId,
-      proectId: variables.model.projectId,
+      projectId: variables.model.projectId,
       description: variables.model.description,
       id: variables.model.id
     }

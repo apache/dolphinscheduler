@@ -441,7 +441,7 @@ public class PythonGateway {
     }
 
     public Tenant createTenant(String tenantCode, String desc, String queueName) {
-        return tenantService.createTenantIfNotExists(tenantCode, desc, queueName, queueName);
+        return tenantService.createTenantIfNotExists(tenantCode, desc, queueName, queueName,0);
     }
 
     public Tenant queryTenantByCode(String tenantCode) {

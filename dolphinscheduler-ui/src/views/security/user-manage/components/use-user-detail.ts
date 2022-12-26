@@ -29,6 +29,13 @@ export function useUserDetail() {
   const userInfo = userStore.getUserInfo as UserInfoRes
   const IS_ADMIN = userInfo.userType === 'ADMIN_USER'
 
+  let ipa=0;
+  if(userInfo.userType === 'PROJECT_ADMIN')
+  {
+    ipa=1;
+  }
+  
+
   const initialValues = {
     userName: '',
     userPassword: '',
@@ -36,7 +43,8 @@ export function useUserDetail() {
     email: '',
     queue: '',
     phone: '',
-    state: 1
+    state: 1,
+    isProjectAdmin:ipa
   } as UserReq
 
   let PREV_NAME: string
@@ -157,6 +165,7 @@ export function useUserDetail() {
     }
   }
   const onSetValues = (record: IRecord) => {
+    console.log(record)
     state.formData = {
       ...pick(record, [
         'userName',
@@ -164,7 +173,8 @@ export function useUserDetail() {
         'email',
         'queue',
         'phone',
-        'state'
+        'state',
+        'isProjectAdmin'
       ]),
       userPassword: ''
     } as UserReq

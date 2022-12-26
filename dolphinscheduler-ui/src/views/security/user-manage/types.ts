@@ -21,7 +21,7 @@ import type {
 import { UserReq } from '@/service/modules/users/types'
 export type { UserInfoRes } from '@/service/modules/users/types'
 
-type TUserType = 'GENERAL_USER' | ''
+type TUserType = 'GENERAL_USER' | '' | 'PROJECT_ADMIN'
 type TAuthType =
   | 'authorize_project'
   | 'authorize_resource'
@@ -40,7 +40,8 @@ interface IRecord {
   phone: string
   state: 0 | 1
   createTime: string
-  updateTime: string
+  updateTime: string,
+  isProjectAdmin:0|1
 }
 
 interface IResourceOption {

@@ -51,6 +51,7 @@ public class Tenant {
      */
     private int queueId;
 
+    @TableField(value = "project_id")
     private int projectId;
 
     /**
@@ -83,16 +84,17 @@ public class Tenant {
     public Tenant() {
     }
 
-    public Tenant(String tenantCode, String description, int queueId) {
+    public Tenant(String tenantCode, String description, int queueId,int projectId) {
         Date now = new Date();
         this.tenantCode = tenantCode;
         this.description = description;
         this.queueId = queueId;
         this.createTime = now;
         this.updateTime = now;
+        this.projectId=projectId;
     }
 
-    public Tenant(int id, String tenantCode, String description, int queueId) {
+    public Tenant(int id, String tenantCode, String description, int queueId,int projectId) {
         Date now = new Date();
         this.id = id;
         this.tenantCode = tenantCode;
@@ -100,6 +102,7 @@ public class Tenant {
         this.queueId = queueId;
         this.createTime = now;
         this.updateTime = now;
+        this.projectId=projectId;
     }
 
     @Override

@@ -158,7 +158,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
-        Tenant tenant = new Tenant(tenantCode, desc, queueId);
+        Tenant tenant = new Tenant(tenantCode, desc, queueId,projectId);
         createTenantValid(tenant);
         tenantMapper.insert(tenant);
 
@@ -229,7 +229,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
-        Tenant updateTenant = new Tenant(id, tenantCode, desc, queueId);
+        Tenant updateTenant = new Tenant(id, tenantCode, desc, queueId,projectId);
         Tenant existsTenant = tenantMapper.queryById(id);
         updateTenantValid(existsTenant, updateTenant);
 
@@ -395,12 +395,12 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      * @return Tenant object
      */
     @Override
-    public Tenant createTenantIfNotExists(String tenantCode, String desc, String queue, String queueName) {
+    public Tenant createTenantIfNotExists(String tenantCode, String desc, String queue, String queueName,int projectId) {
         if (checkTenantExists(tenantCode)) {
             return tenantMapper.queryByTenantCode(tenantCode);
         }
         Queue queueObj = queueService.createQueueIfNotExists(queue, queueName);
-        Tenant tenant = new Tenant(tenantCode, desc, queueObj.getId());
+        Tenant tenant = new Tenant(tenantCode, desc, queueObj.getId(),projectId);
         createTenantValid(tenant);
         tenantMapper.insert(tenant);
         return tenant;

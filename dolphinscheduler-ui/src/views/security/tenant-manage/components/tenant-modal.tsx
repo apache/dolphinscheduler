@@ -65,7 +65,7 @@ const TenantModal = defineComponent({
     watch(
       () => props.showModalRef,
       () => {
-        props.showModalRef && getListData(props.statusRef) && getProjectListData()
+        props.showModalRef && getListData(props.statusRef) && getProjectListData(props.statusRef)
       }
     )
 

@@ -35,7 +35,8 @@ interface UserReq {
   phone?: string
   queue?: string
   state?: number
-  timeZone?: string
+  timeZone?: string,
+  isProjectAdmin: number
 }
 
 interface IdReq {

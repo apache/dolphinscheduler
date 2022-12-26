@@ -44,10 +44,10 @@ public interface UsersService {
      * @throws Exception exception
      */
     Map<String, Object> createUser(User loginUser, String userName, String userPassword, String email,
-                                   int tenantId, String phone, String queue, int state) throws Exception;
+                                   int tenantId, String phone, String queue, int state,boolean isProjectAdmin) throws Exception;
 
     User createUser(String userName, String userPassword, String email,
-                    int tenantId, String phone, String queue, int state);
+                    int tenantId, String phone, String queue, int state,boolean isProjectAdmin);
 
     /***
      * create User for ldap login
@@ -291,7 +291,7 @@ public interface UsersService {
      * @return registry result code
      * @throws Exception exception
      */
-    Map<String, Object> registerUser(String userName, String userPassword, String repeatPassword, String email);
+    Map<String, Object> registerUser(String userName, String userPassword, String repeatPassword, String email,boolean isProjectAdmin);
 
     /**
      * activate user, only system admin have permission, change user state code 0 to 1
