@@ -28,6 +28,8 @@ public final class Constants {
         throw new UnsupportedOperationException("Construct Constants");
     }
 
+    public static final String AUTO_CLOSE_ALERT = "alert.auto-close";
+
     /**
      * common properties path
      */
