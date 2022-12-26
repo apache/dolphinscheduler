@@ -8,7 +8,7 @@
 
 ### 下载新版本的安装包
 
-在[下载](https://dolphinscheduler.apache.org/#/zh-cn/download)页面下载最新版本的二进制安装包，并将二进制包放到与当前 dolphinscheduler 服务不一样的路径中，以下服务启动操作都需要在新版本的目录进行。
+在[下载](https://dolphinscheduler.apache.org/zh-cn/download)页面下载最新版本的二进制安装包，并将二进制包放到与当前 dolphinscheduler 服务不一样的路径中，以下服务启动操作都需要在新版本的目录进行。
 
 ## 服务启动步骤
 

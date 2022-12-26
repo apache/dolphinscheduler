@@ -54,11 +54,11 @@ The key features for DolphinScheduler are as follows:
 
 ## QuickStart in Docker
 
-Please refer the official website document: [QuickStart in Docker](https://dolphinscheduler.apache.org/#/en-us/docs/3.1.2/guide/start/docker)
+Please refer the official website document: [QuickStart in Docker](https://dolphinscheduler.apache.org/en-us/docs/3.1.2/guide/start/docker)
 
 ## QuickStart in Kubernetes
 
-Please refer to the official website document: [QuickStart in Kubernetes](https://dolphinscheduler.apache.org/#/en-us/docs/3.1.2/guide/installation/kubernetes)
+Please refer to the official website document: [QuickStart in Kubernetes](https://dolphinscheduler.apache.org/en-us/docs/3.1.2/guide/installation/kubernetes)
 
 ## How to Build
 

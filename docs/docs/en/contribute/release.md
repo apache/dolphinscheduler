@@ -564,7 +564,7 @@ Dolphin Scheduler is a distributed and easy-to-extend visual workflow scheduler 
 dedicated to solving the complex task dependencies in data processing, making the scheduler system out of the box for data processing.
 
 
-Download Links: https://dolphinscheduler.apache.org/#/en-us/download
+Download Links: https://dolphinscheduler.apache.org/en-us/download
 
 Release Notes: https://github.com/apache/dolphinscheduler/releases/tag/<VERSION>
 
@@ -573,7 +573,7 @@ Website: https://dolphinscheduler.apache.org/
 DolphinScheduler Resources:
 - Issue: https://github.com/apache/dolphinscheduler/issues/
 - Mailing list: dev@dolphinscheduler.apache.org
-- Documents: https://dolphinscheduler.apache.org/#/zh-cn/docs/<VERSION>/about/introduction
+- Documents: https://dolphinscheduler.apache.org/zh-cn/docs/<VERSION>/about/introduction
 ```
 
 ## News
