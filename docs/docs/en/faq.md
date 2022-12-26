@@ -298,9 +298,9 @@ change into
 
 ## Q : how to add a worker server
 
-A: 1, Create deployment user and hosts mapping, please refer 1.3 part of [cluster deployment](https://dolphinscheduler.apache.org/#/en-us/docs/3.1.2/user_doc/installation/cluster)
+A: 1, Create deployment user and hosts mapping, please refer 1.3 part of [cluster deployment](https://dolphinscheduler.apache.org/en-us/docs/3.1.2/user_doc/installation/cluster)
 
-​ 2, Configure hosts mapping and ssh access and modify directory permissions. please refer 1.4 part of [cluster deployment](https://dolphinscheduler.apache.org/#/en-us/docs/3.1.2/user_doc/installation/cluster)
+​ 2, Configure hosts mapping and ssh access and modify directory permissions. please refer 1.4 part of [cluster deployment](https://dolphinscheduler.apache.org/en-us/docs/3.1.2/user_doc/installation/cluster)
 
 ​ 3, Copy the deployment directory from worker server that has already deployed
 
@@ -762,6 +762,7 @@ A: For the task identified as `Cache Execution`, when the task starts, a cache k
 - environment configuration: the actual configuration content of the environment configuration under the environment name, that is, the actual configuration content in the `security` - `environment management`
 
 If the task with cache identification runs, it will find whether there is data with the same cache key in the database,
+
 - If there is, copy the task instance and update the corresponding data
 - If not, the task runs as usual, and the task instance data is stored in the cache when the task is completed
 
