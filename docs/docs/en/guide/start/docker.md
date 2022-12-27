@@ -79,6 +79,7 @@ $ docker run -d --name dolphinscheduler-tools \
     -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/<DATABASE>" \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
+    -e SPRING_JACKSON_TIME_ZONE="UTC" \
     --net host \
     apache/dolphinscheduler-tools:"${DOLPHINSCHEDULER_VERSION}" tools/bin/upgrade-schema.sh
 # Starting DolphinScheduler service
@@ -87,6 +88,7 @@ $ docker run -d --name dolphinscheduler-master \
     -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/dolphinscheduler" \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
+    -e SPRING_JACKSON_TIME_ZONE="UTC" \
     -e REGISTRY_ZOOKEEPER_CONNECT_STRING="localhost:2181" \
     --net host \
     -d apache/dolphinscheduler-master:"${DOLPHINSCHEDULER_VERSION}"
@@ -95,6 +97,7 @@ $ docker run -d --name dolphinscheduler-worker \
     -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/dolphinscheduler" \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
+    -e SPRING_JACKSON_TIME_ZONE="UTC" \
     -e REGISTRY_ZOOKEEPER_CONNECT_STRING="localhost:2181" \
     --net host \
     -d apache/dolphinscheduler-worker:"${DOLPHINSCHEDULER_VERSION}"
@@ -103,6 +106,7 @@ $ docker run -d --name dolphinscheduler-api \
     -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/dolphinscheduler" \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
+    -e SPRING_JACKSON_TIME_ZONE="UTC" \
     -e REGISTRY_ZOOKEEPER_CONNECT_STRING="localhost:2181" \
     --net host \
     -d apache/dolphinscheduler-api:"${DOLPHINSCHEDULER_VERSION}"
@@ -111,6 +115,7 @@ $ docker run -d --name dolphinscheduler-alert-server \
     -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/dolphinscheduler" \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
+    -e SPRING_JACKSON_TIME_ZONE="UTC" \
     -e REGISTRY_ZOOKEEPER_CONNECT_STRING="localhost:2181" \
     --net host \
     -d apache/dolphinscheduler-alert-server:"${DOLPHINSCHEDULER_VERSION}"
