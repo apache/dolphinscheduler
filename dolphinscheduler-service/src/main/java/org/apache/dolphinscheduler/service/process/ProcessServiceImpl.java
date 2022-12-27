@@ -595,6 +595,7 @@ public class ProcessServiceImpl implements ProcessService {
         ProcessInstance processInstance = new ProcessInstance(processDefinition);
         processInstance.setProcessDefinitionCode(processDefinition.getCode());
         processInstance.setProcessDefinitionVersion(processDefinition.getVersion());
+        processInstance.setProjectCode(processDefinition.getProjectCode());
         processInstance.setStateWithDesc(WorkflowExecutionStatus.RUNNING_EXECUTION, "init running");
         processInstance.setRecovery(Flag.NO);
         processInstance.setStartTime(new Date());
@@ -608,6 +609,8 @@ public class ProcessServiceImpl implements ProcessService {
         processInstance.setTaskDependType(command.getTaskDependType());
         processInstance.setFailureStrategy(command.getFailureStrategy());
         processInstance.setExecutorId(command.getExecutorId());
+        processInstance.setExecutorName(Optional.ofNullable(userMapper.selectById(command.getExecutorId()))
+                .map(User::getUserName).orElse(null));
         WarningType warningType = command.getWarningType() == null ? WarningType.NONE : command.getWarningType();
         processInstance.setWarningType(warningType);
         Integer warningGroupId = command.getWarningGroupId() == null ? 0 : command.getWarningGroupId();
@@ -647,6 +650,8 @@ public class ProcessServiceImpl implements ProcessService {
                 .setEnvironmentCode(Objects.isNull(command.getEnvironmentCode()) ? -1 : command.getEnvironmentCode());
         processInstance.setTimeout(processDefinition.getTimeout());
         processInstance.setTenantId(processDefinition.getTenantId());
+        processInstance.setTenantCode(Optional.ofNullable(tenantMapper.queryById(processDefinition.getTenantId()))
+                .map(Tenant::getTenantCode).orElse(null));
         return processInstance;
     }
 
