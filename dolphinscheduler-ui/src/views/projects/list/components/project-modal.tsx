@@ -22,7 +22,7 @@ import {
   toRefs,
   watch
 } from 'vue'
-import { NForm, NFormItem, NInput } from 'naive-ui'
+import { NForm, NFormItem,  NSelect, NInput } from 'naive-ui'
 import { useForm } from './use-form'
 import Modal from '@/components/modal'
 import { useUserStore } from '@/store/user/user'
@@ -48,7 +48,7 @@ const ProjectModal = defineComponent({
   props,
   emits: ['cancelModal', 'confirmModal'],
   setup(props, ctx) {
-    const { variables, t, handleValidate } = useForm(props, ctx)
+    const { variables, t, handleValidate,getTenants } = useForm(props, ctx)
 
     const userStore = useUserStore()
 
@@ -56,8 +56,9 @@ const ProjectModal = defineComponent({
       if (props.statusRef === 0) {
         variables.model.projectName = ''
         variables.model.description = ''
+        variables.model.tenantId = null
       } else {
-        variables.model.userName = props.row.userName
+        variables.model.tenantId = props.row.tenantCode
         variables.model.projectName = props.row.name
         variables.model.description = props.row.description
       }
@@ -75,13 +76,11 @@ const ProjectModal = defineComponent({
       () => {
         if (props.statusRef === 0) {
           variables.model.projectName = ''
-          variables.model.userName = (
-            userStore.getUserInfo as UserInfoRes
-          ).userName
+          variables.model.tenantId = null
           variables.model.description = ''
         } else {
           variables.model.projectName = props.row.name
-          variables.model.userName = props.row.userName
+          variables.model.tenantId = props.row.tenantId
           variables.model.description = props.row.description
         }
       }
@@ -91,7 +90,7 @@ const ProjectModal = defineComponent({
       () => props.row,
       () => {
         variables.model.projectName = props.row.name
-        variables.model.userName = props.row.userName
+        variables.model.tenantId = props.row.tenantId
         variables.model.description = props.row.description
       }
     )
@@ -110,7 +109,7 @@ const ProjectModal = defineComponent({
         show={this.showModalRef}
         onConfirm={this.confirmModal}
         onCancel={this.cancelModal}
-        confirmDisabled={!this.model.projectName || !this.model.userName}
+        confirmDisabled={!this.model.projectName || !this.model.tenantId}
         confirmClassName='btn-submit'
         cancelClassName='btn-cancel'
         confirmLoading={this.saving}
@@ -124,14 +123,15 @@ const ProjectModal = defineComponent({
               class='input-project-name'
             />
           </NFormItem>
-          <NFormItem label={t('project.list.owned_users')} path='userName'>
-            <NInput
-              allowInput={this.trim}
-              disabled={true}
-              v-model={[this.model.userName, 'value']}
-              placeholder={t('project.list.username_tips')}
-            />
-          </NFormItem>
+
+          <NFormItem label={t('project.list.owned_tenant')} path='tenantCode'>
+              <NSelect
+                class='select-tenant'
+                options={this.tenantOptions}
+                v-model:value={this.model.tenantId}
+              />
+            </NFormItem>
+
           <NFormItem
             label={t('project.list.project_description')}
             path='description'

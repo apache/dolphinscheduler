@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.AlertGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -30,13 +31,7 @@ import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,14 +114,17 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
         if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
             alertGroupPage = alertGroupMapper.queryAlertGroupPage(page, searchVal);
         } else {
-            Set<Integer> ids = resourcePermissionCheckService
-                    .userOwnedResourceIdsAcquisition(AuthorizationType.ALERT_GROUP, loginUser.getId(), logger);
-            if (ids.isEmpty()) {
-                result.setData(pageInfo);
-                putMsg(result, Status.SUCCESS);
-                return result;
+            List<AlertGroup> groups=alertGroupMapper.queryByTenantId(loginUser.getTenantId());
+            if(groups.isEmpty())
+            {
+                alertGroupPage=new PageDTO<>();
+            }else {
+                Set<Integer> ids=new HashSet<>();
+                for (AlertGroup group:groups) {
+                    ids.add(group.getId());
+                }
+                alertGroupPage = alertGroupMapper.queryAlertGroupPageByIds(page, new ArrayList<>(ids), searchVal);
             }
-            alertGroupPage = alertGroupMapper.queryAlertGroupPageByIds(page, new ArrayList<>(ids), searchVal);
         }
         pageInfo.setTotal((int) alertGroupPage.getTotal());
         pageInfo.setTotalList(alertGroupPage.getRecords());

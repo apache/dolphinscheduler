@@ -92,7 +92,7 @@ public class ProjectV2Controller extends BaseController {
     public ProjectCreateResponse createProject(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                @RequestBody ProjectCreateRequest projectCreateRequest) {
         Result result = projectService.createProject(loginUser, projectCreateRequest.getProjectName(),
-                projectCreateRequest.getDescription());
+                projectCreateRequest.getDescription(),projectCreateRequest.getTenantId());
         return new ProjectCreateResponse(result);
     }
 

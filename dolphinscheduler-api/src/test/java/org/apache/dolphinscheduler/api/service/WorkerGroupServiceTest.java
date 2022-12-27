@@ -92,7 +92,7 @@ public class WorkerGroupServiceTest {
 
     private final String GROUP_NAME = "testWorkerGroup";
 
-    private String tenantCode = "test";
+    private int tenantId = 1;
 
     private User getLoginUser() {
         User loginUser = new User();
@@ -111,7 +111,7 @@ public class WorkerGroupServiceTest {
                 baseServiceLogger)).thenReturn(false);
         Map<String, Object> result =
                 workerGroupService.saveWorkerGroup(loginUser, 1, GROUP_NAME, "localhost:0000", "test group", "",
-                        this.tenantCode);
+                        this.tenantId);
         Assertions.assertEquals(Status.USER_NO_OPERATION_PERM.getCode(),
                 ((Status) result.get(Constants.STATUS)).getCode());
     }
@@ -125,7 +125,7 @@ public class WorkerGroupServiceTest {
                 baseServiceLogger)).thenReturn(true);
         Map<String, Object> result =
                 workerGroupService.saveWorkerGroup(loginUser, 1, "", "localhost:0000", "test group", "",
-                        this.tenantCode);
+                        this.tenantId);
         Assertions.assertEquals(Status.NAME_NULL.getCode(),
                 ((Status) result.get(Constants.STATUS)).getCode());
     }
@@ -144,7 +144,7 @@ public class WorkerGroupServiceTest {
 
         Map<String, Object> result =
                 workerGroupService.saveWorkerGroup(loginUser, 1, GROUP_NAME, "localhost:0000", "test group", "",
-                        this.tenantCode);
+                        this.tenantId);
         Assertions.assertEquals(Status.NAME_EXIST.getCode(),
                 ((Status) result.get(Constants.STATUS)).getCode());
     }
@@ -164,7 +164,7 @@ public class WorkerGroupServiceTest {
 
         Map<String, Object> result =
                 workerGroupService.saveWorkerGroup(loginUser, 1, GROUP_NAME, "localhost:0000", "test group", "",
-                        this.tenantCode);
+                        this.tenantId);
         Assertions.assertEquals(Status.WORKER_ADDRESS_INVALID.getCode(),
                 ((Status) result.get(Constants.STATUS)).getCode());
     }
@@ -186,7 +186,7 @@ public class WorkerGroupServiceTest {
 
         Map<String, Object> result =
                 workerGroupService.saveWorkerGroup(loginUser, 1, GROUP_NAME, "localhost:0000", "test group", "",
-                        this.tenantCode);
+                        this.tenantId);
         Assertions.assertEquals(Status.SUCCESS.getCode(),
                 ((Status) result.get(Constants.STATUS)).getCode());
     }

@@ -109,19 +109,19 @@ public class ProjectServiceTest {
                 PROJECT_CREATE, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS, null, 1,
                 baseServiceLogger)).thenReturn(true);
-        Result result = projectService.createProject(loginUser, projectName, getDesc());
+        Result result = projectService.createProject(loginUser, projectName, getDesc(),loginUser.getTenantId());
         logger.info(result.toString());
         Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), 10001);
 
         // project name exist
         Mockito.when(projectMapper.queryByName(projectName)).thenReturn(getProject());
-        result = projectService.createProject(loginUser, projectName, projectName);
+        result = projectService.createProject(loginUser, projectName, projectName,loginUser.getTenantId());
         logger.info(result.toString());
         Assertions.assertEquals(Status.PROJECT_ALREADY_EXISTS.getCode(), result.getCode().intValue());
 
         // success
         Mockito.when(projectMapper.insert(Mockito.any(Project.class))).thenReturn(1);
-        result = projectService.createProject(loginUser, "test", "test");
+        result = projectService.createProject(loginUser, "test", "test",loginUser.getTenantId());
         logger.info(result.toString());
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
 

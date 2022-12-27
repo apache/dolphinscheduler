@@ -31,17 +31,16 @@ public interface TenantService {
     /**
      * create tenant
      *
-     * @param loginUser login user
+     * @param loginUser  login user
      * @param tenantCode tenant code
-     * @param queueId queue id
-     * @param desc description
+     * @param queueId    queue id
+     * @param desc       description
      * @return create result code
      * @throws Exception exception
      */
     Map<String, Object> createTenant(User loginUser,
                                      String tenantCode,
                                      int queueId,
-                                     int projectId,
                                      String desc) throws Exception;
 
     /**

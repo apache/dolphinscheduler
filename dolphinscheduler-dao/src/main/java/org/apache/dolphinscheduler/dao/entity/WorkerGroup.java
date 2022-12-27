@@ -54,4 +54,7 @@ public class WorkerGroup {
     @TableField("tenant_id")
     private Integer tenantId;
 
+    @TableField("tenant_code")
+    private String tenantCode;
+
 }

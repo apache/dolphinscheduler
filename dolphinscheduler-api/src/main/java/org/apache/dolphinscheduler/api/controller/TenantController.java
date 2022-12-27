@@ -87,10 +87,9 @@ public class TenantController extends BaseController {
     public Result createTenant(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                @RequestParam(value = "tenantCode") String tenantCode,
                                @RequestParam(value = "queueId") int queueId,
-                               @RequestParam(value = "projectId") int projectId,
                                @RequestParam(value = "description", required = false) String description) throws Exception {
 
-        Map<String, Object> result = tenantService.createTenant(loginUser, tenantCode, queueId, projectId, description);
+        Map<String, Object> result = tenantService.createTenant(loginUser, tenantCode, queueId, description);
         return returnDataList(result);
     }
 

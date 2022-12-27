@@ -134,10 +134,10 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     /**
      * create tenant
      *
-     * @param loginUser login user
+     * @param loginUser  login user
      * @param tenantCode tenant code
-     * @param queueId queue id
-     * @param desc description
+     * @param queueId    queue id
+     * @param desc       description
      * @return create result code
      * @throws Exception exception
      */
@@ -146,7 +146,6 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     public Map<String, Object> createTenant(User loginUser,
                                             String tenantCode,
                                             int queueId,
-                                            int projectId,
                                             String desc) throws Exception {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
@@ -158,7 +157,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
-        Tenant tenant = new Tenant(tenantCode, desc, queueId,projectId);
+        Tenant tenant = new Tenant(tenantCode, desc, queueId);
         createTenantValid(tenant);
         tenantMapper.insert(tenant);
 
@@ -229,7 +228,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
-        Tenant updateTenant = new Tenant(id, tenantCode, desc, queueId,projectId);
+        Tenant updateTenant = new Tenant(id, tenantCode, desc, queueId);
         Tenant existsTenant = tenantMapper.queryById(id);
         updateTenantValid(existsTenant, updateTenant);
 
@@ -400,7 +399,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             return tenantMapper.queryByTenantCode(tenantCode);
         }
         Queue queueObj = queueService.createQueueIfNotExists(queue, queueName);
-        Tenant tenant = new Tenant(tenantCode, desc, queueObj.getId(),projectId);
+        Tenant tenant = new Tenant(tenantCode, desc, queueObj.getId());
         createTenantValid(tenant);
         tenantMapper.insert(tenant);
         return tenant;

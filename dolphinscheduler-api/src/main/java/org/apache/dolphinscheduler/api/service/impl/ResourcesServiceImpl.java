@@ -141,7 +141,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Autowired
     private ProcessTaskRelationMapper processTaskRelationMapper;
 
-    @Autowired(required = false)
+    @Autowired
     private StorageOperate storageOperate;
 
     /**
@@ -887,12 +887,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                     }
                 }
             } else {
-                defaultPath = storageOperate.getResDir(tenantCode);
-                if (type.equals(ResourceType.UDF)) {
-                    defaultPath = storageOperate.getUdfDir(tenantCode);
-                }
-
-                resourcesList = storageOperate.listFilesStatusRecursively(defaultPath, defaultPath, tenantCode, type);
+                resourcesList=new ArrayList<>();
             }
         } else {
             defaultPath = storageOperate.getResDir(tenantCode);

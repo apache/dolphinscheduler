@@ -107,7 +107,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     @Override
     @Transactional
     public Map<String, Object> saveWorkerGroup(User loginUser, int id, String name, String addrList, String description,
-                                               String otherParamsJson, String tenantCode) {
+                                               String otherParamsJson, int tenantId) {
         Map<String, Object> result = new HashMap<>();
         if (!canOperatorPermissions(loginUser, null, AuthorizationType.WORKER_GROUP, WORKER_GROUP_CREATE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
@@ -131,13 +131,9 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         workerGroup.setAddrList(addrList);
         workerGroup.setUpdateTime(now);
         workerGroup.setDescription(description);
-
-        Tenant tenant = this.tenantMapper.queryByTenantCode(tenantCode);
-        if (tenant == null) {
-            putMsg(result, Status.TENANT_NOT_EXIST);
-            return result;
-        }
-        workerGroup.setTenantId(tenant.getId());
+        workerGroup.setTenantId(tenantId);
+        Tenant tenant=this.tenantMapper.queryById(tenantId);
+        workerGroup.setTenantCode(tenant.getTenantCode());
 
         if (checkWorkerGroupNameExists(workerGroup)) {
             logger.warn("Worker group with the same name already exists, name:{}.", workerGroup.getName());
@@ -288,7 +284,9 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         // worker groups from database
         List<WorkerGroup> workerGroups = null;
 
+
         User user = RequestContext.getLoginUser();
+        System.out.println("user type:"+user.getUserType());
         if (user.getUserType() == UserType.ADMIN_USER) {
             workerGroups = this.workerGroupMapper.queryAllWorkerGroup();
         } else {

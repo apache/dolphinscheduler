@@ -29,4 +29,11 @@
         where name = #{name}
     </select>
 
+
+    <select id="queryWorkerGroupByTenant" resultType="org.apache.dolphinscheduler.dao.entity.WorkerGroup">
+        select *
+        from t_ds_worker_group
+        where tenant_id = #{tenantId}
+    </select>
+
 </mapper>

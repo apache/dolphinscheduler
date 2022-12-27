@@ -38,9 +38,7 @@ export function useModalData(
       tenantCode: ref(''),
       description: ref(''),
       queueId: ref<number | null>(null),
-      projectId: ref<number | null>(null),
-      generalOptions: [],
-      projectOptions:[]
+      generalOptions: []
     },
     saving: false,
     rules: {
@@ -77,26 +75,6 @@ export function useModalData(
     return state
   }
 
-  const getProjectListData = (status: number) => {
-    const { state } = useAsyncState(
-      queryAllProjectList().then((res: any) => {
-        variables.model.projectOptions = res.map((item: any) => {
-          return {
-            label: item.name,
-            value: item.id
-          }
-        })
-        if (status === 0) {
-          variables.model.projectId = res[0].id
-        }
-        
-      }),
-      {}
-    )
-
-    return state
-  }
-
   const handleValidate = async (statusRef: number) => {
     await variables.tenantFormRef.validate()
 
@@ -117,7 +95,6 @@ export function useModalData(
         const data = {
           tenantCode: variables.model.tenantCode,
           queueId: variables.model.queueId as number,
-          projectId: variables.model.projectId as number,
           description: variables.model.description
         }
         createTenant(data).then(
@@ -125,7 +102,6 @@ export function useModalData(
             variables.model.tenantCode = ''
             variables.model.description = ''
             variables.model.queueId = null
-            variables.model.projectId = null
             ctx.emit('confirmModal', props.showModalRef)
           },
           (unused: any) => {
@@ -140,7 +116,6 @@ export function useModalData(
     const data = {
       tenantCode: variables.model.tenantCode,
       queueId: variables.model.queueId,
-      projectId: variables.model.projectId,
       description: variables.model.description,
       id: variables.model.id
     }
@@ -152,7 +127,6 @@ export function useModalData(
   return {
     variables,
     getListData,
-    getProjectListData,
     handleValidate
   }
 }

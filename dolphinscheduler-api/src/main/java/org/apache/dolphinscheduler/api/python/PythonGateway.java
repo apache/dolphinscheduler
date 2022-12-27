@@ -416,7 +416,7 @@ public class PythonGateway {
         Project project;
         project = projectMapper.queryByName(name);
         if (project == null) {
-            projectService.createProject(user, name, desc);
+            projectService.createProject(user, name, desc,user.getTenantId());
         } else if (project.getUserId() != user.getId()) {
             ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), user.getId());
             if (projectUser == null) {

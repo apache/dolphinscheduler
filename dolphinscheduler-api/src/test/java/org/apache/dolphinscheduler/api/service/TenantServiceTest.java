@@ -121,7 +121,7 @@ public class TenantServiceTest {
         // check exist
         String emptyTenantCode = "";
         Throwable exception = Assertions.assertThrows(ServiceException.class,
-                () -> tenantService.createTenant(loginUser, emptyTenantCode, 1, projectId, tenantDesc));
+                () -> tenantService.createTenant(loginUser, emptyTenantCode, 1, tenantDesc));
         String formatter = MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), emptyTenantCode);
         Assertions.assertEquals(formatter, exception.getMessage());
 
@@ -129,22 +129,22 @@ public class TenantServiceTest {
         String longStr =
                 "this_is_a_very_long_string_this_is_a_very_long_string_this_is_a_very_long_string_this_is_a_very_long_string";
         exception = Assertions.assertThrows(ServiceException.class,
-                () -> tenantService.createTenant(loginUser, longStr, 1, projectId, tenantDesc));
+                () -> tenantService.createTenant(loginUser, longStr, 1, tenantDesc));
         Assertions.assertEquals(Status.TENANT_FULL_NAME_TOO_LONG_ERROR.getMsg(), exception.getMessage());
 
         // check tenant code invalid
         exception = Assertions.assertThrows(ServiceException.class,
-                () -> tenantService.createTenant(getLoginUser(), "%!1111", 1, projectId, tenantDesc));
+                () -> tenantService.createTenant(getLoginUser(), "%!1111", 1, tenantDesc));
         Assertions.assertEquals(Status.CHECK_OS_TENANT_CODE_ERROR.getMsg(), exception.getMessage());
 
         // check exist
         exception = Assertions.assertThrows(ServiceException.class,
-                () -> tenantService.createTenant(loginUser, tenantCode, 1, projectId, tenantDesc));
+                () -> tenantService.createTenant(loginUser, tenantCode, 1, tenantDesc));
         formatter = MessageFormat.format(Status.OS_TENANT_CODE_EXIST.getMsg(), tenantCode);
         Assertions.assertEquals(formatter, exception.getMessage());
 
         // success
-        result = tenantService.createTenant(loginUser, "test", 1, projectId, tenantDesc);
+        result = tenantService.createTenant(loginUser, "test", 1, tenantDesc);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 

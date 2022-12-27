@@ -45,7 +45,7 @@ const WorkerGroupModal = defineComponent({
   },
   emits: ['cancelModal', 'confirmModal'],
   setup(props, ctx) {
-    const { variables, handleValidate, getListData } = useModal(props, ctx)
+    const { variables, handleValidate, getListData,getTenants } = useModal(props, ctx)
     const { t } = useI18n()
 
     const cancelModal = () => {
@@ -65,7 +65,7 @@ const WorkerGroupModal = defineComponent({
     watch(
       () => props.showModalRef,
       () => {
-        props.showModalRef && getListData()
+        props.showModalRef && getListData() && getTenants()
       }
     )
 
@@ -144,6 +144,14 @@ const WorkerGroupModal = defineComponent({
                     v-model={[this.model.addrList, 'value']}
                   />
                 </NFormItem>
+                
+                <NFormItem label={t('security.user.tenant_code')} path='tenantId'>
+              <NSelect
+                class='select-tenant'
+                options={this.model.tenantOptions}
+                v-model:value={this.model.tenantId}
+              />
+            </NFormItem>
               </NForm>
             )
           }}

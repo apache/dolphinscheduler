@@ -44,7 +44,10 @@ export function useTable() {
       searchVal: data.searchVal
     })
     data.loading = false
-    if (!totalList) throw Error()
+    if (!totalList) {
+      data.itemCount = 0
+      return 
+    }
     data.list = totalList.map((record: IRecord) => {
       record.createTime = record.createTime
         ? format(parseTime(record.createTime), 'yyyy-MM-dd HH:mm:ss')

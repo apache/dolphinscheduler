@@ -72,6 +72,13 @@ export const UserModal = defineComponent({
       () => props.show,
       () => {
         if (props.show && props.currentRecord?.id) {
+
+          if(props.currentRecord.userType=="PROJECT_ADMIN")
+          {
+            props.currentRecord.isProjectAdmin=1
+          }else{
+            props.currentRecord.isProjectAdmin=0
+          }
           onSetValues(props.currentRecord)
         }
       }
@@ -90,13 +97,6 @@ export const UserModal = defineComponent({
   render(props: { currentRecord: IRecord }) {
     const { t } = this
     const { currentRecord } = props
-    console.log(currentRecord);
-    if(currentRecord.userType=="PROJECT_ADMIN")
-    {
-      currentRecord.isProjectAdmin=1
-    }else{
-      currentRecord.isProjectAdmin=0
-    }
     return (
       <Modal
         show={this.show}

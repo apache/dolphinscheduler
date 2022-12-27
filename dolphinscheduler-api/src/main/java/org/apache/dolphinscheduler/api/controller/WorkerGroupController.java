@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.thread.RequestContext;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
@@ -75,6 +76,7 @@ public class WorkerGroupController extends BaseController {
             @Parameter(name = "id", description = "WORKER_GROUP_ID", schema = @Schema(implementation = int.class, example = "10", defaultValue = "0")),
             @Parameter(name = "name", description = "WORKER_GROUP_NAME", required = true, schema = @Schema(implementation = String.class)),
             @Parameter(name = "addrList", description = "WORKER_ADDR_LIST", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "tenantId", description = "TENANT_ID", schema = @Schema(implementation = int.class, example = "10", defaultValue = "0")),
             @Parameter(name = "description", description = "WORKER_DESC", required = false, schema = @Schema(implementation = String.class)),
             @Parameter(name = "otherParamsJson", description = "WORKER_PARMS_JSON", required = false, schema = @Schema(implementation = String.class)),
     })
@@ -86,12 +88,12 @@ public class WorkerGroupController extends BaseController {
                                   @RequestParam(value = "id", required = false, defaultValue = "0") int id,
                                   @RequestParam(value = "name") String name,
                                   @RequestParam(value = "addrList") String addrList,
-                                  @RequestParam(value = "tenantCode") String tenantCode,
+                                  @RequestParam(value = "tenantId") int tenantId,
                                   @RequestParam(value = "description", required = false, defaultValue = "") String description,
                                   @RequestParam(value = "otherParamsJson", required = false, defaultValue = "") String otherParamsJson) {
         Map<String, Object> result =
                 workerGroupService.saveWorkerGroup(loginUser, id, name, addrList, description, otherParamsJson,
-                        tenantCode);
+                        tenantId);
         return returnDataList(result);
     }
 

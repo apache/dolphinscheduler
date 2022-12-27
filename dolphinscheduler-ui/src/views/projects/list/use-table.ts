@@ -96,8 +96,8 @@ export function useTable() {
           )
       },
       {
-        title: t('project.list.owned_users'),
-        key: 'userName',
+        title: t('project.list.owned_tenant'),
+        key: 'tenantCode',
         ...COLUMN_WIDTH_CONFIG['userName']
       },
       {
