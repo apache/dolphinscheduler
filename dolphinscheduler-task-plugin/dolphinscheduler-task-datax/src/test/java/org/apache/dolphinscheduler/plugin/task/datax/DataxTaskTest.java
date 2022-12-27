@@ -69,6 +69,7 @@ public class DataxTaskTest {
     private DataxTask dataxTask;
 
     private final TaskCallBack taskCallBack = new TaskCallBack() {
+
         @Override
         public void updateRemoteApplicationInfo(int taskInstanceId, ApplicationInfo applicationInfo) {
 
