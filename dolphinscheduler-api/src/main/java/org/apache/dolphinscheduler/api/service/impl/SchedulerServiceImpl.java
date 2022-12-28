@@ -166,13 +166,18 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         scheduleObj.setProcessDefinitionName(processDefinition.getName());
 
         ScheduleParam scheduleParam = JSONUtils.parseObject(schedule, ScheduleParam.class);
+        if (now.after(scheduleParam.getStartTime())) {
+            logger.warn("The start time must be later than current time.");
+            putMsg(result, Status.START_TIME_BEFORE_CURRENT_TIME_ERROR);
+            return result;
+        }
         if (DateUtils.differSec(scheduleParam.getStartTime(), scheduleParam.getEndTime()) == 0) {
             logger.warn("The start time must not be the same as the end");
             putMsg(result, Status.SCHEDULE_START_TIME_END_TIME_SAME);
             return result;
         }
         if (scheduleParam.getStartTime().getTime() > scheduleParam.getEndTime().getTime()) {
-            logger.warn("The start time must smaller than end time");
+            logger.warn("The start time must be smaller than end time.");
             putMsg(result, Status.START_TIME_BIGGER_THAN_END_TIME_ERROR);
             return result;
         }
@@ -319,6 +324,13 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             return result;
         }
         if (scheduleStatus == ReleaseState.ONLINE) {
+            // check schedule start time
+            Date now = new Date();
+            if (now.after(scheduleObj.getStartTime())) {
+                logger.warn("The start time must be later than current time.");
+                putMsg(result, Status.START_TIME_BEFORE_CURRENT_TIME_ERROR);
+                return result;
+            }
             // check process definition release state
             if (processDefinition.getReleaseState() != ReleaseState.ONLINE) {
                 logger.info("not release process definition id: {} , name : {}",
@@ -667,13 +679,18 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                 putMsg(result, Status.PARSE_TO_CRON_EXPRESSION_ERROR);
                 return;
             }
+            if (now.after(scheduleParam.getStartTime())) {
+                logger.warn("The start time must be later than current time.");
+                putMsg(result, Status.START_TIME_BEFORE_CURRENT_TIME_ERROR);
+                return;
+            }
             if (DateUtils.differSec(scheduleParam.getStartTime(), scheduleParam.getEndTime()) == 0) {
                 logger.warn("The start time must not be the same as the end");
                 putMsg(result, Status.SCHEDULE_START_TIME_END_TIME_SAME);
                 return;
             }
             if (scheduleParam.getStartTime().getTime() > scheduleParam.getEndTime().getTime()) {
-                logger.warn("The start time must smaller than end time");
+                logger.warn("The start time must be smaller than end time.");
                 putMsg(result, Status.START_TIME_BIGGER_THAN_END_TIME_ERROR);
                 return;
             }

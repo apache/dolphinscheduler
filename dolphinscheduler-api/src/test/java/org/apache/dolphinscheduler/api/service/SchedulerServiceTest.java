@@ -83,6 +83,21 @@ public class SchedulerServiceTest {
     @InjectMocks
     private QuartzExecutorImpl quartzExecutors;
 
+    protected static User user;
+    protected Exception exception;
+    private static final String userName = "userName";
+    private static final String projectName = "projectName";
+    private static final long projectCode = 1L;
+    private static final int userId = 1;
+    private static final String processDefinitionName = "processDefinitionName";
+    private static final long processDefinitionCode = 2L;
+    private static final int processDefinitionVersion = 3;
+    private static final int scheduleId = 3;
+    private static final long environmentCode = 4L;
+    private static final String startTime = "2220-01-01 12:13:14";
+    private static final String endTime = "2220-02-01 12:13:14";
+    private static final String crontab = "0 0 * * * ? *";
+
     @Before
     public void setUp() {
 

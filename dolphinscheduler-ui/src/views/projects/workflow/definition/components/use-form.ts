@@ -74,7 +74,7 @@ export const useForm = () => {
     timingFormRef: ref(),
     timingForm: {
       startEndTime: [
-        new Date(year, month, day),
+        new Date(year, month, day + 1),
         new Date(year + 100, month, day)
       ],
       crontab: '0 0 * * * ? *',
