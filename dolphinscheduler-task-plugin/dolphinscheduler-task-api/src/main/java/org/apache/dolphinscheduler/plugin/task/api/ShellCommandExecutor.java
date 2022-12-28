@@ -91,25 +91,17 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
 
         StringBuilder sb = new StringBuilder();
         if (SystemUtils.IS_OS_WINDOWS) {
-            sb.append("@echo off\n");
-            sb.append("cd /d %~dp0\n");
+            sb.append("@echo off").append(System.lineSeparator());
+            sb.append("cd /d %~dp0").append(System.lineSeparator());
             if (StringUtils.isNotBlank(taskRequest.getEnvironmentConfig())) {
-                sb.append(taskRequest.getEnvironmentConfig()).append("\n");
-            } else {
-                if (taskRequest.getEnvFile() != null) {
-                    sb.append("call ").append(taskRequest.getEnvFile()).append("\n");
-                }
+                sb.append(taskRequest.getEnvironmentConfig()).append(System.lineSeparator());
             }
         } else {
-            sb.append("#!/bin/bash\n");
-            sb.append("BASEDIR=$(cd `dirname $0`; pwd)\n");
-            sb.append("cd $BASEDIR\n");
+            sb.append("#!/bin/bash").append(System.lineSeparator());
+            sb.append("BASEDIR=$(cd `dirname $0`; pwd)").append(System.lineSeparator());
+            sb.append("cd $BASEDIR").append(System.lineSeparator());
             if (StringUtils.isNotBlank(taskRequest.getEnvironmentConfig())) {
-                sb.append(taskRequest.getEnvironmentConfig()).append("\n");
-            } else {
-                if (taskRequest.getEnvFile() != null) {
-                    sb.append("source ").append(taskRequest.getEnvFile()).append("\n");
-                }
+                sb.append(taskRequest.getEnvironmentConfig()).append(System.lineSeparator());
             }
         }
         sb.append(execCommand);

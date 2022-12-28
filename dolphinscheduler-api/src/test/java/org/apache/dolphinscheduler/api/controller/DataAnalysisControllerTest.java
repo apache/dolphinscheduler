@@ -142,19 +142,4 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
         assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-
-    /**
-     * get mock Project
-     *
-     * @param projectName projectName
-     * @return Project
-     */
-    private Project getProject(String projectName) {
-        Project project = new Project();
-        project.setCode(11L);
-        project.setId(1);
-        project.setName(projectName);
-        project.setUserId(1);
-        return project;
-    }
 }

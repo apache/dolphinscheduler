@@ -21,12 +21,12 @@ import org.apache.dolphinscheduler.api.service.ResourcesService;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import java.util.Date;
@@ -103,36 +103,30 @@ public class PythonGatewayTest {
         String resourceDir = "/dir1/dir2/";
         String resourceName = "test";
         String resourceSuffix = "py";
-        String desc = "desc";
         String content = "content";
         String resourceFullName = resourceDir + resourceName + "." + resourceSuffix;
 
-        int resourceId = 3;
-
-        Mockito.when(resourcesService.createOrUpdateResource(user.getUserName(), resourceFullName, desc, content))
-                .thenReturn(resourceId);
-
-        int id = pythonGateway.createOrUpdateResource(
-                user.getUserName(), resourceFullName, desc, content);
-        Assertions.assertEquals(id, resourceId);
+        Assertions.assertDoesNotThrow(
+                () -> pythonGateway.createOrUpdateResource(user.getUserName(), resourceFullName, content));
     }
 
     @Test
-    public void testQueryResourcesFileInfo() {
+    public void testQueryResourcesFileInfo() throws Exception {
         User user = getTestUser();
-        Resource resource = getTestResource();
-        Mockito.when(resourcesService.queryResourcesFileInfo(user.getUserName(), resource.getFullName()))
-                .thenReturn(resource);
-        Resource result = pythonGateway.queryResourcesFileInfo(user.getUserName(), resource.getFullName());
-        Assertions.assertEquals(result.getId(), resource.getId());
+        StorageEntity storageEntity = getTestResource();
+
+        Mockito.when(resourcesService.queryFileStatus(user.getUserName(), storageEntity.getFullName()))
+                .thenReturn(storageEntity);
+        StorageEntity result = pythonGateway.queryResourcesFileInfo(user.getUserName(), storageEntity.getFullName());
+        Assertions.assertEquals(result.getId(), storageEntity.getId());
     }
 
-    private Resource getTestResource() {
-        Resource resource = new Resource();
-        resource.setId(1);
-        resource.setType(ResourceType.FILE);
-        resource.setFullName("/dev/test.py");
-        return resource;
+    private StorageEntity getTestResource() {
+        StorageEntity storageEntity = new StorageEntity();
+        storageEntity.setId(1);
+        storageEntity.setType(ResourceType.FILE);
+        storageEntity.setFullName("/dev/test.py");
+        return storageEntity;
     }
 
     private User getTestUser() {

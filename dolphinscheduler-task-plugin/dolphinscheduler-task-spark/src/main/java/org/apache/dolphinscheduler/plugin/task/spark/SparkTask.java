@@ -65,8 +65,6 @@ public class SparkTask extends AbstractYarnTask {
     @Override
     public void init() {
 
-        logger.info("spark task params {}", taskExecutionContext.getTaskParams());
-
         sparkParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SparkParameters.class);
 
         if (null == sparkParameters) {
@@ -82,6 +80,7 @@ public class SparkTask extends AbstractYarnTask {
         if (sparkParameters.getProgramType() != ProgramType.SQL) {
             setMainJarName();
         }
+        logger.info("Initialize spark task params {}", JSONUtils.toPrettyJsonString(sparkParameters));
     }
 
     /**
@@ -254,7 +253,7 @@ public class SparkTask extends AbstractYarnTask {
     }
 
     private String replaceParam(String script) {
-        script = script.replaceAll("\\r\\n", "\n");
+        script = script.replaceAll("\\r\\n", System.lineSeparator());
         // replace placeholder, and combining local and global parameters
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
         script = ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));

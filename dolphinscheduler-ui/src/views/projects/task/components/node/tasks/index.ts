@@ -49,7 +49,7 @@ import { useHiveCli } from './use-hive-cli'
 import { useDms } from './use-dms'
 import { useDatasync } from './use-datasync'
 import { useKubeflow } from './use-kubeflow'
-
+import { useLinkis } from './use-linkis'
 
 export default {
   SHELL: useShell,
@@ -85,5 +85,6 @@ export default {
   HIVECLI: useHiveCli,
   DMS: useDms,
   DATASYNC: useDatasync,
-  KUBEFLOW: useKubeflow
+  KUBEFLOW: useKubeflow,
+  LINKIS: useLinkis
 }

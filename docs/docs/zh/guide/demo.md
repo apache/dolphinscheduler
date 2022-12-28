@@ -8,7 +8,7 @@
 
 ### 下载新版本的安装包
 
-在[下载](/zh-cn/download/download.html)页面下载最新版本的二进制安装包，并将二进制包放到与当前 dolphinscheduler 服务不一样的路径中，以下服务启动操作都需要在新版本的目录进行。
+在[下载](https://dolphinscheduler.apache.org/zh-cn/download)页面下载最新版本的二进制安装包，并将二进制包放到与当前 dolphinscheduler 服务不一样的路径中，以下服务启动操作都需要在新版本的目录进行。
 
 ## 服务启动步骤
 
@@ -37,4 +37,3 @@ demo:
 然后执行初始化工作流 demo 服务的启动脚本：`sh ./tools/bin/create-demo-processes.sh` 来启动服务。
 
 创建 demo 可以参考[快速上手](start/quick-start.md)
-

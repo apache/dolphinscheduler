@@ -44,7 +44,7 @@ Multiple executions (any environment, any time) result in unique and repeatable 
 
 That is, any environment can be implemented quickly.
 
-This requires that we don't rely on too many components, such as various spring beans and the like. These are all mock in unit tests, nd adding them would increase the speed of our single-test execution, as well as potentially passing on contamination.
+This requires that we don't rely on too many components, such as various spring beans and the like. These are all mock in unit tests, and adding them would increase the speed of our single-test execution, as well as potentially passing on contamination.
 
 For some databases, other external components, etc. As far as possible, the mock client is not dependent on the external environment (the presence of any external dependencies greatly limits the portability and stability of test cases and the correctness of results), which also makes it easy for developers to test in any environment.
 

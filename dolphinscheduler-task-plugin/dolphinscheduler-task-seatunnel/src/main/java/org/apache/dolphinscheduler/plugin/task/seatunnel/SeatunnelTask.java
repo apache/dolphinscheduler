@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.seatunnel;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.seatunnel.Constants.CONFIG_OPTIONS;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
@@ -86,9 +87,9 @@ public class SeatunnelTask extends AbstractRemoteTask {
 
     @Override
     public void init() {
-        logger.info("SeaTunnel task params {}", taskExecutionContext.getTaskParams());
-        if (!seatunnelParameters.checkParameters()) {
-            throw new RuntimeException("SeaTunnel task params is not valid");
+        logger.info("Intialize SeaTunnel task params {}", JSONUtils.toPrettyJsonString(seatunnelParameters));
+        if (seatunnelParameters == null || !seatunnelParameters.checkParameters()) {
+            throw new TaskException("SeaTunnel task params is not valid");
         }
     }
 
@@ -172,7 +173,7 @@ public class SeatunnelTask extends AbstractRemoteTask {
 
     private String buildCustomConfigContent() {
         logger.info("raw custom config content : {}", seatunnelParameters.getRawScript());
-        String script = seatunnelParameters.getRawScript().replaceAll("\\r\\n", "\n");
+        String script = seatunnelParameters.getRawScript().replaceAll("\\r\\n", System.lineSeparator());
         script = parseScript(script);
         return script;
     }

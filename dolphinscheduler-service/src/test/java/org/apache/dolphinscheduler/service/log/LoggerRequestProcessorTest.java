@@ -21,10 +21,10 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.log.ViewLogRequestCommand;
+import org.apache.dolphinscheduler.remote.processor.LoggerRequestProcessor;
 import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -79,9 +79,7 @@ public class LoggerRequestProcessorTest {
         command.setBody(JSONUtils.toJsonByteArray(logRequestCommand));
 
         LoggerRequestProcessor loggerRequestProcessor = new LoggerRequestProcessor();
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            loggerRequestProcessor.process(channel, command);
-        });
+        loggerRequestProcessor.process(channel, command);
     }
 
     @Test
@@ -97,9 +95,7 @@ public class LoggerRequestProcessorTest {
         command.setBody(JSONUtils.toJsonByteArray(logRequestCommand));
 
         LoggerRequestProcessor loggerRequestProcessor = new LoggerRequestProcessor();
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            loggerRequestProcessor.process(channel, command);
-        });
+        loggerRequestProcessor.process(channel, command);
     }
 
     @Test
@@ -114,8 +110,6 @@ public class LoggerRequestProcessorTest {
         command.setBody(JSONUtils.toJsonByteArray(logRequestCommand));
 
         LoggerRequestProcessor loggerRequestProcessor = new LoggerRequestProcessor();
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            loggerRequestProcessor.process(channel, command);
-        });
+        loggerRequestProcessor.process(channel, command);
     }
 }

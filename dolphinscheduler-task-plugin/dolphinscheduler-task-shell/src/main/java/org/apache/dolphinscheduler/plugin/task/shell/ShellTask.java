@@ -76,12 +76,12 @@ public class ShellTask extends AbstractTask {
 
     @Override
     public void init() {
-        logger.info("shell task params {}", taskExecutionContext.getTaskParams());
 
         shellParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), ShellParameters.class);
+        logger.info("Initialize shell task params {}", JSONUtils.toPrettyJsonString(shellParameters));
 
-        if (!shellParameters.checkParameters()) {
-            throw new RuntimeException("shell task params is not valid");
+        if (shellParameters == null || !shellParameters.checkParameters()) {
+            throw new TaskException("shell task params is not valid");
         }
     }
 
@@ -137,7 +137,7 @@ public class ShellTask extends AbstractTask {
             return fileName;
         }
 
-        String script = shellParameters.getRawScript().replaceAll("\\r\\n", "\n");
+        String script = shellParameters.getRawScript().replaceAll("\\r\\n", System.lineSeparator());
         script = parseScript(script);
         shellParameters.setRawScript(script);
 

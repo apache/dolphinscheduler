@@ -92,7 +92,22 @@ export function useDatasource(
       id: 10,
       code: 'ATHENA',
       disabled: false
-    }
+    },
+    {
+      id: 12,
+      code: 'TRINO',
+      disabled: false
+    },
+    {
+      id: 13,
+      code: 'STARROCKS',
+      disabled: false
+    },
+    {
+      id: 14,
+      code: 'AZURESQL',
+      disabled: false
+    },
   ]
 
   const getDatasourceTypes = async () => {

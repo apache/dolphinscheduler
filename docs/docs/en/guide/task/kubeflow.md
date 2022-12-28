@@ -26,7 +26,31 @@ The task plugin picture is as follows
 ### Here are some specific parameters for the Kubeflow plugin
 
 - **Namespace**：The namespace parameter of the cluster
-- **yamlContent**：CRD YAML file content
+- **yamlContent**：CRD YAML file content, for example:
+
+```yaml
+apiVersion: "kubeflow.org/v1"
+kind: TFJob
+metadata:
+  name: tfjob-simple
+  namespace: kubeflow-user-example-com
+spec:
+  tfReplicaSpecs:
+    Worker:
+      replicas: 2
+      restartPolicy: OnFailure
+      template:
+        metadata:
+          annotations:
+            sidecar.istio.io/inject: "false"
+        spec:
+          containers:
+            - name: tensorflow
+              image: gcr.io/kubeflow-ci/tf-mnist-with-summaries:1.0
+              command:
+                - "python"
+                - "/var/tf_mnist/mnist_with_summaries.py"
+```
 
 ## Environment Configuration
 

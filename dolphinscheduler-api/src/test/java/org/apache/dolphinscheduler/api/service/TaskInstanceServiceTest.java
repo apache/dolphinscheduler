@@ -24,6 +24,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
+import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceRemoveCacheResponse;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.TaskInstanceServiceImpl;
@@ -40,6 +41,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -92,6 +94,9 @@ public class TaskInstanceServiceTest {
 
     @Mock
     TaskDefinitionMapper taskDefinitionMapper;
+
+    @Mock
+    TaskInstanceDao taskInstanceDao;
 
     @Test
     public void queryTaskListPaging() {
@@ -299,8 +304,8 @@ public class TaskInstanceServiceTest {
         Map<String, Object> mockFailure = new HashMap<>(5);
         putMsg(mockFailure, Status.USER_NO_OPERATION_PROJECT_PERM, user.getUserName(), projectCode);
         when(projectService.checkProjectAndAuth(user, project, projectCode, FORCED_SUCCESS)).thenReturn(mockFailure);
-        Map<String, Object> authFailRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
-        Assertions.assertNotSame(Status.SUCCESS, authFailRes.get(Constants.STATUS));
+        Result authFailRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
+        Assertions.assertNotSame(Status.SUCCESS.getCode(), authFailRes.getCode());
 
         // test task not found
         when(projectService.checkProjectAndAuth(user, project, projectCode, FORCED_SUCCESS)).thenReturn(mockSuccess);
@@ -308,8 +313,8 @@ public class TaskInstanceServiceTest {
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setProjectCode(projectCode);
         when(taskDefinitionMapper.queryByCode(task.getTaskCode())).thenReturn(taskDefinition);
-        Map<String, Object> taskNotFoundRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
-        Assertions.assertEquals(Status.TASK_INSTANCE_NOT_FOUND, taskNotFoundRes.get(Constants.STATUS));
+        Result taskNotFoundRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
+        Assertions.assertEquals(Status.TASK_INSTANCE_NOT_FOUND.getCode(), taskNotFoundRes.getCode().intValue());
 
         // test task instance state error
         task.setState(TaskExecutionStatus.SUCCESS);
@@ -318,8 +323,9 @@ public class TaskInstanceServiceTest {
         putMsg(result, Status.SUCCESS, projectCode);
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         when(projectService.checkProjectAndAuth(user, project, projectCode, FORCED_SUCCESS)).thenReturn(result);
-        Map<String, Object> taskStateErrorRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
-        Assertions.assertEquals(Status.TASK_INSTANCE_STATE_OPERATION_ERROR, taskStateErrorRes.get(Constants.STATUS));
+        Result taskStateErrorRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
+        Assertions.assertEquals(Status.TASK_INSTANCE_STATE_OPERATION_ERROR.getCode(),
+                taskStateErrorRes.getCode().intValue());
 
         // test error
         task.setState(TaskExecutionStatus.FAILURE);
@@ -327,8 +333,8 @@ public class TaskInstanceServiceTest {
         putMsg(result, Status.SUCCESS, projectCode);
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         when(projectService.checkProjectAndAuth(user, project, projectCode, FORCED_SUCCESS)).thenReturn(result);
-        Map<String, Object> errorRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
-        Assertions.assertEquals(Status.FORCE_TASK_SUCCESS_ERROR, errorRes.get(Constants.STATUS));
+        Result errorRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
+        Assertions.assertEquals(Status.FORCE_TASK_SUCCESS_ERROR.getCode(), errorRes.getCode().intValue());
 
         // test success
         task.setState(TaskExecutionStatus.FAILURE);
@@ -336,7 +342,34 @@ public class TaskInstanceServiceTest {
         putMsg(result, Status.SUCCESS, projectCode);
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         when(projectService.checkProjectAndAuth(user, project, projectCode, FORCED_SUCCESS)).thenReturn(result);
-        Map<String, Object> successRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
-        Assertions.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+        Result successRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
+        Assertions.assertEquals(Status.SUCCESS.getCode(), successRes.getCode().intValue());
+
+    }
+
+    @Test
+    public void testRemoveTaskInstanceCache() {
+        User user = getAdminUser();
+        long projectCode = 1L;
+        Project project = getProject(projectCode);
+        int taskId = 1;
+        TaskInstance task = getTaskInstance();
+        String cacheKey = "950311f3597f9198976cd3fd69e208e5b9ba6750";
+        task.setCacheKey(cacheKey);
+
+        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
+        when(taskInstanceMapper.selectById(1)).thenReturn(task);
+        when(taskInstanceDao.findTaskInstanceByCacheKey(cacheKey)).thenReturn(task, null);
+        when(taskInstanceDao.updateTaskInstance(task)).thenReturn(true);
+
+        TaskInstanceRemoveCacheResponse response =
+                taskInstanceService.removeTaskInstanceCache(user, projectCode, taskId);
+        Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode());
+
+        when(taskInstanceMapper.selectById(1)).thenReturn(null);
+        TaskInstanceRemoveCacheResponse responseNotFoundTask =
+                taskInstanceService.removeTaskInstanceCache(user, projectCode, taskId);
+        Assertions.assertEquals(Status.TASK_INSTANCE_NOT_FOUND.getCode(), responseNotFoundTask.getCode());
+
     }
 }

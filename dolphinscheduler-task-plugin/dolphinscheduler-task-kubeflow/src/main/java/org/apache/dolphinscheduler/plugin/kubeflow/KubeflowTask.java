@@ -53,8 +53,8 @@ public class KubeflowTask extends AbstractRemoteTask {
 
     @Override
     public void init() throws TaskException {
-        logger.info("Kubeflow task params {}", taskExecutionContext.getTaskParams());
         kubeflowParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), KubeflowParameters.class);
+        logger.info("Initialize Kubeflow task params {}", taskExecutionContext.getTaskParams());
 
         kubeflowParameters.setClusterYAML(taskExecutionContext.getK8sTaskExecutionContext().getConfigYaml());
         if (!kubeflowParameters.checkParameters()) {
@@ -109,6 +109,7 @@ public class KubeflowTask extends AbstractRemoteTask {
         logger.info("Kubeflow task delete command: \n{}", command);
         String message = runCommand(command);
         logger.info("Kubeflow task delete result: \n{}", message);
+        exitStatusCode = TaskConstants.EXIT_CODE_KILL;
     }
 
     protected String runCommand(String command) {
