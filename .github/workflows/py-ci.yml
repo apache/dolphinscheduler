@@ -152,12 +152,12 @@ jobs:
           submodules: true
       - name: Sanity Check
         uses: ./.github/actions/sanity-check
-      - name: Cache local Maven repository
-        uses: actions/cache@v2
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-maven-
+#      - name: Cache local Maven repository
+#        uses: actions/cache@v2
+#        with:
+#          path: ~/.m2/repository
+#          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+#          restore-keys: ${{ runner.os }}-maven-
       # Switch to project root directory to run mvnw command
       - name: Build Image
         working-directory: ./

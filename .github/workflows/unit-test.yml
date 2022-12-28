@@ -68,10 +68,10 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
           distribution: 'adopt'
-      - uses: actions/cache@v2
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven
+#      - uses: actions/cache@v2
+#        with:
+#          path: ~/.m2/repository
+#          key: ${{ runner.os }}-maven
 
       - name: Run Unit tests
         run: ./mvnw clean verify -B -Dmaven.test.skip=false
