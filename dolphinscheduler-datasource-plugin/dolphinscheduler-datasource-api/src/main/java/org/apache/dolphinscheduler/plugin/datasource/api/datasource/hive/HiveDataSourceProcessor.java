@@ -34,8 +34,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class HiveDataSourceProcessor extends AbstractDataSourceProcessor {
@@ -47,7 +46,7 @@ public class HiveDataSourceProcessor extends AbstractDataSourceProcessor {
 
         hiveDataSourceParamDTO.setDatabase(hiveConnectionParam.getDatabase());
         hiveDataSourceParamDTO.setUserName(hiveConnectionParam.getUser());
-        hiveDataSourceParamDTO.setOther(hiveConnectionParam.getOther());
+        hiveDataSourceParamDTO.setOther(parseOther(hiveConnectionParam.getOther()));
         hiveDataSourceParamDTO.setLoginUserKeytabUsername(hiveConnectionParam.getLoginUserKeytabUsername());
         hiveDataSourceParamDTO.setLoginUserKeytabPath(hiveConnectionParam.getLoginUserKeytabPath());
         hiveDataSourceParamDTO.setJavaSecurityKrb5Conf(hiveConnectionParam.getJavaSecurityKrb5Conf());
@@ -91,7 +90,8 @@ public class HiveDataSourceProcessor extends AbstractDataSourceProcessor {
             hiveConnectionParam.setLoginUserKeytabPath(hiveParam.getLoginUserKeytabPath());
             hiveConnectionParam.setLoginUserKeytabUsername(hiveParam.getLoginUserKeytabUsername());
         }
-        hiveConnectionParam.setOther(hiveParam.getOther());
+        hiveConnectionParam.setOther(transformOther(hiveParam.getOther()));
+        hiveConnectionParam.setProps(hiveParam.getOther());
         return hiveConnectionParam;
     }
 
@@ -114,10 +114,11 @@ public class HiveDataSourceProcessor extends AbstractDataSourceProcessor {
     public String getJdbcUrl(ConnectionParam connectionParam) {
         HiveConnectionParam hiveConnectionParam = (HiveConnectionParam) connectionParam;
         String jdbcUrl = hiveConnectionParam.getJdbcUrl();
-        if (MapUtils.isNotEmpty(hiveConnectionParam.getOther())) {
-            return jdbcUrl + "?" + transformOther(hiveConnectionParam.getOther());
+        String otherParams = filterOther(hiveConnectionParam.getOther());
+        if (StringUtils.isNotEmpty(otherParams) && !"?".equals(otherParams.substring(0, 1))) {
+            jdbcUrl += ";";
         }
-        return jdbcUrl;
+        return jdbcUrl + otherParams;
     }
 
     @Override
@@ -139,9 +140,47 @@ public class HiveDataSourceProcessor extends AbstractDataSourceProcessor {
         if (MapUtils.isEmpty(otherMap)) {
             return null;
         }
-        List<String> otherList = new ArrayList<>();
-        otherMap.forEach((key, value) -> otherList.add(String.format("%s=%s", key, value)));
-        return String.join(";", otherList);
+        StringBuilder stringBuilder = new StringBuilder();
+        otherMap.forEach((key, value) -> stringBuilder.append(String.format("%s=%s;", key, value)));
+        return stringBuilder.toString();
     }
 
+    private String filterOther(String otherParams) {
+        if (StringUtils.isBlank(otherParams)) {
+            return "";
+        }
+
+        StringBuilder hiveConfListSb = new StringBuilder();
+        hiveConfListSb.append("?");
+        StringBuilder sessionVarListSb = new StringBuilder();
+
+        String[] otherArray = otherParams.split(";", -1);
+
+        for (String conf : otherArray) {
+            sessionVarListSb.append(conf).append(";");
+        }
+
+        // remove the last ";"
+        if (sessionVarListSb.length() > 0) {
+            sessionVarListSb.deleteCharAt(sessionVarListSb.length() - 1);
+        }
+
+        if (hiveConfListSb.length() > 0) {
+            hiveConfListSb.deleteCharAt(hiveConfListSb.length() - 1);
+        }
+
+        return sessionVarListSb.toString() + hiveConfListSb.toString();
+    }
+
+    private Map<String, String> parseOther(String other) {
+        if (other == null) {
+            return null;
+        }
+        Map<String, String> otherMap = new LinkedHashMap<>();
+        String[] configs = other.split(";");
+        for (String config : configs) {
+            otherMap.put(config.split("=")[0], config.split("=")[1]);
+        }
+        return otherMap;
+    }
 }

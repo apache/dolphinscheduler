@@ -17,22 +17,16 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.datasource;
 
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.text.MessageFormat;
-import java.util.Collections;
 import java.util.Map;
 import java.util.regex.Pattern;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.google.common.collect.Sets;
 
 public abstract class AbstractDataSourceProcessor implements DataSourceProcessor {
 
@@ -86,14 +80,6 @@ public abstract class AbstractDataSourceProcessor implements DataSourceProcessor
         if (!paramsCheck) {
             throw new IllegalArgumentException("datasource other params illegal");
         }
-    }
-
-    protected Map<String, String> transformOtherParamToMap(String other) {
-        if (StringUtils.isBlank(other)) {
-            return Collections.emptyMap();
-        }
-        return JSONUtils.parseObject(other, new TypeReference<Map<String, String>>() {
-        });
     }
 
     @Override
