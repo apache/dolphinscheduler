@@ -115,9 +115,17 @@ public class SchedulerController extends BaseController {
                                  @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
                                  @RequestParam(value = "environmentCode", required = false, defaultValue = "-1") Long environmentCode,
                                  @RequestParam(value = "processInstancePriority", required = false, defaultValue = DEFAULT_PROCESS_INSTANCE_PRIORITY) Priority processInstancePriority) {
-        Map<String, Object> result = schedulerService.insertSchedule(loginUser, projectCode, processDefinitionCode,
+        Map<String, Object> result = schedulerService.insertSchedule(
+                loginUser,
+                projectCode,
+                processDefinitionCode,
                 schedule,
-                warningType, warningGroupId, failureStrategy, processInstancePriority, workerGroup, environmentCode);
+                warningType,
+                warningGroupId,
+                failureStrategy,
+                processInstancePriority,
+                workerGroup,
+                environmentCode);
 
         return returnDataList(result);
     }

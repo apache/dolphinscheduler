@@ -77,6 +77,14 @@ public class QuartzScheduler implements SchedulerApi {
          */
         Date startDate = DateUtils.transformTimezoneDate(schedule.getStartTime(), timezoneId);
         Date endDate = DateUtils.transformTimezoneDate(schedule.getEndTime(), timezoneId);
+        /**
+         * If the start time is less than the current time, the start time is set to the current time.
+         * We do this change to avoid misfires all triggers when update the scheduler.
+         */
+        Date now = new Date();
+        if (startDate.before(now)) {
+            startDate = now;
+        }
 
         lock.writeLock().lock();
         try {
@@ -111,9 +119,8 @@ public class QuartzScheduler implements SchedulerApi {
                     .endAt(endDate)
                     .withSchedule(
                             cronSchedule(cronExpression)
-                                    .withMisfireHandlingInstructionDoNothing()
-                                    .inTimeZone(DateUtils.getTimezone(timezoneId))
-                    )
+                                    .withMisfireHandlingInstructionIgnoreMisfires()
+                                    .inTimeZone(DateUtils.getTimezone(timezoneId)))
                     .forJob(jobDetail).build();
 
             if (scheduler.checkExists(triggerKey)) {
