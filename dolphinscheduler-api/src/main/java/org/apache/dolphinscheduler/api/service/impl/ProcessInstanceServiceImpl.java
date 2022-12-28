@@ -50,6 +50,7 @@ import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
+import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
@@ -173,6 +174,9 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
 
     @Autowired
     private ScheduleMapper scheduleMapper;
+
+    @Autowired
+    private AlertDao alertDao;
 
     @Autowired
     private CuringParamsService curingGlobalParamsService;
@@ -781,37 +785,27 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
      * delete process instance by id, at the same time，delete task instance and their mapping relation data
      *
      * @param loginUser         login user
-     * @param projectCode       project code
      * @param processInstanceId process instance id
      * @return delete result code
      */
     @Override
     @Transactional
-    public Map<String, Object> deleteProcessInstanceById(User loginUser, long projectCode, Integer processInstanceId) {
-        Project project = projectMapper.queryByCode(projectCode);
-        // check user access for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode,
-                        ApiFuncIdentificationConstant.INSTANCE_DELETE);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+    public void deleteProcessInstanceById(User loginUser, Integer processInstanceId) {
         ProcessInstance processInstance = processService.findProcessInstanceDetailById(processInstanceId)
                 .orElseThrow(() -> new ServiceException(PROCESS_INSTANCE_NOT_EXIST, processInstanceId));
+        ProcessDefinition processDefinition = processDefinitionLogMapper.queryByDefinitionCodeAndVersion(
+                processInstance.getProcessDefinitionCode(), processInstance.getProcessDefinitionVersion());
+
+        Project project = projectMapper.queryByCode(processDefinition.getProjectCode());
+        // check user access for project
+        projectService.checkProjectAndAuthThrowException(loginUser, project,
+                ApiFuncIdentificationConstant.INSTANCE_DELETE);
         // check process instance status
         if (!processInstance.getState().isFinished()) {
             logger.warn("Process Instance state is {} so can not delete process instance, processInstanceId:{}.",
                     processInstance.getState().getDesc(), processInstanceId);
             throw new ServiceException(PROCESS_INSTANCE_STATE_OPERATION_ERROR, processInstance.getName(),
                     processInstance.getState(), "delete");
-        }
-
-        ProcessDefinition processDefinition =
-                processDefineMapper.queryByCode(processInstance.getProcessDefinitionCode());
-        if (processDefinition != null && projectCode != processDefinition.getProjectCode()) {
-            logger.error("Process definition does not exist, projectCode:{}, ProcessDefinitionCode:{}.",
-                    projectCode, processInstance.getProcessDefinitionCode());
-            throw new ServiceException(PROCESS_INSTANCE_NOT_EXIST, processInstanceId);
         }
 
         // delete database cascade
@@ -824,38 +818,18 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         // When delete task instance error, the task log file will also be deleted, this may cause data inconsistency.
         processService.removeTaskLogFile(processInstanceId);
         taskInstanceDao.deleteByWorkflowInstanceId(processInstanceId);
+        alertDao.deleteByWorkflowInstanceId(processInstanceId);
 
         if (delete > 0) {
             logger.info(
-                    "Delete process instance complete, projectCode:{}, ProcessDefinitionCode{}, processInstanceId:{}.",
-                    projectCode, processInstance.getProcessDefinitionCode(), processInstanceId);
-            putMsg(result, Status.SUCCESS);
+                    "Delete process instance complete, ProcessDefinitionCode{}, processInstanceId:{}.",
+                    processInstance.getProcessDefinitionCode(), processInstanceId);
         } else {
             logger.error(
-                    "Delete process instance error, projectCode:{}, ProcessDefinitionCode{}, processInstanceId:{}.",
-                    projectCode, processInstance.getProcessDefinitionCode(), processInstanceId);
-            putMsg(result, Status.DELETE_PROCESS_INSTANCE_BY_ID_ERROR);
+                    "Delete process instance error, ProcessDefinitionCode{}, processInstanceId:{}.",
+                    processInstance.getProcessDefinitionCode(), processInstanceId);
             throw new ServiceException(Status.DELETE_PROCESS_INSTANCE_BY_ID_ERROR);
         }
-
-        return result;
-    }
-
-    /**
-     * delete workflow instance by id, at the same time，delete task instance and their mapping relation data
-     *
-     * @param loginUser          login user
-     * @param workflowInstanceId workflow instance id
-     * @return delete result code
-     */
-    @Override
-    public Map<String, Object> deleteProcessInstanceById(User loginUser, Integer workflowInstanceId) {
-        ProcessInstance processInstance = processService.findProcessInstanceDetailById(workflowInstanceId)
-                .orElseThrow(() -> new ServiceException(PROCESS_INSTANCE_NOT_EXIST, workflowInstanceId));
-        ProcessDefinition processDefinition =
-                processDefineMapper.queryByCode(processInstance.getProcessDefinitionCode());
-
-        return deleteProcessInstanceById(loginUser, processDefinition.getProjectCode(), workflowInstanceId);
     }
 
     /**

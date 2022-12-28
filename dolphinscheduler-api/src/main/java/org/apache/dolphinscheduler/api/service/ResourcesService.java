@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.dto.resources.DeleteDataTransferResponse;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -97,8 +98,9 @@ public interface ResourcesService {
      * @param pageSize page size
      * @return resource list page
      */
-    Result queryResourceListPaging(User loginUser, String fullName, String resTenantCode,
-                                   ResourceType type, String searchVal, Integer pageNo, Integer pageSize);
+    Result<PageInfo<StorageEntity>> queryResourceListPaging(User loginUser, String fullName, String resTenantCode,
+                                                            ResourceType type, String searchVal, Integer pageNo,
+                                                            Integer pageSize);
 
     /**
      * query resource list
