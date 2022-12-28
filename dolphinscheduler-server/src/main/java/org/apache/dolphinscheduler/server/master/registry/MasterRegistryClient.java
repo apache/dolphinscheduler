@@ -483,6 +483,8 @@ public class MasterRegistryClient {
                 .buildTaskInstanceRelatedInfo(taskInstance)
                 .buildProcessInstanceRelatedInfo(processInstance)
                 .create();
+        taskExecutionContext.setProcessDefineCode(processInstance.getProcessDefinitionCode());
+        taskExecutionContext.setProcessDefineVersion(processInstance.getProcessDefinitionVersion());
 
         if (masterConfig.getMasterKillYarnJobWhenHandleFailOver()
             && !(taskInstance.isSubProcess()
