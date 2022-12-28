@@ -5,8 +5,8 @@
 本文扩容是针对现有的DolphinScheduler集群添加新的master或者worker节点的操作说明.
 
 ```
- 注意： 一台物理机上不能存在多个master服务进程或者worker服务进程.
-       如果扩容master或者worker节点所在的物理机已经安装了调度的服务,请直接跳到 [1.4.修改配置]. 编辑 ** 所有 ** 节点上的配置文件 `conf/config/install_config.conf`. 新增masters或者workers参数,重启调度集群即可.
+注意： 一台物理机上不能存在多个master服务进程或者worker服务进程.
+      如果扩容master或者worker节点所在的物理机已经安装了调度的服务,请直接跳到 [1.4.修改配置]. 编辑 ** 所有 ** 节点上的配置文件 `bin/env/install_env.sh`. 新增masters或者workers参数,重启调度集群即可.
 ```
 
 ### 1.1. 基础软件安装(必装项请自行安装)
@@ -95,14 +95,12 @@ sed -i 's/Defaults    requirett/#Defaults    requirett/g' /etc/sudoers
 
 - 将jdk软链到/usr/bin/java下(仍以 JAVA_HOME=/opt/soft/java 为例)
 
-    ```shell
-    sudo ln -s /opt/soft/java/bin/java /usr/bin/java
-    ```
-
- - 修改 **所有** 节点上的配置文件 `conf/config/install_config.conf`, 同步修改以下配置.
-    
-    * 新增的master节点, 需要修改 ips 和 masters 参数.
-    * 新增的worker节点, 需要修改 ips 和  workers 参数.
+  ```shell
+  sudo ln -s /opt/soft/java/bin/java /usr/bin/java
+  ```
+- 修改 **所有** 节点上的配置文件 `bin/env/install_env.sh`, 同步修改以下配置.
+  * 新增的master节点, 需要修改 ips 和 masters 参数.
+  * 新增的worker节点, 需要修改 ips 和  workers 参数.
 
 ```shell
 #在哪些机器上新增部署DS服务,多个物理机之间用逗号隔开.
@@ -224,10 +222,9 @@ bash bin/dolphinscheduler-daemon.sh start alert-server   启动 alert  服务
 
 ### 2.2 修改配置文件
 
- - 修改 **所有** 节点上的配置文件 `conf/config/install_config.conf`, 同步修改以下配置.
-    
-    * 缩容master节点, 需要修改 ips 和 masters 参数.
-    * 缩容worker节点, 需要修改 ips 和  workers 参数.
+- 修改 **所有** 节点上的配置文件 `bin/env/install_env.sh`, 同步修改以下配置.
+  * 缩容master节点, 需要修改 ips 和 masters 参数.
+  * 缩容worker节点, 需要修改 ips 和  workers 参数.
 
 ```shell
 #在哪些机器上部署DS服务，本机选localhost

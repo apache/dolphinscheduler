@@ -35,7 +35,7 @@ jar 包 并添加到 `./tools/libs` 目录下，修改 `./bin/env/dolphinschedul
 
 ### 服务升级
 
-#### 修改 `bin/env/install_config.conf` 配置内容
+#### 修改 `bin/env/install_env.sh` 配置内容
 
 - 伪集群部署请参照[伪集群部署(Pseudo-Cluster)](./installation/pseudo-cluster.md)中的 `修改相关配置`
 - 集群部署请参照[集群部署(Cluster)](./installation/cluster.md)中的 `修改相关配置`
@@ -62,7 +62,7 @@ jar 包 并添加到 `./tools/libs` 目录下，修改 `./bin/env/dolphinschedul
 | 1   | service1     | 192.168.xx.10    |
 | 2   | service2     | 192.168.xx.11,192.168.xx.12      |
 
-- 修改 `bin/env/install_config.conf` 中的 workers 参数
+- 修改 `bin/env/install_env.sh` 中的 workers 参数
 
 假设以下为要部署的 worker 主机名和 ip 的对应关系
 | 主机名 | ip |
