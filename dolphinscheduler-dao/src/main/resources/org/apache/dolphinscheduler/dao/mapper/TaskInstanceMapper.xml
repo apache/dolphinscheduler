@@ -123,7 +123,6 @@
         state, count(0) as count
         from t_ds_task_instance t
         left join t_ds_task_definition_log d on d.code=t.task_code and d.version=t.task_definition_version
-        left join t_ds_project p on p.code=d.project_code
         where 1=1
         <if test="states != null and states.size != 0">
             and t.state in
