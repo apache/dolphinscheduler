@@ -3,6 +3,7 @@
 DolphinScheduler has three parameter types:
 
 * [Global Parameter](global.md): parameters defined at the workflow define page.
+* [Startup Parameter](startup-parameter.md): parameters defined at the workflow launch page.
 * [Parameter Context](context.md): parameters passed by upstream task nodes.
 * [Local Parameter](local.md): parameters belong to its node, which is the parameters defined by the user in [Custom Parameters].
 
