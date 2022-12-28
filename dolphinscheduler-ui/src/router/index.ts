@@ -55,6 +55,8 @@ router.beforeEach(
     NProgress.start()
     const userStore = useUserStore()
     const metaData: metaData = to.meta
+    console.log((userStore.getUserInfo as UserInfoRes).userType)
+    console.log(metaData)
     if (
       (userStore.getUserInfo as UserInfoRes).userType == 'GENERAL_USER' &&
       metaData.activeMenu === 'security') {
@@ -63,7 +65,10 @@ router.beforeEach(
     }else if((userStore.getUserInfo as UserInfoRes).userType == 'PROJECT_ADMIN' &&
       metaData.activeMenu === 'security'){
       next()
-    }else {
+    }else if((userStore.getUserInfo as UserInfoRes).userType == 'ADMIN_USER' &&
+    metaData.activeMenu === 'resource'){
+    next()
+  } else {
       next()
     }
 

@@ -42,6 +42,8 @@ import { verifyName } from '@/service/modules/process-definition'
 import './x6-style.scss'
 import { positiveIntegerRegex } from '@/utils/regex'
 import type { SaveForm, WorkflowDefinition, WorkflowInstance } from './types'
+import { useUserStore } from '@/store/user/user'
+import type { UserInfoRes } from '@/service/modules/users/types'
 
 const props = {
   visible: {
@@ -75,19 +77,16 @@ export default defineComponent({
     const projectCode = Number(route.params.projectCode)
     const tenants = ref<Tenant[]>([])
     const tenantsDropdown = computed(() => {
-      if (tenants.value) {
-        return tenants.value
-          .map((t) => ({
-            label: t.tenantCode,
-            value: t.tenantCode
-          }))
-          .concat({ label: 'default', value: 'default' })
-      }
-      return []
+      return [{
+        label: (useUserStore().getUserInfo as UserInfoRes).tenantCode,
+        value: (useUserStore().getUserInfo as UserInfoRes).tenantCode
+      }]
     })
     onMounted(() => {
+
+      console.log((useUserStore().getUserInfo as UserInfoRes).tenantCode)
       queryTenantList().then((res: any) => {
-        tenants.value = res
+        tenants.value = []
       })
     })
 

@@ -52,6 +52,8 @@ import styles from './index.module.scss'
 import type { ResourceFile } from '@/service/modules/resources/types'
 import type { Router } from 'vue-router'
 import Search from "@/components/input-search";
+import { useUserStore } from '@/store/user/user'
+import type { UserInfoRes } from '@/service/modules/users/types'
 
 export default defineComponent({
   name: 'File',
@@ -162,7 +164,10 @@ export default defineComponent({
     const fileStore = useFileStore()
 
     onMounted(() => {
-      resourceListRef.value = getResourceListState(fullName.value, tenantCode.value,searchRef.value)
+      if((useUserStore().getUserInfo as UserInfoRes).userType !== 'ADMIN_USER')
+      {
+        resourceListRef.value = getResourceListState(fullName.value, tenantCode.value,searchRef.value)
+      }
     })
 
     const breadcrumbItemsRef: Ref<Array<BreadcrumbItem> | undefined> = ref([

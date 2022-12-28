@@ -111,6 +111,11 @@ public class ResourcePermissionCheckServiceImpl
     @Override
     public boolean resourcePermissionCheck(Object authorizationType, Object[] needChecks, Integer userId,
                                            Logger logger) {
+        User user=RequestContext.getLoginUser();
+        if(user.getUserType()==UserType.ADMIN_USER)
+        {
+            return true;
+        }
         if (Objects.nonNull(needChecks) && needChecks.length > 0) {
             Set<?> originResSet = new HashSet<>(Arrays.asList(needChecks));
             Set<?> ownResSets = RESOURCE_LIST_MAP.get(authorizationType).listAuthorizedResource(userId, logger);

@@ -334,7 +334,6 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         }else {
             projectIds = resourcePermissionCheckService
                     .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), logger);
-            System.out.println("projectIds:"+projectIds);
         }
 
         if (projectIds.isEmpty()) {

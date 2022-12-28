@@ -90,10 +90,10 @@ export function useDataList() {
   const changeMenuOption = (state: any) => {
     const projectCode = route.params.projectCode || ''
 
-    let tabs: { label: string; key: string; icon: () => VNode<RendererNode, RendererElement, { [key: string]: any }> }[]=[];
+    let tabs: { label: string; key: string; icon: () => VNode<RendererNode, RendererElement, { [key: string]: any }> }[]=[];  
+
     if ((userStore.getUserInfo as UserInfoRes).userType === 'ADMIN_USER')
     {
-
       tabs=[
         {
           label: t('menu.tenant_manage'),
@@ -232,7 +232,7 @@ export function useDataList() {
         label: () => h(NEllipsis, null, { default: () => t('menu.resources') }),
         key: 'resource',
         icon: renderIcon(FolderOutlined),
-        children: [
+        children: ((userStore.getUserInfo as UserInfoRes).userType !== 'ADMIN_USER')?[
           {
             label: t('menu.file_manage'),
             key: '/resource/file-manage',
@@ -253,6 +253,22 @@ export function useDataList() {
               }
             ]
           },
+          {
+            label: t('menu.task_group_manage'),
+            key: 'task-group-manage',
+            icon: renderIcon(GroupOutlined),
+            children: [
+              {
+                label: t('menu.task_group_option'),
+                key: '/resource/task-group-option'
+              },
+              {
+                label: t('menu.task_group_queue'),
+                key: '/resource/task-group-queue'
+              }
+            ]
+          }
+        ]:[
           {
             label: t('menu.task_group_manage'),
             key: 'task-group-manage',

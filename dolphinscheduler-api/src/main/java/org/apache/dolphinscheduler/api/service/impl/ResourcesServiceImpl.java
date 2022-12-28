@@ -100,6 +100,8 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.base.Joiner;
 import com.google.common.io.Files;
 
+import javax.annotation.PostConstruct;
+
 /**
  * resources service impl
  */
@@ -143,6 +145,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
     @Autowired
     private StorageOperate storageOperate;
+
 
     /**
      * create directory
@@ -887,7 +890,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                     }
                 }
             } else {
-                resourcesList=new ArrayList<>();
+                defaultPath = storageOperate.getResDir(tenantCode);
+                if (type.equals(ResourceType.UDF)) {
+                    defaultPath = storageOperate.getUdfDir(tenantCode);
+                }
+
+                resourcesList = storageOperate.listFilesStatusRecursively(defaultPath, defaultPath, tenantCode, type);
             }
         } else {
             defaultPath = storageOperate.getResDir(tenantCode);

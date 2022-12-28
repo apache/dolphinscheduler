@@ -22,6 +22,9 @@ import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_S_S;
 import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_TYPE_FILE;
 import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_TYPE_UDF;
 
+
+import com.aliyun.oss.model.*;
+import com.amazonaws.AmazonServiceException;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.factory.OssClientFactory;
@@ -44,7 +47,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -56,10 +61,7 @@ import org.slf4j.LoggerFactory;
 
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSException;
-import com.aliyun.oss.model.Bucket;
-import com.aliyun.oss.model.OSSObject;
-import com.aliyun.oss.model.ObjectMetadata;
-import com.aliyun.oss.model.PutObjectRequest;
+
 
 @Data
 public class OssOperator implements Closeable, StorageOperate {
@@ -288,19 +290,171 @@ public class OssOperator implements Closeable, StorageOperate {
     @Override
     public List<StorageEntity> listFilesStatusRecursively(String path, String defaultPath, String tenantCode,
                                                           ResourceType type) {
-        return null;
+        List<StorageEntity> storageEntityList = new ArrayList<>();
+
+        LinkedList<StorageEntity> foldersToFetch = new LinkedList<>();
+
+        do {
+            String pathToExplore = "";
+            if (foldersToFetch.size() == 0) {
+                pathToExplore = path;
+            } else {
+                pathToExplore = foldersToFetch.pop().getFullName();
+            }
+
+            try {
+                List<StorageEntity> tempList = listFilesStatus(pathToExplore, defaultPath, tenantCode, type);
+
+                for (StorageEntity temp : tempList) {
+                    if (temp.isDirectory()) {
+                        foldersToFetch.add(temp);
+                    }
+                }
+
+                storageEntityList.addAll(tempList);
+            } catch (Exception e) {
+                logger.error("Resource path: {}", pathToExplore, e);
+                // return the resources fetched before error occurs.
+                return storageEntityList;
+            }
+
+        } while (foldersToFetch.size() != 0);
+
+        return storageEntityList;
     }
 
     @Override
     public List<StorageEntity> listFilesStatus(String path, String defaultPath, String tenantCode,
                                                ResourceType type) throws Exception {
-        return null;
+
+        List<StorageEntity> storageEntityList = new ArrayList<>();
+        ListObjectsV2Request request = new ListObjectsV2Request();
+        request.setBucketName(this.bucketName);
+        request.setPrefix(path);
+        request.setDelimiter("/");
+
+        ListObjectsV2Result v2Result;
+        do {
+            try {
+                v2Result = this.ossClient.listObjectsV2(request);
+            } catch (AmazonServiceException e) {
+                throw new AmazonServiceException("Get S3 file list exception, error type:" + e.getErrorType(), e);
+            }
+
+            List<OSSObjectSummary> summaries = v2Result.getObjectSummaries();
+
+            for (OSSObjectSummary summary : summaries) {
+                if (!summary.getKey().endsWith("/")) {
+                    // the path is a file
+                    String[] aliasArr = summary.getKey().split("/");
+                    String alias = aliasArr[aliasArr.length - 1];
+                    String fileName = StringUtils.difference(defaultPath, summary.getKey());
+
+                    StorageEntity entity = new StorageEntity();
+                    entity.setAlias(alias);
+                    entity.setFileName(fileName);
+                    entity.setFullName(summary.getKey());
+                    entity.setDirectory(false);
+                    entity.setDescription("");
+                    entity.setUserName(tenantCode);
+                    entity.setType(type);
+                    entity.setSize(summary.getSize());
+                    entity.setCreateTime(summary.getLastModified());
+                    entity.setUpdateTime(summary.getLastModified());
+                    entity.setPfullName(path);
+
+                    storageEntityList.add(entity);
+                }
+            }
+
+            for (String commonPrefix : v2Result.getCommonPrefixes()) {
+                // the paths in commonPrefix are directories
+                String suffix = StringUtils.difference(path, commonPrefix);
+                String fileName = StringUtils.difference(defaultPath, commonPrefix);
+
+                StorageEntity entity = new StorageEntity();
+                entity.setAlias(suffix);
+                entity.setFileName(fileName);
+                entity.setFullName(commonPrefix);
+                entity.setDirectory(true);
+                entity.setDescription("");
+                entity.setUserName(tenantCode);
+                entity.setType(type);
+                entity.setSize(0);
+                entity.setCreateTime(null);
+                entity.setUpdateTime(null);
+                entity.setPfullName(path);
+
+                storageEntityList.add(entity);
+            }
+
+            request.setContinuationToken(v2Result.getContinuationToken());
+
+        } while (v2Result.isTruncated());
+
+        return storageEntityList;
     }
 
     @Override
     public StorageEntity getFileStatus(String path, String defaultPath, String tenantCode,
                                        ResourceType type) throws Exception {
-        return null;
+
+        ListObjectsV2Request request = new ListObjectsV2Request();
+        request.setBucketName(this.bucketName);
+        request.setPrefix(path);
+        request.setDelimiter("/");
+
+        ListObjectsV2Result v2Result;
+        try {
+            v2Result = this.ossClient.listObjectsV2(request);
+        } catch (OSSException  e) {
+            throw new OSSException("Get oss file list exception, error type:" + e.getErrorMessage(), e);
+        }
+
+        List<OSSObjectSummary> summaries = v2Result.getObjectSummaries();
+
+        if (path.endsWith("/")) {
+            // the path is a directory that may or may not exist in S3
+            String alias = findDirAlias(path);
+            String fileName = StringUtils.difference(defaultPath, path);
+
+            StorageEntity entity = new StorageEntity();
+            entity.setAlias(alias);
+            entity.setFileName(fileName);
+            entity.setFullName(path);
+            entity.setDirectory(true);
+            entity.setDescription("");
+            entity.setUserName(tenantCode);
+            entity.setType(type);
+            entity.setSize(0);
+
+            return entity;
+
+        } else {
+            // the path is a file
+            if (summaries.size() > 0) {
+                OSSObjectSummary summary = summaries.get(0);
+                String[] aliasArr = summary.getKey().split("/");
+                String alias = aliasArr[aliasArr.length - 1];
+                String fileName = StringUtils.difference(defaultPath, summary.getKey());
+
+                StorageEntity entity = new StorageEntity();
+                entity.setAlias(alias);
+                entity.setFileName(fileName);
+                entity.setFullName(summary.getKey());
+                entity.setDirectory(false);
+                entity.setDescription("");
+                entity.setUserName(tenantCode);
+                entity.setType(type);
+                entity.setSize(summary.getSize());
+                entity.setCreateTime(summary.getLastModified());
+                entity.setUpdateTime(summary.getLastModified());
+
+                return entity;
+            }
+        }
+
+        throw new FileNotFoundException("Object is not found in OSS Bucket: " + this.bucketName);
     }
 
     @Override
@@ -355,6 +509,20 @@ public class OssOperator implements Closeable, StorageOperate {
         if (ossClient.doesObjectExist(bucketName, directoryName)) {
             ossClient.deleteObject(bucketName, directoryName);
         }
+    }
+
+    private String findDirAlias(String myStr) {
+        if (!myStr.endsWith("/")) {
+            // Make sure system won't crush down if someone accidentally misuse the function.
+            return myStr;
+        }
+        int lastIndex = myStr.lastIndexOf("/");
+        String subbedString = myStr.substring(0, lastIndex);
+        int secondLastIndex = subbedString.lastIndexOf("/");
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(myStr, secondLastIndex + 1, lastIndex + 1);
+
+        return stringBuilder.toString();
     }
 
     protected OSS buildOssClient() {
