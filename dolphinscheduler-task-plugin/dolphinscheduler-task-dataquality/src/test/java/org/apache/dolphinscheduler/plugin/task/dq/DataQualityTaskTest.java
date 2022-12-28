@@ -494,7 +494,7 @@ public class DataQualityTaskTest {
                         + "\"jdbcUrl\":\"jdbc:postgresql://localhost:5432/dolphinscheduler\","
                         + "\"user\":\"test\","
                         + "\"password\":\"test\","
-                        + "\"other\":{\"stringtype\": \"unspecified\", \"characterEncoding\" : \"UTF-8\", \"allowMultiQueries\": true}}");
+                        + "\"other\":\"stringtype=unspecified&characterEncoding=UTF-8&allowMultiQueries=true\"}");
 
         dataQualityTaskExecutionContext.setStatisticsValueConnectorType("JDBC");
         dataQualityTaskExecutionContext.setStatisticsValueType(1);
@@ -505,7 +505,7 @@ public class DataQualityTaskTest {
                         + "\"jdbcUrl\":\"jdbc:postgresql://localhost:5432/dolphinscheduler\","
                         + "\"user\":\"test\","
                         + "\"password\":\"test\","
-                        + "\"other\":{\"stringtype\": \"unspecified\", \"characterEncoding\" : \"UTF-8\", \"allowMultiQueries\": true}}");
+                        + "\"other\":\"stringtype=unspecified&characterEncoding=UTF-8&allowMultiQueries=true\"}");
 
         dataQualityTaskExecutionContext.setCompareWithFixedValue(true);
 
@@ -791,7 +791,7 @@ public class DataQualityTaskTest {
                         + "\"jdbcUrl\":\"jdbc:postgresql://localhost:5432/dolphinscheduler\","
                         + "\"user\":\"test\","
                         + "\"password\":\"test\","
-                        + "\"other\":{\"stringtype\": \"unspecified\", \"characterEncoding\": \"UTF-8\", \"allowMultiQueries\": true}}");
+                        + "\"other\":\"stringtype=unspecified&characterEncoding=UTF-8&allowMultiQueries=true\"}");
 
         String expect = "{\"name\":\"跨表值比对\",\"env\":{\"type\":\"batch\",\"config\":null},\"readers\""
                 + ":[{\"type\":\"JDBC\",\"config\":{\"database\":\"test\",\"password\":\"test\",\"driver\":"
@@ -1115,7 +1115,7 @@ public class DataQualityTaskTest {
                         + "\"jdbcUrl\":\"jdbc:postgresql://localhost:5432/dolphinscheduler\","
                         + "\"user\":\"test\","
                         + "\"password\":\"test\","
-                        + "\"other\":{\"stringtype\": \"unspecified\", \"characterEncoding\": \"UTF-8\", \"allowMultiQueries\": true}}");
+                        + "\"other\":\"stringtype=unspecified&characterEncoding=UTF-8&allowMultiQueries=true\"}");
 
         dataQualityTaskExecutionContext.setStatisticsValueConnectorType("JDBC");
         dataQualityTaskExecutionContext.setStatisticsValueType(1);
@@ -1126,7 +1126,7 @@ public class DataQualityTaskTest {
                         + "\"jdbcUrl\":\"jdbc:postgresql://localhost:5432/dolphinscheduler\","
                         + "\"user\":\"test\","
                         + "\"password\":\"test\","
-                        + "\"other\":{\"stringtype\": \"unspecified\", \"characterEncoding\": \"UTF-8\", \"allowMultiQueries\": true }}");
+                        + "\"other\":\"stringtype=unspecified&characterEncoding=UTF-8&allowMultiQueries=true\"}");
 
         dataQualityTaskExecutionContext.setRuleName("跨表准确性");
         dataQualityTaskExecutionContext.setRuleType(RuleType.MULTI_TABLE_ACCURACY.getCode());
