@@ -679,10 +679,16 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @return resource list page
      */
     @Override
-    public Result queryResourceListPaging(User loginUser, String fullName, String resTenantCode,
-                                          ResourceType type, String searchVal, Integer pageNo, Integer pageSize) {
-        Result<Object> result = new Result<>();
+    public Result<PageInfo<StorageEntity>> queryResourceListPaging(User loginUser, String fullName,
+                                                                   String resTenantCode,
+                                                                   ResourceType type, String searchVal, Integer pageNo,
+                                                                   Integer pageSize) {
+        Result<PageInfo<StorageEntity>> result = new Result<>();
         PageInfo<StorageEntity> pageInfo = new PageInfo<>(pageNo, pageSize);
+        if (storageOperate == null) {
+            logger.warn("The resource storage is not opened.");
+            return Result.success(pageInfo);
+        }
 
         User user = userMapper.selectById(loginUser.getId());
         if (user == null) {
