@@ -178,14 +178,12 @@
         select t.state, count(0) as count
         from t_ds_process_instance t
         join t_ds_process_definition d on d.code=t.process_definition_code
-        join t_ds_project p on p.code=d.project_code
-        where 1 = 1
-        and t.is_sub_process = 0
+        where t.is_sub_process = 0
         <if test="startTime != null and endTime != null">
             and t.start_time <![CDATA[ >= ]]> #{startTime} and t.start_time <![CDATA[ <= ]]> #{endTime}
         </if>
         <if test="projectCodes != null and projectCodes.length != 0">
-            and p.code in
+            and d.project_code in
             <foreach collection="projectCodes" index="index" item="i" open="(" close=")" separator=",">
                 #{i}
             </foreach>
