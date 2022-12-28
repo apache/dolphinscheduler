@@ -175,24 +175,12 @@ public interface ProcessInstanceService {
     /**
      * delete process instance by id, at the same time，delete task instance and their mapping relation data
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser         login user
      * @param processInstanceId process instance id
      * @return delete result code
      */
-    Map<String, Object> deleteProcessInstanceById(User loginUser,
-                                                  long projectCode,
-                                                  Integer processInstanceId);
-
-    /**
-     * delete process instance by id, at the same time，delete task instance and their mapping relation data
-     *
-     * @param loginUser login user
-     * @param workflowInstanceId work instance id
-     * @return delete result code
-     */
-    Map<String, Object> deleteProcessInstanceById(User loginUser,
-                                                  Integer workflowInstanceId);
+    void deleteProcessInstanceById(User loginUser,
+                                   Integer processInstanceId);
 
     /**
      * view process instance variables

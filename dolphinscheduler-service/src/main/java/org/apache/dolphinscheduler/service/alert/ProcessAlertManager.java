@@ -17,11 +17,13 @@
 
 package org.apache.dolphinscheduler.service.alert;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
@@ -275,6 +277,9 @@ public class ProcessAlertManager {
      * @param processInstance success process instance
      */
     public void closeAlert(ProcessInstance processInstance) {
+        if (!PropertyUtils.getBoolean(Constants.AUTO_CLOSE_ALERT, false)) {
+            return;
+        }
         List<Alert> alerts = alertDao.listAlerts(processInstance.getId());
         if (CollectionUtils.isEmpty(alerts)) {
             // no need to close alert

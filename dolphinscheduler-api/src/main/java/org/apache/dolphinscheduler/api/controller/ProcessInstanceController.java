@@ -267,11 +267,11 @@ public class ProcessInstanceController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(Status.DELETE_PROCESS_INSTANCE_BY_ID_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result<ProcessInstance> deleteProcessInstanceById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                             @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                             @PathVariable("id") Integer id) {
-        Map<String, Object> result = processInstanceService.deleteProcessInstanceById(loginUser, projectCode, id);
-        return returnDataList(result);
+    public Result<Void> deleteProcessInstanceById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                  @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                  @PathVariable("id") Integer id) {
+        processInstanceService.deleteProcessInstanceById(loginUser, id);
+        return Result.success();
     }
 
     /**
@@ -396,13 +396,9 @@ public class ProcessInstanceController extends BaseController {
             for (String strProcessInstanceId : processInstanceIdArray) {
                 int processInstanceId = Integer.parseInt(strProcessInstanceId);
                 try {
-                    Map<String, Object> deleteResult =
-                            processInstanceService.deleteProcessInstanceById(loginUser, projectCode, processInstanceId);
-                    if (!Status.SUCCESS.equals(deleteResult.get(Constants.STATUS))) {
-                        deleteFailedIdList.add((String) deleteResult.get(Constants.MSG));
-                        logger.error((String) deleteResult.get(Constants.MSG));
-                    }
+                    processInstanceService.deleteProcessInstanceById(loginUser, processInstanceId);
                 } catch (Exception e) {
+                    logger.error("Delete workflow instance: {} error", strProcessInstanceId, e);
                     deleteFailedIdList
                             .add(MessageFormat.format(Status.PROCESS_INSTANCE_ERROR.getMsg(), strProcessInstanceId));
                 }

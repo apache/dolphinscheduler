@@ -122,8 +122,8 @@ public class WorkflowInstanceV2Controller extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result deleteWorkflowInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                         @PathVariable("workflowInstanceId") Integer workflowInstanceId) {
+    public Result<Void> deleteWorkflowInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                               @PathVariable("workflowInstanceId") Integer workflowInstanceId) {
         processInstanceService.deleteProcessInstanceById(loginUser, workflowInstanceId);
         return Result.success();
     }

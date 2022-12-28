@@ -95,7 +95,7 @@ public class WorkflowInstanceV2ControllerTest extends AbstractControllerTest {
     public void testDeleteWorkflowInstanceById() {
         User loginUser = getLoginUser();
 
-        Mockito.when(processInstanceService.deleteProcessInstanceById(any(), eq(1))).thenReturn(null);
+        Mockito.doNothing().when(processInstanceService).deleteProcessInstanceById(any(), eq(1));
         Result result = workflowInstanceV2Controller.deleteWorkflowInstance(loginUser, 1);
         Assertions.assertTrue(result.isSuccess());
     }

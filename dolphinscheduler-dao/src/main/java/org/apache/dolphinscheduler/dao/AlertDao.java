@@ -333,4 +333,11 @@ public class AlertDao {
     public void setCrashAlarmSuppression(Integer crashAlarmSuppression) {
         this.crashAlarmSuppression = crashAlarmSuppression;
     }
+
+    public void deleteByWorkflowInstanceId(Integer processInstanceId) {
+        if (processInstanceId == null) {
+            return;
+        }
+        alertMapper.deleteByWorkflowInstanceId(processInstanceId);
+    }
 }
