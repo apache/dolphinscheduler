@@ -16,7 +16,7 @@
  */
 import { ref, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useCustomParams, useDatasource } from '.'
+import { useDatasource } from '.'
 import type { IJsonItem } from '../types'
 
 export function useDataX(model: { [field: string]: any }): IJsonItem[] {
