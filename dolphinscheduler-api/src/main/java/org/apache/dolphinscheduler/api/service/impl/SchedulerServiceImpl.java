@@ -439,7 +439,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         if (scheduleObj == null) {
             logger.error("Schedule does not exist, scheduleId:{}.", id);
-            throw new ServiceException(Status.SCHEDULE_NOT_EXISTS, id);
+            throw new ServiceException(Status.SCHEDULE_CRON_NOT_EXISTS, id);
         }
         // check schedule release state
         if (scheduleObj.getReleaseState() == scheduleStatus) {
