@@ -103,13 +103,11 @@ public class CuringGlobalParams implements CuringParamsService {
         Map<String, String> resolveMap = new HashMap<>();
         for (Map.Entry<String, String> entry : entries) {
             String val = entry.getValue();
-            if (val.startsWith(Constants.FUNCTION_START_WITH)) {
-                String str = "";
+            if (val.contains(Constants.FUNCTION_START_WITH)) {
+                String str = val;
                 // whether external scaling calculation is required
                 if (timeFunctionNeedExpand(val)) {
                     str = timeFunctionExtension(processInstanceId, timezone, val);
-                } else {
-                    str = convertParameterPlaceholders(val, allParamMap);
                 }
                 resolveMap.put(entry.getKey(), str);
             }
@@ -174,14 +172,16 @@ public class CuringGlobalParams implements CuringParamsService {
         if (MapUtils.isNotEmpty(localParams)) {
             globalParams.putAll(localParams);
         }
-
+        if (MapUtils.isNotEmpty(cmdParam)) {
+            globalParams.putAll(ParamUtils.getUserDefParamsMap(cmdParam));
+        }
         Iterator<Map.Entry<String, Property>> iter = globalParams.entrySet().iterator();
         while (iter.hasNext()) {
             Map.Entry<String, Property> en = iter.next();
             Property property = en.getValue();
 
             if (StringUtils.isNotEmpty(property.getValue())
-                    && property.getValue().startsWith(Constants.FUNCTION_START_WITH)) {
+                    && property.getValue().contains(Constants.FUNCTION_START_WITH)) {
                 /**
                  *  local parameter refers to global parameter with the same name
                  *  note: the global parameters of the process instance here are solidified parameters,
@@ -191,8 +191,6 @@ public class CuringGlobalParams implements CuringParamsService {
                 // whether external scaling calculation is required
                 if (timeFunctionNeedExpand(val)) {
                     val = timeFunctionExtension(taskInstance.getProcessInstanceId(), timeZone, val);
-                } else {
-                    val = convertParameterPlaceholders(val, params);
                 }
                 property.setValue(val);
             }
