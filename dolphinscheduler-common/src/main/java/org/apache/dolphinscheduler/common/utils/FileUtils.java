@@ -269,31 +269,34 @@ public class FileUtils {
 
     /**
      * Calculate file checksum with CRC32 algorithm
-     *
      * @param pathName
-     * @return
-     * @throws IOException
+     * @return checksum of file/dir
      */
-    public static String getFileChecksum(String pathName) {
+    public static String getFileChecksum(String pathName) throws IOException {
         CRC32 crc32 = new CRC32();
         File file = new File(pathName);
         String crcString = "";
         if (file.isDirectory()) {
             // file system interface remains the same order
             String[] subPaths = file.list();
+            StringBuilder concatenatedCRC = new StringBuilder();
             for (String subPath : subPaths) {
-                crcString += getFileChecksum(pathName + FOLDER_SEPARATOR + subPath);
+                concatenatedCRC.append(getFileChecksum(pathName + FOLDER_SEPARATOR + subPath));
             }
+            crcString = concatenatedCRC.toString();
         } else {
             FileInputStream fileInputStream = null;
+            CheckedInputStream checkedInputStream = null;
             try {
                 fileInputStream = new FileInputStream(pathName);
-                CheckedInputStream checkedInputStream = new CheckedInputStream(fileInputStream, crc32);
+                checkedInputStream = new CheckedInputStream(fileInputStream, crc32);
                 while (checkedInputStream.read() != -1) {
                 }
             } catch (IOException e) {
-                logger.error(e.getMessage(), e);
-                return crcString;
+                throw new IOException("Calculate checksum error.");
+            } finally {
+                fileInputStream.close();
+                checkedInputStream.close();
             }
             crcString = Long.toHexString(crc32.getValue());
         }

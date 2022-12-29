@@ -92,7 +92,11 @@ public class TaskFilesTransferUtils {
 
             // get crc file path
             String srcCRCPath = srcPath + CRC_SUFFIX;
-            FileUtils.writeContent2File(FileUtils.getFileChecksum(path), srcCRCPath);
+            try {
+                FileUtils.writeContent2File(FileUtils.getFileChecksum(path), srcCRCPath);
+            } catch (IOException ex) {
+                throw new TaskException(ex.getMessage(), ex);
+            }
 
             // get remote file path
             String resourcePath = getResourcePath(taskExecutionContext, new File(srcPath).getName());

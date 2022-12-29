@@ -51,7 +51,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public class TaskCacheUtils {
 
-    protected final static Logger logger = LoggerFactory.getLogger(TaskCacheUtils.class);
+    protected static final Logger logger = LoggerFactory.getLogger(TaskCacheUtils.class);
 
     private TaskCacheUtils() {
         throw new IllegalStateException("Utility class");
