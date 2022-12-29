@@ -80,7 +80,6 @@ public class NettyClient {
      */
     private final NettyClientConfig clientConfig;
 
-
     /**
      * client bootstrap
      */
@@ -94,7 +93,7 @@ public class NettyClient {
     /**
      * channels
      */
-    private final ConcurrentHashMap<Host, Channel> channels = new ConcurrentHashMap(128);
+    private final ConcurrentHashMap<Host, Channel> channels = new ConcurrentHashMap<>(128);
 
     /**
      * get channel
@@ -143,6 +142,7 @@ public class NettyClient {
         this.clientConfig = clientConfig;
         if (Epoll.isAvailable()) {
             this.workerGroup = new EpollEventLoopGroup(clientConfig.getWorkerThreads(), new ThreadFactory() {
+
                 private AtomicInteger threadIndex = new AtomicInteger(0);
 
                 @Override
@@ -152,6 +152,7 @@ public class NettyClient {
             });
         } else {
             this.workerGroup = new NioEventLoopGroup(clientConfig.getWorkerThreads(), new ThreadFactory() {
+
                 private AtomicInteger threadIndex = new AtomicInteger(0);
 
                 @Override
@@ -179,12 +180,15 @@ public class NettyClient {
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, clientConfig.getConnectTimeoutMillis())
                 .handler(new LoggingHandler(LogLevel.DEBUG))
                 .handler(new ChannelInitializer<SocketChannel>() {
+
                     @Override
                     public void initChannel(SocketChannel ch) {
                         ch.pipeline()
                                 .addLast(new NettyEncoder())
                                 .addLast(new NettyDecoder(RpcResponse.class))
-                                .addLast("client-idle-handler", new IdleStateHandler(Constants.NETTY_CLIENT_HEART_BEAT_TIME, 0, 0, TimeUnit.MILLISECONDS))
+                                .addLast("client-idle-handler",
+                                        new IdleStateHandler(Constants.NETTY_CLIENT_HEART_BEAT_TIME, 0, 0,
+                                                TimeUnit.MILLISECONDS))
                                 .addLast(new NettyClientHandler());
                     }
                 });

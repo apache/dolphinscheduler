@@ -17,14 +17,13 @@
 
 package org.apache.dolphinscheduler.plugin.task.dq.utils;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class Md5UtilsTest {
 
     @Test
     public void testGetMd5() {
-        assertEquals("jZae727K08KaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=", Md5Utils.getMd5("123456", false));
+        Assertions.assertEquals("jZae727K08KaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=", Md5Utils.getMd5("123456", false));
     }
 }

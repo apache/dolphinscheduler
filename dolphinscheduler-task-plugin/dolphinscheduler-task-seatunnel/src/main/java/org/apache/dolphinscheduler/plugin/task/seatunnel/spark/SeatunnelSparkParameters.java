@@ -29,17 +29,21 @@ public class SeatunnelSparkParameters extends SeatunnelParameters {
     private DeployModeEnum deployMode;
     private MasterTypeEnum master;
     private String masterUrl;
-    private String queue;
 
     @Override
     public boolean checkParameters() {
-        return super.checkParameters()
-                && Objects.nonNull(deployMode)
-                && (DeployModeEnum.local != deployMode && Objects.nonNull(master))
-                && (DeployModeEnum.local != deployMode && (MasterTypeEnum.SPARK == master || MasterTypeEnum.MESOS == master) && StringUtils.isNotBlank(masterUrl));
+        boolean result = super.checkParameters() && Objects.nonNull(deployMode);
+        if (result && DeployModeEnum.local != deployMode) {
+            result = Objects.nonNull(master);
+            if (result && (MasterTypeEnum.SPARK == master || MasterTypeEnum.MESOS == master)) {
+                result = StringUtils.isNotBlank(masterUrl);
+            }
+        }
+        return result;
     }
 
     public static enum MasterTypeEnum {
+
         YARN("yarn"),
         LOCAL("local"),
         SPARK("spark://"),
@@ -78,13 +82,5 @@ public class SeatunnelSparkParameters extends SeatunnelParameters {
 
     public void setMasterUrl(String masterUrl) {
         this.masterUrl = masterUrl;
-    }
-
-    public String getQueue() {
-        return queue;
-    }
-
-    public void setQueue(String queue) {
-        this.queue = queue;
     }
 }

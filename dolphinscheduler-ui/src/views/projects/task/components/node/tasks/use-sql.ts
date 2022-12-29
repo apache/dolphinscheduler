@@ -46,7 +46,6 @@ export function useSql({
     timeout: 30,
     type: 'MYSQL',
     displayRows: 10,
-    segmentSeparator: '',
     sql: '',
     sqlType: '0',
     preStatements: [],
@@ -55,29 +54,16 @@ export function useSql({
     timeoutNotifyStrategy: ['WARN']
   } as INodeData)
 
-  let extra: IJsonItem[] = []
-  if (from === 1) {
-    extra = [
-      Fields.useTaskType(model, readonly),
-      Fields.useProcessName({
-        model,
-        projectCode,
-        isCreate: !data?.id,
-        from,
-        processName: data?.processName
-      })
-    ]
-  }
-
   return {
     json: [
       Fields.useName(from),
-      ...extra,
+      ...Fields.useTaskDefinition({ projectCode, from, readonly, data, model }),
       Fields.useRunFlag(),
+      Fields.useCache(),
       Fields.useDescription(),
       Fields.useTaskPriority(),
       Fields.useWorkerGroup(),
-      Fields.useEnvironmentName(model, !model.id),
+      Fields.useEnvironmentName(model, !data?.id),
       ...Fields.useTaskGroup(model, projectCode),
       ...Fields.useFailed(),
       Fields.useDelayTime(model),

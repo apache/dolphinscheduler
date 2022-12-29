@@ -20,8 +20,12 @@ package org.apache.dolphinscheduler.plugin.task.seatunnel;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.seatunnel.Constants.CONFIG_OPTIONS;
 
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
@@ -38,13 +42,14 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 /**
  * seatunnel task
  */
-public class SeatunnelTask extends AbstractTaskExecutor {
+public class SeatunnelTask extends AbstractRemoteTask {
 
     /**
      * seatunnel parameters
@@ -76,34 +81,59 @@ public class SeatunnelTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public void init() {
-        logger.info("SeaTunnel task params {}", taskExecutionContext.getTaskParams());
-        if (!seatunnelParameters.checkParameters()) {
-            throw new RuntimeException("SeaTunnel task params is not valid");
-        }
+    public List<String> getApplicationIds() throws TaskException {
+        return Collections.emptyList();
     }
 
     @Override
-    public void handle() throws Exception {
+    public void init() {
+        logger.info("Intialize SeaTunnel task params {}", JSONUtils.toPrettyJsonString(seatunnelParameters));
+        if (seatunnelParameters == null || !seatunnelParameters.checkParameters()) {
+            throw new TaskException("SeaTunnel task params is not valid");
+        }
+    }
+
+    // todo split handle to submit and track
+    @Override
+    public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             // construct process
             String command = buildCommand();
             TaskResponse commandExecuteResult = shellCommandExecutor.run(command);
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
-            setAppIds(commandExecuteResult.getAppIds());
+            setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
             setProcessId(commandExecuteResult.getProcessId());
             seatunnelParameters.dealOutParam(shellCommandExecutor.getVarPool());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.error("The current SeaTunnel task has been interrupted", e);
+            setExitStatusCode(EXIT_CODE_FAILURE);
+            throw new TaskException("The current SeaTunnel task has been interrupted", e);
         } catch (Exception e) {
             logger.error("SeaTunnel task error", e);
             setExitStatusCode(EXIT_CODE_FAILURE);
-            throw e;
+            throw new TaskException("Execute Seatunnel task failed", e);
         }
     }
 
     @Override
-    public void cancelApplication(boolean cancelApplication) throws Exception {
+    public void submitApplication() throws TaskException {
+
+    }
+
+    @Override
+    public void trackApplicationStatus() throws TaskException {
+
+    }
+
+    @Override
+    public void cancelApplication() throws TaskException {
         // cancel process
-        shellCommandExecutor.cancelApplication();
+        try {
+            shellCommandExecutor.cancelApplication();
+        } catch (Exception e) {
+            throw new TaskException("cancel application error", e);
+        }
     }
 
     private String buildCommand() throws Exception {
@@ -143,17 +173,19 @@ public class SeatunnelTask extends AbstractTaskExecutor {
 
     private String buildCustomConfigContent() {
         logger.info("raw custom config content : {}", seatunnelParameters.getRawScript());
-        String script = seatunnelParameters.getRawScript().replaceAll("\\r\\n", "\n");
+        String script = seatunnelParameters.getRawScript().replaceAll("\\r\\n", System.lineSeparator());
         script = parseScript(script);
         return script;
     }
 
     private String buildConfigFilePath() {
-        return String.format("%s/seatunnel_%s.conf", taskExecutionContext.getExecutePath(), taskExecutionContext.getTaskAppId());
+        return String.format("%s/seatunnel_%s.conf", taskExecutionContext.getExecutePath(),
+                taskExecutionContext.getTaskAppId());
     }
 
     private void createConfigFileIfNotExists(String script, String scriptFile) throws IOException {
-        logger.info("tenantCode :{}, task dir:{}", taskExecutionContext.getTenantCode(), taskExecutionContext.getExecutePath());
+        logger.info("tenantCode :{}, task dir:{}", taskExecutionContext.getTenantCode(),
+                taskExecutionContext.getExecutePath());
 
         if (!Files.exists(Paths.get(scriptFile))) {
             logger.info("generate script file:{}", scriptFile);

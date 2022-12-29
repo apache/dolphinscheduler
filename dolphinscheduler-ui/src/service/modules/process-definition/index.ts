@@ -137,9 +137,12 @@ export function querySimpleList(code: number): any {
   })
 }
 
-export function verifyName(params: NameReq, code: number): any {
+export function verifyName(
+  params: { name: string; workflowCode?: number },
+  projectCode: number
+): any {
   return axios({
-    url: `/projects/${code}/process-definition/verify-name`,
+    url: `/projects/${projectCode}/process-definition/verify-name`,
     method: 'get',
     params
   })
@@ -244,3 +247,11 @@ export function viewTree(
     params
   })
 }
+
+export function viewProcessDefinitionVariables(code: number, processCode: number): any {
+  return axios({
+    url: `/projects/${code}/process-definition/${processCode}/view-variables`,
+    method: 'get'
+  })
+}
+

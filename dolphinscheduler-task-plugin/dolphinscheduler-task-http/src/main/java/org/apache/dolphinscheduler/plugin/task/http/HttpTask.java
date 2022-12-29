@@ -19,19 +19,20 @@ package org.apache.dolphinscheduler.plugin.task.http;
 
 import static org.apache.dolphinscheduler.plugin.task.http.HttpTaskConstants.APPLICATION_JSON;
 
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
-import org.apache.dolphinscheduler.spi.utils.DateUtils;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.Charsets;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.ParseException;
 import org.apache.http.client.config.RequestConfig;
@@ -47,13 +48,12 @@ import org.apache.http.util.EntityUtils;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class HttpTask extends AbstractTaskExecutor {
+public class HttpTask extends AbstractTask {
 
     /**
      * output
@@ -80,36 +80,43 @@ public class HttpTask extends AbstractTaskExecutor {
 
     @Override
     public void init() {
-        logger.info("http task params {}", taskExecutionContext.getTaskParams());
         this.httpParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), HttpParameters.class);
+        logger.info("Initialize http task params {}", JSONUtils.toPrettyJsonString(httpParameters));
 
-        if (!httpParameters.checkParameters()) {
+        if (httpParameters == null || !httpParameters.checkParameters()) {
             throw new RuntimeException("http task params is not valid");
         }
     }
 
     @Override
-    public void handle() throws Exception {
+    public void handle(TaskCallBack taskCallBack) throws TaskException {
         long startTime = System.currentTimeMillis();
         String formatTimeStamp = DateUtils.formatTimeStamp(startTime);
         String statusCode = null;
         String body = null;
 
-        try (CloseableHttpClient client = createHttpClient();
-             CloseableHttpResponse response = sendRequest(client)) {
+        try (
+                CloseableHttpClient client = createHttpClient();
+                CloseableHttpResponse response = sendRequest(client)) {
             statusCode = String.valueOf(getStatusCode(response));
             body = getResponseBody(response);
             exitStatusCode = validResponse(body, statusCode);
             long costTime = System.currentTimeMillis() - startTime;
-            logger.info("startTime: {}, httpUrl: {}, httpMethod: {}, costTime : {} milliseconds, statusCode : {}, body : {}, log : {}",
+            logger.info(
+                    "startTime: {}, httpUrl: {}, httpMethod: {}, costTime : {} milliseconds, statusCode : {}, body : {}, log : {}",
                     formatTimeStamp, httpParameters.getUrl(),
                     httpParameters.getHttpMethod(), costTime, statusCode, body, output);
         } catch (Exception e) {
             appendMessage(e.toString());
             exitStatusCode = -1;
             logger.error("httpUrl[" + httpParameters.getUrl() + "] connection failed：" + output, e);
-            throw e;
+            throw new TaskException("Execute http task failed", e);
         }
+
+    }
+
+    @Override
+    public void cancel() throws TaskException {
 
     }
 
@@ -136,7 +143,8 @@ public class HttpTask extends AbstractTaskExecutor {
             }
         }
         addRequestParams(builder, httpPropertyList);
-        String requestUrl = ParameterUtils.convertParameterPlaceholders(httpParameters.getUrl(), ParamUtils.convert(paramsMap));
+        String requestUrl =
+                ParameterUtils.convertParameterPlaceholders(httpParameters.getUrl(), ParamUtils.convert(paramsMap));
         HttpUriRequest request = builder.setUri(requestUrl).build();
         setHeaders(request, httpPropertyList);
         return client.execute(request);
@@ -197,7 +205,8 @@ public class HttpTask extends AbstractTaskExecutor {
                 break;
             case STATUS_CODE_CUSTOM:
                 if (!statusCode.equals(httpParameters.getCondition())) {
-                    appendMessage(httpParameters.getUrl() + " statuscode: " + statusCode + ", Must be: " + httpParameters.getCondition());
+                    appendMessage(httpParameters.getUrl() + " statuscode: " + statusCode + ", Must be: "
+                            + httpParameters.getCondition());
                     exitStatusCode = -1;
                 }
                 break;
@@ -288,7 +297,8 @@ public class HttpTask extends AbstractTaskExecutor {
      * @return RequestConfig
      */
     private RequestConfig requestConfig() {
-        return RequestConfig.custom().setSocketTimeout(httpParameters.getSocketTimeout()).setConnectTimeout(httpParameters.getConnectTimeout()).build();
+        return RequestConfig.custom().setSocketTimeout(httpParameters.getSocketTimeout())
+                .setConnectTimeout(httpParameters.getConnectTimeout()).build();
     }
 
     /**

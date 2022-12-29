@@ -24,13 +24,14 @@ import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.List;
 
 import org.slf4j.Logger;
 
 public class PermissionCheck<T> {
+
     /**
      * logger
      */
@@ -74,7 +75,8 @@ public class PermissionCheck<T> {
     /**
      * permission check
      */
-    public PermissionCheck(AuthorizationType authorizationType, ProcessService processService, T[] needChecks, int userId) {
+    public PermissionCheck(AuthorizationType authorizationType, ProcessService processService, T[] needChecks,
+                           int userId) {
         this.authorizationType = authorizationType;
         this.processService = processService;
         this.needChecks = needChecks;
@@ -84,7 +86,8 @@ public class PermissionCheck<T> {
     /**
      * permission check
      */
-    public PermissionCheck(AuthorizationType authorizationType, ProcessService processService, T[] needChecks, int userId, Logger logger) {
+    public PermissionCheck(AuthorizationType authorizationType, ProcessService processService, T[] needChecks,
+                           int userId, Logger logger) {
         this.authorizationType = authorizationType;
         this.processService = processService;
         this.needChecks = needChecks;
@@ -95,7 +98,8 @@ public class PermissionCheck<T> {
     /**
      * permission check
      */
-    public PermissionCheck(AuthorizationType authorizationType, ProcessService processService, List<ResourceInfo> resourceList, int userId, Logger logger) {
+    public PermissionCheck(AuthorizationType authorizationType, ProcessService processService,
+                           List<ResourceInfo> resourceList, int userId, Logger logger) {
         this.authorizationType = authorizationType;
         this.processService = processService;
         this.resourceList = resourceList;
@@ -168,15 +172,17 @@ public class PermissionCheck<T> {
             // get user type in order to judge whether the user is admin
             User user = processService.getUserById(userId);
             if (user == null) {
-                logger.error("user id {} doesn't exist", userId);
+                logger.error("User does not exist, userId:{}.", userId);
                 throw new ServiceException(String.format("user %s doesn't exist", userId));
             }
             if (user.getUserType() != UserType.ADMIN_USER) {
                 List<T> unauthorizedList = processService.listUnauthorized(userId, needChecks, authorizationType);
                 // if exist unauthorized resource
                 if (CollectionUtils.isNotEmpty(unauthorizedList)) {
-                    logger.error("user {} doesn't have permission of {}: {}", user.getUserName(), authorizationType.getDescp(), unauthorizedList);
-                    throw new ServiceException(String.format("user %s doesn't have permission of %s %s", user.getUserName(), authorizationType.getDescp(), unauthorizedList.get(0)));
+                    logger.error("User does not have {} permission for {}, userName:{}.",
+                            authorizationType.getDescp(), unauthorizedList, user.getUserName());
+                    throw new ServiceException(String.format("user %s doesn't have permission of %s %s",
+                            user.getUserName(), authorizationType.getDescp(), unauthorizedList.get(0)));
                 }
             }
         }

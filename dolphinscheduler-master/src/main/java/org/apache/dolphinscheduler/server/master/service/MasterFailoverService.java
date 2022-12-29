@@ -17,47 +17,53 @@
 
 package org.apache.dolphinscheduler.server.master.service;
 
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
-import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.builder.TaskExecutionContextBuilder;
+import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
 import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
 import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactory;
-import org.apache.dolphinscheduler.server.utils.ProcessUtils;
+import org.apache.dolphinscheduler.service.log.LogClient;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.registry.RegistryClient;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+import org.apache.dolphinscheduler.service.utils.LoggerUtils;
+import org.apache.dolphinscheduler.service.utils.ProcessUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import lombok.NonNull;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
-import lombok.NonNull;
 
 @Service
 public class MasterFailoverService {
@@ -70,16 +76,30 @@ public class MasterFailoverService {
 
     private final NettyExecutorManager nettyExecutorManager;
 
+    private final ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+
+    private final LogClient logClient;
+
+    private final TaskInstanceDao taskInstanceDao;
+
+    @Autowired
+    private ProcessDefinitionDao processDefinitionDao;
+
     public MasterFailoverService(@NonNull RegistryClient registryClient,
                                  @NonNull MasterConfig masterConfig,
                                  @NonNull ProcessService processService,
-                                 @NonNull NettyExecutorManager nettyExecutorManager) {
+                                 @NonNull NettyExecutorManager nettyExecutorManager,
+                                 @NonNull ProcessInstanceExecCacheManager processInstanceExecCacheManager,
+                                 @NonNull LogClient logClient,
+                                 @NonNull TaskInstanceDao taskInstanceDao) {
         this.registryClient = registryClient;
         this.masterConfig = masterConfig;
         this.processService = processService;
-        this.localAddress = NetUtils.getAddr(masterConfig.getListenPort());
         this.nettyExecutorManager = nettyExecutorManager;
-
+        this.localAddress = masterConfig.getMasterAddress();
+        this.processInstanceExecCacheManager = processInstanceExecCacheManager;
+        this.logClient = logClient;
+        this.taskInstanceDao = taskInstanceDao;
     }
 
     /**
@@ -89,11 +109,11 @@ public class MasterFailoverService {
     @Timed(value = "ds.master.scheduler.failover.check.time", percentiles = {0.5, 0.75, 0.95, 0.99}, histogram = true)
     public void checkMasterFailover() {
         List<String> needFailoverMasterHosts = processService.queryNeedFailoverProcessInstanceHost()
-            .stream()
-            // failover myself || dead server
-            .filter(host -> localAddress.equals(host) || !registryClient.checkNodeExists(host, NodeType.MASTER))
-            .distinct()
-            .collect(Collectors.toList());
+                .stream()
+                // failover myself || dead server
+                .filter(host -> localAddress.equals(host) || !registryClient.checkNodeExists(host, NodeType.MASTER))
+                .distinct()
+                .collect(Collectors.toList());
         if (CollectionUtils.isEmpty(needFailoverMasterHosts)) {
             return;
         }
@@ -127,18 +147,24 @@ public class MasterFailoverService {
         StopWatch failoverTimeCost = StopWatch.createStarted();
 
         Optional<Date> masterStartupTimeOptional = getServerStartupTime(registryClient.getServerList(NodeType.MASTER),
-                                                                        masterHost);
+                masterHost);
         List<ProcessInstance> needFailoverProcessInstanceList = processService.queryNeedFailoverProcessInstances(
-            masterHost);
+                masterHost);
         if (CollectionUtils.isEmpty(needFailoverProcessInstanceList)) {
             return;
         }
 
         LOGGER.info(
-            "Master[{}] failover starting there are {} workflowInstance may need to failover, will do a deep check, workflowInstanceIds: {}",
-            masterHost,
-            needFailoverProcessInstanceList.size(),
-            needFailoverProcessInstanceList.stream().map(ProcessInstance::getId).collect(Collectors.toList()));
+                "Master[{}] failover starting there are {} workflowInstance may need to failover, will do a deep check, workflowInstanceIds: {}",
+                masterHost,
+                needFailoverProcessInstanceList.size(),
+                needFailoverProcessInstanceList.stream().map(ProcessInstance::getId).collect(Collectors.toList()));
+
+        List<ProcessDefinition> processDefinitions =
+                processDefinitionDao.queryProcessDefinitionsByCodesAndVersions(needFailoverProcessInstanceList);
+        Map<Long, ProcessDefinition> codeDefinitionMap = processDefinitions
+                .stream()
+                .collect(Collectors.toMap(ProcessDefinition::getCode, Function.identity()));
 
         for (ProcessInstance processInstance : needFailoverProcessInstanceList) {
             try {
@@ -148,13 +174,11 @@ public class MasterFailoverService {
                     LOGGER.info("WorkflowInstance doesn't need to failover");
                     continue;
                 }
-                // todo: use batch query
-                ProcessDefinition processDefinition
-                    = processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
-                                                           processInstance.getProcessDefinitionVersion());
+                ProcessDefinition processDefinition = codeDefinitionMap.get(processInstance.getProcessDefinitionCode());
                 processInstance.setProcessDefinition(processDefinition);
                 int processInstanceId = processInstance.getId();
-                List<TaskInstance> taskInstanceList = processService.findValidTaskListByProcessId(processInstanceId);
+                List<TaskInstance> taskInstanceList =
+                        taskInstanceDao.findValidTaskListByProcessId(processInstanceId, processInstance.getTestFlag());
                 for (TaskInstance taskInstance : taskInstanceList) {
                     try {
                         LoggerUtils.setTaskInstanceIdMDC(taskInstance.getId());
@@ -171,7 +195,7 @@ public class MasterFailoverService {
                 }
 
                 ProcessInstanceMetrics.incProcessInstanceByState("failover");
-                //updateProcessInstance host is null to mark this processInstance has been failover
+                // updateProcessInstance host is null to mark this processInstance has been failover
                 // and insert a failover command
                 processInstance.setHost(Constants.NULL);
                 processService.processNeedFailoverProcessInstances(processInstance);
@@ -183,8 +207,8 @@ public class MasterFailoverService {
 
         failoverTimeCost.stop();
         LOGGER.info("Master[{}] failover finished, useTime:{}ms",
-            masterHost,
-            failoverTimeCost.getTime(TimeUnit.MILLISECONDS));
+                masterHost,
+                failoverTimeCost.getTime(TimeUnit.MILLISECONDS));
     }
 
     private Optional<Date> getServerStartupTime(List<Server> servers, String host) {
@@ -220,15 +244,15 @@ public class MasterFailoverService {
         if (!isMasterTask) {
             LOGGER.info("The failover taskInstance is not master task");
             TaskExecutionContext taskExecutionContext = TaskExecutionContextBuilder.get()
-                .buildTaskInstanceRelatedInfo(taskInstance)
-                .buildProcessInstanceRelatedInfo(processInstance)
-                .buildProcessDefinitionRelatedInfo(processInstance.getProcessDefinition())
-                .create();
+                    .buildTaskInstanceRelatedInfo(taskInstance)
+                    .buildProcessInstanceRelatedInfo(processInstance)
+                    .buildProcessDefinitionRelatedInfo(processInstance.getProcessDefinition())
+                    .create();
 
             if (masterConfig.isKillYarnJobWhenTaskFailover()) {
                 // only kill yarn job if exists , the local thread has exited
                 LOGGER.info("TaskInstance failover begin kill the task related yarn job");
-                ProcessUtils.killYarnJob(taskExecutionContext);
+                ProcessUtils.killYarnJob(logClient, taskExecutionContext);
             }
             // kill worker task, When the master failover and worker failover happened in the same time,
             // the task may not be failover if we don't set NEED_FAULT_TOLERANCE.
@@ -238,9 +262,8 @@ public class MasterFailoverService {
             LOGGER.info("The failover taskInstance is a master task");
         }
 
-        taskInstance.setState(ExecutionStatus.NEED_FAULT_TOLERANCE);
-        taskInstance.setFlag(Flag.NO);
-        processService.saveTaskInstance(taskInstance);
+        taskInstance.setState(TaskExecutionStatus.NEED_FAULT_TOLERANCE);
+        taskInstanceDao.upsertTaskInstance(taskInstance);
     }
 
     private void sendKillCommandToWorker(@NonNull TaskInstance taskInstance) {
@@ -258,7 +281,7 @@ public class MasterFailoverService {
     }
 
     private boolean checkTaskInstanceNeedFailover(@NonNull TaskInstance taskInstance) {
-        if (taskInstance.getState() != null && taskInstance.getState().typeIsFinished()) {
+        if (taskInstance.getState() != null && taskInstance.getState().isFinished()) {
             // The task is already finished, so we don't need to failover this task instance
             return false;
         }
@@ -267,7 +290,8 @@ public class MasterFailoverService {
 
     private boolean checkProcessInstanceNeedFailover(Optional<Date> beFailoveredMasterStartupTimeOptional,
                                                      @NonNull ProcessInstance processInstance) {
-        // The process has already been failover, since when we do master failover we will hold a lock, so we can guarantee
+        // The process has already been failover, since when we do master failover we will hold a lock, so we can
+        // guarantee
         // the host will not be set concurrent.
         if (Constants.NULL.equals(processInstance.getHost())) {
             return false;
@@ -280,6 +304,16 @@ public class MasterFailoverService {
 
         if (processInstance.getStartTime().after(beFailoveredMasterStartupTime)) {
             // The processInstance is newly created
+            return false;
+        }
+        if (processInstance.getRestartTime() != null
+                && processInstance.getRestartTime().after(beFailoveredMasterStartupTime)) {
+            // the processInstance is already be failovered.
+            return false;
+        }
+
+        if (processInstanceExecCacheManager.contains(processInstance.getId())) {
+            // the processInstance is a running process instance in the current master
             return false;
         }
 

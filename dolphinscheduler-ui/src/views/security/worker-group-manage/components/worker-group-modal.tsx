@@ -15,7 +15,13 @@
  * limitations under the License.
  */
 
-import { defineComponent, getCurrentInstance, PropType, toRefs, watch } from 'vue'
+import {
+  defineComponent,
+  getCurrentInstance,
+  PropType,
+  toRefs,
+  watch
+} from 'vue'
 import Modal from '@/components/modal'
 import { NForm, NFormItem, NInput, NSelect } from 'naive-ui'
 import { useModal } from './use-modal'
@@ -118,7 +124,7 @@ const WorkerGroupModal = defineComponent({
                   path='name'
                 >
                   <NInput
-                  allowInput={this.trim}
+                    allowInput={this.trim}
                     class='input-worker-group-name'
                     placeholder={t('security.worker_group.group_name_tips')}
                     v-model={[this.model.name, 'value']}

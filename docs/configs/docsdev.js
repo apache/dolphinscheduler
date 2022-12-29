@@ -90,6 +90,10 @@ export default {
                         title: 'Task',
                         children: [
                             {
+                                title: 'Appendix',
+                                link: '/en-us/docs/dev/user_doc/guide/task/appendix.html',
+                            },
+                            {
                                 title: 'Shell',
                                 link: '/en-us/docs/dev/user_doc/guide/task/shell.html',
                             },
@@ -162,6 +166,10 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/task/jupyter.html',
                             },
                             {
+                                title: 'Hive CLI',
+                                link: '/en-us/docs/dev/user_doc/guide/task/hive-cli.html',
+                            },
+                            {
                                 title: 'Kubernetes',
                                 link: '/en-us/docs/dev/user_doc/guide/task/kubernetes.html',
                             },
@@ -182,12 +190,36 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/task/dinky.html',
                             },
                             {
+                                title: 'Java',
+                                link: '/en-us/docs/dev/user_doc/guide/task/java.html',
+                            },
+                            {
                                 title: 'SageMaker',
                                 link: '/en-us/docs/dev/user_doc/guide/task/sagemaker.html',
                             },
                             {
                                 title: 'ChunJun',
                                 link: '/en-us/docs/dev/user_doc/guide/task/chunjun.html',
+                            },
+                            {
+                                title: 'Pytorch',
+                                link: '/en-us/docs/dev/user_doc/guide/task/pytorch.html',
+                            },
+                            {
+                                title: 'Amazon DMS',
+                                link: '/en-us/docs/dev/user_doc/guide/task/dms.html',
+                            },
+                            {
+                                title: 'AWS Datasync',
+                                link: '/en-us/docs/dev/user_doc/guide/task/datasync.html',
+                            },
+                            {
+                                title: 'Kubeflow',
+                                link: '/en-us/docs/dev/user_doc/guide/task/kubeflow.html',
+                            },
+                            {
+                                title: 'Apache Linkis',
+                                link: '/en-us/docs/dev/user_doc/guide/task/linkis.html',
                             },
                         ],
                     },
@@ -213,6 +245,10 @@ export default {
                             {
                                 title: 'Parameter Priority',
                                 link: '/en-us/docs/dev/user_doc/guide/parameter/priority.html',
+                            },
+                            {
+                                title: 'File Parameter',
+                                link: '/en-us/docs/dev/user_doc/guide/parameter/file-parameter.html',
                             },
                         ],
                     },
@@ -259,6 +295,14 @@ export default {
                                 title: 'Oracle',
                                 link: '/en-us/docs/dev/user_doc/guide/datasource/oracle.html',
                             },
+                            {
+                                title: 'Amazon Athena',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/athena.html',
+                            },
+                            {
+                                title: 'Azure SQL Database',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/azure-sql.html',
+                            },
                         ],
                     },
                     {
@@ -299,6 +343,10 @@ export default {
                             {
                                 title: 'Feishu',
                                 link: '/en-us/docs/dev/user_doc/guide/alert/feishu.html',
+                            },
+                            {
+                                title: 'Slack',
+                                link: '/en-us/docs/dev/user_doc/guide/alert/slack.html',
                             },
                         ],
                     },
@@ -365,6 +413,10 @@ export default {
                         title: 'Expansion and Reduction',
                         link: '/en-us/docs/dev/user_doc/guide/expansion-reduction.html',
                     },
+                    {
+                        title: 'Demo',
+                        link: '/en-us/docs/dev/user_doc/guide/demo.html',
+                    },
                 ],
             },
             {
@@ -385,6 +437,15 @@ export default {
                     {
                         title: 'Kubernetes Deployment',
                         link: '/en-us/docs/dev/user_doc/guide/installation/kubernetes.html',
+                    },
+                    {
+                        title: 'integration',
+                        children: [
+                            {
+                                title: 'Rainbond Deployment',
+                                link: '/en-us/docs/dev/user_doc/guide/integration/rainbond.html',
+                            },
+                        ],
                     },
                 ],
             },
@@ -426,11 +487,160 @@ export default {
                     },
                     {
                         title: 'PyDolphinScheduler',
-                        link: '/python/index.html',
+                        link: '/python/main/index.html',
                     },
                     {
                         title: 'Health Check',
                         link: '/en-us/docs/dev/user_doc/guide/healthcheck.html',
+                    },
+                ],
+            },
+            {
+                title: 'Contribution',
+                children: [
+                    {
+                        title: 'Join',
+                        children: [
+                            {
+                                title: 'Security Report',
+                                link: '/en-us/docs/dev/user_doc/contribute/join/security.html',
+                            },
+                            {
+                                title: 'How to Become a Committer',
+                                link: '/en-us/docs/dev/user_doc/contribute/join/become-a-committer.html',
+                            },
+                            {
+                                title: 'Subscribe Mailing Lists',
+                                link: '/en-us/docs/dev/user_doc/contribute/join/subscribe.html',
+                            },
+                            {
+                                title: 'Participate in Contributing',
+                                link: '/en-us/docs/dev/user_doc/contribute/join/contribute.html',
+                            },
+                            {
+                                title: 'Code of Conduct',
+                                link: '/en-us/docs/dev/user_doc/contribute/join/code-conduct.html',
+                            },
+                            {
+                                title: 'Review Issue or Pull Requests',
+                                link: '/en-us/docs/dev/user_doc/contribute/join/review.html',
+                            },
+                            {
+                                title: 'E2E Contribution Guide',
+                                link: '/en-us/docs/dev/user_doc/contribute/join/e2e-guide.html',
+                            },
+                            {
+                                title: 'Submit Code',
+                                link: '/en-us/docs/dev/user_doc/contribute/join/submit-code.html',
+                            },
+                            {
+                                title: 'License Notice',
+                                link: '/en-us/docs/dev/user_doc/contribute/join/DS-License.html',
+                            },
+                            {
+                                title: 'Document Notice',
+                                link: '/en-us/docs/dev/user_doc/contribute/join/document.html',
+                            },
+                            {
+                                title: 'Issue Notice',
+                                link: '/en-us/docs/dev/user_doc/contribute/join/issue.html',
+                            },
+                            {
+                                title: 'Pull Request Notice',
+                                link: '/en-us/docs/dev/user_doc/contribute/join/pull-request.html',
+                            },
+                            {
+                                title: 'Commit Message Notice',
+                                link: '/en-us/docs/dev/user_doc/contribute/join/commit-message.html',
+                            },
+                            {
+                                title: 'Micro BenchMark Notice',
+                                link: '/en-us/docs/dev/user_doc/contribute/join/microbench.html',
+                            },
+                            {
+                                title: 'Unit Test Writing Guide',
+                                link: '/en-us/docs/dev/user_doc/contribute/join/unit-test.html',
+                            },
+                        ],
+                    },
+                    {
+                        title: 'Development Environment Setup',
+                        link: '/en-us/docs/dev/user_doc/contribute/development-environment-setup.html',
+                    },
+                    {
+                        title: 'Design Document',
+                        children: [
+                            // TODO not support multiply level for now
+                            // {
+                            // title: 'SPI',
+                            // children: [
+                            {
+                                title: 'Architecture Design',
+                                link: '/en-us/docs/dev/user_doc/contribute/architecture-design.html',
+                            },
+                            {
+                                title: 'Alert SPI',
+                                link: '/en-us/docs/dev/user_doc/contribute/backend/spi/alert.html',
+                            },
+                            {
+                                title: 'Registry SPI',
+                                link: '/en-us/docs/dev/user_doc/contribute/backend/spi/registry.html',
+                            },
+                            {
+                                title: 'Task SPI',
+                                link: '/en-us/docs/dev/user_doc/contribute/backend/spi/task.html',
+                            },
+                            {
+                                title: 'Datasource SPI',
+                                link: '/en-us/docs/dev/user_doc/contribute/backend/spi/datasource.html',
+                            },
+                            {
+                                title: 'Mechanism Design',
+                                link: '/en-us/docs/dev/user_doc/contribute/backend/mechanism/overview.html',
+                            },
+                        ],
+                    },
+                    {
+                        title: 'Guidelines',
+                        children: [
+                            {
+                                title: 'Frontend Development',
+                                link: '/en-us/docs/dev/user_doc/contribute/frontend-development.html',
+                            },
+                            {
+                                title: 'API Standard',
+                                link: '/en-us/docs/dev/user_doc/contribute/api-standard.html',
+                            },
+                            {
+                                title: 'E2E Automation Test',
+                                link: '/en-us/docs/dev/user_doc/contribute/e2e-test.html',
+                            },
+                            {
+                                title: 'API Automation Test',
+                                link: '/en-us/docs/dev/user_doc/contribute/api-test.html',
+                            },
+                            {
+                                title: 'Log Specification',
+                                link: '/en-us/docs/dev/user_doc/contribute/log-specification.html',
+                            },
+                        ],
+                    },
+                    {
+                        title: 'Releasing',
+                        link: '/en-us/docs/dev/user_doc/contribute/release.html',
+                    },
+                    {
+                        title: 'Questions & Communications',
+                        link: '/en-us/docs/dev/user_doc/contribute/have-questions.html',
+                    },
+                ],
+            },
+            {
+                title: 'DSIP',
+                children: [
+                    {
+                        title: 'DSIP',
+                        link: '/en-us/docs/dev/user_doc/DSIP.html',
                     },
                 ],
             },
@@ -535,6 +745,10 @@ export default {
                         title: '任务类型',
                         children: [
                             {
+                                title: 'Appendix',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/appendix.html',
+                            },
+                            {
                                 title: 'Shell',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/shell.html',
                             },
@@ -607,6 +821,10 @@ export default {
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/jupyter.html',
                             },
                             {
+                                title: 'Hive CLI',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/hive-cli.html',
+                            },
+                            {
                                 title: 'Kubernetes',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/kubernetes.html',
                             },
@@ -627,12 +845,36 @@ export default {
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/dinky.html',
                             },
                             {
+                                title: 'Java',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/java.html',
+                            },
+                            {
                                 title: 'SageMaker',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/sagemaker.html',
                             },
                             {
                                 title: 'ChunJun',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/chunjun.html',
+                            },
+                            {
+                                title: 'Pytorch',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/pytorch.html',
+                            },
+                            {
+                                title: 'Amazon DMS',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/dms.html',
+                            },
+                            {
+                                title: 'AWS Datasync',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/datasync.html',
+                            },
+                            {
+                                title: 'Kubeflow',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/kubeflow.html',
+                            },
+                            {
+                                title: 'Apache Linkis',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/linkis.html',
                             },
                         ],
                     },
@@ -659,6 +901,10 @@ export default {
                                 title: '参数优先级',
                                 link: '/zh-cn/docs/dev/user_doc/guide/parameter/priority.html',
                             },
+                            {
+                                title: '文件参数传递',
+                                link: '/zh-cn/docs/dev/user_doc/guide/parameter/file-parameter.html',
+                            },
                         ],
                     },
                     {
@@ -679,6 +925,14 @@ export default {
                             {
                                 title: 'Spark',
                                 link: '/zh-cn/docs/dev/user_doc/guide/datasource/spark.html',
+                            },
+                            {
+                                title: 'Amazon Athena',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/athena.html',
+                            },
+                            {
+                                title: 'Azure SQL Database',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/azure-sql.html',
                             },
                         ],
                     },
@@ -720,6 +974,10 @@ export default {
                             {
                                 title: '飞书告警',
                                 link: '/zh-cn/docs/dev/user_doc/guide/alert/feishu.html',
+                            },
+                            {
+                                title: 'Slack告警',
+                                link: '/zh-cn/docs/dev/user_doc/guide/alert/slack.html',
                             },
                         ],
                     },
@@ -786,6 +1044,10 @@ export default {
                         title: '扩/缩容',
                         link: '/zh-cn/docs/dev/user_doc/guide/expansion-reduction.html',
                     },
+                    {
+                        title: 'Demo',
+                        link: '/zh-cn/docs/dev/user_doc/guide/demo.html',
+                    },
                 ],
             },
             {
@@ -806,6 +1068,15 @@ export default {
                     {
                         title: 'Kubernetes部署(Kubernetes)',
                         link: '/zh-cn/docs/dev/user_doc/guide/installation/kubernetes.html',
+                    },
+                    {
+                        title: '集成',
+                        children: [
+                            {
+                                title: '基于Rainbond部署(Cluster)',
+                                link: '/zh-cn/docs/dev/user_doc/guide/integration/rainbond.html',
+                            },
+                        ],
                     },
                 ],
             },
@@ -847,11 +1118,160 @@ export default {
                     },
                     {
                         title: 'PyDolphinScheduler',
-                        link: '/python/index.html',
+                        link: '/python/main/index.html',
                     },
                     {
                         title: '健康检查',
                         link: '/zh-cn/docs/dev/user_doc/guide/healthcheck.html',
+                    },
+                ],
+            },
+            {
+                title: '贡献指南',
+                children: [
+                    {
+                        title: '如何参与',
+                        children: [
+                            {
+                                title: '报告安全问题',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/join/security.html',
+                            },
+                            {
+                                title: '如何成为 Committer',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/join/become-a-committer.html',
+                            },
+                            {
+                                title: '订阅/取消订阅邮件列表',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/join/subscribe.html',
+                            },
+                            {
+                                title: '参与贡献',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/join/contribute.html',
+                            },
+                            {
+                                title: '行为准则',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/join/code-conduct.html',
+                            },
+                            {
+                                title: 'Review Issue or Pull Requests',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/join/review.html',
+                            },
+                            {
+                                title: 'E2E Contribution Guide',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/join/e2e-guide.html',
+                            },
+                            {
+                                title: '提交代码',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/join/submit-code.html',
+                            },
+                            {
+                                title: 'License须知',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/join/DS-License.html',
+                            },
+                            {
+                                title: '文档须知',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/join/document.html',
+                            },
+                            {
+                                title: 'Issue须知',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/join/issue.html',
+                            },
+                            {
+                                title: 'Pull Request须知',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/join/pull-request.html',
+                            },
+                            {
+                                title: 'Commit Message须知',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/join/commit-message.html',
+                            },
+                            {
+                                title: '微基准测试须知',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/join/microbench.html',
+                            },
+                            {
+                                title: '单元测试编写指南',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/join/unit-test.html',
+                            },
+                        ],
+                    },
+                    {
+                        title: '环境搭建',
+                        link: '/zh-cn/docs/dev/user_doc/contribute/development-environment-setup.html',
+                    },
+                    {
+                        title: '设计文档',
+                        children: [
+                            // TODO not support multiply level for now
+                            // {
+                            // title: 'SPI',
+                            // children: [
+                            {
+                                title: '架构设计',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/architecture-design.html',
+                            },
+                            {
+                                title: 'Alert SPI',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/backend/spi/alert.html',
+                            },
+                            {
+                                title: 'Registry SPI',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/backend/spi/registry.html',
+                            },
+                            {
+                                title: 'Task SPI',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/backend/spi/task.html',
+                            },
+                            {
+                                title: 'Datasource SPI',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/backend/spi/datasource.html',
+                            },
+                            {
+                                title: '组件设计',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/backend/mechanism/overview.html',
+                            },
+                        ],
+                    },
+                    {
+                        title: '规范',
+                        children: [
+                            {
+                                title: '前端开发',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/frontend-development.html',
+                            },
+                            {
+                                title: 'API规范',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/api-standard.html',
+                            },
+                            {
+                                title: 'E2E 自动化测试',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/e2e-test.html',
+                            },
+                            {
+                                title: 'API 自动化测试',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/api-test.html',
+                            },
+                            {
+                                title: '日志规范',
+                                link: '/zh-cn/docs/dev/user_doc/contribute/log-specification.html',
+                            },
+                        ],
+                    },
+                    {
+                        title: '发版',
+                        link: '/zh-cn/docs/dev/user_doc/contribute/release.html',
+                    },
+                    {
+                        title: '问题与交流',
+                        link: '/zh-cn/docs/dev/user_doc/contribute/have-questions.html',
+                    },
+                ],
+            },
+            {
+                title: 'DSIP',
+                children: [
+                    {
+                        title: 'DSIP',
+                        link: '/zh-cn/docs/dev/user_doc/DSIP.html',
                     },
                 ],
             },

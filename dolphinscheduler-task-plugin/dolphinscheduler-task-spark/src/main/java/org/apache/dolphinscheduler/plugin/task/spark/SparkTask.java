@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.spark;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -27,10 +28,8 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ArgsUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
@@ -42,7 +41,6 @@ import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -67,8 +65,6 @@ public class SparkTask extends AbstractYarnTask {
     @Override
     public void init() {
 
-        logger.info("spark task params {}", taskExecutionContext.getTaskParams());
-
         sparkParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SparkParameters.class);
 
         if (null == sparkParameters) {
@@ -84,6 +80,7 @@ public class SparkTask extends AbstractYarnTask {
         if (sparkParameters.getProgramType() != ProgramType.SQL) {
             setMainJarName();
         }
+        logger.info("Initialize spark task params {}", JSONUtils.toPrettyJsonString(sparkParameters));
     }
 
     /**
@@ -99,17 +96,13 @@ public class SparkTask extends AbstractYarnTask {
          */
         List<String> args = new ArrayList<>();
 
-        // spark version
-        String sparkCommand = SparkVersion.SPARK2.getCommand();
-
-        // If the programType is non-SQL, execute bin/spark-submit
-        if (SparkVersion.SPARK1.name().equals(sparkParameters.getSparkVersion())) {
-            sparkCommand = SparkVersion.SPARK1.getCommand();
-        }
-
+        String sparkCommand;
         // If the programType is SQL, execute bin/spark-sql
         if (sparkParameters.getProgramType() == ProgramType.SQL) {
-            sparkCommand = SparkVersion.SPARKSQL.getCommand();
+            sparkCommand = SparkConstants.SPARK_SQL_COMMAND;
+        } else {
+            // If the programType is non-SQL, execute bin/spark-submit
+            sparkCommand = SparkConstants.SPARK_SUBMIT_COMMAND;
         }
 
         args.add(sparkCommand);
@@ -120,7 +113,8 @@ public class SparkTask extends AbstractYarnTask {
         // replace placeholder, and combining local and global parameters
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
 
-        String command = ParameterUtils.convertParameterPlaceholders(String.join(" ", args), ParamUtils.convert(paramsMap));
+        String command =
+                ParameterUtils.convertParameterPlaceholders(String.join(" ", args), ParamUtils.convert(paramsMap));
 
         logger.info("spark task command: {}", command);
 
@@ -136,7 +130,8 @@ public class SparkTask extends AbstractYarnTask {
         List<String> args = new ArrayList<>();
         args.add(SparkConstants.MASTER);
 
-        String deployMode = StringUtils.isNotEmpty(sparkParameters.getDeployMode()) ? sparkParameters.getDeployMode() : SparkConstants.DEPLOY_MODE_LOCAL;
+        String deployMode = StringUtils.isNotEmpty(sparkParameters.getDeployMode()) ? sparkParameters.getDeployMode()
+                : SparkConstants.DEPLOY_MODE_LOCAL;
         if (!SparkConstants.DEPLOY_MODE_LOCAL.equals(deployMode)) {
             args.add(SparkConstants.SPARK_ON_YARN);
             args.add(SparkConstants.DEPLOY_MODE);
@@ -159,7 +154,8 @@ public class SparkTask extends AbstractYarnTask {
         }
 
         String others = sparkParameters.getOthers();
-        if (!SparkConstants.DEPLOY_MODE_LOCAL.equals(deployMode) && (StringUtils.isEmpty(others) || !others.contains(SparkConstants.SPARK_QUEUE))) {
+        if (!SparkConstants.DEPLOY_MODE_LOCAL.equals(deployMode)
+                && (StringUtils.isEmpty(others) || !others.contains(SparkConstants.SPARK_QUEUE))) {
             String queue = sparkParameters.getQueue();
             if (StringUtils.isNotEmpty(queue)) {
                 args.add(SparkConstants.SPARK_QUEUE);
@@ -223,7 +219,8 @@ public class SparkTask extends AbstractYarnTask {
     }
 
     private String generateScriptFile() {
-        String scriptFileName = String.format("%s/%s_node.sql", taskExecutionContext.getExecutePath(), taskExecutionContext.getTaskAppId());
+        String scriptFileName = String.format("%s/%s_node.sql", taskExecutionContext.getExecutePath(),
+                taskExecutionContext.getTaskAppId());
 
         File file = new File(scriptFileName);
         Path path = file.toPath();
@@ -256,7 +253,7 @@ public class SparkTask extends AbstractYarnTask {
     }
 
     private String replaceParam(String script) {
-        script = script.replaceAll("\\r\\n", "\n");
+        script = script.replaceAll("\\r\\n", System.lineSeparator());
         // replace placeholder, and combining local and global parameters
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
         script = ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));

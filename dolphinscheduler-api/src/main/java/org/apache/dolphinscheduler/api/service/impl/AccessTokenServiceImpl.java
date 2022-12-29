@@ -25,7 +25,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.AccessTokenService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -125,7 +125,8 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         Result result = new Result();
 
         // 1. check permission
-        if (!(canOperatorPermissions(loginUser,null, AuthorizationType.ACCESS_TOKEN,ACCESS_TOKEN_CREATE) || loginUser.getId() == userId)) {
+        if (!(canOperatorPermissions(loginUser, null, AuthorizationType.ACCESS_TOKEN, ACCESS_TOKEN_CREATE)
+                || loginUser.getId() == userId)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -190,14 +191,14 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
     @Override
     public Map<String, Object> delAccessTokenById(User loginUser, int id) {
         Map<String, Object> result = new HashMap<>();
-        if (!canOperatorPermissions(loginUser, null, AuthorizationType.ACCESS_TOKEN,ACCESS_TOKEN_DELETE)) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.ACCESS_TOKEN, ACCESS_TOKEN_DELETE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
         AccessToken accessToken = accessTokenMapper.selectById(id);
         if (accessToken == null) {
-            logger.error("access token not exist,  access token id {}", id);
+            logger.error("Access token does not exist, accessTokenId:{}.", id);
             putMsg(result, Status.ACCESS_TOKEN_NOT_EXIST);
             return result;
         }
@@ -226,7 +227,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         Map<String, Object> result = new HashMap<>();
 
         // 1. check permission
-        if (!canOperatorPermissions(loginUser, null,AuthorizationType.ACCESS_TOKEN,ACCESS_TOKEN_UPDATE)) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.ACCESS_TOKEN, ACCESS_TOKEN_UPDATE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -234,7 +235,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         // 2. check if token is existed
         AccessToken accessToken = accessTokenMapper.selectById(id);
         if (accessToken == null) {
-            logger.error("access token not exist,  access token id {}", id);
+            logger.error("Access token does not exist, accessTokenId:{}.", id);
             putMsg(result, Status.ACCESS_TOKEN_NOT_EXIST);
             return result;
         }

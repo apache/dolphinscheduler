@@ -23,14 +23,15 @@ import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 public interface StateEventHandler {
 
     /**
-     * Handle a event, if handle success will reture true, else return false
+     * Handle an event, if handle success will return true, else return false
      *
      * @param stateEvent given state event.
      * @throws StateEventHandleException this exception means it can be recovered.
      * @throws StateEventHandleError     this exception means it cannot be recovered, so the event need to drop.
+     * @throws StateEventHandleException this means it can be recovered.
      */
-    boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable, StateEvent stateEvent)
-        throws StateEventHandleException, StateEventHandleError;
+    boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable,
+                             StateEvent stateEvent) throws StateEventHandleException, StateEventHandleError, StateEventHandleFailure;
 
     StateEventType getEventType();
 }

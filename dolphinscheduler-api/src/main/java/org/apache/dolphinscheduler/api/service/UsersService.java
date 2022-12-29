@@ -130,7 +130,8 @@ public interface UsersService {
      * @throws Exception exception
      */
     Map<String, Object> updateUser(User loginUser, int userId, String userName, String userPassword, String email,
-                                   int tenantId, String phone, String queue, int state, String timeZone) throws IOException;
+                                   int tenantId, String phone, String queue, int state,
+                                   String timeZone) throws IOException;
 
     /**
      * delete user
@@ -152,6 +153,15 @@ public interface UsersService {
      */
     Map<String, Object> grantProject(User loginUser, int userId, String projectIds);
 
+    /**
+     * grant project with read permission
+     *
+     * @param loginUser login user
+     * @param userId user id
+     * @param projectIds project id array
+     * @return grant result code
+     */
+    Map<String, Object> grantProjectWithReadPerm(User loginUser, int userId, String projectIds);
 
     /**
      * grant project by code
@@ -162,6 +172,15 @@ public interface UsersService {
      * @return grant result code
      */
     Map<String, Object> grantProjectByCode(User loginUser, int userId, long projectCode);
+
+    /**
+     * revoke the project permission for specified user by id
+     * @param loginUser     Login user
+     * @param userId        User id
+     * @param projectIds   project id array
+     * @return
+     */
+    Map<String, Object> revokeProjectById(User loginUser, int userId, String projectIds);
 
     /**
      * revoke the project permission for specified user.
@@ -182,7 +201,6 @@ public interface UsersService {
      */
     Map<String, Object> grantResources(User loginUser, int userId, String resourceIds);
 
-
     /**
      * grant udf function
      *
@@ -193,7 +211,6 @@ public interface UsersService {
      */
     Map<String, Object> grantUDFFunction(User loginUser, int userId, String udfIds);
 
-
     /**
      * grant namespace
      *
@@ -203,7 +220,6 @@ public interface UsersService {
      * @return grant result code
      */
     Map<String, Object> grantNamespaces(User loginUser, int userId, String namespaceIds);
-
 
     /**
      * grant datasource
@@ -231,7 +247,6 @@ public interface UsersService {
      */
     Map<String, Object> queryAllGeneralUsers(User loginUser);
 
-
     /**
      * query user list
      *
@@ -248,7 +263,6 @@ public interface UsersService {
      */
     Result<Object> verifyUserName(String userName);
 
-
     /**
      * unauthorized user
      *
@@ -257,7 +271,6 @@ public interface UsersService {
      * @return unauthorize result code
      */
     Map<String, Object> unauthorizedUser(User loginUser, Integer alertGroupId);
-
 
     /**
      * authorized user

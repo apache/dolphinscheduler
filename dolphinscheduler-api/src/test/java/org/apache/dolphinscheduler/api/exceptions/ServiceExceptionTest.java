@@ -17,30 +17,32 @@
 package org.apache.dolphinscheduler.api.exceptions;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.junit.Assert;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class ServiceExceptionTest {
+
     @Test
-    public void getCodeTest(){
+    public void getCodeTest() {
         ServiceException serviceException = new ServiceException();
-        Assert.assertNull(serviceException.getCode());
+        Assertions.assertEquals(Status.INTERNAL_SERVER_ERROR_ARGS.getCode(), serviceException.getCode());
 
         serviceException = new ServiceException(Status.ALERT_GROUP_EXIST);
-        Assert.assertNotNull(serviceException.getCode());
+        Assertions.assertEquals(Status.ALERT_GROUP_EXIST.getCode(), serviceException.getCode());
 
         serviceException = new ServiceException(10012, "alarm group already exists");
-        Assert.assertNotNull(serviceException.getCode());
+        Assertions.assertEquals(10012, serviceException.getCode());
     }
     @Test
-    public void getMessageTest(){
+    public void getMessageTest() {
         ServiceException serviceException = new ServiceException();
-        Assert.assertNull(serviceException.getMessage());
+        Assertions.assertEquals(Status.INTERNAL_SERVER_ERROR_ARGS.getMsg(), serviceException.getMessage());
 
         serviceException = new ServiceException(Status.ALERT_GROUP_EXIST);
-        Assert.assertNotNull(serviceException.getMessage());
+        Assertions.assertNotNull(serviceException.getMessage());
 
         serviceException = new ServiceException(10012, "alarm group already exists");
-        Assert.assertNotNull(serviceException.getMessage());
+        Assertions.assertNotNull(serviceException.getMessage());
     }
 }

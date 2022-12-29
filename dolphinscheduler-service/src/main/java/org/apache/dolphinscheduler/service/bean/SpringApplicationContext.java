@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.service.bean;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.AbstractApplicationContext;
@@ -38,10 +39,18 @@ public class SpringApplicationContext implements ApplicationContextAware, AutoCl
      */
     @Override
     public void close() {
-        ((AbstractApplicationContext)applicationContext).close();
+        ((AbstractApplicationContext) applicationContext).close();
     }
 
     public static <T> T getBean(Class<T> requiredType) {
         return applicationContext.getBean(requiredType);
+    }
+
+    public static <T> T getBean(Class<T> requiredType, T defaultValue) {
+        try {
+            return applicationContext.getBean(requiredType);
+        } catch (NoSuchBeanDefinitionException e) {
+            return defaultValue;
+        }
     }
 }

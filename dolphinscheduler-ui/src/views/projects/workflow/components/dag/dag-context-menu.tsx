@@ -26,11 +26,15 @@ import { IWorkflowTaskInstance } from './types'
 import { NButton } from 'naive-ui'
 
 const props = {
-  startReadonly: {
+  startDisplay: {
     type: Boolean as PropType<boolean>,
     default: false
   },
-  menuReadonly: {
+  executeTaskDisplay: {
+    type: Boolean as PropType<boolean>,
+    default: false
+  },
+  menuDisplay: {
     type: Boolean as PropType<boolean>,
     default: false
   },
@@ -59,7 +63,7 @@ const props = {
 export default defineComponent({
   name: 'dag-context-menu',
   props,
-  emits: ['hide', 'start', 'edit', 'viewLog', 'copyTask', 'removeTasks'],
+  emits: ['hide', 'start', 'edit', 'viewLog', 'copyTask', 'removeTasks', 'executeTask', 'removeTaskInstanceCache'],
   setup(props, ctx) {
     const graph = inject('graph', ref())
     const route = useRoute()
@@ -80,6 +84,28 @@ export default defineComponent({
     const handleViewLog = () => {
       if (props.taskInstance) {
         ctx.emit('viewLog', props.taskInstance.id, props.taskInstance.taskType)
+      }
+    }
+
+    const handleExecuteTaskOnly = () => {
+      ctx.emit('executeTask', Number(props.cell?.id), 'TASK_ONLY')
+    }
+
+    const handleExecuteTaskPOST = () => {
+      if (props.taskInstance) {
+        ctx.emit('executeTask', Number(props.cell?.id), 'TASK_POST')
+      }
+    }
+
+    const handleExecuteTaskPRE = () => {
+      if (props.taskInstance) {
+        ctx.emit('executeTask', Number(props.cell?.id), 'TASK_PRE')
+      }
+    }
+
+    const handleRemoveTaskInstanceCache = () => {
+      if (props.taskInstance) {
+        ctx.emit('removeTaskInstanceCache', props.taskInstance.id)
       }
     }
 
@@ -115,7 +141,11 @@ export default defineComponent({
       handleEdit,
       handleCopy,
       handleDelete,
-      handleViewLog
+      handleViewLog,
+      handleExecuteTaskOnly,
+      handleExecuteTaskPOST,
+      handleExecuteTaskPRE,
+      handleRemoveTaskInstanceCache
     }
   },
   render() {
@@ -127,41 +157,73 @@ export default defineComponent({
           class={styles['dag-context-menu']}
           style={{ left: `${this.left}px`, top: `${this.top}px` }}
         >
-          <NButton
-            class={`${styles['menu-item']}`}
-            disabled={this.startReadonly}
-            onClick={this.startRunning}
-          >
-            {t('project.node.start')}
-          </NButton>
-          <NButton
-            class={`${styles['menu-item']}`}
-            disabled={this.menuReadonly}
-            onClick={this.handleEdit}
-          >
-            {t('project.node.edit')}
-          </NButton>
-          <NButton
-            class={`${styles['menu-item']}`}
-            disabled={this.menuReadonly}
-            onClick={this.handleCopy}
-          >
-            {t('project.node.copy')}
-          </NButton>
-          <NButton
-            class={`${styles['menu-item']}`}
-            disabled={this.menuReadonly}
-            onClick={this.handleDelete}
-          >
-            {t('project.node.delete')}
-          </NButton>
-          {this.taskInstance && (
+          {this.startDisplay && (
             <NButton
               class={`${styles['menu-item']}`}
-              onClick={this.handleViewLog}
+              onClick={this.startRunning}
             >
-              {t('project.node.view_log')}
+              {t('project.node.start')}
             </NButton>
+          )}
+          {this.menuDisplay && (
+            <>
+              <NButton
+                class={`${styles['menu-item']}`}
+                onClick={this.handleEdit}
+              >
+                {t('project.node.edit')}
+              </NButton>
+              <NButton
+                class={`${styles['menu-item']}`}
+                onClick={this.handleCopy}
+              >
+                {t('project.node.copy')}
+              </NButton>
+              <NButton
+                class={`${styles['menu-item']}`}
+                onClick={this.handleDelete}
+              >
+                {t('project.node.delete')}
+              </NButton>
+            </>
+          )}
+          {this.taskInstance && (
+              <>
+                <NButton
+                    class={`${styles['menu-item']}`}
+                    onClick={this.handleViewLog}
+                >
+                  {t('project.node.view_log')}
+                </NButton>
+                <NButton
+                    class={`${styles['menu-item']}`}
+                    onClick={this.handleRemoveTaskInstanceCache}
+                >
+                  {t('project.task.remove_task_cache')}
+                </NButton>
+              </>
+          )}
+          {this.executeTaskDisplay && (
+              <>
+                <NButton
+                    class={`${styles['menu-item']}`}
+                    onClick={this.handleExecuteTaskOnly}
+                >
+                  {t('project.workflow.current_node_execution_task')}
+                </NButton>
+                <NButton
+                    class={`${styles['menu-item']}`}
+                    onClick={this.handleExecuteTaskPOST}
+                >
+                  {t('project.workflow.backward_execution_task')}
+                </NButton>
+                <NButton
+                    class={`${styles['menu-item']}`}
+                    onClick={this.handleExecuteTaskPRE}
+                >
+                  {t('project.workflow.forward_execution_task')}
+                </NButton>
+              </>
           )}
         </div>
       )

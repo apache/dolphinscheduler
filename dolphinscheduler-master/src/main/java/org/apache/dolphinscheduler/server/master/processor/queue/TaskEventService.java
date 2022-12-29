@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.server.master.processor.queue;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
-import org.apache.dolphinscheduler.common.thread.Stopper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -105,13 +105,14 @@ public class TaskEventService {
      * Dispatch event to target task runnable.
      */
     class TaskEventDispatchThread extends BaseDaemonThread {
+
         protected TaskEventDispatchThread() {
             super("TaskEventLoopThread");
         }
 
         @Override
         public void run() {
-            while (Stopper.isRunning()) {
+            while (!ServerLifeCycleManager.isStopped()) {
                 try {
                     // if not task event, blocking here
                     TaskEvent taskEvent = eventQueue.take();
@@ -139,7 +140,7 @@ public class TaskEventService {
         @Override
         public void run() {
             logger.info("event handler thread started");
-            while (Stopper.isRunning()) {
+            while (!ServerLifeCycleManager.isStopped()) {
                 try {
                     taskExecuteThreadPool.eventHandler();
                     TimeUnit.MILLISECONDS.sleep(Constants.SLEEP_TIME_MILLIS);

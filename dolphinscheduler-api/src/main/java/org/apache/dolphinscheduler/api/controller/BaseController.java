@@ -17,14 +17,14 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.common.Constants.COMMA;
-import static org.apache.dolphinscheduler.common.Constants.HTTP_HEADER_UNKNOWN;
-import static org.apache.dolphinscheduler.common.Constants.HTTP_X_FORWARDED_FOR;
-import static org.apache.dolphinscheduler.common.Constants.HTTP_X_REAL_IP;
+import static org.apache.dolphinscheduler.common.constants.Constants.COMMA;
+import static org.apache.dolphinscheduler.common.constants.Constants.HTTP_HEADER_UNKNOWN;
+import static org.apache.dolphinscheduler.common.constants.Constants.HTTP_X_FORWARDED_FOR;
+import static org.apache.dolphinscheduler.common.constants.Constants.HTTP_X_REAL_IP;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -46,8 +46,9 @@ public class BaseController {
      * @param pageSize page size
      * @return check result code
      */
-    public Result checkPageParams(int pageNo, int pageSize) {
-        Result result = new Result();
+    // todo: directly throw exception
+    public <T> Result<T> checkPageParams(int pageNo, int pageSize) {
+        Result<T> result = new Result<>();
         Status resultEnum = Status.SUCCESS;
         String msg = Status.SUCCESS.getMsg();
         if (pageNo <= 0) {

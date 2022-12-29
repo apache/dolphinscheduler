@@ -26,16 +26,17 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * rule type
  */
 public enum RuleType {
+
     /**
      * 0-single_table
      * 1-single_table_custom_sql
      * 2-multi_table_accuracy
      * 3-multi_table_comparison
      */
-    SINGLE_TABLE(0,"single_table"),
-    SINGLE_TABLE_CUSTOM_SQL(1,"single_table_custom_sql"),
-    MULTI_TABLE_ACCURACY(2,"multi_table_accuracy"),
-    MULTI_TABLE_COMPARISON(3,"multi_table_comparison");
+    SINGLE_TABLE(0, "single_table"),
+    SINGLE_TABLE_CUSTOM_SQL(1, "single_table_custom_sql"),
+    MULTI_TABLE_ACCURACY(2, "multi_table_accuracy"),
+    MULTI_TABLE_COMPARISON(3, "multi_table_comparison");
 
     RuleType(int code, String description) {
         this.code = code;
@@ -58,7 +59,7 @@ public enum RuleType {
 
     static {
         for (RuleType type : RuleType.values()) {
-            VALUES_MAP.put(type.code,type);
+            VALUES_MAP.put(type.code, type);
         }
     }
 

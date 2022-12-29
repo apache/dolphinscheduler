@@ -49,9 +49,7 @@ export default defineComponent({
     }
 
     const handleReturn = () => {
-      const { id } = router.currentRoute.value.params
-      const name = id ? 'resource-file-subdirectory' : 'file'
-      router.push({ name, params: { id } })
+      router.go(-1)
     }
 
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
@@ -75,7 +73,7 @@ export default defineComponent({
         >
           <NFormItem label={t('resource.file.file_name')} path='fileName'>
             <NInput
-                  allowInput={this.trim}
+              allowInput={this.trim}
               v-model={[this.fileForm.fileName, 'value']}
               placeholder={t('resource.file.enter_name_tips')}
               style={{ width: '300px' }}
@@ -93,7 +91,7 @@ export default defineComponent({
           </NFormItem>
           <NFormItem label={t('resource.file.description')} path='description'>
             <NInput
-                  allowInput={this.trim}
+              allowInput={this.trim}
               type='textarea'
               v-model={[this.fileForm.description, 'value']}
               placeholder={t('resource.file.enter_description_tips')}

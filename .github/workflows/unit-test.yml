@@ -23,7 +23,6 @@ on:
     paths-ignore:
       - '**/*.md'
       - 'dolphinscheduler-ui'
-      - 'dolphinscheduler-python/pydolphinscheduler'
     branches:
       - dev
 
@@ -56,7 +55,7 @@ jobs:
     strategy:
       matrix:
         java: ['8', '11']
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v2
         with:

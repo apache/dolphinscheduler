@@ -27,11 +27,11 @@
         </encoder>
     </appender>
 
-    <conversionRule conversionWord="messsage"
-                    converterClass="org.apache.dolphinscheduler.server.log.SensitiveDataConverter"/>
+    <conversionRule conversionWord="message"
+                    converterClass="org.apache.dolphinscheduler.common.log.SensitiveDataConverter"/>
     <appender name="TASKLOGFILE" class="ch.qos.logback.classic.sift.SiftingAppender">
-        <filter class="org.apache.dolphinscheduler.server.log.TaskLogFilter"/>
-        <Discriminator class="org.apache.dolphinscheduler.server.log.TaskLogDiscriminator">
+        <filter class="org.apache.dolphinscheduler.plugin.task.api.log.TaskLogFilter"/>
+        <Discriminator class="org.apache.dolphinscheduler.plugin.task.api.log.TaskLogDiscriminator">
             <key>taskAppId</key>
             <logBase>${log.base}</logBase>
         </Discriminator>
@@ -40,7 +40,7 @@
                 <file>${log.base}/${taskAppId}.log</file>
                 <encoder>
                     <pattern>
-                        [%level] %date{yyyy-MM-dd HH:mm:ss.SSS Z} [%thread] %logger{96}:[%line] - %messsage%n
+                        [%level] %date{yyyy-MM-dd HH:mm:ss.SSS Z} - %message%n
                     </pattern>
                     <charset>UTF-8</charset>
                 </encoder>

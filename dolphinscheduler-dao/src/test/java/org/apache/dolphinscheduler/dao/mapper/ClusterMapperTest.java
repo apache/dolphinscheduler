@@ -23,10 +23,10 @@ import org.apache.dolphinscheduler.dao.entity.Cluster;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -43,7 +43,7 @@ public class ClusterMapperTest extends BaseDaoTest {
      * @return Cluster
      */
     private Cluster insertOne() {
-        //insertOne
+        // insertOne
         Cluster cluster = new Cluster();
         cluster.setName("testCluster");
         cluster.setCode(1L);
@@ -56,12 +56,12 @@ public class ClusterMapperTest extends BaseDaoTest {
         return cluster;
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         clearTestData();
     }
 
-    @After
+    @AfterEach
     public void after() {
         clearTestData();
     }
@@ -77,12 +77,12 @@ public class ClusterMapperTest extends BaseDaoTest {
      */
     @Test
     public void testUpdate() {
-        //insertOne
+        // insertOne
         Cluster cluster = insertOne();
         cluster.setDescription("new description info");
-        //update
+        // update
         int update = clusterMapper.updateById(cluster);
-        Assert.assertEquals(update, 1);
+        Assertions.assertEquals(update, 1);
     }
 
     /**
@@ -92,7 +92,7 @@ public class ClusterMapperTest extends BaseDaoTest {
     public void testDelete() {
         Cluster cluster = insertOne();
         int delete = clusterMapper.deleteById(cluster.getId());
-        Assert.assertEquals(delete, 1);
+        Assertions.assertEquals(delete, 1);
     }
 
     /**
@@ -101,9 +101,9 @@ public class ClusterMapperTest extends BaseDaoTest {
     @Test
     public void testQuery() {
         insertOne();
-        //query
+        // query
         List<Cluster> clusters = clusterMapper.selectList(null);
-        Assert.assertEquals(clusters.size(), 1);
+        Assertions.assertEquals(clusters.size(), 1);
     }
 
     /**
@@ -113,7 +113,7 @@ public class ClusterMapperTest extends BaseDaoTest {
     public void testQueryByClusterName() {
         Cluster entity = insertOne();
         Cluster cluster = clusterMapper.queryByClusterName(entity.getName());
-        Assert.assertEquals(entity.toString(),cluster.toString());
+        Assertions.assertEquals(entity.toString(), cluster.toString());
     }
 
     /**
@@ -123,7 +123,7 @@ public class ClusterMapperTest extends BaseDaoTest {
     public void testQueryByClusterCode() {
         Cluster entity = insertOne();
         Cluster cluster = clusterMapper.queryByClusterCode(entity.getCode());
-        Assert.assertEquals(entity.toString(),cluster.toString());
+        Assertions.assertEquals(entity.toString(), cluster.toString());
     }
 
     /**
@@ -133,8 +133,8 @@ public class ClusterMapperTest extends BaseDaoTest {
     public void testQueryAllClusterList() {
         Cluster entity = insertOne();
         List<Cluster> clusters = clusterMapper.queryAllClusterList();
-        Assert.assertEquals(clusters.size(), 1);
-        Assert.assertEquals(entity.toString(),clusters.get(0).toString());
+        Assertions.assertEquals(clusters.size(), 1);
+        Assertions.assertEquals(entity.toString(), clusters.get(0).toString());
     }
 
     /**
@@ -144,13 +144,13 @@ public class ClusterMapperTest extends BaseDaoTest {
     public void testQueryClusterListPaging() {
         Cluster entity = insertOne();
         Page<Cluster> page = new Page<>(1, 10);
-        IPage<Cluster> clusterIPage = clusterMapper.queryClusterListPaging(page,"");
+        IPage<Cluster> clusterIPage = clusterMapper.queryClusterListPaging(page, "");
         List<Cluster> clusterList = clusterIPage.getRecords();
-        Assert.assertEquals(clusterList.size(), 1);
+        Assertions.assertEquals(clusterList.size(), 1);
 
-        clusterIPage = clusterMapper.queryClusterListPaging(page,"abc");
+        clusterIPage = clusterMapper.queryClusterListPaging(page, "abc");
         clusterList = clusterIPage.getRecords();
-        Assert.assertEquals(clusterList.size(), 0);
+        Assertions.assertEquals(clusterList.size(), 0);
     }
 
     /**
@@ -160,7 +160,7 @@ public class ClusterMapperTest extends BaseDaoTest {
     public void testDeleteByCode() {
         Cluster entity = insertOne();
         int delete = clusterMapper.deleteByCode(entity.getCode());
-        Assert.assertEquals(delete, 1);
+        Assertions.assertEquals(delete, 1);
     }
 
     private String getDesc() {
@@ -173,8 +173,7 @@ public class ClusterMapperTest extends BaseDaoTest {
     private String getConfig() {
         return "export HADOOP_HOME=/opt/hadoop-2.6.5\n"
                 + "export HADOOP_CONF_DIR=/etc/hadoop/conf\n"
-                + "export SPARK_HOME1=/opt/soft/spark1\n"
-                + "export SPARK_HOME2=/opt/soft/spark2\n"
+                + "export SPARK_HOME=/opt/soft/spark\n"
                 + "export PYTHON_HOME=/opt/soft/python\n"
                 + "export JAVA_HOME=/opt/java/jdk1.8.0_181-amd64\n"
                 + "export HIVE_HOME=/opt/soft/hive\n"
@@ -182,7 +181,7 @@ public class ClusterMapperTest extends BaseDaoTest {
                 + "export DATAX_HOME=/opt/soft/datax\n"
                 + "export YARN_CONF_DIR=\"/etc/hadoop/conf\"\n"
                 + "\n"
-                + "export PATH=$HADOOP_HOME/bin:$SPARK_HOME1/bin:$SPARK_HOME2/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH\n"
+                + "export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH\n"
                 + "\n"
                 + "export HADOOP_CLASSPATH=`hadoop classpath`\n"
                 + "\n"

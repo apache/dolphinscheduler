@@ -19,34 +19,17 @@ package org.apache.dolphinscheduler.remote.command.alert;
 
 import java.io.Serializable;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class AlertSendResponseResult implements Serializable {
 
-    private boolean status;
+    private boolean success;
 
     private String message;
 
-    public boolean getStatus() {
-        return status;
-    }
-
-    public void setStatus(boolean status) {
-        this.status = status;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public AlertSendResponseResult() {
-
-    }
-
-    public AlertSendResponseResult(boolean status, String message) {
-        this.status = status;
-        this.message = message;
-    }
 }

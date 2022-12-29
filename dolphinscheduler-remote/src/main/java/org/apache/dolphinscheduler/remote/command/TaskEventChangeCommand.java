@@ -21,9 +21,14 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.io.Serializable;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
  * db task final result response command
  */
+@Data
+@NoArgsConstructor
 public class TaskEventChangeCommand implements Serializable {
 
     private String key;
@@ -32,28 +37,15 @@ public class TaskEventChangeCommand implements Serializable {
 
     private int taskInstanceId;
 
-    public TaskEventChangeCommand() {
-        super();
-    }
-
     public TaskEventChangeCommand(
                                   int processInstanceId,
-                                  int taskInstanceId
-    ) {
+                                  int taskInstanceId) {
         this.key = String.format("%d-%d",
                 processInstanceId,
                 taskInstanceId);
 
         this.processInstanceId = processInstanceId;
         this.taskInstanceId = taskInstanceId;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
     }
 
     /**
@@ -69,26 +61,4 @@ public class TaskEventChangeCommand implements Serializable {
         return command;
     }
 
-    @Override
-    public String toString() {
-        return "TaskEventChangeCommand{"
-                + "key=" + key
-                + '}';
-    }
-
-    public int getProcessInstanceId() {
-        return processInstanceId;
-    }
-
-    public void setProcessInstanceId(int processInstanceId) {
-        this.processInstanceId = processInstanceId;
-    }
-
-    public int getTaskInstanceId() {
-        return taskInstanceId;
-    }
-
-    public void setTaskInstanceId(int taskInstanceId) {
-        this.taskInstanceId = taskInstanceId;
-    }
 }

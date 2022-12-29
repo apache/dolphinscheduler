@@ -16,8 +16,6 @@
 #
 
 spring:
-  application:
-    name: alert-server
   jackson:
     time-zone: UTC
     date-format: "yyyy-MM-dd HH:mm:ss"
@@ -47,7 +45,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: '*'
+        include: health,metrics,prometheus
   endpoint:
     health:
       enabled: true

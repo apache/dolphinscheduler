@@ -20,17 +20,15 @@ package org.apache.dolphinscheduler.remote.command.log;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 
-import org.junit.Test;
-
-import junit.framework.Assert;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class GetLogBytesRequestCommandTest {
 
     @Test
     public void testConvert2Command() {
-        GetLogBytesRequestCommand getLogBytesRequestCommand = new GetLogBytesRequestCommand();
-        getLogBytesRequestCommand.setPath("/opt/test");
+        GetLogBytesRequestCommand getLogBytesRequestCommand = new GetLogBytesRequestCommand("/opt/test");
         Command command = getLogBytesRequestCommand.convert2Command();
-        Assert.assertEquals(CommandType.GET_LOG_BYTES_REQUEST, command.getType());
+        Assertions.assertEquals(CommandType.GET_LOG_BYTES_REQUEST, command.getType());
     }
 }

@@ -21,7 +21,9 @@ import org.apache.dolphinscheduler.common.enums.ConditionType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.util.Date;
-import java.util.Objects;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -29,9 +31,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-/**
- * process task relation
- */
+@Data
+@NoArgsConstructor
 @TableName("t_ds_process_task_relation")
 public class ProcessTaskRelation {
 
@@ -39,7 +40,7 @@ public class ProcessTaskRelation {
      * id
      */
     @TableId(value = "id", type = IdType.AUTO)
-    private int id;
+    private Integer id;
 
     /**
      * name
@@ -103,9 +104,6 @@ public class ProcessTaskRelation {
      */
     private Date updateTime;
 
-    public ProcessTaskRelation() {
-    }
-
     public ProcessTaskRelation(String name,
                                int processDefinitionVersion,
                                long projectCode,
@@ -115,9 +113,7 @@ public class ProcessTaskRelation {
                                long postTaskCode,
                                int postTaskVersion,
                                ConditionType conditionType,
-                               String conditionParams,
-                               Date createTime,
-                               Date updateTime) {
+                               String conditionParams) {
         this.name = name;
         this.processDefinitionVersion = processDefinitionVersion;
         this.projectCode = projectCode;
@@ -128,154 +124,26 @@ public class ProcessTaskRelation {
         this.postTaskVersion = postTaskVersion;
         this.conditionType = conditionType;
         this.conditionParams = conditionParams;
-        this.createTime = createTime;
-        this.updateTime = updateTime;
+
+        Date now = new Date();
+        this.createTime = now;
+        this.updateTime = now;
     }
 
-    public String getName() {
-        return name;
+    public ProcessTaskRelation(ProcessTaskRelationLog processTaskRelationLog) {
+        this.name = processTaskRelationLog.getName();
+        this.processDefinitionVersion = processTaskRelationLog.getProcessDefinitionVersion();
+        this.projectCode = processTaskRelationLog.getProjectCode();
+        this.processDefinitionCode = processTaskRelationLog.getProcessDefinitionCode();
+        this.preTaskCode = processTaskRelationLog.getPreTaskCode();
+        this.preTaskVersion = processTaskRelationLog.getPreTaskVersion();
+        this.postTaskCode = processTaskRelationLog.getPostTaskCode();
+        this.postTaskVersion = processTaskRelationLog.getPostTaskVersion();
+        this.conditionType = processTaskRelationLog.getConditionType();
+        this.conditionParams = processTaskRelationLog.getConditionParams();
+
+        this.createTime = processTaskRelationLog.getCreateTime();
+        this.updateTime = new Date();
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public String getConditionParams() {
-        return conditionParams;
-    }
-
-    public void setConditionParams(String conditionParams) {
-        this.conditionParams = conditionParams;
-    }
-
-    public int getProcessDefinitionVersion() {
-        return processDefinitionVersion;
-    }
-
-    public void setProcessDefinitionVersion(int processDefinitionVersion) {
-        this.processDefinitionVersion = processDefinitionVersion;
-    }
-
-    public long getProjectCode() {
-        return projectCode;
-    }
-
-    public void setProjectCode(long projectCode) {
-        this.projectCode = projectCode;
-    }
-
-    public long getProcessDefinitionCode() {
-        return processDefinitionCode;
-    }
-
-    public void setProcessDefinitionCode(long processDefinitionCode) {
-        this.processDefinitionCode = processDefinitionCode;
-    }
-
-    public long getPreTaskCode() {
-        return preTaskCode;
-    }
-
-    public void setPreTaskCode(long preTaskCode) {
-        this.preTaskCode = preTaskCode;
-    }
-
-    public long getPostTaskCode() {
-        return postTaskCode;
-    }
-
-    public void setPostTaskCode(long postTaskCode) {
-        this.postTaskCode = postTaskCode;
-    }
-
-    public ConditionType getConditionType() {
-        return conditionType;
-    }
-
-    public void setConditionType(ConditionType conditionType) {
-        this.conditionType = conditionType;
-    }
-
-    public int getPreTaskVersion() {
-        return preTaskVersion;
-    }
-
-    public void setPreTaskVersion(int preTaskVersion) {
-        this.preTaskVersion = preTaskVersion;
-    }
-
-    public int getPostTaskVersion() {
-        return postTaskVersion;
-    }
-
-    public void setPostTaskVersion(int postTaskVersion) {
-        this.postTaskVersion = postTaskVersion;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        ProcessTaskRelation that = (ProcessTaskRelation) o;
-        return processDefinitionVersion == that.processDefinitionVersion
-            && projectCode == that.projectCode
-            && processDefinitionCode == that.processDefinitionCode
-            && preTaskCode == that.preTaskCode
-            && preTaskVersion == that.preTaskVersion
-            && postTaskCode == that.postTaskCode
-            && postTaskVersion == that.postTaskVersion
-            && Objects.equals(name, that.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, processDefinitionVersion, projectCode, processDefinitionCode, preTaskCode, preTaskVersion, postTaskCode, postTaskVersion);
-    }
-
-    @Override
-    public String toString() {
-        return "ProcessTaskRelation{"
-            + "id=" + id
-            + ", name='" + name + '\''
-            + ", processDefinitionVersion=" + processDefinitionVersion
-            + ", projectCode=" + projectCode
-            + ", processDefinitionCode=" + processDefinitionCode
-            + ", preTaskCode=" + preTaskCode
-            + ", preTaskVersion=" + preTaskVersion
-            + ", postTaskCode=" + postTaskCode
-            + ", postTaskVersion=" + postTaskVersion
-            + ", conditionType=" + conditionType
-            + ", conditionParams='" + conditionParams + '\''
-            + ", createTime=" + createTime
-            + ", updateTime=" + updateTime
-            + '}';
-    }
 }

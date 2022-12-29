@@ -30,12 +30,15 @@ import lombok.NonNull;
 @Data
 @AllArgsConstructor
 public class TaskInstanceKey {
+
     private final int processInstanceId;
     private final long taskCode;
     private final int taskVersion;
 
-    public static TaskInstanceKey getTaskInstanceKey(@NonNull ProcessInstance processInstance, @NonNull TaskInstance taskInstance) {
-        return new TaskInstanceKey(processInstance.getId(), taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion());
+    public static TaskInstanceKey getTaskInstanceKey(@NonNull ProcessInstance processInstance,
+                                                     @NonNull TaskInstance taskInstance) {
+        return new TaskInstanceKey(processInstance.getId(), taskInstance.getTaskCode(),
+                taskInstance.getTaskDefinitionVersion());
     }
 
 }

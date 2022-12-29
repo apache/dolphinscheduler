@@ -39,11 +39,24 @@ export type TaskType =
   | 'MLFLOW'
   | 'OPENMLDB'
   | 'DVC'
+  | 'JAVA'
   | 'DINKY'
   | 'SAGEMAKER'
   | 'CHUNJUN'
+  | 'FLINK_STREAM'
+  | 'PYTORCH'
+  | 'HIVECLI'
+  | 'DMS'
+  | 'DATASYNC'
+  | 'KUBEFLOW'
+  | 'LINKIS'
+
+export type TaskExecuteType = 'STREAM' | 'BATCH'
 
 export const TASK_TYPES_MAP = {
+  JAVA: {
+    alias: 'JAVA'
+  },
   SHELL: {
     alias: 'SHELL'
   },
@@ -138,5 +151,40 @@ export const TASK_TYPES_MAP = {
   CHUNJUN: {
     alias: 'CHUNJUN',
     helperLinkDisable: true
+  },
+  FLINK_STREAM: {
+    alias: 'FLINK_STREAM',
+    helperLinkDisable: true,
+    taskExecuteType: 'STREAM'
+  },
+  PYTORCH: {
+    alias: 'Pytorch',
+    helperLinkDisable: true
+  },
+  HIVECLI: {
+    alias: 'HIVECLI',
+    helperLinkDisable: true
+  },
+  DMS: {
+    alias: 'DMS',
+    helperLinkDisable: true
+  },
+  DATASYNC: {
+    alias: 'DATASYNC',
+    helperLinkDisable: true
+  },
+  KUBEFLOW: {
+    alias: 'KUBEFLOW',
+    helperLinkDisable: true
+  },
+  LINKIS: {
+    alias: 'LINKIS',
+    helperLinkDisable: true
   }
-} as { [key in TaskType]: { alias: string; helperLinkDisable?: boolean } }
+} as {
+  [key in TaskType]: {
+    alias: string
+    helperLinkDisable?: boolean
+    taskExecuteType?: TaskExecuteType
+  }
+}

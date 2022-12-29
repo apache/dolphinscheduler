@@ -23,27 +23,24 @@ import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendRequestCommand;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseCommand;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseResult;
+import org.apache.dolphinscheduler.remote.factory.NettyRemotingClientFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * alert client service test
- */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({AlertClientService.class})
+@ExtendWith(MockitoExtension.class)
 public class AlertClientServiceTest {
 
     private static final Logger logger = LoggerFactory.getLogger(AlertClientServiceTest.class);
@@ -52,11 +49,20 @@ public class AlertClientServiceTest {
 
     private AlertClientService alertClient;
 
-    @Before
+    private MockedStatic<NettyRemotingClientFactory> mockedNettyRemotingClientFactory;
+
+    @BeforeEach
     public void before() throws Exception {
-        client = PowerMockito.mock(NettyRemotingClient.class);
-        PowerMockito.whenNew(NettyRemotingClient.class).withAnyArguments().thenReturn(client);
+        client = Mockito.mock(NettyRemotingClient.class);
+        mockedNettyRemotingClientFactory = Mockito.mockStatic(NettyRemotingClientFactory.class);
+        mockedNettyRemotingClientFactory.when(NettyRemotingClientFactory::buildNettyRemotingClient)
+                .thenReturn(client);
         alertClient = new AlertClientService();
+    }
+
+    @AfterEach
+    public void after() {
+        mockedNettyRemotingClientFactory.close();
     }
 
     @Test
@@ -67,82 +73,90 @@ public class AlertClientServiceTest {
         String title = "test-title";
         String content = "test-content";
 
-        //1.alter server does not exist
-        AlertSendResponseCommand alertSendResponseCommand = alertClient.sendAlert(host, port, groupId, title, content, WarningType.FAILURE.getCode());
-        Assert.assertNull(alertSendResponseCommand);
+        // 1.alter server does not exist
+        AlertSendResponseCommand alertSendResponseCommand =
+                alertClient.sendAlert(host, port, groupId, title, content, WarningType.FAILURE.getCode());
+        Assertions.assertNull(alertSendResponseCommand);
 
-        AlertSendRequestCommand alertSendRequestCommand = new AlertSendRequestCommand(groupId,title,content, WarningType.FAILURE.getCode());
+        AlertSendRequestCommand alertSendRequestCommand =
+                new AlertSendRequestCommand(groupId, title, content, WarningType.FAILURE.getCode());
         Command reqCommand = alertSendRequestCommand.convert2Command();
         boolean sendResponseStatus;
         List<AlertSendResponseResult> sendResponseResults = new ArrayList<>();
 
-        //2.alter instance does not exist
+        // 2.alter instance does not exist
         sendResponseStatus = false;
         AlertSendResponseResult alertResult = new AlertSendResponseResult();
-        String message = String.format("Alert GroupId %s send error : not found alert instance",groupId);
-        alertResult.setStatus(false);
+        String message = String.format("Alert GroupId %s send error : not found alert instance", groupId);
+        alertResult.setSuccess(false);
         alertResult.setMessage(message);
         sendResponseResults.add(alertResult);
-        AlertSendResponseCommand alertSendResponseCommandData = new AlertSendResponseCommand(sendResponseStatus, sendResponseResults);
+        AlertSendResponseCommand alertSendResponseCommandData =
+                new AlertSendResponseCommand(sendResponseStatus, sendResponseResults);
         Command resCommand = alertSendResponseCommandData.convert2Command(reqCommand.getOpaque());
 
-        PowerMockito.when(client.sendSync(Mockito.any(), Mockito.any(), Mockito.anyLong())).thenReturn(resCommand);
-        alertSendResponseCommand = alertClient.sendAlert(host, port, groupId, title, content, WarningType.FAILURE.getCode());
-        Assert.assertFalse(alertSendResponseCommand.getResStatus());
-        alertSendResponseCommand.getResResults().forEach(result ->
-                logger.info("alert send response result, status:{}, message:{}",result.getStatus(),result.getMessage()));
+        Mockito.when(client.sendSync(Mockito.any(), Mockito.any(), Mockito.anyLong())).thenReturn(resCommand);
+        alertSendResponseCommand =
+                alertClient.sendAlert(host, port, groupId, title, content, WarningType.FAILURE.getCode());
+        Assertions.assertFalse(alertSendResponseCommand.isSuccess());
+        alertSendResponseCommand.getResResults().forEach(result -> logger
+                .info("alert send response result, status:{}, message:{}", result.isSuccess(), result.getMessage()));
 
-        //3.alter plugin does not exist
+        // 3.alter plugin does not exist
         sendResponseStatus = false;
         String pluginInstanceName = "alert-mail";
-        message = String.format("Alert Plugin %s send error : return value is null",pluginInstanceName);
-        alertResult.setStatus(false);
+        message = String.format("Alert Plugin %s send error : return value is null", pluginInstanceName);
+        alertResult.setSuccess(false);
         alertResult.setMessage(message);
         alertSendResponseCommandData = new AlertSendResponseCommand(sendResponseStatus, sendResponseResults);
         resCommand = alertSendResponseCommandData.convert2Command(reqCommand.getOpaque());
-        PowerMockito.when(client.sendSync(Mockito.any(), Mockito.any(), Mockito.anyLong())).thenReturn(resCommand);
-        alertSendResponseCommand = alertClient.sendAlert(host, port, groupId, title, content, WarningType.FAILURE.getCode());
-        Assert.assertFalse(alertSendResponseCommand.getResStatus());
-        alertSendResponseCommand.getResResults().forEach(result ->
-                logger.info("alert send response result, status:{}, message:{}",result.getStatus(),result.getMessage()));
+        Mockito.when(client.sendSync(Mockito.any(), Mockito.any(), Mockito.anyLong())).thenReturn(resCommand);
+        alertSendResponseCommand =
+                alertClient.sendAlert(host, port, groupId, title, content, WarningType.FAILURE.getCode());
+        Assertions.assertFalse(alertSendResponseCommand.isSuccess());
+        alertSendResponseCommand.getResResults().forEach(result -> logger
+                .info("alert send response result, status:{}, message:{}", result.isSuccess(), result.getMessage()));
 
-        //4.alter result is null
+        // 4.alter result is null
         sendResponseStatus = false;
-        message = String.format("Alert Plugin %s send error : return result value is null",pluginInstanceName);
-        alertResult.setStatus(false);
+        message = String.format("Alert Plugin %s send error : return result value is null", pluginInstanceName);
+        alertResult.setSuccess(false);
         alertResult.setMessage(message);
         alertSendResponseCommandData = new AlertSendResponseCommand(sendResponseStatus, sendResponseResults);
         resCommand = alertSendResponseCommandData.convert2Command(reqCommand.getOpaque());
-        PowerMockito.when(client.sendSync(Mockito.any(), Mockito.any(), Mockito.anyLong())).thenReturn(resCommand);
-        alertSendResponseCommand = alertClient.sendAlert(host, port, groupId, title, content, WarningType.FAILURE.getCode());
-        Assert.assertFalse(alertSendResponseCommand.getResStatus());
-        alertSendResponseCommand.getResResults().forEach(result ->
-                logger.info("alert send response result, status:{}, message:{}",result.getStatus(),result.getMessage()));
+        Mockito.when(client.sendSync(Mockito.any(), Mockito.any(), Mockito.anyLong())).thenReturn(resCommand);
+        alertSendResponseCommand =
+                alertClient.sendAlert(host, port, groupId, title, content, WarningType.FAILURE.getCode());
+        Assertions.assertFalse(alertSendResponseCommand.isSuccess());
+        alertSendResponseCommand.getResResults().forEach(result -> logger
+                .info("alert send response result, status:{}, message:{}", result.isSuccess(), result.getMessage()));
 
-        //5.abnormal information inside the alert plug-in code
+        // 5.abnormal information inside the alert plug-in code
         sendResponseStatus = false;
-        alertResult.setStatus(false);
+        alertResult.setSuccess(false);
         alertResult.setMessage("Abnormal information inside the alert plug-in code");
         alertSendResponseCommandData = new AlertSendResponseCommand(sendResponseStatus, sendResponseResults);
         resCommand = alertSendResponseCommandData.convert2Command(reqCommand.getOpaque());
-        PowerMockito.when(client.sendSync(Mockito.any(), Mockito.any(), Mockito.anyLong())).thenReturn(resCommand);
-        alertSendResponseCommand = alertClient.sendAlert(host, port, groupId, title, content, WarningType.FAILURE.getCode());
-        Assert.assertFalse(alertSendResponseCommand.getResStatus());
-        alertSendResponseCommand.getResResults().forEach(result ->
-                logger.info("alert send response result, status:{}, message:{}",result.getStatus(),result.getMessage()));
+        Mockito.when(client.sendSync(Mockito.any(), Mockito.any(), Mockito.anyLong())).thenReturn(resCommand);
+        alertSendResponseCommand =
+                alertClient.sendAlert(host, port, groupId, title, content, WarningType.FAILURE.getCode());
+        Assertions.assertFalse(alertSendResponseCommand.isSuccess());
+        alertSendResponseCommand.getResResults().forEach(result -> logger
+                .info("alert send response result, status:{}, message:{}", result.isSuccess(), result.getMessage()));
 
-        //6.alert plugin send success
+        // 6.alert plugin send success
         sendResponseStatus = true;
-        message = String.format("Alert Plugin %s send success",pluginInstanceName);
-        alertResult.setStatus(true);
+        message = String.format("Alert Plugin %s send success", pluginInstanceName);
+        alertResult.setSuccess(true);
         alertResult.setMessage(message);
         alertSendResponseCommandData = new AlertSendResponseCommand(sendResponseStatus, sendResponseResults);
         resCommand = alertSendResponseCommandData.convert2Command(reqCommand.getOpaque());
-        PowerMockito.when(client.sendSync(Mockito.any(), Mockito.any(), Mockito.anyLong())).thenReturn(resCommand);
-        alertSendResponseCommand = alertClient.sendAlert(host, port, groupId, title, content, WarningType.FAILURE.getCode());
-        Assert.assertTrue(alertSendResponseCommand.getResStatus());
-        alertSendResponseCommand.getResResults().forEach(result ->
-                logger.info("alert send response result, status:{}, message:{}",result.getStatus(),result.getMessage()));
+        Mockito.when(client.sendSync(Mockito.any(), Mockito.any(), Mockito.anyLong())).thenReturn(resCommand);
+        alertSendResponseCommand =
+                alertClient.sendAlert(host, port, groupId, title, content, WarningType.FAILURE.getCode());
+        Assertions.assertTrue(alertSendResponseCommand.isSuccess());
+        alertSendResponseCommand.getResResults().forEach(result -> logger
+                .info("alert send response result, status:{}, message:{}", result.isSuccess(), result.getMessage()));
 
         if (Objects.nonNull(alertClient) && alertClient.isRunning()) {
             alertClient.close();

@@ -18,9 +18,7 @@
 package org.apache.dolphinscheduler.remote.command;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
-
-import java.util.Date;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -49,7 +47,7 @@ public class TaskExecuteRunningCommand extends BaseCommand {
     /**
      * startTime
      */
-    private Date startTime;
+    private long startTime;
 
     /**
      * host
@@ -59,7 +57,7 @@ public class TaskExecuteRunningCommand extends BaseCommand {
     /**
      * status
      */
-    private ExecutionStatus status;
+    private TaskExecutionStatus status;
 
     /**
      * logPath

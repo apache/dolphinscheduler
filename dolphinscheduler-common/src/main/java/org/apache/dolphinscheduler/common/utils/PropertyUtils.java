@@ -17,15 +17,13 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import static org.apache.dolphinscheduler.common.Constants.COMMON_PROPERTIES_PATH;
-import static org.apache.dolphinscheduler.common.Constants.FS_DEFAULT_FS;
-import static org.apache.dolphinscheduler.common.Constants.RESOURCE_STORAGE_TYPE;
-import static org.apache.dolphinscheduler.common.Constants.STORAGE_HDFS;
-import static org.apache.dolphinscheduler.common.Constants.STORAGE_LOCAL;
-import static org.apache.dolphinscheduler.common.Constants.STORAGE_LOCAL_DEFAULT_FS;
+import static org.apache.dolphinscheduler.common.constants.Constants.COMMON_PROPERTIES_PATH;
 
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.spi.enums.ResUploadType;
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.ResUploadType;
+
+import org.apache.commons.collections4.CollectionUtils;
+
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,7 +54,12 @@ public class PropertyUtils {
     public static synchronized void loadPropertyFile(String... propertyFiles) {
         for (String fileName : propertyFiles) {
             try (InputStream fis = PropertyUtils.class.getResourceAsStream(fileName);) {
-                properties.load(fis);
+                Properties subProperties = new Properties();
+                subProperties.load(fis);
+                subProperties.forEach((k, v) -> {
+                    logger.debug("Get property {} -> {}", k, v);
+                });
+                properties.putAll(subProperties);
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
                 System.exit(1);
@@ -77,11 +80,11 @@ public class PropertyUtils {
      */
     private static void postLoadProperty() {
         // load storage local mode
-        if (properties.get(RESOURCE_STORAGE_TYPE).equals(STORAGE_LOCAL)) {
+        if (properties.get(Constants.RESOURCE_STORAGE_TYPE).equals(Constants.STORAGE_LOCAL)) {
             // override the FS_DEFAULT_FS configuration
-            properties.setProperty(FS_DEFAULT_FS, STORAGE_LOCAL_DEFAULT_FS);
+            properties.setProperty(Constants.FS_DEFAULT_FS, Constants.STORAGE_LOCAL_DEFAULT_FS);
             // the RESOURCE_STORAGE_TYPE must be HDFS in local mode
-            properties.setProperty(RESOURCE_STORAGE_TYPE, STORAGE_HDFS);
+            properties.setProperty(Constants.RESOURCE_STORAGE_TYPE, Constants.STORAGE_HDFS);
         }
     }
 
@@ -90,7 +93,8 @@ public class PropertyUtils {
      */
     public static boolean getResUploadStartupState() {
         String resUploadStartupType = PropertyUtils.getUpperCaseString(Constants.RESOURCE_STORAGE_TYPE);
-        ResUploadType resUploadType = ResUploadType.valueOf(Strings.isNullOrEmpty(resUploadStartupType) ? ResUploadType.NONE.name() : resUploadStartupType);
+        ResUploadType resUploadType = ResUploadType.valueOf(
+                Strings.isNullOrEmpty(resUploadStartupType) ? ResUploadType.NONE.name() : resUploadStartupType);
         return resUploadType != ResUploadType.NONE;
     }
 
@@ -293,7 +297,7 @@ public class PropertyUtils {
             return null;
         }
         Set<Object> keys = properties.keySet();
-        if (keys.isEmpty()) {
+        if (CollectionUtils.isEmpty(keys)) {
             return null;
         }
         Map<String, String> propertiesMap = new HashMap<>();
@@ -304,5 +308,4 @@ public class PropertyUtils {
         });
         return propertiesMap;
     }
-
 }

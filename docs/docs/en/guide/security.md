@@ -99,40 +99,47 @@ public  void doPOSTParam()throws Exception{
 
 ## Granted Permissions
 
-- Granted permissions include project permissions, resource permissions, data source permissions, and UDF function permissions.
-- Administrators can authorize projects, resources, data sources, and UDF functions that ordinary users do not create. Because the authorization methods of projects, resources, data sources and UDF functions are all the same, the project authorization is used as an example to introduce.
-- Note: For projects created by the user, the user has all permissions. The item list and the selected items list are not displayed.
+* Granted permissions include project permissions, resource permissions, data source permissions, and UDF function permissions.
+* Administrators can authorize projects, resources, data sources, and UDF functions that ordinary users do not create. Because the authorization methods of projects, resources, data sources and UDF functions are all the same, the project authorization is used as an example to introduce.
+* Note: For projects created by the user, the user has all permissions. Therefore, permission changes to projects created by users themselves are not valid.
 - The administrator enters the `Security Center -> User Management` page, and clicks the "Authorize" button of the user to be authorized, as shown in the following figure:
 
-<p align="center">
-  <img src="../../../img/auth-en.png" width="80%" />
-</p>
+![project-authroize-step-1](../../../img/new_ui/dev/security/project-authroize-step-1.png)
 
-- Select the project to authorize the project.
+- Select one or more projects and click the button above to authorize the project. The upper buttons from left to right correspond to `revoke all permissions`, `grant read permissions`, and `grant all permissions` (which including both read and write permissions).
 
-<p align="center">
-   <img src="../../../img/auth-project-en.png" width="80%" />
-</p>
+![project-authroize-step-2](../../../img/new_ui/dev/security/project-authroize-step-2.png)
+
+- If a user has only the read permission but not the write permission for a project, and the user is trying to do something like delete or update the project, an error message is displayed indicating that the user has no write permission and cannot complete the operation.
+
+![no-permission-error](../../../img/new_ui/dev/security/no-permission-error.png)
 
 - Resources, data sources, and UDF function authorization are the same as project authorization.
 
 ## Worker Grouping
 
-Each worker node will belong to its own worker group, and the default group is "default".
+Each worker node belongs to some worker groups, and the default group is `default`.
 
-When the task is executed, the task can be assigned to the specified worker group, and finally the worker node in the group will execute the task.
+When DolphinScheduler executes a task, it will assign the task to the configured worker group and the worker nodes in the group will execute the task.
 
-### Add or update worker group
+### Add or Update Worker Groups
 
-- Open the `conf/worker.properties` configuration file on the worker node where you want to configure the groups and modify the `worker.groups` parameter.
-- The `worker.groups` parameter is followed by the name of the group corresponding to the worker node, which is `default`.
-- If the worker node corresponds to multiple groups, separate them with commas. Example:
+- Open the `worker-server/conf/application.yaml` on the worker node where you want to configure the groups and modify the `groups` parameter in `worker` section.
+- The values of the `groups` parameter are the names of the groups where the worker node belong. The default value is `default`.
+- If the worker node belongs to multiple groups, list them with hyphens, e.g.
 
 ```conf
-worker.groups=default,test
+worker:
+......
+  groups:
+    - default
+    - group-1
+    - group-2
+......
 ```
 
-- You can also change the worker group for the worker during execution, and if the modification is successful, the worker will use the new group and ignore the configuration in `worker.properties`. The step to modify work group as below: `Security Center -> Worker Group Management -> click 'New Worker Group' -> click 'New Worker Group' ->  enter 'Group Name' -> Select Exists Worker -> Click Submit`. 
+- You can add new worker groups for the workers during runtime regardless of the configurations in `application.yaml` as below:
+  `Security Center` -> `Worker Group Manage` -> `Create Worker Group` -> fill in `Group Name` and `Worker Addresses` -> click `confirm`.
 
 ## Environmental Management
 
@@ -152,13 +159,15 @@ Create a task node in the workflow definition, select the worker group and the e
 
 ![use-environment](../../../img/new_ui/dev/security/use-environment.png)
 
+> NOTE: Please make sure you have associated the `Environments` with your `worker groups` if you can not select the `Environment Name` in workflow definition page or when triggering workflows.
+
 ## Cluster Management
 
 > Add or update cluster
-- Each process can be related to zero or several clusters to support multiple environment, now just support k8s.
-
+> - Each process can be related to zero or several clusters to support multiple environment, now just support k8s.
+>
 > Usage cluster
-- After creation and authorization, k8s namespaces and processes will associate clusters. Each cluster will have separate workflows and task instances running independently.
+> - After creation and authorization, k8s namespaces and processes will associate clusters. Each cluster will have separate workflows and task instances running independently.
 
 ![create-cluster](../../../img/new_ui/dev/security/create-cluster.png)
 
@@ -173,5 +182,4 @@ Create a task node in the workflow definition, select the worker group and the e
 - After creation and authorization, you can select it from the namespace drop down list when edit k8s task, If the k8s cluster name is `ds_null_k8s` means test mode which will not operate the cluster actually.
 
 ![create-environment](../../../img/new_ui/dev/security/create-namespace.png)
-
 

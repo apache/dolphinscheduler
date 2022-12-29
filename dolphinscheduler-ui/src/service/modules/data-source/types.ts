@@ -26,10 +26,31 @@ type IDataBase =
   | 'DB2'
   | 'PRESTO'
   | 'REDSHIFT'
+  | 'ATHENA'
+  | 'TRINO'
+  | 'AZURESQL'
+  | 'STARROCKS'
+
+type IDataBaseLabel =
+| 'MYSQL'
+| 'POSTGRESQL'
+| 'HIVE'
+| 'SPARK'
+| 'CLICKHOUSE'
+| 'ORACLE'
+| 'SQLSERVER'
+| 'DB2'
+| 'PRESTO'
+| 'REDSHIFT'
+| 'ATHENA'
+| 'TRINO'
+| 'AZURESQL'
+| 'STARROCKS'
 
 interface IDataSource {
   id?: number
   type?: IDataBase
+  label?: IDataBaseLabel
   name?: string
   note?: string
   host?: string
@@ -38,11 +59,17 @@ interface IDataSource {
   javaSecurityKrb5Conf?: string
   loginUserKeytabUsername?: string
   loginUserKeytabPath?: string
+  mode?: string
   userName?: string
   password?: string
+  awsRegion?: string
   database?: string
   connectType?: string
   other?: object
+  testFlag?: number
+  bindTestId?: number
+  endpoint?: string
+  MSIClientId?: string
 }
 
 interface ListReq {

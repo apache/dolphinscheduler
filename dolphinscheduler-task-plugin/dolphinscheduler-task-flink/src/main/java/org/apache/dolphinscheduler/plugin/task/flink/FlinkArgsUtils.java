@@ -23,9 +23,8 @@ import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ArgsUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,26 +50,52 @@ public class FlinkArgsUtils {
     public static final FlinkDeployMode DEFAULT_DEPLOY_MODE = FlinkDeployMode.CLUSTER;
 
     /**
-     * build flink command line
+     * build flink run command line
      *
      * @param param flink parameters
      * @return argument list
      */
-    public static List<String> buildCommandLine(TaskExecutionContext taskExecutionContext, FlinkParameters param) {
+    public static List<String> buildRunCommandLine(TaskExecutionContext taskExecutionContext, FlinkParameters param) {
         switch (param.getProgramType()) {
             case SQL:
-                return buildCommandLineForSql(taskExecutionContext, param);
+                return buildRunCommandLineForSql(taskExecutionContext, param);
             default:
-                return buildCommandLineForOthers(taskExecutionContext, param);
+                return buildRunCommandLineForOthers(taskExecutionContext, param);
         }
     }
 
     /**
-     * build flink command line for SQL
+     * build flink cancel command line
+     * @param taskExecutionContext
+     * @return
+     */
+    public static List<String> buildCancelCommandLine(TaskExecutionContext taskExecutionContext) {
+        List<String> args = new ArrayList<>();
+        args.add(FlinkConstants.FLINK_COMMAND);
+        args.add(FlinkConstants.FLINK_CANCEL);
+        args.add(taskExecutionContext.getAppIds());
+        return args;
+    }
+
+    /**
+     * build flink savepoint command line, the savepoint folder should be set in flink conf
+     * @return
+     */
+    public static List<String> buildSavePointCommandLine(TaskExecutionContext taskExecutionContext) {
+        List<String> args = new ArrayList<>();
+        args.add(FlinkConstants.FLINK_COMMAND);
+        args.add(FlinkConstants.FLINK_SAVEPOINT);
+        args.add(taskExecutionContext.getAppIds());
+        return args;
+    }
+
+    /**
+     * build flink run command line for SQL
      *
      * @return argument list
      */
-    private static List<String> buildCommandLineForSql(TaskExecutionContext taskExecutionContext, FlinkParameters flinkParameters) {
+    private static List<String> buildRunCommandLineForSql(TaskExecutionContext taskExecutionContext,
+                                                          FlinkParameters flinkParameters) {
         List<String> args = new ArrayList<>();
 
         args.add(FlinkConstants.FLINK_SQL_COMMAND);
@@ -95,17 +120,19 @@ public class FlinkArgsUtils {
     public static List<String> buildInitOptionsForSql(FlinkParameters flinkParameters) {
         List<String> initOptions = new ArrayList<>();
 
-        FlinkDeployMode deployMode = Optional.ofNullable(flinkParameters.getDeployMode()).orElse(FlinkDeployMode.CLUSTER);
+        FlinkDeployMode deployMode =
+                Optional.ofNullable(flinkParameters.getDeployMode()).orElse(FlinkDeployMode.CLUSTER);
 
         /**
          * Currently flink sql on yarn only supports yarn-per-job mode
          */
-        if (FlinkDeployMode.CLUSTER == deployMode) {
+        if (FlinkDeployMode.LOCAL == deployMode) {
             // execution.target
-            initOptions.add(String.format(FlinkConstants.FLINK_FORMAT_EXECUTION_TARGET, "local"));
+            initOptions.add(String.format(FlinkConstants.FLINK_FORMAT_EXECUTION_TARGET, FlinkConstants.FLINK_LOCAL));
         } else {
             // execution.target
-            initOptions.add(String.format(FlinkConstants.FLINK_FORMAT_EXECUTION_TARGET, FlinkConstants.FLINK_YARN_PER_JOB));
+            initOptions.add(
+                    String.format(FlinkConstants.FLINK_FORMAT_EXECUTION_TARGET, FlinkConstants.FLINK_YARN_PER_JOB));
 
             // taskmanager.numberOfTaskSlots
             int slot = flinkParameters.getSlot();
@@ -116,19 +143,22 @@ public class FlinkArgsUtils {
             // yarn.application.name
             String appName = flinkParameters.getAppName();
             if (StringUtils.isNotEmpty(appName)) {
-                initOptions.add(String.format(FlinkConstants.FLINK_FORMAT_YARN_APPLICATION_NAME, ArgsUtils.escape(appName)));
+                initOptions.add(
+                        String.format(FlinkConstants.FLINK_FORMAT_YARN_APPLICATION_NAME, ArgsUtils.escape(appName)));
             }
 
             // jobmanager.memory.process.size
             String jobManagerMemory = flinkParameters.getJobManagerMemory();
             if (StringUtils.isNotEmpty(jobManagerMemory)) {
-                initOptions.add(String.format(FlinkConstants.FLINK_FORMAT_JOBMANAGER_MEMORY_PROCESS_SIZE, jobManagerMemory));
+                initOptions.add(
+                        String.format(FlinkConstants.FLINK_FORMAT_JOBMANAGER_MEMORY_PROCESS_SIZE, jobManagerMemory));
             }
 
             // taskmanager.memory.process.size
             String taskManagerMemory = flinkParameters.getTaskManagerMemory();
             if (StringUtils.isNotEmpty(taskManagerMemory)) {
-                initOptions.add(String.format(FlinkConstants.FLINK_FORMAT_TASKMANAGER_MEMORY_PROCESS_SIZE, taskManagerMemory));
+                initOptions.add(
+                        String.format(FlinkConstants.FLINK_FORMAT_TASKMANAGER_MEMORY_PROCESS_SIZE, taskManagerMemory));
             }
 
             // yarn.application.queue
@@ -150,7 +180,8 @@ public class FlinkArgsUtils {
         return initOptions;
     }
 
-    private static List<String> buildCommandLineForOthers(TaskExecutionContext taskExecutionContext, FlinkParameters flinkParameters) {
+    private static List<String> buildRunCommandLineForOthers(TaskExecutionContext taskExecutionContext,
+                                                             FlinkParameters flinkParameters) {
         List<String> args = new ArrayList<>();
 
         args.add(FlinkConstants.FLINK_COMMAND);
@@ -159,23 +190,24 @@ public class FlinkArgsUtils {
         // build run command
         switch (deployMode) {
             case CLUSTER:
-                if (FLINK_VERSION_AFTER_OR_EQUALS_1_12.equals(flinkVersion) || FLINK_VERSION_AFTER_OR_EQUALS_1_13.equals(flinkVersion)) {
-                    args.add(FlinkConstants.FLINK_RUN);  //run
-                    args.add(FlinkConstants.FLINK_EXECUTION_TARGET);  //-t
-                    args.add(FlinkConstants.FLINK_YARN_PER_JOB);  //yarn-per-job
+                if (FLINK_VERSION_AFTER_OR_EQUALS_1_12.equals(flinkVersion)
+                        || FLINK_VERSION_AFTER_OR_EQUALS_1_13.equals(flinkVersion)) {
+                    args.add(FlinkConstants.FLINK_RUN); // run
+                    args.add(FlinkConstants.FLINK_EXECUTION_TARGET); // -t
+                    args.add(FlinkConstants.FLINK_YARN_PER_JOB); // yarn-per-job
                 } else {
-                    args.add(FlinkConstants.FLINK_RUN);  //run
-                    args.add(FlinkConstants.FLINK_RUN_MODE);  //-m
-                    args.add(FlinkConstants.FLINK_YARN_CLUSTER);  //yarn-cluster
+                    args.add(FlinkConstants.FLINK_RUN); // run
+                    args.add(FlinkConstants.FLINK_RUN_MODE); // -m
+                    args.add(FlinkConstants.FLINK_YARN_CLUSTER); // yarn-cluster
                 }
                 break;
             case APPLICATION:
-                args.add(FlinkConstants.FLINK_RUN_APPLICATION);  //run-application
-                args.add(FlinkConstants.FLINK_EXECUTION_TARGET);  //-t
-                args.add(FlinkConstants.FLINK_YARN_APPLICATION);  //yarn-application
+                args.add(FlinkConstants.FLINK_RUN_APPLICATION); // run-application
+                args.add(FlinkConstants.FLINK_EXECUTION_TARGET); // -t
+                args.add(FlinkConstants.FLINK_YARN_APPLICATION); // yarn-application
                 break;
             case LOCAL:
-                args.add(FlinkConstants.FLINK_RUN);  //run
+                args.add(FlinkConstants.FLINK_RUN); // run
                 break;
         }
 
@@ -188,11 +220,11 @@ public class FlinkArgsUtils {
                 int slot = flinkParameters.getSlot();
                 if (slot > 0) {
                     args.add(FlinkConstants.FLINK_YARN_SLOT);
-                    args.add(String.format("%d", slot));   //-ys
+                    args.add(String.format("%d", slot)); // -ys
                 }
 
                 String appName = flinkParameters.getAppName();
-                if (StringUtils.isNotEmpty(appName)) { //-ynm
+                if (StringUtils.isNotEmpty(appName)) { // -ynm
                     args.add(FlinkConstants.FLINK_APP_NAME);
                     args.add(ArgsUtils.escape(appName));
                 }
@@ -200,7 +232,7 @@ public class FlinkArgsUtils {
                 // judge flink version, the parameter -yn has removed from flink 1.10
                 if (flinkVersion == null || FLINK_VERSION_BEFORE_1_10.equals(flinkVersion)) {
                     int taskManager = flinkParameters.getTaskManager();
-                    if (taskManager > 0) {                        //-yn
+                    if (taskManager > 0) { // -yn
                         args.add(FlinkConstants.FLINK_TASK_MANAGE);
                         args.add(String.format("%d", taskManager));
                     }
@@ -208,7 +240,7 @@ public class FlinkArgsUtils {
                 String jobManagerMemory = flinkParameters.getJobManagerMemory();
                 if (StringUtils.isNotEmpty(jobManagerMemory)) {
                     args.add(FlinkConstants.FLINK_JOB_MANAGE_MEM);
-                    args.add(jobManagerMemory); //-yjm
+                    args.add(jobManagerMemory); // -yjm
                 }
 
                 String taskManagerMemory = flinkParameters.getTaskManagerMemory();
@@ -232,10 +264,11 @@ public class FlinkArgsUtils {
         int parallelism = flinkParameters.getParallelism();
         if (parallelism > 0) {
             args.add(FlinkConstants.FLINK_PARALLELISM);
-            args.add(String.format("%d", parallelism));   // -p
+            args.add(String.format("%d", parallelism)); // -p
         }
 
-        // If the job is submitted in attached mode, perform a best-effort cluster shutdown when the CLI is terminated abruptly
+        // If the job is submitted in attached mode, perform a best-effort cluster shutdown when the CLI is terminated
+        // abruptly
         // The task status will be synchronized with the cluster job status
         args.add(FlinkConstants.FLINK_SHUTDOWN_ON_ATTACHED_EXIT); // -sae
 
@@ -247,14 +280,14 @@ public class FlinkArgsUtils {
         ProgramType programType = flinkParameters.getProgramType();
         String mainClass = flinkParameters.getMainClass();
         if (programType != null && programType != ProgramType.PYTHON && StringUtils.isNotEmpty(mainClass)) {
-            args.add(FlinkConstants.FLINK_MAIN_CLASS);    //-c
-            args.add(flinkParameters.getMainClass());          //main class
+            args.add(FlinkConstants.FLINK_MAIN_CLASS); // -c
+            args.add(flinkParameters.getMainClass()); // main class
         }
 
         ResourceInfo mainJar = flinkParameters.getMainJar();
         if (mainJar != null) {
             // -py
-            if(ProgramType.PYTHON == programType) {
+            if (ProgramType.PYTHON == programType) {
                 args.add(FlinkConstants.FLINK_PYTHON);
             }
             args.add(mainJar.getRes());

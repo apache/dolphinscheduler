@@ -17,13 +17,19 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.dto.schedule.ScheduleCreateRequest;
+import org.apache.dolphinscheduler.api.dto.schedule.ScheduleFilterRequest;
+import org.apache.dolphinscheduler.api.dto.schedule.ScheduleUpdateRequest;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -58,6 +64,16 @@ public interface SchedulerService {
                                        Long environmentCode);
 
     /**
+     * save schedule V2
+     *
+     * @param loginUser             login user
+     * @param scheduleCreateRequest the new schedule object will be created
+     * @return Schedule object
+     */
+    Schedule createSchedulesV2(User loginUser,
+                               ScheduleCreateRequest scheduleCreateRequest);
+
+    /**
      * updateProcessInstance schedule
      *
      * @param loginUser login user
@@ -83,6 +99,27 @@ public interface SchedulerService {
                                        String workerGroup,
                                        Long environmentCode);
 
+    /**
+     * update schedule object V2
+     *
+     * @param loginUser login user
+     * @param scheduleId scheduler id
+     * @param scheduleUpdateRequest the schedule object will be updated
+     * @return Schedule object
+     */
+    Schedule updateSchedulesV2(User loginUser,
+                               Integer scheduleId,
+                               ScheduleUpdateRequest scheduleUpdateRequest);
+
+    /**
+     * get schedule object
+     *
+     * @param loginUser login user
+     * @param scheduleId scheduler id
+     * @return Schedule object
+     */
+    Schedule getSchedule(User loginUser,
+                         Integer scheduleId);
 
     /**
      * set schedule online or offline
@@ -110,12 +147,24 @@ public interface SchedulerService {
      * @return schedule list page
      */
     Result querySchedule(User loginUser, long projectCode, long processDefineCode, String searchVal,
-                                      Integer pageNo, Integer pageSize);
+                         Integer pageNo, Integer pageSize);
+
+    List<Schedule> queryScheduleByProcessDefinitionCodes(List<Long> processDefinitionCodes);
+
+    /**
+     * query schedule V2
+     *
+     * @param loginUser login user
+     * @param scheduleFilterRequest schedule filter request
+     * @return schedule list page
+     */
+    PageInfo<Schedule> filterSchedules(User loginUser,
+                                       ScheduleFilterRequest scheduleFilterRequest);
 
     /**
      * query schedule list
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
      * @return schedule list
      */
@@ -134,11 +183,9 @@ public interface SchedulerService {
      * delete schedule by id
      *
      * @param loginUser login user
-     * @param projectCode project code
-     * @param scheduleId scheule id
-     * @return delete result code
+     * @param scheduleId schedule id
      */
-    Map<String, Object> deleteScheduleById(User loginUser, long projectCode, Integer scheduleId);
+    void deleteSchedulesById(User loginUser, Integer scheduleId);
 
     /**
      * preview schedule

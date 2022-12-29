@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.server.master.event;
 
 import org.apache.dolphinscheduler.common.enums.TaskEventType;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.TaskRejectAckCommand;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
@@ -44,19 +43,20 @@ public class TaskRejectByWorkerEventHandler implements TaskEventHandler {
         int processInstanceId = taskEvent.getProcessInstanceId();
 
         WorkflowExecuteRunnable workflowExecuteRunnable = this.processInstanceExecCacheManager.getByProcessInstanceId(
-            processInstanceId);
+                processInstanceId);
         if (workflowExecuteRunnable == null) {
             sendAckToWorker(taskEvent);
             throw new TaskEventHandleError(
-                "Handle task reject event error, cannot find related workflow instance from cache, will discard this event");
+                    "Handle task reject event error, cannot find related workflow instance from cache, will discard this event");
         }
         TaskInstance taskInstance = workflowExecuteRunnable.getTaskInstance(taskInstanceId).orElseThrow(() -> {
             sendAckToWorker(taskEvent);
             return new TaskEventHandleError(
-                "Handle task reject event error, cannot find the taskInstance from cache, will discord this event");
+                    "Handle task reject event error, cannot find the taskInstance from cache, will discord this event");
         });
         try {
-            // todo: If the worker submit multiple reject response to master, the task instance may be dispatch multiple,
+            // todo: If the worker submit multiple reject response to master, the task instance may be dispatch
+            // multiple,
             // we need to control the worker overload by master rather than worker
             // if the task resubmit and the worker failover, this task may be dispatch twice?
             // todo: we need to clear the taskInstance host and rollback the status to submit.
@@ -69,11 +69,11 @@ public class TaskRejectByWorkerEventHandler implements TaskEventHandler {
     }
 
     public void sendAckToWorker(TaskEvent taskEvent) {
-        TaskRejectAckCommand taskRejectAckMessage = new TaskRejectAckCommand(ExecutionStatus.SUCCESS,
-                                                                             taskEvent.getTaskInstanceId(),
-                                                                             masterConfig.getMasterAddress(),
-                                                                             taskEvent.getWorkerAddress(),
-                                                                             System.currentTimeMillis());
+        TaskRejectAckCommand taskRejectAckMessage = new TaskRejectAckCommand(true,
+                taskEvent.getTaskInstanceId(),
+                masterConfig.getMasterAddress(),
+                taskEvent.getWorkerAddress(),
+                System.currentTimeMillis());
         taskEvent.getChannel().writeAndFlush(taskRejectAckMessage.convert2Command());
     }
 

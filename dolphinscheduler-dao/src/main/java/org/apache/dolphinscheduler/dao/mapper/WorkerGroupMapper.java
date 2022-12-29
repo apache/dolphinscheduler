@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import static org.apache.dolphinscheduler.common.Constants.CACHE_KEY_VALUE_ALL;
+import static org.apache.dolphinscheduler.common.constants.Constants.CACHE_KEY_VALUE_ALL;
 
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 
@@ -55,10 +55,11 @@ public interface WorkerGroupMapper extends BaseMapper<WorkerGroup> {
     int updateById(@Param("et") WorkerGroup entity);
 
     /**
-     * query worer grouop by name
+     * query worker group by name
      *
      * @param name name
      * @return worker group list
      */
     List<WorkerGroup> queryWorkerGroupByName(@Param("name") String name);
+
 }

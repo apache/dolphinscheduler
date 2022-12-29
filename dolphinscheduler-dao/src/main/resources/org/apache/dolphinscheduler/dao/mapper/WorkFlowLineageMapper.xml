@@ -149,6 +149,7 @@
         SELECT
         c.code AS process_definition_code
         ,c.name AS process_definition_name
+        ,c.version as process_definition_version
         ,a.code AS task_definition_code
         ,a.task_params
         FROM
@@ -160,6 +161,7 @@
             AND a.task_params LIKE concat('%', #{code}, '%')
         </if>
         AND a.task_type = 'DEPENDENT'
+        AND c.release_state = 1
     </select>
 
     <select id="queryTaskSubProcessDepOnProcess" resultType="org.apache.dolphinscheduler.dao.entity.TaskMainInfo">

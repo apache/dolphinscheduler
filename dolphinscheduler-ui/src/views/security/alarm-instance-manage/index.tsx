@@ -15,10 +15,16 @@
  * limitations under the License.
  */
 
-import { defineComponent, getCurrentInstance, onMounted, ref, toRefs, watch } from 'vue'
+import {
+  defineComponent,
+  getCurrentInstance,
+  onMounted,
+  ref,
+  toRefs,
+  watch
+} from 'vue'
 import {
   NButton,
-  NInput,
   NIcon,
   NDataTable,
   NPagination,
@@ -32,6 +38,7 @@ import { useUserInfo } from './use-userinfo'
 import { useColumns } from './use-columns'
 import { useTable } from './use-table'
 import type { IRecord } from './types'
+import Search from "@/components/input-search";
 
 const AlarmInstanceManage = defineComponent({
   name: 'alarm-instance-manage',
@@ -121,17 +128,13 @@ const AlarmInstanceManage = defineComponent({
                     {t('security.alarm_instance.create_alarm_instance')}
                   </NButton>
                 )}
-                <NSpace
-                  justify='end'
-                  wrap={false}
-                >
-                  <NInput
-                  allowInput={this.trim}
-                    v-model={[this.searchVal, 'value']}
-                    size='small'
+                <NSpace justify='end' wrap={false}>
+                  <Search
+                    v-model:value={this.searchVal}
                     placeholder={`${t(
                       'security.alarm_instance.search_input_tips'
                     )}`}
+                    onSearch={onUpdatedList}
                   />
                   <NButton type='primary' size='small' onClick={onUpdatedList}>
                     <NIcon>
@@ -145,7 +148,12 @@ const AlarmInstanceManage = defineComponent({
         </Card>
         <Card title={t('menu.alarm_instance_manage')}>
           <NSpace vertical>
-            <NDataTable columns={columns} data={list} loading={loading} striped />
+            <NDataTable
+              columns={columns}
+              data={list}
+              loading={loading}
+              striped
+            />
             <NSpace justify='center'>
               <NPagination
                 page={page}

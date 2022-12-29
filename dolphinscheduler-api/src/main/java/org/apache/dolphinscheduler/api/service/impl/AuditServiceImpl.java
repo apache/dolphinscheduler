@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.AuditService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.common.enums.AuditResourceType;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
@@ -88,7 +88,7 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
         Map<String, Object> checkAndParseDateResult = checkAndParseDateParameters(startDate, endDate);
         Status resultEnum = (Status) checkAndParseDateResult.get(Constants.STATUS);
         if (resultEnum != Status.SUCCESS) {
-            putMsg(result,resultEnum);
+            putMsg(result, resultEnum);
             return result;
         }
 

@@ -20,34 +20,37 @@ package org.apache.dolphinscheduler.plugin.task.procedure;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
-import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
+import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceProcessorProvider;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.common.collect.Maps;
+
 /**
  * procedure task
  */
-public class ProcedureTask extends AbstractTaskExecutor {
+public class ProcedureTask extends AbstractTask {
 
     /**
      * procedure parameters
@@ -71,67 +74,72 @@ public class ProcedureTask extends AbstractTaskExecutor {
 
         this.taskExecutionContext = taskExecutionContext;
 
-        logger.info("procedure task params {}", taskExecutionContext.getTaskParams());
-
-        this.procedureParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), ProcedureParameters.class);
+        this.procedureParameters =
+                JSONUtils.parseObject(taskExecutionContext.getTaskParams(), ProcedureParameters.class);
+        logger.info("Initialize procedure task params {}", JSONUtils.toPrettyJsonString(procedureParameters));
 
         // check parameters
-        if (!procedureParameters.checkParameters()) {
-            throw new RuntimeException("procedure task params is not valid");
+        if (procedureParameters == null || !procedureParameters.checkParameters()) {
+            throw new TaskException("procedure task params is not valid");
         }
 
-        procedureTaskExecutionContext = procedureParameters.generateExtendedContext(taskExecutionContext.getResourceParametersHelper());
+        procedureTaskExecutionContext =
+                procedureParameters.generateExtendedContext(taskExecutionContext.getResourceParametersHelper());
     }
 
     @Override
-    public void handle() throws Exception {
+    public void handle(TaskCallBack taskCallBack) throws TaskException {
         logger.info("procedure type : {}, datasource : {}, method : {} , localParams : {}",
                 procedureParameters.getType(),
                 procedureParameters.getDatasource(),
                 procedureParameters.getMethod(),
                 procedureParameters.getLocalParams());
 
-        Connection connection = null;
-        CallableStatement stmt = null;
-        try {
-            // load class
-            DbType dbType = DbType.valueOf(procedureParameters.getType());
-            // get datasource
-            ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(DbType.valueOf(procedureParameters.getType()),
-                    procedureTaskExecutionContext.getConnectionParams());
-
-            // get jdbc connection
-            connection = DataSourceClientProvider.getInstance().getConnection(dbType, connectionParam);
+        DbType dbType = DbType.valueOf(procedureParameters.getType());
+        DataSourceProcessor dataSourceProcessor =
+                DataSourceProcessorProvider.getInstance().getDataSourceProcessor(dbType);
+        ConnectionParam connectionParams =
+                dataSourceProcessor.createConnectionParams(procedureTaskExecutionContext.getConnectionParams());
+        try (Connection connection = dataSourceProcessor.getConnection(connectionParams)) {
             Map<Integer, Property> sqlParamsMap = new HashMap<>();
-            Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+            Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap() == null ? Maps.newHashMap()
+                    : taskExecutionContext.getPrepareParamsMap();
+            if (procedureParameters.getOutProperty() != null) {
+                // set out params before format sql
+                paramsMap.putAll(procedureParameters.getOutProperty());
+            }
             String proceduerSql = formatSql(sqlParamsMap, paramsMap);
             // call method
-            stmt = connection.prepareCall(proceduerSql);
+            try (CallableStatement stmt = connection.prepareCall(proceduerSql)) {
+                // set timeout
+                setTimeout(stmt);
 
-            // set timeout
-            setTimeout(stmt);
+                // outParameterMap
+                Map<Integer, Property> outParameterMap = getOutParameterMap(stmt, sqlParamsMap, paramsMap);
 
-            // outParameterMap
-            Map<Integer, Property> outParameterMap = getOutParameterMap(stmt, sqlParamsMap, paramsMap);
+                stmt.executeUpdate();
 
-            stmt.executeUpdate();
+                // print the output parameters to the log
+                printOutParameter(stmt, outParameterMap);
 
-            // print the output parameters to the log
-            printOutParameter(stmt, outParameterMap);
-
-            setExitStatusCode(EXIT_CODE_SUCCESS);
+                setExitStatusCode(EXIT_CODE_SUCCESS);
+            }
         } catch (Exception e) {
             setExitStatusCode(EXIT_CODE_FAILURE);
             logger.error("procedure task error", e);
-            throw e;
-        } finally {
-            close(stmt, connection);
+            throw new TaskException("Execute procedure task failed", e);
         }
+    }
+
+    @Override
+    public void cancel() throws TaskException {
+
     }
 
     private String formatSql(Map<Integer, Property> sqlParamsMap, Map<String, Property> paramsMap) {
         // combining local and global parameters
-        setSqlParamsMap(procedureParameters.getMethod(), rgex, sqlParamsMap, paramsMap, taskExecutionContext.getTaskInstanceId());
+        setSqlParamsMap(procedureParameters.getMethod(), rgex, sqlParamsMap, paramsMap,
+                taskExecutionContext.getTaskInstanceId());
         return procedureParameters.getMethod().replaceAll(rgex, "?");
     }
 
@@ -162,8 +170,8 @@ public class ProcedureTask extends AbstractTaskExecutor {
      * @return outParameterMap
      * @throws Exception Exception
      */
-    private Map<Integer, Property> getOutParameterMap(CallableStatement stmt, Map<Integer, Property> paramsMap
-            , Map<String, Property> totalParamsMap) throws Exception {
+    private Map<Integer, Property> getOutParameterMap(CallableStatement stmt, Map<Integer, Property> paramsMap,
+                                                      Map<String, Property> totalParamsMap) throws Exception {
         Map<Integer, Property> outParameterMap = new HashMap<>();
         if (procedureParameters.getLocalParametersMap() == null) {
             return outParameterMap;
@@ -174,7 +182,8 @@ public class ProcedureTask extends AbstractTaskExecutor {
             for (Map.Entry<Integer, Property> entry : paramsMap.entrySet()) {
                 Property property = entry.getValue();
                 if (property.getDirect().equals(Direct.IN)) {
-                    ParameterUtils.setInParameter(index, stmt, property.getType(), totalParamsMap.get(property.getProp()).getValue());
+                    ParameterUtils.setInParameter(index, stmt, property.getType(),
+                            totalParamsMap.get(property.getProp()).getValue());
                 } else if (property.getDirect().equals(Direct.OUT)) {
                     setOutParameter(index, stmt, property.getType(), totalParamsMap.get(property.getProp()).getValue());
                     outParameterMap.put(index, property);
@@ -200,29 +209,6 @@ public class ProcedureTask extends AbstractTaskExecutor {
     }
 
     /**
-     * close jdbc resource
-     *
-     * @param stmt       stmt
-     * @param connection connection
-     */
-    private void close(PreparedStatement stmt, Connection connection) {
-        if (stmt != null) {
-            try {
-                stmt.close();
-            } catch (SQLException e) {
-                logger.error("close prepared statement error : {}", e.getMessage(), e);
-            }
-        }
-        if (connection != null) {
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                logger.error("close connection error : {}", e.getMessage(), e);
-            }
-        }
-    }
-
-    /**
      * get output parameter
      *
      * @param stmt     stmt
@@ -231,7 +217,8 @@ public class ProcedureTask extends AbstractTaskExecutor {
      * @param dataType dataType
      * @throws SQLException SQLException
      */
-    private Object getOutputParameter(CallableStatement stmt, int index, String prop, DataType dataType) throws SQLException {
+    private Object getOutputParameter(CallableStatement stmt, int index, String prop,
+                                      DataType dataType) throws SQLException {
         Object value = null;
         switch (dataType) {
             case VARCHAR:

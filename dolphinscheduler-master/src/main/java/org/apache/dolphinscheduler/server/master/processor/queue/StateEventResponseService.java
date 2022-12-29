@@ -17,15 +17,14 @@
 
 package org.apache.dolphinscheduler.server.master.processor.queue;
 
-import org.apache.dolphinscheduler.server.master.event.StateEvent;
+import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
-import org.apache.dolphinscheduler.common.thread.Stopper;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.StateEventResponseCommand;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
+import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,7 +79,8 @@ public class StateEventResponseService {
             eventQueue.drainTo(remainEvents);
             for (StateEvent event : remainEvents) {
                 try {
-                    LoggerUtils.setWorkflowAndTaskInstanceIDMDC(event.getProcessInstanceId(), event.getTaskInstanceId());
+                    LoggerUtils.setWorkflowAndTaskInstanceIDMDC(event.getProcessInstanceId(),
+                            event.getTaskInstanceId());
                     this.persist(event);
 
                 } finally {
@@ -115,11 +115,12 @@ public class StateEventResponseService {
         @Override
         public void run() {
             logger.info("State event loop service started");
-            while (Stopper.isRunning()) {
+            while (!ServerLifeCycleManager.isStopped()) {
                 try {
                     // if not task , blocking here
                     StateEvent stateEvent = eventQueue.take();
-                    LoggerUtils.setWorkflowAndTaskInstanceIDMDC(stateEvent.getProcessInstanceId(), stateEvent.getTaskInstanceId());
+                    LoggerUtils.setWorkflowAndTaskInstanceIDMDC(stateEvent.getProcessInstanceId(),
+                            stateEvent.getTaskInstanceId());
                     persist(stateEvent);
                 } catch (InterruptedException e) {
                     logger.warn("State event loop service interrupted, will stop this loop", e);
@@ -133,10 +134,10 @@ public class StateEventResponseService {
         }
     }
 
-    private void writeResponse(StateEvent stateEvent, ExecutionStatus status) {
+    private void writeResponse(StateEvent stateEvent) {
         Channel channel = stateEvent.getChannel();
         if (channel != null) {
-            StateEventResponseCommand command = new StateEventResponseCommand(status, stateEvent.getKey());
+            StateEventResponseCommand command = new StateEventResponseCommand(stateEvent.getKey());
             channel.writeAndFlush(command.convert2Command());
         }
     }
@@ -145,12 +146,13 @@ public class StateEventResponseService {
         try {
             if (!this.processInstanceExecCacheManager.contains(stateEvent.getProcessInstanceId())) {
                 logger.warn("Persist event into workflow execute thread error, "
-                    + "cannot find the workflow instance from cache manager, event: {}", stateEvent);
-                writeResponse(stateEvent, ExecutionStatus.FAILURE);
+                        + "cannot find the workflow instance from cache manager, event: {}", stateEvent);
+                writeResponse(stateEvent);
                 return;
             }
 
-            WorkflowExecuteRunnable workflowExecuteThread = this.processInstanceExecCacheManager.getByProcessInstanceId(stateEvent.getProcessInstanceId());
+            WorkflowExecuteRunnable workflowExecuteThread =
+                    this.processInstanceExecCacheManager.getByProcessInstanceId(stateEvent.getProcessInstanceId());
             // We will refresh the task instance status first, if the refresh failed the event will not be removed
             switch (stateEvent.getType()) {
                 case TASK_STATE_CHANGE:
@@ -162,7 +164,8 @@ public class StateEventResponseService {
                 default:
             }
             workflowExecuteThreadPool.submitStateEvent(stateEvent);
-            writeResponse(stateEvent, ExecutionStatus.SUCCESS);
+            // this response is not needed.
+            writeResponse(stateEvent);
         } catch (Exception e) {
             logger.error("Persist event queue error, event: {}", stateEvent, e);
         }

@@ -23,30 +23,22 @@ import org.apache.dolphinscheduler.remote.command.CommandType;
 
 import java.io.Serializable;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
  *  get log bytes response command
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class GetLogBytesResponseCommand implements Serializable {
 
     /**
      *  log byte data
      */
     private byte[] data;
-
-    public GetLogBytesResponseCommand() {
-    }
-
-    public GetLogBytesResponseCommand(byte[] data) {
-        this.data = data;
-    }
-
-    public byte[] getData() {
-        return data;
-    }
-
-    public void setData(byte[] data) {
-        this.data = data;
-    }
 
     /**
      * package response command

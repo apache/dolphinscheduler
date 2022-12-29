@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.spi.params.radio;
 
+import static org.apache.dolphinscheduler.common.constants.Constants.STRING_PLUGIN_PARAM_OPTIONS;
 import static org.apache.dolphinscheduler.spi.params.base.FormType.RADIO;
-import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_OPTIONS;
 
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
@@ -53,11 +53,11 @@ public class RadioParam extends PluginParams {
         public Builder(String name, String title) {
             super(name, RADIO, title);
         }
-        
+
         private List<ParamsOptions> options;
 
         private RadioParamProps props;
-        
+
         public Builder setOptions(List<ParamsOptions> options) {
             this.options = options;
             return this;

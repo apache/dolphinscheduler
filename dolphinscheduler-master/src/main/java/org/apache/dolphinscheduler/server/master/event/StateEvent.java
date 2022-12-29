@@ -18,34 +18,31 @@
 package org.apache.dolphinscheduler.server.master.event;
 
 import org.apache.dolphinscheduler.common.enums.StateEventType;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
 
+import javax.annotation.Nullable;
+
+import lombok.NonNull;
 import io.netty.channel.Channel;
-import lombok.Data;
 
 /**
  * state event
  */
-@Data
-public class StateEvent {
+public interface StateEvent {
 
-    /**
-     * origin_pid-origin_task_id-process_instance_id-task_instance_id
-     */
-    private String key;
+    int getProcessInstanceId();
 
-    private StateEventType type;
+    Integer getTaskInstanceId();
 
-    private ExecutionStatus executionStatus;
+    @NonNull
+    StateEventType getType();
 
-    private int taskInstanceId;
+    @Nullable
+    String getKey();
 
-    private long taskCode;
+    @Nullable
+    Channel getChannel();
 
-    private int processInstanceId;
-
-    private String context;
-
-    private Channel channel;
+    @Nullable
+    String getContext();
 
 }

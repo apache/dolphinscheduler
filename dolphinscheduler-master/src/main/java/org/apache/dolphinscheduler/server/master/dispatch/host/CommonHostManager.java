@@ -17,16 +17,13 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.host;
 
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.HeartBeat;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostWorker;
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -80,23 +77,11 @@ public abstract class CommonHostManager implements HostManager {
         Set<String> nodes = serverNodeManager.getWorkerGroupNodes(workerGroup);
         if (CollectionUtils.isNotEmpty(nodes)) {
             for (String node : nodes) {
-                String heartbeat = serverNodeManager.getWorkerNodeInfo(node);
-                int hostWeight = getWorkerHostWeightFromHeartbeat(heartbeat);
-                hostWorkers.add(HostWorker.of(node, hostWeight, workerGroup));
+                serverNodeManager.getWorkerNodeInfo(node).ifPresent(
+                        workerNodeInfo -> hostWorkers
+                                .add(HostWorker.of(node, workerNodeInfo.getWorkerHostWeight(), workerGroup)));
             }
         }
         return hostWorkers;
     }
-
-    protected int getWorkerHostWeightFromHeartbeat(String heartBeatInfo) {
-        int hostWeight = Constants.DEFAULT_WORKER_HOST_WEIGHT;
-        if (!StringUtils.isEmpty(heartBeatInfo)) {
-            HeartBeat heartBeat = HeartBeat.decodeHeartBeat(heartBeatInfo);
-            if (heartBeat != null) {
-                hostWeight = heartBeat.getWorkerHostWeight();
-            }
-        }
-        return hostWeight;
-    }
-
 }

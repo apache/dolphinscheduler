@@ -15,16 +15,17 @@
 # limitations under the License.
 #
 
-FROM openjdk:8-jre-slim-buster
+FROM eclipse-temurin:8-jre
 
 RUN apt update ; \
-    apt install -y curl wget sudo openssh-server netcat-traditional ;
+    apt install -y wget sudo openssh-server netcat-traditional ;
 
-#COPY ./dolphinscheduler-dist/target/apache-dolphinscheduler-*-SNAPSHOT-bin.tar.gz /root
 COPY ./apache-dolphinscheduler-*-SNAPSHOT-bin.tar.gz /root
 RUN tar -zxvf /root/apache-dolphinscheduler-*-SNAPSHOT-bin.tar.gz -C ~
 
-ENV DOLPHINSCHEDULER_HOME /root/apache-dolphinscheduler-*-SNAPSHOT-bin
+RUN mv /root/apache-dolphinscheduler-*-SNAPSHOT-bin /root/apache-dolphinscheduler-test-SNAPSHOT-bin
+
+ENV DOLPHINSCHEDULER_HOME /root/apache-dolphinscheduler-test-SNAPSHOT-bin
 
 #Setting install.sh
 COPY .github/workflows/cluster-test/postgresql/install_env.sh $DOLPHINSCHEDULER_HOME/bin/env/install_env.sh

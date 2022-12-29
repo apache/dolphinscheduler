@@ -17,14 +17,15 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.Collection;
 
 /**
  *  AbstractSelector
  */
-public  abstract class AbstractSelector<T> implements Selector<T> {
+public abstract class AbstractSelector<T> implements Selector<T> {
+
     @Override
     public T select(Collection<T> source) {
 
@@ -36,7 +37,7 @@ public  abstract class AbstractSelector<T> implements Selector<T> {
          * if only one , return directly
          */
         if (source.size() == 1) {
-            return (T)source.toArray()[0];
+            return (T) source.toArray()[0];
         }
         return doSelect(source);
     }

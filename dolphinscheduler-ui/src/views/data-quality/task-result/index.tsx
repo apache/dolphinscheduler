@@ -15,21 +15,27 @@
  * limitations under the License.
  */
 
-import { defineComponent, getCurrentInstance, onMounted, toRefs, watch } from 'vue'
+import {
+  defineComponent,
+  getCurrentInstance,
+  onMounted,
+  toRefs,
+  watch
+} from 'vue'
 import {
   NSpace,
-  NInput,
   NSelect,
   NDatePicker,
   NButton,
   NIcon,
   NDataTable,
-  NPagination,
+  NPagination
 } from 'naive-ui'
 import { SearchOutlined } from '@vicons/antd'
 import { useTable } from './use-table'
 import { useI18n } from 'vue-i18n'
 import Card from '@/components/card'
+import Search from '@/components/input-search'
 
 const TaskResult = defineComponent({
   name: 'task-result',
@@ -84,12 +90,10 @@ const TaskResult = defineComponent({
       <NSpace vertical>
         <Card>
           <NSpace justify='end'>
-            <NInput
-              allowInput={this.trim}
-              v-model={[this.searchVal, 'value']}
-              size='small'
-              placeholder={t('data_quality.task_result.task_name')}
-              clearable
+            <Search
+                v-model:value={this.searchVal}
+                placeholder={t('data_quality.task_result.task_name')}
+                onSearch={onSearch}
             />
             <NSelect
               v-model={[this.ruleType, 'value']}

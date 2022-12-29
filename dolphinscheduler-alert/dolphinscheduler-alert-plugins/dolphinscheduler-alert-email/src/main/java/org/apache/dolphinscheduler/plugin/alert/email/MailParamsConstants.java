@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.alert.email;
 
 public final class MailParamsConstants {
+
     public static final String PLUGIN_DEFAULT_EMAIL_RECEIVERS = "$t('receivers')";
     public static final String NAME_PLUGIN_DEFAULT_EMAIL_RECEIVERS = "receivers";
 

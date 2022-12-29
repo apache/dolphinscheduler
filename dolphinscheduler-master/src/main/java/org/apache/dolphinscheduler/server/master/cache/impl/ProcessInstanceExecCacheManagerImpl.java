@@ -26,11 +26,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
 
+import lombok.NonNull;
+
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.ImmutableList;
-
-import lombok.NonNull;
 
 /**
  * cache of process instance id and WorkflowExecuteThread
@@ -38,7 +38,8 @@ import lombok.NonNull;
 @Component
 public class ProcessInstanceExecCacheManagerImpl implements ProcessInstanceExecCacheManager {
 
-    private final ConcurrentHashMap<Integer, WorkflowExecuteRunnable> processInstanceExecMaps = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, WorkflowExecuteRunnable> processInstanceExecMaps =
+            new ConcurrentHashMap<>();
 
     @PostConstruct
     public void registerMetrics() {
@@ -68,5 +69,10 @@ public class ProcessInstanceExecCacheManagerImpl implements ProcessInstanceExecC
     @Override
     public Collection<WorkflowExecuteRunnable> getAll() {
         return ImmutableList.copyOf(processInstanceExecMaps.values());
+    }
+
+    @Override
+    public void clearCache() {
+        processInstanceExecMaps.clear();
     }
 }

@@ -15,11 +15,17 @@
  * limitations under the License.
  */
 
-import { ref, defineComponent, toRefs, reactive, onMounted, getCurrentInstance } from 'vue'
+import {
+  ref,
+  defineComponent,
+  toRefs,
+  reactive,
+  onMounted,
+  getCurrentInstance
+} from 'vue'
 import {
   NButton,
   NIcon,
-  NInput,
   NDataTable,
   NPagination,
   NSpace
@@ -29,6 +35,7 @@ import { SearchOutlined } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
 import FormModal from './components/form-modal'
+import Search from "@/components/input-search";
 
 const taskGroupOption = defineComponent({
   name: 'taskGroupOption',
@@ -156,14 +163,13 @@ const taskGroupOption = defineComponent({
               {t('resource.task_group_option.create')}
             </NButton>
             <NSpace>
-              <NInput
-                allowInput={this.trim}
-                size='small'
-                v-model={[this.name, 'value']}
-                placeholder={t(
-                  'resource.task_group_option.please_enter_keywords'
-                )}
-              ></NInput>
+              <Search
+                  placeholder={t(
+                      'resource.task_group_option.please_enter_keywords'
+                  )}
+                  v-model:value={this.name}
+                  onSearch={this.onSearch}
+              ></Search>
               <NButton size='small' type='primary' onClick={onSearch}>
                 <NIcon>
                   <SearchOutlined />
