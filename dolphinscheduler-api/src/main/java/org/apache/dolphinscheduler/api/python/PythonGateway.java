@@ -416,7 +416,7 @@ public class PythonGateway {
         Project project;
         project = projectMapper.queryByName(name);
         if (project == null) {
-            projectService.createProject(user, name, desc,user.getTenantId());
+            projectService.createProject(user, name, desc, user.getTenantId());
         } else if (project.getUserId() != user.getId()) {
             ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), user.getId());
             if (projectUser == null) {
@@ -441,7 +441,7 @@ public class PythonGateway {
     }
 
     public Tenant createTenant(String tenantCode, String desc, String queueName) {
-        return tenantService.createTenantIfNotExists(tenantCode, desc, queueName, queueName,0);
+        return tenantService.createTenantIfNotExists(tenantCode, desc, queueName, queueName, 0);
     }
 
     public Tenant queryTenantByCode(String tenantCode) {

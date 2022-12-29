@@ -181,7 +181,7 @@ public class BaseServiceImpl implements BaseService {
                 resourcePermissionCheckService.operationPermissionCheck(type, user.getId(), permissionKey, logger);
         boolean resourcePermissionCheck = resourcePermissionCheckService.resourcePermissionCheck(type, ids,
                 user.getUserType().equals(UserType.ADMIN_USER) ? 0 : user.getId(), logger);
-        System.out.println(operationPermissionCheck+":"+resourcePermissionCheck+" type:"+type);
+        System.out.println(operationPermissionCheck + ":" + resourcePermissionCheck + " type:" + type);
         return operationPermissionCheck && resourcePermissionCheck;
     }
 

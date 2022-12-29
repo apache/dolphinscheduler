@@ -394,7 +394,8 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      * @return Tenant object
      */
     @Override
-    public Tenant createTenantIfNotExists(String tenantCode, String desc, String queue, String queueName,int projectId) {
+    public Tenant createTenantIfNotExists(String tenantCode, String desc, String queue, String queueName,
+                                          int projectId) {
         if (checkTenantExists(tenantCode)) {
             return tenantMapper.queryByTenantCode(tenantCode);
         }

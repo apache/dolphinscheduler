@@ -271,14 +271,14 @@ public class TenantServiceTest {
         // Tenant exists
         Mockito.when(tenantMapper.existTenant(tenantCode)).thenReturn(true);
         Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(getTenant());
-        tenant = tenantService.createTenantIfNotExists(tenantCode, tenantDesc, queue, queueName,projectId);
+        tenant = tenantService.createTenantIfNotExists(tenantCode, tenantDesc, queue, queueName, projectId);
         Assertions.assertEquals(getTenant(), tenant);
 
         // Tenant not exists
         Mockito.when(tenantMapper.existTenant(tenantCode)).thenReturn(false);
         Mockito.when(queueService.createQueueIfNotExists(queue, queueName)).thenReturn(getQueue());
-        tenant = tenantService.createTenantIfNotExists(tenantCode, tenantDesc, queue, queueName,projectId);
-        Assertions.assertEquals(new Tenant(tenantCode, tenantDesc, getQueue().getId(),projectId), tenant);
+        tenant = tenantService.createTenantIfNotExists(tenantCode, tenantDesc, queue, queueName, projectId);
+        Assertions.assertEquals(new Tenant(tenantCode, tenantDesc, getQueue().getId(), projectId), tenant);
     }
 
     /**

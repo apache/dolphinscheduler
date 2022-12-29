@@ -97,7 +97,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      */
     @Override
     @Transactional
-    public Result createProject(User loginUser, String name, String desc,int tenantId) {
+    public Result createProject(User loginUser, String name, String desc, int tenantId) {
         Result result = new Result();
 
         checkDesc(result, desc);
@@ -326,12 +326,11 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         Result result = new Result();
         PageInfo<Project> pageInfo = new PageInfo<>(pageNo, pageSize);
         Page<Project> page = new Page<>(pageNo, pageSize);
-        Set<Integer> projectIds=null;
-        if(loginUser.getUserType()==UserType.ADMIN_USER)
-        {
-            List<Project> list=this.projectMapper.queryAllProject(0);
-            projectIds=list.stream().map(Project::getId).collect(Collectors.toSet());
-        }else {
+        Set<Integer> projectIds = null;
+        if (loginUser.getUserType() == UserType.ADMIN_USER) {
+            List<Project> list = this.projectMapper.queryAllProject(0);
+            projectIds = list.stream().map(Project::getId).collect(Collectors.toSet());
+        } else {
             projectIds = resourcePermissionCheckService
                     .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), logger);
         }

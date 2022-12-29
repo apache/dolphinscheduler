@@ -111,9 +111,8 @@ public class ResourcePermissionCheckServiceImpl
     @Override
     public boolean resourcePermissionCheck(Object authorizationType, Object[] needChecks, Integer userId,
                                            Logger logger) {
-        User user=RequestContext.getLoginUser();
-        if(user.getUserType()==UserType.ADMIN_USER)
-        {
+        User user = RequestContext.getLoginUser();
+        if (user.getUserType() == UserType.ADMIN_USER) {
             return true;
         }
         if (Objects.nonNull(needChecks) && needChecks.length > 0) {
@@ -215,7 +214,8 @@ public class ResourcePermissionCheckServiceImpl
 
         @Override
         public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
-            return projectMapper.queryProjectByTenantId(((User) RequestContext.getLoginUser()).getTenantId()).stream().map(Project::getId).collect(toSet());
+            return projectMapper.queryProjectByTenantId(((User) RequestContext.getLoginUser()).getTenantId()).stream()
+                    .map(Project::getId).collect(toSet());
         }
     }
 
@@ -407,9 +407,8 @@ public class ResourcePermissionCheckServiceImpl
 
         @Override
         public boolean permissionCheck(int userId, String url, Logger logger) {
-            User user=RequestContext.getLoginUser();
-            if(user.getUserType()==UserType.ADMIN_USER || user.getUserType()==UserType.PROJECT_ADMIN)
-            {
+            User user = RequestContext.getLoginUser();
+            if (user.getUserType() == UserType.ADMIN_USER || user.getUserType() == UserType.PROJECT_ADMIN) {
                 return true;
             }
             return false;
@@ -445,7 +444,8 @@ public class ResourcePermissionCheckServiceImpl
 
         @Override
         public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
-            List<AlertGroup> alertGroupList = alertGroupMapper.queryByTenantId(((User)RequestContext.getLoginUser()).getTenantId());
+            List<AlertGroup> alertGroupList =
+                    alertGroupMapper.queryByTenantId(((User) RequestContext.getLoginUser()).getTenantId());
             return alertGroupList.stream().map(AlertGroup::getId).collect(toSet());
         }
     }

@@ -36,7 +36,7 @@ public interface ProjectService {
      * @param desc description
      * @return returns an error if it exists
      */
-    Result createProject(User loginUser, String name, String desc,int tenantId);
+    Result createProject(User loginUser, String name, String desc, int tenantId);
 
     /**
      * query project details by code

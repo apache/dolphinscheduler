@@ -132,7 +132,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         workerGroup.setUpdateTime(now);
         workerGroup.setDescription(description);
         workerGroup.setTenantId(tenantId);
-        Tenant tenant=this.tenantMapper.queryById(tenantId);
+        Tenant tenant = this.tenantMapper.queryById(tenantId);
         workerGroup.setTenantCode(tenant.getTenantCode());
 
         if (checkWorkerGroupNameExists(workerGroup)) {
@@ -284,9 +284,8 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         // worker groups from database
         List<WorkerGroup> workerGroups = null;
 
-
         User user = RequestContext.getLoginUser();
-        System.out.println("user type:"+user.getUserType());
+        System.out.println("user type:" + user.getUserType());
         if (user.getUserType() == UserType.ADMIN_USER) {
             workerGroups = this.workerGroupMapper.queryAllWorkerGroup();
         } else {

@@ -100,8 +100,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.base.Joiner;
 import com.google.common.io.Files;
 
-import javax.annotation.PostConstruct;
-
 /**
  * resources service impl
  */
@@ -145,7 +143,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
     @Autowired
     private StorageOperate storageOperate;
-
 
     /**
      * create directory
@@ -876,8 +873,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 List<User> userList = userMapper.selectList(null);
                 Set<String> visitedTenantEntityCode = new HashSet<>();
                 for (User userEntity : userList) {
-                    if(isAdmin(userEntity))
-                    {
+                    if (isAdmin(userEntity)) {
                         continue;
                     }
                     Tenant tt = tenantMapper.queryById(userEntity.getTenantId());

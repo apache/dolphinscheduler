@@ -111,9 +111,11 @@ public class UsersController extends BaseController {
                              @RequestParam(value = "queue", required = false, defaultValue = "") String queue,
                              @RequestParam(value = "email") String email,
                              @RequestParam(value = "phone", required = false) String phone,
-                             @RequestParam(value = "state", required = false) int state,@RequestParam(value = "isProjectAdmin", required = true) boolean isProjectAdmin) throws Exception {
+                             @RequestParam(value = "state", required = false) int state,
+                             @RequestParam(value = "isProjectAdmin", required = true) boolean isProjectAdmin) throws Exception {
         Map<String, Object> result =
-                usersService.createUser(loginUser, userName, userPassword, email, tenantId, phone, queue, state,isProjectAdmin);
+                usersService.createUser(loginUser, userName, userPassword, email, tenantId, phone, queue, state,
+                        isProjectAdmin);
         return returnDataList(result);
     }
 
@@ -566,13 +568,14 @@ public class UsersController extends BaseController {
     public Result<Object> registerUser(@RequestParam(value = "userName") String userName,
                                        @RequestParam(value = "userPassword") String userPassword,
                                        @RequestParam(value = "repeatPassword") String repeatPassword,
-                                       @RequestParam(value = "isProjectAdmin" ,required = false)boolean isProjectAdmin,
+                                       @RequestParam(value = "isProjectAdmin", required = false) boolean isProjectAdmin,
                                        @RequestParam(value = "email") String email) throws Exception {
         userName = ParameterUtils.handleEscapes(userName);
         userPassword = ParameterUtils.handleEscapes(userPassword);
         repeatPassword = ParameterUtils.handleEscapes(repeatPassword);
         email = ParameterUtils.handleEscapes(email);
-        Map<String, Object> result = usersService.registerUser(userName, userPassword, repeatPassword, email,isProjectAdmin);
+        Map<String, Object> result =
+                usersService.registerUser(userName, userPassword, repeatPassword, email, isProjectAdmin);
         return returnDataList(result);
     }
 

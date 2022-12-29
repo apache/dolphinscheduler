@@ -22,9 +22,13 @@ import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_S_S;
 import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_TYPE_FILE;
 import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_TYPE_UDF;
 
-
-import com.aliyun.oss.model.*;
-import com.amazonaws.AmazonServiceException;
+import com.aliyun.oss.model.ListObjectsV2Request;
+import com.aliyun.oss.model.ListObjectsV2Result;
+import com.aliyun.oss.model.PutObjectRequest;
+import com.aliyun.oss.model.Bucket;
+import com.aliyun.oss.model.ObjectMetadata;
+import com.aliyun.oss.model.OSSObject;
+import com.aliyun.oss.model.OSSObjectSummary;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.factory.OssClientFactory;
@@ -61,7 +65,7 @@ import org.slf4j.LoggerFactory;
 
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSException;
-
+import com.amazonaws.AmazonServiceException;
 
 @Data
 public class OssOperator implements Closeable, StorageOperate {
@@ -407,7 +411,7 @@ public class OssOperator implements Closeable, StorageOperate {
         ListObjectsV2Result v2Result;
         try {
             v2Result = this.ossClient.listObjectsV2(request);
-        } catch (OSSException  e) {
+        } catch (OSSException e) {
             throw new OSSException("Get oss file list exception, error type:" + e.getErrorMessage(), e);
         }
 

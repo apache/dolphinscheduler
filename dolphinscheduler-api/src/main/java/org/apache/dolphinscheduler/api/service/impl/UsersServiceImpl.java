@@ -152,7 +152,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
                                           int tenantId,
                                           String phone,
                                           String queue,
-                                          int state,boolean isProjectAdmin) throws Exception {
+                                          int state, boolean isProjectAdmin) throws Exception {
         Map<String, Object> result = new HashMap<>();
 
         // check all user params
@@ -178,7 +178,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             return result;
         }
 
-        User user = createUser(userName, userPassword, email, tenantId, phone, queue, state,isProjectAdmin);
+        User user = createUser(userName, userPassword, email, tenantId, phone, queue, state, isProjectAdmin);
 
         Tenant tenant = tenantMapper.queryById(tenantId);
         // resource upload startup
@@ -200,7 +200,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
                            int tenantId,
                            String phone,
                            String queue,
-                           int state,boolean isProjectAdmin) {
+                           int state, boolean isProjectAdmin) {
         User user = new User();
         Date now = new Date();
 
@@ -211,10 +211,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         user.setPhone(phone);
         user.setState(state);
         // create general users, administrator users are currently built-in
-        if(isProjectAdmin)
-        {
+        if (isProjectAdmin) {
             user.setUserType(UserType.PROJECT_ADMIN);
-        }else {
+        } else {
             user.setUserType(UserType.GENERAL_USER);
         }
 
@@ -1315,7 +1314,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      */
     @Override
     @Transactional
-    public Map<String, Object> registerUser(String userName, String userPassword, String repeatPassword, String email,boolean isProjectAdmin) {
+    public Map<String, Object> registerUser(String userName, String userPassword, String repeatPassword, String email,
+                                            boolean isProjectAdmin) {
         Map<String, Object> result = new HashMap<>();
 
         // check user params
@@ -1333,7 +1333,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "two passwords are not same");
             return result;
         }
-        User user = createUser(userName, userPassword, email, 1, "", "", Flag.NO.ordinal(),isProjectAdmin);
+        User user = createUser(userName, userPassword, email, 1, "", "", Flag.NO.ordinal(), isProjectAdmin);
         putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, user);
         return result;
@@ -1463,7 +1463,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         User user = userMapper.queryByUserNameAccurately(userName);
         if (Objects.isNull(user)) {
             Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
-            user = createUser(userName, userPassword, email, tenant.getId(), phone, queue, state,false);
+            user = createUser(userName, userPassword, email, tenant.getId(), phone, queue, state, false);
             return user;
         }
 

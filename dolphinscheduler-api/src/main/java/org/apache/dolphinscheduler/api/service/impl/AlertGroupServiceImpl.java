@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.AlertGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -31,8 +30,6 @@ import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.*;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +39,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
+
+import java.util.*;
 
 /**
  * alert group service impl
@@ -114,13 +114,12 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
         if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
             alertGroupPage = alertGroupMapper.queryAlertGroupPage(page, searchVal);
         } else {
-            List<AlertGroup> groups=alertGroupMapper.queryByTenantId(loginUser.getTenantId());
-            if(groups.isEmpty())
-            {
-                alertGroupPage=new PageDTO<>();
-            }else {
-                Set<Integer> ids=new HashSet<>();
-                for (AlertGroup group:groups) {
+            List<AlertGroup> groups = alertGroupMapper.queryByTenantId(loginUser.getTenantId());
+            if (groups.isEmpty()) {
+                alertGroupPage = new PageDTO<>();
+            } else {
+                Set<Integer> ids = new HashSet<>();
+                for (AlertGroup group : groups) {
                     ids.add(group.getId());
                 }
                 alertGroupPage = alertGroupMapper.queryAlertGroupPageByIds(page, new ArrayList<>(ids), searchVal);

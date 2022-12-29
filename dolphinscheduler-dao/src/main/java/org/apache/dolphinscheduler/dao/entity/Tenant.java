@@ -51,7 +51,6 @@ public class Tenant {
      */
     private int queueId;
 
-
     /**
      * queue name
      */

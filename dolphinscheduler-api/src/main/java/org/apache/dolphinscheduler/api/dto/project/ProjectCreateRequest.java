@@ -32,6 +32,6 @@ public class ProjectCreateRequest {
     @Schema(example = "this is a project")
     private String description;
 
-    @Schema(example = "1",required = true)
+    @Schema(example = "1", required = true)
     private int tenantId;
 }
