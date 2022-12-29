@@ -28,11 +28,14 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.NoSuchFileException;
+import java.util.zip.CRC32;
+import java.util.zip.CheckedInputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -262,6 +265,40 @@ public class FileUtils {
         } catch (IOException e) {
             return true;
         }
+    }
+
+    /**
+     * Calculate file checksum with CRC32 algorithm
+     *
+     * @param pathName
+     * @return
+     * @throws IOException
+     */
+    public static String getFileChecksum(String pathName) {
+        CRC32 crc32 = new CRC32();
+        File file = new File(pathName);
+        String crcString = "";
+        if (file.isDirectory()) {
+            // file system interface remains the same order
+            String[] subPaths = file.list();
+            for (String subPath : subPaths) {
+                crcString += getFileChecksum(pathName + FOLDER_SEPARATOR + subPath);
+            }
+        } else {
+            FileInputStream fileInputStream = null;
+            try {
+                fileInputStream = new FileInputStream(pathName);
+                CheckedInputStream checkedInputStream = new CheckedInputStream(fileInputStream, crc32);
+                while (checkedInputStream.read() != -1) {
+                }
+            } catch (IOException e) {
+                logger.error(e.getMessage(), e);
+                return crcString;
+            }
+            crcString = Long.toHexString(crc32.getValue());
+        }
+
+        return crcString;
     }
 
 }

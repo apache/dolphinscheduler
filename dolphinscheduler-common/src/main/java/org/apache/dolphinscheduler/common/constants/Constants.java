@@ -327,6 +327,9 @@ public final class Constants {
     public static final String THREAD_NAME_WORKER_SERVER = "Worker-Server";
     public static final String THREAD_NAME_ALERT_SERVER = "Alert-Server";
 
+    // suffix of crc file
+    public final static String CRC_SUFFIX = ".crc";
+
     /**
      * complement date default cron string
      */
