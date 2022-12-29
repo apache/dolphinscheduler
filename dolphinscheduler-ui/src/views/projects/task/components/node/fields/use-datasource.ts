@@ -100,6 +100,16 @@ export function useDatasource(
     },
     {
       id: 13,
+      code: 'STARROCKS',
+      disabled: false
+    },
+    {
+      id: 14,
+      code: 'AZURESQL',
+      disabled: false
+    },
+    {
+      id: 15,
       code: 'DAMENG',
       disabled: false
     }

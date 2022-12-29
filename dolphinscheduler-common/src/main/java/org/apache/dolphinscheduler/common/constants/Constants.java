@@ -28,6 +28,8 @@ public final class Constants {
         throw new UnsupportedOperationException("Construct Constants");
     }
 
+    public static final String AUTO_CLOSE_ALERT = "alert.auto-close";
+
     /**
      * common properties path
      */
@@ -50,12 +52,6 @@ public final class Constants {
     public static final String RESOURCE_TYPE_FILE = "resources";
 
     public static final String RESOURCE_TYPE_UDF = "udfs";
-
-    public static final String STORAGE_S3 = "S3";
-
-    public static final String STORAGE_OSS = "OSS";
-
-    public static final String STORAGE_HDFS = "HDFS";
 
     public static final String EMPTY_STRING = "";
 
@@ -802,4 +798,9 @@ public final class Constants {
     public static final String KERBEROS_KRB5_CONF_PATH = "javaSecurityKrb5Conf";
     public static final String KERBEROS_KEY_TAB_USERNAME = "loginUserKeytabUsername";
     public static final String KERBEROS_KEY_TAB_PATH = "loginUserKeytabPath";
+
+    public static final Integer QUERY_ALL_ON_SYSTEM = 0;
+    public static final Integer QUERY_ALL_ON_PROJECT = 1;
+    public static final Integer QUERY_ALL_ON_WORKFLOW = 2;
+    public static final Integer QUERY_ALL_ON_TASK = 3;
 }

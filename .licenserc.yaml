@@ -47,5 +47,8 @@ header:
     - '.github/actions/translate-on-issue/**'
     - '**/.gitkeep'
     - 'org.mockito.plugins.MockMaker'
+    - tools/dependencies/known-dependencies.txt
+    - '**/banner.txt'
+    - '.terraform.lock.hcl'
 
   comment: on-failure

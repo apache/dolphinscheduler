@@ -24,17 +24,31 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+
+@TableName(value = "t_ds_mysql_registry_data")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class MysqlRegistryData {
 
-    private long id;
+    @TableId(value = "id", type = IdType.AUTO)
+    private Long id;
+    @TableField(value = "`key`")
     private String key;
+    @TableField(value = "`data`")
     private String data;
+    @TableField(value = "`type`")
     private int type;
+    @TableField(value = "`last_term`")
+    private long lastTerm;
+    @TableField(value = "`create_time`")
     private Date createTime;
+    @TableField(value = "`last_time`")
     private Date lastUpdateTime;
 
 }

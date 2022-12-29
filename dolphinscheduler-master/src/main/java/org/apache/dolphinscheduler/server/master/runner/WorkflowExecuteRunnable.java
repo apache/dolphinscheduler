@@ -60,6 +60,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.utils.TaskCacheUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -71,6 +72,7 @@ import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutor
 import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.server.master.event.StateEventHandleError;
 import org.apache.dolphinscheduler.server.master.event.StateEventHandleException;
+import org.apache.dolphinscheduler.server.master.event.StateEventHandleFailure;
 import org.apache.dolphinscheduler.server.master.event.StateEventHandler;
 import org.apache.dolphinscheduler.server.master.event.StateEventHandlerManager;
 import org.apache.dolphinscheduler.server.master.event.TaskStateEvent;
@@ -91,9 +93,10 @@ import org.apache.dolphinscheduler.service.queue.PeerTaskInstancePriorityQueue;
 import org.apache.dolphinscheduler.service.utils.DagHelper;
 import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -149,6 +152,12 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
     private ProcessDefinition processDefinition;
 
     private DAG<String, TaskNode, TaskNodeRelation> dag;
+
+    /**
+     * full task node map, key is task node id, value is task node
+     * # TODO: This field can be removed later if the dag is complete
+     */
+    private Map<Long, TaskNode> taskNodesMap;
 
     /**
      * unique key of workflow
@@ -285,10 +294,13 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                     stateEvents);
             return;
         }
-        StateEvent stateEvent = null;
-        while (!this.stateEvents.isEmpty()) {
+        int loopTimes = stateEvents.size() * 2;
+        for (int i = 0; i < loopTimes; i++) {
+            final StateEvent stateEvent = this.stateEvents.peek();
             try {
-                stateEvent = this.stateEvents.peek();
+                if (stateEvent == null) {
+                    return;
+                }
                 LoggerUtils.setWorkflowAndTaskInstanceIDMDC(stateEvent.getProcessInstanceId(),
                         stateEvent.getTaskInstanceId());
                 // if state handle success then will remove this state, otherwise will retry this state next time.
@@ -311,6 +323,13 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                 logger.error("State event handle error, will retry this event: {}",
                         stateEvent,
                         stateEventHandleException);
+                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
+            } catch (StateEventHandleFailure stateEventHandleFailure) {
+                logger.error("State event handle failed, will move event to the tail: {}",
+                        stateEvent,
+                        stateEventHandleFailure);
+                this.stateEvents.remove(stateEvent);
+                this.stateEvents.offer(stateEvent);
                 ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
             } catch (Exception e) {
                 // we catch the exception here, since if the state event handle failed, the state event will still keep
@@ -400,6 +419,10 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                 // todo: merge the last taskInstance
                 processInstance.setVarPool(taskInstance.getVarPool());
                 processInstanceDao.upsertProcessInstance(processInstance);
+                // save the cacheKey only if the task is defined as cache task and the task is success
+                if (taskInstance.getIsCache().equals(Flag.YES)) {
+                    saveCacheTaskInstance(taskInstance);
+                }
                 if (!processInstance.isBlocked()) {
                     submitPostNode(Long.toString(taskInstance.getTaskCode()));
                 }
@@ -792,6 +815,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             }
         });
 
+        taskNodesMap = taskNodeList.stream().collect(Collectors.toMap(TaskNode::getCode, taskNode -> taskNode));
+
         // generate process to get DAG info
         List<String> recoveryNodeCodeList = getRecoveryNodeCodeList(recoverNodeList);
         List<String> startNodeNameList = parseStartNodeName(processInstance.getCommandParam());
@@ -878,6 +903,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                     LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
                 }
             }
+            clearDataIfExecuteTask();
         } else {
             logger.info("The current workflowInstance is a newly running workflowInstance");
         }
@@ -973,7 +999,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
 
             // if we use task group, then need to acquire the task group resource
             // if there is no resource the current task instance will not be dispatched
-            // it will be weakup when other tasks release the resource.
+            // it will be wakeup when other tasks release the resource.
             int taskGroupId = taskInstance.getTaskGroupId();
             if (taskGroupId > 0) {
                 boolean acquireTaskGroup = processService.acquireTaskGroup(taskInstance.getId(),
@@ -1097,7 +1123,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         newTaskInstance.setProcessDefine(taskInstance.getProcessDefine());
         newTaskInstance.setProcessInstance(processInstance);
         newTaskInstance.setRetryTimes(taskInstance.getRetryTimes() + 1);
-        // todo relative funtion: TaskInstance.retryTaskIntervalOverTime
+        // todo relative function: TaskInstance.retryTaskIntervalOverTime
         newTaskInstance.setState(taskInstance.getState());
         newTaskInstance.setEndTime(taskInstance.getEndTime());
 
@@ -1183,6 +1209,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         // set task cpu quota and max memory
         taskInstance.setCpuQuota(taskNode.getCpuQuota());
         taskInstance.setMemoryMax(taskNode.getMemoryMax());
+
+        taskInstance.setIsCache(taskNode.getIsCache() == Flag.YES.getCode() ? Flag.YES : Flag.NO);
 
         // task instance priority
         if (taskNode.getTaskInstancePriority() == null) {
@@ -1837,8 +1865,10 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             // init varPool only this task is the first time running
             if (task.isFirstRun()) {
                 // get pre task ,get all the task varPool to this task
-                Set<String> preTask = dag.getPreviousNodes(Long.toString(task.getTaskCode()));
-                getPreVarPool(task, preTask);
+                // Do not use dag.getPreviousNodes because of the dag may be miss the upstream node
+                String preTasks = taskNodesMap.get(task.getTaskCode()).getPreTasks();
+                Set<String> preTaskList = new HashSet<>(JSONUtils.toList(preTasks, String.class));
+                getPreVarPool(task, preTaskList);
             }
             DependResult dependResult = getDependResultForTask(task);
             if (DependResult.SUCCESS == dependResult) {
@@ -2038,6 +2068,90 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                     globalMap.put(startParam.getKey(), startParam.getValue());
                     globalParamList.add(new Property(startParam.getKey(), IN, VARCHAR, startParam.getValue()));
                 }
+            }
+        }
+    }
+
+    /**
+     * clear related data if command of process instance is EXECUTE_TASK
+     * 1. find all task code from sub dag (only contains related task)
+     * 2. set the flag of tasks to Flag.NO
+     * 3. clear varPool data from re-execute task instance in process instance
+     * 4. remove related task instance from taskInstanceMap, completeTaskMap, validTaskMap, errorTaskMap
+     *
+     * @return task instance
+     */
+    protected void clearDataIfExecuteTask() {
+        // only clear data if command is EXECUTE_TASK
+        if (!processInstance.getCommandType().equals(CommandType.EXECUTE_TASK)) {
+            return;
+        }
+
+        // Records the key of varPool data to be removed
+        Set<String> taskCodesString = dag.getAllNodesList();
+
+        List<TaskInstance> removeTaskInstances = new ArrayList<>();
+
+        for (String taskCodeString : taskCodesString) {
+            long taskCode = Long.parseLong(taskCodeString);
+            TaskInstance taskInstance;
+            if (validTaskMap.containsKey(taskCode)) {
+                taskInstance = taskInstanceMap.get(validTaskMap.get(taskCode));
+            } else {
+                taskInstance = taskInstanceDao.findTaskByInstanceIdAndCode(processInstance.getId(), taskCode);
+            }
+            if (taskInstance == null) {
+                continue;
+            }
+            removeTaskInstances.add(taskInstance);
+        }
+
+        for (TaskInstance taskInstance : removeTaskInstances) {
+            taskInstance.setFlag(Flag.NO);
+            taskInstanceDao.updateTaskInstance(taskInstance);
+        }
+
+        Set<String> removeSet = new HashSet<>();
+        for (TaskInstance taskInstance : removeTaskInstances) {
+            String taskVarPool = taskInstance.getVarPool();
+            if (StringUtils.isNotEmpty(taskVarPool)) {
+                List<Property> properties = JSONUtils.toList(taskVarPool, Property.class);
+                List<String> keys = properties.stream()
+                        .filter(property -> property.getDirect().equals(Direct.OUT))
+                        .map(property -> String.format("%s_%s", property.getProp(), property.getType()))
+                        .collect(Collectors.toList());
+                removeSet.addAll(keys);
+            }
+        }
+
+        // remove varPool data and update process instance
+        // TODO: we can remove this snippet if : we get varPool from pre taskInstance instead of process instance when
+        // task can not get pre task from incomplete dag
+        List<Property> processProperties = JSONUtils.toList(processInstance.getVarPool(), Property.class);
+        processProperties = processProperties.stream()
+                .filter(property -> !(property.getDirect().equals(Direct.IN)
+                        && removeSet.contains(String.format("%s_%s", property.getProp(), property.getType()))))
+                .collect(Collectors.toList());
+
+        processInstance.setVarPool(JSONUtils.toJsonString(processProperties));
+        processInstanceDao.updateProcessInstance(processInstance);
+
+        // remove task instance from taskInstanceMap, completeTaskMap, validTaskMap, errorTaskMap
+        taskInstanceMap.entrySet().removeIf(map -> dag.containsNode(Long.toString(map.getValue().getTaskCode())));
+        completeTaskMap.entrySet().removeIf(map -> dag.containsNode(Long.toString(map.getKey())));
+        validTaskMap.entrySet().removeIf(map -> dag.containsNode(Long.toString(map.getKey())));
+        errorTaskMap.entrySet().removeIf(map -> dag.containsNode(Long.toString(map.getKey())));
+    }
+
+    private void saveCacheTaskInstance(TaskInstance taskInstance) {
+        Pair<Integer, String> taskIdAndCacheKey = TaskCacheUtils.revertCacheKey(taskInstance.getCacheKey());
+        Integer taskId = taskIdAndCacheKey.getLeft();
+        if (taskId.equals(taskInstance.getId())) {
+            taskInstance.setCacheKey(taskIdAndCacheKey.getRight());
+            try {
+                taskInstanceDao.updateTaskInstance(taskInstance);
+            } catch (Exception e) {
+                logger.error("update task instance cache key failed", e);
             }
         }
     }

@@ -85,6 +85,10 @@ export function useTable() {
         className: 'workflow-name',
         ...COLUMN_WIDTH_CONFIG['name'],
         titleColSpan: 2,
+        resizable: true,
+        width: 300,
+        minWidth: 300,
+        maxWidth: 600,
         render: (row) =>
           h(
             NSpace,
@@ -98,17 +102,21 @@ export function useTable() {
                 h(
                   ButtonLink,
                   {
-                    onClick: () =>
-                      void router.push({
+                    onClick: () => {
+                      let routeUrl = router.resolve({
                         name: 'workflow-definition-detail',
                         params: { code: row.code }
                       })
+                      window.open(routeUrl.href, '_blank')
+                    }
                   },
                   {
                     default: () =>
                       h(
                         NEllipsis,
-                        COLUMN_WIDTH_CONFIG['linkEllipsis'],
+                        {
+                          style: 'max-width: 580px;line-height: 1.5'
+                        },
                         () => row.name
                       )
                   }

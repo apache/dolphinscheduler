@@ -33,4 +33,4 @@ After do this two steps, you can start your DolphinScheduler cluster, your clust
 store server metadata.
 
 NOTE: You need to add `mysql-connector-java.jar` into DS classpath, since this plugin will not bundle this driver in distribution.
-You can get the detail about <a href="https://dolphinscheduler.apache.org/en-us/docs/latest/user_doc/guide/installation/pseudo-cluster.html">Initialize the Database</a>
+You can get the detail about <a href="https://dolphinscheduler.apache.org/en-us/docs/3.1.2/guide/installation/pseudo-cluster">Initialize the Database</a>
