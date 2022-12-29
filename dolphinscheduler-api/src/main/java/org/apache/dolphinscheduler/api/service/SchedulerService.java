@@ -130,9 +130,9 @@ public interface SchedulerService {
      * @param scheduleStatus schedule status
      */
     void setScheduleState(User loginUser,
-                                         long projectCode,
-                                         Integer id,
-                                         ReleaseState scheduleStatus);
+                          long projectCode,
+                          Integer id,
+                          ReleaseState scheduleStatus);
 
     /**
      * query schedule

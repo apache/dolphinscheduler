@@ -427,9 +427,9 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     @Override
     @Transactional
     public void setScheduleState(User loginUser,
-                                                long projectCode,
-                                                Integer id,
-                                                ReleaseState scheduleStatus) {
+                                 long projectCode,
+                                 Integer id,
+                                 ReleaseState scheduleStatus) {
         Project project = projectMapper.queryByCode(projectCode);
         // check project auth
         projectService.checkProjectAndAuthThrowException(loginUser, project, null);
@@ -452,7 +452,8 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
             logger.error("Process definition does not exist, processDefinitionCode:{}.",
                     scheduleObj.getProcessDefinitionCode());
-            throw new ServiceException(Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(scheduleObj.getProcessDefinitionCode()));
+            throw new ServiceException(Status.PROCESS_DEFINE_NOT_EXIST,
+                    String.valueOf(scheduleObj.getProcessDefinitionCode()));
         }
         List<ProcessTaskRelation> processTaskRelations =
                 processTaskRelationMapper.queryByProcessCode(projectCode, scheduleObj.getProcessDefinitionCode());
@@ -486,7 +487,8 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                             logger.warn(
                                     "Only sub process definition state is {} can change schedule state, subProcessDefinitionCode:{}.",
                                     ReleaseState.ONLINE.getDescp(), subProcessDefinition.getCode());
-                            throw new ServiceException(Status.PROCESS_DEFINE_NOT_RELEASE, String.valueOf(subProcessDefinition.getId()));
+                            throw new ServiceException(Status.PROCESS_DEFINE_NOT_RELEASE,
+                                    String.valueOf(subProcessDefinition.getId()));
                         }
                     }
                 }
