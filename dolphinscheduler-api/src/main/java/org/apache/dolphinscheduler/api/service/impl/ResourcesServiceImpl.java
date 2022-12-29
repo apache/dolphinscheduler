@@ -858,16 +858,15 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         if (user == null) {
             logger.error("user {} not exists", loginUser.getId());
             putMsg(result, Status.USER_NOT_EXIST, loginUser.getId());
-            return null;
+            return result;
         }
 
         Tenant tenant = tenantMapper.queryById(user.getTenantId());
-        if (tenant == null) {
+        if (tenant == null && !isAdmin(loginUser)) {
             logger.error("tenant not exists");
             putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
-            return null;
+            return result;
         }
-        String tenantCode = tenant.getTenantCode();
 
         String defaultPath = "";
         List<StorageEntity> resourcesList = new ArrayList<>();
@@ -877,8 +876,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 List<User> userList = userMapper.selectList(null);
                 Set<String> visitedTenantEntityCode = new HashSet<>();
                 for (User userEntity : userList) {
+                    if(isAdmin(userEntity))
+                    {
+                        continue;
+                    }
                     Tenant tt = tenantMapper.queryById(userEntity.getTenantId());
-                    String tenantEntityCode = tenantMapper.queryById(userEntity.getTenantId()).getTenantCode();
+                    String tenantEntityCode = tt.getTenantCode();
                     if (!visitedTenantEntityCode.contains(tenantEntityCode)) {
                         defaultPath = storageOperate.getResDir(tenantEntityCode);
                         if (type.equals(ResourceType.UDF)) {
@@ -890,6 +893,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                     }
                 }
             } else {
+                String tenantCode = tenant.getTenantCode();
                 defaultPath = storageOperate.getResDir(tenantCode);
                 if (type.equals(ResourceType.UDF)) {
                     defaultPath = storageOperate.getUdfDir(tenantCode);
@@ -897,13 +901,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
                 resourcesList = storageOperate.listFilesStatusRecursively(defaultPath, defaultPath, tenantCode, type);
             }
-        } else {
-            defaultPath = storageOperate.getResDir(tenantCode);
-            if (type.equals(ResourceType.UDF)) {
-                defaultPath = storageOperate.getUdfDir(tenantCode);
-            }
-
-            resourcesList = storageOperate.listFilesStatusRecursively(fullName, defaultPath, tenantCode, type);
         }
 
         Visitor resourceTreeVisitor = new ResourceTreeVisitor(resourcesList);
