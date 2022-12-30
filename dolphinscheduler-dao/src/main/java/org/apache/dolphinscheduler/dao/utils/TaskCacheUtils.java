@@ -190,7 +190,7 @@ public class TaskCacheUtils {
             crcString = FileUtils.readFile2Str(new FileInputStream(targetPath));
             fileProperty.setValue(crcString);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Replace checksum failed for file property {}.", fileProperty.getProp());
         }
         return crcString;
     }

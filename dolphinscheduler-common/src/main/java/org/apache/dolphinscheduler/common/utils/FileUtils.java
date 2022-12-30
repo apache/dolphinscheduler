@@ -285,18 +285,13 @@ public class FileUtils {
             }
             crcString = concatenatedCRC.toString();
         } else {
-            FileInputStream fileInputStream = null;
-            CheckedInputStream checkedInputStream = null;
-            try {
-                fileInputStream = new FileInputStream(pathName);
-                checkedInputStream = new CheckedInputStream(fileInputStream, crc32);
+            try (
+                    FileInputStream fileInputStream = new FileInputStream(pathName);
+                    CheckedInputStream checkedInputStream = new CheckedInputStream(fileInputStream, crc32);) {
                 while (checkedInputStream.read() != -1) {
                 }
             } catch (IOException e) {
                 throw new IOException("Calculate checksum error.");
-            } finally {
-                fileInputStream.close();
-                checkedInputStream.close();
             }
             crcString = Long.toHexString(crc32.getValue());
         }
