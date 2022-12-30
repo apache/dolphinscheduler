@@ -279,52 +279,48 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      */
     @Override
     @Transactional
-    public Map<String, Object> setScheduleState(User loginUser,
-                                                long projectCode,
-                                                Integer id,
-                                                ReleaseState scheduleStatus) {
-        Map<String, Object> result = new HashMap<>();
-
+    public void setScheduleState(User loginUser,
+                                 long projectCode,
+                                 Integer id,
+                                 ReleaseState scheduleStatus) {
         Project project = projectMapper.queryByCode(projectCode);
         // check project auth
-        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result, null);
-        if (!hasProjectAndPerm) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, null);
 
         // check schedule exists
         Schedule scheduleObj = scheduleMapper.selectById(id);
 
         if (scheduleObj == null) {
-            putMsg(result, Status.SCHEDULE_CRON_NOT_EXISTS, id);
-            return result;
+            logger.error("Schedule does not exist, scheduleId:{}.", id);
+            throw new ServiceException(Status.SCHEDULE_CRON_NOT_EXISTS, id);
         }
         // check schedule release state
         if (scheduleObj.getReleaseState() == scheduleStatus) {
-            logger.info("schedule release is already {},needn't to change schedule id: {} from {} to {}",
-                    scheduleObj.getReleaseState(), scheduleObj.getId(), scheduleObj.getReleaseState(), scheduleStatus);
-            putMsg(result, Status.SCHEDULE_CRON_REALEASE_NEED_NOT_CHANGE, scheduleStatus);
-            return result;
+            logger.warn("Schedule state does not need to change due to schedule state is already {}, scheduleId:{}.",
+                    scheduleObj.getReleaseState().getDescp(), scheduleObj.getId());
+            throw new ServiceException(Status.SCHEDULE_CRON_REALEASE_NEED_NOT_CHANGE, scheduleStatus);
         }
         ProcessDefinition processDefinition =
                 processDefinitionMapper.queryByCode(scheduleObj.getProcessDefinitionCode());
         if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(scheduleObj.getProcessDefinitionCode()));
-            return result;
+            logger.error("Process definition does not exist, processDefinitionCode:{}.",
+                    scheduleObj.getProcessDefinitionCode());
+            throw new ServiceException(Status.PROCESS_DEFINE_NOT_EXIST,
+                    String.valueOf(scheduleObj.getProcessDefinitionCode()));
         }
         List<ProcessTaskRelation> processTaskRelations =
                 processTaskRelationMapper.queryByProcessCode(projectCode, scheduleObj.getProcessDefinitionCode());
         if (processTaskRelations.isEmpty()) {
-            putMsg(result, Status.PROCESS_DAG_IS_EMPTY);
-            return result;
+            logger.error("Process task relations do not exist, projectCode:{}, processDefinitionCode:{}.", projectCode,
+                    processDefinition.getCode());
+            throw new ServiceException(Status.PROCESS_DAG_IS_EMPTY);
         }
         if (scheduleStatus == ReleaseState.ONLINE) {
             // check process definition release state
             if (processDefinition.getReleaseState() != ReleaseState.ONLINE) {
-                logger.info("not release process definition id: {} , name : {}", processDefinition.getId(),
-                        processDefinition.getName());
-                putMsg(result, Status.PROCESS_DEFINE_NOT_RELEASE, processDefinition.getName());
-                return result;
+                logger.warn("Only process definition state is {} can change schedule state, processDefinitionCode:{}.",
+                        ReleaseState.ONLINE.getDescp(), processDefinition.getCode());
+                throw new ServiceException(Status.PROCESS_DEFINE_NOT_RELEASE, processDefinition.getName());
             }
             // check sub process definition release state
             List<Long> subProcessDefineCodes = new ArrayList<>();
@@ -338,11 +334,11 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                          * if there is no online process, exit directly
                          */
                         if (subProcessDefinition.getReleaseState() != ReleaseState.ONLINE) {
-                            logger.info("not release process definition id: {} , name : {}",
-                                    subProcessDefinition.getId(), subProcessDefinition.getName());
-                            putMsg(result, Status.PROCESS_DEFINE_NOT_RELEASE,
+                            logger.warn(
+                                    "Only sub process definition state is {} can change schedule state, subProcessDefinitionCode:{}.",
+                                    ReleaseState.ONLINE.getDescp(), subProcessDefinition.getCode());
+                            throw new ServiceException(Status.PROCESS_DEFINE_NOT_RELEASE,
                                     String.valueOf(subProcessDefinition.getId()));
-                            return result;
                         }
                     }
                 }
@@ -353,8 +349,8 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         List<Server> masterServers = monitorService.getServerListFromRegistry(true);
 
         if (masterServers.isEmpty()) {
-            putMsg(result, Status.MASTER_NOT_EXISTS);
-            return result;
+            logger.error("Master does not exist.");
+            throw new ServiceException(Status.MASTER_NOT_EXISTS);
         }
 
         // set status
@@ -375,18 +371,13 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                     deleteSchedule(project.getId(), id);
                     break;
                 default:
-                    putMsg(result, Status.SCHEDULE_STATUS_UNKNOWN, scheduleStatus.toString());
-                    return result;
+                    throw new ServiceException(Status.SCHEDULE_STATUS_UNKNOWN, scheduleStatus.toString());
             }
         } catch (Exception e) {
             Status status = scheduleStatus == ReleaseState.ONLINE ? Status.PUBLISH_SCHEDULE_ONLINE_ERROR
                     : Status.OFFLINE_SCHEDULE_ERROR;
-            result.put(Constants.STATUS, status);
             throw new ServiceException(status, e);
         }
-
-        putMsg(result, Status.SUCCESS);
-        return result;
     }
 
     /**

@@ -185,8 +185,8 @@ public class SchedulerController extends BaseController {
     public Result publishScheduleOnline(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
                                         @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                         @PathVariable("id") Integer id) {
-        Map<String, Object> result = schedulerService.setScheduleState(loginUser, projectCode, id, ReleaseState.ONLINE);
-        return returnDataList(result);
+        schedulerService.setScheduleState(loginUser, projectCode, id, ReleaseState.ONLINE);
+        return Result.success();
     }
 
     /**
@@ -207,10 +207,8 @@ public class SchedulerController extends BaseController {
     public Result offlineSchedule(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
                                   @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                   @PathVariable("id") Integer id) {
-
-        Map<String, Object> result =
-                schedulerService.setScheduleState(loginUser, projectCode, id, ReleaseState.OFFLINE);
-        return returnDataList(result);
+        schedulerService.setScheduleState(loginUser, projectCode, id, ReleaseState.OFFLINE);
+        return Result.success();
     }
 
     /**

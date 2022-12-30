@@ -119,8 +119,9 @@ public class SchedulerControllerTest extends AbstractControllerTest {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("id","37");
 
-        Mockito.when(schedulerService.setScheduleState(isA(User.class), isA(Long.class), isA(Integer.class),
-                isA(ReleaseState.class))).thenReturn(success());
+        Mockito.doNothing().when(schedulerService).setScheduleState(isA(User.class), isA(Long.class),
+                isA(Integer.class),
+                isA(ReleaseState.class));
 
         MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedules/{id}/online",123, 37)
                 .header(SESSION_ID, sessionId)
@@ -139,8 +140,9 @@ public class SchedulerControllerTest extends AbstractControllerTest {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("id","28");
 
-        Mockito.when(schedulerService.setScheduleState(isA(User.class), isA(Long.class), isA(Integer.class),
-                isA(ReleaseState.class))).thenReturn(success());
+        Mockito.doNothing().when(schedulerService).setScheduleState(isA(User.class), isA(Long.class),
+                isA(Integer.class),
+                isA(ReleaseState.class));
 
         MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedules/{id}/offline",123, 28)
                 .header(SESSION_ID, sessionId)

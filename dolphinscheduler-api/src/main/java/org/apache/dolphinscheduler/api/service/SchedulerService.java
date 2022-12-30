@@ -92,12 +92,11 @@ public interface SchedulerService {
      * @param projectCode project code
      * @param id scheduler id
      * @param scheduleStatus schedule status
-     * @return publish result code
      */
-    Map<String, Object> setScheduleState(User loginUser,
-                                         long projectCode,
-                                         Integer id,
-                                         ReleaseState scheduleStatus);
+    void setScheduleState(User loginUser,
+                          long projectCode,
+                          Integer id,
+                          ReleaseState scheduleStatus);
 
     /**
      * query schedule
