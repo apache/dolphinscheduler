@@ -77,17 +77,12 @@ import com.google.common.cache.LoadingCache;
 public class HdfsStorageOperator implements Closeable, StorageOperate {
 
     private static final Logger logger = LoggerFactory.getLogger(HdfsStorageOperator.class);
-    private String hdfsUser;
-    public static final String RM_HA_IDS = PropertyUtils.getString(Constants.YARN_RESOURCEMANAGER_HA_RM_IDS);
-    public static final String APP_ADDRESS = PropertyUtils.getString(Constants.YARN_APPLICATION_STATUS_ADDRESS);
-    public static final String JOB_HISTORY_ADDRESS = PropertyUtils.getString(Constants.YARN_JOB_HISTORY_STATUS_ADDRESS);
-    public static final int HADOOP_RESOURCE_MANAGER_HTTP_ADDRESS_PORT_VALUE =
-            PropertyUtils.getInt(Constants.HADOOP_RESOURCE_MANAGER_HTTPADDRESS_PORT, 8088);
+    private static HdfsStorageProperties hdfsProperties = new HdfsStorageProperties();
     private static final String HADOOP_UTILS_KEY = "HADOOP_UTILS_KEY";
 
     private static final LoadingCache<String, HdfsStorageOperator> cache = CacheBuilder
             .newBuilder()
-            .expireAfterWrite(PropertyUtils.getInt(Constants.KERBEROS_EXPIRE_TIME, 2), TimeUnit.HOURS)
+            .expireAfterWrite(hdfsProperties.getKerberosExpireTime(), TimeUnit.HOURS)
             .build(new CacheLoader<String, HdfsStorageOperator>() {
 
                 @Override
@@ -102,7 +97,13 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
     private FileSystem fs;
 
     private HdfsStorageOperator() {
-        hdfsUser = PropertyUtils.getString(Constants.HDFS_ROOT_USER);
+        init();
+        initHdfsPath();
+    }
+
+    public HdfsStorageOperator(HdfsStorageProperties hdfsStorageProperties) {
+        // Overwrite config from passing hdfsStorageProperties
+        hdfsProperties = hdfsStorageProperties;
         init();
         initHdfsPath();
     }
@@ -133,16 +134,12 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
         try {
             configuration = new HdfsConfiguration();
 
+            String hdfsUser = hdfsProperties.getUser();
             if (CommonUtils.loadKerberosConf(configuration)) {
                 hdfsUser = "";
             }
 
-            String defaultFS = configuration.get(Constants.FS_DEFAULT_FS);
-
-            if (StringUtils.isBlank(defaultFS)) {
-                defaultFS = PropertyUtils.getString(Constants.FS_DEFAULT_FS);
-            }
-
+            String defaultFS = getDefaultFS();
             // first get key from core-site.xml hdfs-site.xml ,if null ,then try to get from properties file
             // the default is the local file system
             if (StringUtils.isNotBlank(defaultFS)) {
@@ -189,7 +186,7 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
     public String getDefaultFS() {
         String defaultFS = getConfiguration().get(Constants.FS_DEFAULT_FS);
         if (StringUtils.isBlank(defaultFS)) {
-            defaultFS = PropertyUtils.getString(Constants.FS_DEFAULT_FS);
+            defaultFS = hdfsProperties.getDefaultFS();
         }
         return defaultFS;
     }
@@ -207,18 +204,20 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
     public String getApplicationUrl(String applicationId) throws BaseException {
 
         yarnEnabled = true;
-        String appUrl = StringUtils.isEmpty(RM_HA_IDS) ? APP_ADDRESS : getAppAddress(APP_ADDRESS, RM_HA_IDS);
+        String appUrl = StringUtils.isEmpty(hdfsProperties.getYarnResourceRmIds())
+                ? hdfsProperties.getYarnAppStatusAddress()
+                : getAppAddress(hdfsProperties.getYarnAppStatusAddress(), hdfsProperties.getYarnResourceRmIds());
         if (StringUtils.isBlank(appUrl)) {
             throw new BaseException("yarn application url generation failed");
         }
         logger.debug("yarn application url:{}, applicationId:{}", appUrl, applicationId);
-        return String.format(appUrl, HADOOP_RESOURCE_MANAGER_HTTP_ADDRESS_PORT_VALUE, applicationId);
+        return String.format(appUrl, hdfsProperties.getHadoopResourceManagerHttpAddressPort(), applicationId);
     }
 
     public String getJobHistoryUrl(String applicationId) {
         // eg:application_1587475402360_712719 -> job_1587475402360_712719
         String jobId = applicationId.replace("application", "job");
-        return String.format(JOB_HISTORY_ADDRESS, jobId);
+        return String.format(hdfsProperties.getYarnJobHistoryStatusAddress(), jobId);
     }
 
     /**
@@ -601,7 +600,7 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
      * @return data hdfs path
      */
     public static String getHdfsDataBasePath() {
-        String defaultFS = PropertyUtils.getString(Constants.FS_DEFAULT_FS);
+        String defaultFS = hdfsProperties.getDefaultFS();
         defaultFS = defaultFS.endsWith("/") ? StringUtils.chop(defaultFS) : defaultFS;
         if (FOLDER_SEPARATOR.equals(RESOURCE_UPLOAD_PATH)) {
             return defaultFS + "";
@@ -764,7 +763,8 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
 
             String[] rmIdArr = rmIds.split(Constants.COMMA);
 
-            String yarnUrl = protocol + "%s:" + HADOOP_RESOURCE_MANAGER_HTTP_ADDRESS_PORT_VALUE + "/ws/v1/cluster/info";
+            String yarnUrl =
+                    protocol + "%s:" + hdfsProperties.getHadoopResourceManagerHttpAddressPort() + "/ws/v1/cluster/info";
 
             try {
 
@@ -791,7 +791,7 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
         public static String getRMState(String url) {
 
             String retStr = Boolean.TRUE
-                    .equals(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false))
+                    .equals(hdfsProperties.isHadoopSecurityAuthStartupState())
                             ? KerberosHttpClient.get(url)
                             : HttpUtils.get(url);
 

@@ -9,13 +9,21 @@
 
 ### Configure `common.properties`
 
-If you deploy DolphinScheduler in `Cluster` or `Pseudo-Cluster` mode, you need to configure `api-server/conf/common.properties` and `worker-server/conf/common.properties`.
-If you deploy DolphinScheduler in `Standalone` mode, you only need to configure `standalone-server/conf/common.properties` as follows:
+Dolphinscheduler Resource Center uses the local system is enabled by default, and does not require any additional configuration.
+But please make sure to change the following configuration at the same time when you need to modify the default value.
+
+- If you deploy DolphinScheduler in `Cluster` or `Pseudo-Cluster` mode, you need to configure `api-server/conf/common.properties` and `worker-server/conf/common.properties`.
+- If you deploy DolphinScheduler in `Standalone` mode, you only need to configure `standalone-server/conf/common.properties` as follows:
+
+The configuration you may need to change:
 
 - Change `resource.storage.upload.base.path` to your local directory path. Please make sure the `tenant resource.hdfs.root.user` has read and write permissions for `resource.storage.upload.base.path`, e,g. `/tmp/dolphinscheduler`. `DolphinScheduler` will create the directory you configure if it does not exist.
-- Modify `resource.storage.type=HDFS` and `resource.hdfs.fs.defaultFS=file:///`.
 
-> NOTE: Please modify the value of `resource.storage.upload.base.path` if you do not want to use the default value as the base path.
+> NOTE:
+> 1. Please modify the value of `resource.storage.upload.base.path` if you do not want to use the default value as the base path.
+> 2. The local config is `resource.storage.type=LOCAL` it has actually configured two setting, `resource.storage.type=HDFS`
+> and `resource.hdfs.fs.defaultFS=file:///`, The configuration of `resource.storage.type=LOCAL` is for user-friendly, and enables
+> the local resource center to be enabled by default
 
 ## Use HDFS or Remote Object Storage
 
