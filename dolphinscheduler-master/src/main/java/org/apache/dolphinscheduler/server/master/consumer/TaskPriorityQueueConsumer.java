@@ -105,7 +105,10 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
     @Autowired
     private TaskEventService taskEventService;
 
-    @Autowired
+    /**
+     * storage operator
+     */
+    @Autowired(required = false)
     private StorageOperate storageOperate;
 
     /**
