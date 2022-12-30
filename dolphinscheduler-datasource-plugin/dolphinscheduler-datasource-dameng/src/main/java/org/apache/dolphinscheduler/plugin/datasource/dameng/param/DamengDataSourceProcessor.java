@@ -34,7 +34,8 @@ import org.apache.commons.lang3.StringUtils;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -59,7 +60,7 @@ public class DamengDataSourceProcessor extends AbstractDataSourceProcessor {
 
         damengDatasourceParamDTO.setUserName(connectionParams.getUser());
         damengDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
-        damengDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
+        damengDatasourceParamDTO.setOther(connectionParams.getOther());
 
         String address = connectionParams.getAddress();
         String[] hostSeperator = address.split(Constants.DOUBLE_SLASH);
@@ -88,8 +89,7 @@ public class DamengDataSourceProcessor extends AbstractDataSourceProcessor {
         damengConnectionParam.setPassword(PasswordUtils.encodePassword(dmDatasourceParam.getPassword()));
         damengConnectionParam.setDriverClassName(getDatasourceDriver());
         damengConnectionParam.setValidationQuery(getValidationQuery());
-        damengConnectionParam.setOther(transformOther(dmDatasourceParam.getOther()));
-        damengConnectionParam.setProps(dmDatasourceParam.getOther());
+        damengConnectionParam.setOther(dmDatasourceParam.getOther());
 
         return damengConnectionParam;
     }
@@ -113,8 +113,8 @@ public class DamengDataSourceProcessor extends AbstractDataSourceProcessor {
     public String getJdbcUrl(ConnectionParam connectionParam) {
         DamengConnectionParam damengConnectionParam = (DamengConnectionParam) connectionParam;
         String jdbcUrl = damengConnectionParam.getJdbcUrl();
-        if (!StringUtils.isEmpty(damengConnectionParam.getOther())) {
-            return String.format("%s?%s", jdbcUrl, damengConnectionParam.getOther());
+        if (MapUtils.isNotEmpty(damengConnectionParam.getOther())) {
+            return String.format("%s?%s", jdbcUrl, transformOther(damengConnectionParam.getOther()));
         }
         return jdbcUrl;
     }
@@ -137,24 +137,13 @@ public class DamengDataSourceProcessor extends AbstractDataSourceProcessor {
         return new DamengDataSourceProcessor();
     }
 
-    private String transformOther(Map<String, String> otherMap) {
-        if (MapUtils.isEmpty(otherMap)) {
+    private String transformOther(Map<String, String> paramMap) {
+        if (MapUtils.isEmpty(paramMap)) {
             return null;
         }
-        StringBuilder stringBuilder = new StringBuilder();
-        otherMap.forEach((key, value) -> stringBuilder.append(String.format("%s=%s&", key, value)));
-        return stringBuilder.toString();
-    }
-
-    private Map<String, String> parseOther(String other) {
-        if (StringUtils.isEmpty(other)) {
-            return null;
-        }
-        Map<String, String> otherMap = new LinkedHashMap<>();
-        for (String config : other.split("&")) {
-            otherMap.put(config.split("=")[0], config.split("=")[1]);
-        }
-        return otherMap;
+        List<String> otherList = new ArrayList<>();
+        paramMap.forEach((key, value) -> otherList.add(String.format("%s=%s", key, value)));
+        return String.join("&", otherList);
     }
 
 }
