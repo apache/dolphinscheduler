@@ -17,11 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.dameng;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.client.DruidDataSourceClient;
+import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-public class DamengDataSourceClient extends DruidDataSourceClient {
+public class DamengDataSourceClient extends CommonDataSourceClient {
 
     public DamengDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
         super(baseConnectionParam, dbType);
