@@ -4,7 +4,7 @@
 
 我们这里以 MySQL 为例来说明如何配置外部数据库：
 
-> 如果使用 MySQL 需要手动下载 [mysql-connector-java 驱动][mysql] (8.0.16) 并移动到 DolphinScheduler 的每个模块的 libs 目录下，其中包括 `api-server/libs` 和 `alert-server/libs` 和 `master-server/libs` 和 `worker-server/libs`。
+> 如果使用 MySQL，需要手动下载 [mysql-connector-java 驱动][mysql] (8.0.16) 并解压后移动到 DolphinScheduler 的每个模块的 libs 目录下，其中包括 `api-server/libs`、`alert-server/libs`、`master-server/libs`、`worker-server/libs`、`tools/libs`。
 
 * 首先，参照 [数据源配置](datasource-setting.md) `伪分布式/分布式安装初始化数据库` 创建并初始化数据库
 * 在你的命令行或者修改 bin/env/dolphinscheduler_env.sh 设定下列环境变量，将 `{user}` 和 `{password}` 改为你数据库的用户名和密码
@@ -23,7 +23,7 @@ export SPRING_DATASOURCE_PASSWORD={password}
 
 DolphinScheduler 元数据存储在关系型数据库中，目前支持 PostgreSQL 和 MySQL。下面分别介绍如何使用 MySQL 和 PostgresQL 初始化数据库。
 
-> 如果使用 MySQL 需要手动下载 [mysql-connector-java 驱动][mysql] (8.0.16) 并移动到 DolphinScheduler 的每个模块的 libs 目录下，其中包括 `api-server/libs` 和 `alert-server/libs` 和 `master-server/libs` 和 `worker-server/libs`。
+> 如果使用 MySQL，需要手动下载 [mysql-connector-java 驱动][mysql] (8.0.16) 并解压后移动到 DolphinScheduler 的每个模块的 libs 目录下，其中包括 `api-server/libs`、`alert-server/libs`、`master-server/libs`、`worker-server/libs`、`tools/libs`。
 
 对于mysql 5.6 / 5.7：
 
@@ -123,5 +123,5 @@ DolphinScheduler 分发的二进制包中包含他们。这部分数据源主要
 > 注意：如果你只是想要在数据源中心使用 MySQL，则对 MySQL JDBC 驱动的版本没有要求，如果你想要将 MySQL 作为 DolphinScheduler 的元数据库，
 > 则仅支持 [8.0.16 及以上](https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.16/mysql-connector-java-8.0.16.jar)的版本。
 
-[mysql]: https://downloads.MySQL.com/archives/c-j/
+[mysql]: https://downloads.mysql.com/archives/get/p/3/file/mysql-connector-java-8.0.16.tar.gz
 
