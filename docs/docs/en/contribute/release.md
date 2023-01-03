@@ -480,7 +480,7 @@ Website should be present before you send the announce mail this section will te
 the release version is `<VERSION>`, the following updates are required(note it will take effect immediately when the PR is merged):
 
 - Repository **apache/dolphinscheduler-website**:
-  - `download/en-us/download.md` and `download/zh-cn/download.md`: add the download of the `<VERSION>` release package
+  - `config/download.json`: add the download of the `<VERSION>` release package
   - `scripts/conf.sh`: Add new release version `<VERSION>` key-value pair to variable `DEV_RELEASE_DOCS_VERSIONS`
 - Repository **apache/dolphinscheduler** (dev branch):
   - `docs/configs/site.js`:
