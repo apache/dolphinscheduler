@@ -63,6 +63,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
+import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
 import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -164,6 +165,9 @@ public class ProcessDefinitionServiceTest {
     @Mock
     private WorkFlowLineageService workFlowLineageService;
 
+    @Mock
+    private UserMapper userMapper;
+
     protected User user;
     protected Exception exception;
     protected final static long projectCode = 1L;
@@ -221,7 +225,9 @@ public class ProcessDefinitionServiceTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testQueryProcessDefinitionListPaging() {
-        long projectCode = 1L;
+        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
+        Mockito.when(userMapper.selectList(Mockito.any())).thenReturn(Lists.newArrayList());
+
         Project project = getProject(projectCode);
 
         User loginUser = new User();

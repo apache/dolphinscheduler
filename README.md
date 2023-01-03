@@ -17,30 +17,31 @@ Dolphin Scheduler Official Website
 
 DolphinScheduler is a distributed and extensible workflow scheduler platform with powerful DAG visual interfaces, dedicated to solving complex job dependencies in the data pipeline and providing various types of jobs available `out of the box`.
 
-Its main objectives are as follows:
--  Highly Reliable,
-DolphinScheduler adopts a decentralized multi-master and multi-worker architecture design, which naturally supports easy expansion and high availability (not restricted by a single point of bottleneck), and its performance increases linearly with the increase of machines
-- High performance, supporting tens of millions of tasks every day
-- Support multi-tenant.
-- Cloud Native, DolphinScheduler supports multi-cloud/data center workflow management, also
-supports Kubernetes, Docker deployment and custom task types, distributed
-scheduling, with overall scheduling capability increased linearly with the
-scale of the cluster
-- Support various task types: Shell, MR, Spark, SQL (MySQL, PostgreSQL, hive, spark SQL), Python, Sub_Process, Procedure, etc.
-- Support scheduling of workflows and dependencies, manual scheduling to pause/stop/recover task, support failure task retry/alarm, recover specified nodes from failure, kill task, etc.
-- Associate the tasks according to the dependencies of the tasks in a DAG graph, which can visualize the running state of the task in real-time.
-- WYSIWYG online editing tasks
-- Support the priority of workflows & tasks, task failover, and task timeout alarm or failure.
-- Support workflow global parameters and node customized parameter settings.
-- Support online upload/download/management of resource files, etc. Support online file creation and editing.
-- Support task log online viewing and scrolling and downloading, etc.
-- Support the viewing of Master/Worker CPU load, memory, and CPU usage metrics.
-- Support displaying workflow history in tree/Gantt chart, as well as statistical analysis on the task status & process status in each workflow.
-- Support back-filling data.
-- Support internationalization.
-- More features waiting for partners to explore...
+The key features for DolphinScheduler are as follows:
+- Easy to deploy, we provide 4 ways to deploy, such as Standalone deployment,Cluster deployment,Docker / Kubernetes deployment and Rainbond deployment
+- Easy to use, there are four ways to create workflows:
+  - Visually, create tasks by dragging and dropping tasks
+  - [PyDolphinScheduler](https://dolphinscheduler.apache.org/python/main/index.html), Creating workflows via Python API, aka workflow-as-code
+  - Yaml definition, mapping yaml into workflow(have to install PyDolphinScheduler currently)
+  - Open API, Creating workflows
 
-## What's in DolphinScheduler
+- Highly Reliable,
+DolphinScheduler uses a decentralized multi-master and multi-worker architecture, which naturally supports horizontal scaling and high availability
+- High performance, its performance is N times faster than other orchestration platform and it can support tens of millions of tasks per day
+- Supports multi-tenancy
+- Supports various task types: Shell, MR, Spark, SQL (MySQL, PostgreSQL, Hive, Spark SQL), Python, Procedure, Sub_Workflow,
+Http, K8s, Jupyter, MLflow, SageMaker, DVC, Pytorch, Amazon EMR, etc
+- Orchestrating workflows and dependencies, you can pause/stop/recover task any time, failed tasks can be set to automatically retry
+- Visualizing the running state of the task in real-time and seeing the task runtime log
+- What you see is what you get when you edit the task on the UI
+- Backfill can be operated on the UI directly
+- Perfect project, resource, data source-level permission control
+- Displaying workflow history in tree/Gantt chart, as well as statistical analysis on the task status & process status in each workflow
+- Supports internationalization
+- Cloud Native, DolphinScheduler supports orchestrating multi-cloud/data center workflow, and 
+supports custom task type
+- More features waiting for partners to explore
+>>>>>>> 1347a8f94 ([chore] Separate Python API into another repository (#12779))
 
 |                                                                                                            Stability                                                                                                             |                                                                                     Accessibility                                                                                      |                                                                                    Features                                                                                    |                                                                                       Scalability                                                                                        |
 |----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|

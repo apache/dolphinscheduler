@@ -18,12 +18,57 @@
 import type { EditWorkflowDefinition } from '@/views/projects/workflow/components/dag/types'
 import type { IOption } from '@/components/form/types'
 
+<<<<<<< HEAD
 type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON' | 'SQL'
+=======
+type TaskExecuteType = 'STREAM' | 'BATCH'
+
+type TaskType =
+  | 'SHELL'
+  | 'SUB_PROCESS'
+  | 'PROCEDURE'
+  | 'SQL'
+  | 'SPARK'
+  | 'FLINK'
+  | 'MR'
+  | 'PYTHON'
+  | 'DEPENDENT'
+  | 'HTTP'
+  | 'DATAX'
+  | 'PIGEON'
+  | 'SQOOP'
+  | 'CONDITIONS'
+  | 'DATA_QUALITY'
+  | 'SWITCH'
+  | 'SEATUNNEL'
+  | 'EMR'
+  | 'ZEPPELIN'
+  | 'K8S'
+  | 'JUPYTER'
+  | 'MLFLOW'
+  | 'OPENMLDB'
+  | 'DVC'
+  | 'JAVA'
+  | 'DINKY'
+  | 'SAGEMAKER'
+  | 'CHUNJUN'
+  | 'FLINK_STREAM'
+  | 'PYTORCH'
+  | 'HIVECLI'
+  | 'DMS'
+  | 'DATASYNC'
+  | 'KUBEFLOW'
+  | 'LINKIS'
+
+type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON'
+
+>>>>>>> 4e09bacb1 ([Fix-13248][UI] Ironed out the issue with failing to query task instances by some state of task. (#13251))
 type DependentResultType = {
-  [key: string]: 'SUCCESS' | 'WAITING_THREAD' | 'FAILURE'
+  [key: string]: 'SUCCESS' | 'FAILURE'
 }
+
 type BDependentResultType = {
-  [key: string]: 'SUCCESS' | 'WAITING_THREAD' | 'FAILED'
+  [key: string]: 'SUCCESS' | 'FAILED'
 }
 
 interface IResource {
