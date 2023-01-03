@@ -235,7 +235,7 @@ public class ResourcePermissionCheckServiceImpl implements ResourcePermissionChe
             }
             List<Resource> ownResourceList = resourceMapper.queryResourceListAuthored(userId, -1);
             relationResources.addAll(ownResourceList);
-            return ownResourceList.stream().map(Resource::getId).collect(toSet());
+            return relationResources.stream().map(Resource::getId).collect(toSet());
         }
 
         @Override
