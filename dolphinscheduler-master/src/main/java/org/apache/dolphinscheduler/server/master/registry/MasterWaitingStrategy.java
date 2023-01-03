@@ -92,18 +92,22 @@ public class MasterWaitingStrategy implements MasterConnectStrategy {
 
     @Override
     public void reconnect() {
-        try {
-            ServerLifeCycleManager.recoverFromWaiting();
-            reStartMasterResource();
-            // reopen the resource
-            logger.info("Recover from waiting success, the current server status is {}",
-                    ServerLifeCycleManager.getServerStatus());
-        } catch (Exception e) {
-            String errorMessage =
-                    String.format("Recover from waiting failed, the current server status is %s, will stop the server",
-                            ServerLifeCycleManager.getServerStatus());
-            logger.error(errorMessage, e);
-            registryClient.getStoppable().stop(errorMessage);
+        if (ServerLifeCycleManager.isRunning()) {
+            logger.info("no need to reconnect, as the current server status is running");
+        } else {
+            try {
+                ServerLifeCycleManager.recoverFromWaiting();
+                reStartMasterResource();
+                logger.info("Recover from waiting success, the current server status is {}",
+                        ServerLifeCycleManager.getServerStatus());
+            } catch (Exception e) {
+                String errorMessage =
+                        String.format(
+                                "Recover from waiting failed, the current server status is %s, will stop the server",
+                                ServerLifeCycleManager.getServerStatus());
+                logger.error(errorMessage, e);
+                registryClient.getStoppable().stop(errorMessage);
+            }
         }
     }
 
