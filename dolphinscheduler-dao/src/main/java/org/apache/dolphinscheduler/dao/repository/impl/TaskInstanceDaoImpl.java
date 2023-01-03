@@ -92,6 +92,7 @@ public class TaskInstanceDaoImpl implements TaskInstanceDao {
             taskInstance.setState(TaskExecutionStatus.PAUSE);
         }
         taskInstance.setExecutorId(processInstance.getExecutorId());
+        taskInstance.setExecutorName(processInstance.getExecutorName());
         taskInstance.setState(getSubmitTaskState(taskInstance, processInstance));
         if (taskInstance.getSubmitTime() == null) {
             taskInstance.setSubmitTime(new Date());

@@ -33,6 +33,8 @@ public class TaskInstanceUtils {
         target.setName(source.getName());
         target.setTaskType(source.getTaskType());
         target.setProcessInstanceId(source.getProcessInstanceId());
+        target.setProcessInstanceName(source.getProcessInstanceName());
+        target.setProjectCode(source.getProjectCode());
         target.setTaskCode(source.getTaskCode());
         target.setTaskDefinitionVersion(source.getTaskDefinitionVersion());
         target.setProcessInstanceName(source.getProcessInstanceName());

@@ -260,6 +260,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
         taskInstance.setState(TaskExecutionStatus.SUBMITTED_SUCCESS);
         // set process instance id to 0
         taskInstance.setProcessInstanceId(0);
+        taskInstance.setProjectCode(taskDefinition.getProjectCode());
         // task instance type
         taskInstance.setTaskType(taskDefinition.getTaskType().toUpperCase());
         // task instance whether alert

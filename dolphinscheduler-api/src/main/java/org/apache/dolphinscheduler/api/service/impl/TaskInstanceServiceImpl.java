@@ -138,38 +138,44 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         Result result = new Result();
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> checkResult =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, TASK_INSTANCE);
-        Status status = (Status) checkResult.get(Constants.STATUS);
-        if (status != Status.SUCCESS) {
-            putMsg(result, status);
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, TASK_INSTANCE);
         int[] statusArray = null;
         if (stateType != null) {
             statusArray = new int[]{stateType.getCode()};
         }
-        Map<String, Object> checkAndParseDateResult = checkAndParseDateParameters(startDate, endDate);
-        status = (Status) checkAndParseDateResult.get(Constants.STATUS);
-        if (status != Status.SUCCESS) {
-            putMsg(result, status);
-            return result;
-        }
-        Date start = (Date) checkAndParseDateResult.get(Constants.START_TIME);
-        Date end = (Date) checkAndParseDateResult.get(Constants.END_TIME);
+        Date start = checkAndParseDateParameters(startDate);
+        Date end = checkAndParseDateParameters(endDate);
         Page<TaskInstance> page = new Page<>(pageNo, pageSize);
         PageInfo<Map<String, Object>> pageInfo = new PageInfo<>(pageNo, pageSize);
-        int executorId = usersService.getUserIdByName(executorName);
         IPage<TaskInstance> taskInstanceIPage;
         if (taskExecuteType == TaskExecuteType.STREAM) {
             // stream task without process instance
             taskInstanceIPage = taskInstanceMapper.queryStreamTaskInstanceListPaging(
-                    page, project.getCode(), processDefinitionName, searchVal, taskName, executorId, statusArray, host,
-                    taskExecuteType, start, end);
+                    page,
+                    project.getCode(),
+                    processDefinitionName,
+                    searchVal,
+                    taskName,
+                    executorName,
+                    statusArray,
+                    host,
+                    taskExecuteType,
+                    start,
+                    end);
         } else {
             taskInstanceIPage = taskInstanceMapper.queryTaskInstanceListPaging(
-                    page, project.getCode(), processInstanceId, processInstanceName, searchVal, taskName, executorId,
-                    statusArray, host, taskExecuteType, start, end);
+                    page,
+                    project.getCode(),
+                    processInstanceId,
+                    processInstanceName,
+                    searchVal,
+                    taskName,
+                    executorName,
+                    statusArray,
+                    host,
+                    taskExecuteType,
+                    start,
+                    end);
         }
         Set<String> exclusionSet = new HashSet<>();
         exclusionSet.add(Constants.CLASS);

@@ -170,6 +170,7 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
         processDefinitionMapper.insert(processDefinition);
 
         ProcessInstance processInstance = insertOne();
+        processInstance.setProjectCode(processDefinition.getProjectCode());
         processInstance.setProcessDefinitionCode(processDefinition.getCode());
         processInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
         processInstance.setIsSubProcess(Flag.NO);
@@ -184,7 +185,7 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
                 processDefinition.getProjectCode(),
                 processInstance.getProcessDefinitionCode(),
                 processInstance.getName(),
-                0,
+                "",
                 stateArray,
                 processInstance.getHost(),
                 null,

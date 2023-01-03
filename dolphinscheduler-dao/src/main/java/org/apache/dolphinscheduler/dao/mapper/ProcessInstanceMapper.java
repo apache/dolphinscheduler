@@ -101,7 +101,7 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
      * @param projectCode           projectCode
      * @param processDefinitionCode processDefinitionCode
      * @param searchVal             searchVal
-     * @param executorId            executorId
+     * @param executorName            executorName
      * @param statusArray           statusArray
      * @param host                  host
      * @param startTime             startTime
@@ -112,7 +112,7 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
                                                           @Param("projectCode") Long projectCode,
                                                           @Param("processDefinitionCode") Long processDefinitionCode,
                                                           @Param("searchVal") String searchVal,
-                                                          @Param("executorId") Integer executorId,
+                                                          @Param("executorName") String executorName,
                                                           @Param("states") int[] statusArray,
                                                           @Param("host") String host,
                                                           @Param("startTime") Date startTime,
@@ -281,6 +281,7 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
      * @return process instance IPage
      */
     IPage<ProcessInstance> queryProcessInstanceListV2Paging(Page<ProcessInstance> page,
+                                                            @Param("projectCode") Long projectCode,
                                                             @Param("processDefinitionCode") Long processDefinitionCode,
                                                             @Param("name") String name,
                                                             @Param("startTime") String startTime,

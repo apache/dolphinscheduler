@@ -1183,6 +1183,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         taskInstance.setState(TaskExecutionStatus.SUBMITTED_SUCCESS);
         // process instance id
         taskInstance.setProcessInstanceId(processInstance.getId());
+        taskInstance.setProcessInstanceName(processInstance.getName());
+        taskInstance.setProjectCode(processInstance.getProjectCode());
         // task instance type
         taskInstance.setTaskType(taskNode.getType().toUpperCase());
         // task instance whether alert

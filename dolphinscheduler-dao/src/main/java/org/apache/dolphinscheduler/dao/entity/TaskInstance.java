@@ -70,30 +70,16 @@ public class TaskInstance implements Serializable {
      */
     private String taskType;
 
-    /**
-     * process instance id
-     */
     private int processInstanceId;
 
-    /**
-     * task code
-     */
-    private long taskCode;
-
-    /**
-     * task definition version
-     */
-    private int taskDefinitionVersion;
-
-    /**
-     * process instance name
-     */
-    @TableField(exist = false)
     private String processInstanceName;
 
-    /**
-     * process definition name
-     */
+    private Long projectCode;
+
+    private long taskCode;
+
+    private int taskDefinitionVersion;
+
     @TableField(exist = false)
     private String processDefinitionName;
 
@@ -269,10 +255,6 @@ public class TaskInstance implements Serializable {
      */
     private String varPool;
 
-    /**
-     * executor name
-     */
-    @TableField(exist = false)
     private String executorName;
 
     @TableField(exist = false)

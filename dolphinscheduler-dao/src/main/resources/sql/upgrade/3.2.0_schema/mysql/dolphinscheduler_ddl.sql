@@ -218,3 +218,67 @@ d//
 delimiter ;
 CALL add_t_ds_task_instance_idx_cache_key;
 DROP PROCEDURE add_t_ds_task_instance_idx_cache_key;
+
+-- ALTER TABLE `t_ds_process_instance` ADD column `project_code`, `process_definition_name`, `executor_name`, `tenant_code`;
+drop PROCEDURE if EXISTS add_t_ds_process_instance_add_project_code;
+delimiter d//
+CREATE PROCEDURE add_t_ds_process_instance_add_project_code()
+BEGIN
+   IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_process_instance'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='project_code')
+   THEN
+ALTER TABLE t_ds_process_instance ADD `project_code` bigint(20) DEFAULT NULL COMMENT 'project code';
+END IF;
+   IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_process_instance'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='executor_name')
+   THEN
+ALTER TABLE t_ds_process_instance ADD `executor_name` varchar(64) DEFAULT NULL COMMENT 'execute user name';
+END IF;
+   IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_process_instance'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='tenant_code')
+   THEN
+ALTER TABLE t_ds_process_instance ADD `tenant_code` varchar(64) DEFAULT NULL COMMENT 'tenant code';
+END IF;
+END;
+d//
+delimiter ;
+CALL add_t_ds_process_instance_add_project_code;
+DROP PROCEDURE add_t_ds_process_instance_add_project_code;
+
+-- ALTER TABLE `t_ds_task_instance` ADD column `project_code`, `process_definition_name`, `executor_name`, `tenant_code`;
+drop PROCEDURE if EXISTS add_t_ds_task_instance_add_project_code;
+delimiter d//
+CREATE PROCEDURE add_t_ds_task_instance_add_project_code()
+BEGIN
+   IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_task_instance'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='process_instance_name')
+   THEN
+ALTER TABLE t_ds_task_instance ADD `process_instance_name` varchar(255) DEFAULT NULL COMMENT 'process instance name';
+END IF;
+   IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_task_instance'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='project_code')
+   THEN
+ALTER TABLE t_ds_task_instance ADD `project_code` bigint(20) DEFAULT NULL COMMENT 'project code';
+END IF;
+   IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_task_instance'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='executor_name')
+   THEN
+ALTER TABLE t_ds_task_instance ADD `executor_name` varchar(64) DEFAULT NULL COMMENT 'execute user name';
+END IF;
+END;
+d//
+delimiter ;
+CALL add_t_ds_task_instance_add_project_code;
+DROP PROCEDURE add_t_ds_task_instance_add_project_code;
