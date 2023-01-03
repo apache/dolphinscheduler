@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.utils;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -37,6 +37,7 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
 import org.slf4j.Logger;
+import org.slf4j.MDC;
 
 @Slf4j
 @UtilityClass
@@ -72,5 +73,45 @@ public class LogUtils {
             logger.error("Get appId from log file erro, logPath: {}", logPath, e);
             return Collections.emptyList();
         }
+    }
+
+    public static String readWholeFileContent(String filePath) {
+        String line;
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath)))) {
+            while ((line = br.readLine()) != null) {
+                sb.append(line + "\r\n");
+            }
+            return sb.toString();
+        } catch (IOException e) {
+            log.error("read file error", e);
+        }
+        return "";
+    }
+
+    public static void setWorkflowAndTaskInstanceIDMDC(Integer workflowInstanceId, Integer taskInstanceId) {
+        setWorkflowInstanceIdMDC(workflowInstanceId);
+        setTaskInstanceIdMDC(taskInstanceId);
+    }
+
+    public static void setWorkflowInstanceIdMDC(Integer workflowInstanceId) {
+        MDC.put(Constants.WORKFLOW_INSTANCE_ID_MDC_KEY, String.valueOf(workflowInstanceId));
+    }
+
+    public static void setTaskInstanceIdMDC(Integer taskInstanceId) {
+        MDC.put(Constants.TASK_INSTANCE_ID_MDC_KEY, String.valueOf(taskInstanceId));
+    }
+
+    public static void removeWorkflowAndTaskInstanceIdMDC() {
+        removeWorkflowInstanceIdMDC();
+        removeTaskInstanceIdMDC();
+    }
+
+    public static void removeWorkflowInstanceIdMDC() {
+        MDC.remove(Constants.WORKFLOW_INSTANCE_ID_MDC_KEY);
+    }
+
+    public static void removeTaskInstanceIdMDC() {
+        MDC.remove(Constants.TASK_INSTANCE_ID_MDC_KEY);
     }
 }
