@@ -17,8 +17,12 @@
 
 package org.apache.dolphinscheduler.dao.utils;
 
+import static org.apache.dolphinscheduler.common.constants.Constants.CRC_SUFFIX;
+
 import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
@@ -35,12 +39,15 @@ import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 class TaskCacheUtilsTest {
 
     private TaskInstance taskInstance;
 
     private TaskExecutionContext taskExecutionContext;
+
+    private StorageOperate storageOperate;
 
     @BeforeEach
     void setUp() {
@@ -95,6 +102,7 @@ class TaskCacheUtilsTest {
         prepareParamsMap.put("a", property);
         taskExecutionContext.setPrepareParamsMap(prepareParamsMap);
 
+        storageOperate = Mockito.mock(StorageOperate.class);
     }
 
     @Test
@@ -121,25 +129,26 @@ class TaskCacheUtilsTest {
 
     @Test
     void TestGetTaskInputVarPoolData() {
-        TaskCacheUtils.getTaskInputVarPoolData(taskInstance, taskExecutionContext);
+        TaskCacheUtils.getTaskInputVarPoolData(taskInstance, taskExecutionContext, storageOperate);
         // only a=aa and c=cc will influence the result,
         // b=bb is a fixed value, will be considered in task version
         // k=kk is not in task params, will be ignored
         String except =
                 "[{\"prop\":\"a\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"aa\"},{\"prop\":\"c\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"cc\"}]";
-        Assertions.assertEquals(except, TaskCacheUtils.getTaskInputVarPoolData(taskInstance, taskExecutionContext));
+        Assertions.assertEquals(except,
+                TaskCacheUtils.getTaskInputVarPoolData(taskInstance, taskExecutionContext, storageOperate));
     }
 
     @Test
     void TestGenerateCacheKey() {
-        String cacheKeyBase = TaskCacheUtils.generateCacheKey(taskInstance, taskExecutionContext);
+        String cacheKeyBase = TaskCacheUtils.generateCacheKey(taskInstance, taskExecutionContext, storageOperate);
         Property propertyI = new Property();
         propertyI.setProp("i");
         propertyI.setDirect(Direct.IN);
         propertyI.setType(DataType.VARCHAR);
         propertyI.setValue("ii");
         taskExecutionContext.getPrepareParamsMap().put("i", propertyI);
-        String cacheKeyNew = TaskCacheUtils.generateCacheKey(taskInstance, taskExecutionContext);
+        String cacheKeyNew = TaskCacheUtils.generateCacheKey(taskInstance, taskExecutionContext, storageOperate);
         // i will not influence the result, because task instance not use it
         Assertions.assertEquals(cacheKeyBase, cacheKeyNew);
 
@@ -149,17 +158,17 @@ class TaskCacheUtilsTest {
         propertyD.setType(DataType.VARCHAR);
         propertyD.setValue("dd");
         taskExecutionContext.getPrepareParamsMap().put("i", propertyD);
-        String cacheKeyD = TaskCacheUtils.generateCacheKey(taskInstance, taskExecutionContext);
+        String cacheKeyD = TaskCacheUtils.generateCacheKey(taskInstance, taskExecutionContext, storageOperate);
         // d will influence the result, because task instance use it
         Assertions.assertNotEquals(cacheKeyBase, cacheKeyD);
 
         taskInstance.setTaskDefinitionVersion(100);
-        String cacheKeyE = TaskCacheUtils.generateCacheKey(taskInstance, taskExecutionContext);
+        String cacheKeyE = TaskCacheUtils.generateCacheKey(taskInstance, taskExecutionContext, storageOperate);
         // task definition version is changed, so cache key changed
         Assertions.assertNotEquals(cacheKeyD, cacheKeyE);
 
         taskInstance.setEnvironmentConfig("export PYTHON_HOME=/bin/python3");
-        String cacheKeyF = TaskCacheUtils.generateCacheKey(taskInstance, taskExecutionContext);
+        String cacheKeyF = TaskCacheUtils.generateCacheKey(taskInstance, taskExecutionContext, storageOperate);
         // EnvironmentConfig is changed, so cache key changed
         Assertions.assertNotEquals(cacheKeyE, cacheKeyF);
     }
@@ -168,5 +177,24 @@ class TaskCacheUtilsTest {
     void testGetCacheKey() {
         String cacheKey = TaskCacheUtils.generateTagCacheKey(1, "123");
         Assertions.assertEquals("1-123", cacheKey);
+    }
+
+    @Test
+    void testReplaceWithCheckSum() {
+        String content = "abcdefg";
+        String filePath = "test/testFile.txt";
+        FileUtils.writeContent2File(content, filePath + CRC_SUFFIX);
+
+        Property property = new Property();
+        property.setProp("f1");
+        property.setValue("testFile.txt");
+        property.setType(DataType.FILE);
+        property.setDirect(Direct.IN);
+        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
+        taskExecutionContext.setExecutePath("test");
+        taskExecutionContext.setTenantCode("aaa");
+
+        String crc = TaskCacheUtils.getValCheckSum(property, taskExecutionContext, storageOperate);
+        Assertions.assertEquals(crc, content);
     }
 }
