@@ -482,7 +482,7 @@ git push --delete "${GH_REMOTE}" "${VERSION}-prepare"
 官网应该在您发送通知邮件之前完成更新，本节将告诉您如何更改网站。假设发版的版本是 `<VERSION>`，需要进行以下更新（注意，当修改 pull requests 被 merge 后就会生效）:
 
 - **apache/dolphinscheduler-website** 仓库：
-  - `download/en-us/download.md` 和 `download/zh-cn/download.md`: 增加 `<VERSION>` 版本发布包的下载
+  - `config/download.json`: 增加 `<VERSION>` 版本发布包的下载
   - `scripts/conf.sh`: 在变量 `DEV_RELEASE_DOCS_VERSIONS` 中增加版本为 `<VERSION>` 的新键值对
 - **apache/dolphinscheduler** 仓库 (dev 分支)：
   - `docs/configs/site.js`:
