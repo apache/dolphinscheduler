@@ -20,10 +20,17 @@ package org.apache.dolphinscheduler.tools.datasource;
 import org.apache.dolphinscheduler.dao.upgrade.SchemaUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.tools.datasource.dao.UpgradeDao;
+import org.apache.dolphinscheduler.tools.datasource.upgrader.DolphinSchedulerUpgrader;
+
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
@@ -38,13 +45,20 @@ public class DolphinSchedulerManager {
 
     private final UpgradeDao upgradeDao;
 
-    public DolphinSchedulerManager(DataSource dataSource, List<UpgradeDao> daos) throws Exception {
+    private Map<String, DolphinSchedulerUpgrader> upgraderMap = new HashMap<>();
+
+    public DolphinSchedulerManager(DataSource dataSource, List<UpgradeDao> daos,
+                                   List<DolphinSchedulerUpgrader> dolphinSchedulerUpgraders) throws Exception {
         final DbType type = getCurrentDbType(dataSource);
         upgradeDao = daos.stream()
                 .filter(it -> it.getDbType() == type)
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException(
                         "Cannot find UpgradeDao implementation for db type: " + type));
+        if (CollectionUtils.isNotEmpty(dolphinSchedulerUpgraders)) {
+            upgraderMap = dolphinSchedulerUpgraders.stream()
+                    .collect(Collectors.toMap(DolphinSchedulerUpgrader::getCurrentVersion, Function.identity()));
+        }
     }
 
     private DbType getCurrentDbType(DataSource dataSource) throws Exception {
@@ -113,6 +127,10 @@ public class DolphinSchedulerManager {
                         upgradeDao.upgradeDolphinSchedulerResourceList();
                     } else if ("2.0.0".equals(schemaVersion)) {
                         upgradeDao.upgradeDolphinSchedulerTo200(schemaDir);
+                    }
+                    DolphinSchedulerUpgrader dolphinSchedulerUpgrader = upgraderMap.get(schemaVersion);
+                    if (dolphinSchedulerUpgrader != null) {
+                        dolphinSchedulerUpgrader.doUpgrade();
                     }
                     version = schemaVersion;
                 }

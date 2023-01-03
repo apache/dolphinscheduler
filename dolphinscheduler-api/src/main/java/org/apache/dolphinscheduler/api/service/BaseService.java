@@ -18,10 +18,12 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -107,12 +109,8 @@ public interface BaseService {
 
     /**
      * check and parse date parameters
-     *
-     * @param startDateStr start date string
-     * @param endDateStr end date string
-     * @return map<status,startDate,endDate>
      */
-    Map<String, Object> checkAndParseDateParameters(String startDateStr, String endDateStr);
+    Date checkAndParseDateParameters(String startDateStr) throws ServiceException;
 
     /**
      * check checkDescriptionLength

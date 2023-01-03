@@ -17,14 +17,18 @@
 
 package org.apache.dolphinscheduler.tools.datasource;
 
+import org.apache.dolphinscheduler.dao.DaoConfiguration;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+@ImportAutoConfiguration(DaoConfiguration.class)
 @SpringBootApplication
 public class UpgradeDolphinScheduler {
 
