@@ -33,6 +33,7 @@ public class BeanConfigTest {
     @Autowired
     private AlertClientService alertClientService;
 
+
     @Test
     public void alertClientService() {
         Assert.assertNotNull(alertClientService);
