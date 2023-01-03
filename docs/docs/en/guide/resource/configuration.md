@@ -9,7 +9,7 @@
 
 ### Configure `common.properties`
 
-Dolphinscheduler Resource Center uses the local system is enabled by default, and does not require any additional configuration.
+DolphinScheduler Resource Center uses local file system by default, and does not require any additional configuration.
 But please make sure to change the following configuration at the same time when you need to modify the default value.
 
 - If you deploy DolphinScheduler in `Cluster` or `Pseudo-Cluster` mode, you need to configure `api-server/conf/common.properties` and `worker-server/conf/common.properties`.
