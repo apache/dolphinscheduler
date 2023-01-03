@@ -96,6 +96,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskMainInfo;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.UserWithProcessDefinitionCode;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
@@ -111,6 +112,7 @@ import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
 import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
+import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.SqlType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -118,7 +120,6 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -592,13 +593,16 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         Map<Long, Schedule> scheduleMap = schedulerService.queryScheduleByProcessDefinitionCodes(processDefinitionCodes)
                 .stream()
                 .collect(Collectors.toMap(Schedule::getProcessDefinitionCode, Function.identity()));
-
+        List<UserWithProcessDefinitionCode> userWithCodes = userMapper.queryUserWithProcessDefinitionCode(
+                processDefinitionCodes);
         for (ProcessDefinition pd : processDefinitions) {
-            // todo: use batch query
-            ProcessDefinitionLog processDefinitionLog =
-                    processDefinitionLogMapper.queryByDefinitionCodeAndVersion(pd.getCode(), pd.getVersion());
-            User user = userMapper.selectById(processDefinitionLog.getOperator());
-            pd.setModifyBy(user.getUserName());
+            userWithCodes.stream()
+                    .filter(userWithCode -> userWithCode.getProcessDefinitionCode() == pd.getCode()
+                            && userWithCode.getProcessDefinitionVersion() == pd.getVersion())
+                    .findAny().ifPresent(userWithCode -> {
+                        pd.setModifyBy(userWithCode.getModifierName());
+                        pd.setUserName(userWithCode.getCreatorName());
+                    });
             Schedule schedule = scheduleMap.get(pd.getCode());
             pd.setScheduleReleaseState(schedule == null ? null : schedule.getReleaseState());
         }

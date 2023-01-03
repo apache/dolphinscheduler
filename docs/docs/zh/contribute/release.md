@@ -358,7 +358,7 @@ svn --username="${A_USERNAME}" commit -m "release ${VERSION}"
 
 #### 检查二进制包的文件内容
 
-解压缩`apache-dolphinscheduler-<VERSION>-src.tar.gz`进行如下检查:
+解压缩`apache-dolphinscheduler-<VERSION>-bin.tar.gz`进行如下检查:
 
 - 存在`LICENSE`和`NOTICE`文件
 - 所有文本文件开头都有 ASF 许可证
@@ -415,7 +415,7 @@ Release Commit ID: https://github.com/apache/dolphinscheduler/commit/<SHA-VALUE>
 
 Keys to verify the Release Candidate: https://downloads.apache.org/dolphinscheduler/KEYS
 
-Look at here for how to verify this release candidate: https://dolphinscheduler.apache.org/#/zh-cn/docs/3.1.2/contribute/release/release
+Look at here for how to verify this release candidate: https://dolphinscheduler.apache.org/zh-cn/docs/3.1.2/contribute/release/release
 
 The vote will be open for at least 72 hours or until necessary number of votes are reached.
 
@@ -564,7 +564,7 @@ Dolphin Scheduler is a distributed and easy-to-extend visual workflow scheduler 
 dedicated to solving the complex task dependencies in data processing, making the scheduler system out of the box for data processing.
 
 
-Download Links: https://dolphinscheduler.apache.org/#/zh-cn/download
+Download Links: https://dolphinscheduler.apache.org/zh-cn/download
 
 Release Notes: https://github.com/apache/dolphinscheduler/releases/tag/<VERSION>
 
@@ -573,7 +573,7 @@ Website: https://dolphinscheduler.apache.org/
 DolphinScheduler Resources:
 - Issue: https://github.com/apache/dolphinscheduler/issues/
 - Mailing list: dev@dolphinscheduler.apache.org
-- Documents: https://dolphinscheduler.apache.org/#/zh-cn/docs/<VERSION>/about/introduction
+- Documents: https://dolphinscheduler.apache.org/zh-cn/docs/<VERSION>/about/introduction
 ```
 
 ## News

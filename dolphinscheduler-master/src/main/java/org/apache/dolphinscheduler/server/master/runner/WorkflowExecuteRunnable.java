@@ -154,6 +154,12 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
     private DAG<String, TaskNode, TaskNodeRelation> dag;
 
     /**
+     * full task node map, key is task node id, value is task node
+     * # TODO: This field can be removed later if the dag is complete
+     */
+    private Map<Long, TaskNode> taskNodesMap;
+
+    /**
      * unique key of workflow
      */
     private String key;
@@ -809,6 +815,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             }
         });
 
+        taskNodesMap = taskNodeList.stream().collect(Collectors.toMap(TaskNode::getCode, taskNode -> taskNode));
+
         // generate process to get DAG info
         List<String> recoveryNodeCodeList = getRecoveryNodeCodeList(recoverNodeList);
         List<String> startNodeNameList = parseStartNodeName(processInstance.getCommandParam());
@@ -991,7 +999,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
 
             // if we use task group, then need to acquire the task group resource
             // if there is no resource the current task instance will not be dispatched
-            // it will be weakup when other tasks release the resource.
+            // it will be wakeup when other tasks release the resource.
             int taskGroupId = taskInstance.getTaskGroupId();
             if (taskGroupId > 0) {
                 boolean acquireTaskGroup = processService.acquireTaskGroup(taskInstance.getId(),
@@ -1115,7 +1123,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         newTaskInstance.setProcessDefine(taskInstance.getProcessDefine());
         newTaskInstance.setProcessInstance(processInstance);
         newTaskInstance.setRetryTimes(taskInstance.getRetryTimes() + 1);
-        // todo relative funtion: TaskInstance.retryTaskIntervalOverTime
+        // todo relative function: TaskInstance.retryTaskIntervalOverTime
         newTaskInstance.setState(taskInstance.getState());
         newTaskInstance.setEndTime(taskInstance.getEndTime());
 
@@ -1857,8 +1865,10 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             // init varPool only this task is the first time running
             if (task.isFirstRun()) {
                 // get pre task ,get all the task varPool to this task
-                Set<String> preTask = dag.getPreviousNodes(Long.toString(task.getTaskCode()));
-                getPreVarPool(task, preTask);
+                // Do not use dag.getPreviousNodes because of the dag may be miss the upstream node
+                String preTasks = taskNodesMap.get(task.getTaskCode()).getPreTasks();
+                Set<String> preTaskList = new HashSet<>(JSONUtils.toList(preTasks, String.class));
+                getPreVarPool(task, preTaskList);
             }
             DependResult dependResult = getDependResultForTask(task);
             if (DependResult.SUCCESS == dependResult) {
