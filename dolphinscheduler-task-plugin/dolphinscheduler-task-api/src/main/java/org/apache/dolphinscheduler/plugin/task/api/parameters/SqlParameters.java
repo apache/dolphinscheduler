@@ -246,7 +246,7 @@ public class SqlParameters extends AbstractParameters {
             return;
         }
         if (StringUtils.isEmpty(result)) {
-            varPool.addAll(outProperty);
+            outProperty.forEach(this::addPropertyToValPool);
             return;
         }
         List<Map<String, String>> sqlResult = getListMapByString(result);
@@ -269,7 +269,7 @@ public class SqlParameters extends AbstractParameters {
             for (Property info : outProperty) {
                 if (info.getType() == DataType.LIST) {
                     info.setValue(JSONUtils.toJsonString(sqlResultFormat.get(info.getProp())));
-                    varPool.add(info);
+                    addPropertyToValPool(info);
                 }
             }
         } else {
@@ -277,7 +277,7 @@ public class SqlParameters extends AbstractParameters {
             Map<String, String> firstRow = sqlResult.get(0);
             for (Property info : outProperty) {
                 info.setValue(String.valueOf(firstRow.get(info.getProp())));
-                varPool.add(info);
+                addPropertyToValPool(info);
             }
         }
 
