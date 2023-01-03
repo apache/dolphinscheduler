@@ -553,6 +553,7 @@ public class ProcessDefinitionServiceTest {
         Project project = getProject(projectCode);
         User loginUser = new User();
         loginUser.setId(1);
+
         loginUser.setUserType(UserType.GENERAL_USER);
 
         // project check auth fail
