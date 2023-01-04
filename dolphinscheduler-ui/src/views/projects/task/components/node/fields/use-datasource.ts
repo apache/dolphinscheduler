@@ -108,6 +108,11 @@ export function useDatasource(
       code: 'AZURESQL',
       disabled: false
     },
+    {
+      id: 15,
+      code: 'DAMENG',
+      disabled: false
+    }
   ]
 
   const getDatasourceTypes = async () => {

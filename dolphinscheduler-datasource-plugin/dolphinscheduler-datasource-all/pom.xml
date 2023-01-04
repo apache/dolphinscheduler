@@ -97,5 +97,10 @@
             <artifactId>dolphinscheduler-datasource-azure-sql</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-datasource-dameng</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 </project>

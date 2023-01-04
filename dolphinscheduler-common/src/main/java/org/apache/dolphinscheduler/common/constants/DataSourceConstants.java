@@ -36,6 +36,7 @@ public class DataSourceConstants {
     public static final String COM_REDSHIFT_JDBC_DRIVER = "com.amazon.redshift.jdbc42.Driver";
     public static final String COM_ATHENA_JDBC_DRIVER = "com.simba.athena.jdbc.Driver";
     public static final String COM_TRINO_JDBC_DRIVER = "io.trino.jdbc.TrinoDriver";
+    public static final String COM_DAMENG_JDBC_DRIVER = "dm.jdbc.driver.DmDriver";
 
     /**
      * validation Query
@@ -51,6 +52,7 @@ public class DataSourceConstants {
     public static final String REDHIFT_VALIDATION_QUERY = "select 1";
     public static final String ATHENA_VALIDATION_QUERY = "select 1";
     public static final String TRINO_VALIDATION_QUERY = "select 1";
+    public static final String DAMENG_VALIDATION_QUERY = "select 1";
 
     /**
      * jdbc url
@@ -67,6 +69,7 @@ public class DataSourceConstants {
     public static final String JDBC_REDSHIFT = "jdbc:redshift://";
     public static final String JDBC_ATHENA = "jdbc:awsathena://";
     public static final String JDBC_TRINO = "jdbc:trino://";
+    public static final String JDBC_DAMENG = "jdbc:dm://";
 
     /**
      * database type

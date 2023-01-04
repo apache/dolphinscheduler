@@ -516,7 +516,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     reactor-core 3.4.22: https://mvnrepository.com/artifact/io.projectreactor/reactor-core/3.4.22, Apache 2.0
     reactor-netty-core 1.0.22: https://mvnrepository.com/artifact/io.projectreactor.netty/reactor-netty-core/1.0.22, Apache 2.0
     reactor-netty-http 1.0.22: https://mvnrepository.com/artifact/io.projectreactor.netty/reactor-netty-http/1.0.22, Apache 2.0
-
+    DmJdbcDriver18 8.1.2.79: https://mvnrepository.com/artifact/com.dameng/DmJdbcDriver18/8.1.2.79, Apache 2.0
 
 jna-platform
 
