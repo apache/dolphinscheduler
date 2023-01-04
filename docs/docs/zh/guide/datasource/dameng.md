@@ -1,6 +1,6 @@
 # DAMENG数据源
 
-![dameng](../../../../img/new_ui/dev/datasource/dameng_cn.png)
+![dameng](../../../../img/new_ui/dev/datasource/dameng.png)
 
 - 数据源：选择 DAMENG
 - 数据源名称：输入数据源的名称

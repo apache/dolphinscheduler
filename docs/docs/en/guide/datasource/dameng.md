@@ -1,6 +1,6 @@
 # DAMENG
 
-![dameng](../../../../img/new_ui/dev/datasource/dameng_en.png)
+![dameng](../../../../img/new_ui/dev/datasource/dameng.png)
 
 ## Datasource Parameters
 
