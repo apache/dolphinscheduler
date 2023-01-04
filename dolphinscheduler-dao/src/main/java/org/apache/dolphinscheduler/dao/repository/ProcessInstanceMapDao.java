@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.dao.repository;
 
 import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
 
+import java.util.List;
+
 /**
  * Process Instance Map DAO
  */
@@ -46,4 +48,7 @@ public interface ProcessInstanceMapDao {
      */
     ProcessInstanceMap findWorkProcessMapByParent(Integer parentWorkProcessId, Integer parentTaskId);
 
+    List<Integer> querySubWorkflowInstanceIds(int workflowInstanceId);
+
+    void deleteByParentId(int workflowInstanceId);
 }

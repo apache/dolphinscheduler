@@ -24,6 +24,8 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 
+import org.apache.commons.collections4.CollectionUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -87,5 +89,13 @@ public class TaskDefinitionLogDaoImpl implements TaskDefinitionLogDao {
             taskDefinitionLogs.add((TaskDefinitionLog) taskDefinitionDao.findTaskDefinition(code, version));
         });
         return taskDefinitionLogs;
+    }
+
+    @Override
+    public void deleteByTaskDefinitionCodes(Set<Long> taskDefinitionCodes) {
+        if (CollectionUtils.isEmpty(taskDefinitionCodes)) {
+            return;
+        }
+        taskDefinitionLogMapper.deleteByTaskDefinitionCodes(taskDefinitionCodes);
     }
 }

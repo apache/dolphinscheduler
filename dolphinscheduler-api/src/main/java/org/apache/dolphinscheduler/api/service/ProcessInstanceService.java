@@ -221,4 +221,9 @@ public interface ProcessInstanceService {
      */
     List<ProcessInstance> queryByProcessDefineCode(Long processDefinitionCode,
                                                    int size);
+
+    void deleteProcessInstanceByWorkflowDefinitionCode(long workflowDefinitionCode);
+
+    void deleteProcessInstanceById(int workflowInstanceId);
+
 }

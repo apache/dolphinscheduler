@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,5 +79,21 @@ public class ProcessDefinitionDaoImpl implements ProcessDefinitionDao {
                 processDefinitionLogs.stream().map(log -> (ProcessDefinition) log).collect(Collectors.toList());
 
         return processDefinitions;
+    }
+
+    @Override
+    public Optional<ProcessDefinition> queryByCode(long code) {
+        return Optional.ofNullable(
+                processDefinitionMapper.queryByCode(code));
+    }
+
+    @Override
+    public void deleteById(Integer workflowDefinitionId) {
+        processDefinitionMapper.deleteById(workflowDefinitionId);
+    }
+
+    @Override
+    public void deleteByWorkflowDefinitionCode(long workflowDefinitionCode) {
+        processDefinitionMapper.deleteByCode(workflowDefinitionCode);
     }
 }

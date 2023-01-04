@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Task Definition Log DAO
@@ -41,4 +42,5 @@ public interface TaskDefinitionLogDao {
      */
     List<TaskDefinitionLog> getTaskDefineLogListByRelation(List<ProcessTaskRelation> processTaskRelations);
 
+    void deleteByTaskDefinitionCodes(Set<Long> taskDefinitionCodes);
 }

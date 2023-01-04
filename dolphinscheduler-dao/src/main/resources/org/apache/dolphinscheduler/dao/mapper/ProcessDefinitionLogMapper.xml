@@ -82,4 +82,10 @@
         where code = #{code}
           and version = #{version}
     </delete>
+
+    <delete id="deleteByProcessDefinitionCode">
+        delete
+        from t_ds_process_definition_log
+        where code = #{workflowDefinitionCode}
+    </delete>
 </mapper>

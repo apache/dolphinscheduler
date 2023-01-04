@@ -338,6 +338,15 @@ public class AlertDao {
         if (processInstanceId == null) {
             return;
         }
+        List<Alert> alertList = alertMapper.selectByWorkflowInstanceId(processInstanceId);
+        if (CollectionUtils.isEmpty(alertList)) {
+            return;
+        }
         alertMapper.deleteByWorkflowInstanceId(processInstanceId);
+        List<Integer> alertIds = alertList
+                .stream()
+                .map(Alert::getId)
+                .collect(Collectors.toList());
+        alertSendStatusMapper.deleteByAlertIds(alertIds);
     }
 }

@@ -248,14 +248,7 @@ public interface ProcessDefinitionService {
                                                             long projectCode,
                                                             String codes);
 
-    /**
-     * delete process definition by code
-     *
-     * @param loginUser login user
-     * @param code process definition code
-     */
-    void deleteProcessDefinitionByCode(User loginUser,
-                                       long code);
+    void deleteProcessDefinitionByCode(User loginUser, long workflowDefinitionCode);
 
     /**
      * release process definition: online / offline

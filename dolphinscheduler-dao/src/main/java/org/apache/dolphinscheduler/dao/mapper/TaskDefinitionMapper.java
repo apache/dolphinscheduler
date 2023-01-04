@@ -156,4 +156,6 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
      * @return deleted row count
      */
     int deleteByBatchCodes(@Param("taskCodeList") List<Long> taskCodeList);
+
+    void deleteByWorkflowDefinitionCodeAndVersion(long workflowDefinitionCode, int workflowDefinitionVersion);
 }

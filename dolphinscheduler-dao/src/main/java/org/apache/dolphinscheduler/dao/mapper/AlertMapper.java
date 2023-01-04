@@ -46,4 +46,6 @@ public interface AlertMapper extends BaseMapper<Alert> {
                                     @Param("crashAlarmSuppressionStartTime") Date crashAlarmSuppressionStartTime);
 
     void deleteByWorkflowInstanceId(@Param("workflowInstanceId") Integer processInstanceId);
+
+    List<Alert> selectByWorkflowInstanceId(@Param("workflowInstanceId") Integer processInstanceId);
 }

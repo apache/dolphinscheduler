@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.dao.repository;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Task Instance DAO
@@ -41,4 +42,7 @@ public interface TaskDefinitionDao {
      */
     TaskDefinition findTaskDefinition(long taskCode, int taskDefinitionVersion);
 
+    void deleteByWorkflowDefinitionCodeAndVersion(long workflowDefinitionCode, int workflowDefinitionVersion);
+
+    void deleteByTaskDefinitionCodes(Set<Long> needToDeleteTaskDefinitionCodes);
 }
