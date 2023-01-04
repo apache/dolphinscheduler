@@ -40,6 +40,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
+import org.apache.dolphinscheduler.dao.repository.DqExecuteResultDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.TaskCacheUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -47,6 +48,7 @@ import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
 import org.apache.dolphinscheduler.remote.command.TaskSavePointRequestCommand;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.service.log.LogClient;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.apache.commons.lang3.StringUtils;
@@ -62,6 +64,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -91,6 +94,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
     @Autowired
     TaskInstanceDao taskInstanceDao;
 
+    @Lazy
     @Autowired
     ProcessInstanceService processInstanceService;
 
@@ -102,6 +106,12 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
 
     @Autowired
     private StateEventCallbackService stateEventCallbackService;
+
+    @Autowired
+    private LogClient logClient;
+
+    @Autowired
+    private DqExecuteResultDao dqExecuteResultDao;
 
     /**
      * query task list by project, process instance, task name, task start time, task end time, task status, keyword paging
@@ -359,6 +369,29 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         }
         putMsg(result, Status.SUCCESS);
         return new TaskInstanceRemoveCacheResponse(result, cacheKey);
+    }
+
+    @Override
+    public void deleteByWorkflowInstanceId(Integer workflowInstanceId) {
+        List<TaskInstance> needToDeleteTaskInstances =
+                taskInstanceDao.findTaskInstanceByWorkflowInstanceId(workflowInstanceId);
+        if (org.apache.commons.collections4.CollectionUtils.isEmpty(needToDeleteTaskInstances)) {
+            return;
+        }
+        for (TaskInstance taskInstance : needToDeleteTaskInstances) {
+            // delete log
+            if (StringUtils.isNotEmpty(taskInstance.getLogPath())) {
+                try {
+                    logClient.removeTaskLog(Host.of(taskInstance.getHost()), taskInstance.getLogPath());
+                } catch (Exception e) {
+                    logger.error(
+                            "Remove task log error, meet an unknown exception, taskInstanceId: {}, host: {}, logPath: {}",
+                            taskInstance.getId(), taskInstance.getHost(), taskInstance.getLogPath(), e);
+                }
+            }
+        }
+        dqExecuteResultDao.deleteByWorkflowInstanceId(workflowInstanceId);
+        taskInstanceDao.deleteByWorkflowInstanceId(workflowInstanceId);
     }
 
 }

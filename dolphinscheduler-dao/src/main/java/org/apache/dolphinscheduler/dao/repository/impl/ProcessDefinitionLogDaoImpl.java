@@ -15,19 +15,22 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.mapper;
+package org.apache.dolphinscheduler.dao.repository.impl;
 
-import org.apache.dolphinscheduler.dao.entity.AlertSendStatus;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
+import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionLogDao;
 
-import org.apache.ibatis.annotations.Param;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
-import java.util.List;
+@Repository
+public class ProcessDefinitionLogDaoImpl implements ProcessDefinitionLogDao {
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+    @Autowired
+    private ProcessDefinitionLogMapper processDefinitionLogMapper;
 
-public interface AlertSendStatusMapper extends BaseMapper<AlertSendStatus> {
-
-    int batchInsert(List<AlertSendStatus> alertSendStatuses);
-
-    void deleteByAlertIds(@Param("alertIds") List<Integer> alertIds);
+    @Override
+    public void deleteByWorkflowDefinitionCode(long workflowDefinitionCode) {
+        processDefinitionLogMapper.deleteByProcessDefinitionCode(workflowDefinitionCode);
+    }
 }
