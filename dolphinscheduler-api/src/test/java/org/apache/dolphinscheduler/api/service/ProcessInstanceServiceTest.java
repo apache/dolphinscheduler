@@ -262,7 +262,7 @@ public class ProcessInstanceServiceTest {
     }
 
     @Test
-    public void  queryByTriggerCode() {
+    public void queryByTriggerCode() {
         long projectCode = 666L;
         User loginUser = getAdminUser();
         Project project = getProject(projectCode);
@@ -272,15 +272,15 @@ public class ProcessInstanceServiceTest {
         // project auth fail
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
-        Map<String, Object>  proejctAuthFailMap =
-            processInstanceService.queryByTriggerCode(loginUser, projectCode, 999L);
-        Assertions.assertEquals(Status.PROJECT_NOT_FOUND,proejctAuthFailMap.get(Constants.STATUS));
+        Map<String, Object> proejctAuthFailMap =
+                processInstanceService.queryByTriggerCode(loginUser, projectCode, 999L);
+        Assertions.assertEquals(Status.PROJECT_NOT_FOUND, proejctAuthFailMap.get(Constants.STATUS));
         // project auth sucess
         putMsg(result, Status.SUCCESS, projectCode);
         when(processInstanceMapper.queryByTriggerCode(projectCode)).thenReturn(new ArrayList());
         proejctAuthFailMap =
-            processInstanceService.queryByTriggerCode(loginUser, projectCode, 999L);
-        Assertions.assertEquals(Status.SUCCESS,proejctAuthFailMap.get(Constants.STATUS));
+                processInstanceService.queryByTriggerCode(loginUser, projectCode, 999L);
+        Assertions.assertEquals(Status.SUCCESS, proejctAuthFailMap.get(Constants.STATUS));
     }
 
     @Test
