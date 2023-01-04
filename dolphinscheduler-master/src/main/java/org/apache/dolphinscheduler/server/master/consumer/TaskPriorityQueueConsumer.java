@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.TaskCacheUtils;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.TaskDispatchCommand;
@@ -103,6 +104,12 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
      */
     @Autowired
     private TaskEventService taskEventService;
+
+    /**
+     * storage operator
+     */
+    @Autowired(required = false)
+    private StorageOperate storageOperate;
 
     /**
      * consumer thread pool
@@ -298,7 +305,7 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
                 return false;
             }
             // check if task is cache execution
-            String cacheKey = TaskCacheUtils.generateCacheKey(taskInstance, context);
+            String cacheKey = TaskCacheUtils.generateCacheKey(taskInstance, context, storageOperate);
             TaskInstance cacheTaskInstance = taskInstanceDao.findTaskInstanceByCacheKey(cacheKey);
             // if we can find the cache task instance, we will add cache event, and return true.
             if (cacheTaskInstance != null) {
