@@ -71,13 +71,13 @@
 
     <root level="INFO">
         <appender-ref ref="STDOUT"/>
-<!--        <if condition="${DOCKER:-false}">-->
-<!--            <then>-->
-<!--                <appender-ref ref="STDOUT"/>-->
-<!--            </then>-->
-<!--        </if>-->
-<!--        <appender-ref ref="STANDALONELOGFILE"/>-->
-<!--        <appender-ref ref="TASKLOGFILE"/>-->
+        <if condition="${DOCKER:-false}">
+            <then>
+                <appender-ref ref="STDOUT"/>
+            </then>
+        </if>
+        <appender-ref ref="STANDALONELOGFILE"/>
+        <appender-ref ref="TASKLOGFILE"/>
     </root>
 
 </configuration>
