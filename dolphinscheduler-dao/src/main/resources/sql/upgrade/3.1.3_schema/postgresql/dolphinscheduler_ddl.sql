@@ -14,3 +14,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+ALTER TABLE t_ds_fav RENAME TO t_ds_fav_task;
