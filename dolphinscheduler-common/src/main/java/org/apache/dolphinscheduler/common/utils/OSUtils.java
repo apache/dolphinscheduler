@@ -93,7 +93,7 @@ public class OSUtils {
      * @return disk free space  (GB)
      */
     public static double diskAvailable() {
-        File file = new File(".");
+        File file = new File("/"); // lxs: 更改为只检测根分区大小
         long totalSpace = file.getTotalSpace(); //total disk space in bytes.
         long freeSpace = file.getFreeSpace(); //unallocated / free disk space in bytes.
 
