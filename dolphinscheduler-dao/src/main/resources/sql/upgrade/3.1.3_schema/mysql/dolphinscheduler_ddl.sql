@@ -15,7 +15,7 @@
  * limitations under the License.
 */
 
-DROP PROCEDURE if EXISTS ut_dolphin_T_t_ds_fav;
+DROP PROCEDURE IF EXISTS ut_dolphin_T_t_ds_fav;
 delimiter d//
 CREATE PROCEDURE ut_dolphin_T_t_ds_fav()
 BEGIN
