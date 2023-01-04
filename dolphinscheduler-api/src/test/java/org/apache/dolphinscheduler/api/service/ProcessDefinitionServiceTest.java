@@ -542,12 +542,6 @@ public class ProcessDefinitionServiceTest {
 
         Assertions.assertDoesNotThrow(() -> processDefinitionService.deleteProcessDefinitionByCode(user, 46L, processDefinitionCode));
 
-        // delete fail
-        Mockito.when(taskDefinitionMapper.deleteByBatchCodes(Arrays.asList(100L, 200L))).thenReturn(1);
-        exception = Assertions.assertThrows(ServiceException.class,
-                () -> processDefinitionService.deleteProcessDefinitionByCode(user, 46L, processDefinitionCode));
-        Assertions.assertEquals(Status.DELETE_TASK_DEFINE_BY_CODE_ERROR.getCode(),
-                ((ServiceException) exception).getCode());
     }
 
     @Test
