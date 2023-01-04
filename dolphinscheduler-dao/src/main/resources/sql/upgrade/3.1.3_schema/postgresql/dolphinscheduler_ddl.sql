@@ -14,4 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-ALTER TABLE t_ds_fav RENAME TO t_ds_fav_task;
+
+ALTER TABLE IF EXISTS t_ds_fav RENAME TO t_ds_fav_task;
+
+CREATE TABLE IF NOT EXISTS t_ds_fav_task
+(
+    id        serial      NOT NULL,
+    task_name varchar(64) NOT NULL,
+    user_id   int         NOT NULL,
+    PRIMARY KEY (id)
+);
