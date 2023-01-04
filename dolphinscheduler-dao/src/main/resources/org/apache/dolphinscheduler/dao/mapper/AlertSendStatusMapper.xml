@@ -32,4 +32,13 @@
 
     </insert>
 
+    <delete id="deleteByAlertIds">
+        delete
+        from t_ds_alert_send_status
+        where alert_id in
+        <foreach collection="alertIds" item="alertId" separator="," open="(" close=")">
+            #{alertId}
+        </foreach>
+    </delete>
+
 </mapper>

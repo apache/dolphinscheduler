@@ -913,6 +913,18 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         return result;
     }
 
+    @Override
+    public List<ProcessTaskRelation> queryByWorkflowDefinitionCode(long workflowDefinitionCode,
+                                                                   int workflowDefinitionVersion) {
+        return processTaskRelationMapper.queryProcessTaskRelationsByProcessDefinitionCode(workflowDefinitionCode,
+                workflowDefinitionVersion);
+    }
+
+    @Override
+    public void deleteByWorkflowDefinitionCode(long workflowDefinitionCode, int workflowDefinitionVersion) {
+        processTaskRelationMapper.deleteByWorkflowDefinitionCode(workflowDefinitionCode, workflowDefinitionVersion);
+    }
+
     /**
      * build task definition
      *

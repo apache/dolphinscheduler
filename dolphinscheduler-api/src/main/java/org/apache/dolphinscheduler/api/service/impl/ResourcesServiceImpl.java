@@ -856,6 +856,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Map<String, Object> queryResourceList(User loginUser, ResourceType type, String fullName) {
         Map<String, Object> result = new HashMap<>();
+        if (storageOperate == null) {
+            result.put(Constants.DATA_LIST, Collections.emptyList());
+            result.put(Constants.STATUS, Status.SUCCESS);
+            return result;
+        }
 
         User user = userMapper.selectById(loginUser.getId());
         if (user == null) {
