@@ -15,19 +15,9 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.mapper;
+package org.apache.dolphinscheduler.dao.repository;
 
-import org.apache.dolphinscheduler.dao.entity.AlertSendStatus;
+public interface DqExecuteResultDao {
 
-import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
-
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-
-public interface AlertSendStatusMapper extends BaseMapper<AlertSendStatus> {
-
-    int batchInsert(List<AlertSendStatus> alertSendStatuses);
-
-    void deleteByAlertIds(@Param("alertIds") List<Integer> alertIds);
+    void deleteByWorkflowInstanceId(Integer workflowInstanceId);
 }
