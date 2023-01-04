@@ -39,7 +39,7 @@ $ docker run --name dolphinscheduler-standalone-server -p 12345:12345 -p 25333:2
   - Hyper-V 模式：点击 `Docker Desktop -> Settings -> Resources -> Memory` 调整内存大小
   - WSL 2 模式 模式：参考 [WSL 2 utility VM](https://docs.microsoft.com/zh-cn/windows/wsl/wsl-config#configure-global-options-with-wslconfig) 调整内存大小
 
-配置完成后我们需要获取 `docker-compose.yaml` 文件，通过[下载页面](https://dolphinscheduler.apache.org/#/zh-cn/download)下载对应版本源码包可能是最快的方法，
+配置完成后我们需要获取 `docker-compose.yaml` 文件，通过[下载页面](https://dolphinscheduler.apache.org/zh-cn/download)下载对应版本源码包可能是最快的方法，
 源码包对应的值为 "Total Source Code"。当下载完源码后就可以运行命令进行部署了。
 
 ```shell
@@ -72,6 +72,7 @@ $ docker run -d --name dolphinscheduler-tools \
     -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/<DATABASE>" \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
+    -e SPRING_JACKSON_TIME_ZONE="UTC" \
     --net host \
     apache/dolphinscheduler-tools:"${DOLPHINSCHEDULER_VERSION}" tools/bin/upgrade-schema.sh
 # 启动 DolphinScheduler 对应的服务
@@ -80,6 +81,7 @@ $ docker run -d --name dolphinscheduler-master \
     -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/dolphinscheduler" \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
+    -e SPRING_JACKSON_TIME_ZONE="UTC" \
     -e REGISTRY_ZOOKEEPER_CONNECT_STRING="localhost:2181" \
     --net host \
     -d apache/dolphinscheduler-master:"${DOLPHINSCHEDULER_VERSION}"
@@ -88,6 +90,7 @@ $ docker run -d --name dolphinscheduler-worker \
     -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/dolphinscheduler" \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
+    -e SPRING_JACKSON_TIME_ZONE="UTC" \
     -e REGISTRY_ZOOKEEPER_CONNECT_STRING="localhost:2181" \
     --net host \
     -d apache/dolphinscheduler-worker:"${DOLPHINSCHEDULER_VERSION}"
@@ -96,6 +99,7 @@ $ docker run -d --name dolphinscheduler-api \
     -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/dolphinscheduler" \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
+    -e SPRING_JACKSON_TIME_ZONE="UTC" \
     -e REGISTRY_ZOOKEEPER_CONNECT_STRING="localhost:2181" \
     --net host \
     -d apache/dolphinscheduler-api:"${DOLPHINSCHEDULER_VERSION}"
@@ -104,6 +108,7 @@ $ docker run -d --name dolphinscheduler-alert-server \
     -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/dolphinscheduler" \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
+    -e SPRING_JACKSON_TIME_ZONE="UTC" \
     -e REGISTRY_ZOOKEEPER_CONNECT_STRING="localhost:2181" \
     --net host \
     -d apache/dolphinscheduler-alert-server:"${DOLPHINSCHEDULER_VERSION}"

@@ -480,7 +480,7 @@ Website should be present before you send the announce mail this section will te
 the release version is `<VERSION>`, the following updates are required(note it will take effect immediately when the PR is merged):
 
 - Repository **apache/dolphinscheduler-website**:
-  - `download/en-us/download.md` and `download/zh-cn/download.md`: add the download of the `<VERSION>` release package
+  - `config/download.json`: add the download of the `<VERSION>` release package
   - `scripts/conf.sh`: Add new release version `<VERSION>` key-value pair to variable `DEV_RELEASE_DOCS_VERSIONS`
 - Repository **apache/dolphinscheduler** (dev branch):
   - `docs/configs/site.js`:
@@ -564,7 +564,7 @@ Dolphin Scheduler is a distributed and easy-to-extend visual workflow scheduler 
 dedicated to solving the complex task dependencies in data processing, making the scheduler system out of the box for data processing.
 
 
-Download Links: https://dolphinscheduler.apache.org/#/en-us/download
+Download Links: https://dolphinscheduler.apache.org/en-us/download
 
 Release Notes: https://github.com/apache/dolphinscheduler/releases/tag/<VERSION>
 
@@ -573,7 +573,7 @@ Website: https://dolphinscheduler.apache.org/
 DolphinScheduler Resources:
 - Issue: https://github.com/apache/dolphinscheduler/issues/
 - Mailing list: dev@dolphinscheduler.apache.org
-- Documents: https://dolphinscheduler.apache.org/#/zh-cn/docs/<VERSION>/about/introduction
+- Documents: https://dolphinscheduler.apache.org/zh-cn/docs/<VERSION>/about/introduction
 ```
 
 ## News

@@ -89,7 +89,7 @@ public class EphemeralDateManager implements AutoCloseable {
         connectionListeners.clear();
         scheduledExecutorService.shutdownNow();
         for (Long ephemeralDateId : ephemeralDateIds) {
-            mysqlOperator.deleteEphemeralData(ephemeralDateId);
+            mysqlOperator.deleteDataById(ephemeralDateId);
         }
     }
 

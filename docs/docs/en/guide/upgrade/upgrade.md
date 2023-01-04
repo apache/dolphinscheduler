@@ -12,7 +12,7 @@ To prevent data loss by some miss-operation, it is recommended to back up data b
 
 ### Download the Latest Version Installation Package
 
-Download the latest binary distribute package from [download](https://dolphinscheduler.apache.org/#/en-us/download) and then put it in the different
+Download the latest binary distribute package from [download](https://dolphinscheduler.apache.org/en-us/download) and then put it in the different
 directory where current service running. And all below command is running in this directory.
 
 ## Upgrade
@@ -40,7 +40,7 @@ Execute database upgrade script: `sh ./tools/bin/upgrade-schema.sh`
 
 ### Upgrade Service
 
-#### Change Configuration `bin/env/install_config.conf`
+#### Change Configuration `bin/env/install_env.sh`
 
 - If you deploy with Pseudo-Cluster deployment, change it according to [Pseudo-Cluster](../installation/pseudo-cluster.md) section "Modify Configuration".
 - If you deploy with Cluster deployment, change it according to [Cluster](../installation/cluster.md) section "Modify Configuration".
@@ -65,7 +65,7 @@ The architecture of worker group is different between version before version 1.3
 | 1  | service1 |               192.168.xx.10 |
 | 2  | service2 | 192.168.xx.11,192.168.xx.12 |
 
-- Modify worker related configuration in `bin/env/install_config.conf`.
+- Modify worker related configuration in `bin/env/install_env.sh`.
 
 Assume below are the machine worker service to be deployed:
 

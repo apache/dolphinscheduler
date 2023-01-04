@@ -148,3 +148,77 @@ ALTER TABLE t_ds_task_instance ADD COLUMN IF NOT EXISTS cache_key varchar(200) D
 ALTER TABLE t_ds_task_instance DROP COLUMN IF EXISTS cacke_key;
 
 CREATE INDEX IF NOT EXISTS idx_cache_key ON t_ds_task_instance USING Btree("cache_key");
+
+-- add_t_ds_process_instance_add_project_code
+delimiter ;
+DROP FUNCTION IF EXISTS add_t_ds_process_instance_add_project_code();
+delimiter d//
+CREATE FUNCTION add_t_ds_process_instance_add_project_code() RETURNS void AS $$
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_CATALOG=current_database()
+          AND TABLE_SCHEMA=current_schema()
+          AND TABLE_NAME='t_ds_process_instance'
+          AND COLUMN_NAME ='project_code')
+      THEN
+ALTER TABLE t_ds_process_instance ADD `project_code` bigint DEFAULT NULL COMMENT 'project code';
+END IF;
+IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_CATALOG=current_database()
+          AND TABLE_SCHEMA=current_schema()
+          AND TABLE_NAME='t_ds_process_instance'
+          AND COLUMN_NAME ='executor_name')
+      THEN
+ALTER TABLE t_ds_process_instance ADD `executor_name` varchar(64) DEFAULT NULL COMMENT 'execute user name';
+END IF;
+IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_CATALOG=current_database()
+          AND TABLE_SCHEMA=current_schema()
+          AND TABLE_NAME='t_ds_process_instance'
+          AND COLUMN_NAME ='tenant_code')
+      THEN
+ALTER TABLE t_ds_process_instance ADD `tenant_code` varchar(64) DEFAULT NULL COMMENT 'tenant code';
+END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+delimiter ;
+select add_t_ds_process_instance_add_project_code();
+DROP FUNCTION add_t_ds_process_instance_add_project_code();
+
+-- add_t_ds_process_instance_add_project_code
+delimiter ;
+DROP FUNCTION IF EXISTS add_t_ds_task_instance_add_project_code();
+delimiter d//
+CREATE FUNCTION add_t_ds_task_instance_add_project_code() RETURNS void AS $$
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_CATALOG=current_database()
+          AND TABLE_SCHEMA=current_schema()
+          AND TABLE_NAME='t_ds_task_instance'
+          AND COLUMN_NAME ='process_instance_name')
+      THEN
+ALTER TABLE t_ds_task_instance ADD `process_instance_name` varchar(255) DEFAULT NULL COMMENT 'process instance name';
+END IF;
+IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_CATALOG=current_database()
+          AND TABLE_SCHEMA=current_schema()
+          AND TABLE_NAME='t_ds_task_instance'
+          AND COLUMN_NAME ='project_code')
+      THEN
+ALTER TABLE t_ds_process_instance ADD `project_code` bigint DEFAULT NULL COMMENT 'project code';
+END IF;
+IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_CATALOG=current_database()
+          AND TABLE_SCHEMA=current_schema()
+          AND TABLE_NAME='t_ds_task_instance'
+          AND COLUMN_NAME ='executor_name')
+      THEN
+ALTER TABLE t_ds_task_instance ADD `executor_name` varchar(64) DEFAULT NULL COMMENT 'execute user name';
+END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+delimiter ;
+select add_t_ds_task_instance_add_project_code();
+DROP FUNCTION add_t_ds_task_instance_add_project_code();

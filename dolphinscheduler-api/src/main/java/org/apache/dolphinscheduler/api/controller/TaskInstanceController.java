@@ -119,9 +119,21 @@ public class TaskInstanceController extends BaseController {
             return result;
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = taskInstanceService.queryTaskListPaging(loginUser, projectCode, processInstanceId, processInstanceName,
+        result = taskInstanceService.queryTaskListPaging(
+                loginUser,
+                projectCode,
+                processInstanceId,
+                processInstanceName,
                 processDefinitionName,
-                taskName, executorName, startTime, endTime, searchVal, stateType, host, taskExecuteType, pageNo,
+                taskName,
+                executorName,
+                startTime,
+                endTime,
+                searchVal,
+                stateType,
+                host,
+                taskExecuteType,
+                pageNo,
                 pageSize);
         return result;
     }
