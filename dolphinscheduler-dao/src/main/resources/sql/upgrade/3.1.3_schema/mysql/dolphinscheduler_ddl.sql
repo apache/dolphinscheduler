@@ -14,3 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+
+DROP PROCEDURE if EXISTS ut_dolphin_T_t_ds_fav;
+delimiter d//
+CREATE PROCEDURE ut_dolphin_T_t_ds_fav()
+BEGIN
+		IF EXISTS (SELECT 1 FROM information_schema.TABLES
+			WHERE TABLE_NAME='t_ds_fav'
+			AND TABLE_SCHEMA=(SELECT DATABASE()))
+		THEN
+ALTER TABLE t_ds_fav RENAME t_ds_fav_task;
+END IF;
+END;
+d//
+
+delimiter ;
+CALL ut_dolphin_T_t_ds_fav;
+DROP PROCEDURE ut_dolphin_T_t_ds_fav;
+
+CREATE TABLE IF NOT EXISTS t_ds_fav_task
+(
+    id        serial      NOT NULL,
+    task_name varchar(64) NOT NULL,
+    user_id   int         NOT NULL,
+    PRIMARY KEY (id)
+);
