@@ -65,7 +65,6 @@ import org.slf4j.LoggerFactory;
 
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSException;
-import com.amazonaws.AmazonServiceException;
 
 @Data
 public class OssStorageOperator implements Closeable, StorageOperate {
@@ -341,8 +340,8 @@ public class OssStorageOperator implements Closeable, StorageOperate {
         do {
             try {
                 v2Result = this.ossClient.listObjectsV2(request);
-            } catch (AmazonServiceException e) {
-                throw new AmazonServiceException("Get S3 file list exception, error type:" + e.getErrorType(), e);
+            } catch (Exception e) {
+                throw new Exception("Get S3 file list exception, error type:" , e);
             }
 
             List<OSSObjectSummary> summaries = v2Result.getObjectSummaries();
