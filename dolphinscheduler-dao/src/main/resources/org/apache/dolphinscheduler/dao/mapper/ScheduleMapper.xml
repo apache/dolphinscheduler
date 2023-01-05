@@ -37,7 +37,7 @@
         join t_ds_process_definition p_f on s.process_definition_code = p_f.code
         join t_ds_project as p on p_f.project_code = p.code
         join t_ds_user as u on s.user_id = u.id
-        join t_ds_environment as e on s.environment_code = e.code
+        left join t_ds_environment as e on s.environment_code = e.code
         where 1=1
         <if test="processDefinitionCode != 0">
             and s.process_definition_code = #{processDefinitionCode}
