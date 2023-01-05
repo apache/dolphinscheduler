@@ -17,7 +17,11 @@
 
 package org.apache.dolphinscheduler.server.worker.utils;
 
+import static org.apache.dolphinscheduler.common.constants.Constants.TEMPLATE_SUFFIX;
+import static org.apache.dolphinscheduler.server.worker.utils.TaskFilesTransferUtils.PACK_SUFFIX;
+
 import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
@@ -34,6 +38,7 @@ import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.zeroturnaround.zip.ZipUtil;
 
@@ -44,7 +49,7 @@ public class TaskFilesTransferUtilsTest {
     private final int processInstanceId = 678;
     private final int taskInstanceId = 789;
     private final String taskName = "test";
-
+    private final String host = "localhost:1234";
     private final String tenantCode = "ubuntu";
 
     private long endTime;
@@ -95,17 +100,25 @@ public class TaskFilesTransferUtilsTest {
                 .tenantCode(tenantCode)
                 .executePath(executePath.toString())
                 .endTime(endTime)
+                .host(host)
                 .build();
 
         List<Property> oriProperties = TaskFilesTransferUtils.getVarPools(taskExecutionContext);
 
         StorageOperate storageOperate = Mockito.mock(StorageOperate.class);
-        TaskFilesTransferUtils.uploadOutputFiles(taskExecutionContext, storageOperate);
+
+        try (MockedStatic<FileUtils> FileUtilsMockedStatic = Mockito.mockStatic(FileUtils.class)) {
+            FileUtilsMockedStatic
+                    .when(() -> FileUtils.getTmpDir(FileUtils.getTmpBaseDir(), tenantCode, processInstanceId,
+                            processDefineCode, processDefineVersion, processInstanceId))
+                    .thenReturn(executePath.getPath() + "/tmp");
+            TaskFilesTransferUtils.uploadOutputFiles(taskExecutionContext, storageOperate);
+        }
         System.out.println(taskExecutionContext.getVarPool());
 
         String exceptFolder =
-                String.format("%s_%s", exceptTemplate, folderPath.getName() + TaskFilesTransferUtils.PACK_SUFFIX);
-        String exceptFile = String.format("%s_%s", exceptTemplate, file.getName());
+                String.format("%s_%s", exceptTemplate, folderPath.getName() + PACK_SUFFIX + TEMPLATE_SUFFIX);
+        String exceptFile = String.format("%s_%s", exceptTemplate, file.getName() + TEMPLATE_SUFFIX);
 
         List<Property> properties = TaskFilesTransferUtils.getVarPools(taskExecutionContext);
         Assertions.assertEquals(4, properties.size());
@@ -124,7 +137,7 @@ public class TaskFilesTransferUtilsTest {
     @Test
     void testDownloadUpstreamFiles() {
         File executePath = Files.createTempDir();
-        String folderPath = exceptTemplate + "_folder" + TaskFilesTransferUtils.PACK_SUFFIX;
+        String folderPath = exceptTemplate + "_folder" + PACK_SUFFIX;
         String filePath = exceptTemplate + "_file";
         String varPool = "[" +
                 String.format(
@@ -249,7 +262,7 @@ public class TaskFilesTransferUtilsTest {
         Assertions.assertEquals(file1.getPath(), TaskFilesTransferUtils.packIfDir(file1.getPath()));
         Assertions.assertEquals(file2.getPath(), TaskFilesTransferUtils.packIfDir(file2.getPath()));
 
-        String expectFolderPackPath = folderPath.getPath() + TaskFilesTransferUtils.PACK_SUFFIX;
+        String expectFolderPackPath = folderPath.getPath() + PACK_SUFFIX;
         Assertions.assertEquals(expectFolderPackPath, TaskFilesTransferUtils.packIfDir(folderPath.getPath()));
     }
 }

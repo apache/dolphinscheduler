@@ -225,6 +225,7 @@ The default configuration is as follows:
 |alert.rpc.port | 50052 | the RPC port of Alert Server|
 |zeppelin.rest.url | http://localhost:8080 | the RESTful API url of zeppelin|
 |appId.collect | log | way to collect applicationId, if use aop, alter the configuration from log to aop, annotation of applicationId auto collection related configuration in `bin/env/dolphinscheduler_env.sh` should be removed. Note: Aop way doesn't support submitting yarn job on remote host by client mode like Beeline, and will failure if override applicationId collection-related environment configuration in dolphinscheduler_env.sh, and .|
+|tmp.transfer.file.size | 100 | maximum size of temporary storage at local (MB)|
 
 ### Api-server related configuration
 

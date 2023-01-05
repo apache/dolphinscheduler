@@ -18,10 +18,16 @@
 package org.apache.dolphinscheduler.server.worker.utils;
 
 import static org.apache.dolphinscheduler.common.constants.Constants.CRC_SUFFIX;
+import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_S;
+import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_S_S;
+import static org.apache.dolphinscheduler.common.constants.Constants.SINGLE_SLASH;
+import static org.apache.dolphinscheduler.common.constants.Constants.TEMPLATE_SUFFIX;
+import static org.apache.dolphinscheduler.common.constants.Constants.TMP_TRANSFER_FILE_SIZE;
 
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
@@ -33,9 +39,12 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -59,6 +68,9 @@ public class TaskFilesTransferUtils {
 
     // root path in resource storage
     final static String RESOURCE_TAG = "DATA_TRANSFER";
+
+    // template of scp command
+    final static String SCP_COMMAND_TEMPLATE = "scp %s@%s:%s %s";
 
     private TaskFilesTransferUtils() {
         throw new IllegalStateException("Utility class");
@@ -85,6 +97,9 @@ public class TaskFilesTransferUtils {
         }
 
         logger.info("Upload output files ...");
+        // sort can avoid that nested path calculate wrong crc value cone after replacing content of original file with
+        // scp command template
+        localParamsProperty.sort(Comparator.comparing(Property::getValue));
         for (Property property : localParamsProperty) {
             // get local file path
             String path = String.format("%s/%s", taskExecutionContext.getExecutePath(), property.getValue());
@@ -94,6 +109,13 @@ public class TaskFilesTransferUtils {
             String srcCRCPath = srcPath + CRC_SUFFIX;
             try {
                 FileUtils.writeContent2File(FileUtils.getFileChecksum(path), srcCRCPath);
+                String tmpPath = moveIfUseTmpStorage(taskExecutionContext, srcPath);
+                if (!srcPath.equals(tmpPath)) {
+                    srcPath = tmpPath;
+                    String newCRCPath = srcPath + CRC_SUFFIX;
+                    FileUtils.renameTo(srcCRCPath, newCRCPath);
+                    srcCRCPath = newCRCPath;
+                }
             } catch (IOException ex) {
                 throw new TaskException(ex.getMessage(), ex);
             }
@@ -171,7 +193,8 @@ public class TaskFilesTransferUtils {
             // If the data is packaged, download it to a special directory (DOWNLOAD_TMP) and unpack it to the
             // targetPath
             boolean isPack = resourcePath.endsWith(PACK_SUFFIX);
-            if (isPack) {
+            boolean isScpCommandTemplate = resourcePath.endsWith(TEMPLATE_SUFFIX);
+            if (isPack || isScpCommandTemplate) {
                 downloadPath = String.format("%s/%s", downloadTmpPath, new File(resourcePath).getName());
             } else {
                 downloadPath = targetPath;
@@ -183,7 +206,11 @@ public class TaskFilesTransferUtils {
                 logger.info("{} --- Remote:{} to Local:{}", property, resourceWholePath, downloadPath);
                 storageOperate.download(taskExecutionContext.getTenantCode(), resourceWholePath, downloadPath, false,
                         true);
-            } catch (IOException ex) {
+
+                if (isScpCommandTemplate) {
+                    isPack = scpFetchFile(downloadPath, targetPath);
+                }
+            } catch (Exception ex) {
                 throw new TaskException("Download file from storage error", ex);
             }
 
@@ -284,5 +311,76 @@ public class TaskFilesTransferUtils {
             newPath = path;
         }
         return newPath;
+    }
+
+    /**
+     * If have enough temporary storage, move output file to tmp dir and replace srcPath with scp command.
+     *
+     * @param taskExecutionContext is the context of task
+     * @param srcPath is original source path
+     * @return new source path after using tmp storage (remain unchanged if not use)
+     */
+    public static String moveIfUseTmpStorage(TaskExecutionContext taskExecutionContext, String srcPath) {
+        long maxTmpFileSize = PropertyUtils.getLong(TMP_TRANSFER_FILE_SIZE, 100) * 1024 * 1024;
+        try {
+            String tmpDir = FileUtils.getTmpDir(
+                    FileUtils.getTmpBaseDir(),
+                    taskExecutionContext.getTenantCode(),
+                    taskExecutionContext.getProjectCode(),
+                    taskExecutionContext.getProcessDefineCode(),
+                    taskExecutionContext.getProcessDefineVersion(),
+                    taskExecutionContext.getProcessInstanceId());
+            long tmpDirSize = FileUtils.getDirectorySize(tmpDir);
+            if (tmpDirSize < maxTmpFileSize) {
+                String fileName = srcPath.substring(srcPath.lastIndexOf(SINGLE_SLASH) + 1);
+                String tmpPath = String.format(FORMAT_S_S, tmpDir, fileName);
+                FileUtils.renameTo(srcPath, tmpPath);
+
+                // fill in partial scp command template
+                String preparedCommand = String.format(SCP_COMMAND_TEMPLATE,
+                        taskExecutionContext.getTenantCode(),
+                        taskExecutionContext.getHost().split(":")[0],
+                        tmpPath,
+                        FORMAT_S);
+                FileUtils.writeContent2File(preparedCommand, srcPath);
+
+                String templatePath = srcPath + TEMPLATE_SUFFIX;
+                FileUtils.renameTo(srcPath, templatePath);
+                srcPath = templatePath;
+            }
+        } catch (IOException ex) {
+            throw new TaskException(ex.getMessage(), ex);
+        }
+        return srcPath;
+    }
+
+    /**
+     * Complete and execute scp command
+     *
+     * @param downloadPath  is where to save scp files
+     * @param targetPath    zip file will be unpacked later, rather, move to targetPath directly
+     * @return true if fetch a zip file
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public static boolean scpFetchFile(String downloadPath,
+                                       String targetPath) throws IOException, InterruptedException {
+        String commandString = FileUtils.readFile2Str(new FileInputStream(downloadPath));
+        boolean isZip = downloadPath.endsWith(PACK_SUFFIX + TEMPLATE_SUFFIX);
+
+        String execCommand = String.format(commandString, downloadPath);
+
+        List<String> command = Arrays.asList(execCommand.split(" "));
+        ProcessBuilder processBuilder = new ProcessBuilder();
+        processBuilder.command(command);
+        Process process = processBuilder.start();
+        if (process.isAlive()) {
+            process.waitFor();
+        }
+
+        if (!isZip) {
+            FileUtils.renameTo(downloadPath, targetPath);
+        }
+        return isZip;
     }
 }

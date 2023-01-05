@@ -21,8 +21,10 @@ import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYYMMD
 
 import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -140,6 +142,34 @@ public class FileUtilsTest {
 
         Assertions.assertDoesNotThrow(
                 () -> FileUtils.getFileChecksum(dirPath));
+    }
+
+    @Test
+    void testGetDirectorySize() throws IOException {
+        Assertions.assertNotEquals(0, FileUtils.getDirectorySize("test"));
+    }
+
+    @Test
+    void testRenameTo() throws IOException {
+        String oldPath = "test/testFile1.txt";
+        String newPath = "test/testFile2.txt";
+        String content = "testtest";
+        FileUtils.deleteFile(oldPath);
+        FileUtils.deleteFile(newPath);
+        FileUtils.writeContent2File(content, oldPath);
+        FileUtils.renameTo(oldPath, newPath);
+        String newContent = FileUtils.readFile2Str(new FileInputStream(newPath));
+        Assertions.assertEquals(newContent, content);
+    }
+
+    @Test
+    void testDeleteEmptyParentDir() throws IOException {
+        String dirPath = "test/a/b/c/d";
+        String parentPath = "test/a";
+        FileUtils.createWorkDirIfAbsent(dirPath);
+        FileUtils.deleteEmptyParentDir(dirPath);
+        File parentDir = new File(parentPath);
+        Assertions.assertEquals(parentDir.exists(), false);
     }
 
 }

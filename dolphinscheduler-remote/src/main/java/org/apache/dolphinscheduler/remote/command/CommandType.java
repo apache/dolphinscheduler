@@ -89,6 +89,11 @@ public enum CommandType {
      */
     TASK_SAVEPOINT_RESPONSE,
 
+    /**
+     * clear tmp directory when process is finished, from master to worker
+     */
+    CLEAR_PROCESS_TMP_DIR,
+
     HEART_BEAT,
 
     PING,

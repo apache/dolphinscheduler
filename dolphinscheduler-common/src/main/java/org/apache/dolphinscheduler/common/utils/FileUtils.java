@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.common.utils;
 
 import static org.apache.dolphinscheduler.common.constants.Constants.DATA_BASEDIR_PATH;
 import static org.apache.dolphinscheduler.common.constants.Constants.FOLDER_SEPARATOR;
+import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_S_S;
 import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_VIEW_SUFFIXES;
 import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_VIEW_SUFFIXES_DEFAULT_VALUE;
 import static org.apache.dolphinscheduler.common.constants.Constants.UTF_8;
@@ -119,6 +120,25 @@ public class FileUtils {
     }
 
     /**
+     * base directory of temporary output
+     *
+     * @return
+     */
+    public static String getTmpBaseDir() {
+        return String.format(FORMAT_S_S, DATA_BASEDIR, "tmp");
+    }
+
+    public static String getTmpDir(String tmpBaseDir,
+                                   String tenantCode,
+                                   long projectCode,
+                                   long processDefineCode,
+                                   int processDefineVersion,
+                                   int processInstanceId) {
+        return String.format("%s/%s/%d/%d_%d/%d", tmpBaseDir, tenantCode, projectCode, processDefineCode,
+                processDefineVersion, processInstanceId);
+    }
+
+    /**
      * absolute path of appInfo file
      *
      * @param execPath  directory of process execution
@@ -203,6 +223,20 @@ public class FileUtils {
      */
     public static void deleteFile(String filename) {
         org.apache.commons.io.FileUtils.deleteQuietly(new File(filename));
+    }
+
+    /**
+     * Delete all empty parent directories.
+     *
+     * @param parentPath parent directory path
+     */
+    public static void deleteEmptyParentDir(String parentPath) throws IOException {
+        File dir = new File(parentPath);
+        if (dir.listFiles().length == 0) {
+            parentPath = dir.getParent();
+            org.apache.commons.io.FileUtils.deleteDirectory(dir);
+            deleteEmptyParentDir(parentPath);
+        }
     }
 
     /**
@@ -297,6 +331,36 @@ public class FileUtils {
         }
 
         return crcString;
+    }
+
+    /**
+     * Get total size of directory
+     *
+     * @param path
+     * @return
+     * @throws IOException
+     */
+    public static long getDirectorySize(String path) throws IOException {
+        File dir = new File(path);
+        if (!dir.exists()) {
+            createWorkDirIfAbsent(path);
+        }
+        return org.apache.commons.io.FileUtils.sizeOfDirectory(dir);
+    }
+
+    /**
+     * Rename file / directory
+     *
+     * @param oldPath   old path
+     * @param newPath   new path
+     */
+    public static void renameTo(String oldPath, String newPath) throws IOException {
+        File newFile = new File(newPath);
+        if (newFile.exists()) {
+            org.apache.commons.io.FileUtils.forceDelete(newFile);
+        }
+        File oldFile = new File(oldPath);
+        oldFile.renameTo(new File(newPath));
     }
 
 }

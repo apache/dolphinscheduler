@@ -67,8 +67,10 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.remote.command.HostUpdateCommand;
+import org.apache.dolphinscheduler.remote.command.TmpDirClearCommand;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
 import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.server.master.event.StateEventHandleError;
@@ -753,6 +755,9 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      */
     public void endProcess() {
         this.stateEvents.clear();
+
+        clearTmpDir();
+
         if (processDefinition.getExecutionType().typeIsSerialWait() || processDefinition.getExecutionType()
                 .typeIsSerialPriority()) {
             checkSerialProcess(processDefinition);
@@ -798,6 +803,30 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         command.setProcessDefinitionVersion(processDefinition.getVersion());
         command.setCommandParam(JSONUtils.toJsonString(cmdParam));
         commandService.createCommand(command);
+    }
+
+    /**
+     * clear tmp dir on each worker
+     */
+    private void clearTmpDir() {
+        TmpDirClearCommand tmpDirClearCommand = new TmpDirClearCommand(
+                processInstance.getTenantCode(),
+                processInstance.getProjectCode(),
+                processInstance.getProcessDefinitionCode(),
+                processInstance.getProcessDefinitionVersion(),
+                processInstance.getId());
+
+        HashSet<String> hosts = new HashSet<>();
+        this.completeTaskMap.values().forEach(
+                taskInstanceId -> hosts.add(this.taskInstanceMap.get(taskInstanceId).getHost()));
+        hosts.forEach(host -> {
+            Host workerHost = new Host(host);
+            try {
+                nettyExecutorManager.doExecute(workerHost, tmpDirClearCommand.convert2Command());
+            } catch (ExecuteException e) {
+                logger.error("Clear tmp directory error", e);
+            }
+        });
     }
 
     /**

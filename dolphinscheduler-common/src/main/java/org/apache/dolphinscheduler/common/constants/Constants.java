@@ -44,6 +44,7 @@ public final class Constants {
     public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_MASTERS = "/lock/masters";
     public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_MASTERS = "/lock/failover/masters";
 
+    public static final String FORMAT_S = "%s";
     public static final String FORMAT_SS = "%s%s";
     public static final String FORMAT_S_S = "%s/%s";
     public static final String FORMAT_S_S_COLON = "%s:%s";
@@ -103,6 +104,11 @@ public final class Constants {
      * data basedir path
      */
     public static final String DATA_BASEDIR_PATH = "data.basedir.path";
+
+    /**
+     * temporaty size of transfer file
+     */
+    public static final String TMP_TRANSFER_FILE_SIZE = "tmp.transfer.file.size";
 
     /**
      * dolphinscheduler.env.path
@@ -331,6 +337,8 @@ public final class Constants {
 
     // suffix of crc file
     public static final String CRC_SUFFIX = ".crc";
+
+    public static final String TEMPLATE_SUFFIX = ".template";
 
     /**
      * complement date default cron string
