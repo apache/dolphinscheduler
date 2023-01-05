@@ -1041,10 +1041,12 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             return result;
         }
 
-        List<ProcessInstance> processInstances = processInstanceMapper.queryByTriggerCode(triggerCode);
+        List<ProcessInstance> processInstances = processInstanceMapper.queryByTriggerCode(
+                triggerCode);
         result.put(DATA_LIST, processInstances);
         putMsg(result, Status.SUCCESS);
         return result;
+    }
 
     @Override
     public void deleteProcessInstanceByWorkflowDefinitionCode(long workflowDefinitionCode) {
