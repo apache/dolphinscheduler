@@ -592,6 +592,7 @@ public class TaskDefinitionServiceImplTest {
 
     @Test
     public void testUpdateTaskWithUpstream() {
+
         String taskDefinitionJson = getTaskDefinitionJson();
         TaskDefinition taskDefinition = getTaskDefinition();
         taskDefinition.setFlag(Flag.NO);
