@@ -97,8 +97,8 @@ public class TaskFilesTransferUtils {
         }
 
         logger.info("Upload output files ...");
-        // sort can avoid that nested path calculate wrong crc value cone after replacing content of original file with
-        // scp command template
+        // sort can avoid that nested path calculate wrong crc value after replacing content of original file with scp
+        // command template
         localParamsProperty.sort(Comparator.comparing(Property::getValue));
         for (Property property : localParamsProperty) {
             // get local file path

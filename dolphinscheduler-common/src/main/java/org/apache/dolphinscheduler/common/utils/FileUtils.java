@@ -360,7 +360,7 @@ public class FileUtils {
             org.apache.commons.io.FileUtils.forceDelete(newFile);
         }
         File oldFile = new File(oldPath);
-        if (oldFile.renameTo(new File(newPath))) {
+        if (!oldFile.renameTo(new File(newPath))) {
             throw new RuntimeException(String.format("Rename %s to %s failed!", oldPath, newPath));
         }
     }
