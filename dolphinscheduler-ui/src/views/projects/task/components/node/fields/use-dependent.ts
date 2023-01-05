@@ -223,10 +223,15 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
     cycle: string
     dateValue: string
   }) => {
+    console.log(dependentResult)
     if (!item || router.currentRoute.value.name !== 'workflow-instance-detail')
       return null
     const key = `${item.definitionCode}-${item.depTaskCode}-${item.cycle}-${item.dateValue}`
     const state: ITaskState = dependentResult[key]
+    console.log('task state')
+    console.log(dependentResult)
+    console.log(key)
+    console.log(state)
     return h(NIcon, { size: 24, color: TasksStateConfig[state].color }, () =>
       h(TasksStateConfig[state].icon)
     )
