@@ -17,11 +17,15 @@
 
 package org.apache.dolphinscheduler.server.worker.utils;
 
+import static org.apache.dolphinscheduler.common.constants.Constants.COLON;
 import static org.apache.dolphinscheduler.common.constants.Constants.CRC_SUFFIX;
 import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_S;
 import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_S_S;
 import static org.apache.dolphinscheduler.common.constants.Constants.SINGLE_SLASH;
+import static org.apache.dolphinscheduler.common.constants.Constants.SPACE;
 import static org.apache.dolphinscheduler.common.constants.Constants.TEMPLATE_SUFFIX;
+import static org.apache.dolphinscheduler.common.constants.Constants.TMP_FILE_DEFAULT_SIZE;
+import static org.apache.dolphinscheduler.common.constants.Constants.TMP_SIZE_MB;
 import static org.apache.dolphinscheduler.common.constants.Constants.TMP_TRANSFER_FILE_SIZE;
 
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -321,7 +325,7 @@ public class TaskFilesTransferUtils {
      * @return new source path after using tmp storage (remain unchanged if not use)
      */
     public static String moveIfUseTmpStorage(TaskExecutionContext taskExecutionContext, String srcPath) {
-        long maxTmpFileSize = PropertyUtils.getLong(TMP_TRANSFER_FILE_SIZE, 100) * 1024 * 1024;
+        long maxTmpFileSize = PropertyUtils.getLong(TMP_TRANSFER_FILE_SIZE, TMP_FILE_DEFAULT_SIZE) * TMP_SIZE_MB;
         try {
             String tmpDir = FileUtils.getTmpDir(
                     FileUtils.getTmpBaseDir(),
@@ -339,7 +343,7 @@ public class TaskFilesTransferUtils {
                 // fill in partial scp command template
                 String preparedCommand = String.format(SCP_COMMAND_TEMPLATE,
                         taskExecutionContext.getTenantCode(),
-                        taskExecutionContext.getHost().split(":")[0],
+                        taskExecutionContext.getHost().split(COLON)[0],
                         tmpPath,
                         FORMAT_S);
                 logger.info("Generate scp command template: {}", preparedCommand);
@@ -378,7 +382,7 @@ public class TaskFilesTransferUtils {
         String execCommand = String.format(commandString, downloadPath);
         logger.info("Complete command template: {}", execCommand);
 
-        List<String> command = Arrays.asList(execCommand.split(" "));
+        List<String> command = Arrays.asList(execCommand.split(SPACE));
         ProcessBuilder processBuilder = new ProcessBuilder();
         processBuilder.command(command);
         Process process = processBuilder.start();
