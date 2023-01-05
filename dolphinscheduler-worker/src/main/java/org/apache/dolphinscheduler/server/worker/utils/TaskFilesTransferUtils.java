@@ -366,7 +366,13 @@ public class TaskFilesTransferUtils {
      */
     public static boolean scpFetchFile(String downloadPath,
                                        String targetPath) throws IOException, InterruptedException {
-        String commandString = FileUtils.readFile2Str(new FileInputStream(downloadPath));
+        String commandString = "";
+        try (FileInputStream fileInputStream = new FileInputStream(downloadPath)) {
+            commandString = FileUtils.readFile2Str(fileInputStream);
+        } catch (IOException ex) {
+            logger.error("Read command file error.");
+        }
+
         boolean isZip = downloadPath.endsWith(PACK_SUFFIX + TEMPLATE_SUFFIX);
 
         String execCommand = String.format(commandString, downloadPath);

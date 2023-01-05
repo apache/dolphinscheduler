@@ -146,6 +146,8 @@ public class FileUtilsTest {
 
     @Test
     void testGetDirectorySize() throws IOException {
+        String filePath = "test/testFile1.txt";
+        FileUtils.writeContent2File("abcdefg", filePath);
         Assertions.assertNotEquals(0, FileUtils.getDirectorySize("test"));
     }
 
