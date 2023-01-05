@@ -43,7 +43,7 @@ public final class ProcessUtils {
     /**
      * Expression of PID recognition in Windows scene
      */
-    private static final Pattern WINDOWSATTERN = Pattern.compile("(\\d+)");
+    private static final Pattern WINDOWSATTERN = Pattern.compile("\\w+\\((\\d+)\\)");
 
     /**
      * kill tasks according to different task types.
