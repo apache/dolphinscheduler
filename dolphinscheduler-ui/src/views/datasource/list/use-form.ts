@@ -367,6 +367,11 @@ export const datasourceType: IDataBaseOptionKeys = {
       value: 'STARROCKS',
       label: 'STARROCKS',
       defaultPort: 9030
+  },
+  DAMENG: {
+    value: 'DAMENG',
+    label: 'DAMENG',
+    defaultPort: 5236
   }
 }
 
