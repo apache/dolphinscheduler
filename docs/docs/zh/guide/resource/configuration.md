@@ -144,10 +144,10 @@ development.state=false
 alert.rpc.port=50052
 
 # way to collect applicationId: log(original regex match), aop
-appId.collect: log
+appId.collect=log
 
 # maximum size of temporary storage at local (MB)
-tmp.transfer.file.size = 100
+tmp.transfer.file.size=100
 ```
 
 > **注意**：
