@@ -72,21 +72,14 @@ export function useNodeStatus(options: Options) {
   const refreshTaskStatus = () => {
     const projectCode = Number(route.params.projectCode)
     const instanceId = Number(route.params.id)
-    console.log('refreshTaskStatus')
-    console.log(instanceId)
-    console.log(projectCode)
 
     queryTaskListByProcessId(instanceId, projectCode).then((res: any) => {
       window.$message.success(t('project.workflow.refresh_status_succeeded'))
       taskList.value = res.taskList
-      console.log(taskList.value)
       if (taskList.value) {
         taskList.value.forEach((taskInstance: any) => {
-          console.log(taskInstance)
           setNodeStatus(taskInstance.taskCode, taskInstance.state, taskInstance)
 
-          console.log('use-node-status')
-          console.log(taskInstance.dependentResult)
           if (taskInstance.dependentResult) {
             nodeStore.updateDependentResult(
               JSON.parse(taskInstance.dependentResult)
