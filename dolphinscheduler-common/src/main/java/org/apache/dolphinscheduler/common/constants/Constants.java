@@ -110,7 +110,7 @@ public final class Constants {
      */
     public static final String TMP_TRANSFER_FILE_SIZE = "tmp.transfer.file.size";
     public static final long TMP_FILE_DEFAULT_SIZE = 100;
-    public static final long TMP_SIZE_MB = 1024 * 1024;
+    public static final long TMP_SIZE_MB = 1024L * 1024L;
 
     /**
      * dolphinscheduler.env.path

@@ -61,20 +61,20 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 public class TaskFilesTransferUtils {
 
-    protected final static Logger logger = LoggerFactory
+    protected static final Logger logger = LoggerFactory
             .getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, TaskFilesTransferUtils.class));
 
     // tmp path in local path for transfer
-    final static String DOWNLOAD_TMP = ".DT_TMP";
+    static final String DOWNLOAD_TMP = ".DT_TMP";
 
     // suffix of the package file
-    final static String PACK_SUFFIX = "_ds_pack.zip";
+    static final String PACK_SUFFIX = "_ds_pack.zip";
 
     // root path in resource storage
-    final static String RESOURCE_TAG = "DATA_TRANSFER";
+    static final String RESOURCE_TAG = "DATA_TRANSFER";
 
     // template of scp command
-    final static String SCP_COMMAND_TEMPLATE = "scp %s@%s:%s %s";
+    static final String SCP_COMMAND_TEMPLATE = "scp %s@%s:%s %s";
 
     private TaskFilesTransferUtils() {
         throw new IllegalStateException("Utility class");
@@ -214,7 +214,7 @@ public class TaskFilesTransferUtils {
                 if (isScpCommandTemplate) {
                     isPack = scpFetchFile(downloadPath, targetPath);
                 }
-            } catch (Exception ex) {
+            } catch (IOException | InterruptedException ex) {
                 throw new TaskException("Download file from storage error", ex);
             }
 

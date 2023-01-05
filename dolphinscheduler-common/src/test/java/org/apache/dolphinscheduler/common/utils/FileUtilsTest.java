@@ -171,7 +171,7 @@ public class FileUtilsTest {
         FileUtils.createWorkDirIfAbsent(dirPath);
         FileUtils.deleteEmptyParentDir(dirPath);
         File parentDir = new File(parentPath);
-        Assertions.assertEquals(parentDir.exists(), false);
+        Assertions.assertEquals(false, parentDir.exists());
     }
 
 }

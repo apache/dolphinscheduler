@@ -361,7 +361,7 @@ public class FileUtils {
         }
         File oldFile = new File(oldPath);
         if (!oldFile.renameTo(new File(newPath))) {
-            throw new RuntimeException(String.format("Rename %s to %s failed!", oldPath, newPath));
+            throw new IOException(String.format("Rename %s to %s failed!", oldPath, newPath));
         }
     }
 
