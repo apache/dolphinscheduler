@@ -71,6 +71,7 @@ import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
 import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.spi.enums.DbType;
@@ -88,6 +89,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -172,6 +174,15 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
 
     @Mock
     private WorkFlowLineageService workFlowLineageService;
+
+    @Mock
+    private TaskDefinitionService taskDefinitionService;
+
+    @Mock
+    private TaskDefinitionLogService taskDefinitionLogService;
+
+    @Mock
+    private ProcessDefinitionLogDao processDefinitionLogDao;
 
     @Mock
     private UserMapper userMapper;
@@ -476,7 +487,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         Assertions.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST.getCode(), ((ServiceException) exception).getCode());
 
         // project check auth fail
-        Mockito.when(processDefinitionMapper.queryByCode(6L)).thenReturn(this.getProcessDefinition());
+        Mockito.when(processDefinitionDao.queryByCode(6L)).thenReturn(Optional.of(getProcessDefinition()));
         Mockito.doThrow(new ServiceException(Status.PROJECT_NOT_FOUND)).when(projectService)
                 .checkProjectAndAuthThrowException(user, project, WORKFLOW_DEFINITION_DELETE);
         exception = Assertions.assertThrows(ServiceException.class,
@@ -486,14 +497,14 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         // project check auth success, instance not exist
         Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(user, project,
                 WORKFLOW_DEFINITION_DELETE);
-        Mockito.when(processDefinitionMapper.queryByCode(1L)).thenReturn(null);
+        Mockito.when(processDefinitionDao.queryByCode(1L)).thenReturn(Optional.empty());
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.deleteProcessDefinitionByCode(user, 1L));
         Assertions.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST.getCode(), ((ServiceException) exception).getCode());
 
         ProcessDefinition processDefinition = getProcessDefinition();
         // user no auth
-        Mockito.when(processDefinitionMapper.queryByCode(46L)).thenReturn(processDefinition);
+        Mockito.when(processDefinitionDao.queryByCode(46L)).thenReturn(Optional.of(processDefinition));
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.deleteProcessDefinitionByCode(user, 46L));
         Assertions.assertEquals(Status.USER_NO_OPERATION_PERM.getCode(), ((ServiceException) exception).getCode());
@@ -501,19 +512,16 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         // process definition online
         user.setUserType(UserType.ADMIN_USER);
         processDefinition.setReleaseState(ReleaseState.ONLINE);
-        Mockito.when(processDefinitionMapper.queryByCode(46L)).thenReturn(processDefinition);
+        Mockito.when(processDefinitionDao.queryByCode(46L)).thenReturn(Optional.of(processDefinition));
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.deleteProcessDefinitionByCode(user, 46L));
         Assertions.assertEquals(Status.PROCESS_DEFINE_STATE_ONLINE.getCode(), ((ServiceException) exception).getCode());
 
         // scheduler list elements > 1
         processDefinition.setReleaseState(ReleaseState.OFFLINE);
-        Mockito.when(processDefinitionMapper.queryByCode(46L)).thenReturn(processDefinition);
+        Mockito.when(processDefinitionDao.queryByCode(46L)).thenReturn(Optional.of(processDefinition));
         Mockito.when(scheduleMapper.queryByProcessDefinitionCode(46L)).thenReturn(getSchedule());
         Mockito.when(scheduleMapper.deleteById(46)).thenReturn(1);
-        Mockito.when(processDefinitionMapper.deleteById(processDefinition.getId())).thenReturn(1);
-        Mockito.when(processTaskRelationMapper.deleteByCode(project.getCode(), processDefinition.getCode()))
-                .thenReturn(1);
         Mockito.when(workFlowLineageService.queryTaskDepOnProcess(project.getCode(), processDefinition.getCode()))
                 .thenReturn(Collections.emptySet());
         processDefinitionService.deleteProcessDefinitionByCode(user, 46L);
@@ -538,24 +546,12 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
 
         // delete success
         schedule.setReleaseState(ReleaseState.OFFLINE);
-        Mockito.when(processTaskRelationMapper.queryByProcessCode(1, 11))
-                .thenReturn(getProcessTaskRelation());
-        Mockito.when(taskDefinitionMapper.deleteByBatchCodes(Arrays.asList(100L, 200L))).thenReturn(2);
-        Mockito.when(processDefinitionMapper.deleteById(46)).thenReturn(1);
-        Mockito.when(scheduleMapper.deleteById(schedule.getId())).thenReturn(1);
-        Mockito.when(processTaskRelationMapper.deleteByCode(project.getCode(), processDefinition.getCode()))
-                .thenReturn(1);
         Mockito.when(scheduleMapper.queryByProcessDefinitionCode(46L)).thenReturn(getSchedule());
+        Mockito.when(scheduleMapper.deleteById(schedule.getId())).thenReturn(1);
         Mockito.when(workFlowLineageService.queryTaskDepOnProcess(project.getCode(), processDefinition.getCode()))
                 .thenReturn(Collections.emptySet());
         Assertions.assertDoesNotThrow(() -> processDefinitionService.deleteProcessDefinitionByCode(user, 46L));
 
-        // delete fail
-        Mockito.when(taskDefinitionMapper.deleteByBatchCodes(Arrays.asList(100L, 200L))).thenReturn(1);
-        exception = Assertions.assertThrows(ServiceException.class,
-                () -> processDefinitionService.deleteProcessDefinitionByCode(user, 46L));
-        Assertions.assertEquals(Status.DELETE_TASK_DEFINE_BY_CODE_ERROR.getCode(),
-                ((ServiceException) exception).getCode());
     }
 
     @Test
@@ -584,7 +580,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         definitionCodes = Lists.newArrayList(singleCodes.split(Constants.COMMA)).stream().map(Long::parseLong)
                 .collect(Collectors.toSet());
         Mockito.when(processDefinitionMapper.queryByCodes(definitionCodes)).thenReturn(processDefinitionList);
-        Mockito.when(processDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(process);
+        Mockito.when(processDefinitionDao.queryByCode(processDefinitionCode)).thenReturn(Optional.of(process));
 
         // process definition online
         user.setUserType(UserType.ADMIN_USER);
@@ -600,10 +596,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
 
         // delete success
         process.setReleaseState(ReleaseState.OFFLINE);
-        Mockito.when(processDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(process);
-        Mockito.when(processDefinitionMapper.deleteById(process.getId())).thenReturn(1);
-        Mockito.when(processTaskRelationMapper.deleteByCode(project.getCode(), process.getCode()))
-                .thenReturn(1);
+        Mockito.when(processDefinitionDao.queryByCode(processDefinitionCode)).thenReturn(Optional.of(process));
         Mockito.when(workFlowLineageService.queryTaskDepOnProcess(project.getCode(), process.getCode()))
                 .thenReturn(Collections.emptySet());
         putMsg(result, Status.SUCCESS, projectCode);

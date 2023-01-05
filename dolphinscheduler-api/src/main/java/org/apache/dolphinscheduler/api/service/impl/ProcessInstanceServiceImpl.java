@@ -40,6 +40,7 @@ import org.apache.dolphinscheduler.api.service.LoggerService;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
+import org.apache.dolphinscheduler.api.service.TaskInstanceService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -72,6 +73,7 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.ProcessInstanceMapDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.WorkflowUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
@@ -103,6 +105,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -134,11 +137,18 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
     @Autowired
     TaskInstanceDao taskInstanceDao;
 
+    @Lazy
+    @Autowired
+    private TaskInstanceService taskInstanceService;
+
     @Autowired
     ProcessInstanceMapper processInstanceMapper;
 
     @Autowired
     ProcessInstanceDao processInstanceDao;
+
+    @Autowired
+    private ProcessInstanceMapDao processInstanceMapDao;
 
     @Autowired
     ProcessDefinitionMapper processDefineMapper;
@@ -817,29 +827,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             throw new ServiceException(PROCESS_INSTANCE_STATE_OPERATION_ERROR, processInstance.getName(),
                     processInstance.getState(), "delete");
         }
-
-        // delete database cascade
-        int delete = processService.deleteWorkProcessInstanceById(processInstanceId);
-
-        processService.deleteAllSubWorkProcessByParentId(processInstanceId);
-        processService.deleteWorkProcessMapByParentId(processInstanceId);
-        // We need to remove the task log file before deleting the task instance
-        // because the task log file is query from task instance.
-        // When delete task instance error, the task log file will also be deleted, this may cause data inconsistency.
-        processService.removeTaskLogFile(processInstanceId);
-        taskInstanceDao.deleteByWorkflowInstanceId(processInstanceId);
-        alertDao.deleteByWorkflowInstanceId(processInstanceId);
-
-        if (delete > 0) {
-            logger.info(
-                    "Delete process instance complete, ProcessDefinitionCode{}, processInstanceId:{}.",
-                    processInstance.getProcessDefinitionCode(), processInstanceId);
-        } else {
-            logger.error(
-                    "Delete process instance error, ProcessDefinitionCode{}, processInstanceId:{}.",
-                    processInstance.getProcessDefinitionCode(), processInstanceId);
-            throw new ServiceException(Status.DELETE_PROCESS_INSTANCE_BY_ID_ERROR);
-        }
+        deleteProcessInstanceById(processInstanceId);
     }
 
     /**
@@ -1057,5 +1045,50 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         result.put(DATA_LIST, processInstances);
         putMsg(result, Status.SUCCESS);
         return result;
+
+    @Override
+    public void deleteProcessInstanceByWorkflowDefinitionCode(long workflowDefinitionCode) {
+        while (true) {
+            List<ProcessInstance> processInstances =
+                    processInstanceMapper.queryByProcessDefineCode(workflowDefinitionCode, 100);
+            if (CollectionUtils.isEmpty(processInstances)) {
+                break;
+            }
+            logger.info("Begin to delete workflow instance, workflow definition code: {}", workflowDefinitionCode);
+            for (ProcessInstance processInstance : processInstances) {
+                if (!processInstance.getState().isFinished()) {
+                    logger.warn("Workflow instance is not finished cannot delete, process instance id:{}",
+                            processInstance.getId());
+                    throw new ServiceException(PROCESS_INSTANCE_STATE_OPERATION_ERROR, processInstance.getName(),
+                            processInstance.getState(), "delete");
+                }
+                deleteProcessInstanceById(processInstance.getId());
+            }
+            logger.info("Success delete workflow instance, workflow definition code: {}, size: {}",
+                    workflowDefinitionCode, processInstances.size());
+        }
+    }
+
+    @Override
+    public void deleteProcessInstanceById(int workflowInstanceId) {
+        // delete task instance
+        taskInstanceService.deleteByWorkflowInstanceId(workflowInstanceId);
+        // delete sub process instances
+        deleteSubWorkflowInstanceIfNeeded(workflowInstanceId);
+        // delete alert
+        alertDao.deleteByWorkflowInstanceId(workflowInstanceId);
+        // delete process instance
+        processInstanceDao.deleteById(workflowInstanceId);
+    }
+
+    private void deleteSubWorkflowInstanceIfNeeded(int workflowInstanceId) {
+        List<Integer> subWorkflowInstanceIds = processInstanceMapDao.querySubWorkflowInstanceIds(workflowInstanceId);
+        if (org.apache.commons.collections4.CollectionUtils.isEmpty(subWorkflowInstanceIds)) {
+            return;
+        }
+        for (Integer subWorkflowInstanceId : subWorkflowInstanceIds) {
+            deleteProcessInstanceById(subWorkflowInstanceId);
+        }
+        processInstanceMapDao.deleteByParentId(workflowInstanceId);
     }
 }

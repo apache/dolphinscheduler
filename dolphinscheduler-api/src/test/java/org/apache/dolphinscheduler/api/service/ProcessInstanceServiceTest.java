@@ -58,6 +58,7 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.ProcessInstanceMapDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
@@ -149,6 +150,12 @@ public class ProcessInstanceServiceTest {
 
     @Mock
     AlertDao alertDao;
+
+    @Mock
+    private TaskInstanceService taskInstanceService;
+
+    @Mock
+    private ProcessInstanceMapDao processInstanceMapDao;
 
     private String shellJson = "[{\"name\":\"\",\"preTaskCode\":0,\"preTaskVersion\":0,\"postTaskCode\":123456789,"
             + "\"postTaskVersion\":1,\"conditionType\":0,\"conditionParams\":\"{}\"},{\"name\":\"\",\"preTaskCode\":123456789,"
@@ -704,8 +711,7 @@ public class ProcessInstanceServiceTest {
         processInstanceService.deleteProcessInstanceById(loginUser, 1);
 
         when(processService.deleteWorkProcessInstanceById(1)).thenReturn(0);
-        Assertions.assertThrows(ServiceException.class,
-                () -> processInstanceService.deleteProcessInstanceById(loginUser, 1));
+        Assertions.assertDoesNotThrow(() -> processInstanceService.deleteProcessInstanceById(loginUser, 1));
     }
 
     @Test

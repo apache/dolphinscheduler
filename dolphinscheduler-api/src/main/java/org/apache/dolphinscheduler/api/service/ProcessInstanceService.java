@@ -231,4 +231,8 @@ public interface ProcessInstanceService {
      * @return
      */
     Map<String, Object> queryByTriggerCode(User loginUser, long projectCode, Long triggerCode);
+    void deleteProcessInstanceByWorkflowDefinitionCode(long workflowDefinitionCode);
+
+    void deleteProcessInstanceById(int workflowInstanceId);
+
 }
