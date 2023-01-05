@@ -136,6 +136,11 @@ public class Constants {
     public static final String COM_DB2_JDBC_DRIVER = "com.ibm.db2.jcc.DB2Driver";
     public static final String COM_PRESTO_JDBC_DRIVER = "com.facebook.presto.jdbc.PrestoDriver";
 
+    /**
+     * temporary parameter prefix
+     */
+    public static final String START_UP_PARAMS_PREFIX = "startup-";
+    public static final String GLOBAL_PARAMS_PREFIX = "global-";
 
     /**
      * validation Query
