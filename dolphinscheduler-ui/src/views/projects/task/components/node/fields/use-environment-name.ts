@@ -83,7 +83,7 @@ export function useEnvironmentName(
     name: t('project.node.environment_name'),
     props: {
       loading: loading,
-      clearable: true
+      clearable: true,
     },
     options: options
   }
