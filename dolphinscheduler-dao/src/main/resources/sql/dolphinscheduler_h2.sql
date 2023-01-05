@@ -2052,7 +2052,7 @@ CREATE TABLE t_ds_trigger_relation
     id              bigint(20) NOT NULL AUTO_INCREMENT,
     trigger_type    int         NOT NULL,
     job_id          int         NOT NULL,
-    trigger_code    int         NOT NULL,
+    trigger_code    bigint(20)  NOT NULL,
     create_time     timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     update_time     timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),

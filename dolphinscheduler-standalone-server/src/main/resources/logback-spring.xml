@@ -70,7 +70,6 @@
     </appender>
 
     <root level="INFO">
-        <appender-ref ref="STDOUT"/>
         <if condition="${DOCKER:-false}">
             <then>
                 <appender-ref ref="STDOUT"/>
