@@ -335,13 +335,14 @@ public class TaskFilesTransferUtils {
                 String fileName = srcPath.substring(srcPath.lastIndexOf(SINGLE_SLASH) + 1);
                 String tmpPath = String.format(FORMAT_S_S, tmpDir, fileName);
                 FileUtils.renameTo(srcPath, tmpPath);
-
+                logger.info("Save output files in temporary path: {}", tmpPath);
                 // fill in partial scp command template
                 String preparedCommand = String.format(SCP_COMMAND_TEMPLATE,
                         taskExecutionContext.getTenantCode(),
                         taskExecutionContext.getHost().split(":")[0],
                         tmpPath,
                         FORMAT_S);
+                logger.info("Generate scp command template: {}", preparedCommand);
                 FileUtils.writeContent2File(preparedCommand, srcPath);
 
                 String templatePath = srcPath + TEMPLATE_SUFFIX;
@@ -369,6 +370,7 @@ public class TaskFilesTransferUtils {
         boolean isZip = downloadPath.endsWith(PACK_SUFFIX + TEMPLATE_SUFFIX);
 
         String execCommand = String.format(commandString, downloadPath);
+        logger.info("Complete command template: {}", execCommand);
 
         List<String> command = Arrays.asList(execCommand.split(" "));
         ProcessBuilder processBuilder = new ProcessBuilder();
