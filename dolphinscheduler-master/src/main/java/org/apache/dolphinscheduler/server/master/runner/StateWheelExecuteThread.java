@@ -342,7 +342,7 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
                 if (taskInstance.getState() != TaskExecutionStatus.NEED_FAULT_TOLERANCE
                         && taskInstance.retryTaskIntervalOverTime()) {
                     // reset taskInstance endTime and state
-                    // todo relative funtion: TaskInstance.retryTaskIntervalOverTime,
+                    // todo relative function: TaskInstance.retryTaskIntervalOverTime,
                     // WorkflowExecuteThread.cloneRetryTaskInstance
                     logger.info("[TaskInstanceKey-{}:{}]The task instance can retry, will retry this task instance",
                             taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion());
@@ -422,7 +422,6 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
     private void addTaskRetryEvent(TaskInstance taskInstance) {
         TaskStateEvent stateEvent = TaskStateEvent.builder()
                 .processInstanceId(taskInstance.getProcessInstanceId())
-                .taskInstanceId(taskInstance.getId())
                 .taskCode(taskInstance.getTaskCode())
                 .status(TaskExecutionStatus.RUNNING_EXECUTION)
                 .type(StateEventType.TASK_RETRY)

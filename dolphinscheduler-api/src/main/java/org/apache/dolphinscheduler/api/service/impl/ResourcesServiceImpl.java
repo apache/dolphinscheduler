@@ -61,18 +61,17 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.storage.StorageEntity;
-import org.apache.dolphinscheduler.service.storage.StorageOperate;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.rmi.ServerException;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -680,10 +679,16 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @return resource list page
      */
     @Override
-    public Result queryResourceListPaging(User loginUser, String fullName, String resTenantCode,
-                                          ResourceType type, String searchVal, Integer pageNo, Integer pageSize) {
-        Result<Object> result = new Result<>();
+    public Result<PageInfo<StorageEntity>> queryResourceListPaging(User loginUser, String fullName,
+                                                                   String resTenantCode,
+                                                                   ResourceType type, String searchVal, Integer pageNo,
+                                                                   Integer pageSize) {
+        Result<PageInfo<StorageEntity>> result = new Result<>();
         PageInfo<StorageEntity> pageInfo = new PageInfo<>(pageNo, pageSize);
+        if (storageOperate == null) {
+            logger.warn("The resource storage is not opened.");
+            return Result.success(pageInfo);
+        }
 
         User user = userMapper.selectById(loginUser.getId());
         if (user == null) {
@@ -851,6 +856,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Map<String, Object> queryResourceList(User loginUser, ResourceType type, String fullName) {
         Map<String, Object> result = new HashMap<>();
+        if (storageOperate == null) {
+            result.put(Constants.DATA_LIST, Collections.emptyList());
+            result.put(Constants.STATUS, Status.SUCCESS);
+            return result;
+        }
 
         User user = userMapper.selectById(loginUser.getId());
         if (user == null) {
@@ -1739,7 +1749,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         } catch (IOException e) {
             logger.error("Download resource error, the path is {}, and local filename is {}, the error message is {}",
                     fullName, localFileName, e.getMessage());
-            throw new ServerException("Download the resource file failed ,it may be related to your storage");
+            throw new ServiceException("Download the resource file failed ,it may be related to your storage");
         }
     }
 

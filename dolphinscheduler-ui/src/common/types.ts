@@ -19,24 +19,42 @@ import { Component } from 'vue'
 export type ITaskState =
   | 'SUBMITTED_SUCCESS'
   | 'RUNNING_EXECUTION'
+  | 'PAUSE'
+  | 'FAILURE'
+  | 'SUCCESS'
+  | 'NEED_FAULT_TOLERANCE'
+  | 'KILL'
+  | 'DELAY_EXECUTION'
+  | 'FORCED_SUCCESS'
+  | 'DISPATCH'
+
+export type IWorkflowExecutionState =
+  | 'SUBMITTED_SUCCESS'
+  | 'RUNNING_EXECUTION'
   | 'READY_PAUSE'
   | 'PAUSE'
   | 'READY_STOP'
   | 'STOP'
   | 'FAILURE'
   | 'SUCCESS'
-  | 'NEED_FAULT_TOLERANCE'
-  | 'KILL'
-  | 'WAITING_THREAD'
-  | 'WAITING_DEPEND'
   | 'DELAY_EXECUTION'
-  | 'FORCED_SUCCESS'
   | 'SERIAL_WAIT'
-  | 'DISPATCH'
-  | 'PENDING'
+  | 'READY_BLOCK'
+  | 'BLOCK'
 
 export type ITaskStateConfig = {
   [key in ITaskState]: {
+    id: number
+    desc: string
+    color: string
+    icon: Component
+    isSpin: boolean
+    classNames?: string
+  }
+}
+
+export type IWorkflowExecutionStateConfig = {
+  [key in IWorkflowExecutionState]: {
     id: number
     desc: string
     color: string

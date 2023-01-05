@@ -24,31 +24,43 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+
+@TableName(value = "t_ds_mysql_registry_lock")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class MysqlRegistryLock {
 
-    private long id;
+    @TableId(value = "id", type = IdType.AUTO)
+    private Long id;
     /**
      * The lock key.
      */
+    @TableField(value = "`key`")
     private String key;
     /**
      * acquire lock host.
      */
+    @TableField(value = "`lock_owner`")
     private String lockOwner;
     /**
      * The last term, if the (currentTime - lastTerm) > termExpire time, the lock will be expired.
      */
-    private Date lastTerm;
+    @TableField(value = "`last_term`")
+    private Long lastTerm;
     /**
      * The lock last update time.
      */
+    @TableField(value = "`last_update_time`")
     private Date lastUpdateTime;
     /**
      * The lock create time.
      */
+    @TableField(value = "`create_time`")
     private Date createTime;
 }

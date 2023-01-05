@@ -43,7 +43,7 @@ import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbConnectType;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -428,6 +428,7 @@ public class DataSourceServiceTest {
             Map<String, String> other = new HashMap<>();
             other.put("autoDeserialize", "yes");
             other.put("allowUrlInLocalInfile", "true");
+            other.put("useSSL", "true");
             MySQLDataSourceParamDTO mysqlDatasourceParamDTO = new MySQLDataSourceParamDTO();
             mysqlDatasourceParamDTO.setHost("192.168.9.1");
             mysqlDatasourceParamDTO.setPort(1521);
@@ -437,8 +438,11 @@ public class DataSourceServiceTest {
             mysqlDatasourceParamDTO.setOther(other);
             ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(mysqlDatasourceParamDTO);
             String expected =
-                    "{\"user\":\"test\",\"password\":\"bnVsbE1USXpORFUy\",\"address\":\"jdbc:mysql://192.168.9.1:1521\",\"database\":\"im\",\"jdbcUrl\":\"jdbc:mysql://192.168.9.1:1521/"
-                            + "im\",\"driverClassName\":\"com.mysql.cj.jdbc.Driver\",\"validationQuery\":\"select 1\",\"props\":{\"autoDeserialize\":\"yes\",\"allowUrlInLocalInfile\":\"true\"}}";
+                    "{\"user\":\"test\",\"password\":\"bnVsbE1USXpORFUy\",\"address\":\"jdbc:mysql://192.168.9.1:1521\","
+                            +
+                            "\"database\":\"im\",\"jdbcUrl\":\"jdbc:mysql://192.168.9.1:1521/im\",\"driverClassName\":\"com.mysql.cj.jdbc.Driver\","
+                            +
+                            "\"validationQuery\":\"select 1\",\"other\":{\"autoDeserialize\":\"yes\",\"allowUrlInLocalInfile\":\"true\",\"useSSL\":\"true\"}}";
             Assertions.assertEquals(expected, JSONUtils.toJsonString(connectionParam));
         }
 

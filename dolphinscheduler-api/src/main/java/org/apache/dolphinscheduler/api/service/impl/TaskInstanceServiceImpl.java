@@ -18,10 +18,11 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.FORCED_SUCCESS;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.INSTANCE_UPDATE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TASK_INSTANCE;
 
+import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceRemoveCacheResponse;
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.TaskInstanceService;
 import org.apache.dolphinscheduler.api.service.UsersService;
@@ -38,12 +39,19 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
+import org.apache.dolphinscheduler.dao.repository.DqExecuteResultDao;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.utils.TaskCacheUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
 import org.apache.dolphinscheduler.remote.command.TaskSavePointRequestCommand;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.service.log.LogClient;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -82,7 +90,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
     TaskInstanceMapper taskInstanceMapper;
 
     @Autowired
-    ProcessInstanceService processInstanceService;
+    TaskInstanceDao taskInstanceDao;
 
     @Autowired
     UsersService usersService;
@@ -92,6 +100,12 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
 
     @Autowired
     private StateEventCallbackService stateEventCallbackService;
+
+    @Autowired
+    private LogClient logClient;
+
+    @Autowired
+    private DqExecuteResultDao dqExecuteResultDao;
 
     /**
      * query task list by project, process instance, task name, task start time, task end time, task status, keyword paging
@@ -128,38 +142,44 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         Result result = new Result();
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> checkResult =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, TASK_INSTANCE);
-        Status status = (Status) checkResult.get(Constants.STATUS);
-        if (status != Status.SUCCESS) {
-            putMsg(result, status);
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, TASK_INSTANCE);
         int[] statusArray = null;
         if (stateType != null) {
             statusArray = new int[]{stateType.getCode()};
         }
-        Map<String, Object> checkAndParseDateResult = checkAndParseDateParameters(startDate, endDate);
-        status = (Status) checkAndParseDateResult.get(Constants.STATUS);
-        if (status != Status.SUCCESS) {
-            putMsg(result, status);
-            return result;
-        }
-        Date start = (Date) checkAndParseDateResult.get(Constants.START_TIME);
-        Date end = (Date) checkAndParseDateResult.get(Constants.END_TIME);
+        Date start = checkAndParseDateParameters(startDate);
+        Date end = checkAndParseDateParameters(endDate);
         Page<TaskInstance> page = new Page<>(pageNo, pageSize);
         PageInfo<Map<String, Object>> pageInfo = new PageInfo<>(pageNo, pageSize);
-        int executorId = usersService.getUserIdByName(executorName);
         IPage<TaskInstance> taskInstanceIPage;
         if (taskExecuteType == TaskExecuteType.STREAM) {
             // stream task without process instance
             taskInstanceIPage = taskInstanceMapper.queryStreamTaskInstanceListPaging(
-                    page, project.getCode(), processDefinitionName, searchVal, taskName, executorId, statusArray, host,
-                    taskExecuteType, start, end);
+                    page,
+                    project.getCode(),
+                    processDefinitionName,
+                    searchVal,
+                    taskName,
+                    executorName,
+                    statusArray,
+                    host,
+                    taskExecuteType,
+                    start,
+                    end);
         } else {
             taskInstanceIPage = taskInstanceMapper.queryTaskInstanceListPaging(
-                    page, project.getCode(), processInstanceId, processInstanceName, searchVal, taskName, executorId,
-                    statusArray, host, taskExecuteType, start, end);
+                    page,
+                    project.getCode(),
+                    processInstanceId,
+                    processInstanceName,
+                    searchVal,
+                    taskName,
+                    executorName,
+                    statusArray,
+                    host,
+                    taskExecuteType,
+                    start,
+                    end);
         }
         Set<String> exclusionSet = new HashSet<>();
         exclusionSet.add(Constants.CLASS);
@@ -306,4 +326,66 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
 
         return result;
     }
+
+    @Override
+    public TaskInstance queryTaskInstanceById(User loginUser, long projectCode, Long taskInstanceId) {
+        Project project = projectMapper.queryByCode(projectCode);
+        // check user access for project
+        projectService.checkProjectAndAuthThrowException(loginUser, project, FORCED_SUCCESS);
+        TaskInstance taskInstance = taskInstanceMapper.selectById(taskInstanceId);
+        if (taskInstance == null) {
+            logger.error("Task instance can not be found, projectCode:{}, taskInstanceId:{}.", projectCode,
+                    taskInstanceId);
+        }
+        return taskInstance;
+    }
+
+    @Override
+    public TaskInstanceRemoveCacheResponse removeTaskInstanceCache(User loginUser, long projectCode,
+                                                                   Integer taskInstanceId) {
+        Result result = new Result();
+
+        Project project = projectMapper.queryByCode(projectCode);
+        projectService.checkProjectAndAuthThrowException(loginUser, project, INSTANCE_UPDATE);
+
+        TaskInstance taskInstance = taskInstanceMapper.selectById(taskInstanceId);
+        if (taskInstance == null) {
+            logger.error("Task definition can not be found, projectCode:{}, taskInstanceId:{}.", projectCode,
+                    taskInstanceId);
+            putMsg(result, Status.TASK_INSTANCE_NOT_FOUND);
+            return new TaskInstanceRemoveCacheResponse(result);
+        }
+        String tagCacheKey = taskInstance.getCacheKey();
+        Pair<Integer, String> taskIdAndCacheKey = TaskCacheUtils.revertCacheKey(tagCacheKey);
+        String cacheKey = taskIdAndCacheKey.getRight();
+        if (StringUtils.isNotEmpty(cacheKey)) {
+            taskInstanceDao.clearCacheByCacheKey(cacheKey);
+        }
+        putMsg(result, Status.SUCCESS);
+        return new TaskInstanceRemoveCacheResponse(result, cacheKey);
+    }
+
+    @Override
+    public void deleteByWorkflowInstanceId(Integer workflowInstanceId) {
+        List<TaskInstance> needToDeleteTaskInstances =
+                taskInstanceDao.findTaskInstanceByWorkflowInstanceId(workflowInstanceId);
+        if (org.apache.commons.collections4.CollectionUtils.isEmpty(needToDeleteTaskInstances)) {
+            return;
+        }
+        for (TaskInstance taskInstance : needToDeleteTaskInstances) {
+            // delete log
+            if (StringUtils.isNotEmpty(taskInstance.getLogPath())) {
+                try {
+                    logClient.removeTaskLog(Host.of(taskInstance.getHost()), taskInstance.getLogPath());
+                } catch (Exception e) {
+                    logger.error(
+                            "Remove task log error, meet an unknown exception, taskInstanceId: {}, host: {}, logPath: {}",
+                            taskInstance.getId(), taskInstance.getHost(), taskInstance.getLogPath(), e);
+                }
+            }
+        }
+        dqExecuteResultDao.deleteByWorkflowInstanceId(workflowInstanceId);
+        taskInstanceDao.deleteByWorkflowInstanceId(workflowInstanceId);
+    }
+
 }
