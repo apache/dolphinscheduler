@@ -41,4 +41,9 @@ public class ProcessTaskRelationLogDaoImpl implements ProcessTaskRelationLogDao 
     public void deleteByWorkflowDefinitionCode(long workflowDefinitionCode) {
         processTaskRelationLogMapper.deleteByWorkflowDefinitionCode(workflowDefinitionCode);
     }
+
+    @Override
+    public int batchInsert(List<ProcessTaskRelationLog> taskRelationList) {
+        return processTaskRelationLogMapper.batchInsert(taskRelationList);
+    }
 }

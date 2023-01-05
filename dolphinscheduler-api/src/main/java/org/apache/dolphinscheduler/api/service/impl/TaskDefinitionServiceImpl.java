@@ -59,11 +59,11 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskMainInfo;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.dao.repository.ProcessTaskRelationLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
@@ -125,7 +125,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     private ProcessTaskRelationMapper processTaskRelationMapper;
 
     @Autowired
-    private ProcessTaskRelationLogMapper processTaskRelationLogMapper;
+    private ProcessTaskRelationLogDao processTaskRelationLogDao;
 
     @Autowired
     private ProcessTaskRelationService processTaskRelationService;
@@ -857,7 +857,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         } else {
             queryUpStreamTaskCodeMap = new HashMap<>();
         }
-        if (queryUpStreamTaskCodeMap.size() != 0) {
+        if (MapUtils.isNotEmpty(queryUpStreamTaskCodeMap)) {
             ProcessTaskRelation taskRelation = upstreamTaskRelations.get(0);
             List<ProcessTaskRelation> processTaskRelations =
                     processTaskRelationMapper.queryByProcessCode(projectCode, taskRelation.getProcessDefinitionCode());
@@ -898,7 +898,8 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         return result;
     }
 
-    private void updateUpstreamTask(Set<Long> allPreTaskCodeSet, long taskCode, long projectCode, long processDefinitionCode, User loginUser) {
+    private void updateUpstreamTask(Set<Long> allPreTaskCodeSet, long taskCode, long projectCode,
+                                    long processDefinitionCode, User loginUser) {
         // query all process task relation
         List<ProcessTaskRelation> hadProcessTaskRelationList = processTaskRelationMapper
                 .queryUpstreamByCode(projectCode, taskCode);
@@ -965,14 +966,15 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             }
         }
         if (CollectionUtils.isNotEmpty(processTaskRelationLogList)) {
-            log = processTaskRelationLogMapper.batchInsert(processTaskRelationLogList);
+            log = processTaskRelationLogDao.batchInsert(processTaskRelationLogList);
         }
         if (insert + remove != log) {
             throw new RuntimeException("updateUpstreamTask error");
         }
     }
 
-    private ProcessTaskRelationLog createProcessTaskRelationLog(User loginUser, ProcessTaskRelation processTaskRelation) {
+    private ProcessTaskRelationLog createProcessTaskRelationLog(User loginUser,
+                                                                ProcessTaskRelation processTaskRelation) {
         Date now = new Date();
         ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog(processTaskRelation);
         processTaskRelationLog.setOperator(loginUser.getId());
