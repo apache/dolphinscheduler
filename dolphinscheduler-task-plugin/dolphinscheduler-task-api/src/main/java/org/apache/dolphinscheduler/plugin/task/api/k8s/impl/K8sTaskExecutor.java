@@ -141,8 +141,13 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
 
             @Override
             public void eventReceived(Action action, Job job) {
+                logger.info("event received : job:{} action:{}", job.getMetadata().getName(), action);
                 if (action != Action.ADDED) {
                     int jobStatus = getK8sJobStatus(job);
+                    logger.info("job {} status {}", job.getMetadata().getName(), jobStatus);
+                    if (jobStatus == TaskConstants.RUNNING_CODE) {
+                        return;
+                    }
                     setTaskStatus(jobStatus, taskInstanceId, taskResponse, k8STaskMainParameters);
                     countDownLatch.countDown();
                 }
