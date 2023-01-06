@@ -107,7 +107,7 @@ public class ZeppelinTask extends AbstractRemoteTask {
                 noteId = this.zClient.cloneNote(noteId, cloneNotePath);
             }
 
-            if (paragraphId == null) {
+            if (paragraphId == null || paragraphId.trim().length() == 0) {
                 final NoteResult noteResult = this.zClient.executeNote(noteId, zeppelinParamsMap);
                 final List<ParagraphResult> paragraphResultList = noteResult.getParagraphResultList();
                 StringBuilder resultContentBuilder = new StringBuilder();
