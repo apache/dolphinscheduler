@@ -85,13 +85,14 @@ export function useModal(
     }
   }
 
-  const handleStartDefinition = async (code: number) => {
+  const handleStartDefinition = async (code: number,version: number) => {
     await state.startFormRef.validate()
 
     if (state.saving) return
     state.saving = true
     try {
       state.startForm.processDefinitionCode = code
+      state.startForm.version = version
       const params = omit(state.startForm, [
         'startEndTime',
         'scheduleTime',

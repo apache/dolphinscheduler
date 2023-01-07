@@ -77,6 +77,7 @@ public class ExecutorControllerTest extends AbstractControllerTest {
     final int dryRun = 7;
     final int testFlag = 0;
     final ComplementDependentMode complementDependentMode = ComplementDependentMode.OFF_MODE;
+    final Integer version = null;
 
     final JsonObject expectResponseContent = gson
             .fromJson("{\"code\":0,\"msg\":\"success\",\"data\":\"Test Data\",\"success\":true,\"failed\":false}",
@@ -115,7 +116,7 @@ public class ExecutorControllerTest extends AbstractControllerTest {
                 eq(warningType),
                 eq(warningGroupId), eq(runMode), eq(processInstancePriority), eq(workerGroup), eq(environmentCode),
                 eq(timeout), eq(startParams), eq(expectedParallelismNumber), eq(dryRun), eq(testFlag),
-                eq(complementDependentMode)))
+                eq(complementDependentMode), eq(version)))
                         .thenReturn(executeServiceResult);
 
         // When
@@ -159,7 +160,7 @@ public class ExecutorControllerTest extends AbstractControllerTest {
                 eq(warningGroupId), eq(runMode), eq(processInstancePriority), eq(workerGroup), eq(environmentCode),
                 eq(Constants.MAX_TASK_TIMEOUT), eq(startParams), eq(expectedParallelismNumber), eq(dryRun),
                 eq(testFlag),
-                eq(complementDependentMode))).thenReturn(executeServiceResult);
+                eq(complementDependentMode), eq(version))).thenReturn(executeServiceResult);
 
         // When
         final MvcResult mvcResult = mockMvc
@@ -201,7 +202,7 @@ public class ExecutorControllerTest extends AbstractControllerTest {
                 eq(warningType),
                 eq(warningGroupId), eq(runMode), eq(processInstancePriority), eq(workerGroup), eq(environmentCode),
                 eq(timeout), eq(null), eq(expectedParallelismNumber), eq(dryRun), eq(testFlag),
-                eq(complementDependentMode))).thenReturn(executeServiceResult);
+                eq(complementDependentMode), eq(version))).thenReturn(executeServiceResult);
 
         // When
         final MvcResult mvcResult = mockMvc
@@ -230,7 +231,7 @@ public class ExecutorControllerTest extends AbstractControllerTest {
                 eq(scheduleTime), eq(null), eq(failureStrategy), eq(null), eq(null), eq(warningType),
                 eq(null), eq(null), eq(null), eq("default"), eq(-1L),
                 eq(Constants.MAX_TASK_TIMEOUT), eq(null), eq(null), eq(0), eq(0),
-                eq(complementDependentMode))).thenReturn(executeServiceResult);
+                eq(complementDependentMode), eq(version))).thenReturn(executeServiceResult);
 
         // When
         final MvcResult mvcResult = mockMvc
