@@ -71,6 +71,7 @@ interface ProcessInstanceReq extends ProcessDefinitionCodeReq {
   taskDependType?: 'TASK_ONLY' | 'TASK_PRE' | 'TASK_POST'
   timeout?: number
   workerGroup?: string
+  version?: number
 }
 
 export {
