@@ -506,7 +506,7 @@ public class SqlTask extends AbstractTask {
         // replace the ${} of the SQL statement with the Placeholder
         String formatSql = sql.replaceAll(rgex, "?");
         // Convert the list parameter
-        formatSql = ParameterUtils.expandListParameter(sqlParamsMap, formatSql);
+        formatSql = ParameterUtils.expandListParameter(sqlParamsMap, sql, rgex);
         sqlBuilder.append(formatSql);
         // print replace sql
         printReplacedSql(sql, formatSql, rgex, sqlParamsMap);

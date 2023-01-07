@@ -154,12 +154,12 @@ public class ParameterUtils {
         }
     }
 
-    public static String expandListParameter(Map<Integer, Property> params, String sql) {
+    public static String expandListParameter(Map<Integer, Property> params, String sql, String rgex) {
         Map<Integer, Property> expandMap = new HashMap<>();
         if (params == null || params.isEmpty()) {
             return sql;
         }
-        String[] split = sql.split("\\?");
+        String[] split = sql.split(rgex);
         if (split.length == 0) {
             return sql;
         }
@@ -203,7 +203,7 @@ public class ParameterUtils {
             }
             ret.append(split[i]);
         }
-        if (PARAM_REPLACE_CHAR == sql.charAt(sql.length() - 1)) {
+        if (sql.matches(".+" + rgex + "$")) {
             ret.append(PARAM_REPLACE_CHAR);
             expandMap.put(index, params.get(split.length));
         }
