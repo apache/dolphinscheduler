@@ -31,7 +31,7 @@ import { tasksState } from '@/common/common'
 import type { ITaskTypeNodeOption } from './types'
 
 export default defineComponent({
-  name: 'WorkflowDefinitionTiming',
+  name: 'WorkflowDefinitionTree',
   setup() {
     const router: Router = useRouter()
     const { t, locale } = useI18n()
