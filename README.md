@@ -71,9 +71,9 @@ Please refer to the official website document: [QuickStart in Kubernetes](https:
 The default Zookeeper Server version supported is 3.4.6+.
 ```bash
 # Default Zookeeper Client 3.4.14
-./mvnw clean install -P release
+./mvnw clean install -Prelease
 # Upgrade to Zookeeper Client 3.8
-./mvnw clean install -P release,zk-3.8
+./mvnw clean install -Prelease -Dzk-3.8
 ```
 
 Artifact:
