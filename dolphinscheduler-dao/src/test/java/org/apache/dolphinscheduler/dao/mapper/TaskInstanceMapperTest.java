@@ -403,19 +403,18 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
 
         Page<TaskInstance> page = new Page(1, 3);
         IPage<TaskInstance> taskInstanceIPage = taskInstanceMapper.queryTaskInstanceListPaging(
-            page,
-            definition.getProjectCode(),
-            task.getProcessInstanceId(),
-            "",
-            "",
-            "",
-            "",
-            "",
-            new int[0],
-            "",
-            TaskExecuteType.BATCH,
-            null, null
-        );
+                page,
+                definition.getProjectCode(),
+                task.getProcessInstanceId(),
+                "",
+                "",
+                "",
+                "",
+                "",
+                new int[0],
+                "",
+                TaskExecuteType.BATCH,
+                null, null);
         processInstanceMapper.deleteById(processInstance.getId());
         taskInstanceMapper.deleteById(task.getId());
         processDefinitionMapper.deleteById(definition.getId());
