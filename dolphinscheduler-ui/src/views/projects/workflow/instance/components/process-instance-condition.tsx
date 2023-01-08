@@ -20,7 +20,7 @@ import { NInput, NButton, NDatePicker, NSelect, NIcon, NSpace } from 'naive-ui'
 import { defineComponent, getCurrentInstance, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { format } from 'date-fns'
-import { stateType } from '@/common/common'
+import { workflowExecutionStateType } from '@/common/common'
 
 export default defineComponent({
   name: 'ProcessInstanceCondition',
@@ -56,6 +56,21 @@ export default defineComponent({
       })
     }
 
+    const onClearSearchVal = () => {
+      searchValRef.value = ''
+      handleSearch()
+    }
+
+    const onClearSearchHost = () => {
+      hostRef.value = ''
+      handleSearch()
+    }
+
+    const onClearSearchExecutor = () => {
+      executorNameRef.value = ''
+      handleSearch()
+    }
+
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
     return {
@@ -65,12 +80,15 @@ export default defineComponent({
       stateTypeRef,
       startEndTimeRef,
       handleSearch,
+      onClearSearchVal,
+      onClearSearchExecutor,
+      onClearSearchHost,
       trim
     }
   },
   render() {
     const { t } = useI18n()
-    const options = stateType(t)
+    const options = workflowExecutionStateType(t)
 
     return (
       <NSpace justify='end'>
@@ -79,18 +97,24 @@ export default defineComponent({
           size='small'
           v-model:value={this.searchValRef}
           placeholder={t('project.workflow.name')}
+          clearable
+          onClear={this.onClearSearchVal}
         />
         <NInput
           allowInput={this.trim}
           size='small'
           v-model:value={this.executorNameRef}
           placeholder={t('project.workflow.executor')}
+          clearable
+          onClear={this.onClearSearchExecutor}
         />
         <NInput
           allowInput={this.trim}
           size='small'
           v-model:value={this.hostRef}
           placeholder={t('project.workflow.host')}
+          clearable
+          onClear={this.onClearSearchHost}
         />
         <NSelect
           options={options}

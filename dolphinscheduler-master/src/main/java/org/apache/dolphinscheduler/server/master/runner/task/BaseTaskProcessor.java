@@ -26,7 +26,7 @@ import static org.apache.dolphinscheduler.common.constants.Constants.SINGLE_SLAS
 import static org.apache.dolphinscheduler.common.constants.Constants.USER;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.CLUSTER;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DATA_QUALITY;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_K8S;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SET_K8S;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_NAME;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_TABLE;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_TYPE;
@@ -49,11 +49,13 @@ import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.DataQualityTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ConnectorType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ExecuteSqlType;
@@ -75,14 +77,12 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.storage.impl.HadoopUtils;
-import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.dolphinscheduler.spi.plugin.SPIIdentify;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -124,6 +124,8 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     protected ProcessInstanceDao processInstanceDao;
 
+    protected StorageOperate storageOperate;
+
     protected MasterConfig masterConfig;
 
     protected TaskPluginManager taskPluginManager;
@@ -140,6 +142,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         taskPluginManager = SpringApplicationContext.getBean(TaskPluginManager.class);
         curingParamsService = SpringApplicationContext.getBean(CuringParamsService.class);
         taskInstanceDao = SpringApplicationContext.getBean(TaskInstanceDao.class);
+        storageOperate = SpringApplicationContext.getBean(StorageOperate.class, null);
         this.taskInstance = taskInstance;
         this.processInstance = processInstance;
         this.maxRetryTimes = masterConfig.getTaskCommitRetryTimes();
@@ -320,12 +323,14 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         this.setTaskResourceInfo(resources);
 
         // TODO to be optimized
-        DataQualityTaskExecutionContext dataQualityTaskExecutionContext = new DataQualityTaskExecutionContext();
+        DataQualityTaskExecutionContext dataQualityTaskExecutionContext = null;
         if (TASK_TYPE_DATA_QUALITY.equalsIgnoreCase(taskInstance.getTaskType())) {
+            dataQualityTaskExecutionContext = new DataQualityTaskExecutionContext();
             setDataQualityTaskRelation(dataQualityTaskExecutionContext, taskInstance, tenant.getTenantCode());
         }
-        K8sTaskExecutionContext k8sTaskExecutionContext = new K8sTaskExecutionContext();
-        if (TASK_TYPE_K8S.equalsIgnoreCase(taskInstance.getTaskType())) {
+        K8sTaskExecutionContext k8sTaskExecutionContext = null;
+        if (TASK_TYPE_SET_K8S.contains(taskInstance.getTaskType())) {
+            k8sTaskExecutionContext = new K8sTaskExecutionContext();
             setK8sTaskRelation(k8sTaskExecutionContext, taskInstance);
         }
 
@@ -393,7 +398,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         udfFuncList.forEach(udfFunc -> {
             UdfFuncParameters udfFuncParameters =
                     JSONUtils.parseObject(JSONUtils.toJsonString(udfFunc), UdfFuncParameters.class);
-            udfFuncParameters.setDefaultFS(HadoopUtils.getInstance().getDefaultFS());
+            udfFuncParameters.setDefaultFS(PropertyUtils.getString(Constants.FS_DEFAULT_FS));
             String tenantCode = processService.queryTenantCodeByResName(udfFunc.getResourceName(), ResourceType.UDF);
             udfFuncParameters.setTenantCode(tenantCode);
             map.put(udfFunc.getId(), udfFuncParameters);

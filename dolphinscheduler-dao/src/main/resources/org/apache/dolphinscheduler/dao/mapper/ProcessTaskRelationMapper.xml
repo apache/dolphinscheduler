@@ -145,9 +145,7 @@
                 pre_task_code=#{processTaskRelation.preTaskCode},
                 pre_task_version=#{processTaskRelation.preTaskVersion}
             </set>
-            <where>
                 WHERE id = #{processTaskRelation.id}
-            </where>
         </foreach>
     </update>
 
@@ -223,4 +221,23 @@
         </where>
         order by update_time desc, id asc
     </select>
+    <select id="queryTaskCodeByTaskName" resultType="java.lang.Long">
+        select r.post_task_code
+        from t_ds_process_task_relation r
+                 left join t_ds_task_definition d on d.code = r.post_task_code
+        where r.process_definition_code = #{workflowCode}
+          and d.name = #{taskName}
+    </select>
+    <update id="updateProcessTaskRelationTaskVersion">
+        update t_ds_process_task_relation
+        set pre_task_version=#{processTaskRelation.preTaskVersion},
+            post_task_version=#{processTaskRelation.postTaskVersion}
+        where id = #{processTaskRelation.id}
+    </update>
+
+    <delete id="deleteByWorkflowDefinitionCode">
+        delete
+        from t_ds_process_task_relation
+        where process_definition_code = #{workflowDefinitionCode} and process_definition_version = #{workflowDefinitionVersion}
+    </delete>
 </mapper>

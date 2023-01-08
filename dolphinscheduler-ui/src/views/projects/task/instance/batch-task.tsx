@@ -75,6 +75,36 @@ const BatchTaskInstance = defineComponent({
       requestTableData()
     }
 
+    const onClearSearchTaskName = () => {
+      variables.searchVal = ''
+      onSearch()
+    }
+
+    const onClearSearchProcessInstanceName = () => {
+      variables.processInstanceName = null
+      onSearch()
+    }
+
+    const onClearSearchExecutorName = () => {
+      variables.executorName = null
+      onSearch()
+    }
+
+    const onClearSearchHost = () => {
+      variables.host = null
+      onSearch()
+    }
+
+    const onClearSearchStateType = () => {
+      variables.stateType = null
+      onSearch()
+    }
+
+    const onClearSearchTime = () => {
+      variables.datePickerRange = null
+      onSearch()
+    }
+
     const onConfirmModal = () => {
       variables.showModalRef = false
     }
@@ -154,6 +184,12 @@ const BatchTaskInstance = defineComponent({
       requestTableData,
       onUpdatePageSize,
       onSearch,
+      onClearSearchTaskName,
+      onClearSearchProcessInstanceName,
+      onClearSearchExecutorName,
+      onClearSearchHost,
+      onClearSearchStateType,
+      onClearSearchTime,
       onConfirmModal,
       refreshLogs,
       trim
@@ -180,6 +216,7 @@ const BatchTaskInstance = defineComponent({
               size='small'
               placeholder={t('project.task.task_name')}
               clearable
+              onClear={this.onClearSearchTaskName}
             />
             <NInput
               allowInput={this.trim}
@@ -187,6 +224,7 @@ const BatchTaskInstance = defineComponent({
               size='small'
               placeholder={t('project.task.workflow_instance')}
               clearable
+              onClear={this.onClearSearchProcessInstanceName}
             />
             <NInput
               allowInput={this.trim}
@@ -194,6 +232,7 @@ const BatchTaskInstance = defineComponent({
               size='small'
               placeholder={t('project.task.executor')}
               clearable
+              onClear={this.onClearSearchExecutorName}
             />
             <NInput
               allowInput={this.trim}
@@ -201,6 +240,7 @@ const BatchTaskInstance = defineComponent({
               size='small'
               placeholder={t('project.task.host')}
               clearable
+              onClear={this.onClearSearchHost}
             />
             <NSelect
               v-model={[this.taskType, 'value']}
@@ -219,6 +259,7 @@ const BatchTaskInstance = defineComponent({
               placeholder={t('project.task.state')}
               style={{ width: '180px' }}
               clearable
+              onClear={this.onClearSearchStateType}
             />
             <NDatePicker
               v-model={[this.datePickerRange, 'value']}
@@ -227,6 +268,7 @@ const BatchTaskInstance = defineComponent({
               start-placeholder={t('project.task.start_time')}
               end-placeholder={t('project.task.end_time')}
               clearable
+              onClear={this.onClearSearchTime}
             />
             <NButton size='small' type='primary' onClick={onSearch}>
               <NIcon>

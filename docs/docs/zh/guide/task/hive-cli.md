@@ -31,7 +31,7 @@
 |---------------|-----------------------------------------------------|
 | Hive Cli 任务类型 | Hive Cli任务执行方式，可以选择`FROM_SCRIPT`或者`FROM_FILE`。      |
 | Hive SQL 脚本   | 手动填入您的Hive SQL脚本语句。                                 |
-| Hive Cli 选项   | Hive Cli的其他选项，如`--verbose`。                         |
+| Hive Cli 选项   | Hive Cli的其他选项，如`--verbose`来查看任务结果。                  |
 | 资源            | 如果您选择`FROM_FILE`作为Hive Cli任务类型，您需要在资源中选择Hive SQL文件。 |
 
 ## 任务样例

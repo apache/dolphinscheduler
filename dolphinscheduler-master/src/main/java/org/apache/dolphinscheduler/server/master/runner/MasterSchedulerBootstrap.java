@@ -110,6 +110,9 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
     @Autowired
     private WorkflowEventLooper workflowEventLooper;
 
+    @Autowired
+    private ServerNodeManager serverNodeManager;
+
     private String masterAddress;
 
     protected MasterSchedulerBootstrap() {
@@ -260,22 +263,22 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
     private List<Command> findCommands() throws MasterException {
         try {
             long scheduleStartTime = System.currentTimeMillis();
-            int thisMasterSlot = ServerNodeManager.getSlot();
-            int masterCount = ServerNodeManager.getMasterSize();
+            int thisMasterSlot = serverNodeManager.getSlot();
+            int masterCount = serverNodeManager.getMasterSize();
             if (masterCount <= 0) {
                 logger.warn("Master count: {} is invalid, the current slot: {}", masterCount, thisMasterSlot);
                 return Collections.emptyList();
             }
-            int pageNumber = 0;
             int pageSize = masterConfig.getFetchCommandNum();
             final List<Command> result =
-                    commandService.findCommandPageBySlot(pageSize, pageNumber, masterCount, thisMasterSlot);
+                    commandService.findCommandPageBySlot(pageSize, masterCount, thisMasterSlot);
             if (CollectionUtils.isNotEmpty(result)) {
+                long cost = System.currentTimeMillis() - scheduleStartTime;
                 logger.info(
-                        "Master schedule bootstrap loop command success, command size: {}, current slot: {}, total slot size: {}",
-                        result.size(), thisMasterSlot, masterCount);
+                        "Master schedule bootstrap loop command success, fetch command size: {}, cost: {}ms, current slot: {}, total slot size: {}",
+                        result.size(), cost, thisMasterSlot, masterCount);
+                ProcessInstanceMetrics.recordCommandQueryTime(cost);
             }
-            ProcessInstanceMetrics.recordCommandQueryTime(System.currentTimeMillis() - scheduleStartTime);
             return result;
         } catch (Exception ex) {
             throw new MasterException("Master loop command from database error", ex);
@@ -283,8 +286,8 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
     }
 
     private SlotCheckState slotCheck(Command command) {
-        int slot = ServerNodeManager.getSlot();
-        int masterSize = ServerNodeManager.getMasterSize();
+        int slot = serverNodeManager.getSlot();
+        int masterSize = serverNodeManager.getMasterSize();
         SlotCheckState state;
         if (masterSize <= 0) {
             state = SlotCheckState.CHANGE;

@@ -147,7 +147,8 @@ public class ExecutorController extends BaseController {
                                        @RequestParam(value = "expectedParallelismNumber", required = false) Integer expectedParallelismNumber,
                                        @RequestParam(value = "dryRun", defaultValue = "0", required = false) int dryRun,
                                        @RequestParam(value = "testFlag", defaultValue = "0") int testFlag,
-                                       @RequestParam(value = "complementDependentMode", required = false) ComplementDependentMode complementDependentMode) {
+                                       @RequestParam(value = "complementDependentMode", required = false) ComplementDependentMode complementDependentMode,
+                                       @RequestParam(value = "version", required = false) Integer version) {
 
         if (timeout == null) {
             timeout = Constants.MAX_TASK_TIMEOUT;
@@ -165,7 +166,7 @@ public class ExecutorController extends BaseController {
                 scheduleTime, execType, failureStrategy,
                 startNodeList, taskDependType, warningType, warningGroupId, runMode, processInstancePriority,
                 workerGroup, environmentCode, timeout, startParamMap, expectedParallelismNumber, dryRun, testFlag,
-                complementDependentMode);
+                complementDependentMode, version);
         return returnDataList(result);
     }
 
@@ -264,7 +265,7 @@ public class ExecutorController extends BaseController {
                     execType, failureStrategy,
                     startNodeList, taskDependType, warningType, warningGroupId, runMode, processInstancePriority,
                     workerGroup, environmentCode, timeout, startParamMap, expectedParallelismNumber, dryRun, testFlag,
-                    complementDependentMode);
+                    complementDependentMode, null);
 
             if (!Status.SUCCESS.equals(result.get(Constants.STATUS))) {
                 logger.error("Process definition start failed, projectCode:{}, processDefinitionCode:{}.", projectCode,
@@ -450,4 +451,36 @@ public class ExecutorController extends BaseController {
                 warningGroupId, workerGroup, environmentCode, startParamMap, dryRun);
         return returnDataList(result);
     }
+
+    /**
+     * do action to process instance: pause, stop, repeat, recover from pause, recover from stop
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param processInstanceId process instance id
+     * @param startNodeList start node list
+     * @param taskDependType task depend type
+     * @return execute result code
+     */
+    @Operation(summary = "execute-task", description = "EXECUTE_ACTION_TO_PROCESS_INSTANCE_NOTES")
+    @Parameters({
+            @Parameter(name = "processInstanceId", description = "PROCESS_INSTANCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "startNodeList", description = "START_NODE_LIST", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "taskDependType", description = "TASK_DEPEND_TYPE", required = true, schema = @Schema(implementation = TaskDependType.class))
+    })
+    @PostMapping(value = "/execute-task")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(EXECUTE_PROCESS_INSTANCE_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result executeTask(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                              @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                              @RequestParam("processInstanceId") Integer processInstanceId,
+                              @RequestParam("startNodeList") String startNodeList,
+                              @RequestParam("taskDependType") TaskDependType taskDependType) {
+        logger.info("Start to execute task in process instance, projectCode:{}, processInstanceId:{}.",
+                projectCode,
+                processInstanceId);
+        return execService.executeTask(loginUser, projectCode, processInstanceId, startNodeList, taskDependType);
+    }
+
 }

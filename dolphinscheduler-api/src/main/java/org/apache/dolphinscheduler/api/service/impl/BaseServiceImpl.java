@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -31,7 +32,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.text.MessageFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -177,8 +177,8 @@ public class BaseServiceImpl implements BaseService {
      */
     @Override
     public boolean canOperatorPermissions(User user, Object[] ids, AuthorizationType type, String permissionKey) {
-        boolean operationPermissionCheck = resourcePermissionCheckService.operationPermissionCheck(type,
-                type.equals(AuthorizationType.PROJECTS) ? ids : null, user.getId(), permissionKey, logger);
+        boolean operationPermissionCheck =
+                resourcePermissionCheckService.operationPermissionCheck(type, user.getId(), permissionKey, logger);
         boolean resourcePermissionCheck = resourcePermissionCheckService.resourcePermissionCheck(type, ids,
                 user.getUserType().equals(UserType.ADMIN_USER) ? 0 : user.getId(), logger);
         return operationPermissionCheck && resourcePermissionCheck;
@@ -186,38 +186,18 @@ public class BaseServiceImpl implements BaseService {
 
     /**
      * check and parse date parameters
-     *
-     * @param startDateStr start date string
-     * @param endDateStr end date string
-     * @return map<status,startDate,endDate>
      */
     @Override
-    public Map<String, Object> checkAndParseDateParameters(String startDateStr, String endDateStr) {
-        Map<String, Object> result = new HashMap<>();
+    public Date checkAndParseDateParameters(String startDateStr) throws ServiceException {
         Date start = null;
         if (!StringUtils.isEmpty(startDateStr)) {
             start = DateUtils.stringToDate(startDateStr);
             if (Objects.isNull(start)) {
                 logger.warn("Parameter startDateStr is invalid.");
-                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
-                return result;
+                throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
             }
         }
-        result.put(Constants.START_TIME, start);
-
-        Date end = null;
-        if (!StringUtils.isEmpty(endDateStr)) {
-            end = DateUtils.stringToDate(endDateStr);
-            if (Objects.isNull(end)) {
-                logger.warn("Parameter endDateStr is invalid.");
-                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
-                return result;
-            }
-        }
-        result.put(Constants.END_TIME, end);
-
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return start;
     }
 
     @Override

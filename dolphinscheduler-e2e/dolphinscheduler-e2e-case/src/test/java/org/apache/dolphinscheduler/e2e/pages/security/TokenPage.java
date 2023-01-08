@@ -80,8 +80,8 @@ public final class TokenPage extends NavBarPage implements Tab {
                         userName)))
                 .click();
 
-        createTokenForm().buttonGenerateToken().click();
         new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(createTokenForm().buttonGenerateToken()));
+        createTokenForm().buttonGenerateToken().click();
 
         createTokenForm().buttonSubmit().click();
 

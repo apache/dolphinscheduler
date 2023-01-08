@@ -50,9 +50,13 @@ mergeable:
     validate:
       - do: milestone
         no_empty:
-          enabled: true # Cannot be empty when true.
+          enabled: false # Cannot be empty when true.
           message: 'Milestone is required and cannot be empty.'
       - do: label
-        must_include:
-          regex: 'feature|bug|improvement|document|chore'
-          message: 'Label must include one of the following: `feature`, `bug`, `improvement`, `document`, `chore`'
+        and:
+          - must_include:
+              regex: 'feature|bug|improvement|document|chore'
+              message: 'Label must include one of the following: `feature`, `bug`, `improvement`, `document`, `chore`'
+          - must_include:
+              regex: '\d+\.\d+\.\w+'
+              message: 'Label must include one or more version numbers.'

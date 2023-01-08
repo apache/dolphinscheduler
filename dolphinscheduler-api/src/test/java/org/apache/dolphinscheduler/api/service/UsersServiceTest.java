@@ -48,10 +48,10 @@ import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
-import org.apache.dolphinscheduler.service.storage.StorageOperate;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -256,7 +256,7 @@ public class UsersServiceTest {
         user.setUserType(UserType.ADMIN_USER);
         user.setId(1);
 
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 1,
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ACCESS_TOKEN, 1,
                 USER_MANAGER, serviceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 0,
                 serviceLogger)).thenReturn(false);
@@ -265,7 +265,7 @@ public class UsersServiceTest {
         Assertions.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
 
         // success
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 1,
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ACCESS_TOKEN, 1,
                 USER_MANAGER, serviceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 0,
                 serviceLogger)).thenReturn(true);

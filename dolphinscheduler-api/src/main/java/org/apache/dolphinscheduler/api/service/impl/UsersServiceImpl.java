@@ -55,9 +55,9 @@ import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
-import org.apache.dolphinscheduler.service.storage.StorageOperate;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -722,7 +722,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             projectUser = new ProjectUser();
             projectUser.setUserId(userId);
             projectUser.setProjectId(project.getId());
-            projectUser.setPerm(7);
+            projectUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
             projectUser.setCreateTime(today);
             projectUser.setUpdateTime(today);
             this.projectUserMapper.insert(projectUser);

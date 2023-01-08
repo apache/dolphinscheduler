@@ -65,9 +65,9 @@ public class JupyterTask extends AbstractRemoteTask {
 
     @Override
     public void init() {
-        logger.info("jupyter task params {}", taskExecutionContext.getTaskParams());
 
         jupyterParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), JupyterParameters.class);
+        logger.info("Initialize jupyter task params {}", JSONUtils.toPrettyJsonString(jupyterParameters));
 
         if (null == jupyterParameters) {
             logger.error("jupyter params is null");

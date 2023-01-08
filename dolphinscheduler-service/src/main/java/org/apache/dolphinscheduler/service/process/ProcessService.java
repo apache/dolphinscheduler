@@ -83,8 +83,6 @@ public interface ProcessService {
 
     void removeTaskLogFile(Integer processInstanceId);
 
-    void deleteWorkTaskInstanceByProcessInstanceId(int processInstanceId);
-
     void recurseFindSubProcess(long parentCode, List<Long> ids);
 
     Tenant getTenantForProcess(int tenantId, int userId);
@@ -221,8 +219,11 @@ public interface ProcessService {
     void changeTaskGroupQueueStatus(int taskId, TaskGroupQueueStatus status);
 
     TaskGroupQueue insertIntoTaskGroupQueue(Integer taskId,
-                                            String taskName, Integer groupId,
-                                            Integer processId, Integer priority, TaskGroupQueueStatus status);
+                                            String taskName,
+                                            Integer groupId,
+                                            Integer processId,
+                                            Integer priority,
+                                            TaskGroupQueueStatus status);
 
     int updateTaskGroupQueueStatus(Integer taskId, int status);
 

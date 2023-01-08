@@ -23,7 +23,7 @@ SQL任务类型，用于连接数据库并执行相应SQL。
 - sql类型：支持查询和非查询两种。
 - 查询：支持 `DML select` 类型的命令，是有结果集返回的，可以指定邮件通知为表格、附件或表格附件三种模板；
 - 非查询：支持 `DDL`全部命令 和 `DML update、delete、insert` 三种类型的命令；
-- 默认采用`;\n`作为SQL分隔符,拆分成多段SQL语句执行。Hive支持一次执行多段SQL语句,故不会拆分。
+- 默认采用`;\n`作为SQL分隔符,拆分成多段SQL语句执行。Hive的JDBC不支持一次执行多段SQL语句，请不要使用`;\n`。
 - sql参数：输入参数格式为key1=value1;key2=value2…
 - sql语句：SQL语句
 - UDF函数：对于HIVE类型的数据源，可以引用资源中心中创建的UDF函数，其他类型的数据源暂不支持UDF函数。
@@ -38,6 +38,7 @@ SQL任务类型，用于连接数据库并执行相应SQL。
 #### 在hive中创建临时表并写入数据
 
 该样例向hive中创建临时表`tmp_hello_world`并写入一行数据。选择SQL类型为非查询，在创建临时表之前需要确保该表不存在，所以我们使用自定义参数，在每次运行时获取当天时间作为表名后缀，这样这个任务就可以每天运行。创建的表名格式为：`tmp_hello_world_{yyyyMMdd}`。
+**注意**：sql任务组件的hive应用是基于JDBC去调用，SQL statement 不支持多行执行，请注意不要在语句末尾使用';'。如果要执行多行语句请使用[Hive-Cli](./hive-cli.md)任务。
 
 ![hive-sql](../../../../img/tasks/demo/hive-sql.png)
 
@@ -49,7 +50,7 @@ SQL任务类型，用于连接数据库并执行相应SQL。
 
 ### 使用前置sql和后置sql示例
 
-在前置sql中执行建表操作，在sql语句中执行操作，在后置sql中执行清理操作
+在前置sql中执行建表操作，在sql语句中执行操作，在后置sql中执行清理操作。
 
 ![pre_post_sql](../../../../img/tasks/demo/pre_post_sql.png)
 

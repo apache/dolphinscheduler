@@ -5,7 +5,7 @@
 ### System Architecture Diagram
 
 <p align="center">
-  <img src="../../../img/architecture-1.3.0.jpg" alt="System architecture diagram"  width="70%" />
+  <img src="../../../img/architecture-lastest.jpg" alt="System architecture diagram"  width="70%" />
   <p align="center">
         <em>System architecture diagram</em>
   </p>
@@ -197,10 +197,10 @@ In the early schedule design, if there is no priority design and use the fair sc
 - For details, please refer to the logback configuration of Master and Worker, as shown in the following example:
 
 ```xml
-<conversionRule conversionWord="messsage" converterClass="org.apache.dolphinscheduler.service.log.SensitiveDataConverter"/>
+<conversionRule conversionWord="message" converterClass="org.apache.dolphinscheduler.common.log.SensitiveDataConverter"/>
 <appender name="TASKLOGFILE" class="ch.qos.logback.classic.sift.SiftingAppender">
-    <filter class="org.apache.dolphinscheduler.service.log.TaskLogFilter"/>
-    <Discriminator class="org.apache.dolphinscheduler.service.log.TaskLogDiscriminator">
+    <filter class="org.apache.dolphinscheduler.plugin.task.api.log.TaskLogFilter"/>
+    <Discriminator class="org.apache.dolphinscheduler.plugin.task.api.log.TaskLogDiscriminator">
         <key>taskAppId</key>
         <logBase>${log.base}</logBase>
     </Discriminator>
@@ -209,7 +209,7 @@ In the early schedule design, if there is no priority design and use the fair sc
             <file>${log.base}/${taskAppId}.log</file>
             <encoder>
                 <pattern>
-                            [%level] %date{yyyy-MM-dd HH:mm:ss.SSS Z} [%thread] %logger{96}:[%line] - %messsage%n
+                            [%level] %date{yyyy-MM-dd HH:mm:ss.SSS Z} [%thread] %logger{96}:[%line] - %message%n
                 </pattern>
                 <charset>UTF-8</charset>
             </encoder>

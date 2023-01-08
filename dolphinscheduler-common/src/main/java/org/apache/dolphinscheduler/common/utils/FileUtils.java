@@ -28,11 +28,14 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.NoSuchFileException;
+import java.util.zip.CRC32;
+import java.util.zip.CheckedInputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +48,8 @@ public class FileUtils {
     public static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
 
     public static final String DATA_BASEDIR = PropertyUtils.getString(DATA_BASEDIR_PATH, "/tmp/dolphinscheduler");
+
+    public static final String APPINFO_PATH = "appInfo.log";
 
     private FileUtils() {
         throw new UnsupportedOperationException("Construct FileUtils");
@@ -111,6 +116,16 @@ public class FileUtils {
                 processDefineVersion,
                 processInstanceId,
                 taskInstanceId);
+    }
+
+    /**
+     * absolute path of appInfo file
+     *
+     * @param execPath  directory of process execution
+     * @return
+     */
+    public static String getAppInfoPath(String execPath) {
+        return String.format("%s/%s", execPath, APPINFO_PATH);
     }
 
     /**
@@ -250,6 +265,38 @@ public class FileUtils {
         } catch (IOException e) {
             return true;
         }
+    }
+
+    /**
+     * Calculate file checksum with CRC32 algorithm
+     * @param pathName
+     * @return checksum of file/dir
+     */
+    public static String getFileChecksum(String pathName) throws IOException {
+        CRC32 crc32 = new CRC32();
+        File file = new File(pathName);
+        String crcString = "";
+        if (file.isDirectory()) {
+            // file system interface remains the same order
+            String[] subPaths = file.list();
+            StringBuilder concatenatedCRC = new StringBuilder();
+            for (String subPath : subPaths) {
+                concatenatedCRC.append(getFileChecksum(pathName + FOLDER_SEPARATOR + subPath));
+            }
+            crcString = concatenatedCRC.toString();
+        } else {
+            try (
+                    FileInputStream fileInputStream = new FileInputStream(pathName);
+                    CheckedInputStream checkedInputStream = new CheckedInputStream(fileInputStream, crc32);) {
+                while (checkedInputStream.read() != -1) {
+                }
+            } catch (IOException e) {
+                throw new IOException("Calculate checksum error.");
+            }
+            crcString = Long.toHexString(crc32.getValue());
+        }
+
+        return crcString;
     }
 
 }

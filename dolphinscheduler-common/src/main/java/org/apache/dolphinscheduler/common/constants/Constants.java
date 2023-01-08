@@ -28,6 +28,8 @@ public final class Constants {
         throw new UnsupportedOperationException("Construct Constants");
     }
 
+    public static final String AUTO_CLOSE_ALERT = "alert.auto-close";
+
     /**
      * common properties path
      */
@@ -50,12 +52,6 @@ public final class Constants {
     public static final String RESOURCE_TYPE_FILE = "resources";
 
     public static final String RESOURCE_TYPE_UDF = "udfs";
-
-    public static final String STORAGE_S3 = "S3";
-
-    public static final String STORAGE_OSS = "OSS";
-
-    public static final String STORAGE_HDFS = "HDFS";
 
     public static final String EMPTY_STRING = "";
 
@@ -146,6 +142,12 @@ public final class Constants {
 
     public static final String ALIBABA_CLOUD_OSS_BUCKET_NAME = "resource.alibaba.cloud.oss.bucket.name";
     public static final String ALIBABA_CLOUD_OSS_END_POINT = "resource.alibaba.cloud.oss.endpoint";
+
+    /**
+     * fetch applicationId way
+     */
+    public static final String APPID_COLLECT = "appId.collect";
+    public static final String DEFAULT_COLLECT_WAY = "log";
 
     /**
      * comma ,
@@ -326,6 +328,9 @@ public final class Constants {
     public static final String THREAD_NAME_MASTER_SERVER = "Master-Server";
     public static final String THREAD_NAME_WORKER_SERVER = "Worker-Server";
     public static final String THREAD_NAME_ALERT_SERVER = "Alert-Server";
+
+    // suffix of crc file
+    public static final String CRC_SUFFIX = ".crc";
 
     /**
      * complement date default cron string
@@ -796,4 +801,9 @@ public final class Constants {
     public static final String KERBEROS_KRB5_CONF_PATH = "javaSecurityKrb5Conf";
     public static final String KERBEROS_KEY_TAB_USERNAME = "loginUserKeytabUsername";
     public static final String KERBEROS_KEY_TAB_PATH = "loginUserKeytabPath";
+
+    public static final Integer QUERY_ALL_ON_SYSTEM = 0;
+    public static final Integer QUERY_ALL_ON_PROJECT = 1;
+    public static final Integer QUERY_ALL_ON_WORKFLOW = 2;
+    public static final Integer QUERY_ALL_ON_TASK = 3;
 }

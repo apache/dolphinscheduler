@@ -19,6 +19,7 @@ export default {
   datasource: '数据源',
   create_datasource: '创建源',
   choose_datasource_type: '选择源类型',
+  select: '更改',
   search_input_tips: '请输入关键字',
   datasource_name: '源名称',
   datasource_name_tips: '请输入数据源名称',
@@ -68,7 +69,18 @@ export default {
   user_password_tips: '请输入密码',
   aws_region: 'AwsRegion',
   aws_region_tips: '请输入AwsRegion',
+  validation: '验证',
+  mode_tips: '请选择验证模式',
   jdbc_format_tips: 'jdbc连接参数不是一个正确的JSON格式',
   datasource_test_flag_tips: '请选择数据源定义',
-  datasource_bind_test_id_tips: '请绑定测试数据源'
+  datasource_bind_test_id_tips: '请绑定测试数据源',
+  database_username: '数据库用户名',
+  database_password: '数据库密码',
+  Azure_AD_username: 'Azure AD用户名',
+  Azure_AD_password: 'Azure AD密码',
+  MSIClientId: 'MSI ClientId',
+  clientId: 'ClientId',
+  clientSecret: 'ClientSecret',
+  OAuth_token_endpoint: 'OAuth 2.0 token endpoint',
+  endpoint_tips: '请输入OAuth'
 }

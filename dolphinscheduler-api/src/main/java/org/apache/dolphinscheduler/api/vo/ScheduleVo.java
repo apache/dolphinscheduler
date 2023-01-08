@@ -130,6 +130,11 @@ public class ScheduleVo {
      */
     private Long environmentCode;
 
+    /**
+     * environment name
+     */
+    private String environmentName;
+
     public ScheduleVo(Schedule schedule) {
         this.setId(schedule.getId());
         this.setCrontab(schedule.getCrontab());
@@ -150,5 +155,6 @@ public class ScheduleVo {
         this.setEnvironmentCode(schedule.getEnvironmentCode());
         this.setStartTime(DateUtils.dateToString(schedule.getStartTime(), ZoneId.systemDefault().getId()));
         this.setEndTime(DateUtils.dateToString(schedule.getEndTime(), ZoneId.systemDefault().getId()));
+        this.setEnvironmentName(schedule.getEnvironmentName());
     }
 }

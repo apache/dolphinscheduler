@@ -20,7 +20,6 @@ import {
   NButton,
   NDataTable,
   NIcon,
-  NInput,
   NPagination,
   NSpace
 } from 'naive-ui'
@@ -34,6 +33,7 @@ import {
 import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
 import Card from '@/components/card'
+import Search from "@/components/input-search";
 import ProjectModal from './components/project-modal'
 
 const list = defineComponent({
@@ -58,6 +58,14 @@ const list = defineComponent({
     const handleSearch = () => {
       variables.page = 1
       requestData()
+    }
+
+    const onClearSearch = () => {
+      variables.page = 1
+      getTableData({
+        pageSize: variables.pageSize,
+        pageNo: variables.page
+      })
     }
 
     const onCancelModal = () => {
@@ -93,6 +101,7 @@ const list = defineComponent({
       handleSearch,
       onCancelModal,
       onConfirmModal,
+      onClearSearch,
       handleChangePageSize,
       trim
     }
@@ -112,13 +121,13 @@ const list = defineComponent({
               {t('project.list.create_project')}
             </NButton>
             <NSpace>
-              <NInput
-                allowInput={this.trim}
-                size='small'
-                v-model={[this.searchVal, 'value']}
-                placeholder={t('project.list.project_tips')}
-                clearable
+              <Search
+                  v-model:value = {this.searchVal}
+                  placeholder={t('project.list.project_tips')}
+                  onSearch={this.handleSearch}
+                  onClear={this.onClearSearch}
               />
+
               <NButton size='small' type='primary' onClick={this.handleSearch}>
                 <NIcon>
                   <SearchOutlined />

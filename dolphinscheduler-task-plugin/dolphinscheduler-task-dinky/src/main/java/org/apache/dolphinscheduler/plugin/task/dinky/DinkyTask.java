@@ -80,8 +80,8 @@ public class DinkyTask extends AbstractRemoteTask {
     @Override
     public void init() {
         final String taskParams = taskExecutionContext.getTaskParams();
-        logger.info("dinky task params:{}", taskParams);
         this.dinkyParameters = JSONUtils.parseObject(taskParams, DinkyParameters.class);
+        logger.info("Initialize dinky task params: {}", JSONUtils.toPrettyJsonString(dinkyParameters));
         if (this.dinkyParameters == null || !this.dinkyParameters.checkParameters()) {
             throw new DinkyTaskException("dinky task params is not valid");
         }

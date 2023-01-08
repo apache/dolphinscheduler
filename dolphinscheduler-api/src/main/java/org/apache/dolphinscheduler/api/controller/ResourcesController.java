@@ -42,14 +42,17 @@ import static org.apache.dolphinscheduler.api.enums.Status.VIEW_RESOURCE_FILE_ON
 import static org.apache.dolphinscheduler.api.enums.Status.VIEW_UDF_FUNCTION_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
+import org.apache.dolphinscheduler.api.dto.resources.DeleteDataTransferResponse;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ResourcesService;
 import org.apache.dolphinscheduler.api.service.UdfFuncService;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.enums.UdfType;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
@@ -232,14 +235,14 @@ public class ResourcesController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_RESOURCES_LIST_PAGING)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result<Object> queryResourceListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                  @RequestParam(value = "fullName") String fullName,
-                                                  @RequestParam(value = "tenantCode") String tenantCode,
-                                                  @RequestParam(value = "type") ResourceType type,
-                                                  @RequestParam("pageNo") Integer pageNo,
-                                                  @RequestParam(value = "searchVal", required = false) String searchVal,
-                                                  @RequestParam("pageSize") Integer pageSize) {
-        Result<Object> result = checkPageParams(pageNo, pageSize);
+    public Result<PageInfo<StorageEntity>> queryResourceListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                   @RequestParam(value = "fullName") String fullName,
+                                                                   @RequestParam(value = "tenantCode") String tenantCode,
+                                                                   @RequestParam(value = "type") ResourceType type,
+                                                                   @RequestParam("pageNo") Integer pageNo,
+                                                                   @RequestParam(value = "searchVal", required = false) String searchVal,
+                                                                   @RequestParam("pageSize") Integer pageSize) {
+        Result<PageInfo<StorageEntity>> result = checkPageParams(pageNo, pageSize);
         if (!result.checkResult()) {
             return result;
         }
@@ -268,6 +271,25 @@ public class ResourcesController extends BaseController {
                                          @RequestParam(value = "fullName") String fullName,
                                          @RequestParam(value = "tenantCode", required = false) String tenantCode) throws Exception {
         return resourceService.delete(loginUser, fullName, tenantCode);
+    }
+
+    /**
+     * delete DATA_TRANSFER data
+     *
+     * @param loginUser login user
+     * @return delete result code
+     */
+    @Operation(summary = "deleteDataTransferData", description = "Delete the N days ago data of DATA_TRANSFER ")
+    @Parameters({
+            @Parameter(name = "days", description = "N days ago", required = true, schema = @Schema(implementation = Integer.class))
+    })
+    @DeleteMapping(value = "/data-transfer")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(DELETE_RESOURCE_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public DeleteDataTransferResponse deleteDataTransferData(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                             @RequestParam(value = "days") Integer days) {
+        return resourceService.deleteDataTransferData(loginUser, days);
     }
 
     /**

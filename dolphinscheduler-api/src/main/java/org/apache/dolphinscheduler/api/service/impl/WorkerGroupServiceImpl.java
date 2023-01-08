@@ -38,10 +38,10 @@ import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapp
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
+import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -113,15 +113,11 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             return result;
         }
         Date now = new Date();
-        WorkerGroup workerGroup;
+        WorkerGroup workerGroup = null;
         if (id != 0) {
             workerGroup = workerGroupMapper.selectById(id);
-            // check exist
-            if (workerGroup == null) {
-                workerGroup = new WorkerGroup();
-                workerGroup.setCreateTime(now);
-            }
-        } else {
+        }
+        if (workerGroup == null) {
             workerGroup = new WorkerGroup();
             workerGroup.setCreateTime(now);
         }
@@ -165,23 +161,21 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
      * @return boolean
      */
     private boolean checkWorkerGroupNameExists(WorkerGroup workerGroup) {
+        // check database
         List<WorkerGroup> workerGroupList = workerGroupMapper.queryWorkerGroupByName(workerGroup.getName());
         if (CollectionUtils.isNotEmpty(workerGroupList)) {
-            // new group has same name
+            // create group, the same group name exists in the database
             if (workerGroup.getId() == null) {
                 return true;
             }
-            // check group id
-            for (WorkerGroup group : workerGroupList) {
-                if (Objects.equals(group.getId(), workerGroup.getId())) {
-                    return true;
-                }
+            // update group, the database exists with the same group name except itself
+            Optional<WorkerGroup> sameNameWorkGroupOptional = workerGroupList.stream()
+                    .filter(group -> !Objects.equals(group.getId(), workerGroup.getId())).findFirst();
+            if (sameNameWorkGroupOptional.isPresent()) {
+                return true;
             }
         }
-        // check zookeeper
-        String workerGroupPath =
-                Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS + Constants.SINGLE_SLASH + workerGroup.getName();
-        return registryClient.exists(workerGroupPath);
+        return false;
     }
 
     /**

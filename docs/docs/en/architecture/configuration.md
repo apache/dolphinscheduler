@@ -17,7 +17,7 @@ The directory structure of DolphinScheduler is as follows:
 │
 ├── licenses                                    directory of licenses
 │
-├── bin                                         directory of DolphinScheduler application commands, configrations scripts
+├── bin                                         directory of DolphinScheduler application commands, configurations scripts
 │   ├── dolphinscheduler-daemon.sh              script to start or shut down DolphinScheduler application
 │   ├── env                                     directory of scripts to load environment variables
 │   │   ├── dolphinscheduler_env.sh             script to export environment variables [eg: JAVA_HOME,HADOOP_HOME, HIVE_HOME ...] when you start or stop service using script `dolphinscheduler-daemon.sh`
@@ -29,7 +29,7 @@ The directory structure of DolphinScheduler is as follows:
 │   ├── status-all.sh                           script to check the status of all services when you deploy DolphinScheduler in `psuedo-cluster` mode or `cluster` mode
 │   └── stop-all.sh                             script to shut down all services when you deploy DolphinScheduler in `psuedo-cluster` mode or `cluster` mode
 │
-├── alert-server                                directory of DolphinScheduler alert-server commands, configrations scripts and libs
+├── alert-server                                directory of DolphinScheduler alert-server commands, configurations scripts and libs
 │   ├── bin
 │   │   └── start.sh                            script to start DolphinScheduler alert-server
 │   ├── conf
@@ -40,7 +40,7 @@ The directory structure of DolphinScheduler is as follows:
 │   │   └── logback-spring.xml                  configurations of alert-service log
 │   └── libs                                    directory of alert-server libs
 │
-├── api-server                                  directory of DolphinScheduler api-server commands, configrations scripts and libs
+├── api-server                                  directory of DolphinScheduler api-server commands, configurations scripts and libs
 │   ├── bin
 │   │   └── start.sh                            script to start DolphinScheduler api-server
 │   ├── conf
@@ -52,7 +52,7 @@ The directory structure of DolphinScheduler is as follows:
 │   ├── libs                                    directory of api-server libs
 │   └── ui                                      directory of api-server related front-end web resources
 │
-├── master-server                               directory of DolphinScheduler master-server commands, configrations scripts and libs
+├── master-server                               directory of DolphinScheduler master-server commands, configurations scripts and libs
 │   ├── bin
 │   │   └── start.sh                            script to start DolphinScheduler master-server
 │   ├── conf
@@ -63,7 +63,7 @@ The directory structure of DolphinScheduler is as follows:
 │   │   └── logback-spring.xml                  configurations of master-service log
 │   └── libs                                    directory of master-server libs
 │
-├── standalone-server                           directory of DolphinScheduler standalone-server commands, configrations scripts and libs
+├── standalone-server                           directory of DolphinScheduler standalone-server commands, configurations scripts and libs
 │   ├── bin
 │   │   └── start.sh                            script to start DolphinScheduler standalone-server
 │   ├── conf
@@ -76,7 +76,7 @@ The directory structure of DolphinScheduler is as follows:
 │   ├── libs                                    directory of standalone-server libs
 │   └── ui                                      directory of standalone-server related front-end web resources
 │  
-├── tools                                       directory of DolphinScheduler metadata tools commands, configrations scripts and libs
+├── tools                                       directory of DolphinScheduler metadata tools commands, configurations scripts and libs
 │   ├── bin
 │   │   └── upgrade-schema.sh                   script to initialize or upgrade DolphinScheduler metadata
 │   ├── conf
@@ -85,7 +85,7 @@ The directory structure of DolphinScheduler is as follows:
 │   ├── libs                                    directory of tool libs
 │   └── sql                                     .sql files to create or upgrade DolphinScheduler metadata
 │  
-├── worker-server                               directory of DolphinScheduler worker-server commands, configrations scripts and libs
+├── worker-server                               directory of DolphinScheduler worker-server commands, configurations scripts and libs
 │       ├── bin
 │       │   └── start.sh                        script to start DolphinScheduler worker-server
 │       ├── conf
@@ -224,6 +224,7 @@ The default configuration is as follows:
 |sudo.enable | true | whether to enable sudo|
 |alert.rpc.port | 50052 | the RPC port of Alert Server|
 |zeppelin.rest.url | http://localhost:8080 | the RESTful API url of zeppelin|
+|appId.collect | log | way to collect applicationId, if use aop, alter the configuration from log to aop, annotation of applicationId auto collection related configuration in `bin/env/dolphinscheduler_env.sh` should be removed. Note: Aop way doesn't support submitting yarn job on remote host by client mode like Beeline, and will failure if override applicationId collection-related environment configuration in dolphinscheduler_env.sh, and .|
 
 ### Api-server related configuration
 
@@ -276,7 +277,8 @@ Location: `master-server/conf/application.yaml`
 |master.failover-interval|10|failover interval, the unit is minute|
 |master.kill-yarn-job-when-task-failover|true|whether to kill yarn job when failover taskInstance|
 |master.registry-disconnect-strategy.strategy|stop|Used when the master disconnect from registry, default value: stop. Optional values include stop, waiting|
-|master.registry-disconnect-strategy.max-waiting-time|100s|Used when the master disconnect from registry, and the disconnect strategy is waiting, this config means the master will waiting to reconnect to registry in given times, and after the waiting times, if the master still cannot connect to registry, will stop itself, if the value is 0s, the Master will waitting infinitely|
+|master.registry-disconnect-strategy.max-waiting-time|100s|Used when the master disconnect from registry, and the disconnect strategy is waiting, this config means the master will waiting to reconnect to registry in given times, and after the waiting times, if the master still cannot connect to registry, will stop itself, if the value is 0s, the Master will wait infinitely|
+|master.worker-group-refresh-interval|10s|The interval to refresh worker group from db to memory|
 
 ### Worker Server related configuration
 
@@ -294,7 +296,7 @@ Location: `worker-server/conf/application.yaml`
 |worker.alert-listen-host|localhost|the alert listen host of worker|
 |worker.alert-listen-port|50052|the alert listen port of worker|
 |worker.registry-disconnect-strategy.strategy|stop|Used when the worker disconnect from registry, default value: stop. Optional values include stop, waiting|
-|worker.registry-disconnect-strategy.max-waiting-time|100s|Used when the worker disconnect from registry, and the disconnect strategy is waiting, this config means the worker will waiting to reconnect to registry in given times, and after the waiting times, if the worker still cannot connect to registry, will stop itself, if the value is 0s, will waitting infinitely |
+|worker.registry-disconnect-strategy.max-waiting-time|100s|Used when the worker disconnect from registry, and the disconnect strategy is waiting, this config means the worker will waiting to reconnect to registry in given times, and after the waiting times, if the worker still cannot connect to registry, will stop itself, if the value is 0s, will wait infinitely |
 |worker.task-execute-threads-full-policy|REJECT|If REJECT, when the task waiting in the worker reaches exec-threads, it will reject the received task and the Master will redispatch it; If CONTINUE, it will put the task into the worker's execution queue and wait for a free thread to start execution|
 
 ### Alert Server related configuration
@@ -354,6 +356,13 @@ export FLINK_HOME=${FLINK_HOME:-/opt/soft/flink}
 export DATAX_HOME=${DATAX_HOME:-/opt/soft/datax}
 
 export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH
+
+# applicationId auto collection related configuration, the following configurations are unnecessary if setting appId.collect=log
+export HADOOP_CLASSPATH=`hadoop classpath`:${DOLPHINSCHEDULER_HOME}/tools/libs/*
+export SPARK_DIST_CLASSPATH=$HADOOP_CLASSPATH:$SPARK_DIST_CLASS_PATH
+export HADOOP_CLIENT_OPTS="-javaagent:${DOLPHINSCHEDULER_HOME}/tools/libs/aspectjweaver-1.9.7.jar":$HADOOP_CLIENT_OPTS
+export SPARK_SUBMIT_OPTS="-javaagent:${DOLPHINSCHEDULER_HOME}/tools/libs/aspectjweaver-1.9.7.jar":$SPARK_SUBMIT_OPTS
+export FLINK_ENV_JAVA_OPTS="-javaagent:${DOLPHINSCHEDULER_HOME}/tools/libs/aspectjweaver-1.9.7.jar":$FLINK_ENV_JAVA_OPTS
 ```
 
 ### Log related configuration

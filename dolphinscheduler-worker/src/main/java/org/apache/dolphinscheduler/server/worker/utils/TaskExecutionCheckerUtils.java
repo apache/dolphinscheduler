@@ -21,14 +21,14 @@ import org.apache.dolphinscheduler.common.exception.StorageOperateNoConfiguredEx
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.metrics.WorkerServerMetrics;
-import org.apache.dolphinscheduler.service.storage.StorageOperate;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.MapUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -88,7 +88,9 @@ public class TaskExecutionCheckerUtils {
                     taskExecutionContext.getProcessInstanceId(),
                     taskExecutionContext.getTaskInstanceId());
             taskExecutionContext.setExecutePath(execLocalPath);
-            createDirectoryWithOwner(Paths.get(execLocalPath), taskExecutionContext.getTenantCode());
+            taskExecutionContext.setAppInfoPath(FileUtils.getAppInfoPath(execLocalPath));
+            createDirectoryWithOwner(Paths.get(taskExecutionContext.getExecutePath()),
+                    taskExecutionContext.getTenantCode());
         } catch (Throwable ex) {
             throw new TaskException("Cannot create process execute dir", ex);
         }
