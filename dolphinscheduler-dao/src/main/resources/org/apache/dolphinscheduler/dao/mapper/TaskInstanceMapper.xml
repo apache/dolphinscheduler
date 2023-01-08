@@ -268,7 +268,7 @@
             and name = #{taskName}
         </if>
         <if test="taskType != null and taskType != ''">
-            and instance.task_type=#{taskType}
+            and task_type = #{taskType}
         </if>
         <if test="states != null and states.length != 0">
             and state in

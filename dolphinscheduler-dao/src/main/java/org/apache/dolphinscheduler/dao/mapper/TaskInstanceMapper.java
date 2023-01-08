@@ -138,7 +138,6 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
                                                     @Param("taskName") String taskName,
                                                     @Param("taskType") String taskType,
                                                     @Param("executorName") String executorName,
-                                                    @Param("executorId") int executorId,
                                                     @Param("states") int[] statusArray,
                                                     @Param("host") String host,
                                                     @Param("taskExecuteType") TaskExecuteType taskExecuteType,
