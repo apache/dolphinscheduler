@@ -55,7 +55,6 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 
@@ -116,7 +115,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         List<String> commands = new ArrayList<>();
 
         if (commandString != null) {
-            Matcher commandMatcher = Pattern.compile(COMMAND_SPLIT_REGEX).matcher(commandString.trim());
+            Matcher commandMatcher = COMMAND_SPLIT_REGEX.matcher(commandString.trim());
             while (commandMatcher.find()) {
                 commands.add(commandMatcher.group());
             }
@@ -156,8 +155,13 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
 
             @Override
             public void eventReceived(Action action, Job job) {
+                logger.info("event received : job:{} action:{}", job.getMetadata().getName(), action);
                 if (action != Action.ADDED) {
                     int jobStatus = getK8sJobStatus(job);
+                    logger.info("job {} status {}", job.getMetadata().getName(), jobStatus);
+                    if (jobStatus == TaskConstants.RUNNING_CODE) {
+                        return;
+                    }
                     setTaskStatus(jobStatus, taskInstanceId, taskResponse, k8STaskMainParameters);
                     countDownLatch.countDown();
                 }

@@ -11,16 +11,16 @@
 ```shell
 # 需要 JDK 1.8 及以上的版本
 java -version
-# 需要 Maven 
+# 需要 Maven
 mvn -version
 ```
 
-### GPG设置
+### GPG 设置
 
-#### 安装GPG
+#### 安装 GPG
 
-在[GnuPG官网](https://www.gnupg.org/download/index.html)下载安装包。
-GnuPG的1.x版本和2.x版本的命令有细微差别，下列说明以`GnuPG-2.1.23`版本为例。
+在[GnuPG 官网](https://www.gnupg.org/download/index.html)下载安装包。
+GnuPG 的 1.x 版本和 2.x 版本的命令有细微差别，下列说明以`GnuPG-2.1.23`版本为例。
 
 安装完成后，执行以下命令查看版本号。
 
@@ -28,9 +28,9 @@ GnuPG的1.x版本和2.x版本的命令有细微差别，下列说明以`GnuPG-2.
 gpg --version
 ```
 
-#### 创建key
+#### 创建 key
 
-安装完成后，执行以下命令创建key。
+安装完成后，执行以下命令创建 key。
 
 `GnuPG-2.x`可使用：
 
@@ -44,7 +44,7 @@ gpg --full-gen-key
 gpg --gen-key
 ```
 
-根据提示完成key，**注意：请使用Apache mail 和 对应的密码生成GPG的Key。**
+根据提示完成 key，**注意：请使用 Apache mail 和 对应的密码生成 GPG 的 Key。**
 
 ```shell
 gpg (GnuPG) 2.0.12; Copyright (C) 2009 Free Software Foundation, Inc.
@@ -89,9 +89,9 @@ gpg: cancelled by user
 gpg: Key generation canceled.
 ```
 
-需要使用自己的用户登录服务器，而不是root切到自己的账户
+需要使用自己的用户登录服务器，而不是 root 切到自己的账户
 
-#### 查看生成的key
+#### 查看生成的 key
 
 ```shell
 gpg --list-keys
@@ -105,7 +105,7 @@ uid                  ${用户名} (${注释}) <{邮件地址}>
 sub   4096R/A63BC462 2019-11-15
 ```
 
-其中85E11560为公钥ID。
+其中 85E11560 为公钥 ID。
 
 #### 将公钥同步到服务器
 
@@ -119,7 +119,7 @@ gpg --keyserver hkp://pool.sks-keyservers.net --send-key 85E11560
 
 注意：如果同步到公钥服务器，可以在服务器上查到新建的公钥
 http://keyserver.ubuntu.com:11371/pks/lookup?search=${用户名}&fingerprint=on&op=index
-备用公钥服务器 gpg --keyserver hkp://keyserver.ubuntu.com --send-key ${公钥ID}
+备用公钥服务器 gpg --keyserver hkp://keyserver.ubuntu.com --send-key ${公钥 ID}
 
 ### 配置 Apache Maven Central Repository
 
@@ -157,14 +157,14 @@ http://keyserver.ubuntu.com:11371/pks/lookup?search=${用户名}&fingerprint=on&
 
 ### 配置环境变量
 
-我们将多次使用发布版本 `VERSION`，github名称 `GH_USERNAME`，以及 Apache 用户名 `<YOUR-APACHE-USERNAME>`，因此最好将其存储到bash变量中以便于使用。
+我们将多次使用发布版本 `VERSION`，github 名称 `GH_USERNAME`，以及 Apache 用户名 `<YOUR-APACHE-USERNAME>`，因此最好将其存储到 bash 变量中以便于使用。
 
 ```shell
 VERSION=<THE-VERSION-YOU-RELEASE>
-SOURCE_CODE_DIR=<YOUR-SOURCE-CODE-ROOT-DIR>  # the directory of your source code hold, the location of parent pom.xml instead of binary package 
+SOURCE_CODE_DIR=<YOUR-SOURCE-CODE-ROOT-DIR>  # the directory of your source code hold, the location of parent pom.xml instead of binary package
 
 GH_USERNAME=<YOUR-GITHUB-USERNAME>
-GH_REMOTE=<GITHUB-REMOTE>  # we use `upstream` or `origin` mostly base on your release environment 
+GH_REMOTE=<GITHUB-REMOTE>  # we use `upstream` or `origin` mostly base on your release environment
 
 A_USERNAME=<YOUR-APACHE-USERNAME>
 SVN_DIR=<PATH-TO-SVN-ROOT>  # to keep binary package checkout from SVN, the sub path end with `/dolphinscheduler/dev` and `/dolphinscheduler/release` will be create
@@ -183,13 +183,13 @@ SVN_DIR=<PATH-TO-SVN-ROOT>  # to keep binary package checkout from SVN, the sub 
     - `dolphinscheduler_mysql.sql`: `t_ds_version` 版本更新为 x.y.z
     - `dolphinscheduler_postgre.sql`: `t_ds_version` 版本更新为 x.y.z
     - `dolphinscheduler_h2.sql`: `t_ds_version` 版本更新为 x.y.z
-    - `upgrade`: 是否新增 `x.y.z_schema` 文件夹，如果有一些升级的DDL或DML，如果没有添加任何DDL或DML可以跳过这一步。
+    - `upgrade`: 是否新增 `x.y.z_schema` 文件夹，如果有一些升级的 DDL 或 DML，如果没有添加任何 DDL 或 DML 可以跳过这一步。
     - `soft_version`: 版本更新为 x.y.z
   - `deploy/docker/.env`: `HUB` 改为 `apache`，`TAG` 改为 `x.y.z`
   - `deploy/kubernetes/dolphinscheduler`:
     - `Chart.yaml`: `appVersion` 和 `version` 版本更新为 x.y.z
     - `values.yaml`: `image.tag` 版本更新为 x.y.z
-- 修改文档（docs模块）中的版本号:
+- 修改文档（docs 模块）中的版本号:
   - 将 `docs` 文件夹下文件的占位符 `<version>` (除了 pom.xml 相关的) 修改成 `x.y.z`
   - 新增历史版本
     - `docs/docs/en/history-versions.md` 和 `docs/docs/zh/history-versions.md`: 增加新的历史版本为 `x.y.z`
@@ -218,9 +218,9 @@ git push "${GH_REMOTE}" "${VERSION}"-release
 mvn release:prepare -Prelease -Darguments="-Dmaven.test.skip=true -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true -Dspotless.check.skip=true" -DautoVersionSubmodules=true -DdryRun=true -Dusername="${GH_USERNAME}"
 ```
 
-* `-Prelease`: 选择release的profile，这个profile会打包所有源码、jar文件以及可执行二进制包。
-* `-DautoVersionSubmodules=true`: 作用是发布过程中版本号只需要输入一次，不必为每个子模块都输入一次。
-* `-DdryRun=true`: 演练，即不产生版本号提交，不生成新的tag。
+- `-Prelease`: 选择 release 的 profile，这个 profile 会打包所有源码、jar 文件以及可执行二进制包。
+- `-DautoVersionSubmodules=true`: 作用是发布过程中版本号只需要输入一次，不必为每个子模块都输入一次。
+- `-DdryRun=true`: 演练，即不产生版本号提交，不生成新的 tag。
 
 #### 准备发布
 
@@ -238,12 +238,12 @@ mvn release:prepare -Prelease -Darguments="-Dmaven.test.skip=true -Dcheckstyle.s
 
 和上一步演练的命令基本相同，去掉了 `-DdryRun=true` 参数。
 
-* `-DpushChanges=false`:不要将修改后的版本号和tag自动提交至GitHub。
+- `-DpushChanges=false`:不要将修改后的版本号和 tag 自动提交至 GitHub。
 
 > 注意：如果你遇到来自 git 的类似 **Please tell me who you are.** 错误信息。您可以通过命令 `git config --global user.email "you@example.com"`
 > 和 `git config --global user.name "Your Name"` 来配置你的用户名和邮箱如果你遇到一些错误。
 
-将本地文件检查无误后，提交至github。
+将本地文件检查无误后，提交至 github。
 
 ```shell
 git push -u "${GH_REMOTE}" "${VERSION}"-release
@@ -252,10 +252,10 @@ git push "${GH_REMOTE}" --tags
 
 <!-- markdown-link-check-disable -->
 
-> 注意1：因为 Github 不再支持在 HTTPS 协议中使用原生密码在，所以在这一步你应该使用 github token 作为密码。你可以通过 https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
+> 注意 1：因为 Github 不再支持在 HTTPS 协议中使用原生密码在，所以在这一步你应该使用 github token 作为密码。你可以通过 https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
 > 了解更多如果创建 token 的信息。
 >
-> 注意2：命令完成后，会自动创建 `release.properties` 文件和 `*.Backup` 文件，它们在下面的命令中是需要的，不要删除它们
+> 注意 2：命令完成后，会自动创建 `release.properties` 文件和 `*.Backup` 文件，它们在下面的命令中是需要的，不要删除它们
 
 <!-- markdown-link-check-enable -->
 
@@ -265,13 +265,13 @@ git push "${GH_REMOTE}" --tags
 mvn release:perform -Prelease -Darguments="-Dmaven.test.skip=true -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true -Dspotless.check.skip=true" -DautoVersionSubmodules=true -Dusername="${GH_USERNAME}"
 ```
 
-执行完该命令后，待发布版本会自动上传到Apache的临时筹备仓库(staging repository)。你可以通过访问 [apache staging repositories](https://repository.apache.org/#stagingRepositories)
-, 然后使用Apache的LDAP账户登录后，就会看到上传的版本，`Repository` 列的内容即为 `${STAGING.REPOSITORY}`。
-点击 `Close` 来告诉Nexus这个构建已经完成，只有这样该版本才是可用的。如果电子签名等出现问题，`Close` 会失败，可以通过 `Activity` 查看失败信息。
+执行完该命令后，待发布版本会自动上传到 Apache 的临时筹备仓库(staging repository)。你可以通过访问 [apache staging repositories](https://repository.apache.org/#stagingRepositories)
+, 然后使用 Apache 的 LDAP 账户登录后，就会看到上传的版本，`Repository` 列的内容即为 `${STAGING.REPOSITORY}`。
+点击 `Close` 来告诉 Nexus 这个构建已经完成，只有这样该版本才是可用的。如果电子签名等出现问题，`Close` 会失败，可以通过 `Activity` 查看失败信息。
 
 ### SVN
 
-#### 检出dolphinscheduler发布目录
+#### 检出 dolphinscheduler 发布目录
 
 我们还需要将 Dolphinscheduler 开发版本目录检出到本地，并且
 
@@ -308,9 +308,9 @@ svn --username="${A_USERNAME}" commit -m "new key <YOUR-GPG-KEY-ID> add"
 
 > 注意：这个步骤需要一定的时间去 checkout 特别是在你第一次 checkout 的时候，因为这个库比较大，且这个操作需要 checkout 出全部文件
 
-#### 将待发布的内容添加至SVN目录
+#### 将待发布的内容添加至 SVN 目录
 
-按版本号创建文件夹，将源码包、二进制包、可执行二进制包移动到SVN工作目录。
+按版本号创建文件夹，将源码包、二进制包、可执行二进制包移动到 SVN 工作目录。
 
 ```shell
 mkdir -p "${SVN_DIR_DEV}/${VERSION}"
@@ -340,7 +340,7 @@ svn --username="${A_USERNAME}" commit -m "release ${VERSION}"
 > `gpg --armor --detach-sign --digest-algo=SHA512 apache-dolphinscheduler-"${VERSION}"-bin.tar.gz` 和
 > `gpg --armor --detach-sign --digest-algo=SHA512 apache-dolphinscheduler-"${VERSION}"-src.tar.gz` 将创建它们
 
-将源码包和二进制包添加至SVN工作目录。
+将源码包和二进制包添加至 SVN 工作目录。
 
 ### 检查发布文件内容
 
@@ -348,25 +348,25 @@ svn --username="${A_USERNAME}" commit -m "release ${VERSION}"
 
 解压缩`apache-dolphinscheduler-<VERSION>-src.tar.gz`，进行如下检查:
 
-- 检查源码包是否包含由于包含不必要文件，致使tarball过于庞大
+- 检查源码包是否包含由于包含不必要文件，致使 tarball 过于庞大
 - 存在`LICENSE`和`NOTICE`文件
 - 只存在文本文件，不存在二进制文件
-- 所有文件的开头都有ASF许可证
+- 所有文件的开头都有 ASF 许可证
 - 能够正确编译，单元测试可以通过 (mvn install)
-- 版本内容与GitHub上tag的内容相符 (diff -r a verify_dir tag_dir)
+- 版本内容与 GitHub 上 tag 的内容相符 (diff -r a verify_dir tag_dir)
 - 检查是否有多余文件或文件夹，例如空文件夹等
 
 #### 检查二进制包的文件内容
 
-解压缩`apache-dolphinscheduler-<VERSION>-src.tar.gz`进行如下检查:
+解压缩`apache-dolphinscheduler-<VERSION>-bin.tar.gz`进行如下检查:
 
 - 存在`LICENSE`和`NOTICE`文件
-- 所有文本文件开头都有ASF许可证
+- 所有文本文件开头都有 ASF 许可证
 - 检查第三方依赖许可证：
   - 第三方依赖的许可证兼容
   - 所有第三方依赖的许可证都在`LICENSE`文件中声明
   - 依赖许可证的完整版全部在`license`目录
-  - 如果依赖的是Apache许可证并且存在`NOTICE`文件，那么这些`NOTICE`文件也需要加入到版本的`NOTICE`文件中
+  - 如果依赖的是 Apache 许可证并且存在`NOTICE`文件，那么这些`NOTICE`文件也需要加入到版本的`NOTICE`文件中
 
 ## 发起投票
 
@@ -381,8 +381,8 @@ changelog.
 
 ### 投票阶段
 
-DolphinScheduler社区投票，发起投票邮件到`dev@dolphinscheduler.apache.org`。PMC需要先按照文档检查版本的正确性，然后再进行投票。 经过
-至少72小时并统计到至少3个`+1 并且没有-1 PMC member`票后，即可进入下一阶段。
+DolphinScheduler 社区投票，发起投票邮件到`dev@dolphinscheduler.apache.org`。PMC 需要先按照文档检查版本的正确性，然后再进行投票。 经过
+至少 72 小时并统计到至少 3 个`+1 并且没有-1 PMC member`票后，即可进入下一阶段。
 
 宣布投票结果,发起投票结果邮件到`dev@dolphinscheduler.apache.org`。
 
@@ -415,7 +415,7 @@ Release Commit ID: https://github.com/apache/dolphinscheduler/commit/<SHA-VALUE>
 
 Keys to verify the Release Candidate: https://downloads.apache.org/dolphinscheduler/KEYS
 
-Look at here for how to verify this release candidate: https://dolphinscheduler.apache.org/en-us/docs/latest/user_doc/contribute/release/release.html
+Look at here for how to verify this release candidate: https://dolphinscheduler.apache.org/zh-cn/docs/3.1.2/contribute/release/release
 
 The vote will be open for at least 72 hours or until necessary number of votes are reached.
 
@@ -470,7 +470,7 @@ svn mv -m "release ${VERSION}" https://dist.apache.org/repos/dist/dev/dolphinsch
 # remove old release directory
 svn delete -m "remove old release" https://dist.apache.org/repos/dist/release/dolphinscheduler/<PREVIOUS-RELEASE-VERSION>
 
-# Remove prepare branch 
+# Remove prepare branch
 cd "${SOURCE_CODE_DIR}"
 git push --delete "${GH_REMOTE}" "${VERSION}-prepare"
 ```
@@ -479,10 +479,10 @@ git push --delete "${GH_REMOTE}" "${VERSION}-prepare"
 
 ### 更新文档
 
-官网应该在您发送通知邮件之前完成更新，本节将告诉您如何更改网站。假设发版的版本是 `<VERSION>`，需要进行以下更新（注意，当修改pull requests 被 merge 后就会生效）:
+官网应该在您发送通知邮件之前完成更新，本节将告诉您如何更改网站。假设发版的版本是 `<VERSION>`，需要进行以下更新（注意，当修改 pull requests 被 merge 后就会生效）:
 
 - **apache/dolphinscheduler-website** 仓库：
-  - `download/en-us/download.md` 和 `download/zh-cn/download.md`: 增加 `<VERSION>` 版本发布包的下载
+  - `config/download.json`: 增加 `<VERSION>` 版本发布包的下载
   - `scripts/conf.sh`: 在变量 `DEV_RELEASE_DOCS_VERSIONS` 中增加版本为 `<VERSION>` 的新键值对
 - **apache/dolphinscheduler** 仓库 (dev 分支)：
   - `docs/configs/site.js`:
@@ -525,7 +525,7 @@ docker push apache/dolphinscheduler-api:"${VERSION}"
 docker push apache/dolphinscheduler-alert-server:"${VERSION}"
 ```
 
-> 注意：推送到dockerhub，必须有dockerhub的Apache组织权限。 如果你不需要，你需要向 Apache infra Jira 申请。 您可以参考
+> 注意：推送到 dockerhub，必须有 dockerhub 的 Apache 组织权限。 如果你不需要，你需要向 Apache infra Jira 申请。 您可以参考
 > [此处](https://issues.apache.org/jira/projects/INFRA/issues/INFRA-23314)提交申请
 >
 > 如果您确保 docker image 正常工作，您也可以通过单个命令构建和推送 docker
@@ -564,7 +564,7 @@ Dolphin Scheduler is a distributed and easy-to-extend visual workflow scheduler 
 dedicated to solving the complex task dependencies in data processing, making the scheduler system out of the box for data processing.
 
 
-Download Links: https://dolphinscheduler.apache.org/en-us/download/download.html
+Download Links: https://dolphinscheduler.apache.org/zh-cn/download
 
 Release Notes: https://github.com/apache/dolphinscheduler/releases/tag/<VERSION>
 
@@ -573,17 +573,17 @@ Website: https://dolphinscheduler.apache.org/
 DolphinScheduler Resources:
 - Issue: https://github.com/apache/dolphinscheduler/issues/
 - Mailing list: dev@dolphinscheduler.apache.org
-- Documents: https://dolphinscheduler.apache.org/zh-cn/docs/<VERSION>/user_doc/about/introduction.html
+- Documents: https://dolphinscheduler.apache.org/zh-cn/docs/<VERSION>/about/introduction
 ```
 
 ## News
 
 一切就绪后，应该写一篇文章发布到社区，它应该包括：
 
-* 版本、功能添加、错误修复或两者的主要目的是什么
-* 主要新功能及使用方法，最好有图片或gif
-* 主要错误修复和与之前版本不同的地方，最好有图片或gif
-* 自上一版本以来的所有贡献者
+- 版本、功能添加、错误修复或两者的主要目的是什么
+- 主要新功能及使用方法，最好有图片或 gif
+- 主要错误修复和与之前版本不同的地方，最好有图片或 gif
+- 自上一版本以来的所有贡献者
 
 ## 获取全部的贡献者
 

@@ -333,4 +333,20 @@ public class AlertDao {
     public void setCrashAlarmSuppression(Integer crashAlarmSuppression) {
         this.crashAlarmSuppression = crashAlarmSuppression;
     }
+
+    public void deleteByWorkflowInstanceId(Integer processInstanceId) {
+        if (processInstanceId == null) {
+            return;
+        }
+        List<Alert> alertList = alertMapper.selectByWorkflowInstanceId(processInstanceId);
+        if (CollectionUtils.isEmpty(alertList)) {
+            return;
+        }
+        alertMapper.deleteByWorkflowInstanceId(processInstanceId);
+        List<Integer> alertIds = alertList
+                .stream()
+                .map(Alert::getId)
+                .collect(Collectors.toList());
+        alertSendStatusMapper.deleteByAlertIds(alertIds);
+    }
 }

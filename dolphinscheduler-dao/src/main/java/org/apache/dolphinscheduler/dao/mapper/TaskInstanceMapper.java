@@ -57,6 +57,10 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
     TaskInstance queryByInstanceIdAndCode(@Param("processInstanceId") int processInstanceId,
                                           @Param("taskCode") Long taskCode);
 
+    TaskInstance queryByCacheKey(@Param("cacheKey") String cacheKey);
+
+    Boolean clearCacheByCacheKey(@Param("cacheKey") String cacheKey);
+
     List<TaskInstance> queryByProcessInstanceIdsAndTaskCodes(@Param("processInstanceIds") List<Integer> processInstanceIds,
                                                              @Param("taskCodes") List<Long> taskCodes);
 
@@ -132,7 +136,7 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
                                                     @Param("processInstanceName") String processInstanceName,
                                                     @Param("searchVal") String searchVal,
                                                     @Param("taskName") String taskName,
-                                                    @Param("executorId") int executorId,
+                                                    @Param("executorName") String executorName,
                                                     @Param("states") int[] statusArray,
                                                     @Param("host") String host,
                                                     @Param("taskExecuteType") TaskExecuteType taskExecuteType,
@@ -144,7 +148,7 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
                                                           @Param("processDefinitionName") String processDefinitionName,
                                                           @Param("searchVal") String searchVal,
                                                           @Param("taskName") String taskName,
-                                                          @Param("executorId") int executorId,
+                                                          @Param("executorName") String executorName,
                                                           @Param("states") int[] statusArray,
                                                           @Param("host") String host,
                                                           @Param("taskExecuteType") TaskExecuteType taskExecuteType,

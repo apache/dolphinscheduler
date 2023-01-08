@@ -55,6 +55,7 @@
         <module>dolphinscheduler-tools</module>
         <module>dolphinscheduler-ui</module>
         <module>dolphinscheduler-scheduler-plugin</module>
+        <module>dolphinscheduler-storage-plugin</module>
     </modules>
 
     <properties>
@@ -237,6 +238,17 @@
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-task-all</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-storage-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-storage-all</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

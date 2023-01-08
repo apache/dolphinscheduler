@@ -18,11 +18,14 @@
 package org.apache.dolphinscheduler.server.master.consumer;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.utils.TaskCacheUtils;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.TaskDispatchCommand;
@@ -101,6 +104,12 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
      */
     @Autowired
     private TaskEventService taskEventService;
+
+    /**
+     * storage operator
+     */
+    @Autowired(required = false)
+    private StorageOperate storageOperate;
 
     /**
      * consumer thread pool
@@ -217,6 +226,11 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
                 }
             }
 
+            // check task is cache execution, and decide whether to dispatch
+            if (checkIsCacheExecution(taskInstance, context)) {
+                return true;
+            }
+
             result = dispatcher.dispatch(executionContext);
 
             if (result) {
@@ -275,5 +289,47 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
             return true;
         }
         return false;
+    }
+
+    /**
+     * check if task is cache execution
+     * if the task is defined as cache execution, and we find the cache task instance is finished yet, we will not dispatch this task
+     * @param taskInstance taskInstance
+     * @param context context
+     * @return true if we will not dispatch this task, false if we will dispatch this task
+     */
+    private boolean checkIsCacheExecution(TaskInstance taskInstance, TaskExecutionContext context) {
+        try {
+            // check if task is defined as a cache task
+            if (taskInstance.getIsCache().equals(Flag.NO)) {
+                return false;
+            }
+            // check if task is cache execution
+            String cacheKey = TaskCacheUtils.generateCacheKey(taskInstance, context, storageOperate);
+            TaskInstance cacheTaskInstance = taskInstanceDao.findTaskInstanceByCacheKey(cacheKey);
+            // if we can find the cache task instance, we will add cache event, and return true.
+            if (cacheTaskInstance != null) {
+                logger.info("Task {} is cache, no need to dispatch, task instance id: {}",
+                        taskInstance.getName(), taskInstance.getId());
+                addCacheEvent(taskInstance, cacheTaskInstance);
+                taskInstance.setCacheKey(TaskCacheUtils.generateTagCacheKey(cacheTaskInstance.getId(), cacheKey));
+                return true;
+            } else {
+                // if we can not find cache task, update cache key, and return false. the task will be dispatched
+                taskInstance.setCacheKey(TaskCacheUtils.generateTagCacheKey(taskInstance.getId(), cacheKey));
+            }
+        } catch (Exception e) {
+            logger.error("checkIsCacheExecution error", e);
+        }
+        return false;
+    }
+
+    private void addCacheEvent(TaskInstance taskInstance, TaskInstance cacheTaskInstance) {
+        if (cacheTaskInstance == null) {
+            return;
+        }
+        TaskEvent taskEvent = TaskEvent.newCacheEvent(taskInstance.getProcessInstanceId(), taskInstance.getId(),
+                cacheTaskInstance.getId());
+        taskEventService.addEvent(taskEvent);
     }
 }

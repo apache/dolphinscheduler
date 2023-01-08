@@ -398,6 +398,7 @@ CREATE TABLE t_ds_task_definition (
   task_execute_type int DEFAULT '0',
   task_params text ,
   flag int DEFAULT NULL ,
+  is_cache int DEFAULT '0',
   task_priority int DEFAULT '2' ,
   worker_group varchar(255) DEFAULT NULL ,
   environment_code bigint DEFAULT '-1',
@@ -436,6 +437,7 @@ CREATE TABLE t_ds_task_definition_log (
   task_execute_type int DEFAULT '0',
   task_params text ,
   flag int DEFAULT NULL ,
+  is_cache int DEFAULT '0' ,
   task_priority int DEFAULT '2' ,
   worker_group varchar(255) DEFAULT NULL ,
   environment_code bigint DEFAULT '-1',
@@ -522,6 +524,7 @@ CREATE TABLE t_ds_process_instance (
   name varchar(255) DEFAULT NULL ,
   process_definition_code bigint DEFAULT NULL ,
   process_definition_version int DEFAULT NULL ,
+  project_code bigint DEFAULT NULL ,
   state int DEFAULT NULL ,
   state_history text,
   recovery int DEFAULT NULL ,
@@ -544,6 +547,7 @@ CREATE TABLE t_ds_process_instance (
   update_time timestamp NULL ,
   is_sub_process int DEFAULT '0' ,
   executor_id int NOT NULL ,
+  executor_name varchar(64) DEFAULT NULL,
   history_cmd text ,
   dependence_schedule_times text ,
   process_instance_priority int DEFAULT '2' ,
@@ -551,6 +555,7 @@ CREATE TABLE t_ds_process_instance (
   environment_code bigint DEFAULT '-1',
   timeout int DEFAULT '0' ,
   tenant_id int NOT NULL DEFAULT '-1' ,
+  tenant_code varchar(64) DEFAULT NULL ,
   var_pool text ,
   dry_run int DEFAULT '0' ,
   next_process_instance_id int DEFAULT '0',
@@ -764,6 +769,8 @@ CREATE TABLE t_ds_task_instance (
   task_code bigint NOT NULL,
   task_definition_version int DEFAULT NULL ,
   process_instance_id int DEFAULT NULL ,
+  process_instance_name varchar(255) DEFAULT NULL,
+  project_code bigint DEFAULT NULL,
   state int DEFAULT NULL ,
   submit_time timestamp DEFAULT NULL ,
   start_time timestamp DEFAULT NULL ,
@@ -777,6 +784,8 @@ CREATE TABLE t_ds_task_instance (
   app_link text ,
   task_params text ,
   flag int DEFAULT '1' ,
+  is_cache int DEFAULT '0',
+  cache_key varchar(200) DEFAULT NULL,
   retry_interval int DEFAULT NULL ,
   max_retry_times int DEFAULT NULL ,
   task_instance_priority int DEFAULT NULL ,
@@ -784,6 +793,7 @@ CREATE TABLE t_ds_task_instance (
   environment_code bigint DEFAULT '-1',
   environment_config text,
   executor_id int DEFAULT NULL ,
+  executor_name varchar(64) DEFAULT NULL ,
   first_submit_time timestamp DEFAULT NULL ,
   delay_time int DEFAULT '0' ,
   task_group_id int DEFAULT NULL,
@@ -796,6 +806,7 @@ CREATE TABLE t_ds_task_instance (
 ) ;
 
 create index idx_task_instance_code_version on t_ds_task_instance (task_code, task_definition_version);
+create index idx_cache_key on t_ds_task_instance (cache_key);
 
 --
 -- Table structure for table t_ds_tenant

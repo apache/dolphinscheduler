@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.service.storage.impl.HadoopUtils;
+import org.apache.dolphinscheduler.plugin.storage.hdfs.HdfsStorageOperator;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,7 +48,7 @@ public class BaseServiceTest {
     private BaseServiceImpl baseService;
 
     @Mock
-    private HadoopUtils hadoopUtils;
+    private HdfsStorageOperator hdfsStorageOperator;
 
     @BeforeEach
     public void setUp() {

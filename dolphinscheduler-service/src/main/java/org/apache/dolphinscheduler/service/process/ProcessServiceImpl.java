@@ -116,6 +116,7 @@ import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.DqRuleUtils;
+import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqTaskState;
@@ -137,7 +138,6 @@ import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.log.LogClient;
 import org.apache.dolphinscheduler.service.model.TaskNode;
-import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.apache.dolphinscheduler.service.utils.ClusterConfUtils;
 import org.apache.dolphinscheduler.service.utils.DagHelper;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
@@ -595,6 +595,7 @@ public class ProcessServiceImpl implements ProcessService {
         ProcessInstance processInstance = new ProcessInstance(processDefinition);
         processInstance.setProcessDefinitionCode(processDefinition.getCode());
         processInstance.setProcessDefinitionVersion(processDefinition.getVersion());
+        processInstance.setProjectCode(processDefinition.getProjectCode());
         processInstance.setStateWithDesc(WorkflowExecutionStatus.RUNNING_EXECUTION, "init running");
         processInstance.setRecovery(Flag.NO);
         processInstance.setStartTime(new Date());
@@ -608,6 +609,8 @@ public class ProcessServiceImpl implements ProcessService {
         processInstance.setTaskDependType(command.getTaskDependType());
         processInstance.setFailureStrategy(command.getFailureStrategy());
         processInstance.setExecutorId(command.getExecutorId());
+        processInstance.setExecutorName(Optional.ofNullable(userMapper.selectById(command.getExecutorId()))
+                .map(User::getUserName).orElse(null));
         WarningType warningType = command.getWarningType() == null ? WarningType.NONE : command.getWarningType();
         processInstance.setWarningType(warningType);
         Integer warningGroupId = command.getWarningGroupId() == null ? 0 : command.getWarningGroupId();
@@ -647,6 +650,8 @@ public class ProcessServiceImpl implements ProcessService {
                 .setEnvironmentCode(Objects.isNull(command.getEnvironmentCode()) ? -1 : command.getEnvironmentCode());
         processInstance.setTimeout(processDefinition.getTimeout());
         processInstance.setTenantId(processDefinition.getTenantId());
+        processInstance.setTenantCode(Optional.ofNullable(tenantMapper.queryById(processDefinition.getTenantId()))
+                .map(Tenant::getTenantCode).orElse(null));
         return processInstance;
     }
 
@@ -889,6 +894,12 @@ public class ProcessServiceImpl implements ProcessService {
                     cmdParam.remove(CommandKeyConstants.CMD_PARAM_RECOVERY_START_NODE_STRING);
                     processInstance.setCommandParam(JSONUtils.toJsonString(cmdParam));
                 }
+                // delete the StartNodeList from command parameter if last execution is only execute specified tasks
+                if (processInstance.getCommandType().equals(CommandType.EXECUTE_TASK)) {
+                    cmdParam.remove(CommandKeyConstants.CMD_PARAM_START_NODES);
+                    processInstance.setCommandParam(JSONUtils.toJsonString(cmdParam));
+                    processInstance.setTaskDependType(command.getTaskDependType());
+                }
                 // delete all the valid tasks when repeat running
                 List<TaskInstance> validTaskList =
                         taskInstanceDao.findValidTaskListByProcessId(processInstance.getId(),
@@ -904,6 +915,11 @@ public class ProcessServiceImpl implements ProcessService {
                 initComplementDataParam(processDefinition, processInstance, cmdParam);
                 break;
             case SCHEDULER:
+                break;
+            case EXECUTE_TASK:
+                processInstance.setRunTimes(runTime + 1);
+                processInstance.setTaskDependType(command.getTaskDependType());
+                processInstance.setCommandParam(JSONUtils.toJsonString(cmdParam));
                 break;
             default:
                 break;
@@ -2035,8 +2051,13 @@ public class ProcessServiceImpl implements ProcessService {
         // and update the origin one if exist
         int updateResult = 0;
         int insertResult = 0;
-        if (CollectionUtils.isNotEmpty(newTaskDefinitionLogs)) {
-            insertResult += taskDefinitionLogMapper.batchInsert(newTaskDefinitionLogs);
+
+        // only insert new task definitions if they not in updateTaskDefinitionLogs
+        List<TaskDefinitionLog> newInsertTaskDefinitionLogs = newTaskDefinitionLogs.stream()
+                .filter(taskDefinitionLog -> !updateTaskDefinitionLogs.contains(taskDefinitionLog))
+                .collect(Collectors.toList());
+        if (CollectionUtils.isNotEmpty(newInsertTaskDefinitionLogs)) {
+            insertResult = taskDefinitionLogMapper.batchInsert(newInsertTaskDefinitionLogs);
         }
         if (CollectionUtils.isNotEmpty(updateTaskDefinitionLogs)) {
             insertResult += taskDefinitionLogMapper.batchInsert(updateTaskDefinitionLogs);
@@ -2312,6 +2333,7 @@ public class ProcessServiceImpl implements ProcessService {
                 taskNode.setCpuQuota(taskDefinitionLog.getCpuQuota());
                 taskNode.setMemoryMax(taskDefinitionLog.getMemoryMax());
                 taskNode.setTaskExecuteType(taskDefinitionLog.getTaskExecuteType());
+                taskNode.setIsCache(taskDefinitionLog.getIsCache().getCode());
                 taskNodeList.add(taskNode);
             }
         }
@@ -2520,6 +2542,10 @@ public class ProcessServiceImpl implements ProcessService {
                     logger.info("The taskGroupQueue's status is release, taskInstanceId: {}", taskInstance.getId());
                     return null;
                 }
+                if (thisTaskGroupQueue.getStatus() == TaskGroupQueueStatus.WAIT_QUEUE) {
+                    logger.info("The taskGroupQueue's status is in waiting, will not need to release task group");
+                    break;
+                }
             } while (thisTaskGroupQueue.getForceStart() == Flag.NO.getCode()
                     && taskGroupMapper.releaseTaskGroupResource(taskGroup.getId(),
                             taskGroup.getUseSize(),
@@ -2546,7 +2572,8 @@ public class ProcessServiceImpl implements ProcessService {
         } while (this.taskGroupQueueMapper.updateInQueueCAS(Flag.NO.getCode(),
                 Flag.YES.getCode(),
                 taskGroupQueue.getId()) != 1);
-        logger.info("Finished to release task group queue: taskGroupId: {}", taskInstance.getTaskGroupId());
+        logger.info("Finished to release task group queue: taskGroupId: {}, taskGroupQueueId: {}",
+                taskInstance.getTaskGroupId(), taskGroupQueue.getId());
         return this.taskInstanceMapper.selectById(taskGroupQueue.getTaskId());
     }
 
@@ -2560,6 +2587,7 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public void changeTaskGroupQueueStatus(int taskId, TaskGroupQueueStatus status) {
         TaskGroupQueue taskGroupQueue = taskGroupQueueMapper.queryByTaskId(taskId);
+        taskGroupQueue.setInQueue(Flag.NO.getCode());
         taskGroupQueue.setStatus(status);
         taskGroupQueue.setUpdateTime(new Date(System.currentTimeMillis()));
         taskGroupQueueMapper.updateById(taskGroupQueue);

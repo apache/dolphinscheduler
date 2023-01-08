@@ -17,15 +17,18 @@
 
 package org.apache.dolphinscheduler.server.worker.utils;
 
+import static org.apache.dolphinscheduler.common.constants.Constants.CRC_SUFFIX;
+
 import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-import org.apache.dolphinscheduler.service.storage.StorageOperate;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -84,16 +87,31 @@ public class TaskFilesTransferUtils {
         logger.info("Upload output files ...");
         for (Property property : localParamsProperty) {
             // get local file path
-            String srcPath =
-                    packIfDir(String.format("%s/%s", taskExecutionContext.getExecutePath(), property.getValue()));
+            String path = String.format("%s/%s", taskExecutionContext.getExecutePath(), property.getValue());
+            String srcPath = packIfDir(path);
+
+            // get crc file path
+            String srcCRCPath = srcPath + CRC_SUFFIX;
+            try {
+                FileUtils.writeContent2File(FileUtils.getFileChecksum(path), srcCRCPath);
+            } catch (IOException ex) {
+                throw new TaskException(ex.getMessage(), ex);
+            }
+
             // get remote file path
             String resourcePath = getResourcePath(taskExecutionContext, new File(srcPath).getName());
+            String resourceCRCPath = resourcePath + CRC_SUFFIX;
             try {
                 // upload file to storage
                 String resourceWholePath =
                         storageOperate.getResourceFileName(taskExecutionContext.getTenantCode(), resourcePath);
+                String resourceCRCWholePath =
+                        storageOperate.getResourceFileName(taskExecutionContext.getTenantCode(), resourceCRCPath);
                 logger.info("{} --- Local:{} to Remote:{}", property, srcPath, resourceWholePath);
                 storageOperate.upload(taskExecutionContext.getTenantCode(), srcPath, resourceWholePath, false, true);
+                logger.info("{} --- Local:{} to Remote:{}", "CRC file", srcCRCPath, resourceCRCWholePath);
+                storageOperate.upload(taskExecutionContext.getTenantCode(), srcCRCPath, resourceCRCWholePath, false,
+                        true);
             } catch (IOException ex) {
                 throw new TaskException("Upload file to storage error", ex);
             }

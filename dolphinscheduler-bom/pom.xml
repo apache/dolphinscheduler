@@ -58,6 +58,7 @@
         <h2.version>2.1.210</h2.version>
         <mysql-connector.version>8.0.16</mysql-connector.version>
         <oracle-jdbc.version>21.5.0.0</oracle-jdbc.version>
+        <dameng-jdbc.version>8.1.2.79</dameng-jdbc.version>
         <slf4j.version>1.7.36</slf4j.version>
         <poi.version>4.1.2</poi.version>
         <javax.servlet-api.version>3.1.0</javax.servlet-api.version>
@@ -70,7 +71,7 @@
         <oshi-core.version>6.1.1</oshi-core.version>
         <clickhouse-jdbc.version>0.3.2-patch11</clickhouse-jdbc.version>
         <lz4-java.version>1.4.0</lz4-java.version>
-        <mssql-jdbc.version>6.1.0.jre8</mssql-jdbc.version>
+        <mssql-jdbc.version>11.2.1.jre8</mssql-jdbc.version>
         <presto-jdbc.version>0.238.1</presto-jdbc.version>
         <servlet-api.version>2.5</servlet-api.version>
         <guava-retry.version>2.0.0</guava-retry.version>
@@ -99,6 +100,7 @@
         <aspectj.version>1.9.7</aspectj.version>
         <zt-zip.version>1.15</zt-zip.version>
         <trino-jdbc.version>402</trino-jdbc.version>
+        <azure-identity.version>1.7.1</azure-identity.version>
     </properties>
 
     <dependencyManagement>
@@ -377,6 +379,12 @@
                 <artifactId>ojdbc8</artifactId>
                 <version>${oracle-jdbc.version}</version>
                 <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.dameng</groupId>
+                <artifactId>DmJdbcDriver18</artifactId>
+                <version>${dameng-jdbc.version}</version>
             </dependency>
 
             <dependency>
@@ -783,7 +791,11 @@
                 <artifactId>zt-zip</artifactId>
                 <version>${zt-zip.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>com.azure</groupId>
+                <artifactId>azure-identity</artifactId>
+                <version>${azure-identity.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <profiles>

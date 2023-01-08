@@ -260,6 +260,11 @@ public enum Status {
     SCHEDULE_NOT_EXISTS(10203, "schedule {0} does not exist", "调度 id {0} 不存在"),
     SCHEDULE_ALREADY_EXISTS(10204, "workflow {0} schedule {1} already exist, please update or delete it",
             "工作流 {0} 的定时 {1} 已经存在，请更新或删除"),
+    QUERY_TASK_INSTANCE_ERROR(10205, "query task instance error", "查询任务实例错误"),
+    EXECUTE_NOT_DEFINE_TASK(10206, "please save and try again",
+            "请先保存后再执行"),
+    START_NODE_NOT_EXIST_IN_LAST_PROCESS(10207, "this node {0} does not exist in the latest process definition",
+            "该节点 {0} 不存在于最新的流程定义中"),
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),
     UDF_FUNCTION_EXISTS(20002, "UDF function already exists", "UDF函数已存在"),
@@ -276,12 +281,15 @@ public enum Status {
     UDF_RESOURCE_IS_BOUND(20013, "udf resource file is bound by UDF functions:{0}", "udf函数绑定了资源文件[{0}]"),
     RESOURCE_IS_USED(20014, "resource file is used by process definition", "资源文件被上线的流程定义使用了"),
     PARENT_RESOURCE_NOT_EXIST(20015, "parent resource not exist", "父资源文件不存在"),
+
     RESOURCE_NOT_EXIST_OR_NO_PERMISSION(20016,
             "resource not exist or no permission,please view the task node and remove error resource",
             "请检查任务节点并移除无权限或者已删除的资源"),
     RESOURCE_IS_AUTHORIZED(20017, "resource is authorized to user {0},suffix not allowed to be modified",
             "资源文件已授权其他用户[{0}],后缀不允许修改"),
     RESOURCE_HAS_FOLDER(20018, "There are files or folders in the current directory:{0}", "当前目录下有文件或文件夹[{0}]"),
+
+    REMOVE_TASK_INSTANCE_CACHE_ERROR(20019, "remove task instance cache error", "删除任务实例缓存错误"),
 
     USER_NO_OPERATION_PERM(30001, "user has no operation privilege", "当前用户没有操作权限"),
     USER_NO_OPERATION_PROJECT_PERM(30002, "user {0} is not has project {1} permission", "当前用户[{0}]没有[{1}]项目的操作权限"),
@@ -379,6 +387,10 @@ public enum Status {
             "批量创建工作流任务关系 {0} 错误"),
     PROCESS_TASK_RELATION_BATCH_UPDATE_ERROR(50070, "batch update process task relation error",
             "批量修改工作流任务关系错误"),
+    UPSTREAM_TASK_NOT_EXISTS(50071, "upstream task want to set dependence do not exists {0}", "指定的上游任务 {0} 不存在"),
+
+    WORKFLOW_INSTANCE_IS_NOT_FINISHED(50071, "the workflow instance is not finished, can not do this operation",
+            "工作流实例未结束，不能执行此操作"),
 
     HDFS_NOT_STARTUP(60001, "hdfs not startup", "hdfs未启用"),
     STORAGE_NOT_STARTUP(60002, "storage not startup", "存储未启用"),

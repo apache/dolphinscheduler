@@ -21,12 +21,16 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_START;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowExecuteResponse;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ExecutorServiceImpl;
@@ -38,6 +42,7 @@ import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.RunMode;
+import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
@@ -46,6 +51,7 @@ import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.DependentProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
@@ -55,6 +61,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 import org.apache.dolphinscheduler.service.command.CommandService;
@@ -119,6 +126,9 @@ public class ExecutorServiceTest {
     private TaskDefinitionMapper taskDefinitionMapper;
 
     @Mock
+    private TaskDefinitionLogMapper taskDefinitionLogMapper;
+
+    @Mock
     private ProjectMapper projectMapper;
 
     @Mock
@@ -135,6 +145,8 @@ public class ExecutorServiceTest {
 
     private int processDefinitionId = 1;
 
+    private int processDefinitionVersion = 1;
+
     private long processDefinitionCode = 1L;
 
     private int processInstanceId = 1;
@@ -150,6 +162,8 @@ public class ExecutorServiceTest {
     private ProcessInstance processInstance = new ProcessInstance();
 
     private TaskGroupQueue taskGroupQueue = new TaskGroupQueue();
+
+    private List<ProcessTaskRelation> processTaskRelations = new ArrayList<>();
 
     private User loginUser = new User();
 
@@ -195,20 +209,30 @@ public class ExecutorServiceTest {
         // cronRangeTime
         cronTime = "2020-01-01 00:00:00,2020-01-31 23:00:00";
 
+        // processTaskRelations
+        ProcessTaskRelation processTaskRelation1 = new ProcessTaskRelation();
+        processTaskRelation1.setPostTaskCode(123456789L);
+        ProcessTaskRelation processTaskRelation2 = new ProcessTaskRelation();
+        processTaskRelation2.setPostTaskCode(987654321L);
+        processTaskRelations.add(processTaskRelation1);
+        processTaskRelations.add(processTaskRelation2);
+
         // mock
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_START))
                 .thenReturn(checkProjectAndAuth());
-        Mockito.when(processDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(processDefinition);
+        Mockito.when(processDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(this.processDefinition);
         Mockito.when(processService.getTenantForProcess(tenantId, userId)).thenReturn(new Tenant());
         doReturn(1).when(commandService).createCommand(argThat(c -> c.getId() == null));
         doReturn(0).when(commandService).createCommand(argThat(c -> c.getId() != null));
         Mockito.when(monitorService.getServerListFromRegistry(true)).thenReturn(getMasterServersList());
         Mockito.when(processService.findProcessInstanceDetailById(processInstanceId))
                 .thenReturn(Optional.ofNullable(processInstance));
-        Mockito.when(processService.findProcessDefinition(1L, 1)).thenReturn(processDefinition);
+        Mockito.when(processService.findProcessDefinition(1L, 1)).thenReturn(this.processDefinition);
         Mockito.when(taskGroupQueueMapper.selectById(1)).thenReturn(taskGroupQueue);
         Mockito.when(processInstanceMapper.selectById(1)).thenReturn(processInstance);
+        Mockito.when(processService.findRelationByCode(processDefinitionCode, processDefinitionVersion))
+                .thenReturn(processTaskRelations);
     }
 
     @Test
@@ -235,7 +259,7 @@ public class ExecutorServiceTest {
                 RunMode.RUN_MODE_SERIAL,
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 10, null, 0, Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
-                ComplementDependentMode.OFF_MODE);
+                ComplementDependentMode.OFF_MODE, null);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(commandService, times(1)).createCommand(any(Command.class));
 
@@ -253,15 +277,36 @@ public class ExecutorServiceTest {
                 processDefinitionCode,
                 "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
                 CommandType.START_PROCESS,
-                null, "n1,n2",
+                null, "123456789,987654321",
                 null, null, null,
                 RunMode.RUN_MODE_SERIAL,
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
-                ComplementDependentMode.OFF_MODE);
+                ComplementDependentMode.OFF_MODE, null);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(commandService, times(1)).createCommand(any(Command.class));
 
+    }
+
+    @Test
+    public void testComplementWithOldStartNodeList() {
+        Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
+                .thenReturn(zeroSchedulerList());
+        Map<String, Object> result = new HashMap<>();
+        try {
+            result = executorService.execProcessInstance(loginUser, projectCode,
+                    processDefinitionCode,
+                    "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
+                    CommandType.START_PROCESS,
+                    null, "1123456789,987654321",
+                    null, null, null,
+                    RunMode.RUN_MODE_SERIAL,
+                    Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
+                    Constants.TEST_FLAG_NO,
+                    ComplementDependentMode.OFF_MODE, null);
+        } catch (ServiceException e) {
+            Assertions.assertEquals(Status.START_NODE_NOT_EXIST_IN_LAST_PROCESS.getCode(), e.getCode());
+        }
     }
 
     @Test
@@ -325,7 +370,7 @@ public class ExecutorServiceTest {
                 RunMode.RUN_MODE_SERIAL,
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
-                ComplementDependentMode.OFF_MODE);
+                ComplementDependentMode.OFF_MODE, null);
         Assertions.assertEquals(Status.START_PROCESS_INSTANCE_ERROR, result.get(Constants.STATUS));
         verify(commandService, times(0)).createCommand(any(Command.class));
     }
@@ -347,7 +392,7 @@ public class ExecutorServiceTest {
                 RunMode.RUN_MODE_SERIAL,
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
-                ComplementDependentMode.OFF_MODE);
+                ComplementDependentMode.OFF_MODE, null);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(commandService, times(1)).createCommand(any(Command.class));
     }
@@ -369,7 +414,7 @@ public class ExecutorServiceTest {
                 RunMode.RUN_MODE_PARALLEL,
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
-                ComplementDependentMode.OFF_MODE);
+                ComplementDependentMode.OFF_MODE, null);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(commandService, times(31)).createCommand(any(Command.class));
 
@@ -392,7 +437,7 @@ public class ExecutorServiceTest {
                 RunMode.RUN_MODE_PARALLEL,
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 15, Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
-                ComplementDependentMode.OFF_MODE);
+                ComplementDependentMode.OFF_MODE, null);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(commandService, times(15)).createCommand(any(Command.class));
 
@@ -411,7 +456,7 @@ public class ExecutorServiceTest {
                 RunMode.RUN_MODE_PARALLEL,
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
-                ComplementDependentMode.OFF_MODE);
+                ComplementDependentMode.OFF_MODE, null);
         Assertions.assertEquals(result.get(Constants.STATUS), Status.MASTER_NOT_EXISTS);
 
     }
@@ -440,7 +485,7 @@ public class ExecutorServiceTest {
                 RunMode.RUN_MODE_PARALLEL,
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 15, Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_YES,
-                ComplementDependentMode.OFF_MODE);
+                ComplementDependentMode.OFF_MODE, null);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
@@ -535,6 +580,46 @@ public class ExecutorServiceTest {
         Assertions.assertEquals("0,1", result.get(0));
         Assertions.assertEquals("2,3", result.get(1));
         Assertions.assertEquals("4,4", result.get(2));
+    }
+
+    @Test
+    public void testExecuteTask() {
+        String startNodeList = "1234567870";
+        TaskDependType taskDependType = TaskDependType.TASK_ONLY;
+
+        ProcessInstance processInstanceMock = Mockito.mock(ProcessInstance.class, RETURNS_DEEP_STUBS);
+        Mockito.when(processService.findProcessInstanceDetailById(processInstanceId))
+                .thenReturn(Optional.ofNullable(processInstanceMock));
+
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setProjectCode(projectCode);
+        Mockito.when(processService.findProcessDefinition(Mockito.anyLong(), Mockito.anyInt()))
+                .thenReturn(processDefinition);
+
+        Mockito.when(processService.getTenantForProcess(Mockito.anyInt(), Mockito.anyInt())).thenReturn(new Tenant());
+
+        when(processInstanceMock.getState().isFinished()).thenReturn(false);
+        WorkflowExecuteResponse responseInstanceIsNotFinished =
+                executorService.executeTask(loginUser, projectCode, processInstanceId, startNodeList, taskDependType);
+        Assertions.assertEquals(Status.WORKFLOW_INSTANCE_IS_NOT_FINISHED.getCode(),
+                responseInstanceIsNotFinished.getCode());
+
+        when(processInstanceMock.getState().isFinished()).thenReturn(true);
+        WorkflowExecuteResponse responseStartNodeListError =
+                executorService.executeTask(loginUser, projectCode, processInstanceId, "1234567870,", taskDependType);
+        Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), responseStartNodeListError.getCode());
+
+        Mockito.when(taskDefinitionLogMapper.queryMaxVersionForDefinition(Mockito.anyLong())).thenReturn(null);
+        WorkflowExecuteResponse responseNotDefineTask =
+                executorService.executeTask(loginUser, projectCode, processInstanceId, startNodeList, taskDependType);
+        Assertions.assertEquals(Status.EXECUTE_NOT_DEFINE_TASK.getCode(), responseNotDefineTask.getCode());
+
+        Mockito.when(taskDefinitionLogMapper.queryMaxVersionForDefinition(Mockito.anyLong())).thenReturn(1);
+        Mockito.when(commandService.verifyIsNeedCreateCommand(any())).thenReturn(true);
+        WorkflowExecuteResponse responseSuccess =
+                executorService.executeTask(loginUser, projectCode, processInstanceId, startNodeList, taskDependType);
+        Assertions.assertEquals(Status.SUCCESS.getCode(), responseSuccess.getCode());
+
     }
 
 }
