@@ -569,6 +569,14 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         int createCount = 0;
         runMode = (runMode == null) ? RunMode.RUN_MODE_SERIAL : runMode;
         Map<String, String> cmdParam = JSONUtils.toMap(command.getCommandParam());
+        List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionCode(command.getProcessDefinitionCode());
+        LinkedList<Date> listDate = new LinkedList<>(CronUtils.getSelfFireDateList(start, end, schedules));
+        final int listDateSize = listDate.size();
+        if (listDateSize == 0) {
+            logger.warn("can't create complement command, because the fire date cannot be created, scope: {} ~ {}",
+                    DateUtils.dateToString(start), DateUtils.dateToString(end));
+            return 0;
+        }
         switch (runMode) {
             case RUN_MODE_SERIAL: {
                 if (start.after(end)) {
@@ -587,10 +595,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                     break;
                 }
 
-                LinkedList<Date> listDate = new LinkedList<>();
-                List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionCode(command.getProcessDefinitionCode());
-                listDate.addAll(CronUtils.getSelfFireDateList(start, end, schedules));
-                int listDateSize = listDate.size();
                 createCount = listDate.size();
                 if (!CollectionUtils.isEmpty(listDate)) {
                     if (expectedParallelismNumber != null && expectedParallelismNumber != 0) {
