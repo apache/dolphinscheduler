@@ -19,7 +19,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper">
     <sql id="baseSql">
-        id, name, task_type, process_instance_id, process_instance_name, project_code task_code, task_definition_version, state, submit_time,
+        id, name, task_type, process_instance_id, process_instance_name, project_code, task_code, task_definition_version, state, submit_time,
         start_time, end_time, host, execute_path, log_path, alert_flag, retry_times, pid, app_link,
         flag, is_cache, cache_key, retry_interval, max_retry_times, task_instance_priority, worker_group,environment_code , executor_id, executor_name,
         first_submit_time, delay_time, task_params, var_pool, dry_run, test_flag, task_group_id, cpu_quota, memory_max, task_execute_type
