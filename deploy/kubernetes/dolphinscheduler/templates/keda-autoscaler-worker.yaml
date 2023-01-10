@@ -1,0 +1,54 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+################################
+## DolphinScheduler Worker KEDA Scaler
+#################################
+{{- if and .Values.worker.keda.enabled }}
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ include "dolphinscheduler.fullname" . }}-worker
+  labels:
+    component: worker-horizontalpodautoscaler
+    deploymentName: {{ include "dolphinscheduler.fullname" . }}-worker
+spec:
+  scaleTargetRef:
+    kind: {{ ternary "StatefulSet" "Deployment" .Values.workers.persistence.enabled }}
+    name: {{ include "dolphinscheduler.fullname" . }}-worker
+  pollingInterval:  {{ .Values.worker.keda.pollingInterval }}   # Optional. Default: 30 seconds
+  cooldownPeriod: {{ .Values.worker.keda.cooldownPeriod }}    # Optional. Default: 300 seconds
+  minReplicaCount: {{ .Values.worker.keda.minReplicaCount }}   # Optional. Default: 0
+  maxReplicaCount: {{ .Values.worker.keda.maxReplicaCount }}   # Optional. Default: 100
+  {{- if .Values.workers.keda.advanced }}
+advanced:
+  {{ toYaml .Values.worker.keda.advanced | indent 4 }}
+  {{- end }}
+# This is just an example, you could customize the trigger rule.
+# FYI, check TaskExecutionStatus.java for the human-readable meaning of state values below.
+triggers:
+  - type: postgresql
+    metadata:
+      userName: {{ .Values.postgresql.postgresqlUsername }}
+      connection: jdbc:postgresql://{{ template "dolphinscheduler.postgresql.fullname" . }}:5432/{{ .Values.postgresql.postgresqlDatabase }}?{{ .Values.postgresql.params }}
+      password: {{ .Values.postgresql.postgresqlPassword }}
+      targetQueryValue: "1"
+      query: >-
+        SELECT ceil(COUNT(*)::decimal / {{ .Values.worker.env.WORKER_EXEC_THREADS }})
+        FROM t_ds_task_instance
+        WHERE state IN (0, 1, 8, 12, 17)
+{{- end }}

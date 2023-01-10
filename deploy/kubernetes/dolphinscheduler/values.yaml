@@ -385,6 +385,34 @@ worker:
     WORKER_HEART_ERROR_THRESHOLD: "5"
     WORKER_HOST_WEIGHT: "100"
     WORKER_GROUPS: "default"
+  keda:
+    enabled: false
+    namespaceLabels: { }
+
+    # How often KEDA polls the DolphinScheduler DB to report new scale requests to the HPA
+    pollingInterval: 5
+
+    # How many seconds KEDA will wait before scaling to zero.
+    # Note that HPA has a separate cooldown period for scale-downs
+    cooldownPeriod: 30
+
+    # Minimum number of workers created by keda
+    minReplicaCount: 0
+
+    # Maximum number of workers created by keda
+    maxReplicaCount: 3
+
+    # Specify HPA related options
+    advanced: { }
+    # horizontalPodAutoscalerConfig:
+    #   behavior:
+    #     scaleDown:
+    #       stabilizationWindowSeconds: 300
+    #       policies:
+    #         - type: Percent
+    #           value: 100
+    #           periodSeconds: 15
+
 
 alert:
   ## Number of desired pods. This is a pointer to distinguish between explicit zero and not specified. Defaults to 1.
