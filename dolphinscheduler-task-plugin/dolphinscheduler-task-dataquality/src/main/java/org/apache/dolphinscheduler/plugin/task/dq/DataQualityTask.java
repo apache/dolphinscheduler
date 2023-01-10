@@ -71,16 +71,6 @@ public class DataQualityTask extends AbstractYarnTask {
      */
     private static final String SPARK_COMMAND = "${SPARK_HOME}/bin/spark-submit";
 
-    /**
-     * --class CLASS_NAME
-     */
-    public static final String MAIN_CLASS = "--class";
-
-    /**
-     * DataQuality mainClass name
-     */
-    private static final String DATA_QUALITY_MAIN_CLASS_NAME = "org.apache.dolphinscheduler.data.quality.DataQualityApplication";
-
     private DataQualityParameters dataQualityParameters;
 
     private final TaskExecutionContext dqTaskExecutionContext;
@@ -179,8 +169,6 @@ public class DataQualityTask extends AbstractYarnTask {
         List<String> args = new ArrayList<>();
 
         args.add(SPARK_COMMAND);
-        args.add(MAIN_CLASS);
-        args.add(DATA_QUALITY_MAIN_CLASS_NAME);
         args.addAll(SparkArgsUtils.buildArgs(dataQualityParameters.getSparkParameters()));
 
         // replace placeholder
