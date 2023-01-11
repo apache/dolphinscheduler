@@ -58,7 +58,7 @@ mysql:
       storageClass: "-"
 
 minio:
-  enabled: false
+  enabled: true
   auth:
     rootUser: minioadmin
     rootPassword: minioadmin
@@ -100,7 +100,7 @@ conf:
     data.basedir.path: /tmp/dolphinscheduler
 
     # resource storage type: HDFS, S3, NONE
-    resource.storage.type: NONE
+    resource.storage.type: S3
 
     # resource store on HDFS/S3 path, resource file will store to this base path, self configuration, please make sure the directory exists on hdfs and have read write permissions. "/dolphinscheduler" is recommended
     resource.storage.upload.base.path: /dolphinscheduler
@@ -242,7 +242,7 @@ master:
   ## PodManagementPolicy controls how pods are created during initial scale up, when replacing pods on nodes, or when scaling down.
   podManagementPolicy: "Parallel"
   ## Replicas is the desired number of replicas of the given Template.
-  replicas: "3"
+  replicas: "1"
   ## You can use annotations to attach arbitrary non-identifying metadata to objects.
   ## Clients such as tools and libraries can retrieve this metadata.
   annotations: {}
@@ -314,7 +314,7 @@ worker:
   ## PodManagementPolicy controls how pods are created during initial scale up, when replacing pods on nodes, or when scaling down.
   podManagementPolicy: "Parallel"
   ## Replicas is the desired number of replicas of the given Template.
-  replicas: "3"
+  replicas: "1"
   ## You can use annotations to attach arbitrary non-identifying metadata to objects.
   ## Clients such as tools and libraries can retrieve this metadata.
   annotations: {}
