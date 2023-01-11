@@ -28,27 +28,32 @@ metadata:
     deploymentName: {{ include "dolphinscheduler.fullname" . }}-worker
 spec:
   scaleTargetRef:
-    kind: {{ ternary "StatefulSet" "Deployment" .Values.workers.persistence.enabled }}
+    kind: StatefulSet
     name: {{ include "dolphinscheduler.fullname" . }}-worker
   pollingInterval:  {{ .Values.worker.keda.pollingInterval }}   # Optional. Default: 30 seconds
   cooldownPeriod: {{ .Values.worker.keda.cooldownPeriod }}    # Optional. Default: 300 seconds
   minReplicaCount: {{ .Values.worker.keda.minReplicaCount }}   # Optional. Default: 0
   maxReplicaCount: {{ .Values.worker.keda.maxReplicaCount }}   # Optional. Default: 100
-  {{- if .Values.workers.keda.advanced }}
-advanced:
-  {{ toYaml .Values.worker.keda.advanced | indent 4 }}
-  {{- end }}
-# This is just an example, you could customize the trigger rule.
-# FYI, check TaskExecutionStatus.java for the human-readable meaning of state values below.
-triggers:
-  - type: postgresql
-    metadata:
-      userName: {{ .Values.postgresql.postgresqlUsername }}
-      connection: jdbc:postgresql://{{ template "dolphinscheduler.postgresql.fullname" . }}:5432/{{ .Values.postgresql.postgresqlDatabase }}?{{ .Values.postgresql.params }}
-      password: {{ .Values.postgresql.postgresqlPassword }}
-      targetQueryValue: "1"
-      query: >-
-        SELECT ceil(COUNT(*)::decimal / {{ .Values.worker.env.WORKER_EXEC_THREADS }})
-        FROM t_ds_task_instance
-        WHERE state IN (0, 1, 8, 12, 17)
+  {{- if .Values.worker.keda.advanced }}
+  advanced:
+    {{ toYaml .Values.worker.keda.advanced | indent 4 }}
+    {{- end }}
+  # This is just an example, you could customize the trigger rule.
+  # FYI, check TaskExecutionStatus.java for the human-readable meaning of state values below.
+  triggers:
+    - type: postgresql
+      metadata:
+#        connection: jdbc:postgresql://{{ template "dolphinscheduler.postgresql.fullname" . }}:5432/{{ .Values.postgresql.postgresqlDatabase }}?{{ .Values.postgresql.params }}
+#        host: {{ template "dolphinscheduler.postgresql.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
+        host: dolphinscheduler-postgresql-0.dolphinscheduler-postgresql-headless.{{ .Release.Namespace }}.svc.cluster.local
+        port: "5432"
+        userName: {{ .Values.postgresql.postgresqlUsername }}
+        password: {{ .Values.postgresql.postgresqlPassword }}
+        dbName: {{ .Values.postgresql.postgresqlDatabase }}
+        sslmode: "false"
+        targetQueryValue: "1"
+        query: >-
+          SELECT ceil(COUNT(*)::decimal / {{ .Values.worker.env.WORKER_EXEC_THREADS }})
+          FROM t_ds_task_instance
+          WHERE state IN (0, 1, 8, 12, 17)
 {{- end }}
