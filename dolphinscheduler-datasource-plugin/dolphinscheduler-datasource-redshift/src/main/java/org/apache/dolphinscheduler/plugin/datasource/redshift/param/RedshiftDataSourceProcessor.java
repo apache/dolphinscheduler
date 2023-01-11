@@ -67,9 +67,7 @@ public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
         RedshiftDataSourceParamDTO redshiftParam = (RedshiftDataSourceParamDTO) datasourceParam;
-        String address =
-                String.format("%s%s:%s", DataSourceConstants.JDBC_REDSHIFT, redshiftParam.getHost(),
-                        redshiftParam.getPort());
+        String address = getAddress(redshiftParam);
         String jdbcUrl = address + Constants.SLASH + redshiftParam.getDatabase();
 
         RedshiftConnectionParam redshiftConnectionParam = new RedshiftConnectionParam();
@@ -81,6 +79,8 @@ public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
         redshiftConnectionParam.setDatabase(redshiftParam.getDatabase());
         redshiftConnectionParam.setDriverClassName(getDatasourceDriver());
         redshiftConnectionParam.setValidationQuery(getValidationQuery());
+        redshiftConnectionParam.setMode(redshiftParam.getMode());
+        redshiftConnectionParam.setDbUser(redshiftParam.getDbUser());
 
         return redshiftConnectionParam;
     }
@@ -114,8 +114,14 @@ public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
     public Connection getConnection(ConnectionParam connectionParam) throws ClassNotFoundException, SQLException {
         RedshiftConnectionParam redshiftConnectionParam = (RedshiftConnectionParam) connectionParam;
         Class.forName(getDatasourceDriver());
-        return DriverManager.getConnection(getJdbcUrl(connectionParam),
-                redshiftConnectionParam.getUser(), PasswordUtils.decodePassword(redshiftConnectionParam.getPassword()));
+        if (redshiftConnectionParam.getMode().equals(RedshiftAuthMode.PASSWORD)) {
+            return DriverManager.getConnection(getJdbcUrl(connectionParam),
+                    redshiftConnectionParam.getUser(), PasswordUtils.decodePassword(redshiftConnectionParam.getPassword()));
+        } else if (redshiftConnectionParam.getMode().equals(RedshiftAuthMode.IAM_ACCESS_KEY)) {
+            String connectionUrl = getConnectionUrl(redshiftConnectionParam);
+            return DriverManager.getConnection(connectionUrl);
+        }
+        return null;
     }
 
     @Override
@@ -137,4 +143,56 @@ public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
         return null;
     }
 
+    /**
+     * 2 auth mode
+     * PASSWORD: address example: jdbc:redshift://examplecluster.abc123xyz789.us-west-2.redshift.amazonaws.com:5439/dev
+     * IAM_ACCESS_KEY:
+     * address example1: jdbc:redshift:iam://examplecluster:us-west-2/dev?AccessKeyID=xxx&SecretAccessKey=xxx&DbUser=kristen
+     * address example2: jdbc:redshift:iam://examplecluster.abc123xyz789.us-west-2.redshift.amazonaws.com:5439/dev?AccessKeyID=xxx&SecretAccessKey=xxx&DbUser=kristen
+     *
+     * @param redshiftConnectionParam
+     * @return
+     */
+    private String getConnectionUrl(RedshiftConnectionParam redshiftConnectionParam) {
+        String basic = getJdbcUrl(redshiftConnectionParam);
+        String authParams = String.format("AccessKeyID=%s&SecretAccessKey=%s&DbUser=%s",
+                redshiftConnectionParam.getUser(), PasswordUtils.decodePassword(redshiftConnectionParam.getPassword()),
+                redshiftConnectionParam.getDbUser());
+        if (MapUtils.isNotEmpty(redshiftConnectionParam.getOther())) {
+            // if have other params map, basic will be 'jdbc:redshift:iam://examplecluster:us-west-2/dev?param1=xx&param2=xx'
+            // append AccessKeyID &SecretAccessKey &DbUser
+            return String.format("%s&%s", basic, authParams);
+        } else {
+            // if none other params map, basic will be 'jdbc:redshift:iam://examplecluster:us-west-2/dev'
+            // append AccessKeyID &SecretAccessKey &DbUser
+            return String.format("%s?%s", basic, authParams);
+        }
+    }
+
+    /**
+     * 2 auth mode
+     * PASSWORD: address example: jdbc:redshift://examplecluster.abc123xyz789.us-west-2.redshift.amazonaws.com:5439
+     * IAM_ACCESS_KEY:
+     * address example1: jdbc:redshift:iam://examplecluster:us-west-2
+     * address example2: jdbc:redshift:iam://examplecluster.abc123xyz789.us-west-2.redshift.amazonaws.com:5439
+     *
+     * @param redshiftParam
+     * @return
+     */
+    private String getAddress(RedshiftDataSourceParamDTO redshiftParam) {
+        if (redshiftParam.getMode().equals(RedshiftAuthMode.PASSWORD)) {
+            return String.format("%s%s:%s", DataSourceConstants.JDBC_REDSHIFT, redshiftParam.getHost(),
+                    redshiftParam.getPort());
+        } else if (redshiftParam.getMode().equals(RedshiftAuthMode.IAM_ACCESS_KEY)) {
+            if (redshiftParam.getPort() == null) {
+                // construct IAM_ACCESS_KEY example 1 format
+                return String.format("%s%s", DataSourceConstants.JDBC_REDSHIFT_IAM, redshiftParam.getHost());
+            } else {
+                // construct IAM_ACCESS_KEY example 2 format
+                return String.format("%s%s:%s", DataSourceConstants.JDBC_REDSHIFT_IAM, redshiftParam.getHost(),
+                        redshiftParam.getPort());
+            }
+        }
+        return null;
+    }
 }
