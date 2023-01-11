@@ -133,7 +133,7 @@ public class EventExecuteService extends Thread {
             FutureCallback futureCallback = new FutureCallback() {
                 @Override
                 public void onSuccess(Object o) {
-                    if (workflowExecuteThread.workFlowFinish()) {
+                    if (workflowExecuteThread.workFlowFinish() && workflowExecuteThread.activeTaskFinish()) {
                         processInstanceExecMaps.remove(processInstanceId);
                         notifyProcessChanged();
                         logger.info("process instance {} finished.", processInstanceId);

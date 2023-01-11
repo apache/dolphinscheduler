@@ -141,11 +141,11 @@ public class TaskExecuteThread implements Runnable, Delayed {
                 taskExecutionContext.setStartTime(new Date());
             }
             if (taskExecutionContext.getCurrentExecutionStatus() != ExecutionStatus.RUNNING_EXECUTION) {
-                changeTaskExecutionStatusToRunning();
+                //changeTaskExecutionStatusToRunning();
+                logger.info("the task begins to execute. task instance id: {}", taskExecutionContext.getTaskInstanceId());
+                taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);
+                sendTaskExecuteRunningCommand(taskExecutionContext);
             }
-            logger.info("the task begins to execute. task instance id: {}", taskExecutionContext.getTaskInstanceId());
-            taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);
-            sendTaskExecuteRunningCommand(taskExecutionContext);
             int dryRun = taskExecutionContext.getDryRun();
             // copy hdfs/minio file to local
             if (dryRun == Constants.DRY_RUN_FLAG_NO) {
@@ -212,9 +212,15 @@ public class TaskExecuteThread implements Runnable, Delayed {
             responseCommand.setProcessId(task.getProcessId());
             responseCommand.setAppIds(task.getAppIds());
         } finally {
-            TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-            ResponceCache.get().cache(taskExecutionContext.getTaskInstanceId(), responseCommand.convert2Command(), Event.RESULT);
-            taskCallbackService.sendResult(taskExecutionContext.getTaskInstanceId(), responseCommand.convert2Command());
+            if (this.task.getExitStatusCode() == TaskConstants.EXIT_CODE_KILL
+                && TaskExecutionContextCacheManager.findTaskExecutionStatus(taskExecutionContext.getTaskInstanceId()).typeIsStop()) {
+                logger.info("task has exited, taskInstanceId:{}, exitStatusCode:{} ,task executionStatus:{}",
+                    taskExecutionContext.getTaskInstanceId(), this.task.getExitStatusCode(), ExecutionStatus.STOP);
+            } else {
+                TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+                ResponceCache.get().cache(taskExecutionContext.getTaskInstanceId(), responseCommand.convert2Command(), Event.RESULT);
+                taskCallbackService.sendResult(taskExecutionContext.getTaskInstanceId(), responseCommand.convert2Command());
+            }
             clearTaskExecPath();
         }
     }
@@ -350,42 +356,6 @@ public class TaskExecuteThread implements Runnable, Delayed {
                 logger.info("file : {} exists ", resFile.getName());
             }
         }
-    }
-
-    /**
-     * send an ack to change the status of the task.
-     */
-    private void changeTaskExecutionStatusToRunning() {
-        taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);
-        Command ackCommand = buildAckCommand().convert2Command();
-        try {
-            RetryerUtils.retryCall(() -> {
-                taskCallbackService.sendAck(taskExecutionContext.getTaskInstanceId(), ackCommand);
-                return Boolean.TRUE;
-            });
-        } catch (ExecutionException | RetryException e) {
-            logger.error(e.getMessage(), e);
-        }
-    }
-
-    /**
-     * build ack command.
-     *
-     * @return TaskExecuteAckCommand
-     */
-    private TaskExecuteAckCommand buildAckCommand() {
-        TaskExecuteAckCommand ackCommand = new TaskExecuteAckCommand();
-        ackCommand.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-        ackCommand.setStatus(taskExecutionContext.getCurrentExecutionStatus().getCode());
-        ackCommand.setStartTime(taskExecutionContext.getStartTime());
-        ackCommand.setLogPath(taskExecutionContext.getLogPath());
-        ackCommand.setHost(taskExecutionContext.getHost());
-        if (TaskType.SQL.getDesc().equalsIgnoreCase(taskExecutionContext.getTaskType()) || TaskType.PROCEDURE.getDesc().equalsIgnoreCase(taskExecutionContext.getTaskType())) {
-            ackCommand.setExecutePath(null);
-        } else {
-            ackCommand.setExecutePath(taskExecutionContext.getExecutePath());
-        }
-        return ackCommand;
     }
 
     /**

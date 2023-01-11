@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.spi.task.request;
 
 import org.apache.dolphinscheduler.spi.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.spi.task.ExecutionStatus;
 import org.apache.dolphinscheduler.spi.task.Property;
 
 import java.util.Date;
@@ -182,6 +183,11 @@ public class TaskRequest {
      * delay execution time.
      */
     private int delayTime;
+
+    /**
+     * current execution status
+     */
+    private ExecutionStatus currentExecutionStatus;
 
     /**
      *  Task Logger name should be like: Task-{processDefinitionId}-{processInstanceId}-{taskInstanceId}
@@ -471,6 +477,14 @@ public class TaskRequest {
 
     public void setDelayTime(int delayTime) {
         this.delayTime = delayTime;
+    }
+
+    public ExecutionStatus getCurrentExecutionStatus() {
+        return currentExecutionStatus;
+    }
+
+    public void setCurrentExecutionStatus(ExecutionStatus currentExecutionStatus) {
+        this.currentExecutionStatus = currentExecutionStatus;
     }
 
     public SQLTaskExecutionContext getSqlTaskExecutionContext() {

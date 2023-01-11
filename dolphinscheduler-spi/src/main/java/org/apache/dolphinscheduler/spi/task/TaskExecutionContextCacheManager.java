@@ -71,4 +71,8 @@ public class TaskExecutionContextCacheManager {
     public static Collection<TaskRequest> getAllTaskRequestList() {
         return taskRequestContextCache.values();
     }
+
+    public static ExecutionStatus findTaskExecutionStatus(Integer taskInstanceId) {
+        return taskRequestContextCache.get(taskInstanceId).getCurrentExecutionStatus();
+    }
 }

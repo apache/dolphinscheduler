@@ -942,11 +942,6 @@ public class WorkflowExecuteThread implements Runnable {
                 taskInstance.setVarPool(JSONUtils.toJsonString(allProperty.values()));
             }
         }
-//        else {
-//            if (StringUtils.isNotEmpty(processInstance.getVarPool())) {
-//                taskInstance.setVarPool(processInstance.getVarPool());
-//            }
-//        }
     }
 
     private void setVarPoolValue(Map<String, Property> allProperty, Map<String, TaskInstance> allTaskInstance, TaskInstance preTaskInstance, Property thisProperty) {
@@ -1455,6 +1450,19 @@ public class WorkflowExecuteThread implements Runnable {
 
     public boolean workFlowFinish() {
         return this.processInstance.getState().typeIsFinished();
+    }
+
+    public boolean activeTaskFinish() {
+        if (activeTaskProcessorMaps.isEmpty()) {
+            return true;
+        }
+        List<TaskInstance> taskInstanceList = processService.findTaskInstanceListByIds(activeTaskProcessorMaps.keySet());
+        for (TaskInstance taskInstance : taskInstanceList) {
+            if (!taskInstance.getState().typeIsFinished()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**

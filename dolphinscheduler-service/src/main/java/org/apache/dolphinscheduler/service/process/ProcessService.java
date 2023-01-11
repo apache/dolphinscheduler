@@ -1489,10 +1489,23 @@ public class ProcessService {
      * find task instance by id
      *
      * @param taskId task id
-     * @return task intance
+     * @return task instance
      */
     public TaskInstance findTaskInstanceById(Integer taskId) {
         return taskInstanceMapper.selectById(taskId);
+    }
+
+    /**
+     * find task instance list by ids
+     *
+     * @param taskIds task id list
+     * @return task instance list
+     */
+    public List<TaskInstance> findTaskInstanceListByIds(Set<Integer> taskIds) {
+        if (CollectionUtils.isEmpty(taskIds)) {
+            return new ArrayList<>();
+        }
+        return taskInstanceMapper.queryTaskInstanceListByIds(taskIds);
     }
 
     /**

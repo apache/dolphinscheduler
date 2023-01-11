@@ -100,6 +100,19 @@ public class TaskResponseEvent {
      */
     private long opaque;
 
+    public static TaskResponseEvent newKillResponse(ExecutionStatus state,
+                                                    int taskInstanceId,
+                                                    Channel channel,
+                                                    int processInstanceId) {
+        TaskResponseEvent event = new TaskResponseEvent();
+        event.setState(state);
+        event.setTaskInstanceId(taskInstanceId);
+        event.setEvent(Event.ACTION_STOP);
+        event.setChannel(channel);
+        event.setProcessInstanceId(processInstanceId);
+        return event;
+    }
+
     public static TaskResponseEvent newActionStop(ExecutionStatus state,
                                                   int taskInstanceId,
                                                   int processInstanceId) {
