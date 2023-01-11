@@ -295,6 +295,8 @@ public enum Status {
     DELETE_EDGE_ERROR(50055, "delete edge error", "删除工作流任务连接线错误"),
     NOT_SUPPORT_UPDATE_TASK_DEFINITION(50056, "task state does not support modification", "当前任务不支持修改"),
     NOT_SUPPORT_COPY_TASK_TYPE(50057, "task type [{0}] does not support copy", "不支持复制的任务类型[{0}]"),
+    COMPLEMENT_PROCESS_INSTANCE_DATE_RANGE_ERROR(50059, "complement instances cannot be generated within the complement time range according to the schedule configuration",
+            "根据调度配置在补数时间范围内无法生成补数实例"),
     HDFS_NOT_STARTUP(60001, "hdfs not startup", "hdfs未启用"),
 
     /**
