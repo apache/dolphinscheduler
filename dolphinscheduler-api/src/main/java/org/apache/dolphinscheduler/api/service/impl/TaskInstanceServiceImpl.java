@@ -24,6 +24,7 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceRemoveCacheResponse;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ProjectService;
+import org.apache.dolphinscheduler.api.service.TaskGroupQueueService;
 import org.apache.dolphinscheduler.api.service.TaskInstanceService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -106,6 +107,9 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
 
     @Autowired
     private DqExecuteResultDao dqExecuteResultDao;
+
+    @Autowired
+    private TaskGroupQueueService taskGroupQueueService;
 
     /**
      * query task list by project, process instance, task name, task start time, task end time, task status, keyword paging
@@ -384,7 +388,9 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
                 }
             }
         }
+
         dqExecuteResultDao.deleteByWorkflowInstanceId(workflowInstanceId);
+        taskGroupQueueService.deleteByWorkflowInstanceId(workflowInstanceId);
         taskInstanceDao.deleteByWorkflowInstanceId(workflowInstanceId);
     }
 
