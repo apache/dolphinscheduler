@@ -43,7 +43,7 @@ public abstract class AbstractTask {
     protected final Logger logger =
             LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
 
-    public String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
+    public String rgex = "['\"]?\\$\\{(.*?)\\}['\"]?";
 
     /**
      * varPool string
