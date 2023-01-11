@@ -23,6 +23,7 @@ import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.MonitorService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -144,17 +145,23 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         /**
          * create command
          */
-        int create = this.createCommand(commandType, processDefinition.getCode(),
-                taskDependType, failureStrategy, startNodeList, cronTime, warningType, loginUser.getId(),
-                warningGroupId, runMode, processInstancePriority, workerGroup, environmentCode, startParams, expectedParallelismNumber, dryRun);
+        try {
+            int create = this.createCommand(commandType, processDefinition.getCode(),
+                    taskDependType, failureStrategy, startNodeList, cronTime, warningType, loginUser.getId(),
+                    warningGroupId, runMode, processInstancePriority, workerGroup, environmentCode, startParams, expectedParallelismNumber, dryRun);
 
-        if (create > 0) {
-            processDefinition.setWarningGroupId(warningGroupId);
-            processDefinitionMapper.updateById(processDefinition);
-            putMsg(result, Status.SUCCESS);
-        } else {
-            putMsg(result, Status.START_PROCESS_INSTANCE_ERROR);
+            if (create > 0) {
+                processDefinition.setWarningGroupId(warningGroupId);
+                processDefinitionMapper.updateById(processDefinition);
+                putMsg(result, Status.SUCCESS);
+            } else {
+                putMsg(result, Status.START_PROCESS_INSTANCE_ERROR);
+            }
+        } catch (ServiceException e) {
+            Optional<Status> status = Status.findStatusBy(e.getCode());
+            putMsg(result, status.orElse(Status.START_PROCESS_INSTANCE_ERROR));
         }
+
         return result;
     }
 
@@ -575,7 +582,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         if (listDateSize == 0) {
             logger.warn("can't create complement command, because the fire date cannot be created, scope: {} ~ {}",
                     DateUtils.dateToString(start), DateUtils.dateToString(end));
-            return 0;
+            throw new ServiceException(Status.COMPLEMENT_PROCESS_INSTANCE_DATE_RANGE_ERROR);
         }
         switch (runMode) {
             case RUN_MODE_SERIAL: {
