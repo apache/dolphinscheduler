@@ -48,9 +48,9 @@ spec:
         host: dolphinscheduler-postgresql-0.dolphinscheduler-postgresql-headless.{{ .Release.Namespace }}.svc.cluster.local
         port: "5432"
         userName: {{ .Values.postgresql.postgresqlUsername }}
-        password: {{ .Values.postgresql.postgresqlPassword }}
+        passwordFromEnv: SPRING_DATASOURCE_PASSWORD
         dbName: {{ .Values.postgresql.postgresqlDatabase }}
-        sslmode: "false"
+        sslmode: "disable"
         targetQueryValue: "1"
         query: >-
           SELECT ceil(COUNT(*)::decimal / {{ .Values.worker.env.WORKER_EXEC_THREADS }})
