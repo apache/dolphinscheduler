@@ -196,7 +196,8 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       },
       validate: {
         trigger: ['input', 'blur'],
-        required: true
+        required: true,
+        message: t('project.node.datax_target_table_tips')
       }
     },
     {
