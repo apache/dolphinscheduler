@@ -30,10 +30,10 @@ spec:
   scaleTargetRef:
     kind: StatefulSet
     name: {{ include "dolphinscheduler.fullname" . }}-worker
-  pollingInterval:  {{ .Values.worker.keda.pollingInterval }}   # Optional. Default: 30 seconds
-  cooldownPeriod: {{ .Values.worker.keda.cooldownPeriod }}    # Optional. Default: 300 seconds
+  pollingInterval:  {{ .Values.worker.keda.pollingInterval }}   # Optional. Default: 5 seconds
+  cooldownPeriod: {{ .Values.worker.keda.cooldownPeriod }}    # Optional. Default: 30 seconds
   minReplicaCount: {{ .Values.worker.keda.minReplicaCount }}   # Optional. Default: 0
-  maxReplicaCount: {{ .Values.worker.keda.maxReplicaCount }}   # Optional. Default: 100
+  maxReplicaCount: {{ .Values.worker.keda.maxReplicaCount }}   # Optional. Default: 2
   {{- if .Values.worker.keda.advanced }}
   advanced:
     {{ toYaml .Values.worker.keda.advanced | indent 4 }}
