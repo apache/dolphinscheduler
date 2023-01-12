@@ -17,17 +17,15 @@
 
 package org.apache.dolphinscheduler.service.utils;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.log.LogClient;
-import org.apache.dolphinscheduler.service.storage.impl.HadoopUtils;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -63,34 +61,6 @@ public class ProcessUtils {
      * Expression of PID recognition in Windows scene
      */
     private static final Pattern WINDOWSATTERN = Pattern.compile("\\w+\\((\\d+)\\)");
-
-    /**
-     * kill yarn application.
-     *
-     * @param appIds app id list
-     * @param logger logger
-     * @param tenantCode tenant code
-     * @param executePath execute path
-     */
-    public static void cancelApplication(List<String> appIds, Logger logger, String tenantCode, String executePath) {
-        if (appIds == null || appIds.isEmpty()) {
-            return;
-        }
-
-        for (String appId : appIds) {
-            try {
-                TaskExecutionStatus applicationStatus = HadoopUtils.getInstance().getApplicationStatus(appId);
-
-                if (!applicationStatus.isFinished()) {
-                    String commandFile = String.format("%s/%s.kill", executePath, appId);
-                    String cmd = getKerberosInitCommand() + "yarn application -kill " + appId;
-                    execYarnKillCommand(logger, tenantCode, appId, commandFile, cmd);
-                }
-            } catch (Exception e) {
-                logger.error("Get yarn application app id [{}}] status failed", appId, e);
-            }
-        }
-    }
 
     /**
      * get kerberos init command
@@ -200,18 +170,22 @@ public class ProcessUtils {
         try {
             Thread.sleep(Constants.SLEEP_TIME_MILLIS);
             Host host = Host.of(taskExecutionContext.getHost());
-            List<String> appIds = logClient.getAppIds(host.getIp(), host.getPort(), taskExecutionContext.getLogPath());
+            List<String> appIds = logClient.getAppIds(host.getIp(), host.getPort(), taskExecutionContext.getLogPath(),
+                    taskExecutionContext.getAppInfoPath());
             if (CollectionUtils.isNotEmpty(appIds)) {
                 if (StringUtils.isEmpty(taskExecutionContext.getExecutePath())) {
                     taskExecutionContext
-                            .setExecutePath(FileUtils.getProcessExecDir(taskExecutionContext.getProjectCode(),
+                            .setExecutePath(FileUtils.getProcessExecDir(
+                                    taskExecutionContext.getTenantCode(),
+                                    taskExecutionContext.getProjectCode(),
                                     taskExecutionContext.getProcessDefineCode(),
                                     taskExecutionContext.getProcessDefineVersion(),
                                     taskExecutionContext.getProcessInstanceId(),
                                     taskExecutionContext.getTaskInstanceId()));
                 }
                 FileUtils.createWorkDirIfAbsent(taskExecutionContext.getExecutePath());
-                cancelApplication(appIds, logger, taskExecutionContext.getTenantCode(),
+                org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils.cancelApplication(appIds, logger,
+                        taskExecutionContext.getTenantCode(),
                         taskExecutionContext.getExecutePath());
                 return appIds;
             } else {

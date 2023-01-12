@@ -17,13 +17,13 @@
 
 package org.apache.dolphinscheduler.plugin.task.flink;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -53,9 +53,9 @@ public class FlinkTask extends AbstractYarnTask {
 
     @Override
     public void init() {
-        logger.info("flink task params {}", taskExecutionContext.getTaskParams());
 
         flinkParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), FlinkParameters.class);
+        logger.info("Initialize flink task params {}", JSONUtils.toPrettyJsonString(flinkParameters));
 
         if (flinkParameters == null || !flinkParameters.checkParameters()) {
             throw new RuntimeException("flink task params is not valid");
@@ -85,10 +85,16 @@ public class FlinkTask extends AbstractYarnTask {
 
     @Override
     protected void setMainJarName() {
+        if (flinkParameters.getProgramType() == ProgramType.SQL) {
+            logger.info("The current flink job type is SQL, will no need to set main jar");
+            return;
+        }
+
         ResourceInfo mainJar = flinkParameters.getMainJar();
         String resourceName = getResourceNameOfMainJar(mainJar);
         mainJar.setRes(resourceName);
         flinkParameters.setMainJar(mainJar);
+        logger.info("Success set flink jar: {}", resourceName);
     }
 
     @Override

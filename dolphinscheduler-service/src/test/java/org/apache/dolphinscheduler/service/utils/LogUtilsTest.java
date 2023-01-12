@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.service.utils;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.DateConstants;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.service.log.TaskLogDiscriminator;
+import org.apache.dolphinscheduler.plugin.task.api.log.TaskLogDiscriminator;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -65,7 +65,7 @@ public class LogUtilsTest {
 
         Path logPath = Paths.get(".").toAbsolutePath().getParent()
                 .resolve(logBase)
-                .resolve(DateUtils.format(firstSubmitTime, Constants.YYYYMMDD, null))
+                .resolve(DateUtils.format(firstSubmitTime, DateConstants.YYYYMMDD, null))
                 .resolve("1_1-100-1000.log");
         Assertions.assertEquals(logPath.toString(), LogUtils.getTaskLogPath(taskExecutionContext));
     }

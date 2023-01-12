@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
+import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_WORKER_GROUP;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
@@ -31,8 +31,10 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
@@ -56,11 +58,10 @@ import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
@@ -88,6 +89,8 @@ public class StreamTaskExecuteRunnable implements Runnable {
     protected MasterConfig masterConfig;
 
     protected ProcessService processService;
+
+    protected TaskInstanceDao taskInstanceDao;
 
     protected ExecutorDispatcher dispatcher;
 
@@ -118,6 +121,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
         this.dispatcher = SpringApplicationContext.getBean(ExecutorDispatcher.class);
         this.taskPluginManager = SpringApplicationContext.getBean(TaskPluginManager.class);
         this.processTaskRelationMapper = SpringApplicationContext.getBean(ProcessTaskRelationMapper.class);
+        this.taskInstanceDao = SpringApplicationContext.getBean(TaskInstanceDao.class);
         this.streamTaskInstanceExecCacheManager =
                 SpringApplicationContext.getBean(StreamTaskInstanceExecCacheManager.class);
         this.taskDefinition = taskDefinition;
@@ -133,7 +137,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
         // submit task
         processService.updateTaskDefinitionResources(taskDefinition);
         taskInstance = newTaskInstance(taskDefinition);
-        processService.saveTaskInstance(taskInstance);
+        taskInstanceDao.upsertTaskInstance(taskInstance);
 
         // add cache
         streamTaskInstanceExecCacheManager.cache(taskInstance.getId(), this);
@@ -148,7 +152,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
         TaskExecutionContext taskExecutionContext = getTaskExecutionContext(taskInstance);
         if (taskExecutionContext == null) {
             taskInstance.setState(TaskExecutionStatus.FAILURE);
-            processService.saveTaskInstance(taskInstance);
+            taskInstanceDao.upsertTaskInstance(taskInstance);
             return;
         }
 
@@ -175,7 +179,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
 
             // set task instance fail
             taskInstance.setState(TaskExecutionStatus.FAILURE);
-            processService.saveTaskInstance(taskInstance);
+            taskInstanceDao.upsertTaskInstance(taskInstance);
             return;
         }
 
@@ -256,6 +260,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
         taskInstance.setState(TaskExecutionStatus.SUBMITTED_SUCCESS);
         // set process instance id to 0
         taskInstance.setProcessInstanceId(0);
+        taskInstance.setProjectCode(taskDefinition.getProjectCode());
         // task instance type
         taskInstance.setTaskType(taskDefinition.getTaskType().toUpperCase());
         // task instance whether alert
@@ -416,7 +421,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
         taskInstance.setEndTime(taskEvent.getEndTime());
         taskInstance.setVarPool(taskEvent.getVarPool());
         processService.changeOutParam(taskInstance);
-        processService.updateTaskInstance(taskInstance);
+        taskInstanceDao.updateTaskInstance(taskInstance);
 
         // send ack
         sendAckToWorker(taskEvent);

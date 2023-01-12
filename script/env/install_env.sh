@@ -58,4 +58,6 @@ installPath=${installPath:-"/tmp/dolphinscheduler"}
 deployUser=${deployUser:-"dolphinscheduler"}
 
 # The root of zookeeper, for now DolphinScheduler default registry server is zookeeper.
+# It will delete ${zkRoot} in the zookeeper when you run install.sh, so please keep it same as registry.zookeeper.namespace in yml files.
+# Similarly, if you want to modify the value, please modify registry.zookeeper.namespace in yml files as well.
 zkRoot=${zkRoot:-"/dolphinscheduler"}

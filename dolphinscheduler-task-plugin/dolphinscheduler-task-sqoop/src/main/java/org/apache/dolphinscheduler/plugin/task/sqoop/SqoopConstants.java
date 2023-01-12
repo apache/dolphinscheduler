@@ -72,4 +72,5 @@ public final class SqoopConstants {
     public static final String UPDATE_KEY = "--update-key";
     public static final String UPDATE_MODE = "--update-mode";
 
+    public static final String SQOOP_PASSWORD_REGEX = "(?<=(--password \")).+?(?=\")";
 }

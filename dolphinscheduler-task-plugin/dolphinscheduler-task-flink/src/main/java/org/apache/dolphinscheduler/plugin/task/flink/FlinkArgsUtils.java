@@ -23,7 +23,8 @@ import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ArgsUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -125,9 +126,9 @@ public class FlinkArgsUtils {
         /**
          * Currently flink sql on yarn only supports yarn-per-job mode
          */
-        if (FlinkDeployMode.CLUSTER == deployMode) {
+        if (FlinkDeployMode.LOCAL == deployMode) {
             // execution.target
-            initOptions.add(String.format(FlinkConstants.FLINK_FORMAT_EXECUTION_TARGET, "local"));
+            initOptions.add(String.format(FlinkConstants.FLINK_FORMAT_EXECUTION_TARGET, FlinkConstants.FLINK_LOCAL));
         } else {
             // execution.target
             initOptions.add(

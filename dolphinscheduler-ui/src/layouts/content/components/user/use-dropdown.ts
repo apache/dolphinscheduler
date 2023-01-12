@@ -39,6 +39,7 @@ export function useDropDown() {
   const useLogout = () => {
     logout().then(() => {
       userStore.setSessionId('')
+      userStore.setSecurityConfigType('')
       userStore.setUserInfo({})
       cookies.remove('sessionId')
 

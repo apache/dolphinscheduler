@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.mr;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -25,7 +26,6 @@ import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,8 +64,6 @@ public class MapReduceTask extends AbstractYarnTask {
     @Override
     public void init() {
 
-        logger.info("mapreduce task params {}", taskExecutionContext.getTaskParams());
-
         this.mapreduceParameters =
                 JSONUtils.parseObject(taskExecutionContext.getTaskParams(), MapReduceParameters.class);
 
@@ -89,6 +87,7 @@ public class MapReduceTask extends AbstractYarnTask {
                     ParamUtils.convert(paramsMap));
             mapreduceParameters.setOthers(others);
         }
+        logger.info("Initialize mapreduce task params {}", JSONUtils.toPrettyJsonString(mapreduceParameters));
     }
 
     /**

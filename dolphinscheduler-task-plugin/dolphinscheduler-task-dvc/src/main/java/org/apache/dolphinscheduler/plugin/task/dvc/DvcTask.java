@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.dvc;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
@@ -26,7 +27,6 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,12 +65,12 @@ public class DvcTask extends AbstractTask {
 
     @Override
     public void init() {
-        logger.info("dvc task params {}", taskExecutionContext.getTaskParams());
 
         parameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), DvcParameters.class);
+        logger.info("Initialize dvc task params {}", JSONUtils.toPrettyJsonString(parameters));
 
-        if (!parameters.checkParameters()) {
-            throw new RuntimeException("dvc task params is not valid");
+        if (parameters == null || !parameters.checkParameters()) {
+            throw new TaskException("dvc task params is not valid");
         }
     }
 

@@ -27,7 +27,7 @@ import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.QueueServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Queue;
@@ -35,7 +35,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -128,7 +128,7 @@ public class QueueServiceTest {
 
     @Test
     public void testCreateQueue() {
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.QUEUE, null,
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.QUEUE,
                 getLoginUser().getId(), YARN_QUEUE_CREATE, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.QUEUE, null, 0,
                 baseServiceLogger)).thenReturn(true);
@@ -155,7 +155,7 @@ public class QueueServiceTest {
         Mockito.when(queueMapper.selectById(1)).thenReturn(getQUEUE());
         Mockito.when(queueMapper.existQueue(EXISTS, null)).thenReturn(true);
         Mockito.when(queueMapper.existQueue(null, EXISTS)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.QUEUE, null,
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.QUEUE,
                 getLoginUser().getId(), YARN_QUEUE_UPDATE, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.QUEUE, new Object[]{0}, 0,
                 baseServiceLogger)).thenReturn(true);

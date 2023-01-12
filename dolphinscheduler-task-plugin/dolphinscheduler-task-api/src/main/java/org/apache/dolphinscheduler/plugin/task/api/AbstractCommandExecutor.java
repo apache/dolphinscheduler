@@ -19,13 +19,15 @@ package org.apache.dolphinscheduler.plugin.task.api;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils.getPidsStr;
 
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.utils.AbstractCommandExecutorConstants;
 import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.BufferedReader;
@@ -33,7 +35,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -135,7 +136,6 @@ public abstract class AbstractCommandExecutor {
             }
         }
         command.add(commandInterpreter());
-        command.addAll(Collections.emptyList());
         command.add(commandFile);
 
         // setting commands
@@ -235,10 +235,11 @@ public abstract class AbstractCommandExecutor {
             ProcessUtils.kill(taskRequest);
             result.setExitStatusCode(EXIT_CODE_FAILURE);
         }
-
-        logger.info(
-                "process has exited, execute path:{}, processId:{} ,exitStatusCode:{} ,processWaitForStatus:{} ,processExitValue:{}",
-                taskRequest.getExecutePath(), processId, result.getExitStatusCode(), status, process.exitValue());
+        int exitCode = process.exitValue();
+        String exitLogMessage = EXIT_CODE_KILL == exitCode ? "process has killed." : "process has exited.";
+        logger.info(exitLogMessage
+                + " execute path:{}, processId:{} ,exitStatusCode:{} ,processWaitForStatus:{} ,processExitValue:{}",
+                taskRequest.getExecutePath(), processId, result.getExitStatusCode(), status, exitCode);
         return result;
 
     }
@@ -265,16 +266,11 @@ public abstract class AbstractCommandExecutor {
         logger.info("cancel process: {}", processId);
 
         // kill , waiting for completion
-        boolean killed = softKill(processId);
+        boolean alive = softKill(processId);
 
-        if (!killed) {
+        if (alive) {
             // hard kill
             hardKill(processId);
-
-            // destory
-            process.destroy();
-
-            process = null;
         }
     }
 
@@ -310,12 +306,12 @@ public abstract class AbstractCommandExecutor {
     private void hardKill(int processId) {
         if (processId != 0 && process.isAlive()) {
             try {
-                String cmd = String.format("kill -9 %d", processId);
+                String cmd = String.format("kill -9 %s", getPidsStr(processId));
                 cmd = OSUtils.getSudoCmd(taskRequest.getTenantCode(), cmd);
                 logger.info("hard kill task:{}, process id:{}, cmd:{}", taskRequest.getTaskAppId(), processId, cmd);
 
-                Runtime.getRuntime().exec(cmd);
-            } catch (IOException e) {
+                OSUtils.exeCmd(cmd);
+            } catch (Exception e) {
                 logger.error("kill attempt failed ", e);
             }
         }

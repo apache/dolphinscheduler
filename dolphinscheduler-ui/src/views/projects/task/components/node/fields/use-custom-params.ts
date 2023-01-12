@@ -143,6 +143,10 @@ export const TYPE_LIST = [
   {
     value: 'LIST',
     label: 'LIST'
+  },
+  {
+    value: 'FILE',
+    label: 'FILE'
   }
 ]
 

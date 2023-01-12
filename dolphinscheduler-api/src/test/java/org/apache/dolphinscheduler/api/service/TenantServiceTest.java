@@ -28,7 +28,7 @@ import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.TenantServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -40,8 +40,9 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -96,6 +97,9 @@ public class TenantServiceTest {
     @Mock
     private ResourcePermissionCheckService resourcePermissionCheckService;
 
+    @Mock
+    private StorageOperate storageOperate;
+
     private static final String tenantCode = "hayden";
     private static final String tenantDesc = "This is the tenant desc";
     private static final String queue = "queue";
@@ -106,7 +110,7 @@ public class TenantServiceTest {
 
         User loginUser = getLoginUser();
         Mockito.when(tenantMapper.existTenant(tenantCode)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TENANT, null,
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TENANT,
                 loginUser.getId(), TENANT_CREATE, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TENANT, null, 0,
                 baseServiceLogger)).thenReturn(true);
@@ -178,7 +182,7 @@ public class TenantServiceTest {
     @Test
     public void testUpdateTenant() throws Exception {
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TENANT, null,
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TENANT,
                 getLoginUser().getId(), TENANT_UPDATE, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TENANT, null, 0,
                 baseServiceLogger)).thenReturn(true);
@@ -200,7 +204,7 @@ public class TenantServiceTest {
 
     @Test
     public void testDeleteTenantById() throws Exception {
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TENANT, null,
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TENANT,
                 getLoginUser().getId(), TENANT_DELETE, baseServiceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TENANT, null, 0,
                 baseServiceLogger)).thenReturn(true);

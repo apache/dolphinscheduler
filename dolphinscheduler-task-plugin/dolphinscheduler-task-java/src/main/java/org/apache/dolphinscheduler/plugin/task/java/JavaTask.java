@@ -21,6 +21,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SINGLE_S
 import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.JAVA_HOME_VAR;
 import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.PUBLIC_CLASS_NAME_REGEX;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
@@ -37,7 +38,6 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.plugin.task.java.exception.JavaSourceFileExistException;
 import org.apache.dolphinscheduler.plugin.task.java.exception.PublicClassNotFoundException;
 import org.apache.dolphinscheduler.plugin.task.java.exception.RunTypeNotFoundException;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.apache.commons.io.FileUtils;
 
@@ -89,7 +89,6 @@ public class JavaTask extends AbstractTask {
      **/
     @Override
     public void init() {
-        logger.info("java task params {}", taskRequest.getTaskParams());
         javaParameters = JSONUtils.parseObject(taskRequest.getTaskParams(), JavaParameters.class);
         if (javaParameters == null || !javaParameters.checkParameters()) {
             throw new TaskException("java task params is not valid");
@@ -97,6 +96,7 @@ public class JavaTask extends AbstractTask {
         if (javaParameters.getRunType().equals(JavaConstants.RUN_TYPE_JAR)) {
             setMainJarName();
         }
+        logger.info("Initialize java task params {}", JSONUtils.toPrettyJsonString(javaParameters));
     }
 
     /**

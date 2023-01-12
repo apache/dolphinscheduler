@@ -211,4 +211,18 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      */
     IPage<ProcessTaskRelation> filterProcessTaskRelation(IPage<ProcessTaskRelation> page,
                                                          @Param("relation") ProcessTaskRelation processTaskRelation);
+
+    /**
+     * batch update process task relation version
+     *
+     * @param processTaskRelationList process task relation list
+     * @return update num
+     */
+    int updateProcessTaskRelationTaskVersion(@Param("processTaskRelation") ProcessTaskRelation processTaskRelationList);
+
+    Long queryTaskCodeByTaskName(@Param("workflowCode") Long workflowCode,
+                                 @Param("taskName") String taskName);
+
+    void deleteByWorkflowDefinitionCode(@Param("workflowDefinitionCode") long workflowDefinitionCode,
+                                        @Param("workflowDefinitionVersion") int workflowDefinitionVersion);
 }

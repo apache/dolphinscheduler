@@ -17,9 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.postgresql.param;
 
+import static org.apache.dolphinscheduler.common.constants.DataSourceConstants.ORG_POSTGRESQL_DRIVER;
+import static org.apache.dolphinscheduler.common.constants.DataSourceConstants.POSTGRESQL_VALIDATION_QUERY;
+
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.Constants;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +32,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.google.common.collect.ImmutableMap;
 
 @ExtendWith(MockitoExtension.class)
 public class PostgreSQLDataSourceProcessorTest {
@@ -70,17 +74,20 @@ public class PostgreSQLDataSourceProcessorTest {
 
     @Test
     public void testGetDatasourceDriver() {
-        Assertions.assertEquals(Constants.ORG_POSTGRESQL_DRIVER, postgreSqlDatasourceProcessor.getDatasourceDriver());
+        Assertions.assertEquals(ORG_POSTGRESQL_DRIVER, postgreSqlDatasourceProcessor.getDatasourceDriver());
     }
 
     @Test
     public void testGetJdbcUrl() {
         PostgreSQLConnectionParam postgreSqlConnectionParam = new PostgreSQLConnectionParam();
         postgreSqlConnectionParam.setJdbcUrl("jdbc:postgresql://localhost:3308/default");
-        postgreSqlConnectionParam.setOther("other");
+        ImmutableMap<String, String> map = new ImmutableMap.Builder<String, String>()
+                .put("other", "other")
+                .build();
+        postgreSqlConnectionParam.setOther(map);
 
         String jdbcUrl = postgreSqlDatasourceProcessor.getJdbcUrl(postgreSqlConnectionParam);
-        Assertions.assertEquals("jdbc:postgresql://localhost:3308/default?other", jdbcUrl);
+        Assertions.assertEquals("jdbc:postgresql://localhost:3308/default?other=other", jdbcUrl);
 
     }
 
@@ -91,7 +98,7 @@ public class PostgreSQLDataSourceProcessorTest {
 
     @Test
     public void testGetValidationQuery() {
-        Assertions.assertEquals(Constants.POSTGRESQL_VALIDATION_QUERY,
+        Assertions.assertEquals(POSTGRESQL_VALIDATION_QUERY,
                 postgreSqlDatasourceProcessor.getValidationQuery());
     }
 }

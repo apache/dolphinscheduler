@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import java.util.Date;
 
 import lombok.Data;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * task relation create request
@@ -30,16 +30,16 @@ import io.swagger.annotations.ApiModelProperty;
 @Data
 public class TaskRelationCreateRequest {
 
-    @ApiModelProperty(example = "12345678")
+    @Schema(example = "12345678")
     private long projectCode;
 
-    @ApiModelProperty(example = "87654321", required = true)
+    @Schema(example = "87654321", required = true)
     private long workflowCode;
 
-    @ApiModelProperty(example = "12345", required = true)
+    @Schema(example = "12345", required = true)
     private long preTaskCode;
 
-    @ApiModelProperty(example = "54321", required = true)
+    @Schema(example = "54321", required = true)
     private long postTaskCode;
 
     public ProcessTaskRelation convert2ProcessTaskRelation() {

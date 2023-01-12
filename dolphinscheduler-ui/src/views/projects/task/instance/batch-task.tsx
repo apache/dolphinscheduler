@@ -38,15 +38,15 @@ import { useI18n } from 'vue-i18n'
 import { useAsyncState } from '@vueuse/core'
 import { queryLog } from '@/service/modules/log'
 import { stateType } from '@/common/common'
-import { useLogTimerStore } from '@/store/logTimer/logTimer'
+import { useUISettingStore } from '@/store/ui-setting/ui-setting'
 import Card from '@/components/card'
 import LogModal from '@/components/log-modal'
 
 const BatchTaskInstance = defineComponent({
   name: 'task-instance',
   setup() {
-    const logTimerStore = useLogTimerStore()
-    const logTimer = logTimerStore.getLogTimer
+    const uiSettingStore = useUISettingStore()
+    const logTimer = uiSettingStore.getLogTimer
     const { t, variables, getTableData, createColumns } = useTable()
 
     const requestTableData = () => {
@@ -71,6 +71,36 @@ const BatchTaskInstance = defineComponent({
     const onSearch = () => {
       variables.page = 1
       requestTableData()
+    }
+
+    const onClearSearchTaskName = () => {
+      variables.searchVal = ''
+      onSearch()
+    }
+
+    const onClearSearchProcessInstanceName = () => {
+      variables.processInstanceName = null
+      onSearch()
+    }
+
+    const onClearSearchExecutorName = () => {
+      variables.executorName = null
+      onSearch()
+    }
+
+    const onClearSearchHost = () => {
+      variables.host = null
+      onSearch()
+    }
+
+    const onClearSearchStateType = () => {
+      variables.stateType = null
+      onSearch()
+    }
+
+    const onClearSearchTime = () => {
+      variables.datePickerRange = null
+      onSearch()
     }
 
     const onConfirmModal = () => {
@@ -152,6 +182,12 @@ const BatchTaskInstance = defineComponent({
       requestTableData,
       onUpdatePageSize,
       onSearch,
+      onClearSearchTaskName,
+      onClearSearchProcessInstanceName,
+      onClearSearchExecutorName,
+      onClearSearchHost,
+      onClearSearchStateType,
+      onClearSearchTime,
       onConfirmModal,
       refreshLogs,
       trim
@@ -178,6 +214,7 @@ const BatchTaskInstance = defineComponent({
               size='small'
               placeholder={t('project.task.task_name')}
               clearable
+              onClear={this.onClearSearchTaskName}
             />
             <NInput
               allowInput={this.trim}
@@ -185,6 +222,7 @@ const BatchTaskInstance = defineComponent({
               size='small'
               placeholder={t('project.task.workflow_instance')}
               clearable
+              onClear={this.onClearSearchProcessInstanceName}
             />
             <NInput
               allowInput={this.trim}
@@ -192,6 +230,7 @@ const BatchTaskInstance = defineComponent({
               size='small'
               placeholder={t('project.task.executor')}
               clearable
+              onClear={this.onClearSearchExecutorName}
             />
             <NInput
               allowInput={this.trim}
@@ -199,6 +238,7 @@ const BatchTaskInstance = defineComponent({
               size='small'
               placeholder={t('project.task.host')}
               clearable
+              onClear={this.onClearSearchHost}
             />
             <NSelect
               v-model={[this.stateType, 'value']}
@@ -207,6 +247,7 @@ const BatchTaskInstance = defineComponent({
               placeholder={t('project.task.state')}
               style={{ width: '180px' }}
               clearable
+              onClear={this.onClearSearchStateType}
             />
             <NDatePicker
               v-model={[this.datePickerRange, 'value']}
@@ -215,6 +256,7 @@ const BatchTaskInstance = defineComponent({
               start-placeholder={t('project.task.start_time')}
               end-placeholder={t('project.task.end_time')}
               clearable
+              onClear={this.onClearSearchTime}
             />
             <NButton size='small' type='primary' onClick={onSearch}>
               <NIcon>

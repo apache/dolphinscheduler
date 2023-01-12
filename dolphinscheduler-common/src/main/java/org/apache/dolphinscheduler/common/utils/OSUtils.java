@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.shell.ShellExecutor;
 
 import oshi.SystemInfo;
@@ -241,7 +241,7 @@ public class OSUtils {
         int startPos = 0;
         int endPos = lines.length - 2;
         for (int i = 0; i < lines.length; i++) {
-            if (lines[i].isEmpty()) {
+            if (StringUtils.isEmpty(lines[i])) {
                 continue;
             }
 
@@ -477,10 +477,14 @@ public class OSUtils {
         double loadAverage = loadAverage();
         // system available physical memory
         double availablePhysicalMemorySize = availablePhysicalMemorySize();
-        if (loadAverage > maxCpuLoadAvg || availablePhysicalMemorySize < reservedMemory) {
+        if (loadAverage > maxCpuLoadAvg) {
+            logger.warn("Current cpu load average {} is too high, max.cpuLoad.avg={}", loadAverage, maxCpuLoadAvg);
+            return true;
+        }
+
+        if (availablePhysicalMemorySize < reservedMemory) {
             logger.warn(
-                    "Current cpu load average {} is too high or available memory {}G is too low, under max.cpuLoad.avg={} and reserved.memory={}G",
-                    loadAverage, availablePhysicalMemorySize, maxCpuLoadAvg, reservedMemory);
+                    "Current available memory {}G is too low, reserved.memory={}G", maxCpuLoadAvg, reservedMemory);
             return true;
         }
         return false;

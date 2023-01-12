@@ -22,6 +22,7 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKN
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
 import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
@@ -30,8 +31,8 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -45,18 +46,20 @@ import com.amazonaws.services.sagemaker.AmazonSageMakerClientBuilder;
 import com.amazonaws.services.sagemaker.model.StartPipelineExecutionRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 
 /**
  * SagemakerTask task, Used to start Sagemaker pipeline
  */
 public class SagemakerTask extends AbstractRemoteTask {
 
-    private static final ObjectMapper objectMapper =
-            new ObjectMapper().configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
-                    .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
-                    .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
-                    .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
-                    .setPropertyNamingStrategy(new PropertyNamingStrategy.UpperCamelCaseStrategy());
+    private static final ObjectMapper objectMapper = JsonMapper.builder()
+            .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
+            .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
+            .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
+            .propertyNamingStrategy(new PropertyNamingStrategy.UpperCamelCaseStrategy())
+            .build();
     /**
      * SageMaker parameters
      */
@@ -79,10 +82,10 @@ public class SagemakerTask extends AbstractRemoteTask {
 
     @Override
     public void init() {
-        logger.info("Sagemaker task params {}", taskRequest.getTaskParams());
 
         parameters = JSONUtils.parseObject(taskRequest.getTaskParams(), SagemakerParameters.class);
 
+        logger.info("Initialize Sagemaker task params {}", JSONUtils.toPrettyJsonString(parameters));
         if (parameters == null) {
             throw new SagemakerTaskException("Sagemaker task params is empty");
         }

@@ -41,6 +41,7 @@ import org.apache.dolphinscheduler.dao.entity.AccessToken;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.Environment;
+import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Resource;
@@ -48,6 +49,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskGroup;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
@@ -64,7 +66,7 @@ import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -111,16 +113,17 @@ public class ResourcePermissionCheckServiceImpl
         if (Objects.nonNull(needChecks) && needChecks.length > 0) {
             Set<?> originResSet = new HashSet<>(Arrays.asList(needChecks));
             Set<?> ownResSets = RESOURCE_LIST_MAP.get(authorizationType).listAuthorizedResource(userId, logger);
-            originResSet.removeAll(ownResSets);
-            if (CollectionUtils.isNotEmpty(originResSet))
+            boolean checkResult = ownResSets != null && ownResSets.containsAll(originResSet);
+            if (!checkResult) {
                 logger.warn("User does not have resource permission on associated resources, userId:{}", userId);
-            return originResSet.isEmpty();
+            }
+            return checkResult;
         }
         return true;
     }
 
     @Override
-    public boolean operationPermissionCheck(Object authorizationType, Object[] projectIds, Integer userId,
+    public boolean operationPermissionCheck(Object authorizationType, Integer userId,
                                             String permissionKey, Logger logger) {
         User user = processService.getUserById(userId);
         if (user == null) {
@@ -180,7 +183,7 @@ public class ResourcePermissionCheckServiceImpl
                 return Collections.emptySet();
             }
             List<Queue> queues = queueMapper.selectList(null);
-            return queues.isEmpty() ? Collections.emptySet() : queues.stream().map(Queue::getId).collect(toSet());
+            return queues.stream().map(Queue::getId).collect(toSet());
         }
     }
 
@@ -240,7 +243,7 @@ public class ResourcePermissionCheckServiceImpl
             }
             List<Resource> ownResourceList = resourceMapper.queryResourceListAuthored(userId, -1);
             relationResources.addAll(ownResourceList);
-            return ownResourceList.stream().map(Resource::getId).collect(toSet());
+            return relationResources.stream().map(Resource::getId).collect(toSet());
         }
 
         @Override
@@ -266,9 +269,6 @@ public class ResourcePermissionCheckServiceImpl
         @Override
         public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
             List<UdfFunc> udfFuncList = udfFuncMapper.listAuthorizedUdfByUserId(userId);
-            if (udfFuncList.isEmpty()) {
-                return Collections.emptySet();
-            }
             return udfFuncList.stream().map(UdfFunc::getId).collect(toSet());
         }
 
@@ -295,9 +295,6 @@ public class ResourcePermissionCheckServiceImpl
         @Override
         public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
             List<TaskGroup> taskGroupList = taskGroupMapper.listAuthorizedResource(userId);
-            if (taskGroupList.isEmpty()) {
-                return Collections.emptySet();
-            }
             return taskGroupList.stream().map(TaskGroup::getId).collect(Collectors.toSet());
         }
 
@@ -328,7 +325,8 @@ public class ResourcePermissionCheckServiceImpl
 
         @Override
         public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
-            return Collections.emptySet();
+            List<K8sNamespace> k8sNamespaces = k8sNamespaceMapper.queryAuthedNamespaceListByUserId(userId);
+            return k8sNamespaces.stream().map(K8sNamespace::getId).collect(Collectors.toSet());
         }
     }
 
@@ -354,9 +352,6 @@ public class ResourcePermissionCheckServiceImpl
         @Override
         public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
             List<Environment> environments = environmentMapper.queryAllEnvironmentList();
-            if (environments.isEmpty()) {
-                return Collections.emptySet();
-            }
             return environments.stream().map(Environment::getId).collect(Collectors.toSet());
         }
     }
@@ -382,7 +377,8 @@ public class ResourcePermissionCheckServiceImpl
 
         @Override
         public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
-            return Collections.emptySet();
+            List<WorkerGroup> workerGroups = workerGroupMapper.queryAllWorkerGroup();
+            return workerGroups.stream().map(WorkerGroup::getId).collect(Collectors.toSet());
         }
     }
 
@@ -467,9 +463,6 @@ public class ResourcePermissionCheckServiceImpl
 
         @Override
         public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
-            if (userId != 0) {
-                return Collections.emptySet();
-            }
             List<Tenant> tenantList = tenantMapper.queryAll();
             return tenantList.stream().map(Tenant::getId).collect(Collectors.toSet());
         }

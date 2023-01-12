@@ -22,16 +22,16 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKN
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
 import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -40,15 +40,18 @@ import com.amazonaws.services.databasemigrationservice.model.InvalidResourceStat
 import com.amazonaws.services.databasemigrationservice.model.ReplicationTask;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 
 public class DmsTask extends AbstractRemoteTask {
 
     private static final ObjectMapper objectMapper =
-            new ObjectMapper().configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
+            JsonMapper.builder()
+                    .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
                     .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
                     .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
                     .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
-                    .setPropertyNamingStrategy(new PropertyNamingStrategy.UpperCamelCaseStrategy());
+                    .propertyNamingStrategy(new PropertyNamingStrategy.UpperCamelCaseStrategy())
+                    .build();
     /**
      * taskExecutionContext
      */
@@ -68,8 +71,8 @@ public class DmsTask extends AbstractRemoteTask {
 
     @Override
     public void init() throws TaskException {
-        logger.info("Dms task params {}", taskExecutionContext.getTaskParams());
         parameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), DmsParameters.class);
+        logger.info("Initialize Dms task params {}", JSONUtils.toPrettyJsonString(parameters));
         initDmsHook();
     }
 

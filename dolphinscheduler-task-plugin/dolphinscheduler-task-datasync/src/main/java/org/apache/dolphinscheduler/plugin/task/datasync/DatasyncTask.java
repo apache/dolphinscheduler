@@ -22,14 +22,15 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKN
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
 import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import software.amazon.awssdk.services.datasync.model.TaskExecutionStatus;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -67,9 +68,9 @@ public class DatasyncTask extends AbstractRemoteTask {
 
     @Override
     public void init() {
-        logger.info("Datasync task params {}", taskExecutionContext.getTaskParams());
 
         parameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), DatasyncParameters.class);
+        logger.info("Initialize Datasync task params {}", JSONUtils.toPrettyJsonString(parameters));
         initParams();
 
         hook = new DatasyncHook();
@@ -83,10 +84,9 @@ public class DatasyncTask extends AbstractRemoteTask {
             try {
                 parameters = objectMapper.readValue(parameters.getJson(), DatasyncParameters.class);
             } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
+                throw new TaskException("Convert json to task params failed", e);
             }
-            // parameters = JSONUtils.parseObject(parameters.getJson(), DatasyncParameters.class);
-            logger.info("Datasync convert task params {}", parameters);
+            logger.info("Success convert json to task params {}", JSONUtils.toPrettyJsonString(parameters));
         }
     }
 

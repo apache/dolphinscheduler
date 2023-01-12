@@ -17,15 +17,18 @@
 
 package org.apache.dolphinscheduler.server.worker.message;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.remote.command.BaseCommand;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.service.utils.LoggerUtils;
+
+import org.apache.commons.collections4.MapUtils;
 
 import java.time.Duration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -101,16 +104,24 @@ public class MessageRetryRunner extends BaseDaemonThread {
     public void run() {
         while (!ServerLifeCycleManager.isStopped()) {
             try {
-                if (needToRetryMessages.isEmpty()) {
+                if (MapUtils.isEmpty(needToRetryMessages)) {
                     Thread.sleep(MESSAGE_RETRY_WINDOW);
                 }
 
                 long now = System.currentTimeMillis();
-                for (Map.Entry<Integer, Map<CommandType, BaseCommand>> taskEntry : needToRetryMessages.entrySet()) {
+                Iterator<Map.Entry<Integer, Map<CommandType, BaseCommand>>> iterator =
+                        needToRetryMessages.entrySet().iterator();
+                while (iterator.hasNext()) {
+                    Map.Entry<Integer, Map<CommandType, BaseCommand>> taskEntry = iterator.next();
                     Integer taskInstanceId = taskEntry.getKey();
-                    LoggerUtils.setTaskInstanceIdMDC(taskInstanceId);
+                    Map<CommandType, BaseCommand> retryMessageMap = taskEntry.getValue();
+                    if (retryMessageMap.isEmpty()) {
+                        iterator.remove();
+                        continue;
+                    }
+                    LogUtils.setTaskInstanceIdMDC(taskInstanceId);
                     try {
-                        for (Map.Entry<CommandType, BaseCommand> messageEntry : taskEntry.getValue().entrySet()) {
+                        for (Map.Entry<CommandType, BaseCommand> messageEntry : retryMessageMap.entrySet()) {
                             CommandType messageType = messageEntry.getKey();
                             BaseCommand message = messageEntry.getValue();
                             if (now - message.getMessageSendTime() > MESSAGE_RETRY_WINDOW) {
@@ -123,7 +134,7 @@ public class MessageRetryRunner extends BaseDaemonThread {
                     } catch (Exception e) {
                         logger.warn("Retry send message to master error", e);
                     } finally {
-                        LoggerUtils.removeTaskInstanceIdMDC();
+                        LogUtils.removeTaskInstanceIdMDC();
                     }
                 }
                 Thread.sleep(Constants.SLEEP_TIME_MILLIS);

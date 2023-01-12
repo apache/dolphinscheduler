@@ -248,14 +248,7 @@ public interface ProcessDefinitionService {
                                                             long projectCode,
                                                             String codes);
 
-    /**
-     * delete process definition by code
-     *
-     * @param loginUser login user
-     * @param code process definition code
-     */
-    void deleteProcessDefinitionByCode(User loginUser,
-                                       long code);
+    void deleteProcessDefinitionByCode(User loginUser, long workflowDefinitionCode);
 
     /**
      * release process definition: online / offline
@@ -522,4 +515,13 @@ public interface ProcessDefinitionService {
      * @return Json String
      */
     String doOtherOperateProcess(User loginUser, ProcessDefinition processDefinition);
+
+    /**
+     * view process variables
+     * @param loginUser    login user
+     * @param projectCode project code
+     * @param code process definition code
+     * @return variables data
+     */
+    Map<String, Object> viewVariables(User loginUser, long projectCode, long code);
 }

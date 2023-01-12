@@ -17,23 +17,21 @@
 
 package org.apache.dolphinscheduler.server.worker;
 
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.plugin.task.api.ProcessUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
+import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcServer;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
-import org.apache.dolphinscheduler.service.alert.AlertClientService;
-import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.task.TaskPluginManager;
-import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -64,19 +62,6 @@ public class WorkerServer implements IStoppable {
      * logger
      */
     private static final Logger logger = LoggerFactory.getLogger(WorkerServer.class);
-
-    /**
-     * spring application context
-     * only use it for initialization
-     */
-    @Autowired
-    private SpringApplicationContext springApplicationContext;
-
-    /**
-     * alert model netty remote server
-     */
-    @Autowired
-    private AlertClientService alertClientService;
 
     @Autowired
     private WorkerManagerThread workerManagerThread;
@@ -144,9 +129,7 @@ public class WorkerServer implements IStoppable {
 
         try (
                 WorkerRpcServer closedWorkerRpcServer = workerRpcServer;
-                WorkerRegistryClient closedRegistryClient = workerRegistryClient;
-                AlertClientService closedAlertClientService = alertClientService;
-                SpringApplicationContext closedSpringContext = springApplicationContext;) {
+                WorkerRegistryClient closedRegistryClient = workerRegistryClient) {
             logger.info("Worker server is stopping, current cause : {}", cause);
             // kill running tasks
             this.killAllRunningTasks();
@@ -175,13 +158,13 @@ public class WorkerServer implements IStoppable {
         for (TaskExecutionContext taskRequest : taskRequests) {
             // kill task when it's not finished yet
             try {
-                LoggerUtils.setWorkflowAndTaskInstanceIDMDC(taskRequest.getProcessInstanceId(),
+                LogUtils.setWorkflowAndTaskInstanceIDMDC(taskRequest.getProcessInstanceId(),
                         taskRequest.getTaskInstanceId());
                 if (ProcessUtils.kill(taskRequest)) {
                     killNumber++;
                 }
             } finally {
-                LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
+                LogUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
         }
         logger.info("Worker after kill all cache task, task size: {}, killed number: {}", taskRequests.size(),

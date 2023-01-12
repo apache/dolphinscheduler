@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.presto.param;
 
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.Constants;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -69,15 +69,15 @@ public class PrestoDataSourceProcessorTest {
 
     @Test
     public void testGetDatasourceDriver() {
-        Assertions.assertEquals(Constants.COM_PRESTO_JDBC_DRIVER, prestoDatasourceProcessor.getDatasourceDriver());
+        Assertions.assertEquals(DataSourceConstants.COM_PRESTO_JDBC_DRIVER,
+                prestoDatasourceProcessor.getDatasourceDriver());
     }
 
     @Test
     public void testGetJdbcUrl() {
         PrestoConnectionParam prestoConnectionParam = new PrestoConnectionParam();
         prestoConnectionParam.setJdbcUrl("jdbc:postgresql://localhost:1234/default");
-        prestoConnectionParam.setOther("other");
-        Assertions.assertEquals("jdbc:postgresql://localhost:1234/default?other",
+        Assertions.assertEquals("jdbc:postgresql://localhost:1234/default",
                 prestoDatasourceProcessor.getJdbcUrl(prestoConnectionParam));
 
     }
@@ -89,6 +89,7 @@ public class PrestoDataSourceProcessorTest {
 
     @Test
     public void testGetValidationQuery() {
-        Assertions.assertEquals(Constants.PRESTO_VALIDATION_QUERY, prestoDatasourceProcessor.getValidationQuery());
+        Assertions.assertEquals(DataSourceConstants.PRESTO_VALIDATION_QUERY,
+                prestoDatasourceProcessor.getValidationQuery());
     }
 }

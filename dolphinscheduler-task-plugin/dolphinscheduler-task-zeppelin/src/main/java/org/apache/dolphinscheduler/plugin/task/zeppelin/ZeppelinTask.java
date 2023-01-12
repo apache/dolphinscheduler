@@ -17,14 +17,14 @@
 
 package org.apache.dolphinscheduler.plugin.task.zeppelin;
 
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.spi.utils.DateUtils;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.apache.zeppelin.client.ClientConfig;
 import org.apache.zeppelin.client.NoteResult;
@@ -71,11 +71,11 @@ public class ZeppelinTask extends AbstractRemoteTask {
     @Override
     public void init() {
         final String taskParams = taskExecutionContext.getTaskParams();
-        logger.info("zeppelin task params:{}", taskParams);
         this.zeppelinParameters = JSONUtils.parseObject(taskParams, ZeppelinParameters.class);
         if (this.zeppelinParameters == null || !this.zeppelinParameters.checkParameters()) {
             throw new ZeppelinTaskException("zeppelin task params is not valid");
         }
+        logger.info("Initialize zeppelin task params:{}", JSONUtils.toPrettyJsonString(taskParams));
         this.zClient = getZeppelinClient();
     }
 
@@ -107,7 +107,7 @@ public class ZeppelinTask extends AbstractRemoteTask {
                 noteId = this.zClient.cloneNote(noteId, cloneNotePath);
             }
 
-            if (paragraphId == null) {
+            if (paragraphId == null || paragraphId.trim().length() == 0) {
                 final NoteResult noteResult = this.zClient.executeNote(noteId, zeppelinParamsMap);
                 final List<ParagraphResult> paragraphResultList = noteResult.getParagraphResultList();
                 StringBuilder resultContentBuilder = new StringBuilder();

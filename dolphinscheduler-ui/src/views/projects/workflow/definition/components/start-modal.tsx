@@ -92,7 +92,7 @@ export default defineComponent({
     }
 
     const handleStart = () => {
-      handleStartDefinition(props.row.code)
+      handleStartDefinition(props.row.code,props.row.version)
     }
 
     const generalWarningTypeListOptions = () => [

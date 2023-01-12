@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.redshift.param;
 
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.Constants;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +30,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.google.common.collect.ImmutableMap;
 
 @ExtendWith(MockitoExtension.class)
 public class RedshiftDataSourceProcessorTest {
@@ -70,14 +72,19 @@ public class RedshiftDataSourceProcessorTest {
 
     @Test
     public void testGetDatasourceDriver() {
-        Assertions.assertEquals(Constants.COM_REDSHIFT_JDBC_DRIVER, redshiftDatasourceProcessor.getDatasourceDriver());
+        Assertions.assertEquals(DataSourceConstants.COM_REDSHIFT_JDBC_DRIVER,
+                redshiftDatasourceProcessor.getDatasourceDriver());
     }
 
     @Test
     public void testGetJdbcUrl() {
         RedshiftConnectionParam redshiftConnectionParam = new RedshiftConnectionParam();
         redshiftConnectionParam.setJdbcUrl("jdbc:redshift://localhost:5439/default");
-        redshiftConnectionParam.setOther("DSILogLevel=6;defaultRowFetchSize=100");
+        ImmutableMap<String, String> map = new ImmutableMap.Builder<String, String>()
+                .put("DSILogLevel", "6")
+                .put("defaultRowFetchSize", "100")
+                .build();
+        redshiftConnectionParam.setOther(map);
         Assertions.assertEquals("jdbc:redshift://localhost:5439/default?DSILogLevel=6;defaultRowFetchSize=100",
                 redshiftDatasourceProcessor.getJdbcUrl(redshiftConnectionParam));
 
@@ -90,6 +97,7 @@ public class RedshiftDataSourceProcessorTest {
 
     @Test
     public void testGetValidationQuery() {
-        Assertions.assertEquals(Constants.REDHIFT_VALIDATION_QUERY, redshiftDatasourceProcessor.getValidationQuery());
+        Assertions.assertEquals(DataSourceConstants.REDHIFT_VALIDATION_QUERY,
+                redshiftDatasourceProcessor.getValidationQuery());
     }
 }

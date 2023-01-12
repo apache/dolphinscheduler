@@ -130,3 +130,4 @@ export function viewVariables(id: number, code: number): any {
     method: 'get'
   })
 }
+

@@ -17,13 +17,14 @@
 
 package org.apache.dolphinscheduler.scheduler.quartz;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.scheduler.quartz.utils.QuartzTaskUtils;
+import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.apache.commons.lang3.StringUtils;
@@ -48,6 +49,9 @@ public class ProcessScheduleTask extends QuartzJobBean {
 
     @Autowired
     private ProcessService processService;
+
+    @Autowired
+    private CommandService commandService;
 
     @Counted(value = "ds.master.quartz.job.executed")
     @Timed(value = "ds.master.quartz.job.execution.time", percentiles = {0.5, 0.75, 0.95, 0.99}, histogram = true)
@@ -96,11 +100,12 @@ public class ProcessScheduleTask extends QuartzJobBean {
         String workerGroup = StringUtils.isEmpty(schedule.getWorkerGroup()) ? Constants.DEFAULT_WORKER_GROUP
                 : schedule.getWorkerGroup();
         command.setWorkerGroup(workerGroup);
+        command.setEnvironmentCode(schedule.getEnvironmentCode());
         command.setWarningType(schedule.getWarningType());
         command.setProcessInstancePriority(schedule.getProcessInstancePriority());
         command.setProcessDefinitionVersion(processDefinition.getVersion());
 
-        processService.createCommand(command);
+        commandService.createCommand(command);
     }
 
     private void deleteJob(JobExecutionContext context, int projectId, int scheduleId) {
