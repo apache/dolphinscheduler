@@ -66,6 +66,16 @@ Please refer to the official website document: [QuickStart in Kubernetes](https:
 ./mvnw clean install -Prelease
 ```
 
+### Build with different Zookeeper versions
+
+The default Zookeeper Server version supported is 3.8.0.
+```bash
+# Default Zookeeper 3.8.0
+./mvnw clean install -Prelease
+# Support to Zookeeper 3.4.6+
+./mvnw clean install -Prelease -Dzk-3.4
+```
+
 Artifact:
 
 ```

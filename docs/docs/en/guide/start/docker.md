@@ -121,7 +121,7 @@ $ docker run -d --name dolphinscheduler-alert-server \
     -d apache/dolphinscheduler-alert-server:"${DOLPHINSCHEDULER_VERSION}"
 ```
 
-> Note: You should install and start [PostgreSQL](https://www.postgresql.org/download/)(8.2.15+) and [ZooKeeper](https://zookeeper.apache.org/releases.html)(3.4.6+)
+> Note: You should install and start [PostgreSQL](https://www.postgresql.org/download/)(8.2.15+) and [ZooKeeper](https://zookeeper.apache.org/releases.html)(3.8.0)
 > by yourself if you want to use this way to start Dolphinscheduler, but you do not have those services
 
 ## Login DolphinScheduler

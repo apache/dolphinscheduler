@@ -35,8 +35,6 @@
         <mybatis-plus.version>3.5.2</mybatis-plus.version>
         <quartz.version>2.3.2</quartz.version>
         <druid.version>1.2.4</druid.version>
-        <zookeeper.version>3.8.0</zookeeper.version>
-        <curator.version>5.3.0</curator.version>
         <curator-test.version>2.12.0</curator-test.version>
         <jetcd.version>0.5.11</jetcd.version>
         <jetcd.test.version>0.7.1</jetcd.test.version>
@@ -800,4 +798,28 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+    <profiles>
+        <profile>
+            <id>zk-3.8</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <zookeeper.version>3.8.0</zookeeper.version>
+                <curator.version>5.3.0</curator.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>zk-3.4</id>
+            <activation>
+                <property>
+                    <name>zk-3.4</name>
+                </property>
+            </activation>
+            <properties>
+                <curator.version>4.3.0</curator.version>
+                <zookeeper.version>3.4.14</zookeeper.version>
+            </properties>
+        </profile>
+    </profiles>
 </project>
