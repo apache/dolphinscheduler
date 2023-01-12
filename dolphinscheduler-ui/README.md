@@ -28,7 +28,7 @@ pnpm install
 
 To do this you need to change the `VITE_APP_DEV_WEB_URL` parameter variable in `.env.development` in the project root directory.
 
-It is worth noting that when you do not change the request path or route, you only need to write `http`, `ip` and `port` without the `/` symbol at the end, such as `http://127.0. 0.1:12345`.
+It is worth noting that when you do not change the request path or route, you only need to write `http`, `ip` and `port` without the `/` symbol at the end, such as `http://127.0.0.1:12345`.
 
 ```shell
 pnpm run dev
