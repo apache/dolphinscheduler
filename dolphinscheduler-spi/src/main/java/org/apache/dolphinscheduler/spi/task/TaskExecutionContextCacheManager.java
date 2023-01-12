@@ -72,7 +72,11 @@ public class TaskExecutionContextCacheManager {
         return taskRequestContextCache.values();
     }
 
-    public static ExecutionStatus findTaskExecutionStatus(Integer taskInstanceId) {
-        return taskRequestContextCache.get(taskInstanceId).getCurrentExecutionStatus();
+    public static boolean statusIsStop(Integer taskInstanceId) {
+        TaskRequest taskRequest = taskRequestContextCache.get(taskInstanceId);
+        if (taskRequest == null) {
+            return true;
+        }
+        return taskRequest.getCurrentExecutionStatus().typeIsStop();
     }
 }
