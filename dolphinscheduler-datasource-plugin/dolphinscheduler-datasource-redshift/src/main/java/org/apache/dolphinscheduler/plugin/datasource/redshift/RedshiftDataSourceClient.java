@@ -17,20 +17,22 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.redshift;
 
-import com.google.common.base.Stopwatch;
 import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
 import org.apache.dolphinscheduler.plugin.datasource.redshift.param.RedshiftAuthMode;
 import org.apache.dolphinscheduler.plugin.datasource.redshift.param.RedshiftConnectionParam;
 import org.apache.dolphinscheduler.plugin.datasource.redshift.param.RedshiftDataSourceProcessor;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.concurrent.TimeUnit;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Stopwatch;
 
 public class RedshiftDataSourceClient extends CommonDataSourceClient {
 

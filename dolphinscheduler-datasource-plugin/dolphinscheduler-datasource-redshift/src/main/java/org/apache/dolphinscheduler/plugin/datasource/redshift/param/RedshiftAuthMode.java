@@ -17,14 +17,14 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.redshift.param;
 
-import com.fasterxml.jackson.annotation.JsonValue;
-import com.google.common.base.Functions;
+import static java.util.stream.Collectors.toMap;
 
 import java.util.Arrays;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import static java.util.stream.Collectors.toMap;
+import com.fasterxml.jackson.annotation.JsonValue;
+import com.google.common.base.Functions;
 
 public enum RedshiftAuthMode {
 

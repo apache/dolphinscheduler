@@ -17,10 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.redshift.param;
 
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.spi.enums.DbType;
+
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter

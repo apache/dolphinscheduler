@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.redshift.param;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -30,6 +29,7 @@ import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -134,7 +134,8 @@ public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
         Class.forName(getDatasourceDriver());
         if (redshiftConnectionParam.getMode().equals(RedshiftAuthMode.PASSWORD)) {
             return DriverManager.getConnection(getJdbcUrl(connectionParam),
-                    redshiftConnectionParam.getUser(), PasswordUtils.decodePassword(redshiftConnectionParam.getPassword()));
+                    redshiftConnectionParam.getUser(),
+                    PasswordUtils.decodePassword(redshiftConnectionParam.getPassword()));
         } else if (redshiftConnectionParam.getMode().equals(RedshiftAuthMode.IAM_ACCESS_KEY)) {
             return getConnectionByIAM(redshiftConnectionParam);
         }
@@ -178,7 +179,6 @@ public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
         return null;
     }
 
-
     private static String transformOther(Map<String, String> otherMap) {
         if (MapUtils.isNotEmpty(otherMap)) {
             List<String> list = new ArrayList<>(otherMap.size());
@@ -207,7 +207,8 @@ public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
         if (MapUtils.isNotEmpty(redshiftConnectionParam.getOther())) {
             basic = String.format("%s?%s", redshiftConnectionParam.getJdbcUrl(),
                     transformOther(redshiftConnectionParam.getOther()));
-            // if have other params map, basic will be 'jdbc:redshift:iam://examplecluster:us-west-2/dev?param1=xx&param2=xx'
+            // if have other params map, basic will be
+            // 'jdbc:redshift:iam://examplecluster:us-west-2/dev?param1=xx&param2=xx'
             // append AccessKeyID &SecretAccessKey &DbUser
             connectionUrl = String.format("%s&%s", basic, authParams);
         } else {
