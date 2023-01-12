@@ -44,8 +44,7 @@ spec:
     - type: postgresql
       metadata:
 #        connection: jdbc:postgresql://{{ template "dolphinscheduler.postgresql.fullname" . }}:5432/{{ .Values.postgresql.postgresqlDatabase }}?{{ .Values.postgresql.params }}
-#        host: {{ template "dolphinscheduler.postgresql.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
-        host: dolphinscheduler-postgresql-0.dolphinscheduler-postgresql-headless.{{ .Release.Namespace }}.svc.cluster.local
+        host: {{ template "dolphinscheduler.postgresql.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
         port: "5432"
         userName: {{ .Values.postgresql.postgresqlUsername }}
         passwordFromEnv: SPRING_DATASOURCE_PASSWORD
