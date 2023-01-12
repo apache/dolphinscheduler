@@ -401,7 +401,7 @@ worker:
     minReplicaCount: 0
 
     # Maximum number of workers created by keda
-    maxReplicaCount: 2
+    maxReplicaCount: 3
 
     # Specify HPA related options
     advanced: { }
