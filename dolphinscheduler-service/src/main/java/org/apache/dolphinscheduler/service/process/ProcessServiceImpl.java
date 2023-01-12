@@ -2433,8 +2433,12 @@ public class ProcessServiceImpl implements ProcessService {
      * @param taskId task id
      */
     @Override
-    public boolean acquireTaskGroup(int taskId, String taskName, int groupId, int processId, int priority) {
-        TaskGroup taskGroup = taskGroupMapper.selectById(groupId);
+    public boolean acquireTaskGroup(int taskInstanceId,
+                                    String taskName,
+                                    int taskGroupId,
+                                    int workflowInstanceId,
+                                    int taskGroupPriority) {
+        TaskGroup taskGroup = taskGroupMapper.selectById(taskGroupId);
         if (taskGroup == null) {
             // we don't throw exception here, to avoid the task group has been deleted during workflow running
             return true;
@@ -2444,17 +2448,17 @@ public class ProcessServiceImpl implements ProcessService {
             return true;
         }
         // Create a waiting taskGroupQueue, after acquire resource, we can update the status to ACQUIRE_SUCCESS
-        TaskGroupQueue taskGroupQueue = this.taskGroupQueueMapper.queryByTaskId(taskId);
+        TaskGroupQueue taskGroupQueue = this.taskGroupQueueMapper.queryByTaskId(taskInstanceId);
         if (taskGroupQueue == null) {
             taskGroupQueue = insertIntoTaskGroupQueue(
-                    taskId,
+                    taskInstanceId,
                     taskName,
-                    groupId,
-                    processId,
-                    priority,
+                    taskGroupId,
+                    workflowInstanceId,
+                    taskGroupPriority,
                     TaskGroupQueueStatus.WAIT_QUEUE);
         } else {
-            logger.info("The task queue is already exist, taskId: {}", taskId);
+            logger.info("The task queue is already exist, taskId: {}", taskInstanceId);
             if (taskGroupQueue.getStatus() == TaskGroupQueueStatus.ACQUIRE_SUCCESS) {
                 return true;
             }
@@ -2464,19 +2468,19 @@ public class ProcessServiceImpl implements ProcessService {
         }
         // check if there already exist higher priority tasks
         List<TaskGroupQueue> highPriorityTasks = taskGroupQueueMapper.queryHighPriorityTasks(
-                groupId,
-                priority,
+                taskGroupId,
+                taskGroupPriority,
                 TaskGroupQueueStatus.WAIT_QUEUE.getCode());
         if (CollectionUtils.isNotEmpty(highPriorityTasks)) {
             return false;
         }
         // try to get taskGroup
-        int count = taskGroupMapper.selectAvailableCountById(groupId);
+        int count = taskGroupMapper.selectAvailableCountById(taskGroupId);
         if (count == 1 && robTaskGroupResource(taskGroupQueue)) {
-            logger.info("Success acquire taskGroup, taskInstanceId: {}, taskGroupId: {}", taskId, groupId);
+            logger.info("Success acquire taskGroup, taskInstanceId: {}, taskGroupId: {}", taskInstanceId, taskGroupId);
             return true;
         }
-        logger.info("Failed to acquire taskGroup, taskInstanceId: {}, taskGroupId: {}", taskId, groupId);
+        logger.info("Failed to acquire taskGroup, taskInstanceId: {}, taskGroupId: {}", taskInstanceId, taskGroupId);
         this.taskGroupQueueMapper.updateInQueue(Flag.NO.getCode(), taskGroupQueue.getId());
         return false;
     }
@@ -2608,6 +2612,7 @@ public class ProcessServiceImpl implements ProcessService {
                 .processId(workflowInstanceId)
                 .priority(taskGroupPriority)
                 .status(status)
+                .inQueue(Flag.NO.getCode())
                 .createTime(now)
                 .updateTime(now)
                 .build();

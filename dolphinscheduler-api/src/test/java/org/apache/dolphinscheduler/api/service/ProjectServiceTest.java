@@ -96,6 +96,9 @@ public class ProjectServiceTest {
     @Mock
     private ResourcePermissionCheckService resourcePermissionCheckService;
 
+    @Mock
+    private TaskGroupService taskGroupService;
+
     private String projectName = "ProjectServiceTest";
 
     private String userName = "ProjectServiceTest";

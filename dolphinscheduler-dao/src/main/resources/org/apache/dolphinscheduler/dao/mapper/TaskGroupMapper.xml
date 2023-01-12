@@ -69,8 +69,15 @@
                 #{i}
             </foreach>
         </if>
-        and project_code in ( #{projectCode} ,  0)
+        and project_code in ( #{projectCode} , 0)
         order by update_time desc
+    </select>
+
+    <select id="selectByProjectCode" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroup">
+        select
+        <include refid="baseSql"/>
+        from t_ds_task_group
+        where project_code = #{projectCode}
     </select>
 
     <!--modify data by id-->

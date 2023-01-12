@@ -24,6 +24,7 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectService;
+import org.apache.dolphinscheduler.api.service.TaskGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -60,6 +61,7 @@ import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,6 +75,10 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 public class ProjectServiceImpl extends BaseServiceImpl implements ProjectService {
 
     private static final Logger logger = LoggerFactory.getLogger(ProjectServiceImpl.class);
+
+    @Lazy
+    @Autowired
+    private TaskGroupService taskGroupService;
 
     @Autowired
     private ProjectMapper projectMapper;
@@ -446,6 +452,9 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             putMsg(result, Status.DELETE_PROJECT_ERROR_DEFINES_NOT_NULL);
             return result;
         }
+        // delete the task group
+        taskGroupService.deleteTaskGroupByProjectCode(project.getCode());
+
         int delete = projectMapper.deleteById(project.getId());
         if (delete > 0) {
             logger.info("Project is deleted and id is :{}.", project.getId());
