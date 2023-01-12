@@ -39,7 +39,6 @@ import { useI18n } from 'vue-i18n'
 import { useForm, datasourceType } from './use-form'
 import { useDetail } from './use-detail'
 import styles from './index.module.scss'
-import detail from '@/views/projects/workflow/definition/detail'
 
 const props = {
   show: {
