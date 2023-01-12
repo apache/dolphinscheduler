@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.redshift.param;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -55,8 +56,25 @@ public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
         String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);
 
         RedshiftDataSourceParamDTO redshiftDatasourceParamDTO = new RedshiftDataSourceParamDTO();
-        redshiftDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
-        redshiftDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
+        redshiftDatasourceParamDTO.setMode(connectionParams.getMode());
+        redshiftDatasourceParamDTO.setDbUser(connectionParams.getDbUser());
+        if (connectionParams.getMode().equals(RedshiftAuthMode.PASSWORD)) {
+            redshiftDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
+            redshiftDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
+        } else {
+            if (hostPortArray[0].contains(Constants.COLON)) {
+                String portString = hostPortArray[0].split(Constants.COLON)[1];
+                if (StringUtils.isNumeric(portString)) {
+                    redshiftDatasourceParamDTO.setPort(Integer.parseInt(portString));
+                    redshiftDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
+                } else {
+                    redshiftDatasourceParamDTO.setHost(hostPortArray[0]);
+                }
+            } else {
+                redshiftDatasourceParamDTO.setHost(hostPortArray[0]);
+            }
+
+        }
         redshiftDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
         redshiftDatasourceParamDTO.setUserName(connectionParams.getUser());
         redshiftDatasourceParamDTO.setOther(connectionParams.getOther());
@@ -118,8 +136,7 @@ public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
             return DriverManager.getConnection(getJdbcUrl(connectionParam),
                     redshiftConnectionParam.getUser(), PasswordUtils.decodePassword(redshiftConnectionParam.getPassword()));
         } else if (redshiftConnectionParam.getMode().equals(RedshiftAuthMode.IAM_ACCESS_KEY)) {
-            String connectionUrl = getConnectionUrl(redshiftConnectionParam);
-            return DriverManager.getConnection(connectionUrl);
+            return getConnectionByIAM(redshiftConnectionParam);
         }
         return null;
     }
@@ -132,41 +149,6 @@ public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public DataSourceProcessor create() {
         return new RedshiftDataSourceProcessor();
-    }
-
-    private String transformOther(Map<String, String> otherMap) {
-        if (MapUtils.isNotEmpty(otherMap)) {
-            List<String> list = new ArrayList<>(otherMap.size());
-            otherMap.forEach((key, value) -> list.add(String.format("%s=%s", key, value)));
-            return String.join(Constants.SEMICOLON, list);
-        }
-        return null;
-    }
-
-    /**
-     * 2 auth mode
-     * PASSWORD: address example: jdbc:redshift://examplecluster.abc123xyz789.us-west-2.redshift.amazonaws.com:5439/dev
-     * IAM_ACCESS_KEY:
-     * address example1: jdbc:redshift:iam://examplecluster:us-west-2/dev?AccessKeyID=xxx&SecretAccessKey=xxx&DbUser=kristen
-     * address example2: jdbc:redshift:iam://examplecluster.abc123xyz789.us-west-2.redshift.amazonaws.com:5439/dev?AccessKeyID=xxx&SecretAccessKey=xxx&DbUser=kristen
-     *
-     * @param redshiftConnectionParam
-     * @return
-     */
-    private String getConnectionUrl(RedshiftConnectionParam redshiftConnectionParam) {
-        String basic = getJdbcUrl(redshiftConnectionParam);
-        String authParams = String.format("AccessKeyID=%s&SecretAccessKey=%s&DbUser=%s",
-                redshiftConnectionParam.getUser(), PasswordUtils.decodePassword(redshiftConnectionParam.getPassword()),
-                redshiftConnectionParam.getDbUser());
-        if (MapUtils.isNotEmpty(redshiftConnectionParam.getOther())) {
-            // if have other params map, basic will be 'jdbc:redshift:iam://examplecluster:us-west-2/dev?param1=xx&param2=xx'
-            // append AccessKeyID &SecretAccessKey &DbUser
-            return String.format("%s&%s", basic, authParams);
-        } else {
-            // if none other params map, basic will be 'jdbc:redshift:iam://examplecluster:us-west-2/dev'
-            // append AccessKeyID &SecretAccessKey &DbUser
-            return String.format("%s?%s", basic, authParams);
-        }
     }
 
     /**
@@ -194,5 +176,53 @@ public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
             }
         }
         return null;
+    }
+
+
+    private static String transformOther(Map<String, String> otherMap) {
+        if (MapUtils.isNotEmpty(otherMap)) {
+            List<String> list = new ArrayList<>(otherMap.size());
+            otherMap.forEach((key, value) -> list.add(String.format("%s=%s", key, value)));
+            return String.join(Constants.SEMICOLON, list);
+        }
+        return null;
+    }
+
+    /**
+     * 2 auth mode
+     * PASSWORD: address example: jdbc:redshift://examplecluster.abc123xyz789.us-west-2.redshift.amazonaws.com:5439/dev
+     * IAM_ACCESS_KEY:
+     * address example1: jdbc:redshift:iam://examplecluster:us-west-2/dev?AccessKeyID=xxx&SecretAccessKey=xxx&DbUser=kristen
+     * address example2: jdbc:redshift:iam://examplecluster.abc123xyz789.us-west-2.redshift.amazonaws.com:5439/dev?AccessKeyID=xxx&SecretAccessKey=xxx&DbUser=kristen
+     *
+     * @param redshiftConnectionParam
+     * @return
+     */
+    public static Connection getConnectionByIAM(RedshiftConnectionParam redshiftConnectionParam) {
+        String basic;
+        String authParams = String.format("AccessKeyID=%s&SecretAccessKey=%s&DbUser=%s",
+                redshiftConnectionParam.getUser(), PasswordUtils.decodePassword(redshiftConnectionParam.getPassword()),
+                redshiftConnectionParam.getDbUser());
+        String connectionUrl;
+        if (MapUtils.isNotEmpty(redshiftConnectionParam.getOther())) {
+            basic = String.format("%s?%s", redshiftConnectionParam.getJdbcUrl(),
+                    transformOther(redshiftConnectionParam.getOther()));
+            // if have other params map, basic will be 'jdbc:redshift:iam://examplecluster:us-west-2/dev?param1=xx&param2=xx'
+            // append AccessKeyID &SecretAccessKey &DbUser
+            connectionUrl = String.format("%s&%s", basic, authParams);
+        } else {
+            basic = redshiftConnectionParam.getJdbcUrl();
+            // if none other params map, basic will be 'jdbc:redshift:iam://examplecluster:us-west-2/dev'
+            // append AccessKeyID &SecretAccessKey &DbUser
+            connectionUrl = String.format("%s?%s", basic, authParams);
+        }
+        try {
+            Class.forName(DataSourceConstants.COM_REDSHIFT_JDBC_DRIVER);
+            return DriverManager.getConnection(connectionUrl);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

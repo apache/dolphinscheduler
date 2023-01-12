@@ -19,11 +19,9 @@ package org.apache.dolphinscheduler.plugin.datasource.redshift.param;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-@ToString
 @Getter
 @Setter
 public class RedshiftDataSourceParamDTO extends BaseDataSourceParamDTO {
@@ -34,5 +32,21 @@ public class RedshiftDataSourceParamDTO extends BaseDataSourceParamDTO {
     @Override
     public DbType getType() {
         return DbType.REDSHIFT;
+    }
+
+    @Override
+    public String toString() {
+        return "RedshiftDataSourceParamDTO{"
+                + "name='" + name + '\''
+                + ", note='" + note + '\''
+                + ", host='" + host + '\''
+                + ", port=" + port
+                + ", database='" + database + '\''
+                + ", userName='" + userName + '\''
+                + ", password='" + password + '\''
+                + ", other='" + other + '\''
+                + ", dbUser='" + dbUser + '\''
+                + ", mode='" + mode + '\''
+                + '}';
     }
 }

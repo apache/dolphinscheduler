@@ -445,7 +445,7 @@ const DetailModal = defineComponent({
                     v-model={[detailForm.userName, 'value']}
                     type='text'
                     maxlength={60}
-                    placeholder={t('datasource.user_name_tips')}
+                    placeholder={t('datasource.AccessKeyID_tips')}
                   />
                 </NFormItem>
                 <NFormItem
@@ -458,8 +458,8 @@ const DetailModal = defineComponent({
                     allowInput={this.trim}
                     class='input-password'
                     v-model={[detailForm.password, 'value']}
-                    type='text'
-                    placeholder={t('datasource.user_password_tips')}
+                    type='password'
+                    placeholder={t('datasource.SecretAccessKey_tips')}
                   />
                 </NFormItem>
                 <NFormItem
@@ -473,7 +473,7 @@ const DetailModal = defineComponent({
                     class='input-dbUser'
                     v-model={[detailForm.dbUser, 'value']}
                     type='text'
-                    placeholder={t('datasource.user_password_tips')}
+                    placeholder={t('datasource.dbUser_tips')}
                   />
                 </NFormItem>
                 <NFormItem
