@@ -65,12 +65,12 @@ DolphinScheduler 的工作计划：<a href="https://github.com/apache/dolphinsch
 
 ### 构建不同版本的 Zookeeper 依赖
 
-默认支持 Zookeeper Server 3.4.6+。
+默认支持 Zookeeper Server 3.8.0。
 ```bash
-# 默认 Zookeeper Client 3.4.14
+# 默认 Zookeeper Client 3.8.0
 ./mvnw clean install -Prelease
-# 升级 Zookeeper Client 版本至3.8
-./mvnw clean install -Prelease -Dzk-3.8
+# 构建支持 Zookeeper 3.4.6+
+./mvnw clean install -Prelease -Dzk-3.4
 ```
 
 制品:

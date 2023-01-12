@@ -13,7 +13,7 @@ asm-9.1.jar
 aspectjweaver-1.9.7.jar
 aspectjrt-1.9.7.jar
 auth-2.17.282.jar
-audience-annotations-0.5.0.jar
+audience-annotations-0.12.0.jar
 automaton-1.11-8.jar
 avro-1.7.7.jar
 aws-core-2.17.282.jar
@@ -59,10 +59,10 @@ commons-pool-1.6.jar
 commons-text-1.4.jar
 commons-text-1.8.jar
 cron-utils-9.1.6.jar
-curator-client-4.3.0.jar
-curator-framework-4.3.0.jar
-curator-recipes-4.3.0.jar
-curator-test-4.3.0.jar
+curator-client-5.3.0.jar
+curator-framework-5.3.0.jar
+curator-recipes-5.3.0.jar
+curator-test-5.3.0.jar
 curvesapi-1.06.jar
 datanucleus-api-jdo-4.2.4.jar
 datanucleus-core-4.1.17.jar
@@ -155,7 +155,7 @@ jetty-util-9.4.48.v20220622.jar
 jetty-util-ajax-9.4.48.v20220622.jar
 jetty-webapp-9.4.48.v20220622.jar
 jetty-xml-9.4.48.v20220622.jar
-jline-0.9.94.jar
+jline-2.12.jar
 jmespath-java-1.12.300.jar
 jna-5.10.0.jar
 jna-platform-5.10.0.jar
@@ -213,7 +213,6 @@ kubernetes-model-storageclass-5.10.2.jar
 libfb303-0.9.3.jar
 libthrift-0.9.3.jar
 listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar
-log4j-1.2.17.jar
 log4j-1.2-api-2.17.2.jar
 logback-classic-1.2.11.jar
 logback-core-1.2.11.jar
@@ -239,9 +238,11 @@ netty-common-4.1.53.Final.jar
 netty-handler-4.1.53.Final.jar
 netty-nio-client-2.17.282.jar
 netty-resolver-4.1.53.Final.jar
+netty-tcnative-2.0.48.Final.jar
 netty-tcnative-classes-2.0.53.Final.jar
 netty-transport-4.1.53.Final.jar
 netty-transport-classes-epoll-4.1.79.Final.jar
+netty-transport-native-epoll-4.1.53.Final.jar
 netty-transport-native-unix-common-4.1.53.Final.jar
 nimbus-jose-jwt-9.8.1.jar
 okhttp-2.7.5.jar
@@ -357,7 +358,8 @@ protobuf-java-3.17.2.jar
 protobuf-java-util-3.17.2.jar
 webjars-locator-core-0.50.jar
 zjsonpatch-0.3.0.jar
-zookeeper-3.4.14.jar
+zookeeper-3.8.0.jar
+zookeeper-jute-3.8.0.jar
 aliyun-java-sdk-core-4.5.10.jar
 aliyun-java-sdk-kms-2.11.0.jar
 aliyun-java-sdk-ram-3.1.0.jar
