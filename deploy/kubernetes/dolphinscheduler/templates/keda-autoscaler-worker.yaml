@@ -30,10 +30,10 @@ spec:
   scaleTargetRef:
     kind: StatefulSet
     name: {{ include "dolphinscheduler.fullname" . }}-worker
-  pollingInterval:  {{ .Values.worker.keda.pollingInterval }}   # Optional. Default: 5 seconds
-  cooldownPeriod: {{ .Values.worker.keda.cooldownPeriod }}    # Optional. Default: 30 seconds
-  minReplicaCount: {{ .Values.worker.keda.minReplicaCount }}   # Optional. Default: 0
-  maxReplicaCount: {{ .Values.worker.keda.maxReplicaCount }}   # Optional. Default: 2
+  pollingInterval:  {{ .Values.worker.keda.pollingInterval }}
+  cooldownPeriod: {{ .Values.worker.keda.cooldownPeriod }}
+  minReplicaCount: {{ .Values.worker.keda.minReplicaCount }}
+  maxReplicaCount: {{ .Values.worker.keda.maxReplicaCount }}
   {{- if .Values.worker.keda.advanced }}
   advanced:
     {{ toYaml .Values.worker.keda.advanced | indent 4 }}
@@ -41,9 +41,9 @@ spec:
   # This is just an example, you could customize the trigger rule.
   # FYI, check TaskExecutionStatus.java for the human-readable meaning of state values below.
   triggers:
+    {{- if .Values.postgresql.enabled }}
     - type: postgresql
       metadata:
-#        connection: jdbc:postgresql://{{ template "dolphinscheduler.postgresql.fullname" . }}:5432/{{ .Values.postgresql.postgresqlDatabase }}?{{ .Values.postgresql.params }}
         host: {{ template "dolphinscheduler.postgresql.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
         port: "5432"
         userName: {{ .Values.postgresql.postgresqlUsername }}
@@ -55,4 +55,31 @@ spec:
           SELECT ceil(COUNT(*)::decimal / {{ .Values.worker.env.WORKER_EXEC_THREADS }})
           FROM t_ds_task_instance
           WHERE state IN (0, 1, 8, 12, 17)
+    {{- else if .Values.mysql.enabled }}
+    - type: mysql
+      metadata:
+        host: {{ template "dolphinscheduler.mysql.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
+        port: "3306"
+        dbName: { { .Values.mysql.auth.database } }
+        username: { { .Values.mysql.auth.username } }
+        passwordFromEnv: SPRING_DATASOURCE_PASSWORD
+        queryValue: "1"
+        query: >-
+          SELECT ceil(COUNT(*)::decimal / {{ .Values.worker.env.WORKER_EXEC_THREADS }})
+          FROM t_ds_task_instance
+          WHERE state IN (0, 1, 8, 12, 17)
+    {{- else if .Values.externalDatabase.enabled }}
+    - type: mysql
+      metadata:
+        host: {{ .Values.externalDatabase.host }}
+        port: {{ .Values.externalDatabase.port }}
+        dbName: {{ .Values.externalDatabase.database }}
+        username: {{ .Values.externalDatabase.username }}
+        passwordFromEnv: SPRING_DATASOURCE_PASSWORD
+        queryValue: "1"
+        query: >-
+          SELECT ceil(COUNT(*)::decimal / {{ .Values.worker.env.WORKER_EXEC_THREADS }})
+          FROM t_ds_task_instance
+          WHERE state IN (0, 1, 8, 12, 17)
+    {{- end }}
 {{- end }}
