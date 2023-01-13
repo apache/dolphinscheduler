@@ -87,6 +87,39 @@ $ kubectl delete pvc -l app.kubernetes.io/instance=dolphinscheduler
 
 > **注意**: 删除 PVC 也会删除所有数据，请谨慎操作！
 
+## [试验性] worker 自动扩缩容
+
+> **警告**: 目前此功能尚在试验阶段，不建议在生产环境使用！
+
+`DolphinScheduler` 使用 [KEDA](https://github.com/kedacore/keda) 对 worker 进行自动扩缩容。但是 `DolphinScheduler` 默认是不启用该功能的。
+您需要做下列配置来启用该功能：
+
+首先您需要创建一个单独的命名空间并使用 `helm` 安装 `KEDA`：
+
+```bash
+helm repo add kedacore https://kedacore.github.io/charts
+
+helm repo update
+
+kubectl create namespace keda
+
+helm install keda kedacore/keda \
+    --namespace keda \
+    --version "v2.0.0"
+```
+
+其次，您需要将 `values.yaml` 中的 `worker.keda.enabled` 配置设置成 `true`，或者您可以通过以下命令安装 chart：
+
+```bash
+helm install dolphinscheduler . --set worker.keda.enabled=true -n <your-namespace-to-deploy-dolphinscheduler>
+```
+
+一旦自动扩缩容功能启用，worker的数量将基于任务状态在 `minReplicaCount` 和 `maxReplicaCount` 之间弹性扩缩。
+举例来说，当您的 `DolphinScheduler` 实例中没有任务在运行时，将不会有 worker。因此，这个功能会显著节约资源，降低您的使用成本。
+
+自动扩缩容功能目前支持 `DolphinScheduler 官方 helm chart` 中自带的 `postgresql` and `mysql`。
+如果您要使用外部的数据库，自动扩缩容功能目前只支持 `mysql` 类型的外部数据库。 
+
 ## 配置
 
 配置文件为 `values.yaml`，[附录-配置](#appendix-configuration) 表格列出了 DolphinScheduler 的可配置参数及其默认值 <!-- markdown-link-check-disable-line -->
