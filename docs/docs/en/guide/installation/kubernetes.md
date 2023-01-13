@@ -114,8 +114,8 @@ Secondly, you need to set `worker.keda.enabled` to `true` in `values.yaml` or in
 helm install dolphinscheduler . --set worker.keda.enabled=true -n <your-namespace-to-deploy-dolphinscheduler>
 ```
 
-Once autoscaling enabled, the number of workers will scale between `minReplicaCount` and `maxReplicaCount` based on the states 
-of your tasks. For example, when there is no tasks running in your `DolphinScheduler` instance, there will be no workers, 
+Once autoscaling enabled, the number of workers will scale between `minReplicaCount` and `maxReplicaCount` based on the states
+of your tasks. For example, when there is no tasks running in your `DolphinScheduler` instance, there will be no workers,
 which will significantly save the resources.
 
 Worker autoscaling feature is compatible with `postgresql` and `mysql` shipped with `DolphinScheduler official helm chart`. If you
