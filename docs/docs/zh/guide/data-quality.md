@@ -25,8 +25,8 @@ data-quality.jar.name=dolphinscheduler-data-quality-dev-SNAPSHOT.jar
 - 当前 `dolphinscheduler-data-quality-dev-SNAPSHOT.jar` 是瘦包，不包含任何 `JDBC` 驱动。
   如果有 `JDBC` 驱动需要，可以在`节点设置` `选项参数`处设置 `--jars` 参数，
   如：`--jars /lib/jars/mysql-connector-java-8.0.16.jar`。
-- 当前只测试了`MySQL`、`PostgreSQL`和`HIVE`数据源，其他数据源暂时未测试过
-  `Spark`需要配置好读取`Hive`元数据，`Spark`不是采用`JDBC`的方式读取`Hive`
+- 当前只测试了`MySQL`、`PostgreSQL`和`HIVE`数据源，其他数据源暂时未测试过。
+- `Spark`需要配置好读取`Hive`元数据，`Spark`不是采用`JDBC`的方式读取`Hive`。
 
 ## 检查逻辑详解
 
