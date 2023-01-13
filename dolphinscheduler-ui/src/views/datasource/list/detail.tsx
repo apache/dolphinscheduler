@@ -440,7 +440,6 @@ const DetailModal = defineComponent({
                 >
                   <NInput
                     allowInput={this.trim}
-                    class='input-username'
                     v-model={[detailForm.userName, 'value']}
                     type='text'
                     maxlength={60}
