@@ -444,6 +444,14 @@ public class TaskConstants {
     public static final String TASK_TYPE_STREAM = "STREAM";
 
     /**
+     * azure config
+     */
+    public static final String AZURE_ACCESS_KEY_ID = "resource.azure.access.key.id";
+    public static final String AZURE_SECRET_ACCESS_KEY = "resource.azure.secret.access.key";
+    public static final String AZURE_ACCESS_SUB_ID = "resource.azure.subId";
+    public static final String AZURE_SECRET_TENANT_ID = "resource.azure.tenant.id";
+
+    /**
      * aws config
      */
     public static final String AWS_ACCESS_KEY_ID = "resource.aws.access.key.id";
