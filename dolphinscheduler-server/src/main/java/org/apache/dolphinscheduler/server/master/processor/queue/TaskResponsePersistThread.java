@@ -159,6 +159,9 @@ public class TaskResponsePersistThread implements Runnable {
                         logger.debug("ACTION_STOP: task instance id:{}, process instance id:{}", taskResponseEvent.getTaskInstanceId(), taskResponseEvent.getProcessInstanceId());
                     }
                     workflowExecuteThread.getActiveTaskProcessorMaps().remove(taskResponseEvent.getTaskInstanceId());
+                    if (workflowExecuteThread.activeTaskFinish()) {
+                        this.processInstanceMapper.remove(taskResponseEvent.getProcessInstanceId());
+                    }
                 }
 
                 if (channel != null) {
@@ -197,7 +200,8 @@ public class TaskResponsePersistThread implements Runnable {
         }
 
         WorkflowExecuteThread workflowExecuteThread = this.processInstanceMapper.get(taskResponseEvent.getProcessInstanceId());
-        if (workflowExecuteThread != null && taskResponseEvent.getState().typeIsFinished() && event != Event.ACTION_STOP) {
+        if (workflowExecuteThread != null && taskResponseEvent.getState().typeIsFinished()
+            && event != Event.ACTION_STOP && !workflowExecuteThread.getProcessInstance().getState().typeIsStop()) {
             StateEvent stateEvent = new StateEvent();
             stateEvent.setProcessInstanceId(taskResponseEvent.getProcessInstanceId());
             stateEvent.setTaskInstanceId(taskResponseEvent.getTaskInstanceId());
