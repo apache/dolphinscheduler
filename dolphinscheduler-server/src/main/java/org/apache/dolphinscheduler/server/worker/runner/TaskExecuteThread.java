@@ -20,10 +20,14 @@ package org.apache.dolphinscheduler.server.worker.runner;
 import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.Event;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.enums.TaskType;
 import org.apache.dolphinscheduler.common.process.Property;
-import org.apache.dolphinscheduler.common.utils.*;
-import org.apache.dolphinscheduler.remote.command.Command;
+import org.apache.dolphinscheduler.common.utils.CommonUtils;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.FileUtils;
+import org.apache.dolphinscheduler.common.utils.HadoopUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.LoggerUtils;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
 import org.apache.dolphinscheduler.server.utils.LogUtils;
@@ -51,14 +55,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Delayed;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.github.rholder.retry.RetryException;
 
 /**
  * task scheduler thread
@@ -141,11 +142,11 @@ public class TaskExecuteThread implements Runnable, Delayed {
                 taskExecutionContext.setStartTime(new Date());
             }
             if (taskExecutionContext.getCurrentExecutionStatus() != ExecutionStatus.RUNNING_EXECUTION) {
-                changeTaskExecutionStatusToRunning();
+                //changeTaskExecutionStatusToRunning();
+                logger.info("the task begins to execute. task instance id: {}", taskExecutionContext.getTaskInstanceId());
+                taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);
+                sendTaskExecuteRunningCommand(taskExecutionContext);
             }
-            logger.info("the task begins to execute. task instance id: {}", taskExecutionContext.getTaskInstanceId());
-            taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);
-            sendTaskExecuteRunningCommand(taskExecutionContext);
             int dryRun = taskExecutionContext.getDryRun();
             // copy hdfs/minio file to local
             if (dryRun == Constants.DRY_RUN_FLAG_NO) {
@@ -168,13 +169,19 @@ public class TaskExecuteThread implements Runnable, Delayed {
                 throw new RuntimeException(String.format("%s Task Plugin Not Found,Please Check Config File.", taskExecutionContext.getTaskType()));
             }
             TaskRequest taskRequest = JSONUtils.parseObject(JSONUtils.toJsonString(taskExecutionContext), TaskRequest.class);
+            if (null == taskRequest) {
+                throw new RuntimeException("The taskExecutionContext parse error");
+            }
             String taskLogName = LoggerUtils.buildTaskId(LoggerUtils.TASK_LOGGER_INFO_PREFIX,
                     taskExecutionContext.getProcessDefineCode(),
                     taskExecutionContext.getProcessDefineVersion(),
                     taskExecutionContext.getProcessInstanceId(),
                     taskExecutionContext.getTaskInstanceId());
             taskRequest.setTaskLogName(taskLogName);
-
+            if (!TaskExecutionContextCacheManager.updateTaskExecutionContext(taskRequest)) {
+                TaskExecutionContextCacheManager.cacheTaskExecutionContext(taskRequest);
+                logger.info("taskRequest reCache successfully, taskInstanceId: {}", taskExecutionContext.getTaskInstanceId());
+            }
             // set the name of the current thread
             Thread.currentThread().setName(String.format(TaskConstants.TASK_LOGGER_THREAD_NAME_FORMAT,taskLogName));
 
@@ -212,9 +219,14 @@ public class TaskExecuteThread implements Runnable, Delayed {
             responseCommand.setProcessId(task.getProcessId());
             responseCommand.setAppIds(task.getAppIds());
         } finally {
-            TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-            ResponceCache.get().cache(taskExecutionContext.getTaskInstanceId(), responseCommand.convert2Command(), Event.RESULT);
-            taskCallbackService.sendResult(taskExecutionContext.getTaskInstanceId(), responseCommand.convert2Command());
+            if (TaskExecutionContextCacheManager.statusIsStop(taskExecutionContext.getTaskInstanceId())) {
+                logger.info("task has exited, taskInstanceId:{}, exitStatusCode:{}, task executionStatus:{}",
+                    taskExecutionContext.getTaskInstanceId(), this.task.getExitStatusCode(), ExecutionStatus.STOP);
+            } else {
+                TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+                ResponceCache.get().cache(taskExecutionContext.getTaskInstanceId(), responseCommand.convert2Command(), Event.RESULT);
+                taskCallbackService.sendResult(taskExecutionContext.getTaskInstanceId(), responseCommand.convert2Command());
+            }
             clearTaskExecPath();
         }
     }
@@ -350,42 +362,6 @@ public class TaskExecuteThread implements Runnable, Delayed {
                 logger.info("file : {} exists ", resFile.getName());
             }
         }
-    }
-
-    /**
-     * send an ack to change the status of the task.
-     */
-    private void changeTaskExecutionStatusToRunning() {
-        taskExecutionContext.setCurrentExecutionStatus(ExecutionStatus.RUNNING_EXECUTION);
-        Command ackCommand = buildAckCommand().convert2Command();
-        try {
-            RetryerUtils.retryCall(() -> {
-                taskCallbackService.sendAck(taskExecutionContext.getTaskInstanceId(), ackCommand);
-                return Boolean.TRUE;
-            });
-        } catch (ExecutionException | RetryException e) {
-            logger.error(e.getMessage(), e);
-        }
-    }
-
-    /**
-     * build ack command.
-     *
-     * @return TaskExecuteAckCommand
-     */
-    private TaskExecuteAckCommand buildAckCommand() {
-        TaskExecuteAckCommand ackCommand = new TaskExecuteAckCommand();
-        ackCommand.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-        ackCommand.setStatus(taskExecutionContext.getCurrentExecutionStatus().getCode());
-        ackCommand.setStartTime(taskExecutionContext.getStartTime());
-        ackCommand.setLogPath(taskExecutionContext.getLogPath());
-        ackCommand.setHost(taskExecutionContext.getHost());
-        if (TaskType.SQL.getDesc().equalsIgnoreCase(taskExecutionContext.getTaskType()) || TaskType.PROCEDURE.getDesc().equalsIgnoreCase(taskExecutionContext.getTaskType())) {
-            ackCommand.setExecutePath(null);
-        } else {
-            ackCommand.setExecutePath(taskExecutionContext.getExecutePath());
-        }
-        return ackCommand;
     }
 
     /**

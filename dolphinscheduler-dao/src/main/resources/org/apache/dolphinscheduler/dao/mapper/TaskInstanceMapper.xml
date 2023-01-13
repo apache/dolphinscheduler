@@ -196,4 +196,16 @@
             and start_time <![CDATA[ >= ]]> #{startTime} and start_time <![CDATA[ <= ]]> #{endTime}
         </if>
     </select>
+    <select id="queryTaskInstanceListByIds" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
+        select
+        <include refid="baseSql"/>
+        from t_ds_task_instance
+        where 1=1
+        <if test="ids != null and ids.size() != 0">
+            and id in
+            <foreach collection="ids" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
+    </select>
 </mapper>

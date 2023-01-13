@@ -41,20 +41,19 @@ public class TaskKillAckProcessor implements NettyRequestProcessor {
     public void process(Channel channel, Command command) {
         Preconditions.checkArgument(CommandType.TASK_KILL_RESPONSE_ACK == command.getType(),
                 String.format("invalid command type : %s", command.getType()));
-
-        TaskKillAckCommand taskKillAckCommand = JSONUtils.parseObject(
-                command.getBody(), TaskKillAckCommand.class);
-
+        TaskKillAckCommand taskKillAckCommand = JSONUtils.parseObject(command.getBody(), TaskKillAckCommand.class);
         if (taskKillAckCommand == null) {
+            logger.warn("Cannot parse command, command type: {}", command.getType());
             return;
         }
+        logger.info("received kill ack command : {}", taskKillAckCommand);
 
         if (taskKillAckCommand.getStatus() == ExecutionStatus.SUCCESS.getCode()) {
             ResponceCache.get().removeKillResponseCache(taskKillAckCommand.getTaskInstanceId());
             TaskExecutionContextCacheManager.removeByTaskInstanceId(taskKillAckCommand.getTaskInstanceId());
-            logger.debug("removeKillResponseCache: task instance id:{}", taskKillAckCommand.getTaskInstanceId());
+            logger.info("removeKillResponseCache: task instance id:{}", taskKillAckCommand.getTaskInstanceId());
             TaskCallbackService.remove(taskKillAckCommand.getTaskInstanceId());
-            logger.debug("remove REMOTE_CHANNELS, task instance id:{}", taskKillAckCommand.getTaskInstanceId());
+            logger.info("remove REMOTE_CHANNELS, task instance id:{}", taskKillAckCommand.getTaskInstanceId());
         }
     }
 }

@@ -92,8 +92,9 @@ public class HadoopUtils implements Closeable {
     private FileSystem fs;
 
     private HadoopUtils() {
-        init();
-        initHdfsPath();
+        if(init()) {
+            initHdfsPath();
+        }
     }
 
     public static HadoopUtils getInstance() {
@@ -120,7 +121,7 @@ public class HadoopUtils implements Closeable {
     /**
      * init hadoop configuration
      */
-    private void init() {
+    private boolean init() {
         try {
             configuration = new HdfsConfiguration();
 
@@ -168,11 +169,13 @@ public class HadoopUtils implements Closeable {
                 configuration.set(Constants.FS_S3A_ACCESS_KEY, PropertyUtils.getString(Constants.FS_S3A_ACCESS_KEY));
                 configuration.set(Constants.FS_S3A_SECRET_KEY, PropertyUtils.getString(Constants.FS_S3A_SECRET_KEY));
                 fs = FileSystem.get(configuration);
+            } else {
+                return false;
             }
-
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
+        return true;
     }
 
     /**

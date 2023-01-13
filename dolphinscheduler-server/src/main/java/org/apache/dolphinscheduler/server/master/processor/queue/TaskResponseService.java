@@ -177,7 +177,7 @@ public class TaskResponseService {
                     Thread.currentThread().interrupt();
                     break;
                 } catch (Exception e) {
-                    logger.error("persist task error", e);
+                    logger.error("handle task error", e);
                 }
             }
             logger.info("StateEventResponseWorker stopped");
@@ -227,7 +227,7 @@ public class TaskResponseService {
                 FutureCallback futureCallback = new FutureCallback() {
                     @Override
                     public void onSuccess(Object o) {
-                        logger.info("persist events {} succeeded.", taskResponsePersistThread.getProcessInstanceId());
+                        logger.info("handle events {} succeeded.", taskResponsePersistThread.getProcessInstanceId());
                         if (!processInstanceMap.containsKey(taskResponsePersistThread.getProcessInstanceId())) {
                             processTaskResponseMap.remove(taskResponsePersistThread.getProcessInstanceId());
                             logger.info("remove process instance: {}", taskResponsePersistThread.getProcessInstanceId());
@@ -237,7 +237,7 @@ public class TaskResponseService {
 
                     @Override
                     public void onFailure(Throwable throwable) {
-                        logger.error("persist events failed: {}", throwable);
+                        logger.error("handle events failed: {}", throwable.getMessage());
                         if (!processInstanceMap.containsKey(taskResponsePersistThread.getProcessInstanceId())) {
                             processTaskResponseMap.remove(taskResponsePersistThread.getProcessInstanceId());
                             logger.info("remove process instance: {}", taskResponsePersistThread.getProcessInstanceId());

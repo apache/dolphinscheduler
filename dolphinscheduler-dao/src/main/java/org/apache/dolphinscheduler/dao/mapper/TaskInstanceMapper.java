@@ -84,4 +84,6 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
     TaskInstance queryLastTaskInstance(@Param("taskCode") long taskCode, @Param("startTime") Date startTime, @Param("endTime") Date endTime);
 
     List<TaskInstance> queryLastTaskInstanceList(@Param("taskCodes") Set<Long> taskCodes, @Param("startTime") Date startTime, @Param("endTime") Date endTime);
+
+    List<TaskInstance> queryTaskInstanceListByIds(@Param("ids") Set<Integer> ids);
 }

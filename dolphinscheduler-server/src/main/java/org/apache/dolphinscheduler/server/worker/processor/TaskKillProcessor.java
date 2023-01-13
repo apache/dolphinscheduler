@@ -95,16 +95,18 @@ public class TaskKillProcessor implements NettyRequestProcessor {
         TaskKillRequestCommand killCommand = JSONUtils.parseObject(command.getBody(), TaskKillRequestCommand.class);
         logger.info("received kill command : {}", killCommand);
 
-        taskCallbackService.addRemoteChannel(killCommand.getTaskInstanceId(),
-                new NettyRemoteChannel(channel, command.getOpaque()));
+        TaskRequest taskRequest = TaskExecutionContextCacheManager.getByTaskInstanceId(killCommand.getTaskInstanceId());
+        if (taskRequest == null) {
+            logger.warn("Cannot find taskInstanceId {} in taskContextCacheManager", killCommand.getTaskInstanceId());
+            return;
+        }
+        taskRequest.setCurrentExecutionStatus(org.apache.dolphinscheduler.spi.task.ExecutionStatus.STOP);
+        TaskExecutionContextCacheManager.updateTaskExecutionContext(taskRequest);
+
+        taskCallbackService.addRemoteChannel(killCommand.getTaskInstanceId(), new NettyRemoteChannel(channel, command.getOpaque()));
 
         Pair<Boolean, List<String>> result = doKill(killCommand);
 
-        TaskRequest taskRequest = TaskExecutionContextCacheManager.getByTaskInstanceId(killCommand.getTaskInstanceId());
-
-        if (taskRequest == null) {
-            return;
-        }
         TaskKillResponseCommand taskKillResponseCommand = buildKillTaskResponseCommand(taskRequest, result);
         ResponceCache.get().cache(taskKillResponseCommand.getTaskInstanceId(), taskKillResponseCommand.convert2Command(), Event.ACTION_STOP);
         taskCallbackService.sendResult(taskKillResponseCommand.getTaskInstanceId(), taskKillResponseCommand.convert2Command());
