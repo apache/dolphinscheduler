@@ -87,6 +87,43 @@ $ kubectl delete pvc -l app.kubernetes.io/instance=dolphinscheduler
 
 > **Note**: Deleting the PVC's will delete all data as well. Please be cautious before doing it.
 
+## [Experimental] Worker Autoscaling
+
+> **Warning**: Currently this is an experimental feature and may not be suitable for production!
+
+`DolphinScheduler` uses [KEDA](https://github.com/kedacore/keda) for worker autoscaling. However, `DolphinScheduler` disables
+this feature by default. To turn on worker autoscaling:
+
+Firstly, you need to create a namespace for `KEDA` and install it with `helm`:
+
+```bash
+helm repo add kedacore https://kedacore.github.io/charts
+
+helm repo update
+
+kubectl create namespace keda
+
+helm install keda kedacore/keda \
+    --namespace keda \
+    --version "v2.0.0"
+```
+
+Secondly, you need to set `worker.keda.enabled` to `true` in `values.yaml` or install the chart by:
+
+```bash
+helm install dolphinscheduler . --set worker.keda.enabled=true -n <your-namespace-to-deploy-dolphinscheduler>
+```
+
+Once autoscaling enabled, the number of workers will scale between `minReplicaCount` and `maxReplicaCount` based on the states
+of your tasks. For example, when there is no tasks running in your `DolphinScheduler` instance, there will be no workers,
+which will significantly save the resources.
+
+Worker autoscaling feature is compatible with `postgresql` and `mysql` shipped with `DolphinScheduler official helm chart`. If you
+use external database, worker autoscaling feature only supports external `mysql` and `postgresql` databases.
+
+If you need to change the value of worker `WORKER_EXEC_THREADS` when using autoscaling feature,
+please change `worker.env.WORKER_EXEC_THREADS` in `values.yaml` instead of through `configmap`.
+
 ## Configuration
 
 The configuration file is `values.yaml`, and the [Appendix-Configuration](#appendix-configuration) tables lists the configurable parameters of the DolphinScheduler and their default values.
