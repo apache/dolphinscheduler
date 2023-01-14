@@ -118,7 +118,10 @@ helm install dolphinscheduler . --set worker.keda.enabled=true -n <your-namespac
 举例来说，当您的 `DolphinScheduler` 实例中没有任务在运行时，将不会有 worker。因此，这个功能会显著节约资源，降低您的使用成本。
 
 自动扩缩容功能目前支持 `DolphinScheduler 官方 helm chart` 中自带的 `postgresql` and `mysql`。
-如果您要使用外部的数据库，自动扩缩容功能目前只支持 `mysql` 类型的外部数据库。
+如果您要使用外部的数据库，自动扩缩容功能目前只支持 `mysql` 和 `postgresql` 类型的外部数据库。
+
+如果您在使用自动扩缩容时需要改变 worker `WORKER_EXEC_THREADS` 的值，请直接在 `values.yaml` 中修改 `worker.env.WORKER_EXEC_THREADS` 的值，
+而不要通过 `configmap` 来更新。
 
 ## 配置
 

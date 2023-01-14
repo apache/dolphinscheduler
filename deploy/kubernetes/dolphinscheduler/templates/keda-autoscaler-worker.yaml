@@ -37,7 +37,7 @@ spec:
   {{- if .Values.worker.keda.advanced }}
   advanced:
     {{ toYaml .Values.worker.keda.advanced | indent 4 }}
-    {{- end }}
+  {{- end }}
   # This is just an example, you could customize the trigger rule.
   # FYI, check TaskExecutionStatus.java for the human-readable meaning of state values below.
   triggers:
@@ -46,9 +46,9 @@ spec:
       metadata:
         host: {{ template "dolphinscheduler.postgresql.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
         port: "5432"
+        dbName: {{ .Values.postgresql.postgresqlDatabase }}
         userName: {{ .Values.postgresql.postgresqlUsername }}
         passwordFromEnv: SPRING_DATASOURCE_PASSWORD
-        dbName: {{ .Values.postgresql.postgresqlDatabase }}
         sslmode: "disable"
         targetQueryValue: "1"
         query: >-
@@ -69,6 +69,7 @@ spec:
           FROM t_ds_task_instance
           WHERE state IN (0, 1, 8, 12, 17)
     {{- else if .Values.externalDatabase.enabled }}
+      {{- if eq .Values.externalDatabase.type "mysql" }}
     - type: mysql
       metadata:
         host: {{ .Values.externalDatabase.host }}
@@ -82,5 +83,20 @@ spec:
           SELECT CEIL(COUNT(*) / {{ .Values.worker.env.WORKER_EXEC_THREADS }})
           FROM t_ds_task_instance
           WHERE state IN (0, 1, 8, 12, 17)
+      {{- else if eq .Values.externalDatabase.type "postgresql" }}
+    - type: postgresql
+        metadata:
+          host: {{ .Values.externalDatabase.host }}
+          port: "{{ .Values.externalDatabase.port }}"
+          dbName: {{ .Values.externalDatabase.database }}
+          userName: {{ .Values.externalDatabase.username }}
+          passwordFromEnv: SPRING_DATASOURCE_PASSWORD
+          sslmode: "disable"
+          targetQueryValue: "1"
+          query: >-
+            SELECT ceil(COUNT(*)::decimal / {{ .Values.worker.env.WORKER_EXEC_THREADS }})
+            FROM t_ds_task_instance
+            WHERE state IN (0, 1, 8, 12, 17)
+      {{- end }}
     {{- end }}
 {{- end }}

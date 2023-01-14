@@ -119,7 +119,10 @@ of your tasks. For example, when there is no tasks running in your `DolphinSched
 which will significantly save the resources.
 
 Worker autoscaling feature is compatible with `postgresql` and `mysql` shipped with `DolphinScheduler official helm chart`. If you
-use external database, worker autoscaling feature only supports external `mysql` databases.
+use external database, worker autoscaling feature only supports external `mysql` and `postgresql` databases.
+
+If you need to change the value of worker `WORKER_EXEC_THREADS` when using autoscaling feature,
+please change `worker.env.WORKER_EXEC_THREADS` in `values.yaml` instead of through `configmap`.
 
 ## Configuration
 
