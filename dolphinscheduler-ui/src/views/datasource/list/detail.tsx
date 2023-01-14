@@ -454,7 +454,6 @@ const DetailModal = defineComponent({
                 >
                   <NInput
                     allowInput={this.trim}
-                    class='input-password'
                     v-model={[detailForm.password, 'value']}
                     type='password'
                     placeholder={t('datasource.SecretAccessKey_tips')}
