@@ -77,7 +77,7 @@ public class V320DolphinSchedulerUpgrader implements DolphinSchedulerUpgrader {
                 .collect(Collectors.toMap(User::getId, User::getUserName));
 
         while (true) {
-            LambdaQueryWrapper<ProcessInstance> wrapper = new QueryWrapper<>(new ProcessInstance())
+            LambdaQueryWrapper<ProcessInstance> wrapper = new QueryWrapper<ProcessInstance>()
                     .lambda()
                     .eq(ProcessInstance::getProjectCode, null)
                     .last("limit 1000");
@@ -109,7 +109,7 @@ public class V320DolphinSchedulerUpgrader implements DolphinSchedulerUpgrader {
 
     private void upgradeTaskInstance() {
         while (true) {
-            LambdaQueryWrapper<TaskInstance> wrapper = new QueryWrapper<>(new TaskInstance())
+            LambdaQueryWrapper<TaskInstance> wrapper = new QueryWrapper<TaskInstance>()
                     .lambda()
                     .eq(TaskInstance::getProjectCode, null)
                     .last("limit 1000");
