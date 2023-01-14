@@ -56,7 +56,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
@@ -282,7 +281,7 @@ public class AlertDao {
     }
 
     public List<Alert> listAlerts(int processInstanceId) {
-        LambdaQueryWrapper<Alert> wrapper = new QueryWrapper<>(new Alert()).lambda()
+        LambdaQueryWrapper<Alert> wrapper = new LambdaQueryWrapper<Alert>()
                 .eq(Alert::getProcessInstanceId, processInstanceId);
         return alertMapper.selectList(wrapper);
     }
