@@ -151,8 +151,7 @@ public class LogClientTest {
                     .thenReturn(command);
 
             LogClient logClient = new LogClient();
-            Boolean status = logClient.removeTaskLog(Host.of("localhost:1234"), "/log/path");
-            Assertions.assertTrue(status);
+            Assertions.assertDoesNotThrow(() -> logClient.removeTaskLog(Host.of("localhost:1234"), "/log/path"));
         }
     }
 }

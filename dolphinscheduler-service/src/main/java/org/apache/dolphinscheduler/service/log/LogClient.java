@@ -31,7 +31,6 @@ import org.apache.dolphinscheduler.remote.command.log.GetAppIdResponseCommand;
 import org.apache.dolphinscheduler.remote.command.log.GetLogBytesRequestCommand;
 import org.apache.dolphinscheduler.remote.command.log.GetLogBytesResponseCommand;
 import org.apache.dolphinscheduler.remote.command.log.RemoveTaskLogRequestCommand;
-import org.apache.dolphinscheduler.remote.command.log.RemoveTaskLogResponseCommand;
 import org.apache.dolphinscheduler.remote.command.log.RollViewLogRequestCommand;
 import org.apache.dolphinscheduler.remote.command.log.RollViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.command.log.ViewLogRequestCommand;
@@ -179,27 +178,14 @@ public class LogClient implements AutoCloseable {
      * @param path path
      * @return remove task status
      */
-    public Boolean removeTaskLog(@NonNull Host host, String path) {
+    public void removeTaskLog(@NonNull Host host, String path) {
         logger.info("Remove task log from host: {} logPath {}", host, path);
         RemoveTaskLogRequestCommand request = new RemoveTaskLogRequestCommand(path);
         try {
             Command command = request.convert2Command();
-            Command response = this.client.sendSync(host, command, LOG_REQUEST_TIMEOUT);
-            if (response != null) {
-                RemoveTaskLogResponseCommand taskLogResponse =
-                        JSONUtils.parseObject(response.getBody(), RemoveTaskLogResponseCommand.class);
-                return taskLogResponse.getStatus();
-            }
-            return false;
-        } catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
-            logger.error(
-                    "Remove task log from host: {}, logPath: {} error, the current thread has been interrupted",
-                    host, path, ex);
-            return false;
+            client.send(host, command);
         } catch (Exception e) {
             logger.error("Remove task log from host: {},  logPath: {} error", host, path, e);
-            return false;
         }
     }
 
