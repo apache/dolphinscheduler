@@ -28,11 +28,6 @@ import org.springframework.security.web.util.matcher.RequestHeaderRequestMatcher
 @Configuration
 public class CsrfConfiguration {
 
-    // @Bean
-    // public CsrfInterceptor csrfInterceptor(){
-    // return new CsrfInterceptor();
-    // }
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf().ignoringRequestMatchers().ignoringRequestMatchers(new RequestHeaderRequestMatcher("token"))
