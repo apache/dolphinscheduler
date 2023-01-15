@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.remote.command.log.GetAppIdResponseCommand;
 import org.apache.dolphinscheduler.remote.command.log.GetLogBytesRequestCommand;
 import org.apache.dolphinscheduler.remote.command.log.GetLogBytesResponseCommand;
 import org.apache.dolphinscheduler.remote.command.log.RemoveTaskLogRequestCommand;
+import org.apache.dolphinscheduler.remote.command.log.RemoveTaskLogResponseCommand;
 import org.apache.dolphinscheduler.remote.command.log.RollViewLogRequestCommand;
 import org.apache.dolphinscheduler.remote.command.log.RollViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.command.log.ViewLogRequestCommand;
@@ -176,14 +177,36 @@ public class LogClient implements AutoCloseable {
      *
      * @param host host
      * @param path path
-     * @return remove task status
      */
     public void removeTaskLog(@NonNull Host host, String path) {
-        logger.info("Remove task log from host: {} logPath {}", host, path);
+        logger.info("Begin remove task log from host: {} logPath {}", host, path);
         RemoveTaskLogRequestCommand request = new RemoveTaskLogRequestCommand(path);
         try {
             Command command = request.convert2Command();
-            client.send(host, command);
+            client.sendAsync(host, command, LOG_REQUEST_TIMEOUT, responseFuture -> {
+                if (responseFuture.getCause() != null) {
+                    logger.error("Remove task log from host: {} logPath {} error, meet an unknown exception", host,
+                            path, responseFuture.getCause());
+                    return;
+                }
+                Command response = responseFuture.getResponseCommand();
+                if (response == null) {
+                    logger.error("Remove task log from host: {} logPath {} error, response is null", host, path);
+                    return;
+                }
+                RemoveTaskLogResponseCommand removeTaskLogResponse =
+                        JSONUtils.parseObject(response.getBody(), RemoveTaskLogResponseCommand.class);
+                if (removeTaskLogResponse.getStatus()) {
+                    logger.info("Success remove task log from host: {} logPath {}", host, path);
+                } else {
+                    logger.error("Remove task log from host: {} logPath {} error", host, path);
+                }
+            });
+        } catch (InterruptedException interruptedException) {
+            Thread.currentThread().interrupt();
+            logger.error("Remove task log from host: {} logPath {} error, the current thread has been interrupted",
+                    host,
+                    path, interruptedException);
         } catch (Exception e) {
             logger.error("Remove task log from host: {},  logPath: {} error", host, path, e);
         }
