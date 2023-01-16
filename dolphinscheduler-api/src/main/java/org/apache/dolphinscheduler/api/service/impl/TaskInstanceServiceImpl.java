@@ -379,13 +379,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         for (TaskInstance taskInstance : needToDeleteTaskInstances) {
             // delete log
             if (StringUtils.isNotEmpty(taskInstance.getLogPath())) {
-                try {
-                    logClient.removeTaskLog(Host.of(taskInstance.getHost()), taskInstance.getLogPath());
-                } catch (Exception e) {
-                    logger.error(
-                            "Remove task log error, meet an unknown exception, taskInstanceId: {}, host: {}, logPath: {}",
-                            taskInstance.getId(), taskInstance.getHost(), taskInstance.getLogPath(), e);
-                }
+                logClient.removeTaskLog(Host.of(taskInstance.getHost()), taskInstance.getLogPath());
             }
         }
 

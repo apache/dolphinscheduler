@@ -516,17 +516,10 @@ public class ProcessServiceImpl implements ProcessService {
         }
         for (TaskInstance taskInstance : taskInstanceList) {
             String taskLogPath = taskInstance.getLogPath();
-            if (Strings.isNullOrEmpty(taskInstance.getHost())) {
+            if (StringUtils.isEmpty(taskInstance.getHost()) || StringUtils.isEmpty(taskLogPath)) {
                 continue;
             }
-            try {
-                Host host = Host.of(taskInstance.getHost());
-                logClient.removeTaskLog(host, taskLogPath);
-            } catch (Exception e) {
-                logger.error(
-                        "Remove task log error, meet an unknown exception, taskInstanceId: {}, host: {}, logPath: {}",
-                        taskInstance.getId(), taskInstance.getHost(), taskInstance.getLogPath(), e);
-            }
+            logClient.removeTaskLog(Host.of(taskInstance.getHost()), taskLogPath);
         }
     }
 
@@ -2429,8 +2422,6 @@ public class ProcessServiceImpl implements ProcessService {
 
     /**
      * the first time (when submit the task ) get the resource of the task group
-     *
-     * @param taskId task id
      */
     @Override
     public boolean acquireTaskGroup(int taskInstanceId,
