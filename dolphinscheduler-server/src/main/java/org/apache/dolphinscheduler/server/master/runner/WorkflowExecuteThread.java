@@ -1488,15 +1488,6 @@ public class WorkflowExecuteThread implements Runnable {
                         submitPostNode(Long.toString(task.getTaskCode()));
                         continue;
                     }
-                    if (retryTask != null && retryTask.getState() == ExecutionStatus.FAILURE && retryTask.getMaxRetryTimes() !=0 && retryTask.getRetryInterval() != 0) {
-                        long failedTimeInterval = DateUtils.differSec(new Date(), retryTask.getEndTime());
-                        if ((long) retryTask.getRetryInterval() * SEC_2_MINUTES_TIME_UNIT > failedTimeInterval) {
-                            logger.info("task name: {} retry waiting has not exceeded the interval time, and skip submission this time, task id:{}", task.getName(), task.getId());
-                            readyToSubmitTaskQueue.remove(task);
-                            skipSubmitInstances.add(task);
-                            continue;
-                        }
-                    }
                 }
                 //init varPool only this task is the first time running
                 if (task.isFirstRun()) {
