@@ -17,6 +17,20 @@
 
 package org.apache.dolphinscheduler.plugin.task.datafactory;
 
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.Arrays;
+import java.util.List;
+
+import lombok.Data;
+import lombok.SneakyThrows;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.azure.core.credential.TokenCredential;
 import com.azure.core.management.AzureEnvironment;
 import com.azure.core.management.profile.AzureProfile;
@@ -26,23 +40,14 @@ import com.azure.resourcemanager.datafactory.models.CreateRunResponse;
 import com.azure.resourcemanager.datafactory.models.PipelineResource;
 import com.azure.resourcemanager.datafactory.models.PipelineRun;
 import com.azure.resourcemanager.datafactory.models.PipelineRuns;
-import lombok.Data;
-import lombok.SneakyThrows;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Arrays;
-import java.util.List;
 
 @Data
 public class DatafactoryHook {
 
-    //public static DatafactoryStatus[] doneStatus =
-    //        {DatafactoryStatus.Canceling,DatafactoryStatus.InProgress,DatafactoryStatus.Queued};
-    public static DatafactoryStatus[] taskFinishFlags = {DatafactoryStatus.Failed, DatafactoryStatus.Succeeded,DatafactoryStatus.Cancelled};
+    // public static DatafactoryStatus[] doneStatus =
+    // {DatafactoryStatus.Canceling,DatafactoryStatus.InProgress,DatafactoryStatus.Queued};
+    public static DatafactoryStatus[] taskFinishFlags =
+            {DatafactoryStatus.Failed, DatafactoryStatus.Succeeded, DatafactoryStatus.Cancelled};
     protected final Logger logger =
             LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
     private DataFactoryManager client;
@@ -58,7 +63,7 @@ public class DatafactoryHook {
     protected DataFactoryManager createClient() {
         final String AZURE_ACCESS_SUB_ID = PropertyUtils.getString(TaskConstants.AZURE_ACCESS_SUB_ID);
         final String AZURE_SECRET_TENANT_ID = PropertyUtils.getString(TaskConstants.AZURE_SECRET_TENANT_ID);
-        profile= new AzureProfile(AZURE_SECRET_TENANT_ID,AZURE_ACCESS_SUB_ID, AzureEnvironment.AZURE);
+        profile = new AzureProfile(AZURE_SECRET_TENANT_ID, AZURE_ACCESS_SUB_ID, AzureEnvironment.AZURE);
         credential = new DefaultAzureCredentialBuilder()
                 .authorityHost(profile.getEnvironment().getActiveDirectoryEndpoint())
                 .build();
@@ -68,7 +73,7 @@ public class DatafactoryHook {
     public Boolean startDatasyncTask(DatafactoryParameters parameters) {
         logger.info("initDatafactoryTask ......");
         PipelineResource pipelineResource = getPipelineResource(parameters);
-        if (pipelineResource==null) {
+        if (pipelineResource == null) {
             return false;
         }
         logger.info("startDatafactoryTask ......");
@@ -76,7 +81,7 @@ public class DatafactoryHook {
         if (StringUtils.isEmpty(run.runId())) {
             return false;
         }
-        runId=run.runId();
+        runId = run.runId();
         parameters.setRunId(runId);
         return true;
     }
@@ -86,8 +91,8 @@ public class DatafactoryHook {
         PipelineRuns pipelineRuns = client.pipelineRuns();
         try {
             pipelineRuns.cancel(parameters.getResourceGroupName(), parameters.getFactoryName(), parameters.getRunId());
-        } catch (RuntimeException e){
-            logger.error("failed to cancel datafactory task: "+e.getMessage());
+        } catch (RuntimeException e) {
+            logger.error("failed to cancel datafactory task: " + e.getMessage());
             return false;
         }
         return true;
@@ -97,9 +102,10 @@ public class DatafactoryHook {
         logger.info("queryDatasyncTaskStatus ......");
 
         PipelineRuns pipelineRuns = client.pipelineRuns();
-        PipelineRun pipelineRun = pipelineRuns.get(parameters.getResourceGroupName(), parameters.getFactoryName(), parameters.getRunId());
+        PipelineRun pipelineRun =
+                pipelineRuns.get(parameters.getResourceGroupName(), parameters.getFactoryName(), parameters.getRunId());
 
-        if (pipelineRun!=null) {
+        if (pipelineRun != null) {
             logger.info("queryDatasyncTaskStatus ......{}", pipelineRun.status());
             return DatafactoryStatus.valueOf(pipelineRun.status());
         }
@@ -107,7 +113,8 @@ public class DatafactoryHook {
     }
 
     private PipelineResource getPipelineResource(DatafactoryParameters parameters) {
-        return client.pipelines().get(parameters.getResourceGroupName(), parameters.getFactoryName(), parameters.getPipelineName());
+        return client.pipelines().get(parameters.getResourceGroupName(), parameters.getFactoryName(),
+                parameters.getPipelineName());
     }
 
     @SneakyThrows

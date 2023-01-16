@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum DatafactoryStatus {
+
     Queued,
     InProgress,
     Succeeded,
@@ -21,7 +22,6 @@ public enum DatafactoryStatus {
     DatafactoryStatus() {
     }
 
-
     private static final Map<String, DatafactoryStatus> CODE_MAP = new HashMap<>();
 
     static {
@@ -33,8 +33,9 @@ public enum DatafactoryStatus {
     public static DatafactoryStatus of(String status) {
         DatafactoryStatus taskExecutionStatus = CODE_MAP.get(status);
         if (taskExecutionStatus == null) {
-            throw new IllegalArgumentException(String.format("The data factory task execution status code: %s is invalidated",
-                    status));
+            throw new IllegalArgumentException(
+                    String.format("The data factory task execution status code: %s is invalidated",
+                            status));
         }
         return taskExecutionStatus;
     }

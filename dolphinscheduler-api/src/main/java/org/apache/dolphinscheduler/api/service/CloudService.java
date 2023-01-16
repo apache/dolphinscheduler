@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import com.azure.resourcemanager.datafactory.models.Factory;
-import org.apache.dolphinscheduler.api.dto.FavTaskDto;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.List;

@@ -21,14 +21,10 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.List;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Setter
 @Getter

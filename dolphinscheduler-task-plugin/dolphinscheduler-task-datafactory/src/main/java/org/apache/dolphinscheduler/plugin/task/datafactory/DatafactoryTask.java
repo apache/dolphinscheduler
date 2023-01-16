@@ -22,7 +22,6 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKN
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
 import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
 
-import lombok.Getter;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
@@ -34,6 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Collections;
 import java.util.List;
 
+import lombok.Getter;
 import lombok.Setter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -54,7 +54,6 @@ public class DatafactoryTask extends AbstractRemoteTask {
     private final TaskExecutionContext taskExecutionContext;
     private DatafactoryParameters parameters;
     private DatafactoryHook hook;
-
 
     public DatafactoryTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
