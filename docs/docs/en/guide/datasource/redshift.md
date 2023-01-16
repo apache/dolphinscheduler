@@ -2,7 +2,7 @@
 
 ## Datasource Parameters
 
-| **Datasource**          | **Description**                                             |
+|     **Datasource**      |                       **Description**                       |
 |-------------------------|-------------------------------------------------------------|
 | Datasource              | Select Redshift.                                            |
 | Datasource Name         | Enter the name of the datasource.                           |
