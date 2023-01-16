@@ -72,6 +72,7 @@ interface IDataSource {
   bindTestId?: number
   endpoint?: string
   MSIClientId?: string
+  dbUser?: string
 }
 
 interface ListReq {

@@ -54,7 +54,8 @@ export function useForm(id?: number) {
     testFlag: -1,
     bindTestId: undefined,
     endpoint: '',
-    MSIClientId: ''
+    MSIClientId: '',
+    dbUser: ''
   } as IDataSourceDetail
 
   const state = reactive({
@@ -88,6 +89,9 @@ export function useForm(id?: number) {
       port: {
         trigger: ['input'],
         validator() {
+          if (state.showMode && state.detailForm.mode === 'IAM-accessKey') {
+            return
+          }
           if (!state.detailForm.port && state.showPort) {
             return new Error(t('datasource.port_tips'))
           }
@@ -180,6 +184,18 @@ export function useForm(id?: number) {
           }
         }
       },
+      dbUser: {
+        trigger: ['input'],
+        validator() {
+          if (
+            !state.detailForm.dbUser &&
+            state.showMode &&
+            state.detailForm.mode === 'IAM-accessKey'
+          ) {
+            return new Error(t('datasource.IAM-accessKey'))
+          }
+        }
+      }
       // databaseUserName: {
       //   trigger: ['input'],
       //   validator() {
@@ -210,6 +226,16 @@ export function useForm(id?: number) {
         label: "accessToken",
         value: 'accessToken',
       },
+    ],
+    redShitModeOptions: [
+      {
+        label: 'password',
+        value: 'password'
+      },
+      {
+        label: 'IAM-accessKey',
+        value: 'IAM-accessKey'
+      }
     ]
   })
 
@@ -222,7 +248,7 @@ export function useForm(id?: number) {
     state.showHost = type !== 'ATHENA'
     state.showPort = type !== 'ATHENA'
     state.showAwsRegion = type === 'ATHENA'
-    state.showMode = type === 'AZURESQL'
+    state.showMode = ['AZURESQL', 'REDSHIFT'].includes(type)
 
     if (type === 'ORACLE' && !id) {
       state.detailForm.connectType = 'ORACLE_SERVICE_NAME'

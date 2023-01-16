@@ -49,7 +49,10 @@ public abstract class AbstractDataSourceProcessor implements DataSourceProcessor
 
     @Override
     public void checkDatasourceParam(BaseDataSourceParamDTO baseDataSourceParamDTO) {
-        checkHost(baseDataSourceParamDTO.getHost());
+        if (!baseDataSourceParamDTO.getType().equals(DbType.REDSHIFT)) {
+            // due to redshift use not regular hosts
+            checkHost(baseDataSourceParamDTO.getHost());
+        }
         checkDatabasePatter(baseDataSourceParamDTO.getDatabase());
         checkOther(baseDataSourceParamDTO.getOther());
     }
