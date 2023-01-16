@@ -18,6 +18,7 @@
 import { reactive, ref, SetupContext } from 'vue'
 import { useAsyncState } from '@vueuse/core'
 import { queryList } from '@/service/modules/queues'
+import { queryAllProjectList } from '@/service/modules/projects'
 import {
   verifyTenantCode,
   createTenant,

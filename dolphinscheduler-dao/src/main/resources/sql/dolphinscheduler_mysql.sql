@@ -312,6 +312,7 @@ CREATE TABLE `t_ds_alertgroup`(
   `description`    varchar(255) DEFAULT NULL,
   `create_time`    datetime     DEFAULT NULL COMMENT 'create time',
   `update_time`    datetime     DEFAULT NULL COMMENT 'update time',
+  `tenant_id` int(11) NOT NULL DEFAULT '-1' COMMENT 'tenant id',
   PRIMARY KEY (`id`),
   UNIQUE KEY `t_ds_alertgroup_name_un` (`group_name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
@@ -655,6 +656,7 @@ CREATE TABLE `t_ds_project` (
   `flag` tinyint(4) DEFAULT '1' COMMENT '0 not available, 1 available',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
+  `tenant_id` int(11) DEFAULT '-1' COMMENT 'tenant id',
   PRIMARY KEY (`id`),
   KEY `user_id_index` (`user_id`) USING BTREE,
   UNIQUE KEY `unique_name`(`name`),
@@ -993,6 +995,8 @@ CREATE TABLE `t_ds_worker_group` (
   `update_time` datetime NULL DEFAULT NULL COMMENT 'update time',
   `description` text NULL DEFAULT NULL COMMENT 'description',
   `other_params_json` text NULL DEFAULT NULL COMMENT 'other params json',
+  `tenant_id` int(11) NOT NULL,
+  `tenant_code` varchar(256) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name_unique` (`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
@@ -1057,6 +1061,7 @@ CREATE TABLE `t_ds_alert_plugin_instance` (
   `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `instance_name` varchar(200) DEFAULT NULL COMMENT 'alert instance name',
+  `tenant_id` int(11) NOT NULL DEFAULT '-1',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

@@ -16,33 +16,37 @@
  */
 
 import { useI18n } from 'vue-i18n'
-import { reactive, ref, SetupContext } from 'vue'
+import { onMounted, reactive, ref, SetupContext } from 'vue'
 import { useUserStore } from '@/store/user/user'
 import type { FormRules } from 'naive-ui'
+import { queryTenantList } from '@/service/modules/tenants'
 import type { UserInfoRes } from '@/service/modules/users/types'
 import { createProject, updateProject } from '@/service/modules/projects'
 
 export function useForm(
   props: any,
   ctx: SetupContext<('cancelModal' | 'confirmModal')[]>
-) {
+) 
+{
   const { t } = useI18n()
   const userStore = useUserStore()
 
   const resetForm = () => {
+    variables.tenantOptions=[],
     variables.model = {
       projectName: '',
       description: '',
-      userName: (userStore.getUserInfo as UserInfoRes).userName
+      tenantId: null
     }
   }
 
   const variables = reactive({
     projectFormRef: ref(),
+    tenantOptions:[] as { label: string; value: number }[],
     model: {
       projectName: '',
       description: '',
-      userName: (userStore.getUserInfo as UserInfoRes).userName
+      tenantId: null
     },
     saving: false,
     rules: {
@@ -55,12 +59,12 @@ export function useForm(
           }
         }
       },
-      userName: {
+      tenantCode: {
         required: true,
         trigger: ['input', 'blur'],
         validator() {
-          if (variables.model.userName === '') {
-            return new Error(t('project.list.username_tips'))
+          if (variables.model.tenantId === null) {
+            return new Error(t('project.list.tenant_tips'))
           }
         }
       }
@@ -75,6 +79,16 @@ export function useForm(
         return
       }
     })
+  }
+
+  const getTenants = async () => {
+    const result = await queryTenantList()
+    variables.tenantOptions = result.map(
+      (tenant: { tenantCode: string; id: number }) => ({
+        label: tenant.tenantCode,
+        value: tenant.id
+      })
+    )
   }
 
   const submitProjectModal = async () => {
@@ -103,5 +117,9 @@ export function useForm(
     }
   }
 
-  return { variables, t, handleValidate }
+  onMounted(async () => {
+      getTenants()
+  })
+
+  return { variables, t, handleValidate,getTenants }
 }

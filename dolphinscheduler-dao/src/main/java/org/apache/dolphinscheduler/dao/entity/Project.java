@@ -97,6 +97,12 @@ public class Project {
     @TableField(exist = false)
     private int instRunningCount;
 
+    @TableField(value = "tenant_id")
+    private Integer tenantId;
+
+    @TableField(exist = false)
+    private String tenantCode;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

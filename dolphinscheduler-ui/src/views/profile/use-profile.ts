@@ -34,12 +34,19 @@ export function useProfile() {
   })
   infoOptions.value.push({ key: t('profile.email'), value: userInfo.email })
   infoOptions.value.push({ key: t('profile.phone'), value: userInfo.phone })
+  let usertype;
+  if(userInfo.userType === 'ADMIN_USER')
+  {
+    usertype=t('profile.administrator')
+  }else if (userInfo.userType === 'PROJECT_ADMIN')
+  {
+    usertype=t('profile.project_admin')
+  }else{
+    usertype=t('profile.ordinary_user')
+  }
   infoOptions.value.push({
     key: t('profile.permission'),
-    value:
-      userInfo.userType === 'ADMIN_USER'
-        ? t('profile.administrator')
-        : t('profile.ordinary_user')
+    value: usertype
   })
   infoOptions.value.push({
     key: t('profile.create_time'),

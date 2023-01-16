@@ -45,6 +45,9 @@ public interface WorkerGroupMapper extends BaseMapper<WorkerGroup> {
     @Cacheable(sync = true, key = CACHE_KEY_VALUE_ALL)
     List<WorkerGroup> queryAllWorkerGroup();
 
+    @Cacheable(sync = true, key = CACHE_KEY_VALUE_ALL)
+    List<WorkerGroup> queryWorkerGroupByTenant(Integer tenantId);
+
     @CacheEvict(key = CACHE_KEY_VALUE_ALL)
     int deleteById(Integer id);
 

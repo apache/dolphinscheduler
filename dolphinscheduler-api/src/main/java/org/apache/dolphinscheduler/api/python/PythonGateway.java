@@ -419,7 +419,7 @@ public class PythonGateway {
         Project project;
         project = projectMapper.queryByName(name);
         if (project == null) {
-            projectService.createProject(user, name, desc);
+            projectService.createProject(user, name, desc, user.getTenantId());
         } else if (project.getUserId() != user.getId()) {
             ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), user.getId());
             if (projectUser == null) {
@@ -444,16 +444,17 @@ public class PythonGateway {
     }
 
     public Tenant createTenant(String tenantCode, String desc, String queueName) {
-        return tenantService.createTenantIfNotExists(tenantCode, desc, queueName, queueName);
+        return tenantService.createTenantIfNotExists(tenantCode, desc, queueName, queueName, 0);
     }
 
     public Tenant queryTenantByCode(String tenantCode) {
         return (Tenant) tenantService.queryByTenantCode(tenantCode).get(Constants.DATA_LIST);
     }
 
-    public void updateTenant(String userName, int id, String tenantCode, int queueId, String desc) throws Exception {
+    public void updateTenant(String userName, int id, String tenantCode, int queueId, int projectId,
+                             String desc) throws Exception {
         User user = usersService.queryUser(userName);
-        tenantService.updateTenant(user, id, tenantCode, queueId, desc);
+        tenantService.updateTenant(user, id, tenantCode, queueId, projectId, desc);
     }
 
     public void deleteTenantById(String userName, Integer tenantId) throws Exception {

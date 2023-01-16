@@ -159,42 +159,49 @@ public class UsersServiceTest {
         int tenantId = Integer.MAX_VALUE;
         String phone = "13456432345";
         int state = 1;
+        boolean isPojectAdmin = true;
         try {
             // userName error
             Map<String, Object> result =
-                    usersService.createUser(user, userName, userPassword, email, tenantId, phone, queueName, state);
+                    usersService.createUser(user, userName, userPassword, email, tenantId, phone, queueName, state,
+                            isPojectAdmin);
             logger.info(result.toString());
             Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
 
             userName = "userTest0001";
             userPassword = "userTest000111111111111111";
             // password error
-            result = usersService.createUser(user, userName, userPassword, email, tenantId, phone, queueName, state);
+            result = usersService.createUser(user, userName, userPassword, email, tenantId, phone, queueName, state,
+                    isPojectAdmin);
             logger.info(result.toString());
             Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
 
             userPassword = "userTest0001";
             email = "1q.com";
             // email error
-            result = usersService.createUser(user, userName, userPassword, email, tenantId, phone, queueName, state);
+            result = usersService.createUser(user, userName, userPassword, email, tenantId, phone, queueName, state,
+                    isPojectAdmin);
             logger.info(result.toString());
             Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
 
             email = "122222@qq.com";
             phone = "2233";
             // phone error
-            result = usersService.createUser(user, userName, userPassword, email, tenantId, phone, queueName, state);
+            result = usersService.createUser(user, userName, userPassword, email, tenantId, phone, queueName, state,
+                    isPojectAdmin);
             logger.info(result.toString());
             Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
 
             phone = "13456432345";
             // tenantId not exists
-            result = usersService.createUser(user, userName, userPassword, email, tenantId, phone, queueName, state);
+            result = usersService.createUser(user, userName, userPassword, email, tenantId, phone, queueName, state,
+                    isPojectAdmin);
             logger.info(result.toString());
             Assertions.assertEquals(Status.TENANT_NOT_EXIST, result.get(Constants.STATUS));
             // success
             Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
-            result = usersService.createUser(user, userName, userPassword, email, 1, phone, queueName, state);
+            result = usersService.createUser(user, userName, userPassword, email, 1, phone, queueName, state,
+                    isPojectAdmin);
             logger.info(result.toString());
             Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
@@ -575,6 +582,7 @@ public class UsersServiceTest {
     private User getLoginUser() {
         User loginUser = new User();
         loginUser.setId(1);
+        loginUser.setTenantId(1);
         loginUser.setUserType(UserType.ADMIN_USER);
         return loginUser;
     }
@@ -583,6 +591,7 @@ public class UsersServiceTest {
     public void getUserInfo() {
         User loginUser = new User();
         loginUser.setUserName("admin");
+        loginUser.setTenantId(1);
         loginUser.setUserType(UserType.ADMIN_USER);
         // get admin user
         Map<String, Object> result = usersService.getUserInfo(loginUser);
@@ -596,7 +605,7 @@ public class UsersServiceTest {
         loginUser.setUserType(null);
         loginUser.setId(1);
         when(userMapper.queryDetailsById(1)).thenReturn(getGeneralUser());
-        when(alertGroupMapper.queryByUserId(1)).thenReturn(getAlertGroups());
+        when(alertGroupMapper.queryByTenantId(loginUser.getTenantId())).thenReturn(getAlertGroups());
         result = usersService.getUserInfo(loginUser);
         logger.info(result.toString());
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
@@ -674,32 +683,34 @@ public class UsersServiceTest {
         String userPassword = "userTest";
         String repeatPassword = "userTest";
         String email = "123@qq.com";
+        boolean isProjectAdmin = true;
         try {
             // userName error
-            Map<String, Object> result = usersService.registerUser(userName, userPassword, repeatPassword, email);
+            Map<String, Object> result =
+                    usersService.registerUser(userName, userPassword, repeatPassword, email, isProjectAdmin);
             Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
 
             userName = "userTest0002";
             userPassword = "userTest000111111111111111";
             // password error
-            result = usersService.registerUser(userName, userPassword, repeatPassword, email);
+            result = usersService.registerUser(userName, userPassword, repeatPassword, email, isProjectAdmin);
             Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
 
             userPassword = "userTest0002";
             email = "1q.com";
             // email error
-            result = usersService.registerUser(userName, userPassword, repeatPassword, email);
+            result = usersService.registerUser(userName, userPassword, repeatPassword, email, isProjectAdmin);
             Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
 
             // repeatPassword error
             email = "7400@qq.com";
             repeatPassword = "userPassword";
-            result = usersService.registerUser(userName, userPassword, repeatPassword, email);
+            result = usersService.registerUser(userName, userPassword, repeatPassword, email, isProjectAdmin);
             Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
 
             // success
             repeatPassword = "userTest0002";
-            result = usersService.registerUser(userName, userPassword, repeatPassword, email);
+            result = usersService.registerUser(userName, userPassword, repeatPassword, email, isProjectAdmin);
             Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
         } catch (Exception e) {
@@ -786,6 +797,7 @@ public class UsersServiceTest {
         String phone = "17366666666";
         String tenantCode = "tenantCode";
         int stat = 1;
+        boolean isPojectAdmin = true;
 
         // User exists
         Mockito.when(userMapper.existUser(userName)).thenReturn(true);

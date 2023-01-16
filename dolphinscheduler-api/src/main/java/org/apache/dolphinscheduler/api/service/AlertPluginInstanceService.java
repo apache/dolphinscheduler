@@ -72,14 +72,14 @@ public interface AlertPluginInstanceService {
      *
      * @return alert plugins
      */
-    Map<String, Object> queryAll();
+    Map<String, Object> queryAll(User loginUser);
 
     /**
      * checkExistPluginInstanceName
      * @param pluginName plugin name
      * @return isExist
      */
-    boolean checkExistPluginInstanceName(String pluginName);
+    boolean checkExistPluginInstanceName(String pluginName, User loginUser);
 
     /**
      * queryPluginPage

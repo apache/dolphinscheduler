@@ -123,11 +123,11 @@ const AlarmInstanceManage = defineComponent({
           {{
             default: () => (
               <NSpace justify='space-between'>
-                {IS_ADMIN && (
+                {
                   <NButton onClick={onCreate} type='primary' size='small'>
                     {t('security.alarm_instance.create_alarm_instance')}
                   </NButton>
-                )}
+                }
                 <NSpace justify='end' wrap={false}>
                   <Search
                     v-model:value={this.searchVal}
@@ -166,7 +166,7 @@ const AlarmInstanceManage = defineComponent({
             </NSpace>
           </NSpace>
         </Card>
-        {IS_ADMIN && (
+        { (
           <DetailModal
             show={showDetailModal}
             currentRecord={currentRecord}

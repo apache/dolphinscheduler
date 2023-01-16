@@ -105,6 +105,8 @@ public class TenantServiceTest {
     private static final String queue = "queue";
     private static final String queueName = "queue_name";
 
+    private int projectId = 1;
+
     @Test
     public void testCreateTenant() throws Exception {
 
@@ -190,15 +192,16 @@ public class TenantServiceTest {
 
         // update not exists tenant
         Throwable exception = Assertions.assertThrows(ServiceException.class,
-                () -> tenantService.updateTenant(getLoginUser(), 912222, tenantCode, 1, tenantDesc));
+                () -> tenantService.updateTenant(getLoginUser(), 912222, tenantCode, 1, projectId, tenantDesc));
         Assertions.assertEquals(Status.TENANT_NOT_EXIST.getMsg(), exception.getMessage());
 
         // success
-        Map<String, Object> result = tenantService.updateTenant(getLoginUser(), 1, tenantCode, 1, tenantDesc);
+        Map<String, Object> result =
+                tenantService.updateTenant(getLoginUser(), 1, tenantCode, 1, projectId, tenantDesc);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
         // success update with same tenant code
-        result = tenantService.updateTenant(getLoginUser(), 1, tenantCode, 1, tenantDesc);
+        result = tenantService.updateTenant(getLoginUser(), 1, tenantCode, 1, projectId, tenantDesc);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
@@ -268,14 +271,14 @@ public class TenantServiceTest {
         // Tenant exists
         Mockito.when(tenantMapper.existTenant(tenantCode)).thenReturn(true);
         Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(getTenant());
-        tenant = tenantService.createTenantIfNotExists(tenantCode, tenantDesc, queue, queueName);
+        tenant = tenantService.createTenantIfNotExists(tenantCode, tenantDesc, queue, queueName, projectId);
         Assertions.assertEquals(getTenant(), tenant);
 
         // Tenant not exists
         Mockito.when(tenantMapper.existTenant(tenantCode)).thenReturn(false);
         Mockito.when(queueService.createQueueIfNotExists(queue, queueName)).thenReturn(getQueue());
-        tenant = tenantService.createTenantIfNotExists(tenantCode, tenantDesc, queue, queueName);
-        Assertions.assertEquals(new Tenant(tenantCode, tenantDesc, getQueue().getId()), tenant);
+        tenant = tenantService.createTenantIfNotExists(tenantCode, tenantDesc, queue, queueName, projectId);
+        Assertions.assertEquals(new Tenant(tenantCode, tenantDesc, getQueue().getId(), projectId), tenant);
     }
 
     /**

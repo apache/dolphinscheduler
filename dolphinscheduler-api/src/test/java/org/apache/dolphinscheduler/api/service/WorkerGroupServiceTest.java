@@ -92,6 +92,8 @@ public class WorkerGroupServiceTest {
 
     private final String GROUP_NAME = "testWorkerGroup";
 
+    private int tenantId = 1;
+
     private User getLoginUser() {
         User loginUser = new User();
         loginUser.setUserType(UserType.GENERAL_USER);
@@ -108,7 +110,8 @@ public class WorkerGroupServiceTest {
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
                 baseServiceLogger)).thenReturn(false);
         Map<String, Object> result =
-                workerGroupService.saveWorkerGroup(loginUser, 1, GROUP_NAME, "localhost:0000", "test group", "");
+                workerGroupService.saveWorkerGroup(loginUser, 1, GROUP_NAME, "localhost:0000", "test group", "",
+                        this.tenantId);
         Assertions.assertEquals(Status.USER_NO_OPERATION_PERM.getCode(),
                 ((Status) result.get(Constants.STATUS)).getCode());
     }
@@ -121,7 +124,8 @@ public class WorkerGroupServiceTest {
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
                 baseServiceLogger)).thenReturn(true);
         Map<String, Object> result =
-                workerGroupService.saveWorkerGroup(loginUser, 1, "", "localhost:0000", "test group", "");
+                workerGroupService.saveWorkerGroup(loginUser, 1, "", "localhost:0000", "test group", "",
+                        this.tenantId);
         Assertions.assertEquals(Status.NAME_NULL.getCode(),
                 ((Status) result.get(Constants.STATUS)).getCode());
     }
@@ -139,7 +143,8 @@ public class WorkerGroupServiceTest {
         Mockito.when(workerGroupMapper.queryWorkerGroupByName(GROUP_NAME)).thenReturn(workerGroupList);
 
         Map<String, Object> result =
-                workerGroupService.saveWorkerGroup(loginUser, 1, GROUP_NAME, "localhost:0000", "test group", "");
+                workerGroupService.saveWorkerGroup(loginUser, 1, GROUP_NAME, "localhost:0000", "test group", "",
+                        this.tenantId);
         Assertions.assertEquals(Status.NAME_EXIST.getCode(),
                 ((Status) result.get(Constants.STATUS)).getCode());
     }
@@ -158,7 +163,8 @@ public class WorkerGroupServiceTest {
         Mockito.when(registryClient.getServerMaps(NodeType.WORKER)).thenReturn(serverMaps);
 
         Map<String, Object> result =
-                workerGroupService.saveWorkerGroup(loginUser, 1, GROUP_NAME, "localhost:0000", "test group", "");
+                workerGroupService.saveWorkerGroup(loginUser, 1, GROUP_NAME, "localhost:0000", "test group", "",
+                        this.tenantId);
         Assertions.assertEquals(Status.WORKER_ADDRESS_INVALID.getCode(),
                 ((Status) result.get(Constants.STATUS)).getCode());
     }
@@ -179,7 +185,8 @@ public class WorkerGroupServiceTest {
         Mockito.when(workerGroupMapper.insert(any())).thenReturn(1);
 
         Map<String, Object> result =
-                workerGroupService.saveWorkerGroup(loginUser, 1, GROUP_NAME, "localhost:0000", "test group", "");
+                workerGroupService.saveWorkerGroup(loginUser, 1, GROUP_NAME, "localhost:0000", "test group", "",
+                        this.tenantId);
         Assertions.assertEquals(Status.SUCCESS.getCode(),
                 ((Status) result.get(Constants.STATUS)).getCode());
     }

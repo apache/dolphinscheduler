@@ -59,10 +59,16 @@ export function useColumns(onCallback: Function) {
       {
         title: t('security.user.user_type'),
         key: 'userType',
-        render: (rowData: InternalRowData) =>
-          rowData.userType === 'GENERAL_USER'
-            ? t('security.user.ordinary_user')
-            : t('security.user.administrator'),
+        render: (rowData: InternalRowData) =>{
+          if(rowData.userType === 'PROJECT_ADMIN')
+          {
+            return t('security.user.project_admin');
+          }else if(rowData.userType === 'GENERAL_USER')
+          {
+            return t('security.user.administrator');
+          }else{
+            return t('security.user.ordinary_user');
+          }},
         ...COLUMN_WIDTH_CONFIG['type']
       },
       {

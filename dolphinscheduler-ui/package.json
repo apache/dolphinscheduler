@@ -20,6 +20,7 @@
     "lodash": "^4.17.21",
     "monaco-editor": "^0.34.0",
     "naive-ui": "2.33.5",
+    "node-sass": "^8.0.0",
     "nprogress": "^0.2.0",
     "pinia": "^2.0.22",
     "pinia-plugin-persistedstate": "^2.2.0",
@@ -28,7 +29,8 @@
     "vfonts": "^0.0.3",
     "vue": "^3.2.39",
     "vue-i18n": "^9.2.2",
-    "vue-router": "^4.1.5"
+    "vue-router": "^4.1.5",
+    "vueuc": "^0.4.49"
   },
   "devDependencies": {
     "@types/js-cookie": "^3.0.2",

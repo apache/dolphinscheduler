@@ -27,6 +27,7 @@ export default {
   update_time: 'Update Time',
   administrator: 'Administrator',
   ordinary_user: 'Ordinary User',
+  project_admin: 'Project_admin',
   edit_profile: 'Edit Profile',
   username_tips: 'Please enter your username',
   email_tips: 'Please enter your email',

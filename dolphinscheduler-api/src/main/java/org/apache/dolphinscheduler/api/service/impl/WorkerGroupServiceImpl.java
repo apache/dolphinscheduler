@@ -28,15 +28,18 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.thread.RequestContext;
 import org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
+import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -89,6 +92,9 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     @Autowired
     private ScheduleMapper scheduleMapper;
 
+    @Autowired
+    private TenantMapper tenantMapper;
+
     /**
      * create or update a worker group
      *
@@ -101,7 +107,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     @Override
     @Transactional
     public Map<String, Object> saveWorkerGroup(User loginUser, int id, String name, String addrList, String description,
-                                               String otherParamsJson) {
+                                               String otherParamsJson, int tenantId) {
         Map<String, Object> result = new HashMap<>();
         if (!canOperatorPermissions(loginUser, null, AuthorizationType.WORKER_GROUP, WORKER_GROUP_CREATE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
@@ -125,6 +131,9 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         workerGroup.setAddrList(addrList);
         workerGroup.setUpdateTime(now);
         workerGroup.setDescription(description);
+        workerGroup.setTenantId(tenantId);
+        Tenant tenant = this.tenantMapper.queryById(tenantId);
+        workerGroup.setTenantCode(tenant.getTenantCode());
 
         if (checkWorkerGroupNameExists(workerGroup)) {
             logger.warn("Worker group with the same name already exists, name:{}.", workerGroup.getName());
@@ -214,14 +223,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         int toIndex = (pageNo - 1) * pageSize + pageSize;
 
         Result result = new Result();
-        List<WorkerGroup> workerGroups;
-        if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
-            workerGroups = getWorkerGroups(null);
-        } else {
-            Set<Integer> ids = resourcePermissionCheckService
-                    .userOwnedResourceIdsAcquisition(AuthorizationType.WORKER_GROUP, loginUser.getId(), logger);
-            workerGroups = getWorkerGroups(ids.isEmpty() ? Collections.emptyList() : new ArrayList<>(ids));
-        }
+        List<WorkerGroup> workerGroups = this.getWorkerGroups();
         List<WorkerGroup> resultDataList = new ArrayList<>();
         int total = 0;
 
@@ -264,14 +266,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     @Override
     public Map<String, Object> queryAllGroup(User loginUser) {
         Map<String, Object> result = new HashMap<>();
-        List<WorkerGroup> workerGroups;
-        if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
-            workerGroups = getWorkerGroups(null);
-        } else {
-            Set<Integer> ids = resourcePermissionCheckService
-                    .userOwnedResourceIdsAcquisition(AuthorizationType.WORKER_GROUP, loginUser.getId(), logger);
-            workerGroups = getWorkerGroups(ids.isEmpty() ? Collections.emptyList() : new ArrayList<>(ids));
-        }
+        List<WorkerGroup> workerGroups = this.getWorkerGroups();
         List<String> availableWorkerGroupList = workerGroups.stream()
                 .map(WorkerGroup::getName)
                 .collect(Collectors.toList());
@@ -285,13 +280,16 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
      *
      * @return WorkerGroup list
      */
-    private List<WorkerGroup> getWorkerGroups(List<Integer> ids) {
+    private List<WorkerGroup> getWorkerGroups() {
         // worker groups from database
-        List<WorkerGroup> workerGroups;
-        if (ids != null) {
-            workerGroups = ids.isEmpty() ? new ArrayList<>() : workerGroupMapper.selectBatchIds(ids);
+        List<WorkerGroup> workerGroups = null;
+
+        User user = RequestContext.getLoginUser();
+        System.out.println("user type:" + user.getUserType());
+        if (user.getUserType() == UserType.ADMIN_USER) {
+            workerGroups = this.workerGroupMapper.queryAllWorkerGroup();
         } else {
-            workerGroups = workerGroupMapper.queryAllWorkerGroup();
+            workerGroups = this.workerGroupMapper.queryWorkerGroupByTenant(user.getTenantId());
         }
         Optional<Boolean> containDefaultWorkerGroups = workerGroups.stream()
                 .map(workerGroup -> Constants.DEFAULT_WORKER_GROUP.equals(workerGroup.getName())).findAny();

@@ -65,7 +65,7 @@ const TenantModal = defineComponent({
     watch(
       () => props.showModalRef,
       () => {
-        props.showModalRef && getListData(props.statusRef)
+        props.showModalRef && getListData(props.statusRef) 
       }
     )
 
@@ -81,6 +81,7 @@ const TenantModal = defineComponent({
           variables.model.tenantCode = props.row.tenantCode
           variables.model.queueId = props.row.queueId
           variables.model.description = props.row.description
+
         }
       }
     )

@@ -37,6 +37,7 @@ import static java.util.stream.Collectors.toSet;
 
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.thread.RequestContext;
 import org.apache.dolphinscheduler.dao.entity.AccessToken;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
@@ -110,6 +111,10 @@ public class ResourcePermissionCheckServiceImpl
     @Override
     public boolean resourcePermissionCheck(Object authorizationType, Object[] needChecks, Integer userId,
                                            Logger logger) {
+        User user = RequestContext.getLoginUser();
+        if (user.getUserType() == UserType.ADMIN_USER) {
+            return true;
+        }
         if (Objects.nonNull(needChecks) && needChecks.length > 0) {
             Set<?> originResSet = new HashSet<>(Arrays.asList(needChecks));
             Set<?> ownResSets = RESOURCE_LIST_MAP.get(authorizationType).listAuthorizedResource(userId, logger);
@@ -209,7 +214,8 @@ public class ResourcePermissionCheckServiceImpl
 
         @Override
         public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
-            return projectMapper.listAuthorizedProjects(userId, null).stream().map(Project::getId).collect(toSet());
+            return projectMapper.queryProjectByTenantId(((User) RequestContext.getLoginUser()).getTenantId()).stream()
+                    .map(Project::getId).collect(toSet());
         }
     }
 
@@ -401,6 +407,10 @@ public class ResourcePermissionCheckServiceImpl
 
         @Override
         public boolean permissionCheck(int userId, String url, Logger logger) {
+            User user = RequestContext.getLoginUser();
+            if (user.getUserType() == UserType.ADMIN_USER || user.getUserType() == UserType.PROJECT_ADMIN) {
+                return true;
+            }
             return false;
         }
 
@@ -434,7 +444,8 @@ public class ResourcePermissionCheckServiceImpl
 
         @Override
         public Set<Integer> listAuthorizedResource(int userId, Logger logger) {
-            List<AlertGroup> alertGroupList = alertGroupMapper.queryAllGroupList();
+            List<AlertGroup> alertGroupList =
+                    alertGroupMapper.queryByTenantId(((User) RequestContext.getLoginUser()).getTenantId());
             return alertGroupList.stream().map(AlertGroup::getId).collect(toSet());
         }
     }

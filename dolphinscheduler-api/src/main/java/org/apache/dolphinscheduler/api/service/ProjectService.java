@@ -36,7 +36,7 @@ public interface ProjectService {
      * @param desc description
      * @return returns an error if it exists
      */
-    Result createProject(User loginUser, String name, String desc);
+    Result createProject(User loginUser, String name, String desc, int tenantId);
 
     /**
      * query project details by code
@@ -163,14 +163,6 @@ public interface ProjectService {
      * @return users        who have permission for the specified project
      */
     Result queryAuthorizedUser(User loginUser, Long projectCode);
-
-    /**
-     * query authorized project
-     *
-     * @param loginUser login user
-     * @return projects which the user have permission to see, Except for items created by this user
-     */
-    Map<String, Object> queryProjectCreatedByUser(User loginUser);
 
     /**
      * query all project list that have one or more process definitions.

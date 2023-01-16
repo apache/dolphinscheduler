@@ -53,6 +53,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -102,7 +103,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      */
     @Override
     @Transactional
-    public Result createProject(User loginUser, String name, String desc) {
+    public Result createProject(User loginUser, String name, String desc, int tenantId) {
         Result result = new Result();
 
         checkDesc(result, desc);
@@ -130,6 +131,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
                     .code(CodeGenerateUtils.getInstance().genCode())
                     .description(desc)
                     .userId(loginUser.getId())
+                    .tenantId(tenantId)
                     .userName(loginUser.getUserName())
                     .createTime(now)
                     .updateTime(now)
@@ -273,17 +275,10 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
                 return true;
             }
             // case 2: user is project owner
-            if (project.getUserId().equals(loginUser.getId())) {
+            if (project.getTenantId().equals(loginUser.getTenantId())) {
                 return true;
             }
             // case 3: check user permission level
-            ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), loginUser.getId());
-            if (projectUser == null || projectUser.getPerm() != Constants.DEFAULT_ADMIN_PERMISSION) {
-                putMsg(result, Status.USER_NO_WRITE_PROJECT_PERM, loginUser.getUserName(), project.getCode());
-                checkResult = false;
-            } else {
-                checkResult = true;
-            }
         }
         return checkResult;
     }
@@ -299,17 +294,8 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             if (loginUser.getUserType() == UserType.ADMIN_USER) {
                 return true;
             }
-            // case 2: user is project owner
-            if (project.getUserId().equals(loginUser.getId())) {
+            if (project.getTenantId().equals(loginUser.getTenantId())) {
                 return true;
-            }
-            // case 3: check user permission level
-            ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), loginUser.getId());
-            if (projectUser == null || projectUser.getPerm() != Constants.DEFAULT_ADMIN_PERMISSION) {
-                putMsg(result, Status.USER_NO_WRITE_PROJECT_PERM, loginUser.getUserName(), project.getCode());
-                checkResult = false;
-            } else {
-                checkResult = true;
             }
         }
         return checkResult;
@@ -346,8 +332,15 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         Result result = new Result();
         PageInfo<Project> pageInfo = new PageInfo<>(pageNo, pageSize);
         Page<Project> page = new Page<>(pageNo, pageSize);
-        Set<Integer> projectIds = resourcePermissionCheckService
-                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), logger);
+        Set<Integer> projectIds = null;
+        if (loginUser.getUserType() == UserType.ADMIN_USER) {
+            List<Project> list = this.projectMapper.queryAllProject(0);
+            projectIds = list.stream().map(Project::getId).collect(Collectors.toSet());
+        } else {
+            projectIds = resourcePermissionCheckService
+                    .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), logger);
+        }
+
         if (projectIds.isEmpty()) {
             result.setData(pageInfo);
             putMsg(result, Status.SUCCESS);
@@ -675,23 +668,6 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     }
 
     /**
-     * query authorized project
-     *
-     * @param loginUser login user
-     * @return projects which the user have permission to see, Except for items created by this user
-     */
-    @Override
-    public Map<String, Object> queryProjectCreatedByUser(User loginUser) {
-        Map<String, Object> result = new HashMap<>();
-
-        List<Project> projects = projectMapper.queryProjectCreatedByUser(loginUser.getId());
-        result.put(Constants.DATA_LIST, projects);
-        putMsg(result, Status.SUCCESS);
-
-        return result;
-    }
-
-    /**
      * query authorized and user create project list by user
      *
      * @param loginUser login user
@@ -763,8 +739,10 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     @Override
     public Result queryAllProjectList(User user) {
         Result result = new Result();
+
+        Integer id = user.getUserType() == UserType.ADMIN_USER ? 0 : user.getId();
         List<Project> projects =
-                projectMapper.queryAllProject(user.getUserType() == UserType.ADMIN_USER ? 0 : user.getId());
+                projectMapper.queryAllProject(id);
 
         result.setData(projects);
         putMsg(result, Status.SUCCESS);

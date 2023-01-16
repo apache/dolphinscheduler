@@ -22,6 +22,7 @@ import {
   queryWorkerAddressList,
   saveWorkerGroup
 } from '@/service/modules/worker-groups'
+import { queryTenantList } from '@/service/modules/tenants'
 
 export function useModal(
   props: any,
@@ -35,8 +36,11 @@ export function useModal(
       id: ref<number>(-1),
       name: ref(''),
       addrList: ref<Array<number>>([]),
-      generalOptions: []
+      generalOptions: [],
+      tenantId: null,
+      tenantOptions:[]
     },
+    tenants: [] as { label: string; value: number }[],
     saving: false,
     rules: {
       name: {
@@ -78,6 +82,19 @@ export function useModal(
     return state
   }
 
+  const getTenants = async () => {
+    const result = await queryTenantList()
+    variables.model.tenantOptions = result.map(
+      (tenant: { tenantCode: string; id: number }) => ({
+        label: tenant.tenantCode,
+        value: tenant.id
+      })
+    )
+    if (variables.model.tenantOptions.length) {
+      variables.model.tenantId = variables.model.tenantOptions[0].value;
+    }
+  }
+
   const handleValidate = async (statusRef: number) => {
     await variables.workerGroupFormRef.validate()
 
@@ -98,12 +115,14 @@ export function useModal(
   const submitWorkerGroupModal = () => {
     const data = {
       name: variables.model.name,
-      addrList: variables.model.addrList.toString()
+      addrList: variables.model.addrList.toString(),
+      tenantId: variables.model.tenantId
     }
 
     saveWorkerGroup(data).then(() => {
       variables.model.name = ''
-      variables.model.addrList = []
+      variables.model.addrList = [],
+      variables.model.tenantId= null
       ctx.emit('confirmModal', props.showModalRef)
     })
   }
@@ -112,7 +131,8 @@ export function useModal(
     const data = {
       id: variables.model.id,
       name: variables.model.name,
-      addrList: variables.model.addrList.toString()
+      addrList: variables.model.addrList.toString(),
+      tenantId: variables.model.tenantId
     }
 
     saveWorkerGroup(data).then(() => {
@@ -123,6 +143,7 @@ export function useModal(
   return {
     variables,
     handleValidate,
-    getListData
+    getListData,
+    getTenants
   }
 }

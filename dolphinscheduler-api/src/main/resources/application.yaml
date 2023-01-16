@@ -196,3 +196,15 @@ spring:
   quartz:
     properties:
       org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+
+
+resource:
+  storage:
+    type: OSS
+  alibaba:
+    cloud:
+      region: ds-obs.oss-cn-guangzhou.aliyuncs.com
+      access:
+        key:
+          id: LTAI5tARbNtDn5gfTvS9dGN3
+          secret: htJK6xyji2kT5M7bnft3V096e2zOl5

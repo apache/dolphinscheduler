@@ -134,10 +134,10 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     /**
      * create tenant
      *
-     * @param loginUser login user
+     * @param loginUser  login user
      * @param tenantCode tenant code
-     * @param queueId queue id
-     * @param desc description
+     * @param queueId    queue id
+     * @param desc       description
      * @return create result code
      * @throws Exception exception
      */
@@ -215,7 +215,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      * @throws Exception exception
      */
     @Override
-    public Map<String, Object> updateTenant(User loginUser, int id, String tenantCode, int queueId,
+    public Map<String, Object> updateTenant(User loginUser, int id, String tenantCode, int queueId, int projectId,
                                             String desc) throws Exception {
 
         Map<String, Object> result = new HashMap<>();
@@ -394,7 +394,8 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      * @return Tenant object
      */
     @Override
-    public Tenant createTenantIfNotExists(String tenantCode, String desc, String queue, String queueName) {
+    public Tenant createTenantIfNotExists(String tenantCode, String desc, String queue, String queueName,
+                                          int projectId) {
         if (checkTenantExists(tenantCode)) {
             return tenantMapper.queryByTenantCode(tenantCode);
         }

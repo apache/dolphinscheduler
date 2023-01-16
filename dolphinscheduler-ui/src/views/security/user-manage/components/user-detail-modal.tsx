@@ -72,6 +72,13 @@ export const UserModal = defineComponent({
       () => props.show,
       () => {
         if (props.show && props.currentRecord?.id) {
+
+          if(props.currentRecord.userType=="PROJECT_ADMIN")
+          {
+            props.currentRecord.isProjectAdmin=1
+          }else{
+            props.currentRecord.isProjectAdmin=0
+          }
           onSetValues(props.currentRecord)
         }
       }
@@ -173,6 +180,19 @@ export const UserModal = defineComponent({
           </NFormItem>
           <NFormItem label={t('security.user.state')} path='state'>
             <NRadioGroup v-model:value={this.formData.state}>
+              <NSpace>
+                <NRadio value={1} class='radio-state-enable'>
+                  {this.t('security.user.enable')}
+                </NRadio>
+                <NRadio value={0} class='radio-state-disable'>
+                  {this.t('security.user.disable')}
+                </NRadio>
+              </NSpace>
+            </NRadioGroup>
+          </NFormItem>
+
+          <NFormItem label={t('security.user.project_admin')} path='project_admin'>
+            <NRadioGroup v-model:value={this.formData.isProjectAdmin}>
               <NSpace>
                 <NRadio value={1} class='radio-state-enable'>
                   {this.t('security.user.enable')}

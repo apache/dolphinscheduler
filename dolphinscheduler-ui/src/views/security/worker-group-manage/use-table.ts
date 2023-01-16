@@ -68,6 +68,10 @@ export function useTable() {
           })
       },
       {
+        title: t('security.user.tenant_code'),
+        key: 'tenantCode'
+      },
+      {
         title: t('security.worker_group.create_time'),
         key: 'createTime'
       },

@@ -93,13 +93,15 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
         alertPluginInstance.setPluginInstanceParams(paramsMapJson);
         alertPluginInstance.setInstanceName(instanceName);
         alertPluginInstance.setPluginDefineId(pluginDefineId);
+        alertPluginInstance.setTenantId(loginUser.getTenantId());
 
         Map<String, Object> result = new HashMap<>();
         if (!canOperatorPermissions(loginUser, null, AuthorizationType.ALERT_PLUGIN_INSTANCE, ALART_INSTANCE_CREATE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
-        if (alertPluginInstanceMapper.existInstanceName(alertPluginInstance.getInstanceName()) == Boolean.TRUE) {
+        if (alertPluginInstanceMapper.existInstanceName(alertPluginInstance.getInstanceName(),
+                loginUser.getTenantId()) == Boolean.TRUE) {
             logger.error("Plugin instance with the same name already exists, name:{}.",
                     alertPluginInstance.getInstanceName());
             putMsg(result, Status.PLUGIN_INSTANCE_ALREADY_EXISTS);
@@ -132,7 +134,8 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
 
         String paramsMapJson = parsePluginParamsMap(pluginInstanceParams);
         AlertPluginInstance alertPluginInstance =
-                new AlertPluginInstance(pluginInstanceId, paramsMapJson, instanceName, new Date());
+                new AlertPluginInstance(pluginInstanceId, paramsMapJson, instanceName, new Date(),
+                        loginUser.getTenantId());
 
         Map<String, Object> result = new HashMap<>();
 
@@ -211,9 +214,10 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
     }
 
     @Override
-    public Map<String, Object> queryAll() {
+    public Map<String, Object> queryAll(User loginUser) {
         Map<String, Object> result = new HashMap<>();
-        List<AlertPluginInstance> alertPluginInstances = alertPluginInstanceMapper.queryAllAlertPluginInstanceList();
+        List<AlertPluginInstance> alertPluginInstances =
+                alertPluginInstanceMapper.queryAllAlertPluginInstanceList(loginUser.getTenantId());
         List<AlertPluginInstanceVO> alertPluginInstanceVOS = buildPluginInstanceVOList(alertPluginInstances);
         if (null != alertPluginInstances) {
             putMsg(result, Status.SUCCESS);
@@ -223,8 +227,8 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
     }
 
     @Override
-    public boolean checkExistPluginInstanceName(String pluginInstanceName) {
-        return alertPluginInstanceMapper.existInstanceName(pluginInstanceName) == Boolean.TRUE;
+    public boolean checkExistPluginInstanceName(String pluginInstanceName, User loginUser) {
+        return alertPluginInstanceMapper.existInstanceName(pluginInstanceName, loginUser.getTenantId()) == Boolean.TRUE;
     }
 
     @Override
@@ -233,7 +237,7 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
         Result result = new Result();
         Page<AlertPluginInstance> page = new Page<>(pageNo, pageSize);
         IPage<AlertPluginInstance> alertPluginInstanceIPage =
-                alertPluginInstanceMapper.queryByInstanceNamePage(page, searchVal);
+                alertPluginInstanceMapper.queryByInstanceNamePage(page, searchVal, loginUser.getTenantId());
 
         PageInfo<AlertPluginInstanceVO> pageInfo = new PageInfo<>(pageNo, pageSize);
         pageInfo.setTotal((int) alertPluginInstanceIPage.getTotal());

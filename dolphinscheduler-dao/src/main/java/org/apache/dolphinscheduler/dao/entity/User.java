@@ -45,7 +45,7 @@ public class User {
 
     private UserType userType;
 
-    private int tenantId;
+    private Integer tenantId;
 
     private int state;
 

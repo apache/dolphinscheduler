@@ -55,14 +55,20 @@ router.beforeEach(
     NProgress.start()
     const userStore = useUserStore()
     const metaData: metaData = to.meta
+    console.log((userStore.getUserInfo as UserInfoRes).userType)
+    console.log(metaData)
     if (
-      metaData.auth?.includes('ADMIN_USER') &&
-      (userStore.getUserInfo as UserInfoRes).userType !== 'ADMIN_USER' &&
-      metaData.activeMenu === 'security'
-    ) {
+      (userStore.getUserInfo as UserInfoRes).userType == 'GENERAL_USER' &&
+      metaData.activeMenu === 'security') {
       to.fullPath = '/security/token-manage'
       next({ name: 'token-manage' })
-    } else {
+    }else if((userStore.getUserInfo as UserInfoRes).userType == 'PROJECT_ADMIN' &&
+      metaData.activeMenu === 'security'){
+      next()
+    }else if((userStore.getUserInfo as UserInfoRes).userType == 'ADMIN_USER' &&
+    metaData.activeMenu === 'resource'){
+    next()
+  } else {
       next()
     }
 

@@ -77,6 +77,7 @@ public class TenantController extends BaseController {
     @Parameters({
             @Parameter(name = "tenantCode", description = "TENANT_CODE", required = true, schema = @Schema(implementation = String.class)),
             @Parameter(name = "queueId", description = "QUEUE_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "projectId", description = "PROJECT_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
             @Parameter(name = "description", description = "TENANT_DESC", schema = @Schema(implementation = String.class))
     })
     @PostMapping()
@@ -156,6 +157,7 @@ public class TenantController extends BaseController {
             @Parameter(name = "id", description = "TENANT_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
             @Parameter(name = "tenantCode", description = "TENANT_CODE", required = true, schema = @Schema(implementation = String.class)),
             @Parameter(name = "queueId", description = "QUEUE_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "projectId", description = "PROJECT_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
             @Parameter(name = "description", description = "TENANT_DESC", schema = @Schema(implementation = String.class))
     })
     @PutMapping(value = "/{id}")
@@ -166,9 +168,11 @@ public class TenantController extends BaseController {
                                @PathVariable(value = "id") int id,
                                @RequestParam(value = "tenantCode") String tenantCode,
                                @RequestParam(value = "queueId") int queueId,
+                               @RequestParam(value = "projectId") int projectId,
                                @RequestParam(value = "description", required = false) String description) throws Exception {
 
-        Map<String, Object> result = tenantService.updateTenant(loginUser, id, tenantCode, queueId, description);
+        Map<String, Object> result =
+                tenantService.updateTenant(loginUser, id, tenantCode, queueId, projectId, description);
         return returnDataList(result);
     }
 

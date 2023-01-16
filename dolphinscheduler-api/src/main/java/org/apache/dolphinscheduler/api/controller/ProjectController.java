@@ -88,8 +88,9 @@ public class ProjectController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result createProject(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestParam("projectName") String projectName,
+                                @RequestParam("tenantId") int tenantId,
                                 @RequestParam(value = "description", required = false) String description) {
-        return projectService.createProject(loginUser, projectName, description);
+        return projectService.createProject(loginUser, projectName, description, tenantId);
     }
 
     /**

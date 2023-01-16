@@ -46,21 +46,21 @@ public interface AlertGroupMapper extends BaseMapper<AlertGroup> {
      * @param groupName groupName
      * @return alertgroup list
      */
-    List<AlertGroup> queryByGroupName(@Param("groupName") String groupName);
+    List<AlertGroup> queryByGroupName(@Param("groupName") String groupName, @Param("tenantId") Integer tenantId);
 
     /**
      * Judge whether the alert group exist
      * @param groupName groupName
      * @return if exist return true else return null
      */
-    Boolean existGroupName(@Param("groupName") String groupName);
+    Boolean existGroupName(@Param("groupName") String groupName, @Param("tenantId") Integer tenantId);
 
     /**
-     * query by userId
-     * @param userId userId
+     * query by tenantId
+     * @param tenantId tenantId
      * @return alertgroup list
      */
-    List<AlertGroup> queryByUserId(@Param("userId") int userId);
+    List<AlertGroup> queryByTenantId(@Param("tenantId") int tenantId);
 
     /**
      * query all group list
