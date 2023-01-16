@@ -446,8 +446,8 @@ public class TaskConstants {
     /**
      * azure config
      */
-    public static final String AZURE_ACCESS_KEY_ID = "resource.azure.access.key.id";
-    public static final String AZURE_SECRET_ACCESS_KEY = "resource.azure.secret.access.key";
+    public static final String AZURE_CLIENT_ID = "resource.azure.client.id";
+    public static final String AZURE_CLIENT_SECRET = "resource.azure.client.secret";
     public static final String AZURE_ACCESS_SUB_ID = "resource.azure.subId";
     public static final String AZURE_SECRET_TENANT_ID = "resource.azure.tenant.id";
 

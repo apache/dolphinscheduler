@@ -1,5 +1,8 @@
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.apache.dolphinscheduler.api.enums.Status.LIST_AZURE_DATA_FACTORY_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.LIST_AZURE_DATA_FACTORY_PIPELINE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.LIST_AZURE_RESOURCE_GROUP_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.LIST_TASK_TYPE_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
@@ -46,7 +49,7 @@ public class CloudController extends BaseController {
     @Operation(summary = "listDataFactory", description = "LIST_DATA_FACTORY")
     @GetMapping(value = "/azure/datafactory/factories")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(LIST_TASK_TYPE_ERROR)
+    @ApiException(LIST_AZURE_DATA_FACTORY_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result listDataFactory(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         List<String> factoryNames = cloudService.listDataFactory(loginUser);
@@ -62,7 +65,7 @@ public class CloudController extends BaseController {
     @Operation(summary = "listResourceGroup", description = "LIST_RESOURCE_GROUP")
     @GetMapping(value = "/azure/datafactory/resourceGroups")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(LIST_TASK_TYPE_ERROR)
+    @ApiException(LIST_AZURE_RESOURCE_GROUP_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result listResourceGroup(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         List<String> resourceGroupNames = cloudService.listResourceGroup(loginUser);
@@ -78,7 +81,7 @@ public class CloudController extends BaseController {
     @Operation(summary = "listPipeline", description = "LIST_PIPELINE")
     @GetMapping(value = "/azure/datafactory/pipelines")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(LIST_TASK_TYPE_ERROR)
+    @ApiException(LIST_AZURE_DATA_FACTORY_PIPELINE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result listPipeline(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                @RequestParam("factoryName") String factoryName,
