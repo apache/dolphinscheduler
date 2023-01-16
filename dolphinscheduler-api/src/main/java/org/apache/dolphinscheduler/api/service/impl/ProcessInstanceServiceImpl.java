@@ -326,7 +326,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, processId);
             return result;
         }
-        List<TaskInstance> taskInstanceList = processService.findValidTaskListByProcessId(processId);
+        List<TaskInstance> taskInstanceList = fetchLatestTaskInstance(processService.findValidTaskListByProcessId(processId));
         addDependResultForTaskList(taskInstanceList);
 
         Map<String, Object> resultMap = new HashMap<>();
@@ -346,6 +346,23 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
 
         putMsg(result, Status.SUCCESS);
         return result;
+    }
+
+    /**
+     * When task retry there will have multi instance, and we only need the latest one
+     */
+    private List<TaskInstance> fetchLatestTaskInstance(List<TaskInstance> taskInstanceList) {
+        Map<Long, TaskInstance> taskInstanceMap = new HashMap<>();
+        for (TaskInstance taskInstance : taskInstanceList) {
+            long taskCode = taskInstance.getTaskCode();
+            TaskInstance existsInstance = taskInstanceMap.get(taskCode);
+            if (existsInstance == null) {
+                taskInstanceMap.put(taskCode, taskInstance);
+            } else if (taskInstance.getStartTime().after(existsInstance.getStartTime())) {
+                taskInstanceMap.put(taskCode, taskInstance);
+            }
+        }
+        return new ArrayList<>(taskInstanceMap.values());
     }
 
     /**

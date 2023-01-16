@@ -834,7 +834,9 @@ public class ProcessService {
                 List<Integer> suspendedNodeList = this.findTaskIdByInstanceState(processInstance.getId(), ExecutionStatus.PAUSE);
                 List<Integer> stopNodeList = findTaskIdByInstanceState(processInstance.getId(),
                         ExecutionStatus.KILL);
+                failedList = this.findTaskIdByInstanceState(processInstance.getId(), ExecutionStatus.FAILURE);
                 suspendedNodeList.addAll(stopNodeList);
+                suspendedNodeList.addAll(failedList);
                 for (Integer taskId : suspendedNodeList) {
                     // initialize the pause state
                     initTaskInstance(this.findTaskInstanceById(taskId));
