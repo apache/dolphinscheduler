@@ -3,7 +3,6 @@ package org.apache.dolphinscheduler.api.controller;
 import static org.apache.dolphinscheduler.api.enums.Status.LIST_AZURE_DATA_FACTORY_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.LIST_AZURE_DATA_FACTORY_PIPELINE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.LIST_AZURE_RESOURCE_GROUP_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.LIST_TASK_TYPE_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
