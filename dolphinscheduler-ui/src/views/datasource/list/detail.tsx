@@ -247,9 +247,7 @@ const DetailModal = defineComponent({
                   label={t('datasource.port')}
                   path='port'
                   show-require-mark={
-                    showMode && detailForm.mode === 'IAM-accessKey'
-                      ? false
-                      : true
+                    !(showMode && detailForm.mode === 'IAM-accessKey')
                   }
                 >
                   <NInputNumber
