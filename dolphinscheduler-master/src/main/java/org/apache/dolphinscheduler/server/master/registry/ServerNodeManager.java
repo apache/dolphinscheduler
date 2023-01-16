@@ -235,12 +235,13 @@ public class ServerNodeManager implements InitializingBean {
     }
 
     private void updateMasterNodes() {
-        currentSlot = 0;
-        totalSlot = 0;
-        this.masterNodes.clear();
+
         String nodeLock = Constants.REGISTRY_DOLPHINSCHEDULER_LOCK_MASTERS;
         try {
             registryClient.getLock(nodeLock);
+            currentSlot = 0;
+            totalSlot = 0;
+            this.masterNodes.clear();
             Collection<String> currentNodes = registryClient.getMasterNodesDirectly();
             List<Server> masterNodeList = registryClient.getServerList(NodeType.MASTER);
             syncMasterNodes(currentNodes, masterNodeList);
