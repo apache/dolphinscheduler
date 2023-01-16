@@ -25,7 +25,7 @@
 ### 验证: IAM-accessKey
 
 ![IAM1](../../../../img/new_ui/dev/datasource/redshift-iam1.png)
-![IAM2](../../../../img/new_ui/dev/datasource/redshift-iam1.png)
+![IAM2](../../../../img/new_ui/dev/datasource/redshift-iam2.png)
 
 使用 cluster ID, AWS Region, port(可选) and IAM信息来登录。
 

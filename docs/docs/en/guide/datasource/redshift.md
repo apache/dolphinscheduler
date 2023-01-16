@@ -26,7 +26,7 @@ Use AWS redshift database username and password to login.
 ### Validation: IAM-accessKey
 
 ![IAM1](../../../../img/new_ui/dev/datasource/redshift-iam1.png)
-![IAM2](../../../../img/new_ui/dev/datasource/redshift-iam1.png)
+![IAM2](../../../../img/new_ui/dev/datasource/redshift-iam2.png)
 
 Use cluster ID, AWS Region, port(optional) and IAM to login.
 
