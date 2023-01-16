@@ -339,7 +339,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 }
                 break;
             case RECOVER_SUSPENDED_PROCESS:
-                if (executionStatus.typeIsPause() || executionStatus.typeIsCancel()) {
+                if (executionStatus.typeIsCancel()) {
                     checkResult = true;
                 }
                 break;

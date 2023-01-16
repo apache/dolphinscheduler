@@ -99,8 +99,7 @@ public enum ExecutionStatus {
      * @return status
      */
     public boolean typeIsFinished() {
-        return typeIsSuccess() || typeIsFailure() || typeIsCancel() || typeIsPause()
-                || typeIsStop();
+        return typeIsSuccess() || typeIsFailure() || typeIsCancel();
     }
 
     /**
@@ -113,12 +112,12 @@ public enum ExecutionStatus {
     }
 
     /**
-     * status is pause
+     * status is ready pause
      *
      * @return status
      */
-    public boolean typeIsPause() {
-        return this == PAUSE;
+    public boolean typeIsReadyPause() {
+        return this == READY_PAUSE;
     }
 
     /**
@@ -145,7 +144,16 @@ public enum ExecutionStatus {
      * @return status
      */
     public boolean typeIsCancel() {
-        return this == KILL || this == STOP;
+        return this == KILL || this == STOP || this == PAUSE;
+    }
+
+    /**
+     * status is ready cancel
+     *
+     * @return status
+     */
+    public boolean typeIsReadyCancel() {
+        return this == READY_PAUSE || this == READY_STOP;
     }
 
     public int getCode() {

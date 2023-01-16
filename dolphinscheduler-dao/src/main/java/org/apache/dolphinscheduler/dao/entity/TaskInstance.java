@@ -546,8 +546,7 @@ public class TaskInstance implements Serializable {
     }
 
     public boolean isTaskComplete() {
-        return this.getState().typeIsPause()
-                || this.getState().typeIsSuccess()
+        return this.getState().typeIsSuccess()
                 || this.getState().typeIsCancel()
                 || (this.getState().typeIsFailure() && !taskCanRetry());
     }

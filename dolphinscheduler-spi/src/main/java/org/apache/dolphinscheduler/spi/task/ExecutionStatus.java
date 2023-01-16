@@ -96,8 +96,7 @@ public enum ExecutionStatus {
      * @return status
      */
     public boolean typeIsFinished() {
-        return typeIsSuccess() || typeIsFailure() || typeIsCancel() || typeIsPause()
-                || typeIsStop();
+        return typeIsSuccess() || typeIsFailure() || typeIsCancel();
     }
 
     /**
@@ -142,7 +141,7 @@ public enum ExecutionStatus {
      * @return status
      */
     public boolean typeIsCancel() {
-        return this == KILL || this == STOP;
+        return this == KILL || this == STOP || this == PAUSE;
     }
 
     public int getCode() {
