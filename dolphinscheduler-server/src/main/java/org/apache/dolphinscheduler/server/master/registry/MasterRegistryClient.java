@@ -317,11 +317,14 @@ public class MasterRegistryClient {
             return false;
         }
 
-        Date taskTime = taskInstance.getStartTime() == null ? taskInstance.getSubmitTime() : taskInstance.getStartTime();
-
-        Date serverStartDate = getServerStartupTime(servers, taskInstance.getHost());
-        if (serverStartDate != null) {
-            return taskTime.after(serverStartDate);
+        Date taskSubmitTime = taskInstance.getSubmitTime();
+        Date workServerStartTime = getServerStartupTime(servers, taskInstance.getHost());
+        if (taskSubmitTime != null && workServerStartTime != null && taskSubmitTime.after(workServerStartTime)) {
+            logger.info(
+                    "The taskInstance's submitTime: {} is after the need failover worker's start time: {}, the taskInstance is newly submit, it doesn't need to failover",
+                    taskSubmitTime,
+                    workServerStartTime);
+            return true;
         }
         return false;
     }
