@@ -27,13 +27,11 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.azure.core.credential.TokenCredential;
 import com.azure.core.http.rest.PagedIterable;
 import com.azure.core.management.AzureEnvironment;
 import com.azure.core.management.profile.AzureProfile;
 import com.azure.identity.ClientSecretCredential;
 import com.azure.identity.ClientSecretCredentialBuilder;
-import com.azure.identity.DefaultAzureCredentialBuilder;
 import com.azure.resourcemanager.AzureResourceManager;
 import com.azure.resourcemanager.datafactory.DataFactoryManager;
 import com.azure.resourcemanager.datafactory.models.Factories;
@@ -49,10 +47,7 @@ public class CloudServiceImpl extends BaseServiceImpl implements CloudService {
     private static final String AZURE_SECRET_TENANT_ID = PropertyUtils.getString(TaskConstants.AZURE_SECRET_TENANT_ID);
     private static final AzureProfile profile =
             new AzureProfile(AZURE_SECRET_TENANT_ID, AZURE_ACCESS_SUB_ID, AzureEnvironment.AZURE);
-    private static final TokenCredential credential = new DefaultAzureCredentialBuilder()
-            .authorityHost(profile.getEnvironment().getActiveDirectoryEndpoint())
-            .build();
-    private static final ClientSecretCredential clientSecretCredential2 = new ClientSecretCredentialBuilder()
+    private static final ClientSecretCredential clientSecretCredential = new ClientSecretCredentialBuilder()
             .clientId(AZURE_CLIENT_ID)
             .clientSecret(AZURE_CLIENT_SECRET)
             .tenantId(AZURE_SECRET_TENANT_ID)
@@ -62,19 +57,12 @@ public class CloudServiceImpl extends BaseServiceImpl implements CloudService {
     private static final AzureResourceManager azure;
 
     static {
-        manager = DataFactoryManager.authenticate(clientSecretCredential2, profile);
-        azure = AzureResourceManager.authenticate(credential, profile).withDefaultSubscription();
+        manager = DataFactoryManager.authenticate(clientSecretCredential, profile);
+        azure = AzureResourceManager.authenticate(clientSecretCredential, profile).withDefaultSubscription();
     }
+
     @Override
     public List<String> listDataFactory(User loginUser) {
-        AzureProfile profile = new AzureProfile(AZURE_SECRET_TENANT_ID, AZURE_ACCESS_SUB_ID, AzureEnvironment.AZURE);
-
-        TokenCredential credential = new DefaultAzureCredentialBuilder()
-                .authorityHost(profile.getEnvironment().getActiveDirectoryEndpoint()).build();
-        DataFactoryManager manager =
-                DataFactoryManager.authenticate(credential, profile);
-
-        System.out.println("~~~~~~~~~~~~~~print all factories:");
         Factories factories = manager.factories();
         List<String> names = new ArrayList<>();
         factories.list().stream().forEach(e -> names.add(e.name()));
@@ -83,16 +71,6 @@ public class CloudServiceImpl extends BaseServiceImpl implements CloudService {
 
     @Override
     public List<String> listResourceGroup(User loginUser) {
-        AzureProfile profile = new AzureProfile(AZURE_SECRET_TENANT_ID, AZURE_ACCESS_SUB_ID, AzureEnvironment.AZURE);
-
-        ClientSecretCredential clientSecretCredential = new ClientSecretCredentialBuilder()
-                .clientId(AZURE_CLIENT_ID)
-                .clientSecret(AZURE_CLIENT_SECRET)
-                .tenantId(AZURE_SECRET_TENANT_ID)
-                .authorityHost(profile.getEnvironment().getActiveDirectoryEndpoint())
-                .build();
-        AzureResourceManager azure =
-                AzureResourceManager.authenticate(clientSecretCredential, profile).withDefaultSubscription();
         ResourceGroups resourceGroups = azure.resourceGroups();
         List<String> names = new ArrayList<>();
         resourceGroups.list().stream().forEach(e -> names.add(e.name()));
