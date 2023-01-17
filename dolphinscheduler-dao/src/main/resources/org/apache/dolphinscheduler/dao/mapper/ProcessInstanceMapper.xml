@@ -27,6 +27,17 @@
         process_instance_priority, worker_group,environment_code, timeout, tenant_id, tenant_code, var_pool,
         dry_run, test_flag, next_process_instance_id, restart_time, state_history
     </sql>
+
+    <sql id="baseSqlV2">
+        ${alias}.id
+        , ${alias}.name, ${alias}.process_definition_version, ${alias}.process_definition_code, ${alias}.project_code, ${alias}.state, ${alias}.recovery, ${alias}.start_time, ${alias}.end_time, ${alias}.run_times,host,
+        command_type, ${alias}.command_param, ${alias}.task_depend_type, ${alias}.max_try_times, ${alias}.failure_strategy, ${alias}.warning_type,
+        warning_group_id, ${alias}.schedule_time, ${alias}.command_start_time, ${alias}.global_params, ${alias}.flag,
+        update_time, ${alias}.is_sub_process, ${alias}.executor_id, ${alias}.history_cmd,
+        process_instance_priority, ${alias}.worker_group,environment_code, ${alias}.timeout, ${alias}.tenant_id, ${alias}.tenant_code, ${alias}.var_pool,
+        dry_run, ${alias}.test_flag, ${alias}.next_process_instance_id, ${alias}.restart_time, ${alias}.state_history
+    </sql>
+
     <select id="queryDetailById" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select
         <include refid="baseSql"/>
@@ -338,10 +349,11 @@
 
     <select id="queryByTriggerCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select
-        <include refid="baseSql"/>
+        <include refid="baseSqlV2">
+            <property name="alias" value="b"/>
+        </include>
         from t_ds_trigger_relation a
-        left join   t_ds_process_instance b
-        on a.job_id  = b.id
-        where b.id is not null and a.trigger_type = 0 and a.trigger_code = #{triggerCode}
+        join   t_ds_process_instance b on a.job_id  = b.id
+        where a.trigger_type = 0 and a.trigger_code = #{triggerCode}
     </select>
 </mapper>
