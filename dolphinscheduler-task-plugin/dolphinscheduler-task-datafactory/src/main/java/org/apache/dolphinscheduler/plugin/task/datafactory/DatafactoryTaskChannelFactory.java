@@ -36,7 +36,7 @@ public class DatafactoryTaskChannelFactory implements TaskChannelFactory {
 
     @Override
     public String getName() {
-        return "DATAFACTORY";
+        return "DATA_FACTORY";
     }
 
     @Override
