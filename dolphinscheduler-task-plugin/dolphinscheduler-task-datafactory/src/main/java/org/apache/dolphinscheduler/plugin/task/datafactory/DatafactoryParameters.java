@@ -32,7 +32,6 @@ import lombok.ToString;
 @ToString
 public class DatafactoryParameters extends AbstractParameters {
 
-    private String name;
     private String factoryName;
     private String resourceGroupName;
     private String pipelineName;
@@ -41,6 +40,6 @@ public class DatafactoryParameters extends AbstractParameters {
     @Override
     public boolean checkParameters() {
         return StringUtils.isNotEmpty(factoryName) && StringUtils.isNotEmpty(resourceGroupName)
-                && StringUtils.isNotEmpty(name) && StringUtils.isNotEmpty(pipelineName);
+                && StringUtils.isNotEmpty(pipelineName);
     }
 }
