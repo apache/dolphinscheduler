@@ -37,10 +37,10 @@ export default {
     confirm: 'Confirm',
     cancel: 'Cancel',
     delete_confirm: 'Delete?',
-    authorize_level:'Authorize Level',
+    authorize_level: 'Authorize Level',
     no_permission: 'No Permission',
     read_permission: 'Read Permission',
-    all_permission: 'All Permission',
+    all_permission: 'All Permission'
   },
   workflow: {
     on_line: 'Online',
@@ -215,7 +215,7 @@ export default {
     workflow_relation_no_data_result_desc:
       'There is not any workflows. Please create a workflow, and then visit this page again.',
     ready_to_block: 'Ready to block',
-    block: 'Block',
+    block: 'Block'
   },
   task: {
     on_line: 'Online',
@@ -329,7 +329,7 @@ export default {
     online: 'Online'
   },
   node: {
-    is_cache: "Cache Execution",
+    is_cache: 'Cache Execution',
     jvm_args: 'Java VM Parameters',
     jvm_args_tips: 'Please enter virtual machine parameters',
     run_type: 'Run Type',
@@ -377,7 +377,8 @@ export default {
     image: 'Image',
     image_tips: 'Please enter image',
     command: 'Command',
-    command_tips: 'Please enter the container execution command, for example: /bin/echo hello world',
+    command_tips:
+      'Please enter the container execution command, for example: /bin/echo hello world',
     min_memory_tips: 'Please enter min memory',
     state: 'State',
     branch_flow: 'Branch flow',
@@ -798,7 +799,10 @@ export default {
     pytorch_requirements: 'Requirement File',
     pytorch_conda_python_version: 'Python Version',
     pytorch_conda_python_version_tips:
-      'Please enter the version number, such as 3.6, 3.7, 3.x'
+      'Please enter the version number, such as 3.6, 3.7, 3.x',
+    factory_name: 'Factory Name',
+    resource_group_name: 'Resource Group Name',
+    pipeline_name: 'Pipeline Name'
   },
   menu: {
     fav: 'Favorites',
@@ -808,6 +812,6 @@ export default {
     di: 'Data Integration',
     dq: 'Data Quality',
     ml: 'Machine Learning',
-    other: 'Other',
+    other: 'Other'
   }
 }
