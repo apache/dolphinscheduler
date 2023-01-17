@@ -514,31 +514,34 @@ git checkout -b "${VERSION}" "${VERSION}"
 
 # You should test whether the standalone-server images work or not
 docker run --name dolphinscheduler-standalone-server -p 12345:12345 -p 25333:25333 -d apache/dolphinscheduler-standalone-server:"${DOLPHINSCHEDULER_VERSION}"
-
-# If success, push to dockerhub
-docker push apache/dolphinscheduler-tools:"${VERSION}"
-docker push apache/dolphinscheduler-standalone-server:"${VERSION}"
-docker push apache/dolphinscheduler-master:"${VERSION}"
-docker push apache/dolphinscheduler-worker:"${VERSION}"
-docker push apache/dolphinscheduler-api:"${VERSION}"
-docker push apache/dolphinscheduler-alert-server:"${VERSION}"
 ```
 
 > Note: To push to dockerhub, you must have Apache organization permission of dockerhub. If you don’t you need to require
 > from Apache infra Jira. You can refer to here to submit an application from [here](https://issues.apache.org/jira/projects/INFRA/issues/INFRA-23314)
->
-> You can also build and push docker by single command if you make sure the images work fine
->
-> ```shell
-> ./mvnw -B clean deploy \
->     -Dmaven.test.skip \
->     -Dmaven.javadoc.skip \
->     -Dmaven.checkstyle.skip \
->     -Dmaven.deploy.skip \
->     -Ddocker.tag="${VERSION}" \
->     -Ddocker.hub=apache \
->     -Pdocker,release
-> ```
+
+After verifying the Docker images works as expected, you need to publish the Docker images by the following command:
+
+```shell
+./mvnw -B clean deploy \
+    -Dmaven.test.skip \
+    -Dmaven.javadoc.skip \
+    -Dmaven.checkstyle.skip \
+    -Dmaven.deploy.skip \
+    -Ddocker.tag="${VERSION}" \
+    -Ddocker.hub=apache \
+    -Pdocker,release
+```
+
+## Publish Helm Chart
+
+We will also publish the Helm Chart to Docker Hub so that users don't need to download our source codes just in order
+to install DolphinScheduler with Helm, run the following command to publish the Helm Chart to Docker Hub.
+
+```bash
+cd deploy/kubernetes
+helm package dolphinscheduler
+helm push dolphinscheduler-helm-$VERSION.tgz oci://registry-1.docker.io/apache
+```
 
 ### Send Announcement E-mail Community
 

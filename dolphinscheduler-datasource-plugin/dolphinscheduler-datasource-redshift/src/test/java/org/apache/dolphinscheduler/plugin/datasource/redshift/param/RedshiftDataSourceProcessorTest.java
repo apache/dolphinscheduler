@@ -49,7 +49,7 @@ public class RedshiftDataSourceProcessorTest {
         redshiftDatasourceParamDTO.setUserName("awsuser");
         redshiftDatasourceParamDTO.setPassword("123456");
         redshiftDatasourceParamDTO.setOther(props);
-
+        redshiftDatasourceParamDTO.setMode(RedshiftAuthMode.PASSWORD);
         try (MockedStatic<PasswordUtils> mockedStaticPasswordUtils = Mockito.mockStatic(PasswordUtils.class)) {
             mockedStaticPasswordUtils.when(() -> PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
             RedshiftConnectionParam connectionParams = (RedshiftConnectionParam) redshiftDatasourceProcessor
@@ -63,7 +63,7 @@ public class RedshiftDataSourceProcessorTest {
     public void testCreateConnectionParams2() {
         String connectionJson =
                 "{\"user\":\"awsuser\",\"password\":\"123456\",\"address\":\"jdbc:redshift://localhost:5439\""
-                        + ",\"database\":\"dev\",\"jdbcUrl\":\"jdbc:redshift://localhost:5439/dev\"}";
+                        + ",\"database\":\"dev\",\"jdbcUrl\":\"jdbc:redshift://localhost:5439/dev\",\"mode\":\"password\"}";
         RedshiftConnectionParam connectionParams = (RedshiftConnectionParam) redshiftDatasourceProcessor
                 .createConnectionParams(connectionJson);
         Assertions.assertNotNull(connectionParams);

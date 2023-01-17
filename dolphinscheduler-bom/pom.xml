@@ -35,8 +35,6 @@
         <mybatis-plus.version>3.5.2</mybatis-plus.version>
         <quartz.version>2.3.2</quartz.version>
         <druid.version>1.2.4</druid.version>
-        <zookeeper.version>3.8.0</zookeeper.version>
-        <curator.version>5.3.0</curator.version>
         <curator-test.version>2.12.0</curator-test.version>
         <jetcd.version>0.5.11</jetcd.version>
         <jetcd.test.version>0.7.1</jetcd.test.version>
@@ -103,6 +101,8 @@
         <zt-zip.version>1.15</zt-zip.version>
         <trino-jdbc.version>402</trino-jdbc.version>
         <azure-identity.version>1.7.1</azure-identity.version>
+        <redshift-jdbc42.version>2.1.0.9</redshift-jdbc42.version>
+        <aws-java-sdk-redshift.version>1.12.300</aws-java-sdk-redshift.version>
     </properties>
 
     <dependencyManagement>
@@ -798,6 +798,42 @@
                 <artifactId>azure-identity</artifactId>
                 <version>${azure-identity.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.amazon.redshift</groupId>
+                <artifactId>redshift-jdbc42</artifactId>
+                <version>${redshift-jdbc42.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-redshift</artifactId>
+                <version>${aws-java-sdk-redshift.version}</version>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
+    <profiles>
+        <profile>
+            <id>zk-3.8</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <zookeeper.version>3.8.0</zookeeper.version>
+                <curator.version>5.3.0</curator.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>zk-3.4</id>
+            <activation>
+                <property>
+                    <name>zk-3.4</name>
+                </property>
+            </activation>
+            <properties>
+                <curator.version>4.3.0</curator.version>
+                <zookeeper.version>3.4.14</zookeeper.version>
+            </properties>
+        </profile>
+    </profiles>
 </project>

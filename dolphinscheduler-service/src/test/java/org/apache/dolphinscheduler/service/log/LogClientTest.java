@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.log.GetLogBytesResponseCommand;
-import org.apache.dolphinscheduler.remote.command.log.RemoveTaskLogResponseCommand;
 import org.apache.dolphinscheduler.remote.command.log.RollViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.command.log.ViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.factory.NettyRemotingClientFactory;
@@ -136,7 +135,7 @@ public class LogClientTest {
     }
 
     @Test
-    public void testRemoveTaskLog() throws Exception {
+    public void testRemoveTaskLog() {
 
         try (
                 MockedStatic<NettyRemotingClientFactory> mockedNettyRemotingClientFactory =
@@ -144,15 +143,9 @@ public class LogClientTest {
             NettyRemotingClient remotingClient = Mockito.mock(NettyRemotingClient.class);
             mockedNettyRemotingClientFactory.when(NettyRemotingClientFactory::buildNettyRemotingClient)
                     .thenReturn(remotingClient);
-            Command command = new Command();
-            command.setBody(JSONUtils.toJsonByteArray(new RemoveTaskLogResponseCommand(true)));
-            Mockito.when(
-                    remotingClient.sendSync(Mockito.any(Host.class), Mockito.any(Command.class), Mockito.anyLong()))
-                    .thenReturn(command);
 
             LogClient logClient = new LogClient();
-            Boolean status = logClient.removeTaskLog(Host.of("localhost:1234"), "/log/path");
-            Assertions.assertTrue(status);
+            Assertions.assertDoesNotThrow(() -> logClient.removeTaskLog(Host.of("localhost:1234"), "/log/path"));
         }
     }
 }
