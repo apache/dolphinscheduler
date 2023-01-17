@@ -63,15 +63,4 @@ public class TriggerRelation {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "UTC")
     private Date updateTime;
 
-    @Override
-    public String toString() {
-        return "TriggerRelation{"
-                + "id=" + id
-                + ", triggerCode='" + triggerCode + '\''
-                + ", triggerType=" + triggerType
-                + ", jobId=" + jobId
-                + ", createTime=" + createTime
-                + ", updateTime=" + updateTime
-                + '}';
-    }
 }
