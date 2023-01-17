@@ -802,7 +802,10 @@ export default {
       'Please enter the version number, such as 3.6, 3.7, 3.x',
     factory_name: 'Factory Name',
     resource_group_name: 'Resource Group Name',
-    pipeline_name: 'Pipeline Name'
+    pipeline_name: 'Pipeline Name',
+    factory_tips: 'Please select factory',
+    resource_group_tips: 'Please select resource group',
+    pipeline_tips: 'Please select pipeline'
   },
   menu: {
     fav: 'Favorites',

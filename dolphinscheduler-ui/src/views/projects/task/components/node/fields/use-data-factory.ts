@@ -27,30 +27,42 @@ import type { IJsonItem } from '../types'
 export function useDataFactory(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
 
+  const factoryLoading = ref(false)
+  const resourceGroupLoading = ref(false)
+  const pipelineLoading = ref(false)
+
   const factoryOptions = ref([] as { label: string; value: number }[])
   const resourceGroupOptions = ref([] as { label: string; value: number }[])
   const pipelineOptions = ref([] as { label: string; value: number }[])
 
   const getFactoryOptions = async () => {
+    if (factoryLoading.value) return
+    factoryLoading.value = true
     const factories = await queryDataFactoryFactories()
     factoryOptions.value = factories.map((factory: string) => ({
       label: factory,
       value: factory
     }))
+    factoryLoading.value = false
   }
 
   const getResourceGroupName = async () => {
+    if (resourceGroupLoading.value) return
+    resourceGroupLoading.value = true
     const groupNames = await queryDataFactoryResourceGroups()
     resourceGroupOptions.value = groupNames.map((groupName: string) => ({
       label: groupName,
       value: groupName
     }))
+    resourceGroupLoading.value = false
   }
 
   const getPipelineName = async (
     factoryName: string,
     resourceGroupName: string
   ) => {
+    if (pipelineLoading.value) return
+    pipelineLoading.value = true
     const pipelineNames = await queryDataFactoryPipelines({
       factoryName,
       resourceGroupName
@@ -59,6 +71,7 @@ export function useDataFactory(model: { [field: string]: any }): IJsonItem[] {
       label: pipelineName,
       value: pipelineName
     }))
+    pipelineLoading.value = false
   }
 
   const onChange = () => {
@@ -90,10 +103,13 @@ export function useDataFactory(model: { [field: string]: any }): IJsonItem[] {
       name: t('project.node.factory_name'),
       options: factoryOptions,
       props: {
-        'on-update:value': onChange
+        'on-update:value': onChange,
+        loading: factoryLoading
       },
       validate: {
-        required: true
+        trigger: ['input', 'trigger'],
+        required: true,
+        message: t('project.node.factory_tips')
       }
     },
     {
@@ -103,10 +119,13 @@ export function useDataFactory(model: { [field: string]: any }): IJsonItem[] {
       name: t('project.node.resource_group_name'),
       options: resourceGroupOptions,
       props: {
-        'on-update:value': onChange
+        'on-update:value': onChange,
+        loading: resourceGroupLoading
       },
       validate: {
-        required: true
+        trigger: ['input', 'trigger'],
+        required: true,
+        message: t('project.node.resource_group_tips')
       }
     },
     {
@@ -115,8 +134,13 @@ export function useDataFactory(model: { [field: string]: any }): IJsonItem[] {
       span: 24,
       name: t('project.node.pipeline_name'),
       options: pipelineOptions,
+      props: {
+        loading: pipelineLoading
+      },
       validate: {
-        required: true
+        trigger: ['input', 'trigger'],
+        required: true,
+        message: t('project.node.pipeline_tips')
       }
     },
     ...useCustomParams({
