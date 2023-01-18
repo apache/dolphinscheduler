@@ -832,10 +832,6 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         if (CollectionUtils.isEqualCollection(upstreamCodeSet, upstreamTaskCodes) && taskDefinitionToUpdate == null) {
             putMsg(result, Status.SUCCESS);
             return result;
-        } else {
-            if (taskDefinitionToUpdate == null) {
-                taskDefinitionToUpdate = JSONUtils.parseObject(taskDefinitionJsonObj, TaskDefinitionLog.class);
-            }
         }
         Map<Long, TaskDefinition> queryUpStreamTaskCodeMap;
         if (CollectionUtils.isNotEmpty(upstreamTaskCodes)) {
