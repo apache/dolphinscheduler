@@ -154,7 +154,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
     protected boolean persistTask(TaskAction taskAction) {
         switch (taskAction) {
             case STOP:
-                if (taskInstance.getState().typeIsFinished() && !taskInstance.getState().typeIsCancel()) {
+                if (taskInstance.getState().typeIsSuccess() || taskInstance.getState().typeIsFailure()) {
                     return true;
                 }
                 this.taskInstance.setState(ExecutionStatus.KILL);

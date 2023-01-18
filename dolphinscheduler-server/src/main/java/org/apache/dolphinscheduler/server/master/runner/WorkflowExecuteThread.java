@@ -501,7 +501,7 @@ public class WorkflowExecuteThread implements Runnable {
             logger.info("process:{} state {} change to {}", processInstance.getId(), processInstance.getState(), stateEvent.getExecutionStatus());
             processInstance = processService.findProcessInstanceById(this.processInstance.getId());
 
-            if (stateEvent.getExecutionStatus() == ExecutionStatus.STOP) {
+            if (stateEvent.getExecutionStatus().typeIsCancel()) {
                 this.updateProcessInstanceState(stateEvent);
                 return true;
             }
@@ -529,7 +529,7 @@ public class WorkflowExecuteThread implements Runnable {
             return false;
         }
 
-        if (processInstance.getState() == ExecutionStatus.READY_STOP) {
+        if (processInstance.getState().typeIsReadyCancel()) {
             return false;
         }
 
@@ -984,7 +984,12 @@ public class WorkflowExecuteThread implements Runnable {
                 continue;
             }
             TaskInstance task = createTaskInstance(processInstance, taskNodeObject);
-            taskInstances.add(task);
+            if (processInstance.getState().typeIsReadyPause() && (!activeTaskProcessorMaps.isEmpty() || !completeTaskList.isEmpty())) {
+                task.setState(ExecutionStatus.PAUSE);
+                completeTaskList.put(String.valueOf(task.getTaskCode()), task);
+            } else {
+                taskInstances.add(task);
+            }
         }
 
         // if previous node success , post node submit
@@ -998,7 +1003,7 @@ public class WorkflowExecuteThread implements Runnable {
                 logger.info("task {} has already run success, task id:{}", task.getName(), task.getId());
                 continue;
             }
-            if (task.getState().typeIsPause() || task.getState().typeIsCancel()) {
+            if (task.getState().typeIsCancel()) {
                 logger.info("task {} stopped, the state is {}, task id:{}", task.getName(), task.getState(), task.getId());
             } else {
                 addTaskToStandByList(task);
@@ -1030,7 +1035,7 @@ public class WorkflowExecuteThread implements Runnable {
                     return DependResult.WAITING;
                 }
                 ExecutionStatus depTaskState = completeTaskList.get(depsNode).getState();
-                if (depTaskState.typeIsPause() || depTaskState.typeIsCancel()) {
+                if (depTaskState.typeIsCancel()) {
                     return DependResult.NON_EXEC;
                 }
                 // ignore task state if current task is condition
@@ -1198,9 +1203,7 @@ public class WorkflowExecuteThread implements Runnable {
         }
 
         List<TaskInstance> pauseList = getCompleteTaskByState(ExecutionStatus.PAUSE);
-        if (CollectionUtils.isNotEmpty(pauseList)
-                || !isComplementEnd()
-                || readyToSubmitTaskQueue.size() > 0) {
+        if (CollectionUtils.isNotEmpty(pauseList) || !isComplementEnd()) {
             return ExecutionStatus.PAUSE;
         } else {
             return ExecutionStatus.SUCCESS;
