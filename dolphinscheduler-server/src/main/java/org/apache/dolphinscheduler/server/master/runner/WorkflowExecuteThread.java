@@ -1145,16 +1145,9 @@ public class WorkflowExecuteThread implements Runnable {
         } else {
             if (processInstance.getCommandType() == CommandType.RECOVER_TOLERANCE_FAULT_PROCESS
                 || processInstance.getCommandType() == CommandType.RECOVER_SUSPENDED_PROCESS) {
-                List<Integer> failedList = processService.findTaskIdByInstanceState(processInstance.getId(), ExecutionStatus.FAILURE);
-                if (!failedList.isEmpty()) {
-                    return true;
-                }
-                List<Integer> toleranceList = processService.findTaskIdByInstanceState(processInstance.getId(), ExecutionStatus.NEED_FAULT_TOLERANCE);
-                if (!toleranceList.isEmpty()) {
-                    return true;
-                }
-                List<Integer> killedList = processService.findTaskIdByInstanceState(processInstance.getId(), ExecutionStatus.KILL);
-                if (!killedList.isEmpty()) {
+                List<Integer> failureTaskIds = processService.findLastTaskIdByStateList(processInstance.getId(),
+                    Lists.newArrayList(ExecutionStatus.FAILURE, ExecutionStatus.NEED_FAULT_TOLERANCE, ExecutionStatus.KILL));
+                if (!failureTaskIds.isEmpty()) {
                     return true;
                 }
             }
