@@ -50,8 +50,8 @@ public class DatafactoryHook {
             LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
     private final int QUERY_INTERVAL = PropertyUtils.getInt(TaskConstants.QUERY_INTERVAL, 10000);
     private DataFactoryManager client;
-    private AzureProfile profile;
-    private ClientSecretCredential credential;
+    private static AzureProfile profile;
+    private static ClientSecretCredential credential;
     private String runId;
 
     public DatafactoryHook() {
@@ -59,7 +59,7 @@ public class DatafactoryHook {
         client = createClient();
     }
 
-    protected DataFactoryManager createClient() {
+    protected static DataFactoryManager createClient() {
         final String AZURE_ACCESS_SUB_ID = PropertyUtils.getString(TaskConstants.AZURE_ACCESS_SUB_ID);
         final String AZURE_SECRET_TENANT_ID = PropertyUtils.getString(TaskConstants.AZURE_SECRET_TENANT_ID);
         final String AZURE_CLIENT_ID = PropertyUtils.getString(TaskConstants.AZURE_CLIENT_ID);

@@ -74,6 +74,7 @@ public class DatafactoryTask extends AbstractRemoteTask {
     public void cancelApplication() throws TaskException {
         checkApplicationId();
         hook.cancelDatafactoryTask(parameters);
+        exitStatusCode = TaskConstants.EXIT_CODE_KILL;
     }
 
     @Override
