@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
 @Component
 public interface TriggerRelationService {
 
-    void saveTriggerTdoDb(ApiTriggerType type, Long triggerCode, Integer jobId);
+    void saveTriggerToDb(ApiTriggerType type, Long triggerCode, Integer jobId);
 
     TriggerRelation queryByTypeAndJobId(ApiTriggerType apiTriggerType, int jobId);
 

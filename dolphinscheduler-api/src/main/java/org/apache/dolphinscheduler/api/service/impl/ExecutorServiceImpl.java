@@ -963,7 +963,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             command.setCommandParam(JSONUtils.toJsonString(cmdParam));
             int count = commandService.createCommand(command);
             if (count > 0) {
-                triggerRelationService.saveTriggerTdoDb(ApiTriggerType.COMMAND, triggerCode, command.getId());
+                triggerRelationService.saveTriggerToDb(ApiTriggerType.COMMAND, triggerCode, command.getId());
             }
             return count;
         }
@@ -1044,7 +1044,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                     }
                 }
                 if (createCount > 0) {
-                    triggerRelationService.saveTriggerTdoDb(ApiTriggerType.COMMAND, triggerCode, command.getId());
+                    triggerRelationService.saveTriggerToDb(ApiTriggerType.COMMAND, triggerCode, command.getId());
                 }
                 break;
             }
@@ -1094,7 +1094,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                             if (commandService.createCommand(command) > 0) {
                                 logger.info("Create {} command complete, processDefinitionCode:{}",
                                         command.getCommandType().getDescp(), command.getProcessDefinitionCode());
-                                triggerRelationService.saveTriggerTdoDb(ApiTriggerType.COMMAND, triggerCode,
+                                triggerRelationService.saveTriggerToDb(ApiTriggerType.COMMAND, triggerCode,
                                         command.getId());
                             } else {
                                 logger.error("Create {} command error, processDefinitionCode:{}",

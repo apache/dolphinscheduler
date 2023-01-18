@@ -36,7 +36,7 @@ public class TriggerRelationServiceImpl implements TriggerRelationService {
     private TriggerRelationMapper triggerRelationMapper;
 
     @Override
-    public void saveTriggerTdoDb(ApiTriggerType type, Long triggerCode, Integer jobId) {
+    public void saveTriggerToDb(ApiTriggerType type, Long triggerCode, Integer jobId) {
         TriggerRelation triggerRelation = new TriggerRelation();
         triggerRelation.setTriggerType(type.getCode());
         triggerRelation.setJobId(jobId);
@@ -56,7 +56,7 @@ public class TriggerRelationServiceImpl implements TriggerRelationService {
         if (exist == null) {
             return 0;
         }
-        saveTriggerTdoDb(ApiTriggerType.COMMAND, exist.getTriggerCode(), commandId);
+        saveTriggerToDb(ApiTriggerType.COMMAND, exist.getTriggerCode(), commandId);
         return 1;
     }
 
@@ -66,7 +66,7 @@ public class TriggerRelationServiceImpl implements TriggerRelationService {
         if (exist == null) {
             return 0;
         }
-        saveTriggerTdoDb(ApiTriggerType.PROCESS, exist.getTriggerCode(), processInstanceId);
+        saveTriggerToDb(ApiTriggerType.PROCESS, exist.getTriggerCode(), processInstanceId);
         return 1;
     }
 

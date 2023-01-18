@@ -53,7 +53,7 @@ public class TriggerRelationServiceTest {
     @Test
     public void saveTriggerToDb() {
         Mockito.doNothing().when(triggerRelationMapper).upsert(Mockito.any());
-        triggerRelationService.saveTriggerTdoDb(ApiTriggerType.COMMAND, 1234567890L, 100);
+        triggerRelationService.saveTriggerToDb(ApiTriggerType.COMMAND, 1234567890L, 100);
     }
 
     @Test
