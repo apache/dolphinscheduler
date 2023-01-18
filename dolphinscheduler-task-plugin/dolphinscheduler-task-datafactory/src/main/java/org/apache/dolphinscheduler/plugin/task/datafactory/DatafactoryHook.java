@@ -31,10 +31,10 @@ import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.azure.core.credential.TokenCredential;
 import com.azure.core.management.AzureEnvironment;
 import com.azure.core.management.profile.AzureProfile;
-import com.azure.identity.DefaultAzureCredentialBuilder;
+import com.azure.identity.ClientSecretCredential;
+import com.azure.identity.ClientSecretCredentialBuilder;
 import com.azure.resourcemanager.datafactory.DataFactoryManager;
 import com.azure.resourcemanager.datafactory.models.CreateRunResponse;
 import com.azure.resourcemanager.datafactory.models.PipelineResource;
@@ -52,7 +52,7 @@ public class DatafactoryHook {
             LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
     private DataFactoryManager client;
     private AzureProfile profile;
-    private TokenCredential credential;
+    private ClientSecretCredential credential;
     private String runId;
 
     public DatafactoryHook() {
@@ -63,8 +63,14 @@ public class DatafactoryHook {
     protected DataFactoryManager createClient() {
         final String AZURE_ACCESS_SUB_ID = PropertyUtils.getString(TaskConstants.AZURE_ACCESS_SUB_ID);
         final String AZURE_SECRET_TENANT_ID = PropertyUtils.getString(TaskConstants.AZURE_SECRET_TENANT_ID);
-        profile = new AzureProfile(AZURE_SECRET_TENANT_ID, AZURE_ACCESS_SUB_ID, AzureEnvironment.AZURE);
-        credential = new DefaultAzureCredentialBuilder()
+        final String AZURE_CLIENT_ID = PropertyUtils.getString(TaskConstants.AZURE_CLIENT_ID);
+        final String AZURE_CLIENT_SECRET = PropertyUtils.getString(TaskConstants.AZURE_CLIENT_SECRET);
+        profile =
+                new AzureProfile(AZURE_SECRET_TENANT_ID, AZURE_ACCESS_SUB_ID, AzureEnvironment.AZURE);
+        credential = new ClientSecretCredentialBuilder()
+                .clientId(AZURE_CLIENT_ID)
+                .clientSecret(AZURE_CLIENT_SECRET)
+                .tenantId(AZURE_SECRET_TENANT_ID)
                 .authorityHost(profile.getEnvironment().getActiveDirectoryEndpoint())
                 .build();
         return DataFactoryManager.authenticate(credential, profile);
