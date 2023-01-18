@@ -77,12 +77,12 @@ import com.google.common.cache.LoadingCache;
 public class HdfsStorageOperator implements Closeable, StorageOperate {
 
     private static final Logger logger = LoggerFactory.getLogger(HdfsStorageOperator.class);
-    private static HdfsStorageProperties hdfsProperties = new HdfsStorageProperties();
+    private static HdfsStorageProperties hdfsProperties;
     private static final String HADOOP_UTILS_KEY = "HADOOP_UTILS_KEY";
 
     private static final LoadingCache<String, HdfsStorageOperator> cache = CacheBuilder
             .newBuilder()
-            .expireAfterWrite(hdfsProperties.getKerberosExpireTime(), TimeUnit.HOURS)
+            .expireAfterWrite(HdfsStorageProperties.getKerberosExpireTime(), TimeUnit.HOURS)
             .build(new CacheLoader<String, HdfsStorageOperator>() {
 
                 @Override
@@ -97,6 +97,7 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
     private FileSystem fs;
 
     private HdfsStorageOperator() {
+        hdfsProperties = new HdfsStorageProperties();
         init();
         initHdfsPath();
     }

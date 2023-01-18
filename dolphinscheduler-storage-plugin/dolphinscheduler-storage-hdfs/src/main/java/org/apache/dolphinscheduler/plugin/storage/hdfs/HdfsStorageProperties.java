@@ -76,5 +76,7 @@ public class HdfsStorageProperties {
     /**
      * Kerberos expire time
      */
-    private int kerberosExpireTime = PropertyUtils.getInt(KERBEROS_EXPIRE_TIME, 2);
+    public static int getKerberosExpireTime() {
+        return PropertyUtils.getInt(KERBEROS_EXPIRE_TIME, 2);
+    }
 }
