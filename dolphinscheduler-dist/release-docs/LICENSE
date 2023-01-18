@@ -623,7 +623,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     azure-resourcemanager-containerregistry 2.21.0: https://mvnrepository.com/artifact/com.azure.resourcemanager/azure-resourcemanager-containerregistry/2.21.0, MIT
     azure-resourcemanager-containerservice 2.21.0: https://mvnrepository.com/artifact/com.azure.resourcemanager/azure-resourcemanager-containerservice/2.21.0, MIT
     azure-resourcemanager-cosmos 2.21.0: https://mvnrepository.com/artifact/com.azure.resourcemanager/azure-resourcemanager-cosmos/2.21.0, MIT
-    azure-resourcemanager-datafactory 1.0.0-beta.19 https://mvnrepository.com/artifact/com.azure.resourcemanager/azure-resourcemanager-datafactory/2.21.0, MIT
+    azure-resourcemanager-datafactory 1.0.0-beta.19 https://mvnrepository.com/artifact/com.azure.resourcemanager/azure-resourcemanager-datafactory/1.0.0-beta.19, MIT
     azure-resourcemanager-dns 2.21.0: https://mvnrepository.com/artifact/com.azure.resourcemanager/azure-resourcemanager-dns/2.21.0, MIT
     azure-resourcemanager-eventhubs 2.21.0: https://mvnrepository.com/artifact/com.azure.resourcemanager/azure-resourcemanager-eventhubs/2.21.0, MIT
     azure-resourcemanager-keyvault 2.21.0: https://mvnrepository.com/artifact/com.azure.resourcemanager/azure-resourcemanager-keyvault/2.21.0, MIT
