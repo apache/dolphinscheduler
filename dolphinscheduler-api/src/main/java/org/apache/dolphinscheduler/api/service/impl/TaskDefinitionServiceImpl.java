@@ -820,9 +820,6 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         Map<String, Object> result = new HashMap<>();
         TaskDefinitionLog taskDefinitionToUpdate =
                 updateTask(loginUser, projectCode, taskCode, taskDefinitionJsonObj, result);
-        if (result.get(Constants.STATUS) != Status.SUCCESS && taskDefinitionToUpdate == null) {
-            return result;
-        }
         List<ProcessTaskRelation> upstreamTaskRelations =
                 processTaskRelationMapper.queryUpstreamByCode(projectCode, taskCode);
         Set<Long> upstreamCodeSet =
@@ -835,10 +832,6 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         if (CollectionUtils.isEqualCollection(upstreamCodeSet, upstreamTaskCodes) && taskDefinitionToUpdate == null) {
             putMsg(result, Status.SUCCESS);
             return result;
-        } else {
-            if (taskDefinitionToUpdate == null) {
-                taskDefinitionToUpdate = JSONUtils.parseObject(taskDefinitionJsonObj, TaskDefinitionLog.class);
-            }
         }
         Map<Long, TaskDefinition> queryUpStreamTaskCodeMap;
         if (CollectionUtils.isNotEmpty(upstreamTaskCodes)) {
