@@ -94,7 +94,7 @@ public class DatafactoryHook {
         logger.info("cancelTask ......");
         PipelineRuns pipelineRuns = client.pipelineRuns();
         try {
-            pipelineRuns.cancel(parameters.getResourceGroupName(), parameters.getFactoryName(), parameters.getRunId());
+            pipelineRuns.cancel(parameters.getResourceGroupName(), parameters.getFactoryName(), runId);
         } catch (RuntimeException e) {
             logger.error("failed to cancel datafactory task: " + e.getMessage());
             return false;
@@ -107,7 +107,7 @@ public class DatafactoryHook {
 
         PipelineRuns pipelineRuns = client.pipelineRuns();
         PipelineRun pipelineRun =
-                pipelineRuns.get(parameters.getResourceGroupName(), parameters.getFactoryName(), parameters.getRunId());
+                pipelineRuns.get(parameters.getResourceGroupName(), parameters.getFactoryName(), runId);
 
         if (pipelineRun != null) {
             logger.info("queryDatafactoryTaskStatus ......{}", pipelineRun.status());
