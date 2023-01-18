@@ -642,6 +642,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     azure-security-keyvault-secrets 4.5.2: https://mvnrepository.com/artifact/com.azure/azure-security-keyvault-secrets/4.5.2, MIT
     azure-storage-common 12.19.1: https://mvnrepository.com/artifact/com.azure/azure-storage-common/12.19.1, MIT
     azure-storage-file-share 12.16.1: https://mvnrepository.com/artifact/com.azure/azure-storage-file-share/12.16.1, MIT
+    azure-core-management 1.9.0: https://mvnrepository.com/artifact/com.azure/azure-core-management/1.9.0, MIT
 
 ========================================================================
 MPL 1.1 licenses
