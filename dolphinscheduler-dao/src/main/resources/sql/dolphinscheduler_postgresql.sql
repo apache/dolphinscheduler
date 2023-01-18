@@ -1994,3 +1994,18 @@ CREATE TABLE t_ds_fav_task
     user_id   int         NOT NULL,
     PRIMARY KEY (id)
 );
+
+-- ----------------------------
+-- Table structure for t_ds_trigger_relation
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_trigger_relation;
+CREATE TABLE t_ds_trigger_relation (
+    id        serial      NOT NULL,
+    trigger_type int NOT NULL,
+    trigger_code bigint NOT NULL,
+    job_id bigint NOT NULL,
+    create_time timestamp DEFAULT NULL,
+    update_time timestamp DEFAULT NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT t_ds_trigger_relation_unique UNIQUE (trigger_type,job_id,trigger_code)
+);

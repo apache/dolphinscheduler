@@ -120,6 +120,21 @@ delimiter ;
 select uc_dolphin_T_t_ds_task_instance_R_test_flag();
 DROP FUNCTION uc_dolphin_T_t_ds_task_instance_R_test_flag();
 
+delimiter d//
+DROP TABLE IF EXISTS t_ds_trigger_relation;
+CREATE TABLE t_ds_trigger_relation (
+    id        serial      NOT NULL,
+    trigger_type int NOT NULL,
+    trigger_code bigint NOT NULL,
+    job_id bigint NOT NULL,
+    create_time timestamp DEFAULT NULL,
+    update_time timestamp DEFAULT NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT t_ds_trigger_relation_unique UNIQUE (trigger_type,job_id,trigger_code)
+);
+d//
+delimiter ;
+
 ALTER TABLE t_ds_task_definition DROP COLUMN IF EXISTS is_cache;
 ALTER TABLE t_ds_task_definition ADD COLUMN IF NOT EXISTS is_cache int DEFAULT '0';
 

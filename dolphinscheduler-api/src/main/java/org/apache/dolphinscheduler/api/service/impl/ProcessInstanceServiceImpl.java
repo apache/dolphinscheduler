@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_INSTANCE;
 import static org.apache.dolphinscheduler.api.enums.Status.PROCESS_INSTANCE_NOT_EXIST;
 import static org.apache.dolphinscheduler.api.enums.Status.PROCESS_INSTANCE_STATE_OPERATION_ERROR;
 import static org.apache.dolphinscheduler.common.constants.Constants.DATA_LIST;
@@ -1019,6 +1020,32 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
     @Override
     public List<ProcessInstance> queryByProcessDefineCode(Long processDefinitionCode, int size) {
         return processInstanceMapper.queryByProcessDefineCode(processDefinitionCode, size);
+    }
+
+    /**
+     * query process instance list bt trigger code
+     *
+     * @param loginUser
+     * @param projectCode
+     * @param triggerCode
+     * @return
+     */
+    @Override
+    public Map<String, Object> queryByTriggerCode(User loginUser, long projectCode, Long triggerCode) {
+
+        Project project = projectMapper.queryByCode(projectCode);
+        // check user access for project
+        Map<String, Object> result =
+                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE);
+        if (result.get(Constants.STATUS) != Status.SUCCESS || triggerCode == null) {
+            return result;
+        }
+
+        List<ProcessInstance> processInstances = processInstanceMapper.queryByTriggerCode(
+                triggerCode);
+        result.put(DATA_LIST, processInstances);
+        putMsg(result, Status.SUCCESS);
+        return result;
     }
 
     @Override

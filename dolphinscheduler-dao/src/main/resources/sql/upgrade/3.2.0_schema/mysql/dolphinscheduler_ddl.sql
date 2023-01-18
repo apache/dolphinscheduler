@@ -121,6 +121,21 @@ delimiter ;
 CALL uc_dolphin_T_t_ds_task_instance_R_test_flag;
 DROP PROCEDURE uc_dolphin_T_t_ds_task_instance_R_test_flag;
 
+delimiter d//
+CREATE TABLE `t_ds_trigger_relation` (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT,
+    `trigger_type` int(11) NOT NULL DEFAULT '0' COMMENT '0 process 1 task',
+    `trigger_code` bigint(20) NOT NULL,
+    `job_id` bigint(20) NOT NULL,
+    `create_time` datetime DEFAULT NULL,
+    `update_time` datetime DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    KEY `t_ds_trigger_relation_trigger_code_IDX` (`trigger_code`),
+    UNIQUE KEY `t_ds_trigger_relation_UN` (`trigger_type`,`job_id`,`trigger_code`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+d//
+delimiter ;
+
 -- uc_dolphin_T_t_ds_task_definition_R_is_cache
 drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_task_definition_R_is_cache;
 delimiter d//
