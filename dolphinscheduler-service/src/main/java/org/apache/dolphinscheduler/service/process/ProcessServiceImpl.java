@@ -308,6 +308,8 @@ public class ProcessServiceImpl implements ProcessService {
     @Autowired
     private CommandService commandService;
 
+    @Autowired
+    private TriggerRelationService triggerRelationService;
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
      *
@@ -336,12 +338,14 @@ public class ProcessServiceImpl implements ProcessService {
             saveSerialProcess(processInstance, processDefinition);
             if (processInstance.getState() != WorkflowExecutionStatus.SUBMITTED_SUCCESS) {
                 setSubProcessParam(processInstance);
+                triggerRelationService.saveProcessInstanceTrigger(command.getId(), processInstance.getId());
                 deleteCommandWithCheck(command.getId());
                 return null;
             }
         } else {
             processInstanceDao.upsertProcessInstance(processInstance);
         }
+        triggerRelationService.saveProcessInstanceTrigger(command.getId(), processInstance.getId());
         setSubProcessParam(processInstance);
         deleteCommandWithCheck(command.getId());
         return processInstance;
@@ -2706,6 +2710,11 @@ public class ProcessServiceImpl implements ProcessService {
         if (testDataSourceId != null)
             return testDataSourceId;
         return null;
+    }
+
+    @Override
+    public void saveCommandTrigger(Integer commandId, Integer processInstanceId) {
+        triggerRelationService.saveCommandTrigger(commandId, processInstanceId);
     }
 
     private Set<String> getResourceFullNames(TaskDefinition taskDefinition) {

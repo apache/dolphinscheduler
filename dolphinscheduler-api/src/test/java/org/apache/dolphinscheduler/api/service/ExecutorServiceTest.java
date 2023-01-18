@@ -66,6 +66,7 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.process.TriggerRelationService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -142,6 +143,9 @@ public class ExecutorServiceTest {
 
     @Mock
     private ProcessInstanceMapper processInstanceMapper;
+
+    @Mock
+    private TriggerRelationService triggerRelationService;
 
     private int processDefinitionId = 1;
 
@@ -231,6 +235,8 @@ public class ExecutorServiceTest {
         Mockito.when(processService.findProcessDefinition(1L, 1)).thenReturn(this.processDefinition);
         Mockito.when(taskGroupQueueMapper.selectById(1)).thenReturn(taskGroupQueue);
         Mockito.when(processInstanceMapper.selectById(1)).thenReturn(processInstance);
+        Mockito.when(triggerRelationService.saveProcessInstanceTrigger(Mockito.any(), Mockito.any()))
+                .thenReturn(1);
         Mockito.when(processService.findRelationByCode(processDefinitionCode, processDefinitionVersion))
                 .thenReturn(processTaskRelations);
     }

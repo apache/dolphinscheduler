@@ -222,6 +222,16 @@ public interface ProcessInstanceService {
     List<ProcessInstance> queryByProcessDefineCode(Long processDefinitionCode,
                                                    int size);
 
+    /**
+     * query process instance list bt trigger code
+     *
+     * @param loginUser
+     * @param projectCode
+     * @param triggerCode
+     * @return
+     */
+    Map<String, Object> queryByTriggerCode(User loginUser, long projectCode, Long triggerCode);
+
     void deleteProcessInstanceByWorkflowDefinitionCode(long workflowDefinitionCode);
 
     void deleteProcessInstanceById(int workflowInstanceId);
