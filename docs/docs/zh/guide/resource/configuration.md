@@ -19,8 +19,9 @@ Dolphinscheduler 资源中心使用本地系统默认是开启的，不需要用
 - 将 `resource.storage.upload.base.path` 改为本地存储路径，请确保部署 DolphinScheduler 的用户拥有读写权限，例如：`resource.storage.upload.base.path=/tmp/dolphinscheduler`。当路径不存在时会自动创建文件夹
 
 > **注意**
-> 1. 如果您不想用默认值作为资源中心的基础路径，请修改`resource.storage.upload.base.path`的值。
-> 2. 当配置 `resource.storage.type=LOCAL`，其实您配置了两个配置项，分别是 `resource.storage.type=HDFS` 和 `resource.hdfs.fs.defaultFS=file:///` ，我们单独配置 `resource.storage.type=LOCAL` 这个值是为了
+> 1. LOCAL模式不支持分布式模式读写，意味着上传的资源只能在一台机器上使用，除非使用共享文件挂载点
+> 2. 如果您不想用默认值作为资源中心的基础路径，请修改`resource.storage.upload.base.path`的值。
+> 3. 当配置 `resource.storage.type=LOCAL`，其实您配置了两个配置项，分别是 `resource.storage.type=HDFS` 和 `resource.hdfs.fs.defaultFS=file:///` ，我们单独配置 `resource.storage.type=LOCAL` 这个值是为了
 > 方便用户，并且能使得本地资源中心默认开启
 
 ## 对接分布式或远端对象存储
