@@ -48,6 +48,7 @@ public class DatafactoryHook {
             {DatafactoryStatus.Failed, DatafactoryStatus.Succeeded, DatafactoryStatus.Cancelled};
     protected final Logger logger =
             LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
+    private final int QUERY_INTERVAL = PropertyUtils.getInt(TaskConstants.QUERY_INTERVAL, 10000);
     private DataFactoryManager client;
     private AzureProfile profile;
     private ClientSecretCredential credential;
@@ -139,8 +140,8 @@ public class DatafactoryHook {
                 }
                 return false;
             }
-            logger.debug("wait 10s to recheck finish status....");
-            Thread.sleep(10000);
+            logger.debug("wait {}ms to recheck finish status....", QUERY_INTERVAL);
+            Thread.sleep(QUERY_INTERVAL);
         }
         return false;
     }
