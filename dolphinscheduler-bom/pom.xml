@@ -103,6 +103,8 @@
         <zt-zip.version>1.15</zt-zip.version>
         <trino-jdbc.version>402</trino-jdbc.version>
         <azure-identity.version>1.7.1</azure-identity.version>
+        <azure-resourcemanager.version>2.21.0</azure-resourcemanager.version>
+        <azure-resourcemanager-datafactory.version>1.0.0-beta.19</azure-resourcemanager-datafactory.version>
     </properties>
 
     <dependencyManagement>
@@ -797,6 +799,16 @@
                 <groupId>com.azure</groupId>
                 <artifactId>azure-identity</artifactId>
                 <version>${azure-identity.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.azure.resourcemanager</groupId>
+                <artifactId>azure-resourcemanager</artifactId>
+                <version>${azure-resourcemanager.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.azure.resourcemanager</groupId>
+                <artifactId>azure-resourcemanager-datafactory</artifactId>
+                <version>${azure-resourcemanager-datafactory.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

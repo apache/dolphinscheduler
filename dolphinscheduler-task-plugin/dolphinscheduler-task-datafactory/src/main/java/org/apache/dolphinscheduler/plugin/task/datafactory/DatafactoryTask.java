@@ -17,11 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.datafactory;
 
-import static com.fasterxml.jackson.databind.DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT;
-import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
-import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
-import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
-
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
@@ -36,20 +31,9 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-
 @Setter
 @Getter
 public class DatafactoryTask extends AbstractRemoteTask {
-
-    private static final ObjectMapper objectMapper =
-            JsonMapper.builder().configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
-                    .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
-                    .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
-                    .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
-                    .propertyNamingStrategy(new PropertyNamingStrategies.UpperCamelCaseStrategy()).build();
 
     private final TaskExecutionContext taskExecutionContext;
     private DatafactoryParameters parameters;
@@ -76,20 +60,20 @@ public class DatafactoryTask extends AbstractRemoteTask {
     public void submitApplication() throws TaskException {
         try {
             // start task
-            exitStatusCode = startDatasyncTask();
+            exitStatusCode = startDatafactoryTask();
             setExitStatusCode(exitStatusCode);
         } catch (Exception e) {
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
             throw new TaskException("data factory start task error", e);
         }
-        // set taskExecArn to the appIds if start success
+        // set runId to the appIds if start success
         setAppIds(parameters.getRunId());
     }
 
     @Override
     public void cancelApplication() throws TaskException {
         checkApplicationId();
-        hook.cancelDatasyncTask(parameters);
+        hook.cancelDatafactoryTask(parameters);
     }
 
     @Override
@@ -105,7 +89,7 @@ public class DatafactoryTask extends AbstractRemoteTask {
     }
 
     /**
-     * check datasync applicationId or get it from appId
+     * check datafactory applicationId or get it from appId
      */
     private void checkApplicationId() {
         String taskExecArn = hook.getRunId();
@@ -117,8 +101,8 @@ public class DatafactoryTask extends AbstractRemoteTask {
         }
     }
 
-    public int startDatasyncTask() {
-        Boolean isStartSuccessfully = hook.startDatasyncTask(parameters);
+    public int startDatafactoryTask() {
+        Boolean isStartSuccessfully = hook.startDatafactoryTask(parameters);
         if (!isStartSuccessfully) {
             return TaskConstants.EXIT_CODE_FAILURE;
         }

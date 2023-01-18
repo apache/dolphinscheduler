@@ -44,8 +44,6 @@ import com.azure.resourcemanager.datafactory.models.PipelineRuns;
 @Data
 public class DatafactoryHook {
 
-    // public static DatafactoryStatus[] doneStatus =
-    // {DatafactoryStatus.Canceling,DatafactoryStatus.InProgress,DatafactoryStatus.Queued};
     public static DatafactoryStatus[] taskFinishFlags =
             {DatafactoryStatus.Failed, DatafactoryStatus.Succeeded, DatafactoryStatus.Cancelled};
     protected final Logger logger =
@@ -76,7 +74,7 @@ public class DatafactoryHook {
         return DataFactoryManager.authenticate(credential, profile);
     }
 
-    public Boolean startDatasyncTask(DatafactoryParameters parameters) {
+    public Boolean startDatafactoryTask(DatafactoryParameters parameters) {
         logger.info("initDatafactoryTask ......");
         PipelineResource pipelineResource = getPipelineResource(parameters);
         if (pipelineResource == null) {
@@ -92,7 +90,7 @@ public class DatafactoryHook {
         return true;
     }
 
-    public Boolean cancelDatasyncTask(DatafactoryParameters parameters) {
+    public Boolean cancelDatafactoryTask(DatafactoryParameters parameters) {
         logger.info("cancelTask ......");
         PipelineRuns pipelineRuns = client.pipelineRuns();
         try {
@@ -104,15 +102,15 @@ public class DatafactoryHook {
         return true;
     }
 
-    public DatafactoryStatus queryDatasyncTaskStatus(DatafactoryParameters parameters) {
-        logger.info("queryDatasyncTaskStatus ......");
+    public DatafactoryStatus queryDatafactoryTaskStatus(DatafactoryParameters parameters) {
+        logger.info("queryDatafactoryTaskStatus ......");
 
         PipelineRuns pipelineRuns = client.pipelineRuns();
         PipelineRun pipelineRun =
                 pipelineRuns.get(parameters.getResourceGroupName(), parameters.getFactoryName(), parameters.getRunId());
 
         if (pipelineRun != null) {
-            logger.info("queryDatasyncTaskStatus ......{}", pipelineRun.status());
+            logger.info("queryDatafactoryTaskStatus ......{}", pipelineRun.status());
             return DatafactoryStatus.valueOf(pipelineRun.status());
         }
         return null;
@@ -128,7 +126,7 @@ public class DatafactoryHook {
         List<DatafactoryStatus> stopStatusSet = Arrays.asList(taskFinishFlags);
         int maxRetry = 5;
         while (maxRetry > 0) {
-            DatafactoryStatus status = queryDatasyncTaskStatus(parameters);
+            DatafactoryStatus status = queryDatafactoryTaskStatus(parameters);
 
             if (status == null) {
                 maxRetry--;
