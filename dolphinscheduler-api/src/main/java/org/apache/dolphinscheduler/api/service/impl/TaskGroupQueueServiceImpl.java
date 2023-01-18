@@ -28,6 +28,8 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 
+import org.apache.commons.collections4.CollectionUtils;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -146,6 +148,19 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
     }
 
     @Override
+    public void deleteByTaskInstanceIds(List<Integer> taskInstanceIds) {
+        if (CollectionUtils.isEmpty(taskInstanceIds)) {
+            return;
+        }
+        taskGroupQueueMapper.deleteByTaskInstanceIds(taskInstanceIds);
+    }
+
+    @Override
+    public void deleteByWorkflowInstanceId(Integer workflowInstanceId) {
+        taskGroupQueueMapper.deleteByWorkflowInstanceId(workflowInstanceId);
+    }
+
+    @Override
     public void forceStartTask(int queueId, int forceStart) {
         taskGroupQueueMapper.updateForceStart(queueId, forceStart);
     }
@@ -153,5 +168,13 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
     @Override
     public void modifyPriority(Integer queueId, Integer priority) {
         taskGroupQueueMapper.modifyPriority(queueId, priority);
+    }
+
+    @Override
+    public void deleteByTaskGroupIds(List<Integer> taskGroupIds) {
+        if (CollectionUtils.isEmpty(taskGroupIds)) {
+            return;
+        }
+        taskGroupQueueMapper.deleteByTaskGroupIds(taskGroupIds);
     }
 }

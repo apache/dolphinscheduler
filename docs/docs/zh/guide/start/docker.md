@@ -115,7 +115,7 @@ $ docker run -d --name dolphinscheduler-alert-server \
 ```
 
 > 注意：如果你本地还没有对应的数据库和 ZooKeeper 服务，但是想要尝试这个启动方式，可以先安装并启动
-> [PostgreSQL](https://www.postgresql.org/download/)(8.2.15+) 以及 [ZooKeeper](https://zookeeper.apache.org/releases.html)(3.4.6+)
+> [PostgreSQL](https://www.postgresql.org/download/)(8.2.15+) 以及 [ZooKeeper](https://zookeeper.apache.org/releases.html)(3.8.0)
 
 ## 登录系统
 

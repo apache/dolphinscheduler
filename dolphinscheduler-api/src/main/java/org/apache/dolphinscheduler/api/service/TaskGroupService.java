@@ -139,4 +139,6 @@ public interface TaskGroupService {
     Map<String, Object> forceStartTask(User loginUser, int taskId);
 
     Map<String, Object> modifyPriority(User loginUser, Integer queueId, Integer priority);
+
+    void deleteTaskGroupByProjectCode(long projectCode);
 }

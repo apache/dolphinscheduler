@@ -515,31 +515,33 @@ git checkout -b "${VERSION}" "${VERSION}"
 
 # You should test whether the standalone-server images work or not
 docker run --name dolphinscheduler-standalone-server -p 12345:12345 -p 25333:25333 -d apache/dolphinscheduler-standalone-server:"${DOLPHINSCHEDULER_VERSION}"
-
-# If success, push to dockerhub
-docker push apache/dolphinscheduler-tools:"${VERSION}"
-docker push apache/dolphinscheduler-standalone-server:"${VERSION}"
-docker push apache/dolphinscheduler-master:"${VERSION}"
-docker push apache/dolphinscheduler-worker:"${VERSION}"
-docker push apache/dolphinscheduler-api:"${VERSION}"
-docker push apache/dolphinscheduler-alert-server:"${VERSION}"
 ```
 
-> 注意：推送到 dockerhub，必须有 dockerhub 的 Apache 组织权限。 如果你不需要，你需要向 Apache infra Jira 申请。 您可以参考
+> 注意：推送到 dockerhub，必须有 dockerhub 的 Apache 组织权限。 如果你没有权限，你需要向 Apache infra Jira 申请。 您可以参考
 > [此处](https://issues.apache.org/jira/projects/INFRA/issues/INFRA-23314)提交申请
->
-> 如果您确保 docker image 正常工作，您也可以通过单个命令构建和推送 docker
->
-> ```shell
-> ./mvnw -B clean deploy \
->     -Dmaven.test.skip \
->     -Dmaven.javadoc.skip \
->     -Dmaven.checkstyle.skip \
->     -Dmaven.deploy.skip \
->     -Ddocker.tag="${VERSION}" \
->     -Ddocker.hub=apache \
->     -Pdocker,release
-> ```
+
+如果您确保 docker 镜像正常工作，您需要通过以下命令将镜像发布到 Docker Hub
+
+```shell
+./mvnw -B clean deploy \
+    -Dmaven.test.skip \
+    -Dmaven.javadoc.skip \
+    -Dmaven.checkstyle.skip \
+    -Dmaven.deploy.skip \
+    -Ddocker.tag="${VERSION}" \
+    -Ddocker.hub=apache \
+    -Pdocker,release
+```
+
+## 发布 Helm Chart
+
+我们也会将 Helm Chart 发布到 Docker Hub，这样用户就不需要下载我们的源码就可以使用 Helm 安装 DolphinScheduler，运行以下命令发布 Helm Chart 到 Docker Hub。
+
+```bash
+cd deploy/kubernetes
+helm package dolphinscheduler
+helm push dolphinscheduler-helm-$VERSION.tgz oci://registry-1.docker.io/apache
+```
 
 ### 发送公告邮件通知社区
 
