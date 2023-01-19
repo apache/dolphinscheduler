@@ -23,6 +23,7 @@ import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.MonitorService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -144,17 +145,23 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         /**
          * create command
          */
-        int create = this.createCommand(commandType, processDefinition.getCode(),
-                taskDependType, failureStrategy, startNodeList, cronTime, warningType, loginUser.getId(),
-                warningGroupId, runMode, processInstancePriority, workerGroup, environmentCode, startParams, expectedParallelismNumber, dryRun);
+        try {
+            int create = this.createCommand(commandType, processDefinition.getCode(),
+                    taskDependType, failureStrategy, startNodeList, cronTime, warningType, loginUser.getId(),
+                    warningGroupId, runMode, processInstancePriority, workerGroup, environmentCode, startParams, expectedParallelismNumber, dryRun);
 
-        if (create > 0) {
-            processDefinition.setWarningGroupId(warningGroupId);
-            processDefinitionMapper.updateById(processDefinition);
-            putMsg(result, Status.SUCCESS);
-        } else {
-            putMsg(result, Status.START_PROCESS_INSTANCE_ERROR);
+            if (create > 0) {
+                processDefinition.setWarningGroupId(warningGroupId);
+                processDefinitionMapper.updateById(processDefinition);
+                putMsg(result, Status.SUCCESS);
+            } else {
+                putMsg(result, Status.START_PROCESS_INSTANCE_ERROR);
+            }
+        } catch (ServiceException e) {
+            Optional<Status> status = Status.findStatusBy(e.getCode());
+            putMsg(result, status.orElse(Status.START_PROCESS_INSTANCE_ERROR));
         }
+
         return result;
     }
 
@@ -332,7 +339,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 }
                 break;
             case RECOVER_SUSPENDED_PROCESS:
-                if (executionStatus.typeIsPause() || executionStatus.typeIsCancel()) {
+                if (executionStatus.typeIsCancel()) {
                     checkResult = true;
                 }
                 break;
@@ -569,6 +576,14 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         int createCount = 0;
         runMode = (runMode == null) ? RunMode.RUN_MODE_SERIAL : runMode;
         Map<String, String> cmdParam = JSONUtils.toMap(command.getCommandParam());
+        List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionCode(command.getProcessDefinitionCode());
+        LinkedList<Date> listDate = new LinkedList<>(CronUtils.getSelfFireDateList(start, end, schedules));
+        final int listDateSize = listDate.size();
+        if (listDateSize == 0) {
+            logger.warn("can't create complement command, because the fire date cannot be created, scope: {} ~ {}",
+                    DateUtils.dateToString(start), DateUtils.dateToString(end));
+            throw new ServiceException(Status.COMPLEMENT_PROCESS_INSTANCE_DATE_RANGE_ERROR);
+        }
         switch (runMode) {
             case RUN_MODE_SERIAL: {
                 if (start.after(end)) {
@@ -587,10 +602,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                     break;
                 }
 
-                LinkedList<Date> listDate = new LinkedList<>();
-                List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionCode(command.getProcessDefinitionCode());
-                listDate.addAll(CronUtils.getSelfFireDateList(start, end, schedules));
-                int listDateSize = listDate.size();
                 createCount = listDate.size();
                 if (!CollectionUtils.isEmpty(listDate)) {
                     if (expectedParallelismNumber != null && expectedParallelismNumber != 0) {
