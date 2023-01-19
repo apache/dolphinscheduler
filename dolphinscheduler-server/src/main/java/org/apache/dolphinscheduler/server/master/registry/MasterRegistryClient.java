@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.common.enums.StateEvent;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -317,11 +318,14 @@ public class MasterRegistryClient {
             return false;
         }
 
-        Date taskTime = taskInstance.getStartTime() == null ? taskInstance.getSubmitTime() : taskInstance.getStartTime();
-
-        Date serverStartDate = getServerStartupTime(servers, taskInstance.getHost());
-        if (serverStartDate != null) {
-            return taskTime.after(serverStartDate);
+        Date taskSubmitTime = taskInstance.getSubmitTime();
+        Date serverStartTime = getServerStartupTime(servers, taskInstance.getHost());
+        if (taskSubmitTime != null && serverStartTime != null && taskSubmitTime.after(serverStartTime)) {
+            logger.info(
+                    "The taskInstance's submitTime: {} is after the need failover server's start time: {}, the taskInstance is newly submit, it doesn't need to failover",
+                    DateUtils.dateToString(taskSubmitTime),
+                    DateUtils.dateToString(serverStartTime));
+            return true;
         }
         return false;
     }
