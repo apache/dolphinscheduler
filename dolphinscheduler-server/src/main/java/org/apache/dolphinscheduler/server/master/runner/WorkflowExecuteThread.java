@@ -46,6 +46,7 @@ import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.process.ProcessDag;
 import org.apache.dolphinscheduler.common.process.Property;
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
@@ -404,8 +405,13 @@ public class WorkflowExecuteThread implements Runnable {
             return true;
         }
         if (task.getState().typeIsFinished()) {
-            if (completeTaskList.containsKey(Long.toString(task.getTaskCode())) && completeTaskList.get(Long.toString(task.getTaskCode())).getId() == task.getId()) {
+            if (completeTaskList.containsKey(Long.toString(task.getTaskCode())) && completeTaskList.get(Long.toString(task.getTaskCode())).getId() == task.getId()
+                && task.getState() != ExecutionStatus.NEED_FAULT_TOLERANCE) {
                 return true;
+            }
+            if (task.getStartTime() == null) {
+                logger.info("Maybe TASK_EXECUTE_ACK has not been received when the task finish, will wait for one second");
+                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
             }
             taskFinished(task);
             return true;
