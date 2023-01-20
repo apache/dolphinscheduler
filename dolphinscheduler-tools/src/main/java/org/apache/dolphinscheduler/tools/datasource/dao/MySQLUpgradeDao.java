@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.tools.datasource.dao;
 
-import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.sql.Connection;
@@ -56,17 +55,13 @@ public class MySQLUpgradeDao extends UpgradeDao {
      */
     @Override
     public boolean isExistsTable(String tableName) {
-        ResultSet rs = null;
-        Connection conn = null;
-        try {
-            conn = dataSource.getConnection();
-            rs = conn.getMetaData().getTables(conn.getCatalog(), conn.getSchema(), tableName, null);
+        try (
+                Connection conn = dataSource.getConnection();
+                ResultSet rs = conn.getMetaData().getTables(conn.getCatalog(), conn.getSchema(), tableName, null)) {
             return rs.next();
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);
-        } finally {
-            ConnectionUtils.releaseResource(rs, conn);
         }
 
     }
@@ -79,19 +74,16 @@ public class MySQLUpgradeDao extends UpgradeDao {
      */
     @Override
     public boolean isExistsColumn(String tableName, String columnName) {
-        Connection conn = null;
-        try {
-            conn = dataSource.getConnection();
-            ResultSet rs = conn.getMetaData().getColumns(conn.getCatalog(), conn.getSchema(), tableName, columnName);
+        try (
+                Connection conn = dataSource.getConnection();
+                ResultSet rs =
+                        conn.getMetaData().getColumns(conn.getCatalog(), conn.getSchema(), tableName, columnName)) {
             return rs.next();
 
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);
-        } finally {
-            ConnectionUtils.releaseResource(conn);
         }
-
     }
 
 }

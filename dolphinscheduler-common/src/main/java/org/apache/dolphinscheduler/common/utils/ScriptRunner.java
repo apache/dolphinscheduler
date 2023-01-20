@@ -24,6 +24,8 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,17 +93,17 @@ public class ScriptRunner {
      * @throws IOException if there is an error reading from the Reader
      */
     private void runScript(Connection conn, Reader reader) throws IOException, SQLException {
-        StringBuffer command = null;
+        List<String> command = null;
         try {
             LineNumberReader lineReader = new LineNumberReader(reader);
             String line;
             while ((line = lineReader.readLine()) != null) {
                 if (command == null) {
-                    command = new StringBuffer();
+                    command = new ArrayList<>();
                 }
                 String trimmedLine = line.trim();
                 if (trimmedLine.startsWith("--")) {
-                    logger.info(trimmedLine);
+                    logger.info("\n{}", trimmedLine);
                 } else if (trimmedLine.length() < 1 || trimmedLine.startsWith("//")) {
                     // Do nothing
                 } else if (trimmedLine.startsWith("delimiter")) {
@@ -110,12 +112,11 @@ public class ScriptRunner {
 
                 } else if (!fullLineDelimiter && trimmedLine.endsWith(getDelimiter())
                         || fullLineDelimiter && trimmedLine.equals(getDelimiter())) {
-                    command.append(line, 0, line.lastIndexOf(getDelimiter()));
-                    command.append(" ");
-                    logger.info("sql: {}", command);
+                    command.add(line.substring(0, line.lastIndexOf(getDelimiter())));
+                    logger.info("\n{}", String.join("\n", command));
 
                     try (Statement statement = conn.createStatement()) {
-                        statement.execute(command.toString());
+                        statement.execute(String.join(" ", command));
                         try (ResultSet rs = statement.getResultSet()) {
                             if (stopOnError && rs != null) {
                                 ResultSetMetaData md = rs.getMetaData();
@@ -142,8 +143,7 @@ public class ScriptRunner {
                     command = null;
                     Thread.yield();
                 } else {
-                    command.append(line);
-                    command.append(" ");
+                    command.add(line);
                 }
             }
 

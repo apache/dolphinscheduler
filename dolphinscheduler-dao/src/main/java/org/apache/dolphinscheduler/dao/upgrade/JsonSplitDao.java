@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.upgrade;
 
-import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
@@ -92,8 +91,6 @@ public class JsonSplitDao {
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             throw new RuntimeException(e);
-        } finally {
-            ConnectionUtils.releaseResource(conn);
         }
     }
 
@@ -160,8 +157,6 @@ public class JsonSplitDao {
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             throw new RuntimeException(e);
-        } finally {
-            ConnectionUtils.releaseResource(conn);
         }
     }
 
@@ -250,8 +245,6 @@ public class JsonSplitDao {
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             throw new RuntimeException(e);
-        } finally {
-            ConnectionUtils.releaseResource(conn);
         }
     }
 }

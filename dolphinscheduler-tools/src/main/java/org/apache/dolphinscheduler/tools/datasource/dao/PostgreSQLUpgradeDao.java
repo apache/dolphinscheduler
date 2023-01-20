@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.tools.datasource.dao;
 
-import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.sql.Connection;
@@ -51,13 +50,10 @@ public class PostgreSQLUpgradeDao extends UpgradeDao {
     }
 
     public String getSchema() {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        ResultSet resultSet = null;
-        try {
-            conn = dataSource.getConnection();
-            pstmt = conn.prepareStatement("select current_schema()");
-            resultSet = pstmt.executeQuery();
+        try (
+                Connection conn = dataSource.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement("select current_schema()");
+                ResultSet resultSet = pstmt.executeQuery()) {
             while (resultSet.next()) {
                 if (resultSet.isFirst()) {
                     return resultSet.getString(1);
@@ -66,8 +62,6 @@ public class PostgreSQLUpgradeDao extends UpgradeDao {
 
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
-        } finally {
-            ConnectionUtils.releaseResource(resultSet, pstmt, conn);
         }
         return "";
     }
@@ -80,21 +74,14 @@ public class PostgreSQLUpgradeDao extends UpgradeDao {
      */
     @Override
     public boolean isExistsTable(String tableName) {
-        Connection conn = null;
-        ResultSet rs = null;
-        try {
-            conn = dataSource.getConnection();
-
-            rs = conn.getMetaData().getTables(conn.getCatalog(), getSchema(), tableName, null);
-
+        try (
+                Connection conn = dataSource.getConnection();
+                ResultSet rs = conn.getMetaData().getTables(conn.getCatalog(), getSchema(), tableName, null)) {
             return rs.next();
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);
-        } finally {
-            ConnectionUtils.releaseResource(rs, conn);
         }
-
     }
 
     /**
@@ -106,20 +93,14 @@ public class PostgreSQLUpgradeDao extends UpgradeDao {
      */
     @Override
     public boolean isExistsColumn(String tableName, String columnName) {
-        Connection conn = null;
-        ResultSet rs = null;
-        try {
-            conn = dataSource.getConnection();
-            rs = conn.getMetaData().getColumns(conn.getCatalog(), getSchema(), tableName, columnName);
+        try (
+                Connection conn = dataSource.getConnection();
+                ResultSet rs = conn.getMetaData().getColumns(conn.getCatalog(), getSchema(), tableName, columnName)) {
             return rs.next();
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);
-        } finally {
-            ConnectionUtils.releaseResource(rs, conn);
-
         }
-
     }
 
 }
