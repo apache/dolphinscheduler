@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.tools.datasource.upgrader.DolphinSchedulerUpgrader;
+import org.apache.dolphinscheduler.tools.datasource.upgrader.DolphinSchedulerVersion;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -139,7 +140,7 @@ public class V320DolphinSchedulerUpgrader implements DolphinSchedulerUpgrader {
     }
 
     @Override
-    public String getCurrentVersion() {
-        return "3.2.0";
+    public DolphinSchedulerVersion getCurrentVersion() {
+        return DolphinSchedulerVersion.V3_2_0;
     }
 }
