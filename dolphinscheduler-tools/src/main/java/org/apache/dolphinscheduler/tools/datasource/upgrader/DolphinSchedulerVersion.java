@@ -17,9 +17,31 @@
 
 package org.apache.dolphinscheduler.tools.datasource.upgrader;
 
-public interface DolphinSchedulerUpgrader {
+import java.util.Optional;
 
-    void doUpgrade();
+public enum DolphinSchedulerVersion {
 
-    DolphinSchedulerVersion getCurrentVersion();
+    V1_3_0("1.3.0"),
+    V1_3_2("1.3.2"),
+    V2_0_0("2.0.0"),
+    V3_2_0("3.2.0"),
+    ;
+    private final String versionName;
+
+    DolphinSchedulerVersion(String versionName) {
+        this.versionName = versionName;
+    }
+
+    public String getVersionName() {
+        return versionName;
+    }
+
+    public static Optional<DolphinSchedulerVersion> getVersion(String versionName) {
+        for (DolphinSchedulerVersion version : DolphinSchedulerVersion.values()) {
+            if (version.getVersionName().equals(versionName)) {
+                return Optional.of(version);
+            }
+        }
+        return Optional.empty();
+    }
 }

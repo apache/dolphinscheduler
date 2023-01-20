@@ -763,7 +763,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         String trimmedSearchVal = searchVal != null ? searchVal.trim() : "";
         // filter based on trimmed searchVal
         List<StorageEntity> filteredResourceList = resourcesList.stream()
-                .filter(x -> x.getFileName().matches("(.*)" + trimmedSearchVal + "(.*)")).collect(Collectors.toList());
+                .filter(x -> x.getFileName().contains(trimmedSearchVal)).collect(Collectors.toList());
         // inefficient pagination
         List<StorageEntity> slicedResourcesList = filteredResourceList.stream().skip((long) (pageNo - 1) * pageSize)
                 .limit(pageSize).collect(Collectors.toList());
