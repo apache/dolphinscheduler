@@ -285,6 +285,11 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
         return getHdfsUdfDir(tenantCode) + FOLDER_SEPARATOR;
     }
 
+    @Override
+    public String getDataBasePath() {
+        return getHdfsDataBasePath();
+    }
+
     /**
      * make the given file and all non-existent parents into
      * directories. Has the semantics of Unix 'mkdir -p'.

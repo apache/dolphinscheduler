@@ -1989,6 +1989,52 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     }
 
     /**
+     * get resource base dir
+     *
+     * @param loginUser login user
+     * @param type      resource type
+     * @return
+     */
+    @Override
+    public Result<Object> queryResourceBaseDir(User loginUser, ResourceType type) {
+        Result<Object> result = new Result<>();
+        User user = userMapper.selectById(loginUser.getId());
+        if (user == null) {
+            logger.error("user {} not exists", loginUser.getId());
+            putMsg(result, Status.USER_NOT_EXIST, loginUser.getId());
+            return result;
+        }
+
+        Tenant tenant = tenantMapper.queryById(user.getTenantId());
+        if (tenant == null) {
+            logger.error("tenant not exists");
+            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
+            return result;
+        }
+        String tenantCode = tenant.getTenantCode();
+        String userResRootPath = ResourceType.UDF.equals(type) ? storageOperate.getUdfDir(tenantCode)
+                : storageOperate.getResDir(tenantCode);
+
+        if (isAdmin(loginUser)) {
+            userResRootPath = storageOperate.getDataBasePath();
+        }
+
+        try {
+            userResRootPath =
+                    storageOperate.getFileStatus(userResRootPath, userResRootPath, tenantCode, type).getFullName();
+        } catch (Exception e) {
+            logger.error("Get file status fail, resource path: {}", userResRootPath, e);
+            putMsg(result, Status.RESOURCE_NOT_EXIST);
+            throw new ServiceException((String.format("Get file status fail, resource path: %s", userResRootPath)));
+        }
+
+        putMsg(result, Status.SUCCESS);
+        result.setData(userResRootPath);
+
+        return result;
+    }
+
+    /**
      * get authorized resource list
      *
      * @param resourceSet        resource set

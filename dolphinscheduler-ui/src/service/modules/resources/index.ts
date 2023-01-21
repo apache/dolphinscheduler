@@ -65,6 +65,16 @@ export function queryCurrentResourceByFullName(
   })
 }
 
+export function queryBaseDir(
+    params: { type: String },
+): any {
+  return axios({
+    url: '/resources/base-dir',
+    method: 'get',
+    params
+  })
+}
+
 export function createResource(
   data: CreateReq & FileNameReq & NameReq & ResourceTypeReq
 ): any {

@@ -36,6 +36,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.RESOURCE_NOT_EXIST;
 import static org.apache.dolphinscheduler.api.enums.Status.UNAUTHORIZED_UDF_FUNCTION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_RESOURCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_UDF_FUNCTION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.USER_NOT_EXIST;
 import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_RESOURCE_BY_NAME_AND_TYPE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_UDF_FUNCTION_NAME_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VIEW_RESOURCE_FILE_ON_LINE_ERROR;
@@ -772,5 +773,18 @@ public class ResourcesController extends BaseController {
                                           @RequestParam(value = "tenantCode") String tenantCode) throws IOException {
 
         return resourceService.queryResourceByFullName(loginUser, fullName, tenantCode, type);
+    }
+
+    @Parameters({
+            @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema = @Schema(implementation = ResourceType.class))
+    })
+    @Operation(summary = "queryResourceBaseDir", description = "QUERY_RESOURCE_BASE_DIR")
+    @GetMapping(value = "/base-dir")
+    @ResponseStatus(HttpStatus.CREATED)
+    @ApiException(USER_NOT_EXIST)
+    @AccessLogAnnotation
+    public Result queryResourceBaseDir(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                       @RequestParam(value = "type") ResourceType type) {
+        return resourceService.queryResourceBaseDir(loginUser, type);
     }
 }

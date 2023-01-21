@@ -134,6 +134,11 @@ public class S3StorageOperator implements Closeable, StorageOperate {
     }
 
     @Override
+    public String getDataBasePath() {
+        return getS3DataBasePath();
+    }
+
+    @Override
     public boolean mkdir(String tenantCode, String path) throws IOException {
         String objectName = path + FOLDER_SEPARATOR;
         if (!s3Client.doesObjectExist(BUCKET_NAME, objectName)) {

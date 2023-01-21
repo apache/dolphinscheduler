@@ -271,4 +271,13 @@ public interface ResourcesService {
     Result<Object> queryResourceByFullName(User loginUser, String fullName, String tenantCode,
                                            ResourceType type) throws IOException;
 
+    /**
+     * get resource base dir
+     *
+     * @param loginUser login user
+     * @param type      resource type
+     * @return
+     */
+    Result<Object> queryResourceBaseDir(User loginUser, ResourceType type);
+
 }

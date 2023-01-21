@@ -152,6 +152,11 @@ public class OssStorageOperator implements Closeable, StorageOperate {
     }
 
     @Override
+    public String getDataBasePath() {
+        return getOssDataBasePath();
+    }
+
+    @Override
     public boolean mkdir(String tenantCode, String path) throws IOException {
         final String key = path + FOLDER_SEPARATOR;
         if (!ossClient.doesObjectExist(bucketName, key)) {

@@ -27,11 +27,10 @@ import { NSpace, NTooltip, NButton, NPopconfirm } from 'naive-ui'
 import { EditOutlined, DeleteOutlined, DownloadOutlined } from '@vicons/antd'
 import { useAsyncState } from '@vueuse/core'
 import {
-  queryResourceListPaging,
-  downloadResource,
-  deleteResource,
-  queryCurrentResourceByFileName,
-  queryCurrentResourceByFullName
+    queryResourceListPaging,
+    downloadResource,
+    deleteResource,
+    queryCurrentResourceByFullName
 } from '@/service/modules/resources'
 import ButtonLink from '@/components/button-link'
 import {
@@ -41,6 +40,7 @@ import {
 } from '@/common/column-width-config'
 import type { IUdfResourceParam } from './types'
 import { ResourceFile } from '@/service/modules/resources/types'
+import { getBaseDir } from "@/views/resource";
 
 const goSubFolder = (router: Router, item: any) => {
   const fileStore = useFileStore()
@@ -51,6 +51,8 @@ const goSubFolder = (router: Router, item: any) => {
         query: {prefix: item.fullName, tenantCode: item.userName} })
   }
 }
+
+const baseUDFDir = getBaseDir('UDF')
 
 export function useTable() {
   const { t } = useI18n()
@@ -249,8 +251,8 @@ export function useTable() {
                 tenantCode: variables.tenantCode,
               }
             ).then((res: ResourceFile) => {
-                if (res.fileName) {
-                  const breadList = res.fileName.split('/')
+                if (res.fullName) {
+                  const breadList = res.fullName.split('/')
                   // pop the alias from the fullname path
                   breadList.pop()
                   variables.breadList = breadList
@@ -297,11 +299,15 @@ export function useTable() {
     router.push({ name: 'resource-manage' })
   }
 
-  const goBread = (fileName: string) => {
-    queryCurrentResourceByFileName(
+  const goBread = (fullName: string) => {
+      if (!fullName.startsWith(baseUDFDir.value)) {
+          goUdfManage()
+          return
+      }
+    queryCurrentResourceByFullName(
       {
         type: 'UDF',
-        fileName: fileName + "/",
+        fullName: fullName + "/",
         tenantCode: variables.tenantCode
       }
     ).then((res: any) => {

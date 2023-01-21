@@ -52,6 +52,12 @@ public interface StorageOperate {
     String getUdfDir(String tenantCode);
 
     /**
+     * get data base path
+     * @return
+     */
+    String getDataBasePath();
+
+    /**
      * create the directory that the path of tenant wanted to create
      * @param tenantCode
      * @param path

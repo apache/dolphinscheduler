@@ -38,11 +38,10 @@ import { useI18n } from 'vue-i18n'
 import { SearchOutlined } from '@vicons/antd'
 import { useTable } from './table/use-table'
 import { useFileState } from './use-file'
-import { BreadcrumbItem, IRenameFile } from './types'
+import { IRenameFile } from './types'
 import { useFileStore } from '@/store/file/file'
 import {
-  queryCurrentResourceByFullName,
-  queryCurrentResourceByFileName
+  queryCurrentResourceByFullName
 } from '@/service/modules/resources'
 import Card from '@/components/card'
 import ResourceFolderModal from './folder'
@@ -52,6 +51,9 @@ import styles from './index.module.scss'
 import type { ResourceFile } from '@/service/modules/resources/types'
 import type { Router } from 'vue-router'
 import Search from "@/components/input-search";
+import {getBaseDir} from "@/views/resource";
+
+const baseFILEDir = getBaseDir('FILE')
 
 export default defineComponent({
   name: 'File',
@@ -146,12 +148,6 @@ export default defineComponent({
       handleShowModal(renameShowRef)
     }
 
-    const handleGoRoot = () => {
-      router.push({
-        name: 'file-manage'
-      })
-    }
-
     const updateList = () => {
       resourceListRef.value = getResourceListState(
         fullName.value,
@@ -165,23 +161,62 @@ export default defineComponent({
       resourceListRef.value = getResourceListState(fullName.value, tenantCode.value,searchRef.value)
     })
 
-    const breadcrumbItemsRef: Ref<Array<BreadcrumbItem> | undefined> = ref([
-      {
-        id: 1,
-        fullName: 'l1',
-        userName: 'u1'
-      },
-      {
-        id: 2,
-        fullName: 'l2',
-        userName: 'u2'
-      },
-      {
-        id: 4,
-        fullName: 'l3',
-        userName: 'u3'
+    const breadList = ref([])
+
+    const handleGoBread = (index: number) => {
+      let breadName = ''
+      breadList.value.forEach((item, i) => {
+        if (i <= index) {
+          breadName = breadName === "" ? item.toString() : breadName + '/' + item.toString();
+        }
+      })
+      goBread(breadName)
+    }
+
+    const goBread = (fullName: String) => {
+      if (!fullName.startsWith(baseFILEDir.value)) {
+        handleGoResourceManage()
+        return
       }
-    ])
+      queryCurrentResourceByFullName(
+          {
+            type: 'FILE',
+            fullName: fullName + "/",
+            tenantCode: tenantCode.value
+          }
+      ).then((res: any) => {
+        fileStore.setCurrentDir(res.fullName)
+        router.push({
+          name: 'file-manage', query: {prefix: res.fullName, tenantCode: res.userName}
+        })
+      })
+    }
+
+    const handleGoResourceManage = () => {
+      router.push({ name: 'file-manage' })
+    }
+
+    const getTableData = (fullName: String) => {
+      if (fullName != "") {
+        queryCurrentResourceByFullName(
+            {
+              type: 'FILE',
+              fullName: fullName,
+              tenantCode: tenantCode.value,
+            }
+        ).then((res: ResourceFile) => {
+          if (res.fullName) {
+            const dirs = res.fullName.split('/')
+            if (dirs && dirs.length > 1) {
+              dirs.pop()
+              breadList.value = dirs
+            }
+          }
+        })
+      } else {
+        breadList.value = []
+      }
+    }
 
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
@@ -194,40 +229,8 @@ export default defineComponent({
       }
     })
 
-    const initBreadcrumb = async (dirs: string[]) => {
-      for (let index = 0; index < dirs.length; index ++) {
-        const newDir = dirs.slice(0, index + 1).join('/')
-        const resource = await queryCurrentResourceByFileName(
-          {
-            type: 'FILE',
-            fileName: newDir+"/",
-            tenantCode: tenantCode.value
-          }
-        )
-        breadcrumbItemsRef.value?.push({ id: resource.fullName, fullName: resource.alias, userName: resource.userName })
-        }
-    }
-
     onMounted(() => {
-      breadcrumbItemsRef.value = []
-      if (fullName.value != "") {
-        breadcrumbItemsRef.value?.push({ id: 0, fullName: 'Root', userName: '' })
-        queryCurrentResourceByFullName(
-          {
-            type: 'FILE',
-            fullName: fullName.value,
-            tenantCode: tenantCode.value,
-          }
-        ).then((res: ResourceFile) => {
-          if (res.fileName) {
-            const dirs = res.fileName.split('/')
-            if (dirs && dirs.length > 1) {
-              dirs.pop()
-              initBreadcrumb(dirs)
-            }
-          }
-        })
-      }
+      getTableData(fullName.value)
     })
 
     return {
@@ -246,10 +249,11 @@ export default defineComponent({
       handleRenameFile,
       handleUpdatePage,
       handleUpdatePageSize,
-      handleGoRoot,
+      handleGoBread,
+      handleGoResourceManage,
       pagination: paginationReactive,
       renameInfo,
-      breadcrumbItemsRef,
+      breadList,
       trim
     }
   },
@@ -300,23 +304,23 @@ export default defineComponent({
         </Card>
         <Card title={t('resource.file.file_manage')}>
           {{
-            'header-extra': () => (
+            header: () => (
               <NBreadcrumb separator='>' class={styles['breadcrumb']}>
-                {this.breadcrumbItemsRef?.map((item: BreadcrumbItem) => {
-                  if (item.id === 0) {
-                    return (
-                      <NBreadcrumbItem>
-                        <span onClick={this.handleGoRoot}>{item.fullName}</span>
-                      </NBreadcrumbItem>
-                    )
-                  } else {
-                    return (
-                      <NBreadcrumbItem href={"0?prefix=" + item.id.toString() + "&tenantCode=" + item.userName}>
-                        {item.fullName}
-                      </NBreadcrumbItem>
-                    )
-                  }
-                })}
+                <NBreadcrumbItem>
+                  <NButton text onClick={() => this.handleGoResourceManage()}>
+                    {t('resource.file.file_manage')}
+                  </NButton>
+                </NBreadcrumbItem>
+                {this.breadList.map((item, index) => (
+                  <NBreadcrumbItem>
+                    <NButton
+                        text
+                        disabled={index === this.breadList.length - 1}
+                        onClick={() => this.handleGoBread(index)}>
+                      {item}
+                    </NButton>
+                  </NBreadcrumbItem>
+                ))}
               </NBreadcrumb>
             ),
             default: () => (
