@@ -96,6 +96,7 @@ export SPRING_DATASOURCE_PASSWORD={password}
 ```
 
 完成上述步骤后，您已经为 DolphinScheduler 创建一个新数据库，现在你可以通过快速的 Shell 脚本来初始化数据库
+如果使用的mysql数据库，你需要手动下载 [mysql-connector-java 驱动][mysql] (8.0.16) 并移动到 DolphinScheduler 的tools模块的 libs 目录下`tools/libs/`。
 
 ```shell
 bash tools/bin/upgrade-schema.sh
