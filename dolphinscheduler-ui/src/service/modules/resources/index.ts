@@ -66,7 +66,7 @@ export function queryCurrentResourceByFullName(
 }
 
 export function queryBaseDir(
-    params: { type: String },
+    params: { type: string },
 ): any {
   return axios({
     url: '/resources/base-dir',

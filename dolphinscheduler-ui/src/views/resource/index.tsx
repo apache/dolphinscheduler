@@ -26,7 +26,7 @@ const resource = defineComponent({
   }
 })
 
-export function getBaseDir(resourceType: String) {
+export function getBaseDir(resourceType: string) {
     const baseDir = ref(String(""));
     queryBaseDir(
       {

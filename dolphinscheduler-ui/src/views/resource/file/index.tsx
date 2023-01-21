@@ -161,7 +161,7 @@ export default defineComponent({
       resourceListRef.value = getResourceListState(fullName.value, tenantCode.value,searchRef.value)
     })
 
-    const breadList = ref([])
+    const breadList = ref([] as String[])
 
     const handleGoBread = (index: number) => {
       let breadName = ''
@@ -173,7 +173,7 @@ export default defineComponent({
       goBread(breadName)
     }
 
-    const goBread = (fullName: String) => {
+    const goBread = (fullName: string) => {
       if (!fullName.startsWith(baseFILEDir.value)) {
         handleGoResourceManage()
         return
@@ -196,12 +196,12 @@ export default defineComponent({
       router.push({ name: 'file-manage' })
     }
 
-    const getTableData = (fullName: String) => {
+    const getTableData = (fullName: string) => {
       if (fullName != "") {
         queryCurrentResourceByFullName(
             {
               type: 'FILE',
-              fullName: fullName,
+              fullName: fullName as string,
               tenantCode: tenantCode.value,
             }
         ).then((res: ResourceFile) => {
@@ -214,7 +214,7 @@ export default defineComponent({
           }
         })
       } else {
-        breadList.value = []
+        breadList.value = [] as String[]
       }
     }
 

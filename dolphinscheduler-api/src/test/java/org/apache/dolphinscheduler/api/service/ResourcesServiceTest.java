@@ -904,7 +904,7 @@ public class ResourcesServiceTest {
     }
 
     @Test
-    public void testQueryBaseDir() {
+    void testQueryBaseDir() {
         User user = getUser();
         Mockito.when(userMapper.selectById(user.getId())).thenReturn(getUser());
         Mockito.when(tenantMapper.queryById(user.getTenantId())).thenReturn(getTenant());
