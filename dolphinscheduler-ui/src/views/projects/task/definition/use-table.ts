@@ -146,7 +146,7 @@ export function useTable(onEdit: Function) {
       {
         title: t('project.task.operation'),
         key: 'operation',
-        ...COLUMN_WIDTH_CONFIG['operation'](4),
+        ...COLUMN_WIDTH_CONFIG['operation'](3),
         render(row: any) {
           return h(NSpace, null, {
             default: () => [
@@ -175,33 +175,6 @@ export function useTable(onEdit: Function) {
                       }
                     ),
                   default: () => t('project.task.edit')
-                }
-              ),
-              h(
-                NTooltip,
-                {},
-                {
-                  trigger: () =>
-                    h(
-                      NButton,
-                      {
-                        circle: true,
-                        type: 'info',
-                        size: 'small',
-                        disabled:
-                          !!row.processDefinitionCode &&
-                          row.processReleaseState === 'ONLINE',
-                        onClick: () => {
-                          variables.showMoveModalRef = true
-                          variables.row = row
-                        }
-                      },
-                      {
-                        icon: () =>
-                          h(NIcon, null, { default: () => h(DragOutlined) })
-                      }
-                    ),
-                  default: () => t('project.task.move')
                 }
               ),
               h(
@@ -288,7 +261,6 @@ export function useTable(onEdit: Function) {
     totalPage: ref(1),
     taskType: ref(null),
     showVersionModalRef: ref(false),
-    showMoveModalRef: ref(false),
     row: {},
     loadingRef: ref(false)
   })
