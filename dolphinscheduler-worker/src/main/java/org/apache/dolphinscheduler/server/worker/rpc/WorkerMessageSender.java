@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 import org.apache.dolphinscheduler.server.worker.message.MessageSender;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -34,7 +35,6 @@ import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -46,14 +46,13 @@ public class WorkerMessageSender {
     private MessageRetryRunner messageRetryRunner;
 
     @Autowired
-    private ApplicationContext applicationContext;
+    private List<MessageSender> messageSenders;
 
     private Map<CommandType, MessageSender> messageSenderMap = new HashMap<>();
 
     @PostConstruct
     public void init() {
-        Map<String, MessageSender> messageSenders = applicationContext.getBeansOfType(MessageSender.class);
-        messageSenders.values().forEach(messageSender -> messageSenderMap.put(messageSender.getMessageType(),
+        messageSenders.forEach(messageSender -> messageSenderMap.put(messageSender.getMessageType(),
                 messageSender));
     }
 
