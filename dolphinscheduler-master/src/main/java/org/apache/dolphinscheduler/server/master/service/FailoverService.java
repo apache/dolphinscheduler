@@ -56,7 +56,7 @@ public class FailoverService {
                 LOGGER.info("Master failover finished, masterServer: {}", serverHost);
                 break;
             case WORKER:
-                LOGGER.info("Worker failover staring, workerServer: {}", serverHost);
+                LOGGER.info("Worker failover starting, workerServer: {}", serverHost);
                 workerFailoverService.failoverWorker(serverHost);
                 LOGGER.info("Worker failover finished, workerServer: {}", serverHost);
                 break;
