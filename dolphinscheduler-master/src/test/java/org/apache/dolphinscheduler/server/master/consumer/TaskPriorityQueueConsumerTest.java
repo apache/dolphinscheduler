@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
+import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.TaskPriority;
 import org.apache.dolphinscheduler.service.queue.TaskPriorityQueue;
@@ -310,7 +311,12 @@ public class TaskPriorityQueueConsumerTest {
 
         TaskPriority taskPriority = new TaskPriority();
         taskPriority.setTaskId(1);
-        boolean res = taskPriorityQueueConsumer.dispatchTask(taskPriority);
+        boolean res = false;
+        try {
+            taskPriorityQueueConsumer.dispatchTask(taskPriority);
+        } catch (ExecuteException e) {
+            throw new RuntimeException(e);
+        }
 
         Assertions.assertFalse(res);
     }

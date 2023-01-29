@@ -165,7 +165,8 @@ public class StreamTaskExecuteRunnable implements Runnable {
                 taskExecutionContext.getWorkerGroup(), taskInstance);
         Boolean dispatchSuccess = false;
         try {
-            dispatchSuccess = dispatcher.dispatch(executionContext);
+            dispatcher.dispatch(executionContext);
+            dispatchSuccess = true;
         } catch (ExecuteException e) {
             logger.error("Master dispatch task to worker error, taskInstanceId: {}, worker: {}",
                     taskInstance.getId(),

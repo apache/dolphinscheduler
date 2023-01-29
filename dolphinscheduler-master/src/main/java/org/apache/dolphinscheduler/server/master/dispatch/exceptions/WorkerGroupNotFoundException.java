@@ -15,24 +15,11 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.dispatch.host;
+package org.apache.dolphinscheduler.server.master.dispatch.exceptions;
 
-import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
-import org.apache.dolphinscheduler.server.master.dispatch.exceptions.WorkerGroupNotFoundException;
+public class WorkerGroupNotFoundException extends ExecuteException {
 
-/**
- *  host manager
- */
-public interface HostManager {
-
-    /**
-     * select host
-     *
-     * @param context context
-     * @return host
-     * @throws WorkerGroupNotFoundException If the worker group does exist
-     */
-    Host select(ExecutionContext context) throws WorkerGroupNotFoundException;
-
+    public WorkerGroupNotFoundException(String workerGroup) {
+        super("Cannot find worker group: " + workerGroup);
+    }
 }
