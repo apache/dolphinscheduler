@@ -15,6 +15,7 @@ DolphinScheduler DataFactory functions:
 - **Pipeline**: Azure owns pipelines under the assigned resource group and data factory
 - **Application**: Azure owns an application has permission to visit data factory, enables using SDK to call data factory functions
 - **ApplicationClientSecret**: To apply for client secret under Application `Certificates & secrets`
+- **AZURE-CLI**: Install Azure auth application AZURE-CLI on machine, please refer to [Install the Azure CLI on Linux](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli-linux)
 
 ### Application Permission Setting
 

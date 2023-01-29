@@ -15,6 +15,7 @@ DolphinScheduler DataFactory 组件的功能:
 - **Pipeline**: 拥有前两者对应的pipeline
 - **应用**: 拥有一个有数据工厂访问权限的应用，才能赋予SDK调用数据工厂
 - **应用客户端密钥**: 在应用的`Certificates & secrets`申请客户端密钥
+- **AZURE-CLI**: 在机器上安装了AZURE的鉴权应用AZURE-CLI，请参考[在LINUX上安装AZURE-CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli-linux)
 
 ### 应用权限设置
 
