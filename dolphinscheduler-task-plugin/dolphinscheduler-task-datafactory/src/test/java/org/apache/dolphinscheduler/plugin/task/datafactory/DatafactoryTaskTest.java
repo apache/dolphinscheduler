@@ -68,6 +68,7 @@ public class DatafactoryTaskTest {
         Assertions.assertEquals("whale1", parameters.getFactoryName());
         Assertions.assertEquals("factory1", parameters.getResourceGroupName());
         Assertions.assertEquals("CopyPipeline_ps8", parameters.getPipelineName());
+        datafactoryHookMockedStatic.close();
     }
 
     @Test
@@ -93,6 +94,7 @@ public class DatafactoryTaskTest {
     public void testCancelTask() {
         datafactoryTask.cancelApplication();
         Assertions.assertEquals(datafactoryTask.getExitStatusCode(), TaskConstants.EXIT_CODE_KILL);
+        datafactoryHookMockedStatic.close();
     }
 
     private DatafactoryParameters castParam() {
