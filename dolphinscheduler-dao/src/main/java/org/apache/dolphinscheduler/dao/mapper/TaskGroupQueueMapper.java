@@ -44,8 +44,7 @@ public interface TaskGroupQueueMapper extends BaseMapper<TaskGroupQueue> {
      * @return task group queue list
      */
     IPage<TaskGroupQueue> queryTaskGroupQueuePaging(IPage<TaskGroupQueue> page,
-                                                    @Param("groupId") int groupId
-    );
+                                                    @Param("groupId") int groupId);
 
     TaskGroupQueue queryByTaskId(@Param("taskId") int taskId);
 
@@ -77,7 +76,8 @@ public interface TaskGroupQueueMapper extends BaseMapper<TaskGroupQueue> {
     /**
      * Query the {@link TaskGroupQueue}, who's priority > the given <code>priority</code>
      */
-    List<TaskGroupQueue> queryHighPriorityTasks(@Param("groupId") int groupId, @Param("priority") int priority, @Param("status") int status);
+    List<TaskGroupQueue> queryHighPriorityTasks(@Param("groupId") int groupId, @Param("priority") int priority,
+                                                @Param("status") int status);
 
     TaskGroupQueue queryTheHighestPriorityTasks(@Param("groupId") int groupId, @Param("status") int status,
                                                 @Param("forceStart") int forceStart, @Param("inQueue") int inQueue);
@@ -86,14 +86,23 @@ public interface TaskGroupQueueMapper extends BaseMapper<TaskGroupQueue> {
 
     void updateForceStart(@Param("queueId") int queueId, @Param("forceStart") int forceStart);
 
-    int updateInQueueLimit1(@Param("oldValue") int oldValue, @Param("newValue") int newValue
-            , @Param("groupId") int id, @Param("status") int status);
+    int updateInQueueLimit1(@Param("oldValue") int oldValue, @Param("newValue") int newValue, @Param("groupId") int id,
+                            @Param("status") int status);
 
     int updateInQueueCAS(@Param("oldValue") int oldValue, @Param("newValue") int newValue, @Param("id") int id);
 
     void modifyPriority(@Param("queueId") int queueId, @Param("priority") int priority);
 
-    IPage<TaskGroupQueue> queryTaskGroupQueueByTaskGroupIdPaging(Page<TaskGroupQueue> page, @Param("taskName")String taskName
-        ,@Param("processName") String processName,@Param("status") Integer status,@Param("groupId") int groupId
-        ,@Param("projects") List<Project> projects);
+    IPage<TaskGroupQueue> queryTaskGroupQueueByTaskGroupIdPaging(Page<TaskGroupQueue> page,
+                                                                 @Param("taskName") String taskName,
+                                                                 @Param("processName") String processName,
+                                                                 @Param("status") Integer status,
+                                                                 @Param("groupId") int groupId,
+                                                                 @Param("projects") List<Project> projects);
+
+    void deleteByTaskInstanceIds(@Param("taskInstanceIds") List<Integer> taskInstanceIds);
+
+    void deleteByWorkflowInstanceId(@Param("workflowInstanceId") Integer workflowInstanceId);
+
+    void deleteByTaskGroupIds(@Param("taskGroupIds") List<Integer> taskGroupIds);
 }

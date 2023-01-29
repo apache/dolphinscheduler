@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleException;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.lifecycle.ServerStatus;
 import org.apache.dolphinscheduler.registry.api.Registry;
+import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
 import org.apache.dolphinscheduler.registry.api.StrategyType;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
@@ -28,14 +29,14 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEventQueue;
 import org.apache.dolphinscheduler.server.master.rpc.MasterRPCServer;
 import org.apache.dolphinscheduler.server.master.runner.StateWheelExecuteThread;
-import org.apache.dolphinscheduler.service.registry.RegistryClient;
+
+import java.time.Duration;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
-
-import java.time.Duration;
 
 /**
  * This strategy will change the server status to {@link ServerStatus#WAITING} when disconnect from {@link Registry}.
@@ -63,7 +64,6 @@ public class MasterWaitingStrategy implements MasterConnectStrategy {
     public void disconnect() {
         try {
             ServerLifeCycleManager.toWaiting();
-            // todo: clear the current resource
             clearMasterResource();
             Duration maxWaitingTime = masterConfig.getRegistryDisconnectStrategy().getMaxWaitingTime();
             try {
@@ -93,18 +93,22 @@ public class MasterWaitingStrategy implements MasterConnectStrategy {
 
     @Override
     public void reconnect() {
-        try {
-            ServerLifeCycleManager.recoverFromWaiting();
-            reStartMasterResource();
-            // reopen the resource
-            logger.info("Recover from waiting success, the current server status is {}",
-                    ServerLifeCycleManager.getServerStatus());
-        } catch (Exception e) {
-            String errorMessage =
-                    String.format("Recover from waiting failed, the current server status is %s, will stop the server",
-                            ServerLifeCycleManager.getServerStatus());
-            logger.error(errorMessage, e);
-            registryClient.getStoppable().stop(errorMessage);
+        if (ServerLifeCycleManager.isRunning()) {
+            logger.info("no need to reconnect, as the current server status is running");
+        } else {
+            try {
+                ServerLifeCycleManager.recoverFromWaiting();
+                reStartMasterResource();
+                logger.info("Recover from waiting success, the current server status is {}",
+                        ServerLifeCycleManager.getServerStatus());
+            } catch (Exception e) {
+                String errorMessage =
+                        String.format(
+                                "Recover from waiting failed, the current server status is %s, will stop the server",
+                                ServerLifeCycleManager.getServerStatus());
+                logger.error(errorMessage, e);
+                registryClient.getStoppable().stop(errorMessage);
+            }
         }
     }
 

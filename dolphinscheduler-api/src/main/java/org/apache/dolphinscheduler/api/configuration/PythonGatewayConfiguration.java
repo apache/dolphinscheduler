@@ -17,14 +17,16 @@
 
 package org.apache.dolphinscheduler.api.configuration;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.stereotype.Component;
+import lombok.Data;
 
-@Component
-@EnableConfigurationProperties
-@ConfigurationProperties(value = "python-gateway", ignoreUnknownFields = false)
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+
+@Data
+@Configuration
+@ConfigurationProperties(value = "python-gateway")
 public class PythonGatewayConfiguration {
+
     private boolean enabled;
     private String gatewayServerAddress;
     private int gatewayServerPort;
@@ -32,60 +34,5 @@ public class PythonGatewayConfiguration {
     private int pythonPort;
     private int connectTimeout;
     private int readTimeout;
-
-    public boolean getEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    public String getGatewayServerAddress() {
-        return gatewayServerAddress;
-    }
-
-    public void setGatewayServerAddress(String gatewayServerAddress) {
-        this.gatewayServerAddress = gatewayServerAddress;
-    }
-
-    public int getGatewayServerPort() {
-        return gatewayServerPort;
-    }
-
-    public void setGatewayServerPort(int gatewayServerPort) {
-        this.gatewayServerPort = gatewayServerPort;
-    }
-
-    public String getPythonAddress() {
-        return pythonAddress;
-    }
-
-    public void setPythonAddress(String pythonAddress) {
-        this.pythonAddress = pythonAddress;
-    }
-
-    public int getPythonPort() {
-        return pythonPort;
-    }
-
-    public void setPythonPort(int pythonPort) {
-        this.pythonPort = pythonPort;
-    }
-
-    public int getConnectTimeout() {
-        return connectTimeout;
-    }
-
-    public void setConnectTimeout(int connectTimeout) {
-        this.connectTimeout = connectTimeout;
-    }
-
-    public int getReadTimeout() {
-        return readTimeout;
-    }
-
-    public void setReadTimeout(int readTimeout) {
-        this.readTimeout = readTimeout;
-    }
+    private String authToken;
 }

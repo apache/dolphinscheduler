@@ -17,15 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
@@ -44,7 +36,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -64,7 +57,7 @@ public class CommandMapperTest extends BaseDaoTest {
     @Test
     public void testInsert() {
         Command command = createCommand();
-        assertThat(command.getId(), greaterThan(0));
+        Assertions.assertTrue(command.getId() > 0);
     }
 
     /**
@@ -76,8 +69,8 @@ public class CommandMapperTest extends BaseDaoTest {
         // query
         Command actualCommand = commandMapper.selectById(expectedCommand.getId());
 
-        assertNotNull(actualCommand);
-        assertEquals(expectedCommand.getProcessDefinitionCode(), actualCommand.getProcessDefinitionCode());
+        Assertions.assertNotNull(actualCommand);
+        Assertions.assertEquals(expectedCommand.getProcessDefinitionCode(), actualCommand.getProcessDefinitionCode());
     }
 
     /**
@@ -95,8 +88,8 @@ public class CommandMapperTest extends BaseDaoTest {
 
         Command actualCommand = commandMapper.selectById(expectedCommand.getId());
 
-        assertNotNull(actualCommand);
-        assertEquals(expectedCommand.getUpdateTime(), actualCommand.getUpdateTime());
+        Assertions.assertNotNull(actualCommand);
+        Assertions.assertEquals(expectedCommand.getUpdateTime(), actualCommand.getUpdateTime());
 
     }
 
@@ -111,7 +104,7 @@ public class CommandMapperTest extends BaseDaoTest {
 
         Command actualCommand = commandMapper.selectById(expectedCommand.getId());
 
-        assertNull(actualCommand);
+        Assertions.assertNull(actualCommand);
     }
 
     /**
@@ -125,7 +118,7 @@ public class CommandMapperTest extends BaseDaoTest {
 
         List<Command> actualCommands = commandMapper.selectList(null);
 
-        assertThat(actualCommands.size(), greaterThanOrEqualTo(count));
+        Assertions.assertTrue(actualCommands.size() >= count);
     }
 
     /**
@@ -140,7 +133,7 @@ public class CommandMapperTest extends BaseDaoTest {
 
         List<Command> actualCommand = commandMapper.queryCommandPage(1, 0);
 
-        assertNotNull(actualCommand);
+        Assertions.assertNotNull(actualCommand);
     }
 
     /**
@@ -162,7 +155,7 @@ public class CommandMapperTest extends BaseDaoTest {
 
         List<CommandCount> actualCommandCounts = commandMapper.countCommandState(startTime, endTime, projectCodeArray);
 
-        assertThat(actualCommandCounts.size(), greaterThanOrEqualTo(1));
+        Assertions.assertTrue(actualCommandCounts.size() >= 1);
     }
 
     /**
@@ -183,13 +176,13 @@ public class CommandMapperTest extends BaseDaoTest {
         Command command = createCommand();
         Integer id = command.getId();
         boolean hit = id % masterCount == thisMasterSlot;
-        List<Command> commandList = commandMapper.queryCommandPageBySlot(1, 0, masterCount, thisMasterSlot);
+        List<Command> commandList = commandMapper.queryCommandPageBySlot(1, masterCount, thisMasterSlot);
         if (hit) {
-            assertEquals(id, commandList.get(0).getId());
+            Assertions.assertEquals(id, commandList.get(0).getId());
         } else {
             commandList.forEach(o -> {
-                assertNotEquals(id, o.getId());
-                assertEquals(thisMasterSlot, o.getId() % masterCount);
+                Assertions.assertNotEquals(id, o.getId());
+                Assertions.assertEquals(thisMasterSlot, o.getId() % masterCount);
             });
         }
         return hit;

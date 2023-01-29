@@ -22,7 +22,8 @@ import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.spi.enums.Flag;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -113,8 +114,8 @@ public class ChunJunParameters extends AbstractParameters {
     public boolean checkParameters() {
         if (customConfig == Flag.NO.ordinal()) {
             return dataSource != 0 && dataTarget != 0
-                && StringUtils.isNotEmpty(sql)
-                && StringUtils.isNotEmpty(targetTable);
+                    && StringUtils.isNotEmpty(sql)
+                    && StringUtils.isNotEmpty(targetTable);
         } else {
             return StringUtils.isNotEmpty(json);
         }

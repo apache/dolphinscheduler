@@ -314,15 +314,7 @@ export function useDataList() {
                   icon: renderIcon(SafetyOutlined)
                 }
               ]
-      },
-      // add UI setting to the banner
-      {
-        label: () =>
-          h(NEllipsis, null, { default: () => t('menu.ui_setting') }),
-        key: 'ui-setting',
-        icon: renderIcon(SettingOutlined),
-        children: []
-      },
+      }
     ]
   }
 
@@ -349,9 +341,7 @@ export function useDataList() {
         label: t('user_dropdown.password'),
         key: 'password',
         icon: renderIcon(KeyOutlined),
-        disabled:
-          (userStore.getUserInfo as UserInfoRes).securityConfigType !==
-          'PASSWORD'
+        disabled: userStore.getSecurityConfigType !== 'PASSWORD'
       },
       {
         label: t('user_dropdown.logout'),

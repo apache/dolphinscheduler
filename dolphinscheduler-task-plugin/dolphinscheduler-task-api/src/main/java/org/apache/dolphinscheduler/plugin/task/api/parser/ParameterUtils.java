@@ -21,11 +21,12 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETE
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_FORMAT_TIME;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_SHECDULE_TIME;
 
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-import org.apache.dolphinscheduler.spi.utils.DateUtils;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.PreparedStatement;
 import java.util.Date;
@@ -46,9 +47,9 @@ public class ParameterUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(ParameterUtils.class);
 
-    private static final String DATE_PARSE_PATTERN = "\\$\\[([^\\$\\]]+)]";
+    private static final Pattern DATE_PARSE_PATTERN = Pattern.compile("\\$\\[([^\\$\\]]+)]");
 
-    private static final String DATE_START_PATTERN = "^[0-9]";
+    private static final Pattern DATE_START_PATTERN = Pattern.compile("^[0-9]");
 
     private static final char PARAM_REPLACE_CHAR = '?';
 
@@ -73,7 +74,7 @@ public class ParameterUtils {
             parameterString = PlaceholderUtils.replacePlaceholders(parameterString, parameterMap, true);
         }
         if (parameterMap != null && null != parameterMap.get(PARAMETER_DATETIME)) {
-            //Get current time, schedule execute time
+            // Get current time, schedule execute time
             String cronTimeStr = parameterMap.get(PARAMETER_DATETIME);
             cronTime = DateUtils.parse(cronTimeStr, PARAMETER_FORMAT_TIME);
         } else {
@@ -98,7 +99,7 @@ public class ParameterUtils {
         if (StringUtils.isEmpty(parameterString)) {
             return parameterString;
         }
-        //Get current time, schedule execute time
+        // Get current time, schedule execute time
         String cronTimeStr = parameterMap.get(PARAMETER_SHECDULE_TIME);
         Date cronTime = null;
 
@@ -130,7 +131,8 @@ public class ParameterUtils {
      * @param value    value
      * @throws Exception errors
      */
-    public static void setInParameter(int index, PreparedStatement stmt, DataType dataType, String value) throws Exception {
+    public static void setInParameter(int index, PreparedStatement stmt, DataType dataType,
+                                      String value) throws Exception {
         if (dataType.equals(DataType.VARCHAR)) {
             stmt.setString(index, value);
         } else if (dataType.equals(DataType.INTEGER)) {
@@ -177,9 +179,9 @@ public class ParameterUtils {
                         ret.append(",");
                     }
                 }
-                for (Object v : valueList ) {
+                for (Object v : valueList) {
                     Property newProperty = new Property();
-                     if (v instanceof Integer) {
+                    if (v instanceof Integer) {
                         newProperty.setType(DataType.INTEGER);
                     } else if (v instanceof Long) {
                         newProperty.setType(DataType.LONG);
@@ -215,7 +217,7 @@ public class ParameterUtils {
      */
     public static String replaceScheduleTime(String text, Date scheduleTime) {
         Map<String, Property> paramsMap = new HashMap<>();
-        //if getScheduleTime null ,is current date
+        // if getScheduleTime null ,is current date
         if (null == scheduleTime) {
             scheduleTime = new Date();
         }
@@ -251,15 +253,14 @@ public class ParameterUtils {
         if (templateStr == null) {
             return null;
         }
-        Pattern pattern = Pattern.compile(DATE_PARSE_PATTERN);
 
         StringBuffer newValue = new StringBuffer(templateStr.length());
 
-        Matcher matcher = pattern.matcher(templateStr);
+        Matcher matcher = DATE_PARSE_PATTERN.matcher(templateStr);
 
         while (matcher.find()) {
             String key = matcher.group(1);
-            if (Pattern.matches(DATE_START_PATTERN, key)) {
+            if (DATE_START_PATTERN.matcher(key).matches()) {
                 continue;
             }
             String value = TimePlaceholderUtils.getPlaceHolderTime(key, date);

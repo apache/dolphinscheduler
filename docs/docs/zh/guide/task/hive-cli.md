@@ -22,13 +22,16 @@
 
 ## 任务参数
 
-- 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md#默认任务参数)。
+[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
+[//]: # (- 默认参数说明请参考[DolphinScheduler任务参数附录]&#40;appendix.md#默认任务参数&#41;`默认任务参数`一栏。)
+
+- 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md)`默认任务参数`一栏。
 
 |   **任务参数**    |                       **描述**                        |
 |---------------|-----------------------------------------------------|
 | Hive Cli 任务类型 | Hive Cli任务执行方式，可以选择`FROM_SCRIPT`或者`FROM_FILE`。      |
 | Hive SQL 脚本   | 手动填入您的Hive SQL脚本语句。                                 |
-| Hive Cli 选项   | Hive Cli的其他选项，如`--verbose`。                         |
+| Hive Cli 选项   | Hive Cli的其他选项，如`--verbose`来查看任务结果。                  |
 | 资源            | 如果您选择`FROM_FILE`作为Hive Cli任务类型，您需要在资源中选择Hive SQL文件。 |
 
 ## 任务样例

@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -35,11 +36,11 @@ public interface TaskGroupQueueService {
      * @param status      Task queue status
      * @param pageNo      page no
      * @param pageSize    page size
-
+    
      * @return tasks list
      */
-    Map<String, Object> queryTasksByGroupId(User loginUser, String taskName
-        , String processName, Integer status, int groupId, int pageNo,int pageSize);
+    Map<String, Object> queryTasksByGroupId(User loginUser, String taskName, String processName, Integer status,
+                                            int groupId, int pageNo, int pageSize);
 
     /**
      * query tasks in task group queue by project id
@@ -68,7 +69,13 @@ public interface TaskGroupQueueService {
      */
     boolean deleteByTaskId(int taskId);
 
-    void forceStartTask(int queueId,int forceStart);
+    void deleteByTaskInstanceIds(List<Integer> taskInstanceIds);
+
+    void deleteByWorkflowInstanceId(Integer workflowInstanceId);
+
+    void forceStartTask(int queueId, int forceStart);
 
     void modifyPriority(Integer queueId, Integer priority);
+
+    void deleteByTaskGroupIds(List<Integer> taskGroupIds);
 }

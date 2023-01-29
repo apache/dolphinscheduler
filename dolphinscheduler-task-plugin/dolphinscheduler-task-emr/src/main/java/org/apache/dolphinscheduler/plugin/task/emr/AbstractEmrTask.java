@@ -22,13 +22,12 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKN
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
 import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
 
 import java.util.TimeZone;
 
@@ -52,7 +51,6 @@ public abstract class AbstractEmrTask extends AbstractRemoteTask {
     AmazonElasticMapReduce emrClient;
     String clusterId;
 
-
     /**
      * config ObjectMapper features and propertyNamingStrategy
      * use UpperCamelCaseStrategy support capital letters parse
@@ -60,12 +58,12 @@ public abstract class AbstractEmrTask extends AbstractRemoteTask {
      * @see PropertyNamingStrategy.UpperCamelCaseStrategy
      */
     static final ObjectMapper objectMapper = new ObjectMapper()
-        .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
-        .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
-        .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
-        .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
-        .setTimeZone(TimeZone.getDefault())
-        .setPropertyNamingStrategy(new PropertyNamingStrategy.UpperCamelCaseStrategy());
+            .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
+            .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
+            .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
+            .setTimeZone(TimeZone.getDefault())
+            .setPropertyNamingStrategy(new PropertyNamingStrategy.UpperCamelCaseStrategy());
 
     /**
      * constructor
@@ -80,8 +78,8 @@ public abstract class AbstractEmrTask extends AbstractRemoteTask {
     @Override
     public void init() {
         final String taskParams = taskExecutionContext.getTaskParams();
-        logger.info("emr task params:{}", taskParams);
         emrParameters = JSONUtils.parseObject(taskParams, EmrParameters.class);
+        logger.info("Initialize emr task params:{}", JSONUtils.toPrettyJsonString(taskParams));
         if (emrParameters == null || !emrParameters.checkParameters()) {
             throw new EmrTaskException("emr task params is not valid");
         }
@@ -107,8 +105,8 @@ public abstract class AbstractEmrTask extends AbstractRemoteTask {
         final AWSCredentialsProvider awsCredentialsProvider = new AWSStaticCredentialsProvider(basicAWSCredentials);
         // create an EMR client
         return AmazonElasticMapReduceClientBuilder.standard()
-            .withCredentials(awsCredentialsProvider)
-            .withRegion(awsRegion)
-            .build();
+                .withCredentials(awsCredentialsProvider)
+                .withRegion(awsRegion)
+                .build();
     }
 }

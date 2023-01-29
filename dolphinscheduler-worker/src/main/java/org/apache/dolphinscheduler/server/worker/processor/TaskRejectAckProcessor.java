@@ -17,19 +17,21 @@
 
 package org.apache.dolphinscheduler.server.worker.processor;
 
-import com.google.common.base.Preconditions;
-import io.netty.channel.Channel;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskRejectAckCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.google.common.base.Preconditions;
+import io.netty.channel.Channel;
 
 @Component
 public class TaskRejectAckProcessor implements NettyRequestProcessor {
@@ -52,7 +54,7 @@ public class TaskRejectAckProcessor implements NettyRequestProcessor {
         }
 
         try {
-            LoggerUtils.setTaskInstanceIdMDC(taskRejectAckMessage.getTaskInstanceId());
+            LogUtils.setTaskInstanceIdMDC(taskRejectAckMessage.getTaskInstanceId());
             logger.info("Receive task reject response ack command: {}", taskRejectAckMessage);
             if (taskRejectAckMessage.isSuccess()) {
                 messageRetryRunner.removeRetryMessage(taskRejectAckMessage.getTaskInstanceId(),
@@ -63,7 +65,7 @@ public class TaskRejectAckProcessor implements NettyRequestProcessor {
                         taskRejectAckMessage);
             }
         } finally {
-            LoggerUtils.removeTaskInstanceIdMDC();
+            LogUtils.removeTaskInstanceIdMDC();
         }
     }
 }

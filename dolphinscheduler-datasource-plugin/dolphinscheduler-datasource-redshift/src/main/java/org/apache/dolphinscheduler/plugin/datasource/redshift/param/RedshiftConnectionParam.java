@@ -19,7 +19,16 @@ package org.apache.dolphinscheduler.plugin.datasource.redshift.param;
 
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class RedshiftConnectionParam extends BaseConnectionParam {
+
+    protected RedshiftAuthMode mode;
+    protected String dbUser;
+
     @Override
     public String toString() {
         return "RedshiftConnectionParam{"
@@ -32,6 +41,8 @@ public class RedshiftConnectionParam extends BaseConnectionParam {
                 + ", driverClassName='" + driverClassName + '\''
                 + ", validationQuery='" + validationQuery + '\''
                 + ", other='" + other + '\''
+                + ", dbUser='" + dbUser + '\''
+                + ", mode='" + mode + '\''
                 + '}';
     }
 }

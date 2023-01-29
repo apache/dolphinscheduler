@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.spark;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -27,9 +28,8 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ArgsUtils;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
@@ -65,8 +65,6 @@ public class SparkTask extends AbstractYarnTask {
     @Override
     public void init() {
 
-        logger.info("spark task params {}", taskExecutionContext.getTaskParams());
-
         sparkParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SparkParameters.class);
 
         if (null == sparkParameters) {
@@ -82,6 +80,7 @@ public class SparkTask extends AbstractYarnTask {
         if (sparkParameters.getProgramType() != ProgramType.SQL) {
             setMainJarName();
         }
+        logger.info("Initialize spark task params {}", JSONUtils.toPrettyJsonString(sparkParameters));
     }
 
     /**
@@ -254,7 +253,7 @@ public class SparkTask extends AbstractYarnTask {
     }
 
     private String replaceParam(String script) {
-        script = script.replaceAll("\\r\\n", "\n");
+        script = script.replaceAll("\\r\\n", System.lineSeparator());
         // replace placeholder, and combining local and global parameters
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
         script = ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));

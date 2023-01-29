@@ -17,13 +17,14 @@
 
 package org.apache.dolphinscheduler.server.worker.processor;
 
-import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
+import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskDispatchCommand;
@@ -31,12 +32,10 @@ import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.metrics.TaskMetrics;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
+import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcClient;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerDelayTaskExecuteRunnable;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecuteRunnableFactoryBuilder;
-import org.apache.dolphinscheduler.service.alert.AlertClientService;
-import org.apache.dolphinscheduler.service.task.TaskPluginManager;
-import org.apache.dolphinscheduler.service.utils.LogUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,7 +69,7 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
      * alert client service
      */
     @Autowired
-    private AlertClientService alertClientService;
+    private WorkerRpcClient workerRpcClient;
 
     @Autowired
     private TaskPluginManager taskPluginManager;
@@ -107,7 +106,7 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
             return;
         }
         try {
-            LoggerUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(),
+            LogUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(),
                     taskExecutionContext.getTaskInstanceId());
             TaskMetrics.incrTaskTypeExecuteCount(taskExecutionContext.getTaskType());
             // set cache, it will be used when kill task
@@ -116,8 +115,9 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
             taskExecutionContext.setLogPath(LogUtils.getTaskLogPath(taskExecutionContext));
 
             // delay task process
-            long remainTime = DateUtils.getRemainTime(DateUtils.timeStampToDate(taskExecutionContext.getFirstSubmitTime()),
-                    taskExecutionContext.getDelayTime() * 60L);
+            long remainTime =
+                    DateUtils.getRemainTime(DateUtils.timeStampToDate(taskExecutionContext.getFirstSubmitTime()),
+                            taskExecutionContext.getDelayTime() * 60L);
             if (remainTime > 0) {
                 logger.info("Current taskInstance is choose delay execution, delay time: {}s", remainTime);
                 taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.DELAY_EXECUTION);
@@ -131,20 +131,24 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
                             workerConfig,
                             workflowMasterAddress,
                             workerMessageSender,
-                            alertClientService,
+                            workerRpcClient,
                             taskPluginManager,
                             storageOperate)
                     .createWorkerTaskExecuteRunnable();
             // submit task to manager
             boolean offer = workerManager.offer(workerTaskExecuteRunnable);
             if (!offer) {
-                logger.warn("submit task to wait queue error, queue is full, current queue size is {}, will send a task reject message to master", workerManager.getWaitSubmitQueueSize());
-                workerMessageSender.sendMessageWithRetry(taskExecutionContext, workflowMasterAddress, CommandType.TASK_REJECT);
+                logger.warn(
+                        "submit task to wait queue error, queue is full, current queue size is {}, will send a task reject message to master",
+                        workerManager.getWaitSubmitQueueSize());
+                workerMessageSender.sendMessageWithRetry(taskExecutionContext, workflowMasterAddress,
+                        CommandType.TASK_REJECT);
             } else {
-                logger.info("Submit task to wait queue success, current queue size is {}", workerManager.getWaitSubmitQueueSize());
+                logger.info("Submit task to wait queue success, current queue size is {}",
+                        workerManager.getWaitSubmitQueueSize());
             }
         } finally {
-            LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
+            LogUtils.removeWorkflowAndTaskInstanceIdMDC();
         }
     }
 

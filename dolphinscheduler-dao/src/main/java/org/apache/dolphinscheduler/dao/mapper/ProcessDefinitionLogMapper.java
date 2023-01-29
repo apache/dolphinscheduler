@@ -53,7 +53,8 @@ public interface ProcessDefinitionLogMapper extends BaseMapper<ProcessDefinition
      * @param name process definition name
      * @return process definition log list
      */
-    List<ProcessDefinitionLog> queryByDefinitionName(@Param("projectCode") long projectCode, @Param("name") String name);
+    List<ProcessDefinitionLog> queryByDefinitionName(@Param("projectCode") long projectCode,
+                                                     @Param("name") String name);
 
     /**
      * query process definition log list
@@ -81,7 +82,9 @@ public interface ProcessDefinitionLogMapper extends BaseMapper<ProcessDefinition
      * @param projectCode project code
      * @return the paging process definition version list
      */
-    IPage<ProcessDefinitionLog> queryProcessDefinitionVersionsPaging(Page<ProcessDefinitionLog> page, @Param("code") long code, @Param("projectCode") long projectCode);
+    IPage<ProcessDefinitionLog> queryProcessDefinitionVersionsPaging(Page<ProcessDefinitionLog> page,
+                                                                     @Param("code") long code,
+                                                                     @Param("projectCode") long projectCode);
 
     /**
      * delete the certain process definition version by process definition id and version number
@@ -91,4 +94,6 @@ public interface ProcessDefinitionLogMapper extends BaseMapper<ProcessDefinition
      * @return delete result
      */
     int deleteByProcessDefinitionCodeAndVersion(@Param("code") long code, @Param("version") int version);
+
+    void deleteByProcessDefinitionCode(@Param("workflowDefinitionCode") long workflowDefinitionCode);
 }

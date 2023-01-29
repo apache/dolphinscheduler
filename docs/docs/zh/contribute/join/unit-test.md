@@ -86,9 +86,9 @@ Awaitility.await().atMost(…)
 
 2:忽略某些测试类
 
-@Ignore 注解应该附上相关 issue 地址，方便后续开发者追踪了解该测试被忽略的历史原因。
+@Disabled 注解应该附上相关 issue 地址，方便后续开发者追踪了解该测试被忽略的历史原因。
 
-如 @Ignore("see #1")
+如 @Disabled("see #1")
 
 3: try-catch 单元测试异常
 

@@ -30,7 +30,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 
 import java.util.Date;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -141,20 +141,5 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
         logger.info(mvcResult.getResponse().getContentAsString());
-    }
-
-    /**
-     * get mock Project
-     *
-     * @param projectName projectName
-     * @return Project
-     */
-    private Project getProject(String projectName) {
-        Project project = new Project();
-        project.setCode(11L);
-        project.setId(1);
-        project.setName(projectName);
-        project.setUserId(1);
-        return project;
     }
 }

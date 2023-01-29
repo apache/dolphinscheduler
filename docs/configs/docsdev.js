@@ -213,6 +213,14 @@ export default {
                                 title: 'AWS Datasync',
                                 link: '/en-us/docs/dev/user_doc/guide/task/datasync.html',
                             },
+                            {
+                                title: 'Kubeflow',
+                                link: '/en-us/docs/dev/user_doc/guide/task/kubeflow.html',
+                            },
+                            {
+                                title: 'Apache Linkis',
+                                link: '/en-us/docs/dev/user_doc/guide/task/linkis.html',
+                            },
                         ],
                     },
                     {
@@ -237,6 +245,10 @@ export default {
                             {
                                 title: 'Parameter Priority',
                                 link: '/en-us/docs/dev/user_doc/guide/parameter/priority.html',
+                            },
+                            {
+                                title: 'File Parameter',
+                                link: '/en-us/docs/dev/user_doc/guide/parameter/file-parameter.html',
                             },
                         ],
                     },
@@ -287,6 +299,10 @@ export default {
                                 title: 'Amazon Athena',
                                 link: '/en-us/docs/dev/user_doc/guide/datasource/athena.html',
                             },
+                            {
+                                title: 'Azure SQL Database',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/azure-sql.html',
+                            },
                         ],
                     },
                     {
@@ -327,6 +343,10 @@ export default {
                             {
                                 title: 'Feishu',
                                 link: '/en-us/docs/dev/user_doc/guide/alert/feishu.html',
+                            },
+                            {
+                                title: 'Slack',
+                                link: '/en-us/docs/dev/user_doc/guide/alert/slack.html',
                             },
                         ],
                     },
@@ -392,6 +412,10 @@ export default {
                     {
                         title: 'Expansion and Reduction',
                         link: '/en-us/docs/dev/user_doc/guide/expansion-reduction.html',
+                    },
+                    {
+                        title: 'Demo',
+                        link: '/en-us/docs/dev/user_doc/guide/demo.html',
                     },
                 ],
             },
@@ -463,7 +487,7 @@ export default {
                     },
                     {
                         title: 'PyDolphinScheduler',
-                        link: '/python/dev/index.html',
+                        link: '/python/main/index.html',
                     },
                     {
                         title: 'Health Check',
@@ -602,21 +626,8 @@ export default {
                         ],
                     },
                     {
-                        title: 'Release Guide',
-                        children: [
-                            {
-                                title: 'Release Preparation',
-                                link: '/en-us/docs/dev/user_doc/contribute/release/release-prepare.html',
-                            },
-                            {
-                                title: 'Release Guide',
-                                link: '/en-us/docs/dev/user_doc/contribute/release/release.html',
-                            },
-                            {
-                                title: 'Release Post',
-                                link: '/en-us/docs/dev/user_doc/contribute/release/release-post.html',
-                            },
-                        ],
+                        title: 'Releasing',
+                        link: '/en-us/docs/dev/user_doc/contribute/release.html',
                     },
                     {
                         title: 'Questions & Communications',
@@ -857,6 +868,14 @@ export default {
                                 title: 'AWS Datasync',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/datasync.html',
                             },
+                            {
+                                title: 'Kubeflow',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/kubeflow.html',
+                            },
+                            {
+                                title: 'Apache Linkis',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/linkis.html',
+                            },
                         ],
                     },
                     {
@@ -882,6 +901,10 @@ export default {
                                 title: '参数优先级',
                                 link: '/zh-cn/docs/dev/user_doc/guide/parameter/priority.html',
                             },
+                            {
+                                title: '文件参数传递',
+                                link: '/zh-cn/docs/dev/user_doc/guide/parameter/file-parameter.html',
+                            },
                         ],
                     },
                     {
@@ -906,6 +929,10 @@ export default {
                             {
                                 title: 'Amazon Athena',
                                 link: '/zh-cn/docs/dev/user_doc/guide/datasource/athena.html',
+                            },
+                            {
+                                title: 'Azure SQL Database',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/azure-sql.html',
                             },
                         ],
                     },
@@ -947,6 +974,10 @@ export default {
                             {
                                 title: '飞书告警',
                                 link: '/zh-cn/docs/dev/user_doc/guide/alert/feishu.html',
+                            },
+                            {
+                                title: 'Slack告警',
+                                link: '/zh-cn/docs/dev/user_doc/guide/alert/slack.html',
                             },
                         ],
                     },
@@ -1012,6 +1043,10 @@ export default {
                     {
                         title: '扩/缩容',
                         link: '/zh-cn/docs/dev/user_doc/guide/expansion-reduction.html',
+                    },
+                    {
+                        title: 'Demo',
+                        link: '/zh-cn/docs/dev/user_doc/guide/demo.html',
                     },
                 ],
             },
@@ -1083,7 +1118,7 @@ export default {
                     },
                     {
                         title: 'PyDolphinScheduler',
-                        link: '/python/dev/index.html',
+                        link: '/python/main/index.html',
                     },
                     {
                         title: '健康检查',
@@ -1222,21 +1257,8 @@ export default {
                         ],
                     },
                     {
-                        title: '发版指南',
-                        children: [
-                            {
-                                title: '发版准备',
-                                link: '/zh-cn/docs/dev/user_doc/contribute/release/release-prepare.html',
-                            },
-                            {
-                                title: '发版指南',
-                                link: '/zh-cn/docs/dev/user_doc/contribute/release/release.html',
-                            },
-                            {
-                                title: '发版后续',
-                                link: '/zh-cn/docs/dev/user_doc/contribute/release/release-post.html',
-                            },
-                        ],
+                        title: '发版',
+                        link: '/zh-cn/docs/dev/user_doc/contribute/release.html',
                     },
                     {
                         title: '问题与交流',

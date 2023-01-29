@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class EmailAlertChannel implements AlertChannel {
+
     private static final Logger logger = LoggerFactory.getLogger(EmailAlertChannel.class);
 
     @Override

@@ -23,14 +23,14 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.sql.Connection;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class CommonDataSourceClientTest {
 
     @Mock
@@ -83,6 +83,6 @@ public class CommonDataSourceClientTest {
     public void testGetConnection() {
         Connection connection = Mockito.mock(Connection.class);
         Mockito.when(commonDataSourceClient.getConnection()).thenReturn(connection);
-        Assert.assertNotNull(commonDataSourceClient.getConnection());
+        Assertions.assertNotNull(commonDataSourceClient.getConnection());
     }
 }

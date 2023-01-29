@@ -17,16 +17,17 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
-import lombok.NonNull;
-import lombok.experimental.UtilityClass;
-import org.apache.dolphinscheduler.common.storage.StorageOperate;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
-import org.apache.dolphinscheduler.service.alert.AlertClientService;
-import org.apache.dolphinscheduler.service.task.TaskPluginManager;
+import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcClient;
 
 import javax.annotation.Nullable;
+
+import lombok.NonNull;
+import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class WorkerTaskExecuteRunnableFactoryBuilder {
@@ -35,14 +36,14 @@ public class WorkerTaskExecuteRunnableFactoryBuilder {
                                                                                                        @NonNull WorkerConfig workerConfig,
                                                                                                        @NonNull String workflowMasterAddress,
                                                                                                        @NonNull WorkerMessageSender workerMessageSender,
-                                                                                                       @NonNull AlertClientService alertClientService,
+                                                                                                       @NonNull WorkerRpcClient workerRpcClient,
                                                                                                        @NonNull TaskPluginManager taskPluginManager,
                                                                                                        @Nullable StorageOperate storageOperate) {
         return new DefaultWorkerDelayTaskExecuteRunnableFactory(taskExecutionContext,
                 workerConfig,
                 workflowMasterAddress,
                 workerMessageSender,
-                alertClientService,
+                workerRpcClient,
                 taskPluginManager,
                 storageOperate);
     }

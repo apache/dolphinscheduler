@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -39,6 +39,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Date;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.auto.service.AutoService;
 
 /**
@@ -118,7 +119,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
             TaskPriority taskPriority = new TaskPriority(processInstance.getProcessInstancePriority().getCode(),
                     processInstance.getId(), taskInstance.getProcessInstancePriority().getCode(),
                     taskInstance.getId(), taskInstance.getTaskGroupPriority(),
-                    org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP);
+                    Constants.DEFAULT_WORKER_GROUP);
 
             TaskExecutionContext taskExecutionContext = getTaskExecutionContext(taskInstance);
             if (taskExecutionContext == null) {
@@ -145,27 +146,29 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
     public boolean killTask() {
 
         try {
-            taskInstance = processService.findTaskInstanceById(taskInstance.getId());
+            logger.info("Begin to kill task: {}", taskInstance.getName());
             if (taskInstance == null) {
+                logger.warn("Kill task failed, the task instance is not exist");
                 return true;
             }
             if (taskInstance.getState().isFinished()) {
+                logger.warn("Kill task failed, the task instance is already finished");
                 return true;
             }
             // we don't wait the kill response
             taskInstance.setState(TaskExecutionStatus.KILL);
             taskInstance.setEndTime(new Date());
-            processService.updateTaskInstance(taskInstance);
+            taskInstanceDao.updateTaskInstance(taskInstance);
             if (StringUtils.isNotEmpty(taskInstance.getHost())) {
                 killRemoteTask();
             }
         } catch (Exception e) {
-            logger.error("master kill task error, taskInstance id: {}", taskInstance.getId(), e);
+            logger.error("Master kill task: {} error, taskInstance id: {}", taskInstance.getName(),
+                    taskInstance.getId(), e);
             return false;
         }
 
-        logger.info("master success kill taskInstance name: {} taskInstance id: {}",
-                taskInstance.getName(), taskInstance.getId());
+        logger.info("Master success kill task: {}, taskInstanceId: {}", taskInstance.getName(), taskInstance.getId());
         return true;
     }
 
@@ -183,17 +186,19 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
     }
 
     protected void convertExeEnvironmentOnlineToTest() {
-        //SQL taskType
+        // SQL taskType
         if (TaskConstants.TASK_TYPE_SQL.equals(taskInstance.getTaskType())) {
-            //replace test data source
-            Map<String, Object> taskDefinitionParams = JSONUtils.parseObject(taskInstance.getTaskDefine().getTaskParams(), new TypeReference<Map<String, Object>>() {
-            });
-            Map<String, Object> taskInstanceParams = JSONUtils.parseObject(taskInstance.getTaskParams(), new TypeReference<Map<String, Object>>() {
-            });
-            Integer onlineDataSourceId = (Integer) taskDefinitionParams.get(Constants.DATASOUCE);
+            // replace test data source
+            Map<String, Object> taskDefinitionParams = JSONUtils.parseObject(
+                    taskInstance.getTaskDefine().getTaskParams(), new TypeReference<Map<String, Object>>() {
+                    });
+            Map<String, Object> taskInstanceParams =
+                    JSONUtils.parseObject(taskInstance.getTaskParams(), new TypeReference<Map<String, Object>>() {
+                    });
+            Integer onlineDataSourceId = (Integer) taskDefinitionParams.get(DataSourceConstants.DATASOURCE);
             Integer testDataSourceId = processService.queryTestDataSourceId(onlineDataSourceId);
-            taskDefinitionParams.put(Constants.DATASOUCE, testDataSourceId);
-            taskInstanceParams.put(Constants.DATASOUCE, testDataSourceId);
+            taskDefinitionParams.put(DataSourceConstants.DATASOURCE, testDataSourceId);
+            taskInstanceParams.put(DataSourceConstants.DATASOURCE, testDataSourceId);
             taskInstance.getTaskDefine().setTaskParams(JSONUtils.toJsonString(taskDefinitionParams));
             taskInstance.setTaskParams(JSONUtils.toJsonString(taskInstanceParams));
             if (null == testDataSourceId) {

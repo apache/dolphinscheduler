@@ -17,31 +17,30 @@
 
 package org.apache.dolphinscheduler.server.worker.processor;
 
-import io.netty.channel.Channel;
-import org.apache.dolphinscheduler.common.storage.StorageOperate;
-import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskDispatchCommand;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
+import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcClient;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
-import org.apache.dolphinscheduler.service.alert.AlertClientService;
-import org.apache.dolphinscheduler.service.task.TaskPluginManager;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Date;
+import io.netty.channel.Channel;
 
 /**
  * test task execute processor
  */
-@RunWith(PowerMockRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class TaskDispatchProcessorTest {
 
     @InjectMocks
@@ -54,7 +53,7 @@ public class TaskDispatchProcessorTest {
     private WorkerMessageSender workerMessageSender;
 
     @Mock
-    private AlertClientService alertClientService;
+    private WorkerRpcClient workerRpcClient;
 
     @Mock
     private TaskPluginManager taskPluginManager;
@@ -68,25 +67,21 @@ public class TaskDispatchProcessorTest {
     @Test
     public void process() {
         Channel channel = Mockito.mock(Channel.class);
-        TaskChannel taskChannel = Mockito.mock(TaskChannel.class);
-        Mockito.when(taskPluginManager.getTaskChannel(Mockito.anyString())).thenReturn(taskChannel);
-
         TaskExecutionContext taskExecutionContext = getTaskExecutionContext();
         Command dispatchCommand = createDispatchCommand(taskExecutionContext);
         taskDispatchProcessor.process(channel, dispatchCommand);
 
         Mockito.verify(workerManagerThread, Mockito.atMostOnce()).offer(Mockito.any());
-        Mockito.verify(workerMessageSender, Mockito.never()).sendMessageWithRetry(taskExecutionContext, "localhost:5678", CommandType.TASK_REJECT);
+        Mockito.verify(workerMessageSender, Mockito.never()).sendMessageWithRetry(taskExecutionContext,
+                "localhost:5678", CommandType.TASK_REJECT);
     }
-
 
     public Command createDispatchCommand(TaskExecutionContext taskExecutionContext) {
         return new TaskDispatchCommand(
                 taskExecutionContext,
                 "localhost:5678",
                 "localhost:1234",
-                System.currentTimeMillis()
-        ).convert2Command();
+                System.currentTimeMillis()).convert2Command();
     }
 
     public TaskExecutionContext getTaskExecutionContext() {

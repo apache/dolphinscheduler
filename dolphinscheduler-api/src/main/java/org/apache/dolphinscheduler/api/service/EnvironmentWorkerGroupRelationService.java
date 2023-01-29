@@ -38,4 +38,3 @@ public interface EnvironmentWorkerGroupRelationService {
      */
     Map<String, Object> queryAllEnvironmentWorkerGroupRelationList();
 }
-

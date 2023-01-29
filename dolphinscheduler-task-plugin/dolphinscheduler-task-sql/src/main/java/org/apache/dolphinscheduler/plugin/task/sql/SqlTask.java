@@ -17,10 +17,17 @@
 
 package org.apache.dolphinscheduler.plugin.task.sql;
 
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
-import org.apache.dolphinscheduler.plugin.task.api.*;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
+import org.apache.dolphinscheduler.plugin.task.api.SQLTaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.SqlType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
@@ -33,11 +40,9 @@ import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.DateUtils;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -82,7 +87,8 @@ public class SqlTask extends AbstractTask {
      * create function format
      * include replace here which can be compatible with more cases, for example a long-running Spark session in Kyuubi will keep its own temp functions instead of destroying them right away
      */
-    private static final String CREATE_OR_REPLACE_FUNCTION_FORMAT = "create or replace temporary function {0} as ''{1}''";
+    private static final String CREATE_OR_REPLACE_FUNCTION_FORMAT =
+            "create or replace temporary function {0} as ''{1}''";
 
     /**
      * default query sql limit
@@ -104,16 +110,16 @@ public class SqlTask extends AbstractTask {
         super(taskRequest);
         this.taskExecutionContext = taskRequest;
         this.sqlParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SqlParameters.class);
-
-        assert sqlParameters != null;
+        logger.info("Initialize sql task parameter {}", JSONUtils.toPrettyJsonString(sqlParameters));
+        if (sqlParameters == null || !sqlParameters.checkParameters()) {
+            throw new TaskException("sql task params is not valid");
+        }
         if (taskExecutionContext.getTestFlag() == TEST_FLAG_YES && this.sqlParameters.getDatasource() == 0) {
-            throw new RuntimeException("unbound test data source");
-        }
-        if (!sqlParameters.checkParameters()) {
-            throw new RuntimeException("sql task params is not valid");
+            throw new TaskException("unbound test data source");
         }
 
-        sqlTaskExecutionContext = sqlParameters.generateExtendedContext(taskExecutionContext.getResourceParametersHelper());
+        sqlTaskExecutionContext =
+                sqlParameters.generateExtendedContext(taskExecutionContext.getResourceParametersHelper());
     }
 
     @Override
@@ -124,7 +130,8 @@ public class SqlTask extends AbstractTask {
     @Override
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         logger.info("Full sql parameters: {}", sqlParameters);
-        logger.info("sql type : {}, datasource : {}, sql : {} , localParams : {},udfs : {},showType : {},connParams : {},varPool : {} ,query max result limit  {}",
+        logger.info(
+                "sql type : {}, datasource : {}, sql : {} , localParams : {},udfs : {},showType : {},connParams : {},varPool : {} ,query max result limit  {}",
                 sqlParameters.getType(),
                 sqlParameters.getDatasource(),
                 sqlParameters.getSql(),
@@ -221,7 +228,8 @@ public class SqlTask extends AbstractTask {
         try {
 
             // create connection
-            connection = DataSourceClientProvider.getInstance().getConnection(DbType.valueOf(sqlParameters.getType()), baseConnectionParam);
+            connection = DataSourceClientProvider.getInstance().getConnection(DbType.valueOf(sqlParameters.getType()),
+                    baseConnectionParam);
             // create temp function
             if (CollectionUtils.isNotEmpty(createFuncs)) {
                 createTempFunction(connection, createFuncs);
@@ -241,7 +249,7 @@ public class SqlTask extends AbstractTask {
                 String updateResult = executeUpdate(connection, mainStatementsBinds, "main");
                 result = setNonQuerySqlReturn(updateResult, sqlParameters.getLocalParams());
             }
-            //deal out params
+            // deal out params
             sqlParameters.dealOutParam(result);
 
             // post execute
@@ -297,7 +305,8 @@ public class SqlTask extends AbstractTask {
                 rowCount++;
             }
 
-            int displayRows = sqlParameters.getDisplayRows() > 0 ? sqlParameters.getDisplayRows() : TaskConstants.DEFAULT_DISPLAY_ROWS;
+            int displayRows = sqlParameters.getDisplayRows() > 0 ? sqlParameters.getDisplayRows()
+                    : TaskConstants.DEFAULT_DISPLAY_ROWS;
             displayRows = Math.min(displayRows, rowCount);
             logger.info("display sql result {} rows as follows:", displayRows);
             for (int i = 0; i < displayRows; i++) {
@@ -306,10 +315,10 @@ public class SqlTask extends AbstractTask {
             }
         }
 
-        String result = resultJSONArray.isEmpty() ?
-            JSONUtils.toJsonString(generateEmptyRow(resultSet)) : JSONUtils.toJsonString(resultJSONArray);
+        String result = resultJSONArray.isEmpty() ? JSONUtils.toJsonString(generateEmptyRow(resultSet))
+                : JSONUtils.toJsonString(resultJSONArray);
 
-        if (sqlParameters.getSendEmail() == null || sqlParameters.getSendEmail()) {
+        if (Boolean.TRUE.equals(sqlParameters.getSendEmail())) {
             sendAttachment(sqlParameters.getGroupId(), StringUtils.isNotEmpty(sqlParameters.getTitle())
                     ? sqlParameters.getTitle()
                     : taskExecutionContext.getTaskName() + " query result sets", result);
@@ -338,7 +347,6 @@ public class SqlTask extends AbstractTask {
         return resultJSONArray;
     }
 
-
     /**
      * send alert as an attachment
      *
@@ -362,12 +370,14 @@ public class SqlTask extends AbstractTask {
         }
     }
 
-    private String executeUpdate(Connection connection, List<SqlBinds> statementsBinds, String handlerType) throws Exception {
+    private String executeUpdate(Connection connection, List<SqlBinds> statementsBinds,
+                                 String handlerType) throws Exception {
         int result = 0;
         for (SqlBinds sqlBind : statementsBinds) {
             try (PreparedStatement statement = prepareStatementAndBind(connection, sqlBind)) {
                 result = statement.executeUpdate();
-                logger.info("{} statement execute update result: {}, for sql: {}", handlerType, result, sqlBind.getSql());
+                logger.info("{} statement execute update result: {}, for sql: {}", handlerType, result,
+                        sqlBind.getSql());
             }
         }
         return String.valueOf(result);
@@ -428,7 +438,8 @@ public class SqlTask extends AbstractTask {
                     ParameterUtils.setInParameter(entry.getKey(), stmt, prop.getType(), prop.getValue());
                 }
             }
-            logger.info("prepare statement replace sql : {}, sql parameters : {}", sqlBinds.getSql(), sqlBinds.getParamsMap());
+            logger.info("prepare statement replace sql : {}, sql parameters : {}", sqlBinds.getSql(),
+                    sqlBinds.getParamsMap());
             return stmt;
         } catch (Exception exception) {
             throw new TaskException("SQL task prepareStatementAndBind error", exception);
@@ -444,14 +455,15 @@ public class SqlTask extends AbstractTask {
      * @param sqlParamsMap sql params map
      */
     private void printReplacedSql(String content, String formatSql, String rgex, Map<Integer, Property> sqlParamsMap) {
-        //parameter print style
+        // parameter print style
         logger.info("after replace sql , preparing : {}", formatSql);
         StringBuilder logPrint = new StringBuilder("replaced sql , parameters:");
         if (sqlParamsMap == null) {
             logger.info("printReplacedSql: sqlParamsMap is null.");
         } else {
             for (int i = 1; i <= sqlParamsMap.size(); i++) {
-                logPrint.append(sqlParamsMap.get(i).getValue()).append("(").append(sqlParamsMap.get(i).getType()).append(")");
+                logPrint.append(sqlParamsMap.get(i).getValue()).append("(").append(sqlParamsMap.get(i).getType())
+                        .append(")");
             }
         }
         logger.info("Sql Params are {}", logPrint);
@@ -482,12 +494,13 @@ public class SqlTask extends AbstractTask {
             sqlParameters.setTitle(title);
         }
 
-        //new
-        //replace variable TIME with $[YYYYmmddd...] in sql when history run job and batch complement job
-        sql = ParameterUtils.replaceScheduleTime(sql, DateUtils.timeStampToDate(taskExecutionContext.getScheduleTime()));
+        // new
+        // replace variable TIME with $[YYYYmmddd...] in sql when history run job and batch complement job
+        sql = ParameterUtils.replaceScheduleTime(sql,
+                DateUtils.timeStampToDate(taskExecutionContext.getScheduleTime()));
         // special characters need to be escaped, ${} needs to be escaped
-        setSqlParamsMap(sql, rgex, sqlParamsMap, paramsMap,taskExecutionContext.getTaskInstanceId());
-        //Replace the original value in sql ！{...} ，Does not participate in precompilation
+        setSqlParamsMap(sql, rgex, sqlParamsMap, paramsMap, taskExecutionContext.getTaskInstanceId());
+        // Replace the original value in sql ！{...} ，Does not participate in precompilation
         String rgexo = "['\"]*\\!\\{(.*?)\\}['\"]*";
         sql = replaceOriginalValue(sql, rgexo, paramsMap);
         // replace the ${} of the SQL statement with the Placeholder
@@ -543,7 +556,8 @@ public class SqlTask extends AbstractTask {
      */
     private List<String> buildTempFuncSql(List<UdfFuncParameters> udfFuncParameters) {
         return udfFuncParameters.stream().map(value -> MessageFormat
-                .format(CREATE_OR_REPLACE_FUNCTION_FORMAT, value.getFuncName(), value.getClassName())).collect(Collectors.toList());
+                .format(CREATE_OR_REPLACE_FUNCTION_FORMAT, value.getFuncName(), value.getClassName()))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -557,8 +571,7 @@ public class SqlTask extends AbstractTask {
             String prefixPath = defaultFS.startsWith("file://") ? "file://" : defaultFS;
             String uploadPath = CommonUtils.getHdfsUdfDir(value.getTenantCode());
             String resourceFullName = value.getResourceName();
-            resourceFullName = resourceFullName.startsWith("/") ? resourceFullName : String.format("/%s", resourceFullName);
-            return String.format("add jar %s%s%s", prefixPath, uploadPath, resourceFullName);
+            return String.format("add jar %s", resourceFullName);
         }).collect(Collectors.toList());
     }
 

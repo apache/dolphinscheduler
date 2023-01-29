@@ -26,11 +26,10 @@ import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.storage.StorageOperate;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
@@ -56,8 +55,9 @@ import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -144,7 +144,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @throws Exception exception
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Map<String, Object> createUser(User loginUser,
                                           String userName,
                                           String userPassword,
@@ -190,7 +190,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         result.put(Constants.DATA_LIST, user);
         putMsg(result, Status.SUCCESS);
         return result;
-
     }
 
     @Override
@@ -341,7 +340,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             return result;
         }
         if (!isAdmin(loginUser)) {
-            logger.warn("User does not have permission for this feature, userId:{}, userName:{}.", loginUser.getId(), loginUser.getUserName());
+            logger.warn("User does not have permission for this feature, userId:{}, userName:{}.", loginUser.getId(),
+                    loginUser.getUserName());
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -392,7 +392,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             return result;
         }
         if (check(result, !canOperator(loginUser, userId), Status.USER_NO_OPERATION_PERM)) {
-            logger.warn("User does not have permission for this feature, userId:{}, userName:{}.", loginUser.getId(), loginUser.getUserName());
+            logger.warn("User does not have permission for this feature, userId:{}, userName:{}.", loginUser.getId(),
+                    loginUser.getUserName());
             return result;
         }
         User user = userMapper.selectById(userId);
@@ -443,7 +444,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         if (state == 0 && user.getState() != state && Objects.equals(loginUser.getId(), user.getId())) {
-            logger.warn("Not allow to disable your own account, userId:{}, userName:{}.", user.getId(), user.getUserName());
+            logger.warn("Not allow to disable your own account, userId:{}, userName:{}.", user.getId(),
+                    user.getUserName());
             putMsg(result, Status.NOT_ALLOW_TO_DISABLE_OWN_ACCOUNT);
             return result;
         }
@@ -494,7 +496,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
         // only admin can operate
         if (!isAdmin(loginUser)) {
-            logger.warn("User does not have permission for this feature, userId:{}, userName:{}.", loginUser.getId(), loginUser.getUserName());
+            logger.warn("User does not have permission for this feature, userId:{}, userName:{}.", loginUser.getId(),
+                    loginUser.getUserName());
             putMsg(result, Status.USER_NO_OPERATION_PERM, id);
             return result;
         }
@@ -510,7 +513,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         if (CollectionUtils.isNotEmpty(projects)) {
             String projectNames = projects.stream().map(Project::getName).collect(Collectors.joining(","));
             putMsg(result, Status.TRANSFORM_PROJECT_OWNERSHIP, projectNames);
-            logger.warn("Please transfer the project ownership before deleting the user, userId:{}, projects:{}.", id, projectNames);
+            logger.warn("Please transfer the project ownership before deleting the user, userId:{}, projects:{}.", id,
+                    projectNames);
             return result;
         }
         // delete user
@@ -527,6 +531,97 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             putMsg(result, Status.DELETE_USER_BY_ID_ERROR);
             return result;
         }
+    }
+
+    /**
+     * revoke the project permission for specified user by id
+     * @param loginUser     Login user
+     * @param userId        User id
+     * @param projectIds   project id array
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public Map<String, Object> revokeProjectById(User loginUser, int userId, String projectIds) {
+        Map<String, Object> result = new HashMap<>();
+        result.put(Constants.STATUS, false);
+
+        if (resourcePermissionCheckService.functionDisabled()) {
+            putMsg(result, Status.FUNCTION_DISABLED);
+            return result;
+        }
+        // 1. only admin can operate
+        if (this.check(result, !this.isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
+            return result;
+        }
+
+        // 2. check if user is existed
+        User user = this.userMapper.selectById(userId);
+        if (user == null) {
+            this.putMsg(result, Status.USER_NOT_EXIST, userId);
+            return result;
+        }
+
+        Arrays.stream(projectIds.split(",")).distinct().forEach(projectId -> {
+            // 3. check if project is existed
+            Project project = this.projectMapper.queryDetailById(Integer.parseInt(projectId));
+            if (project == null) {
+                this.putMsg(result, Status.PROJECT_NOT_FOUND, Integer.parseInt(projectId));
+            } else {
+                // 4. delete the relationship between project and user
+                this.projectUserMapper.deleteProjectRelation(project.getId(), user.getId());
+            }
+        });
+
+        this.putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    /**
+     * grant project with read permission
+     *
+     * @param loginUser login user
+     * @param userId user id
+     * @param projectIds project id array
+     * @return grant result code
+     */
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public Map<String, Object> grantProjectWithReadPerm(User loginUser, int userId, String projectIds) {
+        Map<String, Object> result = new HashMap<>();
+        result.put(Constants.STATUS, false);
+
+        if (resourcePermissionCheckService.functionDisabled()) {
+            putMsg(result, Status.FUNCTION_DISABLED);
+            return result;
+        }
+        // check exist
+        User tempUser = userMapper.selectById(userId);
+        if (tempUser == null) {
+            putMsg(result, Status.USER_NOT_EXIST, userId);
+            return result;
+        }
+
+        if (check(result, StringUtils.isEmpty(projectIds), Status.SUCCESS)) {
+            return result;
+        }
+        Arrays.stream(projectIds.split(Constants.COMMA)).distinct().forEach(projectId -> {
+            ProjectUser projectUserOld = projectUserMapper.queryProjectRelation(Integer.parseInt(projectId), userId);
+            if (projectUserOld != null) {
+                projectUserMapper.deleteProjectRelation(Integer.parseInt(projectId), userId);
+            }
+            Date now = new Date();
+            ProjectUser projectUser = new ProjectUser();
+            projectUser.setUserId(userId);
+            projectUser.setProjectId(Integer.parseInt(projectId));
+            projectUser.setPerm(Constants.READ_PERMISSION);
+            projectUser.setCreateTime(now);
+            projectUser.setUpdateTime(now);
+            projectUserMapper.insert(projectUser);
+        });
+        putMsg(result, Status.SUCCESS);
+
+        return result;
     }
 
     /**
@@ -555,13 +650,15 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             return result;
         }
 
-        projectUserMapper.deleteProjectRelation(0, userId);
-
         if (check(result, StringUtils.isEmpty(projectIds), Status.SUCCESS)) {
             logger.warn("Parameter projectIds is empty.");
             return result;
         }
         Arrays.stream(projectIds.split(",")).distinct().forEach(projectId -> {
+            ProjectUser projectUserOld = projectUserMapper.queryProjectRelation(Integer.parseInt(projectId), userId);
+            if (projectUserOld != null) {
+                projectUserMapper.deleteProjectRelation(Integer.parseInt(projectId), userId);
+            }
             Date now = new Date();
             ProjectUser projectUser = new ProjectUser();
             projectUser.setUserId(userId);
@@ -612,7 +709,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         // 3. only project owner can operate
         if (!this.canOperator(loginUser, project.getUserId())) {
-            logger.warn("User does not have permission for project, userId:{}, userName:{}, projectCode:{}.", loginUser.getId(), loginUser.getUserName(), projectCode);
+            logger.warn("User does not have permission for project, userId:{}, userName:{}, projectCode:{}.",
+                    loginUser.getId(), loginUser.getUserName(), projectCode);
             this.putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -624,7 +722,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             projectUser = new ProjectUser();
             projectUser.setUserId(userId);
             projectUser.setProjectId(project.getId());
-            projectUser.setPerm(7);
+            projectUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
             projectUser.setCreateTime(today);
             projectUser.setUpdateTime(today);
             this.projectUserMapper.insert(projectUser);
@@ -779,7 +877,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         }
 
-        logger.info("User is granted permission for resources, userId:{}, resourceIds:{}.", user.getId(), needAuthorizeResIds);
+        logger.info("User is granted permission for resources, userId:{}, resourceIds:{}.", user.getId(),
+                needAuthorizeResIds);
 
         putMsg(result, Status.SUCCESS);
 
@@ -1167,7 +1266,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             if (CollectionUtils.isNotEmpty(components)) {
                 for (ResourceComponent component : components) {
                     // verify whether exist
-                    if (!storageOperate.exists(oldTenantCode,
+                    if (!storageOperate.exists(
                             String.format(Constants.FORMAT_S_S, srcBasePath, component.getFullName()))) {
                         logger.error("Resource file: {} does not exist, copy error.", component.getFullName());
                         throw new ServiceException(Status.RESOURCE_NOT_EXIST);
@@ -1182,8 +1281,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
                     if (CollectionUtils.isEmpty(component.getChildren())) {
                         // if not exist,need create it
-                        if (!storageOperate.exists(oldTenantCode,
-                                String.format(Constants.FORMAT_S_S, dstBasePath, component.getFullName()))) {
+                        if (!storageOperate
+                                .exists(String.format(Constants.FORMAT_S_S, dstBasePath, component.getFullName()))) {
                             storageOperate.mkdir(newTenantCode,
                                     String.format(Constants.FORMAT_S_S, dstBasePath, component.getFullName()));
                         }

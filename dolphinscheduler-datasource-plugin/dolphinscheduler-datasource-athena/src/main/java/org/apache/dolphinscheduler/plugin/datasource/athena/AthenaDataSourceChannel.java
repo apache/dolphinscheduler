@@ -23,8 +23,9 @@ import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 public class AthenaDataSourceChannel implements DataSourceChannel {
+
     @Override
     public DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        return new AthenaDataSourceClient(baseConnectionParam,dbType);
+        return new AthenaDataSourceClient(baseConnectionParam, dbType);
     }
 }

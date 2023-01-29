@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.task.api.k8s;
 
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -26,6 +25,7 @@ import org.apache.dolphinscheduler.plugin.task.api.k8s.impl.K8sTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 
 public abstract class AbstractK8sTask extends AbstractRemoteTask {
+
     /**
      * process task
      */
@@ -37,7 +37,7 @@ public abstract class AbstractK8sTask extends AbstractRemoteTask {
      */
     protected AbstractK8sTask(TaskExecutionContext taskRequest) {
         super(taskRequest);
-        this.abstractK8sTaskExecutor = new K8sTaskExecutor(logger,taskRequest);
+        this.abstractK8sTaskExecutor = new K8sTaskExecutor(logger, taskRequest);
     }
 
     // todo split handle to submit and track
@@ -49,7 +49,7 @@ public abstract class AbstractK8sTask extends AbstractRemoteTask {
             setAppIds(response.getAppIds());
         } catch (Exception e) {
             exitStatusCode = -1;
-            throw new TaskException("k8s process failure",e);
+            throw new TaskException("k8s process failure", e);
         }
     }
 

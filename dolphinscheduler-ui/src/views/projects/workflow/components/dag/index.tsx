@@ -54,7 +54,9 @@ import './x6-style.scss'
 import { queryLog } from '@/service/modules/log'
 import { useAsyncState } from '@vueuse/core'
 import utils from '@/utils'
-import { useLogTimerStore } from '@/store/logTimer/logTimer'
+import { useUISettingStore } from '@/store/ui-setting/ui-setting'
+import { executeTask } from '@/service/modules/executors'
+import { removeTaskInstanceCache } from '@/service/modules/task-instances'
 
 const props = {
   // If this prop is passed, it means from definition detail
@@ -85,8 +87,8 @@ export default defineComponent({
     const route = useRoute()
     const theme = useThemeStore()
 
-    const logTimerStore = useLogTimerStore()
-    const logTimer = logTimerStore.getLogTimer
+    const uiSettingStore = useUISettingStore()
+    const logTimer = uiSettingStore.getLogTimer
 
     // Whether the graph can be operated
     provide('readonly', toRef(props, 'readonly'))
@@ -133,6 +135,13 @@ export default defineComponent({
       } else {
         return false
       }
+    })
+
+    // execute task buttons in the dag node menu
+    const executeTaskDisplay = computed(() => {
+        return (
+            route.name === 'workflow-instance-detail'
+        )
     })
 
     // other button in the dag node menu
@@ -283,6 +292,26 @@ export default defineComponent({
       getLogs(logTimer)
     }
 
+    const handleExecuteTask = (startNodeList: number, taskDependType: string) => {
+      executeTask({
+        processInstanceId: Number(route.params.id),
+        startNodeList: startNodeList,
+        taskDependType: taskDependType,
+      },
+        props.projectCode).then(() => {
+          window.$message.success(t('project.workflow.success'))
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        })
+    }
+
+    const handleRemoveTaskInstanceCache = (taskId: number) => {
+      removeTaskInstanceCache(props.projectCode, taskId).then(() => {
+        window.$message.success(t('project.workflow.success'))
+      })
+    }
+
     const downloadLogs = () => {
       utils.downloadFile('log/download-log', {
         taskInstanceId: nodeVariables.logTaskId
@@ -382,6 +411,7 @@ export default defineComponent({
         />
         <ContextMenuItem
           startDisplay={startDisplay.value}
+          executeTaskDisplay={executeTaskDisplay.value}
           menuDisplay={menuDisplay.value}
           taskInstance={taskInstance.value}
           cell={nodeVariables.menuCell as Cell}
@@ -394,6 +424,8 @@ export default defineComponent({
           onCopyTask={copyTask}
           onRemoveTasks={removeTasks}
           onViewLog={handleViewLog}
+          onExecuteTask={handleExecuteTask}
+          onRemoveTaskInstanceCache={handleRemoveTaskInstanceCache}
         />
         {!!props.definition && (
           <StartModal
@@ -418,3 +450,4 @@ export default defineComponent({
     )
   }
 })
+

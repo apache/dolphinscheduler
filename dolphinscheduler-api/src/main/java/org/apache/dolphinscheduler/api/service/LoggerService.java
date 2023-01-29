@@ -31,21 +31,22 @@ public interface LoggerService {
     /**
      * view log
      *
+     * @param loginUser   login user
      * @param taskInstId task instance id
      * @param skipLineNum skip line number
      * @param limit limit
      * @return log string data
      */
-    Result<ResponseTaskLog> queryLog(int taskInstId, int skipLineNum, int limit);
-
+    Result<ResponseTaskLog> queryLog(User loginUser, int taskInstId, int skipLineNum, int limit);
 
     /**
      * get log size
      *
+     * @param loginUser   login user
      * @param taskInstId task instance id
      * @return log byte array
      */
-    byte[] getLogBytes(int taskInstId);
+    byte[] getLogBytes(User loginUser, int taskInstId);
 
     /**
      * query log

@@ -75,7 +75,7 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
     List<DefinitionGroupByUser> countDefinitionGroupByUser(@Param("projectCodes") Long[] projectCodes);
 
     /**
-     * list all resource ids
+     * list all resource ids and task_params containing resourceList
      *
      * @return task ids list
      */
@@ -111,7 +111,6 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
      *
      * @param page page
      * @param projectCode projectCode
-     * @param searchWorkflowName searchWorkflowName
      * @param searchTaskName searchTaskName
      * @param taskType taskType
      * @param taskExecuteType taskExecuteType
@@ -119,10 +118,18 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
      */
     IPage<TaskMainInfo> queryDefineListPaging(IPage<TaskMainInfo> page,
                                               @Param("projectCode") long projectCode,
-                                              @Param("searchWorkflowName") String searchWorkflowName,
                                               @Param("searchTaskName") String searchTaskName,
                                               @Param("taskType") String taskType,
-                                              @Param("taskExecuteType")TaskExecuteType taskExecuteType);
+                                              @Param("taskExecuteType") TaskExecuteType taskExecuteType);
+
+    /**
+     * task main info
+     * @param projectCode project code
+     * @param codeList code list
+     * @return task main info
+     */
+    List<TaskMainInfo> queryDefineListByCodeList(@Param("projectCode") long projectCode,
+                                                 @Param("codeList") List<Long> codeList);
 
     /**
      * query task definition by code list
@@ -131,4 +138,24 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
      * @return task definition list
      */
     List<TaskDefinition> queryByCodeList(@Param("codes") Collection<Long> codes);
+
+    /**
+     * Filter task definition
+     *
+     * @param page page
+     * @param taskDefinition process definition object
+     * @return task definition IPage
+     */
+    IPage<TaskDefinition> filterTaskDefinition(IPage<TaskDefinition> page,
+                                               @Param("task") TaskDefinition taskDefinition);
+
+    /**
+     * batch delete task by task code
+     *
+     * @param taskCodeList task code list
+     * @return deleted row count
+     */
+    int deleteByBatchCodes(@Param("taskCodeList") List<Long> taskCodeList);
+
+    void deleteByWorkflowDefinitionCodeAndVersion(long workflowDefinitionCode, int workflowDefinitionVersion);
 }

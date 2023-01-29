@@ -34,23 +34,23 @@ public interface MonitorService {
      * @param loginUser login user
      * @return data base state
      */
-    Map<String,Object> queryDatabaseState(User loginUser);
-    
+    Map<String, Object> queryDatabaseState(User loginUser);
+
     /**
      * query master list
      *
      * @param loginUser login user
      * @return master information list
      */
-    Map<String,Object> queryMaster(User loginUser);
-    
+    Map<String, Object> queryMaster(User loginUser);
+
     /**
      * query worker list
      *
      * @param loginUser login user
      * @return worker information list
      */
-    Map<String,Object> queryWorker(User loginUser);
-    
+    Map<String, Object> queryWorker(User loginUser);
+
     List<Server> getServerListFromRegistry(boolean isMaster);
 }

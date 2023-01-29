@@ -17,24 +17,25 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
+
+import org.apache.commons.lang3.StringUtils;
+
+import java.text.MessageFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,16 +44,18 @@ import org.springframework.beans.factory.annotation.Autowired;
  * base service impl
  */
 public class BaseServiceImpl implements BaseService {
+
     private static final Logger logger = LoggerFactory.getLogger(BaseServiceImpl.class);
 
     @Autowired
     protected ResourcePermissionCheckService resourcePermissionCheckService;
 
     @Override
-    public void permissionPostHandle(AuthorizationType authorizationType, Integer userId, List<Integer> ids, Logger logger) {
-        try{
+    public void permissionPostHandle(AuthorizationType authorizationType, Integer userId, List<Integer> ids,
+                                     Logger logger) {
+        try {
             resourcePermissionCheckService.postHandle(authorizationType, userId, ids, logger);
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.error("Post handle error, userId:{}.", userId, e);
             throw new RuntimeException("Resource association user error", e);
         }
@@ -78,7 +81,7 @@ public class BaseServiceImpl implements BaseService {
      */
     @Override
     public boolean isNotAdmin(User loginUser, Map<String, Object> result) {
-        //only admin can operate
+        // only admin can operate
         if (!isAdmin(loginUser)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return true;
@@ -145,14 +148,14 @@ public class BaseServiceImpl implements BaseService {
      * @param tenantCode tenant code
      * @throws IOException if hdfs operation exception
      */
-//    @Override
-//    public void createTenantDirIfNotExists(String tenantCode) throws IOException {
-//        String resourcePath = HadoopUtils.getHdfsResDir(tenantCode);
-//        String udfsPath = HadoopUtils.getHdfsUdfDir(tenantCode);
-//        // init resource path and udf path
-//        HadoopUtils.getInstance().mkdir(tenantCode,resourcePath);
-//        HadoopUtils.getInstance().mkdir(tenantCode,udfsPath);
-//    }
+    // @Override
+    // public void createTenantDirIfNotExists(String tenantCode) throws IOException {
+    // String resourcePath = HadoopUtils.getHdfsResDir(tenantCode);
+    // String udfsPath = HadoopUtils.getHdfsUdfDir(tenantCode);
+    // // init resource path and udf path
+    // HadoopUtils.getInstance().mkdir(tenantCode,resourcePath);
+    // HadoopUtils.getInstance().mkdir(tenantCode,udfsPath);
+    // }
 
     /**
      * Verify that the operator has permissions
@@ -179,42 +182,22 @@ public class BaseServiceImpl implements BaseService {
 
     /**
      * check and parse date parameters
-     *
-     * @param startDateStr start date string
-     * @param endDateStr end date string
-     * @return map<status,startDate,endDate>
      */
     @Override
-    public Map<String, Object> checkAndParseDateParameters(String startDateStr, String endDateStr) {
-        Map<String, Object> result = new HashMap<>();
+    public Date checkAndParseDateParameters(String startDateStr) throws ServiceException {
         Date start = null;
         if (!StringUtils.isEmpty(startDateStr)) {
             start = DateUtils.stringToDate(startDateStr);
             if (Objects.isNull(start)) {
                 logger.warn("Parameter startDateStr is invalid.");
-                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
-                return result;
+                throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
             }
         }
-        result.put(Constants.START_TIME, start);
-
-        Date end = null;
-        if (!StringUtils.isEmpty(endDateStr)) {
-            end = DateUtils.stringToDate(endDateStr);
-            if (Objects.isNull(end)) {
-                logger.warn("Parameter endDateStr is invalid.");
-                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
-                return result;
-            }
-        }
-        result.put(Constants.END_TIME, end);
-
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return start;
     }
 
     @Override
     public boolean checkDescriptionLength(String description) {
-        return description!=null && description.codePointCount(0, description.length()) > 255;
+        return description != null && description.codePointCount(0, description.length()) > 255;
     }
 }

@@ -17,14 +17,15 @@
 
 package org.apache.dolphinscheduler.server.master.event;
 
-import io.netty.channel.Channel;
+import org.apache.dolphinscheduler.common.enums.StateEventType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import org.apache.dolphinscheduler.common.enums.StateEventType;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import io.netty.channel.Channel;
 
 @Data
 @Builder
@@ -35,7 +36,7 @@ public class TaskStateEvent implements StateEvent {
     // todo: use wrapper type
     private int processInstanceId;
 
-    private int taskInstanceId;
+    private Integer taskInstanceId;
 
     private long taskCode;
 

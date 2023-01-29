@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.tools.datasource.dao;
 
-import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.sql.Connection;
@@ -32,6 +31,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class MySQLUpgradeDao extends UpgradeDao {
+
     public static final Logger logger = LoggerFactory.getLogger(MySQLUpgradeDao.class);
 
     private MySQLUpgradeDao(DataSource dataSource) {
@@ -55,17 +55,13 @@ public class MySQLUpgradeDao extends UpgradeDao {
      */
     @Override
     public boolean isExistsTable(String tableName) {
-        ResultSet rs = null;
-        Connection conn = null;
-        try {
-            conn = dataSource.getConnection();
-            rs = conn.getMetaData().getTables(conn.getCatalog(), conn.getSchema(), tableName, null);
+        try (
+                Connection conn = dataSource.getConnection();
+                ResultSet rs = conn.getMetaData().getTables(conn.getCatalog(), conn.getSchema(), tableName, null)) {
             return rs.next();
         } catch (SQLException e) {
-            logger.error(e.getMessage(),e);
-            throw new RuntimeException(e.getMessage(),e);
-        } finally {
-            ConnectionUtils.releaseResource(rs, conn);
+            logger.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
 
     }
@@ -77,20 +73,17 @@ public class MySQLUpgradeDao extends UpgradeDao {
      * @return  if column name exist return true，else return false
      */
     @Override
-    public boolean isExistsColumn(String tableName,String columnName) {
-        Connection conn = null;
-        try {
-            conn = dataSource.getConnection();
-            ResultSet rs = conn.getMetaData().getColumns(conn.getCatalog(), conn.getSchema(),tableName,columnName);
+    public boolean isExistsColumn(String tableName, String columnName) {
+        try (
+                Connection conn = dataSource.getConnection();
+                ResultSet rs =
+                        conn.getMetaData().getColumns(conn.getCatalog(), conn.getSchema(), tableName, columnName)) {
             return rs.next();
 
         } catch (SQLException e) {
-            logger.error(e.getMessage(),e);
-            throw new RuntimeException(e.getMessage(),e);
-        } finally {
-            ConnectionUtils.releaseResource(conn);
+            logger.error(e.getMessage(), e);
+            throw new RuntimeException(e.getMessage(), e);
         }
-
     }
 
 }

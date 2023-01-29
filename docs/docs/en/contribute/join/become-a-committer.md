@@ -20,7 +20,7 @@ In Dolphinscheduler, **new committer nomination** could only be officially start
 
 The following steps are recommended (to be initiated only by an existing PMC member):
 1. Send an email titled `[DISCUSS] Promote xxx as new committer` to `private@dolphinscheduler.apache.org`. List the important contributions of the candidate,
-   so you could gather support from other PMC members for your proposal.
+so you could gather support from other PMC members for your proposal.
 2. Keep the discussion open for more than 3 days but no more than 1 week, unless there is any express objection or concern.
 3. If the PMC generally agrees to the proposal, send an email titled `[VOTE] Promote xxx as new committer` to `private@dolphinscheduler.apache.org`.
 4. Keep the voting process open for more than 3 days, but no more than 1 week. Consider the result as `Consensus Approval` if there are `3 + 1` votes with `NO` vetos. Please note that +1 votes > -1 votes.
@@ -31,6 +31,7 @@ The following steps are recommended (to be initiated only by an existing PMC mem
 The PMC member who starts the promotion is responsible for sending an invitation to the new committer and guiding him/her to set up the ASF env.
 
 The PMC member should send an email using the following template to the new committer:
+
 ```
 To: <invitee name>@gmail.com
 Cc: private@dolphinscheduler.apache.org
@@ -118,7 +119,7 @@ The PMC member should add the new committer to the official committer list throu
 
 1. Go to [Apache Account Utility Platform](https://id.apache.org/), create your password, set up your personal mailbox (`Forwarding email address`) and GitHub account(`Your GitHub Username`). An organizational invite will be sent to you via email shortly thereafter (within 2 hours).
 2. If you would like to use the `xxx@apache.org` email service, please refer to [here](https://infra.apache.org/committer-email.html). Gmail is recommended, because this forwarding mode is not easy to find in most mailbox service settings.
-3. Follow the `Authorized GitHub 2FA wiki` to enable two-factor authorization (2FA) on [Github](http://github.com/). When you set 2FA to "off", it will be delisted by the corresponding Apache committer write permission group until you set it up again. (**NOTE: Treat your recovery codes with the same level of attention as you would your password!**)
+3. Follow the `Authorized GitHub 2FA wiki` to enable two-factor authorization (2FA) on [GitHub](http://github.com/). When you set 2FA to "off", it will be delisted by the corresponding Apache committer write permission group until you set it up again. (**NOTE: Treat your recovery codes with the same level of attention as you would your password!**)
 4. Use [GitBox Account Linking Utility](https://gitbox.apache.org/setup/) to obtain write permission of the Dolphinscheduler project.
 
 If you would like to show up publicly in the Apache GitHub org, you need to go to the [Apache GitHub org people page](https://github.com/orgs/apache/people),

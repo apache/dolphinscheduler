@@ -28,7 +28,10 @@ The MLflow plugin currently supports and will support the following:
 
 ## Task Parameters and Example
 
-- Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md#default-task-parameters) for default parameters.
+[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
+[//]: # (- Please refer to [DolphinScheduler Task Parameters Appendix]&#40;appendix.md#default-task-parameters&#41; `Default Task Parameters` section for default parameters.)
+
+- Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
 
 |       **Parameter**        |                                                                    **Description**                                                                     |
 |----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -58,13 +61,13 @@ The MLflow plugin currently supports and will support the following:
 
 **Task Parameter**
 
-| **Parameter**  |                                                                                                                                                                                                                                                                                                  **Description**                                                                                                                                                                                                                                                                                                  |
-|----------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Register Model | Register the model or not. If register is selected, the following parameters are expanded.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| model name     | The registered model name is added to the original model version and registered as Production.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| Data Path      | The absolute path of the file or folder. Ends with .csv for file or contain train.csv and test.csv for folder(In the suggested way, users should build their own test sets for model evaluation).                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| Parameters     | Parameter when initializing the algorithm/AutoML model, which can be empty. For example, parameters `n_estimators=200;learning_rate=0.2` for flaml. The convention will be passed with '; 'shards each parameter, using the name before the equal sign as the parameter name, and using the name after the equal sign to get the corresponding parameter value through `python eval()`. The detailed parameter list is as follows: <ul><li>[flaml](https://microsoft.github.io/FLAML/docs/reference/automl#automl-objects)</li><li>[autosklearn](https://automl.github.io/auto-sklearn/master/api.html)</li></ul> |
-| AutoML tool    | The AutoML tool used, currently supports [autosklearn](https://github.com/automl/auto-sklearn) and [flaml](https://github.com/microsoft/FLAML).                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| **Parameter**  |                                                                                                                                                                                                                                                                                                 **Description**                                                                                                                                                                                                                                                                                                  |
+|----------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Register Model | Register the model or not. If register is selected, the following parameters are expanded.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| model name     | The registered model name is added to the original model version and registered as Production.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| Data Path      | The absolute path of the file or folder. Ends with .csv for file or contain train.csv and test.csv for folder(In the suggested way, users should build their own test sets for model evaluation).                                                                                                                                                                                                                                                                                                                                                                                                                |
+| Parameters     | Parameter when initializing the algorithm/AutoML model, which can be empty. For example, parameters `n_estimators=200;learning_rate=0.2` for flaml. The convention will be passed with '; 'shards each parameter, using the name before the equal sign as the parameter name, and using the name after the equal sign to get the corresponding parameter value through `python eval()`. The detailed parameter list is as follows: <ul><li>[flaml](https://microsoft.github.io/FLAML/docs/Use-Cases/Task-Oriented-AutoML)</li><li>[autosklearn](https://automl.github.io/auto-sklearn/master/api.html)</li></ul> |
+| AutoML tool    | The AutoML tool used, currently supports [autosklearn](https://github.com/automl/auto-sklearn) and [flaml](https://github.com/microsoft/FLAML).                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 
 #### Custom projects
 
@@ -78,7 +81,7 @@ The MLflow plugin currently supports and will support the following:
 | Repository      | Repository url of MLflow Project, Support git address and directory on worker. If it's in a subdirectory, We add `#` to support this (same as `mlflow run`) , for example `https://github.com/mlflow/mlflow#examples/xgboost/xgboost_native`. |
 | Project Version | Version of the project, default master.                                                                                                                                                                                                       |
 
-You can now use this feature to run all MLFlow projects on Github (For example [MLflow examples](https://github.com/mlflow/mlflow/tree/master/examples) ). You can also create your own machine learning library to reuse your work, and then use DolphinScheduler to use your library with one click.
+You can now use this feature to run all MLFlow projects on GitHub (For example [MLflow examples](https://github.com/mlflow/mlflow/tree/master/examples) ). You can also create your own machine learning library to reuse your work, and then use DolphinScheduler to use your library with one click.
 
 ### MLflow Models
 
@@ -100,6 +103,7 @@ You can now use this feature to run all MLFlow projects on Github (For example [
 ## Environment to Prepare
 
 ### Conda Environment
+
 Please install [anaconda](https://docs.continuum.io/anaconda/install/) or [miniconda](https://docs.conda.io/en/latest/miniconda.html#installing) in advance.
 
 **Method A:**
@@ -112,7 +116,6 @@ Add the following content to the file:
 # config anaconda environment
 export PATH=/opt/anaconda3/bin:$PATH
 ```
-
 
 **Method B:**
 
@@ -153,3 +156,4 @@ ml.mlflow.preset_repository=https://github.com/apache/dolphinscheduler-mlflow
 # mlflow task plugin preset repository version
 ml.mlflow.preset_repository_version="main"
 ```
+

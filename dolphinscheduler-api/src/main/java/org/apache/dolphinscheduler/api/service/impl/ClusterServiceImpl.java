@@ -23,8 +23,7 @@ import org.apache.dolphinscheduler.api.k8s.K8sManager;
 import org.apache.dolphinscheduler.api.service.ClusterService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.ClusterConfUtils;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.dao.entity.Cluster;
@@ -33,8 +32,9 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ClusterMapper;
 import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceMapper;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
+import org.apache.dolphinscheduler.service.utils.ClusterConfUtils;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -258,7 +258,8 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
                 .selectCount(new QueryWrapper<K8sNamespace>().lambda().eq(K8sNamespace::getClusterCode, code));
 
         if (relatedNamespaceNumber > 0) {
-            logger.warn("Delete cluster failed because {} namespace(s) is(are) using it, clusterCode:{}.", relatedNamespaceNumber, code);
+            logger.warn("Delete cluster failed because {} namespace(s) is(are) using it, clusterCode:{}.",
+                    relatedNamespaceNumber, code);
             putMsg(result, Status.DELETE_CLUSTER_RELATED_NAMESPACE_EXISTS);
             return result;
         }
@@ -273,7 +274,6 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
         }
         return result;
     }
-
 
     /**
      * update cluster
@@ -384,4 +384,3 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
     }
 
 }
-

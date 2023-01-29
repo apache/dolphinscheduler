@@ -17,13 +17,13 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.loop.template.http.method;
 
+import org.apache.dolphinscheduler.common.utils.OkHttpUtils;
 import org.apache.dolphinscheduler.plugin.task.api.loop.LoopTaskInstanceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.loop.LoopTaskInstanceStatus;
 import org.apache.dolphinscheduler.plugin.task.api.loop.LoopTaskQueryStatusMethodDefinition;
 import org.apache.dolphinscheduler.plugin.task.api.loop.template.http.HttpLoopTaskInstanceStatus;
 import org.apache.dolphinscheduler.plugin.task.api.loop.template.http.HttpLoopTaskMethodDefinition;
 import org.apache.dolphinscheduler.plugin.task.api.utils.JsonPathUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.OkHttpUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -32,7 +32,8 @@ import java.util.Map;
 import lombok.NonNull;
 
 public class HttpLoopTaskQueryStatusMethodDefinition extends HttpLoopTaskMethodDefinition
-    implements LoopTaskQueryStatusMethodDefinition {
+        implements
+            LoopTaskQueryStatusMethodDefinition {
 
     private final String taskInstanceFinishedJPath;
     // inject the taskInstanceId into template
@@ -75,7 +76,7 @@ public class HttpLoopTaskQueryStatusMethodDefinition extends HttpLoopTaskMethodD
                 responseBody = OkHttpUtils.post(url, httpHeaders, requestParams, requestBody);
             } else {
                 throw new IllegalArgumentException(String.format("http method type: %s is not supported",
-                                                                 httpMethodType));
+                        httpMethodType));
             }
         } catch (IllegalArgumentException ex) {
             throw ex;

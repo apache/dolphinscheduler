@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.dq;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_TABLE;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.SRC_FIELD;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.DataQualityTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ExecuteSqlType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.InputType;
@@ -30,7 +31,6 @@ import org.apache.dolphinscheduler.plugin.task.dq.rule.RuleManager;
 import org.apache.dolphinscheduler.plugin.task.dq.rule.entity.DqRuleExecuteSql;
 import org.apache.dolphinscheduler.plugin.task.dq.rule.entity.DqRuleInputEntry;
 import org.apache.dolphinscheduler.spi.params.base.FormType;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -38,8 +38,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * DataQualityTaskTest
@@ -96,7 +96,7 @@ public class DataQualityTaskTest {
                 + "as unique_code,'table_count.total'AS statistics_name,"
                 + "table_count.total AS statistics_value,'2021-08-12 10:15:48' as data_time,'2021-08-12 10:15:48' as create_time,"
                 + "'2021-08-12 10:15:48' as update_time from table_count\"}}]}";
-        Assert.assertEquals(expect, JSONUtils.toJsonString(ruleManager.generateDataQualityParameter()));
+        Assertions.assertEquals(expect, JSONUtils.toJsonString(ruleManager.generateDataQualityParameter()));
     }
 
     private DataQualityTaskExecutionContext getSingleTableContext() {
@@ -498,7 +498,7 @@ public class DataQualityTaskTest {
                         + "\"jdbcUrl\":\"jdbc:postgresql://localhost:5432/dolphinscheduler\","
                         + "\"user\":\"test\","
                         + "\"password\":\"test\","
-                        + "\"other\":\"stringtype=unspecified&characterEncoding=UTF-8&allowMultiQueries=true\"}");
+                        + "\"other\":{\"stringtype\": \"unspecified\", \"characterEncoding\" : \"UTF-8\", \"allowMultiQueries\": true}}");
 
         dataQualityTaskExecutionContext.setStatisticsValueConnectorType("JDBC");
         dataQualityTaskExecutionContext.setStatisticsValueType(1);
@@ -509,7 +509,7 @@ public class DataQualityTaskTest {
                         + "\"jdbcUrl\":\"jdbc:postgresql://localhost:5432/dolphinscheduler\","
                         + "\"user\":\"test\","
                         + "\"password\":\"test\","
-                        + "\"other\":\"stringtype=unspecified&characterEncoding=UTF-8&allowMultiQueries=true\"}");
+                        + "\"other\":{\"stringtype\": \"unspecified\", \"characterEncoding\" : \"UTF-8\", \"allowMultiQueries\": true}}");
 
         dataQualityTaskExecutionContext.setCompareWithFixedValue(true);
 
@@ -540,7 +540,7 @@ public class DataQualityTaskTest {
                         + "'2021-08-30 00:00:00' as data_time,'2021-08-30 00:00:00' as create_time,'2021-08-30 00:00:00' "
                         + "as update_time from test_person\"}}]}";
 
-        Assert.assertEquals(expect, JSONUtils.toJsonString(ruleManager.generateDataQualityParameter()));
+        Assertions.assertEquals(expect, JSONUtils.toJsonString(ruleManager.generateDataQualityParameter()));
     }
 
     @Test
@@ -796,7 +796,7 @@ public class DataQualityTaskTest {
                         + "\"jdbcUrl\":\"jdbc:postgresql://localhost:5432/dolphinscheduler\","
                         + "\"user\":\"test\","
                         + "\"password\":\"test\","
-                        + "\"other\":\"stringtype=unspecified&characterEncoding=UTF-8&allowMultiQueries=true\"}");
+                        + "\"other\":{\"stringtype\": \"unspecified\", \"characterEncoding\": \"UTF-8\", \"allowMultiQueries\": true}}");
 
         String expect = "{\"name\":\"跨表值比对\",\"env\":{\"type\":\"batch\",\"config\":null},\"readers\""
                 + ":[{\"type\":\"JDBC\",\"config\":{\"database\":\"test\",\"password\":\"test\",\"driver\":"
@@ -819,7 +819,7 @@ public class DataQualityTaskTest {
                 + "where c1>20 ) tmp2\"}}]}";
 
         RuleManager ruleManager = new RuleManager(inputParameterValue, dataQualityTaskExecutionContext);
-        Assert.assertEquals(expect, JSONUtils.toJsonString(ruleManager.generateDataQualityParameter()));
+        Assertions.assertEquals(expect, JSONUtils.toJsonString(ruleManager.generateDataQualityParameter()));
     }
 
     @Test
@@ -1122,7 +1122,7 @@ public class DataQualityTaskTest {
                         + "\"jdbcUrl\":\"jdbc:postgresql://localhost:5432/dolphinscheduler\","
                         + "\"user\":\"test\","
                         + "\"password\":\"test\","
-                        + "\"other\":\"stringtype=unspecified&characterEncoding=UTF-8&allowMultiQueries=true\"}");
+                        + "\"other\":{\"stringtype\": \"unspecified\", \"characterEncoding\": \"UTF-8\", \"allowMultiQueries\": true}}");
 
         dataQualityTaskExecutionContext.setStatisticsValueConnectorType("JDBC");
         dataQualityTaskExecutionContext.setStatisticsValueType(1);
@@ -1133,7 +1133,7 @@ public class DataQualityTaskTest {
                         + "\"jdbcUrl\":\"jdbc:postgresql://localhost:5432/dolphinscheduler\","
                         + "\"user\":\"test\","
                         + "\"password\":\"test\","
-                        + "\"other\":\"stringtype=unspecified&characterEncoding=UTF-8&allowMultiQueries=true\"}");
+                        + "\"other\":{\"stringtype\": \"unspecified\", \"characterEncoding\": \"UTF-8\", \"allowMultiQueries\": true }}");
 
         dataQualityTaskExecutionContext.setRuleName("跨表准确性");
         dataQualityTaskExecutionContext.setRuleType(RuleType.MULTI_TABLE_ACCURACY.getCode());
@@ -1171,6 +1171,6 @@ public class DataQualityTaskTest {
                 + "\"config\":{\"path\":\"hdfs://localhost:8022/user/ods/data_quality_error_data/1_1_test\",\"input_table\":\"miss_items\"}}]}";
 
         RuleManager ruleManager = new RuleManager(inputParameterValue, dataQualityTaskExecutionContext);
-        Assert.assertEquals(expect, JSONUtils.toJsonString(ruleManager.generateDataQualityParameter()));
+        Assertions.assertEquals(expect, JSONUtils.toJsonString(ruleManager.generateDataQualityParameter()));
     }
 }

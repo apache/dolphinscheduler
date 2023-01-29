@@ -22,16 +22,16 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKN
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
 import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -40,15 +40,18 @@ import com.amazonaws.services.databasemigrationservice.model.InvalidResourceStat
 import com.amazonaws.services.databasemigrationservice.model.ReplicationTask;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 
 public class DmsTask extends AbstractRemoteTask {
 
     private static final ObjectMapper objectMapper =
-        new ObjectMapper().configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
-            .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
-            .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
-            .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
-            .setPropertyNamingStrategy(new PropertyNamingStrategy.UpperCamelCaseStrategy());
+            JsonMapper.builder()
+                    .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
+                    .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
+                    .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
+                    .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
+                    .propertyNamingStrategy(new PropertyNamingStrategy.UpperCamelCaseStrategy())
+                    .build();
     /**
      * taskExecutionContext
      */
@@ -68,8 +71,8 @@ public class DmsTask extends AbstractRemoteTask {
 
     @Override
     public void init() throws TaskException {
-        logger.info("Dms task params {}", taskExecutionContext.getTaskParams());
         parameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), DmsParameters.class);
+        logger.info("Initialize Dms task params {}", JSONUtils.toPrettyJsonString(parameters));
         initDmsHook();
     }
 
@@ -102,7 +105,8 @@ public class DmsTask extends AbstractRemoteTask {
         dmsHook.setReplicationTaskArn(appId.getReplicationTaskArn());
         // if CdcStopPosition is not set, the task will not continue to check the running status
         if (isStopTaskWhenCdc()) {
-            logger.info("This is a cdc task and cdcStopPosition is not set, the task will not continue to check the running status");
+            logger.info(
+                    "This is a cdc task and cdcStopPosition is not set, the task will not continue to check the running status");
             exitStatusCode = TaskConstants.EXIT_CODE_SUCCESS;
             return;
         }
@@ -166,7 +170,8 @@ public class DmsTask extends AbstractRemoteTask {
         } catch (InvalidResourceStateException e) {
             logger.error("Failed to start a task, error message: {}", e.getErrorMessage());
 
-            // Only restart task when the error contains "Test connection", means instance can not connect to source or target
+            // Only restart task when the error contains "Test connection", means instance can not connect to source or
+            // target
             if (!e.getErrorMessage().contains("Test connection")) {
                 return TaskConstants.EXIT_CODE_FAILURE;
             }
@@ -231,7 +236,8 @@ public class DmsTask extends AbstractRemoteTask {
         // create a new parameter object using the json data if the json data is not empty
         if (parameters.getIsJsonFormat() && parameters.getJsonData() != null) {
             // combining local and global parameters
-            String jsonData = ParameterUtils.convertParameterPlaceholders(parameters.getJsonData(), ParamUtils.convert(taskExecutionContext.getPrepareParamsMap()));
+            String jsonData = ParameterUtils.convertParameterPlaceholders(parameters.getJsonData(),
+                    ParamUtils.convert(taskExecutionContext.getPrepareParamsMap()));
 
             boolean isRestartTask = parameters.getIsRestartTask();
             try {

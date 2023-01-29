@@ -30,7 +30,6 @@ import {
   NDataTable,
   NButton,
   NPagination,
-  NInput,
   NBreadcrumb,
   NBreadcrumbItem
 } from 'naive-ui'
@@ -41,6 +40,7 @@ import Card from '@/components/card'
 import FolderModal from './components/folder-modal'
 import UploadModal from './components/upload-modal'
 import styles from './index.module.scss'
+import Search from "@/components/input-search";
 
 export default defineComponent({
   name: 'resource-manage',
@@ -50,7 +50,9 @@ export default defineComponent({
 
     const requestData = () => {
       getTableData({
-        id: variables.id,
+        id: -1,
+        fullName: variables.fullName,
+        tenantCode: variables.tenantCode,
         pageSize: variables.pageSize,
         pageNo: variables.page,
         searchVal: variables.searchVal
@@ -88,7 +90,7 @@ export default defineComponent({
       let breadName = ''
       variables.breadList.forEach((item, i) => {
         if (i <= index) {
-          breadName = breadName + '/' + item
+          breadName = breadName === "" ? item.toString() : breadName + '/' + item.toString();
         }
       })
       goBread(breadName)
@@ -146,11 +148,10 @@ export default defineComponent({
               </NButton>
             </NSpace>
             <NSpace>
-              <NInput
-                allowInput={this.trim}
-                size='small'
+              <Search
                 placeholder={t('resource.udf.enter_keyword_tips')}
-                v-model={[this.searchVal, 'value']}
+                v-model:value={this.searchVal}
+                onSearch={this.handleSearch}
               />
               <NButton type='primary' size='small' onClick={this.handleSearch}>
                 <NIcon>

@@ -28,6 +28,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>dolphinscheduler-task-all</module>
         <module>dolphinscheduler-task-api</module>
         <module>dolphinscheduler-task-shell</module>
         <module>dolphinscheduler-task-datax</module>
@@ -42,13 +43,7 @@
         <module>dolphinscheduler-task-pigeon</module>
         <module>dolphinscheduler-task-dataquality</module>
         <module>dolphinscheduler-task-seatunnel</module>
-        <module>dolphinscheduler-task-conditions</module>
-        <module>dolphinscheduler-task-dependent</module>
-        <module>dolphinscheduler-task-subprocess</module>
-        <module>dolphinscheduler-task-switch</module>
-        <module>dolphinscheduler-task-all</module>
         <module>dolphinscheduler-task-emr</module>
-        <module>dolphinscheduler-task-blocking</module>
         <module>dolphinscheduler-task-k8s</module>
         <module>dolphinscheduler-task-zeppelin</module>
         <module>dolphinscheduler-task-jupyter</module>
@@ -64,6 +59,8 @@
         <module>dolphinscheduler-task-hivecli</module>
         <module>dolphinscheduler-task-dms</module>
         <module>dolphinscheduler-task-datasync</module>
+        <module>dolphinscheduler-task-kubeflow</module>
+        <module>dolphinscheduler-task-linkis</module>
     </modules>
 
     <dependencyManagement>
@@ -78,13 +75,4 @@
         </dependencies>
     </dependencyManagement>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-inline</artifactId>
-            <version>3.12.4</version>
-            <!-- TODO: move this dependency to root pom after removing powermock in the whole project -->
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
 </project>

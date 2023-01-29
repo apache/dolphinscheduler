@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.api.k8s.K8sManager;
 import org.apache.dolphinscheduler.api.service.impl.ClusterServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Cluster;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -30,22 +30,22 @@ import org.apache.dolphinscheduler.dao.mapper.ClusterMapper;
 import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceMapper;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.assertj.core.util.Lists;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +55,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 /**
  * cluster service test
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ClusterServiceTest {
 
     public static final Logger logger = LoggerFactory.getLogger(ClusterServiceTest.class);
@@ -76,11 +76,11 @@ public class ClusterServiceTest {
 
     public static final String clusterName = "Env1";
 
-    @Before
+    @BeforeEach
     public void setUp() {
     }
 
-    @After
+    @AfterEach
     public void after() {
     }
 
@@ -89,36 +89,36 @@ public class ClusterServiceTest {
         User loginUser = getGeneralUser();
         Map<String, Object> result = clusterService.createCluster(loginUser, clusterName, getConfig(), getDesc());
         logger.info(result.toString());
-        Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
 
         loginUser = getAdminUser();
         result = clusterService.createCluster(loginUser, clusterName, "", getDesc());
         logger.info(result.toString());
-        Assert.assertEquals(Status.CLUSTER_CONFIG_IS_NULL, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.CLUSTER_CONFIG_IS_NULL, result.get(Constants.STATUS));
 
         result = clusterService.createCluster(loginUser, "", getConfig(), getDesc());
         logger.info(result.toString());
-        Assert.assertEquals(Status.CLUSTER_NAME_IS_NULL, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.CLUSTER_NAME_IS_NULL, result.get(Constants.STATUS));
 
         Mockito.when(clusterMapper.queryByClusterName(clusterName)).thenReturn(getCluster());
         result = clusterService.createCluster(loginUser, clusterName, getConfig(), getDesc());
         logger.info(result.toString());
-        Assert.assertEquals(Status.CLUSTER_NAME_EXISTS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.CLUSTER_NAME_EXISTS, result.get(Constants.STATUS));
 
         Mockito.when(clusterMapper.insert(Mockito.any(Cluster.class))).thenReturn(1);
         result = clusterService.createCluster(loginUser, "testName", "testConfig", "testDesc");
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
     public void testCheckParams() {
         Map<String, Object> result = clusterService.checkParams(clusterName, getConfig());
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         result = clusterService.checkParams("", getConfig());
-        Assert.assertEquals(Status.CLUSTER_NAME_IS_NULL, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.CLUSTER_NAME_IS_NULL, result.get(Constants.STATUS));
         result = clusterService.checkParams(clusterName, "");
-        Assert.assertEquals(Status.CLUSTER_CONFIG_IS_NULL, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.CLUSTER_CONFIG_IS_NULL, result.get(Constants.STATUS));
     }
 
     @Test
@@ -127,32 +127,32 @@ public class ClusterServiceTest {
         Map<String, Object> result =
                 clusterService.updateClusterByCode(loginUser, 1L, clusterName, getConfig(), getDesc());
         logger.info(result.toString());
-        Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
 
         loginUser = getAdminUser();
         result = clusterService.updateClusterByCode(loginUser, 1L, clusterName, "", getDesc());
         logger.info(result.toString());
-        Assert.assertEquals(Status.CLUSTER_CONFIG_IS_NULL, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.CLUSTER_CONFIG_IS_NULL, result.get(Constants.STATUS));
 
         result = clusterService.updateClusterByCode(loginUser, 1L, "", getConfig(), getDesc());
         logger.info(result.toString());
-        Assert.assertEquals(Status.CLUSTER_NAME_IS_NULL, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.CLUSTER_NAME_IS_NULL, result.get(Constants.STATUS));
 
         result = clusterService.updateClusterByCode(loginUser, 2L, clusterName, getConfig(), getDesc());
         logger.info(result.toString());
-        Assert.assertEquals(Status.CLUSTER_NOT_EXISTS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.CLUSTER_NOT_EXISTS, result.get(Constants.STATUS));
 
         Mockito.when(clusterMapper.queryByClusterName(clusterName)).thenReturn(getCluster());
         result = clusterService.updateClusterByCode(loginUser, 2L, clusterName, getConfig(), getDesc());
         logger.info(result.toString());
-        Assert.assertEquals(Status.CLUSTER_NAME_EXISTS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.CLUSTER_NAME_EXISTS, result.get(Constants.STATUS));
 
         Mockito.when(clusterMapper.updateById(Mockito.any(Cluster.class))).thenReturn(1);
         Mockito.when(clusterMapper.queryByClusterCode(1L)).thenReturn(getCluster());
 
         result = clusterService.updateClusterByCode(loginUser, 1L, "testName", getConfig(), "test");
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
     }
 
@@ -161,10 +161,10 @@ public class ClusterServiceTest {
         Mockito.when(clusterMapper.queryAllClusterList()).thenReturn(Lists.newArrayList(getCluster()));
         Map<String, Object> result = clusterService.queryAllClusterList();
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
         List<Cluster> list = (List<Cluster>) (result.get(Constants.DATA_LIST));
-        Assert.assertEquals(1, list.size());
+        Assertions.assertEquals(1, list.size());
     }
 
     @Test
@@ -178,7 +178,7 @@ public class ClusterServiceTest {
         Result result = clusterService.queryClusterListPaging(1, 10, clusterName);
         logger.info(result.toString());
         PageInfo<Cluster> pageInfo = (PageInfo<Cluster>) result.getData();
-        Assert.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getTotalList()));
+        Assertions.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getTotalList()));
     }
 
     @Test
@@ -186,12 +186,12 @@ public class ClusterServiceTest {
         Mockito.when(clusterMapper.queryByClusterName(clusterName)).thenReturn(null);
         Map<String, Object> result = clusterService.queryClusterByName(clusterName);
         logger.info(result.toString());
-        Assert.assertEquals(Status.QUERY_CLUSTER_BY_NAME_ERROR, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.QUERY_CLUSTER_BY_NAME_ERROR, result.get(Constants.STATUS));
 
         Mockito.when(clusterMapper.queryByClusterName(clusterName)).thenReturn(getCluster());
         result = clusterService.queryClusterByName(clusterName);
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
@@ -199,12 +199,12 @@ public class ClusterServiceTest {
         Mockito.when(clusterMapper.queryByClusterCode(1L)).thenReturn(null);
         Map<String, Object> result = clusterService.queryClusterByCode(1L);
         logger.info(result.toString());
-        Assert.assertEquals(Status.QUERY_CLUSTER_BY_CODE_ERROR, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.QUERY_CLUSTER_BY_CODE_ERROR, result.get(Constants.STATUS));
 
         Mockito.when(clusterMapper.queryByClusterCode(1L)).thenReturn(getCluster());
         result = clusterService.queryClusterByCode(1L);
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
@@ -212,30 +212,30 @@ public class ClusterServiceTest {
         User loginUser = getGeneralUser();
         Map<String, Object> result = clusterService.deleteClusterByCode(loginUser, 1L);
         logger.info(result.toString());
-        Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
 
         loginUser = getAdminUser();
         Mockito.when(clusterMapper.deleteByCode(1L)).thenReturn(1);
         result = clusterService.deleteClusterByCode(loginUser, 1L);
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
         Mockito.when(k8sNamespaceMapper.selectCount(Mockito.any())).thenReturn(1L);
         result = clusterService.deleteClusterByCode(loginUser, 1L);
         logger.info(result.toString());
-        Assert.assertEquals(Status.DELETE_CLUSTER_RELATED_NAMESPACE_EXISTS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.DELETE_CLUSTER_RELATED_NAMESPACE_EXISTS, result.get(Constants.STATUS));
     }
 
     @Test
     public void testVerifyCluster() {
         Map<String, Object> result = clusterService.verifyCluster("");
         logger.info(result.toString());
-        Assert.assertEquals(Status.CLUSTER_NAME_IS_NULL, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.CLUSTER_NAME_IS_NULL, result.get(Constants.STATUS));
 
         Mockito.when(clusterMapper.queryByClusterName(clusterName)).thenReturn(getCluster());
         result = clusterService.verifyCluster(clusterName);
         logger.info(result.toString());
-        Assert.assertEquals(Status.CLUSTER_NAME_EXISTS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.CLUSTER_NAME_EXISTS, result.get(Constants.STATUS));
     }
 
     private Cluster getCluster() {

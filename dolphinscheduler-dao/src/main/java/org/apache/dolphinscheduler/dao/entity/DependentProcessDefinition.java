@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CycleEnum;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
@@ -89,13 +89,13 @@ public class DependentProcessDefinition {
                 cycleEnum = CycleEnum.DAY;
                 break;
             case "hour":
-                cycleEnum =  CycleEnum.HOUR;
+                cycleEnum = CycleEnum.HOUR;
                 break;
             case "week":
-                cycleEnum =  CycleEnum.WEEK;
+                cycleEnum = CycleEnum.WEEK;
                 break;
             case "month":
-                cycleEnum =  CycleEnum.MONTH;
+                cycleEnum = CycleEnum.MONTH;
                 break;
             default:
                 break;

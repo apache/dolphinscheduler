@@ -20,27 +20,27 @@ package org.apache.dolphinscheduler.api.service;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.plugin.storage.hdfs.HdfsStorageOperator;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * base service test
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class BaseServiceTest {
 
     private static final Logger logger = LoggerFactory.getLogger(BaseServiceTest.class);
@@ -48,9 +48,9 @@ public class BaseServiceTest {
     private BaseServiceImpl baseService;
 
     @Mock
-    private HadoopUtils hadoopUtils;
+    private HdfsStorageOperator hdfsStorageOperator;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         baseService = new BaseServiceImpl();
     }
@@ -61,10 +61,10 @@ public class BaseServiceTest {
         User user = new User();
         user.setUserType(UserType.ADMIN_USER);
         // ADMIN_USER
-        Assert.assertTrue(baseService.isAdmin(user));
+        Assertions.assertTrue(baseService.isAdmin(user));
         // GENERAL_USER
         user.setUserType(UserType.GENERAL_USER);
-        Assert.assertFalse(baseService.isAdmin(user));
+        Assertions.assertFalse(baseService.isAdmin(user));
 
     }
 
@@ -73,7 +73,7 @@ public class BaseServiceTest {
 
         Map<String, Object> result = new HashMap<>();
         baseService.putMsg(result, Status.SUCCESS);
-        Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         // has params
         baseService.putMsg(result, Status.PROJECT_NOT_FOUND, "test");
 
@@ -84,7 +84,7 @@ public class BaseServiceTest {
 
         Result result = new Result();
         baseService.putMsg(result, Status.SUCCESS);
-        Assert.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
+        Assertions.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
         // has params
         baseService.putMsg(result, Status.PROJECT_NOT_FOUND, "test");
     }
@@ -95,12 +95,12 @@ public class BaseServiceTest {
         User user = new User();
         user.setId(1);
         // create user
-        Assert.assertTrue(baseService.canOperator(user, 1));
+        Assertions.assertTrue(baseService.canOperator(user, 1));
 
         // admin
         user.setId(2);
         user.setUserType(UserType.ADMIN_USER);
-        Assert.assertTrue(baseService.canOperator(user, 1));
+        Assertions.assertTrue(baseService.canOperator(user, 1));
 
     }
 

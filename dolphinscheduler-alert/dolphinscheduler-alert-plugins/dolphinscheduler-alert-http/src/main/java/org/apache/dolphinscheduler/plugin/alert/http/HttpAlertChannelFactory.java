@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.alert.http;
 
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertChannelFactory;
+import org.apache.dolphinscheduler.alert.api.AlertInputTips;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
 import org.apache.dolphinscheduler.spi.params.input.InputParam;
@@ -30,6 +31,7 @@ import com.google.auto.service.AutoService;
 
 @AutoService(AlertChannelFactory.class)
 public final class HttpAlertChannelFactory implements AlertChannelFactory {
+
     @Override
     public String name() {
         return "Http";
@@ -39,39 +41,43 @@ public final class HttpAlertChannelFactory implements AlertChannelFactory {
     public List<PluginParams> params() {
 
         InputParam url = InputParam.newBuilder(HttpAlertConstants.NAME_URL, HttpAlertConstants.URL)
-                                   .setPlaceholder("input request URL")
-                                   .addValidate(Validate.newBuilder()
-                                                        .setRequired(true)
-                                                        .build())
-                                   .build();
+                .setPlaceholder(AlertInputTips.URL.getMsg())
+                .addValidate(Validate.newBuilder()
+                        .setRequired(true)
+                        .build())
+                .build();
 
-        InputParam headerParams = InputParam.newBuilder(HttpAlertConstants.NAME_HEADER_PARAMS, HttpAlertConstants.HEADER_PARAMS)
-                                            .setPlaceholder("input request headers as JSON format ")
-                                            .addValidate(Validate.newBuilder()
-                                                                 .setRequired(true)
-                                                                 .build())
-                                            .build();
+        InputParam headerParams =
+                InputParam.newBuilder(HttpAlertConstants.NAME_HEADER_PARAMS, HttpAlertConstants.HEADER_PARAMS)
+                        .setPlaceholder(AlertInputTips.HEADER.getMsg())
+                        .addValidate(Validate.newBuilder()
+                                .setRequired(true)
+                                .build())
+                        .build();
 
-        InputParam bodyParams = InputParam.newBuilder(HttpAlertConstants.NAME_BODY_PARAMS, HttpAlertConstants.BODY_PARAMS)
-                                          .setPlaceholder("input request body as JSON format ")
-                                          .addValidate(Validate.newBuilder()
-                                                               .setRequired(false)
-                                                               .build())
-                                          .build();
+        InputParam bodyParams =
+                InputParam.newBuilder(HttpAlertConstants.NAME_BODY_PARAMS, HttpAlertConstants.BODY_PARAMS)
+                        .setPlaceholder(AlertInputTips.JSON_BODY.getMsg())
+                        .addValidate(Validate.newBuilder()
+                                .setRequired(false)
+                                .build())
+                        .build();
 
-        InputParam contentField = InputParam.newBuilder(HttpAlertConstants.NAME_CONTENT_FIELD, HttpAlertConstants.CONTENT_FIELD)
-                                            .setPlaceholder("input alert msg field name")
-                                            .addValidate(Validate.newBuilder()
-                                                                 .setRequired(true)
-                                                                 .build())
-                                            .build();
+        InputParam contentField =
+                InputParam.newBuilder(HttpAlertConstants.NAME_CONTENT_FIELD, HttpAlertConstants.CONTENT_FIELD)
+                        .setPlaceholder(AlertInputTips.FIELD_NAME.getMsg())
+                        .addValidate(Validate.newBuilder()
+                                .setRequired(true)
+                                .build())
+                        .build();
 
-        InputParam requestType = InputParam.newBuilder(HttpAlertConstants.NAME_REQUEST_TYPE, HttpAlertConstants.REQUEST_TYPE)
-                                           .setPlaceholder("input request type POST or GET")
-                                           .addValidate(Validate.newBuilder()
-                                                                .setRequired(true)
-                                                                .build())
-                                           .build();
+        InputParam requestType =
+                InputParam.newBuilder(HttpAlertConstants.NAME_REQUEST_TYPE, HttpAlertConstants.REQUEST_TYPE)
+                        .setPlaceholder(AlertInputTips.HTTP_METHOD.getMsg())
+                        .addValidate(Validate.newBuilder()
+                                .setRequired(true)
+                                .build())
+                        .build();
 
         return Arrays.asList(url, requestType, headerParams, bodyParams, contentField);
     }

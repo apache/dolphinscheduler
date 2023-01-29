@@ -19,10 +19,11 @@ package org.apache.dolphinscheduler.plugin.alert.telegram;
 
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.util.List;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class TelegramAlertChannelFactoryTest {
 
@@ -30,18 +31,18 @@ public class TelegramAlertChannelFactoryTest {
 
     @Test
     public void testTestGetName() {
-        Assert.assertEquals("Telegram", telegramAlertChannelFactory.name());
+        Assertions.assertEquals("Telegram", telegramAlertChannelFactory.name());
     }
 
     @Test
     public void testGetParams() {
         List<PluginParams> params = telegramAlertChannelFactory.params();
-        Assert.assertEquals(9, params.size());
+        Assertions.assertEquals(9, params.size());
     }
 
     @Test
     public void testCreate() {
         AlertChannel alertChannel = telegramAlertChannelFactory.create();
-        Assert.assertTrue(alertChannel instanceof TelegramAlertChannel);
+        Assertions.assertTrue(alertChannel instanceof TelegramAlertChannel);
     }
 }

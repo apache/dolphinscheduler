@@ -17,9 +17,12 @@
 
 package org.apache.dolphinscheduler.service.log;
 
+import static org.apache.dolphinscheduler.common.constants.Constants.APPID_COLLECT;
+import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_COLLECT_WAY;
+
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
@@ -34,8 +37,9 @@ import org.apache.dolphinscheduler.remote.command.log.RollViewLogResponseCommand
 import org.apache.dolphinscheduler.remote.command.log.ViewLogRequestCommand;
 import org.apache.dolphinscheduler.remote.command.log.ViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
+import org.apache.dolphinscheduler.remote.factory.NettyRemotingClientFactory;
 import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.service.factory.NettyRemotingClientFactory;
+import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 
 import java.util.List;
 
@@ -172,44 +176,53 @@ public class LogClient implements AutoCloseable {
      * remove task log
      *
      * @param host host
-     * @param port port
      * @param path path
-     * @return remove task status
      */
-    public Boolean removeTaskLog(String host, int port, String path) {
-        logger.info("Remove task log from host: {}, port: {}, logPath {}", host, port, path);
+    public void removeTaskLog(@NonNull Host host, String path) {
+        logger.info("Begin remove task log from host: {} logPath {}", host, path);
         RemoveTaskLogRequestCommand request = new RemoveTaskLogRequestCommand(path);
-        final Host address = new Host(host, port);
         try {
             Command command = request.convert2Command();
-            Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
-            if (response != null) {
-                RemoveTaskLogResponseCommand taskLogResponse =
+            client.sendAsync(host, command, LOG_REQUEST_TIMEOUT, responseFuture -> {
+                if (responseFuture.getCause() != null) {
+                    logger.error("Remove task log from host: {} logPath {} error, meet an unknown exception", host,
+                            path, responseFuture.getCause());
+                    return;
+                }
+                Command response = responseFuture.getResponseCommand();
+                if (response == null) {
+                    logger.error("Remove task log from host: {} logPath {} error, response is null", host, path);
+                    return;
+                }
+                RemoveTaskLogResponseCommand removeTaskLogResponse =
                         JSONUtils.parseObject(response.getBody(), RemoveTaskLogResponseCommand.class);
-                return taskLogResponse.getStatus();
-            }
-            return false;
-        } catch (InterruptedException ex) {
+                if (removeTaskLogResponse.getStatus()) {
+                    logger.info("Success remove task log from host: {} logPath {}", host, path);
+                } else {
+                    logger.error("Remove task log from host: {} logPath {} error", host, path);
+                }
+            });
+        } catch (InterruptedException interruptedException) {
             Thread.currentThread().interrupt();
-            logger.error(
-                    "Remove task log from host: {}, port: {} logPath: {} error, the current thread has been interrupted",
-                    host, port, path, ex);
-            return false;
+            logger.error("Remove task log from host: {} logPath {} error, the current thread has been interrupted",
+                    host,
+                    path, interruptedException);
         } catch (Exception e) {
-            logger.error("Remove task log from host: {}, port: {} logPath: {} error", host, port, path, e);
-            return false;
+            logger.error("Remove task log from host: {},  logPath: {} error", host, path, e);
         }
     }
 
-    public @Nullable List<String> getAppIds(@NonNull String host, int port,
-                                            @NonNull String taskLogFilePath) throws RemotingException, InterruptedException {
-        logger.info("Begin to get appIds from worker: {}:{} taskLogPath: {}", host, port, taskLogFilePath);
+    public @Nullable List<String> getAppIds(@NonNull String host, int port, @NonNull String taskLogFilePath,
+                                            @NonNull String taskAppInfoPath) throws RemotingException, InterruptedException {
+        logger.info("Begin to get appIds from worker: {}:{} taskLogPath: {}, taskAppInfoPath: {}", host, port,
+                taskLogFilePath, taskAppInfoPath);
         final Host workerAddress = new Host(host, port);
         List<String> appIds = null;
         if (NetUtils.getHost().equals(host)) {
-            appIds = LogUtils.getAppIdsFromLogFile(taskLogFilePath);
+            appIds = LogUtils.getAppIds(taskLogFilePath, taskAppInfoPath,
+                    PropertyUtils.getString(APPID_COLLECT, DEFAULT_COLLECT_WAY));
         } else {
-            final Command command = new GetAppIdRequestCommand(taskLogFilePath).convert2Command();
+            final Command command = new GetAppIdRequestCommand(taskLogFilePath, taskAppInfoPath).convert2Command();
             Command response = this.client.sendSync(workerAddress, command, LOG_REQUEST_TIMEOUT);
             if (response != null) {
                 GetAppIdResponseCommand responseCommand =
@@ -217,7 +230,8 @@ public class LogClient implements AutoCloseable {
                 appIds = responseCommand.getAppIds();
             }
         }
-        logger.info("Get appIds: {} from worker: {}:{} taskLogPath: {}", appIds, host, port, taskLogFilePath);
+        logger.info("Get appIds: {} from worker: {}:{} taskLogPath: {}, taskAppInfoPath: {}", appIds, host, port,
+                taskLogFilePath, taskAppInfoPath);
         return appIds;
     }
 

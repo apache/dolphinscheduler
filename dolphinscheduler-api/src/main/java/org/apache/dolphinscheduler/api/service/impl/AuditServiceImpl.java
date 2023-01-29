@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.AuditService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.common.enums.AuditResourceType;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
@@ -34,7 +33,6 @@ import org.apache.dolphinscheduler.dao.mapper.AuditLogMapper;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,13 +83,6 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
                                      Integer pageNo, Integer pageSize) {
         Result result = new Result();
 
-        Map<String, Object> checkAndParseDateResult = checkAndParseDateParameters(startDate, endDate);
-        Status resultEnum = (Status) checkAndParseDateResult.get(Constants.STATUS);
-        if (resultEnum != Status.SUCCESS) {
-            putMsg(result,resultEnum);
-            return result;
-        }
-
         int[] resourceArray = null;
         if (resourceType != null) {
             resourceArray = new int[]{resourceType.getCode()};
@@ -102,8 +93,8 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
             opsArray = new int[]{operationType.getCode()};
         }
 
-        Date start = (Date) checkAndParseDateResult.get(Constants.START_TIME);
-        Date end = (Date) checkAndParseDateResult.get(Constants.END_TIME);
+        Date start = (Date) checkAndParseDateParameters(startDate);
+        Date end = (Date) checkAndParseDateParameters(endDate);
 
         Page<AuditLog> page = new Page<>(pageNo, pageSize);
         IPage<AuditLog> logIPage = auditLogMapper.queryAuditLog(page, resourceArray, opsArray, userName, start, end);

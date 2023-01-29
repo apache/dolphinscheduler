@@ -24,8 +24,8 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import software.amazon.awssdk.http.SdkHttpResponse;
 import software.amazon.awssdk.services.datasync.DataSyncClient;
@@ -38,16 +38,16 @@ import software.amazon.awssdk.services.datasync.model.StartTaskExecutionResponse
 import software.amazon.awssdk.services.datasync.model.TaskExecutionStatus;
 import software.amazon.awssdk.services.datasync.model.TaskStatus;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class DatasyncTaskTest {
 
     private static final String mockExeArn =
@@ -63,7 +63,7 @@ public class DatasyncTaskTest {
     @Mock
     DataSyncClient client;
     MockedStatic<DatasyncHook> datasyncHookMockedStatic;
-    @Before
+    @BeforeEach
     public void before() throws IllegalAccessException {
         client = mock(DataSyncClient.class);
         datasyncHookMockedStatic = mockStatic(DatasyncHook.class);
@@ -129,22 +129,22 @@ public class DatasyncTaskTest {
 
         DatasyncTask DatasyncTask = initTask(DatasyncParameters);
         DatasyncParameters datasyncParameters = DatasyncTask.getParameters();
-        Assert.assertEquals("arn:aws:logs:ap-northeast-3:523202806641:log-group:/aws/datasync:*",
+        Assertions.assertEquals("arn:aws:logs:ap-northeast-3:523202806641:log-group:/aws/datasync:*",
                 datasyncParameters.getCloudWatchLogGroupArn());
-        Assert.assertEquals("task001", datasyncParameters.getName());
-        Assert.assertEquals("arn:aws:datasync:ap-northeast-3:523202806641:location/loc-04ceafb4aaf7a1a0d",
+        Assertions.assertEquals("task001", datasyncParameters.getName());
+        Assertions.assertEquals("arn:aws:datasync:ap-northeast-3:523202806641:location/loc-04ceafb4aaf7a1a0d",
                 datasyncParameters.getSourceLocationArn());
-        Assert.assertEquals("arn:aws:datasync:ap-northeast-3:523202806641:location/loc-01cf61e102e58e365",
+        Assertions.assertEquals("arn:aws:datasync:ap-northeast-3:523202806641:location/loc-01cf61e102e58e365",
                 datasyncParameters.getDestinationLocationArn());
-        Assert.assertEquals("inType1", datasyncParameters.getIncludes().get(0).getFilterType());
-        Assert.assertEquals("inValue1", datasyncParameters.getIncludes().get(0).getValue());
-        Assert.assertEquals("exType1", datasyncParameters.getExcludes().get(0).getFilterType());
-        Assert.assertEquals("exValue1", datasyncParameters.getExcludes().get(0).getValue());
-        Assert.assertEquals("tagKey1", datasyncParameters.getTags().get(0).getKey());
-        Assert.assertEquals("tagValue1", datasyncParameters.getTags().get(0).getValue());
-        Assert.assertEquals("* * * * * ?", datasyncParameters.getSchedule().getScheduleExpression());
-        Assert.assertEquals("aTime", datasyncParameters.getOptions().getAtime());
-        Assert.assertEquals(Long.valueOf(10), datasyncParameters.getOptions().getBytesPerSecond());
+        Assertions.assertEquals("inType1", datasyncParameters.getIncludes().get(0).getFilterType());
+        Assertions.assertEquals("inValue1", datasyncParameters.getIncludes().get(0).getValue());
+        Assertions.assertEquals("exType1", datasyncParameters.getExcludes().get(0).getFilterType());
+        Assertions.assertEquals("exValue1", datasyncParameters.getExcludes().get(0).getValue());
+        Assertions.assertEquals("tagKey1", datasyncParameters.getTags().get(0).getKey());
+        Assertions.assertEquals("tagValue1", datasyncParameters.getTags().get(0).getValue());
+        Assertions.assertEquals("* * * * * ?", datasyncParameters.getSchedule().getScheduleExpression());
+        Assertions.assertEquals("aTime", datasyncParameters.getOptions().getAtime());
+        Assertions.assertEquals(Long.valueOf(10), datasyncParameters.getOptions().getBytesPerSecond());
         datasyncHookMockedStatic.close();
     }
 
@@ -160,7 +160,7 @@ public class DatasyncTaskTest {
 
         doReturn(true).when(hook).doubleCheckTaskStatus(any(), any());
         hook.createDatasyncTask(datasyncTask.getParameters());
-        Assert.assertEquals(mockTaskArn, hook.getTaskArn());
+        Assertions.assertEquals(mockTaskArn, hook.getTaskArn());
         datasyncHookMockedStatic.close();
     }
 
@@ -175,7 +175,7 @@ public class DatasyncTaskTest {
         when(response.taskExecutionArn()).thenReturn(mockExeArn);
         doReturn(true).when(hook).doubleCheckExecStatus(any(), any());
         hook.startDatasyncTask();
-        Assert.assertEquals(mockExeArn, hook.getTaskExecArn());
+        Assertions.assertEquals(mockExeArn, hook.getTaskExecArn());
         datasyncHookMockedStatic.close();
     }
 
@@ -187,7 +187,7 @@ public class DatasyncTaskTest {
         SdkHttpResponse sdkMock = mock(SdkHttpResponse.class);
         when(response.sdkHttpResponse()).thenReturn(sdkMock);
         when(sdkMock.isSuccessful()).thenReturn(true);
-        Assert.assertEquals(true, hook.cancelDatasyncTask());
+        Assertions.assertEquals(true, hook.cancelDatasyncTask());
         datasyncHookMockedStatic.close();
     }
 
@@ -195,10 +195,10 @@ public class DatasyncTaskTest {
     public void testDescribeTask() {
         DatasyncHook hook = spy(new DatasyncHook());
         doReturn(null).when(hook).queryDatasyncTaskStatus();
-        Assert.assertEquals(false, hook.doubleCheckTaskStatus(TaskStatus.AVAILABLE, DatasyncHook.taskFinishFlags));
+        Assertions.assertEquals(false, hook.doubleCheckTaskStatus(TaskStatus.AVAILABLE, DatasyncHook.taskFinishFlags));
 
         doReturn(TaskStatus.AVAILABLE).when(hook).queryDatasyncTaskStatus();
-        Assert.assertEquals(true, hook.doubleCheckTaskStatus(TaskStatus.AVAILABLE, DatasyncHook.taskFinishFlags));
+        Assertions.assertEquals(true, hook.doubleCheckTaskStatus(TaskStatus.AVAILABLE, DatasyncHook.taskFinishFlags));
         datasyncHookMockedStatic.close();
     }
 
@@ -206,10 +206,11 @@ public class DatasyncTaskTest {
     public void testDescribeTaskExec() {
         DatasyncHook hook = spy(new DatasyncHook());
         doReturn(null).when(hook).queryDatasyncTaskExecStatus();
-        Assert.assertEquals(false, hook.doubleCheckExecStatus(TaskExecutionStatus.SUCCESS, DatasyncHook.doneStatus));
+        Assertions.assertEquals(false,
+                hook.doubleCheckExecStatus(TaskExecutionStatus.SUCCESS, DatasyncHook.doneStatus));
 
         doReturn(TaskExecutionStatus.SUCCESS).when(hook).queryDatasyncTaskExecStatus();
-        Assert.assertEquals(true, hook.doubleCheckExecStatus(TaskExecutionStatus.SUCCESS, DatasyncHook.doneStatus));
+        Assertions.assertEquals(true, hook.doubleCheckExecStatus(TaskExecutionStatus.SUCCESS, DatasyncHook.doneStatus));
         datasyncHookMockedStatic.close();
     }
 

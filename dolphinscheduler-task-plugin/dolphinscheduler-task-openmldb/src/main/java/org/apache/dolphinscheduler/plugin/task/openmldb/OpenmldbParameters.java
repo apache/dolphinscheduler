@@ -17,13 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.task.openmldb;
 
-import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+import org.apache.dolphinscheduler.plugin.task.python.PythonParameters;
 
-import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 
-public class OpenmldbParameters extends AbstractParameters {
+public class OpenmldbParameters extends PythonParameters {
 
     private String zk;
     private String zkPath;
@@ -32,11 +30,6 @@ public class OpenmldbParameters extends AbstractParameters {
      * origin sql script
      */
     private String sql;
-
-    /**
-     * resource list
-     */
-    private List<ResourceInfo> resourceList;
 
     public String getZk() {
         return zk;
@@ -70,21 +63,8 @@ public class OpenmldbParameters extends AbstractParameters {
         this.sql = sql;
     }
 
-    public List<ResourceInfo> getResourceList() {
-        return resourceList;
-    }
-
-    public void setResourceList(List<ResourceInfo> resourceList) {
-        this.resourceList = resourceList;
-    }
-
     @Override
     public boolean checkParameters() {
         return StringUtils.isNotEmpty(zk) && StringUtils.isNotEmpty(zkPath) && StringUtils.isNotEmpty(sql);
-    }
-
-    @Override
-    public List<ResourceInfo> getResourceFilesList() {
-        return this.resourceList;
     }
 }

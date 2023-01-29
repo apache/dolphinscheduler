@@ -27,7 +27,10 @@ MLflow 组件用于执行 MLflow 任务，目前包含Mlflow Projects，和MLflo
 
 ## 任务样例
 
-- 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md#默认任务参数)。
+[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
+[//]: # (- 默认参数说明请参考[DolphinScheduler任务参数附录]&#40;appendix.md#默认任务参数&#41;`默认任务参数`一栏。)
+
+- 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md)`默认任务参数`一栏。
 
 以下是一些MLflow 组件的常用参数
 
@@ -54,13 +57,13 @@ MLflow 组件用于执行 MLflow 任务，目前包含Mlflow Projects，和MLflo
 
 ![mlflow-automl](../../../../img/tasks/demo/mlflow-automl.png)
 
-| **任务参数** |                                                                                                                                               **描述**                                                                                                                                                |
-|----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 注册模型     | 是否注册模型，若选择注册，则会展开以下参数                                                                                                                                                                                                                                                                               |
-| 注册的模型名称  | 注册的模型名称，会在原来的基础上加上一个模型版本，并注册为Production                                                                                                                                                                                                                                                             |
-| 数据路径     | 文件/文件夹的绝对路径，若文件需以.csv结尾（自动切分训练集与测试集），文件夹需包含train.csv和test.csv（建议方式，用户应自行构建测试集用于模型评估）                                                                                                                                                                                                                |
-| 参数       | 初始化AutoML训练器时的参数，可为空，如针对 flaml 设置`time_budget=30;estimator_list=['lgbm']`。约定传入后会以; 切分各个参数，等号前的名字作为参数名，等号后的名字将以python eval执行得到对应的参数值。详细的参数列表如下: [flaml](https://microsoft.github.io/FLAML/docs/reference/automl#automl-objects)，[autosklearn](https://automl.github.io/auto-sklearn/master/api.html) |
-| AutoML工具 | 使用的AutoML工具，目前支持 [autosklearn](https://github.com/automl/auto-sklearn)，[flaml](https://github.com/microsoft/FLAML)                                                                                                                                                                                  |
+| **任务参数** |                                                                                                                                               **描述**                                                                                                                                               |
+|----------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 注册模型     | 是否注册模型，若选择注册，则会展开以下参数                                                                                                                                                                                                                                                                              |
+| 注册的模型名称  | 注册的模型名称，会在原来的基础上加上一个模型版本，并注册为Production                                                                                                                                                                                                                                                            |
+| 数据路径     | 文件/文件夹的绝对路径，若文件需以.csv结尾（自动切分训练集与测试集），文件夹需包含train.csv和test.csv（建议方式，用户应自行构建测试集用于模型评估）                                                                                                                                                                                                               |
+| 参数       | 初始化AutoML训练器时的参数，可为空，如针对 flaml 设置`time_budget=30;estimator_list=['lgbm']`。约定传入后会以; 切分各个参数，等号前的名字作为参数名，等号后的名字将以python eval执行得到对应的参数值。详细的参数列表如下: [flaml](https://microsoft.github.io/FLAML/docs/Use-Cases/Task-Oriented-AutoML)，[autosklearn](https://automl.github.io/auto-sklearn/master/api.html) |
+| AutoML工具 | 使用的AutoML工具，目前支持 [autosklearn](https://github.com/automl/auto-sklearn)，[flaml](https://github.com/microsoft/FLAML)                                                                                                                                                                                 |
 
 #### Custom projects
 
@@ -100,6 +103,7 @@ MLflow 组件用于执行 MLflow 任务，目前包含Mlflow Projects，和MLflo
 配置文件：/dolphinscheduler/conf/env/dolphinscheduler_env.sh。
 
 在文件最后添加内容
+
 ```
 # 配置你的conda环境路径
 export PATH=/opt/anaconda3/bin:$PATH
@@ -114,7 +118,6 @@ export PATH=/opt/anaconda3/bin:$PATH
 后续注意配置任务时，环境选择上面创建的conda环境，否则程序会找不到conda环境。
 
 ![mlflow-set-conda-env](../../../../img/tasks/demo/mlflow-set-conda-env.png)
-
 
 ### MLflow service 启动
 
@@ -133,7 +136,6 @@ mlflow server -h 0.0.0.0 -p 5000 --serve-artifacts --backend-store-uri sqlite://
 可以通过访问 MLflow service (`http://localhost:5000`) 页面查看实验与模型。
 
 ![mlflow-server](../../../../img/tasks/demo/mlflow-server.png)
-
 
 ### 内置算法仓库配置
 

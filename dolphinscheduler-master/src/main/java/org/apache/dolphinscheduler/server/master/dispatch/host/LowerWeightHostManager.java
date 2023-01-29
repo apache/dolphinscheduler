@@ -17,8 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.host;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
@@ -26,10 +25,9 @@ import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostWeight
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostWorker;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.LowerWeightRoundRobin;
 import org.apache.dolphinscheduler.server.master.registry.WorkerInfoChangeListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.annotation.PostConstruct;
+import org.apache.commons.collections4.CollectionUtils;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,6 +37,11 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+import javax.annotation.PostConstruct;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * lower weight host manager
@@ -90,40 +93,50 @@ public class LowerWeightHostManager extends CommonHostManager {
         throw new UnsupportedOperationException("not support");
     }
 
-
     private class WorkerWeightListener implements WorkerInfoChangeListener {
+
         @Override
         public void notify(Map<String, Set<String>> workerGroups, Map<String, WorkerHeartBeat> workerNodeInfo) {
             syncWorkerResources(workerGroups, workerNodeInfo);
         }
-    }
 
-    /**
-     * Sync worker resource.
-     *
-     * @param workerGroupNodes  worker group nodes, key is worker group, value is worker group nodes.
-     * @param workerNodeInfoMap worker node info map, key is worker node, value is worker info.
-     */
-    private void syncWorkerResources(final Map<String, Set<String>> workerGroupNodes,
-                                     final Map<String, WorkerHeartBeat> workerNodeInfoMap) {
-        try {
-            Map<String, Set<HostWeight>> workerHostWeights = new HashMap<>();
-            for (Map.Entry<String, Set<String>> entry : workerGroupNodes.entrySet()) {
-                String workerGroup = entry.getKey();
-                Set<String> nodes = entry.getValue();
-                Set<HostWeight> hostWeights = new HashSet<>(nodes.size());
-                for (String node : nodes) {
-                    WorkerHeartBeat heartbeat = workerNodeInfoMap.getOrDefault(node, null);
-                    Optional<HostWeight> hostWeightOpt = getHostWeight(node, workerGroup, heartbeat);
-                    hostWeightOpt.ifPresent(hostWeights::add);
+        /**
+         * Sync worker resource.
+         *
+         * @param workerGroupNodes  worker group nodes, key is worker group, value is worker group nodes.
+         * @param workerNodeInfoMap worker node info map, key is worker node, value is worker info.
+         */
+        private void syncWorkerResources(final Map<String, Set<String>> workerGroupNodes,
+                                         final Map<String, WorkerHeartBeat> workerNodeInfoMap) {
+            try {
+                Map<String, Set<HostWeight>> workerHostWeights = new HashMap<>();
+                for (Map.Entry<String, Set<String>> entry : workerGroupNodes.entrySet()) {
+                    String workerGroup = entry.getKey();
+                    Set<String> nodes = entry.getValue();
+                    Set<HostWeight> hostWeights = new HashSet<>(nodes.size());
+                    for (String node : nodes) {
+                        WorkerHeartBeat heartbeat = workerNodeInfoMap.getOrDefault(node, null);
+                        Optional<HostWeight> hostWeightOpt = getHostWeight(node, workerGroup, heartbeat);
+                        hostWeightOpt.ifPresent(hostWeights::add);
+                    }
+                    if (!hostWeights.isEmpty()) {
+                        workerHostWeights.put(workerGroup, hostWeights);
+                    }
                 }
-                if (!hostWeights.isEmpty()) {
-                    workerHostWeights.put(workerGroup, hostWeights);
-                }
+                syncWorkerHostWeight(workerHostWeights);
+            } catch (Throwable ex) {
+                logger.error("Sync worker resource error", ex);
             }
-            syncWorkerHostWeight(workerHostWeights);
-        } catch (Throwable ex) {
-            logger.error("Sync worker resource error", ex);
+        }
+
+        private void syncWorkerHostWeight(Map<String, Set<HostWeight>> workerHostWeights) {
+            lock.lock();
+            try {
+                workerHostWeightsMap.clear();
+                workerHostWeightsMap.putAll(workerHostWeights);
+            } finally {
+                lock.unlock();
+            }
         }
     }
 
@@ -150,16 +163,6 @@ public class LowerWeightHostManager extends CommonHostManager {
                         heartBeat.getLoadAverage(),
                         heartBeat.getWorkerWaitingTaskCount(),
                         heartBeat.getStartupTime()));
-    }
-
-    private void syncWorkerHostWeight(Map<String, Set<HostWeight>> workerHostWeights) {
-        lock.lock();
-        try {
-            workerHostWeightsMap.clear();
-            workerHostWeightsMap.putAll(workerHostWeights);
-        } finally {
-            lock.unlock();
-        }
     }
 
     private Set<HostWeight> getWorkerHostWeights(String workerGroup) {

@@ -20,24 +20,24 @@ package org.apache.dolphinscheduler.plugin.task.dms;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.lang.reflect.Field;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.amazonaws.services.databasemigrationservice.model.InvalidResourceStateException;
 import com.amazonaws.services.databasemigrationservice.model.ReplicationTask;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class DmsTaskTest {
 
     @Mock
@@ -45,7 +45,7 @@ public class DmsTaskTest {
 
     DmsTask dmsTask;
 
-    @Before
+    @BeforeEach
     public void before() throws Exception {
         DmsParameters dmsParameters = new DmsParameters();
         dmsTask = initTask(dmsParameters);
@@ -56,20 +56,21 @@ public class DmsTaskTest {
     @Test
     public void testCreateTaskJson() {
         String jsonData = "{\n" +
-            "  \"ReplicationTaskIdentifier\":\"task6\",\n" +
-            "  \"SourceEndpointArn\":\"arn:aws:dms:ap-southeast-1:511640773671:endpoint:Z7SUEAL273SCT7OCPYNF5YNDHJDDFRATGNQISOQ\",\n" +
-            "  \"TargetEndpointArn\":\"arn:aws:dms:ap-southeast-1:511640773671:endpoint:aws-mysql57-target\",\n" +
-            "  \"ReplicationInstanceArn\":\"arn:aws:dms:ap-southeast-1:511640773671:rep:dms2c2g\",\n" +
-            "  \"MigrationType\":\"full-load\",\n" +
-            "  \"TableMappings\":\"file://table-mapping.json\",\n" +
-            "  \"ReplicationTaskSettings\":\"file://ReplicationTaskSettings.json\",\n" +
-            "  \"Tags\":[\n" +
-            "    {\n" +
-            "      \"Key\":\"key1\",\n" +
-            "      \"Value\":\"value1\"\n" +
-            "    }\n" +
-            "  ]\n" +
-            "}";
+                "  \"ReplicationTaskIdentifier\":\"task6\",\n" +
+                "  \"SourceEndpointArn\":\"arn:aws:dms:ap-southeast-1:511640773671:endpoint:Z7SUEAL273SCT7OCPYNF5YNDHJDDFRATGNQISOQ\",\n"
+                +
+                "  \"TargetEndpointArn\":\"arn:aws:dms:ap-southeast-1:511640773671:endpoint:aws-mysql57-target\",\n" +
+                "  \"ReplicationInstanceArn\":\"arn:aws:dms:ap-southeast-1:511640773671:rep:dms2c2g\",\n" +
+                "  \"MigrationType\":\"full-load\",\n" +
+                "  \"TableMappings\":\"file://table-mapping.json\",\n" +
+                "  \"ReplicationTaskSettings\":\"file://ReplicationTaskSettings.json\",\n" +
+                "  \"Tags\":[\n" +
+                "    {\n" +
+                "      \"Key\":\"key1\",\n" +
+                "      \"Value\":\"value1\"\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}";
 
         DmsParameters dmsParameters = new DmsParameters();
         dmsParameters.setIsJsonFormat(true);
@@ -78,42 +79,45 @@ public class DmsTaskTest {
         DmsTask dmsTask = initTask(dmsParameters);
         dmsTask.convertJsonParameters();
         DmsParameters dmsParametersNew = dmsTask.getParameters();
-        Assert.assertEquals("task6", dmsParametersNew.getReplicationTaskIdentifier());
-        Assert.assertEquals("arn:aws:dms:ap-southeast-1:511640773671:endpoint:Z7SUEAL273SCT7OCPYNF5YNDHJDDFRATGNQISOQ", dmsParametersNew.getSourceEndpointArn());
-        Assert.assertEquals("arn:aws:dms:ap-southeast-1:511640773671:endpoint:aws-mysql57-target", dmsParametersNew.getTargetEndpointArn());
-        Assert.assertEquals("arn:aws:dms:ap-southeast-1:511640773671:rep:dms2c2g", dmsParametersNew.getReplicationInstanceArn());
-        Assert.assertEquals("full-load", dmsParametersNew.getMigrationType());
-        Assert.assertEquals("file://table-mapping.json", dmsParametersNew.getTableMappings());
-        Assert.assertEquals("file://ReplicationTaskSettings.json", dmsParametersNew.getReplicationTaskSettings());
-        Assert.assertEquals("key1", dmsParametersNew.getTags().get(0).getKey());
-        Assert.assertEquals("value1", dmsParametersNew.getTags().get(0).getValue());
+        Assertions.assertEquals("task6", dmsParametersNew.getReplicationTaskIdentifier());
+        Assertions.assertEquals(
+                "arn:aws:dms:ap-southeast-1:511640773671:endpoint:Z7SUEAL273SCT7OCPYNF5YNDHJDDFRATGNQISOQ",
+                dmsParametersNew.getSourceEndpointArn());
+        Assertions.assertEquals("arn:aws:dms:ap-southeast-1:511640773671:endpoint:aws-mysql57-target",
+                dmsParametersNew.getTargetEndpointArn());
+        Assertions.assertEquals("arn:aws:dms:ap-southeast-1:511640773671:rep:dms2c2g",
+                dmsParametersNew.getReplicationInstanceArn());
+        Assertions.assertEquals("full-load", dmsParametersNew.getMigrationType());
+        Assertions.assertEquals("file://table-mapping.json", dmsParametersNew.getTableMappings());
+        Assertions.assertEquals("file://ReplicationTaskSettings.json", dmsParametersNew.getReplicationTaskSettings());
+        Assertions.assertEquals("key1", dmsParametersNew.getTags().get(0).getKey());
+        Assertions.assertEquals("value1", dmsParametersNew.getTags().get(0).getValue());
     }
 
     @Test
     public void testCheckCreateReplicationTask() throws Exception {
 
-
         DmsParameters dmsParameters = dmsTask.getParameters();
 
         dmsParameters.setIsRestartTask(true);
-        Assert.assertEquals(TaskConstants.EXIT_CODE_SUCCESS, dmsTask.checkCreateReplicationTask());
+        Assertions.assertEquals(TaskConstants.EXIT_CODE_SUCCESS, dmsTask.checkCreateReplicationTask());
 
         dmsParameters.setIsRestartTask(false);
         when(dmsHook.createReplicationTask()).thenReturn(true);
-        Assert.assertEquals(TaskConstants.EXIT_CODE_SUCCESS, dmsTask.checkCreateReplicationTask());
+        Assertions.assertEquals(TaskConstants.EXIT_CODE_SUCCESS, dmsTask.checkCreateReplicationTask());
 
         when(dmsHook.createReplicationTask()).thenReturn(false);
         dmsTask.checkCreateReplicationTask();
-        Assert.assertEquals(TaskConstants.EXIT_CODE_FAILURE, dmsTask.checkCreateReplicationTask());
+        Assertions.assertEquals(TaskConstants.EXIT_CODE_FAILURE, dmsTask.checkCreateReplicationTask());
     }
 
     @Test
     public void testStartReplicationTask() {
         when(dmsHook.startReplicationTask()).thenReturn(true);
-        Assert.assertEquals(TaskConstants.EXIT_CODE_SUCCESS, dmsTask.startReplicationTask());
+        Assertions.assertEquals(TaskConstants.EXIT_CODE_SUCCESS, dmsTask.startReplicationTask());
 
         when(dmsHook.startReplicationTask()).thenReturn(false);
-        Assert.assertEquals(TaskConstants.EXIT_CODE_FAILURE, dmsTask.startReplicationTask());
+        Assertions.assertEquals(TaskConstants.EXIT_CODE_FAILURE, dmsTask.startReplicationTask());
     }
 
     @Test
@@ -123,17 +127,15 @@ public class DmsTaskTest {
         parameters.setIsRestartTask(false);
         when(dmsHook.testConnectionEndpoint()).thenReturn(true);
         when(dmsHook.startReplicationTask())
-            .thenThrow(new InvalidResourceStateException("Test connection"))
-            .thenReturn(true);
-        Assert.assertEquals(TaskConstants.EXIT_CODE_SUCCESS, dmsTask.startReplicationTask());
-
+                .thenThrow(new InvalidResourceStateException("Test connection"))
+                .thenReturn(true);
+        Assertions.assertEquals(TaskConstants.EXIT_CODE_SUCCESS, dmsTask.startReplicationTask());
 
         when(dmsHook.startReplicationTask())
-            .thenThrow(new InvalidResourceStateException("Test connection"))
-            .thenReturn(false);
-        Assert.assertEquals(TaskConstants.EXIT_CODE_FAILURE, dmsTask.startReplicationTask());
+                .thenThrow(new InvalidResourceStateException("Test connection"))
+                .thenReturn(false);
+        Assertions.assertEquals(TaskConstants.EXIT_CODE_FAILURE, dmsTask.startReplicationTask());
     }
-
 
     @Test
     public void testStartReplicationTaskRestartOtherException() {
@@ -141,7 +143,7 @@ public class DmsTaskTest {
         DmsParameters parameters = dmsTask.getParameters();
         parameters.setIsRestartTask(false);
         when(dmsHook.startReplicationTask()).thenThrow(new InvalidResourceStateException("other error"));
-        Assert.assertEquals(TaskConstants.EXIT_CODE_FAILURE, dmsTask.startReplicationTask());
+        Assertions.assertEquals(TaskConstants.EXIT_CODE_FAILURE, dmsTask.startReplicationTask());
     }
 
     @Test
@@ -154,21 +156,20 @@ public class DmsTaskTest {
 
         when(replicationTask.getMigrationType()).thenReturn("cdc");
         parameters.setCdcStopPosition("now");
-        Assert.assertFalse(dmsTask.isStopTaskWhenCdc());
+        Assertions.assertFalse(dmsTask.isStopTaskWhenCdc());
 
         when(replicationTask.getMigrationType()).thenReturn("full-load-and-cdc");
         parameters.setCdcStopPosition("now");
-        Assert.assertFalse(dmsTask.isStopTaskWhenCdc());
+        Assertions.assertFalse(dmsTask.isStopTaskWhenCdc());
 
         when(replicationTask.getMigrationType()).thenReturn("full-load-and-cdc");
         parameters.setCdcStopPosition(null);
-        Assert.assertTrue(dmsTask.isStopTaskWhenCdc());
+        Assertions.assertTrue(dmsTask.isStopTaskWhenCdc());
 
         when(replicationTask.getMigrationType()).thenReturn("full-load");
         parameters.setCdcStopPosition(null);
-        Assert.assertFalse(dmsTask.isStopTaskWhenCdc());
+        Assertions.assertFalse(dmsTask.isStopTaskWhenCdc());
     }
-
 
     private DmsTask initTask(DmsParameters dmsParameters) {
         TaskExecutionContext taskExecutionContext = createContext(dmsParameters);
@@ -184,5 +185,3 @@ public class DmsTaskTest {
         return taskExecutionContext;
     }
 }
-
-

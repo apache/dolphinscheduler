@@ -17,13 +17,16 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import java.util.List;
-import java.util.Map;
-
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.dao.entity.User;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 
 /**
@@ -38,7 +41,6 @@ public interface BaseService {
      * @return ture if administrator, otherwise return false
      */
     boolean isAdmin(User user);
-
 
     /**
      * isNotAdmin
@@ -86,7 +88,6 @@ public interface BaseService {
      */
     boolean check(Map<String, Object> result, boolean bool, Status userNoOperationPerm);
 
-
     /**
      * Verify that the operator has permissions
      *
@@ -108,12 +109,8 @@ public interface BaseService {
 
     /**
      * check and parse date parameters
-     *
-     * @param startDateStr start date string
-     * @param endDateStr end date string
-     * @return map<status,startDate,endDate>
      */
-    Map<String, Object> checkAndParseDateParameters(String startDateStr, String endDateStr);
+    Date checkAndParseDateParameters(String startDateStr) throws ServiceException;
 
     /**
      * check checkDescriptionLength

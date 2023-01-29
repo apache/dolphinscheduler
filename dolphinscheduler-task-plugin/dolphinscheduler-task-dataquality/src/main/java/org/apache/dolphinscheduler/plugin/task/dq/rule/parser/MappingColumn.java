@@ -26,7 +26,8 @@ public class MappingColumn {
     private String operator;
     private String targetField;
 
-    public MappingColumn() {}
+    public MappingColumn() {
+    }
 
     public MappingColumn(String srcField, String operator, String targetField) {
         this.srcField = srcField;
