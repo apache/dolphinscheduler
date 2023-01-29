@@ -18,10 +18,10 @@
 package org.apache.dolphinscheduler.server.master.processor.queue;
 
 import org.apache.dolphinscheduler.common.enums.TaskEventType;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.master.event.TaskEventHandleError;
 import org.apache.dolphinscheduler.server.master.event.TaskEventHandleException;
 import org.apache.dolphinscheduler.server.master.event.TaskEventHandler;
-import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -53,7 +53,7 @@ public class TaskExecuteRunnable implements Runnable {
             // we handle the task event belongs to one task serial, so if the event comes in wrong order,
             TaskEvent event = this.events.peek();
             try {
-                LoggerUtils.setWorkflowAndTaskInstanceIDMDC(event.getProcessInstanceId(), event.getTaskInstanceId());
+                LogUtils.setWorkflowAndTaskInstanceIDMDC(event.getProcessInstanceId(), event.getTaskInstanceId());
                 logger.info("Handle task event begin: {}", event);
                 taskEventHandlerMap.get(event.getEvent()).handleTaskEvent(event);
                 events.remove(event);
@@ -71,7 +71,7 @@ public class TaskExecuteRunnable implements Runnable {
                         event, unknownException);
                 events.remove(event);
             } finally {
-                LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
+                LogUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
         }
     }
