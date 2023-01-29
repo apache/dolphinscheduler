@@ -74,7 +74,7 @@ public class ExecutorDispatcher implements InitializingBean {
      * @return result
      * @throws ExecuteException if error throws ExecuteException
      */
-    public Boolean dispatch(final ExecutionContext context) throws ExecuteException {
+    public void dispatch(final ExecutionContext context) throws ExecuteException {
         // get executor manager
         ExecutorManager<Boolean> executorManager = this.executorManagers.get(context.getExecutorType());
         if (executorManager == null) {
@@ -86,13 +86,13 @@ public class ExecutorDispatcher implements InitializingBean {
         if (StringUtils.isEmpty(host.getAddress())) {
             logger.warn("fail to execute : {} due to no suitable worker, current task needs worker group {} to execute",
                     context.getCommand(), context.getWorkerGroup());
-            return false;
+            throw new ExecuteException("no suitable worker");
         }
         context.setHost(host);
         executorManager.beforeExecute(context);
         try {
             // task execute
-            return executorManager.execute(context);
+            executorManager.execute(context);
         } finally {
             executorManager.afterExecute(context);
         }
