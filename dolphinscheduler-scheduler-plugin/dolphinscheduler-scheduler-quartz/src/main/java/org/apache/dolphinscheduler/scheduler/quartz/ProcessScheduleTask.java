@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.scheduler.quartz;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
@@ -30,6 +31,8 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -90,6 +93,9 @@ public class ProcessScheduleTask extends QuartzJobBean {
         }
 
         Command command = new Command();
+        Map<String, Object> commandParams = new HashMap<>(1);
+        commandParams.put(Constants.SCHEDULE_TIMEZONE, schedule.getTimezoneId());
+        command.setCommandParam(JSONUtils.toJsonString(commandParams));
         command.setCommandType(CommandType.SCHEDULER);
         command.setExecutorId(schedule.getUserId());
         command.setFailureStrategy(schedule.getFailureStrategy());

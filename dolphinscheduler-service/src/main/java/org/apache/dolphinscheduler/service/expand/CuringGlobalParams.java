@@ -154,7 +154,7 @@ public class CuringGlobalParams implements CuringParamsService {
         // you need to pass in the task instance id to locate the time
         // of the process instance complement
         Map<String, String> cmdParam = JSONUtils.toMap(processInstance.getCommandParam());
-        String timeZone = cmdParam.get(Constants.SCHEDULE_TIMEZONE);
+        String timeZone = MapUtils.isEmpty(cmdParam) ? StringUtils.EMPTY : cmdParam.get(Constants.SCHEDULE_TIMEZONE);
         Map<String, String> params = BusinessTimeUtils.getBusinessTime(commandType, scheduleTime, timeZone);
 
         if (MapUtils.isNotEmpty(globalParamsMap)) {
