@@ -16,6 +16,7 @@
  */
 package org.apache.dolphinscheduler.common.task.dependent;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.dolphinscheduler.common.enums.DependentRelation;
 import org.apache.dolphinscheduler.common.model.DependentTaskModel;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
@@ -33,7 +34,7 @@ public class DependentParameters extends AbstractParameters {
 
     @Override
     public boolean checkParameters() {
-        return true;
+        return CollectionUtils.isNotEmpty(dependTaskList) && relation != null;
     }
 
     @Override
