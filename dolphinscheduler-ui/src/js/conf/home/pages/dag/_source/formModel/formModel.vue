@@ -747,6 +747,10 @@
         }
         this.successBranch && (this.conditionResult.successNode[0] = this.successBranch)
         this.failedBranch && (this.conditionResult.failedNode[0] = this.failedBranch)
+        // Empty dependency requires default value,otherwise master NPE
+        if (this.cacheDependence.dependTaskList == null) {
+          this.cacheDependence = Object.assign(this.cacheDependence, { dependTaskList: [], relation: 'AND' })
+        }
 
         this.$emit('addTaskInfo', {
           item: {
