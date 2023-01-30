@@ -103,6 +103,8 @@
         <azure-identity.version>1.7.1</azure-identity.version>
         <redshift-jdbc42.version>2.1.0.9</redshift-jdbc42.version>
         <aws-java-sdk-redshift.version>1.12.300</aws-java-sdk-redshift.version>
+        <azure-resourcemanager.version>2.21.0</azure-resourcemanager.version>
+        <azure-resourcemanager-datafactory.version>1.0.0-beta.19</azure-resourcemanager-datafactory.version>
     </properties>
 
     <dependencyManagement>
@@ -797,6 +799,16 @@
                 <groupId>com.azure</groupId>
                 <artifactId>azure-identity</artifactId>
                 <version>${azure-identity.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.azure.resourcemanager</groupId>
+                <artifactId>azure-resourcemanager</artifactId>
+                <version>${azure-resourcemanager.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.azure.resourcemanager</groupId>
+                <artifactId>azure-resourcemanager-datafactory</artifactId>
+                <version>${azure-resourcemanager-datafactory.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.amazon.redshift</groupId>
