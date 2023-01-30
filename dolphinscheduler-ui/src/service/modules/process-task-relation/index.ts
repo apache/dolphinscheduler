@@ -21,22 +21,13 @@ import {
   PreTaskCodesReq,
   PostTaskCodesReq,
   TaskCodeReq,
-  SaveReq,
-  MoveReq
+  SaveReq
 } from './types'
 import { axios } from '@/service/service'
 
 export function save(data: SaveReq, projectCode: ProjectCodeReq): any {
   return axios({
     url: `/projects/${projectCode}/process-task-relation`,
-    method: 'post',
-    data
-  })
-}
-
-export function moveRelation(data: MoveReq, projectCode: number): any {
-  return axios({
-    url: `/projects/${projectCode}/process-task-relation/move`,
     method: 'post',
     data
   })
