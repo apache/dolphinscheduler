@@ -72,9 +72,9 @@ const err = (err: AxiosError): Promise<AxiosError> => {
 }
 
 service.interceptors.request.use((config: AxiosRequestConfig<any>) => {
-  config.headers && (config.headers.sessionId = userStore.getSessionId)
-  const language = cookies.get('language')
   config.headers = config.headers || {}
+  config.headers.sessionId = userStore.getSessionId
+  const language = cookies.get('language')
   if (language) config.headers.language = language
 
   return config
