@@ -28,7 +28,7 @@ public class SwitchParameters extends AbstractParameters {
 
     private DependentRelation dependRelation;
     private String relation;
-    private List<String> nextNode;
+    private Long nextNode;
     private int resultConditionLocation;
     private List<SwitchResultVo> dependTaskList;
 
@@ -74,21 +74,11 @@ public class SwitchParameters extends AbstractParameters {
         this.dependTaskList = dependTaskList;
     }
 
-    public List<String> getNextNode() {
+    public Long getNextNode() {
         return nextNode;
     }
 
-    public void setNextNode(Object nextNode) {
-        if (nextNode instanceof String) {
-            List<String> nextNodeList = new ArrayList<>();
-            nextNodeList.add(String.valueOf(nextNode));
-            this.nextNode = nextNodeList;
-        } else if (nextNode instanceof Number) {
-            List<String> nextNodeList = new ArrayList<>();
-            nextNodeList.add(nextNode.toString());
-            this.nextNode = nextNodeList;
-        } else {
-            this.nextNode = (ArrayList) nextNode;
-        }
+    public void setNextNode(Long nextNode) {
+        this.nextNode = nextNode;
     }
 }

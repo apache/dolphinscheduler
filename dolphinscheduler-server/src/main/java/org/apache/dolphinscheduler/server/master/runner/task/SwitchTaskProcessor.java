@@ -243,15 +243,7 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
      * check whether switch result is valid
      */
     private boolean isValidSwitchResult(SwitchResultVo switchResult) {
-        if (CollectionUtils.isEmpty(switchResult.getNextNode())) {
-            return false;
-        }
-        for (String nextNode : switchResult.getNextNode()) {
-            if (StringUtils.isEmpty(nextNode)) {
-                return false;
-            }
-        }
-        return true;
+        return switchResult.getNextNode() != null && switchResult.getNextNode() != 0L;
     }
 
 }

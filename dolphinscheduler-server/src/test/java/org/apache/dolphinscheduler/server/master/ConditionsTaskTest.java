@@ -155,8 +155,8 @@ public class ConditionsTaskTest {
         taskNode.setDependence(JSONUtils.toJsonString(dependentParameters));
 
         ConditionsParameters conditionsParameters = new ConditionsParameters();
-        conditionsParameters.setSuccessNode(Stream.of("2").collect(Collectors.toList()));
-        conditionsParameters.setFailedNode(Stream.of("3").collect(Collectors.toList()));
+        conditionsParameters.setSuccessNode(Stream.of(2L).collect(Collectors.toList()));
+        conditionsParameters.setFailedNode(Stream.of(3L).collect(Collectors.toList()));
 
         // out: SUCCESS => 2, FAILED => 3
         taskNode.setConditionResult(JSONUtils.toJsonString(conditionsParameters));

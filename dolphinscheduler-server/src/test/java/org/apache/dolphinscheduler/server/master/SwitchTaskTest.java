@@ -113,19 +113,19 @@ public class SwitchTaskTest {
 
         SwitchResultVo switchResultVo1 = new SwitchResultVo();
         switchResultVo1.setCondition(" 2 == 1");
-        switchResultVo1.setNextNode("t1");
+        switchResultVo1.setNextNode(1L);
         SwitchResultVo switchResultVo2 = new SwitchResultVo();
         switchResultVo2.setCondition(" 2 == 2");
-        switchResultVo2.setNextNode("t2");
+        switchResultVo2.setNextNode(2L);
         SwitchResultVo switchResultVo3 = new SwitchResultVo();
         switchResultVo3.setCondition(" 3 == 2");
-        switchResultVo3.setNextNode("t3");
+        switchResultVo3.setNextNode(3L);
         List<SwitchResultVo> list = new ArrayList<>();
         list.add(switchResultVo1);
         list.add(switchResultVo2);
         list.add(switchResultVo3);
         conditionsParameters.setDependTaskList(list);
-        conditionsParameters.setNextNode("t");
+        conditionsParameters.setNextNode(4L);
         conditionsParameters.setRelation("AND");
 
         return conditionsParameters;
