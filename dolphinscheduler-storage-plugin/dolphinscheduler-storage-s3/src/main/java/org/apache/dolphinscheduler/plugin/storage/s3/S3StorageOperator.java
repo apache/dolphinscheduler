@@ -43,6 +43,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -409,34 +411,31 @@ public class S3StorageOperator implements Closeable, StorageOperate {
     public List<StorageEntity> listFilesStatusRecursively(String path, String defaultPath, String tenantCode,
                                                           ResourceType type) {
         List<StorageEntity> storageEntityList = new ArrayList<>();
-
         LinkedList<StorageEntity> foldersToFetch = new LinkedList<>();
 
-        do {
-            String pathToExplore = "";
-            if (foldersToFetch.size() == 0) {
-                pathToExplore = path;
-            } else {
-                pathToExplore = foldersToFetch.pop().getFullName();
-            }
+        StorageEntity initialEntity = null;
+        try {
+            initialEntity = getFileStatus(path, defaultPath, tenantCode, type);
+        } catch (Exception e) {
+            logger.error("error while listing files status recursively, path: {}", path, e);
+            return storageEntityList;
+        }
+        foldersToFetch.add(initialEntity);
 
+        while (!foldersToFetch.isEmpty()) {
+            String pathToExplore = foldersToFetch.pop().getFullName();
             try {
                 List<StorageEntity> tempList = listFilesStatus(pathToExplore, defaultPath, tenantCode, type);
-
                 for (StorageEntity temp : tempList) {
                     if (temp.isDirectory()) {
                         foldersToFetch.add(temp);
                     }
                 }
-
                 storageEntityList.addAll(tempList);
-            } catch (AmazonServiceException e) {
-                logger.error("Resource path: {}", pathToExplore, e);
-                // return the resources fetched before error occurs.
-                return storageEntityList;
+            } catch (Exception e) {
+                logger.error("error while listing files status recursively, path: {}", pathToExplore, e);
             }
-
-        } while (foldersToFetch.size() != 0);
+        }
 
         return storageEntityList;
 
@@ -585,16 +584,12 @@ public class S3StorageOperator implements Closeable, StorageOperate {
      * a directory is a path ending with "/"
      */
     private String findDirAlias(String myStr) {
-        if (!myStr.endsWith("/")) {
+        if (!myStr.endsWith(FOLDER_SEPARATOR)) {
             // Make sure system won't crush down if someone accidentally misuse the function.
             return myStr;
         }
-        int lastIndex = myStr.lastIndexOf("/");
-        String subbedString = myStr.substring(0, lastIndex);
-        int secondLastIndex = subbedString.lastIndexOf("/");
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(myStr, secondLastIndex + 1, lastIndex + 1);
 
-        return stringBuilder.toString();
+        Path path = Paths.get(myStr);
+        return path.getName(path.getNameCount() - 1) + FOLDER_SEPARATOR;
     }
 }
