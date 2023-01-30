@@ -405,6 +405,9 @@ interface ITaskParams {
   cloudWatchLogGroupArn?: string
   yamlContent?: string
   paramScript?: ILocalParam[]
+  factoryName?: string
+  resourceGroupName?: string
+  pipelineName?: string
 }
 
 interface INodeData

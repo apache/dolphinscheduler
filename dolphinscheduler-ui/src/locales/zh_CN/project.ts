@@ -777,7 +777,13 @@ export default {
     pytorch_python_env_tool: 'python环境管理工具',
     pytorch_requirements: '依赖文件',
     pytorch_conda_python_version: 'python版本',
-    pytorch_conda_python_version_tips: '请输入版本号，如 3.6, 3.7, 3.x等'
+    pytorch_conda_python_version_tips: '请输入版本号，如 3.6, 3.7, 3.x等',
+    factory_name: '工厂名称',
+    resource_group_name: '资源组名称',
+    pipeline_name: 'pipeline名称',
+    factory_tips: '请选择工厂',
+    resource_group_tips: '请选择资源组',
+    pipeline_tips: '请选择pipeline'
   },
   menu: {
     fav: '收藏组件',
