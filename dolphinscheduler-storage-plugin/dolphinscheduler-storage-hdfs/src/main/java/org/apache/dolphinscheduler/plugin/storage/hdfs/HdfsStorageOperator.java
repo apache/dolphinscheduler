@@ -97,9 +97,7 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
     private FileSystem fs;
 
     private HdfsStorageOperator() {
-        hdfsProperties = new HdfsStorageProperties();
-        init();
-        initHdfsPath();
+        this(new HdfsStorageProperties());
     }
 
     public HdfsStorageOperator(HdfsStorageProperties hdfsStorageProperties) {
