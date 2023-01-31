@@ -21,9 +21,10 @@ import java.util.Optional;
 
 public enum StorageType {
 
-    HDFS(0, "HDFS"),
-    OSS(1, "OSS"),
-    S3(2, "S3"),
+    LOCAL(0, "LOCAL"),
+    HDFS(1, "HDFS"),
+    OSS(2, "OSS"),
+    S3(3, "S3"),
     ;
 
     private final int code;
