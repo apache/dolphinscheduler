@@ -47,7 +47,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
@@ -55,6 +57,7 @@ import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import io.netty.channel.Channel;
@@ -69,9 +72,23 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
 
     private final ExecutorService executor;
 
-    public LoggerRequestProcessor() {
+    public final Set<String> taskLoggerDirs;
+
+    public LoggerRequestProcessor(@Value("${task.logger-dir.current:logs}") String currLoggerDir, @Value("${task.logger-dir.past:}") List<String> pastLoggerDirs) {
         this.executor = Executors.newFixedThreadPool(Constants.CPUS * 2 + 1,
                 new NamedThreadFactory("Log-Request-Process-Thread"));
+
+        String dsHome = System.getProperty("DOLPHINSCHEDULER_WORKER_HOME");
+        if (StringUtils.isBlank(dsHome)) {
+            dsHome = System.getProperty("user.dir");
+        }
+        this.taskLoggerDirs = new HashSet<>();
+        if(pastLoggerDirs != null){
+            taskLoggerDirs.addAll(pastLoggerDirs);
+        }
+        currLoggerDir = StringUtils.isBlank(currLoggerDir)? "logs" : currLoggerDir;
+        taskLoggerDirs.add(currLoggerDir);
+        taskLoggerDirs.add(dsHome);
     }
 
     @Override
@@ -181,16 +198,19 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
      * @return
      */
     private boolean checkPathSecurity(String path) {
-        String dsHome = System.getProperty("DOLPHINSCHEDULER_WORKER_HOME");
-        if (StringUtils.isBlank(dsHome)) {
-            dsHome = System.getProperty("user.dir");
-        }
+
         if (StringUtils.isBlank(path)) {
             logger.warn("path is null");
-            return false;
         } else {
-            return path.startsWith(dsHome) && !path.contains("../") && path.endsWith(".log");
+            if(!path.contains("../") && path.endsWith(".log") ){
+                for (String dir : taskLoggerDirs) {
+                    if(path.startsWith(dir)){
+                        return true;
+                    }
+                }
+            }
         }
+        return false;
     }
 
     public ExecutorService getExecutor() {
