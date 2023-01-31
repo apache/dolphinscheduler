@@ -65,6 +65,13 @@ worker:
 server:
   port: 1235
 
+task:
+  logger-dir:
+    # The task log directory currently in use
+    current: logs
+    # The task log directory used in the past; You can have multiple values, separated by commas;
+    past:
+
 management:
   endpoints:
     web:

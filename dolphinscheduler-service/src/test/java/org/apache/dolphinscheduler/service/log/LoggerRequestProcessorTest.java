@@ -24,15 +24,15 @@ import org.apache.dolphinscheduler.remote.command.log.ViewLogRequestCommand;
 import org.apache.dolphinscheduler.remote.processor.LoggerRequestProcessor;
 import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import io.netty.channel.Channel;
+import java.util.LinkedList;
+import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 public class LoggerRequestProcessorTest {
@@ -62,8 +62,8 @@ public class LoggerRequestProcessorTest {
         command.setType(CommandType.VIEW_WHOLE_LOG_REQUEST);
         command.setBody(JSONUtils.toJsonByteArray(logRequestCommand));
 
-        LoggerRequestProcessor loggerRequestProcessor = new LoggerRequestProcessor();
-        loggerRequestProcessor.process(channel, command);
+        LoggerRequestProcessor loggerRequestProcessor = new LoggerRequestProcessor("logs", null);
+        Assertions.assertDoesNotThrow(() -> loggerRequestProcessor.process(channel, command));
     }
 
     @Test
@@ -78,8 +78,8 @@ public class LoggerRequestProcessorTest {
         command.setType(CommandType.VIEW_WHOLE_LOG_REQUEST);
         command.setBody(JSONUtils.toJsonByteArray(logRequestCommand));
 
-        LoggerRequestProcessor loggerRequestProcessor = new LoggerRequestProcessor();
-        loggerRequestProcessor.process(channel, command);
+        LoggerRequestProcessor loggerRequestProcessor = new LoggerRequestProcessor("logs", null);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> loggerRequestProcessor.process(channel, command));
     }
 
     @Test
@@ -94,8 +94,8 @@ public class LoggerRequestProcessorTest {
         command.setType(CommandType.VIEW_WHOLE_LOG_REQUEST);
         command.setBody(JSONUtils.toJsonByteArray(logRequestCommand));
 
-        LoggerRequestProcessor loggerRequestProcessor = new LoggerRequestProcessor();
-        loggerRequestProcessor.process(channel, command);
+        LoggerRequestProcessor loggerRequestProcessor = new LoggerRequestProcessor("logs", null);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> loggerRequestProcessor.process(channel, command));
     }
 
     @Test
@@ -109,7 +109,48 @@ public class LoggerRequestProcessorTest {
         command.setType(CommandType.VIEW_WHOLE_LOG_REQUEST);
         command.setBody(JSONUtils.toJsonByteArray(logRequestCommand));
 
-        LoggerRequestProcessor loggerRequestProcessor = new LoggerRequestProcessor();
-        loggerRequestProcessor.process(channel, command);
+        LoggerRequestProcessor loggerRequestProcessor = new LoggerRequestProcessor("logs", null);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> loggerRequestProcessor.process(channel, command));
+    }
+
+    @Test
+    public void testProcessViewWholeLogRequestStartWithSpecifyDirs() {
+        System.setProperty("DOLPHINSCHEDULER_WORKER_HOME", System.getProperty("user.dir"));
+        Channel channel = Mockito.mock(Channel.class);
+        Mockito.when(LoggerUtils.readWholeFileContent(Mockito.anyString())).thenReturn("");
+
+        String dir1 = "/var/log/dolphinscheduler/";
+        String dir2 = "/var/log/dolphinscheduler_01";
+        String dir3 = "/var/log/dolphinscheduler_02";
+        List<String> pastDirs = new LinkedList<>();
+        pastDirs.add(dir2);
+        pastDirs.add(dir3);
+        LoggerRequestProcessor loggerRequestProcessor = new LoggerRequestProcessor(dir1, pastDirs);
+
+        ViewLogRequestCommand logRequestCommand = new ViewLogRequestCommand(dir1 + "/20220101/task01.log");
+        Command command = new Command();
+        command.setType(CommandType.VIEW_WHOLE_LOG_REQUEST);
+        command.setBody(JSONUtils.toJsonByteArray(logRequestCommand));
+        Assertions.assertDoesNotThrow(() -> loggerRequestProcessor.process(channel, command));
+
+        logRequestCommand = new ViewLogRequestCommand(dir2 + "/20220101/task02.log");
+        command.setBody(JSONUtils.toJsonByteArray(logRequestCommand));
+        Assertions.assertDoesNotThrow(() -> loggerRequestProcessor.process(channel, command));
+    }
+
+    @Test
+    public void testProcessViewWholeLogRequestStartWithSpecifyDirsError() {
+        System.setProperty("DOLPHINSCHEDULER_WORKER_HOME", System.getProperty("user.dir"));
+        Channel channel = Mockito.mock(Channel.class);
+        Mockito.when(LoggerUtils.readWholeFileContent(Mockito.anyString())).thenReturn("");
+
+        String dir = "/var/log/dolphinscheduler";
+        LoggerRequestProcessor loggerRequestProcessor = new LoggerRequestProcessor(dir, null);
+        // access log file in  /var/log/dolphinscheduler_01
+        ViewLogRequestCommand logRequestCommand = new ViewLogRequestCommand(dir + "_01" + "/20220101/task01.log");
+        Command command = new Command();
+        command.setType(CommandType.VIEW_WHOLE_LOG_REQUEST);
+        command.setBody(JSONUtils.toJsonByteArray(logRequestCommand));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> loggerRequestProcessor.process(channel, command));
     }
 }

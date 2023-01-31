@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.remote.processor;
 import static org.apache.dolphinscheduler.common.constants.Constants.APPID_COLLECT;
 import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_COLLECT_WAY;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
@@ -45,12 +46,15 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import io.netty.channel.Channel;
@@ -63,6 +67,25 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(LoggerRequestProcessor.class);
 
+    public final Set<String> taskLoggerDirs;
+
+    public LoggerRequestProcessor(@Value("${task.logger-dir.current:logs}") String currLoggerDir, @Value("${task.logger-dir.past:}") List<String> pastLoggerDirs) {
+
+        String dsHome = System.getProperty("DOLPHINSCHEDULER_WORKER_HOME");
+        if (StringUtils.isBlank(dsHome)) {
+            dsHome = System.getProperty("user.dir");
+        }
+        Set<String> mergeLoggerDirs = new HashSet<>();
+        if(pastLoggerDirs != null){
+            mergeLoggerDirs.addAll(pastLoggerDirs);
+        }
+        currLoggerDir = StringUtils.isBlank(currLoggerDir)? "logs" : currLoggerDir;
+        mergeLoggerDirs.add(currLoggerDir);
+        mergeLoggerDirs.add(dsHome);
+        // log dir path must end with a delimiter
+        this.taskLoggerDirs = mergeLoggerDirs.stream().map(dir -> dir.endsWith(File.separator) ? dir : dir + File.separator).collect(Collectors.toSet());
+    }
+
     @Override
     public void process(Channel channel, Command command) {
         logger.info("received command : {}", command);
@@ -74,6 +97,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                 GetLogBytesRequestCommand getLogRequest = JSONUtils.parseObject(
                         command.getBody(), GetLogBytesRequestCommand.class);
                 String path = getLogRequest.getPath();
+                checkPathSecurityWithThrows(path);
                 byte[] bytes = getFileContentBytes(path);
                 GetLogBytesResponseCommand getLogResponse = new GetLogBytesResponseCommand(bytes);
                 channel.writeAndFlush(getLogResponse.convert2Command(command.getOpaque()));
@@ -82,6 +106,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                 ViewLogRequestCommand viewLogRequest = JSONUtils.parseObject(
                         command.getBody(), ViewLogRequestCommand.class);
                 String viewLogPath = viewLogRequest.getPath();
+                checkPathSecurityWithThrows(viewLogPath);
                 String msg = LogUtils.readWholeFileContent(viewLogPath);
                 ViewLogResponseCommand viewLogResponse = new ViewLogResponseCommand(msg);
                 channel.writeAndFlush(viewLogResponse.convert2Command(command.getOpaque()));
@@ -91,6 +116,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                         command.getBody(), RollViewLogRequestCommand.class);
 
                 String rollViewLogPath = rollViewLogRequest.getPath();
+                checkPathSecurityWithThrows(rollViewLogPath);
 
                 List<String> lines = readPartFileContent(rollViewLogPath,
                         rollViewLogRequest.getSkipLineNum(), rollViewLogRequest.getLimit());
@@ -123,6 +149,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                         command.getBody(), RemoveTaskLogRequestCommand.class);
 
                 String taskLogPath = removeTaskLogRequest.getPath();
+                checkPathSecurityWithThrows(taskLogPath);
                 File taskLogFile = new File(taskLogPath);
                 boolean status = true;
                 try {
@@ -141,6 +168,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                         JSONUtils.parseObject(command.getBody(), GetAppIdRequestCommand.class);
                 String appInfoPath = getAppIdRequestCommand.getAppInfoPath();
                 String logPath = getAppIdRequestCommand.getLogPath();
+                checkPathSecurityWithThrows(logPath);
                 List<String> appIds = LogUtils.getAppIds(logPath, appInfoPath,
                         PropertyUtils.getString(APPID_COLLECT, DEFAULT_COLLECT_WAY));
                 channel.writeAndFlush(
@@ -149,6 +177,30 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
             default:
                 throw new IllegalArgumentException("unknown commandType: " + commandType);
         }
+    }
+
+    private void checkPathSecurityWithThrows(String logPath){
+        if (!checkPathSecurity(logPath)) {
+            throw new IllegalArgumentException("Illegal Log path：" + logPath);
+        }
+    }
+
+    /**
+     * LogServer only can read the logs dir.
+     * @param path
+     * @return
+     */
+    private boolean checkPathSecurity(String path) {
+        if (StringUtils.isBlank(path)) {
+            logger.warn("path is null");
+        } else if(!path.contains("../") && path.endsWith(".log") ){
+            for (String dir : taskLoggerDirs) {
+                if(path.startsWith(dir)){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
