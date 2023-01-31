@@ -87,7 +87,7 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
 
                 @Override
                 public HdfsStorageOperator load(String key) throws Exception {
-                    return new HdfsStorageOperator();
+                    return new HdfsStorageOperator(hdfsProperties);
                 }
             });
 
@@ -96,7 +96,7 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
     private Configuration configuration;
     private FileSystem fs;
 
-    private HdfsStorageOperator() {
+    public HdfsStorageOperator() {
         this(new HdfsStorageProperties());
     }
 
