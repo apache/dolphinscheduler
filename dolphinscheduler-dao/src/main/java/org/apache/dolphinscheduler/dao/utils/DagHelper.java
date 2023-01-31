@@ -38,6 +38,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -363,13 +364,16 @@ public class DagHelper {
         TaskInstance taskInstance = completeTaskList.get(nodeCode);
         ConditionsParameters conditionsParameters =
                 JSONUtils.parseObject(taskNode.getConditionResult(), ConditionsParameters.class);
+        if (conditionsParameters == null) {
+            return conditionTaskList;
+        }
         List<String> skipNodeList = new ArrayList<>();
         if (taskInstance.getState().typeIsSuccess()) {
-            conditionTaskList = conditionsParameters.getSuccessNode();
-            skipNodeList = conditionsParameters.getFailedNode();
+            conditionTaskList = conditionsParameters.getSuccessNode().stream().map(String::valueOf).collect(Collectors.toList());
+            skipNodeList = conditionsParameters.getFailedNode().stream().map(String::valueOf).collect(Collectors.toList());
         } else if (taskInstance.getState().typeIsFailure()) {
-            conditionTaskList = conditionsParameters.getFailedNode();
-            skipNodeList = conditionsParameters.getSuccessNode();
+            conditionTaskList = conditionsParameters.getFailedNode().stream().map(String::valueOf).collect(Collectors.toList());
+            skipNodeList = conditionsParameters.getSuccessNode().stream().map(String::valueOf).collect(Collectors.toList());
         } else {
             conditionTaskList.add(nodeCode);
         }
@@ -395,27 +399,28 @@ public class DagHelper {
         if (!completeTaskList.containsKey(nodeCode)) {
             return conditionTaskList;
         }
-        conditionTaskList = skipTaskNode4Switch(taskNode, skipTaskNodeList, completeTaskList, dag);
+        conditionTaskList.add(String.valueOf(skipTaskNode4Switch(taskNode, skipTaskNodeList, completeTaskList, dag)));
         return conditionTaskList;
     }
 
-    private static List<String> skipTaskNode4Switch(TaskNode taskNode, Map<String, TaskNode> skipTaskNodeList,
-                                                    Map<String, TaskInstance> completeTaskList,
-                                                    DAG<String, TaskNode, TaskNodeRelation> dag) {
+    private static Long skipTaskNode4Switch(TaskNode taskNode, Map<String, TaskNode> skipTaskNodeList,
+                                            Map<String, TaskInstance> completeTaskList,
+                                            DAG<String, TaskNode, TaskNodeRelation> dag) {
 
         SwitchParameters switchParameters = completeTaskList.get(Long.toString(taskNode.getCode())).getSwitchDependency();
         int resultConditionLocation = switchParameters.getResultConditionLocation();
         List<SwitchResultVo> conditionResultVoList = switchParameters.getDependTaskList();
-        List<String> switchTaskList = conditionResultVoList.get(resultConditionLocation).getNextNode();
-        if (CollectionUtils.isEmpty(switchTaskList)) {
-            switchTaskList = new ArrayList<>();
+        Long switchTaskList = conditionResultVoList.get(resultConditionLocation).getNextNode();
+        if (switchTaskList == null) {
+            switchTaskList = 0L;
         }
         conditionResultVoList.remove(resultConditionLocation);
         for (SwitchResultVo info : conditionResultVoList) {
-            if (CollectionUtils.isEmpty(info.getNextNode())) {
+            Long nextNode = info.getNextNode();
+            if (nextNode == null || nextNode == 0L) {
                 continue;
             }
-            setTaskNodeSkip(info.getNextNode().get(0), dag, completeTaskList, skipTaskNodeList);
+            setTaskNodeSkip(String.valueOf(nextNode), dag, completeTaskList, skipTaskNodeList);
         }
         return switchTaskList;
     }

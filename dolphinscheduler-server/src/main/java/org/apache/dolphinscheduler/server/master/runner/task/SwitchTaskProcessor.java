@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
+import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.DependResult;
 import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.TaskType;
@@ -30,7 +31,6 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.utils.LogUtils;
 import org.apache.dolphinscheduler.server.utils.SwitchTaskUtils;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Date;
@@ -225,9 +225,15 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
         }
         while (m.find()) {
             String paramName = m.group(1);
-            Property property = globalParams.get(paramName);
+            Property property = globalParams.get(Constants.START_UP_PARAMS_PREFIX + paramName);
             if (property == null) {
-                return "";
+                property = globalParams.get(paramName);
+                if (property == null) {
+                    property = globalParams.get(Constants.GLOBAL_PARAMS_PREFIX + paramName);
+                    if (property == null) {
+                        return "";
+                    }
+                }
             }
             String value = property.getValue();
             if (!org.apache.commons.lang.math.NumberUtils.isNumber(value)) {
@@ -243,15 +249,7 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
      * check whether switch result is valid
      */
     private boolean isValidSwitchResult(SwitchResultVo switchResult) {
-        if (CollectionUtils.isEmpty(switchResult.getNextNode())) {
-            return false;
-        }
-        for (String nextNode : switchResult.getNextNode()) {
-            if (StringUtils.isEmpty(nextNode)) {
-                return false;
-            }
-        }
-        return true;
+        return switchResult.getNextNode() != null && switchResult.getNextNode() != 0L;
     }
 
 }

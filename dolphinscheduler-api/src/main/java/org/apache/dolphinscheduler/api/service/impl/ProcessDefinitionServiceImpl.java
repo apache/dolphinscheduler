@@ -43,11 +43,16 @@ import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNode;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
+import org.apache.dolphinscheduler.common.task.AbstractParameters;
+import org.apache.dolphinscheduler.common.task.conditions.ConditionsParameters;
+import org.apache.dolphinscheduler.common.task.switchtask.SwitchParameters;
+import org.apache.dolphinscheduler.common.task.switchtask.SwitchResultVo;
 import org.apache.dolphinscheduler.common.thread.Stopper;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.TaskParametersUtils;
 import org.apache.dolphinscheduler.dao.entity.DagData;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
@@ -107,6 +112,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -962,6 +968,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             taskDefinitionLog.setUpdateTime(now);
             taskDefinitionLog.setOperator(loginUser.getId());
             taskDefinitionLog.setOperateTime(now);
+            taskDefinitionLog.setTaskParams(taskDefinition.getTaskParams());
             try {
                 long code = CodeGenerateUtils.getInstance().genCode();
                 taskCodeMap.put(taskDefinitionLog.getCode(), code);
@@ -973,6 +980,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             }
             taskDefinitionLogList.add(taskDefinitionLog);
         }
+        taskDefinitionLogList.forEach(v -> v.setTaskParams(resetImportTaskParams(taskCodeMap, v)));
         int insert = taskDefinitionMapper.batchInsert(taskDefinitionLogList);
         int logInsert = taskDefinitionLogMapper.batchInsert(taskDefinitionLogList);
         if ((logInsert & insert) == 0) {
@@ -1033,6 +1041,64 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             }
         }
         return true;
+    }
+
+    private String resetImportTaskParams(Map<Long, Long> taskCodeMap, TaskDefinitionLog taskDefinition) {
+        String taskType = taskDefinition.getTaskType();
+        if (!TaskType.CONDITIONS.getDesc().equals(taskType) && !TaskType.SWITCH.getDesc().equals(taskType)) {
+            return taskDefinition.getTaskParams();
+        }
+
+        Map<String, Object> taskParamsMap = JSONUtils.parseObject(taskDefinition.getTaskParams(), new TypeReference<Map<String, Object>>() {});
+        if (taskParamsMap == null) {
+            taskParamsMap = new HashMap<>();
+        }
+        AbstractParameters switchParameters = TaskParametersUtils.getParameters(TaskType.SWITCH.getDesc(), JSONUtils.toJsonString(taskParamsMap.get(Constants.SWITCH_RESULT)));
+        if (switchParameters != null) {
+            taskParamsMap.put(Constants.SWITCH_RESULT, resetImportSwitchTaskParams(taskCodeMap, switchParameters));
+        }
+        AbstractParameters conditionParameters = TaskParametersUtils.getParameters(TaskType.CONDITIONS.getDesc(), JSONUtils.toJsonString(taskParamsMap.get(Constants.CONDITION_RESULT)));
+        if (conditionParameters != null) {
+            taskParamsMap.put(Constants.CONDITION_RESULT, resetImportConditionTaskParams(taskCodeMap, conditionParameters));
+        }
+        return JSONUtils.toJsonString(taskParamsMap);
+    }
+
+    private AbstractParameters resetImportSwitchTaskParams(Map<Long, Long> taskCodeMap, AbstractParameters parameter) {
+        SwitchParameters switchParameters = (SwitchParameters) parameter;
+        List<SwitchResultVo> dependTaskList = switchParameters.getDependTaskList();
+        if (CollectionUtils.isEmpty(dependTaskList)) {
+            return switchParameters;
+        }
+        for (SwitchResultVo resultVo : dependTaskList) {
+            Long nextNode = resultVo.getNextNode();
+            resultVo.setNextNode(taskCodeMap.get(nextNode));
+        }
+        Long nextNode = switchParameters.getNextNode();
+        switchParameters.setNextNode(taskCodeMap.get(nextNode));
+        return switchParameters;
+    }
+
+    private AbstractParameters resetImportConditionTaskParams(Map<Long, Long> taskCodeMap, AbstractParameters parameter) {
+        ConditionsParameters conditionsParameters = (ConditionsParameters) parameter;
+        List<Long> originalSuccessNode = conditionsParameters.getSuccessNode();
+        List<Long> originalFailedNode = conditionsParameters.getFailedNode();
+        if (CollectionUtils.isEmpty(originalSuccessNode) || CollectionUtils.isEmpty(originalFailedNode)) {
+            return conditionsParameters;
+        }
+        List<Long> resultSuccessNode = new ArrayList<>();
+        List<Long> resultFailedNode = new ArrayList<>();
+
+        if (CollectionUtils.isNotEmpty(originalSuccessNode)) {
+            originalSuccessNode.forEach(v -> resultSuccessNode.add(taskCodeMap.get(v)));
+        }
+        if (CollectionUtils.isNotEmpty(originalFailedNode)) {
+            originalFailedNode.forEach(v -> resultFailedNode.add(taskCodeMap.get(v)));
+        }
+
+        conditionsParameters.setSuccessNode(resultSuccessNode);
+        conditionsParameters.setFailedNode(resultFailedNode);
+        return conditionsParameters;
     }
 
     /**

@@ -446,15 +446,15 @@ public class DagHelperTest {
         SwitchParameters conditionsParameters = new SwitchParameters();
         SwitchResultVo switchResultVo1 = new SwitchResultVo();
         switchResultVo1.setCondition(" 2 == 1");
-        switchResultVo1.setNextNode("2");
+        switchResultVo1.setNextNode(2L);
         SwitchResultVo switchResultVo2 = new SwitchResultVo();
         switchResultVo2.setCondition(" 2 == 2");
-        switchResultVo2.setNextNode("4");
+        switchResultVo2.setNextNode(4L);
         List<SwitchResultVo> list = new ArrayList<>();
         list.add(switchResultVo1);
         list.add(switchResultVo2);
         conditionsParameters.setDependTaskList(list);
-        conditionsParameters.setNextNode("5");
+        conditionsParameters.setNextNode(5L);
         conditionsParameters.setRelation("AND");
 
         // in: AND(AND(1 is SUCCESS))

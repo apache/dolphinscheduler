@@ -32,10 +32,10 @@ public class ConditionsParameters extends AbstractParameters {
     private DependentRelation dependRelation;
 
     // node list to run when success
-    private List<String> successNode;
+    private List<Long> successNode;
 
     // node list to run when failed
-    private List<String> failedNode;
+    private List<Long> failedNode;
 
     @Override
     public boolean checkParameters() {
@@ -63,19 +63,19 @@ public class ConditionsParameters extends AbstractParameters {
         this.dependRelation = dependRelation;
     }
 
-    public List<String> getSuccessNode() {
+    public List<Long> getSuccessNode() {
         return successNode;
     }
 
-    public void setSuccessNode(List<String> successNode) {
+    public void setSuccessNode(List<Long> successNode) {
         this.successNode = successNode;
     }
 
-    public List<String> getFailedNode() {
+    public List<Long> getFailedNode() {
         return failedNode;
     }
 
-    public void setFailedNode(List<String> failedNode) {
+    public void setFailedNode(List<Long> failedNode) {
         this.failedNode = failedNode;
     }
 

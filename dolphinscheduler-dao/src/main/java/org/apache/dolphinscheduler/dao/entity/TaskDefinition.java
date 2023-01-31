@@ -294,7 +294,7 @@ public class TaskDefinition {
     public Map<String, String> getTaskParamMap() {
         if (taskParamMap == null && StringUtils.isNotEmpty(taskParams)) {
             JsonNode localParams = JSONUtils.parseObject(taskParams).findValue("localParams");
-            if (localParams != null) {
+            if (localParams != null && localParams.size() > 0) {
                 List<Property> propList = JSONUtils.toList(localParams.toString(), Property.class);
                 taskParamMap = propList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
             }

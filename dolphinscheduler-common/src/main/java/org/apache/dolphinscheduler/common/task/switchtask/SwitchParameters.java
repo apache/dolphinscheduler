@@ -21,6 +21,8 @@ import org.apache.dolphinscheduler.common.enums.DependentRelation;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 
+import org.apache.commons.collections.CollectionUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +30,7 @@ public class SwitchParameters extends AbstractParameters {
 
     private DependentRelation dependRelation;
     private String relation;
-    private List<String> nextNode;
+    private Long nextNode;
     private int resultConditionLocation;
     private List<SwitchResultVo> dependTaskList;
 
@@ -74,21 +76,18 @@ public class SwitchParameters extends AbstractParameters {
         this.dependTaskList = dependTaskList;
     }
 
-    public List<String> getNextNode() {
+    public Long getNextNode() {
         return nextNode;
     }
 
     public void setNextNode(Object nextNode) {
-        if (nextNode instanceof String) {
-            List<String> nextNodeList = new ArrayList<>();
-            nextNodeList.add(String.valueOf(nextNode));
-            this.nextNode = nextNodeList;
-        } else if (nextNode instanceof Number) {
-            List<String> nextNodeList = new ArrayList<>();
-            nextNodeList.add(nextNode.toString());
-            this.nextNode = nextNodeList;
+        if (nextNode instanceof Long) {
+            this.nextNode = (Long) nextNode;
         } else {
-            this.nextNode = (ArrayList) nextNode;
+            List<String> nextNodes = (ArrayList) nextNode;
+            if (CollectionUtils.isNotEmpty(nextNodes)) {
+                this.nextNode = Long.parseLong(nextNodes.get(0));
+            }
         }
     }
 }
