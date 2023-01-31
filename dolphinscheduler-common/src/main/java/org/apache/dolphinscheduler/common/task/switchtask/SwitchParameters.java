@@ -21,6 +21,8 @@ import org.apache.dolphinscheduler.common.enums.DependentRelation;
 import org.apache.dolphinscheduler.common.process.ResourceInfo;
 import org.apache.dolphinscheduler.common.task.AbstractParameters;
 
+import org.apache.commons.collections.CollectionUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,7 +80,14 @@ public class SwitchParameters extends AbstractParameters {
         return nextNode;
     }
 
-    public void setNextNode(Long nextNode) {
-        this.nextNode = nextNode;
+    public void setNextNode(Object nextNode) {
+        if (nextNode instanceof Long) {
+            this.nextNode = (Long) nextNode;
+        } else {
+            List<String> nextNodes = (ArrayList) nextNode;
+            if (CollectionUtils.isNotEmpty(nextNodes)) {
+                this.nextNode = Long.parseLong(nextNodes.get(0));
+            }
+        }
     }
 }
