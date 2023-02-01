@@ -234,7 +234,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * @return data source detail
      */
     @Override
-    public Map<String, Object> queryDataSource(int id) {
+    public Map<String, Object> queryDataSource(int id, User loginUser) {
 
         Map<String, Object> result = new HashMap<>();
         DataSource dataSource = dataSourceMapper.selectById(id);
@@ -243,6 +243,13 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
         }
+
+        if (!canOperatorPermissions(loginUser, new Object[]{dataSource.getId()}, AuthorizationType.DATASOURCE,
+                ApiFuncIdentificationConstant.DATASOURCE)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
+            return result;
+        }
+
         // type
         BaseDataSourceParamDTO baseDataSourceParamDTO = DataSourceUtils.buildDatasourceParamDTO(
                 dataSource.getType(), dataSource.getConnectionParams());
@@ -272,8 +279,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         Page<DataSource> dataSourcePage = new Page<>(pageNo, pageSize);
         PageInfo<DataSource> pageInfo = new PageInfo<>(pageNo, pageSize);
         if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
-            dataSourceList = dataSourceMapper.selectPaging(dataSourcePage,
-                    UserType.ADMIN_USER.equals(loginUser.getUserType()) ? 0 : loginUser.getId(), searchVal);
+            dataSourceList = dataSourceMapper.selectPaging(dataSourcePage, 0, searchVal);
         } else {
             Set<Integer> ids = resourcePermissionCheckService
                     .userOwnedResourceIdsAcquisition(AuthorizationType.DATASOURCE, loginUser.getId(), logger);
@@ -340,7 +346,6 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             datasourceList = dataSourceMapper.selectBatchIds(ids).stream()
                     .filter(dataSource -> dataSource.getType().getCode() == type)
                     .filter(dataSource -> dataSource.getTestFlag() == testFlag).collect(Collectors.toList());
-
         }
         result.put(Constants.DATA_LIST, datasourceList);
         putMsg(result, Status.SUCCESS);

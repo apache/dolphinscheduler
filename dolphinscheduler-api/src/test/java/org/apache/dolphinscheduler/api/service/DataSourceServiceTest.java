@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DATASOURCE;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
@@ -334,11 +336,19 @@ public class DataSourceServiceTest {
     @Test
     public void queryDataSourceTest() {
         Mockito.when(dataSourceMapper.selectById(Mockito.anyInt())).thenReturn(null);
-        Map<String, Object> result = dataSourceService.queryDataSource(Mockito.anyInt());
+        User loginUser = new User();
+        loginUser.setUserType(UserType.GENERAL_USER);
+        loginUser.setId(2);
+        Map<String, Object> result = dataSourceService.queryDataSource(Mockito.anyInt(), loginUser);
         Assertions.assertEquals(((Status) result.get(Constants.STATUS)).getCode(), Status.RESOURCE_NOT_EXIST.getCode());
 
-        Mockito.when(dataSourceMapper.selectById(Mockito.anyInt())).thenReturn(getOracleDataSource());
-        result = dataSourceService.queryDataSource(Mockito.anyInt());
+        DataSource dataSource = getOracleDataSource(1);
+        Mockito.when(dataSourceMapper.selectById(Mockito.anyInt())).thenReturn(dataSource);
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATASOURCE,
+                loginUser.getId(), DATASOURCE, baseServiceLogger)).thenReturn(true);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.DATASOURCE,
+                new Object[]{dataSource.getId()}, loginUser.getId(), baseServiceLogger)).thenReturn(true);
+        result = dataSourceService.queryDataSource(dataSource.getId(), loginUser);
         Assertions.assertEquals(((Status) result.get(Constants.STATUS)).getCode(), Status.SUCCESS.getCode());
     }
 

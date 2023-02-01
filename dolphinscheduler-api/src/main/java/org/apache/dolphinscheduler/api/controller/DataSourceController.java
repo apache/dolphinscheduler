@@ -141,7 +141,7 @@ public class DataSourceController extends BaseController {
     public Result queryDataSource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @PathVariable("id") int id) {
 
-        Map<String, Object> result = dataSourceService.queryDataSource(id);
+        Map<String, Object> result = dataSourceService.queryDataSource(id, loginUser);
         return returnDataList(result);
     }
 
