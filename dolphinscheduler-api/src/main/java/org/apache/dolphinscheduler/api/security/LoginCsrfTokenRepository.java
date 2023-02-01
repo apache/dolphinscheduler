@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.api.security;
 
-import org.apache.dolphinscheduler.api.controller.LoginController;
-
 import java.util.UUID;
 
 import javax.servlet.http.Cookie;
@@ -44,18 +42,15 @@ public final class LoginCsrfTokenRepository implements CsrfTokenRepository {
      */
     @Override
     public CsrfToken generateToken(HttpServletRequest request) {
-        return new DefaultCsrfToken(HEADER_NAME, PARAMETER_NAME, createNewToken());
+        return new DefaultCsrfToken(HEADER_NAME, PARAMETER_NAME, UUID.randomUUID().toString());
     }
 
-    /**
-     * The csrf token will be stored in the http request so that the login api {@link LoginController} can obtain the csrf token
-     * @param token csrf token generated in {@link CsrfFilter}
-     * @param request http servlet request
-     * @param response http servlet response
-     */
     @Override
     public void saveToken(CsrfToken token, HttpServletRequest request, HttpServletResponse response) {
-        // none
+        Cookie cookie = new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, generateToken(request).getToken());
+        cookie.setSecure(true);
+        cookie.setHttpOnly(true);
+        response.addCookie(cookie);
     }
 
     /**
@@ -72,10 +67,6 @@ public final class LoginCsrfTokenRepository implements CsrfTokenRepository {
             String token = cookie.getValue();
             return !StringUtils.hasLength(token) ? null : new DefaultCsrfToken(HEADER_NAME, PARAMETER_NAME, token);
         }
-    }
-
-    private String createNewToken() {
-        return UUID.randomUUID().toString();
     }
 
 }

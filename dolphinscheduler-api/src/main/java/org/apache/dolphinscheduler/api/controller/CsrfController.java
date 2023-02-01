@@ -14,15 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.dolphinscheduler.api.controller;
 
-interface LoginReq {
-  userName: string
-  userPassword: string
+import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class CsrfController {
+
+    @RequestMapping("/csrf")
+    public CsrfToken csrf(CsrfToken token) {
+        return token;
+    }
 }
-
-interface LoginRes {
-  securityConfigType: string
-  sessionId: string,
-}
-
-export { LoginReq, LoginRes }

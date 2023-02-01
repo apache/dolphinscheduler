@@ -18,14 +18,17 @@
 import { useRouter } from 'vue-router'
 import { login } from '@/service/modules/login'
 import { getUserInfo } from '@/service/modules/users'
+import { getCsrfToken } from '@/service/modules/csrf'
 import { useUserStore } from '@/store/user/user'
 import type { Router } from 'vue-router'
 import type { LoginRes } from '@/service/modules/login/types'
 import type { UserInfoRes } from '@/service/modules/users/types'
+import type { CsrfToken } from '@/service/modules/csrf/types'
 import { useRouteStore } from '@/store/route/route'
 import { useTimezoneStore } from '@/store/timezone/timezone'
 import { useCsrfTokenStore } from '@/store/csrf-token/csrf-token'
 import cookies from 'js-cookie'
+
 
 export function useLogin(state: any) {
   const router: Router = useRouter()
@@ -37,10 +40,14 @@ export function useLogin(state: any) {
   const handleLogin = () => {
     state.loginFormRef.validate(async (valid: any) => {
       if (!valid) {
+        await getCsrfToken().then((res: CsrfToken) => {
+          csrfTokenStore.setCsrfToken(res.token)
+        })
+
         const loginRes: LoginRes = await login({ ...state.loginForm })
         await userStore.setSessionId(loginRes.sessionId)
         await userStore.setSecurityConfigType(loginRes.securityConfigType)
-        await csrfTokenStore.setCsrfToken(loginRes.csrfToken)
+
         cookies.set('sessionId', loginRes.sessionId, { path: '/' })
         const userInfoRes: UserInfoRes = await getUserInfo()
         await userStore.setUserInfo(userInfoRes)
@@ -59,3 +66,4 @@ export function useLogin(state: any) {
     handleLogin
   }
 }
+

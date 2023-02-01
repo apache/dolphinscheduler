@@ -55,13 +55,16 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
     /**
      * Intercept the execution of a handler. Called after HandlerMapping determined
      *
-     * @param request current HTTP request
+     * @param request  current HTTP request
      * @param response current HTTP response
-     * @param handler chosen handler to execute, for type and/or instance evaluation
+     * @param handler  chosen handler to execute, for type and/or instance evaluation
      * @return boolean true or false
      */
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        if ("/dolphinscheduler/csrf".equals(request.getRequestURI())) {
+            return true;
+        }
         // get token
         String token = request.getHeader("token");
         User user;

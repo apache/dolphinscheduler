@@ -14,15 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-interface LoginReq {
-  userName: string
-  userPassword: string
+export interface CsrfToken {
+    token: string
+    parameterName: string
+    headerName: string
 }
-
-interface LoginRes {
-  securityConfigType: string
-  sessionId: string,
-}
-
-export { LoginReq, LoginRes }

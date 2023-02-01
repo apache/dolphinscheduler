@@ -31,7 +31,7 @@ public class CsrfConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf().ignoringRequestMatchers().ignoringRequestMatchers(new RequestHeaderRequestMatcher("token"))
-                .ignoringAntMatchers("/login").csrfTokenRepository(new LoginCsrfTokenRepository());
+                .csrfTokenRepository(new LoginCsrfTokenRepository());
         return http.build();
     }
 }

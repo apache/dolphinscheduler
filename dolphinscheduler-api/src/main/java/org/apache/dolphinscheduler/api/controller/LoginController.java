@@ -25,14 +25,12 @@ import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.security.Authenticator;
-import org.apache.dolphinscheduler.api.security.LoginCsrfTokenRepository;
 import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpStatus;
 
 import java.util.Map;
 
@@ -41,7 +39,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -107,11 +104,6 @@ public class LoginController extends BaseController {
             return result;
         }
 
-        // csrf token
-        result.getData().put(LoginCsrfTokenRepository.COOKIE_NAME,
-                ((CsrfToken) request.getAttribute(LoginCsrfTokenRepository.PARAMETER_NAME)).getToken());
-
-        response.setStatus(HttpStatus.SC_OK);
         Map<String, String> cookieMap = result.getData();
         for (Map.Entry<String, String> cookieEntry : cookieMap.entrySet()) {
             Cookie cookie = new Cookie(cookieEntry.getKey(), cookieEntry.getValue());
