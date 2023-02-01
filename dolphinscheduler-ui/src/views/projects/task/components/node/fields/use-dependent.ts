@@ -17,7 +17,7 @@
 
 import { ref, onMounted, watch, h } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { NEllipsis, NIcon } from 'naive-ui'
+import { NIcon } from 'naive-ui'
 import { useRelationCustomParams, useDependentTimeout } from '.'
 import { useTaskNodeStore } from '@/store/project/task-node'
 import { queryAllProjectListForDependent } from '@/service/modules/projects'
@@ -182,7 +182,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
     const result = await queryAllProjectListForDependent()
     projectList.value = result.map((item: { code: number; name: string }) => ({
       value: item.code,
-      label: () => h(NEllipsis, null, item.name)
+      label: item.name
     }))
     return projectList
   }
@@ -193,7 +193,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
     const result = await queryProcessDefinitionList(code)
     const processList = result.map((item: { code: number; name: string }) => ({
       value: item.code,
-      label: () => h(NEllipsis, null, item.name)
+      label: item.name
     }))
     processCache[code] = processList
 
@@ -207,7 +207,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
     const result = await getTasksByDefinitionList(code, processCode)
     const taskList = result.map((item: { code: number; name: string }) => ({
       value: item.code,
-      label: () => h(NEllipsis, null, item.name)
+      label: item.name
     }))
     taskList.unshift({
       value: 0,
