@@ -22,7 +22,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.security.LoginCsrfTokenRepository;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -73,8 +72,8 @@ public class LoginControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/signOut")
                 .header("sessionId", sessionId)
-                .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
-                .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                .cookie(new Cookie(CSRF_COOKIE_NAME, csrfToken))
+                .header(CSRF_HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

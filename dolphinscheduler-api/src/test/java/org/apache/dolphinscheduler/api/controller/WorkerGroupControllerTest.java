@@ -23,7 +23,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.apache.dolphinscheduler.api.security.LoginCsrfTokenRepository;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -78,8 +77,8 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
         paramsMap.add("otherParamsJson", "");
         MvcResult mvcResult = mockMvc.perform(post("/worker-groups")
                 .header("sessionId", sessionId)
-                .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
-                .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                .cookie(new Cookie(CSRF_COOKIE_NAME, csrfToken))
+                .header(CSRF_HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -146,8 +145,8 @@ public class WorkerGroupControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(delete("/worker-groups/{id}", "12")
                 .header("sessionId", sessionId)
-                .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
-                .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken))
+                .cookie(new Cookie(CSRF_COOKIE_NAME, csrfToken))
+                .header(CSRF_HEADER_NAME, csrfToken))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();

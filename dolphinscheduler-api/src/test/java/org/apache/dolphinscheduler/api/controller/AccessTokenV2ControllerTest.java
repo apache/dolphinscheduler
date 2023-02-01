@@ -22,7 +22,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.security.LoginCsrfTokenRepository;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
@@ -53,8 +52,8 @@ public class AccessTokenV2ControllerTest extends AbstractControllerTest {
         paramsMap.put("token", "607f5aeaaa2093dbdff5d5522ce00510");
         MvcResult mvcResult = mockMvc.perform(post("/v2/access-tokens")
                 .header("sessionId", sessionId)
-                .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
-                .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                .cookie(new Cookie(CSRF_COOKIE_NAME, csrfToken))
+                .header(CSRF_HEADER_NAME, csrfToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JSONUtils.toJsonString(paramsMap)))
                 .andExpect(status().isCreated())
@@ -75,8 +74,8 @@ public class AccessTokenV2ControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = this.mockMvc
                 .perform(post("/v2/access-tokens")
                         .header("sessionId", this.sessionId)
-                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
-                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                        .cookie(new Cookie(CSRF_COOKIE_NAME, csrfToken))
+                        .header(CSRF_HEADER_NAME, csrfToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(JSONUtils.toJsonString(paramsMap)))
                 .andExpect(status().isCreated())
@@ -96,8 +95,8 @@ public class AccessTokenV2ControllerTest extends AbstractControllerTest {
         paramsMap.put("token", "507f5aeaaa2093dbdff5d5522ce00510");
         MvcResult mvcResult = mockMvc.perform(post("/v2/access-tokens")
                 .header("sessionId", sessionId)
-                .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
-                .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                .cookie(new Cookie(CSRF_COOKIE_NAME, csrfToken))
+                .header(CSRF_HEADER_NAME, csrfToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JSONUtils.toJsonString(paramsMap)))
                 .andExpect(status().isCreated())

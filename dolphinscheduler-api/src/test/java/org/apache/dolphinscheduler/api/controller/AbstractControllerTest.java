@@ -72,6 +72,10 @@ public abstract class AbstractControllerTest {
 
     protected String csrfToken;
 
+    protected String CSRF_COOKIE_NAME = "XSRF-TOKEN";
+
+    protected String CSRF_HEADER_NAME = "X-XSRF-TOKEN";
+
     @BeforeEach
     public void setUp() {
         user = usersService.queryUser(1);

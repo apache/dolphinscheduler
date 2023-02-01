@@ -23,7 +23,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.security.LoginCsrfTokenRepository;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
@@ -61,8 +60,8 @@ public class UsersControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/users/create")
                 .header(SESSION_ID, sessionId)
-                .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
-                .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                .cookie(new Cookie(CSRF_COOKIE_NAME, csrfToken))
+                .header(CSRF_HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -86,8 +85,8 @@ public class UsersControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/users/update")
                 .header(SESSION_ID, sessionId)
-                .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
-                .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                .cookie(new Cookie(CSRF_COOKIE_NAME, csrfToken))
+                .header(CSRF_HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -105,8 +104,8 @@ public class UsersControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/users/grant-project")
                 .header(SESSION_ID, sessionId)
-                .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
-                .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                .cookie(new Cookie(CSRF_COOKIE_NAME, csrfToken))
+                .header(CSRF_HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -126,8 +125,8 @@ public class UsersControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = this.mockMvc
                 .perform(post("/users/grant-project-by-code")
                         .header(SESSION_ID, this.sessionId)
-                        .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
-                        .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                        .cookie(new Cookie(CSRF_COOKIE_NAME, csrfToken))
+                        .header(CSRF_HEADER_NAME, csrfToken)
                         .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -146,8 +145,8 @@ public class UsersControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = this.mockMvc.perform(post("/users/revoke-project")
                 .header(SESSION_ID, this.sessionId)
-                .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
-                .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                .cookie(new Cookie(CSRF_COOKIE_NAME, csrfToken))
+                .header(CSRF_HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -166,8 +165,8 @@ public class UsersControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/users/grant-file")
                 .header(SESSION_ID, sessionId)
-                .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
-                .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                .cookie(new Cookie(CSRF_COOKIE_NAME, csrfToken))
+                .header(CSRF_HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -186,8 +185,8 @@ public class UsersControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/users/grant-udf-func")
                 .header(SESSION_ID, sessionId)
-                .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
-                .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                .cookie(new Cookie(CSRF_COOKIE_NAME, csrfToken))
+                .header(CSRF_HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -206,8 +205,8 @@ public class UsersControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/users/grant-datasource")
                 .header(SESSION_ID, sessionId)
-                .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
-                .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                .cookie(new Cookie(CSRF_COOKIE_NAME, csrfToken))
+                .header(CSRF_HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -309,8 +308,8 @@ public class UsersControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/users/delete")
                 .header(SESSION_ID, sessionId)
-                .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
-                .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                .cookie(new Cookie(CSRF_COOKIE_NAME, csrfToken))
+                .header(CSRF_HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -345,8 +344,8 @@ public class UsersControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/users/register")
                 .header(SESSION_ID, sessionId)
-                .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
-                .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                .cookie(new Cookie(CSRF_COOKIE_NAME, csrfToken))
+                .header(CSRF_HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -364,8 +363,8 @@ public class UsersControllerTest extends AbstractControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/users/activate")
                 .header(SESSION_ID, sessionId)
-                .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
-                .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                .cookie(new Cookie(CSRF_COOKIE_NAME, csrfToken))
+                .header(CSRF_HEADER_NAME, csrfToken)
                 .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -384,8 +383,8 @@ public class UsersControllerTest extends AbstractControllerTest {
         String jsonUserNames = JSONUtils.toJsonString(userNames);
         MvcResult mvcResult = mockMvc.perform(post("/users/batch/activate")
                 .header(SESSION_ID, sessionId)
-                .cookie(new Cookie(LoginCsrfTokenRepository.COOKIE_NAME, csrfToken))
-                .header(LoginCsrfTokenRepository.HEADER_NAME, csrfToken)
+                .cookie(new Cookie(CSRF_COOKIE_NAME, csrfToken))
+                .header(CSRF_HEADER_NAME, csrfToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonUserNames))
                 .andExpect(status().isOk())
