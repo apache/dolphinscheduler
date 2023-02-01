@@ -132,19 +132,24 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
     private void init() throws NullPointerException {
         try {
             configuration = new HdfsConfiguration();
-
-            String hdfsUser = hdfsProperties.getUser();
+            String hadoopConfDir = System.getenv("HADOOP_CONF_DIR");
+            if(StringUtils.isNotBlank(hadoopConfDir)){
+                configuration.addResource(new Path(hadoopConfDir,"hdfs-site.xml"));
+                configuration.addResource(new Path(hadoopConfDir,"core-site.xml"));
+            }
+            boolean isKerberosAuthen = false;
             if (CommonUtils.loadKerberosConf(configuration)) {
-                hdfsUser = "";
+                isKerberosAuthen = true;
             }
 
             String defaultFS = getDefaultFS();
             // first get key from core-site.xml hdfs-site.xml ,if null ,then try to get from properties file
             // the default is the local file system
             if (StringUtils.isNotBlank(defaultFS)) {
-                Map<String, String> fsRelatedProps = PropertyUtils.getPrefixedProperties("fs.");
                 configuration.set(Constants.HDFS_DEFAULT_FS, defaultFS);
-                fsRelatedProps.forEach((key, value) -> configuration.set(key, value));
+                // todo : question - Is this convenient for users to configure HDFS? And Whether it is convenient enough to configure environment variables `HADOOP_CONF_DIR`
+                Map<String, String> fsRelatedProps = PropertyUtils.getPrefixedProperties("resource.hdfs.fs.");
+                fsRelatedProps.forEach((key, value) -> configuration.set(key.substring(14), value));
             } else {
                 logger.error("property:{} can not to be empty, please set!", Constants.FS_DEFAULT_FS);
                 throw new NullPointerException(
@@ -152,19 +157,22 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
             }
 
             if (!defaultFS.startsWith("file")) {
-                logger.info("get property:{} -> {}, from core-site.xml hdfs-site.xml ", Constants.FS_DEFAULT_FS,
+                logger.info("get property:{} -> {}, will use HDFS storage", Constants.FS_DEFAULT_FS,
                         defaultFS);
             }
 
-            if (StringUtils.isNotEmpty(hdfsUser)) {
+            String hdfsUser = hdfsProperties.getUser();
+            if (!isKerberosAuthen && StringUtils.isNotEmpty(hdfsUser)) {
                 UserGroupInformation ugi = UserGroupInformation.createRemoteUser(hdfsUser);
                 ugi.doAs((PrivilegedExceptionAction<Boolean>) () -> {
                     fs = FileSystem.get(configuration);
                     return true;
                 });
             } else {
-                logger.warn("resource.hdfs.root.user is not set value!");
                 fs = FileSystem.get(configuration);
+                if(!isKerberosAuthen){
+                    logger.warn("resource.hdfs.root.user is not set value!");
+                }
             }
 
         } catch (Exception e) {
@@ -184,7 +192,8 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
      */
     public String getDefaultFS() {
         String defaultFS = getConfiguration().get(Constants.FS_DEFAULT_FS);
-        if (StringUtils.isBlank(defaultFS)) {
+        if (StringUtils.isBlank(defaultFS) || defaultFS.equals("file:///")) {
+            logger.info("the property [{}] value from core-site.xml is [{}] . It is not the expected value, will use the config value in common.properties.", Constants.HDFS_DEFAULT_FS,  defaultFS);
             defaultFS = hdfsProperties.getDefaultFS();
         }
         return defaultFS;
