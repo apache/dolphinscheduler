@@ -56,7 +56,7 @@ public class TaskEventProcessor implements NettyRequestProcessor {
                 .processInstanceId(taskEventChangeCommand.getProcessInstanceId())
                 .taskInstanceId(taskEventChangeCommand.getTaskInstanceId())
                 .key(taskEventChangeCommand.getKey())
-                .type(StateEventType.WAIT_TASK_GROUP)
+                .type(StateEventType.WAKE_UP_TASK_GROUP)
                 .build();
         try {
             LoggerUtils.setWorkflowAndTaskInstanceIDMDC(stateEvent.getProcessInstanceId(),

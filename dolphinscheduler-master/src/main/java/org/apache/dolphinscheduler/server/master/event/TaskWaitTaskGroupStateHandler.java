@@ -30,13 +30,19 @@ public class TaskWaitTaskGroupStateHandler implements StateEventHandler {
     private static final Logger logger = LoggerFactory.getLogger(TaskWaitTaskGroupStateHandler.class);
 
     @Override
-    public boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable, StateEvent stateEvent) {
+    public boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable,
+                                    StateEvent stateEvent) {
         logger.info("Handle task instance wait task group event, taskInstanceId: {}", stateEvent.getTaskInstanceId());
-        return workflowExecuteRunnable.checkForceStartAndWakeUp(stateEvent);
+        if (workflowExecuteRunnable.checkForceStartAndWakeUp(stateEvent)) {
+            logger.info("Success wake up task instance, taskInstanceId: {}", stateEvent.getTaskInstanceId());
+        } else {
+            logger.info("Failed to wake up task instance, taskInstanceId: {}", stateEvent.getTaskInstanceId());
+        }
+        return true;
     }
 
     @Override
     public StateEventType getEventType() {
-        return StateEventType.WAIT_TASK_GROUP;
+        return StateEventType.WAKE_UP_TASK_GROUP;
     }
 }

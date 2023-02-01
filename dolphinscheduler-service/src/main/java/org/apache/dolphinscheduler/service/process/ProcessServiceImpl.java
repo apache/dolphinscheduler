@@ -3135,6 +3135,7 @@ public class ProcessServiceImpl implements ProcessService {
                 processInstance.getId(), taskId);
         Host host = new Host(processInstance.getHost());
         stateEventCallbackService.sendResult(host, taskEventChangeCommand.convert2Command(taskType));
+        logger.info("Success send command to master: {}, command: {}", host, taskEventChangeCommand);
     }
 
     @Override

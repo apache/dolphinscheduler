@@ -443,7 +443,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                     TaskStateEvent nextEvent = TaskStateEvent.builder()
                             .processInstanceId(processInstance.getId())
                             .taskInstanceId(nextTaskInstance.getId())
-                            .type(StateEventType.WAIT_TASK_GROUP)
+                            .type(StateEventType.WAKE_UP_TASK_GROUP)
                             .build();
                     this.stateEvents.add(nextEvent);
                 } else {
