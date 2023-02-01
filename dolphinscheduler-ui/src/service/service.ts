@@ -74,11 +74,11 @@ const err = (err: AxiosError): Promise<AxiosError> => {
 }
 
 service.interceptors.request.use((config: AxiosRequestConfig<any>) => {
-  config.headers && (config.headers.sessionId = userStore.getSessionId)
-  config.headers && (config.headers['X-XSRF-TOKEN'] = csrfTokenStore.getCsrfToken)
+
   const language = cookies.get('language')
   config.headers = config.headers || {}
-  config.headers.sessionId = userStore.getSessionId
+  config.headers && (config.headers.sessionId = userStore.getSessionId)
+  config.headers && (config.headers['X-XSRF-TOKEN'] = csrfTokenStore.getCsrfToken)
   if (language) config.headers.language = language
   return config
 }, err)
