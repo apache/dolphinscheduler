@@ -668,6 +668,9 @@
                         </excludes>
                         <flexmark />
                     </markdown>
+                    <upToDateChecking>
+                        <enabled>true</enabled>
+                    </upToDateChecking>
                 </configuration>
                 <executions>
                     <execution>

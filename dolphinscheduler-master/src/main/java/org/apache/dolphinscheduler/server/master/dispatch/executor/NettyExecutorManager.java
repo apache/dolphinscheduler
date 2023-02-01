@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
+import org.apache.dolphinscheduler.server.master.dispatch.exceptions.WorkerGroupNotFoundException;
 import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskRecallProcessor;
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
@@ -92,7 +93,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
      * @throws ExecuteException if error throws ExecuteException
      */
     @Override
-    public Boolean execute(ExecutionContext context) throws ExecuteException {
+    public void execute(ExecutionContext context) throws ExecuteException {
         // all nodes
         Set<String> allNodes = getAllNodes(context);
         // fail nodes
@@ -101,23 +102,22 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
         Command command = context.getCommand();
         // execute task host
         Host host = context.getHost();
-        boolean success = false;
-        while (!success) {
+        for (int i = 0; i < allNodes.size(); i++) {
             try {
                 doExecute(host, command);
-                success = true;
                 context.setHost(host);
                 // We set the host to taskInstance to avoid when the worker down, this taskInstance may not be
                 // failovered, due to the taskInstance's host
                 // is not belongs to the down worker ISSUE-10842.
                 context.getTaskInstance().setHost(host.getAddress());
+                return;
             } catch (ExecuteException ex) {
                 logger.error("Execute command {} error", command, ex);
                 try {
                     failNodeSet.add(host.getAddress());
                     Set<String> tmpAllIps = new HashSet<>(allNodes);
                     Collection<String> remained = CollectionUtils.subtract(tmpAllIps, failNodeSet);
-                    if (remained != null && remained.size() > 0) {
+                    if (CollectionUtils.isNotEmpty(remained)) {
                         host = Host.of(remained.iterator().next());
                         logger.error("retry execute command : {} host : {}", command, host);
                     } else {
@@ -128,8 +128,6 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
                 }
             }
         }
-
-        return success;
     }
 
     @Override
@@ -171,7 +169,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
      * @param context context
      * @return nodes
      */
-    private Set<String> getAllNodes(ExecutionContext context) {
+    private Set<String> getAllNodes(ExecutionContext context) throws WorkerGroupNotFoundException {
         Set<String> nodes = Collections.emptySet();
         /**
          * executor type

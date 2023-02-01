@@ -58,6 +58,8 @@ import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
+import org.apache.dolphinscheduler.api.service.TaskDefinitionLogService;
+import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.service.WorkFlowLineageService;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.FileUtils;
@@ -96,6 +98,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskMainInfo;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.UserWithProcessDefinitionCode;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
@@ -110,6 +113,7 @@ import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
 import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.SqlType;
@@ -197,6 +201,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     @Autowired
     private ProcessDefinitionDao processDefinitionDao;
 
+    @Autowired
+    private ProcessDefinitionLogDao processDefinitionLogDao;
     @Lazy
     @Autowired
     private ProcessInstanceService processInstanceService;
@@ -221,6 +227,13 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
     @Autowired
     TaskDefinitionLogMapper taskDefinitionLogMapper;
+
+    @Lazy
+    @Autowired
+    private TaskDefinitionService taskDefinitionService;
+
+    @Autowired
+    private TaskDefinitionLogService taskDefinitionLogService;
 
     @Autowired
     private TaskDefinitionMapper taskDefinitionMapper;
@@ -592,13 +605,16 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         Map<Long, Schedule> scheduleMap = schedulerService.queryScheduleByProcessDefinitionCodes(processDefinitionCodes)
                 .stream()
                 .collect(Collectors.toMap(Schedule::getProcessDefinitionCode, Function.identity()));
-
+        List<UserWithProcessDefinitionCode> userWithCodes = userMapper.queryUserWithProcessDefinitionCode(
+                processDefinitionCodes);
         for (ProcessDefinition pd : processDefinitions) {
-            // todo: use batch query
-            ProcessDefinitionLog processDefinitionLog =
-                    processDefinitionLogMapper.queryByDefinitionCodeAndVersion(pd.getCode(), pd.getVersion());
-            User user = userMapper.selectById(processDefinitionLog.getOperator());
-            pd.setModifyBy(user.getUserName());
+            userWithCodes.stream()
+                    .filter(userWithCode -> userWithCode.getProcessDefinitionCode() == pd.getCode()
+                            && userWithCode.getProcessDefinitionVersion() == pd.getVersion())
+                    .findAny().ifPresent(userWithCode -> {
+                        pd.setModifyBy(userWithCode.getModifierName());
+                        pd.setUserName(userWithCode.getCreatorName());
+                    });
             Schedule schedule = scheduleMap.get(pd.getCode());
             pd.setScheduleReleaseState(schedule == null ? null : schedule.getReleaseState());
         }
@@ -1040,19 +1056,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
     }
 
-    /**
-     * delete process definition by code
-     *
-     * @param loginUser login user
-     * @param code process definition code
-     */
-    @Override
-    @Transactional
     public void deleteProcessDefinitionByCode(User loginUser, long code) {
-        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(code);
-        if (processDefinition == null) {
-            throw new ServiceException(Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(code));
-        }
+        ProcessDefinition processDefinition = processDefinitionDao.queryByCode(code)
+                .orElseThrow(() -> new ServiceException(PROCESS_DEFINE_NOT_EXIST, String.valueOf(code)));
 
         Project project = projectMapper.queryByCode(processDefinition.getProjectCode());
         // check user access for project
@@ -1078,38 +1084,22 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 throw new ServiceException(Status.SCHEDULE_STATE_ONLINE, scheduleObj.getId());
             }
         }
-        List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper
-                .queryByProcessCode(project.getCode(), processDefinition.getCode());
-        if (CollectionUtils.isNotEmpty(processTaskRelations)) {
-            Set<Long> taskCodeList = new HashSet<>(processTaskRelations.size() * 2);
-            for (ProcessTaskRelation processTaskRelation : processTaskRelations) {
-                if (processTaskRelation.getPreTaskCode() != 0) {
-                    taskCodeList.add(processTaskRelation.getPreTaskCode());
-                }
-                if (processTaskRelation.getPostTaskCode() != 0) {
-                    taskCodeList.add(processTaskRelation.getPostTaskCode());
-                }
-            }
-            if (CollectionUtils.isNotEmpty(taskCodeList)) {
-                int i = taskDefinitionMapper.deleteByBatchCodes(new ArrayList<>(taskCodeList));
-                if (i != taskCodeList.size()) {
-                    logger.error("Delete task definition error, processDefinitionCode:{}.", code);
-                    throw new ServiceException(Status.DELETE_TASK_DEFINE_BY_CODE_ERROR);
-                }
-            }
-        }
-        int delete = processDefinitionMapper.deleteById(processDefinition.getId());
-        if (delete == 0) {
-            logger.error("Delete process definition error, processDefinitionCode:{}.", code);
-            throw new ServiceException(Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR);
-        }
-        int deleteRelation = processTaskRelationMapper.deleteByCode(project.getCode(), processDefinition.getCode());
-        if (deleteRelation == 0) {
-            logger.warn(
-                    "The process definition has not relation, it will be delete successfully, processDefinitionCode:{}.",
-                    code);
-        }
+
+        // delete workflow instance, will delete workflow instance, sub workflow instance, task instance, alert
+        processInstanceService.deleteProcessInstanceByWorkflowDefinitionCode(processDefinition.getCode());
+        // delete task definition
+        taskDefinitionService.deleteTaskByWorkflowDefinitionCode(processDefinition.getCode(),
+                processDefinition.getVersion());
+        // delete task definition log
+        taskDefinitionLogService.deleteTaskByWorkflowDefinitionCode(processDefinition.getCode());
+        // delete workflow definition log
+        processDefinitionLogDao.deleteByWorkflowDefinitionCode(processDefinition.getCode());
         deleteOtherRelation(project, new HashMap<>(), processDefinition);
+
+        // we delete the workflow definition at last to avoid using transaction here.
+        // If delete error, we can call this interface again.
+        processDefinitionDao.deleteByWorkflowDefinitionCode(processDefinition.getCode());
+        logger.info("Success delete workflow definition workflowDefinitionCode: {}", code);
     }
 
     /**

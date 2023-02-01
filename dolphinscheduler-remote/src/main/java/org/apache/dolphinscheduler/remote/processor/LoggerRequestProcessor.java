@@ -36,8 +36,6 @@ import org.apache.dolphinscheduler.remote.command.log.RollViewLogResponseCommand
 import org.apache.dolphinscheduler.remote.command.log.ViewLogRequestCommand;
 import org.apache.dolphinscheduler.remote.command.log.ViewLogResponseCommand;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -76,9 +74,6 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                 GetLogBytesRequestCommand getLogRequest = JSONUtils.parseObject(
                         command.getBody(), GetLogBytesRequestCommand.class);
                 String path = getLogRequest.getPath();
-                if (!checkPathSecurity(path)) {
-                    throw new IllegalArgumentException("Illegal path: " + path);
-                }
                 byte[] bytes = getFileContentBytes(path);
                 GetLogBytesResponseCommand getLogResponse = new GetLogBytesResponseCommand(bytes);
                 channel.writeAndFlush(getLogResponse.convert2Command(command.getOpaque()));
@@ -87,9 +82,6 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                 ViewLogRequestCommand viewLogRequest = JSONUtils.parseObject(
                         command.getBody(), ViewLogRequestCommand.class);
                 String viewLogPath = viewLogRequest.getPath();
-                if (!checkPathSecurity(viewLogPath)) {
-                    throw new IllegalArgumentException("Illegal path: " + viewLogPath);
-                }
                 String msg = LogUtils.readWholeFileContent(viewLogPath);
                 ViewLogResponseCommand viewLogResponse = new ViewLogResponseCommand(msg);
                 channel.writeAndFlush(viewLogResponse.convert2Command(command.getOpaque()));
@@ -99,9 +91,6 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                         command.getBody(), RollViewLogRequestCommand.class);
 
                 String rollViewLogPath = rollViewLogRequest.getPath();
-                if (!checkPathSecurity(rollViewLogPath)) {
-                    throw new IllegalArgumentException("Illegal path: " + rollViewLogPath);
-                }
 
                 List<String> lines = readPartFileContent(rollViewLogPath,
                         rollViewLogRequest.getSkipLineNum(), rollViewLogRequest.getLimit());
@@ -134,9 +123,6 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                         command.getBody(), RemoveTaskLogRequestCommand.class);
 
                 String taskLogPath = removeTaskLogRequest.getPath();
-                if (!checkPathSecurity(taskLogPath)) {
-                    throw new IllegalArgumentException("Illegal path: " + taskLogPath);
-                }
                 File taskLogFile = new File(taskLogPath);
                 boolean status = true;
                 try {
@@ -155,9 +141,6 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                         JSONUtils.parseObject(command.getBody(), GetAppIdRequestCommand.class);
                 String appInfoPath = getAppIdRequestCommand.getAppInfoPath();
                 String logPath = getAppIdRequestCommand.getLogPath();
-                if (!checkPathSecurity(appInfoPath) || !checkPathSecurity(logPath)) {
-                    throw new IllegalArgumentException("Illegal path");
-                }
                 List<String> appIds = LogUtils.getAppIds(logPath, appInfoPath,
                         PropertyUtils.getString(APPID_COLLECT, DEFAULT_COLLECT_WAY));
                 channel.writeAndFlush(
@@ -165,24 +148,6 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                 break;
             default:
                 throw new IllegalArgumentException("unknown commandType: " + commandType);
-        }
-    }
-
-    /**
-     * LogServer only can read the logs dir.
-     * @param path
-     * @return
-     */
-    private boolean checkPathSecurity(String path) {
-        String dsHome = System.getProperty("DOLPHINSCHEDULER_WORKER_HOME");
-        if (StringUtils.isBlank(dsHome)) {
-            dsHome = System.getProperty("user.dir");
-        }
-        if (StringUtils.isBlank(path)) {
-            logger.warn("path is null");
-            return false;
-        } else {
-            return path.startsWith(dsHome) && !path.contains("../") && path.endsWith(".log");
         }
     }
 

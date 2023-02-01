@@ -51,16 +51,26 @@ DolphinScheduler 的工作计划：<a href="https://github.com/apache/dolphinsch
 
 ## 快速试用 Docker
 
-请参考官方文档: [快速试用 Docker 部署](https://dolphinscheduler.apache.org/#/zh-cn/docs/3.1.2/guide/start/docker)
+请参考官方文档: [快速试用 Docker 部署](https://dolphinscheduler.apache.org/zh-cn/docs/3.1.2/guide/start/docker)
 
 ## 快速试用 Kubernetes
 
-请参考官方文档: [快速试用 Kubernetes 部署](http://dolphinscheduler.apache.org/#/zh-cn/docs/3.1.2/guide/installation/kubernetes)
+请参考官方文档: [快速试用 Kubernetes 部署](https://dolphinscheduler.apache.org/zh-cn/docs/3.1.2/guide/installation/kubernetes)
 
 ## 如何构建
 
 ```bash
 ./mvnw clean install -Prelease
+```
+
+### 构建不同版本的 Zookeeper 依赖
+
+默认支持 Zookeeper Server 3.8.0。
+```bash
+# 默认 Zookeeper Client 3.8.0
+./mvnw clean install -Prelease
+# 构建支持 Zookeeper 3.4.6+
+./mvnw clean install -Prelease -Dzk-3.4
 ```
 
 制品:

@@ -679,10 +679,16 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @return resource list page
      */
     @Override
-    public Result queryResourceListPaging(User loginUser, String fullName, String resTenantCode,
-                                          ResourceType type, String searchVal, Integer pageNo, Integer pageSize) {
-        Result<Object> result = new Result<>();
+    public Result<PageInfo<StorageEntity>> queryResourceListPaging(User loginUser, String fullName,
+                                                                   String resTenantCode,
+                                                                   ResourceType type, String searchVal, Integer pageNo,
+                                                                   Integer pageSize) {
+        Result<PageInfo<StorageEntity>> result = new Result<>();
         PageInfo<StorageEntity> pageInfo = new PageInfo<>(pageNo, pageSize);
+        if (storageOperate == null) {
+            logger.warn("The resource storage is not opened.");
+            return Result.success(pageInfo);
+        }
 
         User user = userMapper.selectById(loginUser.getId());
         if (user == null) {
@@ -757,7 +763,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         String trimmedSearchVal = searchVal != null ? searchVal.trim() : "";
         // filter based on trimmed searchVal
         List<StorageEntity> filteredResourceList = resourcesList.stream()
-                .filter(x -> x.getFileName().matches("(.*)" + trimmedSearchVal + "(.*)")).collect(Collectors.toList());
+                .filter(x -> x.getFileName().contains(trimmedSearchVal)).collect(Collectors.toList());
         // inefficient pagination
         List<StorageEntity> slicedResourcesList = filteredResourceList.stream().skip((long) (pageNo - 1) * pageSize)
                 .limit(pageSize).collect(Collectors.toList());
@@ -850,6 +856,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Map<String, Object> queryResourceList(User loginUser, ResourceType type, String fullName) {
         Map<String, Object> result = new HashMap<>();
+        if (storageOperate == null) {
+            result.put(Constants.DATA_LIST, Collections.emptyList());
+            result.put(Constants.STATUS, Status.SUCCESS);
+            return result;
+        }
 
         User user = userMapper.selectById(loginUser.getId());
         if (user == null) {

@@ -308,6 +308,8 @@ public class ProcessServiceImpl implements ProcessService {
     @Autowired
     private CommandService commandService;
 
+    @Autowired
+    private TriggerRelationService triggerRelationService;
     /**
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
      *
@@ -336,12 +338,14 @@ public class ProcessServiceImpl implements ProcessService {
             saveSerialProcess(processInstance, processDefinition);
             if (processInstance.getState() != WorkflowExecutionStatus.SUBMITTED_SUCCESS) {
                 setSubProcessParam(processInstance);
+                triggerRelationService.saveProcessInstanceTrigger(command.getId(), processInstance.getId());
                 deleteCommandWithCheck(command.getId());
                 return null;
             }
         } else {
             processInstanceDao.upsertProcessInstance(processInstance);
         }
+        triggerRelationService.saveProcessInstanceTrigger(command.getId(), processInstance.getId());
         setSubProcessParam(processInstance);
         deleteCommandWithCheck(command.getId());
         return processInstance;
@@ -516,17 +520,10 @@ public class ProcessServiceImpl implements ProcessService {
         }
         for (TaskInstance taskInstance : taskInstanceList) {
             String taskLogPath = taskInstance.getLogPath();
-            if (Strings.isNullOrEmpty(taskInstance.getHost())) {
+            if (StringUtils.isEmpty(taskInstance.getHost()) || StringUtils.isEmpty(taskLogPath)) {
                 continue;
             }
-            try {
-                Host host = Host.of(taskInstance.getHost());
-                logClient.removeTaskLog(host, taskLogPath);
-            } catch (Exception e) {
-                logger.error(
-                        "Remove task log error, meet an unknown exception, taskInstanceId: {}, host: {}, logPath: {}",
-                        taskInstance.getId(), taskInstance.getHost(), taskInstance.getLogPath(), e);
-            }
+            logClient.removeTaskLog(Host.of(taskInstance.getHost()), taskLogPath);
         }
     }
 
@@ -595,6 +592,7 @@ public class ProcessServiceImpl implements ProcessService {
         ProcessInstance processInstance = new ProcessInstance(processDefinition);
         processInstance.setProcessDefinitionCode(processDefinition.getCode());
         processInstance.setProcessDefinitionVersion(processDefinition.getVersion());
+        processInstance.setProjectCode(processDefinition.getProjectCode());
         processInstance.setStateWithDesc(WorkflowExecutionStatus.RUNNING_EXECUTION, "init running");
         processInstance.setRecovery(Flag.NO);
         processInstance.setStartTime(new Date());
@@ -608,6 +606,8 @@ public class ProcessServiceImpl implements ProcessService {
         processInstance.setTaskDependType(command.getTaskDependType());
         processInstance.setFailureStrategy(command.getFailureStrategy());
         processInstance.setExecutorId(command.getExecutorId());
+        processInstance.setExecutorName(Optional.ofNullable(userMapper.selectById(command.getExecutorId()))
+                .map(User::getUserName).orElse(null));
         WarningType warningType = command.getWarningType() == null ? WarningType.NONE : command.getWarningType();
         processInstance.setWarningType(warningType);
         Integer warningGroupId = command.getWarningGroupId() == null ? 0 : command.getWarningGroupId();
@@ -647,6 +647,8 @@ public class ProcessServiceImpl implements ProcessService {
                 .setEnvironmentCode(Objects.isNull(command.getEnvironmentCode()) ? -1 : command.getEnvironmentCode());
         processInstance.setTimeout(processDefinition.getTimeout());
         processInstance.setTenantId(processDefinition.getTenantId());
+        processInstance.setTenantCode(Optional.ofNullable(tenantMapper.queryById(processDefinition.getTenantId()))
+                .map(Tenant::getTenantCode).orElse(null));
         return processInstance;
     }
 
@@ -2424,12 +2426,14 @@ public class ProcessServiceImpl implements ProcessService {
 
     /**
      * the first time (when submit the task ) get the resource of the task group
-     *
-     * @param taskId task id
      */
     @Override
-    public boolean acquireTaskGroup(int taskId, String taskName, int groupId, int processId, int priority) {
-        TaskGroup taskGroup = taskGroupMapper.selectById(groupId);
+    public boolean acquireTaskGroup(int taskInstanceId,
+                                    String taskName,
+                                    int taskGroupId,
+                                    int workflowInstanceId,
+                                    int taskGroupPriority) {
+        TaskGroup taskGroup = taskGroupMapper.selectById(taskGroupId);
         if (taskGroup == null) {
             // we don't throw exception here, to avoid the task group has been deleted during workflow running
             return true;
@@ -2439,17 +2443,17 @@ public class ProcessServiceImpl implements ProcessService {
             return true;
         }
         // Create a waiting taskGroupQueue, after acquire resource, we can update the status to ACQUIRE_SUCCESS
-        TaskGroupQueue taskGroupQueue = this.taskGroupQueueMapper.queryByTaskId(taskId);
+        TaskGroupQueue taskGroupQueue = this.taskGroupQueueMapper.queryByTaskId(taskInstanceId);
         if (taskGroupQueue == null) {
             taskGroupQueue = insertIntoTaskGroupQueue(
-                    taskId,
+                    taskInstanceId,
                     taskName,
-                    groupId,
-                    processId,
-                    priority,
+                    taskGroupId,
+                    workflowInstanceId,
+                    taskGroupPriority,
                     TaskGroupQueueStatus.WAIT_QUEUE);
         } else {
-            logger.info("The task queue is already exist, taskId: {}", taskId);
+            logger.info("The task queue is already exist, taskId: {}", taskInstanceId);
             if (taskGroupQueue.getStatus() == TaskGroupQueueStatus.ACQUIRE_SUCCESS) {
                 return true;
             }
@@ -2459,19 +2463,19 @@ public class ProcessServiceImpl implements ProcessService {
         }
         // check if there already exist higher priority tasks
         List<TaskGroupQueue> highPriorityTasks = taskGroupQueueMapper.queryHighPriorityTasks(
-                groupId,
-                priority,
+                taskGroupId,
+                taskGroupPriority,
                 TaskGroupQueueStatus.WAIT_QUEUE.getCode());
         if (CollectionUtils.isNotEmpty(highPriorityTasks)) {
             return false;
         }
         // try to get taskGroup
-        int count = taskGroupMapper.selectAvailableCountById(groupId);
+        int count = taskGroupMapper.selectAvailableCountById(taskGroupId);
         if (count == 1 && robTaskGroupResource(taskGroupQueue)) {
-            logger.info("Success acquire taskGroup, taskInstanceId: {}, taskGroupId: {}", taskId, groupId);
+            logger.info("Success acquire taskGroup, taskInstanceId: {}, taskGroupId: {}", taskInstanceId, taskGroupId);
             return true;
         }
-        logger.info("Failed to acquire taskGroup, taskInstanceId: {}, taskGroupId: {}", taskId, groupId);
+        logger.info("Failed to acquire taskGroup, taskInstanceId: {}, taskGroupId: {}", taskInstanceId, taskGroupId);
         this.taskGroupQueueMapper.updateInQueue(Flag.NO.getCode(), taskGroupQueue.getId());
         return false;
     }
@@ -2537,6 +2541,10 @@ public class ProcessServiceImpl implements ProcessService {
                     logger.info("The taskGroupQueue's status is release, taskInstanceId: {}", taskInstance.getId());
                     return null;
                 }
+                if (thisTaskGroupQueue.getStatus() == TaskGroupQueueStatus.WAIT_QUEUE) {
+                    logger.info("The taskGroupQueue's status is in waiting, will not need to release task group");
+                    break;
+                }
             } while (thisTaskGroupQueue.getForceStart() == Flag.NO.getCode()
                     && taskGroupMapper.releaseTaskGroupResource(taskGroup.getId(),
                             taskGroup.getUseSize(),
@@ -2563,7 +2571,8 @@ public class ProcessServiceImpl implements ProcessService {
         } while (this.taskGroupQueueMapper.updateInQueueCAS(Flag.NO.getCode(),
                 Flag.YES.getCode(),
                 taskGroupQueue.getId()) != 1);
-        logger.info("Finished to release task group queue: taskGroupId: {}", taskInstance.getTaskGroupId());
+        logger.info("Finished to release task group queue: taskGroupId: {}, taskGroupQueueId: {}",
+                taskInstance.getTaskGroupId(), taskGroupQueue.getId());
         return this.taskInstanceMapper.selectById(taskGroupQueue.getTaskId());
     }
 
@@ -2577,6 +2586,7 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public void changeTaskGroupQueueStatus(int taskId, TaskGroupQueueStatus status) {
         TaskGroupQueue taskGroupQueue = taskGroupQueueMapper.queryByTaskId(taskId);
+        taskGroupQueue.setInQueue(Flag.NO.getCode());
         taskGroupQueue.setStatus(status);
         taskGroupQueue.setUpdateTime(new Date(System.currentTimeMillis()));
         taskGroupQueueMapper.updateById(taskGroupQueue);
@@ -2597,6 +2607,7 @@ public class ProcessServiceImpl implements ProcessService {
                 .processId(workflowInstanceId)
                 .priority(taskGroupPriority)
                 .status(status)
+                .inQueue(Flag.NO.getCode())
                 .createTime(now)
                 .updateTime(now)
                 .build();
@@ -2626,6 +2637,7 @@ public class ProcessServiceImpl implements ProcessService {
                 processInstance.getId(), taskId);
         Host host = new Host(processInstance.getHost());
         stateEventCallbackService.sendResult(host, taskEventChangeCommand.convert2Command(taskType));
+        logger.info("Success send command to master: {}, command: {}", host, taskEventChangeCommand);
     }
 
     @Override
@@ -2699,6 +2711,11 @@ public class ProcessServiceImpl implements ProcessService {
         if (testDataSourceId != null)
             return testDataSourceId;
         return null;
+    }
+
+    @Override
+    public void saveCommandTrigger(Integer commandId, Integer processInstanceId) {
+        triggerRelationService.saveCommandTrigger(commandId, processInstanceId);
     }
 
     private Set<String> getResourceFullNames(TaskDefinition taskDefinition) {

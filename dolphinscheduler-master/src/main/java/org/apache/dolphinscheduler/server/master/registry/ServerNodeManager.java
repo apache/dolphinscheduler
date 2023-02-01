@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.dispatch.exceptions.WorkerGroupNotFoundException;
 import org.apache.dolphinscheduler.service.queue.MasterPriorityQueue;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -334,13 +335,16 @@ public class ServerNodeManager implements InitializingBean {
      * @param workerGroup workerGroup
      * @return worker nodes
      */
-    public Set<String> getWorkerGroupNodes(String workerGroup) {
+    public Set<String> getWorkerGroupNodes(String workerGroup) throws WorkerGroupNotFoundException {
         workerGroupReadLock.lock();
         try {
             if (StringUtils.isEmpty(workerGroup)) {
                 workerGroup = Constants.DEFAULT_WORKER_GROUP;
             }
             Set<String> nodes = workerGroupNodes.get(workerGroup);
+            if (nodes == null) {
+                throw new WorkerGroupNotFoundException(String.format("WorkerGroup: %s is invalidated", workerGroup));
+            }
             if (CollectionUtils.isEmpty(nodes)) {
                 return Collections.emptySet();
             }

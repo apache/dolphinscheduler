@@ -115,9 +115,17 @@ public class SchedulerController extends BaseController {
                                  @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
                                  @RequestParam(value = "environmentCode", required = false, defaultValue = "-1") Long environmentCode,
                                  @RequestParam(value = "processInstancePriority", required = false, defaultValue = DEFAULT_PROCESS_INSTANCE_PRIORITY) Priority processInstancePriority) {
-        Map<String, Object> result = schedulerService.insertSchedule(loginUser, projectCode, processDefinitionCode,
+        Map<String, Object> result = schedulerService.insertSchedule(
+                loginUser,
+                projectCode,
+                processDefinitionCode,
                 schedule,
-                warningType, warningGroupId, failureStrategy, processInstancePriority, workerGroup, environmentCode);
+                warningType,
+                warningGroupId,
+                failureStrategy,
+                processInstancePriority,
+                workerGroup,
+                environmentCode);
 
         return returnDataList(result);
     }
@@ -185,8 +193,8 @@ public class SchedulerController extends BaseController {
     public Result publishScheduleOnline(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
                                         @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                         @PathVariable("id") Integer id) {
-        Map<String, Object> result = schedulerService.setScheduleState(loginUser, projectCode, id, ReleaseState.ONLINE);
-        return returnDataList(result);
+        schedulerService.setScheduleState(loginUser, projectCode, id, ReleaseState.ONLINE);
+        return Result.success();
     }
 
     /**
@@ -207,10 +215,8 @@ public class SchedulerController extends BaseController {
     public Result offlineSchedule(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
                                   @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                   @PathVariable("id") Integer id) {
-
-        Map<String, Object> result =
-                schedulerService.setScheduleState(loginUser, projectCode, id, ReleaseState.OFFLINE);
-        return returnDataList(result);
+        schedulerService.setScheduleState(loginUser, projectCode, id, ReleaseState.OFFLINE);
+        return Result.success();
     }
 
     /**

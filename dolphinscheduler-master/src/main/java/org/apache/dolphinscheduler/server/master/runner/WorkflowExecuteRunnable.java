@@ -65,6 +65,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.remote.command.HostUpdateCommand;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
@@ -376,23 +377,33 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
     public boolean checkForceStartAndWakeUp(StateEvent stateEvent) {
         TaskGroupQueue taskGroupQueue = this.processService.loadTaskGroupQueue(stateEvent.getTaskInstanceId());
         if (taskGroupQueue.getForceStart() == Flag.YES.getCode()) {
+            logger.info("Begin to force start taskGroupQueue: {}", taskGroupQueue.getId());
             TaskInstance taskInstance = this.taskInstanceDao.findTaskInstanceById(stateEvent.getTaskInstanceId());
             ITaskProcessor taskProcessor = activeTaskProcessorMaps.get(taskInstance.getTaskCode());
             taskProcessor.action(TaskAction.DISPATCH);
             this.processService.updateTaskGroupQueueStatus(taskGroupQueue.getTaskId(),
                     TaskGroupQueueStatus.ACQUIRE_SUCCESS.getCode());
+            logger.info("Success force start taskGroupQueue: {}", taskGroupQueue.getId());
             return true;
         }
         if (taskGroupQueue.getInQueue() == Flag.YES.getCode()) {
+            logger.info("Begin to wake up taskGroupQueue: {}", taskGroupQueue.getId());
             boolean acquireTaskGroup = processService.robTaskGroupResource(taskGroupQueue);
             if (acquireTaskGroup) {
                 TaskInstance taskInstance = this.taskInstanceDao.findTaskInstanceById(stateEvent.getTaskInstanceId());
                 ITaskProcessor taskProcessor = activeTaskProcessorMaps.get(taskInstance.getTaskCode());
                 taskProcessor.action(TaskAction.DISPATCH);
+                logger.info("Success wake up taskGroupQueue: {}", taskGroupQueue.getId());
                 return true;
             }
+            logger.warn("Failed to wake up taskGroupQueue, taskGroupQueueId: {}", taskGroupQueue.getId());
+            return false;
+        } else {
+            logger.info(
+                    "Failed to wake up the taskGroupQueue: {}, since the taskGroupQueue is not in queue, will no need to wake up.",
+                    taskGroupQueue);
+            return true;
         }
-        return false;
     }
 
     public void processTimeout() {
@@ -464,7 +475,6 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      *
      */
     public void releaseTaskGroup(TaskInstance taskInstance) {
-        logger.info("Release task group");
         if (taskInstance.getTaskGroupId() > 0) {
             TaskInstance nextTaskInstance = this.processService.releaseTaskGroup(taskInstance);
             if (nextTaskInstance != null) {
@@ -472,7 +482,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                     TaskStateEvent nextEvent = TaskStateEvent.builder()
                             .processInstanceId(processInstance.getId())
                             .taskInstanceId(nextTaskInstance.getId())
-                            .type(StateEventType.WAIT_TASK_GROUP)
+                            .type(StateEventType.WAKE_UP_TASK_GROUP)
                             .build();
                     this.stateEvents.add(nextEvent);
                 } else {
@@ -694,6 +704,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         command.setProcessInstanceId(0);
         command.setProcessDefinitionVersion(processInstance.getProcessDefinitionVersion());
         command.setTestFlag(processInstance.getTestFlag());
+        processService.saveCommandTrigger(command.getId(), processInstance.getId());
         return commandService.createCommand(command);
     }
 
@@ -1173,6 +1184,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         taskInstance.setState(TaskExecutionStatus.SUBMITTED_SUCCESS);
         // process instance id
         taskInstance.setProcessInstanceId(processInstance.getId());
+        taskInstance.setProcessInstanceName(processInstance.getName());
+        taskInstance.setProjectCode(processInstance.getProjectCode());
         // task instance type
         taskInstance.setTaskType(taskNode.getType().toUpperCase());
         // task instance whether alert
@@ -1816,19 +1829,24 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             if (taskInstanceId == null || taskInstanceId.equals(0)) {
                 continue;
             }
-            TaskInstance taskInstance = taskInstanceDao.findTaskInstanceById(taskInstanceId);
-            if (taskInstance == null || taskInstance.getState().isFinished()) {
-                continue;
-            }
-            taskProcessor.action(TaskAction.STOP);
-            if (taskProcessor.taskInstance().getState().isFinished()) {
-                TaskStateEvent taskStateEvent = TaskStateEvent.builder()
-                        .processInstanceId(processInstance.getId())
-                        .taskInstanceId(taskInstance.getId())
-                        .status(taskProcessor.taskInstance().getState())
-                        .type(StateEventType.TASK_STATE_CHANGE)
-                        .build();
-                this.addStateEvent(taskStateEvent);
+            LogUtils.setWorkflowAndTaskInstanceIDMDC(processInstance.getId(), taskInstanceId);
+            try {
+                TaskInstance taskInstance = taskInstanceDao.findTaskInstanceById(taskInstanceId);
+                if (taskInstance == null || taskInstance.getState().isFinished()) {
+                    continue;
+                }
+                taskProcessor.action(TaskAction.STOP);
+                if (taskProcessor.taskInstance().getState().isFinished()) {
+                    TaskStateEvent taskStateEvent = TaskStateEvent.builder()
+                            .processInstanceId(processInstance.getId())
+                            .taskInstanceId(taskInstance.getId())
+                            .status(taskProcessor.taskInstance().getState())
+                            .type(StateEventType.TASK_STATE_CHANGE)
+                            .build();
+                    this.addStateEvent(taskStateEvent);
+                }
+            } finally {
+                LogUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
         }
     }
