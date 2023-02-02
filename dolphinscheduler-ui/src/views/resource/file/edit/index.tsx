@@ -109,7 +109,21 @@ export default defineComponent({
           </div>
         ) : (
           <NSpace justify='center'>
-            <NSpin show={true} />
+            <NSpace vertical>
+              <NSpin show={true} />
+              <NSpace>
+                <NButton
+                  type='info'
+                  size='small'
+                  text
+                  style={{ marginRight: '15px' }}
+                  onClick={this.handleReturn}
+                  class='btn-cancel'
+                >
+                  {t('resource.file.return')}
+                </NButton>
+              </NSpace>
+            </NSpace>
           </NSpace>
         )}
       </Card>

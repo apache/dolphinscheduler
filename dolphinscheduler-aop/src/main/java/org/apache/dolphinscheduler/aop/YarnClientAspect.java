@@ -83,11 +83,10 @@ public class YarnClientAspect {
      *
      * @param appReport current application report when invoking getApplicationReport within submitApplication
      * @param appId     current application id, which is the parameter of getApplicationReport
-     * @throws Throwable exceptions
      */
     @AfterReturning(pointcut = "cflow(execution(ApplicationId org.apache.hadoop.yarn.client.api.impl.YarnClientImpl.submitApplication(ApplicationSubmissionContext))) "
             +
-            "&& !within(CfowAspect) && execution(ApplicationReport org.apache.hadoop.yarn.client.api.impl.YarnClientImpl.getApplicationReport(ApplicationId)) && args(appId)", returning = "appReport", argNames = "appReport,appId")
+            "&& !within(YarnClientAspect) && execution(ApplicationReport org.apache.hadoop.yarn.client.api.impl.YarnClientImpl.getApplicationReport(ApplicationId)) && args(appId)", returning = "appReport", argNames = "appReport,appId")
     public void registerApplicationReport(ApplicationReport appReport, ApplicationId appId) {
         currentApplicationReport = appReport;
     }

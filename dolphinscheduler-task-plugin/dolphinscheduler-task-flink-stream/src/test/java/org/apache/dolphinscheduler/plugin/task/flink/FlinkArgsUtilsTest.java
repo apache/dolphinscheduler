@@ -115,18 +115,18 @@ public class FlinkArgsUtilsTest {
     }
 
     @Test
-    public void testInitOptionsInClusterMode() throws Exception {
+    public void testInitOptionsInLocalMode() throws Exception {
         List<String> initOptions =
-                FlinkArgsUtils.buildInitOptionsForSql(buildTestFlinkParametersWithDeployMode(FlinkDeployMode.CLUSTER));
+                FlinkArgsUtils.buildInitOptionsForSql(buildTestFlinkParametersWithDeployMode(FlinkDeployMode.LOCAL));
         Assertions.assertEquals(2, initOptions.size());
         Assertions.assertTrue(initOptions.contains("set execution.target=local"));
         Assertions.assertTrue(initOptions.contains("set parallelism.default=4"));
     }
 
     @Test
-    public void testInitOptionsInApplicationMode() throws Exception {
+    public void testInitOptionsInClusterMode() throws Exception {
         List<String> initOptions = FlinkArgsUtils
-                .buildInitOptionsForSql(buildTestFlinkParametersWithDeployMode(FlinkDeployMode.APPLICATION));
+                .buildInitOptionsForSql(buildTestFlinkParametersWithDeployMode(FlinkDeployMode.CLUSTER));
         Assertions.assertEquals(6, initOptions.size());
         Assertions.assertTrue(initOptions.contains("set execution.target=yarn-per-job"));
         Assertions.assertTrue(initOptions.contains("set taskmanager.numberOfTaskSlots=4"));

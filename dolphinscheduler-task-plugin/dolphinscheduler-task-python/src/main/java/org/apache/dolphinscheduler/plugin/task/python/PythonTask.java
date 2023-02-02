@@ -78,11 +78,11 @@ public class PythonTask extends AbstractTask {
 
     @Override
     public void init() {
-        logger.info("python task params {}", taskRequest.getTaskParams());
 
         pythonParameters = JSONUtils.parseObject(taskRequest.getTaskParams(), PythonParameters.class);
 
-        if (!pythonParameters.checkParameters()) {
+        logger.info("Initialize python task params {}", JSONUtils.toPrettyJsonString(pythonParameters));
+        if (pythonParameters == null || !pythonParameters.checkParameters()) {
             throw new TaskException("python task params is not valid");
         }
     }
@@ -114,6 +114,7 @@ public class PythonTask extends AbstractTask {
             setExitStatusCode(taskResponse.getExitStatusCode());
             setProcessId(taskResponse.getProcessId());
             setVarPool(shellCommandExecutor.getVarPool());
+            pythonParameters.dealOutParam(shellCommandExecutor.getVarPool());
         } catch (Exception e) {
             logger.error("python task failure", e);
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);

@@ -12,7 +12,7 @@ If you are a new hand and want to experience DolphinScheduler functions, we reco
 
 ## Install DolphinScheduler
 
-Please download the source code package `apache-dolphinscheduler-<version>-src.tar.gz`, download address: [download address](/en-us/download/download.html)
+Please download the source code package `apache-dolphinscheduler-<version>-src.tar.gz`, download address: [download address](https://dolphinscheduler.apache.org/en-us/download)
 
 To publish the release name `dolphinscheduler` version, please execute the following commands:
 
@@ -86,6 +86,43 @@ $ kubectl delete pvc -l app.kubernetes.io/instance=dolphinscheduler
 ```
 
 > **Note**: Deleting the PVC's will delete all data as well. Please be cautious before doing it.
+
+## [Experimental] Worker Autoscaling
+
+> **Warning**: Currently this is an experimental feature and may not be suitable for production!
+
+`DolphinScheduler` uses [KEDA](https://github.com/kedacore/keda) for worker autoscaling. However, `DolphinScheduler` disables
+this feature by default. To turn on worker autoscaling:
+
+Firstly, you need to create a namespace for `KEDA` and install it with `helm`:
+
+```bash
+helm repo add kedacore https://kedacore.github.io/charts
+
+helm repo update
+
+kubectl create namespace keda
+
+helm install keda kedacore/keda \
+    --namespace keda \
+    --version "v2.0.0"
+```
+
+Secondly, you need to set `worker.keda.enabled` to `true` in `values.yaml` or install the chart by:
+
+```bash
+helm install dolphinscheduler . --set worker.keda.enabled=true -n <your-namespace-to-deploy-dolphinscheduler>
+```
+
+Once autoscaling enabled, the number of workers will scale between `minReplicaCount` and `maxReplicaCount` based on the states
+of your tasks. For example, when there is no tasks running in your `DolphinScheduler` instance, there will be no workers,
+which will significantly save the resources.
+
+Worker autoscaling feature is compatible with `postgresql` and `mysql` shipped with `DolphinScheduler official helm chart`. If you
+use external database, worker autoscaling feature only supports external `mysql` and `postgresql` databases.
+
+If you need to change the value of worker `WORKER_EXEC_THREADS` when using autoscaling feature,
+please change `worker.env.WORKER_EXEC_THREADS` in `values.yaml` instead of through `configmap`.
 
 ## Configuration
 
@@ -410,7 +447,7 @@ common:
     enabled: false
     mountPath: "/opt/soft"
     accessModes:
-    - "ReadWriteMany"
+      - "ReadWriteMany"
     storageClassName: "-"
     storage: "20Gi"
 ```
@@ -436,7 +473,7 @@ common:
   fsFileResourcePersistence:
     enabled: true
     accessModes:
-    - "ReadWriteMany"
+      - "ReadWriteMany"
     storageClassName: "-"
     storage: "20Gi"
 ```
@@ -460,7 +497,7 @@ common:
     FS_S3A_SECRET_KEY: "MINIO_SECRET_KEY"
 ```
 
-Modify `BUCKET_NAME`, `MINIO_IP`, `MINIO_ACCESS_KEY` and `MINIO_SECRET_KEY`  to actual environment values.
+Modify `BUCKET_NAME`, `MINIO_IP`, `MINIO_ACCESS_KEY` and `MINIO_SECRET_KEY` to actual environment values.
 
 > **Note**: `MINIO_IP` can only use IP instead of the domain name, because DolphinScheduler currently doesn't support S3 path style access.
 
@@ -540,7 +577,7 @@ common:
 | `common.configmap.HADOOP_CONF_DIR`                                   | Set `HADOOP_CONF_DIR` for DolphinScheduler's task environment                                                                 | `/opt/soft/hadoop/etc/hadoop`         |
 | `common.configmap.SPARK_HOME`                                        | Set `SPARK_HOME` for DolphinScheduler's task environment                                                                      | `/opt/soft/spark`                     |
 | `common.configmap.PYTHON_HOME`                                       | Set `PYTHON_HOME` for DolphinScheduler's task environment                                                                     | `/usr/bin/python`                     |
-| `common.configmap.JAVA_HOME`                                         | Set `JAVA_HOME` for DolphinScheduler's task environment                                                                       | `/usr/local/openjdk-8`                |
+| `common.configmap.JAVA_HOME`                                         | Set `JAVA_HOME` for DolphinScheduler's task environment                                                                       | `/opt/java/openjdk`                   |
 | `common.configmap.HIVE_HOME`                                         | Set `HIVE_HOME` for DolphinScheduler's task environment                                                                       | `/opt/soft/hive`                      |
 | `common.configmap.FLINK_HOME`                                        | Set `FLINK_HOME` for DolphinScheduler's task environment                                                                      | `/opt/soft/flink`                     |
 | `common.configmap.DATAX_HOME`                                        | Set `DATAX_HOME` for DolphinScheduler's task environment                                                                      | `/opt/soft/datax`                     |

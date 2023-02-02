@@ -110,13 +110,12 @@ public class SqlTask extends AbstractTask {
         super(taskRequest);
         this.taskExecutionContext = taskRequest;
         this.sqlParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SqlParameters.class);
-
-        assert sqlParameters != null;
-        if (taskExecutionContext.getTestFlag() == TEST_FLAG_YES && this.sqlParameters.getDatasource() == 0) {
-            throw new RuntimeException("unbound test data source");
+        logger.info("Initialize sql task parameter {}", JSONUtils.toPrettyJsonString(sqlParameters));
+        if (sqlParameters == null || !sqlParameters.checkParameters()) {
+            throw new TaskException("sql task params is not valid");
         }
-        if (!sqlParameters.checkParameters()) {
-            throw new RuntimeException("sql task params is not valid");
+        if (taskExecutionContext.getTestFlag() == TEST_FLAG_YES && this.sqlParameters.getDatasource() == 0) {
+            throw new TaskException("unbound test data source");
         }
 
         sqlTaskExecutionContext =
@@ -319,7 +318,7 @@ public class SqlTask extends AbstractTask {
         String result = resultJSONArray.isEmpty() ? JSONUtils.toJsonString(generateEmptyRow(resultSet))
                 : JSONUtils.toJsonString(resultJSONArray);
 
-        if (sqlParameters.getSendEmail() == null || sqlParameters.getSendEmail()) {
+        if (Boolean.TRUE.equals(sqlParameters.getSendEmail())) {
             sendAttachment(sqlParameters.getGroupId(), StringUtils.isNotEmpty(sqlParameters.getTitle())
                     ? sqlParameters.getTitle()
                     : taskExecutionContext.getTaskName() + " query result sets", result);

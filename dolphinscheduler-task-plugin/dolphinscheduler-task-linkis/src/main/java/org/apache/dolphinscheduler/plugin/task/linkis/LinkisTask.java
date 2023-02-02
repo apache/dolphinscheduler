@@ -17,8 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.task.linkis;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.*;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
@@ -86,7 +89,9 @@ public class LinkisTask extends AbstractRemoteTask {
 
     @Override
     public void init() {
-        logger.info("Linkis task params {}", taskExecutionContext.getTaskParams());
+        linkisParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), LinkisParameters.class);
+        logger.info("Initialize Linkis task params {}", JSONUtils.toPrettyJsonString(linkisParameters));
+
         if (!linkisParameters.checkParameters()) {
             throw new RuntimeException("Linkis task params is not valid");
         }
@@ -248,9 +253,5 @@ public class LinkisTask extends AbstractRemoteTask {
         // combining local and global parameters
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
         return ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
-    }
-
-    public void setLinkisParameters(LinkisParameters linkisParameters) {
-        this.linkisParameters = linkisParameters;
     }
 }

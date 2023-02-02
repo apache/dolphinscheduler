@@ -29,8 +29,8 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.dao.entity.TaskGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -40,6 +40,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,9 +63,6 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
 
     @Autowired
     private TaskGroupQueueService taskGroupQueueService;
-
-    @Autowired
-    private ProcessService processService;
 
     @Autowired
     private ExecutorService executorService;
@@ -112,11 +110,18 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
             putMsg(result, Status.TASK_GROUP_NAME_EXSIT);
             return result;
         }
-        TaskGroup taskGroup = new TaskGroup(name, projectCode, description,
-                groupSize, loginUser.getId(), Flag.YES.getCode());
+        Date now = new Date();
+        TaskGroup taskGroup = TaskGroup.builder()
+                .name(name)
+                .projectCode(projectCode)
+                .description(description)
+                .groupSize(groupSize)
+                .userId(loginUser.getId())
+                .status(Flag.YES.getCode())
+                .createTime(now)
+                .updateTime(now)
+                .build();
 
-        taskGroup.setCreateTime(new Date());
-        taskGroup.setUpdateTime(new Date());
         if (taskGroupMapper.insert(taskGroup) > 0) {
             permissionPostHandle(AuthorizationType.TASK_GROUP, loginUser.getId(),
                     Collections.singletonList(taskGroup.getId()), logger);
@@ -421,5 +426,18 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         logger.info("Modify task group queue priority complete, queueId:{}, priority:{}.", queueId, priority);
         putMsg(result, Status.SUCCESS);
         return result;
+    }
+
+    @Override
+    public void deleteTaskGroupByProjectCode(long projectCode) {
+        List<TaskGroup> taskGroups = taskGroupMapper.selectByProjectCode(projectCode);
+        if (CollectionUtils.isEmpty(taskGroups)) {
+            return;
+        }
+        List<Integer> taskGroupIds = taskGroups.stream()
+                .map(TaskGroup::getId)
+                .collect(Collectors.toList());
+        taskGroupQueueService.deleteByTaskGroupIds(taskGroupIds);
+        taskGroupMapper.deleteBatchIds(taskGroupIds);
     }
 }

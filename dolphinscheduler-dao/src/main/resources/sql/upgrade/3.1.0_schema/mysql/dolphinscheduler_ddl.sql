@@ -392,41 +392,46 @@ CALL modify_t_ds_task_group_col_description;
 DROP PROCEDURE modify_t_ds_task_group_col_description;
 
 -- alter table `t_ds_worker_group` add `other_params_json` text;
--- alter table `t_ds_process_instance` add `state_history` text;
-drop procedure if exists add_column_safety;
+drop procedure if exists add_t_ds_task_group_other_params_json;
 delimiter d//
-create procedure add_column_safety(target_table_name varchar(256), target_column varchar(256),
-                                   target_column_type varchar(256), sths_else varchar(256))
-begin
-    declare target_database varchar(256);
-select database() into target_database;
-IF EXISTS(SELECT *
-              FROM information_schema.COLUMNS
-              WHERE COLUMN_NAME = target_column
-                AND TABLE_NAME = target_table_name
-        )
+CREATE PROCEDURE add_t_ds_task_group_other_params_json()
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_NAME='t_ds_worker_group'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND COLUMN_NAME='other_params_json')
     THEN
-        set @statement =
-                concat('alter table ', target_table_name, ' change column ', target_column, ' ', target_column, ' ',
-                       target_column_type, ' ',
-                       sths_else);
-PREPARE STMT_c FROM @statement;
-EXECUTE STMT_c;
+alter table `t_ds_worker_group` add column `other_params_json` text DEFAULT NULL COMMENT "other params json";
 ELSE
-        set @statement =
-                concat('alter table ', target_table_name, ' add column ', target_column, ' ', target_column_type, ' ',
-                       sths_else);
-PREPARE STMT_a FROM @statement;
-EXECUTE STMT_a;
+alter table `t_ds_worker_group` modify column `other_params_json` text DEFAULT NULL COMMENT "other params json";
 END IF;
-end;
+END;
 d//
 delimiter ;
 
-call add_column_safety('t_ds_worker_group','other_params_json', 'text' , "DEFAULT NULL COMMENT 'other params json'");
-call add_column_safety('t_ds_process_instance','state_history', 'text' , "DEFAULT NULL COMMENT 'state history desc' AFTER `state`");
+call add_t_ds_task_group_other_params_json();
+drop procedure if exists add_t_ds_task_group_other_params_json;
 
-drop procedure if exists add_column_safety;
+-- alter table `t_ds_process_instance` add `state_history` text;
+drop procedure if exists add_t_ds_process_instance_state_history;
+delimiter d//
+CREATE PROCEDURE add_t_ds_process_instance_state_history()
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_NAME='t_ds_process_instance'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND COLUMN_NAME='state_history')
+    THEN
+alter table `t_ds_process_instance` add column `state_history` text DEFAULT NULL COMMENT "other params json";
+ELSE
+alter table `t_ds_process_instance` modify column `state_history` text DEFAULT NULL COMMENT "other params json";
+END IF;
+END;
+d//
+delimiter ;
+call add_t_ds_process_instance_state_history();
+drop procedure if exists add_t_ds_process_instance_state_history;
+
 
 alter table t_ds_process_instance alter column process_instance_priority set default 2;
 alter table t_ds_schedules alter column process_instance_priority set default 2;

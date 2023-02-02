@@ -217,7 +217,6 @@ public interface TaskDefinitionService {
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param searchWorkflowName searchWorkflowName
      * @param searchTaskName searchTaskName
      * @param taskType taskType
      * @param taskExecuteType taskExecuteType
@@ -227,7 +226,6 @@ public interface TaskDefinitionService {
      */
     Result queryTaskDefinitionListPaging(User loginUser,
                                          long projectCode,
-                                         String searchWorkflowName,
                                          String searchTaskName,
                                          String taskType,
                                          TaskExecuteType taskExecuteType,
@@ -255,4 +253,6 @@ public interface TaskDefinitionService {
                                               long projectCode,
                                               long code,
                                               ReleaseState releaseState);
+
+    void deleteTaskByWorkflowDefinitionCode(long workflowDefinitionCode, int workflowDefinitionVersion);
 }

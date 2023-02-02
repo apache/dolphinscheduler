@@ -156,6 +156,6 @@ public class CuringGlobalParamsServiceTest {
 
         String result6 = dolphinSchedulerCuringGlobalParams.curingGlobalParams(1, globalParamMap, globalParamList,
                 CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null);
-        Assertions.assertTrue(result6.contains("20191220"));
+        Assertions.assertEquals(result6, JSONUtils.toJsonString(globalParamList));
     }
 }

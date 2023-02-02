@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.api;
 
 import java.time.Duration;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import com.google.common.collect.Sets;
 
@@ -443,6 +444,15 @@ public class TaskConstants {
     public static final String TASK_TYPE_STREAM = "STREAM";
 
     /**
+     * azure config
+     */
+    public static final String AZURE_CLIENT_ID = "resource.azure.client.id";
+    public static final String AZURE_CLIENT_SECRET = "resource.azure.client.secret";
+    public static final String AZURE_ACCESS_SUB_ID = "resource.azure.subId";
+    public static final String AZURE_SECRET_TENANT_ID = "resource.azure.tenant.id";
+    public static final String QUERY_INTERVAL = "resource.query.interval";
+
+    /**
      * aws config
      */
     public static final String AWS_ACCESS_KEY_ID = "resource.aws.access.key.id";
@@ -473,7 +483,7 @@ public class TaskConstants {
     public static final int LOG_LINES = 500;
     public static final String NAMESPACE_NAME = "name";
     public static final String CLUSTER = "cluster";
-    public static final String COMMAND_SPLIT_REGEX = "[^\\s\"'`]+|\"([^\"]+)\"|'([^']+)'|`([^`]+)`";
+    public static final Pattern COMMAND_SPLIT_REGEX = Pattern.compile("[^\\s\"'`]+|\"([^\"]+)\"|'([^']+)'|`([^`]+)`");
 
     /**
      * conda config used by jupyter task plugin

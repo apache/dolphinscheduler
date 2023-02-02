@@ -62,8 +62,8 @@
         from t_ds_process_definition pd
         JOIN t_ds_user u ON pd.user_id = u.id
         JOIN  t_ds_project p ON pd.project_code = p.code
-        JOIN  t_ds_tenant t ON t.id = u.tenant_id
-        JOIN t_ds_queue q ON t.queue_id = q.id
+        LEFT JOIN  t_ds_tenant t ON t.id = u.tenant_id
+        LEFT JOIN t_ds_queue q ON t.queue_id = q.id
         WHERE p.code = #{projectCode}
         and pd.name = #{processDefinitionName}
     </select>
@@ -149,6 +149,24 @@
             <foreach collection="projectCodes" index="index" item="i" open="(" separator="," close=")">
                 #{i}
             </foreach>
+        </if>
+        group by td.user_id,tu.user_name
+    </select><select id="countDefinitionByProjectCodesV2" resultType="org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser">
+        SELECT td.user_id as user_id, tu.user_name as user_name, count(0) as count
+        FROM t_ds_process_definition td
+        JOIN t_ds_user tu on tu.id=td.user_id
+        where 1 = 1
+        <if test="projectCodes != null and projectCodes.length != 0">
+            and td.project_code in
+            <foreach collection="projectCodes" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
+        <if test="userId != null">
+            and td.user_id = #{userId}
+        </if>
+        <if test="releaseState != null">
+            and td.release_state = #{releaseState}
         </if>
         group by td.user_id,tu.user_name
     </select>

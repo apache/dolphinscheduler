@@ -48,7 +48,6 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.Queue;
-import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
@@ -59,12 +58,13 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import py4j.GatewayServer;
 import py4j.GatewayServer.GatewayServerBuilder;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -226,7 +226,6 @@ public class PythonGateway {
      * @param timeout timeout for workflow working, if running time longer than timeout,
      * task will mark as fail
      * @param workerGroup run task in which worker group
-     * @param tenantCode tenantCode
      * @param taskRelationJson relation json for nodes
      * @param taskDefinitionJson taskDefinitionJson
      * @param otherParamsJson otherParamsJson handle other params
@@ -242,13 +241,16 @@ public class PythonGateway {
                                        int warningGroupId,
                                        int timeout,
                                        String workerGroup,
-                                       String tenantCode,
                                        int releaseState,
                                        String taskRelationJson,
                                        String taskDefinitionJson,
                                        String otherParamsJson,
                                        String executionType) {
         User user = usersService.queryUser(userName);
+        if (user.getTenantCode() == null) {
+            throw new RuntimeException("Can not create or update workflow for user who not related to any tenant.");
+        }
+
         Project project = projectMapper.queryByName(projectName);
         long projectCode = project.getCode();
 
@@ -263,12 +265,12 @@ public class PythonGateway {
                     ReleaseState.OFFLINE);
             processDefinitionService.updateProcessDefinition(user, projectCode, name,
                     processDefinitionCode, description, globalParams,
-                    null, timeout, tenantCode, taskRelationJson, taskDefinitionJson, otherParamsJson,
+                    null, timeout, user.getTenantCode(), taskRelationJson, taskDefinitionJson, otherParamsJson,
                     executionTypeEnum);
         } else {
             Map<String, Object> result = processDefinitionService.createProcessDefinition(user, projectCode, name,
                     description, globalParams,
-                    null, timeout, tenantCode, taskRelationJson, taskDefinitionJson, otherParamsJson,
+                    null, timeout, user.getTenantCode(), taskRelationJson, taskDefinitionJson, otherParamsJson,
                     executionTypeEnum);
             processDefinition = (ProcessDefinition) result.get(Constants.DATA_LIST);
             processDefinitionCode = processDefinition.getCode();
@@ -346,6 +348,8 @@ public class PythonGateway {
             schedulerService.updateSchedule(user, projectCode, scheduleId, schedule, WarningType.valueOf(warningType),
                     warningGroupId, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, DEFAULT_ENVIRONMENT_CODE);
         }
+        // Always set workflow online to set schedule online
+        processDefinitionService.releaseProcessDefinition(user, projectCode, workflowCode, ReleaseState.ONLINE);
         schedulerService.setScheduleState(user, projectCode, scheduleId, ReleaseState.ONLINE);
     }
 
@@ -385,7 +389,8 @@ public class PythonGateway {
                 null,
                 DEFAULT_DRY_RUN,
                 DEFAULT_TEST_FLAG,
-                COMPLEMENT_DEPENDENT_MODE);
+                COMPLEMENT_DEPENDENT_MODE,
+                processDefinition.getVersion());
     }
 
     // side object
@@ -632,9 +637,10 @@ public class PythonGateway {
      *
      * @param userName user who query resource
      * @param fullName full name of the resource
+     * @return StorageEntity object which contains necessary information about resource
      */
-    public Resource queryResourcesFileInfo(String userName, String fullName) {
-        return resourceService.queryResourcesFileInfo(userName, fullName);
+    public StorageEntity queryResourcesFileInfo(String userName, String fullName) throws Exception {
+        return resourceService.queryFileStatus(userName, fullName);
     }
 
     public String getGatewayVersion() {
@@ -647,14 +653,12 @@ public class PythonGateway {
      *
      * @param userName user who create or update resource
      * @param fullName The fullname of resource.Includes path and suffix.
-     * @param description description of resource
      * @param resourceContent content of resource
-     * @return id of resource
+     * @return StorageEntity object which contains necessary information about resource
      */
-    public Integer createOrUpdateResource(
-                                          String userName, String fullName, String description,
-                                          String resourceContent) {
-        return resourceService.createOrUpdateResource(userName, fullName, description, resourceContent);
+    public StorageEntity createOrUpdateResource(String userName, String fullName,
+                                                String resourceContent) throws Exception {
+        return resourceService.createOrUpdateResource(userName, fullName, resourceContent);
     }
 
     @PostConstruct

@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.service.utils;
 
 import org.apache.dolphinscheduler.common.utils.FileUtils;
-import org.apache.dolphinscheduler.service.storage.impl.HadoopUtils;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -46,18 +45,6 @@ public class CommonUtilsTest {
     }
 
     @Test
-    public void isDevelopMode() {
-        logger.info("develop mode: {}", CommonUtils.isDevelopMode());
-        Assertions.assertTrue(true);
-    }
-
-    @Test
-    public void getHdfsDataBasePath() {
-        logger.info(HadoopUtils.getHdfsDataBasePath());
-        Assertions.assertTrue(true);
-    }
-
-    @Test
     public void getDownloadFilename() {
         logger.info(FileUtils.getDownloadFilename("a.txt"));
         Assertions.assertTrue(true);
@@ -66,12 +53,6 @@ public class CommonUtilsTest {
     @Test
     public void getUploadFilename() {
         logger.info(FileUtils.getUploadFilename("1234", "a.txt"));
-        Assertions.assertTrue(true);
-    }
-
-    @Test
-    public void getHdfsDir() {
-        logger.info(HadoopUtils.getHdfsResDir("1234"));
         Assertions.assertTrue(true);
     }
 
