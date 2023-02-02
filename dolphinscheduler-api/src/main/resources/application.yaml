@@ -67,7 +67,7 @@ spring:
       org.quartz.jobStore.tablePrefix: QRTZ_
       org.quartz.jobStore.acquireTriggersWithinLock: true
       org.quartz.scheduler.instanceName: DolphinScheduler
-      org.quartz.threadPool.class: org.apache.dolphinscheduler.scheduler.quartz.QZeroSizeThreadPool
+      org.quartz.threadPool.class: org.apache.dolphinscheduler.scheduler.quartz.QuartzZeroSizeThreadPool
       org.quartz.jobStore.useProperties: false
       org.quartz.jobStore.misfireThreshold: 60000
       org.quartz.scheduler.makeSchedulerThreadDaemon: true
