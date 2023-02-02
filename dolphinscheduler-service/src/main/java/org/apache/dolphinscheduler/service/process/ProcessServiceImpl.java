@@ -336,7 +336,7 @@ public class ProcessServiceImpl implements ProcessService {
                 processInstance.getProcessDefinitionVersion());
         if (processDefinition.getExecutionType().typeIsSerial()) {
             saveSerialProcess(processInstance, processDefinition);
-            if (processInstance.getState() != WorkflowExecutionStatus.SUBMITTED_SUCCESS) {
+            if (processInstance.getState() != WorkflowExecutionStatus.RUNNING_EXECUTION) {
                 setSubProcessParam(processInstance);
                 triggerRelationService.saveProcessInstanceTrigger(command.getId(), processInstance.getId());
                 deleteCommandWithCheck(command.getId());
@@ -364,7 +364,7 @@ public class ProcessServiceImpl implements ProcessService {
                             org.apache.dolphinscheduler.service.utils.Constants.RUNNING_PROCESS_STATE,
                             processInstance.getId());
             if (CollectionUtils.isEmpty(runningProcessInstances)) {
-                processInstance.setStateWithDesc(WorkflowExecutionStatus.SUBMITTED_SUCCESS,
+                processInstance.setStateWithDesc(WorkflowExecutionStatus.RUNNING_EXECUTION,
                         "submit from serial_wait strategy");
                 processInstanceDao.upsertProcessInstance(processInstance);
             }
@@ -380,7 +380,7 @@ public class ProcessServiceImpl implements ProcessService {
                 processInstanceDao.upsertProcessInstance(processInstance);
                 return;
             }
-            processInstance.setStateWithDesc(WorkflowExecutionStatus.SUBMITTED_SUCCESS,
+            processInstance.setStateWithDesc(WorkflowExecutionStatus.RUNNING_EXECUTION,
                     "submit from serial_discard strategy");
             processInstanceDao.upsertProcessInstance(processInstance);
         } else if (processDefinition.getExecutionType().typeIsSerialPriority()) {
@@ -408,7 +408,7 @@ public class ProcessServiceImpl implements ProcessService {
                     }
                 }
             }
-            processInstance.setStateWithDesc(WorkflowExecutionStatus.SUBMITTED_SUCCESS,
+            processInstance.setStateWithDesc(WorkflowExecutionStatus.RUNNING_EXECUTION,
                     "submit by serial_priority strategy");
             processInstanceDao.upsertProcessInstance(processInstance);
         }
