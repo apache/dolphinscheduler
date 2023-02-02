@@ -135,11 +135,6 @@ public class TaskConstants {
     public static final String SH = "sh";
 
     /**
-     * default log cache rows num,output when reach the number
-     */
-    public static final int DEFAULT_LOG_ROWS_NUM = 4 * 16;
-
-    /**
      * log flush interval?output when reach the interval
      */
     public static final int DEFAULT_LOG_FLUSH_INTERVAL = 1000;
