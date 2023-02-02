@@ -133,12 +133,12 @@ public class StatisticsV2ControllerTest extends AbstractControllerTest {
     public void testCountDefinitionByUser() {
         User loginUser = getLoginUser();
 
-        Map<String, Object> result = new HashMap<>();
+        Result result = new Result();
         StatisticsStateRequest statisticsStateRequest = new StatisticsStateRequest();
 
         List<ExecuteStatusCount> executeStatusCounts = new ArrayList<>();
         TaskCountDto taskCountResult = new TaskCountDto(executeStatusCounts);
-        result.put(Constants.DATA_LIST, taskCountResult);
+        result.setData(taskCountResult);
         putMsg(result, Status.SUCCESS);
         Mockito.when(dataAnalysisService.countDefinitionByUserV2(loginUser, statisticsStateRequest.getProjectCode(),
                 null, null)).thenReturn(result);
@@ -151,7 +151,7 @@ public class StatisticsV2ControllerTest extends AbstractControllerTest {
     @Test
     public void testCountDefinitionByUserId() {
         User loginUser = getLoginUser();
-        Map<String, Object> result = new HashMap<>();
+        Result result = new Result();
         Integer userId = 1;
 
         putMsg(result, Status.SUCCESS);

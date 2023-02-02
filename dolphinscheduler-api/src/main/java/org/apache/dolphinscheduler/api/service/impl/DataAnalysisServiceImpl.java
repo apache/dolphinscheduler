@@ -581,23 +581,23 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
      * @return definition count data
      */
     @Override
-    public Map<String, Object> countDefinitionByUserV2(User loginUser, Long projectCode, Integer userId,
-                                                       Integer releaseState) {
-        Map<String, Object> result = new HashMap<>();
+    public Result countDefinitionByUserV2(User loginUser, Long projectCode, Integer userId,
+                                          Integer releaseState) {
+        Result<DefineUserDto> result = new Result<>();
         if (null != projectCode) {
             Project project = projectMapper.queryByCode(projectCode);
-            result = projectService.checkProjectAndAuth(loginUser, project, projectCode, PROJECT_OVERVIEW);
-            if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            projectService.checkProjectAndAuth(result, loginUser, project, projectCode, PROJECT_OVERVIEW);
+            if (result.getCode() != Status.SUCCESS.getCode()) {
                 return result;
             }
         }
 
         List<DefinitionGroupByUser> defineGroupByUsers = new ArrayList<>();
-        Pair<Set<Integer>, Map<String, Object>> projectIds = getProjectIds(loginUser, result);
+        Pair<Set<Integer>, Result> projectIds = getProjectIds(loginUser, result);
         if (projectIds.getRight() != null) {
             List<DefinitionGroupByUser> emptyList = new ArrayList<>();
             DefineUserDto dto = new DefineUserDto(emptyList);
-            result.put(Constants.DATA_LIST, dto);
+            result.setData(dto);
             putMsg(result, Status.SUCCESS);
             return result;
         }
@@ -609,7 +609,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         }
 
         DefineUserDto dto = new DefineUserDto(defineGroupByUsers);
-        result.put(Constants.DATA_LIST, dto);
+        result.setData(dto);
         putMsg(result, Status.SUCCESS);
         return result;
     }

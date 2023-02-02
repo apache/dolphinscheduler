@@ -166,8 +166,7 @@ public class StatisticsV2Controller extends BaseController {
         if (null == projectCode && !StringUtils.isBlank(projectName)) {
             projectCode = dataAnalysisService.getProjectCodeByName(projectName);
         }
-        Map<String, Object> result = dataAnalysisService.countDefinitionByUserV2(loginUser, projectCode, null, null);
-        return returnDataList(result);
+        return dataAnalysisService.countDefinitionByUserV2(loginUser, projectCode, null, null);
     }
 
     /**
@@ -183,8 +182,7 @@ public class StatisticsV2Controller extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result countDefinitionByUserId(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @PathVariable("userId") Integer userId) {
-        Map<String, Object> result = dataAnalysisService.countDefinitionByUserV2(loginUser, null, userId, null);
-        return returnDataList(result);
+        return dataAnalysisService.countDefinitionByUserV2(loginUser, null, userId, null);
     }
     /**
      * statistics the workflow quantities of certain userId and releaseState
@@ -201,7 +199,6 @@ public class StatisticsV2Controller extends BaseController {
     public Result countDefinitionByUserState(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                              @PathVariable("userId") Integer userId,
                                              @PathVariable("releaseState") Integer releaseState) {
-        Map<String, Object> result = dataAnalysisService.countDefinitionByUserV2(loginUser, null, userId, releaseState);
-        return returnDataList(result);
+        return dataAnalysisService.countDefinitionByUserV2(loginUser, null, userId, releaseState);
     }
 }

@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.api.dto.project.StatisticsStateRequest;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
 import org.apache.dolphinscheduler.dao.entity.User;
 
@@ -26,6 +26,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * data analysis service
@@ -76,7 +77,7 @@ public interface DataAnalysisService {
      * @param releaseState releaseState
      * @return workflow count data
      */
-    Map<String, Object> countDefinitionByUserV2(User loginUser, Long projectCode, Integer userId, Integer releaseState);
+    Result countDefinitionByUserV2(User loginUser, Long projectCode, Integer userId, Integer releaseState);
 
     /**
      * statistical command status data
