@@ -85,7 +85,6 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
     public static final String HDFS_SITE_XML = "hdfs-site.xml";
     public static final String CORE_SITE_XML = "core-site.xml";
 
-
     private static final LoadingCache<String, HdfsStorageOperator> cache = CacheBuilder
             .newBuilder()
             .expireAfterWrite(HdfsStorageProperties.getKerberosExpireTime(), TimeUnit.HOURS)
@@ -149,7 +148,8 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
             // the default is the local file system
             if (StringUtils.isNotBlank(defaultFS)) {
                 configuration.set(Constants.HDFS_DEFAULT_FS, defaultFS);
-                // todo : question - Is this convenient for users to configure HDFS? And Whether it is convenient enough to configure environment variables `HADOOP_CONF_DIR`
+                // todo : question - Is this convenient for users to configure HDFS? And Whether it is convenient enough
+                // to configure environment variables `HADOOP_CONF_DIR`
                 Map<String, String> fsRelatedProps = PropertyUtils.getPrefixedProperties("resource.hdfs.fs.");
                 fsRelatedProps.forEach((key, value) -> configuration.set(key.substring(14), value));
             } else {

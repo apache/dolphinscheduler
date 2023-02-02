@@ -121,7 +121,7 @@ public class HdfsStorageOperatorTest {
     }
 
     private String invokeGetHadoopConfPath(String hadoopConfDirEnv,
-                                               String hadoopHomeEnv) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+                                           String hadoopHomeEnv) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Method method =
                 HdfsStorageOperator.class.getDeclaredMethod("getHadoopConfPath", String.class, String.class);
         method.setAccessible(true);
