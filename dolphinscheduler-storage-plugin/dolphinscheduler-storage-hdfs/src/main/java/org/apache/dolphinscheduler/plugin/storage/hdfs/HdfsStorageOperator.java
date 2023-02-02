@@ -53,6 +53,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -79,6 +80,11 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
     private static final Logger logger = LoggerFactory.getLogger(HdfsStorageOperator.class);
     private static HdfsStorageProperties hdfsProperties;
     private static final String HADOOP_UTILS_KEY = "HADOOP_UTILS_KEY";
+    public static final String HADOOP_HOME = "HADOOP_HOME";
+    public static final String HADOOP_CONF_DIR = "HADOOP_CONF_DIR";
+    public static final String HDFS_SITE_XML = "hdfs-site.xml";
+    public static final String CORE_SITE_XML = "core-site.xml";
+
 
     private static final LoadingCache<String, HdfsStorageOperator> cache = CacheBuilder
             .newBuilder()
@@ -132,11 +138,7 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
     private void init() throws NullPointerException {
         try {
             configuration = new HdfsConfiguration();
-            String hadoopConfDir = System.getenv("HADOOP_CONF_DIR");
-            if(StringUtils.isNotBlank(hadoopConfDir)){
-                configuration.addResource(new Path(hadoopConfDir,"hdfs-site.xml"));
-                configuration.addResource(new Path(hadoopConfDir,"core-site.xml"));
-            }
+            loadHdfsConfigurationFromEnv(configuration);
             boolean isKerberosAuthen = false;
             if (CommonUtils.loadKerberosConf(configuration)) {
                 isKerberosAuthen = true;
@@ -170,7 +172,7 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
                 });
             } else {
                 fs = FileSystem.get(configuration);
-                if(!isKerberosAuthen){
+                if (!isKerberosAuthen) {
                     logger.warn("resource.hdfs.root.user is not set value!");
                 }
             }
@@ -178,6 +180,35 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
+    }
+
+    /**
+     * auto load hdfs configuration from os env
+     * @param configuration
+     */
+    private void loadHdfsConfigurationFromEnv(Configuration configuration) {
+        String hadoopConfDirEnv = System.getenv(HADOOP_CONF_DIR);
+        String hadoopHomeEnv = System.getenv(HADOOP_HOME);
+        String hadoopConfPath = getHadoopConfPath(hadoopConfDirEnv, hadoopHomeEnv);
+        if (StringUtils.isNotBlank(hadoopConfPath)) {
+            configuration.addResource(new Path(hadoopConfPath, HDFS_SITE_XML));
+            configuration.addResource(new Path(hadoopConfPath, CORE_SITE_XML));
+        }
+    }
+
+    private String getHadoopConfPath(String hadoopConfDirEnv, String hadoopHomeEnv) {
+        String hadoopConfPath = null;
+        if (StringUtils.isBlank(hadoopConfDirEnv) || !Files.exists(java.nio.file.Paths.get(hadoopConfDirEnv))) {
+            if (StringUtils.isNotBlank(hadoopHomeEnv)) {
+                java.nio.file.Path confPath = Paths.get(hadoopHomeEnv, "conf");
+                if (Files.exists(confPath)) {
+                    hadoopConfPath = confPath.toString();
+                }
+            }
+        } else {
+            hadoopConfPath = hadoopConfDirEnv;
+        }
+        return hadoopConfPath;
     }
 
     /**
@@ -193,7 +224,9 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
     public String getDefaultFS() {
         String defaultFS = getConfiguration().get(Constants.FS_DEFAULT_FS);
         if (StringUtils.isBlank(defaultFS) || defaultFS.equals("file:///")) {
-            logger.info("the property [{}] value from core-site.xml is [{}] . It is not the expected value, will use the config value in common.properties.", Constants.HDFS_DEFAULT_FS,  defaultFS);
+            logger.info(
+                    "the property [{}] value from core-site.xml is [{}] . It is not the expected value, will use the config value in common.properties.",
+                    Constants.HDFS_DEFAULT_FS, defaultFS);
             defaultFS = hdfsProperties.getDefaultFS();
         }
         return defaultFS;

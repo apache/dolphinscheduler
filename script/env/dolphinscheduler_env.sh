@@ -17,7 +17,10 @@
 
 
 # Never put sensitive config such as database password here in your production environment,
-# this file will be sourced everytime a new task is executed.
+
+# auto load hdfs configuration from environment
+#export HADOOP_HOME=${HADOOP_HOME:-/opt/soft/hadoop}
+#export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-/opt/soft/hadoop/etc/hadoop}
 
 # applicationId auto collection related configuration, the following configurations are unnecessary if setting appId.collect=log
 #export HADOOP_CLASSPATH=`hadoop classpath`:${DOLPHINSCHEDULER_HOME}/tools/libs/*
