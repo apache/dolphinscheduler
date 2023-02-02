@@ -74,8 +74,8 @@ public class TaskExecutionContextCacheManager {
 
     public static boolean statusIsStop(Integer taskInstanceId) {
         TaskRequest taskRequest = taskRequestContextCache.get(taskInstanceId);
-        if (taskRequest == null) {
-            return true;
+        if (taskRequest == null || taskRequest.getCurrentExecutionStatus() == null) {
+            return false;
         }
         return taskRequest.getCurrentExecutionStatus().typeIsStop();
     }
