@@ -53,7 +53,7 @@ public class YarnClientAspect {
      *
      * @param appContext     application context when invoking YarnClientImpl.submitApplication
      * @param submittedAppId the submitted application id returned by YarnClientImpl.submitApplication
-     * @throws Throwable exception0s
+     * @throws Throwable exceptions
      */
     @AfterReturning(pointcut = "execution(ApplicationId org.apache.hadoop.yarn.client.api.impl.YarnClientImpl." +
             "submitApplication(ApplicationSubmissionContext)) && args(appContext)", returning = "submittedAppId", argNames = "appContext,submittedAppId")
