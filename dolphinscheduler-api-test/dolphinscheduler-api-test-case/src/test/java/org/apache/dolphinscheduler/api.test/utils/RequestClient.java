@@ -46,7 +46,7 @@ public class RequestClient {
     }
 
     private void setCsrfToken(Map<String, String> headers){
-        headers.put("Cookie","csrfToken=4182caff-edf7-48e1-a29f-93b56d03295a;");
+        headers.put("Cookie","XSRF-TOKEN=4182caff-edf7-48e1-a29f-93b56d03295a;");
         headers.put("X-XSRF-TOKEN","4182caff-edf7-48e1-a29f-93b56d03295a");
     }
 
