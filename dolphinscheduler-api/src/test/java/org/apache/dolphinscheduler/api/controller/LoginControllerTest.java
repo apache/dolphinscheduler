@@ -17,10 +17,19 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+
+import java.util.Map;
+
+import javax.servlet.http.Cookie;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -29,13 +38,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-
-import javax.servlet.http.Cookie;
-import java.util.Map;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * login controller test
@@ -51,10 +53,10 @@ public class LoginControllerTest extends AbstractControllerTest {
         paramsMap.add("userPassword", "dolphinscheduler123");
 
         MvcResult mvcResult = mockMvc.perform(post("/login")
-                        .header("sessionId", sessionId)
-                        .header(CSRF_HEADER_NAME, csrfToken)
-                        .cookie(new Cookie(CSRF_COOKIE_NAME, csrfToken))
-                        .params(paramsMap))
+                .header("sessionId", sessionId)
+                .header(CSRF_HEADER_NAME, csrfToken)
+                .cookie(new Cookie(CSRF_COOKIE_NAME, csrfToken))
+                .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -72,10 +74,10 @@ public class LoginControllerTest extends AbstractControllerTest {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
 
         MvcResult mvcResult = mockMvc.perform(post("/signOut")
-                        .header("sessionId", sessionId)
-                        .cookie(new Cookie(CSRF_COOKIE_NAME, csrfToken))
-                        .header(CSRF_HEADER_NAME, csrfToken)
-                        .params(paramsMap))
+                .header("sessionId", sessionId)
+                .cookie(new Cookie(CSRF_COOKIE_NAME, csrfToken))
+                .header(CSRF_HEADER_NAME, csrfToken)
+                .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
