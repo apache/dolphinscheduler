@@ -36,7 +36,7 @@ We offer you a unit-test class while you can test the integration of DolphinSche
 > dolphinscheduler-api/src/test/java/org/apache/dolphinscheduler/api/security/impl/ldap/LdapServiceTest.java
 
 You can follow guide below：
-- Change`TestPropertySource`configuration to your LDAP information. 
+- Change`TestPropertySource`configuration to your LDAP information.
 - Change userId && userPwd to your information in the `ldapLogin` method.
 - Change the expected email to the return value you expect in the `ldapLogin` method.
 - Run`ldapLogin`method and determine whether the LDAP login result is expected.
