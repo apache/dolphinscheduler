@@ -332,22 +332,15 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn/applicationId�
 
 ## dolphinscheduler_env.sh [环境变量配置]
 
-通过类似shell方式提交任务的的时候，会加载该配置文件中的环境变量到主机中。涉及到的 `JAVA_HOME` 任务类型的环境配置，其中任务类型主要有: Shell任务、Python任务、Spark任务、Flink任务、Datax任务等等。
+配置DS的运行环境. 主要的环境变量配置包括 `JAVA_HOME`,`HADOOP_HOME`,`HADOOP_CONF_DIR`
 
 ```bash
 # JAVA_HOME, will use it to start DolphinScheduler server
 export JAVA_HOME=${JAVA_HOME:-/opt/soft/java}
 
-# Tasks related configurations, need to change the configuration if you use the related tasks.
+# DS will auto load HDFS configuration from environment
 export HADOOP_HOME=${HADOOP_HOME:-/opt/soft/hadoop}
 export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-/opt/soft/hadoop/etc/hadoop}
-export SPARK_HOME=${SPARK_HOME:-/opt/soft/spark}
-export PYTHON_HOME=${PYTHON_HOME:-/opt/soft/python}
-export HIVE_HOME=${HIVE_HOME:-/opt/soft/hive}
-export FLINK_HOME=${FLINK_HOME:-/opt/soft/flink}
-export DATAX_HOME=${DATAX_HOME:-/opt/soft/datax}
-
-export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH
 
 # applicationId auto collection related configuration, the following configurations are unnecessary if setting appId.collect=log
 export HADOOP_CLASSPATH=`hadoop classpath`:${DOLPHINSCHEDULER_HOME}/tools/libs/*
