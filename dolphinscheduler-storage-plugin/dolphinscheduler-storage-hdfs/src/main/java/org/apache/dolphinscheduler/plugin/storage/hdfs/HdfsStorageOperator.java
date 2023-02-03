@@ -199,8 +199,11 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
         if (StringUtils.isBlank(hadoopConfDirEnv) || !Files.exists(java.nio.file.Paths.get(hadoopConfDirEnv))) {
             if (StringUtils.isNotBlank(hadoopHomeEnv)) {
                 java.nio.file.Path confPath = Paths.get(hadoopHomeEnv, "conf");
+                java.nio.file.Path confPath2 = Paths.get(hadoopHomeEnv, "/etc/hadoop"); // hadoop 2.2
                 if (Files.exists(confPath)) {
                     hadoopConfPath = confPath.toString();
+                } else if (Files.exists(confPath2)) {
+                    hadoopConfPath = confPath2.toString();
                 }
             }
         } else {
