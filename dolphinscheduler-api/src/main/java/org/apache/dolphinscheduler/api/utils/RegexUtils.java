@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
  */
 public class RegexUtils {
 
-    private static final Pattern LINUX_USERNAME_PATTERN = Pattern.compile("^[a-zA-Z0-9_].{0,30}");
+    private static final Pattern LINUX_USERNAME_PATTERN = Pattern.compile("[a-zA-Z_][a-zA-Z\\d_-]{0,30}");
 
     private RegexUtils() {
     }
