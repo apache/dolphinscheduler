@@ -56,7 +56,7 @@ spec:
 
 **Configure Kubernetes environment**
 
-Reference [Cluster Management and Namespace Management](../security.md).
+Reference [Cluster Management and Namespace Management](../security/security.md).
 
 Only the required fields need to be filled in, and the others do not need to be filled in. The resource management depends on the YAML file definition in the specific Job.
 

@@ -54,7 +54,7 @@ spec:
 
 **配置Kubernetes环境**
 
-参考[集群管理和命名空间管理](../security.md)。
+参考[集群管理和命名空间管理](../security/security.md)。
 
 只需填写必填项即可，其他无需填写，资源管理依赖于具体Job中的YAML文件定义。
 

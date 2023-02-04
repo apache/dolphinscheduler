@@ -8,7 +8,7 @@
 - 队列是在执行 spark、mapreduce 等程序，需要用到“队列”参数时使用的。
 - 管理员进入安全中心 -> 队列管理页面，点击“创建队列”按钮，创建队列。
 
-![create-queue](../../../img/new_ui/dev/security/create-queue.png)
+![create-queue](../../../../img/new_ui/dev/security/create-queue.png)
 
 ## 添加租户
 
@@ -16,7 +16,7 @@
 - 租户编码：**租户编码是 Linux上 的用户，唯一，不能重复**
 - 管理员进入安全中心->租户管理页面，点击“创建租户”按钮，创建租户。
 
-![create-tenant](../../../img/new_ui/dev/security/create-tenant.png)
+![create-tenant](../../../../img/new_ui/dev/security/create-tenant.png)
 
 ## 创建普通用户
 
@@ -26,7 +26,7 @@
   * 注意：如果该用户切换了租户，则该用户所在租户下所有资源将复制到切换的新租户下。
 - 进入安全中心->用户管理页面，点击“创建用户”按钮，创建用户。
 
-![create-user](../../../img/new_ui/dev/security/create-user.png)
+![create-user](../../../../img/new_ui/dev/security/create-user.png)
 
 ### 编辑用户信息
 
@@ -43,14 +43,14 @@
 * 告警组是在启动时设置的参数，在流程结束以后会将流程的状态和其他信息以邮件形式发送给告警组。
 * 管理员进入安全中心->告警组管理页面，点击“创建告警组”按钮，创建告警组。
 
-![create-alarmInstance](../../../img/new_ui/dev/security/create-alarmInstance.png)
+![create-alarmInstance](../../../../img/new_ui/dev/security/create-alarmInstance.png)
 
 ## 令牌管理
 
 > 由于后端接口有登录检查，令牌管理提供了一种可以通过调用接口的方式对系统进行各种操作。
 > - 管理员进入安全中心->令牌管理页面，点击“创建令牌”按钮，选择失效时间与用户，点击"生成令牌"按钮，点击"提交"按钮，则选择用户的token创建成功。
 
-![create-token](../../../img/new_ui/dev/security/create-token.png)
+![create-token](../../../../img/new_ui/dev/security/create-token.png)
 
 - 普通用户登录后，点击用户名下拉框中的用户信息，进入令牌管理页面，选择失效时间，点击"生成令牌"按钮，点击"提交"按钮，则该用户创建 token 成功。
 
@@ -98,15 +98,15 @@
 * 注意：对于用户自己创建的项目，该用户默认拥有所有的权限，因此对用户自己创建的项目进行权限变更是无效的。
 - 管理员进入`安全中心->用户管理页面`，点击需授权用户的“授权”按钮，如下图所示：
 
-![project-authroize-step-1](../../../img/new_ui/dev/security/project-authroize-step-1.png)
+![project-authroize-step-1](../../../../img/new_ui/dev/security/project-authroize-step-1.png)
 
 - 勾选单个或多个项目，再点击上方授权按钮进行项目授权。上方按钮从左至右分别对应着`撤销所有权限`，`授予读权限`和`授予所有权限`（包括读权限和写权限）。
 
-![project-authroize-step-2](../../../img/new_ui/dev/security/project-authroize-step-2.png)
+![project-authroize-step-2](../../../../img/new_ui/dev/security/project-authroize-step-2.png)
 
 - 如果用户对某个项目只拥有读权限而没有写权限，则在执行删除项目或更新项目等操作时，会返回错误提示，提示用户没有写权限，无法完成该操作。
 
-![no-permission-error](../../../img/new_ui/dev/security/no-permission-error.png)
+![no-permission-error](../../../../img/new_ui/dev/security/no-permission-error.png)
 
 - 资源、数据源、UDF 函数授权同项目授权。
 
@@ -146,13 +146,13 @@ worker:
 
 - 环境配置等价于dolphinscheduler_env.sh文件内配置
 
-![create-environment](../../../img/new_ui/dev/security/create-environment.png)
+![create-environment](../../../../img/new_ui/dev/security/create-environment.png)
 
 > 使用环境
 
 - 在工作流定义中创建任务节点选择 worker 分组和 worker 分组对应的环境，任务执行时 worker 会先执行环境在执行任务.
 
-![use-environment](../../../img/new_ui/dev/security/use-environment.png)
+![use-environment](../../../../img/new_ui/dev/security/use-environment.png)
 
 > 注意: 当无法在任务定义或工作流运行对话框中使用你想要使用的环境时，请检查您已经选择worker，并且您要使用的环境已经关联到您选择的worker中
 
@@ -166,7 +166,7 @@ worker:
 
 - 创建和授权后，k8s命名空间和工作流会增加关联集群的功能。每一个集群会有独立的工作流和任务实例独立运行。
 
-![create-cluster](../../../img/new_ui/dev/security/create-cluster.png)
+![create-cluster](../../../../img/new_ui/dev/security/create-cluster.png)
 
 ## 命名空间管理
 
@@ -178,4 +178,4 @@ worker:
 
 - 创建和授权后，在相关k8s任务选择命名空间时下拉可选，如果k8s集群名字是`ds_null_k8s`是测试模式，不会真正操作集群.
 
-![create-environment](../../../img/new_ui/dev/security/create-namespace.png)
+![create-environment](../../../../img/new_ui/dev/security/create-namespace.png)

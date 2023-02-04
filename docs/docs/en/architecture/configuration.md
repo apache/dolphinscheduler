@@ -248,8 +248,9 @@ Location: `api-server/conf/application.yaml`
 |security.authentication.ldap.base.dn|dc=example,dc=com|LDAP base dn|
 |security.authentication.ldap.username|cn=read-only-admin,dc=example,dc=com|LDAP username|
 |security.authentication.ldap.password|password|LDAP password|
-|security.authentication.ldap.user.identity.attribute|uid|LDAP user identity attribute|
-|security.authentication.ldap.user.email.attribute|mail|LDAP user email attribute|
+|security.authentication.ldap.user.identity-attribute|uid|LDAP user identity attribute|
+|security.authentication.ldap.user.email-attribute|mail|LDAP user email attribute|
+|security.authentication.ldap.user.not-exist-action|CREATE|action when ldap user is not exist,default value: CREATE. Optional values include(CREATE,DENY)|
 |traffic.control.global.switch|false|traffic control global switch|
 |traffic.control.max-global-qps-rate|300|global max request number per second|
 |traffic.control.tenant-switch|false|traffic control tenant switch|
