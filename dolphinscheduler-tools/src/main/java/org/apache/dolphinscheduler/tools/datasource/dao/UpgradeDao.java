@@ -31,14 +31,14 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
+@Slf4j
 public abstract class UpgradeDao {
 
-    public static final Logger logger = LoggerFactory.getLogger(UpgradeDao.class);
     private static final String T_VERSION_NAME = "t_escheduler_version";
     private static final String T_NEW_VERSION_NAME = "t_ds_version";
 
@@ -72,7 +72,7 @@ public abstract class UpgradeDao {
                 initScriptRunner.runScript(initSqlReader);
             }
         } catch (Exception e) {
-            logger.error("Execute init sql file: {} error", sqlFile, e);
+            log.error("Execute init sql file: {} error", sqlFile, e);
             throw new RuntimeException(String.format("Execute init sql file: %s error", sqlFile), e);
         }
     }
@@ -93,7 +93,7 @@ public abstract class UpgradeDao {
             }
             return version;
         } catch (SQLException e) {
-            logger.error("Get current version from database error, sql: {}", sql, e);
+            log.error("Get current version from database error, sql: {}", sql, e);
             throw new RuntimeException("Get current version from database error, sql: " + sql, e);
         }
     }
@@ -114,7 +114,7 @@ public abstract class UpgradeDao {
             // update the size of the folder that is the type of udf.
             resourceDao.updateResourceFolderSizeByFileType(conn, 1);
         } catch (Exception ex) {
-            logger.error("Failed to upgrade because of failing to update the folder's size of resource files.");
+            log.error("Failed to upgrade because of failing to update the folder's size of resource files.");
         }
     }
 
@@ -144,12 +144,12 @@ public abstract class UpgradeDao {
                 }
                 conn.commit();
             }
-            logger.info("Success execute the dml file, schemaDir:  {}, ddlScript: {}", schemaDir, scriptFile);
+            log.info("Success execute the dml file, schemaDir:  {}, ddlScript: {}", schemaDir, scriptFile);
         } catch (FileNotFoundException e) {
-            logger.error("Cannot find the DDL file, schemaDir:  {}, ddlScript: {}", schemaDir, scriptFile, e);
+            log.error("Cannot find the DDL file, schemaDir:  {}, ddlScript: {}", schemaDir, scriptFile, e);
             throw new RuntimeException("sql file not found ", e);
         } catch (Exception e) {
-            logger.error("Execute ddl file failed, meet an unknown exception, schemaDir:  {}, ddlScript: {}", schemaDir,
+            log.error("Execute ddl file failed, meet an unknown exception, schemaDir:  {}, ddlScript: {}", schemaDir,
                     scriptFile, e);
             throw new RuntimeException("Execute ddl file failed, meet an unknown exception", e);
         }
@@ -170,12 +170,12 @@ public abstract class UpgradeDao {
             try (Reader sqlReader = new InputStreamReader(sqlFilePath.getInputStream())) {
                 scriptRunner.runScript(sqlReader);
             }
-            logger.info("Success execute the ddl file, schemaDir:  {}, ddlScript: {}", schemaDir, scriptFile);
+            log.info("Success execute the ddl file, schemaDir:  {}, ddlScript: {}", schemaDir, scriptFile);
         } catch (FileNotFoundException e) {
-            logger.error("Cannot find the DDL file, schemaDir:  {}, ddlScript: {}", schemaDir, scriptFile, e);
+            log.error("Cannot find the DDL file, schemaDir:  {}, ddlScript: {}", schemaDir, scriptFile, e);
             throw new RuntimeException("sql file not found ", e);
         } catch (Exception e) {
-            logger.error("Execute ddl file failed, meet an unknown exception, schemaDir:  {}, ddlScript: {}", schemaDir,
+            log.error("Execute ddl file failed, meet an unknown exception, schemaDir:  {}, ddlScript: {}", schemaDir,
                     scriptFile, e);
             throw new RuntimeException("Execute ddl file failed, meet an unknown exception", e);
         }
@@ -200,7 +200,7 @@ public abstract class UpgradeDao {
             pstmt.executeUpdate();
 
         } catch (SQLException e) {
-            logger.error("Update version error, sql: {}", upgradeSQL, e);
+            log.error("Update version error, sql: {}", upgradeSQL, e);
             throw new RuntimeException("Upgrade version error, sql: " + upgradeSQL, e);
         }
     }

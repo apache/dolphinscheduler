@@ -28,8 +28,8 @@ import org.apache.dolphinscheduler.server.master.service.ExecutingService;
 
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -40,9 +40,8 @@ import io.netty.channel.Channel;
  * workflow executing data process from api/master
  */
 @Component
+@Slf4j
 public class WorkflowExecutingDataRequestProcessor implements NettyRequestProcessor {
-
-    private final Logger logger = LoggerFactory.getLogger(WorkflowExecutingDataRequestProcessor.class);
 
     @Autowired
     private ExecutingService executingService;
@@ -55,7 +54,7 @@ public class WorkflowExecutingDataRequestProcessor implements NettyRequestProces
         WorkflowExecutingDataRequestCommand requestCommand =
                 JSONUtils.parseObject(command.getBody(), WorkflowExecutingDataRequestCommand.class);
 
-        logger.info("received command, processInstanceId:{}", requestCommand.getProcessInstanceId());
+        log.info("received command, processInstanceId:{}", requestCommand.getProcessInstanceId());
 
         Optional<WorkflowExecuteDto> workflowExecuteDtoOptional =
                 executingService.queryWorkflowExecutingData(requestCommand.getProcessInstanceId());

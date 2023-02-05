@@ -37,15 +37,13 @@ import java.nio.file.NoSuchFileException;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedInputStream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * file utils
  */
+@Slf4j
 public class FileUtils {
-
-    public static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
 
     public static final String DATA_BASEDIR = PropertyUtils.getString(DATA_BASEDIR_PATH, "/tmp/dolphinscheduler");
 
@@ -160,7 +158,7 @@ public class FileUtils {
         // create work dir
         org.apache.commons.io.FileUtils.forceMkdir(execLocalPathFile);
         String mkdirLog = "create dir success " + execLocalPath;
-        logger.info(mkdirLog);
+        log.info(mkdirLog);
     }
 
     /**
@@ -175,13 +173,13 @@ public class FileUtils {
         try {
             File distFile = new File(filePath);
             if (!distFile.getParentFile().exists() && !distFile.getParentFile().mkdirs()) {
-                logger.error("mkdir parent failed");
+                log.error("mkdir parent failed");
                 return false;
             }
             fos = new FileOutputStream(filePath);
             IOUtils.write(content, fos, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             return false;
         } finally {
             IOUtils.closeQuietly(fos);
@@ -241,7 +239,7 @@ public class FileUtils {
             }
             return output.toString(UTF_8);
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }

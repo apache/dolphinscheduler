@@ -56,15 +56,13 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class WorkerFailoverService {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(WorkerFailoverService.class);
 
     private final RegistryClient registryClient;
     private final MasterConfig masterConfig;
@@ -102,7 +100,7 @@ public class WorkerFailoverService {
      * @param workerHost worker host
      */
     public void failoverWorker(@NonNull String workerHost) {
-        LOGGER.info("Worker[{}] failover starting", workerHost);
+        log.info("Worker[{}] failover starting", workerHost);
         final StopWatch failoverTimeCost = StopWatch.createStarted();
 
         // we query the task instance from cache, so that we can directly update the cache
@@ -111,10 +109,10 @@ public class WorkerFailoverService {
 
         final List<TaskInstance> needFailoverTaskInstanceList = getNeedFailoverTaskInstance(workerHost);
         if (CollectionUtils.isEmpty(needFailoverTaskInstanceList)) {
-            LOGGER.info("Worker[{}] failover finished there are no taskInstance need to failover", workerHost);
+            log.info("Worker[{}] failover finished there are no taskInstance need to failover", workerHost);
             return;
         }
-        LOGGER.info(
+        log.info(
                 "Worker[{}] failover there are {} taskInstance may need to failover, will do a deep check, taskInstanceIds: {}",
                 workerHost,
                 needFailoverTaskInstanceList.size(),
@@ -133,22 +131,22 @@ public class WorkerFailoverService {
                             return workflowExecuteRunnable.getProcessInstance();
                         });
                 if (!checkTaskInstanceNeedFailover(needFailoverWorkerStartTime, processInstance, taskInstance)) {
-                    LOGGER.info("Worker[{}] the current taskInstance doesn't need to failover", workerHost);
+                    log.info("Worker[{}] the current taskInstance doesn't need to failover", workerHost);
                     continue;
                 }
-                LOGGER.info(
+                log.info(
                         "Worker[{}] failover: begin to failover taskInstance, will set the status to NEED_FAULT_TOLERANCE",
                         workerHost);
                 failoverTaskInstance(processInstance, taskInstance);
-                LOGGER.info("Worker[{}] failover: Finish failover taskInstance", workerHost);
+                log.info("Worker[{}] failover: Finish failover taskInstance", workerHost);
             } catch (Exception ex) {
-                LOGGER.info("Worker[{}] failover taskInstance occur exception", workerHost, ex);
+                log.info("Worker[{}] failover taskInstance occur exception", workerHost, ex);
             } finally {
                 LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
         }
         failoverTimeCost.stop();
-        LOGGER.info("Worker[{}] failover finished, useTime:{}ms",
+        log.info("Worker[{}] failover finished, useTime:{}ms",
                 workerHost,
                 failoverTimeCost.getTime(TimeUnit.MILLISECONDS));
     }
@@ -170,7 +168,7 @@ public class WorkerFailoverService {
         taskInstance.setProcessInstance(processInstance);
 
         if (!isMasterTask) {
-            LOGGER.info("The failover taskInstance is not master task");
+            log.info("The failover taskInstance is not master task");
             TaskExecutionContext taskExecutionContext = TaskExecutionContextBuilder.get()
                     .buildTaskInstanceRelatedInfo(taskInstance)
                     .buildProcessInstanceRelatedInfo(processInstance)
@@ -179,11 +177,11 @@ public class WorkerFailoverService {
 
             if (masterConfig.isKillYarnJobWhenTaskFailover()) {
                 // only kill yarn job if exists , the local thread has exited
-                LOGGER.info("TaskInstance failover begin kill the task related yarn job");
+                log.info("TaskInstance failover begin kill the task related yarn job");
                 ProcessUtils.killYarnJob(logClient, taskExecutionContext);
             }
         } else {
-            LOGGER.info("The failover taskInstance is a master task");
+            log.info("The failover taskInstance is a master task");
         }
 
         taskInstance.setState(TaskExecutionStatus.NEED_FAULT_TOLERANCE);
@@ -209,18 +207,18 @@ public class WorkerFailoverService {
                                                   TaskInstance taskInstance) {
         if (processInstance == null) {
             // This case should be happened.
-            LOGGER.error(
+            log.error(
                     "Failover task instance error, cannot find the related processInstance form memory, this case shouldn't happened");
             return false;
         }
         if (taskInstance == null) {
             // This case should be happened.
-            LOGGER.error("Master failover task instance error, taskInstance is null, this case shouldn't happened");
+            log.error("Master failover task instance error, taskInstance is null, this case shouldn't happened");
             return false;
         }
         // only failover the task owned myself if worker down.
         if (!StringUtils.equalsIgnoreCase(processInstance.getHost(), localAddress)) {
-            LOGGER.error(
+            log.error(
                     "Master failover task instance error, the taskInstance's processInstance's host: {} is not the current master: {}",
                     processInstance.getHost(),
                     localAddress);
@@ -228,7 +226,7 @@ public class WorkerFailoverService {
         }
         if (taskInstance.getState() != null && taskInstance.getState().isFinished()) {
             // The taskInstance is already finished, doesn't need to failover
-            LOGGER.info("The task is already finished, doesn't need to failover");
+            log.info("The task is already finished, doesn't need to failover");
             return false;
         }
         if (!needFailoverWorkerStartTime.isPresent()) {
@@ -238,7 +236,7 @@ public class WorkerFailoverService {
         // The worker is active, may already send some new task to it
         if (taskInstance.getSubmitTime() != null && taskInstance.getSubmitTime()
                 .after(needFailoverWorkerStartTime.get())) {
-            LOGGER.info(
+            log.info(
                     "The taskInstance's submitTime: {} is after the need failover worker's start time: {}, the taskInstance is newly submit, it doesn't need to failover",
                     taskInstance.getSubmitTime(),
                     needFailoverWorkerStartTime.get());

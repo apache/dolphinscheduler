@@ -87,7 +87,7 @@ public class MapReduceTask extends AbstractYarnTask {
                     ParamUtils.convert(paramsMap));
             mapreduceParameters.setOthers(others);
         }
-        logger.info("Initialize mapreduce task params {}", JSONUtils.toPrettyJsonString(mapreduceParameters));
+        log.info("Initialize mapreduce task params {}", JSONUtils.toPrettyJsonString(mapreduceParameters));
     }
 
     /**
@@ -105,7 +105,7 @@ public class MapReduceTask extends AbstractYarnTask {
 
         String command = ParameterUtils.convertParameterPlaceholders(String.join(" ", args),
                 taskExecutionContext.getDefinedParams());
-        logger.info("mapreduce task command: {}", command);
+        log.info("mapreduce task command: {}", command);
 
         return command;
     }

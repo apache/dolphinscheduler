@@ -27,8 +27,8 @@ import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteResultAckP
 import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteRunningAckProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskRejectAckProcessor;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -36,9 +36,8 @@ import org.springframework.stereotype.Component;
  * This rpc client is only used to send message, will not receive message, all response message should send to {@link WorkerRpcServer}.
  */
 @Component
+@Slf4j
 public class WorkerRpcClient implements AutoCloseable {
-
-    private final Logger logger = LoggerFactory.getLogger(WorkerRpcClient.class);
 
     @Autowired
     private TaskExecuteRunningAckProcessor taskExecuteRunningAckProcessor;
@@ -52,7 +51,7 @@ public class WorkerRpcClient implements AutoCloseable {
     private NettyRemotingClient nettyRemotingClient;
 
     public void start() {
-        logger.info("Worker rpc client starting");
+        log.info("Worker rpc client starting");
         NettyClientConfig nettyClientConfig = new NettyClientConfig();
         this.nettyRemotingClient = new NettyRemotingClient(nettyClientConfig);
         // we only use the client to handle the ack message, we can optimize this, send ack to the nettyServer.
@@ -60,7 +59,7 @@ public class WorkerRpcClient implements AutoCloseable {
                 taskExecuteRunningAckProcessor);
         this.nettyRemotingClient.registerProcessor(CommandType.TASK_EXECUTE_RESULT_ACK, taskExecuteResultAckProcessor);
         this.nettyRemotingClient.registerProcessor(CommandType.TASK_REJECT_ACK, taskRejectAckProcessor);
-        logger.info("Worker rpc client started");
+        log.info("Worker rpc client started");
     }
 
     public void send(Host host, Command command) throws RemotingException {
@@ -68,8 +67,8 @@ public class WorkerRpcClient implements AutoCloseable {
     }
 
     public void close() {
-        logger.info("Worker rpc client closing");
+        log.info("Worker rpc client closing");
         nettyRemotingClient.close();
-        logger.info("Worker rpc client closed");
+        log.info("Worker rpc client closed");
     }
 }

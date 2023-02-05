@@ -35,8 +35,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -44,9 +44,8 @@ import org.springframework.stereotype.Repository;
  * Task Instance DAO implementation
  */
 @Repository
+@Slf4j
 public class TaskInstanceDaoImpl implements TaskInstanceDao {
-
-    private final Logger logger = LoggerFactory.getLogger(TaskInstanceDaoImpl.class);
 
     @Autowired
     private TaskInstanceMapper taskInstanceMapper;
@@ -82,7 +81,7 @@ public class TaskInstanceDaoImpl implements TaskInstanceDao {
     public TaskInstance submitTaskInstanceToDB(TaskInstance taskInstance, ProcessInstance processInstance) {
         WorkflowExecutionStatus processInstanceState = processInstance.getState();
         if (processInstanceState.isFinished() || processInstanceState == WorkflowExecutionStatus.READY_STOP) {
-            logger.warn("processInstance: {} state was: {}, skip submit this task, taskCode: {}",
+            log.warn("processInstance: {} state was: {}, skip submit this task, taskCode: {}",
                     processInstance.getId(),
                     processInstanceState,
                     taskInstance.getTaskCode());
@@ -180,7 +179,7 @@ public class TaskInstanceDaoImpl implements TaskInstanceDao {
             taskInstanceMapper.clearCacheByCacheKey(cacheKey);
             return true;
         } catch (Exception e) {
-            logger.error("clear cache by cacheKey failed", e);
+            log.error("clear cache by cacheKey failed", e);
             return false;
         }
     }
