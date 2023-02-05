@@ -28,5 +28,7 @@ public enum FlinkDeployMode {
     @JsonProperty("cluster")
     CLUSTER,
     @JsonProperty("application")
-    APPLICATION
+    APPLICATION,
+    @JsonProperty("standalone")
+    STANDALONE
 }
