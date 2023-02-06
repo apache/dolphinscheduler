@@ -72,12 +72,14 @@ public class MigrateResourceService {
         List<Resource> resources = resourceMapper.queryResourceExceptUserId(-1);
         resources.forEach(resource -> {
             try {
+                String oriFullName = resource.getFullName();
+                oriFullName = oriFullName.startsWith("/") ? oriFullName.substring(1) : oriFullName;
                 if (resource.getType().equals(ResourceType.FILE)) {
-                    storageOperate.copy(resource.getFullName(),
-                            String.format(FORMAT_S_S, resMigrateBasePath, resource.getFullName()), true, true);
+                    storageOperate.copy(oriFullName,
+                            String.format(FORMAT_S_S, resMigrateBasePath, oriFullName), true, true);
                 } else if (resource.getType().equals(ResourceType.UDF)) {
-                    String fullName = String.format(FORMAT_S_S, udfMigrateBasePath, resource.getFullName());
-                    storageOperate.copy(resource.getFullName(), fullName, true, true);
+                    String fullName = String.format(FORMAT_S_S, udfMigrateBasePath, oriFullName);
+                    storageOperate.copy(oriFullName, fullName, true, true);
 
                     // change relative udfs resourceName
                     List<UdfFunc> udfs = udfFuncMapper.listUdfByResourceId(new Integer[]{resource.getId()});
