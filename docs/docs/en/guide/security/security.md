@@ -9,7 +9,7 @@ Administrator login, default username/password: admin/dolphinscheduler123
 - The queue is used when executing programs such as spark and mapreduce, and the "queue" parameter needs to be used.
 - The administrator enters the `Security Center->Queue Management` page and clicks the "Create Queue" button to create a new queue.
 
-![create-queue](../../../img/new_ui/dev/security/create-queue.png)
+![create-queue](../../../../img/new_ui/dev/security/create-queue.png)
 
 ## Add Tenant
 
@@ -17,7 +17,7 @@ Administrator login, default username/password: admin/dolphinscheduler123
 - Tenant Code: **The tenant code is the user on Linux, unique and cannot be repeated**
 - The administrator enters the `Security Center->Tenant Management` page, and clicks the `Create Tenant` button to create a tenant.
 
-![create-tenant](../../../img/new_ui/dev/security/create-tenant.png)
+![create-tenant](../../../../img/new_ui/dev/security/create-tenant.png)
 
 ## Create Normal User
 
@@ -29,7 +29,7 @@ Users are divided into **administrator users** and **ordinary users**
 
 Go to the `Security Center -> User Management` page and click the `Create User` button to create a user, administrator only.
 
-![create-user](../../../img/new_ui/dev/security/create-user.png)
+![create-user](../../../../img/new_ui/dev/security/create-user.png)
 
 ### Edit user information
 
@@ -49,7 +49,7 @@ The alarm group is a parameter set at startup. After the process ends, the statu
 
 The administrator enters the `Security Center -> Alarm Group Management` page and clicks the `Create Alarm Group` button to create an alarm group.
 
-![create-alarmInstance](../../../img/new_ui/dev/security/create-alarmInstance.png)
+![create-alarmInstance](../../../../img/new_ui/dev/security/create-alarmInstance.png)
 
 ## Token Management
 
@@ -57,7 +57,7 @@ Since the back-end interface has a login check, token management provides a way 
 
 The administrator enters the `Security Center -> Token Management page`, clicks the `Create Token` button, selects the expiration time and user, clicks the `Generate Token` button, and clicks the `Submit` button, then create the selected user's token successfully.
 
-![create-token](../../../img/new_ui/dev/security/create-token.png)
+![create-token](../../../../img/new_ui/dev/security/create-token.png)
 
 After a normal user logs in, click the user information in the username drop-down box, enter the token management page, select the expiration time, click the `Generate Token` button, and click the `Submit` button, then the user creates a token successfully.
 
@@ -104,15 +104,15 @@ public  void doPOSTParam()throws Exception{
 * Note: For projects created by the user, the user has all permissions. Therefore, permission changes to projects created by users themselves are not valid.
 - The administrator enters the `Security Center -> User Management` page, and clicks the "Authorize" button of the user to be authorized, as shown in the following figure:
 
-![project-authroize-step-1](../../../img/new_ui/dev/security/project-authroize-step-1.png)
+![project-authroize-step-1](../../../../img/new_ui/dev/security/project-authroize-step-1.png)
 
 - Select one or more projects and click the button above to authorize the project. The upper buttons from left to right correspond to `revoke all permissions`, `grant read permissions`, and `grant all permissions` (which including both read and write permissions).
 
-![project-authroize-step-2](../../../img/new_ui/dev/security/project-authroize-step-2.png)
+![project-authroize-step-2](../../../../img/new_ui/dev/security/project-authroize-step-2.png)
 
 - If a user has only the read permission but not the write permission for a project, and the user is trying to do something like delete or update the project, an error message is displayed indicating that the user has no write permission and cannot complete the operation.
 
-![no-permission-error](../../../img/new_ui/dev/security/no-permission-error.png)
+![no-permission-error](../../../../img/new_ui/dev/security/no-permission-error.png)
 
 - Resources, data sources, and UDF function authorization are the same as project authorization.
 
@@ -151,13 +151,13 @@ worker:
 
 The environment configuration is equivalent to the configuration in the `dolphinscheduler_env.sh` file.
 
-![create-environment](../../../img/new_ui/dev/security/create-environment.png)
+![create-environment](../../../../img/new_ui/dev/security/create-environment.png)
 
 ### Usage environment
 
 Create a task node in the workflow definition, select the worker group and the environment corresponding to the worker group. When executing the task, the Worker will execute the environment first before executing the task.
 
-![use-environment](../../../img/new_ui/dev/security/use-environment.png)
+![use-environment](../../../../img/new_ui/dev/security/use-environment.png)
 
 > NOTE: Please make sure you have associated the `Environments` with your `worker groups` if you can not select the `Environment Name` in workflow definition page or when triggering workflows.
 
@@ -169,7 +169,7 @@ Create a task node in the workflow definition, select the worker group and the e
 > Usage cluster
 > - After creation and authorization, k8s namespaces and processes will associate clusters. Each cluster will have separate workflows and task instances running independently.
 
-![create-cluster](../../../img/new_ui/dev/security/create-cluster.png)
+![create-cluster](../../../../img/new_ui/dev/security/create-cluster.png)
 
 ## Namespace Management
 
@@ -181,5 +181,5 @@ Create a task node in the workflow definition, select the worker group and the e
 
 - After creation and authorization, you can select it from the namespace drop down list when edit k8s task, If the k8s cluster name is `ds_null_k8s` means test mode which will not operate the cluster actually.
 
-![create-environment](../../../img/new_ui/dev/security/create-namespace.png)
+![create-environment](../../../../img/new_ui/dev/security/create-namespace.png)
 

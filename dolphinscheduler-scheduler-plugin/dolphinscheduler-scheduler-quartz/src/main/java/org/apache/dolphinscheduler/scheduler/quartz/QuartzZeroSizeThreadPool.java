@@ -13,6 +13,23 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
-UPDATE QRTZ_JOB_DETAILS SET job_class_name = 'org.apache.dolphinscheduler.scheduler.quartz.ProcessScheduleTask' WHERE job_class_name = 'org.apache.dolphinscheduler.service.quartz.ProcessScheduleJob';
+package org.apache.dolphinscheduler.scheduler.quartz;
+
+import org.quartz.simpl.ZeroSizeThreadPool;
+
+public class QuartzZeroSizeThreadPool extends ZeroSizeThreadPool {
+
+    /**
+     * fix spring bug : add getter、setter method for threadCount field
+     * @param count never use
+     */
+    public void setThreadCount(int count) {
+        // do nothing
+    }
+
+    public int getThreadCount() {
+        return -1;
+    }
+}

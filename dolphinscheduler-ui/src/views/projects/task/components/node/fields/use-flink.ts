@@ -53,6 +53,10 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
         {
           label: 'local',
           value: 'local'
+        },
+        {
+          label: 'standalone',
+          value: 'standalone'
         }
       ]
     }
