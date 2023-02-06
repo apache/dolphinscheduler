@@ -46,35 +46,35 @@ public class HdfsStorageOperatorTest {
     private static final Logger logger = LoggerFactory.getLogger(HdfsStorageOperatorTest.class);
 
     @Test
-    public void getHdfsTenantDir() {
+    void getHdfsTenantDir() {
         HdfsStorageOperator hdfsStorageOperator = new HdfsStorageOperator();
         logger.info(hdfsStorageOperator.getHdfsTenantDir("1234"));
         Assertions.assertTrue(true);
     }
 
     @Test
-    public void getHdfsUdfFileName() {
+    void getHdfsUdfFileName() {
         HdfsStorageOperator hdfsStorageOperator = new HdfsStorageOperator();
         logger.info(hdfsStorageOperator.getHdfsUdfFileName("admin", "file_name"));
         Assertions.assertTrue(true);
     }
 
     @Test
-    public void getHdfsResourceFileName() {
+    void getHdfsResourceFileName() {
         HdfsStorageOperator hdfsStorageOperator = new HdfsStorageOperator();
         logger.info(hdfsStorageOperator.getHdfsResourceFileName("admin", "file_name"));
         Assertions.assertTrue(true);
     }
 
     @Test
-    public void getHdfsFileName() {
+    void getHdfsFileName() {
         HdfsStorageOperator hdfsStorageOperator = new HdfsStorageOperator();
         logger.info(hdfsStorageOperator.getHdfsFileName(ResourceType.FILE, "admin", "file_name"));
         Assertions.assertTrue(true);
     }
 
     @Test
-    public void getAppAddress() {
+    void getAppAddress() {
         HdfsStorageOperator hdfsStorageOperator = new HdfsStorageOperator();
         try (MockedStatic<HttpUtils> mockedHttpUtils = Mockito.mockStatic(HttpUtils.class)) {
             mockedHttpUtils.when(() -> HttpUtils.get("http://ds1:8088/ws/v1/cluster/info"))
@@ -86,7 +86,7 @@ public class HdfsStorageOperatorTest {
 
     @DisplayName("test load Hdfs Configuration by env avaliable HADOOP_CONF_DIR, and directory exist")
     @Test
-    public void testGetHadoopConfPathFromEnvByHADOOP_CONF_DIR1() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+    void testGetHadoopConfPathFromEnvByHADOOP_CONF_DIR1() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         String hadoopConfDirEnv = System.getProperty("user.dir");
         String hadoopHomeEnv = "/not_expected";
         Assertions.assertEquals(hadoopConfDirEnv, invokeGetHadoopConfPath(hadoopConfDirEnv, hadoopHomeEnv));
@@ -94,7 +94,7 @@ public class HdfsStorageOperatorTest {
 
     @DisplayName("test load Hdfs Configuration by env avaliable HADOOP_CONF_DIR, but directory not exist")
     @Test
-    public void testGetHadoopConfPathFromEnvByHADOOP_CONF_DIR2() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+    void testGetHadoopConfPathFromEnvByHADOOP_CONF_DIR2() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         String hadoopConfDirEnv = "/not_exist";
         String hadoopHomeEnv = null;
         Assertions.assertNull(invokeGetHadoopConfPath(hadoopConfDirEnv, hadoopHomeEnv));
@@ -102,7 +102,7 @@ public class HdfsStorageOperatorTest {
 
     @DisplayName("test load Hdfs Configuration by env avaliable HADOOP_HOME, and directory exist")
     @Test
-    public void testGetHadoopConfPathFromEnvByHADOOP_HOME1() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, IOException {
+    void testGetHadoopConfPathFromEnvByHADOOP_HOME1() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, IOException {
         String hadoopConfDirEnv = null;
         String hadoopHomeEnv = System.getProperty("user.dir");
         Path hoemConfPath = Paths.get(hadoopHomeEnv, "conf");
@@ -114,7 +114,7 @@ public class HdfsStorageOperatorTest {
 
     @DisplayName("test load Hdfs Configuration by env avaliable HADOOP_HOME, and directory not exist")
     @Test
-    public void testGetHadoopConfPathFromEnvByHADOOP_HOME2() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+    void testGetHadoopConfPathFromEnvByHADOOP_HOME2() throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         String hadoopConfDirEnv = null;
         String hadoopHomeEnv = "/not_exist";
         Assertions.assertNull(invokeGetHadoopConfPath(hadoopConfDirEnv, hadoopHomeEnv));
