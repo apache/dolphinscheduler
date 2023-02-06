@@ -109,7 +109,7 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
             return;
         }
         if (multiThreadFilterMap.containsKey(workflowExecuteThread.getKey())) {
-            logger.warn("The workflow has been executed by another thread");
+            logger.debug("The workflow has been executed by another thread");
             return;
         }
         multiThreadFilterMap.put(workflowExecuteThread.getKey(), workflowExecuteThread);
@@ -133,7 +133,7 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
             public void onSuccess(Object result) {
                 try {
                     LoggerUtils.setWorkflowInstanceIdMDC(workflowExecuteThread.getProcessInstance().getId());
-                    if (workflowExecuteThread.workFlowFinish()) {
+                    if (workflowExecuteThread.workFlowFinish() && workflowExecuteThread.eventSize() == 0) {
                         stateWheelExecuteThread
                                 .removeProcess4TimeoutCheck(workflowExecuteThread.getProcessInstance().getId());
                         processInstanceExecCacheManager.removeByProcessInstanceId(processInstanceId);

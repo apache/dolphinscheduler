@@ -1,15 +1,15 @@
 # 参与社区 review
 
-贡献 DolphinScheduler 的方式，除了向 [团队](/us-en/community/community.html) 中提到的 GitHub 仓库提交 Issues 和 pull requests 外，另一非常重要的方式是
+贡献 DolphinScheduler 的方式，除了向 [团队](https://dolphinscheduler.apache.org/zh-cn/community) 中提到的 GitHub 仓库提交 Issues 和 pull requests 外，另一非常重要的方式是
 review 社区的 Issues 或者 Pull Requests。通过别人 Issues 和 Pull Requests，你不仅能知道社区的最新进展和发展方向，还能了解别人代码的设
 计思想，同时可以增加自己在社区的曝光、积累自己在社区的荣誉值。
 
-任何人都被鼓励去 review 社区的  Issues 和 Pull Requests。我们还曾经发起过一个 Help Wanted 的邮件讨论，向社区征求贡献者协助 review Issues
+任何人都被鼓励去 review 社区的 Issues 和 Pull Requests。我们还曾经发起过一个 Help Wanted 的邮件讨论，向社区征求贡献者协助 review Issues
 以及 Pull Requests，详见 [邮件][mail-review-wanted]，并将其结果放到了 [GitHub Discussion][discussion-result-review-wanted] 中。
 
 > 注意: 这里并不是说只有 [GitHub Discussion][discussion-result-review-wanted] 中提及的用户才可以协助 review Issue 或者 Pull Requests，
-> 请记住社区的主张是 **任何人都被鼓励去 review 社区的  Issues 和 Pull Requests**。只是那部分用户在邮件列表意见征集的时候，表达了愿意付
-> 出更多的时间，参与社区的 review。另一个好处是，当社区有不确定的问题的时，除了可以找 [团队](/us-en/community/community.html) 中对应的 Members 外，还可以找
+> 请记住社区的主张是 **任何人都被鼓励去 review 社区的 Issues 和 Pull Requests**。只是那部分用户在邮件列表意见征集的时候，表达了愿意付
+> 出更多的时间，参与社区的 review。另一个好处是，当社区有不确定的问题的时，除了可以找 [团队](https://dolphinscheduler.apache.org/zh-cn/community) 中对应的 Members 外，还可以找
 > [GitHub Discussion][discussion-result-review-wanted] 中提及的人解答对应的问题。如果你要想要加入到 [GitHub Discussion][discussion-result-review-wanted]
 > 中，请在该 discussion 中评论并留下你感兴趣的模块，维护者会将你加入到对应的名单中。
 
@@ -33,16 +33,16 @@ Review Issues 是指在 GitHub 中参与 [Issues][all-issues] 的讨论，并在
 
 |                    标签                    |        标签代表的情况        |
 |------------------------------------------|-----------------------|
-| [UI][label-UI]                           | UI以及前端相关的 Issue       |
+| [UI][label-ui]                           | UI 以及前端相关的 Issue      |
 | [security][label-security]               | 安全相关的 Issue           |
 | [user experience][label-user-experience] | 用户体验相关的 Issue         |
 | [development][label-development]         | 开发者相关的 Issue          |
-| [Python][label-Python]                   | Python相关的 Issue       |
+| [Python][label-python]                   | Python 相关的 Issue      |
 | [plug-in][label-plug-in]                 | 插件相关的 Issue           |
 | [document][label-document]               | 文档相关的 Issue           |
-| [docker][label-docker]                   | docker相关的 Issue       |
+| [docker][label-docker]                   | docker 相关的 Issue      |
 | [need verify][label-need-verify]         | Issue 需要被验证           |
-| [e2e][label-e2e]                         | e2e相关的 Issue          |
+| [e2e][label-e2e]                         | e2e 相关的 Issue         |
 | [win-os][label-win-os]                   | windows 操作系统相关的 Issue |
 | [suggestion][label-suggestion]           | Issue 为项目提出了建议        |
 
@@ -58,18 +58,18 @@ Review Issues 是指在 GitHub 中参与 [Issues][all-issues] 的讨论，并在
 
 在阅读以下内容是，请确保你已经为 Issue 打了标签。
 
-* 回复后及时去掉标签[Waiting for reply][label-waiting-for-reply]：在 [创建 Issue 的时候][issue-choose]，我们会为 Issue 打上特定的标签
+- 回复后及时去掉标签[Waiting for reply][label-waiting-for-reply]：在 [创建 Issue 的时候][issue-choose]，我们会为 Issue 打上特定的标签
   [Waiting for reply][label-waiting-for-reply]，方便定位还没有被回复的 Issue，所以当你 review 了 Issue 之后，就需要将标签
   [Waiting for reply][label-waiting-for-reply] 及时的从 Issue 中删除。
-* 打上 [Waiting for review][label-waiting-for-review] 标当你不确定这个 Issue 是否被解决：当你查阅了 Issue 后，会有两个情况出现。一是
-  问题已经被定位或解决，如果创建 Pull Requests 的话，则参考 [创建PR](./submit-code.md)。二是你也不确定这个问题是否真的是
+- 打上 [Waiting for review][label-waiting-for-review] 标当你不确定这个 Issue 是否被解决：当你查阅了 Issue 后，会有两个情况出现。一是
+  问题已经被定位或解决，如果创建 Pull Requests 的话，则参考 [创建 PR](./submit-code.md)。二是你也不确定这个问题是否真的是
   被解决，这时你可以为 Issue 打上 [Waiting for review][label-waiting-for-review] 标签，并在 Issue 中 `@` 对应的人进行二次确认
 
 当 Issue 需要被创建 Pull Requests 解决，也可以视情况打上部分标签
 
-|                     标签                     |     标签代表的PR      |
+|                     标签                     |     标签代表的 PR     |
 |--------------------------------------------|------------------|
-| [Chore][label-Chore]                       | 日常维护工作           |
+| [Chore][label-chore]                       | 日常维护工作           |
 | [Good first issue][label-good-first-issue] | 适合首次贡献者解决的 Issue |
 | [easy to fix][label-easy-to-fix]           | 比较容易解决           |
 | [help wanted][label-help-wanted]           | 向社区寻求帮忙          |
@@ -80,11 +80,13 @@ Review Issues 是指在 GitHub 中参与 [Issues][all-issues] 的讨论，并在
 ### Pull Requests
 
 <!-- markdown-link-check-disable -->
-Review Pull 是指在 GitHub 中参与 [Pull Requests][all-PRs] 的讨论，并在对应的 Pull Requests 给出建议。DolphinScheduler review
+
+Review Pull 是指在 GitHub 中参与 [Pull Requests][all-prs] 的讨论，并在对应的 Pull Requests 给出建议。DolphinScheduler review
 Pull Requests 与 [GitHub 的 reviewing changes in pull requests][gh-review-pr] 一样。你可以为 Pull Requests 提出自己的-->
-* 当你认为这个 Pull Requests 没有问题，可以被合并的时候，可以根据 [GitHub 的 reviewing changes in pull requests][gh-review-pr] 的
+
+- 当你认为这个 Pull Requests 没有问题，可以被合并的时候，可以根据 [GitHub 的 reviewing changes in pull requests][gh-review-pr] 的
   approve 流程同意这个 Pull Requests。
-* 当你觉得这个 Pull Requests 需要被修改时，可以根据 [GitHub 的 reviewing changes in pull requests][gh-review-pr] 的 comment
+- 当你觉得这个 Pull Requests 需要被修改时，可以根据 [GitHub 的 reviewing changes in pull requests][gh-review-pr] 的 comment
   流程评论这个 Pull Requests。当你认为存在一定要先修复才能合并的问题，请参照 [GitHub 的 reviewing changes in pull requests][gh-review-pr]
   的 Request changes 流程要求贡献者修改 Pull Requests 的内容。
 
@@ -115,15 +117,15 @@ Pull Requests 与 [GitHub 的 reviewing changes in pull requests][gh-review-pr] 
 [label-waiting-for-review]: https://github.com/apache/dolphinscheduler/labels/Waiting%20for%20review
 [label-user-experience]: https://github.com/apache/dolphinscheduler/labels/user%20experience
 [label-development]: https://github.com/apache/dolphinscheduler/labels/development
-[label-UI]: https://github.com/apache/dolphinscheduler/labels/UI
+[label-ui]: https://github.com/apache/dolphinscheduler/labels/UI
 [label-suggestion]: https://github.com/apache/dolphinscheduler/labels/suggestion
 [label-security]: https://github.com/apache/dolphinscheduler/labels/security
-[label-Python]: https://github.com/apache/dolphinscheduler/labels/Python
+[label-python]: https://github.com/apache/dolphinscheduler/labels/Python
 [label-plug-in]: https://github.com/apache/dolphinscheduler/labels/plug-in
 [label-document]: https://github.com/apache/dolphinscheduler/labels/document
 [label-docker]: https://github.com/apache/dolphinscheduler/labels/docker
 [label-all-list]: https://github.com/apache/dolphinscheduler/labels
-[label-Chore]: https://github.com/apache/dolphinscheduler/labels/Chore
+[label-chore]: https://github.com/apache/dolphinscheduler/labels/Chore
 [label-good-first-issue]: https://github.com/apache/dolphinscheduler/labels/good%20first%20issue
 [label-help-wanted]: https://github.com/apache/dolphinscheduler/labels/help%20wanted
 [label-easy-to-fix]: https://github.com/apache/dolphinscheduler/labels/easy%20to%20fix
@@ -137,6 +139,6 @@ Pull Requests 与 [GitHub 的 reviewing changes in pull requests][gh-review-pr] 
 [label-need-verify]: https://github.com/apache/dolphinscheduler/labels/need%20to%20verify
 [issue-choose]: https://github.com/apache/dolphinscheduler/issues/new/choose
 [all-issues]: https://github.com/apache/dolphinscheduler/issues
-[all-PRs]: https://github.com/apache/dolphinscheduler/pulls
+[all-prs]: https://github.com/apache/dolphinscheduler/pulls
 [gh-review-pr]: https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/about-pull-request-reviews
 

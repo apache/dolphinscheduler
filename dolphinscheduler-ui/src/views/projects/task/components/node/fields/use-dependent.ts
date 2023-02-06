@@ -226,7 +226,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
     if (!item || router.currentRoute.value.name !== 'workflow-instance-detail')
       return null
     const key = `${item.definitionCode}-${item.depTaskCode}-${item.cycle}-${item.dateValue}`
-    const state: ITaskState = dependentResult[key] || 'WAITING_THREAD'
+    const state: ITaskState = dependentResult[key]
     return h(NIcon, { size: 24, color: TasksStateConfig[state].color }, () =>
       h(TasksStateConfig[state].icon)
     )

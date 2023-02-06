@@ -40,7 +40,7 @@ export default {
     authorize_level: 'Authorize Level',
     no_permission: 'No Permission',
     read_permission: 'Read Permission',
-    all_permission: 'All Permission',
+    all_permission: 'All Permission'
   },
   workflow: {
     on_line: 'Online',
@@ -103,6 +103,9 @@ export default {
     backward_execution: 'Backward execution',
     forward_execution: 'Forward execution',
     current_node_execution: 'Execute only the current node',
+    backward_execution_task: 'Run backwards',
+    forward_execution_task: 'Run forwards',
+    current_node_execution_task: 'Run',
     notification_strategy: 'Notification Strategy',
     workflow_priority: 'Workflow Priority',
     worker_group: 'Worker Group',
@@ -140,6 +143,7 @@ export default {
     switch_version: 'Switch To This Version',
     confirm_switch_version: 'Confirm Switch To This Version?',
     current_version: 'Current Version',
+    run_type: 'Run Type',
     scheduling_time: 'Scheduling Time',
     duration: 'Duration',
     run_times: 'Run Times',
@@ -158,6 +162,7 @@ export default {
     pause: 'Pause',
     recovery_waiting_thread: 'Recovery waiting thread',
     recover_serial_wait: 'Recover serial wait',
+    execute_task: 'Execute the specified task',
     recovery_suspend: 'Recovery Suspend',
     recovery_failed: 'Recovery Failed',
     gantt: 'Gantt',
@@ -208,7 +213,9 @@ export default {
     workflow_relation_no_data_result_title:
       'Can not find any relations of workflows.',
     workflow_relation_no_data_result_desc:
-      'There is not any workflows. Please create a workflow, and then visit this page again.'
+      'There is not any workflows. Please create a workflow, and then visit this page again.',
+    ready_to_block: 'Ready to block',
+    block: 'Block'
   },
   task: {
     on_line: 'Online',
@@ -274,7 +281,8 @@ export default {
     alarm_group: 'Alarm group',
     startup_parameter: 'Startup Parameter',
     whether_dry_run: 'Whether Dry-Run',
-    please_choose: 'Please Choose'
+    please_choose: 'Please Choose',
+    remove_task_cache: 'Clear cache'
   },
   dag: {
     create: 'Create Workflow',
@@ -322,6 +330,7 @@ export default {
     online: 'Online'
   },
   node: {
+    is_cache: 'Cache Execution',
     jvm_args: 'Java VM Parameters',
     jvm_args_tips: 'Please enter virtual machine parameters',
     run_type: 'Run Type',
@@ -369,7 +378,8 @@ export default {
     image: 'Image',
     image_tips: 'Please enter image',
     command: 'Command',
-    command_tips: 'Please enter the container execution command, for example: /bin/echo hello world',
+    command_tips:
+      'Please enter the container execution command, for example: /bin/echo hello world',
     min_memory_tips: 'Please enter min memory',
     state: 'State',
     branch_flow: 'Branch flow',
@@ -726,7 +736,7 @@ export default {
     mlflow_deployModelKey: 'Model-URI',
     mlflow_deployPort: 'Port',
     mlflowProjectRepository: 'Repository',
-    mlflowProjectRepository_tips: 'git respository or path on worker',
+    mlflowProjectRepository_tips: 'git repository or path on worker',
     mlflowProjectVersion: 'Project Version',
     mlflowProjectVersion_tips: 'git version',
     mlflow_cpuLimit: 'Max Cpu Limit',
@@ -790,7 +800,13 @@ export default {
     pytorch_requirements: 'Requirement File',
     pytorch_conda_python_version: 'Python Version',
     pytorch_conda_python_version_tips:
-      'Please enter the version number, such as 3.6, 3.7, 3.x'
+      'Please enter the version number, such as 3.6, 3.7, 3.x',
+    factory_name: 'Factory Name',
+    resource_group_name: 'Resource Group Name',
+    pipeline_name: 'Pipeline Name',
+    factory_tips: 'Please select factory',
+    resource_group_tips: 'Please select resource group',
+    pipeline_tips: 'Please select pipeline'
   },
   menu: {
     fav: 'Favorites',
@@ -800,6 +816,6 @@ export default {
     di: 'Data Integration',
     dq: 'Data Quality',
     ml: 'Machine Learning',
-    other: 'Other',
+    other: 'Other'
   }
 }

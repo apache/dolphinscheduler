@@ -160,6 +160,9 @@ const DetailModal = defineComponent({
       showAwsRegion,
       showConnectType,
       showPrincipal,
+      showMode,
+      modeOptions,
+      redShitModeOptions,
       loading,
       saving,
       testing,
@@ -243,7 +246,9 @@ const DetailModal = defineComponent({
                   v-show={showPort}
                   label={t('datasource.port')}
                   path='port'
-                  show-require-mark
+                  show-require-mark={
+                    !(showMode && detailForm.mode === 'IAM-accessKey')
+                  }
                 >
                   <NInputNumber
                     class='input-port'
@@ -279,6 +284,193 @@ const DetailModal = defineComponent({
                     placeholder={t('datasource.krb5_conf_tips')}
                   />
                 </NFormItem>
+                {/* 验证条件选择 */}
+                <NFormItem
+                    v-show={showMode}
+                    label={t('datasource.validation')}
+                    path='mode'
+                    show-require-mark
+                >
+                  <NSelect
+                   v-model={[detailForm.mode, 'value']}
+                   options={detailForm.type === 'REDSHIFT' ? redShitModeOptions : modeOptions}
+                  ></NSelect>
+                </NFormItem>
+                {/* SqlPassword */}
+                <NFormItem
+                  v-show={showMode && detailForm.mode === 'SqlPassword'}
+                  label={t('datasource.database_username')}
+                  path='userName'
+                  show-require-mark
+                >
+                  <NInput
+                    allowInput={this.trim}
+                    v-model={[detailForm.userName, 'value']}
+                    type='text'
+                    placeholder={t('datasource.database_username')}
+                  />
+                </NFormItem>
+                <NFormItem
+                  v-show={showMode && detailForm.mode === 'SqlPassword'}
+                  label={t('datasource.database_password')}
+                  path='password'
+                  show-require-mark
+                >
+                  <NInput
+                    allowInput={this.trim}
+                    v-model={[detailForm.password, 'value']}
+                    type='password'
+                    placeholder={t('datasource.database_password')}
+                  />
+                </NFormItem>
+                {/* ActiveDirectoryPassword */}
+                <NFormItem
+                  v-show={showMode && detailForm.mode === 'ActiveDirectoryPassword'}
+                  label={t('datasource.Azure_AD_username')}
+                  path='userName'
+                  show-require-mark
+                >
+                  <NInput
+                    allowInput={this.trim}
+                    v-model={[detailForm.userName, 'value']}
+                    type='text'
+                    placeholder={t('datasource.Azure_AD_username')}
+                  />
+                </NFormItem>
+                <NFormItem
+                  v-show={showMode && detailForm.mode === 'ActiveDirectoryPassword'}
+                  label={t('datasource.Azure_AD_password')}
+                  path='password'
+                  show-require-mark
+                >
+                  <NInput
+                    allowInput={this.trim}
+                    v-model={[detailForm.password, 'value']}
+                    type='password'
+                    placeholder={t('datasource.Azure_AD_password')}
+                  />
+                </NFormItem>
+                {/* ActiveDirectoryMSI */}
+                <NFormItem
+                  v-show={showMode && detailForm.mode === 'ActiveDirectoryMSI'}
+                  label={t('datasource.MSIClientId')}
+                  path='MSIClientId'
+                >
+                  <NInput
+                    allowInput={this.trim}
+                    v-model={[detailForm.MSIClientId, 'value']}
+                    type='password'
+                    placeholder={t('datasource.MSIClientId')}
+                  />
+                </NFormItem>
+                {/* ActiveDirectoryServicePrincipal */}
+                <NFormItem
+                  v-show={showMode && detailForm.mode === 'ActiveDirectoryServicePrincipal'}
+                  label={t('datasource.clientId')}
+                  path='userName'
+                  show-require-mark
+                >
+                  <NInput
+                    allowInput={this.trim}
+                    v-model={[detailForm.userName, 'value']}
+                    type='text'
+                    placeholder={t('datasource.clientId')}
+                  />
+                </NFormItem>
+                <NFormItem
+                  v-show={showMode && detailForm.mode === 'ActiveDirectoryServicePrincipal'}
+                  label={t('datasource.clientSecret')}
+                  path='password'
+                  show-require-mark
+                >
+                  <NInput
+                    allowInput={this.trim}
+                    v-model={[detailForm.password, 'value']}
+                    type='password'
+                    placeholder={t('datasource.clientSecret')}
+                  />
+                </NFormItem>
+                {/* accessToken */}
+                <NFormItem
+                  v-show={showMode && detailForm.mode === 'accessToken'}
+                  label={t('datasource.clientId')}
+                  path='userName'
+                  show-require-mark
+                >
+                  <NInput
+                    allowInput={this.trim}
+                    v-model={[detailForm.userName, 'value']}
+                    type='text'
+                    placeholder={t('datasource.clientId')}
+                  />
+                </NFormItem>
+                <NFormItem
+                  v-show={showMode && detailForm.mode === 'accessToken'}
+                  label={t('datasource.clientSecret')}
+                  path='password'
+                  show-require-mark
+                >
+                  <NInput
+                    allowInput={this.trim}
+                    v-model={[detailForm.password, 'value']}
+                    type='password'
+                    placeholder={t('datasource.clientSecret')}
+                  />
+                </NFormItem>
+                <NFormItem
+                  v-show={showMode && detailForm.mode === 'accessToken'}
+                  label={t('datasource.OAuth_token_endpoint')}
+                  path='endpoint'
+                  show-require-mark
+                >
+                  <NInput
+                    allowInput={this.trim}
+                    v-model={[detailForm.endpoint, 'value']}
+                    type='text'
+                    placeholder={t('datasource.OAuth_token_endpoint')}
+                  />
+                </NFormItem>
+                <NFormItem
+                  v-show={showMode && detailForm.mode === 'IAM-accessKey'}
+                  label={t('datasource.AccessKeyID')}
+                  path='userName'
+                  show-require-mark
+                >
+                  <NInput
+                    allowInput={this.trim}
+                    v-model={[detailForm.userName, 'value']}
+                    type='text'
+                    maxlength={60}
+                    placeholder={t('datasource.AccessKeyID_tips')}
+                  />
+                </NFormItem>
+                <NFormItem
+                  v-show={showMode && detailForm.mode === 'IAM-accessKey'}
+                  label={t('datasource.SecretAccessKey')}
+                  path='password'
+                  show-require-mark
+                >
+                  <NInput
+                    allowInput={this.trim}
+                    v-model={[detailForm.password, 'value']}
+                    type='password'
+                    placeholder={t('datasource.SecretAccessKey_tips')}
+                  />
+                </NFormItem>
+                <NFormItem
+                  v-show={showMode && detailForm.mode === 'IAM-accessKey'}
+                  label={t('datasource.dbUser')}
+                  path='dbUser'
+                  show-require-mark
+                >
+                  <NInput
+                    allowInput={this.trim}
+                    class='input-dbUser'
+                    v-model={[detailForm.dbUser, 'value']}
+                    type='text'
+                    placeholder={t('datasource.dbUser_tips')}
+                  />
+                </NFormItem>
                 <NFormItem
                   v-show={showPrincipal}
                   label='keytab.username'
@@ -304,6 +496,7 @@ const DetailModal = defineComponent({
                   />
                 </NFormItem>
                 <NFormItem
+                  v-show={!showMode || detailForm.mode === 'password'}
                   label={t('datasource.user_name')}
                   path='userName'
                   show-require-mark
@@ -318,6 +511,7 @@ const DetailModal = defineComponent({
                   />
                 </NFormItem>
                 <NFormItem
+                  v-show={!showMode || detailForm.mode === 'password'}
                   label={t('datasource.user_password')}
                   path='password'
                 >

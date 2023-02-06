@@ -219,8 +219,11 @@ public interface ProcessService {
     void changeTaskGroupQueueStatus(int taskId, TaskGroupQueueStatus status);
 
     TaskGroupQueue insertIntoTaskGroupQueue(Integer taskId,
-                                            String taskName, Integer groupId,
-                                            Integer processId, Integer priority, TaskGroupQueueStatus status);
+                                            String taskName,
+                                            Integer groupId,
+                                            Integer processId,
+                                            Integer priority,
+                                            TaskGroupQueueStatus status);
 
     int updateTaskGroupQueueStatus(Integer taskId, int status);
 
@@ -238,4 +241,6 @@ public interface ProcessService {
     void forceProcessInstanceSuccessByTaskInstanceId(Integer taskInstanceId);
 
     Integer queryTestDataSourceId(Integer onlineDataSourceId);
+
+    void saveCommandTrigger(Integer commandId, Integer processInstanceId);
 }

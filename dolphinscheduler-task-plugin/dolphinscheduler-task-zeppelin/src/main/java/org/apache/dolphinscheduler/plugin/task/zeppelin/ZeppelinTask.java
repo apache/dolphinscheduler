@@ -71,11 +71,11 @@ public class ZeppelinTask extends AbstractRemoteTask {
     @Override
     public void init() {
         final String taskParams = taskExecutionContext.getTaskParams();
-        logger.info("zeppelin task params:{}", taskParams);
         this.zeppelinParameters = JSONUtils.parseObject(taskParams, ZeppelinParameters.class);
         if (this.zeppelinParameters == null || !this.zeppelinParameters.checkParameters()) {
             throw new ZeppelinTaskException("zeppelin task params is not valid");
         }
+        logger.info("Initialize zeppelin task params:{}", JSONUtils.toPrettyJsonString(taskParams));
         this.zClient = getZeppelinClient();
     }
 
@@ -107,7 +107,7 @@ public class ZeppelinTask extends AbstractRemoteTask {
                 noteId = this.zClient.cloneNote(noteId, cloneNotePath);
             }
 
-            if (paragraphId == null) {
+            if (paragraphId == null || paragraphId.trim().length() == 0) {
                 final NoteResult noteResult = this.zClient.executeNote(noteId, zeppelinParamsMap);
                 final List<ParagraphResult> paragraphResultList = noteResult.getParagraphResultList();
                 StringBuilder resultContentBuilder = new StringBuilder();

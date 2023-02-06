@@ -299,6 +299,10 @@ export default {
                                 title: 'Amazon Athena',
                                 link: '/en-us/docs/dev/user_doc/guide/datasource/athena.html',
                             },
+                            {
+                                title: 'Azure SQL Database',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/azure-sql.html',
+                            },
                         ],
                     },
                     {
@@ -377,8 +381,18 @@ export default {
                     },
                     {
                         title: 'Security',
-                        link: '/en-us/docs/dev/user_doc/guide/security.html',
+                        children: [
+                            {
+                                title: 'Security (Authorization System)',
+                                link: '/en-us/docs/dev/user_doc/guide/security/security.html',
+                            },
+                            {
+                                title: 'Authentication Type',
+                                link: '/en-us/docs/dev/user_doc/guide/security/authentication-type.html',
+                            }
+                        ],
                     },
+
                     {
                         title: 'Metrics',
                         children: [
@@ -622,21 +636,8 @@ export default {
                         ],
                     },
                     {
-                        title: 'Release Guide',
-                        children: [
-                            {
-                                title: 'Release Preparation',
-                                link: '/en-us/docs/dev/user_doc/contribute/release/release-prepare.html',
-                            },
-                            {
-                                title: 'Release Guide',
-                                link: '/en-us/docs/dev/user_doc/contribute/release/release.html',
-                            },
-                            {
-                                title: 'Release Post',
-                                link: '/en-us/docs/dev/user_doc/contribute/release/release-post.html',
-                            },
-                        ],
+                        title: 'Releasing',
+                        link: '/en-us/docs/dev/user_doc/contribute/release.html',
                     },
                     {
                         title: 'Questions & Communications',
@@ -939,6 +940,10 @@ export default {
                                 title: 'Amazon Athena',
                                 link: '/zh-cn/docs/dev/user_doc/guide/datasource/athena.html',
                             },
+                            {
+                                title: 'Azure SQL Database',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/azure-sql.html',
+                            },
                         ],
                     },
                     {
@@ -1017,7 +1022,16 @@ export default {
                     },
                     {
                         title: '安全中心',
-                        link: '/zh-cn/docs/dev/user_doc/guide/security.html',
+                        children: [
+                            {
+                                title: '安全中心（权限系统）',
+                                link: '/zh-cn/docs/dev/user_doc/guide/security/security.html',
+                            },
+                            {
+                                title: '认证方式',
+                                link: '/zh-cn/docs/dev/user_doc/guide/security/authentication-type.html',
+                            }
+                        ],
                     },
                     {
                         title: '指标相关',
@@ -1262,21 +1276,8 @@ export default {
                         ],
                     },
                     {
-                        title: '发版指南',
-                        children: [
-                            {
-                                title: '发版准备',
-                                link: '/zh-cn/docs/dev/user_doc/contribute/release/release-prepare.html',
-                            },
-                            {
-                                title: '发版指南',
-                                link: '/zh-cn/docs/dev/user_doc/contribute/release/release.html',
-                            },
-                            {
-                                title: '发版后续',
-                                link: '/zh-cn/docs/dev/user_doc/contribute/release/release-post.html',
-                            },
-                        ],
+                        title: '发版',
+                        link: '/zh-cn/docs/dev/user_doc/contribute/release.html',
                     },
                     {
                         title: '问题与交流',

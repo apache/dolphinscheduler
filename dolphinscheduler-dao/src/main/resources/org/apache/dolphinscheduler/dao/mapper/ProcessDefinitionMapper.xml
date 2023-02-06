@@ -62,8 +62,8 @@
         from t_ds_process_definition pd
         JOIN t_ds_user u ON pd.user_id = u.id
         JOIN  t_ds_project p ON pd.project_code = p.code
-        JOIN  t_ds_tenant t ON t.id = u.tenant_id
-        JOIN t_ds_queue q ON t.queue_id = q.id
+        LEFT JOIN  t_ds_tenant t ON t.id = u.tenant_id
+        LEFT JOIN t_ds_queue q ON t.queue_id = q.id
         WHERE p.code = #{projectCode}
         and pd.name = #{processDefinitionName}
     </select>

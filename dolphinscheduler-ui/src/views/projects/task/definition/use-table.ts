@@ -34,6 +34,7 @@ import {
   DragOutlined,
   ExclamationCircleOutlined,
   ArrowRightOutlined
+  ExclamationCircleOutlined
 } from '@vicons/antd'
 import {
   queryTaskDefinitionListPaging,
@@ -70,6 +71,9 @@ export function useTable(onEdit: Function) {
         title: t('project.task.task_name'),
         key: 'taskName',
         ...COLUMN_WIDTH_CONFIG['linkName'],
+        resizable: true,
+        minWidth: 200,
+        maxWidth: 600,
         render: (row: IRecord) =>
           h(
             ButtonLink,
@@ -78,18 +82,23 @@ export function useTable(onEdit: Function) {
             },
             {
               default: () =>
-                h(
-                  NEllipsis,
-                  COLUMN_WIDTH_CONFIG['linkEllipsis'],
-                  () => row.taskName
-                )
+                  h(
+                      NEllipsis,
+                      {
+                        style: 'max-width: 580px;line-height: 1.5'
+                      },
+                      () => row.taskName
+                  )
             }
           )
       },
       {
         title: t('project.task.workflow_name'),
         key: 'processDefinitionName',
-        ...COLUMN_WIDTH_CONFIG['name']
+        ...COLUMN_WIDTH_CONFIG['name'],
+        resizable: true,
+        minWidth: 200,
+        maxWidth: 600
       },
       {
         title: t('project.task.workflow_state'),
@@ -141,7 +150,7 @@ export function useTable(onEdit: Function) {
       {
         title: t('project.task.operation'),
         key: 'operation',
-        ...COLUMN_WIDTH_CONFIG['operation'](5),
+        ...COLUMN_WIDTH_CONFIG['operation'](4),
         render(row: any) {
           return h(NSpace, null, {
             default: () => [
@@ -170,33 +179,6 @@ export function useTable(onEdit: Function) {
                       }
                     ),
                   default: () => t('project.task.edit')
-                }
-              ),
-              h(
-                NTooltip,
-                {},
-                {
-                  trigger: () =>
-                    h(
-                      NButton,
-                      {
-                        circle: true,
-                        type: 'info',
-                        size: 'small',
-                        disabled:
-                          !!row.processDefinitionCode &&
-                          row.processReleaseState === 'ONLINE',
-                        onClick: () => {
-                          variables.showMoveModalRef = true
-                          variables.row = row
-                        }
-                      },
-                      {
-                        icon: () =>
-                          h(NIcon, null, { default: () => h(DragOutlined) })
-                      }
-                    ),
-                  default: () => t('project.task.move')
                 }
               ),
               h(
@@ -308,7 +290,6 @@ export function useTable(onEdit: Function) {
     totalPage: ref(1),
     taskType: ref(null),
     showVersionModalRef: ref(false),
-    showMoveModalRef: ref(false),
     row: {},
     loadingRef: ref(false),
     projectCode: ref(Number(router.currentRoute.value.params.projectCode)),

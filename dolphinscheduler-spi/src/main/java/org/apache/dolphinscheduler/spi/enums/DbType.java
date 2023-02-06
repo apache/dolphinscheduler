@@ -40,8 +40,13 @@ public enum DbType {
     H2(9, "h2"),
     REDSHIFT(10, "redshift"),
     ATHENA(11, "athena"),
-    TRINO(12, "trino");
+    TRINO(12, "trino"),
+    STARROCKS(13, "starrocks"),
+    AZURESQL(14, "azuresql"),
+    DAMENG(15, "dameng");
 
+    private static final Map<Integer, DbType> DB_TYPE_MAP =
+            Arrays.stream(DbType.values()).collect(toMap(DbType::getCode, Functions.identity()));
     @EnumValue
     private final int code;
     private final String descp;
@@ -50,17 +55,6 @@ public enum DbType {
         this.code = code;
         this.descp = descp;
     }
-
-    public int getCode() {
-        return code;
-    }
-
-    public String getDescp() {
-        return descp;
-    }
-
-    private static final Map<Integer, DbType> DB_TYPE_MAP =
-            Arrays.stream(DbType.values()).collect(toMap(DbType::getCode, Functions.identity()));
 
     public static DbType of(int type) {
         if (DB_TYPE_MAP.containsKey(type)) {
@@ -74,12 +68,21 @@ public enum DbType {
                 .orElseThrow(() -> new NoSuchElementException("no such db type"));
     }
 
+    public int getCode() {
+        return code;
+    }
+
+    public String getDescp() {
+        return descp;
+    }
+
     public boolean isHive() {
         return this == DbType.HIVE;
     }
 
     /**
      * support execute multiple segmented statements at a time
+     *
      * @return
      */
     public boolean isSupportMultipleStatement() {

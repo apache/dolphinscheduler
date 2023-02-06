@@ -26,13 +26,16 @@ import org.apache.dolphinscheduler.remote.command.TaskRejectCommand;
 
 import java.util.Date;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import io.netty.channel.Channel;
 
-/**
- * task event
- */
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class TaskEvent {
 
     /**
@@ -90,6 +93,8 @@ public class TaskEvent {
      */
     private String varPool;
 
+    private int cacheTaskInstanceId;
+
     /**
      * channel
      */
@@ -145,6 +150,15 @@ public class TaskEvent {
         event.setProcessInstanceId(command.getProcessInstanceId());
         event.setChannel(channel);
         event.setEvent(TaskEventType.WORKER_REJECT);
+        return event;
+    }
+
+    public static TaskEvent newCacheEvent(int processInstanceId, int taskInstanceId, int cacheTaskInstanceId) {
+        TaskEvent event = new TaskEvent();
+        event.setProcessInstanceId(processInstanceId);
+        event.setTaskInstanceId(taskInstanceId);
+        event.setCacheTaskInstanceId(cacheTaskInstanceId);
+        event.setEvent(TaskEventType.CACHE);
         return event;
     }
 }

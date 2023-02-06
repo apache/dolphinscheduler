@@ -398,6 +398,7 @@ CREATE TABLE t_ds_task_definition (
   task_execute_type int DEFAULT '0',
   task_params text ,
   flag int DEFAULT NULL ,
+  is_cache int DEFAULT '0',
   task_priority int DEFAULT '2' ,
   worker_group varchar(255) DEFAULT NULL ,
   environment_code bigint DEFAULT '-1',
@@ -436,6 +437,7 @@ CREATE TABLE t_ds_task_definition_log (
   task_execute_type int DEFAULT '0',
   task_params text ,
   flag int DEFAULT NULL ,
+  is_cache int DEFAULT '0' ,
   task_priority int DEFAULT '2' ,
   worker_group varchar(255) DEFAULT NULL ,
   environment_code bigint DEFAULT '-1',
@@ -522,6 +524,7 @@ CREATE TABLE t_ds_process_instance (
   name varchar(255) DEFAULT NULL ,
   process_definition_code bigint DEFAULT NULL ,
   process_definition_version int DEFAULT NULL ,
+  project_code bigint DEFAULT NULL ,
   state int DEFAULT NULL ,
   state_history text,
   recovery int DEFAULT NULL ,
@@ -544,6 +547,7 @@ CREATE TABLE t_ds_process_instance (
   update_time timestamp NULL ,
   is_sub_process int DEFAULT '0' ,
   executor_id int NOT NULL ,
+  executor_name varchar(64) DEFAULT NULL,
   history_cmd text ,
   dependence_schedule_times text ,
   process_instance_priority int DEFAULT '2' ,
@@ -551,6 +555,7 @@ CREATE TABLE t_ds_process_instance (
   environment_code bigint DEFAULT '-1',
   timeout int DEFAULT '0' ,
   tenant_id int NOT NULL DEFAULT '-1' ,
+  tenant_code varchar(64) DEFAULT NULL ,
   var_pool text ,
   dry_run int DEFAULT '0' ,
   next_process_instance_id int DEFAULT '0',
@@ -764,6 +769,8 @@ CREATE TABLE t_ds_task_instance (
   task_code bigint NOT NULL,
   task_definition_version int DEFAULT NULL ,
   process_instance_id int DEFAULT NULL ,
+  process_instance_name varchar(255) DEFAULT NULL,
+  project_code bigint DEFAULT NULL,
   state int DEFAULT NULL ,
   submit_time timestamp DEFAULT NULL ,
   start_time timestamp DEFAULT NULL ,
@@ -777,6 +784,8 @@ CREATE TABLE t_ds_task_instance (
   app_link text ,
   task_params text ,
   flag int DEFAULT '1' ,
+  is_cache int DEFAULT '0',
+  cache_key varchar(200) DEFAULT NULL,
   retry_interval int DEFAULT NULL ,
   max_retry_times int DEFAULT NULL ,
   task_instance_priority int DEFAULT NULL ,
@@ -784,6 +793,7 @@ CREATE TABLE t_ds_task_instance (
   environment_code bigint DEFAULT '-1',
   environment_config text,
   executor_id int DEFAULT NULL ,
+  executor_name varchar(64) DEFAULT NULL ,
   first_submit_time timestamp DEFAULT NULL ,
   delay_time int DEFAULT '0' ,
   task_group_id int DEFAULT NULL,
@@ -796,6 +806,7 @@ CREATE TABLE t_ds_task_instance (
 ) ;
 
 create index idx_task_instance_code_version on t_ds_task_instance (task_code, task_definition_version);
+create index idx_cache_key on t_ds_task_instance (cache_key);
 
 --
 -- Table structure for table t_ds_tenant
@@ -983,7 +994,7 @@ VALUES ('admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '0',
 
 -- Records of t_ds_alertgroup, default admin warning group
 INSERT INTO t_ds_alertgroup(alert_instance_ids, create_user_id, group_name, description, create_time, update_time)
-VALUES ('1,2', 1, 'default admin warning group', 'default admin warning group', '2018-11-29 10:20:39', '2018-11-29 10:20:39');
+VALUES (NULL, 1, 'default admin warning group', 'default admin warning group', '2018-11-29 10:20:39', '2018-11-29 10:20:39');
 
 -- Records of t_ds_queue,default queue name : default
 INSERT INTO t_ds_queue(queue_name, queue, create_time, update_time)
@@ -1982,4 +1993,19 @@ CREATE TABLE t_ds_fav_task
     task_type varchar(64) NOT NULL,
     user_id   int         NOT NULL,
     PRIMARY KEY (id)
+);
+
+-- ----------------------------
+-- Table structure for t_ds_trigger_relation
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_trigger_relation;
+CREATE TABLE t_ds_trigger_relation (
+    id        serial      NOT NULL,
+    trigger_type int NOT NULL,
+    trigger_code bigint NOT NULL,
+    job_id bigint NOT NULL,
+    create_time timestamp DEFAULT NULL,
+    update_time timestamp DEFAULT NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT t_ds_trigger_relation_unique UNIQUE (trigger_type,job_id,trigger_code)
 );

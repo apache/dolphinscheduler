@@ -634,14 +634,6 @@ public class ProcessDefinitionController extends BaseController {
         return returnDataList(result);
     }
 
-    /**
-     * delete process definition by code
-     *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param code process definition code
-     * @return delete result code
-     */
     @Operation(summary = "deleteByCode", description = "DELETE_PROCESS_DEFINITION_BY_ID_NOTES")
     @Parameters({
             @Parameter(name = "code", description = "PROCESS_DEFINITION_CODE", schema = @Schema(implementation = int.class, example = "100"))
@@ -652,8 +644,8 @@ public class ProcessDefinitionController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteProcessDefinitionByCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                 @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                @PathVariable("code") long code) {
-        processDefinitionService.deleteProcessDefinitionByCode(loginUser, code);
+                                                @PathVariable("code") long workflowDefinitionCode) {
+        processDefinitionService.deleteProcessDefinitionByCode(loginUser, workflowDefinitionCode);
         return new Result(Status.SUCCESS);
     }
 

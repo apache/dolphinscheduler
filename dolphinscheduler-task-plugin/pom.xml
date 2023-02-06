@@ -43,12 +43,7 @@
         <module>dolphinscheduler-task-pigeon</module>
         <module>dolphinscheduler-task-dataquality</module>
         <module>dolphinscheduler-task-seatunnel</module>
-        <module>dolphinscheduler-task-conditions</module>
-        <module>dolphinscheduler-task-dependent</module>
-        <module>dolphinscheduler-task-subprocess</module>
-        <module>dolphinscheduler-task-switch</module>
         <module>dolphinscheduler-task-emr</module>
-        <module>dolphinscheduler-task-blocking</module>
         <module>dolphinscheduler-task-k8s</module>
         <module>dolphinscheduler-task-zeppelin</module>
         <module>dolphinscheduler-task-jupyter</module>
@@ -66,6 +61,7 @@
         <module>dolphinscheduler-task-datasync</module>
         <module>dolphinscheduler-task-kubeflow</module>
         <module>dolphinscheduler-task-linkis</module>
+        <module>dolphinscheduler-task-datafactory</module>
     </modules>
 
     <dependencyManagement>
