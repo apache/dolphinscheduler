@@ -29,7 +29,9 @@ public class CsrfConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf().ignoringRequestMatchers().ignoringRequestMatchers(new RequestHeaderRequestMatcher("token"))
+        http.csrf().ignoringRequestMatchers()
+                .ignoringRequestMatchers(new RequestHeaderRequestMatcher("token"))
+                .ignoringRequestMatchers(request -> request.getParameter("token") != null)
                 .csrfTokenRepository(new CookieCsrfTokenRepository());
         return http.build();
     }
