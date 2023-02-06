@@ -46,7 +46,7 @@ After refactoring resource center in version 3.2.0, original resources become un
 
 Assign an existed target tenant `abc`, the base resource path is `/dolphinscheduler/abc/`.
 
-Execute scipt: `sh ./tools/bin/migrate-resource.sh abc`.
+Execute script: `sh ./tools/bin/migrate-resource.sh abc`.
 
 Execution result:
 
