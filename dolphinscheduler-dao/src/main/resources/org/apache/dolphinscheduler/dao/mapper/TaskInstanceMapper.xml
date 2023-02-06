@@ -265,7 +265,7 @@
             and name like concat('%', #{searchVal}, '%')
         </if>
         <if test="taskCode != 0">
-            and instance.task_code = #{taskCode}
+            and task_code = #{taskCode}
         </if>
         <if test="taskName != null and taskName != ''">
             and name = #{taskName}
