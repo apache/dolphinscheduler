@@ -320,23 +320,37 @@ This part describes quartz configs and configure them based on your practical si
 
 The default configuration is as follows:
 
-|Parameters | Default value|
-|--|--|
-|spring.quartz.properties.org.quartz.threadPool.threadPriority | 5|
-|spring.quartz.properties.org.quartz.jobStore.isClustered | true|
-|spring.quartz.properties.org.quartz.jobStore.class | org.quartz.impl.jdbcjobstore.JobStoreTX|
-|spring.quartz.properties.org.quartz.scheduler.instanceId | AUTO|
-|spring.quartz.properties.org.quartz.jobStore.tablePrefix | QRTZ_|
-|spring.quartz.properties.org.quartz.jobStore.acquireTriggersWithinLock|true|
-|spring.quartz.properties.org.quartz.scheduler.instanceName | DolphinScheduler|
-|spring.quartz.properties.org.quartz.threadPool.class | org.quartz.simpl.SimpleThreadPool|
-|spring.quartz.properties.org.quartz.jobStore.useProperties | false|
-|spring.quartz.properties.org.quartz.threadPool.makeThreadsDaemons | true|
-|spring.quartz.properties.org.quartz.threadPool.threadCount | 25|
-|spring.quartz.properties.org.quartz.jobStore.misfireThreshold | 60000|
-|spring.quartz.properties.org.quartz.scheduler.makeSchedulerThreadDaemon | true|
-|spring.quartz.properties.org.quartz.jobStore.driverDelegateClass | org.quartz.impl.jdbcjobstore.PostgreSQLDelegate|
-|spring.quartz.properties.org.quartz.jobStore.clusterCheckinInterval | 5000|
+|                               Parameters                                |                  Default value                  |
+|-------------------------------------------------------------------------|-------------------------------------------------|
+| spring.quartz.properties.org.quartz.jobStore.isClustered                | true                                            |
+| spring.quartz.properties.org.quartz.jobStore.class                      | org.quartz.impl.jdbcjobstore.JobStoreTX         |
+| spring.quartz.properties.org.quartz.scheduler.instanceId                | AUTO                                            |
+| spring.quartz.properties.org.quartz.jobStore.tablePrefix                | QRTZ_                                           |
+| spring.quartz.properties.org.quartz.jobStore.acquireTriggersWithinLock  | true                                            |
+| spring.quartz.properties.org.quartz.scheduler.instanceName              | DolphinScheduler                                |
+| spring.quartz.properties.org.quartz.jobStore.useProperties              | false                                           |
+| spring.quartz.properties.org.quartz.jobStore.misfireThreshold           | 60000                                           |
+| spring.quartz.properties.org.quartz.scheduler.makeSchedulerThreadDaemon | true                                            |
+| spring.quartz.properties.org.quartz.jobStore.driverDelegateClass        | org.quartz.impl.jdbcjobstore.PostgreSQLDelegate |
+| spring.quartz.properties.org.quartz.jobStore.clusterCheckinInterval     | 5000                                            |
+
+The above configuration items is the same in *Master Server* and *Api Server*, but their *Quartz Scheduler* threadpool configuration is different.
+
+The default quartz threadpool configuration in *Master Server* is as follows:
+
+|                            Parameters                             |           Default value           |
+|-------------------------------------------------------------------|-----------------------------------|
+| spring.quartz.properties.org.quartz.threadPool.makeThreadsDaemons | true                              |
+| spring.quartz.properties.org.quartz.threadPool.threadCount        | 25                                |
+| spring.quartz.properties.org.quartz.threadPool.threadPriority     | 5                                 |
+| spring.quartz.properties.org.quartz.threadPool.class              | org.quartz.simpl.SimpleThreadPool |
+
+Since *Api Server* will not start *Quartz Scheduler* instance, as a client only, therefore it's threadpool is configured as `QuartzZeroSizeThreadPool` which has zero thread;
+The default configuration is as follows:
+
+|                      Parameters                      |                             Default value                             |
+|------------------------------------------------------|-----------------------------------------------------------------------|
+| spring.quartz.properties.org.quartz.threadPool.class | org.apache.dolphinscheduler.scheduler.quartz.QuartzZeroSizeThreadPool |
 
 ### dolphinscheduler_env.sh [load environment variables configs]
 
