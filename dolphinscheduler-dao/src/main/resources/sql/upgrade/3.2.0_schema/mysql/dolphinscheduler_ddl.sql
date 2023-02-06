@@ -298,6 +298,8 @@ delimiter ;
 CALL add_t_ds_task_instance_add_project_code;
 DROP PROCEDURE add_t_ds_task_instance_add_project_code;
 
+ALTER TABLE t_ds_fav_task CHANGE task_name task_type varchar(64) NOT NULL;
+
 
 ALTER TABLE QRTZ_BLOB_TRIGGERS CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;
 alter table QRTZ_CALENDARS CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;

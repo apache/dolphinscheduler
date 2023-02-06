@@ -14,115 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
--- uc_dolphin_T_t_ds_command_R_test_flag
-delimiter ;
-DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_command_R_test_flag();
-delimiter d//
-CREATE FUNCTION uc_dolphin_T_t_ds_command_R_test_flag() RETURNS void AS $$
-BEGIN
-       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
-          WHERE TABLE_CATALOG=current_database()
-          AND TABLE_SCHEMA=current_schema()
-          AND TABLE_NAME='t_ds_command'
-          AND COLUMN_NAME ='test_flag')
-      THEN
-ALTER TABLE t_ds_command alter column test_flag type int DEFAULT NULL;
-END IF;
-END;
-$$ LANGUAGE plpgsql;
-d//
-delimiter ;
-select uc_dolphin_T_t_ds_command_R_test_flag();
-DROP FUNCTION uc_dolphin_T_t_ds_command_R_test_flag();
 
--- uc_dolphin_T_t_ds_error_command_R_test_flag
-delimiter ;
-DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_error_command_R_test_flag();
-delimiter d//
-CREATE FUNCTION uc_dolphin_T_t_ds_error_command_R_test_flag() RETURNS void AS $$
-BEGIN
-       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
-          WHERE TABLE_CATALOG=current_database()
-          AND TABLE_SCHEMA=current_schema()
-          AND TABLE_NAME='t_ds_error_command'
-          AND COLUMN_NAME ='test_flag')
-      THEN
-ALTER TABLE t_ds_error_command alter column test_flag type int DEFAULT NULL;
-END IF;
-END;
-$$ LANGUAGE plpgsql;
-d//
-delimiter ;
-select uc_dolphin_T_t_ds_error_command_R_test_flag();
-DROP FUNCTION uc_dolphin_T_t_ds_error_command_R_test_flag();
+ALTER TABLE t_ds_command ADD COLUMN IF NOT EXISTS test_flag int DEFAULT NULL;
+COMMENT ON COLUMN t_ds_command.test_flag is 'test flag：0 normal, 1 test run';
 
--- uc_dolphin_T_t_ds_datasource_R_test_flag_bind_test_id
-delimiter ;
-DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_datasource_R_test_flag_bind_test_id();
-delimiter d//
-CREATE FUNCTION uc_dolphin_T_t_ds_datasource_R_test_flag_bind_test_id() RETURNS void AS $$
-BEGIN
-       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
-          WHERE TABLE_CATALOG=current_database()
-          AND TABLE_SCHEMA=current_schema()
-          AND TABLE_NAME='t_ds_datasource'
-          AND COLUMN_NAME ='test_flag')
-      THEN
-ALTER TABLE t_ds_datasource alter column test_flag type int DEFAULT NULL;
-ALTER TABLE t_ds_datasource alter column bind_test_id type int DEFAULT NULL;
-END IF;
-END;
-$$ LANGUAGE plpgsql;
-d//
-delimiter ;
-select uc_dolphin_T_t_ds_datasource_R_test_flag_bind_test_id();
-DROP FUNCTION uc_dolphin_T_t_ds_datasource_R_test_flag_bind_test_id();
+ALTER TABLE t_ds_error_command ADD COLUMN IF NOT EXISTS test_flag int DEFAULT NULL;
+COMMENT ON COLUMN t_ds_error_command.test_flag is 'test flag：0 normal, 1 test run';
 
--- uc_dolphin_T_t_ds_process_instance_R_test_flag
-delimiter ;
-DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_process_instance_R_test_flag();
-delimiter d//
-CREATE FUNCTION uc_dolphin_T_t_ds_process_instance_R_test_flag() RETURNS void AS $$
-BEGIN
-       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
-          WHERE TABLE_CATALOG=current_database()
-          AND TABLE_SCHEMA=current_schema()
-          AND TABLE_NAME='t_ds_process_instance'
-          AND COLUMN_NAME ='test_flag')
-      THEN
-ALTER TABLE t_ds_process_instance alter column test_flag type int DEFAULT NULL;
-END IF;
-END;
-$$ LANGUAGE plpgsql;
-d//
-delimiter ;
-select uc_dolphin_T_t_ds_process_instance_R_test_flag();
-DROP FUNCTION uc_dolphin_T_t_ds_process_instance_R_test_flag();
+ALTER TABLE t_ds_datasource ADD COLUMN IF NOT EXISTS test_flag int DEFAULT NULL;
+COMMENT ON COLUMN t_ds_datasource.test_flag is 'test flag：0 normal, 1 test run';
 
--- uc_dolphin_T_t_ds_task_instance_R_test_flag
-delimiter ;
-DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_task_instance_R_test_flag();
-delimiter d//
-CREATE FUNCTION uc_dolphin_T_t_ds_task_instance_R_test_flag() RETURNS void AS $$
-BEGIN
-       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
-          WHERE TABLE_CATALOG=current_database()
-          AND TABLE_SCHEMA=current_schema()
-          AND TABLE_NAME='t_ds_task_instance'
-          AND COLUMN_NAME ='test_flag')
-      THEN
-ALTER TABLE t_ds_task_instance alter column test_flag type int DEFAULT NULL;
-END IF;
-END;
-$$ LANGUAGE plpgsql;
-d//
-delimiter ;
-select uc_dolphin_T_t_ds_task_instance_R_test_flag();
-DROP FUNCTION uc_dolphin_T_t_ds_task_instance_R_test_flag();
+ALTER TABLE t_ds_datasource ADD COLUMN IF NOT EXISTS bind_test_id int DEFAULT NULL;
+COMMENT ON COLUMN t_ds_datasource.bind_test_id is 'bind testDataSource id';
 
-delimiter d//
-DROP TABLE IF EXISTS t_ds_trigger_relation;
-CREATE TABLE t_ds_trigger_relation (
+ALTER TABLE t_ds_process_instance ADD COLUMN IF NOT EXISTS test_flag int DEFAULT NULL;
+COMMENT ON COLUMN t_ds_process_instance.test_flag is 'test flag：0 normal, 1 test run';
+
+ALTER TABLE t_ds_task_instance ADD COLUMN IF NOT EXISTS test_flag int DEFAULT NULL;
+COMMENT ON COLUMN t_ds_task_instance.test_flag is 'test flag：0 normal, 1 test run';
+
+CREATE TABLE IF NOT EXISTS t_ds_trigger_relation (
     id        serial      NOT NULL,
     trigger_type int NOT NULL,
     trigger_code bigint NOT NULL,
@@ -132,93 +43,37 @@ CREATE TABLE t_ds_trigger_relation (
     PRIMARY KEY (id),
     CONSTRAINT t_ds_trigger_relation_unique UNIQUE (trigger_type,job_id,trigger_code)
 );
-d//
-delimiter ;
 
-ALTER TABLE t_ds_task_definition DROP COLUMN IF EXISTS is_cache;
 ALTER TABLE t_ds_task_definition ADD COLUMN IF NOT EXISTS is_cache int DEFAULT '0';
+COMMENT ON COLUMN t_ds_task_definition.is_cache is '0 not available, 1 available';
 
-ALTER TABLE t_ds_task_definition_log DROP COLUMN IF EXISTS is_cache;
 ALTER TABLE t_ds_task_definition_log ADD COLUMN IF NOT EXISTS is_cache int DEFAULT '0';
+COMMENT ON COLUMN t_ds_task_definition_log.is_cache is '0 not available, 1 available';
 
-ALTER TABLE t_ds_task_instance DROP COLUMN IF EXISTS is_cache;
 ALTER TABLE t_ds_task_instance ADD COLUMN IF NOT EXISTS is_cache int DEFAULT '0';
+COMMENT ON COLUMN t_ds_task_instance.is_cache is '0 not available, 1 available';
 
 ALTER TABLE t_ds_task_instance ADD COLUMN IF NOT EXISTS cache_key varchar(200) DEFAULT NULL;
-ALTER TABLE t_ds_task_instance DROP COLUMN IF EXISTS cacke_key;
+COMMENT ON COLUMN t_ds_task_instance.cache_key is 'cache key';
 
 CREATE INDEX IF NOT EXISTS idx_cache_key ON t_ds_task_instance USING Btree("cache_key");
 
--- add_t_ds_process_instance_add_project_code
-delimiter ;
-DROP FUNCTION IF EXISTS add_t_ds_process_instance_add_project_code();
-delimiter d//
-CREATE FUNCTION add_t_ds_process_instance_add_project_code() RETURNS void AS $$
-BEGIN
-       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
-          WHERE TABLE_CATALOG=current_database()
-          AND TABLE_SCHEMA=current_schema()
-          AND TABLE_NAME='t_ds_process_instance'
-          AND COLUMN_NAME ='project_code')
-      THEN
-ALTER TABLE t_ds_process_instance ADD `project_code` bigint DEFAULT NULL COMMENT 'project code';
-END IF;
-IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
-          WHERE TABLE_CATALOG=current_database()
-          AND TABLE_SCHEMA=current_schema()
-          AND TABLE_NAME='t_ds_process_instance'
-          AND COLUMN_NAME ='executor_name')
-      THEN
-ALTER TABLE t_ds_process_instance ADD `executor_name` varchar(64) DEFAULT NULL COMMENT 'execute user name';
-END IF;
-IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
-          WHERE TABLE_CATALOG=current_database()
-          AND TABLE_SCHEMA=current_schema()
-          AND TABLE_NAME='t_ds_process_instance'
-          AND COLUMN_NAME ='tenant_code')
-      THEN
-ALTER TABLE t_ds_process_instance ADD `tenant_code` varchar(64) DEFAULT NULL COMMENT 'tenant code';
-END IF;
-END;
-$$ LANGUAGE plpgsql;
-d//
-delimiter ;
-select add_t_ds_process_instance_add_project_code();
-DROP FUNCTION add_t_ds_process_instance_add_project_code();
+ALTER TABLE t_ds_process_instance ADD COLUMN IF NOT EXISTS project_code bigint DEFAULT NULL;
+COMMENT ON COLUMN t_ds_process_instance.project_code is 'project code';
 
--- add_t_ds_process_instance_add_project_code
-delimiter ;
-DROP FUNCTION IF EXISTS add_t_ds_task_instance_add_project_code();
-delimiter d//
-CREATE FUNCTION add_t_ds_task_instance_add_project_code() RETURNS void AS $$
-BEGIN
-       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
-          WHERE TABLE_CATALOG=current_database()
-          AND TABLE_SCHEMA=current_schema()
-          AND TABLE_NAME='t_ds_task_instance'
-          AND COLUMN_NAME ='process_instance_name')
-      THEN
-ALTER TABLE t_ds_task_instance ADD `process_instance_name` varchar(255) DEFAULT NULL COMMENT 'process instance name';
-END IF;
-IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
-          WHERE TABLE_CATALOG=current_database()
-          AND TABLE_SCHEMA=current_schema()
-          AND TABLE_NAME='t_ds_task_instance'
-          AND COLUMN_NAME ='project_code')
-      THEN
-ALTER TABLE t_ds_process_instance ADD `project_code` bigint DEFAULT NULL COMMENT 'project code';
-END IF;
-IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
-          WHERE TABLE_CATALOG=current_database()
-          AND TABLE_SCHEMA=current_schema()
-          AND TABLE_NAME='t_ds_task_instance'
-          AND COLUMN_NAME ='executor_name')
-      THEN
-ALTER TABLE t_ds_task_instance ADD `executor_name` varchar(64) DEFAULT NULL COMMENT 'execute user name';
-END IF;
-END;
-$$ LANGUAGE plpgsql;
-d//
-delimiter ;
-select add_t_ds_task_instance_add_project_code();
-DROP FUNCTION add_t_ds_task_instance_add_project_code();
+ALTER TABLE t_ds_process_instance ADD COLUMN IF NOT EXISTS executor_name varchar(64) DEFAULT NULL;
+COMMENT ON COLUMN t_ds_process_instance.executor_name is 'execute user name';
+
+ALTER TABLE t_ds_process_instance ADD COLUMN IF NOT EXISTS tenant_code varchar(64) DEFAULT NULL;
+COMMENT ON COLUMN t_ds_process_instance.tenant_code is 'tenant code';
+
+ALTER TABLE t_ds_task_instance ADD COLUMN IF NOT EXISTS process_instance_name varchar(255) DEFAULT NULL;
+COMMENT ON COLUMN t_ds_task_instance.process_instance_name is 'process instance name';
+
+ALTER TABLE t_ds_task_instance ADD COLUMN IF NOT EXISTS project_code bigint DEFAULT NULL;
+COMMENT ON COLUMN t_ds_task_instance.project_code is 'project code';
+
+ALTER TABLE t_ds_task_instance ADD COLUMN IF NOT EXISTS executor_name varchar(64) DEFAULT NULL;
+COMMENT ON COLUMN t_ds_task_instance.executor_name is 'execute user name';
+
+ALTER TABLE t_ds_fav_task RENAME COLUMN task_name to task_type;
