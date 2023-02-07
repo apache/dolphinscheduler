@@ -57,7 +57,7 @@ public class MigrateResourceService {
     private static final String MIGRATE_BASE_DIR = ".migrate";
 
     public void migrateResourceOnce(String targetTenantCode) {
-        if (!tenantMapper.existTenant(targetTenantCode)) {
+        if (true != tenantMapper.existTenant(targetTenantCode)) {
             logger.error("Tenant not exists!");
             return;
         }
