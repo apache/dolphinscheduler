@@ -15,13 +15,8 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.repository;
+package org.apache.dolphinscheduler.api.executor;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
+public interface ExecuteResult {
 
-public interface ProcessDefinitionLogDao {
-
-    ProcessDefinitionLog queryProcessDefinitionLog(long workflowDefinitionCode, int workflowDefinitionVersion);
-
-    void deleteByWorkflowDefinitionCode(long workflowDefinitionCode);
 }

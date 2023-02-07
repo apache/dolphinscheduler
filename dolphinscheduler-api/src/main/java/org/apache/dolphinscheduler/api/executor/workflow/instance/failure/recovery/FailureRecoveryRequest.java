@@ -15,13 +15,22 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.repository;
+package org.apache.dolphinscheduler.api.executor.workflow.instance.failure.recovery;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
+import org.apache.dolphinscheduler.api.executor.ExecuteRequest;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.User;
 
-public interface ProcessDefinitionLogDao {
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-    ProcessDefinitionLog queryProcessDefinitionLog(long workflowDefinitionCode, int workflowDefinitionVersion);
+@Data
+@AllArgsConstructor
+public class FailureRecoveryRequest implements ExecuteRequest {
 
-    void deleteByWorkflowDefinitionCode(long workflowDefinitionCode);
+    private final ProcessInstance workflowInstance;
+    private final ProcessDefinition workflowDefinition;
+    private final User executeUser;
+
 }

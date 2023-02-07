@@ -236,6 +236,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     @Autowired
     private TaskDefinitionMapper taskDefinitionMapper;
 
+    @Lazy
     @Autowired
     private SchedulerService schedulerService;
 
@@ -722,6 +723,25 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
 
         return processDefinition;
+    }
+
+    @Override
+    public Optional<ProcessDefinition> queryWorkflowDefinition(long workflowDefinitionCode,
+                                                               int workflowDefinitionVersion) {
+        ProcessDefinition workflowDefinition = processDefinitionDao.queryByCode(workflowDefinitionCode).orElse(null);
+        if (workflowDefinition == null || workflowDefinition.getVersion() != workflowDefinitionVersion) {
+            workflowDefinition = processDefinitionLogDao.queryProcessDefinitionLog(workflowDefinitionCode,
+                    workflowDefinitionVersion);
+        }
+        return Optional.ofNullable(workflowDefinition);
+    }
+
+    @Override
+    public ProcessDefinition queryWorkflowDefinitionThrowExceptionIfNotFound(long workflowDefinitionCode,
+                                                                             int workflowDefinitionVersion) {
+        return queryWorkflowDefinition(workflowDefinitionCode, workflowDefinitionVersion)
+                .orElseThrow(() -> new ServiceException(Status.PROCESS_DEFINE_NOT_EXIST,
+                        String.valueOf(workflowDefinitionCode)));
     }
 
     @Override
