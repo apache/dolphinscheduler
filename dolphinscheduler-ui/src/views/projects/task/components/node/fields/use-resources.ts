@@ -63,6 +63,8 @@ export function useResources(
       checkable: true,
       cascade: true,
       showPath: true,
+      filterable: true,
+      clearFilterAfterSelect: false,
       checkStrategy: 'child',
       placeholder: t('project.node.resources_tips'),
       keyField: 'fullName',
