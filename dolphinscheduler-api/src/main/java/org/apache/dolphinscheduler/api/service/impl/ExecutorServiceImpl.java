@@ -1241,6 +1241,18 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             if (scheduleResult.get(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST) == null) {
                 return false;
             }
+            String[] stringDates = scheduleResult.get(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST).split(COMMA);
+            for (String stringDate : stringDates) {
+                try {
+                    ZonedDateTime dateTime = DateUtils.stringToZoneDateTime(stringDate.trim());
+                    if (dateTime == null) {
+                        return false;
+                    }
+                } catch (Exception ex) {
+                    logger.warn("Parse schedule time error, date string: {}", stringDate.trim());
+                    return false;
+                }
+            }
         }
         if (scheduleResult.containsKey(CMD_PARAM_COMPLEMENT_DATA_START_DATE)) {
             String startDate = scheduleResult.get(CMD_PARAM_COMPLEMENT_DATA_START_DATE);
