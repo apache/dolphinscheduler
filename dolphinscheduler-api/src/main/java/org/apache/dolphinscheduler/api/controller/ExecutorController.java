@@ -51,8 +51,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -76,9 +76,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "EXECUTOR_TAG")
 @RestController
 @RequestMapping("projects/{projectCode}/executors")
+@Slf4j
 public class ExecutorController extends BaseController {
-
-    private static final Logger logger = LoggerFactory.getLogger(ProcessInstanceController.class);
 
     @Autowired
     private ExecutorService execService;
@@ -239,7 +238,7 @@ public class ExecutorController extends BaseController {
                                             @RequestParam(value = "complementDependentMode", required = false) ComplementDependentMode complementDependentMode) {
 
         if (timeout == null) {
-            logger.debug("Parameter timeout set to {} due to null.", Constants.MAX_TASK_TIMEOUT);
+            log.debug("Parameter timeout set to {} due to null.", Constants.MAX_TASK_TIMEOUT);
             timeout = Constants.MAX_TASK_TIMEOUT;
         }
 
@@ -249,7 +248,7 @@ public class ExecutorController extends BaseController {
         }
 
         if (complementDependentMode == null) {
-            logger.debug("Parameter complementDependentMode set to {} due to null.", ComplementDependentMode.OFF_MODE);
+            log.debug("Parameter complementDependentMode set to {} due to null.", ComplementDependentMode.OFF_MODE);
             complementDependentMode = ComplementDependentMode.OFF_MODE;
         }
 
@@ -268,11 +267,11 @@ public class ExecutorController extends BaseController {
                     complementDependentMode, null);
 
             if (!Status.SUCCESS.equals(result.get(Constants.STATUS))) {
-                logger.error("Process definition start failed, projectCode:{}, processDefinitionCode:{}.", projectCode,
+                log.error("Process definition start failed, projectCode:{}, processDefinitionCode:{}.", projectCode,
                         processDefinitionCode);
                 startFailedProcessDefinitionCodeList.add(String.valueOf(processDefinitionCode));
             } else {
-                logger.info("Start process definition complete, projectCode:{}, processDefinitionCode:{}.", projectCode,
+                log.info("Start process definition complete, projectCode:{}, processDefinitionCode:{}.", projectCode,
                         processDefinitionCode);
             }
         }
@@ -307,7 +306,7 @@ public class ExecutorController extends BaseController {
                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                           @RequestParam("processInstanceId") Integer processInstanceId,
                           @RequestParam("executeType") ExecuteType executeType) {
-        logger.info("Start to execute process instance, projectCode:{}, processInstanceId:{}.", projectCode,
+        log.info("Start to execute process instance, projectCode:{}, processInstanceId:{}.", projectCode,
                 processInstanceId);
         Map<String, Object> result = execService.execute(loginUser, projectCode, processInstanceId, executeType);
         return returnDataList(result);
@@ -347,11 +346,11 @@ public class ExecutorController extends BaseController {
                     Map<String, Object> singleResult =
                             execService.execute(loginUser, projectCode, processInstanceId, executeType);
                     if (!Status.SUCCESS.equals(singleResult.get(Constants.STATUS))) {
-                        logger.error("Start to execute process instance error, projectCode:{}, processInstanceId:{}.",
+                        log.error("Start to execute process instance error, projectCode:{}, processInstanceId:{}.",
                                 projectCode, processInstanceId);
                         executeFailedIdList.add((String) singleResult.get(Constants.MSG));
                     } else
-                        logger.info("Start to execute process instance complete, projectCode:{}, processInstanceId:{}.",
+                        log.info("Start to execute process instance complete, projectCode:{}, processInstanceId:{}.",
                                 projectCode, processInstanceId);
                 } catch (Exception e) {
                     executeFailedIdList
@@ -445,7 +444,7 @@ public class ExecutorController extends BaseController {
             startParamMap = JSONUtils.toMap(startParams);
         }
 
-        logger.info("Start to execute stream task instance, projectCode:{}, taskDefinitionCode:{}, taskVersion:{}.",
+        log.info("Start to execute stream task instance, projectCode:{}, taskDefinitionCode:{}, taskVersion:{}.",
                 projectCode, code, version);
         Map<String, Object> result = execService.execStreamTaskInstance(loginUser, projectCode, code, version,
                 warningGroupId, workerGroup, environmentCode, startParamMap, dryRun);
@@ -477,7 +476,7 @@ public class ExecutorController extends BaseController {
                               @RequestParam("processInstanceId") Integer processInstanceId,
                               @RequestParam("startNodeList") String startNodeList,
                               @RequestParam("taskDependType") TaskDependType taskDependType) {
-        logger.info("Start to execute task in process instance, projectCode:{}, processInstanceId:{}.",
+        log.info("Start to execute task in process instance, projectCode:{}, processInstanceId:{}.",
                 projectCode,
                 processInstanceId);
         return execService.executeTask(loginUser, projectCode, processInstanceId, startNodeList, taskDependType);

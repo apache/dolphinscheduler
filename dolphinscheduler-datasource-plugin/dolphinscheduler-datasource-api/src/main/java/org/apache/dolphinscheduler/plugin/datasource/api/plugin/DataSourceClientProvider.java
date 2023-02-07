@@ -31,23 +31,21 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalListener;
 
+@Slf4j
 public class DataSourceClientProvider {
-
-    private static final Logger logger = LoggerFactory.getLogger(DataSourceClientProvider.class);
 
     private static final long duration = PropertyUtils.getLong(TaskConstants.KERBEROS_EXPIRE_TIME, 24);
     private static final Cache<String, DataSourceClient> uniqueId2dataSourceClientCache = CacheBuilder.newBuilder()
             .expireAfterWrite(duration, TimeUnit.HOURS)
             .removalListener((RemovalListener<String, DataSourceClient>) notification -> {
                 try (DataSourceClient closedClient = notification.getValue()) {
-                    logger.info("Datasource: {} is removed from cache due to expire", notification.getKey());
+                    log.info("Datasource: {} is removed from cache due to expire", notification.getKey());
                 }
             })
             .maximumSize(100)
@@ -70,7 +68,7 @@ public class DataSourceClientProvider {
     public Connection getConnection(DbType dbType, ConnectionParam connectionParam) throws ExecutionException {
         BaseConnectionParam baseConnectionParam = (BaseConnectionParam) connectionParam;
         String datasourceUniqueId = DataSourceUtils.getDatasourceUniqueId(baseConnectionParam, dbType);
-        logger.info("Get connection from datasource {}", datasourceUniqueId);
+        log.info("Get connection from datasource {}", datasourceUniqueId);
 
         DataSourceClient dataSourceClient = uniqueId2dataSourceClientCache.get(datasourceUniqueId, () -> {
             Map<String, DataSourceChannel> dataSourceChannelMap = dataSourcePluginManager.getDataSourceChannelMap();

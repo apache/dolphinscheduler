@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 @Builder
 public class TaskCallbackImpl implements TaskCallBack {
 
-    protected final Logger logger =
+    protected final Logger log =
             LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, TaskCallbackImpl.class));
 
     private final WorkerMessageSender workerMessageSender;
@@ -50,12 +50,12 @@ public class TaskCallbackImpl implements TaskCallBack {
         TaskExecutionContext taskExecutionContext =
                 TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
         if (taskExecutionContext == null) {
-            logger.error("task execution context is empty, taskInstanceId: {}, applicationInfo:{}", taskInstanceId,
+            log.error("task execution context is empty, taskInstanceId: {}, applicationInfo:{}", taskInstanceId,
                     applicationInfo);
             return;
         }
 
-        logger.info("send remote application info {}", applicationInfo);
+        log.info("send remote application info {}", applicationInfo);
         taskExecutionContext.setAppIds(applicationInfo.getAppIds());
         workerMessageSender.sendMessageWithRetry(taskExecutionContext, masterAddress, CommandType.TASK_EXECUTE_RUNNING);
     }

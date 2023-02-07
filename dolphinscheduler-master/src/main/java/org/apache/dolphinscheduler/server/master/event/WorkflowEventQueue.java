@@ -19,14 +19,13 @@ package org.apache.dolphinscheduler.server.master.event;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class WorkflowEventQueue {
-
-    private final Logger logger = LoggerFactory.getLogger(WorkflowEventQueue.class);
 
     private static final LinkedBlockingQueue<WorkflowEvent> workflowEventQueue = new LinkedBlockingQueue<>();
 
@@ -35,7 +34,7 @@ public class WorkflowEventQueue {
      */
     public void addEvent(WorkflowEvent workflowEvent) {
         workflowEventQueue.add(workflowEvent);
-        logger.info("Added workflow event to workflowEvent queue, event: {}", workflowEvent);
+        log.info("Added workflow event to workflowEvent queue, event: {}", workflowEvent);
     }
 
     /**

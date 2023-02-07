@@ -67,21 +67,21 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
             return false;
         }
         this.setTaskExecutionLogger();
-        logger.info("condition task submit success");
+        log.info("condition task submit success");
         return true;
     }
 
     @Override
     public boolean runTask() {
         initTaskParameters();
-        logger.info("condition task start");
+        log.info("condition task start");
         if (conditionResult.equals(DependResult.WAITING)) {
             setConditionResult();
             endTask();
         } else {
             endTask();
         }
-        logger.info("condition task finished");
+        log.info("condition task finished");
         return true;
     }
 
@@ -109,7 +109,7 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
         if (taskTimeoutStrategy == TaskTimeoutStrategy.WARN) {
             return true;
         }
-        logger.info("condition task {} timeout, strategy {} ",
+        log.info("condition task {} timeout, strategy {} ",
                 taskInstance.getId(), taskTimeoutStrategy.getDescp());
         conditionResult = DependResult.FAILED;
         endTask();
@@ -161,7 +161,7 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
             modelResultList.add(modelResult);
         }
         conditionResult = DependentUtils.getDependResultForRelation(dependentParameters.getRelation(), modelResultList);
-        logger.info("the conditions task depend result : {}", conditionResult);
+        log.info("the conditions task depend result : {}", conditionResult);
     }
 
     /**
@@ -171,17 +171,17 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
 
         DependResult dependResult = DependResult.SUCCESS;
         if (!completeTaskList.containsKey(item.getDepTaskCode())) {
-            logger.info("depend item: {} have not completed yet.", item.getDepTaskCode());
+            log.info("depend item: {} have not completed yet.", item.getDepTaskCode());
             dependResult = DependResult.FAILED;
             return dependResult;
         }
         TaskExecutionStatus executionStatus = completeTaskList.get(item.getDepTaskCode());
         if (executionStatus != item.getStatus()) {
-            logger.info("depend item : {} expect status: {}, actual status: {}", item.getDepTaskCode(),
+            log.info("depend item : {} expect status: {}, actual status: {}", item.getDepTaskCode(),
                     item.getStatus(), executionStatus);
             dependResult = DependResult.FAILED;
         }
-        logger.info("dependent item complete, dependentTaskCode: {}, dependResult: {}", item.getDepTaskCode(),
+        log.info("dependent item complete, dependentTaskCode: {}, dependResult: {}", item.getDepTaskCode(),
                 dependResult);
         return dependResult;
     }

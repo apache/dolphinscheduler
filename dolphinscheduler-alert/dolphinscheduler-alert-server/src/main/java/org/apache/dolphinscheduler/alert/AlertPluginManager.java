@@ -37,16 +37,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public final class AlertPluginManager {
-
-    private static final Logger logger = LoggerFactory.getLogger(AlertPluginManager.class);
 
     private final PluginDao pluginDao;
 
@@ -79,11 +78,11 @@ public final class AlertPluginManager {
             String name = entry.getKey();
             AlertChannelFactory factory = entry.getValue();
 
-            logger.info("Registering alert plugin: {} - {}", name, factory.getClass());
+            log.info("Registering alert plugin: {} - {}", name, factory.getClass());
 
             final AlertChannel alertChannel = factory.create();
 
-            logger.info("Registered alert plugin: {} - {}", name, factory.getClass());
+            log.info("Registered alert plugin: {} - {}", name, factory.getClass());
 
             final List<PluginParams> params = new ArrayList<>(factory.params());
             params.add(0, warningTypeParams);

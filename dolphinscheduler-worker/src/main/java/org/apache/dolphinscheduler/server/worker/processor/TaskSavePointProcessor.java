@@ -31,8 +31,8 @@ import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecuteRunnable;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -46,9 +46,8 @@ import io.netty.channel.ChannelFutureListener;
  * task save point processor
  */
 @Component
+@Slf4j
 public class TaskSavePointProcessor implements NettyRequestProcessor {
-
-    private final Logger logger = LoggerFactory.getLogger(TaskSavePointProcessor.class);
 
     /**
      * task execute manager
@@ -69,16 +68,16 @@ public class TaskSavePointProcessor implements NettyRequestProcessor {
         TaskSavePointRequestCommand taskSavePointRequestCommand =
                 JSONUtils.parseObject(command.getBody(), TaskSavePointRequestCommand.class);
         if (taskSavePointRequestCommand == null) {
-            logger.error("task savepoint request command is null");
+            log.error("task savepoint request command is null");
             return;
         }
-        logger.info("Receive task savepoint command : {}", taskSavePointRequestCommand);
+        log.info("Receive task savepoint command : {}", taskSavePointRequestCommand);
 
         int taskInstanceId = taskSavePointRequestCommand.getTaskInstanceId();
         TaskExecutionContext taskExecutionContext =
                 TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
         if (taskExecutionContext == null) {
-            logger.error("taskRequest cache is null, taskInstanceId: {}",
+            log.error("taskRequest cache is null, taskInstanceId: {}",
                     taskSavePointRequestCommand.getTaskInstanceId());
             return;
         }
@@ -101,10 +100,10 @@ public class TaskSavePointProcessor implements NettyRequestProcessor {
             @Override
             public void operationComplete(ChannelFuture future) throws Exception {
                 if (!future.isSuccess()) {
-                    logger.error("Submit kill response to master error, kill command: {}",
+                    log.error("Submit kill response to master error, kill command: {}",
                             taskSavePointResponseCommand);
                 } else
-                    logger.info("Submit kill response to master success, kill command: {}",
+                    log.info("Submit kill response to master success, kill command: {}",
                             taskSavePointResponseCommand);
             }
         });
@@ -113,22 +112,22 @@ public class TaskSavePointProcessor implements NettyRequestProcessor {
     protected void doSavePoint(int taskInstanceId) {
         WorkerTaskExecuteRunnable workerTaskExecuteRunnable = workerManager.getTaskExecuteThread(taskInstanceId);
         if (workerTaskExecuteRunnable == null) {
-            logger.warn("taskExecuteThread not found, taskInstanceId:{}", taskInstanceId);
+            log.warn("taskExecuteThread not found, taskInstanceId:{}", taskInstanceId);
             return;
         }
         AbstractTask task = workerTaskExecuteRunnable.getTask();
         if (task == null) {
-            logger.warn("task not found, taskInstanceId:{}", taskInstanceId);
+            log.warn("task not found, taskInstanceId:{}", taskInstanceId);
             return;
         }
         if (!(task instanceof StreamTask)) {
-            logger.warn("task is not stream task");
+            log.warn("task is not stream task");
             return;
         }
         try {
             ((StreamTask) task).savePoint();
         } catch (Exception e) {
-            logger.error("task save point error", e);
+            log.error("task save point error", e);
         }
     }
 }

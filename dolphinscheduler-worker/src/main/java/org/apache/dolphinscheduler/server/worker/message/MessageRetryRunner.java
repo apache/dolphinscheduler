@@ -34,17 +34,15 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class MessageRetryRunner extends BaseDaemonThread {
-
-    private final Logger logger = LoggerFactory.getLogger(MessageRetryRunner.class);
 
     protected MessageRetryRunner() {
         super("WorkerMessageRetryRunnerThread");
@@ -62,13 +60,13 @@ public class MessageRetryRunner extends BaseDaemonThread {
 
     @Override
     public synchronized void start() {
-        logger.info("Message retry runner staring");
+        log.info("Message retry runner staring");
         messageSenders.forEach(messageSender -> {
             messageSenderMap.put(messageSender.getMessageType(), messageSender);
-            logger.info("Injected message sender: {}", messageSender.getClass().getName());
+            log.info("Injected message sender: {}", messageSender.getClass().getName());
         });
         super.start();
-        logger.info("Message retry runner started");
+        log.info("Message retry runner started");
     }
 
     public void addRetryMessage(int taskInstanceId, @NonNull CommandType messageType, BaseCommand baseCommand) {
@@ -120,25 +118,25 @@ public class MessageRetryRunner extends BaseDaemonThread {
                             CommandType messageType = messageEntry.getKey();
                             BaseCommand message = messageEntry.getValue();
                             if (now - message.getMessageSendTime() > MESSAGE_RETRY_WINDOW) {
-                                logger.info("Begin retry send message to master, message: {}", message);
+                                log.info("Begin retry send message to master, message: {}", message);
                                 message.setMessageSendTime(now);
                                 messageSenderMap.get(messageType).sendMessage(message);
-                                logger.info("Success send message to master, message: {}", message);
+                                log.info("Success send message to master, message: {}", message);
                             }
                         }
                     } catch (Exception e) {
-                        logger.warn("Retry send message to master error", e);
+                        log.warn("Retry send message to master error", e);
                     } finally {
                         LogUtils.removeTaskInstanceIdMDC();
                     }
                 }
                 Thread.sleep(Constants.SLEEP_TIME_MILLIS);
             } catch (InterruptedException instance) {
-                logger.warn("The message retry thread is interrupted, will break this loop", instance);
+                log.warn("The message retry thread is interrupted, will break this loop", instance);
                 Thread.currentThread().interrupt();
                 break;
             } catch (Exception ex) {
-                logger.error("Retry send message failed, get an known exception.", ex);
+                log.error("Retry send message failed, get an known exception.", ex);
             }
         }
     }

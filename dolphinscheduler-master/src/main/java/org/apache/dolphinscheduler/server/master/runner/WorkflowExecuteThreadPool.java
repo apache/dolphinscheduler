@@ -39,9 +39,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.PostConstruct;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
@@ -54,9 +53,8 @@ import com.google.common.base.Strings;
  * Used to execute {@link WorkflowExecuteRunnable}.
  */
 @Component
+@Slf4j
 public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
-
-    private static final Logger logger = LoggerFactory.getLogger(WorkflowExecuteThreadPool.class);
 
     @Autowired
     private MasterConfig masterConfig;
@@ -93,12 +91,12 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
         WorkflowExecuteRunnable workflowExecuteThread =
                 processInstanceExecCacheManager.getByProcessInstanceId(stateEvent.getProcessInstanceId());
         if (workflowExecuteThread == null) {
-            logger.warn("Submit state event error, cannot from workflowExecuteThread from cache manager, stateEvent:{}",
+            log.warn("Submit state event error, cannot from workflowExecuteThread from cache manager, stateEvent:{}",
                     stateEvent);
             return;
         }
         workflowExecuteThread.addStateEvent(stateEvent);
-        logger.info("Submit state event success, stateEvent: {}", stateEvent);
+        log.info("Submit state event success, stateEvent: {}", stateEvent);
     }
 
     /**
@@ -109,7 +107,7 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
             return;
         }
         if (multiThreadFilterMap.containsKey(workflowExecuteThread.getKey())) {
-            logger.debug("The workflow has been executed by another thread");
+            log.debug("The workflow has been executed by another thread");
             return;
         }
         multiThreadFilterMap.put(workflowExecuteThread.getKey(), workflowExecuteThread);
@@ -121,7 +119,7 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
             public void onFailure(Throwable ex) {
                 LoggerUtils.setWorkflowInstanceIdMDC(processInstanceId);
                 try {
-                    logger.error("Workflow instance events handle failed", ex);
+                    log.error("Workflow instance events handle failed", ex);
                     notifyProcessChanged(workflowExecuteThread.getProcessInstance());
                     multiThreadFilterMap.remove(workflowExecuteThread.getKey());
                 } finally {
@@ -138,10 +136,10 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
                                 .removeProcess4TimeoutCheck(workflowExecuteThread.getProcessInstance().getId());
                         processInstanceExecCacheManager.removeByProcessInstanceId(processInstanceId);
                         notifyProcessChanged(workflowExecuteThread.getProcessInstance());
-                        logger.info("Workflow instance is finished.");
+                        log.info("Workflow instance is finished.");
                     }
                 } catch (Exception e) {
-                    logger.error("Workflow instance is finished, but notify changed error", e);
+                    log.error("Workflow instance is finished, but notify changed error", e);
                 } finally {
                     // make sure the process has been removed from multiThreadFilterMap
                     multiThreadFilterMap.remove(workflowExecuteThread.getKey());
@@ -166,10 +164,10 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
             try {
                 LoggerUtils.setWorkflowAndTaskInstanceIDMDC(processInstance.getId(), taskInstance.getId());
                 if (processInstance.getHost().equalsIgnoreCase(address)) {
-                    logger.info("Process host is local master, will notify it");
+                    log.info("Process host is local master, will notify it");
                     this.notifyMyself(processInstance, taskInstance);
                 } else {
-                    logger.info("Process host is remote master, will notify it");
+                    log.info("Process host is remote master, will notify it");
                     this.notifyProcess(finishProcessInstance, processInstance, taskInstance);
                 }
             } finally {
@@ -183,7 +181,7 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
      */
     private void notifyMyself(@NonNull ProcessInstance processInstance, @NonNull TaskInstance taskInstance) {
         if (!processInstanceExecCacheManager.contains(processInstance.getId())) {
-            logger.warn("The execute cache manager doesn't contains this workflow instance");
+            log.warn("The execute cache manager doesn't contains this workflow instance");
             return;
         }
         TaskStateEvent stateEvent = TaskStateEvent.builder()
@@ -202,7 +200,7 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
                                TaskInstance taskInstance) {
         String processInstanceHost = processInstance.getHost();
         if (Strings.isNullOrEmpty(processInstanceHost)) {
-            logger.error("Process {} host is empty, cannot notify task {} now, taskId: {}", processInstance.getName(),
+            log.error("Process {} host is empty, cannot notify task {} now, taskId: {}", processInstance.getName(),
                     taskInstance.getName(), taskInstance.getId());
             return;
         }

@@ -41,8 +41,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -50,12 +50,8 @@ import org.springframework.stereotype.Component;
  * process alert manager
  */
 @Component
+@Slf4j
 public class ProcessAlertManager {
-
-    /**
-     * logger of AlertManager
-     */
-    private static final Logger logger = LoggerFactory.getLogger(ProcessAlertManager.class);
 
     /**
      * alert dao
@@ -204,7 +200,7 @@ public class ProcessAlertManager {
             alertDao.addAlert(alert);
 
         } catch (Exception e) {
-            logger.error("send alert failed:{} ", e.getMessage());
+            log.error("send alert failed:{} ", e.getMessage());
         }
 
     }

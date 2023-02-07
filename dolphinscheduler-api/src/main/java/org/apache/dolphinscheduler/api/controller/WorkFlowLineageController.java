@@ -36,8 +36,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -61,9 +61,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "WORK_FLOW_LINEAGE_TAG")
 @RestController
 @RequestMapping("projects/{projectCode}/lineages")
+@Slf4j
 public class WorkFlowLineageController extends BaseController {
-
-    private static final Logger logger = LoggerFactory.getLogger(WorkFlowLineageController.class);
 
     @Autowired
     private WorkFlowLineageService workFlowLineageService;
@@ -80,7 +79,7 @@ public class WorkFlowLineageController extends BaseController {
             Map<String, Object> result = workFlowLineageService.queryWorkFlowLineageByName(projectCode, workFlowName);
             return returnDataList(result);
         } catch (Exception e) {
-            logger.error(QUERY_WORKFLOW_LINEAGE_ERROR.getMsg(), e);
+            log.error(QUERY_WORKFLOW_LINEAGE_ERROR.getMsg(), e);
             return error(QUERY_WORKFLOW_LINEAGE_ERROR.getCode(), QUERY_WORKFLOW_LINEAGE_ERROR.getMsg());
         }
     }
@@ -96,7 +95,7 @@ public class WorkFlowLineageController extends BaseController {
             Map<String, Object> result = workFlowLineageService.queryWorkFlowLineageByCode(projectCode, workFlowCode);
             return returnDataList(result);
         } catch (Exception e) {
-            logger.error(QUERY_WORKFLOW_LINEAGE_ERROR.getMsg(), e);
+            log.error(QUERY_WORKFLOW_LINEAGE_ERROR.getMsg(), e);
             return error(QUERY_WORKFLOW_LINEAGE_ERROR.getCode(), QUERY_WORKFLOW_LINEAGE_ERROR.getMsg());
         }
     }
@@ -111,7 +110,7 @@ public class WorkFlowLineageController extends BaseController {
             Map<String, Object> result = workFlowLineageService.queryWorkFlowLineage(projectCode);
             return returnDataList(result);
         } catch (Exception e) {
-            logger.error(QUERY_WORKFLOW_LINEAGE_ERROR.getMsg(), e);
+            log.error(QUERY_WORKFLOW_LINEAGE_ERROR.getMsg(), e);
             return error(QUERY_WORKFLOW_LINEAGE_ERROR.getCode(), QUERY_WORKFLOW_LINEAGE_ERROR.getMsg());
         }
     }

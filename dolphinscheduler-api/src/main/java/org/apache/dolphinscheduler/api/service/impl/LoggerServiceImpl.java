@@ -42,8 +42,8 @@ import org.apache.commons.lang3.StringUtils;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,9 +53,8 @@ import com.google.common.primitives.Bytes;
  * logger service impl
  */
 @Service
+@Slf4j
 public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService {
-
-    private static final Logger logger = LoggerFactory.getLogger(LoggerServiceImpl.class);
 
     private static final String LOG_HEAD_FORMAT = "[LOG-PATH]: %s, [HOST]:  %s%s";
 
@@ -90,11 +89,11 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
         TaskInstance taskInstance = taskInstanceDao.findTaskInstanceById(taskInstId);
 
         if (taskInstance == null) {
-            logger.error("Task instance does not exist, taskInstanceId:{}.", taskInstId);
+            log.error("Task instance does not exist, taskInstanceId:{}.", taskInstId);
             return Result.error(Status.TASK_INSTANCE_NOT_FOUND);
         }
         if (StringUtils.isBlank(taskInstance.getHost())) {
-            logger.error("Host of task instance is null, taskInstanceId:{}.", taskInstId);
+            log.error("Host of task instance is null, taskInstanceId:{}.", taskInstId);
             return Result.error(Status.TASK_INSTANCE_HOST_IS_NULL);
         }
         Project project = projectMapper.queryProjectByTaskInstanceId(taskInstId);
@@ -200,7 +199,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
     private String queryLog(TaskInstance taskInstance, int skipLineNum, int limit) {
         Host host = Host.of(taskInstance.getHost());
 
-        logger.info("Query task instance log, taskInstanceId:{}, taskInstanceName:{}, host:{}, logPath:{}, port:{}",
+        log.info("Query task instance log, taskInstanceId:{}, taskInstanceName:{}, host:{}, logPath:{}, port:{}",
                 taskInstance.getId(), taskInstance.getName(), host.getIp(), taskInstance.getLogPath(), host.getPort());
 
         StringBuilder log = new StringBuilder();

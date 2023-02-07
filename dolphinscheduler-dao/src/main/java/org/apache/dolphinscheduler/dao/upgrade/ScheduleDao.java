@@ -24,12 +24,10 @@ import java.time.Clock;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class ScheduleDao {
-
-    public static final Logger logger = LoggerFactory.getLogger(ScheduleDao.class);
 
     /**
      * queryAllSchedule
@@ -49,7 +47,7 @@ public class ScheduleDao {
                 scheduleMap.put(id, processDefinitionCode);
             }
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new RuntimeException("sql: " + sql, e);
         }
         return scheduleMap;
@@ -84,7 +82,7 @@ public class ScheduleDao {
                 }
             }
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new RuntimeException("sql: " + sql, e);
         }
     }

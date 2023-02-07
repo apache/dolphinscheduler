@@ -72,7 +72,7 @@ public class DmsTask extends AbstractRemoteTask {
     @Override
     public void init() throws TaskException {
         parameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), DmsParameters.class);
-        logger.info("Initialize Dms task params {}", JSONUtils.toPrettyJsonString(parameters));
+        log.info("Initialize Dms task params {}", JSONUtils.toPrettyJsonString(parameters));
         initDmsHook();
     }
 
@@ -105,7 +105,7 @@ public class DmsTask extends AbstractRemoteTask {
         dmsHook.setReplicationTaskArn(appId.getReplicationTaskArn());
         // if CdcStopPosition is not set, the task will not continue to check the running status
         if (isStopTaskWhenCdc()) {
-            logger.info(
+            log.info(
                     "This is a cdc task and cdcStopPosition is not set, the task will not continue to check the running status");
             exitStatusCode = TaskConstants.EXIT_CODE_SUCCESS;
             return;
@@ -168,7 +168,7 @@ public class DmsTask extends AbstractRemoteTask {
         try {
             isStartSuccessfully = dmsHook.startReplicationTask();
         } catch (InvalidResourceStateException e) {
-            logger.error("Failed to start a task, error message: {}", e.getErrorMessage());
+            log.error("Failed to start a task, error message: {}", e.getErrorMessage());
 
             // Only restart task when the error contains "Test connection", means instance can not connect to source or
             // target
@@ -176,7 +176,7 @@ public class DmsTask extends AbstractRemoteTask {
                 return TaskConstants.EXIT_CODE_FAILURE;
             }
 
-            logger.info("restart replication task");
+            log.info("restart replication task");
             // if only restart task, run dmsHook.describeReplicationTasks to get replication task arn
             if (parameters.getIsRestartTask()) {
                 dmsHook.describeReplicationTasks();
@@ -244,7 +244,7 @@ public class DmsTask extends AbstractRemoteTask {
                 parameters = objectMapper.readValue(jsonData, DmsParameters.class);
                 parameters.setIsRestartTask(isRestartTask);
             } catch (Exception e) {
-                logger.error("Failed to convert json data to DmsParameters object.", e);
+                log.error("Failed to convert json data to DmsParameters object.", e);
                 throw new TaskException(e.getMessage());
             }
         }

@@ -27,15 +27,13 @@ import org.apache.commons.lang3.StringUtils;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * common utils
  */
+@Slf4j
 public class CommonUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(CommonUtils.class);
 
     private static final Base64 BASE64 = new Base64();
 
@@ -53,7 +51,7 @@ public class CommonUtils {
 
             if (envDefaultPath != null) {
                 envPath = envDefaultPath.getPath();
-                logger.debug("env path :{}", envPath);
+                log.debug("env path :{}", envPath);
             } else {
                 envPath = "/etc/profile";
             }
@@ -101,7 +99,7 @@ public class CommonUtils {
                 DataSourceConstants.DATASOURCE_ENCRYPTION_SALT_DEFAULT);
         String passwordWithSalt = new String(BASE64.decode(password), StandardCharsets.UTF_8);
         if (!passwordWithSalt.startsWith(salt)) {
-            logger.warn("There is a password and salt mismatch: {} ", password);
+            log.warn("There is a password and salt mismatch: {} ", password);
             return password;
         }
         return new String(BASE64.decode(passwordWithSalt.substring(salt.length())), StandardCharsets.UTF_8);

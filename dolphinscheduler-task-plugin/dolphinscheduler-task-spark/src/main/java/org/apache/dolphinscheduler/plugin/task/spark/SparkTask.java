@@ -68,7 +68,7 @@ public class SparkTask extends AbstractYarnTask {
         sparkParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SparkParameters.class);
 
         if (null == sparkParameters) {
-            logger.error("Spark params is null");
+            log.error("Spark params is null");
             return;
         }
 
@@ -80,7 +80,7 @@ public class SparkTask extends AbstractYarnTask {
         if (sparkParameters.getProgramType() != ProgramType.SQL) {
             setMainJarName();
         }
-        logger.info("Initialize spark task params {}", JSONUtils.toPrettyJsonString(sparkParameters));
+        log.info("Initialize spark task params {}", JSONUtils.toPrettyJsonString(sparkParameters));
     }
 
     /**
@@ -116,7 +116,7 @@ public class SparkTask extends AbstractYarnTask {
         String command =
                 ParameterUtils.convertParameterPlaceholders(String.join(" ", args), ParamUtils.convert(paramsMap));
 
-        logger.info("spark task command: {}", command);
+        log.info("spark task command: {}", command);
 
         return command;
     }
@@ -229,8 +229,8 @@ public class SparkTask extends AbstractYarnTask {
             String script = replaceParam(sparkParameters.getRawScript());
             sparkParameters.setRawScript(script);
 
-            logger.info("raw script : {}", sparkParameters.getRawScript());
-            logger.info("task execute path : {}", taskExecutionContext.getExecutePath());
+            log.info("raw script : {}", sparkParameters.getRawScript());
+            log.info("task execute path : {}", taskExecutionContext.getExecutePath());
 
             Set<PosixFilePermission> perms = PosixFilePermissions.fromString(RWXR_XR_X);
             FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);

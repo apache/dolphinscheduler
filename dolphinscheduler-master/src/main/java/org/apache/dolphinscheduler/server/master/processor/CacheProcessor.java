@@ -24,8 +24,8 @@ import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
@@ -38,9 +38,8 @@ import io.netty.channel.Channel;
  * cache process from master/api
  */
 @Component
+@Slf4j
 public class CacheProcessor implements NettyRequestProcessor {
-
-    private final Logger logger = LoggerFactory.getLogger(CacheProcessor.class);
 
     @Autowired
     private CacheManager cacheManager;
@@ -52,7 +51,7 @@ public class CacheProcessor implements NettyRequestProcessor {
 
         CacheExpireCommand cacheExpireCommand = JSONUtils.parseObject(command.getBody(), CacheExpireCommand.class);
 
-        logger.info("received command : {}", cacheExpireCommand);
+        log.info("received command : {}", cacheExpireCommand);
 
         this.cacheExpire(cacheExpireCommand);
     }
@@ -67,7 +66,7 @@ public class CacheProcessor implements NettyRequestProcessor {
         Cache cache = cacheManager.getCache(cacheType.getCacheName());
         if (cache != null) {
             cache.evict(cacheExpireCommand.getCacheKey());
-            logger.info("cache evict, type:{}, key:{}", cacheType.getCacheName(), cacheExpireCommand.getCacheKey());
+            log.info("cache evict, type:{}, key:{}", cacheType.getCacheName(), cacheExpireCommand.getCacheKey());
         }
     }
 }

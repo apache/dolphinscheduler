@@ -19,9 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.api.log;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import lombok.extern.slf4j.Slf4j;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.filter.Filter;
@@ -30,9 +28,8 @@ import ch.qos.logback.core.spi.FilterReply;
 /**
  * task log filter
  */
+@Slf4j
 public class TaskLogFilter extends Filter<ILoggingEvent> {
-
-    private static Logger logger = LoggerFactory.getLogger(TaskLogFilter.class);
 
     /**
      * level
@@ -57,7 +54,7 @@ public class TaskLogFilter extends Filter<ILoggingEvent> {
                 || event.getLevel().isGreaterOrEqual(level)) {
             filterReply = FilterReply.ACCEPT;
         }
-        logger.debug("task log filter, thread name:{}, loggerName:{}, filterReply:{}, level:{}", event.getThreadName(),
+        log.debug("task log filter, thread name:{}, loggerName:{}, filterReply:{}, level:{}", event.getThreadName(),
                 event.getLoggerName(), filterReply.name(), level);
         return filterReply;
     }

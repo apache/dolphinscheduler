@@ -52,7 +52,7 @@ public class DatafactoryTask extends AbstractRemoteTask {
     @Override
     public void init() {
         parameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), DatafactoryParameters.class);
-        logger.info("Initialize Datafactory task params {}", JSONUtils.toPrettyJsonString(parameters));
+        log.info("Initialize Datafactory task params {}", JSONUtils.toPrettyJsonString(parameters));
         hook = new DatafactoryHook();
     }
 

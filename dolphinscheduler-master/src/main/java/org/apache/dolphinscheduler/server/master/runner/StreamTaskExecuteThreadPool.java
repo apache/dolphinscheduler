@@ -22,8 +22,8 @@ import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
@@ -34,9 +34,8 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
  * Used to execute {@link StreamTaskExecuteRunnable}.
  */
 @Component
+@Slf4j
 public class StreamTaskExecuteThreadPool extends ThreadPoolTaskExecutor {
-
-    private static final Logger logger = LoggerFactory.getLogger(StreamTaskExecuteThreadPool.class);
 
     @Autowired
     private MasterConfig masterConfig;
@@ -63,14 +62,14 @@ public class StreamTaskExecuteThreadPool extends ThreadPoolTaskExecutor {
             @Override
             public void onFailure(Throwable ex) {
                 LoggerUtils.setTaskInstanceIdMDC(taskInstanceId);
-                logger.error("Stream task instance events handle failed", ex);
+                log.error("Stream task instance events handle failed", ex);
                 LoggerUtils.removeTaskInstanceIdMDC();
             }
 
             @Override
             public void onSuccess(Object result) {
                 LoggerUtils.setTaskInstanceIdMDC(taskInstanceId);
-                logger.info("Stream task instance is finished.");
+                log.info("Stream task instance is finished.");
                 LoggerUtils.removeTaskInstanceIdMDC();
             }
         });

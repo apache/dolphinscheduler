@@ -28,15 +28,13 @@ import org.apache.dolphinscheduler.server.master.runner.task.TaskAction;
 
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.google.auto.service.AutoService;
 
 @AutoService(StateEventHandler.class)
+@Slf4j
 public class TaskTimeoutStateEventHandler implements StateEventHandler {
-
-    private static final Logger logger = LoggerFactory.getLogger(TaskTimeoutStateEventHandler.class);
 
     @Override
     public boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable,
@@ -52,7 +50,7 @@ public class TaskTimeoutStateEventHandler implements StateEventHandler {
                                 "Cannot find the task instance from workflow execute runnable, taskInstanceId: %s",
                                 taskStateEvent.getTaskInstanceId())));
 
-        logger.info("Handle task instance state timeout event, taskInstanceId: {}", taskStateEvent.getTaskInstanceId());
+        log.info("Handle task instance state timeout event, taskInstanceId: {}", taskStateEvent.getTaskInstanceId());
 
         if (TimeoutFlag.CLOSE == taskInstance.getTaskDefine().getTimeoutFlag()) {
             return true;
@@ -67,7 +65,7 @@ public class TaskTimeoutStateEventHandler implements StateEventHandler {
                 ITaskProcessor taskProcessor = activeTaskProcessMap.get(taskInstance.getTaskCode());
                 taskProcessor.action(TaskAction.TIMEOUT);
             } else {
-                logger.warn(
+                log.warn(
                         "cannot find the task processor for task {}, so skip task processor action.",
                         taskInstance.getTaskCode());
             }

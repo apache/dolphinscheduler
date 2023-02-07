@@ -25,8 +25,8 @@ import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -37,9 +37,8 @@ import io.netty.channel.Channel;
  * task execute running processor
  */
 @Component
+@Slf4j
 public class TaskExecuteRunningProcessor implements NettyRequestProcessor {
-
-    private final Logger logger = LoggerFactory.getLogger(TaskExecuteRunningProcessor.class);
 
     @Autowired
     private TaskEventService taskEventService;
@@ -56,7 +55,7 @@ public class TaskExecuteRunningProcessor implements NettyRequestProcessor {
                 String.format("invalid command type : %s", command.getType()));
         TaskExecuteRunningCommand taskExecuteRunningMessage =
                 JSONUtils.parseObject(command.getBody(), TaskExecuteRunningCommand.class);
-        logger.info("taskExecuteRunningCommand: {}", taskExecuteRunningMessage);
+        log.info("taskExecuteRunningCommand: {}", taskExecuteRunningMessage);
 
         TaskEvent taskEvent = TaskEvent.newRunningEvent(taskExecuteRunningMessage,
                 channel,

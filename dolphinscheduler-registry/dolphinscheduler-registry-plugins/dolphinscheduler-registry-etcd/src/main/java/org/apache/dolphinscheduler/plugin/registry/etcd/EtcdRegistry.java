@@ -38,9 +38,8 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -68,9 +67,9 @@ import io.etcd.jetcd.watch.WatchEvent;
  */
 @Component
 @ConditionalOnProperty(prefix = "registry", name = "type", havingValue = "etcd")
+@Slf4j
 public class EtcdRegistry implements Registry {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(EtcdRegistry.class);
     private final Client client;
     private EtcdConnectionStateListener etcdConnectionStateListener;
     public static final String FOLDER_SEPARATOR = "/";
@@ -102,7 +101,7 @@ public class EtcdRegistry implements Registry {
             clientBuilder.authority(registryProperties.getAuthority());
         }
         client = clientBuilder.build();
-        LOGGER.info("Started Etcd Registry...");
+        log.info("Started Etcd Registry...");
         etcdConnectionStateListener = new EtcdConnectionStateListener(client);
     }
 
@@ -111,9 +110,9 @@ public class EtcdRegistry implements Registry {
      */
     @PostConstruct
     public void start() {
-        LOGGER.info("Starting Etcd ConnectionListener...");
+        log.info("Starting Etcd ConnectionListener...");
         etcdConnectionStateListener.start();
-        LOGGER.info("Started Etcd ConnectionListener...");
+        log.info("Started Etcd ConnectionListener...");
     }
 
     @Override

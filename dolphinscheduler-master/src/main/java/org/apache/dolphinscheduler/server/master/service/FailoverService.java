@@ -20,18 +20,16 @@ package org.apache.dolphinscheduler.server.master.service;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
  * failover service
  */
 @Component
+@Slf4j
 public class FailoverService {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(FailoverService.class);
 
     private final MasterFailoverService masterFailoverService;
     private final WorkerFailoverService workerFailoverService;
@@ -51,14 +49,14 @@ public class FailoverService {
     public void failoverServerWhenDown(String serverHost, NodeType nodeType) {
         switch (nodeType) {
             case MASTER:
-                LOGGER.info("Master failover starting, masterServer: {}", serverHost);
+                log.info("Master failover starting, masterServer: {}", serverHost);
                 masterFailoverService.failoverMaster(serverHost);
-                LOGGER.info("Master failover finished, masterServer: {}", serverHost);
+                log.info("Master failover finished, masterServer: {}", serverHost);
                 break;
             case WORKER:
-                LOGGER.info("Worker failover starting, workerServer: {}", serverHost);
+                log.info("Worker failover starting, workerServer: {}", serverHost);
                 workerFailoverService.failoverWorker(serverHost);
-                LOGGER.info("Worker failover finished, workerServer: {}", serverHost);
+                log.info("Worker failover finished, workerServer: {}", serverHost);
                 break;
             default:
                 break;

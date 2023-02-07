@@ -49,15 +49,13 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * mysql source generator
  */
+@Slf4j
 public class MySQLSourceGenerator implements ISourceGenerator {
-
-    private static final Logger logger = LoggerFactory.getLogger(MySQLSourceGenerator.class);
 
     @Override
     public String generate(SqoopParameters sqoopParameters, SqoopTaskExecutionContext sqoopTaskExecutionContext) {
@@ -141,7 +139,7 @@ public class MySQLSourceGenerator implements ISourceGenerator {
                 }
             }
         } catch (Exception e) {
-            logger.error(String.format("Sqoop task mysql source params build failed: [%s]", e.getMessage()));
+            log.error(String.format("Sqoop task mysql source params build failed: [%s]", e.getMessage()));
         }
 
         return mysqlSourceSb.toString();

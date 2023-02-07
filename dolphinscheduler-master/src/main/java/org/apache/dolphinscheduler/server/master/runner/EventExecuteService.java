@@ -26,15 +26,14 @@ import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class EventExecuteService extends BaseDaemonThread {
-
-    private static final Logger logger = LoggerFactory.getLogger(EventExecuteService.class);
 
     @Autowired
     private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
@@ -54,9 +53,9 @@ public class EventExecuteService extends BaseDaemonThread {
 
     @Override
     public synchronized void start() {
-        logger.info("Master Event execute service starting");
+        log.info("Master Event execute service starting");
         super.start();
-        logger.info("Master Event execute service started");
+        log.info("Master Event execute service started");
     }
 
     @Override
@@ -67,11 +66,11 @@ public class EventExecuteService extends BaseDaemonThread {
                 streamTaskEventHandler();
                 TimeUnit.MILLISECONDS.sleep(Constants.SLEEP_TIME_MILLIS_SHORT);
             } catch (InterruptedException interruptedException) {
-                logger.warn("Master event service interrupted, will exit this loop", interruptedException);
+                log.warn("Master event service interrupted, will exit this loop", interruptedException);
                 Thread.currentThread().interrupt();
                 break;
             } catch (Exception e) {
-                logger.error("Master event execute service error", e);
+                log.error("Master event execute service error", e);
             }
         }
     }

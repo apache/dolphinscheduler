@@ -73,7 +73,7 @@ public class PythonTask extends AbstractTask {
 
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
                 taskRequest,
-                logger);
+                log);
     }
 
     @Override
@@ -81,7 +81,7 @@ public class PythonTask extends AbstractTask {
 
         pythonParameters = JSONUtils.parseObject(taskRequest.getTaskParams(), PythonParameters.class);
 
-        logger.info("Initialize python task params {}", JSONUtils.toPrettyJsonString(pythonParameters));
+        log.info("Initialize python task params {}", JSONUtils.toPrettyJsonString(pythonParameters));
         if (pythonParameters == null || !pythonParameters.checkParameters()) {
             throw new TaskException("python task params is not valid");
         }
@@ -93,7 +93,7 @@ public class PythonTask extends AbstractTask {
         try {
             rawPythonScript = convertPythonScriptPlaceholders(rawPythonScript);
         } catch (StringIndexOutOfBoundsException e) {
-            logger.error("setShareVar field format error, raw python script : {}", rawPythonScript);
+            log.error("setShareVar field format error, raw python script : {}", rawPythonScript);
         }
         return rawPythonScript;
     }
@@ -116,7 +116,7 @@ public class PythonTask extends AbstractTask {
             setVarPool(shellCommandExecutor.getVarPool());
             pythonParameters.dealOutParam(shellCommandExecutor.getVarPool());
         } catch (Exception e) {
-            logger.error("python task failure", e);
+            log.error("python task failure", e);
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
             throw new TaskException("run python task error", e);
         }
@@ -177,17 +177,17 @@ public class PythonTask extends AbstractTask {
      * @throws IOException io exception
      */
     protected void createPythonCommandFileIfNotExists(String pythonScript, String pythonScriptFile) throws IOException {
-        logger.info("tenantCode :{}, task dir:{}", taskRequest.getTenantCode(), taskRequest.getExecutePath());
+        log.info("tenantCode :{}, task dir:{}", taskRequest.getTenantCode(), taskRequest.getExecutePath());
 
         if (!Files.exists(Paths.get(pythonScriptFile))) {
-            logger.info("generate python script file:{}", pythonScriptFile);
+            log.info("generate python script file:{}", pythonScriptFile);
 
             StringBuilder sb = new StringBuilder();
             sb.append("#-*- encoding=utf8 -*-").append(System.lineSeparator());
 
             sb.append(System.lineSeparator());
             sb.append(pythonScript);
-            logger.info(sb.toString());
+            log.info(sb.toString());
 
             // write data to file
             FileUtils.writeStringToFile(new File(pythonScriptFile),
@@ -212,7 +212,7 @@ public class PythonTask extends AbstractTask {
      * @throws Exception exception
      */
     protected String buildPythonScriptContent() throws Exception {
-        logger.info("raw python script : {}", pythonParameters.getRawScript());
+        log.info("raw python script : {}", pythonParameters.getRawScript());
         String rawPythonScript = pythonParameters.getRawScript().replaceAll("\\r\\n", System.lineSeparator());
         Map<String, Property> paramsMap = mergeParamsWithContext(pythonParameters);
         return ParameterUtils.convertParameterPlaceholders(rawPythonScript, ParamUtils.convert(paramsMap));

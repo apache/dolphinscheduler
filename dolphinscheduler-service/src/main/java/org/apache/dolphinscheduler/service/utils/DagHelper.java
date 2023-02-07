@@ -42,15 +42,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * dag tools
  */
+@Slf4j
 public class DagHelper {
-
-    private static final Logger logger = LoggerFactory.getLogger(DagHelper.class);
 
     /**
      * generate flow node relation list by task node list;
@@ -92,7 +90,7 @@ public class DagHelper {
         List<String> startNodeList = startNodeNameList;
 
         if (taskDependType != TaskDependType.TASK_POST && CollectionUtils.isEmpty(startNodeList)) {
-            logger.error("start node list is empty! cannot continue run the process ");
+            log.error("start node list is empty! cannot continue run the process ");
             return destFlowNodeList;
         }
 
@@ -112,7 +110,7 @@ public class DagHelper {
                 TaskNode startNode = findNodeByCode(taskNodeList, startNodeCode);
                 List<TaskNode> childNodeList = new ArrayList<>();
                 if (startNode == null) {
-                    logger.error("start node name [{}] is not in task node list [{}] ",
+                    log.error("start node name [{}] is not in task node list [{}] ",
                             startNodeCode,
                             taskNodeList);
                     continue;
@@ -316,7 +314,7 @@ public class DagHelper {
         for (String subsequent : startVertexes) {
             TaskNode taskNode = dag.getNode(subsequent);
             if (taskNode == null) {
-                logger.error("taskNode {} is null, please check dag", subsequent);
+                log.error("taskNode {} is null, please check dag", subsequent);
                 continue;
             }
             if (isTaskNodeNeedSkip(taskNode, skipTaskNodeList)) {

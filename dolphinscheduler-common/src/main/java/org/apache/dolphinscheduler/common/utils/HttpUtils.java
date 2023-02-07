@@ -48,15 +48,13 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * http utils
  */
+@Slf4j
 public class HttpUtils {
-
-    public static final Logger logger = LoggerFactory.getLogger(HttpUtils.class);
 
     private HttpUtils() {
         throw new UnsupportedOperationException("Construct HttpUtils");
@@ -106,9 +104,9 @@ public class HttpUtils {
             ctx = SSLContext.getInstance(SSLConnectionSocketFactory.TLS);
             ctx.init(null, new TrustManager[]{xtm}, null);
         } catch (NoSuchAlgorithmException e) {
-            logger.error("SSLContext init with NoSuchAlgorithmException", e);
+            log.error("SSLContext init with NoSuchAlgorithmException", e);
         } catch (KeyManagementException e) {
-            logger.error("SSLContext init with KeyManagementException", e);
+            log.error("SSLContext init with KeyManagementException", e);
         }
         socketFactory = new SSLConnectionSocketFactory(ctx, NoopHostnameVerifier.INSTANCE);
         /** set timeout、request time、socket timeout */
@@ -149,7 +147,7 @@ public class HttpUtils {
      */
     public static String getResponseContentString(HttpGet httpget, CloseableHttpClient httpClient) {
         if (Objects.isNull(httpget) || Objects.isNull(httpClient)) {
-            logger.error("HttpGet or HttpClient parameter is null");
+            log.error("HttpGet or HttpClient parameter is null");
             return null;
         }
         String responseContent = null;
@@ -162,13 +160,13 @@ public class HttpUtils {
                 if (entity != null) {
                     responseContent = EntityUtils.toString(entity, Constants.UTF_8);
                 } else {
-                    logger.warn("http entity is null");
+                    log.warn("http entity is null");
                 }
             } else {
-                logger.error("http get:{} response status code is not 200!", response.getStatusLine().getStatusCode());
+                log.error("http get:{} response status code is not 200!", response.getStatusLine().getStatusCode());
             }
         } catch (IOException ioe) {
-            logger.error(ioe.getMessage(), ioe);
+            log.error(ioe.getMessage(), ioe);
         } finally {
             try {
                 if (response != null) {
@@ -176,7 +174,7 @@ public class HttpUtils {
                     response.close();
                 }
             } catch (IOException e) {
-                logger.error(e.getMessage(), e);
+                log.error(e.getMessage(), e);
             }
             if (!httpget.isAborted()) {
                 httpget.releaseConnection();

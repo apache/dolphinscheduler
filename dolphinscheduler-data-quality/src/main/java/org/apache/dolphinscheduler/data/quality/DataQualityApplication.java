@@ -26,8 +26,7 @@ import org.apache.dolphinscheduler.data.quality.context.DataQualityContext;
 import org.apache.dolphinscheduler.data.quality.execution.SparkRuntimeEnvironment;
 import org.apache.dolphinscheduler.data.quality.utils.JsonUtils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.google.common.base.Strings;
 
@@ -37,14 +36,13 @@ import com.google.common.base.Strings;
  * These three components realize the functions of connecting data, executing intermediate SQL
  * and writing execution results and error data to the specified storage engine
  */
+@Slf4j
 public class DataQualityApplication {
-
-    private static final Logger logger = LoggerFactory.getLogger(DataQualityApplication.class);
 
     public static void main(String[] args) throws Exception {
 
         if (args.length < 1) {
-            logger.error("Can not find DataQualityConfiguration");
+            log.error("Can not find DataQualityConfiguration");
             System.exit(-1);
         }
 
@@ -53,7 +51,7 @@ public class DataQualityApplication {
         DataQualityConfiguration dataQualityConfiguration =
                 JsonUtils.fromJson(dataQualityParameter, DataQualityConfiguration.class);
         if (dataQualityConfiguration == null) {
-            logger.info("DataQualityConfiguration is null");
+            log.info("DataQualityConfiguration is null");
             System.exit(-1);
         } else {
             dataQualityConfiguration.validate();

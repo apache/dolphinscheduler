@@ -63,15 +63,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * time place holder utils
  */
+@Slf4j
 public class TimePlaceholderUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(TimePlaceholderUtils.class);
 
     /**
      * Prefix of the position to be replaced
@@ -325,7 +323,7 @@ public class TimePlaceholderUtils {
             try {
                 return calculateTime(placeholderName, date);
             } catch (Exception ex) {
-                logger.error("resolve placeholder '{}' in [ {} ]", placeholderName, value, ex);
+                log.error("resolve placeholder '{}' in [ {} ]", placeholderName, value, ex);
                 return null;
             }
         }
@@ -376,7 +374,7 @@ public class TimePlaceholderUtils {
                 value = DateUtils.format(entry.getKey(), entry.getValue());
             }
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw e;
         }
 

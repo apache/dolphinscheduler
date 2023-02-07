@@ -24,9 +24,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import java.util.List;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import lombok.extern.slf4j.Slf4j;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
 import io.fabric8.kubernetes.api.model.batch.v1.JobList;
@@ -36,9 +34,9 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.Watch;
 import io.fabric8.kubernetes.client.Watcher;
 
+@Slf4j
 public class K8sUtils {
 
-    private static final Logger log = LoggerFactory.getLogger(K8sUtils.class);
     private KubernetesClient client;
 
     public void createJob(String namespace, Job job) {

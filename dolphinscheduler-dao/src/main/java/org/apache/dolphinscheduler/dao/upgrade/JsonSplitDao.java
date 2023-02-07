@@ -26,12 +26,10 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class JsonSplitDao {
-
-    public static final Logger logger = LoggerFactory.getLogger(JsonSplitDao.class);
 
     /**
      * executeJsonSplitProcessDefinition
@@ -89,7 +87,7 @@ public class JsonSplitDao {
             processUpdate.close();
             insertLog.close();
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }
@@ -155,7 +153,7 @@ public class JsonSplitDao {
             insert.close();
             insertLog.close();
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }
@@ -243,7 +241,7 @@ public class JsonSplitDao {
             insert.close();
             insertLog.close();
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }

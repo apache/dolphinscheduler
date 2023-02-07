@@ -27,8 +27,8 @@ import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.master.runner.StreamTaskExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.StreamTaskExecuteThreadPool;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -39,9 +39,8 @@ import io.netty.channel.Channel;
  * task execute start processor, from api to master
  */
 @Component
+@Slf4j
 public class TaskExecuteStartProcessor implements NettyRequestProcessor {
-
-    private final Logger logger = LoggerFactory.getLogger(TaskExecuteStartProcessor.class);
 
     @Autowired
     private StreamTaskExecuteThreadPool streamTaskExecuteThreadPool;
@@ -55,12 +54,12 @@ public class TaskExecuteStartProcessor implements NettyRequestProcessor {
                 String.format("invalid command type : %s", command.getType()));
         TaskExecuteStartCommand taskExecuteStartCommand =
                 JSONUtils.parseObject(command.getBody(), TaskExecuteStartCommand.class);
-        logger.info("taskExecuteStartCommand: {}", taskExecuteStartCommand);
+        log.info("taskExecuteStartCommand: {}", taskExecuteStartCommand);
 
         TaskDefinition taskDefinition = taskDefinitionDao.findTaskDefinition(
                 taskExecuteStartCommand.getTaskDefinitionCode(), taskExecuteStartCommand.getTaskDefinitionVersion());
         if (taskDefinition == null) {
-            logger.error("Task definition can not be found, taskDefinitionCode:{}, taskDefinitionVersion:{}",
+            log.error("Task definition can not be found, taskDefinitionCode:{}, taskDefinitionVersion:{}",
                     taskExecuteStartCommand.getTaskDefinitionCode(),
                     taskExecuteStartCommand.getTaskDefinitionVersion());
             return;

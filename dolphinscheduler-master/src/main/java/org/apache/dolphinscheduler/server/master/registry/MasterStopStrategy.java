@@ -21,8 +21,8 @@ import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.StrategyType;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -32,9 +32,8 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @ConditionalOnProperty(prefix = "master.registry-disconnect-strategy", name = "strategy", havingValue = "stop", matchIfMissing = true)
+@Slf4j
 public class MasterStopStrategy implements MasterConnectStrategy {
-
-    private final Logger logger = LoggerFactory.getLogger(MasterStopStrategy.class);
 
     @Autowired
     private RegistryClient registryClient;
@@ -49,7 +48,7 @@ public class MasterStopStrategy implements MasterConnectStrategy {
 
     @Override
     public void reconnect() {
-        logger.warn("The current connect strategy is stop, so the master will not reconnect to registry");
+        log.warn("The current connect strategy is stop, so the master will not reconnect to registry");
     }
 
     @Override

@@ -37,8 +37,8 @@ import org.apache.dolphinscheduler.server.worker.runner.WorkerDelayTaskExecuteRu
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecuteRunnableFactoryBuilder;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -52,9 +52,8 @@ import io.netty.channel.Channel;
  * Used to handle {@link CommandType#TASK_DISPATCH_REQUEST}
  */
 @Component
+@Slf4j
 public class TaskDispatchProcessor implements NettyRequestProcessor {
-
-    private static final Logger logger = LoggerFactory.getLogger(TaskDispatchProcessor.class);
 
     @Autowired
     private WorkerConfig workerConfig;
@@ -93,16 +92,16 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
         TaskDispatchCommand taskDispatchCommand = JSONUtils.parseObject(command.getBody(), TaskDispatchCommand.class);
 
         if (taskDispatchCommand == null) {
-            logger.error("task execute request command content is null");
+            log.error("task execute request command content is null");
             return;
         }
         final String workflowMasterAddress = taskDispatchCommand.getMessageSenderAddress();
-        logger.info("Receive task dispatch request, command: {}", taskDispatchCommand);
+        log.info("Receive task dispatch request, command: {}", taskDispatchCommand);
 
         TaskExecutionContext taskExecutionContext = taskDispatchCommand.getTaskExecutionContext();
 
         if (taskExecutionContext == null) {
-            logger.error("task execution context is null");
+            log.error("task execution context is null");
             return;
         }
         try {
@@ -119,7 +118,7 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
                     DateUtils.getRemainTime(DateUtils.timeStampToDate(taskExecutionContext.getFirstSubmitTime()),
                             taskExecutionContext.getDelayTime() * 60L);
             if (remainTime > 0) {
-                logger.info("Current taskInstance is choose delay execution, delay time: {}s", remainTime);
+                log.info("Current taskInstance is choose delay execution, delay time: {}s", remainTime);
                 taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.DELAY_EXECUTION);
                 workerMessageSender.sendMessage(taskExecutionContext, workflowMasterAddress,
                         CommandType.TASK_EXECUTE_RESULT);
@@ -138,13 +137,13 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
             // submit task to manager
             boolean offer = workerManager.offer(workerTaskExecuteRunnable);
             if (!offer) {
-                logger.warn(
+                log.warn(
                         "submit task to wait queue error, queue is full, current queue size is {}, will send a task reject message to master",
                         workerManager.getWaitSubmitQueueSize());
                 workerMessageSender.sendMessageWithRetry(taskExecutionContext, workflowMasterAddress,
                         CommandType.TASK_REJECT);
             } else {
-                logger.info("Submit task to wait queue success, current queue size is {}",
+                log.info("Submit task to wait queue success, current queue size is {}",
                         workerManager.getWaitSubmitQueueSize());
             }
         } finally {

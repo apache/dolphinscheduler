@@ -19,18 +19,15 @@ package org.apache.dolphinscheduler.plugin.task.api.log;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import lombok.extern.slf4j.Slf4j;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.sift.AbstractDiscriminator;
 
 /**
  * Task Log Discriminator
  */
+@Slf4j
 public class TaskLogDiscriminator extends AbstractDiscriminator<ILoggingEvent> {
-
-    private static Logger logger = LoggerFactory.getLogger(TaskLogDiscriminator.class);
 
     /**
      * key
@@ -43,7 +40,7 @@ public class TaskLogDiscriminator extends AbstractDiscriminator<ILoggingEvent> {
     private String logBase;
 
     /**
-     * logger name should be like:
+     * log name should be like:
      * Task Logger name should be like: Task-{processDefinitionId}-{processInstanceId}-{taskInstanceId}
      */
     @Override
@@ -61,7 +58,7 @@ public class TaskLogDiscriminator extends AbstractDiscriminator<ILoggingEvent> {
                 key = part1.substring(prefix.length()).replaceFirst("-", "/");
             }
         }
-        logger.debug("task log discriminator end, key is:{}, thread name:{}, loggerName:{}", key, event.getThreadName(),
+        log.debug("task log discriminator end, key is:{}, thread name:{}, loggerName:{}", key, event.getThreadName(),
                 event.getLoggerName());
         return key;
     }

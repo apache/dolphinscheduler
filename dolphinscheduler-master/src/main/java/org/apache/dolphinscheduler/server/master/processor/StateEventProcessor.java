@@ -30,8 +30,8 @@ import org.apache.dolphinscheduler.server.master.event.WorkflowStateEvent;
 import org.apache.dolphinscheduler.server.master.processor.queue.StateEventResponseService;
 import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -42,9 +42,8 @@ import io.netty.channel.Channel;
  * handle state event received from master/api
  */
 @Component
+@Slf4j
 public class StateEventProcessor implements NettyRequestProcessor {
-
-    private final Logger logger = LoggerFactory.getLogger(StateEventProcessor.class);
 
     @Autowired
     private StateEventResponseService stateEventResponseService;
@@ -67,7 +66,7 @@ public class StateEventProcessor implements NettyRequestProcessor {
             LoggerUtils.setWorkflowAndTaskInstanceIDMDC(stateEvent.getProcessInstanceId(),
                     stateEvent.getTaskInstanceId());
 
-            logger.info("Received state change command, event: {}", stateEvent);
+            log.info("Received state change command, event: {}", stateEvent);
             stateEventResponseService.addStateChangeEvent(stateEvent);
         } finally {
             LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();

@@ -27,9 +27,8 @@ import java.util.List;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;
@@ -41,9 +40,9 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "dynamic-task")
 @Getter
 @Setter
+@Slf4j
 public class DynamicTaskTypeConfiguration {
 
-    private static final Logger logger = LoggerFactory.getLogger(DynamicTaskTypeConfiguration.class);
     private static final List<String> defaultTaskCategories =
             Arrays.asList(Constants.TYPE_UNIVERSAL, Constants.TYPE_DATA_INTEGRATION, Constants.TYPE_CLOUD,
                     Constants.TYPE_LOGIC, Constants.TYPE_DATA_QUALITY, Constants.TYPE_OTHER,
@@ -83,12 +82,12 @@ public class DynamicTaskTypeConfiguration {
     }
 
     public void printDefaultTypes() {
-        logger.info("support default universal dynamic task types: {}", universal);
-        logger.info("support default cloud dynamic task types: {}", cloud);
-        logger.info("support default logic dynamic task types: {}", logic);
-        logger.info("support default dataIntegration dynamic task types: {}", dataIntegration);
-        logger.info("support default dataQuality dynamic task types: {}", dataQuality);
-        logger.info("support default machineLearning dynamic task types: {}", machineLearning);
-        logger.info("support default other dynamic task types: {}", other);
+        log.info("support default universal dynamic task types: {}", universal);
+        log.info("support default cloud dynamic task types: {}", cloud);
+        log.info("support default logic dynamic task types: {}", logic);
+        log.info("support default dataIntegration dynamic task types: {}", dataIntegration);
+        log.info("support default dataQuality dynamic task types: {}", dataQuality);
+        log.info("support default machineLearning dynamic task types: {}", machineLearning);
+        log.info("support default other dynamic task types: {}", other);
     }
 }

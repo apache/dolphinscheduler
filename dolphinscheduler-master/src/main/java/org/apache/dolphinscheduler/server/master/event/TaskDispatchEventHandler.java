@@ -26,15 +26,14 @@ import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheM
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class TaskDispatchEventHandler implements TaskEventHandler {
-
-    private final Logger logger = LoggerFactory.getLogger(TaskDispatchEventHandler.class);
 
     @Autowired
     private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
@@ -55,7 +54,7 @@ public class TaskDispatchEventHandler implements TaskEventHandler {
         TaskInstance taskInstance = workflowExecuteRunnable.getTaskInstance(taskInstanceId)
                 .orElseThrow(() -> new TaskEventHandleError("Cannot find related taskInstance from cache"));
         if (taskInstance.getState() != TaskExecutionStatus.SUBMITTED_SUCCESS) {
-            logger.warn(
+            log.warn(
                     "The current taskInstance status is not SUBMITTED_SUCCESS, so the dispatch event will be discarded, the current is a delay event, event: {}",
                     taskEvent);
             return;

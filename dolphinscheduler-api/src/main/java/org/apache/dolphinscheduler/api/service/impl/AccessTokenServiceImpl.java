@@ -41,8 +41,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,9 +53,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * access token service impl
  */
 @Service
+@Slf4j
 public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTokenService {
-
-    private static final Logger logger = LoggerFactory.getLogger(AccessTokenServiceImpl.class);
 
     @Autowired
     private AccessTokenMapper accessTokenMapper;
@@ -134,7 +133,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         // 2. check if user is existed
         if (userId <= 0) {
             String errorMsg = "User id should not less than or equals to 0.";
-            logger.error(errorMsg);
+            log.error(errorMsg);
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, errorMsg);
             return result;
         }
@@ -198,7 +197,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
 
         AccessToken accessToken = accessTokenMapper.selectById(id);
         if (accessToken == null) {
-            logger.error("Access token does not exist, accessTokenId:{}.", id);
+            log.error("Access token does not exist, accessTokenId:{}.", id);
             putMsg(result, Status.ACCESS_TOKEN_NOT_EXIST);
             return result;
         }
@@ -235,7 +234,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         // 2. check if token is existed
         AccessToken accessToken = accessTokenMapper.selectById(id);
         if (accessToken == null) {
-            logger.error("Access token does not exist, accessTokenId:{}.", id);
+            log.error("Access token does not exist, accessTokenId:{}.", id);
             putMsg(result, Status.ACCESS_TOKEN_NOT_EXIST);
             return result;
         }

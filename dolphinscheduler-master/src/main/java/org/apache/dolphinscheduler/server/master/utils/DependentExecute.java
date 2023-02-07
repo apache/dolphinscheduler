@@ -36,9 +36,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * dependent item execute
  */
@@ -70,11 +67,6 @@ public class DependentExecute {
      * depend result map
      */
     private Map<String, DependResult> dependResultMap = new HashMap<>();
-
-    /**
-     * logger
-     */
-    private Logger logger = LoggerFactory.getLogger(DependentExecute.class);
 
     /**
      * constructor

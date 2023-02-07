@@ -33,14 +33,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class TaskPluginManager {
-
-    private static final Logger logger = LoggerFactory.getLogger(TaskPluginManager.class);
 
     private final Map<String, TaskChannelFactory> taskChannelFactoryMap = new HashMap<>();
     private final Map<String, TaskChannel> taskChannelMap = new HashMap<>();
@@ -52,7 +51,7 @@ public class TaskPluginManager {
      */
     public void loadPlugin() {
         if (!loadedFlag.compareAndSet(false, true)) {
-            logger.warn("The task plugin has already been loaded");
+            log.warn("The task plugin has already been loaded");
             return;
         }
         PrioritySPIFactory<TaskChannelFactory> prioritySPIFactory = new PrioritySPIFactory<>(TaskChannelFactory.class);
@@ -60,12 +59,12 @@ public class TaskPluginManager {
             String factoryName = entry.getKey();
             TaskChannelFactory factory = entry.getValue();
 
-            logger.info("Registering task plugin: {} - {}", factoryName, factory.getClass());
+            log.info("Registering task plugin: {} - {}", factoryName, factory.getClass());
 
             taskChannelFactoryMap.put(factoryName, factory);
             taskChannelMap.put(factoryName, factory.create());
 
-            logger.info("Registered task plugin: {} - {}", factoryName, factory.getClass());
+            log.info("Registered task plugin: {} - {}", factoryName, factory.getClass());
         }
 
     }

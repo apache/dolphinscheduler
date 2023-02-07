@@ -35,15 +35,14 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class WorkflowEventLooper extends BaseDaemonThread {
-
-    private final Logger logger = LoggerFactory.getLogger(WorkflowEventLooper.class);
 
     @Autowired
     private WorkflowEventQueue workflowEventQueue;
@@ -66,9 +65,9 @@ public class WorkflowEventLooper extends BaseDaemonThread {
 
     @Override
     public synchronized void start() {
-        logger.info("WorkflowEventLooper thread starting");
+        log.info("WorkflowEventLooper thread starting");
         super.start();
-        logger.info("WorkflowEventLooper thread started");
+        log.info("WorkflowEventLooper thread started");
     }
 
     public void run() {
@@ -77,25 +76,25 @@ public class WorkflowEventLooper extends BaseDaemonThread {
             try {
                 workflowEvent = workflowEventQueue.poolEvent();
                 LoggerUtils.setWorkflowInstanceIdMDC(workflowEvent.getWorkflowInstanceId());
-                logger.info("Workflow event looper receive a workflow event: {}, will handle this", workflowEvent);
+                log.info("Workflow event looper receive a workflow event: {}, will handle this", workflowEvent);
                 WorkflowEventHandler workflowEventHandler =
                         workflowEventHandlerMap.get(workflowEvent.getWorkflowEventType());
                 workflowEventHandler.handleWorkflowEvent(workflowEvent);
             } catch (InterruptedException e) {
-                logger.warn("WorkflowEventLooper thread is interrupted, will close this loop", e);
+                log.warn("WorkflowEventLooper thread is interrupted, will close this loop", e);
                 Thread.currentThread().interrupt();
                 break;
             } catch (WorkflowEventHandleException workflowEventHandleException) {
-                logger.error("Handle workflow event failed, will add this event to event queue again, event: {}",
+                log.error("Handle workflow event failed, will add this event to event queue again, event: {}",
                         workflowEvent, workflowEventHandleException);
                 workflowEventQueue.addEvent(workflowEvent);
                 ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
             } catch (WorkflowEventHandleError workflowEventHandleError) {
-                logger.error("Handle workflow event error, will drop this event, event: {}",
+                log.error("Handle workflow event error, will drop this event, event: {}",
                         workflowEvent,
                         workflowEventHandleError);
             } catch (Exception unknownException) {
-                logger.error(
+                log.error(
                         "Handle workflow event failed, get a unknown exception, will add this event to event queue again, event: {}",
                         workflowEvent, unknownException);
                 workflowEventQueue.addEvent(workflowEvent);

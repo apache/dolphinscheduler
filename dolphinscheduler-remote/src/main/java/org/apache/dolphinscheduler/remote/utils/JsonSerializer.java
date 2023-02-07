@@ -20,8 +20,7 @@ package org.apache.dolphinscheduler.remote.utils;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,11 +28,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * json serialize or deserialize
  */
+@Slf4j
 public class JsonSerializer {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
-    private static final Logger logger = LoggerFactory.getLogger(JsonSerializer.class);
-
     private JsonSerializer() {
 
     }
@@ -50,7 +48,7 @@ public class JsonSerializer {
         try {
             json = objectMapper.writeValueAsString(obj);
         } catch (JsonProcessingException e) {
-            logger.error("serializeToString exception!", e);
+            log.error("serializeToString exception!", e);
         }
 
         return json.getBytes(Constants.UTF8);
@@ -68,7 +66,7 @@ public class JsonSerializer {
         try {
             json = objectMapper.writeValueAsString(obj);
         } catch (JsonProcessingException e) {
-            logger.error("serializeToString exception!", e);
+            log.error("serializeToString exception!", e);
         }
 
         return json;
@@ -88,7 +86,7 @@ public class JsonSerializer {
         try {
             return objectMapper.readValue(json, clazz);
         } catch (IOException e) {
-            logger.error("deserialize exception!", e);
+            log.error("deserialize exception!", e);
             return null;
         }
 

@@ -29,17 +29,14 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.experimental.UtilityClass;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * the factory to create task processor
  */
 @UtilityClass
+@Slf4j
 public final class TaskProcessorFactory {
-
-    private static final Logger logger = LoggerFactory.getLogger(TaskProcessorFactory.class);
 
     private static final Map<String, Constructor<ITaskProcessor>> PROCESS_MAP = new ConcurrentHashMap<>();
 
@@ -49,10 +46,10 @@ public final class TaskProcessorFactory {
         PrioritySPIFactory<ITaskProcessor> prioritySPIFactory = new PrioritySPIFactory<>(ITaskProcessor.class);
         for (Map.Entry<String, ITaskProcessor> entry : prioritySPIFactory.getSPIMap().entrySet()) {
             try {
-                logger.info("Registering task processor: {} - {}", entry.getKey(), entry.getValue().getClass());
+                log.info("Registering task processor: {} - {}", entry.getKey(), entry.getValue().getClass());
                 PROCESS_MAP.put(entry.getKey(),
                         (Constructor<ITaskProcessor>) entry.getValue().getClass().getConstructor());
-                logger.info("Registered task processor: {} - {}", entry.getKey(), entry.getValue().getClass());
+                log.info("Registered task processor: {} - {}", entry.getKey(), entry.getValue().getClass());
             } catch (NoSuchMethodException e) {
                 throw new IllegalArgumentException(
                         String.format("The task processor: %s should has a no args constructor", entry.getKey()));

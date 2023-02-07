@@ -46,7 +46,7 @@ public class DatafactoryHook {
 
     public static DatafactoryStatus[] taskFinishFlags =
             {DatafactoryStatus.Failed, DatafactoryStatus.Succeeded, DatafactoryStatus.Cancelled};
-    protected final Logger logger =
+    protected final Logger log =
             LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
     private final int QUERY_INTERVAL = PropertyUtils.getInt(TaskConstants.QUERY_INTERVAL, 10000);
     private DataFactoryManager client;
@@ -55,7 +55,7 @@ public class DatafactoryHook {
     private String runId;
 
     public DatafactoryHook() {
-        logger.info("initDatafactoryClient ......");
+        log.info("initDatafactoryClient ......");
         client = createClient();
     }
 
@@ -76,12 +76,12 @@ public class DatafactoryHook {
     }
 
     public Boolean startDatafactoryTask(DatafactoryParameters parameters) {
-        logger.info("initDatafactoryTask ......");
+        log.info("initDatafactoryTask ......");
         PipelineResource pipelineResource = getPipelineResource(parameters);
         if (pipelineResource == null) {
             return false;
         }
-        logger.info("startDatafactoryTask ......");
+        log.info("startDatafactoryTask ......");
         CreateRunResponse run = pipelineResource.createRun();
         if (StringUtils.isEmpty(run.runId())) {
             return false;
@@ -92,26 +92,26 @@ public class DatafactoryHook {
     }
 
     public Boolean cancelDatafactoryTask(DatafactoryParameters parameters) {
-        logger.info("cancelTask ......");
+        log.info("cancelTask ......");
         PipelineRuns pipelineRuns = client.pipelineRuns();
         try {
             pipelineRuns.cancel(parameters.getResourceGroupName(), parameters.getFactoryName(), runId);
         } catch (RuntimeException e) {
-            logger.error("failed to cancel datafactory task: " + e.getMessage());
+            log.error("failed to cancel datafactory task: " + e.getMessage());
             return false;
         }
         return true;
     }
 
     public DatafactoryStatus queryDatafactoryTaskStatus(DatafactoryParameters parameters) {
-        logger.info("queryDatafactoryTaskStatus ......");
+        log.info("queryDatafactoryTaskStatus ......");
 
         PipelineRuns pipelineRuns = client.pipelineRuns();
         PipelineRun pipelineRun =
                 pipelineRuns.get(parameters.getResourceGroupName(), parameters.getFactoryName(), runId);
 
         if (pipelineRun != null) {
-            logger.info("queryDatafactoryTaskStatus ......{}", pipelineRun.status());
+            log.info("queryDatafactoryTaskStatus ......{}", pipelineRun.status());
             return DatafactoryStatus.valueOf(pipelineRun.status());
         }
         return null;
@@ -140,7 +140,7 @@ public class DatafactoryHook {
                 }
                 return false;
             }
-            logger.debug("wait {}ms to recheck finish status....", QUERY_INTERVAL);
+            log.debug("wait {}ms to recheck finish status....", QUERY_INTERVAL);
             Thread.sleep(QUERY_INTERVAL);
         }
         return false;

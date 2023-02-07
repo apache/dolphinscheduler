@@ -39,8 +39,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -66,9 +66,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "PROCESS_INSTANCE_TAG")
 @RestController
 @RequestMapping("/projects/{projectCode}/process-instances")
+@Slf4j
 public class ProcessInstanceController extends BaseController {
-
-    private static final Logger logger = LoggerFactory.getLogger(ProcessInstanceController.class);
 
     @Autowired
     private ProcessInstanceService processInstanceService;
@@ -400,7 +399,7 @@ public class ProcessInstanceController extends BaseController {
                 try {
                     processInstanceService.deleteProcessInstanceById(loginUser, processInstanceId);
                 } catch (Exception e) {
-                    logger.error("Delete workflow instance: {} error", strProcessInstanceId, e);
+                    log.error("Delete workflow instance: {} error", strProcessInstanceId, e);
                     deleteFailedIdList
                             .add(MessageFormat.format(Status.PROCESS_INSTANCE_ERROR.getMsg(), strProcessInstanceId));
                 }

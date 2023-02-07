@@ -31,16 +31,14 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class WorkerMessageSender {
-
-    private final Logger logger = LoggerFactory.getLogger(WorkerMessageSender.class);
 
     @Autowired
     private MessageRetryRunner messageRetryRunner;
@@ -69,7 +67,7 @@ public class WorkerMessageSender {
             messageRetryRunner.addRetryMessage(taskExecutionContext.getTaskInstanceId(), messageType, baseCommand);
             messageSender.sendMessage(baseCommand);
         } catch (RemotingException e) {
-            logger.error("Send message error, messageType: {}, message: {}", messageType, baseCommand);
+            log.error("Send message error, messageType: {}, message: {}", messageType, baseCommand);
         }
     }
 
@@ -84,7 +82,7 @@ public class WorkerMessageSender {
         try {
             messageSender.sendMessage(baseCommand);
         } catch (RemotingException e) {
-            logger.error("Send message error, messageType: {}, message: {}", messageType, baseCommand);
+            log.error("Send message error, messageType: {}, message: {}", messageType, baseCommand);
         }
     }
 

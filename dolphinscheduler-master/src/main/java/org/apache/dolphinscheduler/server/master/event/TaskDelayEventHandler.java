@@ -31,15 +31,14 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class TaskDelayEventHandler implements TaskEventHandler {
-
-    private final Logger logger = LoggerFactory.getLogger(TaskDelayEventHandler.class);
 
     @Autowired
     private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
@@ -71,7 +70,7 @@ public class TaskDelayEventHandler implements TaskEventHandler {
         }
         TaskInstance taskInstance = taskInstanceOptional.get();
         if (taskInstance.getState().isFinished()) {
-            logger.warn(
+            log.warn(
                     "The current task status is: {}, will not handle the running event, this event is delay, will discard this event: {}",
                     taskInstance.getState(),
                     taskEvent);

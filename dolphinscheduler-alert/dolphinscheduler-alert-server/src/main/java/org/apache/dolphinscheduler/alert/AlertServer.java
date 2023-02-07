@@ -29,8 +29,8 @@ import java.io.Closeable;
 
 import javax.annotation.PreDestroy;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -39,9 +39,8 @@ import org.springframework.context.event.EventListener;
 
 @SpringBootApplication
 @ComponentScan("org.apache.dolphinscheduler")
+@Slf4j
 public class AlertServer implements Closeable {
-
-    private static final Logger logger = LoggerFactory.getLogger(AlertServer.class);
 
     private final PluginDao pluginDao;
     private final AlertSenderService alertSenderService;
@@ -66,12 +65,12 @@ public class AlertServer implements Closeable {
 
     @EventListener
     public void run(ApplicationReadyEvent readyEvent) {
-        logger.info("Alert server is staring ...");
+        log.info("Alert server is staring ...");
 
         checkTable();
         startServer();
         alertSenderService.start();
-        logger.info("Alert server is started ...");
+        log.info("Alert server is started ...");
     }
 
     @Override
@@ -91,26 +90,26 @@ public class AlertServer implements Closeable {
             // set stop signal is true
             // execute only once
             if (!ServerLifeCycleManager.toStopped()) {
-                logger.warn("AlterServer is already stopped");
+                log.warn("AlterServer is already stopped");
                 return;
             }
 
-            logger.info("Alert server is stopping, cause: {}", cause);
+            log.info("Alert server is stopping, cause: {}", cause);
 
             // thread sleep 3 seconds for thread quietly stop
             ThreadUtils.sleep(Constants.SERVER_CLOSE_WAIT_TIME.toMillis());
 
             // close
             this.nettyRemotingServer.close();
-            logger.info("Alter server stopped, cause: {}", cause);
+            log.info("Alter server stopped, cause: {}", cause);
         } catch (Exception e) {
-            logger.error("Alert server stop failed, cause: {}", cause, e);
+            log.error("Alert server stop failed, cause: {}", cause, e);
         }
     }
 
     protected void checkTable() {
         if (!pluginDao.checkPluginDefineTableExist()) {
-            logger.error("Plugin Define Table t_ds_plugin_define Not Exist . Please Create it First !");
+            log.error("Plugin Define Table t_ds_plugin_define Not Exist . Please Create it First !");
             System.exit(1);
         }
     }

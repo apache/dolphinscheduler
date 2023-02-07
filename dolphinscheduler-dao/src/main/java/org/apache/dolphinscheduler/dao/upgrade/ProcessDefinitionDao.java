@@ -31,12 +31,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class ProcessDefinitionDao {
-
-    public static final Logger logger = LoggerFactory.getLogger(ProcessDefinitionDao.class);
 
     /**
      * queryAllProcessDefinition
@@ -60,7 +58,7 @@ public class ProcessDefinitionDao {
             }
 
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new RuntimeException("sql: " + sql, e);
         }
 
@@ -84,7 +82,7 @@ public class ProcessDefinitionDao {
                 }
             }
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new RuntimeException("sql: " + sql, e);
         }
     }
@@ -116,7 +114,7 @@ public class ProcessDefinitionDao {
                 processDefinitions.add(processDefinition);
             }
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new RuntimeException("sql: " + sql, e);
         }
         return processDefinitions;
@@ -151,7 +149,7 @@ public class ProcessDefinitionDao {
                 }
             }
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new RuntimeException("sql: " + sql, e);
         }
     }

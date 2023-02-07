@@ -53,8 +53,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
@@ -78,9 +77,8 @@ import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import com.google.common.base.Joiner;
 
+@Slf4j
 public class S3StorageOperator implements Closeable, StorageOperate {
-
-    private static final Logger logger = LoggerFactory.getLogger(S3StorageOperator.class);
 
     // todo: move to s3
     private static final String ACCESS_KEY_ID = PropertyUtils.getString(TaskConstants.AWS_ACCESS_KEY_ID);
@@ -205,7 +203,7 @@ public class S3StorageOperator implements Closeable, StorageOperate {
         } catch (AmazonServiceException e) {
             throw new IOException(e.getMessage());
         } catch (FileNotFoundException e) {
-            logger.error("the destination file {} not found", dstFilePath);
+            log.error("the destination file {} not found", dstFilePath);
             throw e;
         }
     }
@@ -221,7 +219,7 @@ public class S3StorageOperator implements Closeable, StorageOperate {
             s3Client.deleteObject(BUCKET_NAME, fullName);
             return true;
         } catch (AmazonServiceException e) {
-            logger.error("delete the object error,the resource path is {}", fullName);
+            log.error("delete the object error,the resource path is {}", fullName);
             return false;
         }
     }
@@ -236,7 +234,7 @@ public class S3StorageOperator implements Closeable, StorageOperate {
         try {
             s3Client.deleteObjects(deleteObjectsRequest);
         } catch (AmazonServiceException e) {
-            logger.error("delete objects error", e);
+            log.error("delete objects error", e);
             return false;
         }
 
@@ -270,7 +268,7 @@ public class S3StorageOperator implements Closeable, StorageOperate {
             s3Client.putObject(BUCKET_NAME, dstPath, new File(srcFile));
             return true;
         } catch (AmazonServiceException e) {
-            logger.error("upload failed,the bucketName is {},the filePath is {}", BUCKET_NAME, dstPath);
+            log.error("upload failed,the bucketName is {},the filePath is {}", BUCKET_NAME, dstPath);
             return false;
         }
     }
@@ -278,7 +276,7 @@ public class S3StorageOperator implements Closeable, StorageOperate {
     @Override
     public List<String> vimFile(String tenantCode, String filePath, int skipLineNums, int limit) throws IOException {
         if (StringUtils.isBlank(filePath)) {
-            logger.error("file path:{} is blank", filePath);
+            log.error("file path:{} is blank", filePath);
             return Collections.emptyList();
         }
         S3Object s3Object = s3Client.getObject(BUCKET_NAME, filePath);
@@ -366,7 +364,7 @@ public class S3StorageOperator implements Closeable, StorageOperate {
                     tm.downloadDirectory(BUCKET_NAME, tenantCode + FOLDER_SEPARATOR + keyPrefix, new File(srcPath));
             download.waitForCompletion();
         } catch (AmazonS3Exception | InterruptedException e) {
-            logger.error("download the directory failed with the bucketName is {} and the keyPrefix is {}", BUCKET_NAME,
+            log.error("download the directory failed with the bucketName is {} and the keyPrefix is {}", BUCKET_NAME,
                     tenantCode + FOLDER_SEPARATOR + keyPrefix);
             Thread.currentThread().interrupt();
         } finally {
@@ -389,7 +387,7 @@ public class S3StorageOperator implements Closeable, StorageOperate {
                             "bucketName: " + bucketName + " is not exists, you need to create them by yourself");
                 });
 
-        logger.info("bucketName: {} has been found, the current regionName is {}", existsBucket.getName(),
+        log.info("bucketName: {} has been found, the current regionName is {}", existsBucket.getName(),
                 s3Client.getRegionName());
     }
 
@@ -417,7 +415,7 @@ public class S3StorageOperator implements Closeable, StorageOperate {
         try {
             initialEntity = getFileStatus(path, defaultPath, tenantCode, type);
         } catch (Exception e) {
-            logger.error("error while listing files status recursively, path: {}", path, e);
+            log.error("error while listing files status recursively, path: {}", path, e);
             return storageEntityList;
         }
         foldersToFetch.add(initialEntity);
@@ -433,7 +431,7 @@ public class S3StorageOperator implements Closeable, StorageOperate {
                 }
                 storageEntityList.addAll(tempList);
             } catch (Exception e) {
-                logger.error("error while listing files status recursively, path: {}", pathToExplore, e);
+                log.error("error while listing files status recursively, path: {}", pathToExplore, e);
             }
         }
 

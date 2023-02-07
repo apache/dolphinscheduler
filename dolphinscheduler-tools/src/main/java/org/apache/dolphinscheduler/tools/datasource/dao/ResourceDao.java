@@ -26,8 +26,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
@@ -35,9 +34,8 @@ import com.google.common.base.Strings;
 /**
  * resource dao
  */
+@Slf4j
 public class ResourceDao {
-
-    public static final Logger logger = LoggerFactory.getLogger(ResourceDao.class);
 
     /**
      * list all resources by the type
@@ -71,7 +69,7 @@ public class ResourceDao {
                 }
             }
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new RuntimeException("sql: " + sql, e);
         }
         return resourceSizeMap;
@@ -95,7 +93,7 @@ public class ResourceDao {
             }
             pstmt.executeBatch();
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new RuntimeException("sql: " + sql, e);
         }
     }

@@ -47,8 +47,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -63,10 +63,9 @@ import io.netty.channel.ChannelFutureListener;
 /**
  * task kill processor
  */
+@Slf4j
 @Component
 public class TaskKillProcessor implements NettyRequestProcessor {
-
-    private final Logger logger = LoggerFactory.getLogger(TaskKillProcessor.class);
 
     @Autowired
     private WorkerManagerThread workerManager;
@@ -86,10 +85,10 @@ public class TaskKillProcessor implements NettyRequestProcessor {
                 String.format("invalid command type : %s", command.getType()));
         TaskKillRequestCommand killCommand = JSONUtils.parseObject(command.getBody(), TaskKillRequestCommand.class);
         if (killCommand == null) {
-            logger.error("task kill request command is null");
+            log.error("task kill request command is null");
             return;
         }
-        logger.info("task kill command : {}", killCommand);
+        log.info("task kill command : {}", killCommand);
 
         int taskInstanceId = killCommand.getTaskInstanceId();
         try {
@@ -97,7 +96,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
             TaskExecutionContext taskExecutionContext =
                     TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
             if (taskExecutionContext == null) {
-                logger.error("taskRequest cache is null, taskInstanceId: {}", killCommand.getTaskInstanceId());
+                log.error("taskRequest cache is null, taskInstanceId: {}", killCommand.getTaskInstanceId());
                 return;
             }
 
@@ -108,7 +107,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
                 taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.KILL);
                 TaskExecutionContextCacheManager.removeByTaskInstanceId(taskInstanceId);
                 sendTaskKillResponseCommand(channel, taskExecutionContext);
-                logger.info("the task has not been executed and has been cancelled, task id:{}", taskInstanceId);
+                log.info("the task has not been executed and has been cancelled, task id:{}", taskInstanceId);
                 return;
             }
 
@@ -124,7 +123,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
             TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
             messageRetryRunner.removeRetryMessages(taskExecutionContext.getTaskInstanceId());
 
-            logger.info("remove REMOTE_CHANNELS, task instance id:{}", killCommand.getTaskInstanceId());
+            log.info("remove REMOTE_CHANNELS, task instance id:{}", killCommand.getTaskInstanceId());
         } finally {
             LogUtils.removeTaskInstanceIdMDC();
         }
@@ -145,7 +144,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
             @Override
             public void operationComplete(ChannelFuture future) throws Exception {
                 if (!future.isSuccess()) {
-                    logger.error("Submit kill response to master error, kill command: {}", taskKillResponseCommand);
+                    log.error("Submit kill response to master error, kill command: {}", taskKillResponseCommand);
                 }
             }
         });
@@ -176,20 +175,20 @@ public class TaskKillProcessor implements NettyRequestProcessor {
     protected void cancelApplication(int taskInstanceId) {
         WorkerTaskExecuteRunnable workerTaskExecuteRunnable = workerManager.getTaskExecuteThread(taskInstanceId);
         if (workerTaskExecuteRunnable == null) {
-            logger.warn("taskExecuteThread not found, taskInstanceId:{}", taskInstanceId);
+            log.warn("taskExecuteThread not found, taskInstanceId:{}", taskInstanceId);
             return;
         }
         AbstractTask task = workerTaskExecuteRunnable.getTask();
         if (task == null) {
-            logger.warn("task not found, taskInstanceId:{}", taskInstanceId);
+            log.warn("task not found, taskInstanceId:{}", taskInstanceId);
             return;
         }
         try {
             task.cancel();
         } catch (Exception e) {
-            logger.error("kill task error", e);
+            log.error("kill task error", e);
         }
-        logger.info("kill task by cancelApplication, task id:{}", taskInstanceId);
+        log.info("kill task by cancelApplication, task id:{}", taskInstanceId);
     }
 
     /**
@@ -207,12 +206,12 @@ public class TaskKillProcessor implements NettyRequestProcessor {
             if (!Strings.isNullOrEmpty(pidsStr)) {
                 String cmd = String.format("kill -9 %s", pidsStr);
                 cmd = OSUtils.getSudoCmd(tenantCode, cmd);
-                logger.info("process id:{}, cmd:{}", processId, cmd);
+                log.info("process id:{}, cmd:{}", processId, cmd);
                 OSUtils.exeCmd(cmd);
             }
         } catch (Exception e) {
             processFlag = false;
-            logger.error("kill task error", e);
+            log.error("kill task error", e);
         }
         return processFlag;
     }
@@ -232,24 +231,24 @@ public class TaskKillProcessor implements NettyRequestProcessor {
                                                     String executePath,
                                                     String tenantCode) {
         if (logPath == null || appInfoPath == null || executePath == null || tenantCode == null) {
-            logger.error(
+            log.error(
                     "Kill yarn job error, the input params is illegal, host: {}, logPath: {}, appInfoPath: {}, executePath: {}, tenantCode: {}",
                     host, logPath, appInfoPath, executePath, tenantCode);
             return Pair.of(false, Collections.emptyList());
         }
         try {
-            logger.info("Get appIds from worker {}:{} taskLogPath: {}", host.getIp(), host.getPort(), logPath);
+            log.info("Get appIds from worker {}:{} taskLogPath: {}", host.getIp(), host.getPort(), logPath);
             List<String> appIds = LogUtils.getAppIds(logPath, appInfoPath,
                     PropertyUtils.getString(APPID_COLLECT, DEFAULT_COLLECT_WAY));
             if (CollectionUtils.isEmpty(appIds)) {
-                logger.info("The appId is empty");
+                log.info("The appId is empty");
                 return Pair.of(true, Collections.emptyList());
             }
 
-            ProcessUtils.cancelApplication(appIds, logger, tenantCode, executePath);
+            ProcessUtils.cancelApplication(appIds, log, tenantCode, executePath);
             return Pair.of(true, appIds);
         } catch (Exception e) {
-            logger.error("Kill yarn job error, host: {}, logPath: {}, executePath: {}, tenantCode: {}", host, logPath,
+            log.error("Kill yarn job error, host: {}, logPath: {}, executePath: {}, tenantCode: {}", host, logPath,
                     executePath, tenantCode, e);
         }
         return Pair.of(false, Collections.emptyList());

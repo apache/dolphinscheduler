@@ -38,15 +38,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.google.auto.service.AutoService;
 
 @AutoService(DataSourceProcessor.class)
+@Slf4j
 public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
-
-    private final Logger logger = LoggerFactory.getLogger(MySQLDataSourceProcessor.class);
 
     private static final String ALLOW_LOAD_LOCAL_IN_FILE_NAME = "allowLoadLocalInfile";
 
@@ -133,12 +131,12 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
         Class.forName(getDatasourceDriver());
         String user = mysqlConnectionParam.getUser();
         if (user.contains(AUTO_DESERIALIZE)) {
-            logger.warn("sensitive param : {} in username field is filtered", AUTO_DESERIALIZE);
+            log.warn("sensitive param : {} in username field is filtered", AUTO_DESERIALIZE);
             user = user.replace(AUTO_DESERIALIZE, "");
         }
         String password = PasswordUtils.decodePassword(mysqlConnectionParam.getPassword());
         if (password.contains(AUTO_DESERIALIZE)) {
-            logger.warn("sensitive param : {} in password field is filtered", AUTO_DESERIALIZE);
+            log.warn("sensitive param : {} in password field is filtered", AUTO_DESERIALIZE);
             password = password.replace(AUTO_DESERIALIZE, "");
         }
         return DriverManager.getConnection(getJdbcUrl(connectionParam), user, password);

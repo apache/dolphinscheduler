@@ -40,16 +40,15 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * mainly used to get the start command line of a process.
  */
+@Slf4j
 public class ProcessUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(ProcessUtils.class);
 
     /**
      * Initialization regularization, solve the problem of pre-compilation performance,
@@ -66,7 +65,7 @@ public class ProcessUtils {
      * get kerberos init command
      */
     static String getKerberosInitCommand() {
-        logger.info("get kerberos init command");
+        log.info("get kerberos init command");
         StringBuilder kerberosCommandBuilder = new StringBuilder();
         boolean hadoopKerberosState =
                 PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
@@ -78,7 +77,7 @@ public class ProcessUtils {
                             PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH),
                             PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME)))
                     .append("\n\n");
-            logger.info("kerberos init command: {}", kerberosCommandBuilder);
+            log.info("kerberos init command: {}", kerberosCommandBuilder);
         }
         return kerberosCommandBuilder.toString();
     }
@@ -114,10 +113,10 @@ public class ProcessUtils {
 
             String runCmd = String.format("%s %s", Constants.SH, commandFile);
             runCmd = OSUtils.getSudoCmd(tenantCode, runCmd);
-            logger.info("kill cmd:{}", runCmd);
+            log.info("kill cmd:{}", runCmd);
             OSUtils.exeCmd(runCmd);
         } catch (Exception e) {
-            logger.error(String.format("Kill yarn application app id [%s] failed: [%s]", appId, e.getMessage()));
+            log.error(String.format("Kill yarn application app id [%s] failed: [%s]", appId, e.getMessage()));
         }
     }
 
@@ -184,16 +183,16 @@ public class ProcessUtils {
                                     taskExecutionContext.getTaskInstanceId()));
                 }
                 FileUtils.createWorkDirIfAbsent(taskExecutionContext.getExecutePath());
-                org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils.cancelApplication(appIds, logger,
+                org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils.cancelApplication(appIds, log,
                         taskExecutionContext.getTenantCode(),
                         taskExecutionContext.getExecutePath());
                 return appIds;
             } else {
-                logger.info("The current appId is empty, don't need to kill the yarn job, taskInstanceId: {}",
+                log.info("The current appId is empty, don't need to kill the yarn job, taskInstanceId: {}",
                         taskExecutionContext.getTaskInstanceId());
             }
         } catch (Exception e) {
-            logger.error("Kill yarn job failure, taskInstanceId: {}", taskExecutionContext.getTaskInstanceId(), e);
+            log.error("Kill yarn job failure, taskInstanceId: {}", taskExecutionContext.getTaskInstanceId(), e);
         }
         return Collections.emptyList();
     }

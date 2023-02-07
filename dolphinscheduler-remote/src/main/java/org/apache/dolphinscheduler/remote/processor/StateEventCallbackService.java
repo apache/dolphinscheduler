@@ -29,8 +29,8 @@ import org.apache.dolphinscheduler.remote.utils.Host;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
 
 import io.netty.channel.Channel;
@@ -39,9 +39,9 @@ import io.netty.channel.Channel;
  * task callback service
  */
 @Service
+@Slf4j
 public class StateEventCallbackService {
 
-    private final Logger logger = LoggerFactory.getLogger(StateEventCallbackService.class);
     private static final int[] RETRY_BACKOFF = {1, 2, 3, 5, 10, 20, 40, 100, 100, 100, 100, 200, 200, 200};
 
     /**
@@ -119,7 +119,7 @@ public class StateEventCallbackService {
      * @param command command need to send
      */
     public void sendResult(Host host, Command command) {
-        logger.info("send result, host:{}, command:{}", host.getAddress(), command.toString());
+        log.info("send result, host:{}, command:{}", host.getAddress(), command.toString());
         newRemoteChannel(host).ifPresent(nettyRemoteChannel -> {
             nettyRemoteChannel.writeAndFlush(command);
         });
@@ -137,10 +137,10 @@ public class StateEventCallbackService {
         try {
             return this.nettyRemotingClient.sendSync(host, requestCommand, HTTP_CONNECTION_REQUEST_TIMEOUT);
         } catch (InterruptedException e) {
-            logger.error("send sync fail, host:{}, command:{}", host, requestCommand, e);
+            log.error("send sync fail, host:{}, command:{}", host, requestCommand, e);
             Thread.currentThread().interrupt();
         } catch (RemotingException e) {
-            logger.error("send sync fail, host:{}, command:{}", host, requestCommand, e);
+            log.error("send sync fail, host:{}, command:{}", host, requestCommand, e);
         } finally {
             this.nettyRemotingClient.closeChannel(host);
         }

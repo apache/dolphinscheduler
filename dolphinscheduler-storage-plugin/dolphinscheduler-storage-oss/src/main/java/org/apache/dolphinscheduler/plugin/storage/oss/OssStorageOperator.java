@@ -54,9 +54,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import lombok.Data;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSException;
@@ -71,9 +69,8 @@ import com.aliyun.oss.model.ObjectMetadata;
 import com.aliyun.oss.model.PutObjectRequest;
 
 @Data
+@Slf4j
 public class OssStorageOperator implements Closeable, StorageOperate {
-
-    private static final Logger logger = LoggerFactory.getLogger(OssStorageOperator.class);
 
     private String accessKeyId;
 
@@ -208,7 +205,7 @@ public class OssStorageOperator implements Closeable, StorageOperate {
         try {
             ossClient.deleteObjects(deleteObjectsRequest);
         } catch (Exception e) {
-            logger.error("delete objects error", e);
+            log.error("delete objects error", e);
             return false;
         }
 
@@ -236,7 +233,7 @@ public class OssStorageOperator implements Closeable, StorageOperate {
         } catch (OSSException e) {
             throw new IOException(e);
         } catch (FileNotFoundException e) {
-            logger.error("cannot fin the destination file {}", dstFilePath);
+            log.error("cannot fin the destination file {}", dstFilePath);
             throw e;
         }
     }
@@ -252,7 +249,7 @@ public class OssStorageOperator implements Closeable, StorageOperate {
             ossClient.deleteObject(bucketName, filePath);
             return true;
         } catch (OSSException e) {
-            logger.error("fail to delete the object, the resource path is {}", filePath, e);
+            log.error("fail to delete the object, the resource path is {}", filePath, e);
             return false;
         }
     }
@@ -283,7 +280,7 @@ public class OssStorageOperator implements Closeable, StorageOperate {
             ossClient.putObject(bucketName, dstPath, new File(srcFile));
             return true;
         } catch (OSSException e) {
-            logger.error("upload failed, the bucketName is {}, the filePath is {}", bucketName, dstPath, e);
+            log.error("upload failed, the bucketName is {}, the filePath is {}", bucketName, dstPath, e);
             return false;
         }
     }
@@ -291,7 +288,7 @@ public class OssStorageOperator implements Closeable, StorageOperate {
     @Override
     public List<String> vimFile(String tenantCode, String filePath, int skipLineNums, int limit) throws IOException {
         if (StringUtils.isBlank(filePath)) {
-            logger.error("file path:{} is empty", filePath);
+            log.error("file path:{} is empty", filePath);
             return Collections.emptyList();
         }
         OSSObject ossObject = ossClient.getObject(bucketName, filePath);
@@ -316,7 +313,7 @@ public class OssStorageOperator implements Closeable, StorageOperate {
         try {
             initialEntity = getFileStatus(path, defaultPath, tenantCode, type);
         } catch (Exception e) {
-            logger.error("error while listing files status recursively, path: {}", path, e);
+            log.error("error while listing files status recursively, path: {}", path, e);
             return storageEntityList;
         }
         foldersToFetch.add(initialEntity);
@@ -332,7 +329,7 @@ public class OssStorageOperator implements Closeable, StorageOperate {
                 }
                 storageEntityList.addAll(tempList);
             } catch (Exception e) {
-                logger.error("error while listing files status recursively, path: {}", pathToExplore, e);
+                log.error("error while listing files stat:wus recursively, path: {}", pathToExplore, e);
             }
         }
 
@@ -518,7 +515,7 @@ public class OssStorageOperator implements Closeable, StorageOperate {
                             "bucketName: " + bucketName + " does not exist, you need to create them by yourself");
                 });
 
-        logger.info("bucketName: {} has been found, the current regionName is {}", existsBucket.getName(), region);
+        log.info("bucketName: {} has been found, the current regionName is {}", existsBucket.getName(), region);
     }
 
     protected void deleteDir(String directoryName) {

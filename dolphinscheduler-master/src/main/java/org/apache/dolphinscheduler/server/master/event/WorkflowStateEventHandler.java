@@ -23,15 +23,13 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.google.auto.service.AutoService;
 
 @AutoService(StateEventHandler.class)
+@Slf4j
 public class WorkflowStateEventHandler implements StateEventHandler {
-
-    private static final Logger logger = LoggerFactory.getLogger(WorkflowStateEventHandler.class);
 
     @Override
     public boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable,
@@ -41,7 +39,7 @@ public class WorkflowStateEventHandler implements StateEventHandler {
         ProcessInstance processInstance = workflowExecuteRunnable.getProcessInstance();
         ProcessDefinition processDefinition = processInstance.getProcessDefinition();
 
-        logger.info(
+        log.info(
                 "Handle workflow instance state event, the current workflow instance state {} will be changed to {}",
                 processInstance.getState(), workflowStateEvent.getStatus());
 

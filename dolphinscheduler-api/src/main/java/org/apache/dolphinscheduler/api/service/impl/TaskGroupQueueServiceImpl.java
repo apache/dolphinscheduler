@@ -35,8 +35,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -47,6 +47,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * task group queue service
  */
 @Service
+@Slf4j
 public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGroupQueueService {
 
     @Autowired
@@ -54,8 +55,6 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
 
     @Autowired
     private ProjectMapper projectMapper;
-
-    private static final Logger logger = LoggerFactory.getLogger(TaskGroupQueueServiceImpl.class);
 
     /**
      * query tasks in task group queue by group id
@@ -73,7 +72,7 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
         Page<TaskGroupQueue> page = new Page<>(pageNo, pageSize);
         PageInfo<TaskGroupQueue> pageInfo = new PageInfo<>(pageNo, pageSize);
         Set<Integer> projectIds = resourcePermissionCheckService
-                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), logger);
+                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), log);
         if (projectIds.isEmpty()) {
             result.put(Constants.DATA_LIST, pageInfo);
             putMsg(result, Status.SUCCESS);

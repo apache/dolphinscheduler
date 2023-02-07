@@ -50,9 +50,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -64,9 +64,8 @@ import io.micrometer.core.annotation.Counted;
  * Command Service implementation
  */
 @Component
+@Slf4j
 public class CommandServiceImpl implements CommandService {
-
-    private final Logger logger = LoggerFactory.getLogger(CommandServiceImpl.class);
 
     @Autowired
     private ErrorCommandMapper errorCommandMapper;
@@ -218,7 +217,7 @@ public class CommandServiceImpl implements CommandService {
                         Long.parseLong(
                                 String.valueOf(subProcessParam.get(CMD_PARAM_SUB_PROCESS_DEFINE_CODE)));
             } catch (NumberFormatException nfe) {
-                logger.error("processDefinitionCode is not a number", nfe);
+                log.error("processDefinitionCode is not a number", nfe);
                 return null;
             }
         }

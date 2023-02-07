@@ -79,7 +79,7 @@ public abstract class AbstractEmrTask extends AbstractRemoteTask {
     public void init() {
         final String taskParams = taskExecutionContext.getTaskParams();
         emrParameters = JSONUtils.parseObject(taskParams, EmrParameters.class);
-        logger.info("Initialize emr task params:{}", JSONUtils.toPrettyJsonString(taskParams));
+        log.info("Initialize emr task params:{}", JSONUtils.toPrettyJsonString(taskParams));
         if (emrParameters == null || !emrParameters.checkParameters()) {
             throw new EmrTaskException("emr task params is not valid");
         }

@@ -49,8 +49,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Component;
 
 import io.netty.channel.Channel;
@@ -59,13 +59,12 @@ import io.netty.channel.Channel;
  * logger request process logic
  */
 @Component
+@Slf4j
 public class LoggerRequestProcessor implements NettyRequestProcessor {
-
-    private final Logger logger = LoggerFactory.getLogger(LoggerRequestProcessor.class);
 
     @Override
     public void process(Channel channel, Command command) {
-        logger.info("received command : {}", command);
+        log.info("received command : {}", command);
 
         // request task log command type
         final CommandType commandType = command.getType();
@@ -168,7 +167,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
             }
             return bos.toByteArray();
         } catch (IOException e) {
-            logger.error("get file bytes error", e);
+            log.error("get file bytes error", e);
         }
         return new byte[0];
     }
@@ -189,10 +188,10 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
             try (Stream<String> stream = Files.lines(Paths.get(filePath))) {
                 return stream.skip(skipLine).limit(limit).collect(Collectors.toList());
             } catch (IOException e) {
-                logger.error("read file error", e);
+                log.error("read file error", e);
             }
         } else {
-            logger.info("file path: {} not exists", filePath);
+            log.info("file path: {} not exists", filePath);
         }
         return Collections.emptyList();
     }

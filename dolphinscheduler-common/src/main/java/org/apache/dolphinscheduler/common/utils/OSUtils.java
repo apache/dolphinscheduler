@@ -45,15 +45,13 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * os utils
  */
+@Slf4j
 public class OSUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(OSUtils.class);
 
     private static final SystemInfo SI = new SystemInfo();
     public static final String TWO_DECIMAL = "0.00";
@@ -138,7 +136,7 @@ public class OSUtils {
             OperatingSystemMXBean osBean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
             loadAverage = osBean.getSystemLoadAverage();
         } catch (Exception e) {
-            logger.error("get operation system load average exception, try another method ", e);
+            log.error("get operation system load average exception, try another method ", e);
             loadAverage = hal.getProcessor().getSystemLoadAverage(1)[0];
             if (Double.isNaN(loadAverage)) {
                 return NEGATIVE_ONE;
@@ -185,7 +183,7 @@ public class OSUtils {
                 return getUserListFromLinux();
             }
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
 
         return Collections.emptyList();
@@ -283,7 +281,7 @@ public class OSUtils {
         } catch (Exception e) {
             // because ShellExecutor method throws exception to the linux return status is not 0
             // not exist user return status is 1
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
         return false;
     }
@@ -297,7 +295,7 @@ public class OSUtils {
         // if not exists this user, then create
         if (!getUserList().contains(userName)) {
             boolean isSuccess = createUser(userName);
-            logger.info("create user {} {}", userName, isSuccess ? "success" : "fail");
+            log.info("create user {} {}", userName, isSuccess ? "success" : "fail");
         }
     }
 
@@ -312,7 +310,7 @@ public class OSUtils {
             String userGroup = getGroup();
             if (StringUtils.isEmpty(userGroup)) {
                 String errorLog = String.format("%s group does not exist for this operating system.", userGroup);
-                logger.error(errorLog);
+                log.error(errorLog);
                 return false;
             }
             if (SystemUtils.IS_OS_MAC) {
@@ -324,7 +322,7 @@ public class OSUtils {
             }
             return true;
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
 
         return false;
@@ -338,9 +336,9 @@ public class OSUtils {
      * @throws IOException in case of an I/O error
      */
     private static void createLinuxUser(String userName, String userGroup) throws IOException {
-        logger.info("create linux os user: {}", userName);
+        log.info("create linux os user: {}", userName);
         String cmd = String.format("sudo useradd -g %s %s", userGroup, userName);
-        logger.info("execute cmd: {}", cmd);
+        log.info("execute cmd: {}", cmd);
         exeCmd(cmd);
     }
 
@@ -352,14 +350,14 @@ public class OSUtils {
      * @throws IOException in case of an I/O error
      */
     private static void createMacUser(String userName, String userGroup) throws IOException {
-        logger.info("create mac os user: {}", userName);
+        log.info("create mac os user: {}", userName);
 
         String createUserCmd = String.format("sudo sysadminctl -addUser %s -password %s", userName, userName);
-        logger.info("create user command: {}", createUserCmd);
+        log.info("create user command: {}", createUserCmd);
         exeCmd(createUserCmd);
 
         String appendGroupCmd = String.format("sudo dseditgroup -o edit -a %s -t user %s", userName, userGroup);
-        logger.info("append user to group: {}", appendGroupCmd);
+        log.info("append user to group: {}", appendGroupCmd);
         exeCmd(appendGroupCmd);
     }
 
@@ -371,14 +369,14 @@ public class OSUtils {
      * @throws IOException in case of an I/O error
      */
     private static void createWindowsUser(String userName, String userGroup) throws IOException {
-        logger.info("create windows os user: {}", userName);
+        log.info("create windows os user: {}", userName);
 
         String userCreateCmd = String.format("net user \"%s\" /add", userName);
-        logger.info("execute create user command: {}", userCreateCmd);
+        log.info("execute create user command: {}", userCreateCmd);
         exeCmd(userCreateCmd);
 
         String appendGroupCmd = String.format("net localgroup \"%s\" \"%s\" /add", userGroup, userName);
-        logger.info("execute append user to group: {}", appendGroupCmd);
+        log.info("execute append user to group: {}", appendGroupCmd);
         exeCmd(appendGroupCmd);
     }
 
@@ -478,12 +476,12 @@ public class OSUtils {
         // system available physical memory
         double availablePhysicalMemorySize = availablePhysicalMemorySize();
         if (loadAverage > maxCpuLoadAvg) {
-            logger.warn("Current cpu load average {} is too high, max.cpuLoad.avg={}", loadAverage, maxCpuLoadAvg);
+            log.warn("Current cpu load average {} is too high, max.cpuLoad.avg={}", loadAverage, maxCpuLoadAvg);
             return true;
         }
 
         if (availablePhysicalMemorySize < reservedMemory) {
-            logger.warn(
+            log.warn(
                     "Current available memory {}G is too low, reserved.memory={}G", maxCpuLoadAvg, reservedMemory);
             return true;
         }

@@ -30,17 +30,16 @@ import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 
 import java.time.Duration;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 @Service
 @ConditionalOnProperty(prefix = "worker.registry-disconnect-strategy", name = "strategy", havingValue = "waiting")
+@Slf4j
 public class WorkerWaitingStrategy implements WorkerConnectStrategy {
-
-    private final Logger logger = LoggerFactory.getLogger(WorkerWaitingStrategy.class);
 
     @Autowired
     private WorkerConfig workerConfig;
@@ -67,7 +66,7 @@ public class WorkerWaitingStrategy implements WorkerConnectStrategy {
             clearWorkerResource();
             Duration maxWaitingTime = workerConfig.getRegistryDisconnectStrategy().getMaxWaitingTime();
             try {
-                logger.info("Worker disconnect from registry will try to reconnect in {} s",
+                log.info("Worker disconnect from registry will try to reconnect in {} s",
                         maxWaitingTime.getSeconds());
                 registryClient.connectUntilTimeout(maxWaitingTime);
             } catch (RegistryException ex) {
@@ -78,15 +77,15 @@ public class WorkerWaitingStrategy implements WorkerConnectStrategy {
             String errorMessage = String.format(
                     "Disconnect from registry and change the current status to waiting error, the current server state is %s, will stop the current server",
                     ServerLifeCycleManager.getServerStatus());
-            logger.error(errorMessage, e);
+            log.error(errorMessage, e);
             registryClient.getStoppable().stop(errorMessage);
         } catch (RegistryException ex) {
             String errorMessage = "Disconnect from registry and waiting to reconnect failed, will stop the server";
-            logger.error(errorMessage, ex);
+            log.error(errorMessage, ex);
             registryClient.getStoppable().stop(errorMessage);
         } catch (Exception ex) {
             String errorMessage = "Disconnect from registry and get an unknown exception, will stop the server";
-            logger.error(errorMessage, ex);
+            log.error(errorMessage, ex);
             registryClient.getStoppable().stop(errorMessage);
         }
     }
@@ -94,19 +93,19 @@ public class WorkerWaitingStrategy implements WorkerConnectStrategy {
     @Override
     public void reconnect() {
         if (ServerLifeCycleManager.isRunning()) {
-            logger.info("no need to reconnect, as the current server status is running");
+            log.info("no need to reconnect, as the current server status is running");
         } else {
             try {
                 ServerLifeCycleManager.recoverFromWaiting();
                 reStartWorkerResource();
-                logger.info("Recover from waiting success, the current server status is {}",
+                log.info("Recover from waiting success, the current server status is {}",
                         ServerLifeCycleManager.getServerStatus());
             } catch (Exception e) {
                 String errorMessage =
                         String.format(
                                 "Recover from waiting failed, the current server status is %s, will stop the server",
                                 ServerLifeCycleManager.getServerStatus());
-                logger.error(errorMessage, e);
+                log.error(errorMessage, e);
                 registryClient.getStoppable().stop(errorMessage);
             }
         }
@@ -120,21 +119,21 @@ public class WorkerWaitingStrategy implements WorkerConnectStrategy {
     private void clearWorkerResource() {
         // close the worker resource, if close failed should stop the worker server
         workerRpcServer.close();
-        logger.warn("Worker server close the RPC server due to lost connection from registry");
+        log.warn("Worker server close the RPC server due to lost connection from registry");
         workerRpcClient.close();
-        logger.warn("Worker server close the RPC client due to lost connection from registry");
+        log.warn("Worker server close the RPC client due to lost connection from registry");
         workerManagerThread.clearTask();
-        logger.warn("Worker server clear the tasks due to lost connection from registry");
+        log.warn("Worker server clear the tasks due to lost connection from registry");
         messageRetryRunner.clearMessage();
-        logger.warn("Worker server clear the retry message due to lost connection from registry");
+        log.warn("Worker server clear the retry message due to lost connection from registry");
 
     }
 
     private void reStartWorkerResource() {
         // reopen the resource, if reopen failed should stop the worker server
         workerRpcServer.start();
-        logger.warn("Worker server restart PRC server due to reconnect to registry");
+        log.warn("Worker server restart PRC server due to reconnect to registry");
         workerRpcClient.start();
-        logger.warn("Worker server restart PRC client due to reconnect to registry");
+        log.warn("Worker server restart PRC client due to reconnect to registry");
     }
 }

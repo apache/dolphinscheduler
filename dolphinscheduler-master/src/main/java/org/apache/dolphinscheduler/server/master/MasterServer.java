@@ -32,9 +32,9 @@ import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import javax.annotation.PostConstruct;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.quartz.SchedulerException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -46,9 +46,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @ComponentScan("org.apache.dolphinscheduler")
 @EnableTransactionManagement
 @EnableCaching
+@Slf4j
 public class MasterServer implements IStoppable {
-
-    private static final Logger logger = LoggerFactory.getLogger(MasterServer.class);
 
     @Autowired
     private SpringApplicationContext springApplicationContext;
@@ -118,7 +117,7 @@ public class MasterServer implements IStoppable {
         // set stop signal is true
         // execute only once
         if (!ServerLifeCycleManager.toStopped()) {
-            logger.warn("MasterServer is already stopped, current cause: {}", cause);
+            log.warn("MasterServer is already stopped, current cause: {}", cause);
             return;
         }
         // thread sleep 3 seconds for thread quietly stop
@@ -132,12 +131,12 @@ public class MasterServer implements IStoppable {
                 // like ServerNodeManager,HostManager,TaskResponseService,CuratorZookeeperClient,etc
                 SpringApplicationContext closedSpringContext = springApplicationContext) {
 
-            logger.info("Master server is stopping, current cause : {}", cause);
+            log.info("Master server is stopping, current cause : {}", cause);
         } catch (Exception e) {
-            logger.error("MasterServer stop failed, current cause: {}", cause, e);
+            log.error("MasterServer stop failed, current cause: {}", cause, e);
             return;
         }
-        logger.info("MasterServer stopped, current cause: {}", cause);
+        log.info("MasterServer stopped, current cause: {}", cause);
     }
 
     @Override

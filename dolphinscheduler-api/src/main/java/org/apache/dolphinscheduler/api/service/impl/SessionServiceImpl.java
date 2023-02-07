@@ -34,8 +34,8 @@ import java.util.UUID;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,9 +45,8 @@ import org.springframework.web.util.WebUtils;
  * session service implement
  */
 @Service
+@Slf4j
 public class SessionServiceImpl extends BaseServiceImpl implements SessionService {
-
-    private static final Logger logger = LoggerFactory.getLogger(SessionService.class);
 
     @Autowired
     private SessionMapper sessionMapper;
@@ -75,7 +74,7 @@ public class SessionServiceImpl extends BaseServiceImpl implements SessionServic
         }
 
         String ip = BaseController.getClientIpAddress(request);
-        logger.debug("Get session: {}, ip: {}.", sessionId, ip);
+        log.debug("Get session: {}, ip: {}.", sessionId, ip);
 
         return sessionMapper.selectById(sessionId);
     }
@@ -156,7 +155,7 @@ public class SessionServiceImpl extends BaseServiceImpl implements SessionServic
             // delete session
             sessionMapper.deleteById(session.getId());
         } catch (Exception e) {
-            logger.warn("userId : {} , ip : {} , find more one session", loginUser.getId(), ip, e);
+            log.warn("userId : {} , ip : {} , find more one session", loginUser.getId(), ip, e);
         }
     }
 

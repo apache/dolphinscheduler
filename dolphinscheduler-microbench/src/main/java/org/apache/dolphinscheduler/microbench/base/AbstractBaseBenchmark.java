@@ -20,6 +20,8 @@ package org.apache.dolphinscheduler.microbench.base;
 import java.io.File;
 import java.io.IOException;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.junit.jupiter.api.Test;
 import org.openjdk.jmh.annotations.Fork;
 import org.openjdk.jmh.annotations.Measurement;
@@ -30,8 +32,6 @@ import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.ChainedOptionsBuilder;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * BaseBenchMark
@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
 @Measurement(iterations = AbstractBaseBenchmark.DEFAULT_MEASURE_ITERATIONS)
 @State(Scope.Thread)
 @Fork(AbstractBaseBenchmark.DEFAULT_FORKS)
+@Slf4j
 public abstract class AbstractBaseBenchmark {
 
     static final int DEFAULT_WARMUP_ITERATIONS = 10;
@@ -48,8 +49,6 @@ public abstract class AbstractBaseBenchmark {
     static final int DEFAULT_MEASURE_ITERATIONS = 10;
 
     static final int DEFAULT_FORKS = 2;
-
-    private static Logger logger = LoggerFactory.getLogger(AbstractBaseBenchmark.class);
 
     private ChainedOptionsBuilder newOptionsBuilder() {
 
@@ -85,7 +84,7 @@ public abstract class AbstractBaseBenchmark {
                 try {
                     writeFileStatus = file.createNewFile();
                 } catch (IOException e) {
-                    logger.warn("jmh test create file error" + e);
+                    log.warn("jmh test create file error" + e);
                 }
             }
             if (writeFileStatus) {
@@ -125,7 +124,7 @@ public abstract class AbstractBaseBenchmark {
         try {
             return Integer.parseInt(forkCount);
         } catch (NumberFormatException e) {
-            logger.error("fail to convert forkCount into int", e);
+            log.error("fail to convert forkCount into int", e);
         }
 
         return -1;

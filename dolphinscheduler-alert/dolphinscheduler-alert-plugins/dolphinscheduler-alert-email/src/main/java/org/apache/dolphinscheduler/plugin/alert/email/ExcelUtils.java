@@ -35,14 +35,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public final class ExcelUtils {
 
     private static final int XLSX_WINDOW_ROW = 10000;
-    private static final Logger logger = LoggerFactory.getLogger(ExcelUtils.class);
-
     private ExcelUtils() {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }
@@ -57,14 +55,14 @@ public final class ExcelUtils {
     public static void genExcelFile(String content, String title, String xlsFilePath) {
         File file = new File(xlsFilePath);
         if (!file.exists() && !file.mkdirs()) {
-            logger.error("Create xlsx directory error, path:{}", xlsFilePath);
+            log.error("Create xlsx directory error, path:{}", xlsFilePath);
             throw new AlertEmailException("Create xlsx directory error");
         }
 
         List<LinkedHashMap> itemsList = JSONUtils.toList(content, LinkedHashMap.class);
 
         if (CollectionUtils.isEmpty(itemsList)) {
-            logger.error("itemsList is null");
+            log.error("itemsList is null");
             throw new AlertEmailException("itemsList is null");
         }
 
