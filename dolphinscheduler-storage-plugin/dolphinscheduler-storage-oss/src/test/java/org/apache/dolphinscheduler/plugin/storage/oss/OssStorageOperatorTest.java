@@ -27,18 +27,24 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.aliyun.oss.OSS;
+import com.aliyun.oss.model.ListObjectsV2Request;
+import com.aliyun.oss.model.ListObjectsV2Result;
 
 @ExtendWith(MockitoExtension.class)
 public class OssStorageOperatorTest {
@@ -52,6 +58,10 @@ public class OssStorageOperatorTest {
     private static final String DIR_MOCK = "DIR_MOCK";
     private static final String FILE_NAME_MOCK = "FILE_NAME_MOCK";
     private static final String FILE_PATH_MOCK = "FILE_PATH_MOCK";
+
+    private static final String FULL_NAME = "/tmp/dir1/";
+
+    private static final String DEFAULT_PATH = "/tmp/";
 
     @Mock
     private OSS ossClientMock;
@@ -247,5 +257,35 @@ public class OssStorageOperatorTest {
         doReturn(true).when(ossClientMock).doesObjectExist(anyString(), anyString());
         ossOperator.deleteDir(DIR_MOCK);
         verify(ossClientMock, times(1)).deleteObject(anyString(), anyString());
+    }
+
+    @Test
+    public void testGetFileStatus() throws Exception {
+        doReturn(new ListObjectsV2Result()).when(ossClientMock).listObjectsV2(Mockito.any(ListObjectsV2Request.class));
+        StorageEntity entity = ossOperator.getFileStatus(FULL_NAME, DEFAULT_PATH, TENANT_CODE_MOCK, ResourceType.FILE);
+        Assertions.assertEquals(FULL_NAME, entity.getFullName());
+        Assertions.assertEquals("dir1/", entity.getFileName());
+    }
+
+    @Test
+    public void testListFilesStatus() throws Exception {
+        doReturn(new ListObjectsV2Result()).when(ossClientMock).listObjectsV2(Mockito.any(ListObjectsV2Request.class));
+        List<StorageEntity> result =
+                ossOperator.listFilesStatus(FULL_NAME, DEFAULT_PATH, TENANT_CODE_MOCK, ResourceType.FILE);
+        Assertions.assertEquals(0, result.size());
+    }
+
+    @Test
+    public void testListFilesStatusRecursively() throws Exception {
+        StorageEntity entity = new StorageEntity();
+        entity.setFullName(FULL_NAME);
+
+        doReturn(entity).when(ossOperator).getFileStatus(FULL_NAME, DEFAULT_PATH, TENANT_CODE_MOCK, ResourceType.FILE);
+        doReturn(Collections.EMPTY_LIST).when(ossOperator).listFilesStatus(anyString(), anyString(), anyString(),
+                Mockito.any(ResourceType.class));
+
+        List<StorageEntity> result =
+                ossOperator.listFilesStatusRecursively(FULL_NAME, DEFAULT_PATH, TENANT_CODE_MOCK, ResourceType.FILE);
+        Assertions.assertEquals(0, result.size());
     }
 }
