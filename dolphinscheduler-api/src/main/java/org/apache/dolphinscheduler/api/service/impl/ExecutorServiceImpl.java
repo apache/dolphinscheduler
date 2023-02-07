@@ -1243,13 +1243,14 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             }
             String[] stringDates = scheduleResult.get(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST).split(COMMA);
             for (String stringDate : stringDates) {
+                stringDate = stringDate.trim();
                 try {
-                    ZonedDateTime dateTime = DateUtils.stringToZoneDateTime(stringDate.trim());
+                    ZonedDateTime dateTime = DateUtils.stringToZoneDateTime(stringDate);
                     if (dateTime == null) {
                         return false;
                     }
                 } catch (Exception ex) {
-                    logger.warn("Parse schedule time error, date string: {}", stringDate.trim());
+                    logger.warn("Parse schedule time error, date string: {}", stringDate);
                     return false;
                 }
             }
