@@ -19,7 +19,7 @@ This node is used to perform http type tasks such as the common POST and GET req
 |      **Parameter**      |                                                                        **Description**                                                                        |
 |-------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Request address         | HTTP request URL.                                                                                                                                             |
-| Request type            | Supports GET, POSt, HEAD, PUT, DELETE.                                                                                                                        |
+| Request type            | Supports GET, POST, HEAD, PUT, DELETE.                                                                                                                        |
 | Request parameters      | Supports Parameter, Body, Headers.                                                                                                                            |
 | Verification conditions | Supports default response code, custom response code, content included, content not included.                                                                 |
 | Verification content    | When the verification condition selects a custom response code, the content contains, and the content does not contain, the verification content is required. |
