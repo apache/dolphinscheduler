@@ -714,6 +714,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         String defaultPath = "";
         List<StorageEntity> resourcesList = new ArrayList<>();
+        String resourceStorageType =
+                PropertyUtils.getString(Constants.RESOURCE_STORAGE_TYPE, ResUploadType.NONE.name());
 
         if (isAdmin(loginUser) && StringUtils.isBlank(fullName)) {
             // list all tenants' resources to admin users in the root directory
@@ -735,7 +737,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                         logger.error(e.getMessage() + " Resource path: {}", defaultPath, e);
                         putMsg(result, Status.RESOURCE_NOT_EXIST);
                         throw new ServiceException(String.format(e.getMessage() +
-                                " make sure resource path: %s exists in hdfs", defaultPath));
+                                " make sure resource path: %s exists in %s", defaultPath, resourceStorageType));
                     }
                 }
             }
@@ -755,7 +757,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 logger.error(e.getMessage() + " Resource path: {}", fullName, e);
                 putMsg(result, Status.RESOURCE_NOT_EXIST);
                 throw new ServiceException(String.format(e.getMessage() +
-                        " make sure resource path: %s exists in hdfs", defaultPath));
+                        " make sure resource path: %s exists in %s", defaultPath, resourceStorageType));
             }
         }
 
