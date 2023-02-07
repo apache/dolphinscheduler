@@ -41,8 +41,8 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -50,9 +50,8 @@ import org.springframework.stereotype.Service;
  * netty executor manager
  */
 @Service
+@Slf4j
 public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
-
-    private final Logger logger = LoggerFactory.getLogger(NettyExecutorManager.class);
 
     /**
      * server node manager
@@ -112,14 +111,14 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
                 context.getTaskInstance().setHost(host.getAddress());
                 return;
             } catch (ExecuteException ex) {
-                logger.error("Execute command {} error", command, ex);
+                log.error("Execute command {} error", command, ex);
                 try {
                     failNodeSet.add(host.getAddress());
                     Set<String> tmpAllIps = new HashSet<>(allNodes);
                     Collection<String> remained = CollectionUtils.subtract(tmpAllIps, failNodeSet);
                     if (CollectionUtils.isNotEmpty(remained)) {
                         host = Host.of(remained.iterator().next());
-                        logger.error("retry execute command : {} host : {}", command, host);
+                        log.error("retry execute command : {} host : {}", command, host);
                     } else {
                         throw new ExecuteException("fail after try all nodes");
                     }
@@ -152,7 +151,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
                 nettyRemotingClient.send(host, command);
                 success = true;
             } catch (Exception ex) {
-                logger.error("Send command to {} error, command: {}", host, command, ex);
+                log.error("Send command to {} error, command: {}", host, command, ex);
                 retryCount--;
                 ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
             }

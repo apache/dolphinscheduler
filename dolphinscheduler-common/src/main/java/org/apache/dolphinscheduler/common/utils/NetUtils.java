@@ -36,18 +36,17 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * NetUtils
  */
+@Slf4j
 public class NetUtils {
 
     private static final String NETWORK_PRIORITY_DEFAULT = "default";
     private static final String NETWORK_PRIORITY_INNER = "inner";
     private static final String NETWORK_PRIORITY_OUTER = "outer";
-    private static final Logger logger = LoggerFactory.getLogger(NetUtils.class);
     private static InetAddress LOCAL_ADDRESS = null;
     private static volatile String HOST_ADDRESS;
 
@@ -134,7 +133,7 @@ public class NetUtils {
                                 return LOCAL_ADDRESS;
                             }
                         } catch (IOException e) {
-                            logger.warn("test address id reachable io exception", e);
+                            log.warn("test address id reachable io exception", e);
                         }
                     }
                 }
@@ -142,7 +141,7 @@ public class NetUtils {
 
             localAddress = InetAddress.getLocalHost();
         } catch (UnknownHostException e) {
-            logger.warn("InetAddress get LocalHost exception", e);
+            log.warn("InetAddress get LocalHost exception", e);
         }
         Optional<InetAddress> addressOp = toValidAddress(localAddress);
         if (addressOp.isPresent()) {
@@ -171,7 +170,7 @@ public class NetUtils {
             try {
                 return InetAddress.getByName(addr.substring(0, i) + '%' + address.getScopeId());
             } catch (UnknownHostException e) {
-                logger.debug("Unknown IPV6 address: ", e);
+                log.debug("Unknown IPV6 address: ", e);
             }
         }
         return address;
@@ -210,7 +209,7 @@ public class NetUtils {
         try {
             validNetworkInterfaces = getValidNetworkInterfaces();
         } catch (SocketException e) {
-            logger.warn("ValidNetworkInterfaces exception", e);
+            log.warn("ValidNetworkInterfaces exception", e);
         }
 
         NetworkInterface result = null;
@@ -279,7 +278,7 @@ public class NetUtils {
         } else if (NETWORK_PRIORITY_OUTER.equalsIgnoreCase(networkPriority)) {
             return findOuterAddress(validNetworkInterfaces);
         } else {
-            logger.error("There is no matching network card acquisition policy!");
+            log.error("There is no matching network card acquisition policy!");
             return null;
         }
     }

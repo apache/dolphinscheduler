@@ -47,7 +47,7 @@ import com.google.common.collect.Sets;
 @ExtendWith(MockitoExtension.class)
 public class WorkerRegistryClientTest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(WorkerRegistryClientTest.class);
+    private static final Logger log = LoggerFactory.getLogger(WorkerRegistryClientTest.class);
 
     private static final String TEST_WORKER_GROUP = "test";
 

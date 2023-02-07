@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
 
 public class TaskExecutionContextBuilder {
 
-    protected final Logger logger =
+    protected final Logger log =
             LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
 
     public static TaskExecutionContextBuilder get() {

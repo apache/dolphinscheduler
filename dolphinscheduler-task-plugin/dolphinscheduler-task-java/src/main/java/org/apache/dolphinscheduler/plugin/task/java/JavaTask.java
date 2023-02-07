@@ -80,7 +80,7 @@ public class JavaTask extends AbstractTask {
         this.taskRequest = taskRequest;
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
                 taskRequest,
-                logger);
+                log);
     }
 
     /**
@@ -96,7 +96,7 @@ public class JavaTask extends AbstractTask {
         if (javaParameters.getRunType().equals(JavaConstants.RUN_TYPE_JAR)) {
             setMainJarName();
         }
-        logger.info("Initialize java task params {}", JSONUtils.toPrettyJsonString(javaParameters));
+        log.info("Initialize java task params {}", JSONUtils.toPrettyJsonString(javaParameters));
     }
 
     /**
@@ -110,7 +110,7 @@ public class JavaTask extends AbstractTask {
         try {
             rawJavaScript = convertJavaSourceCodePlaceholders(rawJavaScript);
         } catch (StringIndexOutOfBoundsException e) {
-            logger.error("setShareVar field format error, raw java script: {}", rawJavaScript);
+            log.error("setShareVar field format error, raw java script: {}", rawJavaScript);
         }
         return rawJavaScript;
     }
@@ -143,21 +143,21 @@ public class JavaTask extends AbstractTask {
             }
             Preconditions.checkNotNull(command, "command not be null.");
             TaskResponse taskResponse = shellCommandExecutor.run(command);
-            logger.info("java task run result: {}", taskResponse);
+            log.info("java task run result: {}", taskResponse);
             setExitStatusCode(taskResponse.getExitStatusCode());
             setAppIds(taskResponse.getAppIds());
             setProcessId(taskResponse.getProcessId());
             setVarPool(shellCommandExecutor.getVarPool());
         } catch (InterruptedException e) {
-            logger.error("java task interrupted ", e);
+            log.error("java task interrupted ", e);
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
             Thread.currentThread().interrupt();
         } catch (RunTypeNotFoundException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
             throw e;
         } catch (Exception e) {
-            logger.error("java task failed ", e);
+            log.error("java task failed ", e);
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
             throw new TaskException("run java task error", e);
         }
@@ -279,9 +279,9 @@ public class JavaTask extends AbstractTask {
      * @return String
      **/
     protected void createJavaSourceFileIfNotExists(String sourceCode, String fileName) throws IOException {
-        logger.info("tenantCode: {}, task dir:{}", taskRequest.getTenantCode(), taskRequest.getExecutePath());
+        log.info("tenantCode: {}, task dir:{}", taskRequest.getTenantCode(), taskRequest.getExecutePath());
         if (!Files.exists(Paths.get(fileName))) {
-            logger.info("the java source code:{}, will be write to the file: {}", fileName, sourceCode);
+            log.info("the java source code:{}, will be write to the file: {}", fileName, sourceCode);
             // write data to file
             FileUtils.writeStringToFile(new File(fileName),
                     sourceCode,
@@ -360,7 +360,7 @@ public class JavaTask extends AbstractTask {
         if (MapUtils.isNotEmpty(taskRequest.getParamsMap())) {
             paramsMap.putAll(taskRequest.getParamsMap());
         }
-        logger.info("The current java source code will begin to replace the placeholder: {}", rawJavaScript);
+        log.info("The current java source code will begin to replace the placeholder: {}", rawJavaScript);
         rawJavaScript = ParameterUtils.convertParameterPlaceholders(rawJavaScript, ParamUtils.convert(paramsMap));
         return rawJavaScript;
     }

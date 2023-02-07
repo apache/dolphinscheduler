@@ -27,12 +27,10 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class DataSourcePluginManager {
-
-    private static final Logger logger = LoggerFactory.getLogger(DataSourcePluginManager.class);
 
     private final Map<String, DataSourceChannel> datasourceClientMap = new ConcurrentHashMap<>();
 
@@ -48,7 +46,7 @@ public class DataSourcePluginManager {
             final DataSourceChannelFactory factory = entry.getValue();
             final String name = entry.getKey();
 
-            logger.info("Registering datasource plugin: {}", name);
+            log.info("Registering datasource plugin: {}", name);
 
             if (datasourceClientMap.containsKey(name)) {
                 throw new IllegalStateException(format("Duplicate datasource plugins named '%s'", name));
@@ -56,7 +54,7 @@ public class DataSourcePluginManager {
 
             loadDatasourceClient(factory);
 
-            logger.info("Registered datasource plugin: {}", name);
+            log.info("Registered datasource plugin: {}", name);
         }
     }
 

@@ -26,15 +26,13 @@ import org.apache.dolphinscheduler.server.master.event.TaskEventHandler;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * task execute thread
  */
+@Slf4j
 public class TaskExecuteRunnable implements Runnable {
-
-    private static final Logger logger = LoggerFactory.getLogger(TaskExecuteRunnable.class);
 
     private final int processInstanceId;
 
@@ -54,20 +52,20 @@ public class TaskExecuteRunnable implements Runnable {
             TaskEvent event = this.events.peek();
             try {
                 LogUtils.setWorkflowAndTaskInstanceIDMDC(event.getProcessInstanceId(), event.getTaskInstanceId());
-                logger.info("Handle task event begin: {}", event);
+                log.info("Handle task event begin: {}", event);
                 taskEventHandlerMap.get(event.getEvent()).handleTaskEvent(event);
                 events.remove(event);
-                logger.info("Handle task event finished: {}", event);
+                log.info("Handle task event finished: {}", event);
             } catch (TaskEventHandleException taskEventHandleException) {
                 // we don't need to resubmit this event, since the worker will resubmit this event
-                logger.error("Handle task event failed, this event will be retry later, event: {}", event,
+                log.error("Handle task event failed, this event will be retry later, event: {}", event,
                         taskEventHandleException);
             } catch (TaskEventHandleError taskEventHandleError) {
-                logger.error("Handle task event error, this event will be removed, event: {}", event,
+                log.error("Handle task event error, this event will be removed, event: {}", event,
                         taskEventHandleError);
                 events.remove(event);
             } catch (Exception unknownException) {
-                logger.error("Handle task event error, get a unknown exception, this event will be removed, event: {}",
+                log.error("Handle task event error, get a unknown exception, this event will be removed, event: {}",
                         event, unknownException);
                 events.remove(event);
             } finally {
@@ -94,7 +92,7 @@ public class TaskExecuteRunnable implements Runnable {
 
     public boolean addEvent(TaskEvent event) {
         if (event.getProcessInstanceId() != this.processInstanceId) {
-            logger.warn(
+            log.warn(
                     "event would be abounded, task instance id:{}, process instance id:{}, this.processInstanceId:{}",
                     event.getTaskInstanceId(), event.getProcessInstanceId(), this.processInstanceId);
             return false;

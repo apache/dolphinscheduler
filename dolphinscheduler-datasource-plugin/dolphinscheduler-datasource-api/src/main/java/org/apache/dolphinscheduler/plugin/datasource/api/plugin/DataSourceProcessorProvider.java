@@ -23,13 +23,10 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import java.util.Map;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+@Slf4j
 public class DataSourceProcessorProvider {
-
-    private static final Logger logger = LoggerFactory.getLogger(DataSourceProcessorProvider.class);
 
     private DataSourceProcessorManager dataSourcePluginManager;
 

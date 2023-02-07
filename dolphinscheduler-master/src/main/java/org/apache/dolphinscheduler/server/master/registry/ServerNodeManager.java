@@ -62,16 +62,15 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PreDestroy;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class ServerNodeManager implements InitializingBean {
-
-    private final Logger logger = LoggerFactory.getLogger(ServerNodeManager.class);
 
     private final Lock masterLock = new ReentrantLock();
 
@@ -156,7 +155,7 @@ public class ServerNodeManager implements InitializingBean {
                 // sync worker node info
                 refreshWorkerNodesAndGroupMappings();
             } catch (Exception e) {
-                logger.error("WorkerNodeInfoAndGroupDbSyncTask error:", e);
+                log.error("WorkerNodeInfoAndGroupDbSyncTask error:", e);
             }
         }
     }
@@ -186,17 +185,17 @@ public class ServerNodeManager implements InitializingBean {
                     final String workerAddress = parts[parts.length - 1];
 
                     // todo: update workerNodeInfo
-                    logger.debug("received subscribe event : {}", event);
+                    log.debug("received subscribe event : {}", event);
                     if (type == Type.ADD) {
-                        logger.info("Worker: {} added, currentNode : {}", path, workerAddress);
+                        log.info("Worker: {} added, currentNode : {}", path, workerAddress);
                     } else if (type == Type.REMOVE) {
-                        logger.info("Worker node : {} down.", path);
+                        log.info("Worker node : {} down.", path);
                         alertDao.sendServerStoppedAlert(1, path, "WORKER");
                     } else if (type == Type.UPDATE) {
                         syncSingleWorkerNodeInfo(workerAddress, JSONUtils.parseObject(data, WorkerHeartBeat.class));
                     }
                 } catch (Exception ex) {
-                    logger.error("WorkerGroupListener capture data change and get data failed", ex);
+                    log.error("WorkerGroupListener capture data change and get data failed", ex);
                 }
             }
         }
@@ -220,16 +219,16 @@ public class ServerNodeManager implements InitializingBean {
             if (registryClient.isMasterPath(path)) {
                 try {
                     if (type.equals(Type.ADD)) {
-                        logger.info("master node : {} added.", path);
+                        log.info("master node : {} added.", path);
                         updateMasterNodes();
                     }
                     if (type.equals(Type.REMOVE)) {
-                        logger.info("master node : {} down.", path);
+                        log.info("master node : {} down.", path);
                         updateMasterNodes();
                         alertDao.sendServerStoppedAlert(1, path, "MASTER");
                     }
                 } catch (Exception ex) {
-                    logger.error("MasterNodeListener capture data change and get data failed.", ex);
+                    log.error("MasterNodeListener capture data change and get data failed.", ex);
                 }
             }
         }
@@ -246,7 +245,7 @@ public class ServerNodeManager implements InitializingBean {
             List<Server> masterNodeList = registryClient.getServerList(NodeType.MASTER);
             syncMasterNodes(currentNodes, masterNodeList);
         } catch (Exception e) {
-            logger.error("update master nodes error", e);
+            log.error("update master nodes error", e);
         } finally {
             registryClient.releaseLock(nodeLock);
         }
@@ -312,9 +311,9 @@ public class ServerNodeManager implements InitializingBean {
                 totalSlot = nodes.size();
                 currentSlot = index;
             } else {
-                logger.warn("Current master is not in active master list");
+                log.warn("Current master is not in active master list");
             }
-            logger.info("Update master nodes, total master size: {}, current slot: {}", totalSlot, currentSlot);
+            log.info("Update master nodes, total master size: {}, current slot: {}", totalSlot, currentSlot);
         } finally {
             masterLock.unlock();
         }

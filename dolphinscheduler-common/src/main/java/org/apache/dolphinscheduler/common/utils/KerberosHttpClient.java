@@ -40,15 +40,13 @@ import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * kerberos http client
  */
+@Slf4j
 public class KerberosHttpClient {
-
-    public static final Logger logger = LoggerFactory.getLogger(KerberosHttpClient.class);
 
     private String principal;
     private String keyTabLocation;
@@ -92,7 +90,7 @@ public class KerberosHttpClient {
     }
 
     public String get(final String url, final String userId) {
-        logger.info("Calling KerberosHttpClient {} {} {}", this.principal, this.keyTabLocation, url);
+        log.info("Calling KerberosHttpClient {} {} {}", this.principal, this.keyTabLocation, url);
         Configuration config = new Configuration() {
 
             @SuppressWarnings("serial")
@@ -128,7 +126,7 @@ public class KerberosHttpClient {
                 return HttpUtils.getResponseContentString(httpget, httpClient);
             });
         } catch (LoginException le) {
-            logger.error("Kerberos authentication failed ", le);
+            log.error("Kerberos authentication failed ", le);
         }
         return null;
     }

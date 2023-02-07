@@ -32,8 +32,8 @@ import org.apache.dolphinscheduler.server.master.runner.StateWheelExecuteThread;
 
 import java.time.Duration;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -43,9 +43,8 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @ConditionalOnProperty(prefix = "master.registry-disconnect-strategy", name = "strategy", havingValue = "waiting")
+@Slf4j
 public class MasterWaitingStrategy implements MasterConnectStrategy {
-
-    private final Logger logger = LoggerFactory.getLogger(MasterWaitingStrategy.class);
 
     @Autowired
     private MasterConfig masterConfig;
@@ -67,7 +66,7 @@ public class MasterWaitingStrategy implements MasterConnectStrategy {
             clearMasterResource();
             Duration maxWaitingTime = masterConfig.getRegistryDisconnectStrategy().getMaxWaitingTime();
             try {
-                logger.info("Master disconnect from registry will try to reconnect in {} s",
+                log.info("Master disconnect from registry will try to reconnect in {} s",
                         maxWaitingTime.getSeconds());
                 registryClient.connectUntilTimeout(maxWaitingTime);
             } catch (RegistryException ex) {
@@ -78,15 +77,15 @@ public class MasterWaitingStrategy implements MasterConnectStrategy {
             String errorMessage = String.format(
                     "Disconnect from registry and change the current status to waiting error, the current server state is %s, will stop the current server",
                     ServerLifeCycleManager.getServerStatus());
-            logger.error(errorMessage, e);
+            log.error(errorMessage, e);
             registryClient.getStoppable().stop(errorMessage);
         } catch (RegistryException ex) {
             String errorMessage = "Disconnect from registry and waiting to reconnect failed, will stop the server";
-            logger.error(errorMessage, ex);
+            log.error(errorMessage, ex);
             registryClient.getStoppable().stop(errorMessage);
         } catch (Exception ex) {
             String errorMessage = "Disconnect from registry and get an unknown exception, will stop the server";
-            logger.error(errorMessage, ex);
+            log.error(errorMessage, ex);
             registryClient.getStoppable().stop(errorMessage);
         }
     }
@@ -94,19 +93,19 @@ public class MasterWaitingStrategy implements MasterConnectStrategy {
     @Override
     public void reconnect() {
         if (ServerLifeCycleManager.isRunning()) {
-            logger.info("no need to reconnect, as the current server status is running");
+            log.info("no need to reconnect, as the current server status is running");
         } else {
             try {
                 ServerLifeCycleManager.recoverFromWaiting();
                 reStartMasterResource();
-                logger.info("Recover from waiting success, the current server status is {}",
+                log.info("Recover from waiting success, the current server status is {}",
                         ServerLifeCycleManager.getServerStatus());
             } catch (Exception e) {
                 String errorMessage =
                         String.format(
                                 "Recover from waiting failed, the current server status is %s, will stop the server",
                                 ServerLifeCycleManager.getServerStatus());
-                logger.error(errorMessage, e);
+                log.error(errorMessage, e);
                 registryClient.getStoppable().stop(errorMessage);
             }
         }
@@ -120,19 +119,19 @@ public class MasterWaitingStrategy implements MasterConnectStrategy {
     private void clearMasterResource() {
         // close the worker resource, if close failed should stop the worker server
         masterRPCServer.close();
-        logger.warn("Master closed RPC server due to lost registry connection");
+        log.warn("Master closed RPC server due to lost registry connection");
         workflowEventQueue.clearWorkflowEventQueue();
-        logger.warn("Master clear workflow event queue due to lost registry connection");
+        log.warn("Master clear workflow event queue due to lost registry connection");
         processInstanceExecCacheManager.clearCache();
-        logger.warn("Master clear process instance cache due to lost registry connection");
+        log.warn("Master clear process instance cache due to lost registry connection");
         stateWheelExecuteThread.clearAllTasks();
-        logger.warn("Master clear all state wheel task due to lost registry connection");
+        log.warn("Master clear all state wheel task due to lost registry connection");
 
     }
 
     private void reStartMasterResource() {
         // reopen the resource, if reopen failed should stop the worker server
         masterRPCServer.start();
-        logger.warn("Master restarted RPC server due to reconnect to registry");
+        log.warn("Master restarted RPC server due to reconnect to registry");
     }
 }

@@ -27,15 +27,13 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Tool to run database scripts
  */
+@Slf4j
 public class ScriptRunner {
-
-    public static final Logger logger = LoggerFactory.getLogger(ScriptRunner.class);
 
     private static final String DEFAULT_DELIMITER = ";";
 
@@ -103,7 +101,7 @@ public class ScriptRunner {
                 }
                 String trimmedLine = line.trim();
                 if (trimmedLine.startsWith("--")) {
-                    logger.info("\n{}", trimmedLine);
+                    log.info("\n{}", trimmedLine);
                 } else if (trimmedLine.length() < 1 || trimmedLine.startsWith("//")) {
                     // Do nothing
                 } else if (trimmedLine.startsWith("delimiter")) {
@@ -113,7 +111,7 @@ public class ScriptRunner {
                 } else if (!fullLineDelimiter && trimmedLine.endsWith(getDelimiter())
                         || fullLineDelimiter && trimmedLine.equals(getDelimiter())) {
                     command.add(line.substring(0, line.lastIndexOf(getDelimiter())));
-                    logger.info("\n{}", String.join("\n", command));
+                    log.info("\n{}", String.join("\n", command));
 
                     try (Statement statement = conn.createStatement()) {
                         statement.execute(String.join(" ", command));
@@ -123,20 +121,20 @@ public class ScriptRunner {
                                 int cols = md.getColumnCount();
                                 for (int i = 1; i < cols; i++) {
                                     String name = md.getColumnLabel(i);
-                                    logger.info("{} \t", name);
+                                    log.info("{} \t", name);
                                 }
-                                logger.info("");
+                                log.info("");
                                 while (rs.next()) {
                                     for (int i = 1; i < cols; i++) {
                                         String value = rs.getString(i);
-                                        logger.info("{} \t", value);
+                                        log.info("{} \t", value);
                                     }
-                                    logger.info("");
+                                    log.info("");
                                 }
                             }
                         }
                     } catch (SQLException e) {
-                        logger.error("SQLException", e);
+                        log.error("SQLException", e);
                         throw e;
                     }
 
@@ -148,11 +146,11 @@ public class ScriptRunner {
             }
 
         } catch (SQLException e) {
-            logger.error("Error executing: {}", command);
+            log.error("Error executing: {}", command);
             throw e;
         } catch (IOException e) {
             e.fillInStackTrace();
-            logger.error("Error executing: {}", command);
+            log.error("Error executing: {}", command);
             throw e;
         }
     }

@@ -54,14 +54,12 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.MimeUtility;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.sun.mail.smtp.SMTPProvider;
 
+@Slf4j
 public final class MailSender {
-
-    private static final Logger logger = LoggerFactory.getLogger(MailSender.class);
 
     private final List<String> receivers;
     private final List<String> receiverCcs;
@@ -390,12 +388,12 @@ public final class MailSender {
     public void deleteFile(File file) {
         if (file.exists()) {
             if (file.delete()) {
-                logger.info("delete success: {}", file.getAbsolutePath());
+                log.info("delete success: {}", file.getAbsolutePath());
             } else {
-                logger.info("delete fail: {}", file.getAbsolutePath());
+                log.info("delete fail: {}", file.getAbsolutePath());
             }
         } else {
-            logger.info("file not exists: {}", file.getAbsolutePath());
+            log.info("file not exists: {}", file.getAbsolutePath());
         }
     }
 
@@ -403,7 +401,7 @@ public final class MailSender {
      * handle exception
      */
     private void handleException(AlertResult alertResult, Exception e) {
-        logger.error("Send email to {} failed", receivers, e);
+        log.error("Send email to {} failed", receivers, e);
         alertResult.setMessage("Send email to {" + String.join(",", receivers) + "} failed，" + e.toString());
     }
 
