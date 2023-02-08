@@ -33,9 +33,8 @@ import java.util.Collection;
 import javax.annotation.PostConstruct;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -45,9 +44,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConditionalOnProperty(prefix = "registry", name = "type", havingValue = "mysql")
+@Slf4j
 public class MysqlRegistry implements Registry {
-
-    private static Logger LOGGER = LoggerFactory.getLogger(MysqlRegistry.class);
 
     private final MysqlRegistryProperties mysqlRegistryProperties;
     private final EphemeralDateManager ephemeralDateManager;
@@ -64,17 +62,17 @@ public class MysqlRegistry implements Registry {
         this.ephemeralDateManager = new EphemeralDateManager(mysqlRegistryProperties, mysqlOperator);
         this.subscribeDataManager = new SubscribeDataManager(mysqlRegistryProperties, mysqlOperator);
         this.registryLockManager = new RegistryLockManager(mysqlRegistryProperties, mysqlOperator);
-        LOGGER.info("Initialize Mysql Registry...");
+        log.info("Initialize Mysql Registry...");
     }
 
     @PostConstruct
     public void start() {
-        LOGGER.info("Starting Mysql Registry...");
+        log.info("Starting Mysql Registry...");
         // start a mysql connect check
         ephemeralDateManager.start();
         subscribeDataManager.start();
         registryLockManager.start();
-        LOGGER.info("Started Mysql Registry...");
+        log.info("Started Mysql Registry...");
     }
 
     @Override
@@ -183,15 +181,15 @@ public class MysqlRegistry implements Registry {
 
     @Override
     public void close() {
-        LOGGER.info("Closing Mysql Registry...");
+        log.info("Closing Mysql Registry...");
         // remove the current Ephemeral node, if can connect to mysql
         try (
                 EphemeralDateManager closed1 = ephemeralDateManager;
                 SubscribeDataManager close2 = subscribeDataManager;
                 RegistryLockManager close3 = registryLockManager) {
         } catch (Exception e) {
-            LOGGER.error("Close Mysql Registry error", e);
+            log.error("Close Mysql Registry error", e);
         }
-        LOGGER.info("Closed Mysql Registry...");
+        log.info("Closed Mysql Registry...");
     }
 }

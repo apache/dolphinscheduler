@@ -42,16 +42,15 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class ProcessDefinitionDemo {
-
-    private static final Logger logger = LoggerFactory.getLogger(ProcessDefinitionDemo.class);
 
     @Value("${demo.tenant-code}")
     private String tenantCode;
@@ -80,7 +79,7 @@ public class ProcessDefinitionDemo {
         // create and get demo projectCode
         Project project = projectMapper.queryByName("demo");
         if (project != null) {
-            logger.warn("Project {} already exists.", project.getName());
+            log.warn("Project {} already exists.", project.getName());
         }
         try {
             project = Project
@@ -94,10 +93,10 @@ public class ProcessDefinitionDemo {
                     .updateTime(now)
                     .build();
         } catch (CodeGenerateUtils.CodeGenerateException e) {
-            logger.error("create project error", e);
+            log.error("create project error", e);
         }
         if (projectMapper.insert(project) > 0) {
-            logger.info("create project success");
+            log.info("create project success");
         } else {
             throw new Exception("create project error");
         }
@@ -105,7 +104,7 @@ public class ProcessDefinitionDemo {
         try {
             projectCode = project.getCode();
         } catch (NullPointerException e) {
-            logger.error("project code is null", e);
+            log.error("project code is null", e);
         }
 
         // generate access token
@@ -121,44 +120,44 @@ public class ProcessDefinitionDemo {
         int insert = accessTokenMapper.insert(accessToken);
 
         if (insert > 0) {
-            logger.info("create access token success");
+            log.info("create access token success");
         } else {
-            logger.info("create access token error");
+            log.info("create access token error");
         }
 
         // creat process definition demo
         // shell demo
         ProxyResult shellResult = shellDemo(token, projectCode, tenantCode);
-        logger.info("create shell demo {}", shellResult.getMsg());
+        log.info("create shell demo {}", shellResult.getMsg());
 
         // subprocess demo
         LinkedHashMap<String, Object> subProcess = (LinkedHashMap<String, Object>) shellResult.getData();
         String subProcessCode = String.valueOf(subProcess.get("code"));
         ProxyResult subProcessResult = subProcessDemo(token, projectCode, tenantCode, subProcessCode);
-        logger.info("create subprocess demo {}", subProcessResult.getMsg());
+        log.info("create subprocess demo {}", subProcessResult.getMsg());
 
         // switch demo
         ProxyResult switchResult = swicthDemo(token, projectCode, tenantCode);
-        logger.info("create switch demo {}", switchResult.getMsg());
+        log.info("create switch demo {}", switchResult.getMsg());
 
         // condition demo
         ProxyResult conditionResult = conditionDemo(token, projectCode, tenantCode);
-        logger.info("create condition demo {}", conditionResult.getMsg());
+        log.info("create condition demo {}", conditionResult.getMsg());
 
         // dependent demo
         LinkedHashMap<String, Object> switchProcess = (LinkedHashMap<String, Object>) switchResult.getData();
         String switchProcessCode = String.valueOf(switchProcess.get("code"));
         ProxyResult dependentResult =
                 dependentProxyResultDemo(token, projectCode, tenantCode, subProcessCode, switchProcessCode);
-        logger.info("create dependent demo {}", dependentResult.getMsg());
+        log.info("create dependent demo {}", dependentResult.getMsg());
 
         // parameter context demo
         ProxyResult parameterContextResult = parameterContextDemo(token, projectCode, tenantCode);
-        logger.info("create parameter context demo {}", parameterContextResult.getMsg());
+        log.info("create parameter context demo {}", parameterContextResult.getMsg());
 
         // clear log demo
         ProxyResult clearLogResult = clearLogDemo(token, projectCode, tenantCode);
-        logger.info("create clear log demo {}", clearLogResult.getMsg());
+        log.info("create clear log demo {}", clearLogResult.getMsg());
 
     }
 
@@ -171,7 +170,7 @@ public class ProcessDefinitionDemo {
                 taskCodes.add(CodeGenerateUtils.getInstance().genCode());
             }
         } catch (CodeGenerateUtils.CodeGenerateException e) {
-            logger.error("task code get error, ", e);
+            log.error("task code get error, ", e);
         }
         String taskCodeFirst = String.valueOf(taskCodes.get(0)).replaceAll("\\[|\\]", "");
         String absolutePath = System.getProperty("user.dir");
@@ -246,7 +245,7 @@ public class ProcessDefinitionDemo {
                 taskCodes.add(CodeGenerateUtils.getInstance().genCode());
             }
         } catch (CodeGenerateUtils.CodeGenerateException e) {
-            logger.error("task code get error, ", e);
+            log.error("task code get error, ", e);
         }
         String taskCodeFirst = String.valueOf(taskCodes.get(0)).replaceAll("\\[|\\]", "");
         String taskCodeSecond = String.valueOf(taskCodes.get(1)).replaceAll("\\[|\\]", "");
@@ -338,7 +337,7 @@ public class ProcessDefinitionDemo {
                 taskCodes.add(CodeGenerateUtils.getInstance().genCode());
             }
         } catch (CodeGenerateUtils.CodeGenerateException e) {
-            logger.error("task code get error, ", e);
+            log.error("task code get error, ", e);
         }
         String taskCodeFirst = String.valueOf(taskCodes.get(0)).replaceAll("\\[|\\]", "");
         String taskCodeSecond = String.valueOf(taskCodes.get(1)).replaceAll("\\[|\\]", "");
@@ -424,7 +423,7 @@ public class ProcessDefinitionDemo {
                 taskCodes.add(CodeGenerateUtils.getInstance().genCode());
             }
         } catch (CodeGenerateUtils.CodeGenerateException e) {
-            logger.error("task code get error, ", e);
+            log.error("task code get error, ", e);
         }
         String taskCodeFirst = String.valueOf(taskCodes.get(0)).replaceAll("\\[|\\]", "");
         String taskCodeSecond = String.valueOf(taskCodes.get(1)).replaceAll("\\[|\\]", "");
@@ -541,7 +540,7 @@ public class ProcessDefinitionDemo {
                 taskCodes.add(CodeGenerateUtils.getInstance().genCode());
             }
         } catch (CodeGenerateUtils.CodeGenerateException e) {
-            logger.error("task code get error, ", e);
+            log.error("task code get error, ", e);
         }
         String taskCodeFirst = String.valueOf(taskCodes.get(0)).replaceAll("\\[|\\]", "");
         String taskCodeSecond = String.valueOf(taskCodes.get(1)).replaceAll("\\[|\\]", "");
@@ -660,7 +659,7 @@ public class ProcessDefinitionDemo {
                 taskCodes.add(CodeGenerateUtils.getInstance().genCode());
             }
         } catch (CodeGenerateUtils.CodeGenerateException e) {
-            logger.error("task code get error, ", e);
+            log.error("task code get error, ", e);
         }
         String taskCodeFirst = String.valueOf(taskCodes.get(0)).replaceAll("\\[|\\]", "");
         String taskCodeSecond = String.valueOf(taskCodes.get(1)).replaceAll("\\[|\\]", "");
@@ -759,7 +758,7 @@ public class ProcessDefinitionDemo {
                 taskCodes.add(CodeGenerateUtils.getInstance().genCode());
             }
         } catch (CodeGenerateUtils.CodeGenerateException e) {
-            logger.error("task code get error, ", e);
+            log.error("task code get error, ", e);
         }
         String taskCode = String.valueOf(taskCodes.get(0)).replaceAll("\\[|\\]", "");
 

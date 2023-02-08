@@ -34,20 +34,16 @@ import java.util.concurrent.LinkedBlockingQueue;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import io.netty.channel.Channel;
 
 @Component
+@Slf4j
 public class StateEventResponseService {
-
-    /**
-     * logger
-     */
-    private final Logger logger = LoggerFactory.getLogger(StateEventResponseService.class);
 
     /**
      * attemptQueue
@@ -98,7 +94,7 @@ public class StateEventResponseService {
             // check the event is validated
             eventQueue.put(stateEvent);
         } catch (InterruptedException e) {
-            logger.error("Put state event : {} error", stateEvent, e);
+            log.error("Put state event : {} error", stateEvent, e);
             Thread.currentThread().interrupt();
         }
     }
@@ -114,7 +110,7 @@ public class StateEventResponseService {
 
         @Override
         public void run() {
-            logger.info("State event loop service started");
+            log.info("State event loop service started");
             while (!ServerLifeCycleManager.isStopped()) {
                 try {
                     // if not task , blocking here
@@ -123,14 +119,14 @@ public class StateEventResponseService {
                             stateEvent.getTaskInstanceId());
                     persist(stateEvent);
                 } catch (InterruptedException e) {
-                    logger.warn("State event loop service interrupted, will stop this loop", e);
+                    log.warn("State event loop service interrupted, will stop this loop", e);
                     Thread.currentThread().interrupt();
                     break;
                 } finally {
                     LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
                 }
             }
-            logger.info("State event loop service stopped");
+            log.info("State event loop service stopped");
         }
     }
 
@@ -145,7 +141,7 @@ public class StateEventResponseService {
     private void persist(StateEvent stateEvent) {
         try {
             if (!this.processInstanceExecCacheManager.contains(stateEvent.getProcessInstanceId())) {
-                logger.warn("Persist event into workflow execute thread error, "
+                log.warn("Persist event into workflow execute thread error, "
                         + "cannot find the workflow instance from cache manager, event: {}", stateEvent);
                 writeResponse(stateEvent);
                 return;
@@ -167,7 +163,7 @@ public class StateEventResponseService {
             // this response is not needed.
             writeResponse(stateEvent);
         } catch (Exception e) {
-            logger.error("Persist event queue error, event: {}", stateEvent, e);
+            log.error("Persist event queue error, event: {}", stateEvent, e);
         }
     }
 

@@ -34,8 +34,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -45,9 +45,8 @@ import com.google.common.collect.Sets;
  * monitor service impl
  */
 @Service
+@Slf4j
 public class MonitorServiceImpl extends BaseServiceImpl implements MonitorService {
-
-    public static final Logger logger = LoggerFactory.getLogger(MonitorServiceImpl.class);
 
     @Autowired
     private MonitorDBDao monitorDBDao;

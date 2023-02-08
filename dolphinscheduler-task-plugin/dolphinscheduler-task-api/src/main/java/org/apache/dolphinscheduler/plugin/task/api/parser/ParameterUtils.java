@@ -37,15 +37,10 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * parameter parse utils
  */
 public class ParameterUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(ParameterUtils.class);
 
     private static final Pattern DATE_PARSE_PATTERN = Pattern.compile("\\$\\[([^\\$\\]]+)]");
 

@@ -81,7 +81,7 @@ public class HttpTask extends AbstractTask {
     @Override
     public void init() {
         this.httpParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), HttpParameters.class);
-        logger.info("Initialize http task params {}", JSONUtils.toPrettyJsonString(httpParameters));
+        log.info("Initialize http task params {}", JSONUtils.toPrettyJsonString(httpParameters));
 
         if (httpParameters == null || !httpParameters.checkParameters()) {
             throw new RuntimeException("http task params is not valid");
@@ -102,14 +102,14 @@ public class HttpTask extends AbstractTask {
             body = getResponseBody(response);
             exitStatusCode = validResponse(body, statusCode);
             long costTime = System.currentTimeMillis() - startTime;
-            logger.info(
+            log.info(
                     "startTime: {}, httpUrl: {}, httpMethod: {}, costTime : {} milliseconds, statusCode : {}, body : {}, log : {}",
                     formatTimeStamp, httpParameters.getUrl(),
                     httpParameters.getHttpMethod(), costTime, statusCode, body, output);
         } catch (Exception e) {
             appendMessage(e.toString());
             exitStatusCode = -1;
-            logger.error("httpUrl[" + httpParameters.getUrl() + "] connection failed：" + output, e);
+            log.error("httpUrl[" + httpParameters.getUrl() + "] connection failed：" + output, e);
             throw new TaskException("Execute http task failed", e);
         }
 
@@ -138,7 +138,7 @@ public class HttpTask extends AbstractTask {
             for (HttpProperty httpProperty : httpParameters.getHttpParams()) {
                 String jsonObject = JSONUtils.toJsonString(httpProperty);
                 String params = ParameterUtils.convertParameterPlaceholders(jsonObject, ParamUtils.convert(paramsMap));
-                logger.info("http request params：{}", params);
+                log.info("http request params：{}", params);
                 httpPropertyList.add(JSONUtils.parseObject(params, HttpProperty.class));
             }
         }

@@ -42,8 +42,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,9 +55,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * queue service impl
  */
 @Service
+@Slf4j
 public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
-
-    private static final Logger logger = LoggerFactory.getLogger(QueueServiceImpl.class);
 
     @Autowired
     private QueueMapper queueMapper;
@@ -120,7 +119,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     public Result queryList(User loginUser) {
         Result result = new Result();
         Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.QUEUE,
-                loginUser.getId(), logger);
+                loginUser.getId(), log);
         if (loginUser.getUserType().equals(UserType.GENERAL_USER)) {
             ids = ids.isEmpty() ? new HashSet<>() : ids;
             ids.add(Constants.DEFAULT_QUEUE_ID);
@@ -145,7 +144,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
         Result result = new Result();
         PageInfo<Queue> pageInfo = new PageInfo<>(pageNo, pageSize);
         Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.QUEUE,
-                loginUser.getId(), logger);
+                loginUser.getId(), log);
         if (ids.isEmpty()) {
             result.setData(pageInfo);
             putMsg(result, Status.SUCCESS);
@@ -183,10 +182,10 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
         queueMapper.insert(queueObj);
 
         result.setData(queueObj);
-        logger.info("Queue create complete, queueName:{}.", queueObj.getQueueName());
+        log.info("Queue create complete, queueName:{}.", queueObj.getQueueName());
         putMsg(result, Status.SUCCESS);
         permissionPostHandle(AuthorizationType.QUEUE, loginUser.getId(), Collections.singletonList(queueObj.getId()),
-                logger);
+                log);
         return result;
     }
 
@@ -215,7 +214,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
             // update user related old queue
             Integer relatedUserNums =
                     userMapper.updateUserQueue(existsQueue.getQueueName(), updateQueue.getQueueName());
-            logger.info("Old queue have related {} users, exec update user success.", relatedUserNums);
+            log.info("Old queue have related {} users, exec update user success.", relatedUserNums);
         }
 
         queueMapper.updateById(updateQueue);
@@ -290,13 +289,13 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     public Queue createQueueIfNotExists(String queue, String queueName) {
         Queue existsQueue = queueMapper.queryQueueName(queue, queueName);
         if (!Objects.isNull(existsQueue)) {
-            logger.info("Queue exists, so return it, queueName:{}.", queueName);
+            log.info("Queue exists, so return it, queueName:{}.", queueName);
             return existsQueue;
         }
         Queue queueObj = new Queue(queueName, queue);
         createQueueValid(queueObj);
         queueMapper.insert(queueObj);
-        logger.info("Queue create complete, queueName:{}.", queueObj.getQueueName());
+        log.info("Queue create complete, queueName:{}.", queueObj.getQueueName());
         return queueObj;
     }
 

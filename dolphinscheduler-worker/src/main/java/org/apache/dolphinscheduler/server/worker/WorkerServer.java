@@ -39,8 +39,8 @@ import java.util.Collection;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -56,12 +56,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
                 "org.apache.dolphinscheduler.service.queue.*",
         })
 })
+@Slf4j
 public class WorkerServer implements IStoppable {
-
-    /**
-     * logger
-     */
-    private static final Logger logger = LoggerFactory.getLogger(WorkerServer.class);
 
     @Autowired
     private WorkerManagerThread workerManagerThread;
@@ -122,7 +118,7 @@ public class WorkerServer implements IStoppable {
 
     public void close(String cause) {
         if (!ServerLifeCycleManager.toStopped()) {
-            logger.warn("WorkerServer is already stopped, current cause: {}", cause);
+            log.warn("WorkerServer is already stopped, current cause: {}", cause);
             return;
         }
         ThreadUtils.sleep(Constants.SERVER_CLOSE_WAIT_TIME.toMillis());
@@ -130,14 +126,14 @@ public class WorkerServer implements IStoppable {
         try (
                 WorkerRpcServer closedWorkerRpcServer = workerRpcServer;
                 WorkerRegistryClient closedRegistryClient = workerRegistryClient) {
-            logger.info("Worker server is stopping, current cause : {}", cause);
+            log.info("Worker server is stopping, current cause : {}", cause);
             // kill running tasks
             this.killAllRunningTasks();
         } catch (Exception e) {
-            logger.error("Worker server stop failed, current cause: {}", cause, e);
+            log.error("Worker server stop failed, current cause: {}", cause, e);
             return;
         }
-        logger.info("Worker server stopped, current cause: {}", cause);
+        log.info("Worker server stopped, current cause: {}", cause);
     }
 
     @Override
@@ -153,7 +149,7 @@ public class WorkerServer implements IStoppable {
         if (CollectionUtils.isEmpty(taskRequests)) {
             return;
         }
-        logger.info("Worker begin to kill all cache task, task size: {}", taskRequests.size());
+        log.info("Worker begin to kill all cache task, task size: {}", taskRequests.size());
         int killNumber = 0;
         for (TaskExecutionContext taskRequest : taskRequests) {
             // kill task when it's not finished yet
@@ -167,7 +163,7 @@ public class WorkerServer implements IStoppable {
                 LogUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
         }
-        logger.info("Worker after kill all cache task, task size: {}, killed number: {}", taskRequests.size(),
+        log.info("Worker after kill all cache task, task size: {}, killed number: {}", taskRequests.size(),
                 killNumber);
     }
 }

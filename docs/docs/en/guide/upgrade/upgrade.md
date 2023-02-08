@@ -38,6 +38,22 @@ jar package and add it to the `./tools/libs` directory, then export the followin
 
 Execute database upgrade script: `sh ./tools/bin/upgrade-schema.sh`
 
+### Migrate Resource
+
+After refactoring resource center in version 3.2.0, original resources become unmanaged. You can assign a target tenant and execute one-time migration script. All resources will be migrated to directory `.migrate` of target tenant.
+
+#### Example
+
+Assign an existed target tenant `abc`, the base resource path is `/dolphinscheduler/abc/`.
+
+Execute script: `sh ./tools/bin/migrate-resource.sh abc`.
+
+Execution result:
+
+- The original file resource `a/b.sh` migrates to `/dolphinscheduler/abc/resources/.migrate/a/b.sh`.
+- The original UDF resource `x/y.jar` migrates to `/dolphinscheduler/abc/udf/.migrate/x/y.jar`.
+- Update UDF function's bound resource info.
+
 ### Upgrade Service
 
 #### Change Configuration `bin/env/install_env.sh`

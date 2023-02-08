@@ -29,9 +29,8 @@ import java.io.InputStreamReader;
 import java.util.Date;
 
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 /**
@@ -39,9 +38,8 @@ import org.slf4j.MDC;
  */
 @Deprecated
 @UtilityClass
+@Slf4j
 public class LoggerUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(LoggerUtils.class);
 
     public static String buildTaskId(Date firstSubmitTime,
                                      Long processDefineCode,
@@ -70,7 +68,7 @@ public class LoggerUtils {
             }
             return sb.toString();
         } catch (IOException e) {
-            logger.error("read file error", e);
+            log.error("read file error", e);
         }
         return "";
     }
