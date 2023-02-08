@@ -21,7 +21,10 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_COD
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
@@ -172,6 +175,22 @@ public class HttpTaskTest {
                 HttpStatus.SC_OK, "");
         httpTask.handle(null);
         Assertions.assertEquals(EXIT_CODE_SUCCESS, httpTask.getExitStatusCode());
+    }
+
+    @Test
+    public void testAddDefaultOutput() throws Exception {
+        HttpTask httpTask = generateHttpTask(HttpMethod.GET, HttpStatus.SC_OK);
+        AbstractParameters httpParameters = httpTask.getParameters();
+        String response = "{\"status\": \"success\"}";
+        httpTask.addDefaultOutput(response);
+
+        List<Property> varPool = httpParameters.getVarPool();
+        Assertions.assertEquals(1, varPool.size());
+        Property property = varPool.get(0);
+        Assertions.assertEquals("null.response", property.getProp());
+        Assertions.assertEquals(Direct.OUT, property.getDirect());
+        Assertions.assertEquals(DataType.VARCHAR, property.getType());
+        Assertions.assertEquals(response, property.getValue());
     }
 
     private String withMockWebServer(String path, int actualResponseCode,
