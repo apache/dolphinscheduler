@@ -31,7 +31,6 @@ import { useI18n } from 'vue-i18n'
 import {
   DeleteOutlined,
   EditOutlined,
-  DragOutlined,
   ExclamationCircleOutlined,
   ArrowRightOutlined
 } from '@vicons/antd'
