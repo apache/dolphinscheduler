@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.tools.demo;
 
-public class DemoContants {
+public class DemoConstants {
 
     public static final String PARAMETER_CONTEXT_PARAMS =
             "[{\"prop\":\"output\",\"value\":\"100\",\"direct\":\"IN\",\"type\":\"VARCHAR\"},{\"prop\":\"value\",\"value\":\"99\",\"direct\":\"IN\",\"type\":\"VARCHAR\"}]";
