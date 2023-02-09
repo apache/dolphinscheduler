@@ -65,11 +65,11 @@ public class TaskCallbackImpl implements TaskCallBack {
         TaskExecutionContext taskExecutionContext =
                 TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
         if (taskExecutionContext == null) {
-            logger.error("task execution context is empty, taskInstanceId: {}", taskInstanceId);
+            log.error("task execution context is empty, taskInstanceId: {}", taskInstanceId);
             return;
         }
 
-        logger.info("send remote taskExecutionContext info {}", taskExecutionContext);
+        log.info("send remote taskExecutionContext info {}", taskExecutionContext);
         workerMessageSender.sendMessageWithRetry(taskExecutionContext, masterAddress, CommandType.TASK_EXECUTE_RUNNING);
     }
 
