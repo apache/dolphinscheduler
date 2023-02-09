@@ -84,7 +84,7 @@ public class DataxTask extends AbstractTask {
      */
     public static final String JVM_PARAM = " --jvm=\"-Xms%sG -Xmx%sG\" ";
 
-    public static final String CUSTOM_PARAM = " -D%s=%s";
+    public static final String CUSTOM_PARAM = " -D%s='%s'";
     /**
      * python process(datax only supports version 2.7 by default)
      */
