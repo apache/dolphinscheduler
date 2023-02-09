@@ -25,8 +25,8 @@ import org.apache.dolphinscheduler.remote.command.TaskRejectAckCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -34,9 +34,8 @@ import com.google.common.base.Preconditions;
 import io.netty.channel.Channel;
 
 @Component
+@Slf4j
 public class TaskRejectAckProcessor implements NettyRequestProcessor {
-
-    private final Logger logger = LoggerFactory.getLogger(TaskRejectAckProcessor.class);
 
     @Autowired
     private MessageRetryRunner messageRetryRunner;
@@ -49,19 +48,19 @@ public class TaskRejectAckProcessor implements NettyRequestProcessor {
         TaskRejectAckCommand taskRejectAckMessage = JSONUtils.parseObject(command.getBody(),
                 TaskRejectAckCommand.class);
         if (taskRejectAckMessage == null) {
-            logger.error("Receive task reject response, the response message is null");
+            log.error("Receive task reject response, the response message is null");
             return;
         }
 
         try {
             LogUtils.setTaskInstanceIdMDC(taskRejectAckMessage.getTaskInstanceId());
-            logger.info("Receive task reject response ack command: {}", taskRejectAckMessage);
+            log.info("Receive task reject response ack command: {}", taskRejectAckMessage);
             if (taskRejectAckMessage.isSuccess()) {
                 messageRetryRunner.removeRetryMessage(taskRejectAckMessage.getTaskInstanceId(),
                         CommandType.TASK_REJECT);
-                logger.debug("removeRecallCache: task instance id:{}", taskRejectAckMessage.getTaskInstanceId());
+                log.debug("removeRecallCache: task instance id:{}", taskRejectAckMessage.getTaskInstanceId());
             } else {
-                logger.error("Receive task reject ack message, the message status is not success, message: {}",
+                log.error("Receive task reject ack message, the message status is not success, message: {}",
                         taskRejectAckMessage);
             }
         } finally {

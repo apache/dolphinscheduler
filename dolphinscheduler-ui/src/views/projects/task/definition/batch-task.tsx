@@ -39,7 +39,6 @@ import { useTask } from './use-task'
 import { TASK_TYPES_MAP } from '@/store/project/task-type'
 import Card from '@/components/card'
 import VersionModal from './components/version-modal'
-import MoveModal from './components/move-modal'
 import TaskModal from '@/views/projects/task/components/node/detail-modal'
 import type { INodeData } from './types'
 
@@ -86,7 +85,6 @@ const BatchTaskDefinition = defineComponent({
 
     const onRefresh = () => {
       variables.showVersionModalRef = false
-      variables.showMoveModalRef = false
       requestData()
     }
     const onCreate = () => {
@@ -203,12 +201,6 @@ const BatchTaskDefinition = defineComponent({
           show={this.showVersionModalRef}
           row={this.row}
           onConfirm={() => (this.showVersionModalRef = false)}
-          onRefresh={onRefresh}
-        />
-        <MoveModal
-          show={this.showMoveModalRef}
-          row={this.row}
-          onCancel={() => (this.showMoveModalRef = false)}
           onRefresh={onRefresh}
         />
         <TaskModal

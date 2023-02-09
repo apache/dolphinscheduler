@@ -244,8 +244,9 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn/applicationId�
 |security.authentication.ldap.base.dn|dc=example,dc=com|LDAP base dn|
 |security.authentication.ldap.username|cn=read-only-admin,dc=example,dc=com|LDAP账号|
 |security.authentication.ldap.password|password|LDAP密码|
-|security.authentication.ldap.user.identity.attribute|uid|LDAP用户身份标识字段名|
-|security.authentication.ldap.user.email.attribute|mail|LDAP邮箱字段名|
+|security.authentication.ldap.user.identity-attribute|uid|LDAP用户身份标识字段名|
+|security.authentication.ldap.user.email-attribute|mail|LDAP邮箱字段名|
+|security.authentication.ldap.user.not-exist-action|CREATE|当通过LDAP登陆时用户不存在的操作，默认值是: CREATE，可选值:CREATE、DENY|
 |traffic.control.global.switch|false|流量控制全局开关|
 |traffic.control.max-global-qps-rate|300|全局最大请求数/秒|
 |traffic.control.tenant-switch|false|流量控制租户开关|
@@ -312,23 +313,35 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn/applicationId�
 
 默认配置如下：
 
-| 参数 | 默认值 |
-|--|--|
-|spring.quartz.properties.org.quartz.threadPool.threadPriority | 5|
-|spring.quartz.properties.org.quartz.jobStore.isClustered | true|
-|spring.quartz.properties.org.quartz.jobStore.class | org.quartz.impl.jdbcjobstore.JobStoreTX|
-|spring.quartz.properties.org.quartz.scheduler.instanceId | AUTO|
-|spring.quartz.properties.org.quartz.jobStore.tablePrefix | QRTZ_|
-|spring.quartz.properties.org.quartz.jobStore.acquireTriggersWithinLock|true|
-|spring.quartz.properties.org.quartz.scheduler.instanceName | DolphinScheduler|
-|spring.quartz.properties.org.quartz.threadPool.class | org.quartz.simpl.SimpleThreadPool|
-|spring.quartz.properties.org.quartz.jobStore.useProperties | false|
-|spring.quartz.properties.org.quartz.threadPool.makeThreadsDaemons | true|
-|spring.quartz.properties.org.quartz.threadPool.threadCount | 25|
-|spring.quartz.properties.org.quartz.jobStore.misfireThreshold | 60000|
-|spring.quartz.properties.org.quartz.scheduler.makeSchedulerThreadDaemon | true|
-|spring.quartz.properties.org.quartz.jobStore.driverDelegateClass | org.quartz.impl.jdbcjobstore.PostgreSQLDelegate|
-|spring.quartz.properties.org.quartz.jobStore.clusterCheckinInterval | 5000|
+|                                   参数                                    |                       默认值                       |
+|-------------------------------------------------------------------------|-------------------------------------------------|
+| spring.quartz.properties.org.quartz.jobStore.isClustered                | true                                            |
+| spring.quartz.properties.org.quartz.jobStore.class                      | org.quartz.impl.jdbcjobstore.JobStoreTX         |
+| spring.quartz.properties.org.quartz.scheduler.instanceId                | AUTO                                            |
+| spring.quartz.properties.org.quartz.jobStore.tablePrefix                | QRTZ_                                           |
+| spring.quartz.properties.org.quartz.jobStore.acquireTriggersWithinLock  | true                                            |
+| spring.quartz.properties.org.quartz.scheduler.instanceName              | DolphinScheduler                                |
+| spring.quartz.properties.org.quartz.jobStore.useProperties              | false                                           |
+| spring.quartz.properties.org.quartz.jobStore.misfireThreshold           | 60000                                           |
+| spring.quartz.properties.org.quartz.scheduler.makeSchedulerThreadDaemon | true                                            |
+| spring.quartz.properties.org.quartz.jobStore.driverDelegateClass        | org.quartz.impl.jdbcjobstore.PostgreSQLDelegate |
+| spring.quartz.properties.org.quartz.jobStore.clusterCheckinInterval     | 5000                                            |
+
+上述配置项在*Master Server* 和 *Api Server*是相同的，但他们的Quartz线程池配置部分却是不一样的。
+*Master Server* 的Quartz线程池默认配置如下：
+
+|                            Parameters                             |           Default value           |
+|-------------------------------------------------------------------|-----------------------------------|
+| spring.quartz.properties.org.quartz.threadPool.makeThreadsDaemons | true                              |
+| spring.quartz.properties.org.quartz.threadPool.threadCount        | 25                                |
+| spring.quartz.properties.org.quartz.threadPool.threadPriority     | 5                                 |
+| spring.quartz.properties.org.quartz.threadPool.class              | org.quartz.simpl.SimpleThreadPool |
+
+因为*Api Server*不会启动*Quartz Scheduler*实例，只会作为Scheduler客户端使用，因此它的Quartz线程池将会使用`QuartzZeroSizeThreadPool`。`QuartzZeroSizeThreadPool`不会启动任何线程。具体的默认配置如下：
+
+|                      Parameters                      |                             Default value                             |
+|------------------------------------------------------|-----------------------------------------------------------------------|
+| spring.quartz.properties.org.quartz.threadPool.class | org.apache.dolphinscheduler.scheduler.quartz.QuartzZeroSizeThreadPool |
 
 ## dolphinscheduler_env.sh [环境变量配置]
 

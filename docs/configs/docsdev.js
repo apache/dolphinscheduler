@@ -381,8 +381,18 @@ export default {
                     },
                     {
                         title: 'Security',
-                        link: '/en-us/docs/dev/user_doc/guide/security.html',
+                        children: [
+                            {
+                                title: 'Security (Authorization System)',
+                                link: '/en-us/docs/dev/user_doc/guide/security/security.html',
+                            },
+                            {
+                                title: 'Authentication Type',
+                                link: '/en-us/docs/dev/user_doc/guide/security/authentication-type.html',
+                            }
+                        ],
                     },
+
                     {
                         title: 'Metrics',
                         children: [
@@ -1012,7 +1022,16 @@ export default {
                     },
                     {
                         title: '安全中心',
-                        link: '/zh-cn/docs/dev/user_doc/guide/security.html',
+                        children: [
+                            {
+                                title: '安全中心（权限系统）',
+                                link: '/zh-cn/docs/dev/user_doc/guide/security/security.html',
+                            },
+                            {
+                                title: '认证方式',
+                                link: '/zh-cn/docs/dev/user_doc/guide/security/authentication-type.html',
+                            }
+                        ],
                     },
                     {
                         title: '指标相关',

@@ -27,12 +27,15 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 
+import org.apache.commons.collections4.CollectionUtils;
+
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -42,9 +45,8 @@ import com.google.common.collect.Lists;
  * Task Definition DAO Implementation
  */
 @Repository
+@Slf4j
 public class TaskDefinitionDaoImpl implements TaskDefinitionDao {
-
-    private final Logger logger = LoggerFactory.getLogger(TaskDefinitionDaoImpl.class);
 
     @Autowired
     private ProcessDefinitionMapper processDefinitionMapper;
@@ -62,7 +64,7 @@ public class TaskDefinitionDaoImpl implements TaskDefinitionDao {
     public List<TaskDefinition> getTaskDefinitionListByDefinition(long processDefinitionCode) {
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
         if (processDefinition == null) {
-            logger.error("Cannot find process definition, code: {}", processDefinitionCode);
+            log.error("Cannot find process definition, code: {}", processDefinitionCode);
             return Lists.newArrayList();
         }
 
@@ -82,6 +84,20 @@ public class TaskDefinitionDaoImpl implements TaskDefinitionDao {
     @Override
     public TaskDefinition findTaskDefinition(long taskCode, int taskDefinitionVersion) {
         return taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskCode, taskDefinitionVersion);
+    }
+
+    @Override
+    public void deleteByWorkflowDefinitionCodeAndVersion(long workflowDefinitionCode, int workflowDefinitionVersion) {
+        taskDefinitionMapper.deleteByWorkflowDefinitionCodeAndVersion(workflowDefinitionCode,
+                workflowDefinitionVersion);
+    }
+
+    @Override
+    public void deleteByTaskDefinitionCodes(Set<Long> needToDeleteTaskDefinitionCodes) {
+        if (CollectionUtils.isEmpty(needToDeleteTaskDefinitionCodes)) {
+            return;
+        }
+        taskDefinitionMapper.deleteByBatchCodes(new ArrayList<>(needToDeleteTaskDefinitionCodes));
     }
 
 }

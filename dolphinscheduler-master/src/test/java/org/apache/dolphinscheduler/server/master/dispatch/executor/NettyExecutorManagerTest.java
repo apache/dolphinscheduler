@@ -72,13 +72,12 @@ public class NettyExecutorManagerTest {
                 .create();
         ExecutionContext executionContext = new ExecutionContext(toCommand(context), ExecutorType.WORKER, taskInstance);
         executionContext.setHost(Host.of(NetUtils.getAddr(serverConfig.getListenPort())));
-        Boolean execute = nettyExecutorManager.execute(executionContext);
-        Assertions.assertTrue(execute);
+        Assertions.assertDoesNotThrow(() -> nettyExecutorManager.execute(executionContext));
         nettyRemotingServer.close();
     }
 
     @Test
-    public void testExecuteWithException() throws ExecuteException {
+    public void testExecuteWithException() {
         TaskInstance taskInstance = Mockito.mock(TaskInstance.class);
         ProcessDefinition processDefinition = Mockito.mock(ProcessDefinition.class);
         ProcessInstance processInstance = new ProcessInstance();

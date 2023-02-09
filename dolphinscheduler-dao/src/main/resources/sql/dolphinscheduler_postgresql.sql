@@ -207,7 +207,7 @@ CREATE TABLE t_ds_access_token (
 DROP TABLE IF EXISTS t_ds_alert;
 CREATE TABLE t_ds_alert (
   id int NOT NULL  ,
-  title varchar(64) DEFAULT NULL ,
+  title varchar(512) DEFAULT NULL ,
   sign varchar(40) NOT NULL DEFAULT '',
   content text ,
   alert_status int DEFAULT '0' ,
@@ -524,6 +524,7 @@ CREATE TABLE t_ds_process_instance (
   name varchar(255) DEFAULT NULL ,
   process_definition_code bigint DEFAULT NULL ,
   process_definition_version int DEFAULT NULL ,
+  project_code bigint DEFAULT NULL ,
   state int DEFAULT NULL ,
   state_history text,
   recovery int DEFAULT NULL ,
@@ -546,6 +547,7 @@ CREATE TABLE t_ds_process_instance (
   update_time timestamp NULL ,
   is_sub_process int DEFAULT '0' ,
   executor_id int NOT NULL ,
+  executor_name varchar(64) DEFAULT NULL,
   history_cmd text ,
   dependence_schedule_times text ,
   process_instance_priority int DEFAULT '2' ,
@@ -553,6 +555,7 @@ CREATE TABLE t_ds_process_instance (
   environment_code bigint DEFAULT '-1',
   timeout int DEFAULT '0' ,
   tenant_id int NOT NULL DEFAULT '-1' ,
+  tenant_code varchar(64) DEFAULT NULL ,
   var_pool text ,
   dry_run int DEFAULT '0' ,
   next_process_instance_id int DEFAULT '0',
@@ -766,6 +769,8 @@ CREATE TABLE t_ds_task_instance (
   task_code bigint NOT NULL,
   task_definition_version int DEFAULT NULL ,
   process_instance_id int DEFAULT NULL ,
+  process_instance_name varchar(255) DEFAULT NULL,
+  project_code bigint DEFAULT NULL,
   state int DEFAULT NULL ,
   submit_time timestamp DEFAULT NULL ,
   start_time timestamp DEFAULT NULL ,
@@ -788,6 +793,7 @@ CREATE TABLE t_ds_task_instance (
   environment_code bigint DEFAULT '-1',
   environment_config text,
   executor_id int DEFAULT NULL ,
+  executor_name varchar(64) DEFAULT NULL ,
   first_submit_time timestamp DEFAULT NULL ,
   delay_time int DEFAULT '0' ,
   task_group_id int DEFAULT NULL,
@@ -1987,4 +1993,19 @@ CREATE TABLE t_ds_fav_task
     task_type varchar(64) NOT NULL,
     user_id   int         NOT NULL,
     PRIMARY KEY (id)
+);
+
+-- ----------------------------
+-- Table structure for t_ds_trigger_relation
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_trigger_relation;
+CREATE TABLE t_ds_trigger_relation (
+    id        serial      NOT NULL,
+    trigger_type int NOT NULL,
+    trigger_code bigint NOT NULL,
+    job_id bigint NOT NULL,
+    create_time timestamp DEFAULT NULL,
+    update_time timestamp DEFAULT NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT t_ds_trigger_relation_unique UNIQUE (trigger_type,job_id,trigger_code)
 );

@@ -29,14 +29,12 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.google.common.base.Stopwatch;
 
+@Slf4j
 public class AzureSQLDataSourceClient extends CommonDataSourceClient {
-
-    private static final Logger logger = LoggerFactory.getLogger(AzureSQLDataSourceClient.class);
 
     public AzureSQLDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
         super(baseConnectionParam, dbType);
@@ -64,7 +62,7 @@ public class AzureSQLDataSourceClient extends CommonDataSourceClient {
             } catch (Exception e) {
                 throw new RuntimeException("JDBC connect failed", e);
             } finally {
-                logger.info("Time to execute check jdbc client with sql {} for {} ms ",
+                log.info("Time to execute check jdbc client with sql {} for {} ms ",
                         this.baseConnectionParam.getValidationQuery(), stopwatch.elapsed(TimeUnit.MILLISECONDS));
             }
         } else {
@@ -75,7 +73,7 @@ public class AzureSQLDataSourceClient extends CommonDataSourceClient {
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             } finally {
-                logger.info("Time to execute check azure sql token client with sql {} for {} ms ",
+                log.info("Time to execute check azure sql token client with sql {} for {} ms ",
                         this.baseConnectionParam.getValidationQuery(), stopwatch.elapsed(TimeUnit.MILLISECONDS));
             }
         }

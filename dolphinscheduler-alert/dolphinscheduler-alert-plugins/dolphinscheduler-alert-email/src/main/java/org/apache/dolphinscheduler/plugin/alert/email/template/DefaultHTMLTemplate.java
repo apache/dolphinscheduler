@@ -32,8 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONTokener;
@@ -42,9 +42,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+@Slf4j
 public class DefaultHTMLTemplate implements AlertTemplate {
-
-    public static final Logger logger = LoggerFactory.getLogger(DefaultHTMLTemplate.class);
 
     @Override
     public String getMessageFromTemplate(String content, ShowType showType, boolean showAll) {
@@ -128,7 +127,7 @@ public class DefaultHTMLTemplate implements AlertTemplate {
                     content = JSONUtils.toJsonString(Collections.singletonList(jsonNodes));
                 }
             } catch (JSONException e) {
-                logger.error("alert content is null");
+                log.error("alert content is null");
             }
             ArrayNode list = JSONUtils.parseArray(content);
             StringBuilder contents = new StringBuilder(100);

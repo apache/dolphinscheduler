@@ -40,7 +40,7 @@ public abstract class AbstractTask {
 
     public static final Marker FINALIZE_SESSION_MARKER = MarkerFactory.getMarker("FINALIZE_SESSION");
 
-    protected final Logger logger =
+    protected final Logger log =
             LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
 
     public String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
@@ -199,13 +199,13 @@ public abstract class AbstractTask {
     public void logHandle(LinkedBlockingQueue<String> logs) {
         // note that the "new line" is added here to facilitate log parsing
         if (logs.contains(FINALIZE_SESSION_MARKER.toString())) {
-            logger.info(FINALIZE_SESSION_MARKER, FINALIZE_SESSION_MARKER.toString());
+            log.info(FINALIZE_SESSION_MARKER, FINALIZE_SESSION_MARKER.toString());
         } else {
             StringJoiner joiner = new StringJoiner("\n\t");
             while (!logs.isEmpty()) {
                 joiner.add(logs.poll());
             }
-            logger.info(" -> {}", joiner);
+            log.info(" -> {}", joiner);
         }
     }
 
@@ -232,14 +232,14 @@ public abstract class AbstractTask {
             Property prop = paramsPropsMap.get(paramName);
 
             if (prop == null) {
-                logger.error(
+                log.error(
                         "setSqlParamsMap: No Property with paramName: {} is found in paramsPropsMap of task instance"
                                 + " with id: {}. So couldn't put Property in sqlParamsMap.",
                         paramName, taskInstanceId);
             } else {
                 sqlParamsMap.put(index, prop);
                 index++;
-                logger.info(
+                log.info(
                         "setSqlParamsMap: Property with paramName: {} put in sqlParamsMap of content {} successfully.",
                         paramName, content);
             }

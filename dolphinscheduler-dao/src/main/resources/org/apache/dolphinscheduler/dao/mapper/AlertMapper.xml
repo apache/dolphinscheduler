@@ -24,6 +24,12 @@
             process_definition_code, process_instance_id, alert_type
     </sql>
 
+    <select id="selectByWorkflowInstanceId" resultType="org.apache.dolphinscheduler.dao.entity.Alert">
+        select
+        <include refid="baseSql"/>
+        from t_ds_alert
+        where process_instance_id = #{workflowInstanceId}
+    </select>
 
     <insert id="insertAlertWhenServerCrash">
         insert into t_ds_alert(sign, title, content, alert_status, warning_type, log, alertgroup_id, create_time,
@@ -52,4 +58,10 @@
         where alert_status = #{alertStatus}
         limit #{limit}
     </select>
+
+    <delete id="deleteByWorkflowInstanceId">
+        delete
+        from t_ds_alert
+        where process_instance_id = #{workflowInstanceId}
+    </delete>
 </mapper>

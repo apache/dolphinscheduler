@@ -26,13 +26,16 @@ import org.apache.dolphinscheduler.remote.command.TaskRejectCommand;
 
 import java.util.Date;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import io.netty.channel.Channel;
 
-/**
- * task event
- */
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class TaskEvent {
 
     /**

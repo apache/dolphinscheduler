@@ -54,16 +54,26 @@ The key features for DolphinScheduler are as follows:
 
 ## QuickStart in Docker
 
-Please refer the official website document: [QuickStart in Docker](https://dolphinscheduler.apache.org/#/en-us/docs/3.1.2/guide/start/docker)
+Please refer the official website document: [QuickStart in Docker](https://dolphinscheduler.apache.org/en-us/docs/3.1.2/guide/start/docker)
 
 ## QuickStart in Kubernetes
 
-Please refer to the official website document: [QuickStart in Kubernetes](https://dolphinscheduler.apache.org/#/en-us/docs/3.1.2/guide/installation/kubernetes)
+Please refer to the official website document: [QuickStart in Kubernetes](https://dolphinscheduler.apache.org/en-us/docs/3.1.2/guide/installation/kubernetes)
 
 ## How to Build
 
 ```bash
 ./mvnw clean install -Prelease
+```
+
+### Build with different Zookeeper versions
+
+The default Zookeeper Server version supported is 3.8.0.
+```bash
+# Default Zookeeper 3.8.0
+./mvnw clean install -Prelease
+# Support to Zookeeper 3.4.6+
+./mvnw clean install -Prelease -Dzk-3.4
 ```
 
 Artifact:

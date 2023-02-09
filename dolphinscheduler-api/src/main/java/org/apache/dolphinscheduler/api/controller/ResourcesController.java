@@ -46,11 +46,13 @@ import org.apache.dolphinscheduler.api.dto.resources.DeleteDataTransferResponse;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ResourcesService;
 import org.apache.dolphinscheduler.api.service.UdfFuncService;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.enums.UdfType;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
@@ -59,8 +61,8 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.IOException;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -91,9 +93,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "RESOURCES_TAG")
 @RestController
 @RequestMapping("resources")
+@Slf4j
 public class ResourcesController extends BaseController {
-
-    private static final Logger logger = LoggerFactory.getLogger(ResourcesController.class);
 
     @Autowired
     private ResourcesService resourceService;
@@ -233,14 +234,14 @@ public class ResourcesController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_RESOURCES_LIST_PAGING)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result<Object> queryResourceListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                  @RequestParam(value = "fullName") String fullName,
-                                                  @RequestParam(value = "tenantCode") String tenantCode,
-                                                  @RequestParam(value = "type") ResourceType type,
-                                                  @RequestParam("pageNo") Integer pageNo,
-                                                  @RequestParam(value = "searchVal", required = false) String searchVal,
-                                                  @RequestParam("pageSize") Integer pageSize) {
-        Result<Object> result = checkPageParams(pageNo, pageSize);
+    public Result<PageInfo<StorageEntity>> queryResourceListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                   @RequestParam(value = "fullName") String fullName,
+                                                                   @RequestParam(value = "tenantCode") String tenantCode,
+                                                                   @RequestParam(value = "type") ResourceType type,
+                                                                   @RequestParam("pageNo") Integer pageNo,
+                                                                   @RequestParam(value = "searchVal", required = false) String searchVal,
+                                                                   @RequestParam("pageSize") Integer pageSize) {
+        Result<PageInfo<StorageEntity>> result = checkPageParams(pageNo, pageSize);
         if (!result.checkResult()) {
             return result;
         }
@@ -412,7 +413,7 @@ public class ResourcesController extends BaseController {
                                        @RequestParam(value = "content") String content,
                                        @RequestParam(value = "currentDir") String currentDir) {
         if (StringUtils.isEmpty(content)) {
-            logger.error("resource file contents are not allowed to be empty");
+            log.error("resource file contents are not allowed to be empty");
             return error(RESOURCE_FILE_IS_EMPTY.getCode(), RESOURCE_FILE_IS_EMPTY.getMsg());
         }
         return resourceService.onlineCreateResource(loginUser, type, fileName, fileSuffix, description, content,
@@ -440,7 +441,7 @@ public class ResourcesController extends BaseController {
                                         @RequestParam(value = "tenantCode") String tenantCode,
                                         @RequestParam(value = "content") String content) {
         if (StringUtils.isEmpty(content)) {
-            logger.error("The resource file contents are not allowed to be empty");
+            log.error("The resource file contents are not allowed to be empty");
             return error(RESOURCE_FILE_IS_EMPTY.getCode(), RESOURCE_FILE_IS_EMPTY.getMsg());
         }
         return resourceService.updateResourceContent(loginUser, fullName, tenantCode, content);

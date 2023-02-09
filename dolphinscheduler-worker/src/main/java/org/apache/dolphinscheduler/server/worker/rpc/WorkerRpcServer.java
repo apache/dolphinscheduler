@@ -32,15 +32,14 @@ import org.apache.dolphinscheduler.server.worker.processor.TaskSavePointProcesso
 
 import java.io.Closeable;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class WorkerRpcServer implements Closeable {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(WorkerRpcServer.class);
 
     @Autowired
     private TaskDispatchProcessor taskDispatchProcessor;
@@ -72,7 +71,7 @@ public class WorkerRpcServer implements Closeable {
     private NettyRemotingServer nettyRemotingServer;
 
     public void start() {
-        LOGGER.info("Worker rpc server starting");
+        log.info("Worker rpc server starting");
         NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(workerConfig.getListenPort());
         this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
@@ -84,21 +83,21 @@ public class WorkerRpcServer implements Closeable {
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_REJECT_ACK, taskRejectAckProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.PROCESS_HOST_UPDATE_REQUEST, hostUpdateProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_SAVEPOINT_REQUEST, taskSavePointProcessor);
-        // logger server
+        // log server
         this.nettyRemotingServer.registerProcessor(CommandType.GET_APP_ID_REQUEST, loggerRequestProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.GET_LOG_BYTES_REQUEST, loggerRequestProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.ROLL_VIEW_LOG_REQUEST, loggerRequestProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.VIEW_WHOLE_LOG_REQUEST, loggerRequestProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.REMOVE_TAK_LOG_REQUEST, loggerRequestProcessor);
         this.nettyRemotingServer.start();
-        LOGGER.info("Worker rpc server started");
+        log.info("Worker rpc server started");
     }
 
     @Override
     public void close() {
-        LOGGER.info("Worker rpc server closing");
+        log.info("Worker rpc server closing");
         this.nettyRemotingServer.close();
-        LOGGER.info("Worker rpc server closed");
+        log.info("Worker rpc server closed");
     }
 
 }

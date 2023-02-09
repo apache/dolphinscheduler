@@ -36,6 +36,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import io.netty.channel.Channel;
+
 @Component
 public class TaskResultEventHandler implements TaskEventHandler {
 
@@ -113,13 +115,17 @@ public class TaskResultEventHandler implements TaskEventHandler {
     }
 
     public void sendAckToWorker(TaskEvent taskEvent) {
+        Channel channel = taskEvent.getChannel();
+        if (channel == null) {
+            return;
+        }
         // we didn't set the receiver address, since the ack doen's need to retry
         TaskExecuteAckCommand taskExecuteAckMessage = new TaskExecuteAckCommand(true,
                 taskEvent.getTaskInstanceId(),
                 masterConfig.getMasterAddress(),
                 taskEvent.getWorkerAddress(),
                 System.currentTimeMillis());
-        taskEvent.getChannel().writeAndFlush(taskExecuteAckMessage.convert2Command());
+        channel.writeAndFlush(taskExecuteAckMessage.convert2Command());
     }
 
     @Override

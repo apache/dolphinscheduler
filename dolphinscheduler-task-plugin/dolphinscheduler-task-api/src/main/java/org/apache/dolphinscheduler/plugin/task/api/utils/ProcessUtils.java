@@ -37,15 +37,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+@Slf4j
 public final class ProcessUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(ProcessUtils.class);
 
     private ProcessUtils() {
         throw new IllegalStateException("Utility class");
@@ -74,22 +73,22 @@ public final class ProcessUtils {
      */
     public static boolean kill(@NonNull TaskExecutionContext request) {
         try {
-            logger.info("Begin kill task instance, processId: {}", request.getProcessId());
+            log.info("Begin kill task instance, processId: {}", request.getProcessId());
             int processId = request.getProcessId();
             if (processId == 0) {
-                logger.error("Task instance kill failed, processId is not exist");
+                log.error("Task instance kill failed, processId is not exist");
                 return false;
             }
 
             String cmd = String.format("kill -9 %s", getPidsStr(processId));
             cmd = OSUtils.getSudoCmd(request.getTenantCode(), cmd);
-            logger.info("process id:{}, cmd:{}", processId, cmd);
+            log.info("process id:{}, cmd:{}", processId, cmd);
 
             OSUtils.exeCmd(cmd);
-            logger.info("Success kill task instance, processId: {}", request.getProcessId());
+            log.info("Success kill task instance, processId: {}", request.getProcessId());
             return true;
         } catch (Exception e) {
-            logger.error("Kill task instance error, processId: {}", request.getProcessId(), e);
+            log.error("Kill task instance error, processId: {}", request.getProcessId(), e);
             return false;
         }
     }
@@ -147,7 +146,7 @@ public final class ProcessUtils {
                     execYarnKillCommand(logger, tenantCode, appId, commandFile, cmd);
                 }
             } catch (Exception e) {
-                logger.error("Get yarn application app id [{}}] status failed", appId, e);
+                log.error("Get yarn application app id [{}}] status failed", appId, e);
             }
         }
     }
@@ -165,7 +164,7 @@ public final class ProcessUtils {
 
         String result;
         String applicationUrl = getApplicationUrl(applicationId);
-        logger.debug("generate yarn application url, applicationUrl={}", applicationUrl);
+        log.debug("generate yarn application url, applicationUrl={}", applicationUrl);
 
         String responseContent = Boolean.TRUE
                 .equals(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false))
@@ -181,7 +180,7 @@ public final class ProcessUtils {
         } else {
             // may be in job history
             String jobHistoryUrl = getJobHistoryUrl(applicationId);
-            logger.debug("generate yarn job history application url, jobHistoryUrl={}", jobHistoryUrl);
+            log.debug("generate yarn job history application url, jobHistoryUrl={}", jobHistoryUrl);
             responseContent = Boolean.TRUE
                     .equals(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false))
                             ? KerberosHttpClient.get(jobHistoryUrl)
@@ -217,7 +216,7 @@ public final class ProcessUtils {
         if (StringUtils.isBlank(appUrl)) {
             throw new BaseException("yarn application url generation failed");
         }
-        logger.debug("yarn application url:{}, applicationId:{}", appUrl, applicationId);
+        log.debug("yarn application url:{}, applicationId:{}", appUrl, applicationId);
         return String.format(appUrl, HADOOP_RESOURCE_MANAGER_HTTP_ADDRESS_PORT_VALUE, applicationId);
     }
 
@@ -256,10 +255,10 @@ public final class ProcessUtils {
 
             String runCmd = String.format("%s %s", Constants.SH, commandFile);
             runCmd = org.apache.dolphinscheduler.common.utils.OSUtils.getSudoCmd(tenantCode, runCmd);
-            logger.info("kill cmd:{}", runCmd);
+            log.info("kill cmd:{}", runCmd);
             org.apache.dolphinscheduler.common.utils.OSUtils.exeCmd(runCmd);
         } catch (Exception e) {
-            logger.error(String.format("Kill yarn application app id [%s] failed: [%s]", appId, e.getMessage()));
+            log.error(String.format("Kill yarn application app id [%s] failed: [%s]", appId, e.getMessage()));
         }
     }
 
@@ -321,7 +320,7 @@ public final class ProcessUtils {
      * get kerberos init command
      */
     private static String getKerberosInitCommand() {
-        logger.info("get kerberos init command");
+        log.info("get kerberos init command");
         StringBuilder kerberosCommandBuilder = new StringBuilder();
         boolean hadoopKerberosState =
                 PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
@@ -333,7 +332,7 @@ public final class ProcessUtils {
                             PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH),
                             PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME)))
                     .append("\n\n");
-            logger.info("kerberos init command: {}", kerberosCommandBuilder);
+            log.info("kerberos init command: {}", kerberosCommandBuilder);
         }
         return kerberosCommandBuilder.toString();
     }
@@ -370,7 +369,7 @@ public final class ProcessUtils {
                 }
 
             } catch (Exception e) {
-                logger.error("yarn ha application url generation failed, message:{}", e.getMessage());
+                log.error("yarn ha application url generation failed, message:{}", e.getMessage());
             }
             return null;
         }

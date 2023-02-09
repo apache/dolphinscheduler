@@ -135,11 +135,6 @@ public class TaskConstants {
     public static final String SH = "sh";
 
     /**
-     * default log cache rows num,output when reach the number
-     */
-    public static final int DEFAULT_LOG_ROWS_NUM = 4 * 16;
-
-    /**
      * log flush interval?output when reach the interval
      */
     public static final int DEFAULT_LOG_FLUSH_INTERVAL = 1000;
@@ -442,6 +437,15 @@ public class TaskConstants {
     public static final String TASK_TYPE_BLOCKING = "BLOCKING";
 
     public static final String TASK_TYPE_STREAM = "STREAM";
+
+    /**
+     * azure config
+     */
+    public static final String AZURE_CLIENT_ID = "resource.azure.client.id";
+    public static final String AZURE_CLIENT_SECRET = "resource.azure.client.secret";
+    public static final String AZURE_ACCESS_SUB_ID = "resource.azure.subId";
+    public static final String AZURE_SECRET_TENANT_ID = "resource.azure.tenant.id";
+    public static final String QUERY_INTERVAL = "resource.query.interval";
 
     /**
      * aws config

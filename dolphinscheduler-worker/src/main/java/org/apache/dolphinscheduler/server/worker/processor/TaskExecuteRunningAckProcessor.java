@@ -25,8 +25,8 @@ import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningAckMessage;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -37,9 +37,8 @@ import io.netty.channel.Channel;
  * task execute running ack processor
  */
 @Component
+@Slf4j
 public class TaskExecuteRunningAckProcessor implements NettyRequestProcessor {
-
-    private final Logger logger = LoggerFactory.getLogger(TaskExecuteRunningAckProcessor.class);
 
     @Autowired
     private MessageRetryRunner messageRetryRunner;
@@ -52,12 +51,12 @@ public class TaskExecuteRunningAckProcessor implements NettyRequestProcessor {
         TaskExecuteRunningAckMessage runningAckCommand = JSONUtils.parseObject(command.getBody(),
                 TaskExecuteRunningAckMessage.class);
         if (runningAckCommand == null) {
-            logger.error("task execute running ack command is null");
+            log.error("task execute running ack command is null");
             return;
         }
         try {
             LogUtils.setTaskInstanceIdMDC(runningAckCommand.getTaskInstanceId());
-            logger.info("task execute running ack command : {}", runningAckCommand);
+            log.info("task execute running ack command : {}", runningAckCommand);
 
             if (runningAckCommand.isSuccess()) {
                 messageRetryRunner.removeRetryMessage(runningAckCommand.getTaskInstanceId(),

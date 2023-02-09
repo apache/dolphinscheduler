@@ -78,15 +78,14 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class PythonGateway {
-
-    private static final Logger logger = LoggerFactory.getLogger(PythonGateway.class);
 
     private static final FailureStrategy DEFAULT_FAILURE_STRATEGY = FailureStrategy.CONTINUE;
     private static final Priority DEFAULT_PRIORITY = Priority.MEDIUM;
@@ -304,7 +303,7 @@ public class PythonGateway {
         } else if (verifyStatus != Status.SUCCESS) {
             String msg =
                     "Verify workflow exists status is invalid, neither SUCCESS or WORKFLOW_NAME_EXIST.";
-            logger.error(msg);
+            log.error(msg);
             throw new RuntimeException(msg);
         }
 
@@ -348,6 +347,8 @@ public class PythonGateway {
             schedulerService.updateSchedule(user, projectCode, scheduleId, schedule, WarningType.valueOf(warningType),
                     warningGroupId, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, DEFAULT_ENVIRONMENT_CODE);
         }
+        // Always set workflow online to set schedule online
+        processDefinitionService.releaseProcessDefinition(user, projectCode, workflowCode, ReleaseState.ONLINE);
         schedulerService.setScheduleState(user, projectCode, scheduleId, ReleaseState.ONLINE);
     }
 
@@ -387,7 +388,8 @@ public class PythonGateway {
                 null,
                 DEFAULT_DRY_RUN,
                 DEFAULT_TEST_FLAG,
-                COMPLEMENT_DEPENDENT_MODE);
+                COMPLEMENT_DEPENDENT_MODE,
+                processDefinition.getVersion());
     }
 
     // side object
@@ -498,11 +500,11 @@ public class PythonGateway {
         List<DataSource> dataSourceList = dataSourceMapper.queryDataSourceByName(datasourceName);
         if (dataSourceList == null || dataSourceList.isEmpty()) {
             String msg = String.format("Can not find any datasource by name %s", datasourceName);
-            logger.error(msg);
+            log.error(msg);
             throw new IllegalArgumentException(msg);
         } else if (dataSourceList.size() > 1) {
             String msg = String.format("Get more than one datasource by name %s", datasourceName);
-            logger.error(msg);
+            log.error(msg);
             throw new IllegalArgumentException(msg);
         } else {
             DataSource dataSource = dataSourceList.get(0);
@@ -539,7 +541,7 @@ public class PythonGateway {
             result.put("code", processDefinition.getCode());
         } else {
             String msg = String.format("Can not find valid workflow by name %s", workflowName);
-            logger.error(msg);
+            log.error(msg);
             throw new IllegalArgumentException(msg);
         }
 
@@ -560,7 +562,7 @@ public class PythonGateway {
         Project project = projectMapper.queryByName(projectName);
         if (project == null) {
             String msg = String.format("Can not find valid project by name %s", projectName);
-            logger.error(msg);
+            log.error(msg);
             throw new IllegalArgumentException(msg);
         }
         long projectCode = project.getCode();
@@ -570,7 +572,7 @@ public class PythonGateway {
                 processDefinitionMapper.queryByDefineName(projectCode, workflowName);
         if (processDefinition == null) {
             String msg = String.format("Can not find valid workflow by name %s", workflowName);
-            logger.error(msg);
+            log.error(msg);
             throw new IllegalArgumentException(msg);
         }
         result.put("processDefinitionCode", processDefinition.getCode());
@@ -601,7 +603,7 @@ public class PythonGateway {
         if (CollectionUtils.isEmpty(namedResources)) {
             String msg =
                     String.format("Can not find valid resource by program type %s and name %s", programType, fullName);
-            logger.error(msg);
+            log.error(msg);
             throw new IllegalArgumentException(msg);
         }
 
@@ -621,7 +623,7 @@ public class PythonGateway {
 
         if (result.get("data") == null) {
             String msg = String.format("Can not find valid environment by name %s", environmentName);
-            logger.error(msg);
+            log.error(msg);
             throw new IllegalArgumentException(msg);
         }
         EnvironmentDto environmentDto = EnvironmentDto.class.cast(result.get("data"));
@@ -679,10 +681,10 @@ public class PythonGateway {
             }
 
             GatewayServer.turnLoggingOn();
-            logger.info("PythonGatewayService started on: " + gatewayHost.toString());
+            log.info("PythonGatewayService started on: " + gatewayHost.toString());
             serverBuilder.build().start();
         } catch (UnknownHostException e) {
-            logger.error("exception occurred while constructing PythonGatewayService().", e);
+            log.error("exception occurred while constructing PythonGatewayService().", e);
         }
     }
 }

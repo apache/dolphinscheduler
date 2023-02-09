@@ -28,21 +28,22 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.NoSuchFileException;
+import java.util.zip.CRC32;
+import java.util.zip.CheckedInputStream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * file utils
  */
+@Slf4j
 public class FileUtils {
-
-    public static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
 
     public static final String DATA_BASEDIR = PropertyUtils.getString(DATA_BASEDIR_PATH, "/tmp/dolphinscheduler");
 
@@ -157,7 +158,7 @@ public class FileUtils {
         // create work dir
         org.apache.commons.io.FileUtils.forceMkdir(execLocalPathFile);
         String mkdirLog = "create dir success " + execLocalPath;
-        logger.info(mkdirLog);
+        log.info(mkdirLog);
     }
 
     /**
@@ -172,13 +173,13 @@ public class FileUtils {
         try {
             File distFile = new File(filePath);
             if (!distFile.getParentFile().exists() && !distFile.getParentFile().mkdirs()) {
-                logger.error("mkdir parent failed");
+                log.error("mkdir parent failed");
                 return false;
             }
             fos = new FileOutputStream(filePath);
             IOUtils.write(content, fos, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             return false;
         } finally {
             IOUtils.closeQuietly(fos);
@@ -238,7 +239,7 @@ public class FileUtils {
             }
             return output.toString(UTF_8);
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }
@@ -262,6 +263,38 @@ public class FileUtils {
         } catch (IOException e) {
             return true;
         }
+    }
+
+    /**
+     * Calculate file checksum with CRC32 algorithm
+     * @param pathName
+     * @return checksum of file/dir
+     */
+    public static String getFileChecksum(String pathName) throws IOException {
+        CRC32 crc32 = new CRC32();
+        File file = new File(pathName);
+        String crcString = "";
+        if (file.isDirectory()) {
+            // file system interface remains the same order
+            String[] subPaths = file.list();
+            StringBuilder concatenatedCRC = new StringBuilder();
+            for (String subPath : subPaths) {
+                concatenatedCRC.append(getFileChecksum(pathName + FOLDER_SEPARATOR + subPath));
+            }
+            crcString = concatenatedCRC.toString();
+        } else {
+            try (
+                    FileInputStream fileInputStream = new FileInputStream(pathName);
+                    CheckedInputStream checkedInputStream = new CheckedInputStream(fileInputStream, crc32);) {
+                while (checkedInputStream.read() != -1) {
+                }
+            } catch (IOException e) {
+                throw new IOException("Calculate checksum error.");
+            }
+            crcString = Long.toHexString(crc32.getValue());
+        }
+
+        return crcString;
     }
 
 }

@@ -17,20 +17,16 @@
 
 package org.apache.dolphinscheduler.dao.upgrade;
 
-import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class WorkerGroupDao {
-
-    public static final Logger logger = LoggerFactory.getLogger(WorkerGroupDao.class);
 
     /**
      * query all old worker group
@@ -40,12 +36,10 @@ public class WorkerGroupDao {
     public Map<Integer, String> queryAllOldWorkerGroup(Connection conn) {
         Map<Integer, String> workerGroupMap = new HashMap<>();
 
-        String sql = String.format("select id,name from t_ds_worker_group");
-        ResultSet rs = null;
-        PreparedStatement pstmt = null;
-        try {
-            pstmt = conn.prepareStatement(sql);
-            rs = pstmt.executeQuery();
+        String sql = "select id,name from t_ds_worker_group";
+        try (
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                ResultSet rs = pstmt.executeQuery()) {
 
             while (rs.next()) {
                 int id = rs.getInt(1);
@@ -54,10 +48,8 @@ public class WorkerGroupDao {
             }
 
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new RuntimeException("sql: " + sql, e);
-        } finally {
-            ConnectionUtils.releaseResource(rs, pstmt, conn);
         }
 
         return workerGroupMap;

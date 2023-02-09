@@ -29,15 +29,14 @@ import org.apache.dolphinscheduler.server.master.runner.WorkflowSubmitStatue;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class WorkflowStartEventHandler implements WorkflowEventHandler {
-
-    private final Logger logger = LoggerFactory.getLogger(WorkflowStartEventHandler.class);
 
     @Autowired
     private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
@@ -53,7 +52,7 @@ public class WorkflowStartEventHandler implements WorkflowEventHandler {
 
     @Override
     public void handleWorkflowEvent(final WorkflowEvent workflowEvent) throws WorkflowEventHandleError {
-        logger.info("Handle workflow start event, begin to start a workflow, event: {}", workflowEvent);
+        log.info("Handle workflow start event, begin to start a workflow, event: {}", workflowEvent);
         WorkflowExecuteRunnable workflowExecuteRunnable = processInstanceExecCacheManager.getByProcessInstanceId(
                 workflowEvent.getWorkflowInstanceId());
         if (workflowExecuteRunnable == null) {
@@ -65,7 +64,7 @@ public class WorkflowStartEventHandler implements WorkflowEventHandler {
         CompletableFuture.supplyAsync(workflowExecuteRunnable::call, workflowExecuteThreadPool)
                 .thenAccept(workflowSubmitStatue -> {
                     if (WorkflowSubmitStatue.SUCCESS == workflowSubmitStatue) {
-                        logger.info("Success submit the workflow instance");
+                        log.info("Success submit the workflow instance");
                         if (processInstance.getTimeout() > 0) {
                             stateWheelExecuteThread.addProcess4TimeoutCheck(processInstance);
                         }
@@ -86,7 +85,7 @@ public class WorkflowStartEventHandler implements WorkflowEventHandler {
                         }
                     } else {
                         // submit failed will resend the event to workflow event queue
-                        logger.error("Failed to submit the workflow instance, will resend the workflow start event: {}",
+                        log.error("Failed to submit the workflow instance, will resend the workflow start event: {}",
                                 workflowEvent);
                         workflowEventQueue.addEvent(workflowEvent);
                     }
