@@ -278,7 +278,7 @@ CREATE TABLE `t_ds_access_token` (
 DROP TABLE IF EXISTS `t_ds_alert`;
 CREATE TABLE `t_ds_alert` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
-  `title` varchar(64) DEFAULT NULL COMMENT 'title',
+  `title` varchar(512) DEFAULT NULL COMMENT 'title',
   `sign` char(40) NOT NULL DEFAULT '' COMMENT 'sign=sha1(content)',
   `content` text COMMENT 'Message content (can be email, can be SMS. Mail is stored in JSON map, and SMS is string)',
   `alert_status` tinyint(4) DEFAULT '0' COMMENT '0:wait running,1:success,2:failed',

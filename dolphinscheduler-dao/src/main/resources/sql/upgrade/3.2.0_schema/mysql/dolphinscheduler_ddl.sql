@@ -298,18 +298,6 @@ delimiter ;
 CALL add_t_ds_task_instance_add_project_code;
 DROP PROCEDURE add_t_ds_task_instance_add_project_code;
 
-
-ALTER TABLE QRTZ_BLOB_TRIGGERS CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;
-alter table QRTZ_CALENDARS CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;
-alter table QRTZ_CRON_TRIGGERS CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;
-alter table QRTZ_FIRED_TRIGGERS CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;
-alter table QRTZ_JOB_DETAILS CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;
-alter table QRTZ_LOCKS CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;
-alter table QRTZ_PAUSED_TRIGGER_GRPS CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;
-alter table QRTZ_SCHEDULER_STATE CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;
-alter table QRTZ_SIMPLE_TRIGGERS CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;
-alter table QRTZ_SIMPROP_TRIGGERS CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;
-alter table QRTZ_TRIGGERS CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;
 alter table t_ds_access_token CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;
 alter table t_ds_alert CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;
 alter table t_ds_alertgroup CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;
@@ -363,6 +351,6 @@ alter table t_ds_cluster CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;
 alter table t_ds_fav_task CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;
 alter table t_ds_trigger_relation CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;
 
-
-
+ALTER TABLE `t_ds_alert`
+    MODIFY `title` varchar (512) null comment 'title';
 
