@@ -15,36 +15,59 @@
  * limitations under the License.
  */
 
-import { reactive, ref, unref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { reactive, ref, unref } from 'vue'
 import type { FormRules } from 'naive-ui'
+import { ICreateFileDefaultValue } from "@/views/resource/components/resource/types";
 
-const defaultValue = (fullName = '',name = '', description = '', user_name = '') => ({
-  id: -1,
-  fullName,
-  name,
+const defaultValue: ICreateFileDefaultValue = () => ({
+  pid: -1,
   type: 'FILE',
-  description,
-  user_name
+  suffix: 'sh',
+  fileName: '',
+  description: '',
+  content: '',
+  currentDir: '/'
 })
 
-export function useForm(fullName: string, name: string, description: string, user_name: string) {
+export function useForm() {
   const { t } = useI18n()
+
   const resetForm = () => {
-    state.renameForm = Object.assign(unref(state.renameForm), defaultValue())
+    state.fileForm = Object.assign(unref(state.fileForm), defaultValue())
   }
 
   const state = reactive({
-    renameFormRef: ref(),
-    renameForm: defaultValue(fullName, name, description, user_name),
-    saving: false,
+    fileFormRef: ref(),
+    fileForm: defaultValue(),
     rules: {
-      name: {
+      fileName: {
         required: true,
         trigger: ['input', 'blur'],
         validator() {
-          if (state.renameForm.name === '') {
+          if (state.fileForm.fileName === '') {
             return new Error(t('resource.file.enter_name_tips'))
+          }
+          if (state.fileForm.fileName.endsWith(`.${state.fileForm.suffix}`)) {
+            return new Error(t('resource.file.duplicate_suffix_tips'))
+          }
+        }
+      },
+      suffix: {
+        required: true,
+        trigger: ['input', 'blur'],
+        validator() {
+          if (state.fileForm.suffix === '') {
+            return new Error(t('resource.file.enter_suffix_tips'))
+          }
+        }
+      },
+      content: {
+        required: true,
+        trigger: ['input', 'blur'],
+        validator() {
+          if (state.fileForm.content === '') {
+            return new Error(t('resource.file.enter_content_tips'))
           }
         }
       }

@@ -15,17 +15,20 @@
  * limitations under the License.
  */
 
-import { useI18n } from 'vue-i18n'
 import { reactive, ref, unref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { FormRules } from 'naive-ui'
+import { IUploadDefaultValue } from "@/views/resource/components/resource/types";
 
-const defaultValue = () => ({
-  pid: -1,
-  type: 'FILE',
-  suffix: 'sh',
-  fileName: '',
+const defaultValue: IUploadDefaultValue = () => ({
+  isReupload: false,
+  fullName: '',
+  user_name: '',
+  name: '',
+  file: '',
   description: '',
-  content: '',
+  type: undefined!,
+  pid: -1,
   currentDir: '/'
 })
 
@@ -33,39 +36,29 @@ export function useForm() {
   const { t } = useI18n()
 
   const resetForm = () => {
-    state.fileForm = Object.assign(unref(state.fileForm), defaultValue())
+    state.uploadForm = Object.assign(unref(state.uploadForm), defaultValue())
   }
 
   const state = reactive({
-    fileFormRef: ref(),
-    fileForm: defaultValue(),
+    uploadFormRef: ref(),
+    uploadFormNameRef: ref(),
+    uploadForm: defaultValue(),
+    saving: false,
     rules: {
-      fileName: {
+      name: {
         required: true,
         trigger: ['input', 'blur'],
         validator() {
-          if (state.fileForm.fileName === '') {
+          if (state.uploadForm.name === '') {
             return new Error(t('resource.file.enter_name_tips'))
           }
-          if (state.fileForm.fileName.endsWith(`.${state.fileForm.suffix}`)) {
-            return new Error(t('resource.file.duplicate_suffix_tips'))
-          }
         }
       },
-      suffix: {
+      file: {
         required: true,
         trigger: ['input', 'blur'],
         validator() {
-          if (state.fileForm.suffix === '') {
-            return new Error(t('resource.file.enter_suffix_tips'))
-          }
-        }
-      },
-      content: {
-        required: true,
-        trigger: ['input', 'blur'],
-        validator() {
-          if (state.fileForm.content === '') {
+          if (state.uploadForm.file === '') {
             return new Error(t('resource.file.enter_content_tips'))
           }
         }

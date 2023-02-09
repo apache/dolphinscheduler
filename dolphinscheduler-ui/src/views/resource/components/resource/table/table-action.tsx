@@ -23,11 +23,12 @@ import {
   DownloadOutlined,
   FormOutlined,
   EditOutlined,
-  InfoCircleFilled
+  InfoCircleFilled,
+  UploadOutlined
 } from '@vicons/antd'
 import _ from 'lodash'
 import { useI18n } from 'vue-i18n'
-import { ResourceFileTableData, IRenameFile, IRtDisb } from '../types'
+import { ResourceFileTableData, IRenameResource, IRtDisb, IReuploadResource } from '../types'
 import { fileTypeArr } from '@/common/common'
 import { downloadResource, deleteResource } from '@/service/modules/resources'
 import type { Router } from 'vue-router'
@@ -50,7 +51,7 @@ const props = {
 export default defineComponent({
   name: 'TableAction',
   props,
-  emits: ['updateList', 'renameResource'],
+  emits: ['updateList', 'reuploadResource', 'renameResource'],
   setup(props, { emit }) {
     const { t } = useI18n()
     const router: Router = useRouter()
@@ -70,7 +71,11 @@ export default defineComponent({
       deleteResource(fullNameObj).then(() => emit('updateList'))
     }
 
-    const handleRenameFile: IRenameFile = (name: string, description: string, fullName: string, user_name: string) => {
+    const handleReuploadFile: IReuploadResource = (name: string, description: string, fullName: string, user_name: string) => {
+      emit('reuploadResource', name, description, fullName, user_name)
+    }
+
+    const handleRenameFile: IRenameResource = (name: string, description: string, fullName: string, user_name: string) => {
       emit('renameResource', name, description, fullName, user_name)
     }
 
@@ -79,6 +84,7 @@ export default defineComponent({
       rtDisb,
       handleEditFile,
       handleDeleteFile,
+      handleReuploadFile,
       handleRenameFile,
       ...props
     }
@@ -87,6 +93,7 @@ export default defineComponent({
     const { t } = useI18n()
     return (
       <NSpace>
+        { this.row.type !== 'UDF' &&
         <NTooltip trigger={'hover'}>
           {{
             default: () => t('resource.file.edit'),
@@ -105,6 +112,34 @@ export default defineComponent({
               >
                 <NIcon>
                   <FormOutlined />
+                </NIcon>
+              </NButton>
+            )
+          }}
+        </NTooltip>
+        }
+        <NTooltip trigger={'hover'}>
+          {{
+            default: () => t('resource.file.reupload'),
+            trigger: () => (
+              <NButton
+                size='tiny'
+                type='info'
+                onClick={() =>
+                  this.handleReuploadFile(
+                    this.row.name,
+                    this.row.description,
+                    this.row.fullName,
+                    this.row.user_name
+                  )
+                }
+                disabled={!!this.row?.directory}
+                style={{ marginRight: '-5px' }}
+                circle
+                class='btn-reupload'
+              >
+                <NIcon>
+                  <UploadOutlined/>
                 </NIcon>
               </NButton>
             )
@@ -145,7 +180,7 @@ export default defineComponent({
               <NButton
                 size='tiny'
                 type='info'
-                disabled={this.row?.directory ? true : false}
+                disabled={!!this.row?.directory}
                 tag='div'
                 circle
                 style={{ marginRight: '-5px' }}

@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+export type ResourceType = 'FILE' | 'UDF'
+
 export interface ResourceFileTableData {
   name: string
   fullName: string
@@ -23,6 +25,7 @@ export interface ResourceFileTableData {
   file_name: string
   description: string
   size: number
+  type: ResourceType
   update_time: string
 }
 
@@ -30,15 +33,20 @@ export interface IEmit {
   (event: any, ...args: any[]): void
 }
 
-export interface IRenameFile {
+export interface IReuploadResource {
   (name: string, description: string, fullName: string, user_name: string): void
 }
+
+export interface IRenameResource {
+  (name: string, description: string, fullName: string, user_name: string): void
+}
+
 export interface IRtDisb {
   (name: string, size: number): boolean
 }
 
 export interface IResourceListState {
-  (searchVal?: string, fullName?: string, tenantCode?: string, pageNo?: number, pageSize?: number): any
+  (type: ResourceType, searchVal?: string, fullName?: string, tenantCode?: string, pageNo?: number, pageSize?: number): any
 }
 
 export interface BasicTableProps {
@@ -69,4 +77,52 @@ export interface BreadcrumbItem {
   id: number
   fullName: string
   userName: string
+}
+
+export interface ICreateFileDefaultValue {
+  (): {
+    pid: number,
+    type: ResourceType,
+    suffix: string,
+    fileName: string,
+    description: string,
+    content: string,
+    currentDir: string
+  }
+}
+
+export interface IFolderDefaultValue {
+  ():
+    {
+      pid: number,
+      type: ResourceType,
+      name: string,
+      description: string,
+      currentDir: string
+    }
+}
+
+export interface IRenameDefaultValue {
+  (
+    type: ResourceType,
+    fullName?: string,
+    name?: string,
+    description?: string,
+    user_name?: string
+  ): {fullName: string, name: string, type: ResourceType, description: string, user_name: string}
+}
+
+export interface IUploadDefaultValue {
+  ():
+    {
+      isReupload: boolean,
+      fullName: string,
+      user_name: string,
+      name: string,
+      file: string,
+      description: string,
+      type: ResourceType,
+      pid: number,
+      currentDir: string
+    }
 }

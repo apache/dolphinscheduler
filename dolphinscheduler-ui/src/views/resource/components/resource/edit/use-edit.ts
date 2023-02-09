@@ -16,13 +16,10 @@
  */
 
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
 import type { Router } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { useAsyncState } from '@vueuse/core'
-import {
-  viewResource,
-  updateResourceContent
-} from '@/service/modules/resources'
+import { updateResourceContent, viewResource } from '@/service/modules/resources'
 
 export function useEdit(state: any) {
   const { t } = useI18n()

@@ -18,32 +18,32 @@
 import { reactive, ref, unref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { FormRules } from 'naive-ui'
+import { IRenameDefaultValue, ResourceType } from "@/views/resource/components/resource/types";
 
-const defaultValue = () => ({
-  pid: -1,
-  type: 'FILE',
-  name: '',
-  description: '',
-  currentDir: '/'
+const defaultValue:IRenameDefaultValue = (type: ResourceType, fullName = '', name = '', description = '', user_name = '') => ({
+  fullName,
+  name,
+  type: type,
+  description,
+  user_name
 })
 
-export function useForm() {
+export function useForm(resourceType: ResourceType, fullName: string, name: string, description: string, user_name: string) {
   const { t } = useI18n()
-
   const resetForm = () => {
-    state.folderForm = Object.assign(unref(state.folderForm), defaultValue())
+    state.renameForm = Object.assign(unref(state.renameForm), defaultValue(resourceType))
   }
 
   const state = reactive({
-    folderFormRef: ref(),
-    folderForm: defaultValue(),
+    renameFormRef: ref(),
+    renameForm: defaultValue(resourceType,fullName, name, description, user_name),
     saving: false,
     rules: {
       name: {
         required: true,
         trigger: ['input', 'blur'],
         validator() {
-          if (state.folderForm.name === '') {
+          if (state.renameForm.name === '') {
             return new Error(t('resource.file.enter_name_tips'))
           }
         }

@@ -18,12 +18,13 @@
 import { reactive, ref, unref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { FormRules } from 'naive-ui'
+import { IFolderDefaultValue } from "@/views/resource/components/resource/types";
 
-const defaultValue = () => ({
-  name: '',
-  file: '',
-  description: '',
+const defaultValue: IFolderDefaultValue = () => ({
   pid: -1,
+  type: undefined!,
+  name: '',
+  description: '',
   currentDir: '/'
 })
 
@@ -31,30 +32,20 @@ export function useForm() {
   const { t } = useI18n()
 
   const resetForm = () => {
-    state.uploadForm = Object.assign(unref(state.uploadForm), defaultValue())
+    state.folderForm = Object.assign(unref(state.folderForm), defaultValue())
   }
 
   const state = reactive({
-    uploadFormRef: ref(),
-    uploadFormNameRef: ref(),
-    uploadForm: defaultValue(),
+    folderFormRef: ref(),
+    folderForm: defaultValue(),
     saving: false,
     rules: {
       name: {
         required: true,
         trigger: ['input', 'blur'],
         validator() {
-          if (state.uploadForm.name === '') {
+          if (state.folderForm.name === '') {
             return new Error(t('resource.file.enter_name_tips'))
-          }
-        }
-      },
-      file: {
-        required: true,
-        trigger: ['input', 'blur'],
-        validator() {
-          if (state.uploadForm.file === '') {
-            return new Error(t('resource.file.enter_content_tips'))
           }
         }
       }

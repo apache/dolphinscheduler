@@ -14,112 +14,103 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import {
   defineComponent,
   toRefs,
   PropType,
   watch,
-  computed,
   getCurrentInstance
 } from 'vue'
 import { NForm, NFormItem, NInput } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import Modal from '@/components/modal'
-import { noSpace } from '@/utils/trim'
 import { useForm } from './use-form'
-import { useModal } from './use-modal'
-import type { IUdf } from '../types'
+import { useRename } from './use-rename'
+import type { ResourceType } from "@/views/resource/components/resource/types";
 
 const props = {
-  row: {
-    type: Object as PropType<IUdf>,
-    default: {}
-  },
   show: {
     type: Boolean as PropType<boolean>,
     default: false
+  },
+  resourceType: {
+    type: String as PropType<ResourceType>,
+    default: undefined
+  },
+  name: {
+    type: String as PropType<string>,
+    default: ''
+  },
+  description: {
+    type: String as PropType<string>,
+    default: ''
+  },
+  fullName: {
+    type: String as PropType<string>,
+    default: ''
+  },
+  userName: {
+    type: String as PropType<string>,
+    default: ''
   }
 }
 
 export default defineComponent({
-  name: 'ResourceFileFolder',
+  name: 'ResourceFileRename',
   props,
-  emits: ['update:show', 'updateList'],
+  emits: ['updateList', 'update:show'],
   setup(props, ctx) {
-    const { folderState: state } = useForm()
-
-    const { handleCreateResource, handleRenameResource } = useModal(state, ctx)
-
+    const { state, resetForm } = useForm(props.resourceType!,props.fullName, props.name, props.description, props.userName)
+    const { handleRenameFile } = useRename(state)
     const hideModal = () => {
-      ctx.emit('update:show')
+      ctx.emit('update:show', false)
     }
 
-    const handleCreate = () => {
-      handleCreateResource()
-    }
-
-    const handleRename = () => {
-      handleRenameResource(props.row.fullName)
+    const handleFile = () => {
+      handleRenameFile(ctx.emit, hideModal, resetForm)
     }
 
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
     watch(
-      () => props.row,
+      () => props.show,
       () => {
-        state.folderForm.name = props.row.alias
-        state.folderForm.description = props.row.description
+        state.renameForm.fullName = props.fullName
+        state.renameForm.name = props.name
+        state.renameForm.description = props.description
+        state.renameForm.user_name = props.userName
       }
     )
-    const fileEdit = computed(() => props.row.fullName && !props.row.directory)
 
-    return {
-      fileEdit,
-      hideModal,
-      handleCreate,
-      handleRename,
-      ...toRefs(state),
-      trim
-    }
+    return { hideModal, handleFile, ...toRefs(state), trim }
   },
   render() {
     const { t } = useI18n()
-
     return (
       <Modal
         show={this.$props.show}
-        title={
-          this.row.fullName ? t('resource.udf.edit') : t('resource.udf.create_folder')
-        }
+        title={t('resource.file.rename')}
         onCancel={this.hideModal}
-        onConfirm={this.row.fullName ? this.handleRename : this.handleCreate}
+        onConfirm={this.handleFile}
         confirmClassName='btn-submit'
         cancelClassName='btn-cancel'
         confirmLoading={this.saving}
       >
-        <NForm rules={this.rules} ref='folderFormRef'>
-          <NFormItem
-            label={
-              this.fileEdit
-                ? t('resource.udf.file_name')
-                : t('resource.udf.folder_name')
-            }
-            path='name'
-          >
+        <NForm rules={this.rules} ref='renameFormRef'>
+          <NFormItem label={t('resource.file.name')} path='name'>
             <NInput
-              allowInput={this.fileEdit ? this.trim : noSpace}
-              v-model={[this.folderForm.name, 'value']}
-              placeholder={t('resource.udf.enter_name_tips')}
-              class='input-directory-name'
+              allowInput={this.trim}
+              v-model={[this.renameForm.name, 'value']}
+              placeholder={t('resource.file.enter_name_tips')}
+              class='input-name'
             />
           </NFormItem>
-          <NFormItem label={t('resource.udf.description')} path='description'>
+          <NFormItem label={t('resource.file.description')} path='description'>
             <NInput
               allowInput={this.trim}
               type='textarea'
-              v-model={[this.folderForm.description, 'value']}
-              placeholder={t('resource.udf.enter_description_tips')}
+              v-model={[this.renameForm.description, 'value']}
+              placeholder={t('resource.file.enter_description_tips')}
               class='input-description'
             />
           </NFormItem>
