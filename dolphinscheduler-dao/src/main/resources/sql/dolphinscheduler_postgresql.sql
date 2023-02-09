@@ -207,7 +207,7 @@ CREATE TABLE t_ds_access_token (
 DROP TABLE IF EXISTS t_ds_alert;
 CREATE TABLE t_ds_alert (
   id int NOT NULL  ,
-  title varchar(64) DEFAULT NULL ,
+  title varchar(512) DEFAULT NULL ,
   sign varchar(40) NOT NULL DEFAULT '',
   content text ,
   alert_status int DEFAULT '0' ,

@@ -271,7 +271,7 @@ DROP TABLE IF EXISTS t_ds_alert CASCADE;
 CREATE TABLE t_ds_alert
 (
     id            int(11) NOT NULL AUTO_INCREMENT,
-    title         varchar(64) DEFAULT NULL,
+    title         varchar(512) DEFAULT NULL,
     sign           char(40) NOT NULL DEFAULT '',
     content       text,
     alert_status  tinyint(4) DEFAULT '0',
