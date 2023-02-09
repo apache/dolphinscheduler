@@ -21,6 +21,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_COD
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils.getPidsStr;
 
+import org.apache.dolphinscheduler.common.log.remote.RemoteLogUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.utils.AbstractCommandExecutorConstants;
@@ -100,6 +101,10 @@ public abstract class AbstractCommandExecutor {
         this.taskRequest = taskRequest;
         this.logger = logger;
         this.logBuffer = new LinkedBlockingQueue<>();
+
+        if (this.taskRequest != null) {
+            this.taskRequest.setLogHandleEnable(true);
+        }
     }
 
     public AbstractCommandExecutor(LinkedBlockingQueue<String> logBuffer) {
@@ -335,6 +340,11 @@ public abstract class AbstractCommandExecutor {
             logBuffer.clear();
         }
         logHandler.accept(markerLog);
+
+        if (RemoteLogUtils.isRemoteLoggingEnable()) {
+            RemoteLogUtils.sendRemoteLog(taskRequest.getLogPath());
+            logger.info("Log handler sends task log {} to remote storage asynchronously.", taskRequest.getLogPath());
+        }
     }
 
     /**

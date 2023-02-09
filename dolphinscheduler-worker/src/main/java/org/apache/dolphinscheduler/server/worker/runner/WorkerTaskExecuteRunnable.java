@@ -23,6 +23,7 @@ import static org.apache.dolphinscheduler.common.constants.Constants.DRY_RUN_FLA
 import static org.apache.dolphinscheduler.common.constants.Constants.SINGLE_SLASH;
 
 import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.common.log.remote.RemoteLogUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
@@ -120,6 +121,8 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
         log.info("Remove the current task execute context from worker cache");
         clearTaskExecPathIfNeeded();
+
+        sendTaskLogOnWorkerToRemoteIfNeeded();
     }
 
     protected void afterThrowing(Throwable throwable) throws TaskException {
@@ -131,6 +134,8 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         log.info(
                 "Get a exception when execute the task, will send the task execute result to master, the current task execute result is {}",
                 TaskExecutionStatus.FAILURE);
+
+        sendTaskLogOnWorkerToRemoteIfNeeded();
     }
 
     public void cancelTask() {
@@ -277,6 +282,18 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
 
         log.info("Send task execute result to master, the current task status: {}",
                 taskExecutionContext.getCurrentExecutionStatus());
+    }
+
+    protected void sendTaskLogOnWorkerToRemoteIfNeeded() {
+        if (taskExecutionContext.isLogHandleEnable()) {
+            return;
+        }
+
+        if (RemoteLogUtils.isRemoteLoggingEnable()) {
+            RemoteLogUtils.sendRemoteLog(taskExecutionContext.getLogPath());
+            log.info("Worker sends task log {} to remote storage asynchronously.",
+                    taskExecutionContext.getLogPath());
+        }
     }
 
     protected void clearTaskExecPathIfNeeded() {
