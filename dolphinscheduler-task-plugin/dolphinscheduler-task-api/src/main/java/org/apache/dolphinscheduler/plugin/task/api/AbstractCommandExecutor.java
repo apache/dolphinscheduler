@@ -103,7 +103,8 @@ public abstract class AbstractCommandExecutor {
         this.logBuffer = new LinkedBlockingQueue<>();
 
         if (this.taskRequest != null) {
-            this.taskRequest.setLogHandleEnable(true);
+            // set logBufferEnable=true if the task uses logHandler and logBuffer to buffer log messages
+            this.taskRequest.setLogBufferEnable(true);
         }
     }
 

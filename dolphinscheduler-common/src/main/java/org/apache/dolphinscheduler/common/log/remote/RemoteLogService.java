@@ -20,30 +20,28 @@ package org.apache.dolphinscheduler.common.log.remote;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class RemoteLogService {
-
-    private static final Logger logger = LoggerFactory.getLogger(RemoteLogService.class);
 
     @Async("remoteLogHandleExecutor")
     public void asyncSendRemoteLog(String logPath) {
         if (RemoteLogUtils.isRemoteLoggingEnable()) {
-            logger.info("Start to send log {} to remote target {}", logPath,
+            log.info("Start to send log {} to remote target {}", logPath,
                     PropertyUtils.getString(Constants.REMOTE_LOGGING_TARGET));
 
             RemoteLogHandler remoteLogHandler = RemoteLogHandlerFactory.getRemoteLogHandler();
-            if (remoteLogHandler != null) {
-                remoteLogHandler.sendRemoteLog(logPath);
-            } else {
-                logger.error("remote log handler is null");
+            if (remoteLogHandler == null) {
+                log.error("remote log handler is null");
+                return;
             }
-
-            logger.info("Succeed to send log {} to remote target {}", logPath,
+            remoteLogHandler.sendRemoteLog(logPath);
+            log.info("Succeed to send log {} to remote target {}", logPath,
                     PropertyUtils.getString(Constants.REMOTE_LOGGING_TARGET));
         }
     }

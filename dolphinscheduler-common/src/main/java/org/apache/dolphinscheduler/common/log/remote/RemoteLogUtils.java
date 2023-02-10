@@ -20,17 +20,19 @@ package org.apache.dolphinscheduler.common.log.remote;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class RemoteLogUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(RemoteLogUtils.class);
 
     private static RemoteLogService remoteLogService;
 
@@ -51,19 +53,24 @@ public class RemoteLogUtils {
 
     public static void getRemoteLog(String logPath) {
         if (isRemoteLoggingEnable()) {
-            logger.info("Start to get log {} from remote target {}", logPath,
+            log.info("Start to get log {} from remote target {}", logPath,
                     PropertyUtils.getString(Constants.REMOTE_LOGGING_TARGET));
 
+            mkdirOfLog(logPath);
             RemoteLogHandler remoteLogHandler = RemoteLogHandlerFactory.getRemoteLogHandler();
-            if (remoteLogHandler != null) {
-                remoteLogHandler.getRemoteLog(logPath);
-            } else {
-                logger.error("remote log handler is null");
+            if (remoteLogHandler == null) {
+                log.error("remote log handler is null");
+                return;
             }
-
-            logger.info("Succeed to get log {} from remote target {}", logPath,
+            remoteLogHandler.getRemoteLog(logPath);
+            log.info("End get log {} from remote target {}", logPath,
                     PropertyUtils.getString(Constants.REMOTE_LOGGING_TARGET));
         }
+    }
+
+    private static void mkdirOfLog(String logPath) {
+        Path directory = Paths.get(logPath).getParent();
+        directory.toFile().mkdirs();
     }
 
     public static boolean isRemoteLoggingEnable() {

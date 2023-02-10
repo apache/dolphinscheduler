@@ -182,13 +182,11 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
         File file = new File(filePath);
         if (file.exists()) {
             return getFileContentBytesFromLocal(filePath);
-        } else {
-            if (RemoteLogUtils.isRemoteLoggingEnable()) {
-                return getFileContentBytesFromRemote(filePath);
-            } else {
-                return getFileContentBytesFromLocal(filePath);
-            }
         }
+        if (RemoteLogUtils.isRemoteLoggingEnable()) {
+            return getFileContentBytesFromRemote(filePath);
+        }
+        return getFileContentBytesFromLocal(filePath);
     }
 
     /**
@@ -228,13 +226,11 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
         File file = new File(filePath);
         if (file.exists()) {
             return readPartFileContentFromLocal(filePath, skipLine, limit);
-        } else {
-            if (RemoteLogUtils.isRemoteLoggingEnable()) {
-                return readPartFileContentFromRemote(filePath, skipLine, limit);
-            } else {
-                return readPartFileContentFromLocal(filePath, skipLine, limit);
-            }
         }
+        if (RemoteLogUtils.isRemoteLoggingEnable()) {
+            return readPartFileContentFromRemote(filePath, skipLine, limit);
+        }
+        return readPartFileContentFromLocal(filePath, skipLine, limit);
     }
 
     private String readWholeFileContentFromRemote(String filePath) {
@@ -246,13 +242,11 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
         File file = new File(filePath);
         if (file.exists()) {
             return LogUtils.readWholeFileContentFromLocal(filePath);
-        } else {
-            if (RemoteLogUtils.isRemoteLoggingEnable()) {
-                return readWholeFileContentFromRemote(filePath);
-            } else {
-                return LogUtils.readWholeFileContentFromLocal(filePath);
-            }
         }
+        if (RemoteLogUtils.isRemoteLoggingEnable()) {
+            return readWholeFileContentFromRemote(filePath);
+        }
+        return LogUtils.readWholeFileContentFromLocal(filePath);
     }
 
 }

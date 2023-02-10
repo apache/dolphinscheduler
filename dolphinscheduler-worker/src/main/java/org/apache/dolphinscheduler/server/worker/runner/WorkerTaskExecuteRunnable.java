@@ -285,7 +285,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
     }
 
     protected void sendTaskLogOnWorkerToRemoteIfNeeded() {
-        if (taskExecutionContext.isLogHandleEnable()) {
+        if (taskExecutionContext.isLogBufferEnable()) {
             return;
         }
 

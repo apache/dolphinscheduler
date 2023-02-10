@@ -26,16 +26,14 @@ import lombok.experimental.UtilityClass;
 public class RemoteLogHandlerFactory {
 
     public RemoteLogHandler getRemoteLogHandler() {
-        if (RemoteLogUtils.isRemoteLoggingEnable()) {
-            if ("OSS".equals(PropertyUtils.getUpperCaseString(Constants.REMOTE_LOGGING_TARGET))) {
-                OssRemoteLogHandler ossRemoteLogHandler = new OssRemoteLogHandler();
-                ossRemoteLogHandler.init();
-                return ossRemoteLogHandler;
-            } else {
-                return null;
-            }
-        } else {
+        if (!RemoteLogUtils.isRemoteLoggingEnable()) {
             return null;
         }
+        if (!"OSS".equals(PropertyUtils.getUpperCaseString(Constants.REMOTE_LOGGING_TARGET))) {
+            return null;
+        }
+        OssRemoteLogHandler ossRemoteLogHandler = new OssRemoteLogHandler();
+        ossRemoteLogHandler.init();
+        return ossRemoteLogHandler;
     }
 }

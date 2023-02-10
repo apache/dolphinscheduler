@@ -30,17 +30,15 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.model.Bucket;
 import com.aliyun.oss.model.GetObjectRequest;
 import com.aliyun.oss.model.PutObjectRequest;
 
+@Slf4j
 public class OssRemoteLogHandler implements RemoteLogHandler, Closeable {
-
-    private static final Logger logger = LoggerFactory.getLogger(OssRemoteLogHandler.class);
 
     private static final int OBJECT_NAME_COUNT = 2;
 
@@ -66,11 +64,11 @@ public class OssRemoteLogHandler implements RemoteLogHandler, Closeable {
         String objectName = getObjectNameFromLogPath(logPath);
 
         try {
-            logger.info("send remote log {} to OSS {}", logPath, objectName);
+            log.info("send remote log {} to OSS {}", logPath, objectName);
             PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, objectName, new File(logPath));
             ossClient.putObject(putObjectRequest);
         } catch (Exception e) {
-            logger.error("error while sending remote log {} to OSS {}", logPath, objectName, e);
+            log.error("error while sending remote log {} to OSS {}", logPath, objectName, e);
         }
     }
 
@@ -79,10 +77,10 @@ public class OssRemoteLogHandler implements RemoteLogHandler, Closeable {
         String objectName = getObjectNameFromLogPath(logPath);
 
         try {
-            logger.info("get remote log on OSS {} to {}", objectName, logPath);
+            log.info("get remote log on OSS {} to {}", objectName, logPath);
             ossClient.getObject(new GetObjectRequest(bucketName, objectName), new File(logPath));
         } catch (Exception e) {
-            logger.error("error while getting remote log on OSS {} to {}", objectName, logPath, e);
+            log.error("error while getting remote log on OSS {} to {}", objectName, logPath, e);
         }
     }
 
@@ -120,7 +118,7 @@ public class OssRemoteLogHandler implements RemoteLogHandler, Closeable {
                             "bucketName: " + bucketName + " does not exist, you need to create them by yourself");
                 });
 
-        logger.info("bucketName: {} has been found", existsBucket.getName());
+        log.info("bucketName: {} has been found", existsBucket.getName());
     }
 
     private String readOssAccessKeyId() {
