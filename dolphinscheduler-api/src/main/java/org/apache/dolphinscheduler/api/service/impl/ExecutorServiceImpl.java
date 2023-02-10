@@ -1246,7 +1246,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 try {
                     ZonedDateTime dateTime = DateUtils.stringToZoneDateTime(date);
                 } catch (Exception ex) {
-                    logger.warn("Parse schedule time error, date string: {}", date);
+                    log.warn("Parse schedule time error, date string: {}.", date);
                     return false;
                 }
             }
