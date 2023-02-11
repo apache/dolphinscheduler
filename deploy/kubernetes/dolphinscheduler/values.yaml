@@ -91,7 +91,6 @@ zookeeper:
 
 ## If exists external registry and set zookeeper.enable value to false, the external registry will be used.
 externalRegistry:
-  registryPluginDir: "lib/plugin/registry"
   registryPluginName: "zookeeper"
   registryServers: "127.0.0.1:2181"
 
