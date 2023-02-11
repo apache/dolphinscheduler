@@ -76,7 +76,7 @@ import com.google.common.cache.LoadingCache;
 @Slf4j
 public class HdfsStorageOperator implements Closeable, StorageOperate {
 
-    private static HdfsStorageProperties hdfsProperties;
+    private static HdfsStorageProperties hdfsProperties = new HdfsStorageProperties();
     private static final String HADOOP_UTILS_KEY = "HADOOP_UTILS_KEY";
 
     private static final LoadingCache<String, HdfsStorageOperator> cache = CacheBuilder
@@ -85,7 +85,7 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
             .build(new CacheLoader<String, HdfsStorageOperator>() {
 
                 @Override
-                public HdfsStorageOperator load(String key) throws Exception {
+                public HdfsStorageOperator load(String key) {
                     return new HdfsStorageOperator(hdfsProperties);
                 }
             });
