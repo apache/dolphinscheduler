@@ -132,6 +132,11 @@ public enum CommandType {
     WORKFLOW_EXECUTING_DATA_REQUEST,
 
     /**
+     * update taskInstance's PID request
+     */
+    UPDATE_PID,
+
+    /**
      * workflow executing data response, from master to api
      */
     WORKFLOW_EXECUTING_DATA_RESPONSE;
