@@ -22,7 +22,16 @@ import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.apache.dolphinscheduler.remote.processor.LoggerRequestProcessor;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.master.processor.*;
+import org.apache.dolphinscheduler.server.master.processor.CacheProcessor;
+import org.apache.dolphinscheduler.server.master.processor.StateEventProcessor;
+import org.apache.dolphinscheduler.server.master.processor.TaskEventProcessor;
+import org.apache.dolphinscheduler.server.master.processor.TaskExecuteResponseProcessor;
+import org.apache.dolphinscheduler.server.master.processor.TaskExecuteRunningProcessor;
+import org.apache.dolphinscheduler.server.master.processor.TaskExecuteStartProcessor;
+import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
+import org.apache.dolphinscheduler.server.master.processor.TaskRecallProcessor;
+import org.apache.dolphinscheduler.server.master.processor.TaskUpdatePidProcessor;
+import org.apache.dolphinscheduler.server.master.processor.WorkflowExecutingDataRequestProcessor;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -60,7 +69,7 @@ public class MasterRPCServer implements AutoCloseable {
     private TaskKillResponseProcessor taskKillResponseProcessor;
 
     @Autowired
-    private UpdatePidProcessor updatePidProcessor;
+    private TaskUpdatePidProcessor updatePidProcessor;
 
     @Autowired
     private TaskRecallProcessor taskRecallProcessor;

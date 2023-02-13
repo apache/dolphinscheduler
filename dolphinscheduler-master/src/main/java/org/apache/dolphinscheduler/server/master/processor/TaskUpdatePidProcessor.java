@@ -38,7 +38,7 @@ import io.netty.channel.Channel;
  */
 @Component
 @Slf4j
-public class UpdatePidProcessor implements NettyRequestProcessor {
+public class TaskUpdatePidProcessor implements NettyRequestProcessor {
 
     @Autowired
     private TaskEventService taskEventService;
