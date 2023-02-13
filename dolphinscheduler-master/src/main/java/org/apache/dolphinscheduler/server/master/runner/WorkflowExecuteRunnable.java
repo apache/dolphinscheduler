@@ -42,6 +42,7 @@ import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.graph.DAG;
+import org.apache.dolphinscheduler.common.log.remote.RemoteLogUtils;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -460,6 +461,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                     taskInstance.getTaskCode(),
                     taskInstance.getState());
             this.updateProcessInstanceState();
+
+            sendTaskLogOnMasterToRemoteIfNeeded(taskInstance.getLogPath(), taskInstance.getHost());
         } catch (Exception ex) {
             log.error("Task finish failed, get a exception, will remove this taskInstance from completeTaskMap", ex);
             // remove the task from complete map, so that we can finish in the next time.
@@ -2178,4 +2181,14 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
 
     }
 
+    private void sendTaskLogOnMasterToRemoteIfNeeded(String logPath, String host) {
+        if (RemoteLogUtils.isRemoteLoggingEnable() && isExecutedOnMaster(host)) {
+            RemoteLogUtils.sendRemoteLog(logPath);
+            log.info("Master sends task log {} to remote storage asynchronously.", logPath);
+        }
+    }
+
+    private boolean isExecutedOnMaster(String host) {
+        return host.endsWith(masterAddress.split(Constants.COLON)[1]);
+    }
 }

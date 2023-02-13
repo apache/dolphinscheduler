@@ -164,7 +164,7 @@ public class LogUtils {
         }
     }
 
-    public static String readWholeFileContent(String filePath) {
+    public static String readWholeFileContentFromLocal(String filePath) {
         String line;
         StringBuilder sb = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath)))) {

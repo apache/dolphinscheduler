@@ -806,4 +806,27 @@ public final class Constants {
     public static final Integer QUERY_ALL_ON_PROJECT = 1;
     public static final Integer QUERY_ALL_ON_WORKFLOW = 2;
     public static final Integer QUERY_ALL_ON_TASK = 3;
+
+    /**
+     * remote logging
+     */
+    public static final String REMOTE_LOGGING_ENABLE = "remote.logging.enable";
+
+    public static final String REMOTE_LOGGING_TARGET = "remote.logging.target";
+
+    public static final String REMOTE_LOGGING_BASE_DIR = "remote.logging.base.dir";
+
+    public static final String REMOTE_LOGGING_THREAD_POOL_SIZE = "remote.logging.thread.pool.size";
+
+    /**
+     * remote logging for OSS
+     */
+
+    public static final String REMOTE_LOGGING_OSS_ACCESS_KEY_ID = "remote.logging.oss.access.key.id";
+
+    public static final String REMOTE_LOGGING_OSS_ACCESS_KEY_SECRET = "remote.logging.oss.access.key.secret";
+
+    public static final String REMOTE_LOGGING_OSS_BUCKET_NAME = "remote.logging.oss.bucket.name";
+
+    public static final String REMOTE_LOGGING_OSS_ENDPOINT = "remote.logging.oss.endpoint";
 }
