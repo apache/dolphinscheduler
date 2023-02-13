@@ -268,4 +268,6 @@ public class TaskExecutionContext implements Serializable {
      * test flag
      */
     private int testFlag;
+
+    private boolean logBufferEnable;
 }
