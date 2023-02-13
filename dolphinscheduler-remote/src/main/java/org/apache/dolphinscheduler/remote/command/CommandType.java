@@ -134,7 +134,7 @@ public enum CommandType {
     /**
      * update taskInstance's PID request
      */
-    UPDATE_PID,
+    TASK_UPDATE_PID,
 
     /**
      * workflow executing data response, from master to api

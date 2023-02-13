@@ -51,7 +51,7 @@ public class UpdatePidProcessor implements NettyRequestProcessor {
      */
     @Override
     public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.UPDATE_PID == command.getType(),
+        Preconditions.checkArgument(CommandType.TASK_UPDATE_PID == command.getType(),
                 String.format("invalid command type : %s", command.getType()));
         TaskExecuteRunningCommand taskExecuteRunningMessage =
                 JSONUtils.parseObject(command.getBody(), TaskExecuteRunningCommand.class);
