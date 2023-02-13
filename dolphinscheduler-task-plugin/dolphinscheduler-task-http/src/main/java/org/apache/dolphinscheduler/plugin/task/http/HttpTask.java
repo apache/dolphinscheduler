@@ -25,6 +25,8 @@ import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
@@ -101,6 +103,7 @@ public class HttpTask extends AbstractTask {
             statusCode = String.valueOf(getStatusCode(response));
             body = getResponseBody(response);
             exitStatusCode = validResponse(body, statusCode);
+            addDefaultOutput(body);
             long costTime = System.currentTimeMillis() - startTime;
             log.info(
                     "startTime: {}, httpUrl: {}, httpMethod: {}, costTime : {} milliseconds, statusCode : {}, body : {}, log : {}",
@@ -326,5 +329,15 @@ public class HttpTask extends AbstractTask {
     @Override
     public AbstractParameters getParameters() {
         return this.httpParameters;
+    }
+
+    public void addDefaultOutput(String response) {
+        // put response in output
+        Property outputProperty = new Property();
+        outputProperty.setProp(String.format("%s.%s", taskExecutionContext.getTaskName(), "response"));
+        outputProperty.setDirect(Direct.OUT);
+        outputProperty.setType(DataType.VARCHAR);
+        outputProperty.setValue(response);
+        httpParameters.addPropertyToValPool(outputProperty);
     }
 }

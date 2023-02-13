@@ -189,7 +189,7 @@ export default defineComponent({
                 disabled={this.uploadShow}
                 showPath={false}
                 class='btn-udf-resource-dropdown'
-              ></NTreeSelect>
+              />
               <NButton
                 type='primary'
                 ghost
@@ -217,7 +217,7 @@ export default defineComponent({
                     'resource.function.enter_select_udf_resources_directory_tips'
                   )}
                   defaultValue={this.uploadForm.pid}
-                ></NTreeSelect>
+                />
               </NFormItem>
               <NFormItem
                 label=' '
@@ -239,7 +239,7 @@ export default defineComponent({
                     <NButton>
                       {t('resource.function.upload')}
                       <NIcon>
-                        <CloudUploadOutlined />
+                        <CloudUploadOutlined/>
                       </NIcon>
                     </NButton>
                   </NUpload>

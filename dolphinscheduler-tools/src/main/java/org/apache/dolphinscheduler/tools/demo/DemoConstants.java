@@ -15,26 +15,18 @@
  * limitations under the License.
  */
 
-export interface IUdfResourceParam {
-  fullName: string
-  tenantCode: string
-  id: number
-  pageSize: number
-  pageNo: number
-  searchVal: string | undefined
-}
+package org.apache.dolphinscheduler.tools.demo;
 
-export interface IUdf {
-  id: number
-  pid: number
-  userId: number
-  fileName: string
-  fullName: string
-  alias: string
-  directory: boolean
-  size: number
-  type: 'UDF'
-  description: string
-  createTime: string
-  updateTime: string
+public class DemoConstants {
+
+    public static final String PARAMETER_CONTEXT_PARAMS =
+            "[{\"prop\":\"output\",\"value\":\"100\",\"direct\":\"IN\",\"type\":\"VARCHAR\"},{\"prop\":\"value\",\"value\":\"99\",\"direct\":\"IN\",\"type\":\"VARCHAR\"}]";
+
+    public static final String SHELL_GLOBAL_PARAMS =
+            "[{\"prop\":\"resources\",\"value\":\"Processing information\",\"direct\":\"IN\",\"type\":\"VARCHAR\"}]";
+
+    public static final String SWITCH_GLOBAL_PARAMS =
+            "[{\"prop\":\"switchValue\",\"value\":\"A\",\"direct\":\"IN\",\"type\":\"VARCHAR\"}]";
+
+    public static final String Expire_Time = "2050-09-30 15:59:23";
 }
