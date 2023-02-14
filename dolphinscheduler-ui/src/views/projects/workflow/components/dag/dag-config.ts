@@ -252,7 +252,7 @@ export const EDGE = {
   router: {
     name: 'er',
     args: {
-      offset: 12,
+      offset: 12
     }
   },
   defaultLabel: {

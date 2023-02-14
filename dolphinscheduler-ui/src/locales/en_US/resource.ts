@@ -59,7 +59,7 @@ export default {
     udf_resources: 'UDF resources',
     upload_udf_resources: 'Upload UDF Resources',
     udf_source_name: 'UDF Resource Name',
-    user_name: 'Resource userName',
+    user_name: 'Resource userName'
   },
   function: {
     udf_function: 'UDF Function',

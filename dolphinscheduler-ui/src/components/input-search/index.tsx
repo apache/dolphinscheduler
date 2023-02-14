@@ -28,8 +28,8 @@ const props = {
 
 const Search = defineComponent({
   name: 'Search',
-  emits: ['search','clear'],
   props: props,
+  emits: ['search', 'clear'],
   setup(props, ctx) {
     const { t } = useI18n()
 
@@ -40,14 +40,15 @@ const Search = defineComponent({
       ctx.emit('clear', (ev.target as HTMLInputElement)?.value || '')
     }
     return () => (
-
-        <NInput
-            size='small'
-            clearable
-            placeholder = {props.placeholder?props.placeholder:t('input_search.placeholder')}
-            onKeydown={withKeys(onKeyDown, ['enter'])}
-            onClear = {onClear}
-        />
+      <NInput
+        size='small'
+        clearable
+        placeholder={
+          props.placeholder ? props.placeholder : t('input_search.placeholder')
+        }
+        onKeydown={withKeys(onKeyDown, ['enter'])}
+        onClear={onClear}
+      />
     )
   }
 })

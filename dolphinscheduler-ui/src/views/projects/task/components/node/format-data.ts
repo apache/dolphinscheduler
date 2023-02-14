@@ -484,7 +484,7 @@ export function formatParams(data: INodeData): {
         : '0',
       failRetryTimes: data.failRetryTimes ? String(data.failRetryTimes) : '0',
       flag: data.flag,
-      isCache: data.isCache ? "YES" : "NO",
+      isCache: data.isCache ? 'YES' : 'NO',
       name: data.name,
       taskGroupId: data.taskGroupId,
       taskGroupPriority: data.taskGroupPriority,
@@ -496,7 +496,9 @@ export function formatParams(data: INodeData): {
         initScript: data.initScript,
         rawScript: data.rawScript,
         resourceList: data.resourceList?.length
-          ? data.resourceList.map((fullName: string) => ({ resourceName: `${fullName}` }))
+          ? data.resourceList.map((fullName: string) => ({
+              resourceName: `${fullName}`
+            }))
           : [],
         ...taskParams
       },
@@ -545,7 +547,7 @@ export function formatModel(data: ITaskData) {
   }
   if (data.taskParams?.resourceList) {
     params.resourceList = data.taskParams.resourceList.map(
-      (item: { resourceName: string }) => (`${item.resourceName}`)
+      (item: { resourceName: string }) => `${item.resourceName}`
     )
   }
   if (data.taskParams?.mainJar) {
@@ -635,7 +637,10 @@ export function formatModel(data: ITaskData) {
   }
 
   if (data.taskParams?.dependence) {
-    const dependence: { relation?: RelationType, dependTaskList?: IDependTask[] } = JSON.parse(JSON.stringify(data.taskParams.dependence))
+    const dependence: {
+      relation?: RelationType
+      dependTaskList?: IDependTask[]
+    } = JSON.parse(JSON.stringify(data.taskParams.dependence))
     params.dependTaskList = dependence.dependTaskList || []
     params.relation = dependence.relation
   }

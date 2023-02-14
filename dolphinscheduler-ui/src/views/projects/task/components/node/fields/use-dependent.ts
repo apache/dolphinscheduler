@@ -244,23 +244,26 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
         if (!item.dependItemList?.length) return
 
         const itemListOptions = ref([] as IDependentItemOptions[])
-        item.dependItemList?.forEach(async (dependItem: IDependentItem, itemIndex: number) => {
-          itemListOptions.value[itemIndex] = {}
-          if (dependItem.projectCode) {
-            itemListOptions.value[itemIndex].definitionCodeOptions = await getProcessList(
-              dependItem.projectCode
-            )
+        item.dependItemList?.forEach(
+          async (dependItem: IDependentItem, itemIndex: number) => {
+            itemListOptions.value[itemIndex] = {}
+            if (dependItem.projectCode) {
+              itemListOptions.value[itemIndex].definitionCodeOptions =
+                await getProcessList(dependItem.projectCode)
+            }
+            if (dependItem.projectCode && dependItem.definitionCode) {
+              itemListOptions.value[itemIndex].depTaskCodeOptions =
+                await getTaskList(
+                  dependItem.projectCode,
+                  dependItem.definitionCode
+                )
+            }
+            if (dependItem.cycle) {
+              itemListOptions.value[itemIndex].dateOptions =
+                DATE_LIST[dependItem.cycle]
+            }
           }
-          if (dependItem.projectCode && dependItem.definitionCode) {
-            itemListOptions.value[itemIndex].depTaskCodeOptions = await getTaskList(
-              dependItem.projectCode,
-              dependItem.definitionCode
-            )
-          }
-          if (dependItem.cycle) {
-            itemListOptions.value[itemIndex].dateOptions = DATE_LIST[dependItem.cycle]
-          }
-        })
+        )
         selectOptions.value[taskIndex] = {} as IDependTaskOptions
         selectOptions.value[taskIndex].dependItemList = itemListOptions.value
       })
@@ -288,7 +291,9 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
                 const options = selectOptions?.value[i] || {}
                 const itemListOptions = options?.dependItemList || []
                 const itemOptions = {} as IDependentItemOptions
-                itemOptions.definitionCodeOptions = await getProcessList(projectCode)
+                itemOptions.definitionCodeOptions = await getProcessList(
+                  projectCode
+                )
                 itemListOptions[j] = itemOptions
                 options.dependItemList = itemListOptions
                 selectOptions.value[i] = options
@@ -317,15 +322,14 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
               filterable: true,
               onUpdateValue: async (processCode: number) => {
                 const item = model.dependTaskList[i].dependItemList[j]
-                selectOptions.value[i].dependItemList[j].depTaskCodeOptions = await getTaskList(
-                  item.projectCode,
-                  processCode
-                )
+                selectOptions.value[i].dependItemList[j].depTaskCodeOptions =
+                  await getTaskList(item.projectCode, processCode)
                 item.depTaskCode = 0
               }
             },
-            options: selectOptions.value[i]?.dependItemList[j]
-                    ?.definitionCodeOptions || [],
+            options:
+              selectOptions.value[i]?.dependItemList[j]
+                ?.definitionCodeOptions || [],
             path: `dependTaskList.${i}.dependItemList.${j}.definitionCode`,
             rule: {
               required: true,

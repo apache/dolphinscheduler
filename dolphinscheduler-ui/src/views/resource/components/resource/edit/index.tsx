@@ -33,8 +33,8 @@ export default defineComponent({
 
     const componentName = route.name
     // fullname is now the id of resources
-    const fullName = String(router.currentRoute.value.query.prefix || "")
-    const tenantCode = String(router.currentRoute.value.query.tenantCode || "")
+    const fullName = String(router.currentRoute.value.query.prefix || '')
+    const tenantCode = String(router.currentRoute.value.query.tenantCode || '')
 
     const { state } = useForm()
     const { getResourceView, handleUpdateContent } = useEdit(state)

@@ -20,9 +20,8 @@ import ResourceCreateModal from '../../components/resource/create'
 
 export default defineComponent({
   name: 'ResourceFileCreate',
-  setup() {
-  },
+  setup() {},
   render() {
-    return <ResourceCreateModal/>
+    return <ResourceCreateModal />
   }
 })

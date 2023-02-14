@@ -107,7 +107,7 @@ const BatchTaskInstance = defineComponent({
       variables.showModalRef = false
     }
 
-    var getLogsID: number
+    let getLogsID: number
 
     const getLogs = (row: any, logTimer: number) => {
       const { state } = useAsyncState(

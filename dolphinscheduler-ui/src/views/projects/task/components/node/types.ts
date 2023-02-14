@@ -103,8 +103,8 @@ interface ISwitchResult {
  * res: resource file name
  */
 interface ISourceItem {
-  id?: number,
-  resourceName: string,
+  id?: number
+  resourceName: string
   res?: string
 }
 
@@ -473,7 +473,7 @@ interface ITaskData
   > {
   name?: string
   taskPriority?: string
-  isCache?: "YES" | "NO"
+  isCache?: 'YES' | 'NO'
   timeoutFlag?: 'OPEN' | 'CLOSE'
   timeoutNotifyStrategy?: string | []
   taskParams?: ITaskParams

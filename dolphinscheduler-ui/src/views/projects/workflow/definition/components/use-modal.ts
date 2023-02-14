@@ -85,7 +85,7 @@ export function useModal(
     }
   }
 
-  const handleStartDefinition = async (code: number,version: number) => {
+  const handleStartDefinition = async (code: number, version: number) => {
     await state.startFormRef.validate()
 
     if (state.saving) return

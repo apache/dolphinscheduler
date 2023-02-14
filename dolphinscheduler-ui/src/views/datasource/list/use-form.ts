@@ -207,25 +207,25 @@ export function useForm(id?: number) {
     } as FormRules,
     modeOptions: [
       {
-        label: "SqlPassword",
-        value: 'SqlPassword',
+        label: 'SqlPassword',
+        value: 'SqlPassword'
       },
       {
-        label: "ActiveDirectoryPassword",
-        value: 'ActiveDirectoryPassword',
+        label: 'ActiveDirectoryPassword',
+        value: 'ActiveDirectoryPassword'
       },
       {
-        label: "ActiveDirectoryMSI",
-        value: 'ActiveDirectoryMSI',
+        label: 'ActiveDirectoryMSI',
+        value: 'ActiveDirectoryMSI'
       },
       {
-        label: "ActiveDirectoryServicePrincipal",
-        value: 'ActiveDirectoryServicePrincipal',
+        label: 'ActiveDirectoryServicePrincipal',
+        value: 'ActiveDirectoryServicePrincipal'
       },
       {
-        label: "accessToken",
-        value: 'accessToken',
-      },
+        label: 'accessToken',
+        value: 'accessToken'
+      }
     ],
     redShitModeOptions: [
       {
@@ -243,7 +243,7 @@ export function useForm(id?: number) {
     state.detailForm.port = options.previousPort || options.defaultPort
     state.detailForm.type = type
 
-    state.requiredDataBase = (type !== 'POSTGRESQL' && type !== 'ATHENA')
+    state.requiredDataBase = type !== 'POSTGRESQL' && type !== 'ATHENA'
 
     state.showHost = type !== 'ATHENA'
     state.showPort = type !== 'ATHENA'
@@ -284,13 +284,13 @@ export function useForm(id?: number) {
     const params = { type: state.detailForm.type, testFlag: 1 } as TypeReq
     const result = await queryDataSourceList(params)
     state.bindTestDataSourceExample = result
-        .filter((value: { label: string; value: string }) => {
-          // @ts-ignore
-          if (state.detailForm.id && state.detailForm.id === value.id)
-            return false
-          return true
-        })
-        .map((TestDataSourceExample: { name: string; id: number }) => ({
+      .filter((value: { label: string; value: string }) => {
+        // @ts-ignore
+        if (state.detailForm.id && state.detailForm.id === value.id)
+          return false
+        return true
+      })
+      .map((TestDataSourceExample: { name: string; id: number }) => ({
         label: TestDataSourceExample.name,
         value: TestDataSourceExample.id
       }))
@@ -309,7 +309,6 @@ export function useForm(id?: number) {
   }
 
   const getFieldsValue = () => state.detailForm
-
 
   return {
     state,
@@ -390,9 +389,9 @@ export const datasourceType: IDataBaseOptionKeys = {
     defaultPort: 1433
   },
   STARROCKS: {
-      value: 'STARROCKS',
-      label: 'STARROCKS',
-      defaultPort: 9030
+    value: 'STARROCKS',
+    label: 'STARROCKS',
+    defaultPort: 9030
   },
   DAMENG: {
     value: 'DAMENG',

@@ -15,9 +15,7 @@
  * limitations under the License.
  */
 import { reactive } from 'vue'
-import {
-  queryProjectWithAuthorizedLevelListPaging
-} from '@/service/modules/projects'
+import { queryProjectWithAuthorizedLevelListPaging } from '@/service/modules/projects'
 import {
   authedDatasource,
   unAuthDatasource
@@ -39,7 +37,7 @@ import {
   grantDataSource,
   grantUDFFunc,
   grantNamespaceFunc,
-  revokeProjectById,
+  revokeProjectById
 } from '@/service/modules/users'
 import utils from '@/utils'
 import type { TAuthType, IResourceOption, IOption, IRecord } from '../types'
@@ -79,7 +77,7 @@ export function useAuthorize() {
     if (userId) {
       state.userId = userId
     }
-    
+
     const projectsList = await queryProjectWithAuthorizedLevelListPaging({
       userId,
       searchVal: state.searchVal,
@@ -104,7 +102,10 @@ export function useAuthorize() {
     await getProjects(state.userId)
   }
 
-  const revokeProjectByIdRequest = async (userId: number, projectIds: string) => {
+  const revokeProjectByIdRequest = async (
+    userId: number,
+    projectIds: string
+  ) => {
     await revokeProjectById({
       userId,
       projectIds: projectIds
@@ -120,7 +121,10 @@ export function useAuthorize() {
     await getProjects(userId)
   }
 
-  const grantProjectWithReadPermRequest = async (userId: number, projectIds: string) => {
+  const grantProjectWithReadPermRequest = async (
+    userId: number,
+    projectIds: string
+  ) => {
     await grantProjectWithReadPerm({
       userId,
       projectIds: projectIds
@@ -322,5 +326,15 @@ export function useAuthorize() {
     return true
   }
 
-  return { state, onInit, onSave, getProjects, revokeProjectByIdRequest, grantProjectRequest, grantProjectWithReadPermRequest, requestData, handleChangePageSize }
+  return {
+    state,
+    onInit,
+    onSave,
+    getProjects,
+    revokeProjectByIdRequest,
+    grantProjectRequest,
+    grantProjectWithReadPermRequest,
+    requestData,
+    handleChangePageSize
+  }
 }

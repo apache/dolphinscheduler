@@ -103,7 +103,7 @@ export function useTable() {
                   ButtonLink,
                   {
                     onClick: () => {
-                      let routeUrl = router.resolve({
+                      const routeUrl = router.resolve({
                         name: 'workflow-definition-detail',
                         params: { code: row.code }
                       })
@@ -148,19 +148,19 @@ export function useTable() {
         render: (row) =>
           row.releaseState === 'ONLINE'
             ? h(
-              NTag,
-              { type: 'success', size: 'small' },
-              {
-                default: () => t('project.workflow.up_line')
-              }
-            )
+                NTag,
+                { type: 'success', size: 'small' },
+                {
+                  default: () => t('project.workflow.up_line')
+                }
+              )
             : h(
-              NTag,
-              { type: 'warning', size: 'small' },
-              {
-                default: () => t('project.workflow.down_line')
-              }
-            )
+                NTag,
+                { type: 'warning', size: 'small' },
+                {
+                  default: () => t('project.workflow.down_line')
+                }
+              )
       },
       {
         title: t('project.workflow.schedule_publish_status'),
@@ -309,7 +309,7 @@ export function useTable() {
     })
   }
 
-  const batchCopyWorkflow = () => { }
+  const batchCopyWorkflow = () => {}
 
   const releaseWorkflow = (row: any) => {
     const data = {

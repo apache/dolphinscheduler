@@ -23,13 +23,7 @@ import {
   toRefs,
   watch
 } from 'vue'
-import {
-  NButton,
-  NIcon,
-  NDataTable,
-  NPagination,
-  NSpace
-} from 'naive-ui'
+import { NButton, NIcon, NDataTable, NPagination, NSpace } from 'naive-ui'
 import DetailModal from './detail'
 import Card from '@/components/card'
 import { SearchOutlined } from '@vicons/antd'
@@ -38,7 +32,7 @@ import { useUserInfo } from './use-userinfo'
 import { useColumns } from './use-columns'
 import { useTable } from './use-table'
 import type { IRecord } from './types'
-import Search from "@/components/input-search";
+import Search from '@/components/input-search'
 
 const AlarmInstanceManage = defineComponent({
   name: 'alarm-instance-manage',

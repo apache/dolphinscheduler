@@ -37,10 +37,10 @@ export default {
     confirm: '确定',
     cancel: '取消',
     delete_confirm: '确定删除吗?',
-    authorize_level:'权限等级',
+    authorize_level: '权限等级',
     no_permission: '无权限',
     read_permission: '读权限',
-    all_permission: '所有权限',
+    all_permission: '所有权限'
   },
   workflow: {
     on_line: '线上',
@@ -215,7 +215,7 @@ export default {
     workflow_relation_no_data_result_desc:
       '目前没有任何工作流，请先创建工作流，再访问该页面',
     ready_to_block: '准备锁定',
-    block: '锁定',
+    block: '锁定'
   },
   task: {
     on_line: '线上',
@@ -329,7 +329,7 @@ export default {
     online: '已上线'
   },
   node: {
-    is_cache: "缓存执行",
+    is_cache: '缓存执行',
     is_module_path: '使用模块路径',
     run_type: '运行类型',
     jvm_args: '虚拟机参数',
@@ -793,6 +793,6 @@ export default {
     di: '数据集成',
     dq: '数据质量',
     ml: '机器学习',
-    other: '其他',
+    other: '其他'
   }
 }

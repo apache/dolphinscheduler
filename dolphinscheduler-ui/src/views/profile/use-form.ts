@@ -32,7 +32,7 @@ export function useForm() {
     profileForm: {
       username: userInfo.userName,
       email: userInfo.email,
-      phone: userInfo.phone,
+      phone: userInfo.phone
     },
     saving: false,
     rules: {
@@ -63,7 +63,7 @@ export function useForm() {
     state.profileForm = {
       username: userInfo.userName,
       email: userInfo.email,
-      phone: userInfo.phone,
+      phone: userInfo.phone
     }
   })
 

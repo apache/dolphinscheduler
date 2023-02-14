@@ -44,9 +44,8 @@ import ResourceUploadModal from './upload'
 import ResourceRenameModal from './rename'
 import styles from './index.module.scss'
 import type { Router } from 'vue-router'
-import Search from "@/components/input-search"
-import { ResourceType } from "@/views/resource/components/resource/types";
-
+import Search from '@/components/input-search'
+import { ResourceType } from '@/views/resource/components/resource/types'
 
 const props = {
   resourceType: {
@@ -69,9 +68,8 @@ export default defineComponent({
       tableWidth,
       requestData,
       updateList,
-      handleCreateFile,
+      handleCreateFile
     } = useTable()
-
 
     variables.resourceType = props.resourceType
 
@@ -105,27 +103,37 @@ export default defineComponent({
 
     onMounted(() => {
       fileStore.setCurrentDir(variables.fullName)
-      breadListRef.value = fileStore.getCurrentDir.replace(/\/+$/g, '')
-        .split('/').slice(2) as Array<string>
+      breadListRef.value = fileStore.getCurrentDir
+        .replace(/\/+$/g, '')
+        .split('/')
+        .slice(2) as Array<string>
       requestData()
-
     })
 
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
     const handleBread = (index: number) => {
-      const breadName = variables.fullName.split('/').slice(0, index+3).join('/')+'/'
+      const breadName =
+        variables.fullName
+          .split('/')
+          .slice(0, index + 3)
+          .join('/') + '/'
       goBread(breadName)
     }
 
     const goBread = (fullName: string) => {
       const { resourceType, tenantCode } = variables
       if (fullName === '') {
-        router.push({ name: resourceType === 'UDF' ? 'resource-manage' : 'file-manage' })
+        router.push({
+          name: resourceType === 'UDF' ? 'resource-manage' : 'file-manage'
+        })
       } else {
         router.push({
-          name: resourceType === 'UDF' ? 'resource-sub-manage' : 'resource-file-subdirectory',
-          query: { prefix: fullName, tenantCode: tenantCode}
+          name:
+            resourceType === 'UDF'
+              ? 'resource-sub-manage'
+              : 'resource-file-subdirectory',
+          query: { prefix: fullName, tenantCode: tenantCode }
         })
       }
     }
@@ -156,11 +164,12 @@ export default defineComponent({
       handleCreateFile,
       handleUploadFile,
       columnsRef,
-      tableWidth,
+      tableWidth
     } = this
-    const manageTitle = this.resourceType === 'UDF'
-      ? t('resource.udf.udf_resources')
-      : t('resource.file.file_manage')
+    const manageTitle =
+      this.resourceType === 'UDF'
+        ? t('resource.udf.udf_resources')
+        : t('resource.file.file_manage')
 
     return (
       <NSpace vertical>
@@ -174,27 +183,26 @@ export default defineComponent({
               >
                 {t('resource.file.create_folder')}
               </NButton>
-              {this.resourceType !== 'UDF' &&
-                  <NButton onClick={handleCreateFile} class='btn-create-file'>
-                    {t('resource.file.create_file')}
-                  </NButton>
-              }
+              {this.resourceType !== 'UDF' && (
+                <NButton onClick={handleCreateFile} class='btn-create-file'>
+                  {t('resource.file.create_file')}
+                </NButton>
+              )}
               <NButton onClick={handleUploadFile} class='btn-upload-resource'>
                 {this.resourceType === 'UDF'
                   ? t('resource.udf.upload_udf_resources')
-                  : t('resource.file.upload_files')
-                }
+                  : t('resource.file.upload_files')}
               </NButton>
             </NButtonGroup>
             <NSpace>
               <Search
-                placeholder = {t('resource.file.enter_keyword_tips')}
+                placeholder={t('resource.file.enter_keyword_tips')}
                 v-model:value={this.searchRef}
                 onSearch={handleConditions}
               />
               <NButton size='small' type='primary' onClick={handleConditions}>
                 <NIcon>
-                  <SearchOutlined/>
+                  <SearchOutlined />
                 </NIcon>
               </NButton>
             </NSpace>
@@ -208,9 +216,12 @@ export default defineComponent({
                   <NBreadcrumbItem>
                     <NButton
                       text
-                      disabled={index > 0 && index === this.breadListRef!.length - 1}
+                      disabled={
+                        index > 0 && index === this.breadListRef!.length - 1
+                      }
                       onClick={() => this.handleBread(index)}
-                    >{index === 0 ? manageTitle : item}
+                    >
+                      {index === 0 ? manageTitle : item}
                     </NButton>
                   </NBreadcrumbItem>
                 ))}

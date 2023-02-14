@@ -20,7 +20,12 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { bytesToSize } from '@/common/common'
 import TableAction from './table-action'
-import { IRenameResource, IReuploadResource, ResourceFileTableData, ResourceType } from '../types'
+import {
+  IRenameResource,
+  IReuploadResource,
+  ResourceFileTableData,
+  ResourceType
+} from '../types'
 import ButtonLink from '@/components/button-link'
 import { NEllipsis } from 'naive-ui'
 import {
@@ -30,27 +35,32 @@ import {
 } from '@/common/column-width-config'
 import type { Router } from 'vue-router'
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
-import { useFileState } from "@/views/resource/components/resource/use-file";
+import { useFileState } from '@/views/resource/components/resource/use-file'
 
 const goSubFolder = (router: Router, item: ResourceFileTableData) => {
   if (item.directory) {
     router.push({
-      name: item.type === 'UDF' ? 'resource-sub-manage' : 'resource-file-subdirectory',
-      query: { prefix: item.fullName, tenantCode: item.user_name}
+      name:
+        item.type === 'UDF'
+          ? 'resource-sub-manage'
+          : 'resource-file-subdirectory',
+      query: { prefix: item.fullName, tenantCode: item.user_name }
     })
   } else if (item.type === 'FILE') {
-    router.push({ name: 'resource-file-list', query: {prefix: item.fullName, tenantCode: item.user_name}} )
+    router.push({
+      name: 'resource-file-list',
+      query: { prefix: item.fullName, tenantCode: item.user_name }
+    })
   }
 }
-
 
 export function useTable() {
   const { t } = useI18n()
   const router: Router = useRouter()
 
   const variables = reactive({
-    fullName: ref(String(router.currentRoute.value.query.prefix || "")),
-    tenantCode: ref(String(router.currentRoute.value.query.tenantCode || "")),
+    fullName: ref(String(router.currentRoute.value.query.prefix || '')),
+    tenantCode: ref(String(router.currentRoute.value.query.tenantCode || '')),
     resourceType: ref<ResourceType>(),
     resourceList: ref(),
     folderShowRef: ref(false),
@@ -75,7 +85,6 @@ export function useTable() {
       pageSize: 10,
       itemCount: 0,
       pageSizes: [10, 30, 50]
-
     })
   })
 
@@ -94,19 +103,19 @@ export function useTable() {
         return !row.directory
           ? row.alias
           : h(
-            ButtonLink,
-            {
-              onClick: () => goSubFolder(router, row)
-            },
-            {
-              default: () =>
-                h(
-                  NEllipsis,
-                  COLUMN_WIDTH_CONFIG['linkEllipsis'],
-                  () => row.alias
-                )
-            }
-          )
+              ButtonLink,
+              {
+                onClick: () => goSubFolder(router, row)
+              },
+              {
+                default: () =>
+                  h(
+                    NEllipsis,
+                    COLUMN_WIDTH_CONFIG['linkEllipsis'],
+                    () => row.alias
+                  )
+              }
+            )
       }
     },
     {
@@ -153,44 +162,54 @@ export function useTable() {
       render: (row) =>
         h(TableAction, {
           row,
-          onReuploadResource: ( name, description, fullName, user_name ) =>
-            reuploadResource( name, description, fullName, user_name ),
-          onRenameResource: ( name, description, fullName, user_name ) =>
-            renameResource( name, description, fullName, user_name ),
+          onReuploadResource: (name, description, fullName, user_name) =>
+            reuploadResource(name, description, fullName, user_name),
+          onRenameResource: (name, description, fullName, user_name) =>
+            renameResource(name, description, fullName, user_name),
           onUpdateList: () => updateList()
         }),
-      ...COLUMN_WIDTH_CONFIG['operation'](variables.resourceType === 'UDF' ? 4 : 5)
+      ...COLUMN_WIDTH_CONFIG['operation'](
+        variables.resourceType === 'UDF' ? 4 : 5
+      )
     }
   ]
 
   const createFile = () => {
     const { fullName } = variables
-    const name = fullName
-      ? 'resource-subfile-create'
-      : 'resource-file-create'
+    const name = fullName ? 'resource-subfile-create' : 'resource-file-create'
     router.push({
       name,
-      params: { id: fullName}
+      params: { id: fullName }
     })
   }
 
-  const reuploadResource: IReuploadResource = ( name, description, fullName, user_name ) => {
+  const reuploadResource: IReuploadResource = (
+    name,
+    description,
+    fullName,
+    user_name
+  ) => {
     variables.reuploadInfo = {
       name: name,
       description: description,
       fullName: fullName,
-      user_name:user_name
+      user_name: user_name
     }
     variables.isReupload = true
     variables.uploadShowRef = true
   }
 
-  const renameResource: IRenameResource = ( name, description, fullName, user_name ) => {
+  const renameResource: IRenameResource = (
+    name,
+    description,
+    fullName,
+    user_name
+  ) => {
     variables.renameInfo = {
       name: name,
       description: description,
       fullName: fullName,
-      user_name:user_name
+      user_name: user_name
     }
     variables.renameShowRef = true
   }
@@ -212,7 +231,6 @@ export function useTable() {
     )
   }
 
-
   const updateList = () => {
     variables.pagination.page = 1
     requestData()
@@ -224,6 +242,6 @@ export function useTable() {
     tableWidth: calculateTableWidth(columnsRef) || DefaultTableWidth,
     requestData,
     updateList,
-    handleCreateFile: createFile,
+    handleCreateFile: createFile
   }
 }

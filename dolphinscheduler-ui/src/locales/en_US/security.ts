@@ -152,7 +152,7 @@ export default {
     namespace: 'Namespace',
     revoke_auth: 'Revoke',
     grant_read: 'Grant Read',
-    grant_all:'Grant All',
+    grant_all: 'Grant All',
     authorize_project: 'Project Authorize',
     authorize_resource: 'Resource Authorize',
     authorize_namespace: 'Namespace Authorize',

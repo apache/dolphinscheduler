@@ -20,11 +20,8 @@ import ResourceListModal from '../../components/resource'
 
 export default defineComponent({
   name: 'resource-manage',
-  setup() {
-  },
+  setup() {},
   render() {
-    return <ResourceListModal
-      resourceType={'UDF'}
-    />
+    return <ResourceListModal resourceType={'UDF'} />
   }
 })

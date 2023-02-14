@@ -20,7 +20,6 @@ import { watch, ref } from 'vue'
 import { useCustomParams, useResources } from '.'
 
 export function useDms(model: { [field: string]: any }): IJsonItem[] {
-
   const jsonDataSpan = ref(0)
   const replicationTaskArnSpan = ref(0)
   const replicationTaskIdentifierSpan = ref(0)
@@ -31,8 +30,10 @@ export function useDms(model: { [field: string]: any }): IJsonItem[] {
   const tableMappingsSpan = ref(0)
 
   const setFlag = () => {
-    model.isCreateAndNotJson = !model.isRestartTask && !model.isJsonFormat ? true : false
-    model.isRestartAndNotJson = model.isRestartTask && !model.isJsonFormat ? true : false
+    model.isCreateAndNotJson =
+      !model.isRestartTask && !model.isJsonFormat ? true : false
+    model.isRestartAndNotJson =
+      model.isRestartTask && !model.isJsonFormat ? true : false
   }
 
   const resetSpan = () => {
