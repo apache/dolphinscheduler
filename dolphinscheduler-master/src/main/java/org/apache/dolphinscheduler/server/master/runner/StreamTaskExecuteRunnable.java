@@ -75,16 +75,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import lombok.NonNull;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * stream task execute
  */
+@Slf4j
 public class StreamTaskExecuteRunnable implements Runnable {
-
-    private static final Logger logger = LoggerFactory.getLogger(StreamTaskExecuteRunnable.class);
 
     protected MasterConfig masterConfig;
 
@@ -168,13 +165,13 @@ public class StreamTaskExecuteRunnable implements Runnable {
             dispatcher.dispatch(executionContext);
             dispatchSuccess = true;
         } catch (ExecuteException e) {
-            logger.error("Master dispatch task to worker error, taskInstanceId: {}, worker: {}",
+            log.error("Master dispatch task to worker error, taskInstanceId: {}, worker: {}",
                     taskInstance.getId(),
                     executionContext.getHost(),
                     e);
         }
         if (!dispatchSuccess) {
-            logger.info("Master failed to dispatch task to worker, taskInstanceId: {}, worker: {}",
+            log.info("Master failed to dispatch task to worker, taskInstanceId: {}, worker: {}",
                     taskInstance.getId(),
                     executionContext.getHost());
 
@@ -187,7 +184,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
         // set started flag
         taskRunnableStatus = TaskRunnableStatus.STARTED;
 
-        logger.info("Master success dispatch task to worker, taskInstanceId: {}, worker: {}",
+        log.info("Master success dispatch task to worker, taskInstanceId: {}, worker: {}",
                 taskInstance.getId(),
                 executionContext.getHost());
     }
@@ -198,7 +195,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
 
     public boolean addTaskEvent(TaskEvent taskEvent) {
         if (taskInstance.getId() != taskEvent.getTaskInstanceId()) {
-            logger.info("state event would be abounded, taskInstanceId:{}, eventType:{}, state:{}",
+            log.info("state event would be abounded, taskInstanceId:{}, eventType:{}, state:{}",
                     taskEvent.getTaskInstanceId(), taskEvent.getEvent(), taskEvent.getState());
             return false;
         }
@@ -215,7 +212,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
      */
     public void handleEvents() {
         if (!isStart()) {
-            logger.info(
+            log.info(
                     "The stream task instance is not started, will not handle its state event, current state event size: {}",
                     taskEvents.size());
             return;
@@ -226,23 +223,23 @@ public class StreamTaskExecuteRunnable implements Runnable {
                 taskEvent = this.taskEvents.peek();
                 LoggerUtils.setTaskInstanceIdMDC(taskEvent.getTaskInstanceId());
 
-                logger.info("Begin to handle state event, {}", taskEvent);
+                log.info("Begin to handle state event, {}", taskEvent);
                 if (this.handleTaskEvent(taskEvent)) {
                     this.taskEvents.remove(taskEvent);
                 }
             } catch (StateEventHandleError stateEventHandleError) {
-                logger.error("State event handle error, will remove this event: {}", taskEvent, stateEventHandleError);
+                log.error("State event handle error, will remove this event: {}", taskEvent, stateEventHandleError);
                 this.taskEvents.remove(taskEvent);
                 ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
             } catch (StateEventHandleException stateEventHandleException) {
-                logger.error("State event handle error, will retry this event: {}",
+                log.error("State event handle error, will retry this event: {}",
                         taskEvent,
                         stateEventHandleException);
                 ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
             } catch (Exception e) {
                 // we catch the exception here, since if the state event handle failed, the state event will still keep
                 // in the stateEvents queue.
-                logger.error("State event handle error, get a unknown exception, will retry this event: {}",
+                log.error("State event handle error, get a unknown exception, will retry this event: {}",
                         taskEvent,
                         e);
                 ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
@@ -339,7 +336,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
 
         // verify tenant is null
         if (tenant == null) {
-            logger.error("tenant not exists,task instance id : {}", taskInstance.getId());
+            log.error("tenant not exists,task instance id : {}", taskInstance.getId());
             return null;
         }
 
@@ -429,7 +426,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
 
         if (taskInstance.getState().isFinished()) {
             streamTaskInstanceExecCacheManager.removeByTaskInstanceId(taskInstance.getId());
-            logger.info("The stream task instance is finish, taskInstanceId:{}, state:{}", taskInstance.getId(),
+            log.info("The stream task instance is finish, taskInstanceId:{}, state:{}", taskInstance.getId(),
                     taskEvent.getState());
         }
 
@@ -439,7 +436,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
     private void measureTaskState(TaskEvent taskEvent) {
         if (taskEvent == null || taskEvent.getState() == null) {
             // the event is broken
-            logger.warn("The task event is broken..., taskEvent: {}", taskEvent);
+            log.warn("The task event is broken..., taskEvent: {}", taskEvent);
             return;
         }
         if (taskEvent.getState().isFinished()) {

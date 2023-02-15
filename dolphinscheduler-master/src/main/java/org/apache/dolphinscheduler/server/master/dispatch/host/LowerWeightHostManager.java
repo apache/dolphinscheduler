@@ -40,15 +40,13 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * lower weight host manager
  */
+@Slf4j
 public class LowerWeightHostManager extends CommonHostManager {
-
-    private final Logger logger = LoggerFactory.getLogger(LowerWeightHostManager.class);
 
     /**
      * selector
@@ -125,7 +123,7 @@ public class LowerWeightHostManager extends CommonHostManager {
                 }
                 syncWorkerHostWeight(workerHostWeights);
             } catch (Throwable ex) {
-                logger.error("Sync worker resource error", ex);
+                log.error("Sync worker resource error", ex);
             }
         }
 
@@ -142,16 +140,16 @@ public class LowerWeightHostManager extends CommonHostManager {
 
     public Optional<HostWeight> getHostWeight(String addr, String workerGroup, WorkerHeartBeat heartBeat) {
         if (heartBeat == null) {
-            logger.warn("worker {} in work group {} have not received the heartbeat", addr, workerGroup);
+            log.warn("worker {} in work group {} have not received the heartbeat", addr, workerGroup);
             return Optional.empty();
         }
         if (Constants.ABNORMAL_NODE_STATUS == heartBeat.getServerStatus()) {
-            logger.warn("worker {} current cpu load average {} is too high or available memory {}G is too low",
+            log.warn("worker {} current cpu load average {} is too high or available memory {}G is too low",
                     addr, heartBeat.getLoadAverage(), heartBeat.getAvailablePhysicalMemorySize());
             return Optional.empty();
         }
         if (Constants.BUSY_NODE_STATUE == heartBeat.getServerStatus()) {
-            logger.warn("worker {} is busy, current waiting task count {} is large than worker thread count {}",
+            log.warn("worker {} is busy, current waiting task count {} is large than worker thread count {}",
                     addr, heartBeat.getWorkerWaitingTaskCount(), heartBeat.getWorkerExecThreadCount());
             return Optional.empty();
         }

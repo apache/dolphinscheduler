@@ -222,3 +222,6 @@ d//
 delimiter ;
 select add_t_ds_task_instance_add_project_code();
 DROP FUNCTION add_t_ds_task_instance_add_project_code();
+
+ALTER TABLE `t_ds_alert`
+    MODIFY `title` varchar(512) DEFAULT NULL ;

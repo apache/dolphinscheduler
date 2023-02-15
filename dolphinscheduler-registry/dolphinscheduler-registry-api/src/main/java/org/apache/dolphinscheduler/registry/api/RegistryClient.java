@@ -43,17 +43,15 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Strings;
 
 @Component
+@Slf4j
 public class RegistryClient {
-
-    private static final Logger logger = LoggerFactory.getLogger(RegistryClient.class);
 
     private static final String EMPTY = "";
     private IStoppable stoppable;
@@ -81,7 +79,7 @@ public class RegistryClient {
                 childrenList = getChildrenKeys(rootNodePath(NodeType.MASTER));
             }
         } catch (Exception e) {
-            logger.error("getActiveMasterNum error", e);
+            log.error("getActiveMasterNum error", e);
         }
         return childrenList.size();
     }
@@ -95,7 +93,7 @@ public class RegistryClient {
             String serverPath = entry.getKey();
             String heartBeatJson = entry.getValue();
             if (StringUtils.isEmpty(heartBeatJson)) {
-                logger.error("The heartBeatJson is empty, serverPath: {}", serverPath);
+                log.error("The heartBeatJson is empty, serverPath: {}", serverPath);
                 continue;
             }
             Server server = new Server();
@@ -139,7 +137,7 @@ public class RegistryClient {
                 serverMap.putIfAbsent(server, get(path + Constants.SINGLE_SLASH + server));
             }
         } catch (Exception e) {
-            logger.error("get server list failed", e);
+            log.error("get server list failed", e);
         }
 
         return serverMap;

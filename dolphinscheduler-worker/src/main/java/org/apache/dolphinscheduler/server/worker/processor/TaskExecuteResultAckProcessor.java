@@ -25,8 +25,8 @@ import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -36,10 +36,9 @@ import io.netty.channel.Channel;
 /**
  * task execute running ack, from master to worker
  */
+@Slf4j
 @Component
 public class TaskExecuteResultAckProcessor implements NettyRequestProcessor {
-
-    private final Logger logger = LoggerFactory.getLogger(TaskExecuteResultAckProcessor.class);
 
     @Autowired
     private MessageRetryRunner messageRetryRunner;
@@ -53,20 +52,20 @@ public class TaskExecuteResultAckProcessor implements NettyRequestProcessor {
                 TaskExecuteAckCommand.class);
 
         if (taskExecuteAckMessage == null) {
-            logger.error("task execute response ack command is null");
+            log.error("task execute response ack command is null");
             return;
         }
 
         try {
             LogUtils.setTaskInstanceIdMDC(taskExecuteAckMessage.getTaskInstanceId());
-            logger.info("Receive task execute response ack command : {}", taskExecuteAckMessage);
+            log.info("Receive task execute response ack command : {}", taskExecuteAckMessage);
             if (taskExecuteAckMessage.isSuccess()) {
                 messageRetryRunner.removeRetryMessage(taskExecuteAckMessage.getTaskInstanceId(),
                         CommandType.TASK_EXECUTE_RESULT);
-                logger.debug("remove REMOTE_CHANNELS, task instance id:{}", taskExecuteAckMessage.getTaskInstanceId());
+                log.debug("remove REMOTE_CHANNELS, task instance id:{}", taskExecuteAckMessage.getTaskInstanceId());
             } else {
                 // master handle worker response error, will still retry
-                logger.error("Receive task execute result ack message, the message status is not success, message: {}",
+                log.error("Receive task execute result ack message, the message status is not success, message: {}",
                         taskExecuteAckMessage);
             }
         } finally {

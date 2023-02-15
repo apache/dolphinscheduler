@@ -57,7 +57,7 @@ public class SqoopTask extends AbstractYarnTask {
     public void init() {
         sqoopParameters =
                 JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SqoopParameters.class);
-        logger.info("Initialize sqoop task params {}", JSONUtils.toPrettyJsonString(sqoopParameters));
+        log.info("Initialize sqoop task params {}", JSONUtils.toPrettyJsonString(sqoopParameters));
         if (null == sqoopParameters) {
             throw new TaskException("Sqoop Task params is null");
         }
@@ -82,7 +82,7 @@ public class SqoopTask extends AbstractYarnTask {
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
 
         String resultScripts = ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
-        logger.info("sqoop script: {}", resultScripts);
+        log.info("sqoop script: {}", resultScripts);
         return resultScripts;
 
     }

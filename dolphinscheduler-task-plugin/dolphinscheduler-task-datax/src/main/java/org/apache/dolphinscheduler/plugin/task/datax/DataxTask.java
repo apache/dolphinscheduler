@@ -84,7 +84,7 @@ public class DataxTask extends AbstractTask {
      */
     public static final String JVM_PARAM = " --jvm=\"-Xms%sG -Xmx%sG\" ";
 
-    public static final String CUSTOM_PARAM = " -D%s=%s";
+    public static final String CUSTOM_PARAM = " -D%s='%s'";
     /**
      * python process(datax only supports version 2.7 by default)
      */
@@ -126,7 +126,7 @@ public class DataxTask extends AbstractTask {
         this.taskExecutionContext = taskExecutionContext;
 
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-                taskExecutionContext, logger);
+                taskExecutionContext, log);
     }
 
     /**
@@ -135,7 +135,7 @@ public class DataxTask extends AbstractTask {
     @Override
     public void init() {
         dataXParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), DataxParameters.class);
-        logger.info("Initialize datax task params {}", JSONUtils.toPrettyJsonString(dataXParameters));
+        log.info("Initialize datax task params {}", JSONUtils.toPrettyJsonString(dataXParameters));
 
         if (dataXParameters == null || !dataXParameters.checkParameters()) {
             throw new RuntimeException("datax task params is not valid");
@@ -165,11 +165,11 @@ public class DataxTask extends AbstractTask {
             setProcessId(commandExecuteResult.getProcessId());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            logger.error("The current DataX task has been interrupted", e);
+            log.error("The current DataX task has been interrupted", e);
             setExitStatusCode(EXIT_CODE_FAILURE);
             throw new TaskException("The current DataX task has been interrupted", e);
         } catch (Exception e) {
-            logger.error("datax task error", e);
+            log.error("datax task error", e);
             setExitStatusCode(EXIT_CODE_FAILURE);
             throw new TaskException("Execute DataX task failed", e);
         }
@@ -224,7 +224,7 @@ public class DataxTask extends AbstractTask {
         // replace placeholder
         json = ParameterUtils.convertParameterPlaceholders(json, ParamUtils.convert(paramsMap));
 
-        logger.debug("datax job json : {}", json);
+        log.debug("datax job json : {}", json);
 
         // create datax json file
         FileUtils.writeStringToFile(new File(fileName), json, StandardCharsets.UTF_8);
@@ -406,7 +406,7 @@ public class DataxTask extends AbstractTask {
         // replace placeholder
         String dataxCommand = ParameterUtils.convertParameterPlaceholders(sbr, ParamUtils.convert(paramsMap));
 
-        logger.debug("raw script : {}", dataxCommand);
+        log.debug("raw script : {}", dataxCommand);
 
         // create shell command file
         Set<PosixFilePermission> perms = PosixFilePermissions.fromString(RWXR_XR_X);
@@ -473,7 +473,7 @@ public class DataxTask extends AbstractTask {
         String[] columnNames = tryGrammaticalAnalysisSqlColumnNames(sourceType, sql);
 
         if (columnNames == null || columnNames.length == 0) {
-            logger.info("try to execute sql analysis query column name");
+            log.info("try to execute sql analysis query column name");
             columnNames = tryExecuteSqlResolveColumnNames(sourceType, dataSourceCfg, sql);
         }
 
@@ -496,7 +496,7 @@ public class DataxTask extends AbstractTask {
         try {
             SQLStatementParser parser = DataxUtils.getSqlStatementParser(dbType, sql);
             if (parser == null) {
-                logger.warn("database driver [{}] is not support grammatical analysis sql", dbType);
+                log.warn("database driver [{}] is not support grammatical analysis sql", dbType);
                 return new String[0];
             }
 
@@ -546,7 +546,7 @@ public class DataxTask extends AbstractTask {
                 columnNames[i] = columnName;
             }
         } catch (Exception e) {
-            logger.warn(e.getMessage(), e);
+            log.warn(e.getMessage(), e);
             return new String[0];
         }
 
@@ -578,7 +578,7 @@ public class DataxTask extends AbstractTask {
                 columnNames[i - 1] = md.getColumnName(i).replace("t.", "");
             }
         } catch (SQLException | ExecutionException e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             return null;
         }
 

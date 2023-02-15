@@ -101,7 +101,7 @@ import com.zaxxer.hikari.HikariDataSource;
 
 public abstract class BaseTaskProcessor implements ITaskProcessor {
 
-    protected final Logger logger =
+    protected final Logger log =
             LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
 
     protected boolean killed = false;
@@ -218,7 +218,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
                     result = resubmit();
                     break;
                 default:
-                    logger.error("unknown task action: {}", taskAction);
+                    log.error("unknown task action: {}", taskAction);
             }
             return result;
         } finally {
@@ -284,7 +284,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
     }
 
     /**
-     * set master task running logger.
+     * set master task running log.
      */
     public void setTaskExecutionLogger() {
         threadLoggerInfoName = LoggerUtils.buildTaskId(taskInstance.getFirstSubmitTime(),
@@ -307,7 +307,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
         // verify tenant is null
         if (verifyTenantIsNull(tenant, taskInstance)) {
-            logger.info("Task state changes to {}", TaskExecutionStatus.FAILURE);
+            log.info("Task state changes to {}", TaskExecutionStatus.FAILURE);
             taskInstance.setState(TaskExecutionStatus.FAILURE);
             taskInstanceDao.upsertTaskInstance(taskInstance);
             return null;
@@ -424,7 +424,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         int ruleId = dataQualityParameters.getRuleId();
         DqRule dqRule = processService.getDqRule(ruleId);
         if (dqRule == null) {
-            logger.error("Can not get dataQuality rule by id {}", ruleId);
+            log.error("Can not get dataQuality rule by id {}", ruleId);
             return;
         }
 
@@ -434,7 +434,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
         List<DqRuleInputEntry> ruleInputEntryList = processService.getRuleInputEntry(ruleId);
         if (CollectionUtils.isEmpty(ruleInputEntryList)) {
-            logger.error("Rule input entry list is empty, ruleId: {}", ruleId);
+            log.error("Rule input entry list is empty, ruleId: {}", ruleId);
             return;
         }
         List<DqRuleExecuteSql> executeSqlList = processService.getDqExecuteSql(ruleId);
@@ -609,7 +609,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
      */
     protected boolean verifyTenantIsNull(Tenant tenant, TaskInstance taskInstance) {
         if (tenant == null) {
-            logger.error("Tenant does not exists");
+            log.error("Tenant does not exists");
             return true;
         }
         return false;

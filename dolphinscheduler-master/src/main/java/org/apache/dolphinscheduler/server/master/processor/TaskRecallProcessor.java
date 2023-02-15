@@ -26,8 +26,8 @@ import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
 import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -38,9 +38,8 @@ import io.netty.channel.Channel;
  * task recall processor
  */
 @Component
+@Slf4j
 public class TaskRecallProcessor implements NettyRequestProcessor {
-
-    private final Logger logger = LoggerFactory.getLogger(TaskRecallProcessor.class);
 
     @Autowired
     private TaskEventService taskEventService;
@@ -60,7 +59,7 @@ public class TaskRecallProcessor implements NettyRequestProcessor {
         try {
             LoggerUtils.setWorkflowAndTaskInstanceIDMDC(recallCommand.getProcessInstanceId(),
                     recallCommand.getTaskInstanceId());
-            logger.info("Receive task recall command: {}", recallCommand);
+            log.info("Receive task recall command: {}", recallCommand);
             taskEventService.addEvent(taskEvent);
         } finally {
             LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();

@@ -65,8 +65,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Joiner;
@@ -74,10 +73,10 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
+@Slf4j
 public class HdfsStorageOperator implements Closeable, StorageOperate {
 
-    private static final Logger logger = LoggerFactory.getLogger(HdfsStorageOperator.class);
-    private static HdfsStorageProperties hdfsProperties;
+    private static HdfsStorageProperties hdfsProperties = new HdfsStorageProperties();
     private static final String HADOOP_UTILS_KEY = "HADOOP_UTILS_KEY";
 
     private static final LoadingCache<String, HdfsStorageOperator> cache = CacheBuilder
@@ -86,7 +85,7 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
             .build(new CacheLoader<String, HdfsStorageOperator>() {
 
                 @Override
-                public HdfsStorageOperator load(String key) throws Exception {
+                public HdfsStorageOperator load(String key) {
                     return new HdfsStorageOperator(hdfsProperties);
                 }
             });
@@ -122,7 +121,7 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
                 fs.mkdirs(path);
             }
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -146,13 +145,13 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
                 configuration.set(Constants.HDFS_DEFAULT_FS, defaultFS);
                 fsRelatedProps.forEach((key, value) -> configuration.set(key, value));
             } else {
-                logger.error("property:{} can not to be empty, please set!", Constants.FS_DEFAULT_FS);
+                log.error("property:{} can not to be empty, please set!", Constants.FS_DEFAULT_FS);
                 throw new NullPointerException(
                         String.format("property: %s can not to be empty, please set!", Constants.FS_DEFAULT_FS));
             }
 
             if (!defaultFS.startsWith("file")) {
-                logger.info("get property:{} -> {}, from core-site.xml hdfs-site.xml ", Constants.FS_DEFAULT_FS,
+                log.info("get property:{} -> {}, from core-site.xml hdfs-site.xml ", Constants.FS_DEFAULT_FS,
                         defaultFS);
             }
 
@@ -163,12 +162,12 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
                     return true;
                 });
             } else {
-                logger.warn("resource.hdfs.root.user is not set value!");
+                log.warn("resource.hdfs.root.user is not set value!");
                 fs = FileSystem.get(configuration);
             }
 
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -209,7 +208,7 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
         if (StringUtils.isBlank(appUrl)) {
             throw new BaseException("yarn application url generation failed");
         }
-        logger.debug("yarn application url:{}, applicationId:{}", appUrl, applicationId);
+        log.debug("yarn application url:{}, applicationId:{}", appUrl, applicationId);
         return String.format(appUrl, hdfsProperties.getHadoopResourceManagerHttpAddressPort(), applicationId);
     }
 
@@ -229,7 +228,7 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
     public byte[] catFile(String hdfsFilePath) throws IOException {
 
         if (StringUtils.isBlank(hdfsFilePath)) {
-            logger.error("hdfs file path:{} is blank", hdfsFilePath);
+            log.error("hdfs file path:{} is blank", hdfsFilePath);
             return new byte[0];
         }
 
@@ -250,7 +249,7 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
     public List<String> catFile(String hdfsFilePath, int skipLineNums, int limit) throws IOException {
 
         if (StringUtils.isBlank(hdfsFilePath)) {
-            logger.error("hdfs file path:{} is blank", hdfsFilePath);
+            log.error("hdfs file path:{} is blank", hdfsFilePath);
             return Collections.emptyList();
         }
 
@@ -402,7 +401,7 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
                     Files.delete(dstPath.toPath());
                 }
             } else {
-                logger.error("destination file must be a file");
+                log.error("destination file must be a file");
             }
         }
 
@@ -741,7 +740,7 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
             try {
                 fs.close();
             } catch (IOException e) {
-                logger.error("Close HadoopUtils instance failed", e);
+                log.error("Close HadoopUtils instance failed", e);
                 throw new IOException("Close HadoopUtils instance failed", e);
             }
         }
@@ -779,7 +778,7 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
                 }
 
             } catch (Exception e) {
-                logger.error("yarn ha application url generation failed, message:{}", e.getMessage());
+                log.error("yarn ha application url generation failed, message:{}", e.getMessage());
             }
             return null;
         }
@@ -850,11 +849,11 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
 
                 storageEntityList.addAll(tempList);
             } catch (FileNotFoundException e) {
-                logger.error("Resource path: {}", pathToExplore, e);
+                log.error("Resource path: {}", pathToExplore, e);
                 // return the resources fetched before error occurs.
                 return storageEntityList;
             } catch (IOException e) {
-                logger.error("Resource path: {}", pathToExplore, e);
+                log.error("Resource path: {}", pathToExplore, e);
                 // return the resources fetched before error occurs.
                 return storageEntityList;
             }

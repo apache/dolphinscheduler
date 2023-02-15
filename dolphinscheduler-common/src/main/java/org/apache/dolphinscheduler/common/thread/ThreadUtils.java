@@ -23,16 +23,13 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 
 import lombok.experimental.UtilityClass;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 @UtilityClass
+@Slf4j
 public class ThreadUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(ThreadUtils.class);
 
     /**
      * Wrapper over newDaemonFixedThreadExecutor.
@@ -62,7 +59,7 @@ public class ThreadUtils {
             Thread.sleep(millis);
         } catch (final InterruptedException interruptedException) {
             Thread.currentThread().interrupt();
-            logger.error("Current thread sleep error", interruptedException);
+            log.error("Current thread sleep error", interruptedException);
         }
     }
 }

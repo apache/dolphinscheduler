@@ -44,14 +44,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+@Slf4j
 public class TaskCacheUtils {
-
-    protected static final Logger logger = LoggerFactory.getLogger(TaskCacheUtils.class);
 
     private TaskCacheUtils() {
         throw new IllegalStateException("Utility class");
@@ -182,7 +180,7 @@ public class TaskCacheUtils {
         String resourceCRCPath = fileProperty.getValue() + CRC_SUFFIX;
         String resourceCRCWholePath = storageOperate.getResourceFileName(context.getTenantCode(), resourceCRCPath);
         String targetPath = String.format("%s/%s", context.getExecutePath(), resourceCRCPath);
-        logger.info("{} --- Remote:{} to Local:{}", "CRC file", resourceCRCWholePath, targetPath);
+        log.info("{} --- Remote:{} to Local:{}", "CRC file", resourceCRCWholePath, targetPath);
         String crcString = "";
         try {
             storageOperate.download(context.getTenantCode(), resourceCRCWholePath, targetPath, false,
@@ -190,7 +188,7 @@ public class TaskCacheUtils {
             crcString = FileUtils.readFile2Str(new FileInputStream(targetPath));
             fileProperty.setValue(crcString);
         } catch (IOException e) {
-            logger.error("Replace checksum failed for file property {}.", fileProperty.getProp());
+            log.error("Replace checksum failed for file property {}.", fileProperty.getProp());
         }
         return crcString;
     }

@@ -23,6 +23,7 @@ import static org.apache.dolphinscheduler.common.constants.Constants.DRY_RUN_FLA
 import static org.apache.dolphinscheduler.common.constants.Constants.SINGLE_SLASH;
 
 import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.common.log.remote.RemoteLogUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
@@ -69,7 +70,7 @@ import com.google.common.base.Strings;
 
 public abstract class WorkerTaskExecuteRunnable implements Runnable {
 
-    protected final Logger logger = LoggerFactory
+    protected final Logger log = LoggerFactory
             .getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, WorkerTaskExecuteRunnable.class));
 
     protected final TaskExecutionContext taskExecutionContext;
@@ -104,7 +105,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
                         taskExecutionContext.getProcessInstanceId(),
                         taskExecutionContext.getTaskInstanceId());
         taskExecutionContext.setTaskLogName(taskLogName);
-        logger.info("Set task logger name: {}", taskLogName);
+        log.info("Set task log name: {}", taskLogName);
     }
 
     protected abstract void executeTask(TaskCallBack taskCallBack);
@@ -118,8 +119,10 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         sendTaskResult();
 
         TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-        logger.info("Remove the current task execute context from worker cache");
+        log.info("Remove the current task execute context from worker cache");
         clearTaskExecPathIfNeeded();
+
+        sendTaskLogOnWorkerToRemoteIfNeeded();
     }
 
     protected void afterThrowing(Throwable throwable) throws TaskException {
@@ -128,9 +131,11 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.FAILURE);
         taskExecutionContext.setEndTime(System.currentTimeMillis());
         workerMessageSender.sendMessageWithRetry(taskExecutionContext, masterAddress, CommandType.TASK_EXECUTE_RESULT);
-        logger.info(
+        log.info(
                 "Get a exception when execute the task, will send the task execute result to master, the current task execute result is {}",
                 TaskExecutionStatus.FAILURE);
+
+        sendTaskLogOnWorkerToRemoteIfNeeded();
     }
 
     public void cancelTask() {
@@ -142,11 +147,11 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
                         LogUtils.getAppIds(taskExecutionContext.getLogPath(), taskExecutionContext.getExecutePath(),
                                 PropertyUtils.getString(APPID_COLLECT, DEFAULT_COLLECT_WAY));
                 if (CollectionUtils.isNotEmpty(appIds)) {
-                    ProcessUtils.cancelApplication(appIds, logger, taskExecutionContext.getTenantCode(),
+                    ProcessUtils.cancelApplication(appIds, log, taskExecutionContext.getTenantCode(),
                             taskExecutionContext.getExecutePath());
                 }
             } catch (Exception e) {
-                logger.error(
+                log.error(
                         "Task execute failed and cancel the application failed, this will not affect the taskInstance status, but you need to check manual",
                         e);
             }
@@ -161,7 +166,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
 
             LogUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(),
                     taskExecutionContext.getTaskInstanceId());
-            logger.info("Begin to pulling task");
+            log.info("Begin to pulling task");
 
             initializeTask();
 
@@ -171,7 +176,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
                 TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
                 workerMessageSender.sendMessageWithRetry(taskExecutionContext, masterAddress,
                         CommandType.TASK_EXECUTE_RESULT);
-                logger.info(
+                log.info(
                         "The current execute mode is dry run, will stop the subsequent process and set the taskInstance status to success");
                 return;
             }
@@ -185,7 +190,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
             afterExecute();
 
         } catch (Throwable ex) {
-            logger.error("Task execute failed, due to meet an exception", ex);
+            log.error("Task execute failed, due to meet an exception", ex);
             afterThrowing(ex);
         } finally {
             LogUtils.removeWorkflowAndTaskInstanceIdMDC();
@@ -193,33 +198,33 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
     }
 
     protected void initializeTask() {
-        logger.info("Begin to initialize task");
+        log.info("Begin to initialize task");
 
         long taskStartTime = System.currentTimeMillis();
         taskExecutionContext.setStartTime(taskStartTime);
-        logger.info("Set task startTime: {}", taskStartTime);
+        log.info("Set task startTime: {}", taskStartTime);
 
         String taskAppId = String.format("%s_%s", taskExecutionContext.getProcessInstanceId(),
                 taskExecutionContext.getTaskInstanceId());
         taskExecutionContext.setTaskAppId(taskAppId);
-        logger.info("Set task appId: {}", taskAppId);
+        log.info("Set task appId: {}", taskAppId);
 
-        logger.info("End initialize task {}", JSONUtils.toPrettyJsonString(taskExecutionContext));
+        log.info("End initialize task {}", JSONUtils.toPrettyJsonString(taskExecutionContext));
     }
 
     protected void beforeExecute() {
         taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.RUNNING_EXECUTION);
         workerMessageSender.sendMessageWithRetry(taskExecutionContext, masterAddress, CommandType.TASK_EXECUTE_RUNNING);
-        logger.info("Set task status to {}", TaskExecutionStatus.RUNNING_EXECUTION);
+        log.info("Set task status to {}", TaskExecutionStatus.RUNNING_EXECUTION);
 
         TaskExecutionCheckerUtils.checkTenantExist(workerConfig, taskExecutionContext);
-        logger.info("TenantCode:{} check success", taskExecutionContext.getTenantCode());
+        log.info("TenantCode:{} check success", taskExecutionContext.getTenantCode());
 
         TaskExecutionCheckerUtils.createProcessLocalPathIfAbsent(taskExecutionContext);
-        logger.info("ProcessExecDir:{} check success", taskExecutionContext.getExecutePath());
+        log.info("ProcessExecDir:{} check success", taskExecutionContext.getExecutePath());
 
-        TaskExecutionCheckerUtils.downloadResourcesIfNeeded(storageOperate, taskExecutionContext, logger);
-        logger.info("Resources:{} check success", taskExecutionContext.getResources());
+        TaskExecutionCheckerUtils.downloadResourcesIfNeeded(storageOperate, taskExecutionContext, log);
+        log.info("Resources:{} check success", taskExecutionContext.getResources());
 
         TaskFilesTransferUtils.downloadUpstreamFiles(taskExecutionContext, storageOperate);
 
@@ -233,13 +238,13 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
             throw new TaskPluginException(String.format("%s task is null, please check the task plugin is correct",
                     taskExecutionContext.getTaskType()));
         }
-        logger.info("Task plugin: {} create success", taskExecutionContext.getTaskType());
+        log.info("Task plugin: {} create success", taskExecutionContext.getTaskType());
 
         task.init();
-        logger.info("Success initialized task plugin instance success");
+        log.info("Success initialized task plugin instance success");
 
         task.getParameters().setVarPool(taskExecutionContext.getVarPool());
-        logger.info("Success set taskVarPool: {}", taskExecutionContext.getVarPool());
+        log.info("Success set taskVarPool: {}", taskExecutionContext.getVarPool());
 
     }
 
@@ -247,7 +252,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         if (!task.getNeedAlert()) {
             return;
         }
-        logger.info("The current task need to send alert, begin to send alert");
+        log.info("The current task need to send alert, begin to send alert");
         TaskExecutionStatus status = task.getExitStatus();
         TaskAlertInfo taskAlertInfo = task.getTaskAlertInfo();
         int strategy =
@@ -259,9 +264,9 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
                 strategy);
         try {
             workerRpcClient.send(Host.of(workerConfig.getAlertListenHost()), alertCommand.convert2Command());
-            logger.info("Success send alert");
+            log.info("Success send alert");
         } catch (RemotingException e) {
-            logger.error("Send alert failed, alertCommand: {}", alertCommand, e);
+            log.error("Send alert failed, alertCommand: {}", alertCommand, e);
         }
     }
 
@@ -275,40 +280,52 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         TaskFilesTransferUtils.uploadOutputFiles(taskExecutionContext, storageOperate);
         workerMessageSender.sendMessageWithRetry(taskExecutionContext, masterAddress, CommandType.TASK_EXECUTE_RESULT);
 
-        logger.info("Send task execute result to master, the current task status: {}",
+        log.info("Send task execute result to master, the current task status: {}",
                 taskExecutionContext.getCurrentExecutionStatus());
+    }
+
+    protected void sendTaskLogOnWorkerToRemoteIfNeeded() {
+        if (taskExecutionContext.isLogBufferEnable()) {
+            return;
+        }
+
+        if (RemoteLogUtils.isRemoteLoggingEnable()) {
+            RemoteLogUtils.sendRemoteLog(taskExecutionContext.getLogPath());
+            log.info("Worker sends task log {} to remote storage asynchronously.",
+                    taskExecutionContext.getLogPath());
+        }
     }
 
     protected void clearTaskExecPathIfNeeded() {
         String execLocalPath = taskExecutionContext.getExecutePath();
         if (!CommonUtils.isDevelopMode()) {
-            logger.info("The current execute mode isn't develop mode, will clear the task execute file: {}",
+            log.info("The current execute mode isn't develop mode, will clear the task execute file: {}",
                     execLocalPath);
             // get exec dir
             if (Strings.isNullOrEmpty(execLocalPath)) {
-                logger.warn("The task execute file is {} no need to clear", taskExecutionContext.getTaskName());
+                log.warn("The task execute file is {} no need to clear", taskExecutionContext.getTaskName());
                 return;
             }
 
             if (SINGLE_SLASH.equals(execLocalPath)) {
-                logger.warn("The task execute file is '/', direct deletion is not allowed");
+                log.warn("The task execute file is '/', direct deletion is not allowed");
                 return;
             }
 
             try {
                 org.apache.commons.io.FileUtils.deleteDirectory(new File(execLocalPath));
-                logger.info("Success clear the task execute file: {}", execLocalPath);
+                log.info("Success clear the task execute file: {}", execLocalPath);
             } catch (IOException e) {
                 if (e instanceof NoSuchFileException) {
                     // this is expected
                 } else {
-                    logger.error(
+                    log.error(
                             "Delete task execute file: {} failed, this will not affect the task status, but you need to clear this manually",
                             execLocalPath, e);
                 }
             }
         } else {
-            logger.info("The current execute mode is develop mode, will not clear the task execute file: {}",
+            log.info("The current execute mode is develop mode, will not clear the task execute file: {}",
                     execLocalPath);
         }
     }
