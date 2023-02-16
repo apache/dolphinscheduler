@@ -21,6 +21,7 @@
 *.swp
 *.tgz
 *.tsbuildinfo
+.history
 
 node_modules
 dist
