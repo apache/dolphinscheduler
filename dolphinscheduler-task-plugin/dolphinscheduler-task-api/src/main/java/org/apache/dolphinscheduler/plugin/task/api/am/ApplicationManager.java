@@ -15,41 +15,25 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api;
+package org.apache.dolphinscheduler.plugin.task.api.am;
 
-import java.io.Serializable;
+import org.apache.dolphinscheduler.common.enums.ResourceManagerType;
 
-/**
- *  k8s Task ExecutionContext
- */
+public interface ApplicationManager {
 
-public class K8sTaskExecutionContext implements Serializable {
+    /**
+     * kill application by application manager context
+     *
+     * @param applicationManagerContext
+     * @return
+     */
+    boolean killApplication(ApplicationManagerContext applicationManagerContext);
 
-    private String configYaml;
+    /**
+     * get resource manager type
+     *
+     * @return ResourceManagerType yarn / kubernetes
+     */
+    ResourceManagerType getResourceManagerType();
 
-    private String namespace;
-
-    public String getConfigYaml() {
-        return configYaml;
-    }
-
-    public void setNamespace(String namespace) {
-        this.namespace = namespace;
-    }
-
-    public String getNamespace() {
-        return namespace;
-    }
-
-    public void setConfigYaml(String configYaml) {
-        this.configYaml = configYaml;
-    }
-
-    @Override
-    public String toString() {
-        return "K8sTaskExecutionContext{"
-                + "namespace=" + namespace
-                + ", configYaml='" + configYaml + '\''
-                + '}';
-    }
 }

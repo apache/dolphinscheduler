@@ -15,41 +15,29 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api;
+package org.apache.dolphinscheduler.common.enums;
 
-import java.io.Serializable;
+import com.baomidou.mybatisplus.annotation.EnumValue;
 
-/**
- *  k8s Task ExecutionContext
- */
+public enum ResourceManagerType {
 
-public class K8sTaskExecutionContext implements Serializable {
+    YARN(0, "yarn"),
+    KUBERNETES(1, "kubernetes");
 
-    private String configYaml;
-
-    private String namespace;
-
-    public String getConfigYaml() {
-        return configYaml;
+    ResourceManagerType(int code, String descp) {
+        this.code = code;
+        this.descp = descp;
     }
 
-    public void setNamespace(String namespace) {
-        this.namespace = namespace;
+    @EnumValue
+    private final int code;
+    private final String descp;
+
+    public int getCode() {
+        return code;
     }
 
-    public String getNamespace() {
-        return namespace;
-    }
-
-    public void setConfigYaml(String configYaml) {
-        this.configYaml = configYaml;
-    }
-
-    @Override
-    public String toString() {
-        return "K8sTaskExecutionContext{"
-                + "namespace=" + namespace
-                + ", configYaml='" + configYaml + '\''
-                + '}';
+    public String getDescp() {
+        return descp;
     }
 }

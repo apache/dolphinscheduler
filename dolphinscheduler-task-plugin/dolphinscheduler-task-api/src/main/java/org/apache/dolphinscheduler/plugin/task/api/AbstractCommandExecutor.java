@@ -22,6 +22,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_COD
 import static org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils.getPidsStr;
 
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.utils.AbstractCommandExecutorConstants;
 import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
@@ -37,6 +38,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -223,8 +225,11 @@ public abstract class AbstractCommandExecutor {
         // waiting for the run to finish
         boolean status = process.waitFor(remainTime, TimeUnit.SECONDS);
 
+        TaskExecutionStatus kubernetesStatus =
+                ProcessUtils.getApplicationStatus(taskRequest.getK8sTaskExecutionContext(), taskRequest.getTaskAppId());
+
         // if SHELL task exit
-        if (status) {
+        if (status && kubernetesStatus.isSuccess()) {
 
             // SHELL task state
             result.setExitStatusCode(process.exitValue());
@@ -328,13 +333,24 @@ public abstract class AbstractCommandExecutor {
 
         LinkedBlockingQueue<String> markerLog = new LinkedBlockingQueue<>(1);
         markerLog.add(ch.qos.logback.classic.ClassicConstants.FINALIZE_SESSION_MARKER.toString());
-
+        String logs = appendPodLogIfNeeded();
+        if (StringUtils.isNotEmpty(logs)) {
+            logBuffer.add("Dump logs from driver pod:");
+            logBuffer.add(logs);
+        }
         if (!logBuffer.isEmpty()) {
             // log handle
             logHandler.accept(logBuffer);
             logBuffer.clear();
         }
         logHandler.accept(markerLog);
+    }
+
+    private String appendPodLogIfNeeded() {
+        if (Objects.isNull(taskRequest.getK8sTaskExecutionContext())) {
+            return "";
+        }
+        return ProcessUtils.getPodLog(taskRequest.getK8sTaskExecutionContext(), taskRequest.getTaskAppId());
     }
 
     /**

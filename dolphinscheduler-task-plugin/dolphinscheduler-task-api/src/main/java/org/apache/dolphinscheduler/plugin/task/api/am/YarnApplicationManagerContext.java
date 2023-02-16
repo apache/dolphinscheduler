@@ -15,41 +15,34 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api;
+package org.apache.dolphinscheduler.plugin.task.api.am;
 
-import java.io.Serializable;
+import java.util.List;
 
-/**
- *  k8s Task ExecutionContext
- */
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-public class K8sTaskExecutionContext implements Serializable {
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class YarnApplicationManagerContext implements ApplicationManagerContext {
 
-    private String configYaml;
+    /**
+     * execute path
+     */
+    private String executePath;
 
-    private String namespace;
+    /**
+     * tenant code
+     */
+    private String tenantCode;
 
-    public String getConfigYaml() {
-        return configYaml;
-    }
+    /**
+     * appId list
+     */
+    private List<String> appIds;
 
-    public void setNamespace(String namespace) {
-        this.namespace = namespace;
-    }
-
-    public String getNamespace() {
-        return namespace;
-    }
-
-    public void setConfigYaml(String configYaml) {
-        this.configYaml = configYaml;
-    }
-
-    @Override
-    public String toString() {
-        return "K8sTaskExecutionContext{"
-                + "namespace=" + namespace
-                + ", configYaml='" + configYaml + '\''
-                + '}';
-    }
 }

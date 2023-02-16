@@ -17,14 +17,11 @@
 
 package org.apache.dolphinscheduler.server.worker.processor;
 
-import static org.apache.dolphinscheduler.common.constants.Constants.APPID_COLLECT;
-import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_COLLECT_WAY;
-
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -35,14 +32,12 @@ import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
 import org.apache.dolphinscheduler.remote.command.TaskKillResponseCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
-import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.remote.utils.Pair;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecuteRunnable;
 
-import org.apache.commons.collections4.CollectionUtils;
-
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -55,7 +50,6 @@ import org.springframework.stereotype.Component;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
-import io.micrometer.core.lang.NonNull;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -159,13 +153,14 @@ public class TaskKillProcessor implements NettyRequestProcessor {
         // kill system process
         boolean processFlag = killProcess(taskExecutionContext.getTenantCode(), taskExecutionContext.getProcessId());
 
-        // find log and kill yarn job
-        Pair<Boolean, List<String>> yarnResult = killYarnJob(Host.of(taskExecutionContext.getHost()),
-                taskExecutionContext.getLogPath(),
-                taskExecutionContext.getAppInfoPath(),
-                taskExecutionContext.getExecutePath(),
-                taskExecutionContext.getTenantCode());
-        return Pair.of(processFlag && yarnResult.getLeft(), yarnResult.getRight());
+        // kill yarn or k8s application
+        List<String> appIds = new ArrayList<>();
+        try {
+            appIds.addAll(ProcessUtils.cancelApplication(taskExecutionContext));
+        } catch (TaskException e) {
+            return Pair.of(false, Collections.emptyList());
+        }
+        return Pair.of(processFlag, appIds);
     }
 
     /**
@@ -214,44 +209,6 @@ public class TaskKillProcessor implements NettyRequestProcessor {
             log.error("kill task error", e);
         }
         return processFlag;
-    }
-
-    /**
-     * kill yarn job
-     *
-     * @param host host
-     * @param logPath logPath
-     * @param executePath executePath
-     * @param tenantCode  tenantCode
-     * @return Pair<Boolean, List < String>> yarn kill result
-     */
-    private Pair<Boolean, List<String>> killYarnJob(@NonNull Host host,
-                                                    String logPath,
-                                                    String appInfoPath,
-                                                    String executePath,
-                                                    String tenantCode) {
-        if (logPath == null || appInfoPath == null || executePath == null || tenantCode == null) {
-            log.error(
-                    "Kill yarn job error, the input params is illegal, host: {}, logPath: {}, appInfoPath: {}, executePath: {}, tenantCode: {}",
-                    host, logPath, appInfoPath, executePath, tenantCode);
-            return Pair.of(false, Collections.emptyList());
-        }
-        try {
-            log.info("Get appIds from worker {}:{} taskLogPath: {}", host.getIp(), host.getPort(), logPath);
-            List<String> appIds = LogUtils.getAppIds(logPath, appInfoPath,
-                    PropertyUtils.getString(APPID_COLLECT, DEFAULT_COLLECT_WAY));
-            if (CollectionUtils.isEmpty(appIds)) {
-                log.info("The appId is empty");
-                return Pair.of(true, Collections.emptyList());
-            }
-
-            ProcessUtils.cancelApplication(appIds, log, tenantCode, executePath);
-            return Pair.of(true, appIds);
-        } catch (Exception e) {
-            log.error("Kill yarn job error, host: {}, logPath: {}, executePath: {}, tenantCode: {}", host, logPath,
-                    executePath, tenantCode, e);
-        }
-        return Pair.of(false, Collections.emptyList());
     }
 
 }
