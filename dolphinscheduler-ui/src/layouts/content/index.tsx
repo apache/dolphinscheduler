@@ -77,7 +77,6 @@ const Content = defineComponent({
           }
 
           getSideMenu(state)
-
           const currentSide = (
             route.meta.activeSide
               ? route.meta.activeSide
