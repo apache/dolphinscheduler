@@ -99,7 +99,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -742,11 +741,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             return WorkflowSubmitStatue.SUCCESS;
         } catch (Exception e) {
             log.error("Start workflow error", e);
-            if (e instanceof SQLException) {
-                return WorkflowSubmitStatue.FAILED;
-            } else {
-                return WorkflowSubmitStatue.ERROR;
-            }
+            return WorkflowSubmitStatue.ERROR;
         } finally {
             LoggerUtils.removeWorkflowInstanceIdMDC();
         }

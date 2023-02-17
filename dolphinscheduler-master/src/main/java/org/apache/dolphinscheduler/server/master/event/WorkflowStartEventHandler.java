@@ -87,7 +87,6 @@ public class WorkflowStartEventHandler implements WorkflowEventHandler {
                         // submit failed will resend the event to workflow event queue
                         log.error("Failed to submit the workflow instance, will resend the workflow start event: {}",
                                 workflowEvent);
-                        workflowEvent.setMaxSubmitTimes(workflowEvent.getMaxSubmitTimes() - 1);
                         if (workflowEvent.getMaxSubmitTimes() >= 0) {
                             workflowEventQueue.addEvent(workflowEvent);
                         } else {
