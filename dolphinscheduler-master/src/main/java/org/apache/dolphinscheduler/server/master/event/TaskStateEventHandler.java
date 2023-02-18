@@ -59,11 +59,20 @@ public class TaskStateEventHandler implements StateEventHandler {
                 task.getState(), taskStateEvent.getStatus());
 
         Map<Long, Integer> completeTaskMap = workflowExecuteRunnable.getCompleteTaskMap();
+        if (task.getState().isFinished()
+                && (taskStateEvent.getStatus() != null && taskStateEvent.getStatus().isRunning())) {
+            String errorMessage = String.format(
+                    "The current task instance state is %s, but the task state event status is %s, so the task state event will be ignored",
+                    task.getState(),
+                    taskStateEvent.getStatus());
+            logger.warn(errorMessage);
+            throw new StateEventHandleError(errorMessage);
+        }
 
         if (task.getState().isFinished()) {
             if (completeTaskMap.containsKey(task.getTaskCode())
-                    && completeTaskMap.get(task.getTaskCode()) == task.getId()) {
-                logger.warn("The task instance is already complete, stateEvent: {}", stateEvent);
+                    && completeTaskMap.get(task.getTaskCode()).equals(task.getId())) {
+                    logger.warn("The task instance is already complete, stateEvent: {}", stateEvent);
                 return true;
             }
             workflowExecuteRunnable.taskFinished(task);
