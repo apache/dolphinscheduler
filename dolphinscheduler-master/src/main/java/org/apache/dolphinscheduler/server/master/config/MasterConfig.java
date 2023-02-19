@@ -99,8 +99,6 @@ public class MasterConfig implements Validator {
     // /nodes/master/ip:listenPort
     private String masterRegistryPath;
 
-    private int workflowMaxSubmitTimes = 10;
-
     @Override
     public boolean supports(Class<?> clazz) {
         return MasterConfig.class.isAssignableFrom(clazz);

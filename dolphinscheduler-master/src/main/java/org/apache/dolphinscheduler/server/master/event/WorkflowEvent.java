@@ -28,6 +28,4 @@ public class WorkflowEvent {
 
     private int workflowInstanceId;
 
-    private int maxSubmitTimes;
-
 }

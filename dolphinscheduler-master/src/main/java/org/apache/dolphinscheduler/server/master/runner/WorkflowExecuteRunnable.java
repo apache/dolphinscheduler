@@ -741,7 +741,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             return WorkflowSubmitStatue.SUCCESS;
         } catch (Exception e) {
             log.error("Start workflow error", e);
-            return WorkflowSubmitStatue.ERROR;
+            return WorkflowSubmitStatue.FAILED;
         } finally {
             LoggerUtils.removeWorkflowInstanceIdMDC();
         }

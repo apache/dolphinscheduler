@@ -68,35 +68,16 @@ public class WorkflowStartEventHandler implements WorkflowEventHandler {
                         if (processInstance.getTimeout() > 0) {
                             stateWheelExecuteThread.addProcess4TimeoutCheck(processInstance);
                         }
-                    } else if (WorkflowSubmitStatue.ERROR == workflowSubmitStatue) {
+                    } else if (WorkflowSubmitStatue.FAILED == workflowSubmitStatue) {
                         log.error(
-                                "Failed to submit the workflow instance, will resend the workflow start event: {}, and reduce submit times that can be used",
+                                "Failed to submit the workflow instance, will resend the workflow start event: {}",
                                 workflowEvent);
-                        workflowEvent.setMaxSubmitTimes(workflowEvent.getMaxSubmitTimes() - 1);
-                        if (workflowEvent.getMaxSubmitTimes() >= 0) {
-                            workflowEventQueue.addEvent(workflowEvent);
-                        } else {
-                            WorkflowStateEvent stateEvent = WorkflowStateEvent.builder()
-                                    .processInstanceId(processInstance.getId())
-                                    .type(StateEventType.PROCESS_SUBMIT_FAILED)
-                                    .status(WorkflowExecutionStatus.FAILURE)
-                                    .build();
-                            workflowExecuteRunnable.addStateEvent(stateEvent);
-                        }
-                    } else {
-                        // submit failed will resend the event to workflow event queue
-                        log.error("Failed to submit the workflow instance, will resend the workflow start event: {}",
-                                workflowEvent);
-                        if (workflowEvent.getMaxSubmitTimes() >= 0) {
-                            workflowEventQueue.addEvent(workflowEvent);
-                        } else {
-                            WorkflowStateEvent stateEvent = WorkflowStateEvent.builder()
-                                    .processInstanceId(processInstance.getId())
-                                    .type(StateEventType.PROCESS_SUBMIT_FAILED)
-                                    .status(WorkflowExecutionStatus.FAILURE)
-                                    .build();
-                            workflowExecuteRunnable.addStateEvent(stateEvent);
-                        }
+                        WorkflowStateEvent stateEvent = WorkflowStateEvent.builder()
+                                .processInstanceId(processInstance.getId())
+                                .type(StateEventType.PROCESS_SUBMIT_FAILED)
+                                .status(WorkflowExecutionStatus.FAILURE)
+                                .build();
+                        workflowExecuteRunnable.addStateEvent(stateEvent);
                     }
                 });
     }
