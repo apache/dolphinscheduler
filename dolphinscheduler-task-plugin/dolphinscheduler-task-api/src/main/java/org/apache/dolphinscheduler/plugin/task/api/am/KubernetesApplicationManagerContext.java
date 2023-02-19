@@ -17,9 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.am;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.NAMESPACE_NAME;
-
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 
 import lombok.Data;
@@ -37,15 +34,9 @@ public class KubernetesApplicationManagerContext implements ApplicationManagerCo
      */
     private String labelValue;
 
-    /**
-     * kubernetes cluster namespace
-     */
-    private String namespace;
-
     public KubernetesApplicationManagerContext(K8sTaskExecutionContext k8sTaskExecutionContext, String taskAppId) {
         this.k8sTaskExecutionContext = k8sTaskExecutionContext;
         this.labelValue = taskAppId;
-        this.namespace = JSONUtils.toMap(k8sTaskExecutionContext.getNamespace()).get(NAMESPACE_NAME);
     }
 
 }

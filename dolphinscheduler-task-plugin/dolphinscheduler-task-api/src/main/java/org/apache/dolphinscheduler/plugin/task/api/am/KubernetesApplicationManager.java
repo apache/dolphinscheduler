@@ -50,7 +50,10 @@ public class KubernetesApplicationManager implements ApplicationManager {
     private static final String FAILED = "Failed";
     private static final String UNKNOWN = "Unknown";
 
-    private final Map<String, KubernetesClient> cacheClient = new ConcurrentHashMap<>();
+    /**
+     * cache k8s client for same task
+     */
+    private final Map<String, KubernetesClient> cacheClientMap = new ConcurrentHashMap<>();
 
     @Override
     public boolean killApplication(ApplicationManagerContext applicationManagerContext) throws TaskException {
@@ -70,6 +73,9 @@ public class KubernetesApplicationManager implements ApplicationManager {
             }
         } catch (Exception e) {
             throw new TaskException("Failed to kill Kubernetes application with label " + labelValue, e);
+        } finally {
+            // remove client cache after killing application
+            removeCache(labelValue);
         }
 
         return isKill;
@@ -90,7 +96,8 @@ public class KubernetesApplicationManager implements ApplicationManager {
         KubernetesClient client = getClient(kubernetesApplicationManagerContext);
         String labelValue = kubernetesApplicationManagerContext.getLabelValue();
         FilterWatchListDeletable<Pod, PodList> watchList =
-                client.pods().inNamespace(kubernetesApplicationManagerContext.getNamespace())
+                client.pods()
+                        .inNamespace(kubernetesApplicationManagerContext.getK8sTaskExecutionContext().getNamespace())
                         .withLabel(UNIQUE_LABEL_NAME, labelValue);
         List<Pod> podList = watchList.list().getItems();
         if (podList.size() != 1) {
@@ -109,14 +116,16 @@ public class KubernetesApplicationManager implements ApplicationManager {
         K8sTaskExecutionContext k8sTaskExecutionContext =
                 kubernetesApplicationManagerContext.getK8sTaskExecutionContext();
         Config config = Config.fromKubeconfig(k8sTaskExecutionContext.getConfigYaml());
-        // format: "{\"name\":\"default\",\"cluster\":\"ds1\"}";
-        String namespaceJson = k8sTaskExecutionContext.getNamespace();
-        cacheClient.computeIfAbsent(namespaceJson, key -> new DefaultKubernetesClient(config));
-        return cacheClient.get(namespaceJson);
+        return cacheClientMap.computeIfAbsent(kubernetesApplicationManagerContext.getLabelValue(),
+                key -> new DefaultKubernetesClient(config));
     }
 
     public void removeCache(String cacheKey) {
-        cacheClient.remove(cacheKey);
+        KubernetesClient client = cacheClientMap.get(cacheKey);
+        if (Objects.nonNull(client)) {
+            client.close();
+        }
+        cacheClientMap.remove(cacheKey);
     }
 
     /**
@@ -140,7 +149,7 @@ public class KubernetesApplicationManager implements ApplicationManager {
      */
     private TaskExecutionStatus getApplicationStatus(KubernetesApplicationManagerContext kubernetesApplicationManagerContext,
                                                      FilterWatchListDeletable<Pod, PodList> watchList) throws TaskException {
-        String phase = "";
+        String phase;
         try {
             if (Objects.isNull(watchList)) {
                 watchList = getDriverPod(kubernetesApplicationManagerContext);
@@ -169,21 +178,22 @@ public class KubernetesApplicationManager implements ApplicationManager {
      * @return
      */
     public String collectPodLog(KubernetesApplicationManagerContext kubernetesApplicationManagerContext) {
-        FilterWatchListDeletable<Pod, PodList> watchList = getDriverPod(kubernetesApplicationManagerContext);
-        List<Pod> driverPod = watchList.list().getItems();
-        if (!driverPod.isEmpty()) {
-            Pod driver = driverPod.get(0);
-            KubernetesClient client = getClient(kubernetesApplicationManagerContext);
-            String driverPodName = driver.getMetadata().getName();
-            String logs = client.pods().inNamespace(kubernetesApplicationManagerContext.getNamespace())
-                    .withName(driverPodName).getLog();
+        try (KubernetesClient client = getClient(kubernetesApplicationManagerContext)) {
+            FilterWatchListDeletable<Pod, PodList> watchList = getDriverPod(kubernetesApplicationManagerContext);
+            List<Pod> driverPod = watchList.list().getItems();
+            if (!driverPod.isEmpty()) {
+                Pod driver = driverPod.get(0);
+                String driverPodName = driver.getMetadata().getName();
+                String logs = client.pods()
+                        .inNamespace(kubernetesApplicationManagerContext.getK8sTaskExecutionContext().getNamespace())
+                        .withName(driverPodName).getLog();
 
-            // remove client cache after collecting logs
-            removeCache(kubernetesApplicationManagerContext.getK8sTaskExecutionContext().getNamespace());
-
-            // delete driver pod only after successful execution
-            killApplication(kubernetesApplicationManagerContext);
-            return logs;
+                // delete driver pod only after successful execution
+                killApplication(kubernetesApplicationManagerContext);
+                return logs;
+            }
+        } catch (Exception e) {
+            log.error("Collect pod log failed:", e.getMessage());
         }
         return "";
     }

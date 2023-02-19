@@ -39,7 +39,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -137,49 +136,45 @@ public final class ProcessUtils {
      *
      * @param taskExecutionContext
      * @return
-     * @throws TaskException
      */
-    public static List<String> cancelApplication(TaskExecutionContext taskExecutionContext) throws TaskException {
-        if (Objects.nonNull(taskExecutionContext.getK8sTaskExecutionContext()) &&
-                !TASK_TYPE_SET_K8S.contains(taskExecutionContext.getTaskType())) {
-            applicationManagerMap.get(ResourceManagerType.KUBERNETES)
-                    .killApplication(new KubernetesApplicationManagerContext(
-                            taskExecutionContext.getK8sTaskExecutionContext(), taskExecutionContext.getTaskAppId()));
-            return Collections.emptyList();
-        } else {
-            String host = taskExecutionContext.getHost();
-            String executePath = taskExecutionContext.getExecutePath();
-            String tenantCode = taskExecutionContext.getTenantCode();
-            List<String> appIds;
-            if (StringUtils.isNotEmpty(taskExecutionContext.getAppIds())) {
-                // is failover
-                appIds = Arrays.asList(taskExecutionContext.getAppIds().split(COMMA));
+    public static void cancelApplication(TaskExecutionContext taskExecutionContext) {
+        try {
+            if (Objects.nonNull(taskExecutionContext.getK8sTaskExecutionContext()) &&
+                    !TASK_TYPE_SET_K8S.contains(taskExecutionContext.getTaskType())) {
+                applicationManagerMap.get(ResourceManagerType.KUBERNETES)
+                        .killApplication(new KubernetesApplicationManagerContext(
+                                taskExecutionContext.getK8sTaskExecutionContext(),
+                                taskExecutionContext.getTaskAppId()));
             } else {
-                String logPath = taskExecutionContext.getLogPath();
-                String appInfoPath = taskExecutionContext.getAppInfoPath();
-                if (logPath == null || appInfoPath == null || executePath == null || tenantCode == null) {
-                    log.error(
-                            "Kill yarn job error, the input params is illegal, host: {}, logPath: {}, appInfoPath: {}, executePath: {}, tenantCode: {}",
-                            host, logPath, appInfoPath, executePath, tenantCode);
-                    throw new TaskException("Cancel application failed!");
-                }
-                try {
+                String host = taskExecutionContext.getHost();
+                String executePath = taskExecutionContext.getExecutePath();
+                String tenantCode = taskExecutionContext.getTenantCode();
+                List<String> appIds;
+                if (StringUtils.isNotEmpty(taskExecutionContext.getAppIds())) {
+                    // is failover
+                    appIds = Arrays.asList(taskExecutionContext.getAppIds().split(COMMA));
+                } else {
+                    String logPath = taskExecutionContext.getLogPath();
+                    String appInfoPath = taskExecutionContext.getAppInfoPath();
+                    if (logPath == null || appInfoPath == null || executePath == null || tenantCode == null) {
+                        log.error(
+                                "Kill yarn job error, the input params is illegal, host: {}, logPath: {}, appInfoPath: {}, executePath: {}, tenantCode: {}",
+                                host, logPath, appInfoPath, executePath, tenantCode);
+                        throw new TaskException("Cancel application failed!");
+                    }
                     log.info("Get appIds from worker {}, taskLogPath: {}", host, logPath);
                     appIds = LogUtils.getAppIds(logPath, appInfoPath,
                             PropertyUtils.getString(APPID_COLLECT, DEFAULT_COLLECT_WAY));
-                } catch (Exception e) {
-                    log.error("Kill yarn job error, host: {}, logPath: {}, executePath: {}, tenantCode: {}", host,
-                            logPath, executePath, tenantCode, e);
-                    throw new TaskException("Cancel application failed!");
+                    taskExecutionContext.setAppIds(String.join(TaskConstants.COMMA, appIds));
                 }
+                if (CollectionUtils.isEmpty(appIds)) {
+                    log.info("The appId is empty");
+                }
+                ApplicationManager applicationManager = applicationManagerMap.get(ResourceManagerType.YARN);
+                applicationManager.killApplication(new YarnApplicationManagerContext(executePath, tenantCode, appIds));
             }
-            if (CollectionUtils.isEmpty(appIds)) {
-                log.info("The appId is empty");
-                return Collections.emptyList();
-            }
-            applicationManagerMap.get(ResourceManagerType.YARN)
-                    .killApplication(new YarnApplicationManagerContext(executePath, tenantCode, appIds));
-            return appIds;
+        } catch (Exception e) {
+            log.error("Cancel application failed: {}", e.getMessage());
         }
     }
 

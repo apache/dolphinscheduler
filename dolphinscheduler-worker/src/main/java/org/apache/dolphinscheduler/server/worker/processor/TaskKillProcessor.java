@@ -32,15 +32,11 @@ import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
 import org.apache.dolphinscheduler.remote.command.TaskKillResponseCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
-import org.apache.dolphinscheduler.remote.utils.Pair;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecuteRunnable;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -107,11 +103,10 @@ public class TaskKillProcessor implements NettyRequestProcessor {
 
             // if processId > 0, it should call cancelApplication to cancel remote application too.
             this.cancelApplication(taskInstanceId);
-            Pair<Boolean, List<String>> result = doKill(taskExecutionContext);
+            boolean result = doKill(taskExecutionContext);
 
             taskExecutionContext.setCurrentExecutionStatus(
-                    result.getLeft() ? TaskExecutionStatus.SUCCESS : TaskExecutionStatus.FAILURE);
-            taskExecutionContext.setAppIds(String.join(TaskConstants.COMMA, result.getRight()));
+                    result ? TaskExecutionStatus.SUCCESS : TaskExecutionStatus.FAILURE);
             sendTaskKillResponseCommand(channel, taskExecutionContext);
 
             TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
@@ -149,18 +144,17 @@ public class TaskKillProcessor implements NettyRequestProcessor {
      *
      * @return kill result
      */
-    private Pair<Boolean, List<String>> doKill(TaskExecutionContext taskExecutionContext) {
+    private boolean doKill(TaskExecutionContext taskExecutionContext) {
         // kill system process
         boolean processFlag = killProcess(taskExecutionContext.getTenantCode(), taskExecutionContext.getProcessId());
 
         // kill yarn or k8s application
-        List<String> appIds = new ArrayList<>();
         try {
-            appIds.addAll(ProcessUtils.cancelApplication(taskExecutionContext));
+            ProcessUtils.cancelApplication(taskExecutionContext);
         } catch (TaskException e) {
-            return Pair.of(false, Collections.emptyList());
+            return false;
         }
-        return Pair.of(processFlag, appIds);
+        return processFlag;
     }
 
     /**

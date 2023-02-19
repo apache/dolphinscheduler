@@ -25,6 +25,7 @@ import static org.apache.dolphinscheduler.common.constants.Constants.PASSWORD;
 import static org.apache.dolphinscheduler.common.constants.Constants.SINGLE_SLASH;
 import static org.apache.dolphinscheduler.common.constants.Constants.USER;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.CLUSTER;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.NAMESPACE_NAME;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DATA_QUALITY;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_NAME;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_TABLE;
@@ -664,7 +665,8 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
             String configYaml = processService.findConfigYamlByName(clusterName);
             if (configYaml != null) {
                 k8sTaskExecutionContext.setConfigYaml(configYaml);
-                k8sTaskExecutionContext.setNamespace(namespace);
+                k8sTaskExecutionContext
+                        .setNamespace(JSONUtils.toMap(namespace).get(NAMESPACE_NAME));
             }
         }
         return k8sTaskExecutionContext;
