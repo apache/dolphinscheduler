@@ -71,7 +71,7 @@ public class WorkflowStartEventHandler implements WorkflowEventHandler {
                         }
                     } else if (WorkflowSubmitStatue.FAILED == workflowSubmitStatue) {
                         logger.error(
-                                "Failed to submit the workflow instance, will resend the workflow start event: {}",
+                             "Failed to submit the workflow instance, will resend the workflow start event: {}",
                                 workflowEvent);
                         WorkflowStateEvent stateEvent = WorkflowStateEvent.builder()
                                 .processInstanceId(processInstance.getId())
