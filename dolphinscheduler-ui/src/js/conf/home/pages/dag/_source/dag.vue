@@ -157,7 +157,9 @@
         // log dialog
         logDialog: false,
         logTaskInstance: null,
-        taskInstances: []
+        taskInstances: [],
+        // incremental comparison after the first refresh
+        lastStatues: new Map()
       }
     },
     mounted () {
@@ -182,11 +184,13 @@
 
       // refresh task status
       if (this.type === 'instance') {
-        this.refreshTaskStatus()
-        // status polling
-        this.statusTimer = setInterval(() => {
-          this.refreshTaskStatus()
-        }, 90000)
+        this.refreshTaskStatus(() => {
+          // set the timer after the first refresh
+          // status polling
+          this.statusTimer = setInterval(() => {
+            this.refreshTaskStatus()
+          }, 90000)
+        })
       }
     },
     beforeDestroy () {
@@ -558,7 +562,7 @@
       /**
        * Task status
        */
-      refreshTaskStatus () {
+      refreshTaskStatus (callback = undefined) {
         const instanceId = this.$route.params.id
         this.loading(true)
         this.getTaskState(instanceId)
@@ -569,11 +573,20 @@
             if (taskList) {
               this.taskInstances = taskList
               taskList.forEach((taskInstance) => {
-                this.$refs.canvas.setNodeStatus({
-                  code: taskInstance.taskCode,
-                  state: taskInstance.state,
-                  taskInstance
-                })
+                const lastStatus = this.lastStatues.get(taskInstance.taskCode)
+                if (!lastStatus ||
+                    (lastStatus.host != taskInstance.host) ||
+                    (lastStatus.retryTimes != taskInstance.retryTimes) ||
+                    (lastStatus.submitTime != taskInstance.submitTime) ||
+                    (lastStatus.startTime != taskInstance.startTime) ||
+                    (lastStatus.endTime != taskInstance.endTime)) {
+                  this.lastStatues.set(taskInstance.taskCode, taskInstance)
+                  this.$refs.canvas.setNodeStatus({
+                    code: taskInstance.taskCode,
+                    state: taskInstance.state,
+                    taskInstance
+                  })
+                }
               })
             }
             if (list) {
@@ -586,6 +599,9 @@
           })
           .finally(() => {
             this.loading(false)
+            if (callback) {
+              callback()
+            }
           })
       },
       /**
