@@ -110,8 +110,6 @@ master:
   failover-interval: 10m
   # kill yarn jon when failover taskInstance, default true
   kill-yarn-job-when-task-failover: true
-  # workflow.submit.max.times
-  workflow-submit-max-times: 10
   registry-disconnect-strategy:
     # The disconnect strategy: stop, waiting
     strategy: waiting
