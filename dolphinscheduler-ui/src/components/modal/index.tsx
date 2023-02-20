@@ -74,7 +74,7 @@ const props = {
 const Modal = defineComponent({
   name: 'Modal',
   props,
-  emits: ['cancel', 'confirm', 'jumpLink'],
+  emits: ['cancel', 'confirm', 'jumpLink', 'maskClick'],
   setup(props, ctx) {
     const { t } = useI18n()
 
@@ -86,11 +86,22 @@ const Modal = defineComponent({
       ctx.emit('confirm')
     }
 
-    return { t, onCancel, onConfirm }
+    const onMaskClick = () => {
+      ctx.emit('maskClick')
+    }
+
+    return { t, onCancel, onConfirm, onMaskClick }
   },
   render() {
-    const { $slots, t, onCancel, onConfirm, confirmDisabled, confirmLoading } =
-      this
+    const {
+      $slots,
+      t,
+      onCancel,
+      onConfirm,
+      onMaskClick,
+      confirmDisabled,
+      confirmLoading
+    } = this
 
     return (
       <NModal
@@ -98,6 +109,7 @@ const Modal = defineComponent({
         class={styles.container}
         mask-closable={false}
         auto-focus={this.autoFocus}
+        onMaskClick={onMaskClick}
       >
         <NCard
           title={this.title}
