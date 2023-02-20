@@ -575,11 +575,11 @@
               taskList.forEach((taskInstance) => {
                 const lastStatus = this.lastStatues.get(taskInstance.taskCode)
                 if (!lastStatus ||
-                    (lastStatus.host != taskInstance.host) ||
-                    (lastStatus.retryTimes != taskInstance.retryTimes) ||
-                    (lastStatus.submitTime != taskInstance.submitTime) ||
-                    (lastStatus.startTime != taskInstance.startTime) ||
-                    (lastStatus.endTime != taskInstance.endTime)) {
+                  (lastStatus.host !== taskInstance.host) ||
+                  (lastStatus.retryTimes !== taskInstance.retryTimes) ||
+                  (lastStatus.submitTime !== taskInstance.submitTime) ||
+                  (lastStatus.startTime !== taskInstance.startTime) ||
+                  (lastStatus.endTime !== taskInstance.endTime)) {
                   this.lastStatues.set(taskInstance.taskCode, taskInstance)
                   this.$refs.canvas.setNodeStatus({
                     code: taskInstance.taskCode,
