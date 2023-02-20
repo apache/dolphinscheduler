@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.event;
 
+import org.apache.dolphinscheduler.common.enums.StateEventType;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
@@ -66,11 +68,16 @@ public class WorkflowStartEventHandler implements WorkflowEventHandler {
                         if (processInstance.getTimeout() > 0) {
                             stateWheelExecuteThread.addProcess4TimeoutCheck(processInstance);
                         }
-                    } else {
-                        // submit failed will resend the event to workflow event queue
-                        log.error("Failed to submit the workflow instance, will resend the workflow start event: {}",
+                    } else if (WorkflowSubmitStatue.FAILED == workflowSubmitStatue) {
+                        log.error(
+                                "Failed to submit the workflow instance, will resend the workflow start event: {}",
                                 workflowEvent);
-                        workflowEventQueue.addEvent(workflowEvent);
+                        WorkflowStateEvent stateEvent = WorkflowStateEvent.builder()
+                                .processInstanceId(processInstance.getId())
+                                .type(StateEventType.PROCESS_SUBMIT_FAILED)
+                                .status(WorkflowExecutionStatus.FAILURE)
+                                .build();
+                        workflowExecuteRunnable.addStateEvent(stateEvent);
                     }
                 });
     }
