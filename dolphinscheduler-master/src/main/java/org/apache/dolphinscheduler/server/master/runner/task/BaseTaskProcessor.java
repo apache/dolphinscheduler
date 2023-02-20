@@ -643,7 +643,6 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         switch (taskInstance.getTaskType()) {
             case "K8S":
             case "KUBEFLOW":
-                k8sTaskExecutionContext = new K8sTaskExecutionContext();
                 K8sTaskParameters k8sTaskParameters =
                         JSONUtils.parseObject(taskInstance.getTaskParams(), K8sTaskParameters.class);
                 namespace = k8sTaskParameters.getNamespace();
@@ -652,7 +651,6 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
                 SparkParameters sparkParameters =
                         JSONUtils.parseObject(taskInstance.getTaskParams(), SparkParameters.class);
                 if (StringUtils.isNotEmpty(sparkParameters.getNamespace())) {
-                    k8sTaskExecutionContext = new K8sTaskExecutionContext();
                     namespace = sparkParameters.getNamespace();
                 }
                 break;
@@ -660,13 +658,12 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
                 break;
         }
 
-        if (StringUtils.isNotEmpty(namespace) && Objects.nonNull(k8sTaskExecutionContext)) {
+        if (StringUtils.isNotEmpty(namespace)) {
             String clusterName = JSONUtils.toMap(namespace).get(CLUSTER);
             String configYaml = processService.findConfigYamlByName(clusterName);
             if (configYaml != null) {
-                k8sTaskExecutionContext.setConfigYaml(configYaml);
-                k8sTaskExecutionContext
-                        .setNamespace(JSONUtils.toMap(namespace).get(NAMESPACE_NAME));
+                k8sTaskExecutionContext =
+                        new K8sTaskExecutionContext(configYaml, JSONUtils.toMap(namespace).get(NAMESPACE_NAME));
             }
         }
         return k8sTaskExecutionContext;

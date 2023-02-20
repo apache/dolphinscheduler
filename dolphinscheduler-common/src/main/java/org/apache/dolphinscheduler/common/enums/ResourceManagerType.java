@@ -17,27 +17,10 @@
 
 package org.apache.dolphinscheduler.common.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
-
 public enum ResourceManagerType {
 
-    YARN(0, "yarn"),
-    KUBERNETES(1, "kubernetes");
+    YARN,
 
-    ResourceManagerType(int code, String descp) {
-        this.code = code;
-        this.descp = descp;
-    }
+    KUBERNETES;
 
-    @EnumValue
-    private final int code;
-    private final String descp;
-
-    public int getCode() {
-        return code;
-    }
-
-    public String getDescp() {
-        return descp;
-    }
 }

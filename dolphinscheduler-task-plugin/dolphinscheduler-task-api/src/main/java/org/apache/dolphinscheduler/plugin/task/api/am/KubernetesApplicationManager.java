@@ -115,17 +115,13 @@ public class KubernetesApplicationManager implements ApplicationManager {
     private KubernetesClient getClient(KubernetesApplicationManagerContext kubernetesApplicationManagerContext) {
         K8sTaskExecutionContext k8sTaskExecutionContext =
                 kubernetesApplicationManagerContext.getK8sTaskExecutionContext();
-        Config config = Config.fromKubeconfig(k8sTaskExecutionContext.getConfigYaml());
         return cacheClientMap.computeIfAbsent(kubernetesApplicationManagerContext.getLabelValue(),
-                key -> new DefaultKubernetesClient(config));
+                key -> new DefaultKubernetesClient(Config.fromKubeconfig(k8sTaskExecutionContext.getConfigYaml())));
     }
 
     public void removeCache(String cacheKey) {
-        KubernetesClient client = cacheClientMap.get(cacheKey);
-        if (Objects.nonNull(client)) {
-            client.close();
+        try (KubernetesClient ignored = cacheClientMap.remove(cacheKey)) {
         }
-        cacheClientMap.remove(cacheKey);
     }
 
     /**
@@ -178,7 +174,8 @@ public class KubernetesApplicationManager implements ApplicationManager {
      * @return
      */
     public String collectPodLog(KubernetesApplicationManagerContext kubernetesApplicationManagerContext) {
-        try (KubernetesClient client = getClient(kubernetesApplicationManagerContext)) {
+        try {
+            KubernetesClient client = getClient(kubernetesApplicationManagerContext);
             FilterWatchListDeletable<Pod, PodList> watchList = getDriverPod(kubernetesApplicationManagerContext);
             List<Pod> driverPod = watchList.list().getItems();
             if (!driverPod.isEmpty()) {

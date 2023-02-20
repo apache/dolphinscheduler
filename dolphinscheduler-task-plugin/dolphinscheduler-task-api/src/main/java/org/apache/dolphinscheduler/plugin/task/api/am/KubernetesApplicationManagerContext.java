@@ -19,24 +19,21 @@ package org.apache.dolphinscheduler.plugin.task.api.am;
 
 import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 
-import lombok.Data;
+import lombok.RequiredArgsConstructor;
+import lombok.Value;
 
-@Data
+@Value
+@RequiredArgsConstructor
 public class KubernetesApplicationManagerContext implements ApplicationManagerContext {
 
     /**
      * kubernetes execution context
      */
-    private K8sTaskExecutionContext k8sTaskExecutionContext;
+    private final K8sTaskExecutionContext k8sTaskExecutionContext;
 
     /**
      * driver pod label value
      */
-    private String labelValue;
-
-    public KubernetesApplicationManagerContext(K8sTaskExecutionContext k8sTaskExecutionContext, String taskAppId) {
-        this.k8sTaskExecutionContext = k8sTaskExecutionContext;
-        this.labelValue = taskAppId;
-    }
+    private final String labelValue;
 
 }
