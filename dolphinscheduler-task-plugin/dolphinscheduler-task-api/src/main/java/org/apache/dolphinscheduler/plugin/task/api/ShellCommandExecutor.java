@@ -97,7 +97,9 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
             sb.append("cd /d %~dp0").append(System.lineSeparator());
             if (CollectionUtils.isNotEmpty(ShellUtils.ENV_SOURCE_LIST)) {
                 for (String envSourceFile : ShellUtils.ENV_SOURCE_LIST) {
-                    sb.append("call ").append(envSourceFile).append("\n");
+                    if (StringUtils.isNotBlank(envSourceFile)) {
+                        sb.append("call ").append(envSourceFile).append("\n");
+                    }
                 }
             }
             if (StringUtils.isNotBlank(taskRequest.getEnvironmentConfig())) {
@@ -109,7 +111,9 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
             sb.append("cd $BASEDIR").append(System.lineSeparator());
             if (CollectionUtils.isNotEmpty(ShellUtils.ENV_SOURCE_LIST)) {
                 for (String envSourceFile : ShellUtils.ENV_SOURCE_LIST) {
-                    sb.append("source ").append(envSourceFile).append("\n");
+                    if (StringUtils.isNotBlank(envSourceFile)) {
+                        sb.append("source ").append(envSourceFile).append("\n");
+                    }
                 }
             }
             if (StringUtils.isNotBlank(taskRequest.getEnvironmentConfig())) {

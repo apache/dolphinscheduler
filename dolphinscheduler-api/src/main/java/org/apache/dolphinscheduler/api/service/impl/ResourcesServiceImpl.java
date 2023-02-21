@@ -84,6 +84,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -999,9 +1000,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Transactional(rollbackFor = Exception.class)
     public Result<Object> delete(User loginUser, String fullName,
                                  String resTenantCode) throws IOException {
-        Result<Object> result = new Result<>();
-
-        result = checkResourceUploadStartupState();
+        Result<Object> result = checkResourceUploadStartupState();
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
             return result;
         }
@@ -1073,7 +1072,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         if (resourcesNeedToDeleteSet.size() > 0) {
             for (ResourcesTask resourcesTask : resourcesNeedToDeleteSet) {
                 int taskId = resourcesTask.getTaskId();
-                if (processService.isTaskOnline(taskDefinitionMapper.selectById(taskId).getCode())) {
+                TaskDefinition taskDefinition = taskDefinitionMapper.selectById(taskId);
+                if (taskDefinition != null && processService.isTaskOnline(taskDefinition.getCode())) {
                     log.error("can't be deleted,because it is used of process definition that's online");
                     log.error("resource task relation id:{} is used of task code {}", resourcesTask.getId(),
                             taskDefinitionMapper.selectById(taskId).getCode());
@@ -1084,7 +1084,13 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
             for (ResourcesTask existResource : resourcesNeedToDeleteSet) {
                 int taskId = existResource.getTaskId();
-                long taskCode = taskDefinitionMapper.selectById(taskId).getCode();
+
+                Long taskCode = Optional.ofNullable(taskDefinitionMapper.selectById(taskId))
+                        .map(TaskDefinition::getCode).orElse(null);
+                if (taskCode == null) {
+                    // This tells that process definition or task definition has already been deleted
+                    continue;
+                }
 
                 // use taskCode to get processDefinitionCode, then get a list of processDefinitionLog.
                 List<ProcessTaskRelation> processTaskRelation = processTaskRelationMapper.selectByMap(
