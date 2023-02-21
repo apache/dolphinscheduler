@@ -158,7 +158,7 @@ public final class WebexTeamsSender {
             for (Map map : list) {
                 for (Map.Entry<String, Object> entry : (Iterable<Map.Entry<String, Object>>) map.entrySet()) {
                     String key = entry.getKey();
-                    String value = entry.getValue().toString();
+                    String value = entry.getValue() == null ? "" : entry.getValue().toString();
                     contents.append(key).append(":").append(value);
                     contents.append("\n");
                 }
