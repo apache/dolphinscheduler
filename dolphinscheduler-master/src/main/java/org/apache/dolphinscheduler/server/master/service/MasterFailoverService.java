@@ -227,7 +227,7 @@ public class MasterFailoverService {
     /**
      * failover task instance
      * <p>
-     * 1. kill yarn job if run on worker and there are yarn jobs in tasks.
+     * 1. kill yarn/k8s job if run on worker and there are yarn/k8s jobs in tasks.
      * 2. change task state from running to need failover.
      * 3. try to notify local master
      *
@@ -248,10 +248,10 @@ public class MasterFailoverService {
                     .buildProcessDefinitionRelatedInfo(processInstance.getProcessDefinition())
                     .create();
 
-            if (masterConfig.isKillYarnJobWhenTaskFailover()) {
-                // only kill yarn job if exists , the local thread has exited
-                log.info("TaskInstance failover begin kill the task related yarn job");
-                ProcessUtils.killYarnJob(logClient, taskExecutionContext);
+            if (masterConfig.isKillApplicationWhenTaskFailover()) {
+                // only kill yarn/k8s job if exists , the local thread has exited
+                log.info("TaskInstance failover begin kill the task related yarn or k8s job");
+                ProcessUtils.killApplication(logClient, taskExecutionContext);
             }
             // kill worker task, When the master failover and worker failover happened in the same time,
             // the task may not be failover if we don't set NEED_FAULT_TOLERANCE.

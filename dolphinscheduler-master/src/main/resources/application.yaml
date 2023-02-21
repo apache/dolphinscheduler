@@ -108,8 +108,8 @@ master:
   reserved-memory: 0.3
   # failover interval, the unit is minute
   failover-interval: 10m
-  # kill yarn jon when failover taskInstance, default true
-  kill-yarn-job-when-task-failover: true
+  # kill yarn / k8s application when failover taskInstance, default true
+  kill-application-when-task-failover: true
   registry-disconnect-strategy:
     # The disconnect strategy: stop, waiting
     strategy: waiting

@@ -276,7 +276,7 @@ Location: `master-server/conf/application.yaml`
 |master.max-cpu-load-avg|-1|master max CPU load avg, only higher than the system CPU load average, master server can schedule. default value -1: the number of CPU cores * 2|
 |master.reserved-memory|0.3|master reserved memory, only lower than system available memory, master server can schedule. default value 0.3, the unit is G|
 |master.failover-interval|10|failover interval, the unit is minute|
-|master.kill-yarn-job-when-task-failover|true|whether to kill yarn job when failover taskInstance|
+|master.kill-application-when-task-failover|true|whether to kill yarn/k8s application when failover taskInstance|
 |master.registry-disconnect-strategy.strategy|stop|Used when the master disconnect from registry, default value: stop. Optional values include stop, waiting|
 |master.registry-disconnect-strategy.max-waiting-time|100s|Used when the master disconnect from registry, and the disconnect strategy is waiting, this config means the master will waiting to reconnect to registry in given times, and after the waiting times, if the master still cannot connect to registry, will stop itself, if the value is 0s, the Master will wait infinitely|
 |master.worker-group-refresh-interval|10s|The interval to refresh worker group from db to memory|

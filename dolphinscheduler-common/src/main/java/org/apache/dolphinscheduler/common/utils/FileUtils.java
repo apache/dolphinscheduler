@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.common.utils;
 
 import static org.apache.dolphinscheduler.common.constants.Constants.DATA_BASEDIR_PATH;
 import static org.apache.dolphinscheduler.common.constants.Constants.FOLDER_SEPARATOR;
+import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_S_S;
 import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_VIEW_SUFFIXES;
 import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_VIEW_SUFFIXES_DEFAULT_VALUE;
 import static org.apache.dolphinscheduler.common.constants.Constants.UTF_8;
@@ -48,6 +49,8 @@ public class FileUtils {
     public static final String DATA_BASEDIR = PropertyUtils.getString(DATA_BASEDIR_PATH, "/tmp/dolphinscheduler");
 
     public static final String APPINFO_PATH = "appInfo.log";
+
+    public static final String KUBE_CONFIG_FILE = "config";
 
     private FileUtils() {
         throw new UnsupportedOperationException("Construct FileUtils");
@@ -114,6 +117,16 @@ public class FileUtils {
                 processDefineVersion,
                 processInstanceId,
                 taskInstanceId);
+    }
+
+    /**
+     * absolute path of kubernetes configuration file
+     *
+     * @param execPath
+     * @return
+     */
+    public static String getKubeConfigPath(String execPath) {
+        return String.format(FORMAT_S_S, execPath, KUBE_CONFIG_FILE);
     }
 
     /**

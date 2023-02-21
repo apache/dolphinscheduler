@@ -39,7 +39,7 @@ public class SparkParameters extends AbstractParameters {
     private String mainClass;
 
     /**
-     * deploy mode
+     * deploy mode  local / cluster / client
      */
     private String deployMode;
 
@@ -99,6 +99,19 @@ public class SparkParameters extends AbstractParameters {
      * spark sql script
      */
     private String rawScript;
+
+    /**
+     * kubernetes cluster namespace
+     */
+    private String namespace;
+
+    public String getNamespace() {
+        return namespace;
+    }
+
+    public void setNamespace(String namespace) {
+        this.namespace = namespace;
+    }
 
     /**
      * resource list

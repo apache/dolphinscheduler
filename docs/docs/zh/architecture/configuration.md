@@ -271,7 +271,7 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn/applicationId�
 |master.max-cpu-load-avg|-1|master最大cpuload均值,只有高于系统cpuload均值时,master服务才能调度任务. 默认值为-1: cpu cores * 2|
 |master.reserved-memory|0.3|master预留内存,只有低于系统可用内存时,master服务才能调度任务,单位为G|
 |master.failover-interval|10|failover间隔，单位为分钟|
-|master.kill-yarn-job-when-task-failover|true|当任务实例failover时，是否kill掉yarn job|
+|master.kill-application-when-task-failover|true|当任务实例failover时，是否kill掉yarn或k8s application|
 |master.registry-disconnect-strategy.strategy|stop|当Master与注册中心失联之后采取的策略, 默认值是: stop. 可选值包括： stop, waiting|
 |master.registry-disconnect-strategy.max-waiting-time|100s|当Master与注册中心失联之后重连时间, 之后当strategy为waiting时，该值生效。 该值表示当Master与注册中心失联时会在给定时间之内进行重连, 在给定时间之内重连失败将会停止自己，在重连时，Master会丢弃目前正在执行的工作流，值为0表示会无限期等待 |
 |master.master.worker-group-refresh-interval|10s|定期将workerGroup从数据库中同步到内存的时间间隔|

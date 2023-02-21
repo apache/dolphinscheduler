@@ -88,7 +88,7 @@ public class MasterConfig implements Validator {
     private double maxCpuLoadAvg = -1;
     private double reservedMemory = 0.3;
     private Duration failoverInterval = Duration.ofMinutes(10);
-    private boolean killYarnJobWhenTaskFailover = true;
+    private boolean killApplicationWhenTaskFailover = true;
     private ConnectStrategyProperties registryDisconnectStrategy = new ConnectStrategyProperties();
 
     private Duration workerGroupRefreshInterval = Duration.ofSeconds(10L);
@@ -163,7 +163,7 @@ public class MasterConfig implements Validator {
         log.info("Master config: maxCpuLoadAvg -> {} ", maxCpuLoadAvg);
         log.info("Master config: reservedMemory -> {} ", reservedMemory);
         log.info("Master config: failoverInterval -> {} ", failoverInterval);
-        log.info("Master config: killYarnJobWhenTaskFailover -> {} ", killYarnJobWhenTaskFailover);
+        log.info("Master config: killApplicationWhenTaskFailover -> {} ", killApplicationWhenTaskFailover);
         log.info("Master config: registryDisconnectStrategy -> {} ", registryDisconnectStrategy);
         log.info("Master config: masterAddress -> {} ", masterAddress);
         log.info("Master config: masterRegistryPath -> {} ", masterRegistryPath);
