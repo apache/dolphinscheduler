@@ -15,52 +15,57 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.processor;
+package org.apache.dolphinscheduler.server.worker.processor;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.TaskUpdatePidCommand;
+import org.apache.dolphinscheduler.remote.command.TaskUpdatePidAckMessage;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
-import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
-import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
+import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
+
+import javax.annotation.Resource;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
 import io.netty.channel.Channel;
 
 /**
- * task execute running processor
+ * task execute running ack processor
  */
 @Component
 @Slf4j
-public class TaskUpdatePidProcessor implements NettyRequestProcessor {
+public class TaskUpdatePidAckProcessor implements NettyRequestProcessor {
 
-    @Autowired
-    private TaskEventService taskEventService;
+    @Resource
+    private MessageRetryRunner messageRetryRunner;
 
-    /**
-     * task ack process
-     *
-     * @param channel channel channel
-     * @param command command TaskExecuteAckCommand
-     */
     @Override
     public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.TASK_UPDATE_PID == command.getType(),
+        Preconditions.checkArgument(CommandType.TASK_UPDATE_PID_ACK == command.getType(),
                 String.format("invalid command type : %s", command.getType()));
-        TaskUpdatePidCommand taskUpdatePidCommand =
-                JSONUtils.parseObject(command.getBody(), TaskUpdatePidCommand.class);
-        log.info("taskUpdatePidCommand: {}", taskUpdatePidCommand);
 
-        TaskEvent taskEvent = TaskEvent.newUpdatePidEvent(taskUpdatePidCommand,
-                channel,
-                taskUpdatePidCommand.getMessageSenderAddress());
-        taskEventService.addEvent(taskEvent);
+        TaskUpdatePidAckMessage updatePidAckCommand = JSONUtils.parseObject(command.getBody(),
+                TaskUpdatePidAckMessage.class);
+        if (updatePidAckCommand == null) {
+            log.error("task execute update pid ack command is null");
+            return;
+        }
+        try {
+            LogUtils.setTaskInstanceIdMDC(updatePidAckCommand.getTaskInstanceId());
+            log.info("task execute update pid ack command : {}", updatePidAckCommand);
+
+            if (updatePidAckCommand.isSuccess()) {
+                messageRetryRunner.removeRetryMessage(updatePidAckCommand.getTaskInstanceId(),
+                        CommandType.TASK_UPDATE_PID);
+            }
+        } finally {
+            LogUtils.removeTaskInstanceIdMDC();
+        }
     }
 
 }
