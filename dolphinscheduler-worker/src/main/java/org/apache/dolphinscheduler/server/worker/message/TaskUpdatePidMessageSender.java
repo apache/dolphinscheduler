@@ -44,6 +44,7 @@ public class TaskUpdatePidMessageSender implements MessageSender<TaskUpdatePidCo
         workerRpcClient.send(Host.of(message.getMessageReceiverAddress()), message.convert2Command());
     }
 
+    @Override
     public TaskUpdatePidCommand buildMessage(@NonNull TaskExecutionContext taskExecutionContext,
                                              @NonNull String messageReceiverAddress) {
         TaskUpdatePidCommand taskUpdatePidCommand =
