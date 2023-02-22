@@ -33,6 +33,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskRunStatus;
+import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
@@ -67,7 +68,17 @@ public class DataxTaskTest {
 
     private DataxTask dataxTask;
 
-    private final TaskCallBack taskCallBack = (taskInstanceId, appIds) -> {
+    private final TaskCallBack taskCallBack = new TaskCallBack() {
+
+        @Override
+        public void updateRemoteApplicationInfo(int taskInstanceId, ApplicationInfo applicationInfo) {
+
+        }
+
+        @Override
+        public void updateTaskInstanceInfo(int taskInstanceId) {
+
+        }
     };
 
     @BeforeEach
@@ -99,7 +110,7 @@ public class DataxTaskTest {
         taskResponse.setStatus(TaskRunStatus.SUCCESS);
         taskResponse.setExitStatusCode(0);
         taskResponse.setProcessId(1);
-        when(shellCommandExecutor.run(anyString())).thenReturn(taskResponse);
+        when(shellCommandExecutor.run(anyString(), eq(taskCallBack))).thenReturn(taskResponse);
 
         dataxTask.handle(taskCallBack);
         Assertions.assertEquals(0, dataxTask.getExitStatusCode());
@@ -140,7 +151,7 @@ public class DataxTaskTest {
         taskResponse.setStatus(TaskRunStatus.SUCCESS);
         taskResponse.setExitStatusCode(0);
         taskResponse.setProcessId(1);
-        when(shellCommandExecutor.run(anyString())).thenReturn(taskResponse);
+        when(shellCommandExecutor.run(anyString(), eq(taskCallBack))).thenReturn(taskResponse);
 
         dataxTask.handle(taskCallBack);
         Assertions.assertEquals(0, dataxTask.getExitStatusCode());
@@ -176,7 +187,8 @@ public class DataxTaskTest {
         shellCommandExecutorFiled.setAccessible(true);
         shellCommandExecutorFiled.set(dataxTask, shellCommandExecutor);
 
-        when(shellCommandExecutor.run(anyString())).thenThrow(new InterruptedException("Command execution failed"));
+        when(shellCommandExecutor.run(anyString(), eq(taskCallBack)))
+                .thenThrow(new InterruptedException("Command execution failed"));
         Assertions.assertThrows(TaskException.class, () -> dataxTask.handle(taskCallBack));
     }
 
@@ -194,7 +206,8 @@ public class DataxTaskTest {
         shellCommandExecutorFiled.setAccessible(true);
         shellCommandExecutorFiled.set(dataxTask, shellCommandExecutor);
 
-        when(shellCommandExecutor.run(anyString())).thenThrow(new IOException("Command execution failed"));
+        when(shellCommandExecutor.run(anyString(), eq(taskCallBack)))
+                .thenThrow(new IOException("Command execution failed"));
         Assertions.assertThrows(TaskException.class, () -> dataxTask.handle(taskCallBack));
     }
 

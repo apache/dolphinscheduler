@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteResultCommand;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningCommand;
 import org.apache.dolphinscheduler.remote.command.TaskRejectCommand;
+import org.apache.dolphinscheduler.remote.command.TaskUpdatePidCommand;
 
 import java.util.Date;
 
@@ -159,6 +160,18 @@ public class TaskEvent {
         event.setTaskInstanceId(taskInstanceId);
         event.setCacheTaskInstanceId(cacheTaskInstanceId);
         event.setEvent(TaskEventType.CACHE);
+        return event;
+    }
+
+    public static TaskEvent newUpdatePidEvent(TaskUpdatePidCommand command, Channel channel, String workerAddress) {
+        TaskEvent event = new TaskEvent();
+        event.setProcessInstanceId(command.getProcessInstanceId());
+        event.setTaskInstanceId(command.getTaskInstanceId());
+        event.setStartTime(DateUtils.timeStampToDate(command.getStartTime()));
+        event.setLogPath(command.getLogPath());
+        event.setChannel(channel);
+        event.setWorkerAddress(workerAddress);
+        event.setEvent(TaskEventType.UPDATE_PID);
         return event;
     }
 }

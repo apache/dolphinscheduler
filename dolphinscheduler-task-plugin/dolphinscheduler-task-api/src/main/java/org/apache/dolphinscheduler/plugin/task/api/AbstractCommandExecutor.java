@@ -186,7 +186,7 @@ public abstract class AbstractCommandExecutor {
         command.add(String.format("--uid=%s", taskRequest.getTenantCode()));
     }
 
-    public TaskResponse run(String execCommand) throws IOException, InterruptedException {
+    public TaskResponse run(String execCommand, TaskCallBack taskCallBack) throws IOException, InterruptedException {
         TaskResponse result = new TaskResponse();
         int taskInstanceId = taskRequest.getTaskInstanceId();
         if (null == TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId)) {
@@ -227,6 +227,11 @@ public abstract class AbstractCommandExecutor {
 
         // if timeout occurs, exit directly
         long remainTime = getRemainTime();
+
+        // update pid before waiting for the run to finish
+        if (null != taskCallBack) {
+            taskCallBack.updateTaskInstanceInfo(taskInstanceId);
+        }
 
         // waiting for the run to finish
         boolean status = process.waitFor(remainTime, TimeUnit.SECONDS);
