@@ -28,7 +28,9 @@ public class S3StorageOperatorFactory implements StorageOperateFactory {
 
     @Override
     public StorageOperate createStorageOperate() {
-        return new S3StorageOperator();
+        S3StorageOperator s3StorageOperator = new S3StorageOperator();
+        s3StorageOperator.init();
+        return s3StorageOperator;
     }
 
     @Override
