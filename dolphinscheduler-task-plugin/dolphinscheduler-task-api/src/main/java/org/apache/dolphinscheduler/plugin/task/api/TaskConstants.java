@@ -430,7 +430,7 @@ public class TaskConstants {
 
     public static final String TASK_TYPE_DATA_QUALITY = "DATA_QUALITY";
 
-    public static final String TASK_TYPE_K8S = "K8S";
+    public static final String DEPLOY_MODE_KUBERNETES = "Kubernetes";
 
     public static final Set<String> TASK_TYPE_SET_K8S = Sets.newHashSet("K8S", "KUBEFLOW");
 
@@ -479,6 +479,11 @@ public class TaskConstants {
     public static final String NAMESPACE_NAME = "name";
     public static final String CLUSTER = "cluster";
     public static final Pattern COMMAND_SPLIT_REGEX = Pattern.compile("[^\\s\"'`]+|\"([^\"]+)\"|'([^']+)'|`([^`]+)`");
+
+    /**
+     * spark / flink on k8s label name
+     */
+    public static final String UNIQUE_LABEL_NAME = "dolphinscheduler-label";
 
     /**
      * conda config used by jupyter task plugin

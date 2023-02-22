@@ -17,15 +17,13 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
-import static org.apache.dolphinscheduler.common.constants.Constants.APPID_COLLECT;
-import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_COLLECT_WAY;
 import static org.apache.dolphinscheduler.common.constants.Constants.DRY_RUN_FLAG_YES;
 import static org.apache.dolphinscheduler.common.constants.Constants.SINGLE_SLASH;
 
 import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.common.log.remote.RemoteLogUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
@@ -51,12 +49,9 @@ import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcClient;
 import org.apache.dolphinscheduler.server.worker.utils.TaskExecutionCheckerUtils;
 import org.apache.dolphinscheduler.server.worker.utils.TaskFilesTransferUtils;
 
-import org.apache.commons.collections4.CollectionUtils;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
-import java.util.List;
 
 import javax.annotation.Nullable;
 
@@ -120,6 +115,8 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
         log.info("Remove the current task execute context from worker cache");
         clearTaskExecPathIfNeeded();
+
+        sendTaskLogOnWorkerToRemoteIfNeeded();
     }
 
     protected void afterThrowing(Throwable throwable) throws TaskException {
@@ -131,6 +128,8 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         log.info(
                 "Get a exception when execute the task, will send the task execute result to master, the current task execute result is {}",
                 TaskExecutionStatus.FAILURE);
+
+        sendTaskLogOnWorkerToRemoteIfNeeded();
     }
 
     public void cancelTask() {
@@ -138,13 +137,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         if (task != null) {
             try {
                 task.cancel();
-                List<String> appIds =
-                        LogUtils.getAppIds(taskExecutionContext.getLogPath(), taskExecutionContext.getExecutePath(),
-                                PropertyUtils.getString(APPID_COLLECT, DEFAULT_COLLECT_WAY));
-                if (CollectionUtils.isNotEmpty(appIds)) {
-                    ProcessUtils.cancelApplication(appIds, log, taskExecutionContext.getTenantCode(),
-                            taskExecutionContext.getExecutePath());
-                }
+                ProcessUtils.cancelApplication(taskExecutionContext);
             } catch (Exception e) {
                 log.error(
                         "Task execute failed and cancel the application failed, this will not affect the taskInstance status, but you need to check manual",
@@ -277,6 +270,18 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
 
         log.info("Send task execute result to master, the current task status: {}",
                 taskExecutionContext.getCurrentExecutionStatus());
+    }
+
+    protected void sendTaskLogOnWorkerToRemoteIfNeeded() {
+        if (taskExecutionContext.isLogBufferEnable()) {
+            return;
+        }
+
+        if (RemoteLogUtils.isRemoteLoggingEnable()) {
+            RemoteLogUtils.sendRemoteLog(taskExecutionContext.getLogPath());
+            log.info("Worker sends task log {} to remote storage asynchronously.",
+                    taskExecutionContext.getLogPath());
+        }
     }
 
     protected void clearTaskExecPathIfNeeded() {

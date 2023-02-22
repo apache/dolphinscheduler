@@ -15,35 +15,30 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.enums;
+package org.apache.dolphinscheduler.plugin.task.api.am;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
+import java.util.List;
 
-public enum StateEventType {
+import lombok.RequiredArgsConstructor;
+import lombok.Value;
 
-    PROCESS_STATE_CHANGE(0, "process state change"),
-    TASK_STATE_CHANGE(1, "task state change"),
-    PROCESS_TIMEOUT(2, "process timeout"),
-    TASK_TIMEOUT(3, "task timeout"),
-    WAKE_UP_TASK_GROUP(4, "wait task group"),
-    TASK_RETRY(5, "task retry"),
-    PROCESS_BLOCKED(6, "process blocked"),
-    PROCESS_SUBMIT_FAILED(7, "process submit failed");
+@Value
+@RequiredArgsConstructor
+public class YarnApplicationManagerContext implements ApplicationManagerContext {
 
-    StateEventType(int code, String descp) {
-        this.code = code;
-        this.descp = descp;
-    }
+    /**
+     * execute path
+     */
+    private final String executePath;
 
-    @EnumValue
-    private final int code;
-    private final String descp;
+    /**
+     * tenant code
+     */
+    private final String tenantCode;
 
-    public int getCode() {
-        return code;
-    }
+    /**
+     * appId list
+     */
+    private final List<String> appIds;
 
-    public String getDescp() {
-        return descp;
-    }
 }

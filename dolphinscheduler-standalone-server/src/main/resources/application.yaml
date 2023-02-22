@@ -146,8 +146,8 @@ master:
   reserved-memory: 0.03
   # failover interval
   failover-interval: 10m
-  # kill yarn jon when failover taskInstance, default true
-  kill-yarn-job-when-task-failover: true
+  # kill yarn/k8s application when failover taskInstance, default true
+  kill-application-when-task-failover: true
   worker-group-refresh-interval: 10s
 
 worker:
