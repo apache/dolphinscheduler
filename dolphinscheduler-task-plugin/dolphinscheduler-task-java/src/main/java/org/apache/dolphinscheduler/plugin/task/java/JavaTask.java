@@ -142,7 +142,7 @@ public class JavaTask extends AbstractTask {
                     throw new RunTypeNotFoundException("run type is required, but it is null now.");
             }
             Preconditions.checkNotNull(command, "command not be null.");
-            TaskResponse taskResponse = shellCommandExecutor.run(command);
+            TaskResponse taskResponse = shellCommandExecutor.run(command, taskCallBack);
             log.info("java task run result: {}", taskResponse);
             setExitStatusCode(taskResponse.getExitStatusCode());
             setAppIds(taskResponse.getAppIds());

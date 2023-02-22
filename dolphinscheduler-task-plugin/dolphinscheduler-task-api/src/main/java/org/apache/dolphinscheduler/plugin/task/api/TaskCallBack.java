@@ -22,4 +22,6 @@ import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
 public interface TaskCallBack {
 
     public void updateRemoteApplicationInfo(int taskInstanceId, ApplicationInfo applicationInfo);
+
+    public void updateTaskInstanceInfo(int taskInstanceId);
 }

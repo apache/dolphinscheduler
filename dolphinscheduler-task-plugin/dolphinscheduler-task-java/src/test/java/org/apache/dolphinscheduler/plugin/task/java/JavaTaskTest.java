@@ -25,6 +25,7 @@ import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.RUN_TYP
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.java.exception.JavaSourceFileExistException;
@@ -44,8 +45,17 @@ import org.junit.jupiter.api.Test;
 
 public class JavaTaskTest {
 
-    private TaskCallBack taskCallBack = (taskInstanceId, appIds) -> {
+    private TaskCallBack taskCallBack = new TaskCallBack() {
 
+        @Override
+        public void updateRemoteApplicationInfo(int taskInstanceId, ApplicationInfo applicationInfo) {
+
+        }
+
+        @Override
+        public void updateTaskInstanceInfo(int taskInstanceId) {
+
+        }
     };
 
     @Test
