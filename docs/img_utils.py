@@ -112,8 +112,10 @@ def check() -> None:
     img_docs, img_img = check_diff_img()
     assert not img_docs and not img_img, (
         f"Images assert failed: \n"
-        f"* difference `docs` imgs to `img` is: {img_docs if img_docs else 'None'}\n"
-        f"* difference `img` imgs to `docs` is: {img_img if img_img else 'None'}\n"
+        f"* Some images use in documents but do not exists in `img` directory, please add them: "
+        f"{img_docs if img_docs else 'None'}\n"
+        f"* Some images not use in documents but exists in `img` directory, please delete them: "
+        f"{img_img if img_img else 'None'}\n"
     )
 
 
