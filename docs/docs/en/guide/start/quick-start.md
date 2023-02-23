@@ -1,6 +1,6 @@
 # Quick Start
 
-In this section, we will use DolphinScheduler to create and run a simple workflow step by step. During this journey, 
+In this section, we will use DolphinScheduler to create and run a simple workflow step by step. During this journey,
 you will learn the basic concepts of DolphinScheduler and know the most basic configuration to run the workflow. We
 provide both video and text in this tutorial, you can choose the way you prefer
 
@@ -14,12 +14,12 @@ provide both video and text in this tutorial, you can choose the way you prefer
 
 ### Setup Dolphinscheduler
 
-You have to install and start dolphinscheduler first before go ahead. For the beginner, we recommend setup up 
+You have to install and start dolphinscheduler first before go ahead. For the beginner, we recommend setup up
 dolphionscheduler with the official Docker image or starting the standalone server.
 
 * [standalone server](https://dolphinscheduler.apache.org/en-us/docs/3.1.3/guide/installation/standalone)
 * [docker](https://dolphinscheduler.apache.org/en-us/docs/3.1.3/guide/start/docker)
-  
+
 ### Build Your First Workflow
 
 You can log in dolphinscheduler with http://localhost:12345/dolphinscheduler/ui the default username/password
