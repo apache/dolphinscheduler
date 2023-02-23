@@ -1,61 +1,119 @@
 # Quick Start
 
-This is a Quick Start guide to help you get a basic idea of working with Apache DolphinScheduler. Once you've gone through the tutorial video, we encourage you to find out more about Apache DolphinScheduler functions and examples in .
+In this section, we will use DolphinScheduler to create and run a simple workflow step by step. During this journey, 
+you will learn the basic concepts of DolphinScheduler and know the most basic configuration to run the workflow. We
+provide both video and text in this tutorial, you can choose the way you prefer
+
+## Video Tutorial
 
 <figure class="video_container"> 
   <iframe src="https://www.youtube.com/embed/nrF20hpCkug" frameborder="0" allowfullscreen="true"></iframe>
 </figure>
 
-## Administrator User Login
+## Text Tutorial
 
-* Address: http://localhost:12345/dolphinscheduler
-* Username and password: admin/dolphinscheduler123
+### Setup Dolphinscheduler
 
-![login](../../../../img/new_ui/dev/quick-start/login.png)
+You have to install and start dolphinscheduler first before go ahead. For the beginner, we recommend setup up 
+dolphionscheduler with the official Docker image or starting the standalone server.
 
-## Create a queue
+* [standalone server](https://dolphinscheduler.apache.org/en-us/docs/3.1.3/guide/installation/standalone)
+* [docker](https://dolphinscheduler.apache.org/en-us/docs/3.1.3/guide/start/docker)
+  
+### Build Your First Workflow
 
-![create-queue](../../../../img/new_ui/dev/quick-start/create-queue.png)
+You can log in dolphinscheduler with http://localhost:12345/dolphinscheduler/ui the default username/password
+is `admin/dolphinscheduler123`.
 
-## Create a tenant
+![login](../../../../img/start/login.gif)
 
-![create-tenant](../../../../img/new_ui/dev/quick-start/create-tenant.png)
+#### Create Tenant
 
-## Create Ordinary Users
+Tenant is a concept that cannot be bypassed while using DolphinScheduler, so
+let's briefly introduce the concept of tenant first.
 
-![create-user](../../../../img/new_ui/dev/quick-start/create-user.png)
+The account named `admin` logged into DolphinScheduler is called user in dolphinscheduler.
+To better control system resources, DolphinScheduler introduce the concept of
+tenants, which are used to execute tasks.
 
-## Create an alarm instance
+The brief is as follows:
 
-![create-alarmInstance](../../../../img/new_ui/dev/quick-start/create-alarmInstance.png)
+* User: login web UI, do all operations in the web UI, including workflow management and tenant creation.
+* Tenant: the actual executor of the task, A Linux user for DolphinScheduler worker.
 
-## Create an alarm group
+We can create a tenant in DolphinScheduler `Security -> Tenant Manage` page.
 
-![create-alarmGroup](../../../../img/new_ui/dev/quick-start/create-alarmGroup.png)
+![create-tenant](../../../../img/start/create-tenant.gif)
 
-## Create a worker group
+#### Assign Tenant to User
 
-![create-workerGroup](../../../../img/new_ui/dev/quick-start/create-workerGroup.png)
+As we talked about above in [Create Tenant](#create-tenant), the user can only run the task
+unless the user is assigned to a tenant.
 
-## Create environment
+We can assign a tenant to a specific user in DolphinScheduler `Security -> User Manage` page.
 
-![create-environment](../../../../img/new_ui/dev/quick-start/create-environment.png)
+![assign-tenant](../../../../img/start/assign-tenant.gif)
 
-## Create a token
+After we create a tenant and assign it to a user, we can start creating a
+simple workflow in DolphinScheduler.
 
-![create-token](../../../../img/new_ui/dev/quick-start/create-token.png)
+#### Create Project
 
-## Login with regular users
+But in DolphinScheduler, all workflow must belong to a project, so we need
+to create a project first.
 
-Click on the user name in the upper right corner to "exit" and re-use the normal user login.
+We can create a project in DolphinScheduler `Project` page by clicking
+`Create Project` button.
 
-* `Project Management -> Create Project -> Project Name`
+![create-project](../../../../img/start/create-project.gif)
 
-![project](../../../../img/new_ui/dev/quick-start/project.png)
+#### Create Workflow
 
-* `Click Workflow Definition -> Create Workflow Definition-> Online Workflow Definition`
+Now we can create a workflow for the project `tutorial`. Click the project we just created,
+go to `Workflow Definition` page, click `Create Workflow` button, and we will redirect
+to the workflow detail page.
 
-![workflow-definition](../../../../img/new_ui/dev/quick-start/workflow-definition.png)
-* `Running Workflow Definition -> Click Workflow Instance -> Click Workflow Instance Name -> Double-click Task Node -> View Task Execution Log`
+![create-workflow](../../../../img/start/create-workflow.gif)
 
-![log](../../../../img/new_ui/dev/quick-start/log.png)
+#### Create Tasks
+
+We can use the mouse to drag the task you want to create from the toolbar in the workflow canvas.
+In this case, we create a `Shell` task. Entering the necessary information for the task,
+we just fill the attribute `Node Name` with `Script` to the task for this simple workflow.
+After that, we can click the `Save` button save the task into the workflow. We create another task
+using the same way.
+
+![create-task](../../../../img/start/create-task.gif)
+
+#### Set Task Dependency
+
+So we have two different tasks with different names and commands to run in the workflow. The
+only thing missing from the current workflow is task dependency. We can add dependency using
+the mouse to drag the arrow from the upstream task to the downstream and then release the mouse.
+And you can see the link with the arrow between the two tasks is created, from the upstream
+task to the downstream one. Finally, we can click the `Save` button from the top right corner
+to save the workflow, do not forget to fill name of the workflow.
+
+![set-dependence](../../../../img/start/set-dep.gif)
+
+#### Run Workflow
+
+After all done, we can run the workflow by clicking the `Online` and then the `Run` button from
+the workflows list. If you want to see the workflow instance, just go to `Workflow Instance`
+page, you can see the workflow instance is running and the status is `Executing`.
+
+![run-workflow](../../../../img/start/run-workflow.gif)
+
+#### View Log
+
+If you want to view the task log, please click the workflow instance from the workflow instance
+list, then find the task you want to view the log, right-click the mouse and select `View Log`
+from the context dialog, and you can see the detailed log of the task.
+
+You can the task print the `Hello DolphinScheduler` and `Ending...` which is the same as we
+define [in the task](#create-tasks).
+
+![view-log](../../../../img/start/view-log.gif)
+
+You just finished the first tutorial of DolphinScheduler, you can now run some simple workflow
+in DolphinScheduler, congratulations!
