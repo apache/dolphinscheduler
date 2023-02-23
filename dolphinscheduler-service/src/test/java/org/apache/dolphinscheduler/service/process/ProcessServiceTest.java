@@ -103,6 +103,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * process service test
@@ -752,29 +753,45 @@ public class ProcessServiceTest {
         List<ProcessTaskRelationLog> list = new ArrayList<>();
         list.add(processTaskRelation);
 
-        TaskDefinitionLog taskDefinition = new TaskDefinitionLog();
-        taskDefinition.setCode(3L);
-        taskDefinition.setName("1-test");
-        taskDefinition.setProjectCode(1L);
-        taskDefinition.setTaskType("SHELL");
-        taskDefinition.setUserId(1);
-        taskDefinition.setVersion(2);
-        taskDefinition.setCreateTime(new Date());
-        taskDefinition.setUpdateTime(new Date());
+        TaskDefinitionLog taskDefinition1 = new TaskDefinitionLog();
+        taskDefinition1.setId(1);
+        taskDefinition1.setCode(3L);
+        taskDefinition1.setName("1-test");
+        taskDefinition1.setProjectCode(1L);
+        taskDefinition1.setTaskType("SHELL");
+        taskDefinition1.setUserId(1);
+        taskDefinition1.setVersion(2);
+        taskDefinition1.setCreateTime(new Date());
+        taskDefinition1.setUpdateTime(new Date());
 
-        TaskDefinitionLog td2 = new TaskDefinitionLog();
-        td2.setCode(2L);
-        td2.setName("unit-test");
-        td2.setProjectCode(1L);
-        td2.setTaskType("SHELL");
-        td2.setUserId(1);
-        td2.setVersion(1);
-        td2.setCreateTime(new Date());
-        td2.setUpdateTime(new Date());
+        // cause taskDefintion2's id is bigger than taskDefinition1 => genDagGraph should use taskDefintion2
+        TaskDefinitionLog taskDefintion2 = new TaskDefinitionLog();
+        taskDefintion2.setId(2);
+        taskDefintion2.setCode(3L);
+        taskDefintion2.setName("1-test");
+        taskDefintion2.setProjectCode(1L);
+        taskDefintion2.setTaskType("SHELL");
+        taskDefintion2.setTaskParams("{\"name\":\"dolphinscheduler\"}");
+        taskDefintion2.setUserId(1);
+        taskDefintion2.setVersion(2);
+        taskDefintion2.setCreateTime(new Date());
+        taskDefintion2.setUpdateTime(new Date());
+
+        TaskDefinitionLog taskDefinition3 = new TaskDefinitionLog();
+        taskDefinition3.setId(3);
+        taskDefinition3.setCode(2L);
+        taskDefinition3.setName("unit-test");
+        taskDefinition3.setProjectCode(1L);
+        taskDefinition3.setTaskType("SHELL");
+        taskDefinition3.setUserId(1);
+        taskDefinition3.setVersion(1);
+        taskDefinition3.setCreateTime(new Date());
+        taskDefinition3.setUpdateTime(new Date());
 
         List<TaskDefinitionLog> taskDefinitionLogs = new ArrayList<>();
-        taskDefinitionLogs.add(taskDefinition);
-        taskDefinitionLogs.add(td2);
+        taskDefinitionLogs.add(taskDefinition1);
+        taskDefinitionLogs.add(taskDefintion2);
+        taskDefinitionLogs.add(taskDefinition3);
 
         Mockito.when(taskDefinitionLogMapper.queryByTaskDefinitions(any())).thenReturn(taskDefinitionLogs);
         Mockito.when(processTaskRelationLogMapper.queryByProcessCodeAndVersion(Mockito.anyLong(), Mockito.anyInt()))
@@ -783,6 +800,8 @@ public class ProcessServiceTest {
         DAG<String, TaskNode, TaskNodeRelation> stringTaskNodeTaskNodeRelationDAG =
                 processService.genDagGraph(processDefinition);
         Assert.assertEquals(1, stringTaskNodeTaskNodeRelationDAG.getNodesCount());
+        ObjectNode objectNode = JSONUtils.parseObject(stringTaskNodeTaskNodeRelationDAG.getNode("3").getTaskParams());
+        Assert.assertEquals("dolphinscheduler", objectNode.get("name").asText());
     }
 
     @Test

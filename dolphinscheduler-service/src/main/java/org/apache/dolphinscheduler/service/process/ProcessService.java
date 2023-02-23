@@ -219,8 +219,7 @@ public interface ProcessService {
     int switchProcessTaskRelationVersion(ProcessDefinition processDefinition);
 
     int switchTaskDefinitionVersion(long taskCode, int taskVersion);
-
-    String getResourceIds(TaskDefinition taskDefinition);
+    void modifyResourceInfoIfNeeded(TaskDefinition taskDefinition);
 
     int saveTaskDefine(User operator, long projectCode, List<TaskDefinitionLog> taskDefinitionLogs, Boolean syncDefine);
 
