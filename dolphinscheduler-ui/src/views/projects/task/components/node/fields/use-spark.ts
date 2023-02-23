@@ -25,6 +25,7 @@ import {
   useExecutorMemory,
   useExecutorCores,
   useMainJar,
+  useNamespace,
   useResources
 } from '.'
 import type { IJsonItem } from '../types'
@@ -90,6 +91,7 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
       }
     },
     useDeployMode(24, ref(true), showCluster),
+    useNamespace(),
     {
       type: 'input',
       field: 'appName',

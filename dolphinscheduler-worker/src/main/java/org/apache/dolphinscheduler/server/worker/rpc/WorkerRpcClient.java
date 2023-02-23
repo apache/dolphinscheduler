@@ -26,6 +26,9 @@ import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteResultAckProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteRunningAckProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskRejectAckProcessor;
+import org.apache.dolphinscheduler.server.worker.processor.TaskUpdatePidAckProcessor;
+
+import javax.annotation.Resource;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,6 +48,9 @@ public class WorkerRpcClient implements AutoCloseable {
     @Autowired
     private TaskExecuteResultAckProcessor taskExecuteResultAckProcessor;
 
+    @Resource
+    private TaskUpdatePidAckProcessor taskUpdatePidAckProcessor;
+
     @Autowired
     private TaskRejectAckProcessor taskRejectAckProcessor;
 
@@ -57,6 +63,8 @@ public class WorkerRpcClient implements AutoCloseable {
         // we only use the client to handle the ack message, we can optimize this, send ack to the nettyServer.
         this.nettyRemotingClient.registerProcessor(CommandType.TASK_EXECUTE_RUNNING_ACK,
                 taskExecuteRunningAckProcessor);
+        this.nettyRemotingClient.registerProcessor(CommandType.TASK_UPDATE_PID_ACK,
+                taskUpdatePidAckProcessor);
         this.nettyRemotingClient.registerProcessor(CommandType.TASK_EXECUTE_RESULT_ACK, taskExecuteResultAckProcessor);
         this.nettyRemotingClient.registerProcessor(CommandType.TASK_REJECT_ACK, taskRejectAckProcessor);
         log.info("Worker rpc client started");

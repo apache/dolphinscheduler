@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.log.LogClient;
@@ -161,8 +162,8 @@ public class ProcessUtils {
      * @param taskExecutionContext taskExecutionContext
      * @return yarn application ids
      */
-    public static @Nullable List<String> killYarnJob(@NonNull LogClient logClient,
-                                                     @NonNull TaskExecutionContext taskExecutionContext) {
+    public static @Nullable List<String> killApplication(@NonNull LogClient logClient,
+                                                         @NonNull TaskExecutionContext taskExecutionContext) {
         if (taskExecutionContext.getLogPath() == null) {
             return Collections.emptyList();
         }
@@ -172,6 +173,7 @@ public class ProcessUtils {
             List<String> appIds = logClient.getAppIds(host.getIp(), host.getPort(), taskExecutionContext.getLogPath(),
                     taskExecutionContext.getAppInfoPath());
             if (CollectionUtils.isNotEmpty(appIds)) {
+                taskExecutionContext.setAppIds(String.join(TaskConstants.COMMA, appIds));
                 if (StringUtils.isEmpty(taskExecutionContext.getExecutePath())) {
                     taskExecutionContext
                             .setExecutePath(FileUtils.getProcessExecDir(
@@ -183,9 +185,7 @@ public class ProcessUtils {
                                     taskExecutionContext.getTaskInstanceId()));
                 }
                 FileUtils.createWorkDirIfAbsent(taskExecutionContext.getExecutePath());
-                org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils.cancelApplication(appIds, log,
-                        taskExecutionContext.getTenantCode(),
-                        taskExecutionContext.getExecutePath());
+                org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils.cancelApplication(taskExecutionContext);
                 return appIds;
             } else {
                 log.info("The current appId is empty, don't need to kill the yarn job, taskInstanceId: {}",

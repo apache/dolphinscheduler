@@ -35,7 +35,7 @@ const props = {
 const SourceModal = defineComponent({
   name: 'SourceModal',
   props,
-  emits: ['change'],
+  emits: ['change', 'maskClick'],
   setup(props, ctx) {
     const { t } = useI18n()
 
@@ -45,15 +45,20 @@ const SourceModal = defineComponent({
       ctx.emit('change', value)
     }
 
+    const handleMaskClick = () => {
+      ctx.emit('maskClick')
+    }
+
     return {
       t,
       ...toRefs(state),
-      handleTypeSelect
+      handleTypeSelect,
+      handleMaskClick
     }
   },
   render() {
-    const { show, t, handleTypeSelect } = this
-
+    const { show, t, handleTypeSelect, handleMaskClick } = this
+    
     return (
       <Modal
         class='dialog-source-modal'
@@ -61,6 +66,7 @@ const SourceModal = defineComponent({
         title={t('datasource.choose_datasource_type')}
         cancelShow={false}
         confirmShow={false}
+        onMaskClick={handleMaskClick}
       >
         {{
           default: () => (

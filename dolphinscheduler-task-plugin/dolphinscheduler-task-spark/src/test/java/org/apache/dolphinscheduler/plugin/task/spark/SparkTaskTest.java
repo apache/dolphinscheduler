@@ -46,11 +46,11 @@ public class SparkTaskTest {
                 "${SPARK_HOME}/bin/spark-sql " +
                         "--master yarn " +
                         "--deploy-mode client " +
-                        "--driver-cores 1 " +
-                        "--driver-memory 512M " +
-                        "--num-executors 2 " +
-                        "--executor-cores 2 " +
-                        "--executor-memory 1G " +
+                        "--conf spark.driver.cores=1 " +
+                        "--conf spark.driver.memory=512M " +
+                        "--conf spark.executor.instances=2 " +
+                        "--conf spark.executor.cores=2 " +
+                        "--conf spark.executor.memory=1G " +
                         "--name sparksql " +
                         "-f /tmp/5536_node.sql");
     }
@@ -67,11 +67,11 @@ public class SparkTaskTest {
                         "--master yarn " +
                         "--deploy-mode client " +
                         "--class org.apache.dolphinscheduler.plugin.task.spark.SparkTaskTest " +
-                        "--driver-cores 1 " +
-                        "--driver-memory 512M " +
-                        "--num-executors 2 " +
-                        "--executor-cores 2 " +
-                        "--executor-memory 1G " +
+                        "--conf spark.driver.cores=1 " +
+                        "--conf spark.driver.memory=512M " +
+                        "--conf spark.executor.instances=2 " +
+                        "--conf spark.executor.cores=2 " +
+                        "--conf spark.executor.memory=1G " +
                         "--name spark " +
                         "lib/dolphinscheduler-task-spark.jar");
     }

@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.remote.processor;
 import static org.apache.dolphinscheduler.common.constants.Constants.APPID_COLLECT;
 import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_COLLECT_WAY;
 
+import org.apache.dolphinscheduler.common.log.remote.RemoteLogUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
@@ -81,7 +82,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                 ViewLogRequestCommand viewLogRequest = JSONUtils.parseObject(
                         command.getBody(), ViewLogRequestCommand.class);
                 String viewLogPath = viewLogRequest.getPath();
-                String msg = LogUtils.readWholeFileContent(viewLogPath);
+                String msg = readWholeFileContent(viewLogPath);
                 ViewLogResponseCommand viewLogResponse = new ViewLogResponseCommand(msg);
                 channel.writeAndFlush(viewLogResponse.convert2Command(command.getOpaque()));
                 break;
@@ -156,7 +157,7 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
      * @param filePath file path
      * @return byte array of file
      */
-    private byte[] getFileContentBytes(String filePath) {
+    private byte[] getFileContentBytesFromLocal(String filePath) {
         try (
                 InputStream in = new FileInputStream(filePath);
                 ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
@@ -172,6 +173,22 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
         return new byte[0];
     }
 
+    private byte[] getFileContentBytesFromRemote(String filePath) {
+        RemoteLogUtils.getRemoteLog(filePath);
+        return getFileContentBytesFromLocal(filePath);
+    }
+
+    private byte[] getFileContentBytes(String filePath) {
+        File file = new File(filePath);
+        if (file.exists()) {
+            return getFileContentBytesFromLocal(filePath);
+        }
+        if (RemoteLogUtils.isRemoteLoggingEnable()) {
+            return getFileContentBytesFromRemote(filePath);
+        }
+        return getFileContentBytesFromLocal(filePath);
+    }
+
     /**
      * read part file content，can skip any line and read some lines
      *
@@ -180,9 +197,9 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
      * @param limit read lines limit
      * @return part file content
      */
-    private List<String> readPartFileContent(String filePath,
-                                             int skipLine,
-                                             int limit) {
+    private List<String> readPartFileContentFromLocal(String filePath,
+                                                      int skipLine,
+                                                      int limit) {
         File file = new File(filePath);
         if (file.exists() && file.isFile()) {
             try (Stream<String> stream = Files.lines(Paths.get(filePath))) {
@@ -194,6 +211,42 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
             log.info("file path: {} not exists", filePath);
         }
         return Collections.emptyList();
+    }
+
+    private List<String> readPartFileContentFromRemote(String filePath,
+                                                       int skipLine,
+                                                       int limit) {
+        RemoteLogUtils.getRemoteLog(filePath);
+        return readPartFileContentFromLocal(filePath, skipLine, limit);
+    }
+
+    private List<String> readPartFileContent(String filePath,
+                                             int skipLine,
+                                             int limit) {
+        File file = new File(filePath);
+        if (file.exists()) {
+            return readPartFileContentFromLocal(filePath, skipLine, limit);
+        }
+        if (RemoteLogUtils.isRemoteLoggingEnable()) {
+            return readPartFileContentFromRemote(filePath, skipLine, limit);
+        }
+        return readPartFileContentFromLocal(filePath, skipLine, limit);
+    }
+
+    private String readWholeFileContentFromRemote(String filePath) {
+        RemoteLogUtils.getRemoteLog(filePath);
+        return LogUtils.readWholeFileContentFromLocal(filePath);
+    }
+
+    private String readWholeFileContent(String filePath) {
+        File file = new File(filePath);
+        if (file.exists()) {
+            return LogUtils.readWholeFileContentFromLocal(filePath);
+        }
+        if (RemoteLogUtils.isRemoteLoggingEnable()) {
+            return readWholeFileContentFromRemote(filePath);
+        }
+        return LogUtils.readWholeFileContentFromLocal(filePath);
     }
 
 }

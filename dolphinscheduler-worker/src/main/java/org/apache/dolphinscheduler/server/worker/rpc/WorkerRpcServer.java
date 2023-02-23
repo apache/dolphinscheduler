@@ -29,8 +29,11 @@ import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteRunningAck
 import org.apache.dolphinscheduler.server.worker.processor.TaskKillProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskRejectAckProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskSavePointProcessor;
+import org.apache.dolphinscheduler.server.worker.processor.TaskUpdatePidAckProcessor;
 
 import java.io.Closeable;
+
+import javax.annotation.Resource;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -56,6 +59,9 @@ public class WorkerRpcServer implements Closeable {
     @Autowired
     private TaskExecuteRunningAckProcessor taskExecuteRunningAckProcessor;
 
+    @Resource
+    private TaskUpdatePidAckProcessor taskUpdatePidAckProcessor;
+
     @Autowired
     private TaskExecuteResultAckProcessor taskExecuteResultAckProcessor;
 
@@ -79,6 +85,8 @@ public class WorkerRpcServer implements Closeable {
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_REQUEST, taskKillProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RUNNING_ACK,
                 taskExecuteRunningAckProcessor);
+        this.nettyRemotingServer.registerProcessor(CommandType.TASK_UPDATE_PID_ACK,
+                taskUpdatePidAckProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RESULT_ACK, taskExecuteResultAckProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_REJECT_ACK, taskRejectAckProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.PROCESS_HOST_UPDATE_REQUEST, hostUpdateProcessor);

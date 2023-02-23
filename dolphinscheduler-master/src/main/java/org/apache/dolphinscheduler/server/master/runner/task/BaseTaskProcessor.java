@@ -25,8 +25,8 @@ import static org.apache.dolphinscheduler.common.constants.Constants.PASSWORD;
 import static org.apache.dolphinscheduler.common.constants.Constants.SINGLE_SLASH;
 import static org.apache.dolphinscheduler.common.constants.Constants.USER;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.CLUSTER;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.NAMESPACE_NAME;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DATA_QUALITY;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SET_K8S;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_NAME;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_TABLE;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_TYPE;
@@ -72,6 +72,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceP
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.UdfFuncParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.JdbcUrlParser;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
+import org.apache.dolphinscheduler.plugin.task.spark.SparkParameters;
 import org.apache.dolphinscheduler.server.master.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
@@ -328,11 +329,8 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
             dataQualityTaskExecutionContext = new DataQualityTaskExecutionContext();
             setDataQualityTaskRelation(dataQualityTaskExecutionContext, taskInstance, tenant.getTenantCode());
         }
-        K8sTaskExecutionContext k8sTaskExecutionContext = null;
-        if (TASK_TYPE_SET_K8S.contains(taskInstance.getTaskType())) {
-            k8sTaskExecutionContext = new K8sTaskExecutionContext();
-            setK8sTaskRelation(k8sTaskExecutionContext, taskInstance);
-        }
+
+        K8sTaskExecutionContext k8sTaskExecutionContext = setK8sTaskRelation(taskInstance);
 
         Map<String, Property> businessParamsMap = curingParamsService.preBuildBusinessParams(processInstance);
 
@@ -635,18 +633,39 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
     }
 
     /**
-     * set k8s task relation
-     * @param k8sTaskExecutionContext k8sTaskExecutionContext
+     * get k8s task execution context based on task type and deploy mode
+     *
      * @param taskInstance taskInstance
      */
-    private void setK8sTaskRelation(K8sTaskExecutionContext k8sTaskExecutionContext, TaskInstance taskInstance) {
-        K8sTaskParameters k8sTaskParameters =
-                JSONUtils.parseObject(taskInstance.getTaskParams(), K8sTaskParameters.class);
-        Map<String, String> namespace = JSONUtils.toMap(k8sTaskParameters.getNamespace());
-        String clusterName = namespace.get(CLUSTER);
-        String configYaml = processService.findConfigYamlByName(clusterName);
-        if (configYaml != null) {
-            k8sTaskExecutionContext.setConfigYaml(configYaml);
+    private K8sTaskExecutionContext setK8sTaskRelation(TaskInstance taskInstance) {
+        K8sTaskExecutionContext k8sTaskExecutionContext = null;
+        String namespace = "";
+        switch (taskInstance.getTaskType()) {
+            case "K8S":
+            case "KUBEFLOW":
+                K8sTaskParameters k8sTaskParameters =
+                        JSONUtils.parseObject(taskInstance.getTaskParams(), K8sTaskParameters.class);
+                namespace = k8sTaskParameters.getNamespace();
+                break;
+            case "SPARK":
+                SparkParameters sparkParameters =
+                        JSONUtils.parseObject(taskInstance.getTaskParams(), SparkParameters.class);
+                if (StringUtils.isNotEmpty(sparkParameters.getNamespace())) {
+                    namespace = sparkParameters.getNamespace();
+                }
+                break;
+            default:
+                break;
         }
+
+        if (StringUtils.isNotEmpty(namespace)) {
+            String clusterName = JSONUtils.toMap(namespace).get(CLUSTER);
+            String configYaml = processService.findConfigYamlByName(clusterName);
+            if (configYaml != null) {
+                k8sTaskExecutionContext =
+                        new K8sTaskExecutionContext(configYaml, JSONUtils.toMap(namespace).get(NAMESPACE_NAME));
+            }
+        }
+        return k8sTaskExecutionContext;
     }
 }

@@ -79,6 +79,10 @@ const list = defineComponent({
       showSourceModal.value = true
     }
 
+    const handleSourceModalClose = () => {
+      showSourceModal.value = false
+    }
+
     onMounted(() => {
       changePage(1)
       columns.value = getColumns()
@@ -102,7 +106,8 @@ const list = defineComponent({
       trim,
       handleSelectSourceType,
       selectType,
-      handleSourceModalOpen
+      handleSourceModalOpen,
+      handleSourceModalClose
     }
   },
   render() {
@@ -123,7 +128,8 @@ const list = defineComponent({
       onUpdatedList,
       handleSelectSourceType,
       selectType,
-      handleSourceModalOpen
+      handleSourceModalOpen,
+      handleSourceModalClose
     } = this
 
     return (
@@ -179,6 +185,7 @@ const list = defineComponent({
         <SourceModal
           show={showSourceModal}
           onChange={handleSelectSourceType}
+          onMaskClick={handleSourceModalClose}
         ></SourceModal>
         <DetailModal
           show={showDetailModal}

@@ -21,6 +21,11 @@
 
 timezone: "Asia/Shanghai"
 
+# Used to detect whether dolphinscheduler dependent services such as database are ready
+initImage:
+  pullPolicy: "IfNotPresent"
+  busybox: "busybox:1.30.1"
+
 image:
   registry: "dolphinscheduler.docker.scarf.sh/apache"
   tag: "dev-SNAPSHOT"
@@ -308,7 +313,7 @@ master:
     MASTER_MAX_CPU_LOAD_AVG: "-1"
     MASTER_RESERVED_MEMORY: "0.3"
     MASTER_FAILOVER_INTERVAL: "10m"
-    MASTER_KILL_YARN_JOB_WHEN_HANDLE_FAILOVER: "true"
+    MASTER_KILL_APPLICATION_WHEN_HANDLE_FAILOVER: "true"
 
 worker:
   ## PodManagementPolicy controls how pods are created during initial scale up, when replacing pods on nodes, or when scaling down.
