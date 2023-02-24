@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.plugin.task.api.utils;
 
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -30,8 +32,9 @@ import lombok.experimental.UtilityClass;
 public class ShellUtils {
 
     public List<String> ENV_SOURCE_LIST = Arrays.stream(
-            Optional.ofNullable(PropertyUtils.getString("shell.env_source_list"))
-                    .map(s -> s.split(",")).orElse(new String[0]))
+            Optional.ofNullable(PropertyUtils.getString("shell.env_source_list")).map(s -> s.split(","))
+                    .orElse(new String[0]))
             .map(String::trim)
+            .filter(StringUtils::isNotBlank)
             .collect(Collectors.toList());
 }

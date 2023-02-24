@@ -15,13 +15,27 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.repository;
+package org.apache.dolphinscheduler.api.rpc;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
+import org.apache.dolphinscheduler.remote.NettyRemotingClient;
+import org.apache.dolphinscheduler.remote.command.Command;
+import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
+import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
+import org.apache.dolphinscheduler.remote.utils.Host;
 
-public interface ProcessDefinitionLogDao {
+import org.springframework.stereotype.Component;
 
-    ProcessDefinitionLog queryProcessDefinitionLog(long workflowDefinitionCode, int workflowDefinitionVersion);
+@Component
+public class ApiRpcClient {
 
-    void deleteByWorkflowDefinitionCode(long workflowDefinitionCode);
+    private final NettyRemotingClient nettyRemotingClient;
+
+    public ApiRpcClient() {
+        this.nettyRemotingClient = new NettyRemotingClient(new NettyClientConfig());
+    }
+
+    public void send(Host host, Command command) throws RemotingException {
+        nettyRemotingClient.send(host, command);
+    }
+
 }

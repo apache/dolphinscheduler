@@ -15,13 +15,16 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.repository;
+package org.apache.dolphinscheduler.api.executor.workflow.instance.rerun;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
+import org.apache.dolphinscheduler.api.executor.ExecuteResult;
 
-public interface ProcessDefinitionLogDao {
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-    ProcessDefinitionLog queryProcessDefinitionLog(long workflowDefinitionCode, int workflowDefinitionVersion);
+@Data
+@AllArgsConstructor
+public class RepeatRunningResult implements ExecuteResult {
 
-    void deleteByWorkflowDefinitionCode(long workflowDefinitionCode);
+    private final Integer commandId;
 }

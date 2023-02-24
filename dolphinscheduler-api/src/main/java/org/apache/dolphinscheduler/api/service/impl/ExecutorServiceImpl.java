@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_START;
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_END_DATE;
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST;
@@ -34,8 +36,11 @@ import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowExecuteRespo
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.executor.ExecuteClient;
+import org.apache.dolphinscheduler.api.executor.ExecuteContext;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.MonitorService;
+import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -91,7 +96,6 @@ import org.apache.dolphinscheduler.service.process.TriggerRelationService;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.ZonedDateTime;
@@ -101,6 +105,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -111,7 +116,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
 
 /**
@@ -144,10 +148,13 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     private ProcessService processService;
 
     @Autowired
-    private CommandService commandService;
+    private ProcessInstanceDao processInstanceDao;
 
     @Autowired
-    private ProcessInstanceDao processInstanceDao;
+    private ProcessDefinitionService processDefinitionService;
+
+    @Autowired
+    private CommandService commandService;
 
     @Autowired
     private TaskDefinitionLogMapper taskDefinitionLogMapper;
@@ -169,6 +176,10 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
     @Autowired
     private TriggerRelationService triggerRelationService;
+
+    @Autowired
+    private ExecuteClient executeClient;
+
     /**
      * execute process instance
      *
@@ -236,15 +247,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             return result;
         }
 
-        if (!checkScheduleTimeNum(commandType, cronTime)) {
-            putMsg(result, Status.SCHEDULE_TIME_NUMBER);
-            return result;
-        }
-
-        // check master exists
-        if (!checkMasterExists(result)) {
-            return result;
-        }
+        checkScheduleTimeNumExceed(commandType, cronTime);
+        checkMasterExists();
 
         long triggerCode = CodeGenerateUtils.getInstance().genCode();
 
@@ -275,46 +279,31 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         return result;
     }
 
-    /**
-     * check whether master exists
-     *
-     * @param result result
-     * @return master exists return true , otherwise return false
-     */
-    private boolean checkMasterExists(Map<String, Object> result) {
+    private void checkMasterExists() {
         // check master server exists
         List<Server> masterServers = monitorService.getServerListFromRegistry(true);
 
         // no master
         if (masterServers.isEmpty()) {
-            log.error("Master does not exist.");
-            putMsg(result, Status.MASTER_NOT_EXISTS);
-            return false;
+            throw new ServiceException(Status.MASTER_NOT_EXISTS);
         }
-        return true;
     }
 
-    /**
-     * @param complementData
-     * @param cronTime
-     * @return CommandType is COMPLEMENT_DATA and cronTime's number is not greater than 100 return true , otherwise return false
-     */
-    private boolean checkScheduleTimeNum(CommandType complementData, String cronTime) {
+    private void checkScheduleTimeNumExceed(CommandType complementData, String cronTime) {
         if (!CommandType.COMPLEMENT_DATA.equals(complementData)) {
-            return true;
+            return;
         }
         if (cronTime == null) {
-            return true;
+            return;
         }
         Map<String, String> cronMap = JSONUtils.toMap(cronTime);
         if (cronMap.containsKey(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)) {
             String[] stringDates = cronMap.get(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST).split(COMMA);
             if (stringDates.length > SCHEDULE_TIME_MAX_LENGTH) {
                 log.warn("Parameter cornTime is bigger than {}.", SCHEDULE_TIME_MAX_LENGTH);
-                return false;
+                throw new ServiceException(Status.SCHEDULE_TIME_NUMBER_EXCEED);
             }
         }
-        return true;
     }
 
     /**
@@ -322,19 +311,18 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      *
      * @param projectCode       project code
      * @param processDefinition process definition
-     * @param processDefineCode process definition code
-     * @param version           process instance version
      */
     @Override
     public void checkProcessDefinitionValid(long projectCode, ProcessDefinition processDefinition,
                                             long processDefineCode, Integer version) {
         // check process definition exists
-        if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
-            throw new ServiceException(Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(processDefineCode));
+        if (projectCode != processDefinition.getProjectCode()) {
+            throw new ServiceException(Status.PROCESS_DEFINE_NOT_EXIST, processDefinition.getCode());
         }
         // check process definition online
         if (processDefinition.getReleaseState() != ReleaseState.ONLINE) {
-            throw new ServiceException(Status.PROCESS_DEFINE_NOT_RELEASE, String.valueOf(processDefineCode), version);
+            throw new ServiceException(Status.PROCESS_DEFINE_NOT_RELEASE, processDefinition.getCode(),
+                    processDefinition.getVersion());
         }
         // check sub process definition online
         if (!checkSubProcessDefinitionValid(processDefinition)) {
@@ -381,8 +369,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
     /**
      * do action to process instance：pause, stop, repeat, recover from pause, recover from stop，rerun failed task
-    
-    
      *
      * @param loginUser         login user
      * @param projectCode       project code
@@ -391,103 +377,35 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @return execute result code
      */
     @Override
-    public Map<String, Object> execute(User loginUser, long projectCode, Integer processInstanceId,
+    public Map<String, Object> execute(User loginUser,
+                                       long projectCode,
+                                       Integer processInstanceId,
                                        ExecuteType executeType) {
-        Project project = projectMapper.queryByCode(projectCode);
+        checkNotNull(processInstanceId, "workflowInstanceId cannot be null");
+        checkNotNull(executeType, "executeType cannot be null");
+
         // check user access for project
-
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode,
+        projectService.checkProjectAndAuthThrowException(loginUser, projectCode,
                 ApiFuncIdentificationConstant.map.get(executeType));
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        checkMasterExists();
 
-        // check master exists
-        if (!checkMasterExists(result)) {
-            return result;
-        }
+        ProcessInstance workflowInstance =
+                Optional.ofNullable(processInstanceDao.queryByWorkflowInstanceId(processInstanceId))
+                        .orElseThrow(() -> new ServiceException(Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceId));
 
-        ProcessInstance processInstance = processService.findProcessInstanceDetailById(processInstanceId)
-                .orElseThrow(() -> new ServiceException(Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceId));
+        checkState(workflowInstance.getProjectCode() == projectCode,
+                "The workflow instance's project code doesn't equals to the given project");
+        ProcessDefinition processDefinition = processDefinitionService.queryWorkflowDefinitionThrowExceptionIfNotFound(
+                workflowInstance.getProcessDefinitionCode(), workflowInstance.getProcessDefinitionVersion());
 
-        ProcessDefinition processDefinition =
-                processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
-                        processInstance.getProcessDefinitionVersion());
-        processDefinition.setReleaseState(ReleaseState.ONLINE);
-        if (executeType != ExecuteType.STOP && executeType != ExecuteType.PAUSE) {
-            this.checkProcessDefinitionValid(projectCode, processDefinition, processInstance.getProcessDefinitionCode(),
-                    processInstance.getProcessDefinitionVersion());
-        }
+        executeClient.executeWorkflowInstance(new ExecuteContext(
+                workflowInstance,
+                processDefinition,
+                loginUser,
+                executeType));
 
-        result = checkExecuteType(processInstance, executeType);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
-        if (!checkTenantSuitable(processDefinition)) {
-            log.error(
-                    "There is not any valid tenant for the process definition, processDefinitionId:{}, processDefinitionCode:{}, ",
-                    processDefinition.getId(), processDefinition.getName());
-            putMsg(result, Status.TENANT_NOT_SUITABLE);
-        }
-
-        // get the startParams user specified at the first starting while repeat running is needed
-        Map<String, Object> commandMap =
-                JSONUtils.parseObject(processInstance.getCommandParam(), new TypeReference<Map<String, Object>>() {
-                });
-        String startParams = null;
-        if (MapUtils.isNotEmpty(commandMap) && executeType == ExecuteType.REPEAT_RUNNING) {
-            Object startParamsJson = commandMap.get(CMD_PARAM_START_PARAMS);
-            if (startParamsJson != null) {
-                startParams = startParamsJson.toString();
-            }
-        }
-
-        switch (executeType) {
-            case REPEAT_RUNNING:
-                result = insertCommand(loginUser, processInstanceId, processDefinition.getCode(),
-                        processDefinition.getVersion(), CommandType.REPEAT_RUNNING, startParams,
-                        processInstance.getTestFlag());
-                break;
-            case RECOVER_SUSPENDED_PROCESS:
-                result = insertCommand(loginUser, processInstanceId, processDefinition.getCode(),
-                        processDefinition.getVersion(), CommandType.RECOVER_SUSPENDED_PROCESS, startParams,
-                        processInstance.getTestFlag());
-                break;
-            case START_FAILURE_TASK_PROCESS:
-                result = insertCommand(loginUser, processInstanceId, processDefinition.getCode(),
-                        processDefinition.getVersion(), CommandType.START_FAILURE_TASK_PROCESS, startParams,
-                        processInstance.getTestFlag());
-                break;
-            case STOP:
-                if (processInstance.getState() == WorkflowExecutionStatus.READY_STOP) {
-                    log.warn("Process instance status is already {}, processInstanceName:{}.",
-                            WorkflowExecutionStatus.READY_STOP.getDesc(), processInstance.getName());
-                    putMsg(result, Status.PROCESS_INSTANCE_ALREADY_CHANGED, processInstance.getName(),
-                            processInstance.getState());
-                } else {
-                    result =
-                            updateProcessInstancePrepare(processInstance, CommandType.STOP,
-                                    WorkflowExecutionStatus.READY_STOP);
-                }
-                break;
-            case PAUSE:
-                if (processInstance.getState() == WorkflowExecutionStatus.READY_PAUSE) {
-                    log.warn("Process instance status is already {}, processInstanceName:{}.",
-                            WorkflowExecutionStatus.READY_STOP.getDesc(), processInstance.getName());
-                    putMsg(result, Status.PROCESS_INSTANCE_ALREADY_CHANGED, processInstance.getName(),
-                            processInstance.getState());
-                } else {
-                    result = updateProcessInstancePrepare(processInstance, CommandType.PAUSE,
-                            WorkflowExecutionStatus.READY_PAUSE);
-                }
-                break;
-            default:
-                log.warn("Unknown execute type for process instance, processInstanceId:{}.",
-                        processInstance.getId());
-                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "unknown execute type");
-
-                break;
-        }
+        Map<String, Object> result = new HashMap<>();
+        result.put(Constants.STATUS, Status.SUCCESS);
         return result;
     }
 
@@ -504,10 +422,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     @Override
     public Map<String, Object> execute(User loginUser, Integer workflowInstanceId, ExecuteType executeType) {
         ProcessInstance processInstance = processInstanceMapper.selectById(workflowInstanceId);
-        ProcessDefinition processDefinition =
-                processDefineMapper.queryByCode(processInstance.getProcessDefinitionCode());
-
-        return execute(loginUser, processDefinition.getProjectCode(), workflowInstanceId, executeType);
+        return execute(loginUser, processInstance.getProjectCode(), workflowInstanceId, executeType);
     }
 
     /**
@@ -633,10 +548,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             return result;
         }
 
-        // check master exists
-        if (!checkMasterExists(result)) {
-            return result;
-        }
+        checkMasterExists();
         return forceStart(processInstance, taskGroupQueue);
     }
 
@@ -770,62 +682,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         processService.sendStartTask2Master(processInstance, taskGroupQueue.getTaskId(),
                 org.apache.dolphinscheduler.remote.command.CommandType.TASK_FORCE_STATE_EVENT_REQUEST);
         putMsg(result, Status.SUCCESS);
-        return result;
-    }
-
-    /**
-     * insert command, used in the implementation of the page, rerun, recovery (pause / failure) execution
-     *
-     * @param loginUser             login user
-     * @param instanceId            instance id
-     * @param processDefinitionCode process definition code
-     * @param processVersion
-     * @param commandType           command type
-     * @return insert result code
-     */
-    private Map<String, Object> insertCommand(User loginUser, Integer instanceId, long processDefinitionCode,
-                                              int processVersion, CommandType commandType, String startParams,
-                                              int testFlag) {
-        Map<String, Object> result = new HashMap<>();
-
-        // To add startParams only when repeat running is needed
-        Map<String, Object> cmdParam = new HashMap<>();
-        cmdParam.put(CMD_PARAM_RECOVER_PROCESS_ID_STRING, instanceId);
-        if (!StringUtils.isEmpty(startParams)) {
-            cmdParam.put(CMD_PARAM_START_PARAMS, startParams);
-        }
-
-        Command command = new Command();
-        command.setCommandType(commandType);
-        command.setProcessDefinitionCode(processDefinitionCode);
-        command.setCommandParam(JSONUtils.toJsonString(cmdParam));
-        command.setExecutorId(loginUser.getId());
-        command.setProcessDefinitionVersion(processVersion);
-        command.setProcessInstanceId(instanceId);
-        command.setTestFlag(testFlag);
-        if (!commandService.verifyIsNeedCreateCommand(command)) {
-            log.warn(
-                    "Process instance is executing the command, processDefinitionCode:{}, processDefinitionVersion:{}, processInstanceId:{}.",
-                    processDefinitionCode, processVersion, instanceId);
-            putMsg(result, Status.PROCESS_INSTANCE_EXECUTING_COMMAND, String.valueOf(processDefinitionCode));
-            return result;
-        }
-
-        log.info("Creating command, commandInfo:{}.", command);
-        int create = commandService.createCommand(command);
-
-        if (create > 0) {
-            log.info("Create {} command complete, processDefinitionCode:{}, processDefinitionVersion:{}.",
-                    command.getCommandType().getDescp(), command.getProcessDefinitionCode(), processVersion);
-            putMsg(result, Status.SUCCESS);
-        } else {
-            log.error(
-                    "Execute process instance failed because create {} command error, processDefinitionCode:{}, processDefinitionVersion:{}， processInstanceId:{}.",
-                    command.getCommandType().getDescp(), command.getProcessDefinitionCode(), processVersion,
-                    instanceId);
-            putMsg(result, Status.EXECUTE_PROCESS_INSTANCE_ERROR);
-        }
-
         return result;
     }
 
@@ -1319,11 +1175,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             return result;
         }
 
-        // check master exists
-        if (!checkMasterExists(result)) {
-            return result;
-        }
-
+        checkMasterExists();
         // todo dispatch improvement
         List<Server> masterServerList = monitorService.getServerListFromRegistry(true);
         Host host = new Host(masterServerList.get(0).getHost(), masterServerList.get(0).getPort());

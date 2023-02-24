@@ -31,8 +31,8 @@ import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowExecuteRespo
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.executor.ExecuteClient;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
-import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ExecutorServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -64,6 +64,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
+import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.process.TriggerRelationService;
@@ -96,11 +97,9 @@ import org.slf4j.LoggerFactory;
  */
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-public class ExecutorServiceTest {
+public class ExecuteFunctionServiceTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(ExecutorServiceTest.class);
-
-    private static final Logger baseServiceLogger = LoggerFactory.getLogger(BaseServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExecuteFunctionServiceTest.class);
 
     @Mock
     private ResourcePermissionCheckService resourcePermissionCheckService;
@@ -146,6 +145,15 @@ public class ExecutorServiceTest {
 
     @Mock
     private TriggerRelationService triggerRelationService;
+
+    @Mock
+    private ExecuteClient executeClient;
+
+    @Mock
+    private ProcessInstanceDao processInstanceDao;
+
+    @Mock
+    private ProcessDefinitionService processDefinitionService;
 
     private int processDefinitionId = 1;
 
@@ -195,6 +203,7 @@ public class ExecutorServiceTest {
 
         // processInstance
         processInstance.setId(processInstanceId);
+        processInstance.setProjectCode(projectCode);
         processInstance.setState(WorkflowExecutionStatus.FAILURE);
         processInstance.setExecutorId(userId);
         processInstance.setTenantId(tenantId);
@@ -453,25 +462,39 @@ public class ExecutorServiceTest {
     public void testNoMasterServers() {
         Mockito.when(monitorService.getServerListFromRegistry(true)).thenReturn(new ArrayList<>());
 
-        Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
+        Assertions.assertThrows(ServiceException.class, () -> executorService.execProcessInstance(
+                loginUser,
+                projectCode,
                 processDefinitionCode,
                 "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
                 CommandType.COMPLEMENT_DATA,
-                null, null,
-                null, null, null,
+                null,
+                null,
+                null,
+                null,
+                null,
                 RunMode.RUN_MODE_PARALLEL,
-                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
+                Priority.LOW,
+                Constants.DEFAULT_WORKER_GROUP,
+                100L,
+                110,
+                null,
+                0,
+                Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
-                ComplementDependentMode.OFF_MODE, null);
-        Assertions.assertEquals(result.get(Constants.STATUS), Status.MASTER_NOT_EXISTS);
+                ComplementDependentMode.OFF_MODE,
+                null));
 
     }
 
     @Test
     public void testExecuteRepeatRunning() {
-        Mockito.when(commandService.verifyIsNeedCreateCommand(any(Command.class))).thenReturn(true);
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, RERUN))
+        when(commandService.verifyIsNeedCreateCommand(any(Command.class))).thenReturn(true);
+        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, RERUN))
                 .thenReturn(checkProjectAndAuth());
+        when(processInstanceDao.queryByWorkflowInstanceId(processInstanceId)).thenReturn(processInstance);
+        when(processDefinitionService.queryWorkflowDefinitionThrowExceptionIfNotFound(processDefinitionCode,
+                processDefinitionVersion)).thenReturn(processDefinition);
         Map<String, Object> result =
                 executorService.execute(loginUser, projectCode, processInstanceId, ExecuteType.REPEAT_RUNNING);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));

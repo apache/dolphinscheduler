@@ -69,4 +69,9 @@ public class ProcessInstanceDaoImpl implements ProcessInstanceDao {
     public void deleteById(Integer workflowInstanceId) {
         processInstanceMapper.deleteById(workflowInstanceId);
     }
+
+    @Override
+    public ProcessInstance queryByWorkflowInstanceId(Integer workflowInstanceId) {
+        return processInstanceMapper.selectById(workflowInstanceId);
+    }
 }

@@ -57,6 +57,8 @@ public interface ProcessInstanceService {
                                                  long projectCode,
                                                  Integer processId);
 
+    ProcessInstance queryByWorkflowInstanceIdThrowExceptionIfNotFound(Integer processId);
+
     /**
      * query process instance by id
      *

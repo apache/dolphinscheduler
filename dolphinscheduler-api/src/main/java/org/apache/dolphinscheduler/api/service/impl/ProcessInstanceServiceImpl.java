@@ -278,6 +278,15 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         return result;
     }
 
+    @Override
+    public ProcessInstance queryByWorkflowInstanceIdThrowExceptionIfNotFound(Integer workflowInstanceId) {
+        ProcessInstance processInstance = processInstanceDao.queryByWorkflowInstanceId(workflowInstanceId);
+        if (processInstance == null) {
+            throw new ServiceException(PROCESS_INSTANCE_NOT_EXIST, workflowInstanceId);
+        }
+        return processInstance;
+    }
+
     /**
      * query workflow instance by id
      *

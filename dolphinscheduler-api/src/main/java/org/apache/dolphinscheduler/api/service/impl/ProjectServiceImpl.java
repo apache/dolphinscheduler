@@ -243,6 +243,12 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     }
 
     @Override
+    public void checkProjectAndAuthThrowException(User loginUser, long projectCode, String permission) {
+        Project project = projectMapper.queryByCode(projectCode);
+        checkProjectAndAuthThrowException(loginUser, project, permission);
+    }
+
+    @Override
     public boolean hasProjectAndPerm(User loginUser, Project project, Map<String, Object> result, String permission) {
         boolean checkResult = false;
         if (project == null) {
