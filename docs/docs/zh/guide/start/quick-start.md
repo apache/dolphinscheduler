@@ -37,7 +37,7 @@ Tenant是使用DolphinScheduler时绕不开的一个概念，所以先简单介�
 
 #### 将租户分配给用户
 
-正如我们上面在[Create Tenant](#create-tenant)中谈到的，用户只能运行任务除非用户被分配给租户。
+正如我们上面在创建租户中谈到的，用户只能运行任务除非用户被分配给租户。
 
 我们可以在 DolphinScheduler 的“安全 -> 用户管理”页面中将租户分配给特定用户。
 
@@ -83,7 +83,7 @@ Tenant是使用DolphinScheduler时绕不开的一个概念，所以先简单介�
 
 如需查看任务日志，请从工作流实例中点击工作流实例列表，然后找到要查看日志的任务，右击鼠标选择`View Log` 从上下文对话框中，您可以看到任务的详细日志。
 
-您可以在任务中打印 `Hello DolphinScheduler` 和 `Ending...` 这和我们一样定义 [在任务中](#create-tasks)。
+您可以在任务中打印 `Hello DolphinScheduler` 和 `Ending...` 这和我们一样定义 在创建任务中。
 
 ![view-log](../../../../img/start/view-log.gif)
 

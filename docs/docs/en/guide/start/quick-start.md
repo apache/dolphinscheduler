@@ -47,8 +47,7 @@ We can create a tenant in DolphinScheduler `Security -> Tenant Manage` page.
 
 #### Assign Tenant to User
 
-As we talked about above in [Create Tenant](#create-tenant), the user can only run the task
-unless the user is assigned to a tenant.
+As we talked about above in Create Tenant, the user can only run the task unless the user is assigned to a tenant.
 
 We can assign a tenant to a specific user in DolphinScheduler `Security -> User Manage` page.
 
@@ -111,7 +110,7 @@ list, then find the task you want to view the log, right-click the mouse and sel
 from the context dialog, and you can see the detailed log of the task.
 
 You can the task print the `Hello DolphinScheduler` and `Ending...` which is the same as we
-define [in the task](#create-tasks).
+define in create the task.
 
 ![view-log](../../../../img/start/view-log.gif)
 
