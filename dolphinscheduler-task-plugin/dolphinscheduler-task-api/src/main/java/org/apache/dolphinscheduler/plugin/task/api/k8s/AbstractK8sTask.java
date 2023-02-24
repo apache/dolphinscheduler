@@ -17,13 +17,15 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.k8s;
 
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.impl.K8sTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 
-public abstract class AbstractK8sTask extends AbstractTaskExecutor {
+public abstract class AbstractK8sTask extends AbstractRemoteTask {
+
     /**
      * process task
      */
@@ -35,30 +37,41 @@ public abstract class AbstractK8sTask extends AbstractTaskExecutor {
      */
     protected AbstractK8sTask(TaskExecutionContext taskRequest) {
         super(taskRequest);
-        this.abstractK8sTaskExecutor = new K8sTaskExecutor(logger,taskRequest);
+        this.abstractK8sTaskExecutor = new K8sTaskExecutor(log, taskRequest);
     }
 
+    // todo split handle to submit and track
     @Override
-    public void handle() throws Exception {
+    public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             TaskResponse response = abstractK8sTaskExecutor.run(buildCommand());
             setExitStatusCode(response.getExitStatusCode());
             setAppIds(response.getAppIds());
         } catch (Exception e) {
             exitStatusCode = -1;
-            throw new TaskException("k8s process failure",e);
+            throw new TaskException("k8s process failure", e);
         }
+    }
+
+    // todo
+    @Override
+    public void submitApplication() throws TaskException {
+
+    }
+
+    // todo
+    @Override
+    public void trackApplicationStatus() throws TaskException {
+
     }
 
     /**
      * cancel application
      *
-     * @param status status
      * @throws Exception exception
      */
     @Override
-    public void cancelApplication(boolean status) throws Exception {
-        cancel = true;
+    public void cancelApplication() throws TaskException {
         // cancel process
         abstractK8sTaskExecutor.cancelApplication(buildCommand());
     }

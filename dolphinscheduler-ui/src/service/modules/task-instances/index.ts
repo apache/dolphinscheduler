@@ -40,3 +40,24 @@ export function forceSuccess(taskId: IdReq, projectCode: ProjectCodeReq): any {
 export function downloadLog(id: number): void {
   utils.downloadFile('log/download-log', { taskInstanceId: id })
 }
+
+export function streamTaskStop(projectCode: number, taskId: number): any {
+  return axios({
+    url: `projects/${projectCode}/task-instances/${taskId}/stop`,
+    method: 'post'
+  })
+}
+
+export function savePoint(projectCode: number, taskId: number): any {
+  return axios({
+    url: `projects/${projectCode}/task-instances/${taskId}/savepoint`,
+    method: 'post'
+  })
+}
+
+export function removeTaskInstanceCache(projectCode: number, taskId: number): any {
+  return axios({
+    url: `projects/${projectCode}/task-instances/${taskId}/remove-cache`,
+    method: 'delete'
+  })
+}

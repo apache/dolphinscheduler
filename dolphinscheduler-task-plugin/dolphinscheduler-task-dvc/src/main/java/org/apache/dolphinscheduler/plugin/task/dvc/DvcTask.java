@@ -19,12 +19,14 @@ package org.apache.dolphinscheduler.plugin.task.dvc;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +34,7 @@ import java.util.List;
 /**
  * shell task
  */
-public class DvcTask extends AbstractTaskExecutor {
+public class DvcTask extends AbstractTask {
 
     /**
      * dvc parameters
@@ -58,54 +60,62 @@ public class DvcTask extends AbstractTaskExecutor {
         super(taskExecutionContext);
 
         this.taskExecutionContext = taskExecutionContext;
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskExecutionContext, logger);
+        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskExecutionContext, log);
     }
 
     @Override
     public void init() {
-        logger.info("dvc task params {}", taskExecutionContext.getTaskParams());
 
         parameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), DvcParameters.class);
+        log.info("Initialize dvc task params {}", JSONUtils.toPrettyJsonString(parameters));
 
-        if (!parameters.checkParameters()) {
-            throw new RuntimeException("dvc task params is not valid");
+        if (parameters == null || !parameters.checkParameters()) {
+            throw new TaskException("dvc task params is not valid");
         }
     }
 
     @Override
-    public void handle() throws Exception {
+    public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             // construct process
             String command = buildCommand();
-            TaskResponse commandExecuteResult = shellCommandExecutor.run(command);
+            TaskResponse commandExecuteResult = shellCommandExecutor.run(command, taskCallBack);
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
-            setAppIds(commandExecuteResult.getAppIds());
             setProcessId(commandExecuteResult.getProcessId());
             parameters.dealOutParam(shellCommandExecutor.getVarPool());
-        } catch (Exception e) {
-            logger.error("dvc task error", e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.error("The current DvcTask has been interrupted", e);
             setExitStatusCode(EXIT_CODE_FAILURE);
-            throw e;
+            throw new TaskException("The current DvcTask has been interrupted", e);
+        } catch (Exception e) {
+            log.error("dvc task error", e);
+            setExitStatusCode(EXIT_CODE_FAILURE);
+            throw new TaskException("Execute dvc task failed", e);
         }
     }
 
     @Override
-    public void cancelApplication(boolean cancelApplication) throws Exception {
+    public void cancel() throws TaskException {
         // cancel process
-        shellCommandExecutor.cancelApplication();
+        try {
+            shellCommandExecutor.cancelApplication();
+        } catch (Exception e) {
+            throw new TaskException("cancel application error", e);
+        }
     }
 
     public String buildCommand() {
         String command = "";
-        TaskTypeEnum taskType = parameters.getDvcTaskType();
-        if (taskType == TaskTypeEnum.UPLOAD) {
+        String taskType = parameters.getDvcTaskType();
+        if (taskType.equals(DvcConstants.DVC_TASK_TYPE.UPLOAD)) {
             command = buildUploadCommond();
-        }else if (taskType == TaskTypeEnum.DOWNLOAD){
+        } else if (taskType.equals(DvcConstants.DVC_TASK_TYPE.DOWNLOAD)) {
             command = buildDownCommond();
-        }else if (taskType == TaskTypeEnum.INIT){
+        } else if (taskType.equals(DvcConstants.DVC_TASK_TYPE.INIT)) {
             command = buildInitDvcCommond();
         }
-        logger.info("Run DVC task with command: \n{}", command);
+        log.info("Run DVC task with command: \n{}", command);
         return command;
     }
 
@@ -152,12 +162,9 @@ public class DvcTask extends AbstractTaskExecutor {
 
     }
 
-
     @Override
     public AbstractParameters getParameters() {
         return parameters;
     }
 
-
 }
-

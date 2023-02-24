@@ -22,13 +22,14 @@ import org.apache.dolphinscheduler.common.utils.FileUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.core.io.ClassPathResource;
 
 import com.google.common.base.Strings;
@@ -36,8 +37,8 @@ import com.google.common.base.Strings;
 /**
  * Metadata related common classes
  */
+@Slf4j
 public class SchemaUtils {
-    private static final Logger logger = LoggerFactory.getLogger(SchemaUtils.class);
 
     private SchemaUtils() {
         throw new UnsupportedOperationException("Construct SchemaUtils");
@@ -65,7 +66,7 @@ public class SchemaUtils {
 
                 return -1;
             } catch (Exception e) {
-                logger.error(e.getMessage(), e);
+                log.error(e.getMessage(), e);
                 throw new RuntimeException(e);
             }
         }).collect(Collectors.toList());
@@ -94,7 +95,8 @@ public class SchemaUtils {
             }
         }
 
-        // If the version and schema version is the same from 0 up to the arrlength-1 element,whoever has a larger arrLength has a larger version number
+        // If the version and schema version is the same from 0 up to the arrlength-1 element,whoever has a larger
+        // arrLength has a larger version number
         return schemaVersionArr.length > versionArr.length;
     }
 
@@ -106,12 +108,13 @@ public class SchemaUtils {
     public static String getSoftVersion() throws IOException {
         final ClassPathResource softVersionFile = new ClassPathResource("sql/soft_version");
         String softVersion;
-        try {
-            softVersion = FileUtils.readFile2Str(softVersionFile.getInputStream());
+        try (InputStream inputStream = softVersionFile.getInputStream()) {
+            softVersion = FileUtils.readFile2Str(inputStream);
             softVersion = Strings.nullToEmpty(softVersion).replaceAll("\\s+|\r|\n", "");
         } catch (FileNotFoundException e) {
-            logger.error(e.getMessage(), e);
-            throw new RuntimeException("Failed to get the product version description file. The file could not be found", e);
+            log.error(e.getMessage(), e);
+            throw new RuntimeException(
+                    "Failed to get the product version description file. The file could not be found", e);
         }
         return softVersion;
     }

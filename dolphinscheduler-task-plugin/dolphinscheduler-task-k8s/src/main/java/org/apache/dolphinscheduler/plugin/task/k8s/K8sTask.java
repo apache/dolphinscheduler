@@ -20,17 +20,18 @@ package org.apache.dolphinscheduler.plugin.task.k8s;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.CLUSTER;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.NAMESPACE_NAME;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.AbstractK8sTask;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.K8sTaskMainParameters;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.K8sTaskParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 public class K8sTask extends AbstractK8sTask {
@@ -52,9 +53,15 @@ public class K8sTask extends AbstractK8sTask {
         super(taskRequest);
         this.taskExecutionContext = taskRequest;
         this.k8sTaskParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), K8sTaskParameters.class);
-        if (!k8sTaskParameters.checkParameters()) {
+        log.info("Initialize k8s task parameters {}", JSONUtils.toPrettyJsonString(k8sTaskParameters));
+        if (k8sTaskParameters == null || !k8sTaskParameters.checkParameters()) {
             throw new TaskException("K8S task params is not valid");
         }
+    }
+
+    @Override
+    public List<String> getApplicationIds() throws TaskException {
+        return Collections.emptyList();
     }
 
     @Override
@@ -66,7 +73,7 @@ public class K8sTask extends AbstractK8sTask {
     protected String buildCommand() {
         K8sTaskMainParameters k8sTaskMainParameters = new K8sTaskMainParameters();
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
-        Map<String,String> namespace = JSONUtils.toMap(k8sTaskParameters.getNamespace());
+        Map<String, String> namespace = JSONUtils.toMap(k8sTaskParameters.getNamespace());
         String namespaceName = namespace.get(NAMESPACE_NAME);
         String clusterName = namespace.get(CLUSTER);
         k8sTaskMainParameters.setImage(k8sTaskParameters.getImage());
@@ -75,6 +82,7 @@ public class K8sTask extends AbstractK8sTask {
         k8sTaskMainParameters.setMinCpuCores(k8sTaskParameters.getMinCpuCores());
         k8sTaskMainParameters.setMinMemorySpace(k8sTaskParameters.getMinMemorySpace());
         k8sTaskMainParameters.setParamsMap(ParamUtils.convert(paramsMap));
+        k8sTaskMainParameters.setCommand(k8sTaskParameters.getCommand());
         return JSONUtils.toJsonString(k8sTaskMainParameters);
     }
 

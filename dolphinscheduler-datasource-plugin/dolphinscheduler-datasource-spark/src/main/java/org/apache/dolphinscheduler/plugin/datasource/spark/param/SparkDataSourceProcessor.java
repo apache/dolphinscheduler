@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.spark.param;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
@@ -25,9 +28,6 @@ import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.Constants;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.collections4.MapUtils;
 
@@ -36,7 +36,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -53,14 +52,12 @@ public class SparkDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
-        SparkConnectionParam
-                connectionParams = (SparkConnectionParam) createConnectionParams(connectionJson);
+        SparkConnectionParam connectionParams = (SparkConnectionParam) createConnectionParams(connectionJson);
 
-        SparkDataSourceParamDTO
-                sparkDatasourceParamDTO = new SparkDataSourceParamDTO();
+        SparkDataSourceParamDTO sparkDatasourceParamDTO = new SparkDataSourceParamDTO();
         sparkDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
         sparkDatasourceParamDTO.setUserName(connectionParams.getUser());
-        sparkDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
+        sparkDatasourceParamDTO.setOther(connectionParams.getOther());
         sparkDatasourceParamDTO.setJavaSecurityKrb5Conf(connectionParams.getJavaSecurityKrb5Conf());
         sparkDatasourceParamDTO.setLoginUserKeytabPath(connectionParams.getLoginUserKeytabPath());
         sparkDatasourceParamDTO.setLoginUserKeytabUsername(connectionParams.getLoginUserKeytabUsername());
@@ -68,7 +65,8 @@ public class SparkDataSourceProcessor extends AbstractDataSourceProcessor {
         StringBuilder hosts = new StringBuilder();
         String[] tmpArray = connectionParams.getAddress().split(Constants.DOUBLE_SLASH);
         String[] hostPortArray = tmpArray[tmpArray.length - 1].split(Constants.COMMA);
-        Arrays.stream(hostPortArray).forEach(hostPort -> hosts.append(hostPort.split(Constants.COLON)[0]).append(Constants.COMMA));
+        Arrays.stream(hostPortArray)
+                .forEach(hostPort -> hosts.append(hostPort.split(Constants.COLON)[0]).append(Constants.COMMA));
         hosts.deleteCharAt(hosts.length() - 1);
 
         sparkDatasourceParamDTO.setHost(hosts.toString());
@@ -81,7 +79,7 @@ public class SparkDataSourceProcessor extends AbstractDataSourceProcessor {
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO dataSourceParam) {
         StringBuilder address = new StringBuilder();
         SparkDataSourceParamDTO sparkDatasourceParam = (SparkDataSourceParamDTO) dataSourceParam;
-        address.append(Constants.JDBC_HIVE_2);
+        address.append(DataSourceConstants.JDBC_HIVE_2);
         for (String zkHost : sparkDatasourceParam.getHost().split(",")) {
             address.append(String.format("%s:%s,", zkHost, sparkDatasourceParam.getPort()));
         }
@@ -89,17 +87,15 @@ public class SparkDataSourceProcessor extends AbstractDataSourceProcessor {
 
         String jdbcUrl = address + "/" + sparkDatasourceParam.getDatabase();
 
-        SparkConnectionParam
-                sparkConnectionParam = new SparkConnectionParam();
+        SparkConnectionParam sparkConnectionParam = new SparkConnectionParam();
         sparkConnectionParam.setPassword(PasswordUtils.encodePassword(sparkDatasourceParam.getPassword()));
         sparkConnectionParam.setUser(sparkDatasourceParam.getUserName());
-        sparkConnectionParam.setOther(transformOther(sparkDatasourceParam.getOther()));
+        sparkConnectionParam.setOther(sparkDatasourceParam.getOther());
         sparkConnectionParam.setDatabase(sparkDatasourceParam.getDatabase());
         sparkConnectionParam.setAddress(address.toString());
         sparkConnectionParam.setJdbcUrl(jdbcUrl);
         sparkConnectionParam.setDriverClassName(getDatasourceDriver());
         sparkConnectionParam.setValidationQuery(getValidationQuery());
-        sparkConnectionParam.setProps(sparkDatasourceParam.getOther());
 
         if (CommonUtils.getKerberosStartupState()) {
             sparkConnectionParam.setPrincipal(sparkDatasourceParam.getPrincipal());
@@ -118,20 +114,20 @@ public class SparkDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER;
+        return DataSourceConstants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER;
     }
 
     @Override
     public String getValidationQuery() {
-        return Constants.HIVE_VALIDATION_QUERY;
+        return DataSourceConstants.HIVE_VALIDATION_QUERY;
     }
 
     @Override
     public String getJdbcUrl(ConnectionParam connectionParam) {
-        SparkConnectionParam
-                sparkConnectionParam = (SparkConnectionParam) connectionParam;
-        if (!StringUtils.isEmpty(sparkConnectionParam.getOther())) {
-            return String.format("%s;%s", sparkConnectionParam.getJdbcUrl(), sparkConnectionParam.getOther());
+        SparkConnectionParam sparkConnectionParam = (SparkConnectionParam) connectionParam;
+        if (MapUtils.isNotEmpty(sparkConnectionParam.getOther())) {
+            return String.format("%s;%s", sparkConnectionParam.getJdbcUrl(),
+                    transformOther(sparkConnectionParam.getOther()));
         }
         return sparkConnectionParam.getJdbcUrl();
     }
@@ -165,15 +161,4 @@ public class SparkDataSourceProcessor extends AbstractDataSourceProcessor {
         return String.join(";", stringBuilder);
     }
 
-    private Map<String, String> parseOther(String other) {
-        if (StringUtils.isEmpty(other)) {
-            return null;
-        }
-        Map<String, String> otherMap = new LinkedHashMap<>();
-        String[] configs = other.split(";");
-        for (String config : configs) {
-            otherMap.put(config.split("=")[0], config.split("=")[1]);
-        }
-        return otherMap;
-    }
 }

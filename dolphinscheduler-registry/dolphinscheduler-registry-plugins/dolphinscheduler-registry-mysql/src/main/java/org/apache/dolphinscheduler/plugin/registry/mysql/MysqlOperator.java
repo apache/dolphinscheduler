@@ -17,310 +17,163 @@
 
 package org.apache.dolphinscheduler.plugin.registry.mysql;
 
+import org.apache.dolphinscheduler.plugin.registry.mysql.mapper.MysqlRegistryDataMapper;
+import org.apache.dolphinscheduler.plugin.registry.mysql.mapper.MysqlRegistryLockMapper;
 import org.apache.dolphinscheduler.plugin.registry.mysql.model.DataType;
 import org.apache.dolphinscheduler.plugin.registry.mysql.model.MysqlRegistryData;
 import org.apache.dolphinscheduler.plugin.registry.mysql.model.MysqlRegistryLock;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.sql.Array;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Component;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
+@Component
+@ConditionalOnProperty(prefix = "registry", name = "type", havingValue = "mysql")
+public class MysqlOperator {
 
-/**
- * Used to CRUD from mysql
- */
-public class MysqlOperator implements AutoCloseable {
+    @Autowired
+    private MysqlRegistryDataMapper mysqlRegistryDataMapper;
+    @Autowired
+    private MysqlRegistryLockMapper mysqlRegistryLockMapper;
 
-    private static final Logger logger = LoggerFactory.getLogger(MysqlOperator.class);
-
-    private final HikariDataSource dataSource;
     private final long expireTimeWindow;
 
     public MysqlOperator(MysqlRegistryProperties registryProperties) {
-        this.expireTimeWindow = registryProperties.getTermExpireTimes() * registryProperties.getTermRefreshInterval().toMillis();
-
-        HikariConfig hikariConfig = registryProperties.getHikariConfig();
-        hikariConfig.setPoolName("MysqlRegistryDataSourcePool");
-
-        this.dataSource = new HikariDataSource(hikariConfig);
+        this.expireTimeWindow =
+                registryProperties.getTermExpireTimes() * registryProperties.getTermRefreshInterval().toMillis();
     }
 
-    public void healthCheck() throws SQLException {
-        String sql = "select 1 from t_ds_mysql_registry_data";
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-             ResultSet resultSet = preparedStatement.executeQuery();) {
-            // if no exception, the healthCheck success
-        }
+    public void healthCheck() {
+        mysqlRegistryLockMapper.countAll();
     }
 
-    public List<MysqlRegistryData> queryAllMysqlRegistryData() throws SQLException {
-        String sql = "select id, `key`, data, type, create_time, last_update_time from t_ds_mysql_registry_data";
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-             ResultSet resultSet = preparedStatement.executeQuery()) {
-            List<MysqlRegistryData> result = new ArrayList<>(resultSet.getFetchSize());
-            while (resultSet.next()) {
-                MysqlRegistryData mysqlRegistryData = MysqlRegistryData.builder()
-                        .id(resultSet.getLong("id"))
-                        .key(resultSet.getString("key"))
-                        .data(resultSet.getString("data"))
-                        .type(resultSet.getInt("type"))
-                        .createTime(resultSet.getTimestamp("create_time"))
-                        .lastUpdateTime(resultSet.getTimestamp("last_update_time"))
-                        .build();
-                result.add(mysqlRegistryData);
+    public List<MysqlRegistryData> queryAllMysqlRegistryData() {
+        return mysqlRegistryDataMapper.selectAll();
+    }
+
+    public Long insertOrUpdateEphemeralData(String key, String value) throws SQLException {
+        MysqlRegistryData mysqlRegistryData = mysqlRegistryDataMapper.selectByKey(key);
+        if (mysqlRegistryData != null) {
+            long id = mysqlRegistryData.getId();
+            if (mysqlRegistryDataMapper.updateDataAndTermById(id, value, System.currentTimeMillis()) <= 0) {
+                throw new SQLException(String.format("update registry value failed, key: %s, value: %s", key, value));
             }
-            return result;
+            return id;
         }
-    }
-
-    public long insertOrUpdateEphemeralData(String key, String value) throws SQLException {
-        String sql = "INSERT INTO t_ds_mysql_registry_data (`key`, data, type, create_time, last_update_time) VALUES (?, ?, ?, current_timestamp, current_timestamp)" +
-                "ON DUPLICATE KEY UPDATE data=?, last_update_time=current_timestamp";
-        // put a ephemeralData
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            preparedStatement.setString(1, key);
-            preparedStatement.setString(2, value);
-            preparedStatement.setInt(3, DataType.EPHEMERAL.getTypeValue());
-            preparedStatement.setString(4, value);
-            int insertCount = preparedStatement.executeUpdate();
-            ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
-            if (insertCount < 1 || !generatedKeys.next()) {
-                throw new SQLException("Insert or update ephemeral data error");
-            }
-            return generatedKeys.getLong(1);
-        }
+        mysqlRegistryData = MysqlRegistryData.builder()
+                .key(key)
+                .data(value)
+                .type(DataType.EPHEMERAL.getTypeValue())
+                .lastTerm(System.currentTimeMillis())
+                .build();
+        mysqlRegistryDataMapper.insert(mysqlRegistryData);
+        return mysqlRegistryData.getId();
     }
 
     public long insertOrUpdatePersistentData(String key, String value) throws SQLException {
-        String sql = "INSERT INTO t_ds_mysql_registry_data (`key`, data, type, create_time, last_update_time) VALUES (?, ?, ?, current_timestamp, current_timestamp)" +
-                "ON DUPLICATE KEY UPDATE data=?, last_update_time=current_timestamp";
-        // put a persistent Data
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            preparedStatement.setString(1, key);
-            preparedStatement.setString(2, value);
-            preparedStatement.setInt(3, DataType.PERSISTENT.getTypeValue());
-            preparedStatement.setString(4, value);
-            int insertCount = preparedStatement.executeUpdate();
-            ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
-            if (insertCount < 1 || !generatedKeys.next()) {
-                throw new SQLException("Insert or update persistent data error");
+        MysqlRegistryData mysqlRegistryData = mysqlRegistryDataMapper.selectByKey(key);
+        if (mysqlRegistryData != null) {
+            long id = mysqlRegistryData.getId();
+            if (mysqlRegistryDataMapper.updateDataAndTermById(id, value, System.currentTimeMillis()) <= 0) {
+                throw new SQLException(String.format("update registry value failed, key: %s, value: %s", key, value));
             }
-            return generatedKeys.getLong(1);
+            return id;
         }
+        mysqlRegistryData = MysqlRegistryData.builder()
+                .key(key)
+                .data(value)
+                .type(DataType.PERSISTENT.getTypeValue())
+                .lastTerm(System.currentTimeMillis())
+                .build();
+        mysqlRegistryDataMapper.insert(mysqlRegistryData);
+        return mysqlRegistryData.getId();
     }
 
-    public void deleteEphemeralData(String key) throws SQLException {
-        String sql = "DELETE from t_ds_mysql_registry_data where `key` = ? and type = ?";
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setString(1, key);
-            preparedStatement.setInt(2, DataType.EPHEMERAL.getTypeValue());
-            preparedStatement.execute();
-        }
+    public void deleteDataByKey(String key) {
+        mysqlRegistryDataMapper.deleteByKey(key);
     }
 
-    public void deleteEphemeralData(long ephemeralNodeId) throws SQLException {
-        String sql = "DELETE from t_ds_mysql_registry_data where `id` = ?";
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setLong(1, ephemeralNodeId);
-            preparedStatement.execute();
-        }
-    }
-
-    public void deletePersistentData(String key) throws SQLException {
-        String sql = "DELETE from t_ds_mysql_registry_data where `key` = ? and type = ?";
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setString(1, key);
-            preparedStatement.setInt(2, DataType.PERSISTENT.getTypeValue());
-            preparedStatement.execute();
-        }
+    public void deleteDataById(long id) {
+        mysqlRegistryDataMapper.deleteById(id);
     }
 
     public void clearExpireLock() {
-        String sql = "delete from t_ds_mysql_registry_lock where last_term < ?";
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setTimestamp(1,
-                    new Timestamp(System.currentTimeMillis() - expireTimeWindow));
-            int i = preparedStatement.executeUpdate();
-            if (i > 0) {
-                logger.info("Clear expire lock, size: {}", i);
-            }
-        } catch (Exception ex) {
-            logger.warn("Clear expire lock from mysql registry error", ex);
-        }
+        mysqlRegistryLockMapper.clearExpireLock(System.currentTimeMillis() - expireTimeWindow);
     }
 
     public void clearExpireEphemeralDate() {
-        String sql = "delete from t_ds_mysql_registry_data where last_update_time < ? and type = ?";
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setTimestamp(1, new Timestamp(System.currentTimeMillis() - expireTimeWindow));
-            preparedStatement.setInt(2, DataType.EPHEMERAL.getTypeValue());
-            int i = preparedStatement.executeUpdate();
-            if (i > 0) {
-                logger.info("clear expire ephemeral data, size:{}", i);
-            }
-        } catch (Exception ex) {
-            logger.warn("Clear expire ephemeral data from mysql registry error", ex);
-        }
+        mysqlRegistryDataMapper.clearExpireEphemeralDate(System.currentTimeMillis() - expireTimeWindow,
+                DataType.EPHEMERAL.getTypeValue());
     }
 
     public MysqlRegistryData getData(String key) throws SQLException {
-        String sql = "SELECT id, `key`, data, type, create_time, last_update_time FROM t_ds_mysql_registry_data WHERE `key` = ?";
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setString(1, key);
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (!resultSet.next()) {
-                    return null;
-                }
-                return MysqlRegistryData.builder()
-                        .id(resultSet.getLong("id"))
-                        .key(resultSet.getString("key"))
-                        .data(resultSet.getString("data"))
-                        .type(resultSet.getInt("type"))
-                        .createTime(resultSet.getTimestamp("create_time"))
-                        .lastUpdateTime(resultSet.getTimestamp("last_update_time"))
-                        .build();
-            }
-        }
+        return mysqlRegistryDataMapper.selectByKey(key);
     }
 
     public List<String> getChildren(String key) throws SQLException {
-        String sql = "SELECT `key` from t_ds_mysql_registry_data where `key` like ?";
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setString(1, key + "%");
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                List<String> result = new ArrayList<>(resultSet.getFetchSize());
-                while (resultSet.next()) {
-                    String fullPath = resultSet.getString("key");
-                    if (fullPath.length() > key.length()) {
-                        result.add(StringUtils.substringBefore(fullPath.substring(key.length() + 1), "/"));
-                    }
-                }
-                return result;
-            }
-        }
+        return mysqlRegistryDataMapper.fuzzyQueryByKey(key)
+                .stream()
+                .map(MysqlRegistryData::getKey)
+                .filter(fullPath -> fullPath.length() > key.length())
+                .map(fullPath -> StringUtils.substringBefore(fullPath.substring(key.length() + 1), "/"))
+                .collect(Collectors.toList());
     }
 
     public boolean existKey(String key) throws SQLException {
-        String sql = "SELECT 1 FROM t_ds_mysql_registry_data WHERE `key` = ?";
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setString(1, key);
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        MysqlRegistryData mysqlRegistryData = mysqlRegistryDataMapper.selectByKey(key);
+        return mysqlRegistryData != null;
     }
 
     /**
      * Try to acquire the target Lock, if cannot acquire, return null.
      */
+    @SuppressWarnings("checkstyle:IllegalCatch")
     public MysqlRegistryLock tryToAcquireLock(String key) throws SQLException {
-        String sql = "INSERT INTO t_ds_mysql_registry_lock (`key`, lock_owner, last_term, last_update_time, create_time) VALUES (?, ?, current_timestamp, current_timestamp, current_timestamp)";
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            preparedStatement.setString(1, key);
-            preparedStatement.setString(2, MysqlRegistryConstant.LOCK_OWNER);
-            preparedStatement.executeUpdate();
-            try (ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
-                if (resultSet.next()) {
-                    long newLockId = resultSet.getLong(1);
-                    return getLockById(newLockId);
-                }
+        MysqlRegistryLock mysqlRegistryLock = MysqlRegistryLock.builder()
+                .key(key)
+                .lockOwner(MysqlRegistryConstant.LOCK_OWNER)
+                .lastTerm(System.currentTimeMillis())
+                .build();
+        try {
+            mysqlRegistryLockMapper.insert(mysqlRegistryLock);
+            return mysqlRegistryLock;
+        } catch (Exception e) {
+            if (e instanceof SQLIntegrityConstraintViolationException) {
+                return null;
             }
-            return null;
-        } catch (SQLIntegrityConstraintViolationException e) {
-            // duplicate exception
-            return null;
+            throw e;
         }
     }
 
     public MysqlRegistryLock getLockById(long lockId) throws SQLException {
-        String sql = "SELECT `id`, `key`, lock_owner, last_term, last_update_time, create_time FROM t_ds_mysql_registry_lock WHERE id = ?";
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setLong(1, lockId);
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    return MysqlRegistryLock.builder()
-                            .id(resultSet.getLong("id"))
-                            .key(resultSet.getString("key"))
-                            .lockOwner(resultSet.getString("lock_owner"))
-                            .lastTerm(resultSet.getTimestamp("last_term"))
-                            .lastUpdateTime(resultSet.getTimestamp("last_update_time"))
-                            .createTime(resultSet.getTimestamp("create_time"))
-                            .build();
-                }
-            }
-            return null;
-        }
+        return mysqlRegistryLockMapper.selectById(lockId);
     }
 
-    // release the lock
     public boolean releaseLock(long lockId) throws SQLException {
-        String sql = "DELETE FROM t_ds_mysql_registry_lock WHERE id = ?";
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setLong(1, lockId);
-            int i = preparedStatement.executeUpdate();
-            return i > 0;
-        }
+        return mysqlRegistryLockMapper.deleteById(lockId) > 0;
     }
 
     public boolean updateEphemeralDataTerm(Collection<Long> ephemeralDateIds) throws SQLException {
-        String sql = "update t_ds_mysql_registry_data set `last_update_time` = current_timestamp() where `id` IN (?)";
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            Array idArray = connection.createArrayOf("bigint", ephemeralDateIds.toArray());
-            preparedStatement.setArray(1, idArray);
-            return preparedStatement.executeUpdate() > 0;
+        if (CollectionUtils.isEmpty(ephemeralDateIds)) {
+            return true;
         }
+        return mysqlRegistryDataMapper.updateTermByIds(ephemeralDateIds, System.currentTimeMillis()) > 0;
     }
 
-    public boolean updateLockTerm(List<Long> lockIds) throws SQLException {
-        String sql = "update t_ds_mysql_registry_lock set `last_term` = current_timestamp and `last_update_time` = current_timestamp where `id` IN (?)";
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            Array idArray = connection.createArrayOf("bigint", lockIds.toArray());
-            preparedStatement.setArray(1, idArray);
-            return preparedStatement.executeUpdate() > 0;
+    public boolean updateLockTerm(List<Long> lockIds) {
+        if (CollectionUtils.isEmpty(lockIds)) {
+            return true;
         }
+        return mysqlRegistryLockMapper.updateTermByIds(lockIds, System.currentTimeMillis()) > 0;
     }
 
-    @Override
-    public void close() throws Exception {
-        if (!dataSource.isClosed()) {
-            try (HikariDataSource closedDatasource = this.dataSource) {
-
-            }
-        }
-    }
 }

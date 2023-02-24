@@ -23,7 +23,8 @@ import {
   onMounted,
   ref,
   watch,
-  computed
+  computed,
+  getCurrentInstance
 } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Modal from '@/components/modal'
@@ -184,6 +185,8 @@ export default defineComponent({
       })
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     onMounted(() => {
       getWorkerGroups()
       getAlertGroups()
@@ -225,7 +228,8 @@ export default defineComponent({
       handlePreview,
       ...toRefs(variables),
       ...toRefs(timingState),
-      ...toRefs(props)
+      ...toRefs(props),
+      trim
     }
   },
 
@@ -262,6 +266,7 @@ export default defineComponent({
                 {{
                   trigger: () => (
                     <NInput
+                      allowInput={this.trim}
                       style={{ width: '80%' }}
                       readonly={true}
                       v-model:value={this.timingForm.crontab}
@@ -373,7 +378,7 @@ export default defineComponent({
               clearable
             />
           </NFormItem>
-          <NFormItem
+          {this.timingForm.warningType !== 'NONE' && ( <NFormItem
             label={t('project.workflow.alarm_group')}
             path='warningGroupId'
           >
@@ -383,7 +388,7 @@ export default defineComponent({
               v-model:value={this.timingForm.warningGroupId}
               clearable
             />
-          </NFormItem>
+          </NFormItem> )}
         </NForm>
       </Modal>
     )

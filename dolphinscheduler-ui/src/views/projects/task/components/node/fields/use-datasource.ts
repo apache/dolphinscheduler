@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, onMounted, nextTick, Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { queryDataSourceList } from '@/service/modules/data-source'
 import { indexOf, find } from 'lodash'
@@ -24,8 +24,13 @@ import type { TypeReq } from '@/service/modules/data-source/types'
 
 export function useDatasource(
   model: { [field: string]: any },
-  supportedDatasourceType?: string[],
-  field?: string
+  params: {
+    supportedDatasourceType?: string[]
+    typeField?: string
+    sourceField?: string
+    span?: Ref | number
+    testFlag?: Ref | number
+  } = {}
 ): IJsonItem[] {
   const { t } = useI18n()
 
@@ -82,6 +87,31 @@ export function useDatasource(
       id: 9,
       code: 'REDSHIFT',
       disabled: false
+    },
+    {
+      id: 10,
+      code: 'ATHENA',
+      disabled: false
+    },
+    {
+      id: 12,
+      code: 'TRINO',
+      disabled: false
+    },
+    {
+      id: 13,
+      code: 'STARROCKS',
+      disabled: false
+    },
+    {
+      id: 14,
+      code: 'AZURESQL',
+      disabled: false
+    },
+    {
+      id: 15,
+      code: 'DAMENG',
+      disabled: false
     }
   ]
 
@@ -91,8 +121,8 @@ export function useDatasource(
         if (item.disabled) {
           return false
         }
-        if (supportedDatasourceType) {
-          return indexOf(supportedDatasourceType, item.code) !== -1
+        if (params.supportedDatasourceType) {
+          return indexOf(params.supportedDatasourceType, item.code) !== -1
         }
         return true
       })
@@ -100,17 +130,21 @@ export function useDatasource(
   }
 
   const refreshOptions = async () => {
-    const params = { type: model.type } as TypeReq
-    const res = await queryDataSourceList(params)
+    const parameters = {
+      type: model[params.typeField || 'type'],
+      testFlag: 0
+    } as TypeReq
+    const res = await queryDataSourceList(parameters)
     datasourceOptions.value = res.map((item: any) => ({
       label: item.name,
       value: item.id
     }))
-    if (!res.length && model.datasource) model.datasource = null
-    if (res.length && model.datasource) {
-      const item = find(res, { id: model.datasource })
+    const sourceField = params.sourceField || 'datasource'
+    if (!res.length && model[sourceField]) model[sourceField] = null
+    if (res.length && model[sourceField]) {
+      const item = find(res, { id: model[sourceField] })
       if (!item) {
-        model.datasource = null
+        model[sourceField] = null
       }
     }
   }
@@ -127,8 +161,8 @@ export function useDatasource(
   return [
     {
       type: 'select',
-      field: field ? field : 'type',
-      span: 12,
+      field: params.typeField || 'type',
+      span: params.span || 12,
       name: t('project.node.datasource_type'),
       props: {
         'on-update:value': onChange
@@ -141,8 +175,8 @@ export function useDatasource(
     },
     {
       type: 'select',
-      field: field || 'datasource',
-      span: 12,
+      field: params.sourceField || 'datasource',
+      span: params.span || 12,
       name: t('project.node.datasource_instances'),
       options: datasourceOptions,
       validate: {

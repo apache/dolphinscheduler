@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.oracle;
 
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.Constants;
 
 public class OracleDataSourceClient extends CommonDataSourceClient {
 
@@ -30,7 +30,7 @@ public class OracleDataSourceClient extends CommonDataSourceClient {
 
     @Override
     protected void setDefaultValidationQuery(BaseConnectionParam baseConnectionParam) {
-        baseConnectionParam.setValidationQuery(Constants.ORACLE_VALIDATION_QUERY);
+        baseConnectionParam.setValidationQuery(DataSourceConstants.ORACLE_VALIDATION_QUERY);
     }
 
 }

@@ -22,21 +22,20 @@ import static com.github.dreamhead.moco.MocoJsonRunner.jsonHttpServer;
 import static com.github.dreamhead.moco.Runner.running;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
 import org.apache.commons.io.IOUtils;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,12 +43,13 @@ import org.slf4j.LoggerFactory;
 import com.github.dreamhead.moco.HttpServer;
 
 public class PigeonTaskTest {
+
     private static final Logger logger = LoggerFactory.getLogger(PigeonTaskTest.class);
     private PigeonTask pigeonTask;
 
     private TaskExecutionContext taskExecutionContext;
 
-    @Before
+    @BeforeEach
     public void before() throws Exception {
 
         String taskParams = "{\"targetJobName\":\"mysql_elastic\"}";
@@ -60,12 +60,14 @@ public class PigeonTaskTest {
         Mockito.when(taskExecutionContext.getExecutePath()).thenReturn("/tmp");
         Mockito.when(taskExecutionContext.getTaskAppId()).thenReturn(UUID.randomUUID().toString());
         Mockito.when(taskExecutionContext.getTenantCode()).thenReturn("root");
-        Mockito.when(taskExecutionContext.getStartTime()).thenReturn(new Date());
+        Mockito.when(taskExecutionContext.getStartTime()).thenReturn(System.currentTimeMillis());
         Mockito.when(taskExecutionContext.getTaskTimeout()).thenReturn(10000);
         Mockito.when(taskExecutionContext.getLogPath()).thenReturn("/tmp/dx");
-        //        Mockito.when(taskExecutionContext.getVarPool())
-        //                .thenReturn("[{\"direct\":\"IN\",\"prop\":\"" + TISTask.KEY_POOL_VAR_TIS_HOST + "\",\"type\":\"VARCHAR\",\"value\":\"127.0.0.1:8080\"}]");
-        Map<String, String> gloabParams = Collections.singletonMap(PigeonTask.KEY_POOL_VAR_PIGEON_HOST, "127.0.0.1:8080");
+        // Mockito.when(taskExecutionContext.getVarPool())
+        // .thenReturn("[{\"direct\":\"IN\",\"prop\":\"" + TISTask.KEY_POOL_VAR_TIS_HOST +
+        // "\",\"type\":\"VARCHAR\",\"value\":\"127.0.0.1:8080\"}]");
+        Map<String, String> gloabParams =
+                Collections.singletonMap(PigeonTask.KEY_POOL_VAR_PIGEON_HOST, "127.0.0.1:8080");
         Mockito.when(taskExecutionContext.getDefinedParams()).thenReturn(gloabParams);
 
         pigeonTask = new PigeonTask(taskExecutionContext);
@@ -77,40 +79,43 @@ public class PigeonTaskTest {
     public void testGetTISConfigParams() {
         PigeonConfig cfg = PigeonConfig.getInstance();
         String tisHost = "127.0.0.1:8080";
-        Assert.assertEquals("http://127.0.0.1:8080/tjs/coredefine/coredefine.ajax", cfg.getJobTriggerUrl(tisHost));
+        Assertions.assertEquals("http://127.0.0.1:8080/tjs/coredefine/coredefine.ajax", cfg.getJobTriggerUrl(tisHost));
         String jobName = "mysql_elastic";
         int taskId = 123;
-        Assert.assertEquals("ws://" + tisHost + "/tjs/download/logfeedback?logtype=full&collection=mysql_elastic&taskid=" + taskId
-                , cfg.getJobLogsFetchUrl(tisHost, jobName, taskId));
+        Assertions.assertEquals(
+                "ws://" + tisHost + "/tjs/download/logfeedback?logtype=full&collection=mysql_elastic&taskid=" + taskId,
+                cfg.getJobLogsFetchUrl(tisHost, jobName, taskId));
 
-        Assert.assertEquals("action=datax_action&emethod=trigger_fullbuild_task", cfg.getJobTriggerPostBody());
+        Assertions.assertEquals("action=datax_action&emethod=trigger_fullbuild_task", cfg.getJobTriggerPostBody());
 
-        Assert.assertEquals("http://127.0.0.1:8080/tjs/config/config.ajax?action=collection_action&emethod=get_task_status", cfg.getJobStatusUrl(tisHost));
+        Assertions.assertEquals(
+                "http://127.0.0.1:8080/tjs/config/config.ajax?action=collection_action&emethod=get_task_status",
+                cfg.getJobStatusUrl(tisHost));
 
-        Assert.assertEquals("{\n taskid: " + taskId + "\n, log: false }", cfg.getJobStatusPostBody(taskId));
+        Assertions.assertEquals("{\n taskid: " + taskId + "\n, log: false }", cfg.getJobStatusPostBody(taskId));
 
-        Assert.assertEquals("action=core_action&event_submit_do_cancel_task=y&taskid=" + taskId, cfg.getJobCancelPostBody(taskId));
+        Assertions.assertEquals("action=core_action&event_submit_do_cancel_task=y&taskid=" + taskId,
+                cfg.getJobCancelPostBody(taskId));
     }
 
     @Test
-    public void testInit()
-            throws Exception {
+    public void testInit() throws Exception {
         try {
             pigeonTask.init();
         } catch (Exception e) {
-            Assert.fail(e.getMessage());
+            Assertions.fail(e.getMessage());
         }
     }
 
     @Test
-    public void testHandle()
-            throws Exception {
-        HttpServer server = jsonHttpServer(8080, file("src/test/resources/org/apache/dolphinscheduler/plugin/task/pigeon/PigeonTaskTest.json"));
+    public void testHandle() throws Exception {
+        HttpServer server = jsonHttpServer(8080,
+                file("src/test/resources/org/apache/dolphinscheduler/plugin/task/pigeon/PigeonTaskTest.json"));
 
         running(server, () -> {
-            pigeonTask.handle();
+            pigeonTask.handle(null);
 
-            Assert.assertEquals("PIGEON execute be success", ExecutionStatus.SUCCESS, pigeonTask.getExitStatus());
+            Assertions.assertEquals(TaskExecutionStatus.SUCCESS, pigeonTask.getExitStatus());
         });
     }
 
@@ -125,14 +130,14 @@ public class PigeonTaskTest {
         }
     }
 
-    //    @Test
-    //    public void testCancelApplication()
-    //            throws Exception {
-    //        try {
-    //            tisTask.cancelApplication(true);
-    //        } catch (Exception e) {
-    //            Assert.fail(e.getMessage());
-    //        }
-    //    }
+    // @Test
+    // public void testCancelApplication()
+    // throws Exception {
+    // try {
+    // tisTask.cancelApplication(true);
+    // } catch (Exception e) {
+    // Assertions.fail(e.getMessage());
+    // }
+    // }
 
 }

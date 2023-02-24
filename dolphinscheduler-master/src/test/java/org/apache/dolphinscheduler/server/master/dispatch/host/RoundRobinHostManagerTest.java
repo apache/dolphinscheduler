@@ -17,25 +17,30 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.host;
 
+import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.ExecutionContextTestUtils;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
+import org.apache.dolphinscheduler.server.master.dispatch.exceptions.WorkerGroupNotFoundException;
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
+
+import java.util.Optional;
+
 import org.assertj.core.util.Strings;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.google.common.collect.Sets;
 
 /**
  * round robin host manager test
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class RoundRobinHostManagerTest {
 
     @Mock
@@ -45,19 +50,21 @@ public class RoundRobinHostManagerTest {
     RoundRobinHostManager roundRobinHostManager;
 
     @Test
-    public void testSelectWithEmptyResult() {
+    public void testSelectWithEmptyResult() throws WorkerGroupNotFoundException {
         Mockito.when(serverNodeManager.getWorkerGroupNodes("default")).thenReturn(null);
         ExecutionContext context = ExecutionContextTestUtils.getExecutionContext(10000);
         Host emptyHost = roundRobinHostManager.select(context);
-        Assert.assertTrue(Strings.isNullOrEmpty(emptyHost.getAddress()));
+        Assertions.assertTrue(Strings.isNullOrEmpty(emptyHost.getAddress()));
     }
 
     @Test
-    public void testSelectWithResult() {
+    public void testSelectWithResult() throws WorkerGroupNotFoundException {
         Mockito.when(serverNodeManager.getWorkerGroupNodes("default")).thenReturn(Sets.newHashSet("192.168.1.1:22"));
+        Mockito.when(serverNodeManager.getWorkerNodeInfo("192.168.1.1:22"))
+                .thenReturn(Optional.of(new WorkerHeartBeat()));
         ExecutionContext context = ExecutionContextTestUtils.getExecutionContext(10000);
         Host host = roundRobinHostManager.select(context);
-        Assert.assertTrue(!Strings.isNullOrEmpty(host.getAddress()));
-        Assert.assertTrue(host.getAddress().equalsIgnoreCase("192.168.1.1:22"));
+        Assertions.assertFalse(Strings.isNullOrEmpty(host.getAddress()));
+        Assertions.assertTrue(host.getAddress().equalsIgnoreCase("192.168.1.1:22"));
     }
 }

@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.server.master.processor.queue;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
-import org.apache.dolphinscheduler.common.thread.Stopper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +30,8 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -39,12 +39,8 @@ import org.springframework.stereotype.Component;
  * task manager
  */
 @Component
+@Slf4j
 public class TaskEventService {
-
-    /**
-     * logger
-     */
-    private final Logger logger = LoggerFactory.getLogger(TaskEventService.class);
 
     /**
      * attemptQueue
@@ -63,11 +59,15 @@ public class TaskEventService {
 
     @PostConstruct
     public void start() {
-        this.taskEventThread = new TaskEventThread();
+        this.taskEventThread = new TaskEventDispatchThread();
+        log.info("TaskEvent dispatch thread starting");
         this.taskEventThread.start();
+        log.info("TaskEvent dispatch thread started");
 
         this.taskEventHandlerThread = new TaskEventHandlerThread();
+        log.info("TaskEvent handle thread staring");
         this.taskEventHandlerThread.start();
+        log.info("TaskEvent handle thread started");
     }
 
     @PreDestroy
@@ -84,7 +84,7 @@ public class TaskEventService {
                 taskExecuteThreadPool.eventHandler();
             }
         } catch (Exception e) {
-            logger.error("TaskEventService stop error:", e);
+            log.error("TaskEventService stop error:", e);
         }
     }
 
@@ -94,32 +94,33 @@ public class TaskEventService {
      * @param taskEvent taskEvent
      */
     public void addEvent(TaskEvent taskEvent) {
-        taskExecuteThreadPool.submitTaskEvent(taskEvent);
+        eventQueue.add(taskEvent);
     }
 
     /**
-     * task worker thread
+     * Dispatch event to target task runnable.
      */
-    class TaskEventThread extends BaseDaemonThread {
-        protected TaskEventThread() {
+    class TaskEventDispatchThread extends BaseDaemonThread {
+
+        protected TaskEventDispatchThread() {
             super("TaskEventLoopThread");
         }
 
         @Override
         public void run() {
-            while (Stopper.isRunning()) {
+            while (!ServerLifeCycleManager.isStopped()) {
                 try {
-                    // if not task , blocking here
+                    // if not task event, blocking here
                     TaskEvent taskEvent = eventQueue.take();
                     taskExecuteThreadPool.submitTaskEvent(taskEvent);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     break;
                 } catch (Exception e) {
-                    logger.error("persist task error", e);
+                    log.error("persist task error", e);
                 }
             }
-            logger.info("StateEventResponseWorker stopped");
+            log.info("StateEventResponseWorker stopped");
         }
     }
 
@@ -134,16 +135,17 @@ public class TaskEventService {
 
         @Override
         public void run() {
-            logger.info("event handler thread started");
-            while (Stopper.isRunning()) {
+            log.info("event handler thread started");
+            while (!ServerLifeCycleManager.isStopped()) {
                 try {
                     taskExecuteThreadPool.eventHandler();
                     TimeUnit.MILLISECONDS.sleep(Constants.SLEEP_TIME_MILLIS);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
+                    log.warn("TaskEvent handle thread interrupted, will return this loop");
                     break;
                 } catch (Exception e) {
-                    logger.error("event handler thread error", e);
+                    log.error("event handler thread error", e);
                 }
             }
         }

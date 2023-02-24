@@ -25,22 +25,20 @@ import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
-
 import io.netty.channel.Channel;
 
 /**
  * task execute running processor
  */
 @Component
+@Slf4j
 public class TaskExecuteRunningProcessor implements NettyRequestProcessor {
-
-    private final Logger logger = LoggerFactory.getLogger(TaskExecuteRunningProcessor.class);
 
     @Autowired
     private TaskEventService taskEventService;
@@ -53,11 +51,15 @@ public class TaskExecuteRunningProcessor implements NettyRequestProcessor {
      */
     @Override
     public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.TASK_EXECUTE_RUNNING == command.getType(), String.format("invalid command type : %s", command.getType()));
-        TaskExecuteRunningCommand taskExecuteRunningCommand = JSONUtils.parseObject(command.getBody(), TaskExecuteRunningCommand.class);
-        logger.info("taskExecuteRunningCommand: {}", taskExecuteRunningCommand);
+        Preconditions.checkArgument(CommandType.TASK_EXECUTE_RUNNING == command.getType(),
+                String.format("invalid command type : %s", command.getType()));
+        TaskExecuteRunningCommand taskExecuteRunningMessage =
+                JSONUtils.parseObject(command.getBody(), TaskExecuteRunningCommand.class);
+        log.info("taskExecuteRunningCommand: {}", taskExecuteRunningMessage);
 
-        TaskEvent taskEvent = TaskEvent.newRunningEvent(taskExecuteRunningCommand, channel);
+        TaskEvent taskEvent = TaskEvent.newRunningEvent(taskExecuteRunningMessage,
+                channel,
+                taskExecuteRunningMessage.getMessageSenderAddress());
         taskEventService.addEvent(taskEvent);
     }
 

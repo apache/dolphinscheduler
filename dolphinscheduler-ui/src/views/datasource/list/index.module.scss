@@ -15,18 +15,42 @@
  * limitations under the License.
  */
 
-.conditions {
+.content {
+  display: flex;
+  flex-wrap: wrap;
+
+  .itemBox {
+    padding: 5px 14px;
+    border: 1px solid rgb(224, 224, 230);
+    width: 120px;
+    text-align: center;
+    cursor: pointer;
+
+    &:hover {
+      color: #40a9ff;
+      border: 1px solid #40a9ff;
+    }
+  }
+}
+
+.typeBox {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  width: 100%;
+  padding: 5px 14px;
+  border: 1px solid rgb(224, 224, 230);
+
+  &:hover {
+    border: 1px solid #40a9ff;
+  }
+
+  .text-color {
+    color: #1890ff;
+    cursor: pointer;
+  }
 }
-.conditions-search-input {
-  width: 250px;
-}
-.pagination {
-  margin-top: 20px;
-  justify-content: center;
-}
-.mt-8 {
-  margin-top: 8px;
+
+.disabledBox {
+  pointer-events: none;
+  opacity: 0.5;
 }

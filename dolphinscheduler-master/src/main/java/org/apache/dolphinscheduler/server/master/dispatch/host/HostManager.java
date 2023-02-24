@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.master.dispatch.host;
 
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
+import org.apache.dolphinscheduler.server.master.dispatch.exceptions.WorkerGroupNotFoundException;
 
 /**
  *  host manager
@@ -26,10 +27,12 @@ import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionConte
 public interface HostManager {
 
     /**
-     *  select host
+     * select host
+     *
      * @param context context
      * @return host
+     * @throws WorkerGroupNotFoundException If the worker group does exist
      */
-    Host select(ExecutionContext context);
+    Host select(ExecutionContext context) throws WorkerGroupNotFoundException;
 
 }

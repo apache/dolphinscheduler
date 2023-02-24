@@ -23,22 +23,21 @@ import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.HCATA
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.HCATALOG_PARTITION_VALUES;
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.HCATALOG_TABLE;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.ISourceGenerator;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SqoopParameters;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.sources.SourceHiveParameter;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.lang3.StringUtils;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * hive source generator
  */
+@Slf4j
 public class HiveSourceGenerator implements ISourceGenerator {
-
-    private static final Logger logger = LoggerFactory.getLogger(HiveSourceGenerator.class);
 
     @Override
     public String generate(SqoopParameters sqoopParameters, SqoopTaskExecutionContext sqoopTaskExecutionContext) {
@@ -46,30 +45,30 @@ public class HiveSourceGenerator implements ISourceGenerator {
         StringBuilder hiveSourceSb = new StringBuilder();
 
         try {
-            SourceHiveParameter sourceHiveParameter
-                = JSONUtils.parseObject(sqoopParameters.getSourceParams(), SourceHiveParameter.class);
+            SourceHiveParameter sourceHiveParameter =
+                    JSONUtils.parseObject(sqoopParameters.getSourceParams(), SourceHiveParameter.class);
 
             if (null != sourceHiveParameter) {
                 if (StringUtils.isNotEmpty(sourceHiveParameter.getHiveDatabase())) {
                     hiveSourceSb.append(SPACE).append(HCATALOG_DATABASE)
-                        .append(SPACE).append(sourceHiveParameter.getHiveDatabase());
+                            .append(SPACE).append(sourceHiveParameter.getHiveDatabase());
                 }
 
                 if (StringUtils.isNotEmpty(sourceHiveParameter.getHiveTable())) {
                     hiveSourceSb.append(SPACE).append(HCATALOG_TABLE)
-                        .append(SPACE).append(sourceHiveParameter.getHiveTable());
+                            .append(SPACE).append(sourceHiveParameter.getHiveTable());
                 }
 
                 if (StringUtils.isNotEmpty(sourceHiveParameter.getHivePartitionKey())
-                    && StringUtils.isNotEmpty(sourceHiveParameter.getHivePartitionValue())) {
+                        && StringUtils.isNotEmpty(sourceHiveParameter.getHivePartitionValue())) {
                     hiveSourceSb.append(SPACE).append(HCATALOG_PARTITION_KEYS)
-                        .append(SPACE).append(sourceHiveParameter.getHivePartitionKey())
-                        .append(SPACE).append(HCATALOG_PARTITION_VALUES)
-                        .append(SPACE).append(sourceHiveParameter.getHivePartitionValue());
+                            .append(SPACE).append(sourceHiveParameter.getHivePartitionKey())
+                            .append(SPACE).append(HCATALOG_PARTITION_VALUES)
+                            .append(SPACE).append(sourceHiveParameter.getHivePartitionValue());
                 }
             }
         } catch (Exception e) {
-            logger.error(String.format("Sqoop hive source params build failed: [%s]", e.getMessage()));
+            log.error(String.format("Sqoop hive source params build failed: [%s]", e.getMessage()));
         }
 
         return hiveSourceSb.toString();

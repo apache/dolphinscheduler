@@ -15,22 +15,26 @@
  * limitations under the License.
  */
 
-import { defineComponent, toRefs } from 'vue'
+import {
+  defineComponent,
+  getCurrentInstance,
+  toRefs
+} from 'vue'
 import {
   NButton,
-  NInput,
   NIcon,
   NSpace,
   NDataTable,
   NPagination
 } from 'naive-ui'
-import Card from '@/components/card'
-import UserDetailModal from './components/user-detail-modal'
-import AuthorizeModal from './components/authorize-modal'
 import { useI18n } from 'vue-i18n'
 import { SearchOutlined } from '@vicons/antd'
 import { useColumns } from './use-columns'
 import { useTable } from './use-table'
+import UserDetailModal from './components/user-detail-modal'
+import AuthorizeModal from './components/authorize-modal'
+import Card from '@/components/card'
+import Search from "@/components/input-search";
 
 const UsersManage = defineComponent({
   name: 'user-manage',
@@ -50,6 +54,7 @@ const UsersManage = defineComponent({
     const onAuthorizeModalCancel = () => {
       state.authorizeModalShow = false
     }
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
     return {
       t,
@@ -60,56 +65,59 @@ const UsersManage = defineComponent({
       onAddUser,
       onUpdatedList: updateList,
       onDetailModalCancel,
-      onAuthorizeModalCancel
+      onAuthorizeModalCancel,
+      trim
     }
   },
   render() {
     return (
-      <>
-        <NSpace vertical>
-          <Card>
-            <NSpace justify='space-between'>
-              <NButton
-                onClick={this.onAddUser}
-                type='primary'
-                class='btn-create-user'
-              >
-                {this.t('security.user.create_user')}
-              </NButton>
-              <NSpace>
-                <NInput v-model:value={this.searchVal} clearable />
-                <NButton type='primary' onClick={this.onUpdatedList}>
-                  <NIcon>
-                    <SearchOutlined />
-                  </NIcon>
-                </NButton>
-              </NSpace>
-            </NSpace>
-          </Card>
-          <Card>
-            <NSpace vertical>
-              <NDataTable
-                row-class-name='items'
-                columns={this.columnsRef.columns}
-                data={this.list}
-                loading={this.loading}
-                scrollX={this.columnsRef.tableWidth}
+      <NSpace vertical>
+        <Card>
+          <NSpace justify='space-between'>
+            <NButton
+              onClick={this.onAddUser}
+              type='primary'
+              class='btn-create-user'
+              size='small'
+            >
+              {this.t('security.user.create_user')}
+            </NButton>
+            <NSpace>
+              <Search
+                v-model:value={this.searchVal}
+                onSearch={this.onUpdatedList}
               />
-              <NSpace justify='center'>
-                <NPagination
-                  v-model:page={this.page}
-                  v-model:page-size={this.pageSize}
-                  item-count={this.itemCount}
-                  show-size-picker
-                  page-sizes={[10, 30, 50]}
-                  show-quick-jumper
-                  on-update:page={this.changePage}
-                  on-update:page-size={this.changePageSize}
-                />
-              </NSpace>
+              <NButton type='primary' size='small' onClick={this.onUpdatedList}>
+                <NIcon>
+                  <SearchOutlined />
+                </NIcon>
+              </NButton>
             </NSpace>
-          </Card>
-        </NSpace>
+          </NSpace>
+        </Card>
+        <Card title={this.t('menu.user_manage')}>
+          <NSpace vertical>
+            <NDataTable
+              row-class-name='items'
+              columns={this.columnsRef.columns}
+              data={this.list}
+              loading={this.loading}
+              scrollX={this.columnsRef.tableWidth}
+            />
+            <NSpace justify='center'>
+              <NPagination
+                v-model:page={this.page}
+                v-model:page-size={this.pageSize}
+                item-count={this.itemCount}
+                show-size-picker
+                page-sizes={[10, 30, 50]}
+                show-quick-jumper
+                on-update:page={this.changePage}
+                on-update:page-size={this.changePageSize}
+              />
+            </NSpace>
+          </NSpace>
+        </Card>
         <UserDetailModal
           show={this.detailModalShow}
           currentRecord={this.currentRecord}
@@ -122,7 +130,7 @@ const UsersManage = defineComponent({
           userId={this.currentRecord?.id}
           onCancel={this.onAuthorizeModalCancel}
         />
-      </>
+      </NSpace>
     )
   }
 })

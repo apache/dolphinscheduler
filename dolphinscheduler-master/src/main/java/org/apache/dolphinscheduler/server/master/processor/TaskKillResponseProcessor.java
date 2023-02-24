@@ -23,21 +23,19 @@ import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskKillResponseCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
-
 import io.netty.channel.Channel;
 
 /**
  *  task response processor
  */
 @Component
+@Slf4j
 public class TaskKillResponseProcessor implements NettyRequestProcessor {
-
-    private final Logger logger = LoggerFactory.getLogger(TaskKillResponseProcessor.class);
 
     /**
      * task final result response
@@ -48,11 +46,13 @@ public class TaskKillResponseProcessor implements NettyRequestProcessor {
      */
     @Override
     public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.TASK_KILL_RESPONSE == command.getType(), String.format("invalid command type : %s", command.getType()));
+        Preconditions.checkArgument(CommandType.TASK_KILL_RESPONSE == command.getType(),
+                String.format("invalid command type : %s", command.getType()));
 
-        TaskKillResponseCommand responseCommand = JSONUtils.parseObject(command.getBody(), TaskKillResponseCommand.class);
-        logger.info("[TaskInstance-{}] Received task kill response command : {}",
-            responseCommand.getTaskInstanceId(), responseCommand);
+        TaskKillResponseCommand responseCommand =
+                JSONUtils.parseObject(command.getBody(), TaskKillResponseCommand.class);
+        log.info("[TaskInstance-{}] Received task kill response command : {}",
+                responseCommand.getTaskInstanceId(), responseCommand);
     }
 
 }

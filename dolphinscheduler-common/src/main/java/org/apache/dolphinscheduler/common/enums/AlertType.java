@@ -23,9 +23,10 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
  * describe the reason why alert generates
  */
 public enum AlertType {
+
     /**
      * 0 process instance failure, 1 process instance success, 2 process instance blocked, 3 process instance timeout, 4 fault tolerance warning,
-     * 5 task failure, 6 task success, 7 task timeout
+     * 5 task failure, 6 task success, 7 task timeout, 8 close alert
       */
     PROCESS_INSTANCE_FAILURE(0, "process instance failure"),
     PROCESS_INSTANCE_SUCCESS(1, "process instance success"),
@@ -34,7 +35,9 @@ public enum AlertType {
     FAULT_TOLERANCE_WARNING(4, "fault tolerance warning"),
     TASK_FAILURE(5, "task failure"),
     TASK_SUCCESS(6, "task success"),
-    TASK_TIMEOUT(7, "task timeout"),;
+    TASK_TIMEOUT(7, "task timeout"),
+
+    CLOSE_ALERT(8, "the process instance success, can close the before alert");
 
     AlertType(int code, String descp) {
         this.code = code;

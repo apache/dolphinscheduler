@@ -15,72 +15,73 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.apache.dolphinscheduler</groupId>
+        <artifactId>dolphinscheduler</artifactId>
+        <version>dev-SNAPSHOT</version>
+    </parent>
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <parent>
-    <artifactId>dolphinscheduler</artifactId>
-    <groupId>org.apache.dolphinscheduler</groupId>
-    <version>dev-SNAPSHOT</version>
-  </parent>
-  <modelVersion>4.0.0</modelVersion>
+    <artifactId>dolphinscheduler-ui</artifactId>
 
-  <artifactId>dolphinscheduler-ui</artifactId>
+    <name>${project.artifactId}</name>
 
-  <name>${project.artifactId}</name>
+    <properties>
+        <node.version>v16.13.1</node.version>
+        <pnpm.version>v6.32.6</pnpm.version>
+        <sonar.sources>src</sonar.sources>
+        <frontend-maven-plugin.version>1.12.1</frontend-maven-plugin.version>
+    </properties>
 
-  <properties>
-    <node.version>v16.13.1</node.version>
-    <pnpm.version>v6.32.6</pnpm.version>
-    <sonar.sources>src</sonar.sources>
-  </properties>
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.eirslett</groupId>
+                        <artifactId>frontend-maven-plugin</artifactId>
+                        <version>${frontend-maven-plugin.version}</version>
+                        <configuration>
+                            <pnpmInheritsProxyConfigFromMaven>false</pnpmInheritsProxyConfigFromMaven>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>install node and pnpm</id>
+                                <goals>
+                                    <goal>install-node-and-pnpm</goal>
+                                </goals>
+                                <configuration>
+                                    <nodeVersion>${node.version}</nodeVersion>
+                                    <pnpmVersion>${pnpm.version}</pnpmVersion>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>pnpm install</id>
+                                <goals>
+                                    <goal>pnpm</goal>
+                                </goals>
+                                <phase>generate-resources</phase>
+                                <configuration>
+                                    <arguments>install</arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>pnpm run build:prod</id>
+                                <goals>
+                                    <goal>pnpm</goal>
+                                </goals>
+                                <configuration>
+                                    <arguments>run build:prod</arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
 
-  <profiles>
-    <profile>
-      <id>release</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>com.github.eirslett</groupId>
-            <artifactId>frontend-maven-plugin</artifactId>
-            <version>${frontend-maven-plugin.version}</version>
-            <configuration>
-              <pnpmInheritsProxyConfigFromMaven>false</pnpmInheritsProxyConfigFromMaven>
-            </configuration>
-            <executions>
-              <execution>
-                <id>install node and pnpm</id>
-                <goals>
-                  <goal>install-node-and-pnpm</goal>
-                </goals>
-                <configuration>
-                  <nodeVersion>${node.version}</nodeVersion>
-                  <pnpmVersion>${pnpm.version}</pnpmVersion>
-                </configuration>
-              </execution>
-              <execution>
-                <id>pnpm install</id>
-                <goals>
-                  <goal>pnpm</goal>
-                </goals>
-                <phase>generate-resources</phase>
-                <configuration>
-                  <arguments>install</arguments>
-                </configuration>
-              </execution>
-              <execution>
-                <id>pnpm run build:prod</id>
-                <goals>
-                  <goal>pnpm</goal>
-                </goals>
-                <configuration>
-                  <arguments>run build:prod</arguments>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-
-      </build>
-    </profile>
-  </profiles>
+            </build>
+        </profile>
+    </profiles>
 </project>

@@ -17,30 +17,27 @@
 
 package org.apache.dolphinscheduler.server.master.processor.queue;
 
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.remote.command.TaskExecuteResponseCommand;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.remote.command.TaskExecuteResultCommand;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningCommand;
 import org.apache.dolphinscheduler.server.master.cache.impl.ProcessInstanceExecCacheManagerImpl;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
-import org.apache.dolphinscheduler.server.utils.DataQualityResultOperator;
+import org.apache.dolphinscheduler.server.master.utils.DataQualityResultOperator;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
-import java.net.InetSocketAddress;
-import java.util.Date;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import io.netty.channel.Channel;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class TaskResponseServiceTest {
 
     @Mock(name = "processService")
@@ -70,36 +67,42 @@ public class TaskResponseServiceTest {
     @Mock
     private TaskExecuteThreadPool taskExecuteThreadPool;
 
-    @Before
+    @BeforeEach
     public void before() {
         taskEventService.start();
 
-        Mockito.when(channel.remoteAddress()).thenReturn(InetSocketAddress.createUnresolved("127.0.0.1", 1234));
+        TaskExecuteRunningCommand taskExecuteRunningMessage = new TaskExecuteRunningCommand("127.0.0.1:5678",
+                "127.0.0.1:1234",
+                System.currentTimeMillis());
+        taskExecuteRunningMessage.setProcessId(1);
+        taskExecuteRunningMessage.setTaskInstanceId(22);
+        taskExecuteRunningMessage.setStatus(TaskExecutionStatus.RUNNING_EXECUTION);
+        taskExecuteRunningMessage.setExecutePath("path");
+        taskExecuteRunningMessage.setLogPath("logPath");
+        taskExecuteRunningMessage.setHost("127.*.*.*");
+        taskExecuteRunningMessage.setStartTime(System.currentTimeMillis());
 
-        TaskExecuteRunningCommand taskExecuteRunningCommand = new TaskExecuteRunningCommand();
-        taskExecuteRunningCommand.setProcessId(1);
-        taskExecuteRunningCommand.setTaskInstanceId(22);
-        taskExecuteRunningCommand.setStatus(ExecutionStatus.RUNNING_EXECUTION.getCode());
-        taskExecuteRunningCommand.setExecutePath("path");
-        taskExecuteRunningCommand.setLogPath("logPath");
-        taskExecuteRunningCommand.setHost("127.*.*.*");
-        taskExecuteRunningCommand.setStartTime(new Date());
+        ackEvent = TaskEvent.newRunningEvent(taskExecuteRunningMessage,
+                channel,
+                taskExecuteRunningMessage.getMessageSenderAddress());
 
-        ackEvent = TaskEvent.newRunningEvent(taskExecuteRunningCommand, channel);
-
-        TaskExecuteResponseCommand taskExecuteResponseCommand = new TaskExecuteResponseCommand();
-        taskExecuteResponseCommand.setProcessInstanceId(1);
-        taskExecuteResponseCommand.setTaskInstanceId(22);
-        taskExecuteResponseCommand.setStatus(ExecutionStatus.SUCCESS.getCode());
-        taskExecuteResponseCommand.setEndTime(new Date());
-        taskExecuteResponseCommand.setVarPool("varPol");
-        taskExecuteResponseCommand.setAppIds("ids");
-        taskExecuteResponseCommand.setProcessId(1);
-        resultEvent = TaskEvent.newResultEvent(taskExecuteResponseCommand, channel);
+        TaskExecuteResultCommand taskExecuteResultMessage = new TaskExecuteResultCommand(NetUtils.getAddr(1234),
+                NetUtils.getAddr(5678),
+                System.currentTimeMillis());
+        taskExecuteResultMessage.setProcessInstanceId(1);
+        taskExecuteResultMessage.setTaskInstanceId(22);
+        taskExecuteResultMessage.setStatus(TaskExecutionStatus.SUCCESS.getCode());
+        taskExecuteResultMessage.setEndTime(System.currentTimeMillis());
+        taskExecuteResultMessage.setVarPool("varPol");
+        taskExecuteResultMessage.setAppIds("ids");
+        taskExecuteResultMessage.setProcessId(1);
+        resultEvent = TaskEvent.newResultEvent(taskExecuteResultMessage,
+                channel,
+                taskExecuteResultMessage.getMessageSenderAddress());
 
         taskInstance = new TaskInstance();
         taskInstance.setId(22);
-        taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
+        taskInstance.setState(TaskExecutionStatus.RUNNING_EXECUTION);
     }
 
     @Test
@@ -108,7 +111,7 @@ public class TaskResponseServiceTest {
         taskEventService.addEvent(resultEvent);
     }
 
-    @After
+    @AfterEach
     public void after() {
         if (taskEventService != null) {
             taskEventService.stop();

@@ -33,17 +33,14 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-
+@Slf4j
 public class RegistryLockManager implements AutoCloseable {
-
-    private static final Logger logger = LoggerFactory.getLogger(RegistryLockManager.class);
 
     private final MysqlOperator mysqlOperator;
     private final MysqlRegistryProperties registryProperties;
@@ -75,7 +72,7 @@ public class RegistryLockManager implements AutoCloseable {
             MysqlRegistryLock mysqlRegistryLock;
             try {
                 while ((mysqlRegistryLock = mysqlOperator.tryToAcquireLock(lockKey)) == null) {
-                    logger.debug("Acquire the lock {} failed try again", key);
+                    log.debug("Acquire the lock {} failed try again", key);
                     // acquire failed, wait and try again
                     ThreadUtils.sleep(MysqlRegistryConstant.LOCK_ACQUIRE_INTERVAL);
                 }
@@ -112,6 +109,7 @@ public class RegistryLockManager implements AutoCloseable {
      */
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     static class LockTermRefreshTask implements Runnable {
+
         private final Map<String, MysqlRegistryLock> lockHoldMap;
         private final MysqlOperator mysqlOperator;
 
@@ -125,13 +123,12 @@ public class RegistryLockManager implements AutoCloseable {
                         .map(MysqlRegistryLock::getId)
                         .collect(Collectors.toList());
                 if (!mysqlOperator.updateLockTerm(lockIds)) {
-                    logger.warn("Update the lock: {} term failed.", lockIds);
+                    log.warn("Update the lock: {} term failed.", lockIds);
                 }
                 mysqlOperator.clearExpireLock();
             } catch (Exception e) {
-                logger.error("Update lock term error", e);
+                log.error("Update lock term error", e);
             }
         }
     }
 }
-

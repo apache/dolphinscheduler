@@ -16,64 +16,11 @@
  */
 import { ref, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useCustomParams, useDatasource, useResources } from '.'
 import type { IJsonItem } from '../types'
-import { find } from 'lodash'
-import { TypeReq } from '@/service/modules/data-source/types'
-import { queryDataSourceList } from '@/service/modules/data-source'
 
 export function useDataX(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
-
-  const datasourceTypes = [
-    {
-      id: 0,
-      code: 'MYSQL',
-      disabled: false
-    },
-    {
-      id: 1,
-      code: 'POSTGRESQL',
-      disabled: false
-    },
-    {
-      id: 2,
-      code: 'HIVE',
-      disabled: true
-    },
-    {
-      id: 3,
-      code: 'SPARK',
-      disabled: true
-    },
-    {
-      id: 4,
-      code: 'CLICKHOUSE',
-      disabled: false
-    },
-    {
-      id: 5,
-      code: 'ORACLE',
-      disabled: false
-    },
-    {
-      id: 6,
-      code: 'SQLSERVER',
-      disabled: false
-    },
-    {
-      id: 7,
-      code: 'DB2',
-      disabled: true
-    },
-    {
-      id: 8,
-      code: 'PRESTO',
-      disabled: true
-    }
-  ]
-  const datasourceTypeOptions = ref([] as any)
-  const datasourceOptions = ref([] as any)
-  const destinationDatasourceOptions = ref([] as any)
   const jobSpeedByteOptions: any[] = [
     {
       label: `0(${t('project.node.unlimited')})`,
@@ -148,53 +95,6 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       value: 4
     }
   ]
-  const loading = ref(false)
-
-  const getDatasourceTypes = async () => {
-    if (loading.value) return
-    loading.value = true
-    datasourceTypeOptions.value = datasourceTypes
-      .filter((item) => !item.disabled)
-      .map((item) => ({ label: item.code, value: item.code }))
-    loading.value = false
-  }
-
-  const getDatasourceInstances = async () => {
-    const params = { type: model.dsType } as TypeReq
-    const res = await queryDataSourceList(params)
-    datasourceOptions.value = []
-    res.map((item: any) => {
-      datasourceOptions.value.push({ label: item.name, value: String(item.id) })
-    })
-    if (datasourceOptions.value && model.dataSource) {
-      const item = find(datasourceOptions.value, {
-        value: String(model.dataSource)
-      })
-      if (!item) {
-        model.dataSource = null
-      }
-    }
-  }
-
-  const getDestinationDatasourceInstances = async () => {
-    const params = { type: model.dtType } as TypeReq
-    const res = await queryDataSourceList(params)
-    destinationDatasourceOptions.value = []
-    res.map((item: any) => {
-      destinationDatasourceOptions.value.push({
-        label: item.name,
-        value: String(item.id)
-      })
-    })
-    if (destinationDatasourceOptions.value && model.dataTarget) {
-      const item = find(destinationDatasourceOptions.value, {
-        value: String(model.dataTarget)
-      })
-      if (!item) {
-        model.dataTarget = null
-      }
-    }
-  }
 
   const sqlEditorSpan = ref(24)
   const jsonEditorSpan = ref(0)
@@ -203,6 +103,7 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
   const otherStatementSpan = ref(22)
   const jobSpeedSpan = ref(12)
   const customParameterSpan = ref(0)
+  const useResourcesSpan = ref(0)
 
   const initConstants = () => {
     if (model.customConfig) {
@@ -213,6 +114,7 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       otherStatementSpan.value = 0
       jobSpeedSpan.value = 0
       customParameterSpan.value = 24
+      useResourcesSpan.value = 24
     } else {
       sqlEditorSpan.value = 24
       jsonEditorSpan.value = 0
@@ -221,26 +123,21 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       otherStatementSpan.value = 22
       jobSpeedSpan.value = 12
       customParameterSpan.value = 0
+      useResourcesSpan.value = 0
     }
   }
-
+  const supportedDatasourceType = [
+    'MYSQL',
+    'POSTGRESQL',
+    'ORACLE',
+    'SQLSERVER',
+    'CLICKHOUSE',
+    'HIVE',
+    'PRESTO'
+  ]
   onMounted(() => {
-    getDatasourceTypes()
-    getDatasourceInstances()
-    getDestinationDatasourceInstances()
     initConstants()
   })
-
-  const onSourceTypeChange = (type: string) => {
-    model.dsType = type
-    getDatasourceInstances()
-  }
-
-  const onDestinationTypeChange = (type: string) => {
-    model.dtType = type
-    getDestinationDatasourceInstances()
-  }
-
   watch(
     () => model.customConfig,
     () => {
@@ -254,35 +151,12 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       field: 'customConfig',
       name: t('project.node.datax_custom_template')
     },
-    {
-      type: 'select',
-      field: 'dsType',
+    ...useDatasource(model, {
+      typeField: 'dsType',
+      sourceField: 'dataSource',
       span: datasourceSpan,
-      name: t('project.node.datasource_type'),
-      props: {
-        loading: loading,
-        'on-update:value': onSourceTypeChange
-      },
-      options: datasourceTypeOptions,
-      validate: {
-        trigger: ['input', 'blur'],
-        required: true
-      }
-    },
-    {
-      type: 'select',
-      field: 'dataSource',
-      span: datasourceSpan,
-      name: t('project.node.datasource_instances'),
-      props: {
-        loading: loading
-      },
-      options: datasourceOptions,
-      validate: {
-        trigger: ['input', 'blur'],
-        required: true
-      }
-    },
+      supportedDatasourceType
+    }),
     {
       type: 'editor',
       field: 'sql',
@@ -305,35 +179,13 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
         message: t('project.node.sql_empty_tips')
       }
     },
-    {
-      type: 'select',
-      field: 'dtType',
-      name: t('project.node.datax_target_datasource_type'),
+    useResources(useResourcesSpan),
+    ...useDatasource(model, {
+      typeField: 'dtType',
+      sourceField: 'dataTarget',
       span: destinationDatasourceSpan,
-      props: {
-        loading: loading,
-        'on-update:value': onDestinationTypeChange
-      },
-      options: datasourceTypeOptions,
-      validate: {
-        trigger: ['input', 'blur'],
-        required: true
-      }
-    },
-    {
-      type: 'select',
-      field: 'dataTarget',
-      name: t('project.node.datax_target_database'),
-      span: destinationDatasourceSpan,
-      props: {
-        loading: loading
-      },
-      options: destinationDatasourceOptions,
-      validate: {
-        trigger: ['input', 'blur'],
-        required: true
-      }
-    },
+      supportedDatasourceType
+    }),
     {
       type: 'input',
       field: 'targetTable',
@@ -443,6 +295,7 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       span: 12,
       options: memoryLimitOptions,
       value: 1
-    }
+    },
+    ...useCustomParams({ model, field: 'localParams', isSimple: true })
   ]
 }

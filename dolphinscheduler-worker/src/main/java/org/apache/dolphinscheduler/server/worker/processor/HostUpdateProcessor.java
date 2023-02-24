@@ -21,16 +21,15 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.HostUpdateCommand;
-import org.apache.dolphinscheduler.remote.processor.NettyRemoteChannel;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
+import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
-
 import io.netty.channel.Channel;
 
 /**
@@ -38,26 +37,22 @@ import io.netty.channel.Channel;
  * this used when master failover
  */
 @Component
+@Slf4j
 public class HostUpdateProcessor implements NettyRequestProcessor {
 
-    private final Logger logger = LoggerFactory.getLogger(HostUpdateProcessor.class);
-
-    /**
-     * task callback service
-     */
     @Autowired
-    private TaskCallbackService taskCallbackService;
+    private MessageRetryRunner messageRetryRunner;
 
     @Override
     public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.PROCESS_HOST_UPDATE_REQUEST == command.getType(), String.format("invalid command type : %s", command.getType()));
+        Preconditions.checkArgument(CommandType.PROCESS_HOST_UPDATE_REQUEST == command.getType(),
+                String.format("invalid command type : %s", command.getType()));
         HostUpdateCommand updateCommand = JSONUtils.parseObject(command.getBody(), HostUpdateCommand.class);
         if (updateCommand == null) {
-            logger.error("host update command is null");
+            log.error("host update command is null");
             return;
         }
-        logger.info("received host update command : {}", updateCommand);
-        taskCallbackService.changeRemoteChannel(updateCommand.getTaskInstanceId(), new NettyRemoteChannel(channel, command.getOpaque()));
-
+        log.info("received host update command : {}", updateCommand);
+        messageRetryRunner.updateMessageHost(updateCommand.getTaskInstanceId(), updateCommand.getProcessHost());
     }
 }

@@ -17,16 +17,19 @@
 
 package org.apache.dolphinscheduler.plugin.task.pigeon;
 
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -37,6 +40,7 @@ import org.apache.http.util.EntityUtils;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -48,7 +52,7 @@ import org.java_websocket.handshake.ServerHandshake;
 /**
  * TIS DataX Task
  **/
-public class PigeonTask extends AbstractTaskExecutor {
+public class PigeonTask extends AbstractRemoteTask {
 
     public static final String KEY_POOL_VAR_PIGEON_HOST = "p_host";
     private final TaskExecutionContext taskExecutionContext;
@@ -64,19 +68,25 @@ public class PigeonTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public void init() {
-        super.init();
-        logger.info("PIGEON task params {}", taskExecutionContext.getTaskParams());
-        parameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), PigeonParameters.class);
-        if (!parameters.checkParameters()) {
-            throw new RuntimeException("datax task params is not valid");
-        }
+    public List<String> getApplicationIds() throws TaskException {
+        return Collections.emptyList();
     }
 
     @Override
-    public void handle() throws Exception {
+    public void init() throws TaskException {
+        super.init();
+        parameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), PigeonParameters.class);
+        log.info("Initialize PIGEON task params {}", JSONUtils.toPrettyJsonString(parameters));
+        if (parameters == null || !parameters.checkParameters()) {
+            throw new TaskException("datax task params is not valid");
+        }
+    }
+
+    // todo split handle to submit and track
+    @Override
+    public void handle(TaskCallBack taskCallBack) throws TaskException {
         // Trigger PIGEON DataX pipeline
-        logger.info("start execute PIGEON task");
+        log.info("start execute PIGEON task");
         long startTime = System.currentTimeMillis();
         String targetJobName = this.parameters.getTargetJobName();
         String host = getHost();
@@ -91,9 +101,10 @@ public class PigeonTask extends AbstractTaskExecutor {
             ExecResult execState = null;
             int taskId;
             WebSocketClient webSocket = null;
-            try (CloseableHttpClient client = HttpClients.createDefault();
-                 // trigger to start PIGEON dataX task
-                 CloseableHttpResponse response = client.execute(post)) {
+            try (
+                    CloseableHttpClient client = HttpClients.createDefault();
+                    // trigger to start PIGEON dataX task
+                    CloseableHttpResponse response = client.execute(post)) {
                 triggerResult = processResponse(triggerUrl, response, BizResult.class);
                 if (!triggerResult.isSuccess()) {
                     List<String> errormsg = triggerResult.getErrormsg();
@@ -135,22 +146,34 @@ public class PigeonTask extends AbstractTaskExecutor {
                     try {
                         webSocket.close();
                     } catch (Throwable e) {
-                        logger.warn(e.getMessage(), e);
+                        log.warn(e.getMessage(), e);
                     }
                 }
             }
 
             long costTime = System.currentTimeMillis() - startTime;
-            logger.info("PIGEON task: {},taskId:{} costTime : {} milliseconds, statusCode : {}",
+            log.info("PIGEON task: {},taskId:{} costTime : {} milliseconds, statusCode : {}",
                     targetJobName, taskId, costTime, (execState == ExecResult.SUCCESS) ? "'success'" : "'failure'");
-            setExitStatusCode((execState == ExecResult.SUCCESS) ? TaskConstants.EXIT_CODE_SUCCESS : TaskConstants.EXIT_CODE_FAILURE);
+            setExitStatusCode((execState == ExecResult.SUCCESS) ? TaskConstants.EXIT_CODE_SUCCESS
+                    : TaskConstants.EXIT_CODE_FAILURE);
         } catch (Exception e) {
-            logger.error("execute PIGEON dataX faild,PIGEON task name:" + targetJobName, e);
+            log.error("execute PIGEON dataX faild,PIGEON task name:" + targetJobName, e);
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
             if (e instanceof InterruptedException) {
                 Thread.currentThread().interrupt();
             }
+            throw new TaskException("Execute pigeon task failed", e);
         }
+    }
+
+    @Override
+    public void submitApplication() throws TaskException {
+
+    }
+
+    @Override
+    public void trackApplicationStatus() throws TaskException {
+
     }
 
     private void addFormUrlencoded(HttpPost post) {
@@ -158,22 +181,23 @@ public class PigeonTask extends AbstractTaskExecutor {
     }
 
     @Override
-    public void cancelApplication(boolean status) throws Exception {
-        super.cancelApplication(status);
-        logger.info("start to cancelApplication");
+    public void cancelApplication() throws TaskException {
+        log.info("start to cancelApplication");
         Objects.requireNonNull(triggerResult, "triggerResult can not be null");
-        logger.info("start to cancelApplication taskId:{}", triggerResult.getTaskId());
+        log.info("start to cancelApplication taskId:{}", triggerResult.getTaskId());
         final String triggerUrl = getTriggerUrl();
 
-        StringEntity entity = new StringEntity(config.getJobCancelPostBody(triggerResult.getTaskId()), StandardCharsets.UTF_8);
+        StringEntity entity =
+                new StringEntity(config.getJobCancelPostBody(triggerResult.getTaskId()), StandardCharsets.UTF_8);
 
         CancelResult cancelResult = null;
         HttpPost post = new HttpPost(triggerUrl);
         addFormUrlencoded(post);
         post.setEntity(entity);
-        try (CloseableHttpClient client = HttpClients.createDefault();
-             // trigger to start TIS dataX task
-             CloseableHttpResponse response = client.execute(post)) {
+        try (
+                CloseableHttpClient client = HttpClients.createDefault();
+                // trigger to start TIS dataX task
+                CloseableHttpResponse response = client.execute(post)) {
             cancelResult = processResponse(triggerUrl, response, CancelResult.class);
             if (!cancelResult.isSuccess()) {
                 List<String> errormsg = triggerResult.getErrormsg();
@@ -181,8 +205,12 @@ public class PigeonTask extends AbstractTaskExecutor {
                 if (CollectionUtils.isNotEmpty(errormsg)) {
                     errs.append(",errs:").append(errormsg.stream().collect(Collectors.joining(",")));
                 }
-                throw new Exception("cancel PIGEON job faild taskId:" + triggerResult.getTaskId() + errs.toString());
+                throw new TaskException("cancel PIGEON job faild taskId:" + triggerResult.getTaskId() + errs);
             }
+        } catch (ClientProtocolException e) {
+            throw new TaskException("client protocol error", e);
+        } catch (Exception e) {
+            throw new TaskException("pigeon execute error", e);
         }
     }
 
@@ -201,34 +229,36 @@ public class PigeonTask extends AbstractTaskExecutor {
 
     private WebSocketClient receiveRealtimeLog(final String tisHost, String dataXName, int taskId) throws Exception {
         final String applyURI = config.getJobLogsFetchUrl(tisHost, dataXName, taskId);
-        logger.info("apply ws connection,uri:{}", applyURI);
+        log.info("apply ws connection,uri:{}", applyURI);
         WebSocketClient webSocketClient = new WebSocketClient(new URI(applyURI)) {
+
             @Override
             public void onOpen(ServerHandshake handshakedata) {
-                logger.info("start to receive remote execute log");
+                log.info("start to receive remote execute log");
             }
 
             @Override
             public void onMessage(String message) {
                 ExecLog execLog = JSONUtils.parseObject(message, ExecLog.class);
-                logger.info(execLog.getMsg());
+                log.info(execLog.getMsg());
             }
 
             @Override
             public void onClose(int code, String reason, boolean remote) {
-                logger.info("stop to receive remote log,reason:{},taskId:{}", reason, taskId);
+                log.info("stop to receive remote log,reason:{},taskId:{}", reason, taskId);
             }
 
             @Override
             public void onError(Exception t) {
-                logger.error(t.getMessage(), t);
+                log.error(t.getMessage(), t);
             }
         };
         webSocketClient.connect();
         return webSocketClient;
     }
 
-    private <T extends AjaxResult> T processResponse(String applyUrl, CloseableHttpResponse response, Class<T> clazz) throws Exception {
+    private <T extends AjaxResult> T processResponse(String applyUrl, CloseableHttpResponse response,
+                                                     Class<T> clazz) throws Exception {
         StatusLine resStatus = response.getStatusLine();
         if (HttpURLConnection.HTTP_OK != resStatus.getStatusCode()) {
             throw new IllegalStateException("request server " + applyUrl + " faild:" + resStatus.getReasonPhrase());
@@ -246,6 +276,7 @@ public class PigeonTask extends AbstractTaskExecutor {
     }
 
     private static class CancelResult extends AjaxResult<Object> {
+
         private Object bizresult;
 
         @Override
@@ -259,6 +290,7 @@ public class PigeonTask extends AbstractTaskExecutor {
     }
 
     private static class BizResult extends AjaxResult<TriggerBuildResult> {
+
         private TriggerBuildResult bizresult;
 
         @Override
@@ -276,6 +308,7 @@ public class PigeonTask extends AbstractTaskExecutor {
     }
 
     private static class StatusResult extends AjaxResult<Map> {
+
         private Map bizresult;
 
         @Override
@@ -325,6 +358,7 @@ public class PigeonTask extends AbstractTaskExecutor {
     }
 
     private static class TriggerBuildResult {
+
         private int taskid;
 
         public int getTaskid() {
@@ -361,6 +395,7 @@ public class PigeonTask extends AbstractTaskExecutor {
     }
 
     private static class ExecLog {
+
         private String logType;
         private String msg;
         private int taskId;

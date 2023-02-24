@@ -20,41 +20,50 @@ package org.apache.dolphinscheduler.server.worker.rpc;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
-import org.apache.dolphinscheduler.server.log.LoggerRequestProcessor;
+import org.apache.dolphinscheduler.remote.processor.LoggerRequestProcessor;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.processor.HostUpdateProcessor;
-import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteProcessor;
-import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteResponseAckProcessor;
+import org.apache.dolphinscheduler.server.worker.processor.TaskDispatchProcessor;
+import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteResultAckProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteRunningAckProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskKillProcessor;
-import org.apache.dolphinscheduler.server.worker.processor.TaskRecallAckProcessor;
+import org.apache.dolphinscheduler.server.worker.processor.TaskRejectAckProcessor;
+import org.apache.dolphinscheduler.server.worker.processor.TaskSavePointProcessor;
+import org.apache.dolphinscheduler.server.worker.processor.TaskUpdatePidAckProcessor;
 
 import java.io.Closeable;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javax.annotation.Resource;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class WorkerRpcServer implements Closeable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(WorkerRpcServer.class);
-
     @Autowired
-    private TaskExecuteProcessor taskExecuteProcessor;
+    private TaskDispatchProcessor taskDispatchProcessor;
 
     @Autowired
     private TaskKillProcessor taskKillProcessor;
 
     @Autowired
-    private TaskRecallAckProcessor taskRecallAckProcessor;
+    private TaskRejectAckProcessor taskRejectAckProcessor;
+
+    @Autowired
+    private TaskSavePointProcessor taskSavePointProcessor;
 
     @Autowired
     private TaskExecuteRunningAckProcessor taskExecuteRunningAckProcessor;
 
+    @Resource
+    private TaskUpdatePidAckProcessor taskUpdatePidAckProcessor;
+
     @Autowired
-    private TaskExecuteResponseAckProcessor taskExecuteResponseAckProcessor;
+    private TaskExecuteResultAckProcessor taskExecuteResultAckProcessor;
 
     @Autowired
     private HostUpdateProcessor hostUpdateProcessor;
@@ -68,30 +77,35 @@ public class WorkerRpcServer implements Closeable {
     private NettyRemotingServer nettyRemotingServer;
 
     public void start() {
-        LOGGER.info("Worker rpc server starting");
+        log.info("Worker rpc server starting");
         NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(workerConfig.getListenPort());
         this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_REQUEST, taskExecuteProcessor);
+        this.nettyRemotingServer.registerProcessor(CommandType.TASK_DISPATCH_REQUEST, taskDispatchProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_REQUEST, taskKillProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RUNNING_ACK, taskExecuteRunningAckProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RESPONSE_ACK, taskExecuteResponseAckProcessor);
+        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RUNNING_ACK,
+                taskExecuteRunningAckProcessor);
+        this.nettyRemotingServer.registerProcessor(CommandType.TASK_UPDATE_PID_ACK,
+                taskUpdatePidAckProcessor);
+        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RESULT_ACK, taskExecuteResultAckProcessor);
+        this.nettyRemotingServer.registerProcessor(CommandType.TASK_REJECT_ACK, taskRejectAckProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.PROCESS_HOST_UPDATE_REQUEST, hostUpdateProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_RECALL_ACK, taskRecallAckProcessor);
-        // logger server
+        this.nettyRemotingServer.registerProcessor(CommandType.TASK_SAVEPOINT_REQUEST, taskSavePointProcessor);
+        // log server
+        this.nettyRemotingServer.registerProcessor(CommandType.GET_APP_ID_REQUEST, loggerRequestProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.GET_LOG_BYTES_REQUEST, loggerRequestProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.ROLL_VIEW_LOG_REQUEST, loggerRequestProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.VIEW_WHOLE_LOG_REQUEST, loggerRequestProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.REMOVE_TAK_LOG_REQUEST, loggerRequestProcessor);
         this.nettyRemotingServer.start();
-        LOGGER.info("Worker rpc server started");
+        log.info("Worker rpc server started");
     }
 
     @Override
     public void close() {
-        LOGGER.info("Worker rpc server closing");
+        log.info("Worker rpc server closing");
         this.nettyRemotingServer.close();
-        LOGGER.info("Worker rpc server closed");
+        log.info("Worker rpc server closed");
     }
 
 }

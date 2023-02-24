@@ -37,6 +37,9 @@ import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertSendStatusMapper;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -46,17 +49,21 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 @Component
+@Slf4j
 public class AlertDao {
+
+    private static final int QUERY_ALERT_THRESHOLD = 100;
 
     @Value("${alert.alarm-suppression.crash:60}")
     private Integer crashAlarmSuppression;
@@ -80,16 +87,23 @@ public class AlertDao {
      * @return add alert result
      */
     public int addAlert(Alert alert) {
+        if (null == alert.getAlertGroupId() || NumberUtils.INTEGER_ZERO.equals(alert.getAlertGroupId())) {
+            log.warn("the value of alertGroupId is null or 0 ");
+            return 0;
+        }
+
         String sign = generateSign(alert);
         alert.setSign(sign);
-        return alertMapper.insert(alert);
+        int count = alertMapper.insert(alert);
+        log.info("add alert to db , alert: {}", alert);
+        return count;
     }
 
     /**
      * update alert sending(execution) status
      *
      * @param alertStatus alertStatus
-     * @param log log
+     * @param log alert results json
      * @param id id
      * @return update alert result
      */
@@ -108,7 +122,7 @@ public class AlertDao {
      * @param alert alert
      * @return sign's str
      */
-    private String generateSign (Alert alert) {
+    private String generateSign(Alert alert) {
         return Optional.of(alert)
                 .map(Alert::getContent)
                 .map(DigestUtils::sha1Hex)
@@ -135,20 +149,25 @@ public class AlertDao {
         return alertSendStatusMapper.insert(alertSendStatus);
     }
 
+    public int insertAlertSendStatus(List<AlertSendStatus> alertSendStatuses) {
+        if (CollectionUtils.isEmpty(alertSendStatuses)) {
+            return 0;
+        }
+        return alertSendStatusMapper.batchInsert(alertSendStatuses);
+    }
+
     /**
      * MasterServer or WorkerServer stopped
      *
      * @param alertGroupId alertGroupId
-     * @param host host
-     * @param serverType serverType
+     * @param host         host
+     * @param serverType   serverType
      */
     public void sendServerStoppedAlert(int alertGroupId, String host, String serverType) {
-        ServerAlertContent serverStopAlertContent = ServerAlertContent.newBuilder().
-                type(serverType)
+        ServerAlertContent serverStopAlertContent = ServerAlertContent.newBuilder().type(serverType)
                 .host(host)
                 .event(AlertEvent.SERVER_DOWN)
-                .warningLevel(AlertWarnLevel.SERIOUS).
-                build();
+                .warningLevel(AlertWarnLevel.SERIOUS).build();
         String content = JSONUtils.toJsonString(Lists.newArrayList(serverStopAlertContent));
 
         Alert alert = new Alert();
@@ -163,7 +182,8 @@ public class AlertDao {
         alert.setSign(generateSign(alert));
         // we use this method to avoid insert duplicate alert(issue #5525)
         // we modified this method to optimize performance(issue #9174)
-        Date crashAlarmSuppressionStartTime = Date.from(LocalDateTime.now().plusMinutes(-crashAlarmSuppression).atZone(ZoneId.systemDefault()).toInstant());
+        Date crashAlarmSuppressionStartTime = Date.from(
+                LocalDateTime.now().plusMinutes(-crashAlarmSuppression).atZone(ZoneId.systemDefault()).toInstant());
         alertMapper.insertAlertWhenServerCrash(alert, crashAlarmSuppressionStartTime);
     }
 
@@ -177,7 +197,7 @@ public class AlertDao {
         int alertGroupId = processInstance.getWarningGroupId();
         Alert alert = new Alert();
         List<ProcessAlertContent> processAlertContentList = new ArrayList<>(1);
-        ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
+        ProcessAlertContent processAlertContent = ProcessAlertContent.builder()
                 .projectCode(projectUser.getProjectCode())
                 .projectName(projectUser.getProjectName())
                 .owner(projectUser.getUserName())
@@ -190,7 +210,7 @@ public class AlertDao {
                 .processStartTime(processInstance.getStartTime())
                 .processHost(processInstance.getHost())
                 .event(AlertEvent.TIME_OUT)
-                .warningLevel(AlertWarnLevel.MIDDLE)
+                .warnLevel(AlertWarnLevel.MIDDLE)
                 .build();
         processAlertContentList.add(processAlertContent);
         String content = JSONUtils.toJsonString(processAlertContentList);
@@ -220,10 +240,11 @@ public class AlertDao {
      * @param taskInstance taskInstance
      * @param projectUser projectUser
      */
-    public void sendTaskTimeoutAlert(ProcessInstance processInstance, TaskInstance taskInstance, ProjectUser projectUser) {
+    public void sendTaskTimeoutAlert(ProcessInstance processInstance, TaskInstance taskInstance,
+                                     ProjectUser projectUser) {
         Alert alert = new Alert();
         List<ProcessAlertContent> processAlertContentList = new ArrayList<>(1);
-        ProcessAlertContent processAlertContent = ProcessAlertContent.newBuilder()
+        ProcessAlertContent processAlertContent = ProcessAlertContent.builder()
                 .projectCode(projectUser.getProjectCode())
                 .projectName(projectUser.getProjectName())
                 .owner(projectUser.getUserName())
@@ -236,7 +257,7 @@ public class AlertDao {
                 .taskStartTime(taskInstance.getStartTime())
                 .taskHost(taskInstance.getHost())
                 .event(AlertEvent.TIME_OUT)
-                .warningLevel(AlertWarnLevel.MIDDLE)
+                .warnLevel(AlertWarnLevel.MIDDLE)
                 .build();
         processAlertContentList.add(processAlertContent);
         String content = JSONUtils.toJsonString(processAlertContentList);
@@ -252,8 +273,12 @@ public class AlertDao {
      * List alerts that are pending for execution
      */
     public List<Alert> listPendingAlerts() {
-        LambdaQueryWrapper<Alert> wrapper = new QueryWrapper<>(new Alert()).lambda()
-                .eq(Alert::getAlertStatus, AlertStatus.WAIT_EXECUTION);
+        return alertMapper.listingAlertByStatus(AlertStatus.WAIT_EXECUTION.getCode(), QUERY_ALERT_THRESHOLD);
+    }
+
+    public List<Alert> listAlerts(int processInstanceId) {
+        LambdaQueryWrapper<Alert> wrapper = new LambdaQueryWrapper<Alert>()
+                .eq(Alert::getProcessInstanceId, processInstanceId);
         return alertMapper.selectList(wrapper);
     }
 
@@ -302,5 +327,21 @@ public class AlertDao {
 
     public void setCrashAlarmSuppression(Integer crashAlarmSuppression) {
         this.crashAlarmSuppression = crashAlarmSuppression;
+    }
+
+    public void deleteByWorkflowInstanceId(Integer processInstanceId) {
+        if (processInstanceId == null) {
+            return;
+        }
+        List<Alert> alertList = alertMapper.selectByWorkflowInstanceId(processInstanceId);
+        if (CollectionUtils.isEmpty(alertList)) {
+            return;
+        }
+        alertMapper.deleteByWorkflowInstanceId(processInstanceId);
+        List<Integer> alertIds = alertList
+                .stream()
+                .map(Alert::getId)
+                .collect(Collectors.toList());
+        alertSendStatusMapper.deleteByAlertIds(alertIds);
     }
 }

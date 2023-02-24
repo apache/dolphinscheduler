@@ -16,24 +16,24 @@
  */
 package org.apache.dolphinscheduler.api.dto.resources.visitor;
 
-
 import org.apache.dolphinscheduler.api.dto.resources.Directory;
 import org.apache.dolphinscheduler.api.dto.resources.FileLeaf;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
-import org.apache.dolphinscheduler.dao.entity.Resource;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * resource tree visitor
  */
-public class ResourceTreeVisitor implements Visitor{
+public class ResourceTreeVisitor implements Visitor {
 
     /**
      * resource list
      */
-    private List<Resource> resourceList;
+    private List<StorageEntity> resourceList;
 
     public ResourceTreeVisitor() {
     }
@@ -42,7 +42,7 @@ public class ResourceTreeVisitor implements Visitor{
      * constructor
      * @param resourceList resource list
      */
-    public ResourceTreeVisitor(List<Resource> resourceList) {
+    public ResourceTreeVisitor(List<StorageEntity> resourceList) {
         this.resourceList = resourceList;
     }
 
@@ -51,14 +51,15 @@ public class ResourceTreeVisitor implements Visitor{
      * @return resoruce component
      */
     @Override
-    public ResourceComponent visit() {
+    public ResourceComponent visit(String rootPath) {
         ResourceComponent rootDirectory = new Directory();
-        for (Resource resource : resourceList) {
+        for (StorageEntity resource : resourceList) {
             // judge whether is root node
-            if (rootNode(resource)){
+            if (rootNode(resource, rootPath)) {
+                // if it is a root node.
                 ResourceComponent tempResourceComponent = getResourceComponent(resource);
                 rootDirectory.add(tempResourceComponent);
-                tempResourceComponent.setChildren(setChildren(tempResourceComponent.getId(),resourceList));
+                tempResourceComponent.setChildren(setChildren(tempResourceComponent.getFullName(), resourceList));
             }
         }
         return rootDirectory;
@@ -66,22 +67,23 @@ public class ResourceTreeVisitor implements Visitor{
 
     /**
      * set children
-     * @param id    id
+     * @param fullName   unique path
      * @param list  resource list
      * @return resource component list
      */
-    public static List<ResourceComponent> setChildren(int id, List<Resource> list ){
+    public static List<ResourceComponent> setChildren(String fullName, List<StorageEntity> list) {
+        // id is the unique value,
         List<ResourceComponent> childList = new ArrayList<>();
-        for (Resource resource : list) {
-            if (id == resource.getPid()){
+        for (StorageEntity resource : list) {
+            if (Objects.equals(fullName, resource.getPfullName())) {
                 ResourceComponent tempResourceComponent = getResourceComponent(resource);
                 childList.add(tempResourceComponent);
             }
         }
         for (ResourceComponent resourceComponent : childList) {
-            resourceComponent.setChildren(setChildren(resourceComponent.getId(),list));
+            resourceComponent.setChildren(setChildren(resourceComponent.getFullName(), list));
         }
-        if (childList.size()==0){
+        if (childList.size() == 0) {
             return new ArrayList<>();
         }
         return childList;
@@ -92,17 +94,18 @@ public class ResourceTreeVisitor implements Visitor{
      * @param resource resource
      * @return true if it is the root node
      */
-    public boolean rootNode(Resource resource) {
+    public boolean rootNode(StorageEntity resource, String rootPath) {
 
         boolean isRootNode = true;
-        if(resource.getPid() != -1 ){
-            for (Resource parent : resourceList) {
-                if (resource.getPid() == parent.getId()) {
+        if (!Objects.equals(resource.getPfullName(), rootPath)) {
+            for (StorageEntity parent : resourceList) {
+                if (Objects.equals(resource.getPfullName(), parent.getFullName())) {
                     isRootNode = false;
                     break;
                 }
             }
         }
+
         return isRootNode;
     }
 
@@ -111,19 +114,20 @@ public class ResourceTreeVisitor implements Visitor{
      * @param resource resource
      * @return resource component
      */
-    private static ResourceComponent getResourceComponent(Resource resource) {
+    private static ResourceComponent getResourceComponent(StorageEntity resource) {
         ResourceComponent tempResourceComponent;
-        if(resource.isDirectory()){
+        if (resource.isDirectory()) {
             tempResourceComponent = new Directory();
-        }else{
+        } else {
             tempResourceComponent = new FileLeaf();
         }
-        
+
         tempResourceComponent.setName(resource.getAlias());
-        tempResourceComponent.setFullName(resource.getFullName().replaceFirst("/",""));
+        // tempResourceComponent.setFullName(resource.getFullName().replaceFirst("/",""));
+        tempResourceComponent.setFullName(resource.getFullName());
         tempResourceComponent.setId(resource.getId());
-        tempResourceComponent.setPid(resource.getPid());
-        tempResourceComponent.setIdValue(resource.getId(),resource.isDirectory());
+        tempResourceComponent.setPid(resource.getPfullName());
+        tempResourceComponent.setIdValue(resource.getId(), resource.isDirectory());
         tempResourceComponent.setDescription(resource.getDescription());
         tempResourceComponent.setType(resource.getType());
         return tempResourceComponent;

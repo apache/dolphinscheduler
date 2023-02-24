@@ -17,34 +17,40 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import static org.apache.dolphinscheduler.common.Constants.DATA_BASEDIR_PATH;
-import static org.apache.dolphinscheduler.common.Constants.FOLDER_SEPARATOR;
-import static org.apache.dolphinscheduler.common.Constants.RESOURCE_VIEW_SUFFIXES;
-import static org.apache.dolphinscheduler.common.Constants.RESOURCE_VIEW_SUFFIXES_DEFAULT_VALUE;
-import static org.apache.dolphinscheduler.common.Constants.UTF_8;
-import static org.apache.dolphinscheduler.common.Constants.YYYYMMDDHHMMSS;
+import static org.apache.dolphinscheduler.common.constants.Constants.DATA_BASEDIR_PATH;
+import static org.apache.dolphinscheduler.common.constants.Constants.FOLDER_SEPARATOR;
+import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_S_S;
+import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_VIEW_SUFFIXES;
+import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_VIEW_SUFFIXES_DEFAULT_VALUE;
+import static org.apache.dolphinscheduler.common.constants.Constants.UTF_8;
+import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYYMMDDHHMMSS;
 
 import org.apache.commons.io.IOUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.NoSuchFileException;
+import java.util.zip.CRC32;
+import java.util.zip.CheckedInputStream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * file utils
  */
+@Slf4j
 public class FileUtils {
 
-    public static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
-
     public static final String DATA_BASEDIR = PropertyUtils.getString(DATA_BASEDIR_PATH, "/tmp/dolphinscheduler");
+
+    public static final String APPINFO_PATH = "appInfo.log";
+
+    public static final String KUBE_CONFIG_FILE = "config";
 
     private FileUtils() {
         throw new UnsupportedOperationException("Construct FileUtils");
@@ -57,7 +63,8 @@ public class FileUtils {
      * @return download file name
      */
     public static String getDownloadFilename(String filename) {
-        String fileName = String.format("%s/download/%s/%s", DATA_BASEDIR, DateUtils.getCurrentTime(YYYYMMDDHHMMSS), filename);
+        String fileName =
+                String.format("%s/download/%s/%s", DATA_BASEDIR, DateUtils.getCurrentTime(YYYYMMDDHHMMSS), filename);
 
         File file = new File(fileName);
         if (!file.getParentFile().exists()) {
@@ -87,22 +94,49 @@ public class FileUtils {
     /**
      * directory of process execution
      *
-     * @param projectCode project code
-     * @param processDefineCode process definition Code
+     * @param tenant               tenant
+     * @param projectCode          project code
+     * @param processDefineCode    process definition Code
      * @param processDefineVersion process definition version
-     * @param processInstanceId process instance id
-     * @param taskInstanceId task instance id
+     * @param processInstanceId    process instance id
+     * @param taskInstanceId       task instance id
      * @return directory of process execution
      */
-    public static String getProcessExecDir(long projectCode, long processDefineCode, int processDefineVersion, int processInstanceId, int taskInstanceId) {
-        String fileName = String.format("%s/exec/process/%d/%s/%d/%d", DATA_BASEDIR,
-                projectCode, processDefineCode + "_" + processDefineVersion, processInstanceId, taskInstanceId);
-        File file = new File(fileName);
-        if (!file.getParentFile().exists()) {
-            file.getParentFile().mkdirs();
-        }
+    public static String getProcessExecDir(String tenant,
+                                           long projectCode,
+                                           long processDefineCode,
+                                           int processDefineVersion,
+                                           int processInstanceId,
+                                           int taskInstanceId) {
+        return String.format(
+                "%s/exec/process/%s/%d/%d_%d/%d/%d",
+                DATA_BASEDIR,
+                tenant,
+                projectCode,
+                processDefineCode,
+                processDefineVersion,
+                processInstanceId,
+                taskInstanceId);
+    }
 
-        return fileName;
+    /**
+     * absolute path of kubernetes configuration file
+     *
+     * @param execPath
+     * @return
+     */
+    public static String getKubeConfigPath(String execPath) {
+        return String.format(FORMAT_S_S, execPath, KUBE_CONFIG_FILE);
+    }
+
+    /**
+     * absolute path of appInfo file
+     *
+     * @param execPath  directory of process execution
+     * @return
+     */
+    public static String getAppInfoPath(String execPath) {
+        return String.format("%s/%s", execPath, APPINFO_PATH);
     }
 
     /**
@@ -119,7 +153,7 @@ public class FileUtils {
      * @throws IOException errors
      */
     public static void createWorkDirIfAbsent(String execLocalPath) throws IOException {
-        //if work dir exists, first delete
+        // if work dir exists, first delete
         File execLocalPathFile = new File(execLocalPath);
 
         if (execLocalPathFile.exists()) {
@@ -134,10 +168,10 @@ public class FileUtils {
             }
         }
 
-        //create work dir
+        // create work dir
         org.apache.commons.io.FileUtils.forceMkdir(execLocalPathFile);
         String mkdirLog = "create dir success " + execLocalPath;
-        logger.info(mkdirLog);
+        log.info(mkdirLog);
     }
 
     /**
@@ -152,13 +186,13 @@ public class FileUtils {
         try {
             File distFile = new File(filePath);
             if (!distFile.getParentFile().exists() && !distFile.getParentFile().mkdirs()) {
-                logger.error("mkdir parent failed");
+                log.error("mkdir parent failed");
                 return false;
             }
             fos = new FileOutputStream(filePath);
             IOUtils.write(content, fos, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             return false;
         } finally {
             IOUtils.closeQuietly(fos);
@@ -218,7 +252,7 @@ public class FileUtils {
             }
             return output.toString(UTF_8);
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }
@@ -230,7 +264,7 @@ public class FileUtils {
      * @param filename String type of filename
      * @return whether file path could be traversal or not
      */
-    public static boolean directoryTraversal(String filename){
+    public static boolean directoryTraversal(String filename) {
         if (filename.contains(FOLDER_SEPARATOR)) {
             return true;
         }
@@ -242,6 +276,38 @@ public class FileUtils {
         } catch (IOException e) {
             return true;
         }
+    }
+
+    /**
+     * Calculate file checksum with CRC32 algorithm
+     * @param pathName
+     * @return checksum of file/dir
+     */
+    public static String getFileChecksum(String pathName) throws IOException {
+        CRC32 crc32 = new CRC32();
+        File file = new File(pathName);
+        String crcString = "";
+        if (file.isDirectory()) {
+            // file system interface remains the same order
+            String[] subPaths = file.list();
+            StringBuilder concatenatedCRC = new StringBuilder();
+            for (String subPath : subPaths) {
+                concatenatedCRC.append(getFileChecksum(pathName + FOLDER_SEPARATOR + subPath));
+            }
+            crcString = concatenatedCRC.toString();
+        } else {
+            try (
+                    FileInputStream fileInputStream = new FileInputStream(pathName);
+                    CheckedInputStream checkedInputStream = new CheckedInputStream(fileInputStream, crc32);) {
+                while (checkedInputStream.read() != -1) {
+                }
+            } catch (IOException e) {
+                throw new IOException("Calculate checksum error.");
+            }
+            crcString = Long.toHexString(crc32.getValue());
+        }
+
+        return crcString;
     }
 
 }

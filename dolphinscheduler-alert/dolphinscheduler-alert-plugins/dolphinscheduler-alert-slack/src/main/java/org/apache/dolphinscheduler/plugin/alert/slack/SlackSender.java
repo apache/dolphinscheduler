@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.alert.slack;
 
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -38,13 +38,12 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.google.common.base.Preconditions;
 
+@Slf4j
 public final class SlackSender {
-    private static final Logger logger = LoggerFactory.getLogger(SlackSender.class);
 
     private final String webHookUrl;
     private final String botName;
@@ -53,7 +52,8 @@ public final class SlackSender {
         webHookUrl = slackAlertParam.get(SlackParamsConstants.SLACK_WEB_HOOK_URL_NAME);
         botName = slackAlertParam.get(SlackParamsConstants.SLACK_BOT_NAME);
         Preconditions.checkArgument(!Objects.isNull(webHookUrl), "SlackWebHookURL can not be null");
-        Preconditions.checkArgument(webHookUrl.startsWith("https://hooks.slack.com/services/"), "SlackWebHookURL invalidate");
+        Preconditions.checkArgument(webHookUrl.startsWith("https://hooks.slack.com/services/"),
+                "SlackWebHookURL invalidate");
         Preconditions.checkArgument(!Objects.isNull(botName), "slack bot name can not be null");
     }
 
@@ -84,7 +84,7 @@ public final class SlackSender {
             HttpEntity entity = response.getEntity();
             return EntityUtils.toString(entity, "UTF-8");
         } catch (Exception e) {
-            logger.error("Send message to slack error.", e);
+            log.error("Send message to slack error.", e);
             return "System Exception";
         }
     }
@@ -120,17 +120,17 @@ public final class SlackSender {
         final int elementLen = maxLen;
         StringBuilder stringBuilder = new StringBuilder(200);
         stringBuilder.append(headers.stream()
-                                    .map(header -> generateString(header, elementLen, " "))
-                                    .collect(Collectors.joining("|")));
+                .map(header -> generateString(header, elementLen, " "))
+                .collect(Collectors.joining("|")));
         stringBuilder.append("\n");
         for (List<String> element : elements) {
             stringBuilder.append(element.stream()
-                                        .map(lement -> generateString("", elementLen, "-"))
-                                        .collect(Collectors.joining("|")));
+                    .map(lement -> generateString("", elementLen, "-"))
+                    .collect(Collectors.joining("|")));
             stringBuilder.append("\n");
             stringBuilder.append(element.stream()
-                                        .map(e -> generateString(e, elementLen, " "))
-                                        .collect(Collectors.joining("|")));
+                    .map(e -> generateString(e, elementLen, " "))
+                    .collect(Collectors.joining("|")));
             stringBuilder.append("\n");
         }
         return String.format("```%s```", stringBuilder);

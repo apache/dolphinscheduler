@@ -21,7 +21,7 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import ButtonLink from '@/components/button-link'
 import { RowKey } from 'naive-ui/lib/data-table/src/interface'
-import { NEllipsis } from 'naive-ui'
+import {NEllipsis, NIcon, NSpin, NTooltip} from 'naive-ui'
 import {
   queryProcessInstanceListPaging,
   deleteProcessInstanceById,
@@ -29,9 +29,10 @@ import {
 } from '@/service/modules/process-instances'
 import { execute } from '@/service/modules/executors'
 import TableAction from './components/table-action'
-import { renderTableTime, runningType } from '@/common/common'
-import styles from './index.module.scss'
-import { renderStateCell } from '../../task/instance/use-table'
+import {
+  renderTableTime,
+  runningType, workflowExecutionState
+} from '@/common/common'
 import {
   COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
@@ -41,6 +42,8 @@ import type { Router } from 'vue-router'
 import type { IWorkflowInstance } from '@/service/modules/process-instances/types'
 import type { ICountDownParam } from './types'
 import type { ExecuteReq } from '@/service/modules/executors/types'
+import {renderEnvironmentalDistinctionCell} from "@/utils/environmental-distinction";
+import { IWorkflowExecutionState } from "@/common/types";
 
 export function useTable() {
   const { t } = useI18n()
@@ -78,28 +81,36 @@ export function useTable() {
         render: (rowData: any, rowIndex: number) => rowIndex + 1
       },
       {
-        title: t('project.workflow.workflow_name'),
+        title: t('project.workflow.workflow_instance_name'),
         key: 'name',
         ...COLUMN_WIDTH_CONFIG['linkName'],
         className: 'workflow-name',
+        resizable: true,
+        width: 300,
+        minWidth: 300,
+        maxWidth: 600,
         render: (row: IWorkflowInstance) =>
           h(
             ButtonLink,
             {
-              onClick: () =>
-                void router.push({
+              onClick: () => {
+                let routeUrl = router.resolve({
                   name: 'workflow-instance-detail',
                   params: { id: row.id },
                   query: { code: row.processDefinitionCode }
                 })
+                window.open(routeUrl.href, '_blank')
+              }
             },
             {
               default: () =>
-                h(
-                  NEllipsis,
-                  COLUMN_WIDTH_CONFIG['linkEllipsis'],
-                  () => row.name
-                )
+                  h(
+                      NEllipsis,
+                      {
+                        style: 'max-width: 580px;line-height: 1.5'
+                      },
+                      () => row.name
+                  )
             }
           )
       },
@@ -108,7 +119,15 @@ export function useTable() {
         key: 'state',
         ...COLUMN_WIDTH_CONFIG['state'],
         className: 'workflow-status',
-        render: (_row: IWorkflowInstance) => renderStateCell(_row.state, t)
+        render: (_row: IWorkflowInstance) => renderWorkflowStateCell(_row.state, t)
+      },
+      {
+        title: t('project.workflow.operating_environment'),
+        key: 'testFlag',
+        width: 160,
+        className: 'workflow-testFlag',
+        render: (_row: IWorkflowInstance) =>
+          renderEnvironmentalDistinctionCell(_row.testFlag, t)
       },
       {
         title: t('project.workflow.run_type'),
@@ -175,8 +194,7 @@ export function useTable() {
       {
         title: t('project.workflow.operation'),
         key: 'operation',
-        ...COLUMN_WIDTH_CONFIG['operation'](6),
-        className: styles.operation,
+        ...COLUMN_WIDTH_CONFIG['operation'](7),
         render: (_row: IWorkflowInstance, index: number) =>
           h(TableAction, {
             row: _row,
@@ -342,4 +360,30 @@ export function useTable() {
     getTableData,
     batchDeleteInstance
   }
+}
+
+export function renderWorkflowStateCell(state: IWorkflowExecutionState, t: Function) {
+  if (!state) return ''
+
+  const stateOption = workflowExecutionState(t)[state]
+
+  const Icon = h(
+      NIcon,
+      {
+        color: stateOption.color,
+        class: stateOption.classNames,
+        style: {
+          display: 'flex'
+        },
+        size: 20
+      },
+      () => h(stateOption.icon)
+  )
+  return h(NTooltip, null, {
+    trigger: () => {
+      if (!stateOption.isSpin) return Icon
+      return h(NSpin, { size: 20 }, { icon: () => Icon })
+    },
+    default: () => stateOption.desc
+  })
 }

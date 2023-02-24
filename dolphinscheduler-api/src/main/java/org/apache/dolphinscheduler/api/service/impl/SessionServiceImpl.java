@@ -19,12 +19,12 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.controller.BaseController;
 import org.apache.dolphinscheduler.api.service.SessionService;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.Session;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.SessionMapper;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
@@ -34,8 +34,8 @@ import java.util.UUID;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,9 +45,8 @@ import org.springframework.web.util.WebUtils;
  * session service implement
  */
 @Service
+@Slf4j
 public class SessionServiceImpl extends BaseServiceImpl implements SessionService {
-
-    private static final Logger logger = LoggerFactory.getLogger(SessionService.class);
 
     @Autowired
     private SessionMapper sessionMapper;
@@ -75,7 +74,7 @@ public class SessionServiceImpl extends BaseServiceImpl implements SessionServic
         }
 
         String ip = BaseController.getClientIpAddress(request);
-        logger.debug("get session: {}, ip: {}", sessionId, ip);
+        log.debug("Get session: {}, ip: {}.", sessionId, ip);
 
         return sessionMapper.selectById(sessionId);
     }
@@ -88,7 +87,7 @@ public class SessionServiceImpl extends BaseServiceImpl implements SessionServic
      * @return session string
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public String createSession(User user, String ip) {
         Session session = null;
 
@@ -153,10 +152,10 @@ public class SessionServiceImpl extends BaseServiceImpl implements SessionServic
              */
             Session session = sessionMapper.queryByUserIdAndIp(loginUser.getId(), ip);
 
-            //delete session
+            // delete session
             sessionMapper.deleteById(session.getId());
         } catch (Exception e) {
-            logger.warn("userId : {} , ip : {} , find more one session", loginUser.getId(), ip);
+            log.warn("userId : {} , ip : {} , find more one session", loginUser.getId(), ip, e);
         }
     }
 

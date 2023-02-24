@@ -18,18 +18,20 @@ Usage of local parameters is: at the task define page, click the '+' beside the 
 
 ### Use Local Parameter by Custom Parameter
 
-This example shows how to use local parameters to print the current date. Create a Shell task and write a script with the content `echo ${dt}`. Click **custom parameter** in the configuration bar, and the configuration is as follows:
+This example shows how to use local parameters to print the current date.
+
+Create a Shell task and write a script with the content `echo ${dt}`. Click **custom parameter** in the configuration bar, and the configuration is as follows:
 
 ![local-parameter01](../../../../img/new_ui/dev/parameter/local_parameter01.png)
 
 Parameters:
 
 - dt: indicates the parameter name.
-- in: IN indicates that local parameters can only be used on the current node, and OUT indicates that local.parameters can be transmitted to the downstream.
+- IN: IN indicates that local parameters can only be used on the current node, and OUT indicates that local parameters can be transmitted to the downstream.
 - DATE: indicates the DATE of the data type.
 - $[YYYY-MM-DD] : indicates a built-in parameter derived from a user-defined format.
 
-Save the workflow and run it. View Shell task's log.
+Save the workflow and run it. View log of Shell task.
 
 ![local-parameter02](../../../../img/new_ui/dev/parameter/local_parameter02.png)
 
@@ -59,7 +61,7 @@ You could get this value in downstream task using syntax `echo '${set_val_param}
 
 If you want to export parameters with bash variable instead of constants value, and then use them in downstream tasks,
 you could use `setValue` in your task, which more flexible such as you can get variable for exists local or HTTP resource.
-You can use syntax like 
+You can use syntax like
 
 ```shell
 lines_num=$(wget https://raw.githubusercontent.com/apache/dolphinscheduler/dev/README.md -q -O - | wc -l | xargs)

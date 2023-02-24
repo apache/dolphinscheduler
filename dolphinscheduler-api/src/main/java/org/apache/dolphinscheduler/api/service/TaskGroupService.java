@@ -66,7 +66,7 @@ public interface TaskGroupService {
      * @param pageSize  page size
      * @return the result code and msg
      */
-    Map<String, Object> queryAllTaskGroup(User loginUser, String name,Integer status, int pageNo, int pageSize);
+    Map<String, Object> queryAllTaskGroup(User loginUser, String name, Integer status, int pageNo, int pageSize);
 
     /**
      * query all task group by status
@@ -139,4 +139,6 @@ public interface TaskGroupService {
     Map<String, Object> forceStartTask(User loginUser, int taskId);
 
     Map<String, Object> modifyPriority(User loginUser, Integer queueId, Integer priority);
+
+    void deleteTaskGroupByProjectCode(long projectCode);
 }

@@ -17,17 +17,31 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
+import static org.apache.dolphinscheduler.common.constants.Constants.APPID_COLLECT;
+import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_COLLECT_WAY;
+
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
+
+import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * abstract yarn task
  */
-public abstract class AbstractYarnTask extends AbstractTaskExecutor {
+public abstract class AbstractYarnTask extends AbstractRemoteTask {
+
     /**
      * process task
      */
     private ShellCommandExecutor shellCommandExecutor;
+
+    /**
+     * rules for extracting application ID
+     */
+    protected static final Pattern YARN_APPLICATION_REGEX = Pattern.compile(TaskConstants.YARN_APPLICATION_REGEX);
 
     /**
      * Abstract Yarn Task
@@ -37,36 +51,68 @@ public abstract class AbstractYarnTask extends AbstractTaskExecutor {
     public AbstractYarnTask(TaskExecutionContext taskRequest) {
         super(taskRequest);
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-            taskRequest,
-            logger);
+                taskRequest,
+                log);
     }
 
+    // todo split handle to submit and track
     @Override
-    public void handle() throws Exception {
+    public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             // SHELL task exit code
-            TaskResponse response = shellCommandExecutor.run(buildCommand());
+            TaskResponse response = shellCommandExecutor.run(buildCommand(), taskCallBack);
             setExitStatusCode(response.getExitStatusCode());
-            setAppIds(response.getAppIds());
+            // set appIds
+            setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
             setProcessId(response.getProcessId());
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            log.info("The current yarn task has been interrupted", ex);
+            setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
+            throw new TaskException("The current yarn task has been interrupted", ex);
         } catch (Exception e) {
-            logger.error("yarn process failure", e);
+            log.error("yarn process failure", e);
             exitStatusCode = -1;
-            throw e;
+            throw new TaskException("Execute task failed", e);
         }
+    }
+
+    // todo
+    @Override
+    public void submitApplication() throws TaskException {
+
+    }
+
+    // todo
+    @Override
+    public void trackApplicationStatus() throws TaskException {
+
     }
 
     /**
      * cancel application
      *
-     * @param status status
-     * @throws Exception exception
+     * @throws TaskException exception
      */
     @Override
-    public void cancelApplication(boolean status) throws Exception {
-        cancel = true;
+    public void cancelApplication() throws TaskException {
         // cancel process
-        shellCommandExecutor.cancelApplication();
+        try {
+            shellCommandExecutor.cancelApplication();
+        } catch (Exception e) {
+            throw new TaskException("cancel application error", e);
+        }
+    }
+
+    /**
+     * get application ids
+     * @return
+     * @throws TaskException
+     */
+    @Override
+    public List<String> getApplicationIds() throws TaskException {
+        return LogUtils.getAppIds(taskRequest.getLogPath(), taskRequest.getAppInfoPath(),
+                PropertyUtils.getString(APPID_COLLECT, DEFAULT_COLLECT_WAY));
     }
 
     /**
@@ -92,9 +138,9 @@ public abstract class AbstractYarnTask extends AbstractTaskExecutor {
             throw new RuntimeException("The jar for the task is required.");
         }
 
-        return mainJar.getId() == 0
-            ? mainJar.getRes()
-            // when update resource maybe has error
-            : mainJar.getResourceName().replaceFirst("/", "");
+        return mainJar.getId() == null
+                ? mainJar.getRes()
+                // when update resource maybe has error
+                : mainJar.getResourceName().replaceFirst("/", "");
     }
 }

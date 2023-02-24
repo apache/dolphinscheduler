@@ -17,11 +17,12 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceRemoveCacheResponse;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
-
-import java.util.Map;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
 /**
  * task instance service
@@ -40,6 +41,7 @@ public interface TaskInstanceService {
      * @param host host
      * @param startDate start time
      * @param endDate end time
+     * @param taskExecuteType task execute type
      * @param pageNo page number
      * @param pageSize page size
      * @return task list page
@@ -48,13 +50,15 @@ public interface TaskInstanceService {
                                long projectCode,
                                Integer processInstanceId,
                                String processInstanceName,
+                               String processDefinitionName,
                                String taskName,
                                String executorName,
                                String startDate,
                                String endDate,
                                String searchVal,
-                               ExecutionStatus stateType,
+                               TaskExecutionStatus stateType,
                                String host,
+                               TaskExecuteType taskExecuteType,
                                Integer pageNo,
                                Integer pageSize);
 
@@ -66,7 +70,46 @@ public interface TaskInstanceService {
      * @param taskInstanceId task instance id
      * @return the result code and msg
      */
-    Map<String, Object> forceTaskSuccess(User loginUser,
-                                         long projectCode,
-                                         Integer taskInstanceId);
+    Result forceTaskSuccess(User loginUser,
+                            long projectCode,
+                            Integer taskInstanceId);
+
+    /**
+     * task savepoint
+     * @param loginUser
+     * @param projectCode
+     * @param taskInstanceId
+     * @return
+     */
+    Result taskSavePoint(User loginUser, long projectCode, Integer taskInstanceId);
+
+    /**
+     * stop task
+     * @param loginUser
+     * @param projectCode
+     * @param taskInstanceId
+     * @return
+     */
+    Result stopTask(User loginUser, long projectCode, Integer taskInstanceId);
+
+    /**
+     * query taskInstance by taskInstanceCode
+     *
+     * @param loginUser   login user
+     * @param projectCode project code
+     * @param taskInstanceId taskInstance id
+     * @return the result code and msg
+     */
+    TaskInstance queryTaskInstanceById(User loginUser, long projectCode, Long taskInstanceId);
+
+    /**
+     * remove task instance cache
+     * @param loginUser
+     * @param projectCode
+     * @param taskInstanceId
+     * @return
+     */
+    TaskInstanceRemoveCacheResponse removeTaskInstanceCache(User loginUser, long projectCode, Integer taskInstanceId);
+
+    void deleteByWorkflowInstanceId(Integer workflowInstanceId);
 }

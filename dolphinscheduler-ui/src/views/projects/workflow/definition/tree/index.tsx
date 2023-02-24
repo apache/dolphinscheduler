@@ -31,7 +31,7 @@ import { tasksState } from '@/common/common'
 import type { ITaskTypeNodeOption } from './types'
 
 export default defineComponent({
-  name: 'WorkflowDefinitionTiming',
+  name: 'WorkflowDefinitionTree',
   setup() {
     const router: Router = useRouter()
     const { t, locale } = useI18n()
@@ -133,7 +133,17 @@ export default defineComponent({
         color: '#8c8c8f',
         image: `${import.meta.env.BASE_URL}images/task-icons/seatunnel.png`
       },
-      { taskType: 'DAG', color: '#bbdde9' }
+      {
+        taskType: 'DINKY',
+        color: '#d69f5b',
+        image: `${import.meta.env.BASE_URL}images/task-icons/dinky.png`
+      },
+      { taskType: 'DAG', color: '#bbdde9' },
+      {
+        taskType: 'FLINK_STREAM',
+        color: '#d68f5b',
+        image: `${import.meta.env.BASE_URL}images/task-icons/flink.png`
+      }
     ])
 
     const initTaskStateMap = () => {

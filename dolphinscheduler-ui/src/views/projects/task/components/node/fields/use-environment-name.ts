@@ -29,7 +29,7 @@ export function useEnvironmentName(
   let environmentList = [] as IEnvironmentNameOption[]
   const options = ref([] as IEnvironmentNameOption[])
   const loading = ref(false)
-  const value = ref()
+  let mounted = false
 
   const getEnvironmentList = async () => {
     if (loading.value) return
@@ -46,6 +46,11 @@ export function useEnvironmentName(
       filterByWorkerGroup(option)
     )
     loading.value = false
+    if (options.value.length === 0) {
+      model.environmentCode = null
+    } else {
+      (isCreate && !model.environmentCode)  && (model.environmentCode = options.value[0].value)
+    }
   }
 
   const filterByWorkerGroup = (option: IEnvironmentNameOption) => {
@@ -55,27 +60,20 @@ export function useEnvironmentName(
   }
 
   watch(
-    () => options.value.length,
-    () => {
-      if (isCreate && options.value.length === 1 && !value.value) {
-        model.environmentCode = options.value[0].value
-      }
-      if (options.value.length === 0) model.environmentCode = null
-    }
-  )
-
-  watch(
     () => model.workerGroup,
     () => {
-      if (!model.workerGroup) return
+      if (!model.workerGroup || !mounted) return
       options.value = environmentList.filter((option: IEnvironmentNameOption) =>
         filterByWorkerGroup(option)
       )
+      model.environmentCode =
+        options.value.length === 0 ? null : options.value[0].value
     }
   )
 
-  onMounted(() => {
-    getEnvironmentList()
+  onMounted(async () => {
+    await getEnvironmentList()
+    mounted = true
   })
 
   return {
@@ -85,7 +83,7 @@ export function useEnvironmentName(
     name: t('project.node.environment_name'),
     props: {
       loading: loading,
-      clearable: true
+      clearable: true,
     },
     options: options
   }

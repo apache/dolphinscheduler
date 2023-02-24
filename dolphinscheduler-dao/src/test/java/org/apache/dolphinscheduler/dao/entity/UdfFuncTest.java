@@ -18,48 +18,33 @@
 package org.apache.dolphinscheduler.dao.entity;
 
 import org.apache.dolphinscheduler.dao.entity.UdfFunc.UdfFuncDeserializer;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.io.IOException;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 public class UdfFuncTest {
 
-  /**
-   * test to String
-   */
-  @Test
-  public void testUdfFuncToString() {
-    
-    UdfFunc udfFunc = new UdfFunc();
-    udfFunc.setResourceName("dolphin_resource_update");
-    udfFunc.setResourceId(2);
-    udfFunc.setClassName("org.apache.dolphinscheduler.test.mrUpdate");
+    /**
+     * test UdfFuncDeserializer.deserializeKey
+     *
+     * @throws IOException
+     */
+    @Test
+    public void testUdfFuncDeserializer() throws IOException {
 
-    Assert.assertEquals("{\"id\":0,\"userId\":0,\"resourceType\":\"UDF\",\"funcName\":null,\"className\":\"org.apache.dolphinscheduler.test.mrUpdate\",\"argTypes\":null,\"database\":null,"
-                    + "\"description\":null,\"resourceId\":2,\"resourceName\":\"dolphin_resource_update\",\"type\":null,\"createTime\":null,\"updateTime\":null,\"userName\":null}"
-            , udfFunc.toString());
-  }
+        // UdfFuncDeserializer.deserializeKey key is null
+        UdfFuncDeserializer udfFuncDeserializer = new UdfFuncDeserializer();
+        Assertions.assertNull(udfFuncDeserializer.deserializeKey(null, null));
 
-  /**
-   * test UdfFuncDeserializer.deserializeKey
-   *
-   * @throws IOException
-   */
-  @Test
-  public void testUdfFuncDeserializer() throws IOException {
+        //
+        UdfFunc udfFunc = new UdfFunc();
+        udfFunc.setResourceName("dolphin_resource_update");
+        udfFunc.setResourceId(2);
+        udfFunc.setClassName("org.apache.dolphinscheduler.test.mrUpdate");
 
-    // UdfFuncDeserializer.deserializeKey key is null
-    UdfFuncDeserializer udfFuncDeserializer = new UdfFuncDeserializer();
-    Assert.assertNull(udfFuncDeserializer.deserializeKey(null, null));
-
-    //
-    UdfFunc udfFunc = new UdfFunc();
-    udfFunc.setResourceName("dolphin_resource_update");
-    udfFunc.setResourceId(2);
-    udfFunc.setClassName("org.apache.dolphinscheduler.test.mrUpdate");
-
-    Assert.assertNotNull(udfFuncDeserializer.deserializeKey(udfFunc.toString(), null));
-  }
+        Assertions.assertNotNull(udfFuncDeserializer.deserializeKey(udfFunc.toString(), null));
+    }
 
 }

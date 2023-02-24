@@ -89,6 +89,7 @@ export function useDataList() {
 
   const changeMenuOption = (state: any) => {
     const projectCode = route.params.projectCode || ''
+    const projectName = route.query.projectName || ''
     state.menuOptions = [
       {
         label: () => h(NEllipsis, null, { default: () => t('menu.home') }),
@@ -101,9 +102,10 @@ export function useDataList() {
         icon: renderIcon(ProfileOutlined),
         children: [
           {
-            label: t('menu.project_overview'),
+            label: t('menu.project_overview') + (projectName? `[${projectName}]` : ''),
             key: `/projects/${projectCode}`,
-            icon: renderIcon(FundProjectionScreenOutlined)
+            icon: renderIcon(FundProjectionScreenOutlined),
+            payload: {projectName:projectName}
           },
           {
             label: t('menu.workflow'),
@@ -112,15 +114,18 @@ export function useDataList() {
             children: [
               {
                 label: t('menu.workflow_relation'),
-                key: `/projects/${projectCode}/workflow/relation`
+                key: `/projects/${projectCode}/workflow/relation`,
+                payload: {projectName:projectName}
               },
               {
                 label: t('menu.workflow_definition'),
-                key: `/projects/${projectCode}/workflow-definition`
+                key: `/projects/${projectCode}/workflow-definition`,
+                payload: {projectName:projectName}
               },
               {
                 label: t('menu.workflow_instance'),
-                key: `/projects/${projectCode}/workflow/instances`
+                key: `/projects/${projectCode}/workflow/instances`,
+                payload: {projectName:projectName}
               }
             ]
           },
@@ -131,11 +136,13 @@ export function useDataList() {
             children: [
               {
                 label: t('menu.task_definition'),
-                key: `/projects/${projectCode}/task/definitions`
+                key: `/projects/${projectCode}/task/definitions`,
+                payload: {projectName:projectName}
               },
               {
                 label: t('menu.task_instance'),
-                key: `/projects/${projectCode}/task/instances`
+                key: `/projects/${projectCode}/task/instances`,
+                payload: {projectName:projectName}
               }
             ]
           }
@@ -340,7 +347,8 @@ export function useDataList() {
       {
         label: t('user_dropdown.password'),
         key: 'password',
-        icon: renderIcon(KeyOutlined)
+        icon: renderIcon(KeyOutlined),
+        disabled: userStore.getSecurityConfigType !== 'PASSWORD'
       },
       {
         label: t('user_dropdown.logout'),

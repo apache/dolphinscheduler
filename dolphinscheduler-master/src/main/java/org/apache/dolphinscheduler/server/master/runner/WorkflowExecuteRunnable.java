@@ -17,37 +17,36 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_END_DATE;
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST;
-import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_DATA_START_DATE;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVERY_START_NODE_STRING;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
-import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODES;
-import static org.apache.dolphinscheduler.common.Constants.COMMA;
-import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
-import static org.apache.dolphinscheduler.common.Constants.YYYY_MM_DD_HH_MM_SS;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_END_DATE;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_START_DATE;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_FATHER_PARAMS;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_RECOVERY_START_NODE_STRING;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_START_NODES;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_START_PARAMS;
+import static org.apache.dolphinscheduler.common.constants.Constants.COMMA;
+import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_WORKER_GROUP;
+import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYY_MM_DD_HH_MM_SS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_BLOCKING;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.DataType.VARCHAR;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.Direct.IN;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
-import org.apache.dolphinscheduler.common.enums.StateEvent;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
-import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
-import org.apache.dolphinscheduler.service.expand.CuringParamsService;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.graph.DAG;
-import org.apache.dolphinscheduler.common.model.TaskNode;
+import org.apache.dolphinscheduler.common.log.remote.RemoteLogUtils;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
-import org.apache.dolphinscheduler.common.process.ProcessDag;
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.Environment;
@@ -59,31 +58,47 @@ import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.utils.DagHelper;
+import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.utils.TaskCacheUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.BlockingParameters;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.remote.command.HostUpdateCommand;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
-import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
+import org.apache.dolphinscheduler.server.master.event.StateEvent;
+import org.apache.dolphinscheduler.server.master.event.StateEventHandleError;
+import org.apache.dolphinscheduler.server.master.event.StateEventHandleException;
+import org.apache.dolphinscheduler.server.master.event.StateEventHandleFailure;
+import org.apache.dolphinscheduler.server.master.event.StateEventHandler;
+import org.apache.dolphinscheduler.server.master.event.StateEventHandlerManager;
+import org.apache.dolphinscheduler.server.master.event.TaskStateEvent;
+import org.apache.dolphinscheduler.server.master.event.WorkflowStateEvent;
 import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
 import org.apache.dolphinscheduler.server.master.runner.task.ITaskProcessor;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskAction;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactory;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
-import org.apache.dolphinscheduler.service.corn.CronUtils;
+import org.apache.dolphinscheduler.service.command.CommandService;
+import org.apache.dolphinscheduler.service.cron.CronUtils;
+import org.apache.dolphinscheduler.service.exceptions.CronParseException;
+import org.apache.dolphinscheduler.service.expand.CuringParamsService;
+import org.apache.dolphinscheduler.service.model.TaskNode;
+import org.apache.dolphinscheduler.service.process.ProcessDag;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.PeerTaskInstancePriorityQueue;
+import org.apache.dolphinscheduler.service.utils.DagHelper;
+import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -104,62 +119,52 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.BeanUtils;
 
 import com.google.common.collect.Lists;
-
-import lombok.NonNull;
+import com.google.common.collect.Sets;
 
 /**
  * Workflow execute task, used to execute a workflow instance.
  */
+@Slf4j
 public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
 
-    /**
-     * logger of WorkflowExecuteThread
-     */
-    private static final Logger logger = LoggerFactory.getLogger(WorkflowExecuteRunnable.class);
-
-    /**
-     * process service
-     */
     private final ProcessService processService;
 
-    /**
-     * alert manager
-     */
+    private final CommandService commandService;
+
+    private ProcessInstanceDao processInstanceDao;
+
+    private TaskInstanceDao taskInstanceDao;
+
+    private TaskDefinitionLogDao taskDefinitionLogDao;
+
     private final ProcessAlertManager processAlertManager;
 
-    /**
-     * netty executor manager
-     */
     private final NettyExecutorManager nettyExecutorManager;
 
-    /**
-     * process instance
-     */
-    private ProcessInstance processInstance;
+    private final ProcessInstance processInstance;
 
-    /**
-     * process definition
-     */
     private ProcessDefinition processDefinition;
 
-    /**
-     * the object of DAG
-     */
     private DAG<String, TaskNode, TaskNodeRelation> dag;
+
+    /**
+     * full task node map, key is task node id, value is task node
+     * # TODO: This field can be removed later if the dag is complete
+     */
+    private Map<Long, TaskNode> taskNodesMap;
 
     /**
      * unique key of workflow
      */
     private String key;
 
-    /**
-     * start flag, true: start nodes submit completely
-     */
-    private volatile boolean isStart = false;
+    private WorkflowRunnableStatus workflowRunnableStatus = WorkflowRunnableStatus.CREATED;
 
     /**
      * submit failure nodes
@@ -196,9 +201,9 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
     private final Map<Long, Integer> completeTaskMap = new ConcurrentHashMap<>();
 
     /**
-     * depend failed task map, taskCode as key, taskId as value
+     * depend failed task set
      */
-    private final Map<Long, Integer> dependFailedTaskMap = new ConcurrentHashMap<>();
+    private final Set<Long> dependFailedTaskSet = Sets.newConcurrentHashSet();
 
     /**
      * forbidden task map, code as key
@@ -221,7 +226,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
     private final ConcurrentLinkedQueue<StateEvent> stateEvents = new ConcurrentLinkedQueue<>();
 
     /**
-     * ready to submit task queue
+     * The StandBy task list, will be executed, need to know, the taskInstance in this queue may doesn't have id.
      */
     private final PeerTaskInstancePriorityQueue readyToSubmitTaskQueue = new PeerTaskInstancePriorityQueue();
 
@@ -231,14 +236,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      */
     private final Map<Long, TaskInstance> waitToRetryTaskInstanceMap = new ConcurrentHashMap<>();
 
-    /**
-     * state wheel execute thread
-     */
     private final StateWheelExecuteThread stateWheelExecuteThread;
 
-    /**
-     * curing global params service
-     */
     private final CuringParamsService curingParamsService;
 
     private final String masterAddress;
@@ -246,25 +245,34 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
     /**
      * @param processInstance         processInstance
      * @param processService          processService
+     * @param processInstanceDao      processInstanceDao
      * @param nettyExecutorManager    nettyExecutorManager
      * @param processAlertManager     processAlertManager
      * @param masterConfig            masterConfig
      * @param stateWheelExecuteThread stateWheelExecuteThread
      */
     public WorkflowExecuteRunnable(
-        @NonNull ProcessInstance processInstance,
-        @NonNull ProcessService processService,
-        @NonNull NettyExecutorManager nettyExecutorManager,
-        @NonNull ProcessAlertManager processAlertManager,
-        @NonNull MasterConfig masterConfig,
-        @NonNull StateWheelExecuteThread stateWheelExecuteThread,
-        @NonNull CuringParamsService curingParamsService) {
+                                   @NonNull ProcessInstance processInstance,
+                                   @NonNull CommandService commandService,
+                                   @NonNull ProcessService processService,
+                                   @NonNull ProcessInstanceDao processInstanceDao,
+                                   @NonNull NettyExecutorManager nettyExecutorManager,
+                                   @NonNull ProcessAlertManager processAlertManager,
+                                   @NonNull MasterConfig masterConfig,
+                                   @NonNull StateWheelExecuteThread stateWheelExecuteThread,
+                                   @NonNull CuringParamsService curingParamsService,
+                                   @NonNull TaskInstanceDao taskInstanceDao,
+                                   @NonNull TaskDefinitionLogDao taskDefinitionLogDao) {
         this.processService = processService;
+        this.commandService = commandService;
+        this.processInstanceDao = processInstanceDao;
         this.processInstance = processInstance;
         this.nettyExecutorManager = nettyExecutorManager;
         this.processAlertManager = processAlertManager;
         this.stateWheelExecuteThread = stateWheelExecuteThread;
         this.curingParamsService = curingParamsService;
+        this.taskInstanceDao = taskInstanceDao;
+        this.taskDefinitionLogDao = taskDefinitionLogDao;
         this.masterAddress = NetUtils.getAddr(masterConfig.getListenPort());
         TaskMetrics.registerTaskPrepared(readyToSubmitTaskQueue::size);
     }
@@ -273,36 +281,71 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      * the process start nodes are submitted completely.
      */
     public boolean isStart() {
-        return this.isStart;
+        return WorkflowRunnableStatus.STARTED == workflowRunnableStatus;
     }
 
     /**
      * handle event
      */
     public void handleEvents() {
-        if (!isStart) {
+        if (!isStart()) {
+            log.info(
+                    "The workflow instance is not started, will not handle its state event, current state event size: {}",
+                    stateEvents);
             return;
         }
-        while (!this.stateEvents.isEmpty()) {
+        int loopTimes = stateEvents.size() * 2;
+        for (int i = 0; i < loopTimes; i++) {
+            final StateEvent stateEvent = this.stateEvents.peek();
             try {
-                StateEvent stateEvent = this.stateEvents.peek();
-                LoggerUtils.setWorkflowAndTaskInstanceIDMDC(stateEvent.getProcessInstanceId(), stateEvent.getTaskInstanceId());
-                if (stateEventHandler(stateEvent)) {
+                if (stateEvent == null) {
+                    return;
+                }
+                LoggerUtils.setWorkflowAndTaskInstanceIDMDC(stateEvent.getProcessInstanceId(),
+                        stateEvent.getTaskInstanceId());
+                // if state handle success then will remove this state, otherwise will retry this state next time.
+                // The state should always handle success except database error.
+                checkProcessInstance(stateEvent);
+
+                StateEventHandler stateEventHandler =
+                        StateEventHandlerManager.getStateEventHandler(stateEvent.getType())
+                                .orElseThrow(() -> new StateEventHandleError(
+                                        "Cannot find handler for the given state event"));
+                log.info("Begin to handle state event, {}", stateEvent);
+                if (stateEventHandler.handleStateEvent(this, stateEvent)) {
                     this.stateEvents.remove(stateEvent);
                 }
+            } catch (StateEventHandleError stateEventHandleError) {
+                log.error("State event handle error, will remove this event: {}", stateEvent, stateEventHandleError);
+                this.stateEvents.remove(stateEvent);
+                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
+            } catch (StateEventHandleException stateEventHandleException) {
+                log.error("State event handle error, will retry this event: {}",
+                        stateEvent,
+                        stateEventHandleException);
+                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
+            } catch (StateEventHandleFailure stateEventHandleFailure) {
+                log.error("State event handle failed, will move event to the tail: {}",
+                        stateEvent,
+                        stateEventHandleFailure);
+                this.stateEvents.remove(stateEvent);
+                this.stateEvents.offer(stateEvent);
+                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
             } catch (Exception e) {
-                // we catch the exception here, since if the state event handle failed, the state event will still keep in the stateEvents queue.
-                logger.error("state handle error:", e);
+                // we catch the exception here, since if the state event handle failed, the state event will still keep
+                // in the stateEvents queue.
+                log.error("State event handle error, get a unknown exception, will retry this event: {}",
+                        stateEvent,
+                        e);
+                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
             } finally {
                 LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
-
         }
     }
 
     public String getKey() {
-        if (StringUtils.isNotEmpty(key)
-                || this.processDefinition == null) {
+        if (StringUtils.isNotEmpty(key) || this.processDefinition == null) {
             return key;
         }
 
@@ -315,7 +358,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
 
     public boolean addStateEvent(StateEvent stateEvent) {
         if (processInstance.getId() != stateEvent.getProcessInstanceId()) {
-            logger.info("state event would be abounded :{}", stateEvent);
+            log.info("state event would be abounded :{}", stateEvent);
             return false;
         }
         this.stateEvents.add(stateEvent);
@@ -330,200 +373,122 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         return this.processInstance;
     }
 
-    private boolean stateEventHandler(StateEvent stateEvent) {
-        logger.info("process event: {}", stateEvent);
-
-        if (!checkProcessInstance(stateEvent)) {
-            return false;
-        }
-
-        boolean result = false;
-        switch (stateEvent.getType()) {
-            case PROCESS_STATE_CHANGE:
-                measureProcessState(stateEvent);
-                result = processStateChangeHandler(stateEvent);
-                break;
-            case TASK_STATE_CHANGE:
-                measureTaskState(stateEvent);
-                result = taskStateChangeHandler(stateEvent);
-                break;
-            case PROCESS_TIMEOUT:
-                ProcessInstanceMetrics.incProcessInstanceTimeout();
-                result = processTimeout();
-                break;
-            case TASK_TIMEOUT:
-                TaskMetrics.incTaskTimeout();
-                result = taskTimeout(stateEvent);
-                break;
-            case WAIT_TASK_GROUP:
-                result = checkForceStartAndWakeUp(stateEvent);
-                break;
-            case TASK_RETRY:
-                TaskMetrics.incTaskRetry();
-                result = taskRetryEventHandler(stateEvent);
-                break;
-            case PROCESS_BLOCKED:
-                result = processBlockHandler(stateEvent);
-                break;
-            default:
-                break;
-        }
-
-        if (result) {
-            this.stateEvents.remove(stateEvent);
-        }
-        return result;
-    }
-
-    private boolean checkForceStartAndWakeUp(StateEvent stateEvent) {
+    public boolean checkForceStartAndWakeUp(StateEvent stateEvent) {
         TaskGroupQueue taskGroupQueue = this.processService.loadTaskGroupQueue(stateEvent.getTaskInstanceId());
         if (taskGroupQueue.getForceStart() == Flag.YES.getCode()) {
-            TaskInstance taskInstance = this.processService.findTaskInstanceById(stateEvent.getTaskInstanceId());
+            log.info("Begin to force start taskGroupQueue: {}", taskGroupQueue.getId());
+            TaskInstance taskInstance = this.taskInstanceDao.findTaskInstanceById(stateEvent.getTaskInstanceId());
             ITaskProcessor taskProcessor = activeTaskProcessorMaps.get(taskInstance.getTaskCode());
             taskProcessor.action(TaskAction.DISPATCH);
-            this.processService.updateTaskGroupQueueStatus(taskGroupQueue.getTaskId(), TaskGroupQueueStatus.ACQUIRE_SUCCESS.getCode());
+            this.processService.updateTaskGroupQueueStatus(taskGroupQueue.getTaskId(),
+                    TaskGroupQueueStatus.ACQUIRE_SUCCESS.getCode());
+            log.info("Success force start taskGroupQueue: {}", taskGroupQueue.getId());
             return true;
         }
         if (taskGroupQueue.getInQueue() == Flag.YES.getCode()) {
-            boolean acquireTaskGroup = processService.acquireTaskGroupAgain(taskGroupQueue);
+            log.info("Begin to wake up taskGroupQueue: {}", taskGroupQueue.getId());
+            boolean acquireTaskGroup = processService.robTaskGroupResource(taskGroupQueue);
             if (acquireTaskGroup) {
-                TaskInstance taskInstance = this.processService.findTaskInstanceById(stateEvent.getTaskInstanceId());
+                TaskInstance taskInstance = this.taskInstanceDao.findTaskInstanceById(stateEvent.getTaskInstanceId());
                 ITaskProcessor taskProcessor = activeTaskProcessorMaps.get(taskInstance.getTaskCode());
                 taskProcessor.action(TaskAction.DISPATCH);
+                log.info("Success wake up taskGroupQueue: {}", taskGroupQueue.getId());
                 return true;
             }
-        }
-        return false;
-    }
-
-    private boolean taskTimeout(StateEvent stateEvent) {
-        if (!checkTaskInstanceByStateEvent(stateEvent)) {
+            log.warn("Failed to wake up taskGroupQueue, taskGroupQueueId: {}", taskGroupQueue.getId());
+            return false;
+        } else {
+            log.info(
+                    "Failed to wake up the taskGroupQueue: {}, since the taskGroupQueue is not in queue, will no need to wake up.",
+                    taskGroupQueue);
             return true;
         }
-
-        TaskInstance taskInstance = taskInstanceMap.get(stateEvent.getTaskInstanceId());
-        if (TimeoutFlag.CLOSE == taskInstance.getTaskDefine().getTimeoutFlag()) {
-            return true;
-        }
-        TaskTimeoutStrategy taskTimeoutStrategy = taskInstance.getTaskDefine().getTimeoutNotifyStrategy();
-        if (TaskTimeoutStrategy.FAILED == taskTimeoutStrategy || TaskTimeoutStrategy.WARNFAILED == taskTimeoutStrategy) {
-            ITaskProcessor taskProcessor = activeTaskProcessorMaps.get(taskInstance.getTaskCode());
-            taskProcessor.action(TaskAction.TIMEOUT);
-        }
-        if (TaskTimeoutStrategy.WARN == taskTimeoutStrategy || TaskTimeoutStrategy.WARNFAILED == taskTimeoutStrategy) {
-            ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
-            processAlertManager.sendTaskTimeoutAlert(processInstance, taskInstance, projectUser);
-        }
-        return true;
     }
 
-    private boolean processTimeout() {
+    public void processTimeout() {
         ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
         this.processAlertManager.sendProcessTimeoutAlert(this.processInstance, projectUser);
-        return true;
     }
 
-    private boolean taskStateChangeHandler(StateEvent stateEvent) {
-        if (!checkTaskInstanceByStateEvent(stateEvent)) {
-            return true;
-        }
+    public void taskTimeout(TaskInstance taskInstance) {
+        ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
+        processAlertManager.sendTaskTimeoutAlert(processInstance, taskInstance, projectUser);
+    }
 
-        Optional<TaskInstance> taskInstanceOptional = getTaskInstance(stateEvent.getTaskInstanceId());
-        TaskInstance task = taskInstanceOptional.orElseThrow(
-                () -> new RuntimeException("Cannot find task instance by task instance id: " + stateEvent.getTaskInstanceId()));
+    public void taskFinished(TaskInstance taskInstance) throws StateEventHandleException {
+        log.info("TaskInstance finished task code:{} state:{}", taskInstance.getTaskCode(), taskInstance.getState());
+        try {
 
-        if (task.getState() == null) {
-            logger.error("task state is null, state handler error: {}", stateEvent);
-            return true;
-        }
+            activeTaskProcessorMaps.remove(taskInstance.getTaskCode());
+            stateWheelExecuteThread.removeTask4TimeoutCheck(processInstance, taskInstance);
+            stateWheelExecuteThread.removeTask4RetryCheck(processInstance, taskInstance);
+            stateWheelExecuteThread.removeTask4StateCheck(processInstance, taskInstance);
 
-        if (task.getState().typeIsFinished()) {
-            if (completeTaskMap.containsKey(task.getTaskCode()) && completeTaskMap.get(task.getTaskCode()) == task.getId()) {
-                logger.warn("The task instance is already complete, stateEvent: {}", stateEvent);
-                return true;
-            }
-            taskFinished(task);
-            if (task.getTaskGroupId() > 0) {
-                releaseTaskGroup(task);
-            }
-            return true;
-        }
-        if (activeTaskProcessorMaps.containsKey(task.getTaskCode())) {
-            ITaskProcessor iTaskProcessor = activeTaskProcessorMaps.get(task.getTaskCode());
-            iTaskProcessor.action(TaskAction.RUN);
-
-            if (iTaskProcessor.taskInstance().getState().typeIsFinished()) {
-                if (iTaskProcessor.taskInstance().getState() != task.getState()) {
-                    task.setState(iTaskProcessor.taskInstance().getState());
+            if (taskInstance.getState().isSuccess()) {
+                completeTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
+                // todo: merge the last taskInstance
+                processInstance.setVarPool(taskInstance.getVarPool());
+                processInstanceDao.upsertProcessInstance(processInstance);
+                // save the cacheKey only if the task is defined as cache task and the task is success
+                if (taskInstance.getIsCache().equals(Flag.YES)) {
+                    saveCacheTaskInstance(taskInstance);
                 }
-                taskFinished(task);
-            }
-            return true;
-        }
-        logger.error("state handler error: {}", stateEvent);
-
-        return true;
-    }
-
-    private void taskFinished(TaskInstance taskInstance) {
-        logger.info("TaskInstance finished task code:{} state:{} ",
-            taskInstance.getTaskCode(),
-            taskInstance.getState());
-
-        activeTaskProcessorMaps.remove(taskInstance.getTaskCode());
-        stateWheelExecuteThread.removeTask4TimeoutCheck(processInstance, taskInstance);
-        stateWheelExecuteThread.removeTask4RetryCheck(processInstance, taskInstance);
-        stateWheelExecuteThread.removeTask4StateCheck(processInstance, taskInstance);
-
-        if (taskInstance.getState().typeIsSuccess()) {
-            completeTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
-            // todo: merge the last taskInstance
-            processInstance.setVarPool(taskInstance.getVarPool());
-            processService.saveProcessInstance(processInstance);
-            if (!processInstance.isBlocked()) {
-                submitPostNode(Long.toString(taskInstance.getTaskCode()));
-            }
-        } else if (taskInstance.taskCanRetry() && processInstance.getState() != ExecutionStatus.READY_STOP) {
-            // retry task
-            logger.info("Retry taskInstance taskInstance state: {}", taskInstance.getState());
-            retryTaskInstance(taskInstance);
-        } else if (taskInstance.getState().typeIsFailure()) {
-            completeTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
-            // There are child nodes and the failure policy is: CONTINUE
-            if (processInstance.getFailureStrategy() == FailureStrategy.CONTINUE
-                && DagHelper.haveAllNodeAfterNode(Long.toString(taskInstance.getTaskCode()), dag)) {
-                submitPostNode(Long.toString(taskInstance.getTaskCode()));
-            } else {
+                if (!processInstance.isBlocked()) {
+                    submitPostNode(Long.toString(taskInstance.getTaskCode()));
+                }
+            } else if (taskInstance.taskCanRetry() && !processInstance.getState().isReadyStop()) {
+                // retry task
+                log.info("Retry taskInstance taskInstance state: {}", taskInstance.getState());
+                retryTaskInstance(taskInstance);
+            } else if (taskInstance.getState().isFailure()) {
+                completeTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
                 errorTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
-                if (processInstance.getFailureStrategy() == FailureStrategy.END) {
-                    killAllTasks();
+                // There are child nodes and the failure policy is: CONTINUE
+                if (processInstance.getFailureStrategy() == FailureStrategy.CONTINUE && DagHelper.haveAllNodeAfterNode(
+                        Long.toString(taskInstance.getTaskCode()),
+                        dag)) {
+                    submitPostNode(Long.toString(taskInstance.getTaskCode()));
+                } else {
+                    if (processInstance.getFailureStrategy() == FailureStrategy.END) {
+                        killAllTasks();
+                    }
                 }
+            } else if (taskInstance.getState().isFinished()) {
+                // todo: when the task instance type is pause, then it should not in completeTaskMap
+                completeTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
             }
-        } else if (taskInstance.getState().typeIsFinished()) {
-            // todo: when the task instance type is pause, then it should not in completeTaskMap
-            completeTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
-        }
+            log.info("TaskInstance finished will try to update the workflow instance state, task code:{} state:{}",
+                    taskInstance.getTaskCode(),
+                    taskInstance.getState());
+            this.updateProcessInstanceState();
 
-        this.updateProcessInstanceState();
+            sendTaskLogOnMasterToRemoteIfNeeded(taskInstance.getLogPath(), taskInstance.getHost());
+        } catch (Exception ex) {
+            log.error("Task finish failed, get a exception, will remove this taskInstance from completeTaskMap", ex);
+            // remove the task from complete map, so that we can finish in the next time.
+            completeTaskMap.remove(taskInstance.getTaskCode());
+            throw ex;
+        }
     }
 
     /**
      * release task group
      *
-     * @param taskInstance
      */
-    private void releaseTaskGroup(TaskInstance taskInstance) {
+    public void releaseTaskGroup(TaskInstance taskInstance) {
         if (taskInstance.getTaskGroupId() > 0) {
             TaskInstance nextTaskInstance = this.processService.releaseTaskGroup(taskInstance);
             if (nextTaskInstance != null) {
                 if (nextTaskInstance.getProcessInstanceId() == taskInstance.getProcessInstanceId()) {
-                    StateEvent nextEvent = new StateEvent();
-                    nextEvent.setProcessInstanceId(this.processInstance.getId());
-                    nextEvent.setTaskInstanceId(nextTaskInstance.getId());
-                    nextEvent.setType(StateEventType.WAIT_TASK_GROUP);
+                    TaskStateEvent nextEvent = TaskStateEvent.builder()
+                            .processInstanceId(processInstance.getId())
+                            .taskInstanceId(nextTaskInstance.getId())
+                            .type(StateEventType.WAKE_UP_TASK_GROUP)
+                            .build();
                     this.stateEvents.add(nextEvent);
                 } else {
-                    ProcessInstance processInstance = this.processService.findProcessInstanceById(nextTaskInstance.getProcessInstanceId());
+                    ProcessInstance processInstance =
+                            this.processService.findProcessInstanceById(nextTaskInstance.getProcessInstanceId());
                     this.processService.sendStartTask2Master(processInstance, nextTaskInstance.getId(),
                             org.apache.dolphinscheduler.remote.command.CommandType.TASK_WAKEUP_EVENT_REQUEST);
                 }
@@ -534,25 +499,24 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
     /**
      * crate new task instance to retry, different objects from the original
      *
-     * @param taskInstance
      */
-    private void retryTaskInstance(TaskInstance taskInstance) {
+    private void retryTaskInstance(TaskInstance taskInstance) throws StateEventHandleException {
         if (!taskInstance.taskCanRetry()) {
             return;
         }
         TaskInstance newTaskInstance = cloneRetryTaskInstance(taskInstance);
         if (newTaskInstance == null) {
-            logger.error("retry fail, new taskInstance is null, task code:{}, task id:{}", taskInstance.getTaskCode(), taskInstance.getId());
+            log.error("Retry task fail because new taskInstance is null, task code:{}, task id:{}",
+                    taskInstance.getTaskCode(),
+                    taskInstance.getId());
             return;
         }
         waitToRetryTaskInstanceMap.put(newTaskInstance.getTaskCode(), newTaskInstance);
         if (!taskInstance.retryTaskIntervalOverTime()) {
-            logger.info("failure task will be submitted: process id: {}, task instance code: {} state:{} retry times:{} / {}, interval:{}",
-                    processInstance.getId(),
-                    newTaskInstance.getTaskCode(),
-                    newTaskInstance.getState(),
-                    newTaskInstance.getRetryTimes(),
-                    newTaskInstance.getMaxRetryTimes(),
+            log.info(
+                    "Failure task will be submitted, process id: {}, task instance code: {}, state: {}, retry times: {} / {}, interval: {}",
+                    processInstance.getId(), newTaskInstance.getTaskCode(),
+                    newTaskInstance.getState(), newTaskInstance.getRetryTimes(), newTaskInstance.getMaxRetryTimes(),
                     newTaskInstance.getRetryInterval());
             stateWheelExecuteThread.addTask4TimeoutCheck(processInstance, newTaskInstance);
             stateWheelExecuteThread.addTask4RetryCheck(processInstance, newTaskInstance);
@@ -564,25 +528,14 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
     }
 
     /**
-     * handle task retry event
-     *
-     * @param stateEvent
-     * @return
-     */
-    private boolean taskRetryEventHandler(StateEvent stateEvent) {
-        TaskInstance taskInstance = waitToRetryTaskInstanceMap.get(stateEvent.getTaskCode());
-        addTaskToStandByList(taskInstance);
-        submitStandByTask();
-        waitToRetryTaskInstanceMap.remove(stateEvent.getTaskCode());
-        return true;
-    }
-
-    /**
      * update process instance
      */
     public void refreshProcessInstance(int processInstanceId) {
-        logger.info("process instance update: {}", processInstanceId);
-        processInstance = processService.findProcessInstanceById(processInstanceId);
+        log.info("process instance update: {}", processInstanceId);
+        ProcessInstance newProcessInstance = processService.findProcessInstanceById(processInstanceId);
+        // just update the processInstance field(this is soft copy)
+        BeanUtils.copyProperties(newProcessInstance, processInstance);
+
         processDefinition = processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion());
         processInstance.setProcessDefinition(processDefinition);
@@ -592,10 +545,10 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      * update task instance
      */
     public void refreshTaskInstance(int taskInstanceId) {
-        logger.info("task instance update: {} ", taskInstanceId);
-        TaskInstance taskInstance = processService.findTaskInstanceById(taskInstanceId);
+        log.info("task instance update: {} ", taskInstanceId);
+        TaskInstance taskInstance = taskInstanceDao.findTaskInstanceById(taskInstanceId);
         if (taskInstance == null) {
-            logger.error("can not find task instance, id:{}", taskInstanceId);
+            log.error("can not find task instance, id:{}", taskInstanceId);
             return;
         }
         processService.packageTaskInstance(taskInstance, processInstance);
@@ -610,45 +563,23 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
     /**
      * check process instance by state event
      */
-    public boolean checkProcessInstance(StateEvent stateEvent) {
+    public void checkProcessInstance(StateEvent stateEvent) throws StateEventHandleError {
         if (this.processInstance.getId() != stateEvent.getProcessInstanceId()) {
-            logger.error("mismatch process instance id: {}, state event:{}",
-                    this.processInstance.getId(),
-                    stateEvent);
-            return false;
+            throw new StateEventHandleError("The event doesn't contains process instance id");
         }
-        return true;
     }
 
     /**
      * check if task instance exist by state event
      */
-    public boolean checkTaskInstanceByStateEvent(StateEvent stateEvent) {
-        if (stateEvent.getTaskInstanceId() == 0) {
-            logger.error("task instance id null, state event:{}", stateEvent);
-            return false;
+    public void checkTaskInstanceByStateEvent(TaskStateEvent stateEvent) throws StateEventHandleError {
+        if (stateEvent.getTaskInstanceId() == null || stateEvent.getTaskInstanceId() == 0) {
+            throw new StateEventHandleError("The taskInstanceId is 0");
         }
 
         if (!taskInstanceMap.containsKey(stateEvent.getTaskInstanceId())) {
-            logger.error("mismatch task instance id, event:{}", stateEvent);
-            return false;
+            throw new StateEventHandleError("Cannot find the taskInstance from taskInstanceMap");
         }
-        return true;
-    }
-
-    /**
-     * check if task instance exist by task code
-     */
-    public boolean checkTaskInstanceByCode(long taskCode) {
-        if (taskInstanceMap.isEmpty()) {
-            return false;
-        }
-        for (TaskInstance taskInstance : taskInstanceMap.values()) {
-            if (taskInstance.getTaskCode() == taskCode) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
@@ -665,10 +596,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      * get task instance from memory
      */
     public Optional<TaskInstance> getTaskInstance(int taskInstanceId) {
-        if (taskInstanceMap.containsKey(taskInstanceId)) {
-            return Optional.ofNullable(taskInstanceMap.get(taskInstanceId));
-        }
-        return Optional.empty();
+        return Optional.ofNullable(taskInstanceMap.get(taskInstanceId));
     }
 
     public Optional<TaskInstance> getTaskInstance(long taskCode) {
@@ -684,8 +612,9 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
     }
 
     public Optional<TaskInstance> getActiveTaskInstanceByTaskCode(long taskCode) {
-        if (activeTaskProcessorMaps.containsKey(taskCode)) {
-            return Optional.ofNullable(activeTaskProcessorMaps.get(taskCode).taskInstance());
+        Integer taskInstanceId = validTaskMap.get(taskCode);
+        if (taskInstanceId != null) {
+            return Optional.ofNullable(taskInstanceMap.get(taskInstanceId));
         }
         return Optional.empty();
     }
@@ -697,91 +626,46 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         return Optional.empty();
     }
 
-    private boolean processStateChangeHandler(StateEvent stateEvent) {
-        try {
-            logger.info("process:{} state {} change to {}", processInstance.getId(), processInstance.getState(), stateEvent.getExecutionStatus());
-
-            if (stateEvent.getExecutionStatus() == ExecutionStatus.STOP) {
-                // serial wait execution type needs to wake up the waiting process
-                if (processDefinition.getExecutionType().typeIsSerialWait() || processDefinition.getExecutionType().typeIsSerialPriority()) {
-                    endProcess();
-                    return true;
-                }
-                this.updateProcessInstanceState(stateEvent);
-                return true;
-            }
-            if (processComplementData()) {
-                return true;
-            }
-            if (stateEvent.getExecutionStatus().typeIsFinished()) {
-                endProcess();
-            }
-            if (processInstance.getState() == ExecutionStatus.READY_STOP) {
-                killAllTasks();
-            }
-            return true;
-        } catch (Exception e) {
-            logger.error("process state change error:", e);
-        }
-        return true;
+    public void processBlock() {
+        ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
+        processAlertManager.sendProcessBlockingAlert(processInstance, projectUser);
+        log.info("processInstance {} block alert send successful!", processInstance.getId());
     }
 
-    private boolean processBlockHandler(StateEvent stateEvent) {
-        try {
-            Optional<TaskInstance> taskInstanceOptional = getTaskInstance(stateEvent.getTaskInstanceId());
-            TaskInstance task = taskInstanceOptional.orElseThrow(
-                    () -> new RuntimeException("Cannot find taskInstance by taskInstanceId:" + stateEvent.getTaskInstanceId()));
-            if (!checkTaskInstanceByStateEvent(stateEvent)) {
-                logger.error("task {} is not a blocking task", task.getTaskCode());
-                return false;
-            }
-
-            BlockingParameters parameters = JSONUtils.parseObject(task.getTaskParams(), BlockingParameters.class);
-            if (parameters.isAlertWhenBlocking()) {
-                ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
-                processAlertManager.sendProcessBlockingAlert(processInstance, projectUser);
-                logger.info("processInstance {} block alert send successful!", processInstance.getId());
-            }
-        } catch (Exception e) {
-            logger.error("sending blocking message error:", e);
-        }
-        return true;
-    }
-
-    private boolean processComplementData() throws Exception {
+    public boolean processComplementData() {
         if (!needComplementProcess()) {
             return false;
         }
 
-        if (processInstance.getState() == ExecutionStatus.READY_STOP) {
+        // when the serial complement is executed, the next complement instance is created,
+        // and this method does not need to be executed when the parallel complement is used.
+        if (processInstance.getState().isReadyStop() || !processInstance.getState().isFinished()) {
             return false;
         }
 
         Date scheduleDate = processInstance.getScheduleTime();
         if (scheduleDate == null) {
             scheduleDate = complementListDate.get(0);
-        } else if (processInstance.getState().typeIsFinished()) {
+        } else if (processInstance.getState().isFinished()) {
             endProcess();
             if (complementListDate.isEmpty()) {
-                logger.info("process complement end. process id:{}", processInstance.getId());
+                log.info("process complement end. process id:{}", processInstance.getId());
                 return true;
             }
             int index = complementListDate.indexOf(scheduleDate);
-            if (index >= complementListDate.size() - 1 || !processInstance.getState().typeIsSuccess()) {
-                logger.info("process complement end. process id:{}", processInstance.getId());
+            if (index >= complementListDate.size() - 1 || !processInstance.getState().isSuccess()) {
+                log.info("process complement end. process id:{}", processInstance.getId());
                 // complement data ends || no success
                 return true;
             }
-            logger.info("process complement continue. process id:{}, schedule time:{} complementListDate:{}",
-                    processInstance.getId(),
-                    processInstance.getScheduleTime(),
-                    complementListDate);
+            log.info("process complement continue. process id:{}, schedule time:{} complementListDate:{}",
+                    processInstance.getId(), processInstance.getScheduleTime(), complementListDate);
             scheduleDate = complementListDate.get(index + 1);
         }
-        //the next process complement
+        // the next process complement
         int create = this.createComplementDataCommand(scheduleDate);
         if (create > 0) {
-            logger.info("create complement data command successfully.");
+            log.info("create complement data command successfully.");
         }
         return true;
     }
@@ -792,18 +676,19 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         command.setCommandType(CommandType.COMPLEMENT_DATA);
         command.setProcessDefinitionCode(processInstance.getProcessDefinitionCode());
         Map<String, String> cmdParam = JSONUtils.toMap(processInstance.getCommandParam());
-        if (cmdParam.containsKey(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING)) {
-            cmdParam.remove(Constants.CMD_PARAM_RECOVERY_START_NODE_STRING);
+        if (cmdParam.containsKey(CMD_PARAM_RECOVERY_START_NODE_STRING)) {
+            cmdParam.remove(CMD_PARAM_RECOVERY_START_NODE_STRING);
         }
 
-        if (cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)) {
-            cmdParam.replace(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST,
-                cmdParam.get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)
-                    .substring(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST).indexOf(COMMA) + 1));
+        if (cmdParam.containsKey(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)) {
+            cmdParam.replace(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST,
+                    cmdParam.get(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)
+                            .substring(cmdParam.get(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST).indexOf(COMMA) + 1));
         }
 
-        if (cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_START_DATE)) {
-            cmdParam.replace(CMDPARAM_COMPLEMENT_DATA_START_DATE, DateUtils.format(scheduleDate, YYYY_MM_DD_HH_MM_SS, null));
+        if (cmdParam.containsKey(CMD_PARAM_COMPLEMENT_DATA_START_DATE)) {
+            cmdParam.replace(CMD_PARAM_COMPLEMENT_DATA_START_DATE,
+                    DateUtils.format(scheduleDate, YYYY_MM_DD_HH_MM_SS, null));
         }
         command.setCommandParam(JSONUtils.toJsonString(cmdParam));
         command.setTaskDependType(processInstance.getTaskDependType());
@@ -819,15 +704,13 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         command.setDryRun(processInstance.getDryRun());
         command.setProcessInstanceId(0);
         command.setProcessDefinitionVersion(processInstance.getProcessDefinitionVersion());
-        return processService.createCommand(command);
+        command.setTestFlag(processInstance.getTestFlag());
+        processService.saveCommandTrigger(command.getId(), processInstance.getId());
+        return commandService.createCommand(command);
     }
 
     private boolean needComplementProcess() {
-        if (processInstance.isComplementData()
-                && Flag.NO == processInstance.getIsSubProcess()) {
-            return true;
-        }
-        return false;
+        return processInstance.isComplementData() && Flag.NO == processInstance.getIsSubProcess();
     }
 
     /**
@@ -835,20 +718,32 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      */
     @Override
     public WorkflowSubmitStatue call() {
-        if (this.taskInstanceMap.size() > 0 || isStart) {
-            logger.warn("The workflow has already been started");
+        if (isStart()) {
+            // This case should not been happened
+            log.warn("[WorkflowInstance-{}] The workflow has already been started", processInstance.getId());
             return WorkflowSubmitStatue.DUPLICATED_SUBMITTED;
         }
 
         try {
             LoggerUtils.setWorkflowInstanceIdMDC(processInstance.getId());
-            buildFlowDag();
-            initTaskQueue();
-            submitPostNode(null);
-            isStart = true;
+            if (workflowRunnableStatus == WorkflowRunnableStatus.CREATED) {
+                buildFlowDag();
+                workflowRunnableStatus = WorkflowRunnableStatus.INITIALIZE_DAG;
+                log.info("workflowStatue changed to :{}", workflowRunnableStatus);
+            }
+            if (workflowRunnableStatus == WorkflowRunnableStatus.INITIALIZE_DAG) {
+                initTaskQueue();
+                workflowRunnableStatus = WorkflowRunnableStatus.INITIALIZE_QUEUE;
+                log.info("workflowStatue changed to :{}", workflowRunnableStatus);
+            }
+            if (workflowRunnableStatus == WorkflowRunnableStatus.INITIALIZE_QUEUE) {
+                submitPostNode(null);
+                workflowRunnableStatus = WorkflowRunnableStatus.STARTED;
+                log.info("workflowStatue changed to :{}", workflowRunnableStatus);
+            }
             return WorkflowSubmitStatue.SUCCESS;
         } catch (Exception e) {
-            logger.error("Start workflow error", e);
+            log.error("Start workflow error", e);
             return WorkflowSubmitStatue.FAILED;
         } finally {
             LoggerUtils.removeWorkflowInstanceIdMDC();
@@ -860,18 +755,17 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      */
     public void endProcess() {
         this.stateEvents.clear();
-        if (processDefinition.getExecutionType().typeIsSerialWait() || processDefinition.getExecutionType().typeIsSerialPriority()) {
+        if (processDefinition.getExecutionType().typeIsSerialWait() || processDefinition.getExecutionType()
+                .typeIsSerialPriority()) {
             checkSerialProcess(processDefinition);
         }
-        if (processInstance.getState().typeIsWaitingThread()) {
-            processService.createRecoveryWaitingThreadCommand(null, processInstance);
-        }
-        if (processAlertManager.isNeedToSendWarning(processInstance)) {
-            ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
-            processAlertManager.sendAlertProcessInstance(processInstance, getValidTaskList(), projectUser);
+        ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
+        processAlertManager.sendAlertProcessInstance(processInstance, getValidTaskList(), projectUser);
+        if (processInstance.getState().isSuccess()) {
+            processAlertManager.closeAlert(processInstance);
         }
         if (checkTaskQueue()) {
-            //release task group
+            // release task group
             processService.releaseAllTaskGroup(processInstance.getId());
         }
     }
@@ -879,18 +773,22 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
     public void checkSerialProcess(ProcessDefinition processDefinition) {
         int nextInstanceId = processInstance.getNextProcessInstanceId();
         if (nextInstanceId == 0) {
-            ProcessInstance nextProcessInstance = this.processService.loadNextProcess4Serial(processInstance.getProcessDefinition().getCode(), ExecutionStatus.SERIAL_WAIT.getCode(), processInstance.getId());
+            ProcessInstance nextProcessInstance =
+                    this.processService.loadNextProcess4Serial(processInstance.getProcessDefinition().getCode(),
+                            WorkflowExecutionStatus.SERIAL_WAIT.getCode(), processInstance.getId());
             if (nextProcessInstance == null) {
                 return;
             }
-            ProcessInstance nextReadyStopProcessInstance = this.processService.loadNextProcess4Serial(processInstance.getProcessDefinition().getCode(), ExecutionStatus.READY_STOP.getCode(), processInstance.getId());
+            ProcessInstance nextReadyStopProcessInstance =
+                    this.processService.loadNextProcess4Serial(processInstance.getProcessDefinition().getCode(),
+                            WorkflowExecutionStatus.READY_STOP.getCode(), processInstance.getId());
             if (processDefinition.getExecutionType().typeIsSerialPriority() && nextReadyStopProcessInstance != null) {
                 return;
             }
             nextInstanceId = nextProcessInstance.getId();
         }
         ProcessInstance nextProcessInstance = this.processService.findProcessInstanceById(nextInstanceId);
-        if (nextProcessInstance.getState().typeIsFinished() || nextProcessInstance.getState().typeIsRunning()) {
+        if (nextProcessInstance.getState().isFinished() || nextProcessInstance.getState().isRunning()) {
             return;
         }
         Map<String, Object> cmdParam = new HashMap<>();
@@ -901,7 +799,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         command.setProcessDefinitionCode(processDefinition.getCode());
         command.setProcessDefinitionVersion(processDefinition.getVersion());
         command.setCommandParam(JSONUtils.toJsonString(cmdParam));
-        processService.createCommand(command);
+        commandService.createCommand(command);
     }
 
     /**
@@ -910,17 +808,16 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      * @throws Exception exception
      */
     private void buildFlowDag() throws Exception {
-        if (this.dag != null) {
-            return;
-        }
         processDefinition = processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion());
         processInstance.setProcessDefinition(processDefinition);
 
         List<TaskInstance> recoverNodeList = getRecoverTaskInstanceList(processInstance.getCommandParam());
 
-        List<ProcessTaskRelation> processTaskRelations = processService.findRelationByCode(processDefinition.getCode(), processDefinition.getVersion());
-        List<TaskDefinitionLog> taskDefinitionLogs = processService.getTaskDefineLogListByRelation(processTaskRelations);
+        List<ProcessTaskRelation> processTaskRelations =
+                processService.findRelationByCode(processDefinition.getCode(), processDefinition.getVersion());
+        List<TaskDefinitionLog> taskDefinitionLogs =
+                taskDefinitionLogDao.getTaskDefineLogListByRelation(processTaskRelations);
         List<TaskNode> taskNodeList = processService.transformTask(processTaskRelations, taskDefinitionLogs);
         forbiddenTaskMap.clear();
 
@@ -930,68 +827,97 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             }
         });
 
+        taskNodesMap = taskNodeList.stream().collect(Collectors.toMap(TaskNode::getCode, taskNode -> taskNode));
+
         // generate process to get DAG info
         List<String> recoveryNodeCodeList = getRecoveryNodeCodeList(recoverNodeList);
         List<String> startNodeNameList = parseStartNodeName(processInstance.getCommandParam());
-        ProcessDag processDag = generateFlowDag(taskNodeList,
-                startNodeNameList, recoveryNodeCodeList, processInstance.getTaskDependType());
+        ProcessDag processDag = generateFlowDag(taskNodeList, startNodeNameList, recoveryNodeCodeList,
+                processInstance.getTaskDependType());
         if (processDag == null) {
-            logger.error("processDag is null");
+            log.error("ProcessDag is null");
             return;
         }
         // generate process dag
         dag = DagHelper.buildDagGraph(processDag);
+        log.info("Build dag success, dag: {}", dag);
     }
 
     /**
      * init task queue
      */
-    private void initTaskQueue() {
+    private void initTaskQueue() throws StateEventHandleException, CronParseException {
 
         taskFailedSubmit = false;
         activeTaskProcessorMaps.clear();
-        dependFailedTaskMap.clear();
+        dependFailedTaskSet.clear();
         completeTaskMap.clear();
         errorTaskMap.clear();
 
         if (!isNewProcessInstance()) {
-            List<TaskInstance> validTaskInstanceList = processService.findValidTaskListByProcessId(processInstance.getId());
+            log.info("The workflowInstance is not a newly running instance, runtimes: {}, recover flag: {}",
+                    processInstance.getRunTimes(),
+                    processInstance.getRecovery());
+            List<TaskInstance> validTaskInstanceList =
+                    taskInstanceDao.findValidTaskListByProcessId(processInstance.getId(),
+                            processInstance.getTestFlag());
             for (TaskInstance task : validTaskInstanceList) {
-                if (validTaskMap.containsKey(task.getTaskCode())) {
-                    int oldTaskInstanceId = validTaskMap.get(task.getTaskCode());
-                    TaskInstance oldTaskInstance = taskInstanceMap.get(oldTaskInstanceId);
-                    if (!oldTaskInstance.getState().typeIsFinished() && task.getState().typeIsFinished()) {
-                        task.setFlag(Flag.NO);
-                        processService.updateTaskInstance(task);
+                try {
+                    LoggerUtils.setWorkflowAndTaskInstanceIDMDC(task.getProcessInstanceId(), task.getId());
+                    log.info(
+                            "Check the taskInstance from a exist workflowInstance, existTaskInstanceCode: {}, taskInstanceStatus: {}",
+                            task.getTaskCode(),
+                            task.getState());
+                    if (validTaskMap.containsKey(task.getTaskCode())) {
+                        log.warn(
+                                "Have same taskCode taskInstance when init task queue, need to check taskExecutionStatus, taskCode:{}",
+                                task.getTaskCode());
+                        int oldTaskInstanceId = validTaskMap.get(task.getTaskCode());
+                        TaskInstance oldTaskInstance = taskInstanceMap.get(oldTaskInstanceId);
+                        if (!oldTaskInstance.getState().isFinished() && task.getState().isFinished()) {
+                            task.setFlag(Flag.NO);
+                            taskInstanceDao.updateTaskInstance(task);
+                            continue;
+                        }
+                    }
+
+                    validTaskMap.put(task.getTaskCode(), task.getId());
+                    taskInstanceMap.put(task.getId(), task);
+
+                    if (task.isTaskComplete()) {
+                        log.info("TaskInstance is already complete.");
+                        completeTaskMap.put(task.getTaskCode(), task.getId());
                         continue;
                     }
-                    logger.warn("have same taskCode taskInstance when init task queue, taskCode:{}", task.getTaskCode());
-                }
-
-                validTaskMap.put(task.getTaskCode(), task.getId());
-                taskInstanceMap.put(task.getId(), task);
-
-                if (task.isTaskComplete()) {
-                    completeTaskMap.put(task.getTaskCode(), task.getId());
-                    continue;
-                }
-                if (task.isConditionsTask() || DagHelper.haveConditionsAfterNode(Long.toString(task.getTaskCode()), dag)) {
-                    continue;
-                }
-                if (task.taskCanRetry()) {
-                    if (task.getState() == ExecutionStatus.NEED_FAULT_TOLERANCE) {
-                        // tolerantTaskInstance add to standby list directly
-                        TaskInstance tolerantTaskInstance = cloneTolerantTaskInstance(task);
-                        addTaskToStandByList(tolerantTaskInstance);
-                    } else {
-                        retryTaskInstance(task);
+                    if (task.isConditionsTask() || DagHelper.haveConditionsAfterNode(Long.toString(task.getTaskCode()),
+                            dag)) {
+                        continue;
                     }
-                    continue;
-                }
-                if (task.getState().typeIsFailure()) {
-                    errorTaskMap.put(task.getTaskCode(), task.getId());
+                    if (task.taskCanRetry()) {
+                        if (task.getState().isNeedFaultTolerance()) {
+                            log.info("TaskInstance needs fault tolerance, will be added to standby list.");
+                            task.setFlag(Flag.NO);
+                            taskInstanceDao.updateTaskInstance(task);
+
+                            // tolerantTaskInstance add to standby list directly
+                            TaskInstance tolerantTaskInstance = cloneTolerantTaskInstance(task);
+                            addTaskToStandByList(tolerantTaskInstance);
+                        } else {
+                            log.info("Retry taskInstance, taskState: {}", task.getState());
+                            retryTaskInstance(task);
+                        }
+                        continue;
+                    }
+                    if (task.getState().isFailure()) {
+                        errorTaskMap.put(task.getTaskCode(), task.getId());
+                    }
+                } finally {
+                    LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
                 }
             }
+            clearDataIfExecuteTask();
+        } else {
+            log.info("The current workflowInstance is a newly running workflowInstance");
         }
 
         if (processInstance.isComplementData() && complementListDate.isEmpty()) {
@@ -1002,19 +928,21 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
 
                 Date start = null;
                 Date end = null;
-                if (cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_START_DATE) && cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_END_DATE)) {
-                    start = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_START_DATE));
-                    end = DateUtils.stringToDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE));
+                if (cmdParam.containsKey(CMD_PARAM_COMPLEMENT_DATA_START_DATE)
+                        && cmdParam.containsKey(CMD_PARAM_COMPLEMENT_DATA_END_DATE)) {
+                    start = DateUtils.stringToDate(cmdParam.get(CMD_PARAM_COMPLEMENT_DATA_START_DATE));
+                    end = DateUtils.stringToDate(cmdParam.get(CMD_PARAM_COMPLEMENT_DATA_END_DATE));
                 }
-                List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionCode(processInstance.getProcessDefinitionCode());
                 if (complementListDate.isEmpty() && needComplementProcess()) {
                     if (start != null && end != null) {
+                        List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionCode(
+                                processInstance.getProcessDefinitionCode());
                         complementListDate = CronUtils.getSelfFireDateList(start, end, schedules);
                     }
-                    if (cmdParam.containsKey(CMDPARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)) {
+                    if (cmdParam.containsKey(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)) {
                         complementListDate = CronUtils.getSelfScheduleDateList(cmdParam);
                     }
-                    logger.info(" process definition code:{} complement data: {}",
+                    log.info(" process definition code:{} complement data: {}",
                             processInstance.getProcessDefinitionCode(), complementListDate);
 
                     if (!complementListDate.isEmpty() && Flag.NO == processInstance.getIsSubProcess()) {
@@ -1022,13 +950,19 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                         String globalParams = curingParamsService.curingGlobalParams(processInstance.getId(),
                                 processDefinition.getGlobalParamMap(),
                                 processDefinition.getGlobalParamList(),
-                                CommandType.COMPLEMENT_DATA, processInstance.getScheduleTime(), cmdParam.get(Constants.SCHEDULE_TIMEZONE));
+                                CommandType.COMPLEMENT_DATA,
+                                processInstance.getScheduleTime(),
+                                cmdParam.get(Constants.SCHEDULE_TIMEZONE));
                         processInstance.setGlobalParams(globalParams);
-                        processService.updateProcessInstance(processInstance);
+                        processInstanceDao.updateProcessInstance(processInstance);
                     }
                 }
             }
         }
+        log.info("Initialize task queue, dependFailedTaskSet: {}, completeTaskMap: {}, errorTaskMap: {}",
+                dependFailedTaskSet,
+                completeTaskMap,
+                errorTaskMap);
     }
 
     /**
@@ -1045,26 +979,27 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             ITaskProcessor taskProcessor = TaskProcessorFactory.getTaskProcessor(taskInstance.getTaskType());
             taskProcessor.init(taskInstance, processInstance);
 
-            if (taskInstance.getState() == ExecutionStatus.RUNNING_EXECUTION
+            if (taskInstance.getState().isRunning()
                     && taskProcessor.getType().equalsIgnoreCase(Constants.COMMON_TASK_TYPE)) {
                 notifyProcessHostUpdate(taskInstance);
             }
 
             boolean submit = taskProcessor.action(TaskAction.SUBMIT);
             if (!submit) {
-                logger.error("process id:{} name:{} submit standby task id:{} name:{} failed!",
-                        processInstance.getId(), processInstance.getName(),
-                        taskInstance.getId(), taskInstance.getName());
+                log.error("Submit standby task failed!, taskCode: {}, taskName: {}",
+                        taskInstance.getTaskCode(),
+                        taskInstance.getName());
                 return Optional.empty();
             }
 
             // in a dag, only one taskInstance is valid per taskCode, so need to set the old taskInstance invalid
+            LoggerUtils.setWorkflowAndTaskInstanceIDMDC(taskInstance.getProcessInstanceId(), taskInstance.getId());
             if (validTaskMap.containsKey(taskInstance.getTaskCode())) {
                 int oldTaskInstanceId = validTaskMap.get(taskInstance.getTaskCode());
                 if (taskInstance.getId() != oldTaskInstanceId) {
                     TaskInstance oldTaskInstance = taskInstanceMap.get(oldTaskInstanceId);
                     oldTaskInstance.setFlag(Flag.NO);
-                    processService.updateTaskInstance(oldTaskInstance);
+                    taskInstanceDao.updateTaskInstance(oldTaskInstance);
                     validTaskMap.remove(taskInstance.getTaskCode());
                     activeTaskProcessorMaps.remove(taskInstance.getTaskCode());
                 }
@@ -1073,31 +1008,62 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             validTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
             taskInstanceMap.put(taskInstance.getId(), taskInstance);
             activeTaskProcessorMaps.put(taskInstance.getTaskCode(), taskProcessor);
+
+            // if we use task group, then need to acquire the task group resource
+            // if there is no resource the current task instance will not be dispatched
+            // it will be wakeup when other tasks release the resource.
+            int taskGroupId = taskInstance.getTaskGroupId();
+            if (taskGroupId > 0) {
+                boolean acquireTaskGroup = processService.acquireTaskGroup(taskInstance.getId(),
+                        taskInstance.getName(),
+                        taskGroupId,
+                        taskInstance.getProcessInstanceId(),
+                        taskInstance.getTaskGroupPriority());
+                if (!acquireTaskGroup) {
+                    log.info(
+                            "Submitted task will not be dispatch right now because the first time to try to acquire" +
+                                    " task group failed, taskInstanceName: {}, taskGroupId: {}",
+                            taskInstance.getName(), taskGroupId);
+                    return Optional.of(taskInstance);
+                }
+            }
+
+            boolean dispatchSuccess = taskProcessor.action(TaskAction.DISPATCH);
+            if (!dispatchSuccess) {
+                log.error("Dispatch standby process {} task {} failed", processInstance.getName(),
+                        taskInstance.getName());
+                return Optional.empty();
+            }
             taskProcessor.action(TaskAction.RUN);
 
             stateWheelExecuteThread.addTask4TimeoutCheck(processInstance, taskInstance);
             stateWheelExecuteThread.addTask4StateCheck(processInstance, taskInstance);
 
-            if (taskProcessor.taskInstance().getState().typeIsFinished()) {
+            if (taskProcessor.taskInstance().getState().isFinished()) {
                 if (processInstance.isBlocked()) {
-                    StateEvent processBlockEvent = new StateEvent();
-                    processBlockEvent.setProcessInstanceId(this.processInstance.getId());
-                    processBlockEvent.setTaskInstanceId(taskInstance.getId());
-                    processBlockEvent.setExecutionStatus(taskProcessor.taskInstance().getState());
-                    processBlockEvent.setType(StateEventType.PROCESS_BLOCKED);
+                    TaskStateEvent processBlockEvent = TaskStateEvent.builder()
+                            .processInstanceId(processInstance.getId())
+                            .taskInstanceId(taskInstance.getId())
+                            .status(taskProcessor.taskInstance().getState())
+                            .type(StateEventType.PROCESS_BLOCKED)
+                            .build();
                     this.stateEvents.add(processBlockEvent);
                 }
-                StateEvent taskStateChangeEvent = new StateEvent();
-                taskStateChangeEvent.setProcessInstanceId(this.processInstance.getId());
-                taskStateChangeEvent.setTaskInstanceId(taskInstance.getId());
-                taskStateChangeEvent.setExecutionStatus(taskProcessor.taskInstance().getState());
-                taskStateChangeEvent.setType(StateEventType.TASK_STATE_CHANGE);
+                TaskStateEvent taskStateChangeEvent = TaskStateEvent.builder()
+                        .processInstanceId(processInstance.getId())
+                        .taskInstanceId(taskInstance.getId())
+                        .status(taskProcessor.taskInstance().getState())
+                        .type(StateEventType.TASK_STATE_CHANGE)
+                        .build();
                 this.stateEvents.add(taskStateChangeEvent);
             }
             return Optional.of(taskInstance);
         } catch (Exception e) {
-            logger.error("submit standby task error", e);
+            log.error("Submit standby task {} error, taskCode: {}", taskInstance.getName(),
+                    taskInstance.getTaskCode(), e);
             return Optional.empty();
+        } finally {
+            LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
         }
     }
 
@@ -1113,7 +1079,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             Host host = new Host(taskInstance.getHost());
             nettyExecutorManager.doExecute(host, hostUpdateCommand.convert2Command());
         } catch (Exception e) {
-            logger.error("notify process host update", e);
+            // Do we need to catch this exception?
+            log.error("notify process host update", e);
         }
     }
 
@@ -1154,12 +1121,13 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
     /**
      * clone a new taskInstance for retry and reset some logic fields
      *
-     * @return
+     * @return taskInstance
      */
     public TaskInstance cloneRetryTaskInstance(TaskInstance taskInstance) {
         TaskNode taskNode = dag.getNode(Long.toString(taskInstance.getTaskCode()));
         if (taskNode == null) {
-            logger.error("taskNode is null, code:{}", taskInstance.getTaskCode());
+            log.error("Clone retry taskInstance error because taskNode is null, taskCode:{}",
+                    taskInstance.getTaskCode());
             return null;
         }
         TaskInstance newTaskInstance = newTaskInstance(processInstance, taskNode);
@@ -1167,21 +1135,27 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         newTaskInstance.setProcessDefine(taskInstance.getProcessDefine());
         newTaskInstance.setProcessInstance(processInstance);
         newTaskInstance.setRetryTimes(taskInstance.getRetryTimes() + 1);
-        // todo relative funtion: TaskInstance.retryTaskIntervalOverTime
+        // todo relative function: TaskInstance.retryTaskIntervalOverTime
         newTaskInstance.setState(taskInstance.getState());
         newTaskInstance.setEndTime(taskInstance.getEndTime());
+
+        if (taskInstance.getState() == TaskExecutionStatus.NEED_FAULT_TOLERANCE) {
+            newTaskInstance.setAppLink(taskInstance.getAppLink());
+        }
+
         return newTaskInstance;
     }
 
     /**
      * clone a new taskInstance for tolerant and reset some logic fields
      *
-     * @return
+     * @return taskInstance
      */
     public TaskInstance cloneTolerantTaskInstance(TaskInstance taskInstance) {
         TaskNode taskNode = dag.getNode(Long.toString(taskInstance.getTaskCode()));
         if (taskNode == null) {
-            logger.error("taskNode is null, code:{}", taskInstance.getTaskCode());
+            log.error("Clone tolerant taskInstance error because taskNode is null, taskCode:{}",
+                    taskInstance.getTaskCode());
             return null;
         }
         TaskInstance newTaskInstance = newTaskInstance(processInstance, taskNode);
@@ -1190,15 +1164,16 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         newTaskInstance.setProcessInstance(processInstance);
         newTaskInstance.setRetryTimes(taskInstance.getRetryTimes());
         newTaskInstance.setState(taskInstance.getState());
+        newTaskInstance.setAppLink(taskInstance.getAppLink());
         return newTaskInstance;
     }
 
     /**
      * new a taskInstance
      *
-     * @param processInstance
-     * @param taskNode
-     * @return
+     * @param processInstance process instance
+     * @param taskNode task node
+     * @return task instance
      */
     public TaskInstance newTaskInstance(ProcessInstance processInstance, TaskNode taskNode) {
         TaskInstance taskInstance = new TaskInstance();
@@ -1207,9 +1182,11 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         // task name
         taskInstance.setName(taskNode.getName());
         // task instance state
-        taskInstance.setState(ExecutionStatus.SUBMITTED_SUCCESS);
+        taskInstance.setState(TaskExecutionStatus.SUBMITTED_SUCCESS);
         // process instance id
         taskInstance.setProcessInstanceId(processInstance.getId());
+        taskInstance.setProcessInstanceName(processInstance.getName());
+        taskInstance.setProjectCode(processInstance.getProjectCode());
         // task instance type
         taskInstance.setTaskType(taskNode.getType().toUpperCase());
         // task instance whether alert
@@ -1217,6 +1194,9 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
 
         // task instance start time
         taskInstance.setStartTime(null);
+
+        // task test flag
+        taskInstance.setTestFlag(processInstance.getTestFlag());
 
         // task instance flag
         taskInstance.setFlag(Flag.YES);
@@ -1233,16 +1213,18 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         // retry task instance interval
         taskInstance.setRetryInterval(taskNode.getRetryInterval());
 
-        //set task param
+        // set task param
         taskInstance.setTaskParams(taskNode.getTaskParams());
 
-        //set task group and priority
+        // set task group and priority
         taskInstance.setTaskGroupId(taskNode.getTaskGroupId());
         taskInstance.setTaskGroupPriority(taskNode.getTaskGroupPriority());
 
-        //set task cpu quota and max memory
+        // set task cpu quota and max memory
         taskInstance.setCpuQuota(taskNode.getCpuQuota());
         taskInstance.setMemoryMax(taskNode.getMemoryMax());
+
+        taskInstance.setIsCache(taskNode.getIsCache() == Flag.YES.getCode() ? Flag.YES : Flag.NO);
 
         // task instance priority
         if (taskNode.getTaskInstancePriority() == null) {
@@ -1253,10 +1235,13 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
 
         String processWorkerGroup = processInstance.getWorkerGroup();
         processWorkerGroup = StringUtils.isBlank(processWorkerGroup) ? DEFAULT_WORKER_GROUP : processWorkerGroup;
-        String taskWorkerGroup = StringUtils.isBlank(taskNode.getWorkerGroup()) ? processWorkerGroup : taskNode.getWorkerGroup();
+        String taskWorkerGroup =
+                StringUtils.isBlank(taskNode.getWorkerGroup()) ? processWorkerGroup : taskNode.getWorkerGroup();
 
-        Long processEnvironmentCode = Objects.isNull(processInstance.getEnvironmentCode()) ? -1 : processInstance.getEnvironmentCode();
-        Long taskEnvironmentCode = Objects.isNull(taskNode.getEnvironmentCode()) ? processEnvironmentCode : taskNode.getEnvironmentCode();
+        Long processEnvironmentCode =
+                Objects.isNull(processInstance.getEnvironmentCode()) ? -1 : processInstance.getEnvironmentCode();
+        Long taskEnvironmentCode =
+                Objects.isNull(taskNode.getEnvironmentCode()) ? processEnvironmentCode : taskNode.getEnvironmentCode();
 
         if (!processWorkerGroup.equals(DEFAULT_WORKER_GROUP) && taskWorkerGroup.equals(DEFAULT_WORKER_GROUP)) {
             taskInstance.setWorkerGroup(processWorkerGroup);
@@ -1274,6 +1259,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         }
         // delay execution time
         taskInstance.setDelayTime(taskNode.getDelayTime());
+        taskInstance.setTaskExecuteType(taskNode.getTaskExecuteType());
         return taskInstance;
     }
 
@@ -1312,19 +1298,20 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         return taskInstanceMap.values();
     }
 
-    private void setVarPoolValue(Map<String, Property> allProperty, Map<String, TaskInstance> allTaskInstance, TaskInstance preTaskInstance, Property thisProperty) {
-        //for this taskInstance all the param in this part is IN.
+    private void setVarPoolValue(Map<String, Property> allProperty, Map<String, TaskInstance> allTaskInstance,
+                                 TaskInstance preTaskInstance, Property thisProperty) {
+        // for this taskInstance all the param in this part is IN.
         thisProperty.setDirect(Direct.IN);
-        //get the pre taskInstance Property's name
+        // get the pre taskInstance Property's name
         String proName = thisProperty.getProp();
-        //if the Previous nodes have the Property of same name
+        // if the Previous nodes have the Property of same name
         if (allProperty.containsKey(proName)) {
-            //comparison the value of two Property
+            // comparison the value of two Property
             Property otherPro = allProperty.get(proName);
-            //if this property'value of loop is empty,use the other,whether the other's value is empty or not
+            // if this property'value of loop is empty,use the other,whether the other's value is empty or not
             if (StringUtils.isEmpty(thisProperty.getValue())) {
                 allProperty.put(proName, otherPro);
-                //if  property'value of loop is not empty,and the other's value is not empty too, use the earlier value
+                // if property'value of loop is not empty,and the other's value is not empty too, use the earlier value
             } else if (StringUtils.isNotEmpty(otherPro.getValue())) {
                 TaskInstance otherTask = allTaskInstance.get(proName);
                 if (otherTask.getEndTime().getTime() > preTaskInstance.getEndTime().getTime()) {
@@ -1348,9 +1335,19 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      */
     private Map<String, TaskInstance> getCompleteTaskInstanceMap() {
         Map<String, TaskInstance> completeTaskInstanceMap = new HashMap<>();
-        for (Integer taskInstanceId : completeTaskMap.values()) {
+        for (Map.Entry<Long, Integer> entry : completeTaskMap.entrySet()) {
+            Long taskConde = entry.getKey();
+            Integer taskInstanceId = entry.getValue();
             TaskInstance taskInstance = taskInstanceMap.get(taskInstanceId);
+            if (taskInstance == null) {
+                log.warn("Cannot find the taskInstance from taskInstanceMap, taskInstanceId: {}, taskConde: {}",
+                        taskInstanceId,
+                        taskConde);
+                // This case will happen when we submit to db failed, then the taskInstanceId is 0
+                continue;
+            }
             completeTaskInstanceMap.put(Long.toString(taskInstance.getTaskCode()), taskInstance);
+
         }
         return completeTaskInstanceMap;
     }
@@ -1366,8 +1363,9 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         return validTaskInstanceList;
     }
 
-    private void submitPostNode(String parentNodeCode) {
-        Set<String> submitTaskNodeList = DagHelper.parsePostNodes(parentNodeCode, skipTaskNodeMap, dag, getCompleteTaskInstanceMap());
+    private void submitPostNode(String parentNodeCode) throws StateEventHandleException {
+        Set<String> submitTaskNodeList =
+                DagHelper.parsePostNodes(parentNodeCode, skipTaskNodeMap, dag, getCompleteTaskInstanceMap());
         List<TaskInstance> taskInstances = new ArrayList<>();
         for (String taskNode : submitTaskNodeList) {
             TaskNode taskNodeObject = dag.getNode(taskNode);
@@ -1379,7 +1377,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             TaskInstance task = createTaskInstance(processInstance, taskNodeObject);
             taskInstances.add(task);
         }
-        //the end node of the branch of the dag
+        // the end node of the branch of the dag
         if (StringUtils.isNotEmpty(parentNodeCode) && dag.getEndNode().contains(parentNodeCode)) {
             TaskInstance endTaskInstance = taskInstanceMap.get(completeTaskMap.get(NumberUtils.toLong(parentNodeCode)));
             String taskInstanceVarPool = endTaskInstance.getVarPool();
@@ -1400,16 +1398,16 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         for (TaskInstance task : taskInstances) {
 
             if (readyToSubmitTaskQueue.contains(task)) {
-                logger.warn("Task is already at submit queue, taskInstanceId: {}", task.getId());
+                log.warn("Task is already at submit queue, taskInstanceId: {}", task.getId());
                 continue;
             }
 
-            if (task.getId() > 0 && completeTaskMap.containsKey(task.getTaskCode())) {
-                logger.info("task {} has already run success", task.getName());
+            if (task.getId() != null && completeTaskMap.containsKey(task.getTaskCode())) {
+                log.info("Task has already run success, taskName: {}", task.getName());
                 continue;
             }
-            if (task.getState().typeIsPause() || task.getState().typeIsCancel()) {
-                logger.info("task {} stopped, the state is {}", task.getName(), task.getState());
+            if (task.getState().isKill()) {
+                log.info("Task is be stopped, the state is {}, taskInstanceId: {}", task.getState(), task.getId());
                 continue;
             }
 
@@ -1442,8 +1440,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                     return DependResult.WAITING;
                 }
                 Integer depsTaskId = completeTaskMap.get(despNodeTaskCode);
-                ExecutionStatus depTaskState = taskInstanceMap.get(depsTaskId).getState();
-                if (depTaskState.typeIsPause() || depTaskState.typeIsCancel()) {
+                TaskExecutionStatus depTaskState = taskInstanceMap.get(depsTaskId).getState();
+                if (depTaskState.isKill()) {
                     return DependResult.NON_EXEC;
                 }
                 // ignore task state if current task is block
@@ -1461,7 +1459,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                 }
             }
         }
-        logger.info("taskCode: {} completeDependTaskList: {}", taskCode, Arrays.toString(completeTaskMap.keySet().toArray()));
+        log.info("The dependTasks of task all success, currentTaskCode: {}, dependTaskCodes: {}",
+                taskCode, Arrays.toString(completeTaskMap.keySet().toArray()));
         return DependResult.SUCCESS;
     }
 
@@ -1489,18 +1488,21 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      */
     private boolean dependTaskSuccess(String dependNodeName, String nextNodeName) {
         if (dag.getNode(dependNodeName).isConditionsTask()) {
-            //condition task need check the branch to run
-            List<String> nextTaskList = DagHelper.parseConditionTask(dependNodeName, skipTaskNodeMap, dag, getCompleteTaskInstanceMap());
+            // condition task need check the branch to run
+            List<String> nextTaskList =
+                    DagHelper.parseConditionTask(dependNodeName, skipTaskNodeMap, dag, getCompleteTaskInstanceMap());
             if (!nextTaskList.contains(nextNodeName)) {
+                log.info(
+                        "DependTask is a condition task, and its next condition branch does not hava current task, " +
+                                "dependTaskCode: {}, currentTaskCode: {}",
+                        dependNodeName, nextNodeName);
                 return false;
             }
         } else {
             long taskCode = Long.parseLong(dependNodeName);
             Integer taskInstanceId = completeTaskMap.get(taskCode);
-            ExecutionStatus depTaskState = taskInstanceMap.get(taskInstanceId).getState();
-            if (depTaskState.typeIsFailure()) {
-                return false;
-            }
+            TaskExecutionStatus depTaskState = taskInstanceMap.get(taskInstanceId).getState();
+            return !depTaskState.isFailure();
         }
         return true;
     }
@@ -1511,7 +1513,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      * @param state state
      * @return task instance list
      */
-    private List<TaskInstance> getCompleteTaskByState(ExecutionStatus state) {
+    private List<TaskInstance> getCompleteTaskByState(TaskExecutionStatus state) {
         List<TaskInstance> resultList = new ArrayList<>();
         for (Integer taskInstanceId : completeTaskMap.values()) {
             TaskInstance taskInstance = taskInstanceMap.get(taskInstanceId);
@@ -1528,16 +1530,14 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      * @param state state
      * @return ExecutionStatus
      */
-    private ExecutionStatus runningState(ExecutionStatus state) {
-        if (state == ExecutionStatus.READY_STOP
-                || state == ExecutionStatus.READY_PAUSE
-                || state == ExecutionStatus.WAITING_THREAD
-                || state == ExecutionStatus.READY_BLOCK
-                || state == ExecutionStatus.DELAY_EXECUTION) {
+    private WorkflowExecutionStatus runningState(WorkflowExecutionStatus state) {
+        if (state == WorkflowExecutionStatus.READY_STOP || state == WorkflowExecutionStatus.READY_PAUSE
+                || state == WorkflowExecutionStatus.READY_BLOCK ||
+                state == WorkflowExecutionStatus.DELAY_EXECUTION) {
             // if the running task is not completed, the state remains unchanged
             return state;
         } else {
-            return ExecutionStatus.RUNNING_EXECUTION;
+            return WorkflowExecutionStatus.RUNNING_EXECUTION;
         }
     }
 
@@ -1554,7 +1554,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         if (this.errorTaskMap.size() > 0) {
             return true;
         }
-        return this.dependFailedTaskMap.size() > 0;
+        return this.dependFailedTaskSet.size() > 0;
     }
 
     /**
@@ -1564,26 +1564,16 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      */
     private boolean processFailed() {
         if (hasFailedTask()) {
+            log.info("The current process has failed task, the current process failed");
             if (processInstance.getFailureStrategy() == FailureStrategy.END) {
                 return true;
             }
             if (processInstance.getFailureStrategy() == FailureStrategy.CONTINUE) {
-                return readyToSubmitTaskQueue.size() == 0
-                        && activeTaskProcessorMaps.size() == 0
+                return readyToSubmitTaskQueue.size() == 0 && activeTaskProcessorMaps.size() == 0
                         && waitToRetryTaskInstanceMap.size() == 0;
             }
         }
         return false;
-    }
-
-    /**
-     * whether task for waiting thread
-     *
-     * @return Boolean whether has waiting thread task
-     */
-    private boolean hasWaitingThreadTask() {
-        List<TaskInstance> waitingList = getCompleteTaskByState(ExecutionStatus.WAITING_THREAD);
-        return CollectionUtils.isNotEmpty(waitingList);
     }
 
     /**
@@ -1594,19 +1584,17 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      *
      * @return ExecutionStatus
      */
-    private ExecutionStatus processReadyPause() {
+    private WorkflowExecutionStatus processReadyPause() {
         if (hasRetryTaskInStandBy()) {
-            return ExecutionStatus.FAILURE;
+            return WorkflowExecutionStatus.FAILURE;
         }
 
-        List<TaskInstance> pauseList = getCompleteTaskByState(ExecutionStatus.PAUSE);
-        if (CollectionUtils.isNotEmpty(pauseList)
-                || processInstance.isBlocked()
-                || !isComplementEnd()
+        List<TaskInstance> pauseList = getCompleteTaskByState(TaskExecutionStatus.PAUSE);
+        if (CollectionUtils.isNotEmpty(pauseList) || processInstance.isBlocked() || !isComplementEnd()
                 || readyToSubmitTaskQueue.size() > 0) {
-            return ExecutionStatus.PAUSE;
+            return WorkflowExecutionStatus.PAUSE;
         } else {
-            return ExecutionStatus.SUCCESS;
+            return WorkflowExecutionStatus.SUCCESS;
         }
     }
 
@@ -1618,7 +1606,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      *
      * @return ExecutionStatus
      */
-    private ExecutionStatus processReadyBlock() {
+    private WorkflowExecutionStatus processReadyBlock() {
         if (activeTaskProcessorMaps.size() > 0) {
             for (ITaskProcessor taskProcessor : activeTaskProcessorMaps.values()) {
                 if (!TASK_TYPE_BLOCKING.equals(taskProcessor.getType())) {
@@ -1627,11 +1615,11 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             }
         }
         if (readyToSubmitTaskQueue.size() > 0) {
-            for (Iterator<TaskInstance> iter = readyToSubmitTaskQueue.iterator(); iter.hasNext(); ) {
-                iter.next().setState(ExecutionStatus.KILL);
+            for (Iterator<TaskInstance> iter = readyToSubmitTaskQueue.iterator(); iter.hasNext();) {
+                iter.next().setState(TaskExecutionStatus.PAUSE);
             }
         }
-        return ExecutionStatus.BLOCK;
+        return WorkflowExecutionStatus.BLOCK;
     }
 
     /**
@@ -1639,61 +1627,62 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      *
      * @return process instance execution status
      */
-    private ExecutionStatus getProcessInstanceState(ProcessInstance instance) {
-        ExecutionStatus state = instance.getState();
+    private WorkflowExecutionStatus getProcessInstanceState(ProcessInstance instance) {
+        WorkflowExecutionStatus state = instance.getState();
 
         if (activeTaskProcessorMaps.size() > 0 || hasRetryTaskInStandBy()) {
             // active task and retry task exists
-            return runningState(state);
+            WorkflowExecutionStatus executionStatus = runningState(state);
+            log.info("The workflowInstance has task running, the workflowInstance status is {}", executionStatus);
+            return executionStatus;
         }
 
         // block
-        if (state == ExecutionStatus.READY_BLOCK) {
-            return processReadyBlock();
-        }
-
-        // waiting thread
-        if (hasWaitingThreadTask()) {
-            return ExecutionStatus.WAITING_THREAD;
+        if (state == WorkflowExecutionStatus.READY_BLOCK) {
+            WorkflowExecutionStatus executionStatus = processReadyBlock();
+            log.info("The workflowInstance is ready to block, the workflowInstance status is {}", executionStatus);
+            return executionStatus;
         }
 
         // pause
-        if (state == ExecutionStatus.READY_PAUSE) {
-            return processReadyPause();
+        if (state == WorkflowExecutionStatus.READY_PAUSE) {
+            WorkflowExecutionStatus executionStatus = processReadyPause();
+            log.info("The workflowInstance is ready to pause, the workflow status is {}", executionStatus);
+            return executionStatus;
         }
 
         // stop
-        if (state == ExecutionStatus.READY_STOP) {
-            List<TaskInstance> stopList = getCompleteTaskByState(ExecutionStatus.STOP);
-            List<TaskInstance> killList = getCompleteTaskByState(ExecutionStatus.KILL);
-            List<TaskInstance> failList = getCompleteTaskByState(ExecutionStatus.FAILURE);
-            if (CollectionUtils.isNotEmpty(stopList)
-                    || CollectionUtils.isNotEmpty(killList)
-                    || CollectionUtils.isNotEmpty(failList)
-                    || !isComplementEnd()) {
-                return ExecutionStatus.STOP;
+        if (state == WorkflowExecutionStatus.READY_STOP) {
+            List<TaskInstance> killList = getCompleteTaskByState(TaskExecutionStatus.KILL);
+            List<TaskInstance> failList = getCompleteTaskByState(TaskExecutionStatus.FAILURE);
+            WorkflowExecutionStatus executionStatus;
+            if (CollectionUtils.isNotEmpty(killList) || CollectionUtils.isNotEmpty(failList) || !isComplementEnd()) {
+                executionStatus = WorkflowExecutionStatus.STOP;
             } else {
-                return ExecutionStatus.SUCCESS;
+                executionStatus = WorkflowExecutionStatus.SUCCESS;
             }
+            log.info("The workflowInstance is ready to stop, the workflow status is {}", executionStatus);
+            return executionStatus;
         }
 
         // process failure
         if (processFailed()) {
-            return ExecutionStatus.FAILURE;
+            log.info("The workflowInstance is failed, the workflow status is {}", WorkflowExecutionStatus.FAILURE);
+            return WorkflowExecutionStatus.FAILURE;
         }
 
         // success
-        if (state == ExecutionStatus.RUNNING_EXECUTION) {
-            List<TaskInstance> killTasks = getCompleteTaskByState(ExecutionStatus.KILL);
+        if (state == WorkflowExecutionStatus.RUNNING_EXECUTION) {
+            List<TaskInstance> killTasks = getCompleteTaskByState(TaskExecutionStatus.KILL);
             if (readyToSubmitTaskQueue.size() > 0 || waitToRetryTaskInstanceMap.size() > 0) {
-                //tasks currently pending submission, no retries, indicating that depend is waiting to complete
-                return ExecutionStatus.RUNNING_EXECUTION;
+                // tasks currently pending submission, no retries, indicating that depend is waiting to complete
+                return WorkflowExecutionStatus.RUNNING_EXECUTION;
             } else if (CollectionUtils.isNotEmpty(killTasks)) {
                 // tasks maybe killed manually
-                return ExecutionStatus.FAILURE;
+                return WorkflowExecutionStatus.FAILURE;
             } else {
-                //  if the waiting queue is empty and the status is in progress, then success
-                return ExecutionStatus.SUCCESS;
+                // if the waiting queue is empty and the status is in progress, then success
+                return WorkflowExecutionStatus.SUCCESS;
             }
         }
 
@@ -1710,62 +1699,64 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             return true;
         }
 
-        try {
-            Map<String, String> cmdParam = JSONUtils.toMap(processInstance.getCommandParam());
-            Date endTime = DateUtils.getScheduleDate(cmdParam.get(CMDPARAM_COMPLEMENT_DATA_END_DATE));
-            return processInstance.getScheduleTime().equals(endTime);
-        } catch (Exception e) {
-            logger.error("complement end failed ", e);
-            return false;
-        }
+        Map<String, String> cmdParam = JSONUtils.toMap(processInstance.getCommandParam());
+        Date endTime = DateUtils.stringToDate(cmdParam.get(CMD_PARAM_COMPLEMENT_DATA_END_DATE));
+        return processInstance.getScheduleTime().equals(endTime);
     }
 
     /**
      * updateProcessInstance process instance state
      * after each batch of tasks is executed, the status of the process instance is updated
      */
-    private void updateProcessInstanceState() {
-        ExecutionStatus state = getProcessInstanceState(processInstance);
+    private void updateProcessInstanceState() throws StateEventHandleException {
+        WorkflowExecutionStatus state = getProcessInstanceState(processInstance);
         if (processInstance.getState() != state) {
-            logger.info(
-                    "work flow process instance [id: {}, name:{}], state change from {} to {}, cmd type: {}",
-                    processInstance.getId(), processInstance.getName(),
-                    processInstance.getState(), state,
-                    processInstance.getCommandType());
+            log.info("Update workflowInstance states, origin state: {}, target state: {}",
+                    processInstance.getState(),
+                    state);
+            updateWorkflowInstanceStatesToDB(state);
 
-            processInstance.setState(state);
-            if (state.typeIsFinished()) {
-                processInstance.setEndTime(new Date());
-            }
-            processService.updateProcessInstance(processInstance);
-
-            StateEvent stateEvent = new StateEvent();
-            stateEvent.setExecutionStatus(processInstance.getState());
-            stateEvent.setProcessInstanceId(this.processInstance.getId());
-            stateEvent.setType(StateEventType.PROCESS_STATE_CHANGE);
-            // this.processStateChangeHandler(stateEvent);
+            WorkflowStateEvent stateEvent = WorkflowStateEvent.builder()
+                    .processInstanceId(processInstance.getId())
+                    .status(processInstance.getState())
+                    .type(StateEventType.PROCESS_STATE_CHANGE)
+                    .build();
             // replace with `stateEvents`, make sure `WorkflowExecuteThread` can be deleted to avoid memory leaks
             this.stateEvents.add(stateEvent);
+        } else {
+            log.info("There is no need to update the workflow instance state, origin state: {}, target state: {}",
+                    processInstance.getState(),
+                    state);
         }
     }
 
     /**
      * stateEvent's execution status as process instance state
      */
-    private void updateProcessInstanceState(StateEvent stateEvent) {
-        ExecutionStatus state = stateEvent.getExecutionStatus();
-        if (processInstance.getState() != state) {
-            logger.info(
-                    "work flow process instance [id: {}, name:{}], state change from {} to {}, cmd type: {}",
-                    processInstance.getId(), processInstance.getName(),
-                    processInstance.getState(), state,
-                    processInstance.getCommandType());
+    public void updateProcessInstanceState(WorkflowStateEvent stateEvent) throws StateEventHandleException {
+        WorkflowExecutionStatus state = stateEvent.getStatus();
+        updateWorkflowInstanceStatesToDB(state);
+    }
 
-            processInstance.setState(state);
-            if (state.typeIsFinished()) {
+    private void updateWorkflowInstanceStatesToDB(WorkflowExecutionStatus newStates) throws StateEventHandleException {
+        WorkflowExecutionStatus originStates = processInstance.getState();
+        if (originStates != newStates) {
+            log.info("Begin to update workflow instance state , state will change from {} to {}",
+                    originStates,
+                    newStates);
+
+            processInstance.setStateWithDesc(newStates, "update by workflow executor");
+            if (newStates.isFinished()) {
                 processInstance.setEndTime(new Date());
             }
-            processService.updateProcessInstance(processInstance);
+            try {
+                processInstanceDao.updateProcessInstance(processInstance);
+            } catch (Exception ex) {
+                // recover the status
+                processInstance.setStateWithDesc(originStates, "recover state by DB error");
+                processInstance.setEndTime(null);
+                throw new StateEventHandleException("Update process instance status to DB error", ex);
+            }
         }
     }
 
@@ -1784,19 +1775,18 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      *
      * @param taskInstance task instance
      */
-    private void addTaskToStandByList(TaskInstance taskInstance) {
-        try {
-            if (readyToSubmitTaskQueue.contains(taskInstance)) {
-                logger.warn("task was found in ready submit queue, task code:{}", taskInstance.getTaskCode());
-                return;
-            }
-            logger.info("add task to stand by list, task name:{}, task id:{}, task code:{}",
-                    taskInstance.getName(), taskInstance.getId(), taskInstance.getTaskCode());
-            TaskMetrics.incTaskSubmit();
-            readyToSubmitTaskQueue.put(taskInstance);
-        } catch (Exception e) {
-            logger.error("add task instance to readyToSubmitTaskQueue, taskName:{}, task id:{}", taskInstance.getName(), taskInstance.getId(), e);
+    public void addTaskToStandByList(TaskInstance taskInstance) {
+        if (readyToSubmitTaskQueue.contains(taskInstance)) {
+            log.warn("Task already exists in ready submit queue, no need to add again, task code:{}",
+                    taskInstance.getTaskCode());
+            return;
         }
+        log.info("Add task to stand by list, task name:{}, task id:{}, task code:{}",
+                taskInstance.getName(),
+                taskInstance.getId(),
+                taskInstance.getTaskCode());
+        TaskMetrics.incTaskInstanceByState("submit");
+        readyToSubmitTaskQueue.put(taskInstance);
     }
 
     /**
@@ -1804,14 +1794,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      *
      * @param taskInstance task instance
      */
-    private void removeTaskFromStandbyList(TaskInstance taskInstance) {
-        try {
-            readyToSubmitTaskQueue.remove(taskInstance);
-        } catch (Exception e) {
-            logger.error("remove task instance from readyToSubmitTaskQueue error, task id:{}, Name: {}",
-                    taskInstance.getId(),
-                    taskInstance.getName(), e);
-        }
+    private boolean removeTaskFromStandbyList(TaskInstance taskInstance) {
+        return readyToSubmitTaskQueue.remove(taskInstance);
     }
 
     /**
@@ -1820,8 +1804,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      * @return Boolean whether has retry task in standby
      */
     private boolean hasRetryTaskInStandBy() {
-        for (Iterator<TaskInstance> iter = readyToSubmitTaskQueue.iterator(); iter.hasNext(); ) {
-            if (iter.next().getState().typeIsFailure()) {
+        for (Iterator<TaskInstance> iter = readyToSubmitTaskQueue.iterator(); iter.hasNext();) {
+            if (iter.next().getState().isFailure()) {
                 return true;
             }
         }
@@ -1831,8 +1815,9 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
     /**
      * close the on going tasks
      */
-    private void killAllTasks() {
-        logger.info("kill called on process instance id: {}, num: {}", processInstance.getId(),
+    public void killAllTasks() {
+        log.info("kill called on process instance id: {}, num: {}",
+                processInstance.getId(),
                 activeTaskProcessorMaps.size());
 
         if (readyToSubmitTaskQueue.size() > 0) {
@@ -1845,30 +1830,36 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             if (taskInstanceId == null || taskInstanceId.equals(0)) {
                 continue;
             }
-            TaskInstance taskInstance = processService.findTaskInstanceById(taskInstanceId);
-            if (taskInstance == null || taskInstance.getState().typeIsFinished()) {
-                continue;
-            }
-            taskProcessor.action(TaskAction.STOP);
-            if (taskProcessor.taskInstance().getState().typeIsFinished()) {
-                StateEvent stateEvent = new StateEvent();
-                stateEvent.setType(StateEventType.TASK_STATE_CHANGE);
-                stateEvent.setProcessInstanceId(this.processInstance.getId());
-                stateEvent.setTaskInstanceId(taskInstance.getId());
-                stateEvent.setExecutionStatus(taskProcessor.taskInstance().getState());
-                this.addStateEvent(stateEvent);
+            LogUtils.setWorkflowAndTaskInstanceIDMDC(processInstance.getId(), taskInstanceId);
+            try {
+                TaskInstance taskInstance = taskInstanceDao.findTaskInstanceById(taskInstanceId);
+                if (taskInstance == null || taskInstance.getState().isFinished()) {
+                    continue;
+                }
+                taskProcessor.action(TaskAction.STOP);
+                if (taskProcessor.taskInstance().getState().isFinished()) {
+                    TaskStateEvent taskStateEvent = TaskStateEvent.builder()
+                            .processInstanceId(processInstance.getId())
+                            .taskInstanceId(taskInstance.getId())
+                            .status(taskProcessor.taskInstance().getState())
+                            .type(StateEventType.TASK_STATE_CHANGE)
+                            .build();
+                    this.addStateEvent(taskStateEvent);
+                }
+            } finally {
+                LogUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
         }
     }
 
     public boolean workFlowFinish() {
-        return this.processInstance.getState().typeIsFinished();
+        return this.processInstance.getState().isFinished();
     }
 
     /**
      * handling the list of tasks to be submitted
      */
-    private void submitStandByTask() {
+    public void submitStandByTask() throws StateEventHandleException {
         int length = readyToSubmitTaskQueue.size();
         for (int i = 0; i < length; i++) {
             TaskInstance task = readyToSubmitTaskQueue.peek();
@@ -1877,10 +1868,12 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             }
             // stop tasks which is retrying if forced success happens
             if (task.taskCanRetry()) {
-                TaskInstance retryTask = processService.findTaskInstanceById(task.getId());
-                if (retryTask != null && retryTask.getState().equals(ExecutionStatus.FORCED_SUCCESS)) {
+                TaskInstance retryTask = taskInstanceDao.findTaskInstanceById(task.getId());
+                if (retryTask != null && retryTask.getState().isForceSuccess()) {
                     task.setState(retryTask.getState());
-                    logger.info("task: {} has been forced success, put it into complete task list and stop retrying", task.getName());
+                    log.info(
+                            "Task {} has been forced success, put it into complete task list and stop retrying, taskInstanceId: {}",
+                            task.getName(), task.getId());
                     removeTaskFromStandbyList(task);
                     completeTaskMap.put(task.getTaskCode(), task.getId());
                     taskInstanceMap.put(task.getId(), task);
@@ -1888,34 +1881,49 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                     continue;
                 }
             }
-            //init varPool only this task is the first time running
+            // init varPool only this task is the first time running
             if (task.isFirstRun()) {
-                //get pre task ,get all the task varPool to this task
-                Set<String> preTask = dag.getPreviousNodes(Long.toString(task.getTaskCode()));
-                getPreVarPool(task, preTask);
+                // get pre task ,get all the task varPool to this task
+                // Do not use dag.getPreviousNodes because of the dag may be miss the upstream node
+                String preTasks = taskNodesMap.get(task.getTaskCode()).getPreTasks();
+                Set<String> preTaskList = new HashSet<>(JSONUtils.toList(preTasks, String.class));
+                getPreVarPool(task, preTaskList);
             }
             DependResult dependResult = getDependResultForTask(task);
             if (DependResult.SUCCESS == dependResult) {
+                log.info("The dependResult of task {} is success, so ready to submit to execute", task.getName());
                 Optional<TaskInstance> taskInstanceOptional = submitTaskExec(task);
                 if (!taskInstanceOptional.isPresent()) {
                     this.taskFailedSubmit = true;
                     // Remove and add to complete map and error map
-                    removeTaskFromStandbyList(task);
+                    if (!removeTaskFromStandbyList(task)) {
+                        log.error(
+                                "Task submit failed, remove from standby list failed, workflowInstanceId: {}, taskCode: {}",
+                                processInstance.getId(),
+                                task.getTaskCode());
+                    }
                     completeTaskMap.put(task.getTaskCode(), task.getId());
+                    taskInstanceMap.put(task.getId(), task);
                     errorTaskMap.put(task.getTaskCode(), task.getId());
-                    logger.error("Task submitted failed, processInstanceId: {}, taskInstanceId: {}", task.getProcessInstanceId(), task.getId());
+                    activeTaskProcessorMaps.remove(task.getTaskCode());
+                    log.error("Task submitted failed, workflowInstanceId: {}, taskInstanceId: {}, taskCode: {}",
+                            task.getProcessInstanceId(),
+                            task.getId(),
+                            task.getTaskCode());
                 } else {
                     removeTaskFromStandbyList(task);
                 }
             } else if (DependResult.FAILED == dependResult) {
                 // if the dependency fails, the current node is not submitted and the state changes to failure.
-                dependFailedTaskMap.put(task.getTaskCode(), task.getId());
+                dependFailedTaskSet.add(task.getTaskCode());
                 removeTaskFromStandbyList(task);
-                logger.info("Task dependent result is failed, taskInstanceId:{} depend result : {}", task.getId(), dependResult);
+                log.info("Task dependent result is failed, taskInstanceId:{} depend result : {}", task.getId(),
+                        dependResult);
             } else if (DependResult.NON_EXEC == dependResult) {
                 // for some reasons(depend task pause/stop) this task would not be submit
                 removeTaskFromStandbyList(task);
-                logger.info("Remove task due to depend result not executed, taskInstanceId:{} depend result : {}", task.getId(), dependResult);
+                log.info("Remove task due to depend result not executed, taskInstanceId:{} depend result : {}",
+                        task.getId(), dependResult);
             }
         }
     }
@@ -1931,10 +1939,13 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
 
         // todo: Can we use a better way to set the recover taskInstanceId list? rather then use the cmdParam
         if (paramMap != null && paramMap.containsKey(CMD_PARAM_RECOVERY_START_NODE_STRING)) {
-            String[] idList = paramMap.get(CMD_PARAM_RECOVERY_START_NODE_STRING).split(Constants.COMMA);
-            if (ArrayUtils.isNotEmpty(idList)) {
-                List<Integer> taskInstanceIds = Arrays.stream(idList).map(Integer::valueOf).collect(Collectors.toList());
-                return processService.findTaskInstanceByIdList(taskInstanceIds);
+            List<Integer> startTaskInstanceIds = Arrays.stream(paramMap.get(CMD_PARAM_RECOVERY_START_NODE_STRING)
+                    .split(COMMA))
+                    .filter(StringUtils::isNotEmpty)
+                    .map(Integer::valueOf)
+                    .collect(Collectors.toList());
+            if (CollectionUtils.isNotEmpty(startTaskInstanceIds)) {
+                return taskInstanceDao.findTaskInstanceByIdList(startTaskInstanceIds);
             }
         }
         return Collections.emptyList();
@@ -2008,35 +2019,54 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      * is new process instance
      */
     private boolean isNewProcessInstance() {
-        if (ExecutionStatus.RUNNING_EXECUTION == processInstance.getState() && processInstance.getRunTimes() == 1) {
-            return true;
-        } else if (processInstance.getRecovery().equals(Flag.YES)) {
-            // host is empty use old task instance
-            return false;
-        } else {
+        if (Flag.YES.equals(processInstance.getRecovery())) {
+            log.info("This workInstance will be recover by this execution");
             return false;
         }
+
+        if (WorkflowExecutionStatus.RUNNING_EXECUTION == processInstance.getState()
+                && processInstance.getRunTimes() == 1) {
+            return true;
+        }
+        log.info(
+                "The workflowInstance has been executed before, this execution is to reRun, processInstance status: {}, runTimes: {}",
+                processInstance.getState(),
+                processInstance.getRunTimes());
+        return false;
     }
 
     public void resubmit(long taskCode) throws Exception {
         ITaskProcessor taskProcessor = activeTaskProcessorMaps.get(taskCode);
         if (taskProcessor != null) {
             taskProcessor.action(TaskAction.RESUBMIT);
-            logger.debug("RESUBMIT: task code:{}", taskCode);
+            log.debug("RESUBMIT: task code:{}", taskCode);
         } else {
             throw new Exception("resubmit error, taskProcessor is null, task code: " + taskCode);
         }
     }
+
+    public Map<Long, Integer> getCompleteTaskMap() {
+        return completeTaskMap;
+    }
+
+    public Map<Long, ITaskProcessor> getActiveTaskProcessMap() {
+        return activeTaskProcessorMaps;
+    }
+
+    public Map<Long, TaskInstance> getWaitToRetryTaskInstanceMap() {
+        return waitToRetryTaskInstanceMap;
+    }
+
     private void setGlobalParamIfCommanded(ProcessDefinition processDefinition, Map<String, String> cmdParam) {
         // get start params from command param
         Map<String, String> startParamMap = new HashMap<>();
-        if (cmdParam.containsKey(Constants.CMD_PARAM_START_PARAMS)) {
-            String startParamJson = cmdParam.get(Constants.CMD_PARAM_START_PARAMS);
+        if (cmdParam.containsKey(CMD_PARAM_START_PARAMS)) {
+            String startParamJson = cmdParam.get(CMD_PARAM_START_PARAMS);
             startParamMap = JSONUtils.toMap(startParamJson);
         }
         Map<String, String> fatherParamMap = new HashMap<>();
-        if (cmdParam.containsKey(Constants.CMD_PARAM_FATHER_PARAMS)) {
-            String fatherParamJson = cmdParam.get(Constants.CMD_PARAM_FATHER_PARAMS);
+        if (cmdParam.containsKey(CMD_PARAM_FATHER_PARAMS)) {
+            String fatherParamJson = cmdParam.get(CMD_PARAM_FATHER_PARAMS);
             fatherParamMap = JSONUtils.toMap(fatherParamJson);
         }
         startParamMap.putAll(fatherParamMap);
@@ -2044,14 +2074,14 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         Map<String, String> globalMap = processDefinition.getGlobalParamMap();
         List<Property> globalParamList = processDefinition.getGlobalParamList();
         if (startParamMap.size() > 0 && globalMap != null) {
-            //start param to overwrite global param
+            // start param to overwrite global param
             for (Map.Entry<String, String> param : globalMap.entrySet()) {
                 String val = startParamMap.get(param.getKey());
                 if (val != null) {
                     param.setValue(val);
                 }
             }
-            //start param to create new global param if global not exist
+            // start param to create new global param if global not exist
             for (Map.Entry<String, String> startParam : startParamMap.entrySet()) {
                 if (!globalMap.containsKey(startParam.getKey())) {
                     globalMap.put(startParam.getKey(), startParam.getValue());
@@ -2061,46 +2091,104 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         }
     }
 
-    private void measureProcessState(StateEvent processStateEvent) {
-        if (processStateEvent.getExecutionStatus().typeIsFinished()) {
-            ProcessInstanceMetrics.incProcessInstanceFinish();
+    /**
+     * clear related data if command of process instance is EXECUTE_TASK
+     * 1. find all task code from sub dag (only contains related task)
+     * 2. set the flag of tasks to Flag.NO
+     * 3. clear varPool data from re-execute task instance in process instance
+     * 4. remove related task instance from taskInstanceMap, completeTaskMap, validTaskMap, errorTaskMap
+     *
+     * @return task instance
+     */
+    protected void clearDataIfExecuteTask() {
+        // only clear data if command is EXECUTE_TASK
+        if (!processInstance.getCommandType().equals(CommandType.EXECUTE_TASK)) {
+            return;
         }
-        switch (processStateEvent.getExecutionStatus()) {
-            case STOP:
-                ProcessInstanceMetrics.incProcessInstanceStop();
-                break;
-            case SUCCESS:
-                ProcessInstanceMetrics.incProcessInstanceSuccess();
-                break;
-            case FAILURE:
-                ProcessInstanceMetrics.incProcessInstanceFailure();
-                break;
-            default:
-                break;
+
+        // Records the key of varPool data to be removed
+        Set<String> taskCodesString = dag.getAllNodesList();
+
+        List<TaskInstance> removeTaskInstances = new ArrayList<>();
+
+        for (String taskCodeString : taskCodesString) {
+            long taskCode = Long.parseLong(taskCodeString);
+            TaskInstance taskInstance;
+            if (validTaskMap.containsKey(taskCode)) {
+                taskInstance = taskInstanceMap.get(validTaskMap.get(taskCode));
+            } else {
+                taskInstance = taskInstanceDao.findTaskByInstanceIdAndCode(processInstance.getId(), taskCode);
+            }
+            if (taskInstance == null) {
+                continue;
+            }
+            removeTaskInstances.add(taskInstance);
+        }
+
+        for (TaskInstance taskInstance : removeTaskInstances) {
+            taskInstance.setFlag(Flag.NO);
+            taskInstanceDao.updateTaskInstance(taskInstance);
+        }
+
+        Set<String> removeSet = new HashSet<>();
+        for (TaskInstance taskInstance : removeTaskInstances) {
+            String taskVarPool = taskInstance.getVarPool();
+            if (StringUtils.isNotEmpty(taskVarPool)) {
+                List<Property> properties = JSONUtils.toList(taskVarPool, Property.class);
+                List<String> keys = properties.stream()
+                        .filter(property -> property.getDirect().equals(Direct.OUT))
+                        .map(property -> String.format("%s_%s", property.getProp(), property.getType()))
+                        .collect(Collectors.toList());
+                removeSet.addAll(keys);
+            }
+        }
+
+        // remove varPool data and update process instance
+        // TODO: we can remove this snippet if : we get varPool from pre taskInstance instead of process instance when
+        // task can not get pre task from incomplete dag
+        List<Property> processProperties = JSONUtils.toList(processInstance.getVarPool(), Property.class);
+        processProperties = processProperties.stream()
+                .filter(property -> !(property.getDirect().equals(Direct.IN)
+                        && removeSet.contains(String.format("%s_%s", property.getProp(), property.getType()))))
+                .collect(Collectors.toList());
+
+        processInstance.setVarPool(JSONUtils.toJsonString(processProperties));
+        processInstanceDao.updateProcessInstance(processInstance);
+
+        // remove task instance from taskInstanceMap, completeTaskMap, validTaskMap, errorTaskMap
+        taskInstanceMap.entrySet().removeIf(map -> dag.containsNode(Long.toString(map.getValue().getTaskCode())));
+        completeTaskMap.entrySet().removeIf(map -> dag.containsNode(Long.toString(map.getKey())));
+        validTaskMap.entrySet().removeIf(map -> dag.containsNode(Long.toString(map.getKey())));
+        errorTaskMap.entrySet().removeIf(map -> dag.containsNode(Long.toString(map.getKey())));
+    }
+
+    private void saveCacheTaskInstance(TaskInstance taskInstance) {
+        Pair<Integer, String> taskIdAndCacheKey = TaskCacheUtils.revertCacheKey(taskInstance.getCacheKey());
+        Integer taskId = taskIdAndCacheKey.getLeft();
+        if (taskId.equals(taskInstance.getId())) {
+            taskInstance.setCacheKey(taskIdAndCacheKey.getRight());
+            try {
+                taskInstanceDao.updateTaskInstance(taskInstance);
+            } catch (Exception e) {
+                log.error("update task instance cache key failed", e);
+            }
         }
     }
 
-    private void measureTaskState(StateEvent taskStateEvent) {
-        if (taskStateEvent == null || taskStateEvent.getExecutionStatus() == null) {
-            // the event is broken
-            logger.warn("The task event is broken..., taskEvent: {}", taskStateEvent);
-            return;
+    private enum WorkflowRunnableStatus {
+        CREATED, INITIALIZE_DAG, INITIALIZE_QUEUE, STARTED,
+        ;
+
+    }
+
+    private void sendTaskLogOnMasterToRemoteIfNeeded(String logPath, String host) {
+        if (RemoteLogUtils.isRemoteLoggingEnable() && isExecutedOnMaster(host)) {
+            RemoteLogUtils.sendRemoteLog(logPath);
+            log.info("Master sends task log {} to remote storage asynchronously.", logPath);
         }
-        if (taskStateEvent.getExecutionStatus().typeIsFinished()) {
-            TaskMetrics.incTaskFinish();
-        }
-        switch (taskStateEvent.getExecutionStatus()) {
-            case STOP:
-                TaskMetrics.incTaskStop();
-                break;
-            case SUCCESS:
-                TaskMetrics.incTaskSuccess();
-                break;
-            case FAILURE:
-                TaskMetrics.incTaskFailure();
-                break;
-            default:
-                break;
-        }
+    }
+
+    private boolean isExecutedOnMaster(String host) {
+        return host.endsWith(masterAddress.split(Constants.COLON)[1]);
     }
 }

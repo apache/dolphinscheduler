@@ -21,33 +21,17 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.io.Serializable;
 
+import lombok.Data;
+
 /**
  * process host update
  */
+@Data
 public class HostUpdateCommand implements Serializable {
 
-    /**
-     * task id
-     */
     private int taskInstanceId;
 
     private String processHost;
-
-    public int getTaskInstanceId() {
-        return taskInstanceId;
-    }
-
-    public void setTaskInstanceId(int taskInstanceId) {
-        this.taskInstanceId = taskInstanceId;
-    }
-
-    public String getProcessHost() {
-        return processHost;
-    }
-
-    public void setProcessHost(String processHost) {
-        this.processHost = processHost;
-    }
 
     /**
      * package request command
@@ -62,11 +46,4 @@ public class HostUpdateCommand implements Serializable {
         return command;
     }
 
-    @Override
-    public String toString() {
-        return "HostUpdateCommand{"
-                + "taskInstanceId=" + taskInstanceId
-                + "host=" + processHost
-                + '}';
-    }
 }

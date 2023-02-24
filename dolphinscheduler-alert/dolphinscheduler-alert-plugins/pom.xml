@@ -15,19 +15,20 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>dolphinscheduler-alert</artifactId>
         <groupId>org.apache.dolphinscheduler</groupId>
+        <artifactId>dolphinscheduler-alert</artifactId>
         <version>dev-SNAPSHOT</version>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
     <artifactId>dolphinscheduler-alert-plugins</artifactId>
     <packaging>pom</packaging>
 
     <modules>
+        <module>dolphinscheduler-alert-all</module>
+        <module>dolphinscheduler-alert-api</module>
         <module>dolphinscheduler-alert-email</module>
         <module>dolphinscheduler-alert-wechat</module>
         <module>dolphinscheduler-alert-dingtalk</module>
@@ -39,12 +40,5 @@
         <module>dolphinscheduler-alert-webexteams</module>
         <module>dolphinscheduler-alert-telegram</module>
     </modules>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-alert-api</artifactId>
-        </dependency>
-    </dependencies>
 
 </project>

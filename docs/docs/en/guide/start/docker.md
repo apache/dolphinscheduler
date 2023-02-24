@@ -38,21 +38,21 @@ DolphinScheduler in a long term. You have to install [docker-compose](https://do
 start servers.
 
 After installed docker-compose, it is recommended to modify some configurations for better experience. We highly recommended
-modify docker-compose's memory up to 4 GB.
+modify docker-compose's free memory up to 4 GB.
 
 - Mac：Click `Docker Desktop -> Preferences -> Resources -> Memory` modified it
 - Windows Docker Desktop：
-    - Hyper-V mode: Click `Docker Desktop -> Settings -> Resources -> Memory` modified it
-    - WSL 2 mode: see [WSL 2 utility VM](https://docs.microsoft.com/zh-cn/windows/wsl/wsl-config#configure-global-options-with-wslconfig) for more detail.
+  - Hyper-V mode: Click `Docker Desktop -> Settings -> Resources -> Memory` modified it
+  - WSL 2 mode: see [WSL 2 utility VM](https://docs.microsoft.com/zh-cn/windows/wsl/wsl-config#configure-global-options-with-wslconfig) for more detail.
 
-After complete the configuration, we can get the `docker-compose.yaml` file from [download page](/en-us/download/download.html)
+After complete the configuration, we can get the `docker-compose.yaml` file from [download page](https://dolphinscheduler.apache.org/en-us/download)
 form its source package, and make sure you get the right version. After download the package, you can run the commands as below.
 
 ```shell
 $ DOLPHINSCHEDULER_VERSION=<version>
 $ tar -zxf apache-dolphinscheduler-"${DOLPHINSCHEDULER_VERSION}"-src.tar.gz
 # Going to docker-compose's location
-# For Mac or Linux users 
+# For Mac or Linux users
 $ cd apache-dolphinscheduler-"${DOLPHINSCHEDULER_VERSION}"-src/deploy/docker
 # For Windows users, you should run command `cd apache-dolphinscheduler-"${DOLPHINSCHEDULER_VERSION}"-src\deploy\docker`
 
@@ -71,7 +71,6 @@ $ docker-compose --profile all up -d
 [Using docker-compose to start server](#using-docker-compose-to-start-server) will create new a database and the ZooKeeper
 container when it up. You could start DolphinScheduler server separately if you want to reuse your exists services.
 
-
 ```shell
 $ DOLPHINSCHEDULER_VERSION=<version>
 # Initialize the database, make sure database <DATABASE> already exists
@@ -80,14 +79,16 @@ $ docker run -d --name dolphinscheduler-tools \
     -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/<DATABASE>" \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
+    -e SPRING_JACKSON_TIME_ZONE="UTC" \
     --net host \
-    apache/dolphinscheduler-tools:"${DOLPHINSCHEDULER_VERSION}" tools/bin/upgrade-schema.sh 
+    apache/dolphinscheduler-tools:"${DOLPHINSCHEDULER_VERSION}" tools/bin/upgrade-schema.sh
 # Starting DolphinScheduler service
 $ docker run -d --name dolphinscheduler-master \
     -e DATABASE="postgresql" \
     -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/dolphinscheduler" \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
+    -e SPRING_JACKSON_TIME_ZONE="UTC" \
     -e REGISTRY_ZOOKEEPER_CONNECT_STRING="localhost:2181" \
     --net host \
     -d apache/dolphinscheduler-master:"${DOLPHINSCHEDULER_VERSION}"
@@ -96,6 +97,7 @@ $ docker run -d --name dolphinscheduler-worker \
     -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/dolphinscheduler" \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
+    -e SPRING_JACKSON_TIME_ZONE="UTC" \
     -e REGISTRY_ZOOKEEPER_CONNECT_STRING="localhost:2181" \
     --net host \
     -d apache/dolphinscheduler-worker:"${DOLPHINSCHEDULER_VERSION}"
@@ -104,6 +106,7 @@ $ docker run -d --name dolphinscheduler-api \
     -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/dolphinscheduler" \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
+    -e SPRING_JACKSON_TIME_ZONE="UTC" \
     -e REGISTRY_ZOOKEEPER_CONNECT_STRING="localhost:2181" \
     --net host \
     -d apache/dolphinscheduler-api:"${DOLPHINSCHEDULER_VERSION}"
@@ -112,12 +115,13 @@ $ docker run -d --name dolphinscheduler-alert-server \
     -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/dolphinscheduler" \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
+    -e SPRING_JACKSON_TIME_ZONE="UTC" \
     -e REGISTRY_ZOOKEEPER_CONNECT_STRING="localhost:2181" \
     --net host \
     -d apache/dolphinscheduler-alert-server:"${DOLPHINSCHEDULER_VERSION}"
 ```
 
-> Note: You should install and start [PostgreSQL](https://www.postgresql.org/download/)(8.2.15+) and [ZooKeeper](https://zookeeper.apache.org/releases.html)(3.4.6+)
+> Note: You should install and start [PostgreSQL](https://www.postgresql.org/download/)(8.2.15+) and [ZooKeeper](https://zookeeper.apache.org/releases.html)(3.8.0)
 > by yourself if you want to use this way to start Dolphinscheduler, but you do not have those services
 
 ## Login DolphinScheduler

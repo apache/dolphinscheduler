@@ -19,18 +19,23 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.dto.ClusterDto;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.k8s.K8sManager;
 import org.apache.dolphinscheduler.api.service.ClusterService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.dao.entity.Cluster;
+import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ClusterMapper;
+import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceMapper;
+import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
+import org.apache.dolphinscheduler.service.utils.ClusterConfUtils;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -39,13 +44,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
@@ -53,13 +59,17 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * cluster definition service impl
  */
 @Service
+@Slf4j
 public class ClusterServiceImpl extends BaseServiceImpl implements ClusterService {
-
-    private static final Logger logger = LoggerFactory.getLogger(ClusterServiceImpl.class);
 
     @Autowired
     private ClusterMapper clusterMapper;
 
+    @Autowired
+    private K8sManager k8sManager;
+
+    @Autowired
+    private K8sNamespaceMapper k8sNamespaceMapper;
     /**
      * create cluster
      *
@@ -68,11 +78,12 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
      * @param config    cluster config
      * @param desc      cluster desc
      */
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     @Override
     public Map<String, Object> createCluster(User loginUser, String name, String config, String desc) {
         Map<String, Object> result = new HashMap<>();
         if (isNotAdmin(loginUser, result)) {
+            log.warn("Only admin can create cluster, current login user name:{}.", loginUser.getUserName());
             return result;
         }
 
@@ -83,6 +94,7 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
 
         Cluster clusterExistByName = clusterMapper.queryByClusterName(name);
         if (clusterExistByName != null) {
+            log.warn("Cluster with the same name already exists, clusterName:{}.", clusterExistByName.getName());
             putMsg(result, Status.CLUSTER_NAME_EXISTS, name);
             return result;
         }
@@ -99,7 +111,7 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
             code = CodeGenerateUtils.getInstance().genCode();
             cluster.setCode(code);
         } catch (CodeGenerateException e) {
-            logger.error("Cluster code get error, ", e);
+            log.error("Generate cluster code error.", e);
         }
         if (code == 0L) {
             putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS, "Error generating cluster code");
@@ -107,9 +119,11 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
         }
 
         if (clusterMapper.insert(cluster) > 0) {
+            log.info("Cluster create complete, clusterName:{}.", cluster.getName());
             result.put(Constants.DATA_LIST, cluster.getCode());
             putMsg(result, Status.SUCCESS);
         } else {
+            log.error("Cluster create error, clusterName:{}.", cluster.getName());
             putMsg(result, Status.CREATE_CLUSTER_ERROR);
         }
         return result;
@@ -212,6 +226,7 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
 
         Cluster cluster = clusterMapper.queryByClusterName(name);
         if (cluster == null) {
+            log.warn("Cluster does not exist, name:{}.", name);
             putMsg(result, Status.QUERY_CLUSTER_BY_NAME_ERROR, name);
         } else {
 
@@ -229,23 +244,35 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
      * @param loginUser login user
      * @param code      cluster code
      */
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     @Override
     public Map<String, Object> deleteClusterByCode(User loginUser, Long code) {
         Map<String, Object> result = new HashMap<>();
         if (isNotAdmin(loginUser, result)) {
+            log.warn("Only admin can delete cluster, current login user name:{}.", loginUser.getUserName());
+            return result;
+        }
+
+        Long relatedNamespaceNumber = k8sNamespaceMapper
+                .selectCount(new QueryWrapper<K8sNamespace>().lambda().eq(K8sNamespace::getClusterCode, code));
+
+        if (relatedNamespaceNumber > 0) {
+            log.warn("Delete cluster failed because {} namespace(s) is(are) using it, clusterCode:{}.",
+                    relatedNamespaceNumber, code);
+            putMsg(result, Status.DELETE_CLUSTER_RELATED_NAMESPACE_EXISTS);
             return result;
         }
 
         int delete = clusterMapper.deleteByCode(code);
         if (delete > 0) {
+            log.info("Delete cluster complete, clusterCode:{}.", code);
             putMsg(result, Status.SUCCESS);
         } else {
+            log.error("Delete cluster error, clusterCode:{}.", code);
             putMsg(result, Status.DELETE_CLUSTER_ERROR);
         }
         return result;
     }
-
 
     /**
      * update cluster
@@ -256,11 +283,18 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
      * @param config    cluster config
      * @param desc      cluster desc
      */
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     @Override
     public Map<String, Object> updateClusterByCode(User loginUser, Long code, String name, String config, String desc) {
         Map<String, Object> result = new HashMap<>();
         if (isNotAdmin(loginUser, result)) {
+            log.warn("Only admin can update cluster, current login user name:{}.", loginUser.getUserName());
+            return result;
+        }
+
+        if (checkDescriptionLength(desc)) {
+            log.warn("Parameter description is too long.");
+            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
 
@@ -271,23 +305,36 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
 
         Cluster clusterExistByName = clusterMapper.queryByClusterName(name);
         if (clusterExistByName != null && !clusterExistByName.getCode().equals(code)) {
+            log.warn("Cluster with the same name already exists, name:{}.", clusterExistByName.getName());
             putMsg(result, Status.CLUSTER_NAME_EXISTS, name);
             return result;
         }
 
         Cluster clusterExist = clusterMapper.queryByClusterCode(code);
         if (clusterExist == null) {
+            log.error("Cluster does not exist, code:{}.", code);
             putMsg(result, Status.CLUSTER_NOT_EXISTS, name);
             return result;
         }
 
-        //update cluster
+        if (!Constants.K8S_LOCAL_TEST_CLUSTER_CODE.equals(clusterExist.getCode())
+                && !config.equals(ClusterConfUtils.getK8sConfig(clusterExist.getConfig()))) {
+            try {
+                k8sManager.getAndUpdateK8sClient(code, true);
+            } catch (RemotingException e) {
+                log.error("Update K8s error.", e);
+                putMsg(result, Status.K8S_CLIENT_OPS_ERROR, name);
+                return result;
+            }
+        }
+
+        // update cluster
         clusterExist.setConfig(config);
         clusterExist.setName(name);
         clusterExist.setDescription(desc);
         clusterMapper.updateById(clusterExist);
-        //need not update relation
-
+        // need not update relation
+        log.info("Cluster update complete, clusterId:{}.", clusterExist.getId());
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -303,12 +350,14 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
         Map<String, Object> result = new HashMap<>();
 
         if (StringUtils.isEmpty(clusterName)) {
+            log.warn("Parameter cluster name is empty.");
             putMsg(result, Status.CLUSTER_NAME_IS_NULL);
             return result;
         }
 
         Cluster cluster = clusterMapper.queryByClusterName(clusterName);
         if (cluster != null) {
+            log.warn("Cluster with the same name already exists, name:{}.", cluster.getName());
             putMsg(result, Status.CLUSTER_NAME_EXISTS, clusterName);
             return result;
         }
@@ -320,10 +369,12 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
     public Map<String, Object> checkParams(String name, String config) {
         Map<String, Object> result = new HashMap<>();
         if (StringUtils.isEmpty(name)) {
+            log.warn("Parameter cluster name is empty.");
             putMsg(result, Status.CLUSTER_NAME_IS_NULL);
             return result;
         }
         if (StringUtils.isEmpty(config)) {
+            log.warn("Parameter cluster config is empty.");
             putMsg(result, Status.CLUSTER_CONFIG_IS_NULL);
             return result;
         }
@@ -332,4 +383,3 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
     }
 
 }
-

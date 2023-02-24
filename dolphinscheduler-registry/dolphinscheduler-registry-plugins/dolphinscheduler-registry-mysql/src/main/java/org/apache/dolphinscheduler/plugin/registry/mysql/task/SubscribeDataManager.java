@@ -33,19 +33,16 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-
-import lombok.RequiredArgsConstructor;
 
 /**
  * Used to refresh if the subscribe path has been changed.
  */
+@Slf4j
 public class SubscribeDataManager implements AutoCloseable {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(SubscribeDataManager.class);
 
     private final MysqlOperator mysqlOperator;
     private final MysqlRegistryProperties registryProperties;
@@ -58,7 +55,8 @@ public class SubscribeDataManager implements AutoCloseable {
         this.mysqlOperator = mysqlOperator;
         this.dataSubscribeCheckThreadPool = Executors.newScheduledThreadPool(
                 1,
-                new ThreadFactoryBuilder().setNameFormat("MysqlRegistrySubscribeDataCheckThread").setDaemon(true).build());
+                new ThreadFactoryBuilder().setNameFormat("MysqlRegistrySubscribeDataCheckThread").setDaemon(true)
+                        .build());
     }
 
     public void start() {
@@ -136,7 +134,7 @@ public class SubscribeDataManager implements AutoCloseable {
                     triggerListener(updatedData, subscribeKey, subscribeListeners, Event.Type.UPDATE);
                 }
             } catch (Exception e) {
-                LOGGER.error("Query data from mysql registry error");
+                log.error("Query data from mysql registry error");
             }
         }
 
@@ -146,8 +144,8 @@ public class SubscribeDataManager implements AutoCloseable {
                                      Event.Type type) {
             for (MysqlRegistryData data : dataList) {
                 if (data.getKey().startsWith(subscribeKey)) {
-                    subscribeListeners.forEach(subscribeListener ->
-                            subscribeListener.notify(new Event(data.getKey(), data.getKey(), data.getData(), type)));
+                    subscribeListeners.forEach(subscribeListener -> subscribeListener
+                            .notify(new Event(data.getKey(), data.getKey(), data.getData(), type)));
                 }
             }
         }

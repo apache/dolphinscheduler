@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.dao.entity.ResponseTaskLog;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
@@ -30,21 +31,22 @@ public interface LoggerService {
     /**
      * view log
      *
+     * @param loginUser   login user
      * @param taskInstId task instance id
      * @param skipLineNum skip line number
      * @param limit limit
      * @return log string data
      */
-    Result<String> queryLog(int taskInstId, int skipLineNum, int limit);
-
+    Result<ResponseTaskLog> queryLog(User loginUser, int taskInstId, int skipLineNum, int limit);
 
     /**
      * get log size
      *
+     * @param loginUser   login user
      * @param taskInstId task instance id
      * @return log byte array
      */
-    byte[] getLogBytes(int taskInstId);
+    byte[] getLogBytes(User loginUser, int taskInstId);
 
     /**
      * query log

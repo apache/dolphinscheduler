@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.upgrade;
 
-import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -26,12 +24,10 @@ import java.time.Clock;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class ScheduleDao {
-
-    public static final Logger logger = LoggerFactory.getLogger(ScheduleDao.class);
 
     /**
      * queryAllSchedule
@@ -42,21 +38,17 @@ public class ScheduleDao {
     public Map<Integer, Long> queryAllSchedule(Connection conn) {
         Map<Integer, Long> scheduleMap = new HashMap<>();
         String sql = "SELECT id,process_definition_code FROM t_ds_schedules";
-        ResultSet rs = null;
-        PreparedStatement pstmt = null;
-        try {
-            pstmt = conn.prepareStatement(sql);
-            rs = pstmt.executeQuery();
+        try (
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
                 Integer id = rs.getInt(1);
                 long processDefinitionCode = rs.getLong(2);
                 scheduleMap.put(id, processDefinitionCode);
             }
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new RuntimeException("sql: " + sql, e);
-        } finally {
-            ConnectionUtils.releaseResource(rs, pstmt, conn);
         }
         return scheduleMap;
     }
@@ -68,7 +60,8 @@ public class ScheduleDao {
      * @param scheduleMap scheduleMap
      * @param processIdCodeMap processIdCodeMap
      */
-    public void updateScheduleCode(Connection conn, Map<Integer, Long> scheduleMap, Map<Integer, Long> processIdCodeMap) {
+    public void updateScheduleCode(Connection conn, Map<Integer, Long> scheduleMap,
+                                   Map<Integer, Long> processIdCodeMap) {
         String sql = "UPDATE t_ds_schedules SET process_definition_code=?,timezone_id=?,environment_code=-1 where id=?";
         try {
             Clock clock = Clock.systemDefaultZone();
@@ -89,10 +82,8 @@ public class ScheduleDao {
                 }
             }
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new RuntimeException("sql: " + sql, e);
-        } finally {
-            ConnectionUtils.releaseResource(conn);
         }
     }
 }

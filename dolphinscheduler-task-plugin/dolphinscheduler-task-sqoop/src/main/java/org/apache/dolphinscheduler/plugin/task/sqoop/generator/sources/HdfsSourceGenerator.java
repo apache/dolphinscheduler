@@ -20,22 +20,21 @@ package org.apache.dolphinscheduler.plugin.task.sqoop.generator.sources;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SPACE;
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.HDFS_EXPORT_DIR;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.ISourceGenerator;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SqoopParameters;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.sources.SourceHdfsParameter;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.lang3.StringUtils;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * hdfs source generator
  */
+@Slf4j
 public class HdfsSourceGenerator implements ISourceGenerator {
-
-    private static final Logger logger = LoggerFactory.getLogger(HdfsSourceGenerator.class);
 
     @Override
     public String generate(SqoopParameters sqoopParameters, SqoopTaskExecutionContext sqoopTaskExecutionContext) {
@@ -43,20 +42,20 @@ public class HdfsSourceGenerator implements ISourceGenerator {
         StringBuilder hdfsSourceSb = new StringBuilder();
 
         try {
-            SourceHdfsParameter sourceHdfsParameter
-                = JSONUtils.parseObject(sqoopParameters.getSourceParams(), SourceHdfsParameter.class);
+            SourceHdfsParameter sourceHdfsParameter =
+                    JSONUtils.parseObject(sqoopParameters.getSourceParams(), SourceHdfsParameter.class);
 
             if (null != sourceHdfsParameter) {
                 if (StringUtils.isNotEmpty(sourceHdfsParameter.getExportDir())) {
                     hdfsSourceSb.append(SPACE).append(HDFS_EXPORT_DIR)
-                        .append(SPACE).append(sourceHdfsParameter.getExportDir());
+                            .append(SPACE).append(sourceHdfsParameter.getExportDir());
                 } else {
                     throw new IllegalArgumentException("Sqoop hdfs export dir is null");
                 }
 
             }
         } catch (Exception e) {
-            logger.error(String.format("Sqoop hdfs source parmas build failed: [%s]", e.getMessage()));
+            log.error(String.format("Sqoop hdfs source parmas build failed: [%s]", e.getMessage()));
         }
 
         return hdfsSourceSb.toString();

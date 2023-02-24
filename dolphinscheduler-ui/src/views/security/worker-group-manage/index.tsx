@@ -15,13 +15,17 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, toRefs, watch } from 'vue'
+import {
+  defineComponent,
+  getCurrentInstance,
+  onMounted,
+  toRefs,
+  watch
+} from 'vue'
 import {
   NButton,
-  NCard,
   NDataTable,
   NIcon,
-  NInput,
   NPagination,
   NSpace
 } from 'naive-ui'
@@ -29,6 +33,8 @@ import { SearchOutlined } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
 import WorkerGroupModal from './components/worker-group-modal'
+import Card from '@/components/card'
+import Search from "@/components/input-search";
 
 const workerGroupManage = defineComponent({
   name: 'worker-group-manage',
@@ -68,6 +74,8 @@ const workerGroupManage = defineComponent({
       requestData()
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     onMounted(() => {
       createColumns(variables)
       requestData()
@@ -85,7 +93,8 @@ const workerGroupManage = defineComponent({
       onConfirmModal,
       onUpdatePageSize,
       handleModalChange,
-      onSearch
+      onSearch,
+      trim
     }
   },
   render() {
@@ -102,7 +111,7 @@ const workerGroupManage = defineComponent({
 
     return (
       <NSpace vertical>
-        <NCard size='small'>
+        <Card>
           <NSpace justify='space-between'>
             <NButton
               size='small'
@@ -113,25 +122,20 @@ const workerGroupManage = defineComponent({
               {t('security.worker_group.create_worker_group')}
             </NButton>
             <NSpace>
-              <NInput
-                size='small'
-                clearable
-                v-model={[this.searchVal, 'value']}
+              <Search
+                v-model:value={this.searchVal}
                 placeholder={t('security.worker_group.search_tips')}
+                onSearch={onSearch}
               />
               <NButton size='small' type='primary' onClick={onSearch}>
-                {{
-                  icon: () => (
-                    <NIcon>
-                      <SearchOutlined />
-                    </NIcon>
-                  )
-                }}
+                <NIcon>
+                  <SearchOutlined />
+                </NIcon>
               </NButton>
             </NSpace>
           </NSpace>
-        </NCard>
-        <NCard size='small'>
+        </Card>
+        <Card title={t('menu.worker_group_manage')}>
           <NSpace vertical>
             <NDataTable
               loading={loadingRef}
@@ -152,7 +156,7 @@ const workerGroupManage = defineComponent({
               />
             </NSpace>
           </NSpace>
-        </NCard>
+        </Card>
         <WorkerGroupModal
           showModalRef={this.showModalRef}
           statusRef={this.statusRef}

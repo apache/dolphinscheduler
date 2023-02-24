@@ -116,7 +116,8 @@ $bgLight: #ffffff;
     &.icon-sql {
       background-image: url('/images/task-icons/sql.png');
     }
-    &.icon-flink {
+    &.icon-flink,
+    &.icon-flink_stream {
       background-image: url('/images/task-icons/flink.png');
     }
     &.icon-mr {
@@ -158,6 +159,9 @@ $bgLight: #ffffff;
     &.icon-zeppelin {
       background-image: url('/images/task-icons/zeppelin.png');
     }
+    &.icon-hivecli {
+      background-image: url('/images/task-icons/hivecli.png');
+    }
     &.icon-k8s {
       background-image: url('/images/task-icons/k8s.png');
     }
@@ -172,6 +176,36 @@ $bgLight: #ffffff;
     }
     &.icon-dvc {
       background-image: url('/images/task-icons/dvc.png');
+    }
+    &.icon-java {
+      background-image: url('/images/task-icons/java.png');
+    }
+    &.icon-dinky {
+      background-image: url('/images/task-icons/dinky.png');
+    }
+    &.icon-sagemaker {
+      background-image: url('/images/task-icons/sagemaker.png');
+    }
+    &.icon-chunjun {
+      background-image: url('/images/task-icons/chunjun.png');
+    }
+    &.icon-pytorch {
+      background-image: url('/images/task-icons/pytorch.png');
+    }
+    &.icon-dms {
+      background-image: url('/images/task-icons/dms.png');
+    }
+    &.icon-datasync {
+      background-image: url('/images/task-icons/datasync.png');
+    }
+    &.icon-linkis {
+      background-image: url('/images/task-icons/linkis.png');
+    }
+    &.icon-kubeflow {
+      background-image: url('/images/task-icons/kubeflow.png');
+    }
+    &.icon-data_factory {
+      background-image: url('/images/task-icons/data_factory.png');
     }
   }
 
@@ -192,7 +226,8 @@ $bgLight: #ffffff;
       &.icon-sql {
         background-image: url('/images/task-icons/sql_hover.png');
       }
-      &.icon-flink {
+      &.icon-flink,
+      &.icon-flink_stream {
         background-image: url('/images/task-icons/flink_hover.png');
       }
       &.icon-mr {
@@ -234,6 +269,9 @@ $bgLight: #ffffff;
       &.icon-zeppelin {
         background-image: url('/images/task-icons/zeppelin_hover.png');
       }
+      &.icon-hivecli {
+        background-image: url('/images/task-icons/hivecli_hover.png');
+      }
       &.icon-k8s {
         background-image: url('/images/task-icons/k8s_hover.png');
       }
@@ -249,7 +287,47 @@ $bgLight: #ffffff;
       &.icon-dvc {
         background-image: url('/images/task-icons/dvc_hover.png');
       }
+      &.icon-dinky {
+        background-image: url('/images/task-icons/dinky_hover.png');
+      }
+      &.icon-java {
+        background-image: url('/images/task-icons/java.png');
+      }
+      &.icon-sagemaker {
+        background-image: url('/images/task-icons/sagemaker_hover.png');
+      }
+      &.icon-chunjun {
+        background-image: url('/images/task-icons/chunjun_hover.png');
+      }
+      &.icon-pytorch {
+        background-image: url('/images/task-icons/pytorch_hover.png');
+      }
+      &.icon-dms {
+        background-image: url('/images/task-icons/dms_hover.png');
+      }
+      &.icon-datasync {
+        background-image: url('/images/task-icons/datasync_hover.png');
+      }
+      &.icon-linkis {
+        background-image: url('/images/task-icons/linkis_hover.png');
+      }
+      &.icon-kubeflow {
+        background-image: url('/images/task-icons/kubeflow_hover.png');
+      }
+      &.icon-data_factory {
+        background-image: url('/images/task-icons/data_factory_hover.png');
+      }
     }
+  }
+
+  span {
+    display: flex;
+    flex: 1;
+  }
+
+  .stars {
+    display: flex;
+    cursor: pointer;
   }
 }
 

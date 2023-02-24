@@ -15,24 +15,30 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, ref, toRefs, watch } from 'vue'
+import {
+  defineComponent,
+  getCurrentInstance,
+  onMounted,
+  ref,
+  toRefs,
+  watch
+} from 'vue'
 import {
   NButton,
-  NInput,
   NIcon,
   NDataTable,
   NPagination,
   NSpace
 } from 'naive-ui'
-import Card from '@/components/card'
 import DetailModal from './detail'
+import Card from '@/components/card'
 import { SearchOutlined } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
 import { useUserInfo } from './use-userinfo'
 import { useColumns } from './use-columns'
 import { useTable } from './use-table'
-import styles from './index.module.scss'
 import type { IRecord } from './types'
+import Search from "@/components/input-search";
 
 const AlarmInstanceManage = defineComponent({
   name: 'alarm-instance-manage',
@@ -66,6 +72,8 @@ const AlarmInstanceManage = defineComponent({
       currentRecord.value = {}
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     onMounted(() => {
       changePage(1)
       columns.value = getColumns()
@@ -86,7 +94,8 @@ const AlarmInstanceManage = defineComponent({
       changePageSize,
       onCreate,
       onCloseModal,
-      onUpdatedList: updateList
+      onUpdatedList: updateList,
+      trim
     }
   },
   render() {
@@ -109,50 +118,53 @@ const AlarmInstanceManage = defineComponent({
     } = this
 
     return (
-      <>
-        <Card title=''>
+      <NSpace vertical>
+        <Card>
           {{
             default: () => (
-              <div class={styles['conditions']}>
+              <NSpace justify='space-between'>
                 {IS_ADMIN && (
-                  <NButton onClick={onCreate} type='primary'>
+                  <NButton onClick={onCreate} type='primary' size='small'>
                     {t('security.alarm_instance.create_alarm_instance')}
                   </NButton>
                 )}
-                <NSpace
-                  class={styles['conditions-search']}
-                  justify='end'
-                  wrap={false}
-                >
-                  <div class={styles['conditions-search-input']}>
-                    <NInput
-                      v-model={[this.searchVal, 'value']}
-                      placeholder={`${t(
-                        'security.alarm_instance.search_input_tips'
-                      )}`}
-                    />
-                  </div>
-                  <NButton type='primary' onClick={onUpdatedList}>
+                <NSpace justify='end' wrap={false}>
+                  <Search
+                    v-model:value={this.searchVal}
+                    placeholder={`${t(
+                      'security.alarm_instance.search_input_tips'
+                    )}`}
+                    onSearch={onUpdatedList}
+                  />
+                  <NButton type='primary' size='small' onClick={onUpdatedList}>
                     <NIcon>
                       <SearchOutlined />
                     </NIcon>
                   </NButton>
                 </NSpace>
-              </div>
+              </NSpace>
             )
           }}
         </Card>
-        <Card title='' class={styles['mt-8']}>
-          <NDataTable columns={columns} data={list} loading={loading} striped />
-          <NPagination
-            page={page}
-            page-size={pageSize}
-            item-count={itemCount}
-            show-quick-jumper
-            class={styles['pagination']}
-            on-update:page={changePage}
-            on-update:page-size={changePageSize}
-          />
+        <Card title={t('menu.alarm_instance_manage')}>
+          <NSpace vertical>
+            <NDataTable
+              columns={columns}
+              data={list}
+              loading={loading}
+              striped
+            />
+            <NSpace justify='center'>
+              <NPagination
+                page={page}
+                page-size={pageSize}
+                item-count={itemCount}
+                show-quick-jumper
+                on-update:page={changePage}
+                on-update:page-size={changePageSize}
+              />
+            </NSpace>
+          </NSpace>
         </Card>
         {IS_ADMIN && (
           <DetailModal
@@ -162,7 +174,7 @@ const AlarmInstanceManage = defineComponent({
             onUpdate={onUpdatedList}
           />
         )}
-      </>
+      </NSpace>
     )
   }
 })

@@ -29,9 +29,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import lombok.extern.slf4j.Slf4j;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -48,9 +46,8 @@ import io.netty.handler.timeout.IdleStateHandler;
 /**
  * NettyServer
  */
+@Slf4j
 public class NettyServer {
-
-    private static final Logger logger = LoggerFactory.getLogger(NettyServer.class);
 
     /**
      * boss group
@@ -86,6 +83,7 @@ public class NettyServer {
         this.serverConfig = serverConfig;
         if (Epoll.isAvailable()) {
             this.bossGroup = new EpollEventLoopGroup(1, new ThreadFactory() {
+
                 private AtomicInteger threadIndex = new AtomicInteger(0);
 
                 @Override
@@ -95,15 +93,18 @@ public class NettyServer {
             });
 
             this.workGroup = new EpollEventLoopGroup(serverConfig.getWorkerThread(), new ThreadFactory() {
+
                 private AtomicInteger threadIndex = new AtomicInteger(0);
 
                 @Override
                 public Thread newThread(Runnable r) {
-                    return new Thread(r, String.format("NettyServerWorkerThread_%d", this.threadIndex.incrementAndGet()));
+                    return new Thread(r,
+                            String.format("NettyServerWorkerThread_%d", this.threadIndex.incrementAndGet()));
                 }
             });
         } else {
             this.bossGroup = new NioEventLoopGroup(1, new ThreadFactory() {
+
                 private AtomicInteger threadIndex = new AtomicInteger(0);
 
                 @Override
@@ -113,11 +114,13 @@ public class NettyServer {
             });
 
             this.workGroup = new NioEventLoopGroup(serverConfig.getWorkerThread(), new ThreadFactory() {
+
                 private AtomicInteger threadIndex = new AtomicInteger(0);
 
                 @Override
                 public Thread newThread(Runnable r) {
-                    return new Thread(r, String.format("NettyServerWorkerThread_%d", this.threadIndex.incrementAndGet()));
+                    return new Thread(r,
+                            String.format("NettyServerWorkerThread_%d", this.threadIndex.incrementAndGet()));
                 }
             });
         }
@@ -151,15 +154,19 @@ public class NettyServer {
             try {
                 future = serverBootstrap.bind(serverConfig.getListenPort()).sync();
             } catch (Exception e) {
-                logger.error("NettyRemotingServer bind fail {}, exit", e.getMessage(), e);
-                throw new RuntimeException(String.format("NettyRemotingServer bind %s fail", serverConfig.getListenPort()));
+                log.error("NettyRemotingServer bind fail {}, exit", e.getMessage(), e);
+                throw new RuntimeException(
+                        String.format("NettyRemotingServer bind %s fail", serverConfig.getListenPort()));
             }
             if (future.isSuccess()) {
-                logger.info("NettyRemotingServer bind success at port : {}", serverConfig.getListenPort());
+                log.info("NettyRemotingServer bind success at port : {}", serverConfig.getListenPort());
             } else if (future.cause() != null) {
-                throw new RuntimeException(String.format("NettyRemotingServer bind %s fail", serverConfig.getListenPort()), future.cause());
+                throw new RuntimeException(
+                        String.format("NettyRemotingServer bind %s fail", serverConfig.getListenPort()),
+                        future.cause());
             } else {
-                throw new RuntimeException(String.format("NettyRemotingServer bind %s fail", serverConfig.getListenPort()));
+                throw new RuntimeException(
+                        String.format("NettyRemotingServer bind %s fail", serverConfig.getListenPort()));
             }
         }
     }
@@ -173,7 +180,8 @@ public class NettyServer {
         ch.pipeline()
                 .addLast(new NettyDecoder(RpcRequest.class))
                 .addLast(new NettyEncoder())
-                .addLast("server-idle-handle", new IdleStateHandler(0, 0, Constants.NETTY_SERVER_HEART_BEAT_TIME, TimeUnit.MILLISECONDS))
+                .addLast("server-idle-handle",
+                        new IdleStateHandler(0, 0, Constants.NETTY_SERVER_HEART_BEAT_TIME, TimeUnit.MILLISECONDS))
                 .addLast("handler", new NettyServerHandler());
     }
 
@@ -188,9 +196,9 @@ public class NettyServer {
                 }
 
             } catch (Exception ex) {
-                logger.error("netty server close exception", ex);
+                log.error("netty server close exception", ex);
             }
-            logger.info("netty server closed");
+            log.info("netty server closed");
         }
     }
 

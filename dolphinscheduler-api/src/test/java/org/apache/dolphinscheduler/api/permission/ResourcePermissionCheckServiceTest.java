@@ -14,36 +14,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.permission;
 
-
-import com.google.common.collect.Lists;
+import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * permission service test
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ResourcePermissionCheckServiceTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ResourcePermissionCheckServiceTest.class);
@@ -54,72 +53,95 @@ public class ResourcePermissionCheckServiceTest {
     @Mock
     private ProjectMapper projectMapper;
 
-    @Mock
-    private  ApplicationContext context;
-    @Mock
-    private ResourcePermissionCheckService<Object> resourcePermissionCheckService;
-
     @InjectMocks
-    ResourcePermissionCheckServiceImpl resourcePermissionCheckServices;
+    ResourcePermissionCheckServiceImpl resourcePermissionCheckService;
 
-    protected static final Map<AuthorizationType, ResourcePermissionCheckServiceImpl.ResourceAcquisitionAndPermissionCheck<?>> RESOURCE_LIST_MAP = new ConcurrentHashMap<>();
-
-    @Test
-    public void testResourcePermissionCheck(){
-        User user = new User();
-        user.setId(1);
-        Object[] obj = new Object[]{1,2};
-        boolean result = this.resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS, obj, user.getId(), logger);
-        Assert.assertFalse(result);
+    @BeforeEach
+    public void setup() {
+        ResourcePermissionCheckServiceImpl.RESOURCE_LIST_MAP.put(AuthorizationType.PROJECTS,
+                new ResourcePermissionCheckServiceImpl.ProjectsResourcePermissionCheck(projectMapper));
     }
 
     @Test
-    public void testOperationPermissionCheck(){
-        User user = new User();
-        user.setId(1);
-        resourcePermissionCheckServices.setApplicationContext(context);
-        Assert.assertFalse(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS, user.getId(), null, logger));
-        String sourceUrl = "/tmp/";
-        Assert.assertFalse(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS, user.getId(), sourceUrl, logger));
+    public void testResourcePermissionCheck() {
+        User user = getGeneralUser();
+
+        Assertions.assertTrue(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS, null,
+                user.getId(), logger));
+
+        List<Project> projects = Arrays.asList(getProject(1), getProject(2), getProject(3));
+        Mockito.when(projectMapper.listAuthorizedProjects(user.getId(), null)).thenReturn(projects);
+
+        Assertions.assertTrue(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS,
+                new Object[]{}, user.getId(), logger));
+        Assertions.assertTrue(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS,
+                new Object[]{1, 2}, user.getId(), logger));
+        Assertions.assertFalse(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS,
+                new Object[]{1, 2, 3, 4}, user.getId(), logger));
+        Assertions.assertFalse(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS,
+                new Object[]{2, 3, 4}, user.getId(), logger));
+        Assertions.assertFalse(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS,
+                new Object[]{4, 5}, user.getId(), logger));
     }
 
     @Test
-    public void testUserOwnedResourceIdsAcquisition(){
+    public void testOperationPermissionCheck() {
+        User user = getGeneralUser();
+
+        Mockito.when(processService.getUserById(user.getId())).thenReturn(null);
+        Assertions.assertFalse(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS,
+                user.getId(), ApiFuncIdentificationConstant.PROJECT, logger));
+
+        Mockito.when(processService.getUserById(user.getId())).thenReturn(user);
+        Assertions.assertTrue(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS,
+                user.getId(), ApiFuncIdentificationConstant.PROJECT, logger));
+    }
+
+    @Test
+    public void testUserOwnedResourceIdsAcquisition() {
+        User generalUser = getGeneralUser();
+        Mockito.when(processService.getUserById(generalUser.getId())).thenReturn(null);
+        Assertions.assertEquals(0, resourcePermissionCheckService
+                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, generalUser.getId(), logger).size());
+
+        // GENERAL_USER
+        List<Project> projects = Arrays.asList(getProject(1), getProject(2), getProject(3));
+        Mockito.when(processService.getUserById(generalUser.getId())).thenReturn(generalUser);
+        Mockito.when(projectMapper.listAuthorizedProjects(generalUser.getId(), null)).thenReturn(projects);
+        Assertions.assertEquals(3, resourcePermissionCheckService
+                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, generalUser.getId(), logger).size());
+
+        // ADMIN_USER
+        User adminUser = getAdminUser();
+        Mockito.when(processService.getUserById(adminUser.getId())).thenReturn(adminUser);
+        Mockito.when(projectMapper.listAuthorizedProjects(0, null)).thenReturn(projects);
+        Assertions.assertEquals(3, resourcePermissionCheckService
+                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, adminUser.getId(), logger).size());
+    }
+
+    private User getGeneralUser() {
+        User user = new User();
+        user.setId(2);
+        user.setUserType(UserType.GENERAL_USER);
+        user.setUserName("userTest0001");
+        user.setUserPassword("userTest0001");
+        return user;
+    }
+
+    private User getAdminUser() {
         User user = new User();
         user.setId(1);
-        //ADMIN
         user.setUserType(UserType.ADMIN_USER);
-        Object[] obj = new Object[]{1,2};
-        List<Project> projectList = Lists.newArrayList(this.getEntity());
-        Set result = resourcePermissionCheckServices.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS,
-                user.getId(),
-                logger);
-        Assert.assertNotNull(result);
+        user.setUserName("userTest0001");
+        user.setUserPassword("userTest0001");
+        return user;
     }
 
-
-    @Test
-    public void  testSetApplication(){
-       resourcePermissionCheckServices.setApplicationContext(context);
-    }
-    /**
-     * create entity
-     */
-    private Project getEntity() {
+    private Project getProject(int projectId) {
         Project project = new Project();
-        project.setId(1);
-        project.setUserId(1);
-        project.setName("permissionsTest");
-        project.setUserName("permissionTest");
+        project.setCode(1L);
+        project.setId(projectId);
+        project.setName("projectName");
         return project;
-    }
-
-    /**
-     * entity list
-     */
-    private List<Project> getList() {
-        List<Project> list = new ArrayList<>();
-        list.add(getEntity());
-        return list;
     }
 }

@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.plugin.alert.dingtalk;
 
 import org.apache.dolphinscheduler.alert.api.AlertResult;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.StringUtils;
@@ -47,8 +47,7 @@ import java.util.Objects;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * <p>
@@ -56,9 +55,9 @@ import org.slf4j.LoggerFactory;
  *     https://open.dingtalk.com/document/robots/customize-robot-security-settings
  * </p>
  */
+@Slf4j
 public final class DingTalkSender {
 
-    private static final Logger logger = LoggerFactory.getLogger(DingTalkSender.class);
     private final String url;
     private final String keyword;
     private final String secret;
@@ -127,13 +126,13 @@ public final class DingTalkSender {
 
         if (null == result) {
             alertResult.setMessage("send ding talk msg error");
-            logger.info("send ding talk msg error,ding talk server resp is null");
+            log.info("send ding talk msg error,ding talk server resp is null");
             return alertResult;
         }
         DingTalkSendMsgResponse sendMsgResponse = JSONUtils.parseObject(result, DingTalkSendMsgResponse.class);
         if (null == sendMsgResponse) {
             alertResult.setMessage("send ding talk msg fail");
-            logger.info("send ding talk msg error,resp error");
+            log.info("send ding talk msg error,resp error");
             return alertResult;
         }
         if (sendMsgResponse.errcode == 0) {
@@ -142,7 +141,7 @@ public final class DingTalkSender {
             return alertResult;
         }
         alertResult.setMessage(String.format("alert send ding talk msg error : %s", sendMsgResponse.getErrmsg()));
-        logger.info("alert send ding talk msg error : {}", sendMsgResponse.getErrmsg());
+        log.info("alert send ding talk msg error : {}", sendMsgResponse.getErrmsg());
         return alertResult;
     }
 
@@ -159,7 +158,7 @@ public final class DingTalkSender {
             String resp = sendMsg(title, content);
             return checkSendDingTalkSendMsgResult(resp);
         } catch (Exception e) {
-            logger.info("send ding talk alert msg  exception : {}", e.getMessage());
+            log.info("send ding talk alert msg  exception : {}", e.getMessage());
             alertResult = new AlertResult();
             alertResult.setStatus("false");
             alertResult.setMessage("send ding talk alert fail.");
@@ -171,7 +170,8 @@ public final class DingTalkSender {
 
         String msg = generateMsgJson(title, content);
 
-        HttpPost httpPost = constructHttpPost(org.apache.dolphinscheduler.spi.utils.StringUtils.isBlank(secret) ? url : generateSignedUrl(), msg);
+        HttpPost httpPost = constructHttpPost(
+                org.apache.commons.lang3.StringUtils.isBlank(secret) ? url : generateSignedUrl(), msg);
 
         CloseableHttpClient httpClient;
         if (Boolean.TRUE.equals(enableProxy)) {
@@ -192,7 +192,7 @@ public final class DingTalkSender {
             } finally {
                 response.close();
             }
-            logger.info("Ding Talk send msg :{}, resp: {}", msg, resp);
+            log.info("Ding Talk send msg :{}, resp: {}", msg, resp);
             return resp;
         } finally {
             httpClient.close();
@@ -207,7 +207,7 @@ public final class DingTalkSender {
      * @return msg
      */
     private String generateMsgJson(String title, String content) {
-        if (org.apache.dolphinscheduler.spi.utils.StringUtils.isBlank(msgType)) {
+        if (org.apache.commons.lang3.StringUtils.isBlank(msgType)) {
             msgType = DingTalkParamsConstants.DING_TALK_MSG_TYPE_TEXT;
         }
         Map<String, Object> items = new HashMap<>();
@@ -237,7 +237,7 @@ public final class DingTalkSender {
         StringBuilder builder = new StringBuilder(title);
         builder.append("\n");
         builder.append(content);
-        if (org.apache.dolphinscheduler.spi.utils.StringUtils.isNotBlank(keyword)) {
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(keyword)) {
             builder.append(" ");
             builder.append(keyword);
         }
@@ -255,19 +255,19 @@ public final class DingTalkSender {
      */
     private void generateMarkdownMsg(String title, String content, Map<String, Object> text) {
         StringBuilder builder = new StringBuilder(content);
-        if (org.apache.dolphinscheduler.spi.utils.StringUtils.isNotBlank(keyword)) {
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(keyword)) {
             builder.append(" ");
             builder.append(keyword);
         }
         builder.append("\n\n");
-        if (org.apache.dolphinscheduler.spi.utils.StringUtils.isNotBlank(atMobiles)) {
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(atMobiles)) {
             Arrays.stream(atMobiles.split(",")).forEach(value -> {
                 builder.append("@");
                 builder.append(value);
                 builder.append(" ");
             });
         }
-        if (org.apache.dolphinscheduler.spi.utils.StringUtils.isNotBlank(atUserIds)) {
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(atUserIds)) {
             Arrays.stream(atUserIds.split(",")).forEach(value -> {
                 builder.append("@");
                 builder.append(value);
@@ -289,8 +289,12 @@ public final class DingTalkSender {
     private void setMsgAt(Map<String, Object> items) {
         Map<String, Object> at = new HashMap<>();
 
-        String[] atMobileArray = org.apache.dolphinscheduler.spi.utils.StringUtils.isNotBlank(atMobiles) ? atMobiles.split(",") : new String[0];
-        String[] atUserArray = org.apache.dolphinscheduler.spi.utils.StringUtils.isNotBlank(atUserIds) ? atUserIds.split(",") : new String[0];
+        String[] atMobileArray =
+                org.apache.commons.lang3.StringUtils.isNotBlank(atMobiles) ? atMobiles.split(",")
+                        : new String[0];
+        String[] atUserArray =
+                org.apache.commons.lang3.StringUtils.isNotBlank(atUserIds) ? atUserIds.split(",")
+                        : new String[0];
         boolean isAtAll = Objects.isNull(atAll) ? false : atAll;
 
         at.put("atMobiles", atMobileArray);
@@ -308,19 +312,20 @@ public final class DingTalkSender {
     private String generateSignedUrl() {
         Long timestamp = System.currentTimeMillis();
         String stringToSign = timestamp + "\n" + secret;
-        String sign = org.apache.dolphinscheduler.spi.utils.StringUtils.EMPTY;
+        String sign = org.apache.commons.lang3.StringUtils.EMPTY;
         try {
             Mac mac = Mac.getInstance("HmacSHA256");
             mac.init(new SecretKeySpec(secret.getBytes("UTF-8"), "HmacSHA256"));
             byte[] signData = mac.doFinal(stringToSign.getBytes("UTF-8"));
-            sign = URLEncoder.encode(new String(Base64.encodeBase64(signData)),"UTF-8");
+            sign = URLEncoder.encode(new String(Base64.encodeBase64(signData)), "UTF-8");
         } catch (Exception e) {
-            logger.error("generate sign error, message:{}", e);
+            log.error("generate sign error, message:{}", e);
         }
         return url + "&timestamp=" + timestamp + "&sign=" + sign;
     }
 
     static final class DingTalkSendMsgResponse {
+
         private Integer errcode;
         private String errmsg;
 
@@ -378,7 +383,8 @@ public final class DingTalkSender {
 
         @Override
         public String toString() {
-            return "DingTalkSender.DingTalkSendMsgResponse(errcode=" + this.getErrcode() + ", errmsg=" + this.getErrmsg() + ")";
+            return "DingTalkSender.DingTalkSendMsgResponse(errcode=" + this.getErrcode() + ", errmsg="
+                    + this.getErrmsg() + ")";
         }
     }
 }

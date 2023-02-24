@@ -13,8 +13,13 @@ DolphinScheduler 允许在任务间进行参数传递，目前传递方向仅支
 * [Shell](../task/shell.md)
 * [SQL](../task/sql.md)
 * [Procedure](../task/stored-procedure.md)
+* [Python](../task/python.md)
 
 当定义上游节点时，如果有需要将该节点的结果传递给有依赖关系的下游节点，需要在【当前节点设置】的【自定义参数】设置一个方向是 OUT 的变量。目前我们主要针对 SQL 和 SHELL 节点做了可以向下传递参数的功能。
+
+上游传递的参数可以在下游节点中被更新，更新方法与[设置参数](#创建-shell-任务并设置参数)相同。
+
+如果定义了同名的传递参数，上游节点的参数将被覆盖。
 
 > 注：若节点之间没有依赖关系，则局部参数无法通过上游传递。
 
@@ -22,7 +27,7 @@ DolphinScheduler 允许在任务间进行参数传递，目前传递方向仅支
 
 本样例展示了如何使用参数传递的功能，通过 SHELL 任务来创建本地参数并赋值传递给下游，SQL 任务通过获得上游任务的参数完成查询操作。
 
-#### 创建 SHELL 任务，设置参数
+#### 创建 SHELL 任务并设置参数
 
 > 用户需要传递参数，在定义 SHELL 脚本时，需要输出格式为 ${setValue(key=value)} 的语句，key 为对应参数的 prop，value 为该参数的值。
 
@@ -41,7 +46,7 @@ SHELL 节点定义时当日志检测到 ${setValue(output=1)} 的格式时，会
 
 ![context-parameter02](../../../../img/new_ui/dev/parameter/context_parameter02.png)
 
-#### 创建 SQL 任务，使用参数
+#### 创建 SQL 任务并使用参数
 
 完成上述的 SHELL 任务之后，我们可以使用上游所传递的 output 作为 SQL 的查询对象。其中将所查询的 id 重命名为 ID，作为参数输出。
 
@@ -51,7 +56,7 @@ SHELL 节点定义时当日志检测到 ${setValue(output=1)} 的格式时，会
 >
 > 如果 SQL 节点的结果为多行，一个或多个字段，参数的名字需要和字段名称一致。数据类型选择为 LIST。获取到 SQL 查询结果后会将对应列转化为 LIST，并将该结果转化为 JSON 后作为对应变量的值。
 
-#### 保存工作流，设置全局参数
+#### 保存工作流并设置全局参数
 
 点击保存工作流图标，并设置全局参数 output 和 value。
 
@@ -73,6 +78,13 @@ Node_mysql 运行结果如下：
 
 ![context-log03](../../../../img/new_ui/dev/parameter/context_log03.png)
 
-虽然在 Node_A 的脚本中为 output 赋值为 1，但日志中显示的值仍然为 100。但根据[参数优先级](priority.md)的原则：`本地参数 > 上游任务传递的参数 > 全局参数`，在 Node_B 中输出的值为 1。则证明 output 参数参照预期的值在该工作流中传递，并在 Node_mysql 中使用该值完成查询操作。
+虽然在 Node_A 的脚本中为 output 赋值为 1，但日志中显示的值仍然为 100。但根据[参数优先级](priority.md)的原则：`启动参数 > 本地参数 > 上游任务传递的参数 > 全局参数`，在 Node_B 中输出的值为 1。则证明 output 参数参照预期的值在该工作流中传递，并在 Node_mysql 中使用该值完成查询操作。
 
 但是 value 的值却只有在 Node_A 中输出为 66，其原因为 value 的方向选择为 IN，只有当方向为 OUT 时才会被定义为变量输出。
+
+#### Python 任务传递参数
+
+使用 `print('${setValue(key=%s)}' % value)`，DolphinScheduler会捕捉输出中的 `${setValue(key=value}`来进行参数捕捉，从而传递到下游
+
+如
+![img.png](../../../../img/new_ui/dev/parameter/python_context_param.png)

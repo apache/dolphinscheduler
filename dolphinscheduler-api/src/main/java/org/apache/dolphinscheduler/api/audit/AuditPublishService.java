@@ -25,12 +25,13 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class AuditPublishService {
 
     private BlockingQueue<AuditMessage> auditMessageQueue = new LinkedBlockingQueue<>();
@@ -40,8 +41,6 @@ public class AuditPublishService {
 
     @Autowired
     private AuditConfiguration auditConfiguration;
-
-    private static final Logger logger = LoggerFactory.getLogger(AuditPublishService.class);
 
     /**
      * create a daemon thread to process the message queue
@@ -63,7 +62,7 @@ public class AuditPublishService {
      */
     public void publish(AuditMessage message) {
         if (auditConfiguration.getEnabled() && !auditMessageQueue.offer(message)) {
-            logger.error("add audit message failed {}", message);
+            log.error("Publish audit message failed, message:{}", message);
         }
     }
 
@@ -79,11 +78,11 @@ public class AuditPublishService {
                     try {
                         subscriber.execute(message);
                     } catch (Exception e) {
-                        logger.error("consume audit message {} failed, error detail {}", message, e);
+                        log.error("Consume audit message failed, message:{}", message, e);
                     }
                 }
             } catch (InterruptedException e) {
-                logger.error("consume audit message failed {}.", message, e);
+                log.error("Consume audit message failed, message:{}", message, e);
                 Thread.currentThread().interrupt();
                 break;
             }

@@ -15,102 +15,14 @@
  * limitations under the License.
  */
 
-import { useRoute, useRouter } from 'vue-router'
-import { defineComponent, toRefs, watch } from 'vue'
-import { NButton, NForm, NFormItem, NSpace, NSpin } from 'naive-ui'
-import { useI18n } from 'vue-i18n'
-import { useForm } from './use-form'
-import { useEdit } from './use-edit'
-import Card from '@/components/card'
-import MonacoEditor from '@/components/monaco-editor'
-import styles from '../index.module.scss'
+import { defineComponent } from 'vue'
+import ResourceEditModal from '../../components/resource/edit'
 
 export default defineComponent({
   name: 'ResourceFileEdit',
   setup() {
-    const route = useRoute()
-    const router = useRouter()
-
-    const componentName = route.name
-    const fileId = Number(route.params.id)
-
-    const { state } = useForm()
-    const { getResourceView, handleUpdateContent } = useEdit(state)
-
-    const handleFileContent = () => {
-      state.fileForm.content = resourceViewRef.state.value.content
-      handleUpdateContent(fileId)
-    }
-
-    const handleReturn = () => {
-      router.go(-1)
-    }
-
-    const resourceViewRef = getResourceView(fileId)
-    watch(
-      () => resourceViewRef.state.value.content,
-      () => (state.fileForm.content = resourceViewRef.state.value.content)
-    )
-
-    return {
-      componentName,
-      resourceViewRef,
-      handleReturn,
-      handleFileContent,
-      ...toRefs(state)
-    }
   },
   render() {
-    const { t } = useI18n()
-    return (
-      <Card title={t('resource.file.file_details')}>
-        {this.resourceViewRef.isReady.value ? (
-          <div class={styles['file-edit-content']}>
-            <h2>
-              <span>{this.resourceViewRef.state.value.alias}</span>
-            </h2>
-            <NForm
-              rules={this.rules}
-              ref='fileFormRef'
-              class={styles['form-content']}
-              disabled={this.componentName !== 'resource-file-edit'}
-            >
-              <NFormItem path='content'>
-                <MonacoEditor
-                  v-model={[this.resourceViewRef.state.value.content, 'value']}
-                />
-              </NFormItem>
-              <NSpace>
-                <NButton
-                  type='info'
-                  size='small'
-                  text
-                  style={{ marginRight: '15px' }}
-                  onClick={this.handleReturn}
-                  class='btn-cancel'
-                >
-                  {t('resource.file.return')}
-                </NButton>
-                {this.componentName === 'resource-file-edit' && (
-                  <NButton
-                    type='info'
-                    size='small'
-                    round
-                    onClick={() => this.handleFileContent()}
-                    class='btn-submit'
-                  >
-                    {t('resource.file.save')}
-                  </NButton>
-                )}
-              </NSpace>
-            </NForm>
-          </div>
-        ) : (
-          <NSpace justify='center'>
-            <NSpin show={true} />
-          </NSpace>
-        )}
-      </Card>
-    )
+    return <ResourceEditModal/>
   }
 })

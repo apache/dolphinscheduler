@@ -17,19 +17,17 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
-import static org.junit.Assert.assertNotNull;
-
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class SqlParametersTest {
 
@@ -55,7 +53,7 @@ public class SqlParametersTest {
         properties.add(property);
 
         SqlParameters sqlParameters = new SqlParameters();
-        Assert.assertTrue(CollectionUtils.isEmpty(sqlParameters.getResourceFilesList()));
+        Assertions.assertTrue(CollectionUtils.isEmpty(sqlParameters.getResourceFilesList()));
 
         sqlParameters.setType(type);
         sqlParameters.setSql(sql);
@@ -68,29 +66,29 @@ public class SqlParametersTest {
         sqlParameters.setTitle(title);
         sqlParameters.setGroupId(groupId);
 
-        Assert.assertEquals(type, sqlParameters.getType());
-        Assert.assertEquals(sql, sqlParameters.getSql());
-        Assert.assertEquals(udfs, sqlParameters.getUdfs());
-        Assert.assertEquals(datasource, sqlParameters.getDatasource());
-        Assert.assertEquals(sqlType, sqlParameters.getSqlType());
-        Assert.assertEquals(sendEmail, sqlParameters.getSendEmail());
-        Assert.assertEquals(displayRows, sqlParameters.getDisplayRows());
-        Assert.assertEquals(showType, sqlParameters.getShowType());
-        Assert.assertEquals(title, sqlParameters.getTitle());
-        Assert.assertEquals(groupId, sqlParameters.getGroupId());
+        Assertions.assertEquals(type, sqlParameters.getType());
+        Assertions.assertEquals(sql, sqlParameters.getSql());
+        Assertions.assertEquals(udfs, sqlParameters.getUdfs());
+        Assertions.assertEquals(datasource, sqlParameters.getDatasource());
+        Assertions.assertEquals(sqlType, sqlParameters.getSqlType());
+        Assertions.assertEquals(sendEmail, sqlParameters.getSendEmail());
+        Assertions.assertEquals(displayRows, sqlParameters.getDisplayRows());
+        Assertions.assertEquals(showType, sqlParameters.getShowType());
+        Assertions.assertEquals(title, sqlParameters.getTitle());
+        Assertions.assertEquals(groupId, sqlParameters.getGroupId());
 
         String sqlResult = "[{\"id\":6,\"test1\":\"6\"},{\"id\":70002,\"test1\":\"+1\"}]";
         String sqlResult1 = "[{\"id\":6,\"test1\":\"6\"}]";
         sqlParameters.setLocalParams(properties);
         sqlParameters.varPool = new ArrayList<>();
         sqlParameters.dealOutParam(sqlResult1);
-        assertNotNull(sqlParameters.getVarPool().get(0));
+        Assertions.assertNotNull(sqlParameters.getVarPool().get(0));
 
         property.setType(DataType.LIST);
         properties.clear();
         properties.add(property);
         sqlParameters.setLocalParams(properties);
         sqlParameters.dealOutParam(sqlResult);
-        assertNotNull(sqlParameters.getVarPool().get(0));
+        Assertions.assertNotNull(sqlParameters.getVarPool().get(0));
     }
 }

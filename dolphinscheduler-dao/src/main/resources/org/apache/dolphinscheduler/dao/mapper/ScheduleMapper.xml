@@ -29,7 +29,7 @@
         ${alias}.update_time
     </sql>
     <select id="queryByProcessDefineCodePaging" resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
-        select p_f.name as process_definition_name, p.name as project_name,u.user_name,
+        select p_f.name as process_definition_name, p.name as project_name,u.user_name,e.name as environment_name,
         <include refid="baseSqlV2">
             <property name="alias" value="s"/>
         </include>
@@ -37,6 +37,7 @@
         join t_ds_process_definition p_f on s.process_definition_code = p_f.code
         join t_ds_project as p on p_f.project_code = p.code
         join t_ds_user as u on s.user_id = u.id
+        left join t_ds_environment as e on s.environment_code = e.code
         where 1=1
         <if test="processDefinitionCode != 0">
             and s.process_definition_code = #{processDefinitionCode}
@@ -75,10 +76,12 @@
         select
         <include refid="baseSql"/>
         from t_ds_schedules
-        where process_definition_code in
-        <foreach collection="processDefinitionCodeList" item="code" index="index" open="(" close=")" separator=",">
-            #{code}
-        </foreach>
+        <if test="processDefinitionCodeList != null and processDefinitionCodeList.size() != 0">
+            where process_definition_code in
+            <foreach collection="processDefinitionCodeList" item="code" index="index" open="(" close=")" separator=",">
+                #{code}
+            </foreach>
+        </if>
     </select>
 
     <select id="queryReleaseSchedulerListByProcessDefinitionCode"
@@ -87,5 +90,30 @@
         <include refid="baseSql"/>
         from t_ds_schedules
         where process_definition_code = #{processDefinitionCode} and release_state = 1
+    </select>
+
+    <select id="filterSchedules"
+            parameterType="org.apache.dolphinscheduler.dao.entity.Schedule"
+            resultType="org.apache.dolphinscheduler.dao.entity.Schedule"
+    >
+        SELECT pd.name as process_definition_name, p.name as project_name,
+        <include refid="baseSqlV2">
+            <property name="alias" value="s"/>
+        </include>
+        FROM t_ds_schedules s
+        join t_ds_process_definition pd on s.process_definition_code = pd.code
+        join t_ds_project as p on pd.project_code = p.code
+        <where>
+            <if test=" schedule.projectName != null and schedule.projectName != ''">
+                and p.name like concat('%', #{schedule.projectName}, '%')
+            </if>
+            <if test=" schedule.processDefinitionName != null and schedule.processDefinitionName != ''">
+                and pd.name like concat('%', #{schedule.processDefinitionName}, '%')
+            </if>
+            <if test=" schedule.releaseState != null and schedule.releaseState != ''">
+                and s.release_state = #{schedule.releaseState}
+            </if>
+        </where>
+        order by update_time desc, id asc
     </select>
 </mapper>

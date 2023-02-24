@@ -17,15 +17,15 @@
 
 package org.apache.dolphinscheduler.plugin.task.openmldb;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.python.PythonTask;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.nio.file.Paths;
 import java.util.Locale;
@@ -41,15 +41,15 @@ import com.google.common.base.Preconditions;
 public class OpenmldbTask extends PythonTask {
 
     /**
-     * openmldb parameters
+     * openmldb parameters: cast pythonParameters to OpenmldbParameters
      */
-    private OpenmldbParameters openmldbParameters;
 
     /**
      * python process(openmldb only supports version 3 by default)
      */
     private static final String OPENMLDB_PYTHON = "python3";
     private static final Pattern PYTHON_PATH_PATTERN = Pattern.compile("/bin/python[\\d.]*$");
+    public static final Pattern SQL_PATTERN = Pattern.compile("\\S");
 
     /**
      * constructor
@@ -62,11 +62,10 @@ public class OpenmldbTask extends PythonTask {
 
     @Override
     public void init() {
-        logger.info("openmldb task params {}", taskRequest.getTaskParams());
+        pythonParameters = JSONUtils.parseObject(taskRequest.getTaskParams(), OpenmldbParameters.class);
 
-        openmldbParameters = JSONUtils.parseObject(taskRequest.getTaskParams(), OpenmldbParameters.class);
-
-        if (openmldbParameters == null || !openmldbParameters.checkParameters()) {
+        log.info("Initialize openmldb task params {}", JSONUtils.toPrettyJsonString(pythonParameters));
+        if (pythonParameters == null || !pythonParameters.checkParameters()) {
             throw new TaskException("openmldb task params is not valid");
         }
     }
@@ -75,11 +74,6 @@ public class OpenmldbTask extends PythonTask {
     @Deprecated
     public String getPreScript() {
         return "";
-    }
-
-    @Override
-    public AbstractParameters getParameters() {
-        return openmldbParameters;
     }
 
     /**
@@ -99,7 +93,8 @@ public class OpenmldbTask extends PythonTask {
      */
     @Override
     protected String buildPythonScriptContent() {
-        logger.info("raw sql script : {}", openmldbParameters.getSql());
+        OpenmldbParameters openmldbParameters = (OpenmldbParameters) pythonParameters;
+        log.info("raw sql script : {}", openmldbParameters.getSql());
 
         String rawSQLScript = openmldbParameters.getSql().replaceAll("[\\r]?\\n", "\n");
         Map<String, Property> paramsMap = mergeParamsWithContext(openmldbParameters);
@@ -107,7 +102,7 @@ public class OpenmldbTask extends PythonTask {
 
         // convert sql to python script
         String pythonScript = buildPythonScriptsFromSql(rawSQLScript);
-        logger.info("rendered python script : {}", pythonScript);
+        log.info("rendered python script : {}", pythonScript);
         return pythonScript;
     }
 
@@ -116,6 +111,7 @@ public class OpenmldbTask extends PythonTask {
         StringBuilder builder = new StringBuilder("import openmldb\nimport sqlalchemy as db\n");
 
         // connect to openmldb
+        OpenmldbParameters openmldbParameters = (OpenmldbParameters) pythonParameters;
         builder.append(String.format("engine = db.create_engine('openmldb:///?zk=%s&zkPath=%s')\n",
                 openmldbParameters.getZk(), openmldbParameters.getZkPath()));
         builder.append("con = engine.connect()\n");
@@ -132,9 +128,8 @@ public class OpenmldbTask extends PythonTask {
 
         // split sql to list
         // skip the sql only has space characters
-        Pattern pattern = Pattern.compile("\\S");
         for (String sql : rawSqlScript.split(";")) {
-            if (pattern.matcher(sql).find()) {
+            if (SQL_PATTERN.matcher(sql).find()) {
                 sql = sql.replaceAll("\\n", "\\\\n");
                 builder.append("con.execute(\"").append(sql).append("\")\n");
             }

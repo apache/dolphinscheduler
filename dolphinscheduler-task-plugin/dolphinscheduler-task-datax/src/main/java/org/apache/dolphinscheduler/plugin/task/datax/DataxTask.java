@@ -21,25 +21,26 @@ import static org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUt
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTaskExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.enums.Flag;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
@@ -57,7 +58,6 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -77,11 +77,14 @@ import com.alibaba.druid.sql.parser.SQLStatementParser;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class DataxTask extends AbstractTaskExecutor {
+public class DataxTask extends AbstractTask {
+
     /**
      * jvm parameters
      */
     public static final String JVM_PARAM = " --jvm=\"-Xms%sG -Xmx%sG\" ";
+
+    public static final String CUSTOM_PARAM = " -D%s='%s'";
     /**
      * python process(datax only supports version 2.7 by default)
      */
@@ -123,7 +126,7 @@ public class DataxTask extends AbstractTaskExecutor {
         this.taskExecutionContext = taskExecutionContext;
 
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-                taskExecutionContext, logger);
+                taskExecutionContext, log);
     }
 
     /**
@@ -131,53 +134,60 @@ public class DataxTask extends AbstractTaskExecutor {
      */
     @Override
     public void init() {
-        logger.info("datax task params {}", taskExecutionContext.getTaskParams());
         dataXParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), DataxParameters.class);
+        log.info("Initialize datax task params {}", JSONUtils.toPrettyJsonString(dataXParameters));
 
-        if (!dataXParameters.checkParameters()) {
+        if (dataXParameters == null || !dataXParameters.checkParameters()) {
             throw new RuntimeException("datax task params is not valid");
         }
 
-        dataxTaskExecutionContext = dataXParameters.generateExtendedContext(taskExecutionContext.getResourceParametersHelper());
+        dataxTaskExecutionContext =
+                dataXParameters.generateExtendedContext(taskExecutionContext.getResourceParametersHelper());
     }
 
     /**
      * run DataX process
      *
-     * @throws Exception if error throws Exception
+     * @throws TaskException if error throws Exception
      */
     @Override
-    public void handle() throws Exception {
+    public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             // replace placeholder,and combine local and global parameters
             Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
 
-            // run datax procesDataSourceService.s
+            // run datax processDataSourceService
             String jsonFilePath = buildDataxJsonFile(paramsMap);
             String shellCommandFilePath = buildShellCommandFile(jsonFilePath, paramsMap);
-            TaskResponse commandExecuteResult = shellCommandExecutor.run(shellCommandFilePath);
+            TaskResponse commandExecuteResult = shellCommandExecutor.run(shellCommandFilePath, taskCallBack);
 
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
-            setAppIds(commandExecuteResult.getAppIds());
             setProcessId(commandExecuteResult.getProcessId());
-        } catch (Exception e) {
-            logger.error("datax task error", e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.error("The current DataX task has been interrupted", e);
             setExitStatusCode(EXIT_CODE_FAILURE);
-            throw e;
+            throw new TaskException("The current DataX task has been interrupted", e);
+        } catch (Exception e) {
+            log.error("datax task error", e);
+            setExitStatusCode(EXIT_CODE_FAILURE);
+            throw new TaskException("Execute DataX task failed", e);
         }
     }
 
     /**
      * cancel DataX process
      *
-     * @param cancelApplication cancelApplication
-     * @throws Exception if error throws Exception
+     * @throws TaskException if error throws Exception
      */
     @Override
-    public void cancelApplication(boolean cancelApplication)
-            throws Exception {
+    public void cancel() throws TaskException {
         // cancel process
-        shellCommandExecutor.cancelApplication();
+        try {
+            shellCommandExecutor.cancelApplication();
+        } catch (Exception e) {
+            throw new TaskException("cancel application error", e);
+        }
     }
 
     /**
@@ -186,8 +196,7 @@ public class DataxTask extends AbstractTaskExecutor {
      * @return datax json file name
      * @throws Exception if error throws Exception
      */
-    private String buildDataxJsonFile(Map<String, Property> paramsMap)
-            throws Exception {
+    private String buildDataxJsonFile(Map<String, Property> paramsMap) throws Exception {
         // generate json
         String fileName = String.format("%s/%s_job.json",
                 taskExecutionContext.getExecutePath(),
@@ -200,7 +209,7 @@ public class DataxTask extends AbstractTaskExecutor {
         }
 
         if (dataXParameters.getCustomConfig() == Flag.YES.ordinal()) {
-            json = dataXParameters.getJson().replaceAll("\\r\\n", "\n");
+            json = dataXParameters.getJson().replaceAll("\\r\\n", System.lineSeparator());
         } else {
             ObjectNode job = JSONUtils.createObjectNode();
             job.putArray("content").addAll(buildDataxJobContentJson());
@@ -215,7 +224,7 @@ public class DataxTask extends AbstractTaskExecutor {
         // replace placeholder
         json = ParameterUtils.convertParameterPlaceholders(json, ParamUtils.convert(paramsMap));
 
-        logger.debug("datax job json : {}", json);
+        log.debug("datax job json : {}", json);
 
         // create datax json file
         FileUtils.writeStringToFile(new File(fileName), json, StandardCharsets.UTF_8);
@@ -226,7 +235,6 @@ public class DataxTask extends AbstractTaskExecutor {
      * build datax job config
      *
      * @return collection of datax job config JSONObject
-     * @throws SQLException if error throws SQLException
      */
     private List<ObjectNode> buildDataxJobContentJson() {
 
@@ -265,7 +273,8 @@ public class DataxTask extends AbstractTaskExecutor {
         ArrayNode tableArr = writerConn.putArray("table");
         tableArr.add(dataXParameters.getTargetTable());
 
-        writerConn.put("jdbcUrl", DataSourceUtils.getJdbcUrl(DbType.valueOf(dataXParameters.getDtType()), dataTargetCfg));
+        writerConn.put("jdbcUrl",
+                DataSourceUtils.getJdbcUrl(DbType.valueOf(dataXParameters.getDtType()), dataTargetCfg));
         writerConnArr.add(writerConn);
 
         ObjectNode writerParam = JSONUtils.createObjectNode();
@@ -371,8 +380,7 @@ public class DataxTask extends AbstractTaskExecutor {
      * @return shell command file name
      * @throws Exception if error throws Exception
      */
-    private String buildShellCommandFile(String jobConfigFilePath, Map<String, Property> paramsMap)
-            throws Exception {
+    private String buildShellCommandFile(String jobConfigFilePath, Map<String, Property> paramsMap) throws Exception {
         // generate scripts
         String fileName = String.format("%s/%s_node.%s",
                 taskExecutionContext.getExecutePath(),
@@ -386,18 +394,19 @@ public class DataxTask extends AbstractTaskExecutor {
         }
 
         // datax python command
-        StringBuilder sbr = new StringBuilder();
-        sbr.append(getPythonCommand());
-        sbr.append(" ");
-        sbr.append(DATAX_PATH);
-        sbr.append(" ");
-        sbr.append(loadJvmEnv(dataXParameters));
-        sbr.append(jobConfigFilePath);
+        String sbr = getPythonCommand() +
+                " " +
+                DATAX_PATH +
+                " " +
+                loadJvmEnv(dataXParameters) +
+                addCustomParameters(paramsMap) +
+                " " +
+                jobConfigFilePath;
 
         // replace placeholder
-        String dataxCommand = ParameterUtils.convertParameterPlaceholders(sbr.toString(), ParamUtils.convert(paramsMap));
+        String dataxCommand = ParameterUtils.convertParameterPlaceholders(sbr, ParamUtils.convert(paramsMap));
 
-        logger.debug("raw script : {}", dataxCommand);
+        log.debug("raw script : {}", dataxCommand);
 
         // create shell command file
         Set<PosixFilePermission> perms = PosixFilePermissions.fromString(RWXR_XR_X);
@@ -412,6 +421,19 @@ public class DataxTask extends AbstractTaskExecutor {
         Files.write(path, dataxCommand.getBytes(), StandardOpenOption.APPEND);
 
         return fileName;
+    }
+
+    private StringBuilder addCustomParameters(Map<String, Property> paramsMap) {
+        if (paramsMap == null || paramsMap.size() == 0) {
+            return new StringBuilder();
+        }
+        StringBuilder customParameters = new StringBuilder("-p \"");
+        for (Map.Entry<String, Property> entry : paramsMap.entrySet()) {
+            customParameters.append(String.format(CUSTOM_PARAM, entry.getKey(), entry.getValue().getValue()));
+        }
+        customParameters.replace(4, 5, "");
+        customParameters.append("\"");
+        return customParameters;
     }
 
     public String getPythonCommand() {
@@ -446,11 +468,12 @@ public class DataxTask extends AbstractTaskExecutor {
      * @param sql sql for data synchronization
      * @return Keyword converted column names
      */
-    private String[] parsingSqlColumnNames(DbType sourceType, DbType targetType, BaseConnectionParam dataSourceCfg, String sql) {
+    private String[] parsingSqlColumnNames(DbType sourceType, DbType targetType, BaseConnectionParam dataSourceCfg,
+                                           String sql) {
         String[] columnNames = tryGrammaticalAnalysisSqlColumnNames(sourceType, sql);
 
         if (columnNames == null || columnNames.length == 0) {
-            logger.info("try to execute sql analysis query column name");
+            log.info("try to execute sql analysis query column name");
             columnNames = tryExecuteSqlResolveColumnNames(sourceType, dataSourceCfg, sql);
         }
 
@@ -473,7 +496,7 @@ public class DataxTask extends AbstractTaskExecutor {
         try {
             SQLStatementParser parser = DataxUtils.getSqlStatementParser(dbType, sql);
             if (parser == null) {
-                logger.warn("database driver [{}] is not support grammatical analysis sql", dbType);
+                log.warn("database driver [{}] is not support grammatical analysis sql", dbType);
                 return new String[0];
             }
 
@@ -512,18 +535,18 @@ public class DataxTask extends AbstractTaskExecutor {
                     }
                 } else {
                     throw new RuntimeException(
-                            String.format("grammatical analysis sql column [ %s ] failed", item.toString()));
+                            String.format("grammatical analysis sql column [ %s ] failed", item));
                 }
 
                 if (columnName == null) {
                     throw new RuntimeException(
-                            String.format("grammatical analysis sql column [ %s ] failed", item.toString()));
+                            String.format("grammatical analysis sql column [ %s ] failed", item));
                 }
 
                 columnNames[i] = columnName;
             }
         } catch (Exception e) {
-            logger.warn(e.getMessage(), e);
+            log.warn(e.getMessage(), e);
             return new String[0];
         }
 
@@ -543,7 +566,8 @@ public class DataxTask extends AbstractTaskExecutor {
         sql = sql.replace(";", "");
 
         try (
-                Connection connection = DataSourceClientProvider.getInstance().getConnection(sourceType, baseDataSource);
+                Connection connection =
+                        DataSourceClientProvider.getInstance().getConnection(sourceType, baseDataSource);
                 PreparedStatement stmt = connection.prepareStatement(sql);
                 ResultSet resultSet = stmt.executeQuery()) {
 
@@ -551,10 +575,10 @@ public class DataxTask extends AbstractTaskExecutor {
             int num = md.getColumnCount();
             columnNames = new String[num];
             for (int i = 1; i <= num; i++) {
-                columnNames[i - 1] = md.getColumnName(i);
+                columnNames[i - 1] = md.getColumnName(i).replace("t.", "");
             }
         } catch (SQLException | ExecutionException e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             return null;
         }
 

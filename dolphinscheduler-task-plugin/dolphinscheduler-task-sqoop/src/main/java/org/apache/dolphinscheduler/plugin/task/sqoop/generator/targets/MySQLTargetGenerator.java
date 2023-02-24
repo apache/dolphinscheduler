@@ -31,6 +31,7 @@ import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.TABLE
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.UPDATE_KEY;
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.UPDATE_MODE;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.ITargetGenerator;
@@ -38,18 +39,16 @@ import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SqoopParameters;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets.TargetMysqlParameter;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.lang3.StringUtils;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * mysql target generator
  */
+@Slf4j
 public class MySQLTargetGenerator implements ITargetGenerator {
-
-    private static final Logger logger = LoggerFactory.getLogger(MySQLTargetGenerator.class);
 
     @Override
     public String generate(SqoopParameters sqoopParameters, SqoopTaskExecutionContext sqoopTaskExecutionContext) {
@@ -58,7 +57,7 @@ public class MySQLTargetGenerator implements ITargetGenerator {
 
         try {
             TargetMysqlParameter targetMysqlParameter =
-                JSONUtils.parseObject(sqoopParameters.getTargetParams(), TargetMysqlParameter.class);
+                    JSONUtils.parseObject(sqoopParameters.getTargetParams(), TargetMysqlParameter.class);
 
             if (null != targetMysqlParameter && targetMysqlParameter.getTargetDatasource() != 0) {
 
@@ -77,12 +76,12 @@ public class MySQLTargetGenerator implements ITargetGenerator {
                             .append(SPACE).append(DB_PWD)
                             .append(SPACE).append(DOUBLE_QUOTES)
                             .append(decodePassword(baseDataSource.getPassword())).append(DOUBLE_QUOTES)
-                        .append(SPACE).append(TABLE)
-                        .append(SPACE).append(targetMysqlParameter.getTargetTable());
+                            .append(SPACE).append(TABLE)
+                            .append(SPACE).append(targetMysqlParameter.getTargetTable());
 
                     if (StringUtils.isNotEmpty(targetMysqlParameter.getTargetColumns())) {
                         mysqlTargetSb.append(SPACE).append(COLUMNS)
-                            .append(SPACE).append(targetMysqlParameter.getTargetColumns());
+                                .append(SPACE).append(targetMysqlParameter.getTargetColumns());
                     }
 
                     if (StringUtils.isNotEmpty(targetMysqlParameter.getFieldsTerminated())) {
@@ -91,7 +90,8 @@ public class MySQLTargetGenerator implements ITargetGenerator {
                             mysqlTargetSb.append(SPACE).append(targetMysqlParameter.getFieldsTerminated());
 
                         } else {
-                            mysqlTargetSb.append(SPACE).append(SINGLE_QUOTES).append(targetMysqlParameter.getFieldsTerminated()).append(SINGLE_QUOTES);
+                            mysqlTargetSb.append(SPACE).append(SINGLE_QUOTES)
+                                    .append(targetMysqlParameter.getFieldsTerminated()).append(SINGLE_QUOTES);
                         }
                     }
 
@@ -100,22 +100,23 @@ public class MySQLTargetGenerator implements ITargetGenerator {
                         if (targetMysqlParameter.getLinesTerminated().contains(SINGLE_QUOTES)) {
                             mysqlTargetSb.append(SPACE).append(targetMysqlParameter.getLinesTerminated());
                         } else {
-                            mysqlTargetSb.append(SPACE).append(SINGLE_QUOTES).append(targetMysqlParameter.getLinesTerminated()).append(SINGLE_QUOTES);
+                            mysqlTargetSb.append(SPACE).append(SINGLE_QUOTES)
+                                    .append(targetMysqlParameter.getLinesTerminated()).append(SINGLE_QUOTES);
                         }
                     }
 
                     if (targetMysqlParameter.getIsUpdate()
-                        && StringUtils.isNotEmpty(targetMysqlParameter.getTargetUpdateKey())
-                        && StringUtils.isNotEmpty(targetMysqlParameter.getTargetUpdateMode())) {
+                            && StringUtils.isNotEmpty(targetMysqlParameter.getTargetUpdateKey())
+                            && StringUtils.isNotEmpty(targetMysqlParameter.getTargetUpdateMode())) {
                         mysqlTargetSb.append(SPACE).append(UPDATE_KEY)
-                            .append(SPACE).append(targetMysqlParameter.getTargetUpdateKey())
-                            .append(SPACE).append(UPDATE_MODE)
-                            .append(SPACE).append(targetMysqlParameter.getTargetUpdateMode());
+                                .append(SPACE).append(targetMysqlParameter.getTargetUpdateKey())
+                                .append(SPACE).append(UPDATE_MODE)
+                                .append(SPACE).append(targetMysqlParameter.getTargetUpdateMode());
                     }
                 }
             }
         } catch (Exception e) {
-            logger.error(String.format("Sqoop mysql target params build failed: [%s]", e.getMessage()));
+            log.error(String.format("Sqoop mysql target params build failed: [%s]", e.getMessage()));
         }
 
         return mysqlTargetSb.toString();

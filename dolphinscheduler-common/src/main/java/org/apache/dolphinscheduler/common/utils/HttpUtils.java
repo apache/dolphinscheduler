@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.client.config.AuthSchemes;
@@ -32,6 +32,7 @@ import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
@@ -47,15 +48,13 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * http utils
  */
+@Slf4j
 public class HttpUtils {
-
-    public static final Logger logger = LoggerFactory.getLogger(HttpUtils.class);
 
     private HttpUtils() {
         throw new UnsupportedOperationException("Construct HttpUtils");
@@ -66,9 +65,13 @@ public class HttpUtils {
     }
 
     private static class HttpClientInstance {
-        private static final CloseableHttpClient httpClient = HttpClients.custom().setConnectionManager(cm).setDefaultRequestConfig(requestConfig).build();
+
+        private static final CloseableHttpClient httpClient = getHttpClientBuilder().build();
     }
 
+    public static HttpClientBuilder getHttpClientBuilder() {
+        return HttpClients.custom().setConnectionManager(cm).setDefaultRequestConfig(requestConfig);
+    }
 
     private static PoolingHttpClientConnectionManager cm;
 
@@ -81,6 +84,7 @@ public class HttpUtils {
     private static Registry<ConnectionSocketFactory> socketFactoryRegistry;
 
     private static X509TrustManager xtm = new X509TrustManager() {
+
         @Override
         public void checkClientTrusted(X509Certificate[] chain, String authType) {
         }
@@ -100,16 +104,16 @@ public class HttpUtils {
             ctx = SSLContext.getInstance(SSLConnectionSocketFactory.TLS);
             ctx.init(null, new TrustManager[]{xtm}, null);
         } catch (NoSuchAlgorithmException e) {
-            logger.error("SSLContext init with NoSuchAlgorithmException", e);
+            log.error("SSLContext init with NoSuchAlgorithmException", e);
         } catch (KeyManagementException e) {
-            logger.error("SSLContext init with KeyManagementException", e);
+            log.error("SSLContext init with KeyManagementException", e);
         }
         socketFactory = new SSLConnectionSocketFactory(ctx, NoopHostnameVerifier.INSTANCE);
         /** set timeout、request time、socket timeout */
         requestConfig = RequestConfig.custom().setCookieSpec(CookieSpecs.IGNORE_COOKIES)
                 .setExpectContinueEnabled(Boolean.TRUE)
-                .setTargetPreferredAuthSchemes(Arrays.asList(AuthSchemes.NTLM, AuthSchemes.DIGEST))
-                .setProxyPreferredAuthSchemes(Arrays.asList(AuthSchemes.BASIC))
+                .setTargetPreferredAuthSchemes(Arrays.asList(AuthSchemes.NTLM, AuthSchemes.DIGEST, AuthSchemes.SPNEGO))
+                .setProxyPreferredAuthSchemes(Arrays.asList(AuthSchemes.BASIC, AuthSchemes.SPNEGO))
                 .setConnectTimeout(Constants.HTTP_CONNECT_TIMEOUT).setSocketTimeout(Constants.SOCKET_TIMEOUT)
                 .setConnectionRequestTimeout(Constants.HTTP_CONNECTION_REQUEST_TIMEOUT).setRedirectsEnabled(true)
                 .build();
@@ -137,13 +141,13 @@ public class HttpUtils {
     /**
      * get http response content
      *
-     * @param httpget httpget
+     * @param httpget    httpget
      * @param httpClient httpClient
      * @return http get request response content
      */
     public static String getResponseContentString(HttpGet httpget, CloseableHttpClient httpClient) {
         if (Objects.isNull(httpget) || Objects.isNull(httpClient)) {
-            logger.error("HttpGet or HttpClient parameter is null");
+            log.error("HttpGet or HttpClient parameter is null");
             return null;
         }
         String responseContent = null;
@@ -156,13 +160,13 @@ public class HttpUtils {
                 if (entity != null) {
                     responseContent = EntityUtils.toString(entity, Constants.UTF_8);
                 } else {
-                    logger.warn("http entity is null");
+                    log.warn("http entity is null");
                 }
             } else {
-                logger.error("http get:{} response status code is not 200!", response.getStatusLine().getStatusCode());
+                log.error("http get:{} response status code is not 200!", response.getStatusLine().getStatusCode());
             }
         } catch (IOException ioe) {
-            logger.error(ioe.getMessage(), ioe);
+            log.error(ioe.getMessage(), ioe);
         } finally {
             try {
                 if (response != null) {
@@ -170,7 +174,7 @@ public class HttpUtils {
                     response.close();
                 }
             } catch (IOException e) {
-                logger.error(e.getMessage(), e);
+                log.error(e.getMessage(), e);
             }
             if (!httpget.isAborted()) {
                 httpget.releaseConnection();

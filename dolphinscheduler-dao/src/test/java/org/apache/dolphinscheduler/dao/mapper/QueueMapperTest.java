@@ -20,11 +20,12 @@ package org.apache.dolphinscheduler.dao.mapper;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -41,7 +42,7 @@ public class QueueMapperTest extends BaseDaoTest {
      * @return Queue
      */
     private Queue insertOne() {
-        //insertOne
+        // insertOne
         Queue queue = new Queue();
         queue.setQueueName("queue");
         queue.setQueue("queue");
@@ -56,12 +57,12 @@ public class QueueMapperTest extends BaseDaoTest {
      */
     @Test
     public void testUpdate() {
-        //insertOne
+        // insertOne
         Queue queue = insertOne();
         queue.setCreateTime(new Date());
-        //update
+        // update
         int update = queueMapper.updateById(queue);
-        Assert.assertEquals(1, update);
+        Assertions.assertEquals(1, update);
     }
 
     /**
@@ -71,7 +72,7 @@ public class QueueMapperTest extends BaseDaoTest {
     public void testDelete() {
         Queue queue = insertOne();
         int delete = queueMapper.deleteById(queue.getId());
-        Assert.assertEquals(1, delete);
+        Assertions.assertEquals(1, delete);
     }
 
     /**
@@ -80,9 +81,9 @@ public class QueueMapperTest extends BaseDaoTest {
     @Test
     public void testQuery() {
         Queue queue = insertOne();
-        //query
+        // query
         List<Queue> queues = queueMapper.selectList(null);
-        Assert.assertNotEquals(queues.size(), 0);
+        Assertions.assertNotEquals(queues.size(), 0);
     }
 
     /**
@@ -92,15 +93,13 @@ public class QueueMapperTest extends BaseDaoTest {
     public void testQueryQueuePaging() {
 
         Queue queue = insertOne();
-        Page<Queue> page = new Page(1,3);
+        Page<Queue> page = new Page(1, 3);
 
-        IPage<Queue> queueIPage= queueMapper.queryQueuePaging(page,
-                null);
-        Assert.assertNotEquals(queueIPage.getTotal(), 0);
+        IPage<Queue> queueIPage = queueMapper.queryQueuePaging(page, Collections.singletonList(queue.getId()), null);
+        Assertions.assertNotEquals(queueIPage.getTotal(), 0);
 
-        queueIPage= queueMapper.queryQueuePaging(page,
-                queue.getQueueName());
-        Assert.assertNotEquals(queueIPage.getTotal(), 0);
+        queueIPage = queueMapper.queryQueuePaging(page, Collections.singletonList(queue.getId()), queue.getQueueName());
+        Assertions.assertNotEquals(queueIPage.getTotal(), 0);
     }
 
     /**
@@ -111,18 +110,18 @@ public class QueueMapperTest extends BaseDaoTest {
         Queue queue = insertOne();
 
         List<Queue> queues = queueMapper.queryAllQueueList(queue.getQueue(), null);
-        Assert.assertNotEquals(queues.size(), 0);
+        Assertions.assertNotEquals(queues.size(), 0);
 
         queues = queueMapper.queryAllQueueList(null, queue.getQueueName());
-        Assert.assertNotEquals(queues.size(), 0);
+        Assertions.assertNotEquals(queues.size(), 0);
     }
 
     @Test
     public void existQueue() {
-        Assert.assertNull(queueMapper.existQueue("queue", null));
-        Assert.assertNull(queueMapper.existQueue(null, "queue"));
+        Assertions.assertNull(queueMapper.existQueue("queue", null));
+        Assertions.assertNull(queueMapper.existQueue(null, "queue"));
         Queue queue = insertOne();
-        Assert.assertTrue(queueMapper.existQueue(queue.getQueue(), null) == Boolean.TRUE);
-        Assert.assertTrue(queueMapper.existQueue(null, queue.getQueueName()) == Boolean.TRUE);
+        Assertions.assertTrue(queueMapper.existQueue(queue.getQueue(), null) == Boolean.TRUE);
+        Assertions.assertTrue(queueMapper.existQueue(null, queue.getQueueName()) == Boolean.TRUE);
     }
 }

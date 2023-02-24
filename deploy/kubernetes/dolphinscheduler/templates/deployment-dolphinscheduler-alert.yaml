@@ -39,6 +39,7 @@ spec:
         {{- toYaml .Values.alert.annotations | nindent 8 }}
       {{- end }}
     spec:
+      serviceAccountName: {{ template "dolphinscheduler.fullname" . }}
       {{- if .Values.alert.affinity }}
       affinity:
         {{- toYaml .Values.alert.affinity | nindent 8 }}
@@ -70,6 +71,7 @@ spec:
             - name: SPRING_JACKSON_TIME_ZONE
               value: {{ .Values.timezone }}
             {{- include "dolphinscheduler.database.env_vars" . | nindent 12 }}
+            {{- include "dolphinscheduler.registry.env_vars" . | nindent 12 }}
             {{ range $key, $value :=  .Values.alert.env }}
             - name: {{ $key }}
               value: {{ $value | quote }}
@@ -104,6 +106,9 @@ spec:
           volumeMounts:
             - mountPath: "/opt/dolphinscheduler/logs"
               name: {{ include "dolphinscheduler.fullname" . }}-alert
+            - name: config-volume
+              mountPath: /opt/dolphinscheduler/conf/common.properties
+              subPath: common_properties
       volumes:
         - name: {{ include "dolphinscheduler.fullname" . }}-alert
           {{- if .Values.alert.persistentVolumeClaim.enabled }}
@@ -112,3 +117,6 @@ spec:
           {{- else }}
           emptyDir: {}
           {{- end }}
+        - name: config-volume
+          configMap:
+            name: {{ include "dolphinscheduler.fullname" . }}-configs

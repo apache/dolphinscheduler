@@ -28,8 +28,7 @@ import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * A base class for running a Unix command.
@@ -38,9 +37,8 @@ import org.slf4j.LoggerFactory;
  * <code>df</code>. It also offers facilities to gate commands by
  * time-intervals.
  */
+@Slf4j
 public abstract class AbstractShell {
-
-    private static final Logger logger = LoggerFactory.getLogger(AbstractShell.class);
 
     /**
      * Time after which the executing script would be timedout
@@ -148,7 +146,7 @@ public abstract class AbstractShell {
             timeOutTimer = new Timer();
             timeoutTimerTask = new ShellTimeoutTimerTask(
                     this);
-            //One time scheduling.
+            // One time scheduling.
             timeOutTimer.schedule(timeoutTimerTask, timeOutInterval);
         }
         final BufferedReader errReader =
@@ -162,6 +160,7 @@ public abstract class AbstractShell {
         // read error and input streams as this would free up the buffers
         // free the error stream buffer
         Thread errThread = new Thread() {
+
             @Override
             public void run() {
                 try {
@@ -172,17 +171,18 @@ public abstract class AbstractShell {
                         line = errReader.readLine();
                     }
                 } catch (IOException ioe) {
-                    logger.warn("Error reading the error stream", ioe);
+                    log.warn("Error reading the error stream", ioe);
                 }
             }
         };
         Thread inThread = new Thread() {
+
             @Override
             public void run() {
                 try {
                     parseExecResult(inReader);
                 } catch (IOException ioe) {
-                    logger.warn("Error reading the in stream", ioe);
+                    log.warn("Error reading the in stream", ioe);
                 }
                 super.run();
             }
@@ -191,7 +191,7 @@ public abstract class AbstractShell {
             errThread.start();
             inThread.start();
         } catch (IllegalStateException e) {
-            logger.error(" read error and input streams start error", e);
+            log.error(" read error and input streams start error", e);
         }
         try {
             // parse the output
@@ -201,11 +201,11 @@ public abstract class AbstractShell {
                 errThread.join();
                 inThread.join();
             } catch (InterruptedException ie) {
-                logger.warn("Interrupted while reading the error and in stream", ie);
+                log.warn("Interrupted while reading the error and in stream", ie);
             }
             completed.compareAndSet(false, true);
-            //the timeout thread handling
-            //taken care in finally block
+            // the timeout thread handling
+            // taken care in finally block
             if (exitCode != 0 || errMsg.length() > 0) {
                 throw new ExitCodeException(exitCode, errMsg.toString());
             }
@@ -219,7 +219,7 @@ public abstract class AbstractShell {
             try {
                 inReader.close();
             } catch (IOException ioe) {
-                logger.warn("Error while closing the input stream", ioe);
+                log.warn("Error while closing the input stream", ioe);
             }
             if (!completed.get()) {
                 errThread.interrupt();
@@ -227,7 +227,7 @@ public abstract class AbstractShell {
             try {
                 errReader.close();
             } catch (IOException ioe) {
-                logger.warn("Error while closing the error stream", ioe);
+                log.warn("Error while closing the error stream", ioe);
             }
             ProcessContainer.removeProcess(process);
             process.destroy();
@@ -246,8 +246,7 @@ public abstract class AbstractShell {
      * @param lines lines
      * @throws IOException errors
      */
-    protected abstract void parseExecResult(BufferedReader lines)
-            throws IOException;
+    protected abstract void parseExecResult(BufferedReader lines) throws IOException;
 
     /**
      * get the current sub-process executing the given command
@@ -291,9 +290,9 @@ public abstract class AbstractShell {
             try {
                 p.exitValue();
             } catch (Exception e) {
-                //Process has not terminated.
-                //So check if it has completed
-                //if not just destroy it.
+                // Process has not terminated.
+                // So check if it has completed
+                // if not just destroy it.
                 if (p != null && !shell.completed.get()) {
                     shell.setTimedOut();
                     p.destroy();
@@ -306,6 +305,7 @@ public abstract class AbstractShell {
      * This is an IOException with exit code added.
      */
     public static class ExitCodeException extends IOException {
+
         private final int exitCode;
 
         public ExitCodeException(int exitCode, String message) {
@@ -322,6 +322,7 @@ public abstract class AbstractShell {
      * process manage container
      */
     public static class ProcessContainer extends ConcurrentHashMap<Integer, Process> {
+
         private static final ProcessContainer container = new ProcessContainer();
 
         private ProcessContainer() {
@@ -350,11 +351,11 @@ public abstract class AbstractShell {
                 try {
                     entry.getValue().destroy();
                 } catch (Exception e) {
-                    logger.error("Destroy All Processes error", e);
+                    log.error("Destroy All Processes error", e);
                 }
             }
 
-            logger.info("close " + set.size() + " executing process tasks");
+            log.info("close " + set.size() + " executing process tasks");
         }
     }
 }

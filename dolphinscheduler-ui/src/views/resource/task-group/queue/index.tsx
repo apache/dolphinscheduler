@@ -15,27 +15,34 @@
  * limitations under the License.
  */
 
-import { ref, defineComponent, toRefs, reactive, onMounted, Ref } from 'vue'
+import {
+  ref,
+  defineComponent,
+  toRefs,
+  reactive,
+  onMounted,
+  getCurrentInstance
+} from 'vue'
 import {
   NButton,
   NIcon,
-  NInput,
-  NCard,
   NDataTable,
   NPagination,
   NSelect,
   NSpace
 } from 'naive-ui'
-import Card from '@/components/card'
 import { SearchOutlined } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
-import styles from './index.module.scss'
 import { useTable } from './use-table'
-import FormModal from '@/views/resource/task-group/queue/components/form-modal'
 import { queryTaskGroupListPaging } from '@/service/modules/task-group'
 import { TaskGroupRes } from '@/service/modules/task-group/types'
 import { SelectMixedOption } from 'naive-ui/lib/select/src/interface'
-import { Router, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
+import FormModal from '@/views/resource/task-group/queue/components/form-modal'
+import Card from '@/components/card'
+import Search from "@/components/input-search";
+import type { Ref } from 'vue'
+import type { Router } from 'vue-router'
 
 const taskGroupQueue = defineComponent({
   name: 'taskGroupQueue',
@@ -99,6 +106,8 @@ const taskGroupQueue = defineComponent({
       resetTableData()
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     onMounted(() => {
       const taskGroupOptionsParams = {
         pageNo: 1,
@@ -134,7 +143,8 @@ const taskGroupQueue = defineComponent({
       onConfirm,
       showModalRef,
       updateItemData,
-      taskGroupOptions
+      taskGroupOptions,
+      trim
     }
   },
   render() {
@@ -155,43 +165,38 @@ const taskGroupQueue = defineComponent({
     const { columns } = useTable(updatePriority, resetTableData)
 
     return (
-      <div>
-        <NCard>
-          <div class={styles.toolbar}>
-            <NSpace>
-              <NSelect
-                size='small'
-                options={taskGroupOptions}
-                clearable
-                style={{ width: '180px' }}
-                v-model:value={this.searchParamRef.groupId}
-                placeholder={t('resource.task_group_queue.task_group_name')}
-              />
-              <NInput
-                size='small'
-                v-model={[this.searchParamRef.processName, 'value']}
+      <NSpace vertical>
+        <Card>
+          <NSpace justify='end'>
+            <NSelect
+              size='small'
+              options={taskGroupOptions}
+              clearable
+              style={{ width: '180px' }}
+              v-model:value={this.searchParamRef.groupId}
+              placeholder={t('resource.task_group_queue.task_group_name')}
+            />
+            <Search
+                v-model:value={this.searchParamRef.processName}
                 placeholder={t(
-                  'resource.task_group_queue.workflow_instance_name'
+                    'resource.task_group_queue.workflow_instance_name'
                 )}
-              ></NInput>
-              <NInput
-                size='small'
-                v-model={[this.searchParamRef.instanceName, 'value']}
+              onSearch={onSearch}
+            ></Search>
+            <Search
+                v-model:value={this.searchParamRef.instanceName}
                 placeholder={t('resource.task_group_queue.task_instance_name')}
-              ></NInput>
-              <NButton size='small' type='primary' onClick={onSearch}>
-                <NIcon>
-                  <SearchOutlined />
-                </NIcon>
-              </NButton>
-            </NSpace>
-          </div>
-        </NCard>
-        <Card
-          class={styles['table-card']}
-          title={t('resource.task_group_queue.queue')}
-        >
-          <div>
+                onSearch ={onSearch}
+            ></Search>
+            <NButton size='small' type='primary' onClick={onSearch}>
+              <NIcon>
+                <SearchOutlined />
+              </NIcon>
+            </NButton>
+          </NSpace>
+        </Card>
+        <Card title={t('resource.task_group_queue.queue')}>
+          <NSpace vertical>
             <NDataTable
               loading={loadingRef}
               columns={columns}
@@ -200,7 +205,7 @@ const taskGroupQueue = defineComponent({
               striped
               scrollX={this.tableWidth}
             />
-            <div class={styles.pagination}>
+            <NSpace justify='center'>
               <NPagination
                 v-model:page={this.page}
                 v-model:page-size={this.pageSize}
@@ -211,8 +216,8 @@ const taskGroupQueue = defineComponent({
                 onUpdatePage={resetTableData}
                 onUpdatePageSize={onUpdatePageSize}
               />
-            </div>
-          </div>
+            </NSpace>
+          </NSpace>
         </Card>
         {showModalRef && (
           <FormModal
@@ -222,7 +227,7 @@ const taskGroupQueue = defineComponent({
             data={updateItemData}
           />
         )}
-      </div>
+      </NSpace>
     )
   }
 })

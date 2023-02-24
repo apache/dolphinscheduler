@@ -16,8 +16,6 @@
 #
 
 spring:
-  application:
-    name: alert-server
   jackson:
     time-zone: UTC
     date-format: "yyyy-MM-dd HH:mm:ss"
@@ -47,7 +45,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: '*'
+        include: health,metrics,prometheus
   endpoint:
     health:
       enabled: true
@@ -63,6 +61,9 @@ management:
 
 alert:
   port: 50052
+  # Mark each alert of alert server if late after x milliseconds as failed.
+  # Define value is (0 = infinite), and alert server would be waiting alert result.
+  wait-timeout: 0
 
 metrics:
   enabled: true
@@ -76,3 +77,6 @@ spring:
       on-profile: mysql
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler
+    username: root
+    password: root

@@ -17,8 +17,12 @@
 ---
 version: 2
 mergeable:
-  - when: pull_request.*, pull_request_review.*
-    name: synchronize change for sql files
+  # we can not use `pull_request.*` which including event `pull_request.labeled`, according to https://github.com/mergeability/mergeable/issues/643,
+  # otherwise mergeable will keep add or remove label endless, we just need this CI act like the default behavior as
+  # GitHub action workflow `pull_requests` https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#pull_request like,
+  # which only trigger runs when a pull_request event's activity type is opened, synchronize, or reopened
+  - when: pull_request.opened, pull_request.reopened, pull_request.synchronize
+    name: sync-sql-ddl
     validate:
       # Sql files must change synchronize
       - do: dependent
@@ -27,16 +31,32 @@ mergeable:
           - 'dolphinscheduler-dao/src/main/resources/sql/dolphinscheduler_mysql.sql'
           - 'dolphinscheduler-dao/src/main/resources/sql/dolphinscheduler_postgresql.sql'
         message: 'Sql files not change synchronize'
-# Temporary comment this because sometime mergable will become mad keep adding or deleting the label
-#    # Add labels 'sql not sync' and comment to reviewers if Sql files not change synchronize
-#    fail:
-#      - do: comment
-#        payload:
-#          body: >
-#            :warning: This PR do not change database DDL synchronize.
-#      - do: labels
-#        add: 'sql not sync'
-#    # Remove labels 'sql not sync' if pass
-#    pass:
-#      - do: labels
-#        delete: 'sql not sync'
+    # Add labels 'sql not sync' and comment to reviewers if Sql files not change synchronize
+    fail:
+      - do: comment
+        payload:
+          body: >
+            :warning: This PR do not change database DDL synchronize.
+        leave_old_comment: false
+      - do: labels
+        add: 'sql not sync'
+    # Remove labels 'sql not sync' if pass
+    pass:
+      - do: labels
+        delete: 'sql not sync'
+
+  - when: pull_request.*
+    name: milestone-label-check
+    validate:
+      - do: milestone
+        no_empty:
+          enabled: false # Cannot be empty when true.
+          message: 'Milestone is required and cannot be empty.'
+      - do: label
+        and:
+          - must_include:
+              regex: 'feature|bug|improvement|document|chore'
+              message: 'Label must include one of the following: `feature`, `bug`, `improvement`, `document`, `chore`'
+          - must_include:
+              regex: '\d+\.\d+\.\w+'
+              message: 'Label must include one or more version numbers.'

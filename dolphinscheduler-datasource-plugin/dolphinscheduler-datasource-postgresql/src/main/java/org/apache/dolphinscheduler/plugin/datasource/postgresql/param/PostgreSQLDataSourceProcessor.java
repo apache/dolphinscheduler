@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.postgresql.param;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
@@ -24,19 +27,17 @@ import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.Constants;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import org.apache.commons.collections4.MapUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import com.google.auto.service.AutoService;
-import com.google.common.base.Strings;
 
 @AutoService(DataSourceProcessor.class)
 public class PostgreSQLDataSourceProcessor extends AbstractDataSourceProcessor {
@@ -49,11 +50,10 @@ public class PostgreSQLDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
         PostgreSQLConnectionParam connectionParams = (PostgreSQLConnectionParam) createConnectionParams(connectionJson);
-        PostgreSQLDataSourceParamDTO
-                postgreSqlDatasourceParamDTO = new PostgreSQLDataSourceParamDTO();
+        PostgreSQLDataSourceParamDTO postgreSqlDatasourceParamDTO = new PostgreSQLDataSourceParamDTO();
         postgreSqlDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
         postgreSqlDatasourceParamDTO.setUserName(connectionParams.getUser());
-        postgreSqlDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
+        postgreSqlDatasourceParamDTO.setOther(connectionParams.getOther());
 
         String address = connectionParams.getAddress();
         String[] hostSeperator = address.split(Constants.DOUBLE_SLASH);
@@ -67,7 +67,8 @@ public class PostgreSQLDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
         PostgreSQLDataSourceParamDTO postgreSqlParam = (PostgreSQLDataSourceParamDTO) datasourceParam;
-        String address = String.format("%s%s:%s", Constants.JDBC_POSTGRESQL, postgreSqlParam.getHost(), postgreSqlParam.getPort());
+        String address = String.format("%s%s:%s", DataSourceConstants.JDBC_POSTGRESQL, postgreSqlParam.getHost(),
+                postgreSqlParam.getPort());
         String jdbcUrl = String.format("%s/%s", address, postgreSqlParam.getDatabase());
 
         PostgreSQLConnectionParam postgreSqlConnectionParam = new PostgreSQLConnectionParam();
@@ -78,8 +79,7 @@ public class PostgreSQLDataSourceProcessor extends AbstractDataSourceProcessor {
         postgreSqlConnectionParam.setPassword(PasswordUtils.encodePassword(postgreSqlParam.getPassword()));
         postgreSqlConnectionParam.setDriverClassName(getDatasourceDriver());
         postgreSqlConnectionParam.setValidationQuery(getValidationQuery());
-        postgreSqlConnectionParam.setOther(transformOther(postgreSqlParam.getOther()));
-        postgreSqlConnectionParam.setProps(postgreSqlParam.getOther());
+        postgreSqlConnectionParam.setOther(postgreSqlParam.getOther());
 
         return postgreSqlConnectionParam;
     }
@@ -91,19 +91,20 @@ public class PostgreSQLDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return Constants.ORG_POSTGRESQL_DRIVER;
+        return DataSourceConstants.ORG_POSTGRESQL_DRIVER;
     }
 
     @Override
     public String getValidationQuery() {
-        return Constants.POSTGRESQL_VALIDATION_QUERY;
+        return DataSourceConstants.POSTGRESQL_VALIDATION_QUERY;
     }
 
     @Override
     public String getJdbcUrl(ConnectionParam connectionParam) {
         PostgreSQLConnectionParam postgreSqlConnectionParam = (PostgreSQLConnectionParam) connectionParam;
-        if (!Strings.isNullOrEmpty(postgreSqlConnectionParam.getOther())) {
-            return String.format("%s?%s", postgreSqlConnectionParam.getJdbcUrl(), postgreSqlConnectionParam.getOther());
+        if (MapUtils.isNotEmpty(postgreSqlConnectionParam.getOther())) {
+            return String.format("%s?%s", postgreSqlConnectionParam.getJdbcUrl(),
+                    transformOther(postgreSqlConnectionParam.getOther()));
         }
         return postgreSqlConnectionParam.getJdbcUrl();
     }
@@ -113,7 +114,8 @@ public class PostgreSQLDataSourceProcessor extends AbstractDataSourceProcessor {
         PostgreSQLConnectionParam postgreSqlConnectionParam = (PostgreSQLConnectionParam) connectionParam;
         Class.forName(getDatasourceDriver());
         return DriverManager.getConnection(getJdbcUrl(postgreSqlConnectionParam),
-                postgreSqlConnectionParam.getUser(), PasswordUtils.decodePassword(postgreSqlConnectionParam.getPassword()));
+                postgreSqlConnectionParam.getUser(),
+                PasswordUtils.decodePassword(postgreSqlConnectionParam.getPassword()));
     }
 
     @Override
@@ -130,20 +132,9 @@ public class PostgreSQLDataSourceProcessor extends AbstractDataSourceProcessor {
         if (MapUtils.isEmpty(otherMap)) {
             return null;
         }
-        StringBuilder stringBuilder = new StringBuilder();
-        otherMap.forEach((key, value) -> stringBuilder.append(String.format("%s=%s&", key, value)));
-        return stringBuilder.toString();
+        List<String> otherList = new ArrayList<>();
+        otherMap.forEach((key, value) -> otherList.add(String.format("%s=%s", key, value)));
+        return String.join("&", otherList);
     }
 
-    private Map<String, String> parseOther(String other) {
-        if (Strings.isNullOrEmpty(other)) {
-            return null;
-        }
-        Map<String, String> otherMap = new LinkedHashMap<>();
-        for (String config : other.split("&")) {
-            String[] split = config.split("=");
-            otherMap.put(split[0], split[1]);
-        }
-        return otherMap;
-    }
 }

@@ -18,20 +18,20 @@
 version: "3.8"
 
 services:
-    dolphinscheduler:
-      image: apache/dolphinscheduler-standalone-server:ci
-      environment:
-        MASTER_MAX_CPU_LOAD_AVG: 100
-        WORKER_TENANT_AUTO_CREATE: 'true'
-      ports:
-        - "12345:12345"
-      networks:
-        - api-test
-      healthcheck:
-        test: [ "CMD", "curl", "http://localhost:12345/actuator/health" ]
-        interval: 5s
-        timeout: 60s
-        retries: 120
+  dolphinscheduler:
+    image: apache/dolphinscheduler-standalone-server:ci
+    environment:
+      MASTER_MAX_CPU_LOAD_AVG: 100
+      WORKER_TENANT_AUTO_CREATE: 'true'
+    ports:
+      - "12345:12345"
+    networks:
+      - api-test
+    healthcheck:
+      test: [ "CMD", "curl", "http://localhost:12345/actuator/health" ]
+      interval: 5s
+      timeout: 60s
+      retries: 120
 
 networks:
   api-test:

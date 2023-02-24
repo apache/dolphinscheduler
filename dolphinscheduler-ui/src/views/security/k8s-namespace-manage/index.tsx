@@ -15,13 +15,17 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, toRefs, watch } from 'vue'
+import {
+  defineComponent,
+  getCurrentInstance,
+  onMounted,
+  toRefs,
+  watch
+} from 'vue'
 import {
   NButton,
-  NCard,
   NDataTable,
   NIcon,
-  NInput,
   NPagination,
   NSpace
 } from 'naive-ui'
@@ -29,6 +33,8 @@ import { SearchOutlined } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
 import K8sNamespaceModal from './components/k8s-namespace-modal'
+import Card from '@/components/card'
+import Search from "@/components/input-search";
 
 const k8sNamespaceManage = defineComponent({
   name: 'k8s-namespace-manage',
@@ -68,6 +74,8 @@ const k8sNamespaceManage = defineComponent({
       requestData()
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     onMounted(() => {
       createColumns(variables)
       requestData()
@@ -85,7 +93,8 @@ const k8sNamespaceManage = defineComponent({
       onConfirmModal,
       onUpdatePageSize,
       handleModalChange,
-      onSearch
+      onSearch,
+      trim
     }
   },
   render() {
@@ -102,31 +111,26 @@ const k8sNamespaceManage = defineComponent({
 
     return (
       <NSpace vertical>
-        <NCard size='small'>
+        <Card>
           <NSpace justify='space-between'>
             <NButton size='small' type='primary' onClick={handleModalChange}>
               {t('security.k8s_namespace.create_namespace')}
             </NButton>
             <NSpace>
-              <NInput
-                size='small'
-                clearable
-                v-model={[this.searchVal, 'value']}
+              <Search
+                v-model:value={this.searchVal}
                 placeholder={t('security.k8s_namespace.search_tips')}
+                onSearch={onSearch}
               />
               <NButton size='small' type='primary' onClick={onSearch}>
-                {{
-                  icon: () => (
-                    <NIcon>
-                      <SearchOutlined />
-                    </NIcon>
-                  )
-                }}
+                <NIcon>
+                  <SearchOutlined />
+                </NIcon>
               </NButton>
             </NSpace>
           </NSpace>
-        </NCard>
-        <NCard size='small'>
+        </Card>
+        <Card title={t('menu.k8s_namespace_manage')}>
           <NSpace vertical>
             <NDataTable
               loading={loadingRef}
@@ -147,7 +151,7 @@ const k8sNamespaceManage = defineComponent({
               />
             </NSpace>
           </NSpace>
-        </NCard>
+        </Card>
         <K8sNamespaceModal
           showModalRef={this.showModalRef}
           statusRef={this.statusRef}

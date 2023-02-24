@@ -21,20 +21,16 @@ import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendRequestCommand;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseCommand;
-import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
+import org.apache.dolphinscheduler.remote.factory.NettyRemotingClientFactory;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class AlertClientService implements AutoCloseable {
-
-    private static final Logger logger = LoggerFactory.getLogger(AlertClientService.class);
-
-    private final NettyClientConfig clientConfig;
 
     private final NettyRemotingClient client;
 
@@ -53,8 +49,7 @@ public class AlertClientService implements AutoCloseable {
      * alert client
      */
     public AlertClientService() {
-        this.clientConfig = new NettyClientConfig();
-        this.client = new NettyRemotingClient(clientConfig);
+        this.client = NettyRemotingClientFactory.buildNettyRemotingClient();
         this.isRunning = new AtomicBoolean(true);
     }
 
@@ -73,13 +68,13 @@ public class AlertClientService implements AutoCloseable {
     @Override
     public void close() {
         if (isRunning.compareAndSet(true, false)) {
-            logger.warn("Alert client is already closed");
+            log.warn("Alert client is already closed");
             return;
         }
 
-        logger.info("Alter client closing");
+        log.info("Alter client closing");
         this.client.close();
-        logger.info("Alter client closed");
+        log.info("Alter client closed");
     }
 
     /**
@@ -89,8 +84,8 @@ public class AlertClientService implements AutoCloseable {
      * @param content
      * @return
      */
-    public AlertSendResponseCommand sendAlert(int groupId, String title,  String content, int strategy) {
-        return this.sendAlert(this.host,this.port,groupId,title,content,strategy);
+    public AlertSendResponseCommand sendAlert(int groupId, String title, String content, int strategy) {
+        return this.sendAlert(this.host, this.port, groupId, title, content, strategy);
     }
 
     /**
@@ -102,8 +97,10 @@ public class AlertClientService implements AutoCloseable {
      * @param content content
      * @return AlertSendResponseCommand
      */
-    public AlertSendResponseCommand sendAlert(String host, int port, int groupId, String title,  String content, int strategy) {
-        logger.info("sync alert send, host : {}, port : {}, groupId : {}, title : {} , strategy : {} ", host, port, groupId, title, strategy);
+    public AlertSendResponseCommand sendAlert(String host, int port, int groupId, String title, String content,
+                                              int strategy) {
+        log.info("sync alert send, host : {}, port : {}, groupId : {}, title : {} , strategy : {} ", host, port,
+                groupId, title, strategy);
         AlertSendRequestCommand request = new AlertSendRequestCommand(groupId, title, content, strategy);
         final Host address = new Host(host, port);
         try {
@@ -113,7 +110,7 @@ public class AlertClientService implements AutoCloseable {
                 return JsonSerializer.deserialize(response.getBody(), AlertSendResponseCommand.class);
             }
         } catch (Exception e) {
-            logger.error("sync alert send error", e);
+            log.error("sync alert send error", e);
         } finally {
             this.client.closeChannel(address);
         }

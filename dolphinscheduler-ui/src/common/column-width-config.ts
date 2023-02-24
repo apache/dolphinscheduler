@@ -29,7 +29,10 @@ export const COLUMN_WIDTH_CONFIG = {
     width: 50
   },
   linkName: {
-    width: 200
+    width: 200,
+    ellipsis: {
+      tooltip: true
+    }
   },
   linkEllipsis: {
     style: 'max-width: 180px;line-height: 1.5'
@@ -94,6 +97,12 @@ export const COLUMN_WIDTH_CONFIG = {
   },
   tag: {
     width: 160
+  },
+  checkbox:{
+    width: 20
+  },
+  copy: {
+    width: 50
   }
 }
 

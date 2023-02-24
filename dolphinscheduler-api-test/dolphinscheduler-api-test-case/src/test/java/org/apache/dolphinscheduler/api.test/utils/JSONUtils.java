@@ -16,12 +16,15 @@
  */
 
 package org.apache.dolphinscheduler.api.test.utils;
+
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import static com.fasterxml.jackson.databind.DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
 import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
+
+import org.apache.dolphinscheduler.api.test.core.Constants;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -32,9 +35,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.TimeZone;
 
-import org.apache.dolphinscheduler.api.test.core.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testcontainers.shaded.org.apache.commons.lang.StringUtils;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
@@ -52,7 +55,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.databind.type.CollectionType;
-import org.testcontainers.shaded.org.apache.commons.lang.StringUtils;
 
 /**
  * json utils
@@ -62,19 +64,15 @@ public class JSONUtils {
     private static final Logger logger = LoggerFactory.getLogger(JSONUtils.class);
 
     static {
-        logger.info("init timezone: {}",TimeZone.getDefault());
+        logger.info("init timezone: {}", TimeZone.getDefault());
     }
 
     /**
      * can use static singleton, inject: just make sure to reuse!
      */
-    private static final ObjectMapper objectMapper = new ObjectMapper()
-            .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
-            .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
-            .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
-            .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
-            .setTimeZone(TimeZone.getDefault())
-            .setDateFormat(new SimpleDateFormat(Constants.YYYY_MM_DD_HH_MM_SS));
+    private static final ObjectMapper objectMapper =
+        new ObjectMapper().configure(FAIL_ON_UNKNOWN_PROPERTIES, false).configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true).configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
+            .configure(REQUIRE_SETTERS_FOR_GETTERS, true).setTimeZone(TimeZone.getDefault()).setDateFormat(new SimpleDateFormat(Constants.YYYY_MM_DD_HH_MM_SS));
 
     private JSONUtils() {
         throw new UnsupportedOperationException("Construct JSONUtils");
@@ -95,7 +93,7 @@ public class JSONUtils {
     /**
      * json representation of object
      *
-     * @param object object
+     * @param object  object
      * @param feature feature
      * @return object to json string
      */
@@ -118,9 +116,9 @@ public class JSONUtils {
      * the fields of the specified object are generics, just the object itself should not be a
      * generic type.
      *
-     * @param json the string from which the object is to be deserialized
+     * @param json  the string from which the object is to be deserialized
      * @param clazz the class of T
-     * @param <T> T
+     * @param <T>   T
      * @return an object of type T from the string
      * classOfT
      */
@@ -138,11 +136,11 @@ public class JSONUtils {
     }
 
     /**
-     *  deserialize
+     * deserialize
      *
-     * @param src byte array
+     * @param src   byte array
      * @param clazz class
-     * @param <T> deserialize type
+     * @param <T>   deserialize type
      * @return deserialize type
      */
     public static <T> T parseObject(byte[] src, Class<T> clazz) {
@@ -156,9 +154,9 @@ public class JSONUtils {
     /**
      * json to list
      *
-     * @param json json string
+     * @param json  json string
      * @param clazz class
-     * @param <T> T
+     * @param <T>   T
      * @return list
      */
     public static <T> List<T> toList(String json, Class<T> clazz) {
@@ -203,7 +201,7 @@ public class JSONUtils {
      * node or its child nodes, and returning value it has.
      * If no matching field is found in this node or its descendants, returns null.
      *
-     * @param jsonNode json node
+     * @param jsonNode  json node
      * @param fieldName Name of field to look for
      * @return Value of first matching node found, if any; null if none
      */
@@ -225,17 +223,18 @@ public class JSONUtils {
      * @return json to map
      */
     public static Map<String, String> toMap(String json) {
-        return parseObject(json, new TypeReference<Map<String, String>>() {});
+        return parseObject(json, new TypeReference<Map<String, String>>() {
+        });
     }
 
     /**
      * json to map
      *
-     * @param json json
+     * @param json   json
      * @param classK classK
      * @param classV classV
-     * @param <K> K
-     * @param <V> V
+     * @param <K>    K
+     * @param <V>    V
      * @return to map
      */
     public static <K, V> Map<K, V> toMap(String json, Class<K> classK, Class<V> classV) {
@@ -255,7 +254,8 @@ public class JSONUtils {
 
     /**
      * from the key-value generated json  to get the str value no matter the real type of value
-     * @param json the json str
+     *
+     * @param json     the json str
      * @param nodeName key
      * @return the str value of key
      */
@@ -315,7 +315,7 @@ public class JSONUtils {
      * @param <T> object type
      * @return byte array
      */
-    public static <T> byte[] toJsonByteArray(T obj)  {
+    public static <T> byte[] toJsonByteArray(T obj) {
         if (obj == null) {
             return null;
         }
@@ -331,7 +331,7 @@ public class JSONUtils {
 
     public static ObjectNode parseObject(String text) {
         try {
-            if (text.isEmpty()) {
+            if (StringUtils.isEmpty(text)) {
                 return parseObject(text, ObjectNode.class);
             } else {
                 return (ObjectNode) objectMapper.readTree(text);

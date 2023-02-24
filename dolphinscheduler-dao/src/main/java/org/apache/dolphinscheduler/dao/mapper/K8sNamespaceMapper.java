@@ -30,6 +30,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
  * namespace interface
  */
 public interface K8sNamespaceMapper extends BaseMapper<K8sNamespace> {
+
     /**
      * k8s namespace page
      *
@@ -43,11 +44,11 @@ public interface K8sNamespaceMapper extends BaseMapper<K8sNamespace> {
     /**
      * check the target namespace exist
      *
-     * @param namespace namespace
-     * @param k8s       k8s name
+     * @param namespace   namespace
+     * @param clusterCode clusterCode
      * @return true if exist else return null
      */
-    Boolean existNamespace(@Param("namespace") String namespace, @Param("k8s") String k8s);
+    Boolean existNamespace(@Param("namespace") String namespace, @Param("clusterCode") Long clusterCode);
 
     /**
      * query namespace except userId
@@ -63,13 +64,13 @@ public interface K8sNamespaceMapper extends BaseMapper<K8sNamespace> {
      * @param userId userId
      * @return namespace list
      */
-    List<K8sNamespace> queryAuthedNamespaceListByUserId(@Param("userId") int userId);
+    List<K8sNamespace> queryAuthedNamespaceListByUserId(@Param("userId") Integer userId);
 
     /**
-     * query namespace can use
+     * check the target namespace
      *
-     * @param userId userId
-     * @return namespace list
+     * @param namespaceCode namespaceCode
+     * @return true if exist else return null
      */
-    List<K8sNamespace> queryNamespaceAvailable(@Param("userId") Integer userId);
+    K8sNamespace queryByNamespaceCode(@Param("clusterCode") Long namespaceCode);
 }

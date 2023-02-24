@@ -40,10 +40,9 @@ public class TaskPriorityQueueImpl implements TaskPriorityQueue<TaskPriority> {
      * put task takePriorityInfo
      *
      * @param taskPriorityInfo takePriorityInfo
-     * @throws TaskPriorityQueueException
      */
     @Override
-    public void put(TaskPriority taskPriorityInfo) throws TaskPriorityQueueException {
+    public void put(TaskPriority taskPriorityInfo) {
         queue.put(taskPriorityInfo);
     }
 
@@ -69,7 +68,7 @@ public class TaskPriorityQueueImpl implements TaskPriorityQueue<TaskPriority> {
      */
     @Override
     public TaskPriority poll(long timeout, TimeUnit unit) throws TaskPriorityQueueException, InterruptedException {
-        return queue.poll(timeout,unit);
+        return queue.poll(timeout, unit);
     }
 
     /**

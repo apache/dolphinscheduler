@@ -17,10 +17,10 @@ there are no subsequent nodes. Examples are as follows:
 manual start or scheduled scheduling. Each time the process definition runs, a process instance is generated
 
 **Task instance**: The task instance is the instantiation of the task node in the process definition, which identifies
-the specific task execution status
+the specific task
 
 **Task type**: Currently supports SHELL, SQL, SUB_PROCESS (sub-process), PROCEDURE, MR, SPARK, PYTHON, DEPENDENT (
-depends), and plans to support dynamic plug-in expansion, note: **SUB_PROCESS**  It is also a separate process
+depends), and plans to support dynamic plug-in expansion, note: **SUB_PROCESS**  need relation with another workflow definition which also a separate process
 definition that can be started and executed separately
 
 **Scheduling method**: The system supports scheduled scheduling and manual scheduling based on cron expressions. Command
@@ -45,9 +45,13 @@ provided. **Continue** refers to regardless of the status of the task running in
 failure. **End** means that once a failed task is found, Kill will also run the parallel task at the same time, and the
 process fails and ends
 
-**Complement**: Supplement historical data，supports **interval parallel and serial** two complement methods, and two types of date selection which include **date range** and **date enumeration**.
+**Complement**: Supplement historical data，supports **interval parallel** and **serial** two complement methods, and two types of date selection which include **date range** and **date enumeration**.
 
 ### 2.Module introduction
+
+- dolphinscheduler-master master module, provides workflow management and orchestration.
+
+- dolphinscheduler-worker worker module, provides task execution management.
 
 - dolphinscheduler-alert alarm module, providing AlertServer service.
 
@@ -59,8 +63,6 @@ process fails and ends
 
 - dolphinscheduler-remote client and server based on netty
 
-- dolphinscheduler-server MasterServer and WorkerServer services
-
 - dolphinscheduler-service service module, including Quartz, Zookeeper, log client access service, easy to call server
   module and api module
 
@@ -70,5 +72,4 @@ process fails and ends
 
 From the perspective of scheduling, this article preliminarily introduces the architecture principles and implementation
 ideas of the big data distributed workflow scheduling system-DolphinScheduler. To be continued
-
 

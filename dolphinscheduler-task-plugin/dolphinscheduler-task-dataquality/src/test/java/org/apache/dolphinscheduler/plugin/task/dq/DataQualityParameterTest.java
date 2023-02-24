@@ -17,7 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.dq;
 
-import org.apache.dolphinscheduler.plugin.task.dq.utils.spark.SparkParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.dataquality.DataQualityParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.dataquality.spark.SparkParameters;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.TriggerType;
@@ -32,9 +33,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -47,7 +48,7 @@ public class DataQualityParameterTest {
 
     private DataQualityParameters dataQualityParameters = null;
 
-    @Before
+    @BeforeEach
     public void before() {
         dataQualityParameters = new DataQualityParameters();
         dataQualityParameters.setRuleId(1);
@@ -57,24 +58,24 @@ public class DataQualityParameterTest {
     @Test
     public void testCheckParameterNormal() {
 
-        Map<String,String> inputParameterValue = new HashMap<>();
-        inputParameterValue.put("src_connector_type","JDBC");
-        inputParameterValue.put("src_datasource_id","1");
-        inputParameterValue.put("src_table","test1");
-        inputParameterValue.put("src_filter","date=2012-10-05");
-        inputParameterValue.put("src_field","id");
+        Map<String, String> inputParameterValue = new HashMap<>();
+        inputParameterValue.put("src_connector_type", "JDBC");
+        inputParameterValue.put("src_datasource_id", "1");
+        inputParameterValue.put("src_table", "test1");
+        inputParameterValue.put("src_filter", "date=2012-10-05");
+        inputParameterValue.put("src_field", "id");
 
-        inputParameterValue.put("rule_type","1");
-        inputParameterValue.put("process_definition_id","1");
-        inputParameterValue.put("task_instance_id","1");
-        inputParameterValue.put("check_type","1");
-        inputParameterValue.put("threshold","1000");
-        inputParameterValue.put("create_time","2012-10-05");
-        inputParameterValue.put("update_time","2012-10-05");
+        inputParameterValue.put("rule_type", "1");
+        inputParameterValue.put("process_definition_id", "1");
+        inputParameterValue.put("task_instance_id", "1");
+        inputParameterValue.put("check_type", "1");
+        inputParameterValue.put("threshold", "1000");
+        inputParameterValue.put("create_time", "2012-10-05");
+        inputParameterValue.put("update_time", "2012-10-05");
 
         dataQualityParameters.setRuleInputParameter(inputParameterValue);
 
-        Assert.assertTrue(dataQualityParameters.checkParameters());
+        Assertions.assertTrue(dataQualityParameters.checkParameters());
     }
 
     @Test
@@ -95,10 +96,10 @@ public class DataQualityParameterTest {
         selectParamProps.setDisabled(false);
         selectParamProps.setSize("small");
 
-        SelectParam srcConnectorType = SelectParam.newBuilder("src_connector_type","源数据类型")
+        SelectParam srcConnectorType = SelectParam.newBuilder("src_connector_type", "源数据类型")
                 .setProps(selectParamProps)
-                .addOptions(new ParamsOptions("HIVE","HIVE",false))
-                .addOptions(new ParamsOptions("JDBC","JDBC",false))
+                .addOptions(new ParamsOptions("HIVE", "HIVE", false))
+                .addOptions(new ParamsOptions("JDBC", "JDBC", false))
                 .setValue("JDBC")
                 .build();
 
@@ -108,9 +109,10 @@ public class DataQualityParameterTest {
         inputParamProps.setSize("small");
         inputParamProps.setRows(0);
 
-        InputParam srcTable = InputParam.newBuilder("src_table","源数据表")
+        InputParam srcTable = InputParam.newBuilder("src_table", "源数据表")
                 .setProps(inputParamProps)
-                .addValidate(Validate.newBuilder().setType("string").setRequired(true).setTrigger(TriggerType.BLUR.getTriggerType()).build())
+                .addValidate(Validate.newBuilder().setType("string").setRequired(true)
+                        .setTrigger(TriggerType.BLUR.getTriggerType()).build())
                 .build();
 
         pluginParamsList.add(srcConnectorType);
@@ -123,9 +125,9 @@ public class DataQualityParameterTest {
         try {
             result = mapper.writeValueAsString(pluginParamsList);
         } catch (JsonProcessingException e) {
-            Assert.fail();
+            Assertions.fail();
         }
 
-        Assert.assertEquals(formCreateJson,result);
+        Assertions.assertEquals(formCreateJson, result);
     }
 }

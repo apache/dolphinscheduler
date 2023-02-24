@@ -19,15 +19,13 @@ package org.apache.dolphinscheduler.plugin.task.api.parser;
 
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * placeholder utils
  */
+@Slf4j
 public class PlaceholderUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(PlaceholderUtils.class);
 
     /**
      * Prefix of the position to be replaced
@@ -52,15 +50,16 @@ public class PlaceholderUtils {
     public static String replacePlaceholders(String value,
                                              Map<String, String> paramsMap,
                                              boolean ignoreUnresolvablePlaceholders) {
-        //replacement tool， parameter key will be replaced by value,if can't match , will throw an exception
+        // replacement tool， parameter key will be replaced by value,if can't match , will throw an exception
         PropertyPlaceholderHelper strictHelper = getPropertyPlaceholderHelper(false);
 
-        //Non-strict replacement tool implementation, when the position to be replaced does not get the corresponding value, the current position is ignored, and the next position is replaced.
+        // Non-strict replacement tool implementation, when the position to be replaced does not get the corresponding
+        // value, the current position is ignored, and the next position is replaced.
         PropertyPlaceholderHelper nonStrictHelper = getPropertyPlaceholderHelper(true);
 
         PropertyPlaceholderHelper helper = (ignoreUnresolvablePlaceholders ? nonStrictHelper : strictHelper);
 
-        //the PlaceholderResolver to use for replacement
+        // the PlaceholderResolver to use for replacement
         return helper.replacePlaceholders(value, new PropertyPlaceholderResolver(value, paramsMap));
     }
 
@@ -72,7 +71,8 @@ public class PlaceholderUtils {
      */
     public static PropertyPlaceholderHelper getPropertyPlaceholderHelper(boolean ignoreUnresolvablePlaceholders) {
 
-        return new PropertyPlaceholderHelper(PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX, null, ignoreUnresolvablePlaceholders);
+        return new PropertyPlaceholderHelper(PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX, null,
+                ignoreUnresolvablePlaceholders);
     }
 
     /**
@@ -94,7 +94,7 @@ public class PlaceholderUtils {
             try {
                 return paramsMap.get(placeholderName);
             } catch (Exception ex) {
-                logger.error("resolve placeholder '{}' in [ {} ]", placeholderName, value, ex);
+                log.error("resolve placeholder '{}' in [ {} ]", placeholderName, value, ex);
                 return null;
             }
         }

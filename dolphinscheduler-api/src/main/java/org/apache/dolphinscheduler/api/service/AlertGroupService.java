@@ -76,7 +76,8 @@ public interface AlertGroupService {
      * @param alertInstanceIds alertInstanceIds
      * @return update result code
      */
-    Map<String, Object> updateAlertgroup(User loginUser, int id, String groupName, String desc, String alertInstanceIds);
+    Map<String, Object> updateAlertgroup(User loginUser, int id, String groupName, String desc,
+                                         String alertInstanceIds);
 
     /**
      * delete alert group by id

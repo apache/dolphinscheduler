@@ -15,23 +15,27 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, toRefs, watch } from 'vue'
+import {
+  defineComponent,
+  getCurrentInstance,
+  onMounted,
+  toRefs,
+  watch
+} from 'vue'
 import {
   NSpace,
-  NInput,
   NSelect,
   NDatePicker,
   NButton,
   NIcon,
   NDataTable,
-  NPagination,
-  NCard
+  NPagination
 } from 'naive-ui'
 import { SearchOutlined } from '@vicons/antd'
 import { useTable } from './use-table'
 import { useI18n } from 'vue-i18n'
 import Card from '@/components/card'
-import styles from './index.module.scss'
+import Search from '@/components/input-search'
 
 const TaskResult = defineComponent({
   name: 'task-result',
@@ -59,6 +63,8 @@ const TaskResult = defineComponent({
       requestTableData()
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     onMounted(() => {
       createColumns(variables)
       requestTableData()
@@ -73,21 +79,21 @@ const TaskResult = defineComponent({
       ...toRefs(variables),
       requestTableData,
       onUpdatePageSize,
-      onSearch
+      onSearch,
+      trim
     }
   },
   render() {
     const { t, requestTableData, onUpdatePageSize, onSearch, loadingRef } = this
 
     return (
-      <>
-        <NCard>
+      <NSpace vertical>
+        <Card>
           <NSpace justify='end'>
-            <NInput
-              v-model={[this.searchVal, 'value']}
-              size='small'
-              placeholder={t('data_quality.task_result.task_name')}
-              clearable
+            <Search
+                v-model:value={this.searchVal}
+                placeholder={t('data_quality.task_result.task_name')}
+                onSearch={onSearch}
             />
             <NSelect
               v-model={[this.ruleType, 'value']}
@@ -144,37 +150,35 @@ const TaskResult = defineComponent({
               clearable
             />
             <NButton size='small' type='primary' onClick={onSearch}>
-              {{
-                icon: () => (
-                  <NIcon>
-                    <SearchOutlined />
-                  </NIcon>
-                )
-              }}
+              <NIcon>
+                <SearchOutlined />
+              </NIcon>
             </NButton>
           </NSpace>
-        </NCard>
-        <Card class={styles['table-card']}>
-          <NDataTable
-            loading={loadingRef}
-            columns={this.columns}
-            data={this.tableData}
-            scrollX={this.tableWidth}
-          />
-          <div class={styles.pagination}>
-            <NPagination
-              v-model:page={this.page}
-              v-model:page-size={this.pageSize}
-              page-count={this.totalPage}
-              show-size-picker
-              page-sizes={[10, 30, 50]}
-              show-quick-jumper
-              onUpdatePage={requestTableData}
-              onUpdatePageSize={onUpdatePageSize}
-            />
-          </div>
         </Card>
-      </>
+        <Card title={t('menu.task_result')}>
+          <NSpace vertical>
+            <NDataTable
+              loading={loadingRef}
+              columns={this.columns}
+              data={this.tableData}
+              scrollX={this.tableWidth}
+            />
+            <NSpace justify='center'>
+              <NPagination
+                v-model:page={this.page}
+                v-model:page-size={this.pageSize}
+                page-count={this.totalPage}
+                show-size-picker
+                page-sizes={[10, 30, 50]}
+                show-quick-jumper
+                onUpdatePage={requestTableData}
+                onUpdatePageSize={onUpdatePageSize}
+              />
+            </NSpace>
+          </NSpace>
+        </Card>
+      </NSpace>
     )
   }
 })

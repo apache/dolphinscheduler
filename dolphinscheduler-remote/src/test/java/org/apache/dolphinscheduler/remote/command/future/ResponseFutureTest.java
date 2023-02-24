@@ -26,15 +26,17 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class ResponseFutureTest {
 
     @Test
     public void testScanFutureTable() {
-        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("executor-service"));
+        ScheduledExecutorService executorService =
+                Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("executor-service"));
         executorService.scheduleAtFixedRate(new Runnable() {
+
             @Override
             public void run() {
                 ResponseFuture.scanFutureTable();
@@ -43,6 +45,7 @@ public class ResponseFutureTest {
 
         CountDownLatch latch = new CountDownLatch(1);
         InvokeCallback invokeCallback = new InvokeCallback() {
+
             @Override
             public void operationComplete(ResponseFuture responseFuture) {
                 latch.countDown();
@@ -51,7 +54,7 @@ public class ResponseFutureTest {
         ResponseFuture future = new ResponseFuture(1, 2000, invokeCallback, null);
         try {
             latch.await(5000, TimeUnit.MILLISECONDS);
-            Assert.assertNull(ResponseFuture.getFuture(1));
+            Assertions.assertNull(ResponseFuture.getFuture(1));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

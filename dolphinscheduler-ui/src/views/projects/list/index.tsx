@@ -15,22 +15,26 @@
  * limitations under the License.
  */
 
-import Card from '@/components/card'
 import { SearchOutlined } from '@vicons/antd'
 import {
   NButton,
-  NCard,
   NDataTable,
   NIcon,
-  NInput,
   NPagination,
   NSpace
 } from 'naive-ui'
-import { defineComponent, onMounted, toRefs, watch } from 'vue'
+import {
+  defineComponent,
+  getCurrentInstance,
+  onMounted,
+  toRefs,
+  watch
+} from 'vue'
 import { useI18n } from 'vue-i18n'
-import ProjectModal from './components/project-modal'
-import styles from './index.module.scss'
 import { useTable } from './use-table'
+import Card from '@/components/card'
+import Search from "@/components/input-search";
+import ProjectModal from './components/project-modal'
 
 const list = defineComponent({
   name: 'list',
@@ -56,6 +60,14 @@ const list = defineComponent({
       requestData()
     }
 
+    const onClearSearch = () => {
+      variables.page = 1
+      getTableData({
+        pageSize: variables.pageSize,
+        pageNo: variables.page
+      })
+    }
+
     const onCancelModal = () => {
       variables.showModalRef = false
     }
@@ -69,6 +81,8 @@ const list = defineComponent({
       variables.page = 1
       requestData()
     }
+
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
     onMounted(() => {
       createColumns(variables)
@@ -87,15 +101,17 @@ const list = defineComponent({
       handleSearch,
       onCancelModal,
       onConfirmModal,
-      handleChangePageSize
+      onClearSearch,
+      handleChangePageSize,
+      trim
     }
   },
   render() {
     const { t, loadingRef } = this
     return (
-      <div>
-        <NCard>
-          <div class={styles['search-card']}>
+      <NSpace vertical>
+        <Card>
+          <NSpace justify='space-between'>
             <NButton
               size='small'
               onClick={this.handleModalChange}
@@ -105,43 +121,43 @@ const list = defineComponent({
               {t('project.list.create_project')}
             </NButton>
             <NSpace>
-              <NInput
-                size='small'
-                v-model={[this.searchVal, 'value']}
-                placeholder={t('project.list.project_tips')}
-                clearable
+              <Search
+                  v-model:value = {this.searchVal}
+                  placeholder={t('project.list.project_tips')}
+                  onSearch={this.handleSearch}
+                  onClear={this.onClearSearch}
               />
+
               <NButton size='small' type='primary' onClick={this.handleSearch}>
                 <NIcon>
                   <SearchOutlined />
                 </NIcon>
               </NButton>
             </NSpace>
-          </div>
-        </NCard>
-        <Card
-          title={t('project.list.project_list')}
-          class={styles['table-card']}
-        >
-          <NDataTable
-            loading={loadingRef}
-            columns={this.columns}
-            data={this.tableData}
-            scrollX={this.tableWidth}
-            row-class-name='items'
-          />
-          <div class={styles.pagination}>
-            <NPagination
-              v-model:page={this.page}
-              v-model:page-size={this.pageSize}
-              page-count={this.totalPage}
-              show-size-picker
-              page-sizes={[10, 30, 50]}
-              show-quick-jumper
-              onUpdatePage={this.requestData}
-              onUpdatePageSize={this.handleChangePageSize}
+          </NSpace>
+        </Card>
+        <Card title={t('project.list.project_list')}>
+          <NSpace vertical>
+            <NDataTable
+              loading={loadingRef}
+              columns={this.columns}
+              data={this.tableData}
+              scrollX={this.tableWidth}
+              row-class-name='items'
             />
-          </div>
+            <NSpace justify='center'>
+              <NPagination
+                v-model:page={this.page}
+                v-model:page-size={this.pageSize}
+                page-count={this.totalPage}
+                show-size-picker
+                page-sizes={[10, 30, 50]}
+                show-quick-jumper
+                onUpdatePage={this.requestData}
+                onUpdatePageSize={this.handleChangePageSize}
+              />
+            </NSpace>
+          </NSpace>
         </Card>
         <ProjectModal
           showModalRef={this.showModalRef}
@@ -150,7 +166,7 @@ const list = defineComponent({
           onCancelModal={this.onCancelModal}
           onConfirmModal={this.onConfirmModal}
         />
-      </div>
+      </NSpace>
     )
   }
 })

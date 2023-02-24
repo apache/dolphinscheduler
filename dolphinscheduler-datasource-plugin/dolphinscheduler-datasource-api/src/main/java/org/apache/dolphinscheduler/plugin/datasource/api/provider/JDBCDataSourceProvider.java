@@ -17,33 +17,35 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.provider;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.Constants;
-import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Driver;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.zaxxer.hikari.HikariDataSource;
 
 /**
  * Jdbc Data Source Provider
  */
+@Slf4j
 public class JDBCDataSourceProvider {
 
-    private static final Logger logger = LoggerFactory.getLogger(JDBCDataSourceProvider.class);
-
     public static HikariDataSource createJdbcDataSource(BaseConnectionParam properties, DbType dbType) {
-        logger.info("Creating HikariDataSource pool for maxActive:{}", PropertyUtils.getInt(Constants.SPRING_DATASOURCE_MAX_ACTIVE, 50));
+        log.info("Creating HikariDataSource pool for maxActive:{}",
+                PropertyUtils.getInt(DataSourceConstants.SPRING_DATASOURCE_MAX_ACTIVE, 50));
         HikariDataSource dataSource = new HikariDataSource();
 
-        //TODO Support multiple versions of data sources
+        // TODO Support multiple versions of data sources
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         loaderJdbcDriver(classLoader, properties, dbType);
 
@@ -52,15 +54,15 @@ public class JDBCDataSourceProvider {
         dataSource.setUsername(properties.getUser());
         dataSource.setPassword(PasswordUtils.decodePassword(properties.getPassword()));
 
-        dataSource.setMinimumIdle(PropertyUtils.getInt(Constants.SPRING_DATASOURCE_MIN_IDLE, 5));
-        dataSource.setMaximumPoolSize(PropertyUtils.getInt(Constants.SPRING_DATASOURCE_MAX_ACTIVE, 50));
+        dataSource.setMinimumIdle(PropertyUtils.getInt(DataSourceConstants.SPRING_DATASOURCE_MIN_IDLE, 5));
+        dataSource.setMaximumPoolSize(PropertyUtils.getInt(DataSourceConstants.SPRING_DATASOURCE_MAX_ACTIVE, 50));
         dataSource.setConnectionTestQuery(properties.getValidationQuery());
 
-        if (properties.getProps() != null) {
-            properties.getProps().forEach(dataSource::addDataSourceProperty);
+        if (MapUtils.isNotEmpty(properties.getOther())) {
+            properties.getOther().forEach(dataSource::addDataSourceProperty);
         }
 
-        logger.info("Creating HikariDataSource pool success.");
+        log.info("Creating HikariDataSource pool success.");
         return dataSource;
     }
 
@@ -68,7 +70,8 @@ public class JDBCDataSourceProvider {
      * @return One Session Jdbc DataSource
      */
     public static HikariDataSource createOneSessionJdbcDataSource(BaseConnectionParam properties, DbType dbType) {
-        logger.info("Creating OneSession HikariDataSource pool for maxActive:{}", PropertyUtils.getInt(Constants.SPRING_DATASOURCE_MAX_ACTIVE, 50));
+        log.info("Creating OneSession HikariDataSource pool for maxActive:{}",
+                PropertyUtils.getInt(DataSourceConstants.SPRING_DATASOURCE_MAX_ACTIVE, 50));
 
         HikariDataSource dataSource = new HikariDataSource();
 
@@ -78,36 +81,40 @@ public class JDBCDataSourceProvider {
         dataSource.setPassword(PasswordUtils.decodePassword(properties.getPassword()));
 
         Boolean isOneSession = PropertyUtils.getBoolean(Constants.SUPPORT_HIVE_ONE_SESSION, false);
-        dataSource.setMinimumIdle(isOneSession ? 1 : PropertyUtils.getInt(Constants.SPRING_DATASOURCE_MIN_IDLE, 5));
-        dataSource.setMaximumPoolSize(isOneSession ? 1 : PropertyUtils.getInt(Constants.SPRING_DATASOURCE_MAX_ACTIVE, 50));
+        dataSource.setMinimumIdle(
+                isOneSession ? 1 : PropertyUtils.getInt(DataSourceConstants.SPRING_DATASOURCE_MIN_IDLE, 5));
+        dataSource.setMaximumPoolSize(
+                isOneSession ? 1 : PropertyUtils.getInt(DataSourceConstants.SPRING_DATASOURCE_MAX_ACTIVE, 50));
         dataSource.setConnectionTestQuery(properties.getValidationQuery());
 
-        if (properties.getProps() != null) {
-            properties.getProps().forEach(dataSource::addDataSourceProperty);
+        if (MapUtils.isNotEmpty(properties.getOther())) {
+            properties.getOther().forEach(dataSource::addDataSourceProperty);
         }
 
-        logger.info("Creating OneSession HikariDataSource pool success.");
+        log.info("Creating OneSession HikariDataSource pool success.");
         return dataSource;
     }
 
     protected static void loaderJdbcDriver(ClassLoader classLoader, BaseConnectionParam properties, DbType dbType) {
-        String drv = StringUtils.isBlank(properties.getDriverClassName()) ? DataSourceUtils.getDatasourceProcessor(dbType).getDatasourceDriver() : properties.getDriverClassName();
+        String drv = StringUtils.isBlank(properties.getDriverClassName())
+                ? DataSourceUtils.getDatasourceProcessor(dbType).getDatasourceDriver()
+                : properties.getDriverClassName();
         try {
             final Class<?> clazz = Class.forName(drv, true, classLoader);
             final Driver driver = (Driver) clazz.newInstance();
             if (!driver.acceptsURL(properties.getJdbcUrl())) {
-                logger.warn("Jdbc driver loading error. Driver {} cannot accept url.", drv);
+                log.warn("Jdbc driver loading error. Driver {} cannot accept url.", drv);
                 throw new RuntimeException("Jdbc driver loading error.");
             }
             if (dbType.equals(DbType.MYSQL)) {
                 if (driver.getMajorVersion() >= 8) {
                     properties.setDriverClassName(drv);
                 } else {
-                    properties.setDriverClassName(Constants.COM_MYSQL_JDBC_DRIVER);
+                    properties.setDriverClassName(DataSourceConstants.COM_MYSQL_JDBC_DRIVER);
                 }
             }
         } catch (final Exception e) {
-            logger.warn("The specified driver not suitable.");
+            log.warn("The specified driver not suitable.");
         }
     }
 

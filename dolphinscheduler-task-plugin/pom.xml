@@ -15,20 +15,20 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>dolphinscheduler</artifactId>
         <groupId>org.apache.dolphinscheduler</groupId>
+        <artifactId>dolphinscheduler</artifactId>
         <version>dev-SNAPSHOT</version>
     </parent>
-    <modelVersion>4.0.0</modelVersion>
 
     <artifactId>dolphinscheduler-task-plugin</artifactId>
     <packaging>pom</packaging>
 
     <modules>
+        <module>dolphinscheduler-task-all</module>
         <module>dolphinscheduler-task-api</module>
         <module>dolphinscheduler-task-shell</module>
         <module>dolphinscheduler-task-datax</module>
@@ -43,18 +43,37 @@
         <module>dolphinscheduler-task-pigeon</module>
         <module>dolphinscheduler-task-dataquality</module>
         <module>dolphinscheduler-task-seatunnel</module>
-        <module>dolphinscheduler-task-conditions</module>
-        <module>dolphinscheduler-task-dependent</module>
-        <module>dolphinscheduler-task-subprocess</module>
-        <module>dolphinscheduler-task-switch</module>
-        <module>dolphinscheduler-task-all</module>
         <module>dolphinscheduler-task-emr</module>
-        <module>dolphinscheduler-task-blocking</module>
         <module>dolphinscheduler-task-k8s</module>
         <module>dolphinscheduler-task-zeppelin</module>
         <module>dolphinscheduler-task-jupyter</module>
         <module>dolphinscheduler-task-mlflow</module>
         <module>dolphinscheduler-task-openmldb</module>
         <module>dolphinscheduler-task-dvc</module>
+        <module>dolphinscheduler-task-dinky</module>
+        <module>dolphinscheduler-task-java</module>
+        <module>dolphinscheduler-task-sagemaker</module>
+        <module>dolphinscheduler-task-chunjun</module>
+        <module>dolphinscheduler-task-flink-stream</module>
+        <module>dolphinscheduler-task-pytorch</module>
+        <module>dolphinscheduler-task-hivecli</module>
+        <module>dolphinscheduler-task-dms</module>
+        <module>dolphinscheduler-task-datasync</module>
+        <module>dolphinscheduler-task-kubeflow</module>
+        <module>dolphinscheduler-task-linkis</module>
+        <module>dolphinscheduler-task-datafactory</module>
     </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-bom</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
 </project>

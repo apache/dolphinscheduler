@@ -22,11 +22,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public final class StreamGobbler extends Thread {
-    private static final Logger logger = LoggerFactory.getLogger(StreamGobbler.class);
 
     private final InputStream inputStream;
 
@@ -47,16 +46,16 @@ public final class StreamGobbler extends Thread {
                 output.append(System.getProperty("line.separator"));
             }
             if (output.length() > 0) {
-                logger.info("out put msg is{}", output);
+                log.info("out put msg is{}", output);
             }
         } catch (IOException e) {
-            logger.error("I/O error occurs {}", e.getMessage());
+            log.error("I/O error occurs {}", e.getMessage());
         } finally {
             try {
                 inputBufferReader.close();
                 inputStreamReader.close();
             } catch (IOException e) {
-                logger.error("I/O error occurs {}", e.getMessage());
+                log.error("I/O error occurs {}", e.getMessage());
             }
         }
     }

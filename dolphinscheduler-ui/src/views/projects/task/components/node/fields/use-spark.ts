@@ -25,6 +25,7 @@ import {
   useExecutorMemory,
   useExecutorCores,
   useMainJar,
+  useNamespace,
   useResources
 } from '.'
 import type { IJsonItem } from '../types'
@@ -54,13 +55,6 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
           model.mainClass = ''
         }
       }
-    },
-    {
-      type: 'select',
-      field: 'sparkVersion',
-      span: 12,
-      name: t('project.node.spark_version'),
-      options: SPARK_VERSIONS
     },
     {
       type: 'input',
@@ -97,6 +91,7 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
       }
     },
     useDeployMode(24, ref(true), showCluster),
+    useNamespace(),
     {
       type: 'input',
       field: 'appName',
@@ -130,7 +125,7 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
       }
     },
     useResources(),
-    ...useCustomParams({ model, field: 'localParams', isSimple: true })
+    ...useCustomParams({ model, field: 'localParams', isSimple: false })
   ]
 }
 
@@ -150,16 +145,5 @@ export const PROGRAM_TYPES = [
   {
     label: 'SQL',
     value: 'SQL'
-  }
-]
-
-export const SPARK_VERSIONS = [
-  {
-    label: 'SPARK2',
-    value: 'SPARK2'
-  },
-  {
-    label: 'SPARK1',
-    value: 'SPARK1'
   }
 ]

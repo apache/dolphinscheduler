@@ -18,31 +18,22 @@ The plugin provides the following three functions:
   DAG editing page.
 - Drag from the toolbar <img src="../../../../img/tasks/icons/dvc.png" width="15"/> task node to canvas.
 
-## Task Example
+## Task Parameters
 
-First, introduce some general parameters of DolphinScheduler:
+[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
+[//]: # (- Please refer to [DolphinScheduler Task Parameters Appendix]&#40;appendix.md#default-task-parameters&#41; `Default Task Parameters` section for default parameters.)
 
-- **Node name**: The node name in a workflow definition is unique.
-- **Run flag**: Identifies whether this node schedules normally, if it does not need to execute, select
-  the `prohibition execution`.
-- **Descriptive information**: Describe the function of the node.
-- **Task priority**: When the number of worker threads is insufficient, execute in the order of priority from high
-  to low, and tasks with the same priority will execute in a first-in first-out order.
-- **Worker grouping**: Assign tasks to the machines of the worker group to execute. If `Default` is selected,
-  randomly select a worker machine for execution.
-- **Environment Name**: Configure the environment name in which run the script.
-- **Times of failed retry attempts**: The number of times the task failed to resubmit.
-- **Failed retry interval**: The time interval (unit minute) for resubmitting the task after a failed task.
-- **Delayed execution time**: The time (unit minute) that a task delays in execution.
-- **Timeout alarm**: Check the timeout alarm and timeout failure. When the task runs exceed the "timeout", an alarm
-  email will send and the task execution will fail.
-- **Predecessor task**: Selecting a predecessor task for the current task, will set the selected predecessor task as
-  upstream of the current task.
+- Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
 
-Here are some specific parameters for the DVC plugin:
-
-- **DVC Task Type** ：Upload, Download or Init DVC。
-- **DVC Repository** ：The DVC repository address associated with the task execution.
+|        **Parameter**        |                                                                                               **Description**                                                                                               |
+|-----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| DVC Task Type               | Upload, Download or Init DVC。                                                                                                                                                                               |
+| DVC Repository              | The DVC repository address associated with the task execution.                                                                                                                                              |
+| Remote Store Url            | The actual data is stored at the address. You can learn about the supported storage types from the [DVC supported storage types](https://dvc.org/doc/command-reference/remote/add#supported-storage-types). |
+| Data Path in DVC Repository | The path which the task uploads /downloads data to in the repository.                                                                                                                                       |
+| Data Path In Worker         | Data path to be uploaded. / Path for saving data after the file is downloaded to the local                                                                                                                  |
+| Version                     | After the data is uploaded, the version tag for the data will be saved in `git tag`. / The version of the data to download.                                                                                 |
+| Version Message             | Version Message.                                                                                                                                                                                            |
 
 ### Init DVC
 
@@ -54,11 +45,7 @@ The data is not actually stored in a Git repository, but somewhere else, and DVC
 
 ![dvc_init](../../../../img/tasks/demo/dvc_init.png)
 
-**Task Parameter**
-
-- **Remote Store Url** ：The actual data is stored at the address. You can learn about the supported storage types from the [DVC supported storage types](https://dvc.org/doc/command-reference/remote/add#supported-storage-types) .
-
-The example above shows that: 
+The example above shows that:
 Initialize repository `git@github.com:<YOUR-NAME-OR-ORG>/dvc-data-repository-example.git` as a DVC project and bind the remote storage address to `~/dvc`
 
 ### Upload
@@ -66,13 +53,6 @@ Initialize repository `git@github.com:<YOUR-NAME-OR-ORG>/dvc-data-repository-exa
 Used to upload and update data and record version numbers.
 
 ![dvc_upload](../../../../img/tasks/demo/dvc_upload.png)
-
-**Task Parameter**
-
-- **Data Path in DVC Repository** ：The data will be uploaded to this path in the repository.
-- **Data Path In Worker** ：Data path to be uploaded.
-- **Version** ：After the data is uploaded, the version tag for the data will be saved in `git tag`.
-- **Version Message** ：Version Message. 
 
 The example above shows that:
 
@@ -85,12 +65,6 @@ Then run `git tag "iris_1.0" -m "init iris data"`. Record the version tag `iris_
 Used to download data for a specific version.
 
 ![dvc_download](../../../../img/tasks/demo/dvc_download.png)
-
-**Task Parameter**
-
-- **Data Path in DVC Repository** ：The path to the data to download in the DVC repository.
-- **Data Path In Worker** ：Path for saving data after the file is downloaded to the local.
-- **Version** ：The version of the data to download.
 
 The example above shows that:
 
@@ -115,7 +89,7 @@ which dvc
 
 You need to enter the admin account to configure a conda environment variable（Please
 install [anaconda](https://docs.continuum.io/anaconda/install/)
-or [miniconda](https://docs.conda.io/en/latest/miniconda.html#installing ) in advance).
+or [miniconda](https://docs.conda.io/en/latest/miniconda.html#installing) in advance).
 
 ![dvc_env_config](../../../../img/tasks/demo/dvc_env_config.png)
 

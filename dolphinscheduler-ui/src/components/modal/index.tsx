@@ -38,6 +38,10 @@ const props = {
     type: Boolean as PropType<boolean>,
     default: true
   },
+  confirmShow: {
+    type: Boolean as PropType<boolean>,
+    default: true
+  },
   confirmText: {
     type: String as PropType<string>
   },
@@ -70,7 +74,7 @@ const props = {
 const Modal = defineComponent({
   name: 'Modal',
   props,
-  emits: ['cancel', 'confirm', 'jumpLink'],
+  emits: ['cancel', 'confirm', 'jumpLink', 'maskClick'],
   setup(props, ctx) {
     const { t } = useI18n()
 
@@ -82,11 +86,22 @@ const Modal = defineComponent({
       ctx.emit('confirm')
     }
 
-    return { t, onCancel, onConfirm }
+    const onMaskClick = () => {
+      ctx.emit('maskClick')
+    }
+
+    return { t, onCancel, onConfirm, onMaskClick }
   },
   render() {
-    const { $slots, t, onCancel, onConfirm, confirmDisabled, confirmLoading } =
-      this
+    const {
+      $slots,
+      t,
+      onCancel,
+      onConfirm,
+      onMaskClick,
+      confirmDisabled,
+      confirmLoading
+    } = this
 
     return (
       <NModal
@@ -94,6 +109,7 @@ const Modal = defineComponent({
         class={styles.container}
         mask-closable={false}
         auto-focus={this.autoFocus}
+        onMaskClick={onMaskClick}
       >
         <NCard
           title={this.title}
@@ -136,16 +152,18 @@ const Modal = defineComponent({
                 )}
                 {/* TODO: Add left and right slots later */}
                 {renderSlot($slots, 'btn-middle')}
-                <NButton
-                  class={[this.confirmClassName, 'btn-submit']}
-                  type='info'
-                  size='small'
-                  onClick={onConfirm}
-                  disabled={confirmDisabled}
-                  loading={confirmLoading}
-                >
-                  {this.confirmText || t('modal.confirm')}
-                </NButton>
+                {this.confirmShow && (
+                  <NButton
+                    class={[this.confirmClassName, 'btn-submit']}
+                    type='info'
+                    size='small'
+                    onClick={onConfirm}
+                    disabled={confirmDisabled}
+                    loading={confirmLoading}
+                  >
+                    {this.confirmText || t('modal.confirm')}
+                  </NButton>
+                )}
               </NSpace>
             )
           }}

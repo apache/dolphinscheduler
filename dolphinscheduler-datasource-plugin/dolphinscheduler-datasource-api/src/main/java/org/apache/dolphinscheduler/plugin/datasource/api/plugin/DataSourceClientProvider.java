@@ -17,8 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.plugin;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
@@ -26,22 +25,29 @@ import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import lombok.extern.slf4j.Slf4j;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.RemovalListener;
+
+@Slf4j
 public class DataSourceClientProvider {
-    private static final Logger logger = LoggerFactory.getLogger(DataSourceClientProvider.class);
 
-    private static long duration = PropertyUtils.getLong(TaskConstants.KERBEROS_EXPIRE_TIME, 24);
+    private static final long duration = PropertyUtils.getLong(TaskConstants.KERBEROS_EXPIRE_TIME, 24);
     private static final Cache<String, DataSourceClient> uniqueId2dataSourceClientCache = CacheBuilder.newBuilder()
             .expireAfterWrite(duration, TimeUnit.HOURS)
+            .removalListener((RemovalListener<String, DataSourceClient>) notification -> {
+                try (DataSourceClient closedClient = notification.getValue()) {
+                    log.info("Datasource: {} is removed from cache due to expire", notification.getKey());
+                }
+            })
             .maximumSize(100)
             .build();
     private DataSourcePluginManager dataSourcePluginManager;
@@ -51,6 +57,7 @@ public class DataSourceClientProvider {
     }
 
     private static class DataSourceClientProviderHolder {
+
         private static final DataSourceClientProvider INSTANCE = new DataSourceClientProvider();
     }
 
@@ -61,7 +68,7 @@ public class DataSourceClientProvider {
     public Connection getConnection(DbType dbType, ConnectionParam connectionParam) throws ExecutionException {
         BaseConnectionParam baseConnectionParam = (BaseConnectionParam) connectionParam;
         String datasourceUniqueId = DataSourceUtils.getDatasourceUniqueId(baseConnectionParam, dbType);
-        logger.info("getConnection datasourceUniqueId {}", datasourceUniqueId);
+        log.info("Get connection from datasource {}", datasourceUniqueId);
 
         DataSourceClient dataSourceClient = uniqueId2dataSourceClientCache.get(datasourceUniqueId, () -> {
             Map<String, DataSourceChannel> dataSourceChannelMap = dataSourcePluginManager.getDataSourceChannelMap();

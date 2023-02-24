@@ -17,20 +17,20 @@
 
 package org.apache.dolphinscheduler.alert;
 
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.thread.Stopper;
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
+import org.apache.dolphinscheduler.remote.factory.NettyRemotingServerFactory;
 
 import java.io.Closeable;
 
 import javax.annotation.PreDestroy;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -39,8 +39,8 @@ import org.springframework.context.event.EventListener;
 
 @SpringBootApplication
 @ComponentScan("org.apache.dolphinscheduler")
+@Slf4j
 public class AlertServer implements Closeable {
-    private static final Logger logger = LoggerFactory.getLogger(AlertServer.class);
 
     private final PluginDao pluginDao;
     private final AlertSenderService alertSenderService;
@@ -58,11 +58,6 @@ public class AlertServer implements Closeable {
         this.alertConfig = alertConfig;
     }
 
-    /**
-     * alert server startup, not use web service
-     *
-     * @param args arguments
-     */
     public static void main(String[] args) {
         Thread.currentThread().setName(Constants.THREAD_NAME_ALERT_SERVER);
         new SpringApplicationBuilder(AlertServer.class).run(args);
@@ -70,12 +65,12 @@ public class AlertServer implements Closeable {
 
     @EventListener
     public void run(ApplicationReadyEvent readyEvent) {
-        logger.info("Alert server is staring ...");
+        log.info("Alert server is staring ...");
 
         checkTable();
         startServer();
         alertSenderService.start();
-        logger.info("Alert server is started ...");
+        log.info("Alert server is started ...");
     }
 
     @Override
@@ -94,38 +89,34 @@ public class AlertServer implements Closeable {
         try {
             // set stop signal is true
             // execute only once
-            if (!Stopper.stop()) {
-                logger.warn("AlterServer is already stopped");
+            if (!ServerLifeCycleManager.toStopped()) {
+                log.warn("AlterServer is already stopped");
                 return;
             }
 
-            logger.info("Alert server is stopping, cause: {}", cause);
+            log.info("Alert server is stopping, cause: {}", cause);
 
             // thread sleep 3 seconds for thread quietly stop
             ThreadUtils.sleep(Constants.SERVER_CLOSE_WAIT_TIME.toMillis());
 
             // close
             this.nettyRemotingServer.close();
-            logger.info("Alter server stopped, cause: {}", cause);
+            log.info("Alter server stopped, cause: {}", cause);
         } catch (Exception e) {
-            logger.error("Alert server stop failed, cause: {}", cause, e);
+            log.error("Alert server stop failed, cause: {}", cause, e);
         }
     }
 
-    private void checkTable() {
+    protected void checkTable() {
         if (!pluginDao.checkPluginDefineTableExist()) {
-            logger.error("Plugin Define Table t_ds_plugin_define Not Exist . Please Create it First !");
+            log.error("Plugin Define Table t_ds_plugin_define Not Exist . Please Create it First !");
             System.exit(1);
         }
     }
 
-    private void startServer() {
-        NettyServerConfig serverConfig = new NettyServerConfig();
-        serverConfig.setListenPort(alertConfig.getPort());
-
-        nettyRemotingServer = new NettyRemotingServer(serverConfig);
+    protected void startServer() {
+        nettyRemotingServer = NettyRemotingServerFactory.buildNettyRemotingServer(alertConfig.getPort());
         nettyRemotingServer.registerProcessor(CommandType.ALERT_SEND_REQUEST, alertRequestProcessor);
         nettyRemotingServer.start();
     }
-
 }

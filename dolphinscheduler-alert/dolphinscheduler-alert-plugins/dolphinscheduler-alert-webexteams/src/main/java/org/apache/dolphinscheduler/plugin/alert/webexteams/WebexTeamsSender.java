@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.plugin.alert.webexteams;
 
 import org.apache.dolphinscheduler.alert.api.AlertData;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -34,12 +34,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 
 import com.google.common.base.Preconditions;
 
+@Slf4j
 public final class WebexTeamsSender {
-    private static final Logger log = org.slf4j.LoggerFactory.getLogger(WebexTeamsSender.class);
 
     private final String botAccessToken;
     private final String roomId;
@@ -57,7 +57,9 @@ public final class WebexTeamsSender {
         destination = WebexTeamsDestination.of(config.get(WebexTeamsParamsConstants.NAME_WEBEX_TEAMS_DESTINATION));
         Preconditions.checkArgument(!Objects.isNull(botAccessToken), "WebexTeams bot access token can not be null");
         Preconditions.checkArgument(!Objects.isNull(destination), "WebexTeams message destination can not be null");
-        Preconditions.checkArgument((!Objects.isNull(roomId) || !Objects.isNull(toPersonId) || !Objects.isNull(toPersonEmail)),"WebexTeams message destination could not be determined. Provide only one destination in the roomId, toPersonEmail, or toPersonId field");
+        Preconditions.checkArgument(
+                (!Objects.isNull(roomId) || !Objects.isNull(toPersonId) || !Objects.isNull(toPersonEmail)),
+                "WebexTeams message destination could not be determined. Provide only one destination in the roomId, toPersonEmail, or toPersonId field");
     }
 
     public AlertResult sendWebexTeamsAlter(AlertData alertData) {
@@ -137,11 +139,11 @@ public final class WebexTeamsSender {
     public static String addAtPersonEmailInRoom(String formatContent, String atPersonEmailInRoom) {
         String[] emailArr = atPersonEmailInRoom.split(",");
         StringBuilder formatContentBuilder = new StringBuilder(formatContent);
-        for (String email: emailArr) {
+        for (String email : emailArr) {
             formatContentBuilder.append(" <@personEmail:").append(email).append(">");
         }
 
-        return  formatContentBuilder.toString();
+        return formatContentBuilder.toString();
     }
 
     public static String formatContent(AlertData alertData) {
@@ -156,7 +158,7 @@ public final class WebexTeamsSender {
             for (Map map : list) {
                 for (Map.Entry<String, Object> entry : (Iterable<Map.Entry<String, Object>>) map.entrySet()) {
                     String key = entry.getKey();
-                    String value = entry.getValue().toString();
+                    String value = entry.getValue() == null ? "" : entry.getValue().toString();
                     contents.append(key).append(":").append(value);
                     contents.append("\n");
                 }

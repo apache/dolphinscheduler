@@ -43,7 +43,6 @@ public class TaskDefinitionLog extends TaskDefinition {
 
     public TaskDefinitionLog(TaskDefinition taskDefinition) {
         super();
-        this.setId(taskDefinition.getId());
         this.setCode(taskDefinition.getCode());
         this.setVersion(taskDefinition.getVersion());
         this.setName(taskDefinition.getName());
@@ -69,6 +68,7 @@ public class TaskDefinitionLog extends TaskDefinition {
         this.setFailRetryInterval(taskDefinition.getFailRetryInterval());
         this.setFailRetryTimes(taskDefinition.getFailRetryTimes());
         this.setFlag(taskDefinition.getFlag());
+        this.setIsCache(taskDefinition.getIsCache());
         this.setModifyBy(taskDefinition.getModifyBy());
         this.setCpuQuota(taskDefinition.getCpuQuota());
         this.setMemoryMax(taskDefinition.getMemoryMax());

@@ -17,19 +17,20 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import static org.apache.dolphinscheduler.common.Constants.SEC_2_MINUTES_TIME_UNIT;
+import static org.apache.dolphinscheduler.common.constants.Constants.SEC_2_MINUTES_TIME_UNIT;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_BLOCKING;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_CONDITIONS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DEPENDENT;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SUB_PROCESS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SWITCH;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
+import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
 
@@ -37,6 +38,9 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 
+import lombok.Data;
+
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -46,6 +50,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 /**
  * task instance
  */
+@Data
 @TableName("t_ds_task_instance")
 public class TaskInstance implements Serializable {
 
@@ -53,39 +58,30 @@ public class TaskInstance implements Serializable {
      * id
      */
     @TableId(value = "id", type = IdType.AUTO)
-    private int id;
+    private Integer id;
 
     /**
      * task name
      */
     private String name;
 
-
     /**
      * task type
      */
     private String taskType;
 
-    /**
-     * process instance id
-     */
     private int processInstanceId;
 
-    /**
-     * task code
-     */
+    private String processInstanceName;
+
+    private Long projectCode;
+
     private long taskCode;
 
-    /**
-     * task definition version
-     */
     private int taskDefinitionVersion;
 
-    /**
-     * process instance name
-     */
     @TableField(exist = false)
-    private String processInstanceName;
+    private String processDefinitionName;
 
     /**
      * process instance name
@@ -96,7 +92,7 @@ public class TaskInstance implements Serializable {
     /**
      * state
      */
-    private ExecutionStatus state;
+    private TaskExecutionStatus state;
 
     /**
      * task first submit time.
@@ -179,6 +175,17 @@ public class TaskInstance implements Serializable {
     private Flag flag;
 
     /**
+     * task is cache: yes/no
+     */
+    private Flag isCache;
+
+    /**
+     * cache_key
+     */
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
+    private String cacheKey;
+
+    /**
      * dependency
      */
     @TableField(exist = false)
@@ -223,7 +230,6 @@ public class TaskInstance implements Serializable {
     @TableField(exist = false)
     private String dependentResult;
 
-
     /**
      * workerGroup
      */
@@ -249,12 +255,7 @@ public class TaskInstance implements Serializable {
      */
     private String varPool;
 
-    /**
-     * executor name
-     */
-    @TableField(exist = false)
     private String executorName;
-
 
     @TableField(exist = false)
     private Map<String, String> resources;
@@ -263,7 +264,6 @@ public class TaskInstance implements Serializable {
      * delay execution time.
      */
     private int delayTime;
-
 
     /**
      * task params
@@ -289,205 +289,29 @@ public class TaskInstance implements Serializable {
      */
     private Integer memoryMax;
 
+    /**
+     * task execute type
+     */
+    private TaskExecuteType taskExecuteType;
+
+    /**
+     * test flag
+     */
+    private int testFlag;
+
     public void init(String host, Date startTime, String executePath) {
         this.host = host;
         this.startTime = startTime;
         this.executePath = executePath;
     }
 
-    public String getVarPool() {
-        return varPool;
-    }
-
-    public void setVarPool(String varPool) {
-        this.varPool = varPool;
-    }
-
-    public int getTaskGroupId() {
-        return taskGroupId;
-    }
-
-    public void setTaskGroupId(int taskGroupId) {
-        this.taskGroupId = taskGroupId;
-    }
-
-    public ProcessInstance getProcessInstance() {
-        return processInstance;
-    }
-
-    public void setProcessInstance(ProcessInstance processInstance) {
-        this.processInstance = processInstance;
-    }
-
-    public ProcessDefinition getProcessDefine() {
-        return processDefine;
-    }
-
-    public void setProcessDefine(ProcessDefinition processDefine) {
-        this.processDefine = processDefine;
-    }
-
-    public TaskDefinition getTaskDefine() {
-        return taskDefine;
-    }
-
-    public void setTaskDefine(TaskDefinition taskDefine) {
-        this.taskDefine = taskDefine;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getTaskType() {
-        return taskType;
-    }
-
-    public void setTaskType(String taskType) {
-        this.taskType = taskType;
-    }
-
-    public int getProcessInstanceId() {
-        return processInstanceId;
-    }
-
-    public void setProcessInstanceId(int processInstanceId) {
-        this.processInstanceId = processInstanceId;
-    }
-
-    public ExecutionStatus getState() {
-        return state;
-    }
-
-    public void setState(ExecutionStatus state) {
-        this.state = state;
-    }
-
-    public Date getFirstSubmitTime() {
-        return firstSubmitTime;
-    }
-
-    public void setFirstSubmitTime(Date firstSubmitTime) {
-        this.firstSubmitTime = firstSubmitTime;
-    }
-
-    public Date getSubmitTime() {
-        return submitTime;
-    }
-
-    public void setSubmitTime(Date submitTime) {
-        this.submitTime = submitTime;
-    }
-
-    public Date getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
-    }
-
-    public Date getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(Date endTime) {
-        this.endTime = endTime;
-    }
-
-    public String getHost() {
-        return host;
-    }
-
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    public String getExecutePath() {
-        return executePath;
-    }
-
-    public void setExecutePath(String executePath) {
-        this.executePath = executePath;
-    }
-
-    public String getLogPath() {
-        return logPath;
-    }
-
-    public void setLogPath(String logPath) {
-        this.logPath = logPath;
-    }
-
-    public Flag getAlertFlag() {
-        return alertFlag;
-    }
-
-    public void setAlertFlag(Flag alertFlag) {
-        this.alertFlag = alertFlag;
-    }
-
-    public int getRetryTimes() {
-        return retryTimes;
-    }
-
-    public void setRetryTimes(int retryTimes) {
-        this.retryTimes = retryTimes;
-    }
-
-    public Boolean isTaskSuccess() {
-        return this.state == ExecutionStatus.SUCCESS;
-    }
-
-    public int getPid() {
-        return pid;
-    }
-
-    public void setPid(int pid) {
-        this.pid = pid;
-    }
-
-    public String getAppLink() {
-        return appLink;
-    }
-
-    public void setAppLink(String appLink) {
-        this.appLink = appLink;
-    }
-
-    public Long getEnvironmentCode() {
-        return this.environmentCode;
-    }
-
-    public void setEnvironmentCode(Long environmentCode) {
-        this.environmentCode = environmentCode;
-    }
-
-    public String getEnvironmentConfig() {
-        return this.environmentConfig;
-    }
-
-    public void setEnvironmentConfig(String environmentConfig) {
-        this.environmentConfig = environmentConfig;
-    }
-
     public DependentParameters getDependency() {
         if (this.dependency == null) {
-            Map<String, Object> taskParamsMap = JSONUtils.parseObject(this.getTaskParams(), new TypeReference<Map<String, Object>>() {
-            });
-            this.dependency = JSONUtils.parseObject((String) taskParamsMap.get(Constants.DEPENDENCE), DependentParameters.class);
+            Map<String, Object> taskParamsMap =
+                    JSONUtils.parseObject(this.getTaskParams(), new TypeReference<Map<String, Object>>() {
+                    });
+            this.dependency =
+                    JSONUtils.parseObject((String) taskParamsMap.get(Constants.DEPENDENCE), DependentParameters.class);
         }
         return this.dependency;
     }
@@ -498,98 +322,28 @@ public class TaskInstance implements Serializable {
 
     public SwitchParameters getSwitchDependency() {
         if (this.switchDependency == null) {
-            Map<String, Object> taskParamsMap = JSONUtils.parseObject(this.getTaskParams(), new TypeReference<Map<String, Object>>() {
-            });
-            this.switchDependency = JSONUtils.parseObject((String) taskParamsMap.get(Constants.SWITCH_RESULT), SwitchParameters.class);
+            Map<String, Object> taskParamsMap =
+                    JSONUtils.parseObject(this.getTaskParams(), new TypeReference<Map<String, Object>>() {
+                    });
+            this.switchDependency =
+                    JSONUtils.parseObject((String) taskParamsMap.get(Constants.SWITCH_RESULT), SwitchParameters.class);
         }
         return this.switchDependency;
     }
 
     public void setSwitchDependency(SwitchParameters switchDependency) {
-        Map<String, Object> taskParamsMap = JSONUtils.parseObject(this.getTaskParams(), new TypeReference<Map<String, Object>>() {
-        });
+        Map<String, Object> taskParamsMap =
+                JSONUtils.parseObject(this.getTaskParams(), new TypeReference<Map<String, Object>>() {
+                });
         taskParamsMap.put(Constants.SWITCH_RESULT, JSONUtils.toJsonString(switchDependency));
         this.setTaskParams(JSONUtils.toJsonString(taskParamsMap));
     }
 
-    public Flag getFlag() {
-        return flag;
-    }
-
-    public void setFlag(Flag flag) {
-        this.flag = flag;
-    }
-
-    public String getProcessInstanceName() {
-        return processInstanceName;
-    }
-
-    public void setProcessInstanceName(String processInstanceName) {
-        this.processInstanceName = processInstanceName;
-    }
-
-    public String getDuration() {
-        return duration;
-    }
-
-    public void setDuration(String duration) {
-        this.duration = duration;
-    }
-
-    public int getMaxRetryTimes() {
-        return maxRetryTimes;
-    }
-
-    public void setMaxRetryTimes(int maxRetryTimes) {
-        this.maxRetryTimes = maxRetryTimes;
-    }
-
-    public int getRetryInterval() {
-        return retryInterval;
-    }
-
-    public void setRetryInterval(int retryInterval) {
-        this.retryInterval = retryInterval;
-    }
-
-    public int getExecutorId() {
-        return executorId;
-    }
-
-    public void setExecutorId(int executorId) {
-        this.executorId = executorId;
-    }
-
-    public String getExecutorName() {
-        return executorName;
-    }
-
-    public void setExecutorName(String executorName) {
-        this.executorName = executorName;
-    }
-
-    public int getDryRun() {
-        return dryRun;
-    }
-
-    public void setDryRun(int dryRun) {
-        this.dryRun = dryRun;
-    }
-
     public boolean isTaskComplete() {
 
-        return this.getState().typeIsPause()
-                || this.getState().typeIsSuccess()
-                || this.getState().typeIsCancel()
-                || (this.getState().typeIsFailure() && !taskCanRetry());
-    }
-
-    public Map<String, String> getResources() {
-        return resources;
-    }
-
-    public void setResources(Map<String, String> resources) {
-        this.resources = resources;
+        return this.getState().isSuccess()
+                || this.getState().isKill()
+                || (this.getState().isFailure() && !taskCanRetry());
     }
 
     public boolean isSubProcess() {
@@ -612,6 +366,10 @@ public class TaskInstance implements Serializable {
         return TASK_TYPE_BLOCKING.equalsIgnoreCase(this.taskType);
     }
 
+    public boolean isFirstRun() {
+        return endTime == null;
+    }
+
     /**
      * determine if a task instance can retry
      * if subProcess,
@@ -622,10 +380,10 @@ public class TaskInstance implements Serializable {
         if (this.isSubProcess()) {
             return false;
         }
-        if (this.getState() == ExecutionStatus.NEED_FAULT_TOLERANCE) {
+        if (this.getState() == TaskExecutionStatus.NEED_FAULT_TOLERANCE) {
             return true;
         }
-        return this.getState() == ExecutionStatus.FAILURE && (this.getRetryTimes() < this.getMaxRetryTimes());
+        return this.getState() == TaskExecutionStatus.FAILURE && (this.getRetryTimes() < this.getMaxRetryTimes());
     }
 
     /**
@@ -634,7 +392,7 @@ public class TaskInstance implements Serializable {
      * @return Boolean
      */
     public boolean retryTaskIntervalOverTime() {
-        if (getState() != ExecutionStatus.FAILURE) {
+        if (getState() != TaskExecutionStatus.FAILURE) {
             return true;
         }
         if (getMaxRetryTimes() == 0 || getRetryInterval() == 0) {
@@ -646,137 +404,4 @@ public class TaskInstance implements Serializable {
         return getRetryInterval() * SEC_2_MINUTES_TIME_UNIT < failedTimeInterval;
     }
 
-    public Priority getTaskInstancePriority() {
-        return taskInstancePriority;
-    }
-
-    public void setTaskInstancePriority(Priority taskInstancePriority) {
-        this.taskInstancePriority = taskInstancePriority;
-    }
-
-    public Priority getProcessInstancePriority() {
-        return processInstancePriority;
-    }
-
-    public void setProcessInstancePriority(Priority processInstancePriority) {
-        this.processInstancePriority = processInstancePriority;
-    }
-
-    public String getWorkerGroup() {
-        return workerGroup;
-    }
-
-    public void setWorkerGroup(String workerGroup) {
-        this.workerGroup = workerGroup;
-    }
-
-    public String getDependentResult() {
-        return dependentResult;
-    }
-
-    public void setDependentResult(String dependentResult) {
-        this.dependentResult = dependentResult;
-    }
-
-    public int getDelayTime() {
-        return delayTime;
-    }
-
-    public void setDelayTime(int delayTime) {
-        this.delayTime = delayTime;
-    }
-
-    @Override
-    public String toString() {
-        return "TaskInstance{"
-                + "id=" + id
-                + ", name='" + name + '\''
-                + ", taskType='" + taskType + '\''
-                + ", processInstanceId=" + processInstanceId
-                + ", processInstanceName='" + processInstanceName + '\''
-                + ", state=" + state
-                + ", firstSubmitTime=" + firstSubmitTime
-                + ", submitTime=" + submitTime
-                + ", startTime=" + startTime
-                + ", endTime=" + endTime
-                + ", host='" + host + '\''
-                + ", executePath='" + executePath + '\''
-                + ", logPath='" + logPath + '\''
-                + ", retryTimes=" + retryTimes
-                + ", alertFlag=" + alertFlag
-                + ", processInstance=" + processInstance
-                + ", processDefine=" + processDefine
-                + ", pid=" + pid
-                + ", appLink='" + appLink + '\''
-                + ", flag=" + flag
-                + ", dependency='" + dependency + '\''
-                + ", duration=" + duration
-                + ", maxRetryTimes=" + maxRetryTimes
-                + ", retryInterval=" + retryInterval
-                + ", taskInstancePriority=" + taskInstancePriority
-                + ", processInstancePriority=" + processInstancePriority
-                + ", dependentResult='" + dependentResult + '\''
-                + ", workerGroup='" + workerGroup + '\''
-                + ", environmentCode=" + environmentCode
-                + ", environmentConfig='" + environmentConfig + '\''
-                + ", executorId=" + executorId
-                + ", executorName='" + executorName + '\''
-                + ", delayTime=" + delayTime
-                + ", dryRun=" + dryRun
-                + ", taskGroupId=" + taskGroupId
-                + ", taskGroupPriority=" + taskGroupPriority
-                + '}';
-    }
-
-    public long getTaskCode() {
-        return taskCode;
-    }
-
-    public void setTaskCode(long taskCode) {
-        this.taskCode = taskCode;
-    }
-
-    public int getTaskDefinitionVersion() {
-        return taskDefinitionVersion;
-    }
-
-    public void setTaskDefinitionVersion(int taskDefinitionVersion) {
-        this.taskDefinitionVersion = taskDefinitionVersion;
-    }
-
-    public String getTaskParams() {
-        return taskParams;
-    }
-
-    public void setTaskParams(String taskParams) {
-        this.taskParams = taskParams;
-    }
-
-    public boolean isFirstRun() {
-        return endTime == null;
-    }
-
-    public int getTaskGroupPriority() {
-        return taskGroupPriority;
-    }
-
-    public void setTaskGroupPriority(int taskGroupPriority) {
-        this.taskGroupPriority = taskGroupPriority;
-    }
-
-    public Integer getCpuQuota() {
-        return cpuQuota == null ? -1 : cpuQuota;
-    }
-
-    public void setCpuQuota(Integer cpuQuota) {
-        this.cpuQuota = cpuQuota;
-    }
-
-    public Integer getMemoryMax() {
-        return memoryMax == null ? -1 : memoryMax;
-    }
-
-    public void setMemoryMax(Integer memoryMax) {
-        this.memoryMax = memoryMax;
-    }
 }

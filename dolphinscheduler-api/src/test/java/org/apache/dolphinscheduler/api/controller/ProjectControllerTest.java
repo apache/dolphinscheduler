@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Resource;
@@ -29,23 +28,26 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 
 import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 /**
  * project controller test
  */
-@RunWith(MockitoJUnitRunner.Silent.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class ProjectControllerTest {
+
+    protected User user;
 
     @InjectMocks
     private ProjectController projectController;
@@ -56,9 +58,7 @@ public class ProjectControllerTest {
     @Mock
     private ProjectMapper projectMapper;
 
-    protected User user;
-
-    @Before
+    @BeforeEach
     public void before() {
         User loginUser = new User();
         loginUser.setId(1);
@@ -69,9 +69,8 @@ public class ProjectControllerTest {
 
     @Test
     public void testUpdateProject() {
-        Map<String, Object> result = new HashMap<>();
+        Result result = new Result();
         putMsg(result, Status.SUCCESS);
-        result.put("projectId", 1);
 
         long projectCode = 1L;
         String projectName = "test";
@@ -79,18 +78,18 @@ public class ProjectControllerTest {
         String userName = "jack";
         Mockito.when(projectService.update(user, projectCode, projectName, desc, userName)).thenReturn(result);
         Result response = projectController.updateProject(user, projectCode, projectName, desc, userName);
-        Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
 
     @Test
     public void testQueryProjectByCode() {
-        Map<String, Object> result = new HashMap<>();
+        Result result = new Result();
         putMsg(result, Status.SUCCESS);
         long projectCode = 1L;
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject());
         Mockito.when(projectService.queryByCode(user, projectCode)).thenReturn(result);
         Result response = projectController.queryProjectByCode(user, projectCode);
-        Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
 
     @Test
@@ -104,48 +103,57 @@ public class ProjectControllerTest {
         Mockito.when(projectService.queryProjectListPaging(user, pageSize, pageNo, searchVal)).thenReturn(result);
         Result response = projectController.queryProjectListPaging(user, searchVal, pageSize, pageNo);
 
-        Assert.assertTrue(response != null && response.isSuccess());
+        Assertions.assertTrue(response != null && response.isSuccess());
     }
 
     @Test
     public void testQueryUnauthorizedProject() {
-        Map<String, Object> result = new HashMap<>();
+        Result result = new Result();
         putMsg(result, Status.SUCCESS);
         Mockito.when(projectService.queryUnauthorizedProject(user, 2)).thenReturn(result);
         Result response = projectController.queryUnauthorizedProject(user, 2);
-        Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
 
     @Test
     public void testQueryAuthorizedProject() {
-        Map<String, Object> result = new HashMap<>();
+        Result result = new Result();
         putMsg(result, Status.SUCCESS);
         Mockito.when(projectService.queryAuthorizedProject(user, 2)).thenReturn(result);
         Result response = projectController.queryAuthorizedProject(user, 2);
-        Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
 
     @Test
     public void testQueryAuthorizedUser() {
-        Map<String, Object> result = new HashMap<>();
+        Result result = new Result();
         this.putMsg(result, Status.SUCCESS);
 
         Mockito.when(this.projectService.queryAuthorizedUser(this.user, 3682329499136L)).thenReturn(result);
         Result response = this.projectController.queryAuthorizedUser(this.user, 3682329499136L);
-        Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
 
     @Test
     public void testQueryAllProjectList() {
         User user = new User();
         user.setId(0);
-        Map<String, Object> result = new HashMap<>();
+        Result result = new Result();
         putMsg(result, Status.SUCCESS);
         Mockito.when(projectService.queryAllProjectList(user)).thenReturn(result);
         Result response = projectController.queryAllProjectList(user);
-        Assert.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
-
+    @Test
+    public void testQueryAllProjectListForDependent() {
+        User user = new User();
+        user.setId(0);
+        Result result = new Result();
+        putMsg(result, Status.SUCCESS);
+        Mockito.when(projectService.queryAllProjectListForDependent()).thenReturn(result);
+        Result response = projectController.queryAllProjectListForDependent(user);
+        Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+    }
     private Project getProject() {
         Project project = new Project();
         project.setCode(1L);
@@ -155,12 +163,12 @@ public class ProjectControllerTest {
         return project;
     }
 
-    private void putMsg(Map<String, Object> result, Status status, Object... statusParams) {
-        result.put(Constants.STATUS, status);
+    private void putMsg(Result result, Status status, Object... statusParams) {
+        result.setCode(status.getCode());
         if (statusParams != null && statusParams.length > 0) {
-            result.put(Constants.MSG, MessageFormat.format(status.getMsg(), statusParams));
+            result.setMsg(MessageFormat.format(status.getMsg(), statusParams));
         } else {
-            result.put(Constants.MSG, status.getMsg());
+            result.setMsg(status.getMsg());
         }
     }
 }

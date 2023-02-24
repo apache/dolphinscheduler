@@ -15,7 +15,13 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, toRefs, watch } from 'vue'
+import {
+  defineComponent,
+  getCurrentInstance,
+  PropType,
+  toRefs,
+  watch
+} from 'vue'
 import Modal from '@/components/modal'
 import { NForm, NFormItem, NInput, NSelect } from 'naive-ui'
 import { useModal } from './use-modal'
@@ -55,6 +61,8 @@ const AlarmGroupModal = defineComponent({
       handleValidate(props.statusRef)
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     watch(
       () => props.showModalRef,
       () => {
@@ -92,7 +100,7 @@ const AlarmGroupModal = defineComponent({
       }
     )
 
-    return { t, ...toRefs(variables), cancelModal, confirmModal }
+    return { t, ...toRefs(variables), cancelModal, confirmModal, trim }
   },
   render() {
     const { t } = this
@@ -124,6 +132,7 @@ const AlarmGroupModal = defineComponent({
                   path='groupName'
                 >
                   <NInput
+                    allowInput={this.trim}
                     placeholder={t(
                       'security.alarm_group.alert_group_name_tips'
                     )}
@@ -148,6 +157,7 @@ const AlarmGroupModal = defineComponent({
                   path='description'
                 >
                   <NInput
+                    allowInput={this.trim}
                     type='textarea'
                     placeholder={t(
                       'security.alarm_group.alarm_group_description_tips'

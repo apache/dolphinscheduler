@@ -45,7 +45,7 @@ do
   fi
 
   if [[ $i -eq $TIMEOUT ]];then
-    docker exec -u root ds bash -c "cat /root/apache-dolphinscheduler-dev-SNAPSHOT-bin/master-server/logs/dolphinscheduler-master.log"
+    docker exec -u root ds bash -c "cat /root/apache-dolphinscheduler-*-SNAPSHOT-bin/master-server/logs/dolphinscheduler-master.log"
     echo "cluster start health check failed"
     exit $START_HEALTHCHECK_EXITCODE
   fi
@@ -54,7 +54,7 @@ do
 done
 
 #Stop Cluster
-docker exec -u root ds bash -c "/root/apache-dolphinscheduler-dev-SNAPSHOT-bin/bin/stop-all.sh"
+docker exec -u root ds bash -c "/root/apache-dolphinscheduler-*-SNAPSHOT-bin/bin/stop-all.sh"
 
 #Cluster stop health check
 sleep 5

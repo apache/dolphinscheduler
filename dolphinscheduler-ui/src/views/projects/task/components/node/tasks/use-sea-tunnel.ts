@@ -46,37 +46,47 @@ export function useSeaTunnel({
     memoryMax: -1,
     delayTime: 0,
     timeout: 30,
+    engine: 'FLINK',
+    runMode: 'RUN',
+    useCustom: true,
     deployMode: 'client',
-    queue: 'default',
-    master: 'yarn',
+    master: 'YARN',
     masterUrl: '',
     resourceFiles: [],
-    timeoutNotifyStrategy: ['WARN']
+    timeoutNotifyStrategy: ['WARN'],
+    rawScript:
+      'env {\n' +
+      '    execution.parallelism = 1\n' +
+      '}\n' +
+      '\n' +
+      'source {\n' +
+      '    FakeSourceStream {\n' +
+      '        result_table_name = "fake"\n' +
+      '        field_name = "name,age"\n' +
+      '    }\n' +
+      '}\n' +
+      '\n' +
+      'transform {\n' +
+      '    sql {\n' +
+      '        sql = "select name,age from fake"\n' +
+      '    }\n' +
+      '}\n' +
+      '\n' +
+      'sink {\n' +
+      '    ConsoleSink {}\n' +
+      '}'
   } as INodeData)
-
-  let extra: IJsonItem[] = []
-  if (from === 1) {
-    extra = [
-      Fields.useTaskType(model, readonly),
-      Fields.useProcessName({
-        model,
-        projectCode,
-        isCreate: !data?.id,
-        from,
-        processName: data?.processName
-      })
-    ]
-  }
 
   return {
     json: [
       Fields.useName(from),
-      ...extra,
+      ...Fields.useTaskDefinition({ projectCode, from, readonly, data, model }),
       Fields.useRunFlag(),
+      Fields.useCache(),
       Fields.useDescription(),
       Fields.useTaskPriority(),
       Fields.useWorkerGroup(),
-      Fields.useEnvironmentName(model, !model.id),
+      Fields.useEnvironmentName(model, !data?.id),
       ...Fields.useTaskGroup(model, projectCode),
       ...Fields.useFailed(),
       ...Fields.useResourceLimit(),

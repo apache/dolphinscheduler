@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.sqoop;
 
+import org.apache.commons.lang3.ObjectUtils;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -31,12 +33,13 @@ import java.util.Map;
 public class EntityTestUtils {
 
     private static final Map<String, Object> OBJECT_MAP = new HashMap<>();
- 
+
     private static final String SKIP_METHOD = "getClass,notify,notifyAll,wait,equals,hashCode,clone";
 
     static {
         OBJECT_MAP.put("java.lang.Long", 1L);
-        OBJECT_MAP.put("java.lang.String", "[{\"direct\":\"OUT\",\"prop\":\"percentage5\",\"type\":\"VARCHAR\",\"value\":\"qwe\"}]");
+        OBJECT_MAP.put("java.lang.String",
+                "[{\"direct\":\"OUT\",\"prop\":\"percentage5\",\"type\":\"VARCHAR\",\"value\":\"qwe\"}]");
         OBJECT_MAP.put("java.lang.Integer", 1);
         OBJECT_MAP.put("int", 1);
         OBJECT_MAP.put("long", 1L);
@@ -45,9 +48,8 @@ public class EntityTestUtils {
         OBJECT_MAP.put("java.util.Map", new HashMap());
         OBJECT_MAP.put("boolean", true);
     }
-    
-    public static void run(List<Class> classList)
-            throws IllegalAccessException, InvocationTargetException, InstantiationException {
+
+    public static void run(List<Class> classList) throws IllegalAccessException, InvocationTargetException, InstantiationException {
         for (Class temp : classList) {
             Object tempInstance = new Object();
             Constructor[] constructors = temp.getConstructors();
@@ -74,6 +76,9 @@ public class EntityTestUtils {
                     Object[] objects = new Object[parameterTypes.length];
                     for (int i = 0; i < parameterTypes.length; i++) {
                         objects[i] = OBJECT_MAP.get(parameterTypes[i].getName());
+                    }
+                    if (ObjectUtils.allNull(objects)) {
+                        break;
                     }
                     method.invoke(tempInstance, objects);
                 } else {

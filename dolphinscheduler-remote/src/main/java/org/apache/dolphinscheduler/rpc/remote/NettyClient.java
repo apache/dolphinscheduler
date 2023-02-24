@@ -37,9 +37,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import lombok.extern.slf4j.Slf4j;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -57,6 +55,7 @@ import io.netty.handler.timeout.IdleStateHandler;
 /**
  * NettyClient
  */
+@Slf4j
 public class NettyClient {
 
     public static NettyClient getInstance() {
@@ -68,8 +67,6 @@ public class NettyClient {
         private static final NettyClient INSTANCE = new NettyClient(new NettyClientConfig());
     }
 
-    private final Logger logger = LoggerFactory.getLogger(NettyClient.class);
-
     /**
      * worker group
      */
@@ -79,7 +76,6 @@ public class NettyClient {
      * client config
      */
     private final NettyClientConfig clientConfig;
-
 
     /**
      * client bootstrap
@@ -94,7 +90,7 @@ public class NettyClient {
     /**
      * channels
      */
-    private final ConcurrentHashMap<Host, Channel> channels = new ConcurrentHashMap(128);
+    private final ConcurrentHashMap<Host, Channel> channels = new ConcurrentHashMap<>(128);
 
     /**
      * get channel
@@ -129,7 +125,7 @@ public class NettyClient {
                 return channel;
             }
         } catch (Exception ex) {
-            logger.warn(String.format("connect to %s error", host), ex);
+            log.warn(String.format("connect to %s error", host), ex);
         }
         return null;
     }
@@ -143,6 +139,7 @@ public class NettyClient {
         this.clientConfig = clientConfig;
         if (Epoll.isAvailable()) {
             this.workerGroup = new EpollEventLoopGroup(clientConfig.getWorkerThreads(), new ThreadFactory() {
+
                 private AtomicInteger threadIndex = new AtomicInteger(0);
 
                 @Override
@@ -152,6 +149,7 @@ public class NettyClient {
             });
         } else {
             this.workerGroup = new NioEventLoopGroup(clientConfig.getWorkerThreads(), new ThreadFactory() {
+
                 private AtomicInteger threadIndex = new AtomicInteger(0);
 
                 @Override
@@ -179,12 +177,15 @@ public class NettyClient {
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, clientConfig.getConnectTimeoutMillis())
                 .handler(new LoggingHandler(LogLevel.DEBUG))
                 .handler(new ChannelInitializer<SocketChannel>() {
+
                     @Override
                     public void initChannel(SocketChannel ch) {
                         ch.pipeline()
                                 .addLast(new NettyEncoder())
                                 .addLast(new NettyDecoder(RpcResponse.class))
-                                .addLast("client-idle-handler", new IdleStateHandler(Constants.NETTY_CLIENT_HEART_BEAT_TIME, 0, 0, TimeUnit.MILLISECONDS))
+                                .addLast("client-idle-handler",
+                                        new IdleStateHandler(Constants.NETTY_CLIENT_HEART_BEAT_TIME, 0, 0,
+                                                TimeUnit.MILLISECONDS))
                                 .addLast(new NettyClientHandler());
                     }
                 });
@@ -219,7 +220,7 @@ public class NettyClient {
             assert future != null;
             result = future.get();
         } catch (InterruptedException e) {
-            logger.error("send msg error，service name is {}", serviceName, e);
+            log.error("send msg error，service name is {}", serviceName, e);
             Thread.currentThread().interrupt();
         }
         return result;
@@ -236,9 +237,9 @@ public class NettyClient {
                     this.workerGroup.shutdownGracefully();
                 }
             } catch (Exception ex) {
-                logger.error("netty client close exception", ex);
+                log.error("netty client close exception", ex);
             }
-            logger.info("netty client closed");
+            log.info("netty client closed");
         }
     }
 

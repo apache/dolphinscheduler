@@ -17,31 +17,30 @@
 
 package org.apache.dolphinscheduler.server.worker;
 
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.IStoppable;
-import org.apache.dolphinscheduler.common.enums.NodeType;
-import org.apache.dolphinscheduler.common.thread.Stopper;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
-import org.apache.dolphinscheduler.plugin.task.api.ProcessUtils;
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
-import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcServer;
+import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
+import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
+import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
-import org.apache.dolphinscheduler.server.worker.runner.RetryReportTaskStatusThread;
+import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcClient;
+import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcServer;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
-import org.apache.dolphinscheduler.service.alert.AlertClientService;
-import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.Collection;
-import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -51,36 +50,14 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication
 @EnableTransactionManagement
-@ComponentScan(basePackages = "org.apache.dolphinscheduler",
-        excludeFilters = {
-                @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
-                        "org.apache.dolphinscheduler.service.process.*",
-                        "org.apache.dolphinscheduler.service.queue.*",
-                })
-        }
-)
+@ComponentScan(basePackages = "org.apache.dolphinscheduler", excludeFilters = {
+        @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
+                "org.apache.dolphinscheduler.service.process.*",
+                "org.apache.dolphinscheduler.service.queue.*",
+        })
+})
+@Slf4j
 public class WorkerServer implements IStoppable {
-
-    /**
-     * logger
-     */
-    private static final Logger logger = LoggerFactory.getLogger(WorkerServer.class);
-
-    /**
-     * spring application context
-     * only use it for initialization
-     */
-    @Autowired
-    private SpringApplicationContext springApplicationContext;
-
-    /**
-     * alert model netty remote server
-     */
-    @Autowired
-    private AlertClientService alertClientService;
-
-    @Autowired
-    private RetryReportTaskStatusThread retryReportTaskStatusThread;
 
     @Autowired
     private WorkerManagerThread workerManagerThread;
@@ -91,13 +68,20 @@ public class WorkerServer implements IStoppable {
     @Autowired
     private WorkerRegistryClient workerRegistryClient;
 
-    // todo: Can we just load the task spi, and don't install into mysql?
-    //  we don't need to rely the dao module in worker.
     @Autowired
     private TaskPluginManager taskPluginManager;
 
     @Autowired
     private WorkerRpcServer workerRpcServer;
+
+    @Autowired
+    private WorkerRpcClient workerRpcClient;
+
+    @Autowired
+    private MessageRetryRunner messageRetryRunner;
+
+    @Autowired
+    private WorkerConfig workerConfig;
 
     /**
      * worker server startup, not use web service
@@ -112,60 +96,44 @@ public class WorkerServer implements IStoppable {
     @PostConstruct
     public void run() {
         this.workerRpcServer.start();
+        this.workerRpcClient.start();
+        this.taskPluginManager.loadPlugin();
 
-        this.taskPluginManager.installPlugin();
-
-        this.workerRegistryClient.registry();
         this.workerRegistryClient.setRegistryStoppable(this);
-        Set<String> workerZkPaths = this.workerRegistryClient.getWorkerZkPaths();
-        this.workerRegistryClient.handleDeadServer(workerZkPaths, NodeType.WORKER, Constants.DELETE_OP);
+        this.workerRegistryClient.start();
 
         this.workerManagerThread.start();
 
-        this.retryReportTaskStatusThread.start();
+        this.messageRetryRunner.start();
 
         /*
          * registry hooks, which are called before the process exits
          */
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            if (Stopper.isRunning()) {
+            if (!ServerLifeCycleManager.isStopped()) {
                 close("WorkerServer shutdown hook");
             }
         }));
     }
 
     public void close(String cause) {
-        try {
-            // execute only once
-            // set stop signal is true
-            if (!Stopper.stop()) {
-                logger.warn("WorkerServer is already stopped, current cause: {}", cause);
-                return;
-            }
+        if (!ServerLifeCycleManager.toStopped()) {
+            log.warn("WorkerServer is already stopped, current cause: {}", cause);
+            return;
+        }
+        ThreadUtils.sleep(Constants.SERVER_CLOSE_WAIT_TIME.toMillis());
 
-            logger.info("Worker server is stopping, current cause : {}", cause);
-
-            try {
-                // thread sleep 3 seconds for thread quitely stop
-                Thread.sleep(Constants.SERVER_CLOSE_WAIT_TIME.toMillis());
-            } catch (Exception e) {
-                logger.warn("Worker server close wait error", e);
-            }
-
-            // close
-            this.workerRpcServer.close();
-            this.workerRegistryClient.unRegistry();
-            this.alertClientService.close();
-
+        try (
+                WorkerRpcServer closedWorkerRpcServer = workerRpcServer;
+                WorkerRegistryClient closedRegistryClient = workerRegistryClient) {
+            log.info("Worker server is stopping, current cause : {}", cause);
             // kill running tasks
             this.killAllRunningTasks();
-
-            // close the application context
-            this.springApplicationContext.close();
-            logger.info("Worker server stopped, current cause: {}", cause);
         } catch (Exception e) {
-            logger.error("Worker server stop failed, current cause: {}", cause, e);
+            log.error("Worker server stop failed, current cause: {}", cause, e);
+            return;
         }
+        log.info("Worker server stopped, current cause: {}", cause);
     }
 
     @Override
@@ -181,19 +149,21 @@ public class WorkerServer implements IStoppable {
         if (CollectionUtils.isEmpty(taskRequests)) {
             return;
         }
-        logger.info("Worker begin to kill all cache task, task size: {}", taskRequests.size());
+        log.info("Worker begin to kill all cache task, task size: {}", taskRequests.size());
         int killNumber = 0;
         for (TaskExecutionContext taskRequest : taskRequests) {
             // kill task when it's not finished yet
             try {
-                LoggerUtils.setWorkflowAndTaskInstanceIDMDC(taskRequest.getProcessInstanceId(), taskRequest.getTaskInstanceId());
+                LogUtils.setWorkflowAndTaskInstanceIDMDC(taskRequest.getProcessInstanceId(),
+                        taskRequest.getTaskInstanceId());
                 if (ProcessUtils.kill(taskRequest)) {
                     killNumber++;
                 }
             } finally {
-                LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
+                LogUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
         }
-        logger.info("Worker after kill all cache task, task size: {}, killed number: {}", taskRequests.size(), killNumber);
+        log.info("Worker after kill all cache task, task size: {}, killed number: {}", taskRequests.size(),
+                killNumber);
     }
 }

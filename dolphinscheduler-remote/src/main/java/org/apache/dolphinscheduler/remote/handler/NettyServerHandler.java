@@ -28,9 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import lombok.extern.slf4j.Slf4j;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelConfig;
 import io.netty.channel.ChannelHandler;
@@ -38,14 +36,12 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.timeout.IdleStateEvent;
 
-
 /**
  * netty server request handler
  */
 @ChannelHandler.Sharable
+@Slf4j
 public class NettyServerHandler extends ChannelInboundHandlerAdapter {
-
-    private final Logger logger = LoggerFactory.getLogger(NettyServerHandler.class);
 
     /**
      * netty remote server
@@ -55,7 +51,8 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
     /**
      * server processors queue
      */
-    private final ConcurrentHashMap<CommandType, Pair<NettyRequestProcessor, ExecutorService>> processors = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<CommandType, Pair<NettyRequestProcessor, ExecutorService>> processors =
+            new ConcurrentHashMap<>();
 
     public NettyServerHandler(NettyRemotingServer nettyRemotingServer) {
         this.nettyRemotingServer = nettyRemotingServer;
@@ -100,7 +97,8 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
      * @param processor processor
      * @param executor thread executor
      */
-    public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor, final ExecutorService executor) {
+    public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor,
+                                  final ExecutorService executor) {
         ExecutorService executorRef = executor;
         if (executorRef == null) {
             executorRef = nettyRemotingServer.getDefaultExecutor();
@@ -117,8 +115,8 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
     private void processReceived(final Channel channel, final Command msg) {
         final CommandType commandType = msg.getType();
         if (CommandType.HEART_BEAT.equals(commandType)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("server receive heart beat from: host: {}", ChannelUtils.getRemoteAddress(channel));
+            if (log.isDebugEnabled()) {
+                log.debug("server receive heart beat from: host: {}", ChannelUtils.getRemoteAddress(channel));
             }
             return;
         }
@@ -128,16 +126,16 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
                 try {
                     pair.getLeft().process(channel, msg);
                 } catch (Exception ex) {
-                    logger.error("process msg {} error", msg, ex);
+                    log.error("process msg {} error", msg, ex);
                 }
             };
             try {
                 pair.getRight().submit(r);
             } catch (RejectedExecutionException e) {
-                logger.warn("thread pool is full, discard msg {} from {}", msg, ChannelUtils.getRemoteAddress(channel));
+                log.warn("thread pool is full, discard msg {} from {}", msg, ChannelUtils.getRemoteAddress(channel));
             }
         } else {
-            logger.warn("commandType {} not support", commandType);
+            log.warn("commandType {} not support", commandType);
         }
     }
 
@@ -149,7 +147,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        logger.error("exceptionCaught : {}", cause.getMessage(), cause);
+        log.error("exceptionCaught : {}", cause.getMessage(), cause);
         ctx.channel().close();
     }
 
@@ -164,15 +162,15 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
         ChannelConfig config = ch.config();
 
         if (!ch.isWritable()) {
-            if (logger.isWarnEnabled()) {
-                logger.warn("{} is not writable, over high water level : {}",
+            if (log.isWarnEnabled()) {
+                log.warn("{} is not writable, over high water level : {}",
                         ch, config.getWriteBufferHighWaterMark());
             }
 
             config.setAutoRead(false);
         } else {
-            if (logger.isWarnEnabled()) {
-                logger.warn("{} is writable, to low water : {}",
+            if (log.isWarnEnabled()) {
+                log.warn("{} is writable, to low water : {}",
                         ch, config.getWriteBufferLowWaterMark());
             }
             config.setAutoRead(true);

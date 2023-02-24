@@ -29,8 +29,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,9 +39,8 @@ import org.springframework.stereotype.Service;
  * executor dispatcher
  */
 @Service
+@Slf4j
 public class ExecutorDispatcher implements InitializingBean {
-
-    private static final Logger logger = LoggerFactory.getLogger(ExecutorDispatcher.class);
 
     /**
      * netty executor manager
@@ -74,7 +73,7 @@ public class ExecutorDispatcher implements InitializingBean {
      * @return result
      * @throws ExecuteException if error throws ExecuteException
      */
-    public Boolean dispatch(final ExecutionContext context) throws ExecuteException {
+    public void dispatch(final ExecutionContext context) throws ExecuteException {
         // get executor manager
         ExecutorManager<Boolean> executorManager = this.executorManagers.get(context.getExecutorType());
         if (executorManager == null) {
@@ -84,15 +83,15 @@ public class ExecutorDispatcher implements InitializingBean {
         // host select
         Host host = hostManager.select(context);
         if (StringUtils.isEmpty(host.getAddress())) {
-            logger.warn("fail to execute : {} due to no suitable worker, current task needs worker group {} to execute",
-                context.getCommand(), context.getWorkerGroup());
-            return false;
+            log.warn("fail to execute : {} due to no suitable worker, current task needs worker group {} to execute",
+                    context.getCommand(), context.getWorkerGroup());
+            throw new ExecuteException("no suitable worker");
         }
         context.setHost(host);
         executorManager.beforeExecute(context);
         try {
             // task execute
-            return executorManager.execute(context);
+            executorManager.execute(context);
         } finally {
             executorManager.afterExecute(context);
         }

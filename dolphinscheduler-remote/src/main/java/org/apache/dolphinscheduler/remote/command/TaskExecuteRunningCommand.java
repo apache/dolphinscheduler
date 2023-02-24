@@ -18,15 +18,21 @@
 package org.apache.dolphinscheduler.remote.command;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
-import java.io.Serializable;
-import java.util.Date;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
- * task execute running command
- * from worker to master
+ * Task running message, means the task is running in worker.
  */
-public class TaskExecuteRunningCommand implements Serializable {
+@Data
+@NoArgsConstructor
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+public class TaskExecuteRunningCommand extends BaseCommand {
 
     /**
      * taskInstanceId
@@ -41,7 +47,7 @@ public class TaskExecuteRunningCommand implements Serializable {
     /**
      * startTime
      */
-    private Date startTime;
+    private long startTime;
 
     /**
      * host
@@ -51,7 +57,7 @@ public class TaskExecuteRunningCommand implements Serializable {
     /**
      * status
      */
-    private int status;
+    private TaskExecutionStatus status;
 
     /**
      * logPath
@@ -73,76 +79,8 @@ public class TaskExecuteRunningCommand implements Serializable {
      */
     private String appIds;
 
-    public Date getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
-    }
-
-    public String getHost() {
-        return host;
-    }
-
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
-    public int getTaskInstanceId() {
-        return taskInstanceId;
-    }
-
-    public void setTaskInstanceId(int taskInstanceId) {
-        this.taskInstanceId = taskInstanceId;
-    }
-
-    public int getProcessInstanceId() {
-        return processInstanceId;
-    }
-
-    public void setProcessInstanceId(int processInstanceId) {
-        this.processInstanceId = processInstanceId;
-    }
-
-    public String getLogPath() {
-        return logPath;
-    }
-
-    public void setLogPath(String logPath) {
-        this.logPath = logPath;
-    }
-
-    public String getExecutePath() {
-        return executePath;
-    }
-
-    public void setExecutePath(String executePath) {
-        this.executePath = executePath;
-    }
-
-    public int getProcessId() {
-        return processId;
-    }
-
-    public void setProcessId(int processId) {
-        this.processId = processId;
-    }
-
-    public String getAppIds() {
-        return appIds;
-    }
-
-    public void setAppIds(String appIds) {
-        this.appIds = appIds;
+    public TaskExecuteRunningCommand(String messageSenderAddress, String messageReceiverAddress, long messageSendTime) {
+        super(messageSenderAddress, messageReceiverAddress, messageSendTime);
     }
 
     /**
@@ -158,18 +96,4 @@ public class TaskExecuteRunningCommand implements Serializable {
         return command;
     }
 
-    @Override
-    public String toString() {
-        return "TaskExecuteRunningCommand{"
-                + "taskInstanceId=" + taskInstanceId
-                + ", processInstanceId='" + processInstanceId + '\''
-                + ", startTime=" + startTime
-                + ", host='" + host + '\''
-                + ", status=" + status
-                + ", logPath='" + logPath + '\''
-                + ", executePath='" + executePath + '\''
-                + ", processId=" + processId + '\''
-                + ", appIds='" + appIds + '\''
-                + '}';
-    }
 }

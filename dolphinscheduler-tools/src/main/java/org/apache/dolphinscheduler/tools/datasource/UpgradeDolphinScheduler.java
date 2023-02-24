@@ -17,24 +17,29 @@
 
 package org.apache.dolphinscheduler.tools.datasource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.dolphinscheduler.dao.DaoConfiguration;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+@ImportAutoConfiguration(DaoConfiguration.class)
 @SpringBootApplication
 public class UpgradeDolphinScheduler {
+
     public static void main(String[] args) {
         SpringApplication.run(UpgradeDolphinScheduler.class, args);
     }
 
     @Component
     @Profile("upgrade")
+    @Slf4j
     static class UpgradeRunner implements CommandLineRunner {
-        private static final Logger logger = LoggerFactory.getLogger(UpgradeRunner.class);
 
         private final DolphinSchedulerManager dolphinSchedulerManager;
 
@@ -46,10 +51,10 @@ public class UpgradeDolphinScheduler {
         public void run(String... args) throws Exception {
             if (dolphinSchedulerManager.schemaIsInitialized()) {
                 dolphinSchedulerManager.upgradeDolphinScheduler();
-                logger.info("upgrade DolphinScheduler finished");
+                log.info("upgrade DolphinScheduler finished");
             } else {
                 dolphinSchedulerManager.initDolphinScheduler();
-                logger.info("init DolphinScheduler finished");
+                log.info("init DolphinScheduler finished");
             }
         }
     }

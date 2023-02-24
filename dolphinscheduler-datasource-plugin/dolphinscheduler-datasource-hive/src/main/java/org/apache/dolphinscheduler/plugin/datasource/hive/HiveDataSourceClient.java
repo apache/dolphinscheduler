@@ -17,42 +17,31 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.hive;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.zaxxer.hikari.HikariDataSource;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.JAVA_SECURITY_KRB5_CONF;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.JAVA_SECURITY_KRB5_CONF_PATH;
+
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
 import org.apache.dolphinscheduler.plugin.datasource.api.provider.JDBCDataSourceProvider;
-import org.apache.dolphinscheduler.plugin.datasource.hive.utils.CommonUtil;
+import org.apache.dolphinscheduler.plugin.datasource.hive.security.UserGroupInformationFactory;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.utils.Constants;
-import org.apache.dolphinscheduler.spi.utils.PropertyUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.security.UserGroupInformation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import sun.security.krb5.Config;
 
-import java.io.IOException;
+import org.apache.commons.lang3.StringUtils;
+
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.*;
+import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.jdbc.core.JdbcTemplate;
+
+@Slf4j
 public class HiveDataSourceClient extends CommonDataSourceClient {
-
-    private static final Logger logger = LoggerFactory.getLogger(HiveDataSourceClient.class);
-
-    private ScheduledExecutorService kerberosRenewalService;
-
-    private Configuration hadoopConf;
-    protected HikariDataSource oneSessionDataSource;
-    private UserGroupInformation ugi;
-    private boolean retryGetConnection = true;
 
     public HiveDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
         super(baseConnectionParam, dbType);
@@ -60,24 +49,18 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
 
     @Override
     protected void preInit() {
-        logger.info("PreInit in {}", getClass().getName());
-        this.kerberosRenewalService = Executors.newSingleThreadScheduledExecutor(
-                new ThreadFactoryBuilder().setNameFormat("Hive-Kerberos-Renewal-Thread-").setDaemon(true).build());
+        log.info("PreInit in {}", getClass().getName());
     }
 
     @Override
     protected void initClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        logger.info("Create Configuration for hive configuration.");
-        this.hadoopConf = createHadoopConf();
-        logger.info("Create Configuration success.");
+        log.info("Create UserGroupInformation.");
+        UserGroupInformationFactory.login(baseConnectionParam.getUser());
+        log.info("Create ugi success.");
 
-        logger.info("Create UserGroupInformation.");
-        this.ugi = createUserGroupInformation(baseConnectionParam.getUser());
-        logger.info("Create ugi success.");
-
-        super.initClient(baseConnectionParam, dbType);
-        this.oneSessionDataSource = JDBCDataSourceProvider.createOneSessionJdbcDataSource(baseConnectionParam, dbType);
-        logger.info("Init {} success.", getClass().getName());
+        this.dataSource = JDBCDataSourceProvider.createOneSessionJdbcDataSource(baseConnectionParam, dbType);
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
+        log.info("Init {} success.", getClass().getName());
     }
 
     @Override
@@ -103,71 +86,28 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
         }
     }
 
-    private UserGroupInformation createUserGroupInformation(String username) {
-        String krb5File = PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH);
-        String keytab = PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH);
-        String principal = PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME);
-
-        try {
-            UserGroupInformation ugi = CommonUtil.createUGI(getHadoopConf(), principal, keytab, krb5File, username);
-            try {
-                Field isKeytabField = ugi.getClass().getDeclaredField("isKeytab");
-                isKeytabField.setAccessible(true);
-                isKeytabField.set(ugi, true);
-            } catch (NoSuchFieldException | IllegalAccessException e) {
-                logger.warn(e.getMessage());
-            }
-
-            kerberosRenewalService.scheduleWithFixedDelay(() -> {
-                try {
-                    ugi.checkTGTAndReloginFromKeytab();
-                } catch (IOException e) {
-                    logger.error("Check TGT and Renewal from Keytab error", e);
-                }
-            }, 5, 5, TimeUnit.MINUTES);
-            return ugi;
-        } catch (IOException e) {
-            throw new RuntimeException("createUserGroupInformation fail. ", e);
-        }
-    }
-
-    protected Configuration createHadoopConf() {
-        Configuration hadoopConf = new Configuration();
-        hadoopConf.setBoolean("ipc.client.fallback-to-simple-auth-allowed", true);
-        return hadoopConf;
-    }
-
-    protected Configuration getHadoopConf() {
-        return this.hadoopConf;
-    }
-
     @Override
     public Connection getConnection() {
-        try {
-            return oneSessionDataSource.getConnection();
-        } catch (SQLException e) {
-            boolean kerberosStartupState = PropertyUtils.getBoolean(HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
-            if (retryGetConnection && kerberosStartupState) {
-                retryGetConnection = false;
-                createUserGroupInformation(baseConnectionParam.getUser());
-                Connection connection = getConnection();
-                retryGetConnection = true;
-                return connection;
+        Connection connection = null;
+        while (connection == null) {
+            try {
+                connection = dataSource.getConnection();
+            } catch (SQLException e) {
+                UserGroupInformationFactory.logout(baseConnectionParam.getUser());
+                UserGroupInformationFactory.login(baseConnectionParam.getUser());
             }
-            logger.error("get oneSessionDataSource Connection fail SQLException: {}", e.getMessage(), e);
-            return null;
         }
+        return connection;
     }
 
     @Override
     public void close() {
-        super.close();
+        try {
+            super.close();
+        } finally {
+            UserGroupInformationFactory.logout(baseConnectionParam.getUser());
+        }
+        log.info("Closed Hive datasource client.");
 
-        logger.info("close {}.", this.getClass().getSimpleName());
-        kerberosRenewalService.shutdown();
-        this.ugi = null;
-
-        this.oneSessionDataSource.close();
-        this.oneSessionDataSource = null;
     }
 }

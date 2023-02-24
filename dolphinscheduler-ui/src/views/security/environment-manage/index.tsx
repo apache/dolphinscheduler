@@ -15,13 +15,17 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, toRefs, watch } from 'vue'
+import {
+  defineComponent,
+  getCurrentInstance,
+  onMounted,
+  toRefs,
+  watch
+} from 'vue'
 import {
   NButton,
-  NCard,
   NDataTable,
   NIcon,
-  NInput,
   NPagination,
   NSpace
 } from 'naive-ui'
@@ -29,6 +33,8 @@ import { SearchOutlined } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
 import EnvironmentModal from './components/environment-modal'
+import Card from '@/components/card'
+import Search from "@/components/input-search";
 
 const environmentManage = defineComponent({
   name: 'environment-manage',
@@ -68,6 +74,8 @@ const environmentManage = defineComponent({
       requestData()
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     onMounted(() => {
       createColumns(variables)
       requestData()
@@ -85,7 +93,8 @@ const environmentManage = defineComponent({
       onConfirmModal,
       onUpdatePageSize,
       handleModalChange,
-      onSearch
+      onSearch,
+      trim
     }
   },
   render() {
@@ -102,7 +111,7 @@ const environmentManage = defineComponent({
 
     return (
       <NSpace vertical>
-        <NCard size='small'>
+        <Card>
           <NSpace justify='space-between'>
             <NButton
               size='small'
@@ -113,25 +122,20 @@ const environmentManage = defineComponent({
               {t('security.environment.create_environment')}
             </NButton>
             <NSpace>
-              <NInput
-                size='small'
-                clearable
-                v-model={[this.searchVal, 'value']}
+              <Search
+                v-model:value={this.searchVal}
                 placeholder={t('security.environment.search_tips')}
+                onSearch={onSearch}
               />
               <NButton size='small' type='primary' onClick={onSearch}>
-                {{
-                  icon: () => (
-                    <NIcon>
-                      <SearchOutlined />
-                    </NIcon>
-                  )
-                }}
+                <NIcon>
+                  <SearchOutlined />
+                </NIcon>
               </NButton>
             </NSpace>
           </NSpace>
-        </NCard>
-        <NCard size='small'>
+        </Card>
+        <Card title={t('menu.environment_manage')}>
           <NSpace vertical>
             <NDataTable
               loading={loadingRef}
@@ -140,7 +144,7 @@ const environmentManage = defineComponent({
               data={this.tableData}
               scrollX={this.tableWidth}
             />
-            <NSpace>
+            <NSpace justify='center'>
               <NPagination
                 v-model:page={this.page}
                 v-model:page-size={this.pageSize}
@@ -153,7 +157,7 @@ const environmentManage = defineComponent({
               />
             </NSpace>
           </NSpace>
-        </NCard>
+        </Card>
         <EnvironmentModal
           showModalRef={this.showModalRef}
           statusRef={this.statusRef}

@@ -34,18 +34,17 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 /**
  * This thread is used to check the connect state to mysql.
  */
+@Slf4j
 public class EphemeralDateManager implements AutoCloseable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(EphemeralDateManager.class);
-
+    private ConnectionState connectionState;
     private final MysqlOperator mysqlOperator;
     private final MysqlRegistryProperties registryProperties;
     private final List<ConnectionListener> connectionListeners = Collections.synchronizedList(new ArrayList<>());
@@ -78,22 +77,26 @@ public class EphemeralDateManager implements AutoCloseable {
         return ephemeralId;
     }
 
+    public ConnectionState getConnectionState() {
+        return connectionState;
+    }
+
     @Override
     public void close() throws SQLException {
         ephemeralDateIds.clear();
         connectionListeners.clear();
         scheduledExecutorService.shutdownNow();
         for (Long ephemeralDateId : ephemeralDateIds) {
-            mysqlOperator.deleteEphemeralData(ephemeralDateId);
+            mysqlOperator.deleteDataById(ephemeralDateId);
         }
     }
 
     // Use this task to refresh ephemeral term and check the connect state.
-    static class EphemeralDateTermRefreshTask implements Runnable {
+    class EphemeralDateTermRefreshTask implements Runnable {
+
         private final List<ConnectionListener> connectionListeners;
         private final Set<Long> ephemeralDateIds;
         private final MysqlOperator mysqlOperator;
-        private ConnectionState connectionState;
 
         private EphemeralDateTermRefreshTask(MysqlOperator mysqlOperator,
                                              List<ConnectionListener> connectionListeners,
@@ -127,7 +130,7 @@ public class EphemeralDateManager implements AutoCloseable {
                     triggerListener(connectionState);
                 }
             } catch (Exception e) {
-                LOGGER.error("Mysql Registry connect state check task execute failed", e);
+                log.error("Mysql Registry connect state check task execute failed", e);
                 connectionState = ConnectionState.DISCONNECTED;
                 triggerListener(ConnectionState.DISCONNECTED);
             }
@@ -143,13 +146,14 @@ public class EphemeralDateManager implements AutoCloseable {
                 mysqlOperator.clearExpireEphemeralDate();
                 return ConnectionState.CONNECTED;
             } catch (Exception ex) {
+                log.error("Get connection state error, meet an unknown exception", ex);
                 return ConnectionState.DISCONNECTED;
             }
         }
 
         private void updateEphemeralDateTerm() throws SQLException {
             if (!mysqlOperator.updateEphemeralDataTerm(ephemeralDateIds)) {
-                LOGGER.warn("Update mysql registry ephemeral data: {} term error", ephemeralDateIds);
+                log.warn("Update mysql registry ephemeral data: {} term error", ephemeralDateIds);
             }
         }
 

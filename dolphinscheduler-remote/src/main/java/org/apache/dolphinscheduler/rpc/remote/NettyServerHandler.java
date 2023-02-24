@@ -26,9 +26,7 @@ import org.apache.dolphinscheduler.rpc.protocol.RpcProtocol;
 
 import java.lang.reflect.Method;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import lombok.extern.slf4j.Slf4j;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.timeout.IdleStateEvent;
@@ -36,21 +34,20 @@ import io.netty.handler.timeout.IdleStateEvent;
 /**
  * NettyServerHandler
  */
+@Slf4j
 public class NettyServerHandler extends ChannelInboundHandlerAdapter {
-
-    private static final Logger logger = LoggerFactory.getLogger(NettyServerHandler.class);
 
     private static final ThreadPoolManager threadPoolManager = ThreadPoolManager.INSTANCE;
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
-        logger.info("channel close");
+        log.info("channel close");
         ctx.channel().close();
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        logger.info("client connect success !" + ctx.channel().remoteAddress());
+        log.info("client connect success !" + ctx.channel().remoteAddress());
     }
 
     @Override
@@ -58,7 +55,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         RpcProtocol<RpcRequest> rpcProtocol = (RpcProtocol<RpcRequest>) msg;
         if (rpcProtocol.getMsgHeader().getEventType() == EventType.HEARTBEAT.getType()) {
-            logger.info("heart beat");
+            log.info("heart beat");
             return;
         }
         threadPoolManager.addExecuteTask(() -> readHandler(ctx, rpcProtocol));
@@ -87,7 +84,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
 
             result = method.invoke(object, arguments);
         } catch (Exception e) {
-            logger.error("netty server execute error,service name :{} method name :{} ", classname + methodName, e);
+            log.error("netty server execute error,service name :{} method name :{} ", classname + methodName, e);
             response.setStatus((byte) -1);
         }
 
@@ -100,7 +97,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof IdleStateEvent) {
-            logger.debug("IdleStateEvent triggered, send heartbeat to channel " + ctx.channel());
+            log.debug("IdleStateEvent triggered, send heartbeat to channel " + ctx.channel());
         } else {
             super.userEventTriggered(ctx, evt);
         }
@@ -108,7 +105,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        logger.error("exceptionCaught : {}", cause.getMessage(), cause);
+        log.error("exceptionCaught : {}", cause.getMessage(), cause);
         ctx.channel().close();
     }
 }

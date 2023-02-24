@@ -17,26 +17,33 @@
 
 package org.apache.dolphinscheduler.plugin.alert.http;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
+
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class HttpSenderTest {
 
     @Test
-    public void sendTest() {
+    public void sendTest() throws IOException {
         Map<String, String> paramsMap = new HashMap<>();
-        paramsMap.put(HttpAlertConstants.NAME_URL, "http://www.baidu.com");
+        paramsMap.put(HttpAlertConstants.NAME_URL, "http://www.dolphinscheduler-not-exists-web.com");
         paramsMap.put(HttpAlertConstants.NAME_REQUEST_TYPE, "POST");
         paramsMap.put(HttpAlertConstants.NAME_HEADER_PARAMS, "{\"Content-Type\":\"application/json\"}");
-        paramsMap.put(HttpAlertConstants.NAME_BODY_PARAMS, "{\"number\":\"13457654323\"}");
+        paramsMap.put(HttpAlertConstants.NAME_BODY_PARAMS, "{\"number\":\"123456\"}");
         paramsMap.put(HttpAlertConstants.NAME_CONTENT_FIELD, "content");
-        HttpSender httpSender = new HttpSender(paramsMap);
+
+        HttpSender httpSender = spy(new HttpSender(paramsMap));
+        doReturn("success").when(httpSender).getResponseString(any());
         AlertResult alertResult = httpSender.send("Fault tolerance warning");
-        Assert.assertEquals("true", alertResult.getStatus());
+        Assertions.assertEquals("true", alertResult.getStatus());
     }
 }

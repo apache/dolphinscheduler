@@ -19,7 +19,6 @@
 
 package org.apache.dolphinscheduler.api.test.pages.security;
 
-
 import org.apache.dolphinscheduler.api.test.core.Constants;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.utils.RequestClient;

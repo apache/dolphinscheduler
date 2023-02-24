@@ -15,21 +15,26 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, toRefs, watch } from 'vue'
+import {
+  defineComponent,
+  getCurrentInstance,
+  onMounted,
+  toRefs,
+  watch
+} from 'vue'
 import {
   NButton,
-  NCard,
   NDataTable,
   NIcon,
-  NInput,
-  NPagination
+  NPagination,
+  NSpace
 } from 'naive-ui'
 import { SearchOutlined } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
-import Card from '@/components/card'
 import AlarmGroupModal from './components/alarm-group-modal'
-import styles from './index.module.scss'
+import Card from '@/components/card'
+import Search from "@/components/input-search";
 
 const alarmGroupManage = defineComponent({
   name: 'alarm-group-manage',
@@ -69,6 +74,8 @@ const alarmGroupManage = defineComponent({
       requestData()
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     onMounted(() => {
       createColumns(variables)
       requestData()
@@ -86,7 +93,8 @@ const alarmGroupManage = defineComponent({
       onConfirmModal,
       onUpdatePageSize,
       handleModalChange,
-      onSearch
+      onSearch,
+      trim
     }
   },
   render() {
@@ -102,51 +110,46 @@ const alarmGroupManage = defineComponent({
     } = this
 
     return (
-      <div>
-        <NCard>
-          <div class={styles['search-card']}>
-            <div>
-              <NButton size='small' type='primary' onClick={handleModalChange}>
-                {t('security.alarm_group.create_alarm_group')}
-              </NButton>
-            </div>
-            <div class={styles.box}>
-              <NInput
-                size='small'
-                clearable
-                v-model={[this.searchVal, 'value']}
+      <NSpace vertical>
+        <Card>
+          <NSpace justify='space-between'>
+            <NButton size='small' type='primary' onClick={handleModalChange}>
+              {t('security.alarm_group.create_alarm_group')}
+            </NButton>
+            <NSpace>
+              <Search
+                v-model:value={this.searchVal}
                 placeholder={t('security.alarm_group.search_tips')}
+                onSearch={onSearch}
               />
               <NButton size='small' type='primary' onClick={onSearch}>
-                {{
-                  icon: () => (
-                    <NIcon>
-                      <SearchOutlined />
-                    </NIcon>
-                  )
-                }}
+                <NIcon>
+                  <SearchOutlined />
+                </NIcon>
               </NButton>
-            </div>
-          </div>
-        </NCard>
-        <Card class={styles['table-card']}>
-          <NDataTable
-            loading={loadingRef}
-            columns={this.columns}
-            data={this.tableData}
-          />
-          <div class={styles.pagination}>
-            <NPagination
-              v-model:page={this.page}
-              v-model:page-size={this.pageSize}
-              page-count={this.totalPage}
-              show-size-picker
-              page-sizes={[10, 30, 50]}
-              show-quick-jumper
-              onUpdatePage={requestData}
-              onUpdatePageSize={onUpdatePageSize}
+            </NSpace>
+          </NSpace>
+        </Card>
+        <Card title={t('menu.alarm_group_manage')}>
+          <NSpace vertical>
+            <NDataTable
+              loading={loadingRef}
+              columns={this.columns}
+              data={this.tableData}
             />
-          </div>
+            <NSpace justify='center'>
+              <NPagination
+                v-model:page={this.page}
+                v-model:page-size={this.pageSize}
+                page-count={this.totalPage}
+                show-size-picker
+                page-sizes={[10, 30, 50]}
+                show-quick-jumper
+                onUpdatePage={requestData}
+                onUpdatePageSize={onUpdatePageSize}
+              />
+            </NSpace>
+          </NSpace>
         </Card>
         <AlarmGroupModal
           showModalRef={this.showModalRef}
@@ -155,7 +158,7 @@ const alarmGroupManage = defineComponent({
           onCancelModal={onCancelModal}
           onConfirmModal={onConfirmModal}
         />
-      </div>
+      </NSpace>
     )
   }
 })

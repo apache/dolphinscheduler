@@ -16,8 +16,6 @@
 #
 
 spring:
-  application:
-    name: standalone-server
   jackson:
     time-zone: UTC
     date-format: "yyyy-MM-dd HH:mm:ss"
@@ -47,9 +45,9 @@ spring:
     jdbc:
       initialize-schema: never
     properties:
-      org.quartz.threadPool:threadPriority: 5
+      org.quartz.threadPool.threadPriority: 5
       org.quartz.jobStore.isClustered: true
-      org.quartz.jobStore.class: org.quartz.impl.jdbcjobstore.JobStoreTX
+      org.quartz.jobStore.class: org.springframework.scheduling.quartz.LocalDataSourceJobStore
       org.quartz.scheduler.instanceId: AUTO
       org.quartz.jobStore.tablePrefix: QRTZ_
       org.quartz.jobStore.acquireTriggersWithinLock: true
@@ -62,6 +60,7 @@ spring:
       org.quartz.scheduler.makeSchedulerThreadDaemon: true
       org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
       org.quartz.jobStore.clusterCheckinInterval: 5000
+      org.quartz.scheduler.batchTriggerAcquisitionMaxCount: 1
   servlet:
     multipart:
       max-file-size: 1024MB
@@ -71,6 +70,9 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
 
 registry:
   type: zookeeper
@@ -137,15 +139,16 @@ master:
   task-commit-retry-times: 5
   # master commit task interval
   task-commit-interval: 1s
-  state-wheel-interval: 5
+  state-wheel-interval: 5s
   # master max cpuload avg, only higher than the system cpu load average, master server can schedule. default value -1: the number of cpu cores * 2
-  max-cpu-load-avg: -1
+  max-cpu-load-avg: 50
   # master reserved memory, only lower than system available memory, master server can schedule. default value 0.3, the unit is G
-  reserved-memory: 0.3
+  reserved-memory: 0.03
   # failover interval
   failover-interval: 10m
-  # kill yarn jon when failover taskInstance, default true
-  kill-yarn-job-when-task-failover: true
+  # kill yarn/k8s application when failover taskInstance, default true
+  kill-application-when-task-failover: true
+  worker-group-refresh-interval: 10s
 
 worker:
   # worker listener port
@@ -170,13 +173,20 @@ worker:
   # alert server listen host
   alert-listen-host: localhost
   alert-listen-port: 50052
+  task-execute-threads-full-policy: REJECT
 
 alert:
   port: 50052
+  # Mark each alert of alert server if late after x milliseconds as failed.
+  # Define value is (0 = infinite), and alert server would be waiting alert result.
+  wait-timeout: 0
 
 python-gateway:
   # Weather enable python gateway server or not. The default value is true.
   enabled: true
+  # Authentication token for connection from python api to python gateway server. Should be changed the default value
+  # when you deploy in public network.
+  auth-token: jwUDzpLsNKEFER4*a8gruBH_GsAurNxU7A@Xc
   # The address of Python gateway server start. Set its value to `0.0.0.0` if your Python API run in different
   # between Python gateway server. It could be be specific to other address like `127.0.0.1` or `localhost`
   gateway-server-address: 0.0.0.0
@@ -210,7 +220,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: '*'
+        include: health,metrics,prometheus
   endpoint:
     health:
       enabled: true

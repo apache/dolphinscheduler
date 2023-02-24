@@ -17,21 +17,17 @@
 
 package org.apache.dolphinscheduler.plugin.task.flink;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class FlinkTask extends AbstractYarnTask {
 
@@ -45,6 +41,11 @@ public class FlinkTask extends AbstractYarnTask {
      */
     private TaskExecutionContext taskExecutionContext;
 
+    /**
+     * rules for flink application ID
+     */
+    protected static final Pattern FLINK_APPLICATION_REGEX = Pattern.compile(TaskConstants.FLINK_APPLICATION_REGEX);
+
     public FlinkTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
         this.taskExecutionContext = taskExecutionContext;
@@ -52,9 +53,9 @@ public class FlinkTask extends AbstractYarnTask {
 
     @Override
     public void init() {
-        logger.info("flink task params {}", taskExecutionContext.getTaskParams());
 
         flinkParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), FlinkParameters.class);
+        log.info("Initialize flink task params {}", JSONUtils.toPrettyJsonString(flinkParameters));
 
         if (flinkParameters == null || !flinkParameters.checkParameters()) {
             throw new RuntimeException("flink task params is not valid");
@@ -73,25 +74,46 @@ public class FlinkTask extends AbstractYarnTask {
     @Override
     protected String buildCommand() {
         // flink run/run-application [OPTIONS] <jar-file> <arguments>
-        List<String> args = FlinkArgsUtils.buildCommandLine(taskExecutionContext, flinkParameters);
+        List<String> args = FlinkArgsUtils.buildRunCommandLine(taskExecutionContext, flinkParameters);
 
         String command = ParameterUtils
                 .convertParameterPlaceholders(String.join(" ", args), taskExecutionContext.getDefinedParams());
 
-        logger.info("flink task command : {}", command);
+        log.info("flink task command : {}", command);
         return command;
     }
 
     @Override
     protected void setMainJarName() {
+        if (flinkParameters.getProgramType() == ProgramType.SQL) {
+            log.info("The current flink job type is SQL, will no need to set main jar");
+            return;
+        }
+
         ResourceInfo mainJar = flinkParameters.getMainJar();
         String resourceName = getResourceNameOfMainJar(mainJar);
         mainJar.setRes(resourceName);
         flinkParameters.setMainJar(mainJar);
+        log.info("Success set flink jar: {}", resourceName);
     }
 
     @Override
     public AbstractParameters getParameters() {
         return flinkParameters;
+    }
+
+    /**
+     * find app id
+     *
+     * @param line line
+     * @return appid
+     */
+    protected String findAppId(String line) {
+        Matcher matcher = FLINK_APPLICATION_REGEX.matcher(line);
+        if (matcher.find()) {
+            String str = matcher.group();
+            return str.substring(6);
+        }
+        return null;
     }
 }

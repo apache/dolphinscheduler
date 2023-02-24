@@ -33,120 +33,76 @@ export function useCustomParams({
 }): IJsonItem[] {
   const { t } = useI18n()
 
-  if (isSimple) {
-    return [
-      {
-        type: 'custom-parameters',
-        field: field,
-        name: t(`project.node.${name}`),
-        class: 'btn-custom-parameters',
-        span,
-        children: [
-          {
-            type: 'input',
-            field: 'prop',
-            span: 10,
-            class: 'input-param-key',
-            props: {
-              placeholder: t('project.node.prop_tips'),
-              maxLength: 256
-            },
-            validate: {
-              trigger: ['input', 'blur'],
-              required: true,
-              validator(validate: any, value: string) {
-                if (!value) {
-                  return new Error(t('project.node.prop_tips'))
-                }
+  return [
+    {
+      type: 'custom-parameters',
+      field: field,
+      name: t(`project.node.${name}`),
+      class: 'btn-custom-parameters',
+      span,
+      children: [
+        {
+          type: 'input',
+          field: 'prop',
+          span: 6,
+          class: 'input-param-key',
+          props: {
+            placeholder: t('project.node.prop_tips'),
+            maxLength: 256
+          },
+          validate: {
+            trigger: ['input', 'blur'],
+            required: true,
+            validator(validate: any, value: string) {
+              if (!value) {
+                return new Error(t('project.node.prop_tips'))
+              }
 
-                const sameItems = model[field].filter(
-                  (item: { prop: string }) => item.prop === value
-                )
+              const sameItems = model[field].filter(
+                (item: { prop: string }) => item.prop === value
+              )
 
-                if (sameItems.length > 1) {
-                  return new Error(t('project.node.prop_repeat'))
-                }
+              if (sameItems.length > 1) {
+                return new Error(t('project.node.prop_repeat'))
               }
             }
-          },
-          {
-            type: 'input',
-            field: 'value',
-            span: 10,
-            class: 'input-param-value',
-            props: {
-              placeholder: t('project.node.value_tips'),
-              maxLength: 256
-            }
           }
-        ]
-      }
-    ]
-  } else {
-    return [
-      {
-        type: 'custom-parameters',
-        field: field,
-        name: t(`project.node.${name}`),
-        class: 'btn-custom-parameters',
-        span,
-        children: [
-          {
-            type: 'input',
-            field: 'prop',
-            span: 6,
-            class: 'input-param-key',
-            props: {
-              placeholder: t('project.node.prop_tips'),
-              maxLength: 256
-            },
-            validate: {
-              trigger: ['input', 'blur'],
-              required: true,
-              validator(validate: any, value: string) {
-                if (!value) {
-                  return new Error(t('project.node.prop_tips'))
-                }
-
-                const sameItems = model[field].filter(
-                  (item: { prop: string }) => item.prop === value
-                )
-
-                if (sameItems.length > 1) {
-                  return new Error(t('project.node.prop_repeat'))
-                }
-              }
-            }
-          },
-          {
-            type: 'select',
-            field: 'direct',
-            span: 4,
-            options: DIRECT_LIST,
-            value: 'IN'
-          },
-          {
-            type: 'select',
-            field: 'type',
-            span: 6,
-            options: TYPE_LIST,
-            value: 'VARCHAR'
-          },
-          {
-            type: 'input',
-            field: 'value',
-            span: 6,
-            class: 'input-param-value',
-            props: {
-              placeholder: t('project.node.value_tips'),
-              maxLength: 256
-            }
+        },
+        {
+          type: 'select',
+          field: 'direct',
+          span: 4,
+          options: DIRECT_LIST,
+          value: 'IN',
+          props: {
+            disabled: isSimple
           }
-        ]
-      }
-    ]
-  }
+        },
+        {
+          type: 'select',
+          field: 'type',
+          span: 6,
+          options: TYPE_LIST,
+          value: 'VARCHAR',
+          props: {
+            disabled: isSimple
+          }
+        },
+        {
+          type: 'input',
+          field: 'value',
+          span: 6,
+          class: 'input-param-value',
+          props: {
+            placeholder: t('project.node.value_tips'),
+            maxLength: 256
+          }
+        }
+      ]
+    }
+  ]
 }
+
 export const TYPE_LIST = [
   {
     value: 'VARCHAR',
@@ -187,6 +143,10 @@ export const TYPE_LIST = [
   {
     value: 'LIST',
     label: 'LIST'
+  },
+  {
+    value: 'FILE',
+    label: 'FILE'
   }
 ]
 

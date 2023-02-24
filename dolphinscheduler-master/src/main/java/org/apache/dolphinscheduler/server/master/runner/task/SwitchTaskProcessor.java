@@ -23,12 +23,12 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.SwitchResultVo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
-import org.apache.dolphinscheduler.server.utils.LogUtils;
-import org.apache.dolphinscheduler.server.utils.SwitchTaskUtils;
+import org.apache.dolphinscheduler.server.master.utils.SwitchTaskUtils;
+import org.apache.dolphinscheduler.service.utils.LogUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -58,35 +58,35 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
 
     @Override
     public boolean submitTask() {
-        this.taskInstance = processService.submitTaskWithRetry(processInstance, taskInstance, maxRetryTimes, commitInterval);
+        this.taskInstance =
+                processService.submitTaskWithRetry(processInstance, taskInstance, maxRetryTimes, commitInterval);
 
         if (this.taskInstance == null) {
             return false;
         }
         this.setTaskExecutionLogger();
-        taskInstance.setLogPath(LogUtils.getTaskLogPath(taskInstance.getFirstSubmitTime(), processInstance.getProcessDefinitionCode(),
-                processInstance.getProcessDefinitionVersion(),
-                taskInstance.getProcessInstanceId(),
-                taskInstance.getId()));
-        taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
-        taskInstance.setState(ExecutionStatus.RUNNING_EXECUTION);
-        taskInstance.setStartTime(new Date());
-        processService.updateTaskInstance(taskInstance);
+        log.info("switch task submit success");
         return true;
     }
 
     @Override
     public boolean runTask() {
-        try {
-            if (!this.taskInstance().getState().typeIsFinished() && setSwitchResult()) {
-                endTaskState();
-            }
-        } catch (Exception e) {
-            logger.error("update work flow {} switch task {} state error:",
-                    this.processInstance.getId(),
-                    this.taskInstance.getId(),
-                    e);
+        log.info("switch task starting");
+        taskInstance.setLogPath(
+                LogUtils.getTaskLogPath(taskInstance.getFirstSubmitTime(), processInstance.getProcessDefinitionCode(),
+                        processInstance.getProcessDefinitionVersion(),
+                        taskInstance.getProcessInstanceId(),
+                        taskInstance.getId()));
+        taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
+        taskInstance.setState(TaskExecutionStatus.RUNNING_EXECUTION);
+        taskInstance.setStartTime(new Date());
+        taskInstanceDao.updateTaskInstance(taskInstance);
+
+        if (!this.taskInstance().getState().isFinished()) {
+            setSwitchResult();
         }
+        endTaskState();
+        log.info("switch task finished");
         return true;
     }
 
@@ -102,17 +102,17 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
 
     @Override
     protected boolean pauseTask() {
-        this.taskInstance.setState(ExecutionStatus.PAUSE);
+        this.taskInstance.setState(TaskExecutionStatus.PAUSE);
         this.taskInstance.setEndTime(new Date());
-        processService.saveTaskInstance(taskInstance);
+        taskInstanceDao.upsertTaskInstance(taskInstance);
         return true;
     }
 
     @Override
     protected boolean killTask() {
-        this.taskInstance.setState(ExecutionStatus.KILL);
+        this.taskInstance.setState(TaskExecutionStatus.KILL);
         this.taskInstance.setEndTime(new Date());
-        processService.saveTaskInstance(taskInstance);
+        taskInstanceDao.upsertTaskInstance(taskInstance);
         return true;
     }
 
@@ -127,10 +127,9 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
     }
 
     private boolean setSwitchResult() {
-        List<TaskInstance> taskInstances = processService.findValidTaskListByProcessId(
-                taskInstance.getProcessInstanceId()
-        );
-        Map<String, ExecutionStatus> completeTaskList = new HashMap<>();
+        List<TaskInstance> taskInstances = taskInstanceDao.findValidTaskListByProcessId(
+                taskInstance.getProcessInstanceId(), processInstance.getTestFlag());
+        Map<String, TaskExecutionStatus> completeTaskList = new HashMap<>();
         for (TaskInstance task : taskInstances) {
             completeTaskList.putIfAbsent(task.getName(), task.getState());
         }
@@ -143,23 +142,23 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
         int i = 0;
         conditionResult = DependResult.SUCCESS;
         for (SwitchResultVo info : switchResultVos) {
-            logger.info("the {} execution ", (i + 1));
-            logger.info("original condition sentence：{}", info.getCondition());
+            log.info("the {} execution ", (i + 1));
+            log.info("original condition sentence：{}", info.getCondition());
             if (StringUtils.isEmpty(info.getCondition())) {
                 finalConditionLocation = i;
                 break;
             }
             String content = setTaskParams(info.getCondition().replaceAll("'", "\""), rgex);
-            logger.info("format condition sentence::{}", content);
+            log.info("format condition sentence::{}", content);
             Boolean result = null;
             try {
                 result = SwitchTaskUtils.evaluate(content);
             } catch (Exception e) {
-                logger.info("error sentence : {}", content);
+                log.info("error sentence : {}", content);
                 conditionResult = DependResult.FAILED;
                 break;
             }
-            logger.info("condition result : {}", result);
+            log.info("condition result : {}", result);
             if (result) {
                 finalConditionLocation = i;
                 break;
@@ -172,11 +171,12 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
 
         if (!isValidSwitchResult(switchResultVos.get(finalConditionLocation))) {
             conditionResult = DependResult.FAILED;
-            logger.error("the switch task depend result is invalid, result:{}, switch branch:{}", conditionResult, finalConditionLocation);
+            log.error("the switch task depend result is invalid, result:{}, switch branch:{}", conditionResult,
+                    finalConditionLocation);
             return true;
         }
 
-        logger.info("the switch task depend result:{}, switch branch:{}", conditionResult, finalConditionLocation);
+        log.info("the switch task depend result:{}, switch branch:{}", conditionResult, finalConditionLocation);
         return true;
     }
 
@@ -184,10 +184,11 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
      * update task state
      */
     private void endTaskState() {
-        ExecutionStatus status = (conditionResult == DependResult.SUCCESS) ? ExecutionStatus.SUCCESS : ExecutionStatus.FAILURE;
+        TaskExecutionStatus status =
+                (conditionResult == DependResult.SUCCESS) ? TaskExecutionStatus.SUCCESS : TaskExecutionStatus.FAILURE;
         taskInstance.setEndTime(new Date());
         taskInstance.setState(status);
-        processService.updateTaskInstance(taskInstance);
+        taskInstanceDao.updateTaskInstance(taskInstance);
     }
 
     public String setTaskParams(String content, String rgex) {
@@ -215,7 +216,7 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
             if (!org.apache.commons.lang3.math.NumberUtils.isCreatable(value)) {
                 value = "\"" + value + "\"";
             }
-            logger.info("paramName:{}，paramValue:{}", paramName, value);
+            log.info("paramName:{}，paramValue:{}", paramName, value);
             content = content.replace("${" + paramName + "}", value);
         }
         return content;

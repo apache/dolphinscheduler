@@ -17,14 +17,33 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+
+import java.util.Map;
+import java.util.StringJoiner;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 
 /**
  * executive task
  */
 public abstract class AbstractTask {
+
+    public static final Marker FINALIZE_SESSION_MARKER = MarkerFactory.getMarker("FINALIZE_SESSION");
+
+    protected final Logger log =
+            LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
+
+    public String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
 
     /**
      * varPool string
@@ -34,7 +53,7 @@ public abstract class AbstractTask {
     /**
      * taskExecutionContext
      **/
-    TaskExecutionContext taskRequest;
+    protected TaskExecutionContext taskRequest;
 
     /**
      * SHELL process pid
@@ -50,12 +69,6 @@ public abstract class AbstractTask {
      * other resource manager appId , for example : YARN etc
      */
     protected String appIds;
-
-
-    /**
-     * cancel
-     */
-    protected volatile boolean cancel = false;
 
     /**
      * exit code
@@ -85,22 +98,9 @@ public abstract class AbstractTask {
         return null;
     }
 
-    /**
-     * task handle
-     *
-     * @throws Exception exception
-     */
-    public abstract void handle() throws Exception;
+    public abstract void handle(TaskCallBack taskCallBack) throws TaskException;
 
-    /**
-     * cancel application
-     *
-     * @param status status
-     * @throws Exception exception
-     */
-    public void cancelApplication(boolean status) throws Exception {
-        this.cancel = status;
-    }
+    public abstract void cancel() throws TaskException;
 
     public void setVarPool(String varPool) {
         this.varPool = varPool;
@@ -123,14 +123,6 @@ public abstract class AbstractTask {
         this.exitStatusCode = exitStatusCode;
     }
 
-    public String getAppIds() {
-        return appIds;
-    }
-
-    public void setAppIds(String appIds) {
-        this.appIds = appIds;
-    }
-
     public int getProcessId() {
         return processId;
     }
@@ -145,6 +137,14 @@ public abstract class AbstractTask {
 
     public void setResultString(String resultString) {
         this.resultString = resultString;
+    }
+
+    public String getAppIds() {
+        return appIds;
+    }
+
+    public void setAppIds(String appIds) {
+        this.appIds = appIds;
     }
 
     public boolean getNeedAlert() {
@@ -175,20 +175,75 @@ public abstract class AbstractTask {
      *
      * @return exit status
      */
-    public ExecutionStatus getExitStatus() {
-        ExecutionStatus status;
+    public TaskExecutionStatus getExitStatus() {
+        TaskExecutionStatus status;
         switch (getExitStatusCode()) {
             case TaskConstants.EXIT_CODE_SUCCESS:
-                status = ExecutionStatus.SUCCESS;
+                status = TaskExecutionStatus.SUCCESS;
                 break;
             case TaskConstants.EXIT_CODE_KILL:
-                status = ExecutionStatus.KILL;
+                status = TaskExecutionStatus.KILL;
                 break;
             default:
-                status = ExecutionStatus.FAILURE;
+                status = TaskExecutionStatus.FAILURE;
                 break;
         }
         return status;
     }
 
+    /**
+     * log handle
+     *
+     * @param logs log list
+     */
+    public void logHandle(LinkedBlockingQueue<String> logs) {
+        // note that the "new line" is added here to facilitate log parsing
+        if (logs.contains(FINALIZE_SESSION_MARKER.toString())) {
+            log.info(FINALIZE_SESSION_MARKER, FINALIZE_SESSION_MARKER.toString());
+        } else {
+            StringJoiner joiner = new StringJoiner("\n\t");
+            while (!logs.isEmpty()) {
+                joiner.add(logs.poll());
+            }
+            log.info(" -> {}", joiner);
+        }
+    }
+
+    /**
+     * regular expressions match the contents between two specified strings
+     *
+     * @param content content
+     * @param rgex rgex
+     * @param sqlParamsMap sql params map
+     * @param paramsPropsMap params props map
+     */
+    public void setSqlParamsMap(String content, String rgex, Map<Integer, Property> sqlParamsMap,
+                                Map<String, Property> paramsPropsMap, int taskInstanceId) {
+        if (paramsPropsMap == null) {
+            return;
+        }
+
+        Pattern pattern = Pattern.compile(rgex);
+        Matcher m = pattern.matcher(content);
+        int index = 1;
+        while (m.find()) {
+
+            String paramName = m.group(1);
+            Property prop = paramsPropsMap.get(paramName);
+
+            if (prop == null) {
+                log.error(
+                        "setSqlParamsMap: No Property with paramName: {} is found in paramsPropsMap of task instance"
+                                + " with id: {}. So couldn't put Property in sqlParamsMap.",
+                        paramName, taskInstanceId);
+            } else {
+                sqlParamsMap.put(index, prop);
+                index++;
+                log.info(
+                        "setSqlParamsMap: Property with paramName: {} put in sqlParamsMap of content {} successfully.",
+                        paramName, content);
+            }
+
+        }
+    }
 }

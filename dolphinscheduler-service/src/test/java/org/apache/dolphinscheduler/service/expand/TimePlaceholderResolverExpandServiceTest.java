@@ -18,14 +18,15 @@
 package org.apache.dolphinscheduler.service.expand;
 
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class TimePlaceholderResolverExpandServiceTest {
 
     @Mock
@@ -39,13 +40,14 @@ public class TimePlaceholderResolverExpandServiceTest {
     @Test
     public void testTimePlaceholderResolverExpandService() {
         boolean checkResult = timePlaceholderResolverExpandService.timeFunctionNeedExpand(placeHolderName);
-        Assert.assertFalse(checkResult);
+        Assertions.assertFalse(checkResult);
         String resultString = timePlaceholderResolverExpandService.timeFunctionExtension(1, "", placeHolderName);
-        Assert.assertTrue(StringUtils.isEmpty(resultString));
+        Assertions.assertTrue(StringUtils.isEmpty(resultString));
 
         boolean implCheckResult = timePlaceholderResolverExpandServiceImpl.timeFunctionNeedExpand(placeHolderName);
-        Assert.assertFalse(implCheckResult);
-        String implResultString = timePlaceholderResolverExpandServiceImpl.timeFunctionExtension(1, "", placeHolderName);
-        Assert.assertTrue(StringUtils.isEmpty(implResultString));
+        Assertions.assertFalse(implCheckResult);
+        String implResultString =
+                timePlaceholderResolverExpandServiceImpl.timeFunctionExtension(1, "", placeHolderName);
+        Assertions.assertTrue(StringUtils.isEmpty(implResultString));
     }
 }

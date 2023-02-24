@@ -19,8 +19,8 @@ package org.apache.dolphinscheduler.plugin.datasource.sqlserver;
 
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class SQLServerDataSourceChannelFactoryTest {
 
@@ -28,6 +28,6 @@ public class SQLServerDataSourceChannelFactoryTest {
     public void testCreate() {
         SQLServerDataSourceChannelFactory sourceChannelFactory = new SQLServerDataSourceChannelFactory();
         DataSourceChannel dataSourceChannel = sourceChannelFactory.create();
-        Assert.assertNotNull(dataSourceChannel);
+        Assertions.assertNotNull(dataSourceChannel);
     }
 }

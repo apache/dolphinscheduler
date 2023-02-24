@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.dao;
 
 import org.apache.dolphinscheduler.dao.entity.MonitorRecord;
+import org.apache.dolphinscheduler.dao.utils.H2Performance;
 import org.apache.dolphinscheduler.dao.utils.MySQLPerformance;
 import org.apache.dolphinscheduler.dao.utils.PostgreSQLPerformance;
 import org.apache.dolphinscheduler.spi.enums.DbType;
@@ -29,15 +30,14 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class MonitorDBDao {
-
-    private static final Logger logger = LoggerFactory.getLogger(MonitorDBDao.class);
 
     public static final String VARIABLE_NAME = "variable_name";
 
@@ -51,9 +51,11 @@ public class MonitorDBDao {
                 return new MySQLPerformance().getMonitorRecord(conn);
             } else if (driverClassName.contains(DbType.POSTGRESQL.toString().toLowerCase())) {
                 return new PostgreSQLPerformance().getMonitorRecord(conn);
+            } else if (driverClassName.contains(DbType.H2.toString().toLowerCase())) {
+                return new H2Performance().getMonitorRecord(conn);
             }
         } catch (Exception e) {
-            logger.error("SQLException: {}", e.getMessage(), e);
+            log.error("SQLException: {}", e.getMessage(), e);
         }
         return null;
     }

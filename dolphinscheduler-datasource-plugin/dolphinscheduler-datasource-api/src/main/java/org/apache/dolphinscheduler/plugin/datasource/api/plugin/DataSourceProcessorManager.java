@@ -26,11 +26,10 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class DataSourceProcessorManager {
-    private static final Logger logger = LoggerFactory.getLogger(DataSourceProcessorManager.class);
 
     private static final Map<String, DataSourceProcessor> dataSourceProcessorMap = new ConcurrentHashMap<>();
 
@@ -43,13 +42,13 @@ public class DataSourceProcessorManager {
         ServiceLoader.load(DataSourceProcessor.class).forEach(factory -> {
             final String name = factory.getDbType().name();
 
-            logger.info("start register processor: {}", name);
+            log.info("start register processor: {}", name);
             if (dataSourceProcessorMap.containsKey(name)) {
                 throw new IllegalStateException(format("Duplicate datasource plugins named '%s'", name));
             }
             loadDatasourceClient(factory);
 
-            logger.info("done register processor: {}", name);
+            log.info("done register processor: {}", name);
 
         });
     }

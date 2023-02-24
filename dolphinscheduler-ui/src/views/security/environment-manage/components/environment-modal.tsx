@@ -15,7 +15,13 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, toRefs, watch } from 'vue'
+import {
+  defineComponent,
+  getCurrentInstance,
+  PropType,
+  toRefs,
+  watch
+} from 'vue'
 import Modal from '@/components/modal'
 import { NForm, NFormItem, NInput, NSelect } from 'naive-ui'
 import { useModal } from './use-modal'
@@ -69,6 +75,8 @@ const EnvironmentModal = defineComponent({
       handleValidate(props.statusRef)
     }
 
+    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+
     watch(
       () => props.showModalRef,
       () => {
@@ -105,7 +113,7 @@ const EnvironmentModal = defineComponent({
       }
     )
 
-    return { t, ...toRefs(variables), cancelModal, confirmModal }
+    return { t, ...toRefs(variables), cancelModal, confirmModal, trim }
   },
   render() {
     const { t } = this
@@ -139,6 +147,7 @@ const EnvironmentModal = defineComponent({
                   path='name'
                 >
                   <NInput
+                    allowInput={this.trim}
                     class='input-environment-name'
                     placeholder={t(
                       'security.environment.environment_name_tips'
@@ -163,6 +172,7 @@ const EnvironmentModal = defineComponent({
                   path='description'
                 >
                   <NInput
+                    allowInput={this.trim}
                     class='input-environment-desc'
                     placeholder={t(
                       'security.environment.environment_description_tips'

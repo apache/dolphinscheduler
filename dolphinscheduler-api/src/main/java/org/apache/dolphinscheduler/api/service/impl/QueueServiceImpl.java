@@ -17,12 +17,17 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.YARN_QUEUE_CREATE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.YARN_QUEUE_UPDATE;
+
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.QueueService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
@@ -30,30 +35,28 @@ import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.*;
 
 /**
  * queue service impl
  */
 @Service
+@Slf4j
 public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
-
-    private static final Logger logger = LoggerFactory.getLogger(QueueServiceImpl.class);
 
     @Autowired
     private QueueMapper queueMapper;
@@ -62,24 +65,68 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     private UserMapper userMapper;
 
     /**
+     * Check the queue new object valid or not
+     *
+     * @param queue The queue object want to create
+     */
+    private void createQueueValid(Queue queue) throws ServiceException {
+        if (StringUtils.isEmpty(queue.getQueue())) {
+            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.QUEUE);
+        } else if (StringUtils.isEmpty(queue.getQueueName())) {
+            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.QUEUE_NAME);
+        } else if (checkQueueExist(queue.getQueue())) {
+            throw new ServiceException(Status.QUEUE_VALUE_EXIST, queue.getQueue());
+        } else if (checkQueueNameExist(queue.getQueueName())) {
+            throw new ServiceException(Status.QUEUE_NAME_EXIST, queue.getQueueName());
+        }
+    }
+
+    /**
+     * Check queue update object valid or not
+     *
+     * @param existsQueue The exists queue object
+     * @param updateQueue The queue object want to update
+     */
+    private void updateQueueValid(Queue existsQueue, Queue updateQueue) throws ServiceException {
+        // Check the exists queue and the necessary of update operation, in not exist checker have to use updateQueue to
+        // avoid NPE
+        if (Objects.isNull(existsQueue)) {
+            throw new ServiceException(Status.QUEUE_NOT_EXIST, updateQueue.getQueue());
+        } else if (Objects.equals(existsQueue, updateQueue)) {
+            throw new ServiceException(Status.NEED_NOT_UPDATE_QUEUE);
+        }
+        // Check the update queue parameters
+        else if (StringUtils.isEmpty(updateQueue.getQueue())) {
+            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.QUEUE);
+        } else if (StringUtils.isEmpty(updateQueue.getQueueName())) {
+            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.QUEUE_NAME);
+        } else if (!Objects.equals(updateQueue.getQueue(), existsQueue.getQueue())
+                && checkQueueExist(updateQueue.getQueue())) {
+            throw new ServiceException(Status.QUEUE_VALUE_EXIST, updateQueue.getQueue());
+        } else if (!Objects.equals(updateQueue.getQueueName(), existsQueue.getQueueName())
+                && checkQueueNameExist(updateQueue.getQueueName())) {
+            throw new ServiceException(Status.QUEUE_NAME_EXIST, updateQueue.getQueueName());
+        }
+    }
+
+    /**
      * query queue list
      *
      * @param loginUser login user
      * @return queue list
      */
     @Override
-    public Map<String, Object> queryList(User loginUser) {
-        Map<String, Object> result = new HashMap<>();
-        Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.QUEUE, loginUser.getId(), logger);
-        if (ids.isEmpty()) {
-            result.put(Constants.DATA_LIST, Collections.emptyList());
-            putMsg(result, Status.SUCCESS);
-            return result;
+    public Result queryList(User loginUser) {
+        Result result = new Result();
+        Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.QUEUE,
+                loginUser.getId(), log);
+        if (loginUser.getUserType().equals(UserType.GENERAL_USER)) {
+            ids = ids.isEmpty() ? new HashSet<>() : ids;
+            ids.add(Constants.DEFAULT_QUEUE_ID);
         }
         List<Queue> queueList = queueMapper.selectBatchIds(ids);
-        result.put(Constants.DATA_LIST, queueList);
+        result.setData(queueList);
         putMsg(result, Status.SUCCESS);
-
         return result;
     }
 
@@ -96,14 +143,15 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     public Result queryList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Result result = new Result();
         PageInfo<Queue> pageInfo = new PageInfo<>(pageNo, pageSize);
-        Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.QUEUE, loginUser.getId(), logger);
+        Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.QUEUE,
+                loginUser.getId(), log);
         if (ids.isEmpty()) {
             result.setData(pageInfo);
             putMsg(result, Status.SUCCESS);
             return result;
         }
         Page<Queue> page = new Page<>(pageNo, pageSize);
-        IPage<Queue> queueList = queueMapper.queryQueuePaging(page, searchVal);
+        IPage<Queue> queueList = queueMapper.queryQueuePaging(page, new ArrayList<>(ids), searchVal);
         Integer count = (int) queueList.getTotal();
         pageInfo.setTotal(count);
         pageInfo.setTotalList(queueList.getRecords());
@@ -122,45 +170,22 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @return create result
      */
     @Override
-    public Map<String, Object> createQueue(User loginUser, String queue, String queueName) {
-        Map<String, Object> result = new HashMap<>();
-        if (!canOperatorPermissions(loginUser,null, AuthorizationType.QUEUE,YARN_QUEUE_CREATE)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
+    @Transactional
+    public Result createQueue(User loginUser, String queue, String queueName) {
+        Result result = new Result();
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.QUEUE, YARN_QUEUE_CREATE)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
 
-        if (StringUtils.isEmpty(queue)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.QUEUE);
-            return result;
-        }
-
-        if (StringUtils.isEmpty(queueName)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.QUEUE_NAME);
-            return result;
-        }
-
-        if (checkQueueNameExist(queueName)) {
-            putMsg(result, Status.QUEUE_NAME_EXIST, queueName);
-            return result;
-        }
-
-        if (checkQueueExist(queue)) {
-            putMsg(result, Status.QUEUE_VALUE_EXIST, queue);
-            return result;
-        }
-
-        Queue queueObj = new Queue();
-        Date now = new Date();
-
-        queueObj.setQueue(queue);
-        queueObj.setQueueName(queueName);
-        queueObj.setCreateTime(now);
-        queueObj.setUpdateTime(now);
-
+        Queue queueObj = new Queue(queueName, queue);
+        createQueueValid(queueObj);
         queueMapper.insert(queueObj);
-        result.put(Constants.DATA_LIST, queueObj);
-        putMsg(result, Status.SUCCESS);
 
+        result.setData(queueObj);
+        log.info("Queue create complete, queueName:{}.", queueObj.getQueueName());
+        putMsg(result, Status.SUCCESS);
+        permissionPostHandle(AuthorizationType.QUEUE, loginUser.getId(), Collections.singletonList(queueObj.getId()),
+                log);
         return result;
     }
 
@@ -174,65 +199,27 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @return update result code
      */
     @Override
-    public Map<String, Object> updateQueue(User loginUser, int id, String queue, String queueName) {
-        Map<String, Object> result = new HashMap<>();
-        if (!canOperatorPermissions(loginUser,new Object[]{id}, AuthorizationType.QUEUE,YARN_QUEUE_UPDATE)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
+    public Result updateQueue(User loginUser, int id, String queue, String queueName) {
+        Result result = new Result();
+        if (!canOperatorPermissions(loginUser, new Object[]{id}, AuthorizationType.QUEUE, YARN_QUEUE_UPDATE)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
 
-        if (StringUtils.isEmpty(queue)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.QUEUE);
-            return result;
-        }
-
-        if (StringUtils.isEmpty(queueName)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.QUEUE_NAME);
-            return result;
-        }
-
-        Queue queueObj = queueMapper.selectById(id);
-        if (queueObj == null) {
-            putMsg(result, Status.QUEUE_NOT_EXIST, id);
-            return result;
-        }
-
-        // whether queue value or queueName is changed
-        if (queue.equals(queueObj.getQueue()) && queueName.equals(queueObj.getQueueName())) {
-            putMsg(result, Status.NEED_NOT_UPDATE_QUEUE);
-            return result;
-        }
-
-        // check queue name is exist
-        if (!queueName.equals(queueObj.getQueueName())
-                && checkQueueNameExist(queueName)) {
-            putMsg(result, Status.QUEUE_NAME_EXIST, queueName);
-            return result;
-        }
-
-        // check queue value is exist
-        if (!queue.equals(queueObj.getQueue()) && checkQueueExist(queue)) {
-            putMsg(result, Status.QUEUE_VALUE_EXIST, queue);
-            return result;
-        }
+        Queue updateQueue = new Queue(id, queueName, queue);
+        Queue existsQueue = queueMapper.selectById(id);
+        updateQueueValid(existsQueue, updateQueue);
 
         // check old queue using by any user
-        if (checkIfQueueIsInUsing(queueObj.getQueueName(), queueName)) {
-            //update user related old queue
-            Integer relatedUserNums = userMapper.updateUserQueue(queueObj.getQueueName(), queueName);
-            logger.info("old queue have related {} user, exec update user success.", relatedUserNums);
+        if (checkIfQueueIsInUsing(existsQueue.getQueueName(), updateQueue.getQueueName())) {
+            // update user related old queue
+            Integer relatedUserNums =
+                    userMapper.updateUserQueue(existsQueue.getQueueName(), updateQueue.getQueueName());
+            log.info("Old queue have related {} users, exec update user success.", relatedUserNums);
         }
 
-        // update queue
-        Date now = new Date();
-        queueObj.setQueue(queue);
-        queueObj.setQueueName(queueName);
-        queueObj.setUpdateTime(now);
-
-        queueMapper.updateById(queueObj);
-
+        queueMapper.updateById(updateQueue);
+        result.setData(updateQueue);
         putMsg(result, Status.SUCCESS);
-
         return result;
     }
 
@@ -247,52 +234,9 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     public Result<Object> verifyQueue(String queue, String queueName) {
         Result<Object> result = new Result<>();
 
-        if (StringUtils.isEmpty(queue)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.QUEUE);
-            return result;
-        }
-
-        if (StringUtils.isEmpty(queueName)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.QUEUE_NAME);
-            return result;
-        }
-
-        if (checkQueueNameExist(queueName)) {
-            putMsg(result, Status.QUEUE_NAME_EXIST, queueName);
-            return result;
-        }
-
-        if (checkQueueExist(queue)) {
-            putMsg(result, Status.QUEUE_VALUE_EXIST, queue);
-            return result;
-        }
-
-        putMsg(result, Status.SUCCESS);
-        return result;
-    }
-
-    /**
-     * query queue by queueName
-     *
-     * @param queueName queue name
-     * @return queue object for provide queue name
-     */
-    @Override
-    public Map<String, Object> queryQueueName(String queueName) {
-        Map<String, Object> result = new HashMap<>();
-
-        if (StringUtils.isEmpty(queueName)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.QUEUE_NAME);
-            return result;
-        }
-
-        if (!checkQueueNameExist(queueName)) {
-            putMsg(result, Status.QUEUE_NOT_EXIST, queueName);
-            return result;
-        }
-
-        List<Queue> queueList = queueMapper.queryQueueName(queueName);
-        result.put(Constants.DATA_LIST, queueList);
+        Queue queueValidator = new Queue(queueName, queue);
+        createQueueValid(queueValidator);
+        result.setData(queueValidator);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -330,6 +274,29 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      */
     private boolean checkIfQueueIsInUsing(String oldQueue, String newQueue) {
         return !oldQueue.equals(newQueue) && userMapper.existUser(oldQueue) == Boolean.TRUE;
+    }
+
+    /**
+     * Make sure queue with given name exists, and create the queue if not exists
+     *
+     * ONLY for python gateway server, and should not use this in web ui function
+     *
+     * @param queue queue value
+     * @param queueName queue name
+     * @return Queue object
+     */
+    @Override
+    public Queue createQueueIfNotExists(String queue, String queueName) {
+        Queue existsQueue = queueMapper.queryQueueName(queue, queueName);
+        if (!Objects.isNull(existsQueue)) {
+            log.info("Queue exists, so return it, queueName:{}.", queueName);
+            return existsQueue;
+        }
+        Queue queueObj = new Queue(queueName, queue);
+        createQueueValid(queueObj);
+        queueMapper.insert(queueObj);
+        log.info("Queue create complete, queueName:{}.", queueObj.getQueueName());
+        return queueObj;
     }
 
 }

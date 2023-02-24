@@ -30,11 +30,13 @@ import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -54,6 +56,11 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
     })
     private WebElement buttonConfirm;
 
+    @FindBys({
+        @FindBy(className = "dialog-source-modal"),
+    })
+    private WebElement dataSourceModal;
+
     private final CreateDataSourceForm createDataSourceForm;
 
     public DataSourcePage(RemoteWebDriver driver) {
@@ -63,20 +70,15 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
     }
 
     public DataSourcePage createDataSource(String dataSourceType, String dataSourceName, String dataSourceDescription, String ip, String port, String userName, String password, String database,
-                                           String jdbcParams) {
+                                           String jdbcParams, int testFlag) {
         buttonCreateDataSource().click();
 
-        createDataSourceForm().btnDataSourceTypeDropdown().click();
-
         new WebDriverWait(driver, 10).until(ExpectedConditions.visibilityOfElementLocated(
-                new By.ByClassName("dialog-create-data-source")));
+            new By.ByClassName("dialog-source-modal")));
 
-        createDataSourceForm().selectDataSourceType()
-            .stream()
-            .filter(it -> it.getText().contains(dataSourceType.toUpperCase()))
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException(String.format("No %s in data source type list", dataSourceType.toUpperCase())))
-            .click();
+        dataSourceModal().findElement(By.className(dataSourceType.toUpperCase()+"-box")).click();
+
+        new WebDriverWait(driver, 10).until(ExpectedConditions.textToBePresentInElement(driver.findElement(By.className("dialog-create-data-source")), dataSourceType.toUpperCase()));
 
         createDataSourceForm().inputDataSourceName().sendKeys(dataSourceName);
         createDataSourceForm().inputDataSourceDescription().sendKeys(dataSourceDescription);
@@ -87,6 +89,8 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
         createDataSourceForm().inputUserName().sendKeys(userName);
         createDataSourceForm().inputPassword().sendKeys(password);
         createDataSourceForm().inputDataBase().sendKeys(database);
+        createDataSourceForm().radioTestDatasource().click();
+
 
         if (!"".equals(jdbcParams)) {
             createDataSourceForm().inputJdbcParams().sendKeys(jdbcParams);
@@ -175,6 +179,15 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
         })
         private WebElement inputJdbcParams;
 
+        @FindBy(className = "radio-test-datasource")
+        private WebElement radioTestDatasource;
+
+        @FindBy(className = "radio-online-datasource")
+        private WebElement radioOnlineDatasource;
+
+        @FindBy(className = "select-bind-test-data-source-type-drop-down")
+        private WebElement selectBindTestDataSourceId;
+
         @FindBy(className = "btn-submit")
         private WebElement buttonSubmit;
 
@@ -182,6 +195,7 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
         private WebElement buttonCancel;
 
         @FindBy(className = "btn-test-connection")
-        private WebElement btnTestConnection;
+        private WebElement radioTestConnection;
+
     }
 }

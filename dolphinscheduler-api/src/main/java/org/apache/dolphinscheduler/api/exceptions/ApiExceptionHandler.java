@@ -20,8 +20,8 @@ package org.apache.dolphinscheduler.api.exceptions;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -32,21 +32,25 @@ import org.springframework.web.method.HandlerMethod;
  */
 @RestControllerAdvice
 @ResponseBody
+@Slf4j
 public class ApiExceptionHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(ApiExceptionHandler.class);
+    @ExceptionHandler(ServiceException.class)
+    public Result exceptionHandler(ServiceException e, HandlerMethod hm) {
+        log.error("ServiceException: ", e);
+        return new Result(e.getCode(), e.getMessage());
+    }
 
     @ExceptionHandler(Exception.class)
     public Result exceptionHandler(Exception e, HandlerMethod hm) {
         ApiException ce = hm.getMethodAnnotation(ApiException.class);
         if (ce == null) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             return Result.errorWithArgs(Status.INTERNAL_SERVER_ERROR_ARGS, e.getMessage());
         }
         Status st = ce.value();
-        logger.error(st.getMsg(), e);
+        log.error(st.getMsg(), e);
         return Result.error(st);
     }
 
 }
-

@@ -20,6 +20,9 @@ metadata:
   name: {{ include "dolphinscheduler.fullname" . }}-db-init-job
   labels:
     {{- include "dolphinscheduler.common.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "1"
 spec:
   template:
     metadata:
@@ -46,7 +49,6 @@ spec:
               value: {{ .Values.timezone }}
             {{- include "dolphinscheduler.database.env_vars" . | nindent 12 }}
             {{- include "dolphinscheduler.registry.env_vars" . | nindent 12 }}
-            {{- include "dolphinscheduler.fs_s3a.env_vars" . | nindent 12 }}
           envFrom:
             - configMapRef:
                 name: {{ include "dolphinscheduler.fullname" . }}-common

@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.UserWithProcessDefinitionCode;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -79,7 +80,6 @@ public interface UserMapper extends BaseMapper<User> {
      * @return user
      */
     User queryUserByNamePassword(@Param("userName") String userName, @Param("password") String password);
-
 
     /**
      * user page
@@ -174,13 +174,17 @@ public interface UserMapper extends BaseMapper<User> {
     List<User> queryAuthedUserListByProjectId(@Param("projectId") int projectId);
 
     /**
-     * list authorized User
-     * @param userId
-     * @param resourcesIds
-     * @param <T>
+     * query enabled users
      * @return
      */
-    <T> List<User> listAuthorizedUsersList (@Param("userId") int userId, @Param("resourcesIds")T[] resourcesIds);
+    List<User> queryEnabledUsers();
 
+    /**
+     * query User and task flow binding relationship
+     *
+     * @param processDefinitionCodes processDefinitionCodes
+     * @return user with process definition code
+     */
+    List<UserWithProcessDefinitionCode> queryUserWithProcessDefinitionCode(@Param("processDefinitionCodes") List<Long> processDefinitionCodes);
 
 }

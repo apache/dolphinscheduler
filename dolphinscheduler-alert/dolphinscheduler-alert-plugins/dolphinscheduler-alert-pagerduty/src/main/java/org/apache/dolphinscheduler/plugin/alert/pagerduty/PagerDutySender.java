@@ -17,22 +17,29 @@
 
 package org.apache.dolphinscheduler.plugin.alert.pagerduty;
 
-import com.google.common.base.Preconditions;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.slf4j.Logger;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
+import lombok.extern.slf4j.Slf4j;
+
+import com.google.common.base.Preconditions;
+
+@Slf4j
 public final class PagerDutySender {
-    private static final Logger log = org.slf4j.LoggerFactory.getLogger(PagerDutySender.class);
 
     private final String integrationKey;
 
@@ -41,7 +48,7 @@ public final class PagerDutySender {
         Preconditions.checkArgument(!Objects.isNull(integrationKey), "PagerDuty integration key can not be null");
     }
 
-    public AlertResult sendPagerDutyAlter(String title, String content){
+    public AlertResult sendPagerDutyAlter(String title, String content) {
         AlertResult alertResult = new AlertResult();
         alertResult.setStatus("false");
         alertResult.setMessage("send pager duty alert fail.");
@@ -72,10 +79,10 @@ public final class PagerDutySender {
                 if (statusCode == HttpStatus.SC_OK || statusCode == HttpStatus.SC_ACCEPTED) {
                     alertResult.setStatus("true");
                     alertResult.setMessage("send pager duty alert success");
-                }else {
+                } else {
                     log.info("send pager duty alert fail, statusCode : {}", statusCode);
                 }
-            }finally {
+            } finally {
                 response.close();
             }
         } catch (IOException e) {

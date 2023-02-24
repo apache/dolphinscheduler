@@ -17,7 +17,7 @@
 
 import { ref, onMounted, watch } from 'vue'
 import { remove, cloneDeep } from 'lodash'
-import { TaskType } from '@/views/projects/task/constants/task-type'
+import { TaskType } from '@/store/project/types'
 import { formatParams } from '@/views/projects/task/components/node/format-data'
 import { useCellUpdate } from './dag-hooks'
 import type { Ref } from 'vue'
@@ -28,7 +28,6 @@ import type {
   WorkflowDefinition,
   EditWorkflowDefinition
 } from './types'
-
 
 interface Options {
   graph: Ref<Graph | undefined>
@@ -175,7 +174,8 @@ export function useTaskEdit(options: Options) {
             ...taskDef,
             version: task.version,
             code: task.code,
-            taskType: currTask.value.taskType
+            taskType: currTask.value.taskType,
+            id: task.id
           }
         }
         return task

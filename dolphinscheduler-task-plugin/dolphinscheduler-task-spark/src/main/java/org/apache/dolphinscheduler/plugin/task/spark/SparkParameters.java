@@ -39,7 +39,7 @@ public class SparkParameters extends AbstractParameters {
     private String mainClass;
 
     /**
-     * deploy mode
+     * deploy mode  local / cluster / client
      */
     private String deployMode;
 
@@ -96,14 +96,22 @@ public class SparkParameters extends AbstractParameters {
     private ProgramType programType;
 
     /**
-     * spark version
-     */
-    private String sparkVersion;
-
-    /**
      * spark sql script
      */
     private String rawScript;
+
+    /**
+     * kubernetes cluster namespace
+     */
+    private String namespace;
+
+    public String getNamespace() {
+        return namespace;
+    }
+
+    public void setNamespace(String namespace) {
+        this.namespace = namespace;
+    }
 
     /**
      * resource list
@@ -220,14 +228,6 @@ public class SparkParameters extends AbstractParameters {
 
     public void setProgramType(ProgramType programType) {
         this.programType = programType;
-    }
-
-    public String getSparkVersion() {
-        return sparkVersion;
-    }
-
-    public void setSparkVersion(String sparkVersion) {
-        this.sparkVersion = sparkVersion;
     }
 
     public String getRawScript() {

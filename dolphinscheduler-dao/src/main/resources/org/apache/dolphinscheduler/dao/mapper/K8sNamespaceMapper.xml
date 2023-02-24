@@ -20,22 +20,26 @@
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.K8sNamespaceMapper">
 
     <sql id="baseSql">
-        id, namespace, k8s, user_id, limits_memory, limits_cpu, online_job_num, pod_replicas, pod_request_cpu, pod_request_memory, create_time, update_time
+        id, code, namespace, user_id, limits_memory, limits_cpu, pod_replicas, pod_request_cpu, pod_request_memory, cluster_code, create_time, update_time
     </sql>
 
     <sql id="baseSqlV2">
-        ${alias}.id, ${alias}.namespace, ${alias}.k8s, ${alias}.user_id, ${alias}.limits_memory, ${alias}.limits_cpu, ${alias}.online_job_num, ${alias}.pod_replicas, ${alias}.pod_request_cpu, ${alias}.pod_request_memory, ${alias}.create_time, ${alias}.update_time
+        ${alias}.id, ${alias}.code, ${alias}.namespace, ${alias}.user_id, ${alias}.limits_memory, ${alias}.limits_cpu, ${alias}.pod_replicas, ${alias}.pod_request_cpu, ${alias}.pod_request_memory, ${alias}.cluster_code, ${alias}.create_time, ${alias}.update_time
     </sql>
 
     <select id="queryK8sNamespacePaging" resultType="org.apache.dolphinscheduler.dao.entity.K8sNamespace">
         select
-        <include refid="baseSql"/>
-        from t_ds_k8s_namespace
+        <include refid="baseSqlV2">
+            <property name="alias" value="p"/>
+        </include>
+        ,u.name as cluster_name
+        from t_ds_k8s_namespace p
+        left join t_ds_cluster u on u.code=p.cluster_code
         where 1= 1
         <if test="searchVal != null and searchVal != ''">
-            and namespace like concat('%', #{searchVal}, '%')
+            and p.namespace like concat('%', #{searchVal}, '%')
         </if>
-        order by update_time desc
+        order by p.update_time desc
     </select>
 
     <select id="existNamespace" resultType="java.lang.Boolean">
@@ -45,8 +49,8 @@
         <if test="namespace != null and namespace != ''">
             and namespace = #{namespace}
         </if>
-        <if test="k8s != null and k8s != ''">
-            and k8s =#{k8s}
+        <if test="clusterCode != null and clusterCode != ''">
+            and cluster_code =#{clusterCode}
         </if>
     </select>
 
@@ -66,14 +70,10 @@
         where p.id = rel.namespace_id and rel.user_id= #{userId}
     </select>
 
-    <select id="queryNamespaceAvailable" resultType="org.apache.dolphinscheduler.dao.entity.K8sNamespace">
+    <select id="queryByNamespaceCode" resultType="org.apache.dolphinscheduler.dao.entity.K8sNamespace">
         select
-        <include refid="baseSqlV2">
-            <property name="alias" value="b"/>
-        </include>
-        from ( select namespace_id  from t_ds_relation_namespace_user where user_id= #{userId} ) a
-        left join  t_ds_k8s_namespace b
-        on b.id = a.namespace_id
-        where b.id is not null
+        <include refid="baseSql"/>
+        from t_ds_k8s_namespace
+        where code = #{namespaceCode}
     </select>
 </mapper>

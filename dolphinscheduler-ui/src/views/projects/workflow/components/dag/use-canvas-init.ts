@@ -75,9 +75,9 @@ export function useCanvasInit(options: Options) {
       minimap: {
         enabled: true,
         container: minimap.value,
-        scalable: false,
-        width: 200,
-        height: 120
+        scalable: true,
+        width: 250,
+        height: 150
       },
       interacting: {
         edgeLabelMovable: false,
@@ -100,16 +100,18 @@ export function useCanvasInit(options: Options) {
         // Whether all available ports or nodes are highlighted when you drag the edge
         highlight: true,
         createEdge() {
-          return graph.value?.createEdge({ shape: X6_EDGE_NAME })
+          return graph.value?.createEdge({
+            shape: X6_EDGE_NAME
+          })
         },
         validateConnection(data) {
           const { sourceCell, targetCell } = data
 
           if (
-            sourceCell &&
-            targetCell &&
-            sourceCell.isNode() &&
-            targetCell.isNode()
+              sourceCell &&
+              targetCell &&
+              sourceCell.isNode() &&
+              targetCell.isNode()
           ) {
             const sourceData = sourceCell.getData()
             if (!sourceData) return true
@@ -125,6 +127,20 @@ export function useCanvasInit(options: Options) {
             })
           }
 
+          return true
+        },
+        validateEdge({ edge }) {
+          const sourceData = edge.getSourceNode()?.getData()
+          const targetData = edge.getTargetNode()?.getData()
+          edge?.setAttrs({
+            line: {
+              strokeDasharray:
+                  sourceData.taskExecuteType === 'STREAM' ||
+                  targetData.taskExecuteType === 'STREAM'
+                      ? '5 5'
+                      : 'none'
+            }
+          })
           return true
         }
       },

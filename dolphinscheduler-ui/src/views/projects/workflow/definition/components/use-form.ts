@@ -66,7 +66,9 @@ export const useForm = () => {
       environmentCode: null,
       startParams: null,
       expectedParallelismNumber: '',
-      dryRun: 0
+      dryRun: 0,
+      testFlag: 0,
+      version: null
     },
     saving: false,
     rules: {
