@@ -60,6 +60,9 @@ export function formatParams(data: INodeData): {
     taskParams.appName = data.appName
     taskParams.mainArgs = data.mainArgs
     taskParams.others = data.others
+    if (data.namespace) {
+      taskParams.namespace = data.namespace
+    }
   }
 
   if (data.taskType === 'SPARK') {

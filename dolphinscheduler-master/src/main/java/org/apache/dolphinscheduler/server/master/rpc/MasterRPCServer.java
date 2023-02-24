@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.server.master.processor.TaskExecuteRunningPro
 import org.apache.dolphinscheduler.server.master.processor.TaskExecuteStartProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskRecallProcessor;
+import org.apache.dolphinscheduler.server.master.processor.TaskUpdatePidProcessor;
 import org.apache.dolphinscheduler.server.master.processor.WorkflowExecutingDataRequestProcessor;
 
 import lombok.extern.slf4j.Slf4j;
@@ -68,6 +69,9 @@ public class MasterRPCServer implements AutoCloseable {
     private TaskKillResponseProcessor taskKillResponseProcessor;
 
     @Autowired
+    private TaskUpdatePidProcessor updatePidProcessor;
+
+    @Autowired
     private TaskRecallProcessor taskRecallProcessor;
 
     @Autowired
@@ -86,6 +90,7 @@ public class MasterRPCServer implements AutoCloseable {
         serverConfig.setListenPort(masterConfig.getListenPort());
         this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RUNNING, taskExecuteRunningProcessor);
+        this.nettyRemotingServer.registerProcessor(CommandType.TASK_UPDATE_PID, updatePidProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RESULT, taskExecuteResponseProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_RESPONSE, taskKillResponseProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.STATE_EVENT_REQUEST, stateEventProcessor);

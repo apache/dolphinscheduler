@@ -55,7 +55,7 @@ import com.google.gson.JsonObject;
 /**
  * executor controller test
  */
-public class ExecutorControllerTest extends AbstractControllerTest {
+public class ExecuteFunctionControllerTest extends AbstractControllerTest {
 
     final Gson gson = new Gson();
     final long projectCode = 1L;
