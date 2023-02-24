@@ -220,7 +220,7 @@ public class PythonGateway {
      * @param globalParams global params
      * @param schedule schedule for workflow, will not set schedule if null,
      * and if would always fresh exists schedule if not null
-     * @param online_schedule Whether set the workflow's schedule to online state
+     * @param onlineSchedule Whether set the workflow's schedule to online state
      * @param warningType warning type
      * @param warningGroupId warning group id
      * @param timeout timeout for workflow working, if running time longer than timeout,
@@ -237,7 +237,7 @@ public class PythonGateway {
                                        String description,
                                        String globalParams,
                                        String schedule,
-                                       boolean online_schedule,
+                                       boolean onlineSchedule,
                                        String warningType,
                                        int warningGroupId,
                                        int timeout,
@@ -279,7 +279,8 @@ public class PythonGateway {
 
         // Fresh workflow schedule
         if (schedule != null) {
-            createOrUpdateSchedule(user, projectCode, processDefinitionCode, schedule, online_schedule, workerGroup, warningType,
+            createOrUpdateSchedule(user, projectCode, processDefinitionCode, schedule, onlineSchedule, workerGroup,
+                    warningType,
                     warningGroupId);
         }
         processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode,
@@ -321,7 +322,7 @@ public class PythonGateway {
      * @param projectCode project which workflow belongs to
      * @param workflowCode workflow code
      * @param schedule schedule expression
-     * @param online_schedule Whether set the workflow's schedule to online state
+     * @param onlineSchedule Whether set the workflow's schedule to online state
      * @param workerGroup work group
      * @param warningType warning type
      * @param warningGroupId warning group id
@@ -330,7 +331,7 @@ public class PythonGateway {
                                         long projectCode,
                                         long workflowCode,
                                         String schedule,
-                                        boolean online_schedule,
+                                        boolean onlineSchedule,
                                         String workerGroup,
                                         String warningType,
                                         int warningGroupId) {
@@ -351,7 +352,7 @@ public class PythonGateway {
             schedulerService.updateSchedule(user, projectCode, scheduleId, schedule, WarningType.valueOf(warningType),
                     warningGroupId, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, DEFAULT_ENVIRONMENT_CODE);
         }
-        if (online_schedule) {
+        if (onlineSchedule) {
             // set workflow online to make sure we can set schedule online
             processDefinitionService.releaseProcessDefinition(user, projectCode, workflowCode, ReleaseState.ONLINE);
             schedulerService.setScheduleState(user, projectCode, scheduleId, ReleaseState.ONLINE);
