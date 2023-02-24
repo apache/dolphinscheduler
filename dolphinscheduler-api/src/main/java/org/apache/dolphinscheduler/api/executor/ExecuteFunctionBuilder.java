@@ -15,13 +15,18 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.repository;
+package org.apache.dolphinscheduler.api.executor;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
+import org.apache.dolphinscheduler.api.enums.ExecuteType;
 
-public interface ProcessDefinitionLogDao {
+import java.util.concurrent.CompletableFuture;
 
-    ProcessDefinitionLog queryProcessDefinitionLog(long workflowDefinitionCode, int workflowDefinitionVersion);
+public interface ExecuteFunctionBuilder<Request extends ExecuteRequest, Result extends ExecuteResult> {
 
-    void deleteByWorkflowDefinitionCode(long workflowDefinitionCode);
+    CompletableFuture<ExecuteFunction<Request, Result>> createWorkflowInstanceExecuteFunction(ExecuteContext executeContext);
+
+    CompletableFuture<Request> createWorkflowInstanceExecuteRequest(ExecuteContext executeContext);
+
+    ExecuteType getExecuteType();
+
 }

@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.repository.impl;
 
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionLogDao;
 
@@ -28,6 +29,12 @@ public class ProcessDefinitionLogDaoImpl implements ProcessDefinitionLogDao {
 
     @Autowired
     private ProcessDefinitionLogMapper processDefinitionLogMapper;
+
+    @Override
+    public ProcessDefinitionLog queryProcessDefinitionLog(long workflowDefinitionCode, int workflowDefinitionVersion) {
+        return processDefinitionLogMapper.queryByDefinitionCodeAndVersion(workflowDefinitionCode,
+                workflowDefinitionVersion);
+    }
 
     @Override
     public void deleteByWorkflowDefinitionCode(long workflowDefinitionCode) {

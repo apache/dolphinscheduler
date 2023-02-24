@@ -15,13 +15,23 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.repository;
+package org.apache.dolphinscheduler.api.executor;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
+import org.apache.dolphinscheduler.api.enums.ExecuteType;
 
-public interface ProcessDefinitionLogDao {
+public interface ExecuteFunction<Request extends ExecuteRequest, Result extends ExecuteResult> {
 
-    ProcessDefinitionLog queryProcessDefinitionLog(long workflowDefinitionCode, int workflowDefinitionVersion);
+    /**
+     * Execute the workflow by the given request.
+     *
+     * @param request execute request
+     * @return execute result
+     * @throws ExecuteRuntimeException If there is an exception during execution, it will be thrown.
+     */
+    Result execute(Request request) throws ExecuteRuntimeException;
 
-    void deleteByWorkflowDefinitionCode(long workflowDefinitionCode);
+    /**
+     * @return the type of the executor
+     */
+    ExecuteType getExecuteType();
 }

@@ -15,13 +15,15 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.repository;
+package org.apache.dolphinscheduler.api.executor.workflow.instance.pause.pause;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
+import org.apache.dolphinscheduler.api.executor.ExecuteResult;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 
-public interface ProcessDefinitionLogDao {
+import lombok.AllArgsConstructor;
 
-    ProcessDefinitionLog queryProcessDefinitionLog(long workflowDefinitionCode, int workflowDefinitionVersion);
+@AllArgsConstructor
+public class PauseExecuteResult implements ExecuteResult {
 
-    void deleteByWorkflowDefinitionCode(long workflowDefinitionCode);
+    private final ProcessInstance processInstance;
 }

@@ -38,4 +38,5 @@ public interface ProcessInstanceDao {
 
     void deleteById(Integer workflowInstanceId);
 
+    ProcessInstance queryByWorkflowInstanceId(Integer workflowInstanceId);
 }
