@@ -1070,18 +1070,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         // delete data in database
         if (resourcesNeedToDeleteSet.size() > 0) {
-            for (ResourcesTask resourcesTask : resourcesNeedToDeleteSet) {
-                int taskId = resourcesTask.getTaskId();
-                TaskDefinition taskDefinition = taskDefinitionMapper.selectById(taskId);
-                if (taskDefinition != null && processService.isTaskOnline(taskDefinition.getCode())) {
-                    log.error("can't be deleted,because it is used of process definition that's online");
-                    log.error("resource task relation id:{} is used of task code {}", resourcesTask.getId(),
-                            taskDefinitionMapper.selectById(taskId).getCode());
-                    putMsg(result, Status.RESOURCE_IS_USED);
-                    return result;
-                }
-            }
-
             for (ResourcesTask existResource : resourcesNeedToDeleteSet) {
                 int taskId = existResource.getTaskId();
 
