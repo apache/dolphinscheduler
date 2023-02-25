@@ -24,6 +24,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.DELETE_TASK_PROCESS_R
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_PROCESS_RELATION_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
+import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProcessTaskRelationService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -228,6 +229,41 @@ public class ProcessTaskRelationController extends BaseController {
                                           @PathVariable("taskCode") long taskCode) {
         return returnDataList(processTaskRelationService.queryDownstreamRelation(loginUser, projectCode, taskCode));
     }
+
+    /**
+     * query task relation by projectCode and processDefinitionCode
+     *
+     * @param loginUser             login user
+     * @param projectCode           project code
+     * @param processDefinitionCode processDefinitionCode
+     * @return create result code
+     */
+    @ApiOperation(value = "queryProcessTaskRelation", notes = "QUERY_PROCESS_TASK_RELATION_NOTES")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "projectCode", value = "PROJECT_CODE", required = true, dataTypeClass = long.class),
+        @ApiImplicitParam(name = "processDefinitionCode", value = "PROCESS_DEFINITION_CODE", required = true, dataTypeClass = long.class),
+    })
+    @GetMapping(value = "/{processDefinitionCode}")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_TASK_PROCESS_RELATION_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result queryProcessTaskRelation(
+        @ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+        @ApiParam(name = "projectCode", value = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+        @ApiParam(name = "processDefinitionCode", required = true) @PathVariable long processDefinitionCode) {
+        Map<String, Object> result = new HashMap<>();
+
+        if (projectCode == 0L) {
+            putMsg(result, DATA_IS_NOT_VALID, "projectCode");
+        } else if (processDefinitionCode == 0L) {
+            putMsg(result, DATA_IS_NOT_VALID, "processDefinitionCode");
+        } else {
+            result = processTaskRelationService.queryProcessTaskRelation(loginUser, projectCode, processDefinitionCode);
+            putMsg(result, Status.SUCCESS);
+        }
+        return returnDataList(result);
+    }
+
 
     /**
      * delete edge

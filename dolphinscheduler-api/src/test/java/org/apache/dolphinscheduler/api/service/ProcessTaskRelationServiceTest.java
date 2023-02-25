@@ -48,6 +48,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -391,6 +392,52 @@ public class ProcessTaskRelationServiceTest {
                 .queryUpstreamRelation(loginUser, projectCode, taskCode);
         Assert.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
         Assert.assertEquals(2, ((List) relation.get("data")).size());
+    }
+
+    @Test
+    public void testQueryProcessTaskRelation() {
+        long projectCode = 1L;
+        long taskCode = 7481905076736L;
+        long processDefinitionCode = 7481910102016L;
+
+        ProcessDefinition processDefinitionDemo = getProcessDefinition();
+        Mockito.when(processDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(processDefinitionDemo);
+
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(
+            processDefinitionCode);
+
+        Assert.assertNotNull(processDefinition);
+        Assert.assertEquals(projectCode,processDefinition.getProjectCode());
+
+
+        List<ProcessTaskRelation> processTaskRelations = getProcessTaskRelations(
+            projectCode, processDefinitionCode,taskCode);
+        Mockito.when(processTaskRelationMapper.queryByProcessCode(projectCode, processDefinitionCode)).thenReturn(processTaskRelations);
+
+        List<ProcessTaskRelation> resData = processTaskRelationMapper.queryByProcessCode(
+            projectCode, processDefinitionCode);
+
+        Assert.assertEquals(resData.size(), 1);
+        System.out.println(resData.get(0).getPostTaskCode());
+        Assert.assertEquals(resData.get(0).getPostTaskCode(), taskCode);
+    }
+
+    @NotNull
+    private static List<ProcessTaskRelation> getProcessTaskRelations(long projectCode,
+        long processDefinitionCode, long taskCode) {
+        List<ProcessTaskRelation> processTaskRelations = new ArrayList<>();
+        ProcessTaskRelation relation = new ProcessTaskRelation();
+        relation.setId(30);
+        relation.setName("aa");
+        relation.setProcessDefinitionVersion(7);
+        relation.setProcessDefinitionCode(processDefinitionCode);
+        relation.setProjectCode(projectCode);
+        relation.setPreTaskCode(0);
+        relation.setPreTaskVersion(0);
+        relation.setPostTaskCode(taskCode);
+        relation.setPostTaskVersion(7);
+        processTaskRelations.add(relation);
+        return processTaskRelations;
     }
 
     @Test

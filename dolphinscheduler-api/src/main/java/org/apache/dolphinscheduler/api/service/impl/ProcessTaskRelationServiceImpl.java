@@ -544,6 +544,38 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
     }
 
     /**
+     * query task relation by projectCode and processDefinitionCode
+     *
+     * @param loginUser loginUser
+     * @param projectCode projectCode
+     * @param processDefinitionCode processDefinitionCode
+     * @return  process task relation lis
+     */
+    @Override
+    public Map<String, Object> queryProcessTaskRelation(User loginUser, long projectCode,
+        long processDefinitionCode) {
+
+        Map<String, Object> result = new HashMap<>();
+
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
+        if (processDefinition == null) {
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(processDefinitionCode));
+            return result;
+        }
+        if (processDefinition.getProjectCode() != projectCode) {
+            putMsg(result, Status.PROJECT_PROCESS_NOT_MATCH);
+            return result;
+        }
+
+        List<ProcessTaskRelation> processTaskRelationList =
+            processTaskRelationMapper.queryByProcessCode(projectCode, processDefinitionCode);
+        List<ProcessTaskRelation> processTaskRelations = Lists.newArrayList(processTaskRelationList);
+        result.put(Constants.DATA_LIST, processTaskRelations);
+        return result;
+    }
+
+
+    /**
      * build task definition
      *
      * @return task definition

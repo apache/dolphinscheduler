@@ -21,16 +21,22 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ProcessTaskRelationService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
+import org.apache.dolphinscheduler.dao.entity.User;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
@@ -44,6 +50,15 @@ import org.springframework.test.web.servlet.MvcResult;
 public class ProcessTaskRelationControllerTest extends AbstractControllerTest {
     @MockBean(name = "processTaskRelationServiceImpl")
     private ProcessTaskRelationService processTaskRelationService;
+
+    @Before
+    public void before() {
+        User loginUser = new User();
+        loginUser.setId(1);
+        loginUser.setUserType(UserType.GENERAL_USER);
+        loginUser.setUserName("admin");
+        user = loginUser;
+    }
 
     @Test
     public void testQueryDownstreamRelation() throws Exception {
@@ -79,5 +94,36 @@ public class ProcessTaskRelationControllerTest extends AbstractControllerTest {
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assert.assertNotNull(result);
         Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+    }
+
+    @Test
+    public void testQueryProcessTaskRelation(){
+        List<ProcessTaskRelation> processTaskRelations = new ArrayList<>();
+        ProcessTaskRelation relation = new ProcessTaskRelation();
+        relation.setId(30);
+        relation.setName("aa");
+        relation.setProcessDefinitionVersion(7);
+        relation.setProcessDefinitionCode(7481910102016L);
+        relation.setProjectCode(7481640680704L);
+        relation.setPreTaskCode(0);
+        relation.setPreTaskVersion(0);
+        relation.setPostTaskCode(7481905076736L);
+        relation.setPostTaskVersion(7);
+        processTaskRelations.add(relation);
+
+        Map<String, Object> mockResult = new HashMap<>();
+        mockResult.put(Constants.STATUS, Status.SUCCESS);
+        mockResult.put(Constants.DATA_LIST, processTaskRelations);
+
+        PowerMockito.when(
+            processTaskRelationService.queryProcessTaskRelation(user, 7481640680704L,
+                7481910102016L)).thenReturn(mockResult);
+
+        Map<String, Object> map = processTaskRelationService.queryProcessTaskRelation(
+            user, 7481640680704L,
+            7481910102016L);
+        System.out.println(map);
+        Assert.assertEquals(Status.SUCCESS, map.get(Constants.STATUS));
+
     }
 }

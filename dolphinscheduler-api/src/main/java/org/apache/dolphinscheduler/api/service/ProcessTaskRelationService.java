@@ -108,6 +108,19 @@ public interface ProcessTaskRelationService {
                                                 long projectCode,
                                                 long taskCode);
 
+
+    /**
+     * query task relation by projectCode and processDefinitionCode
+     *
+     * @param loginUser loginUser
+     * @param projectCode projectCode
+     * @param processDefinitionCode processDefinitionCode
+     * @return  process task relation lis
+     */
+    Map<String, Object> queryProcessTaskRelation(User loginUser, long projectCode, long processDefinitionCode);
+
+
+
     /**
      * delete edge
      *
