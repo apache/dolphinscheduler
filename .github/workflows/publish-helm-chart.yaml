@@ -47,7 +47,7 @@ jobs:
             echo "DOCKER_PASSWORD=${{ secrets.DOCKERHUB_TOKEN }}" >> $GITHUB_ENV
           else
             echo "HUB=ghcr.io/apache/dolphinscheduler" >> $GITHUB_ENV
-            echo "DOCKER_REGISTRY=c" >> $GITHUB_ENV
+            echo "DOCKER_REGISTRY=ghcr.io/apache/dolphinscheduler" >> $GITHUB_ENV
             echo "DOCKER_USERNAME=${{ github.actor }}" >> $GITHUB_ENV
             echo "DOCKER_PASSWORD=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
           fi
