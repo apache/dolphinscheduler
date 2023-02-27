@@ -497,7 +497,13 @@ the release version is `<VERSION>`, the following updates are required(note it w
     issue template have **Version** selection bottom. So after we release DolphinScheduler we should and the new `<VERSION>` to
     bug-report.yml
 
-### Find DolphinScheduler in [apache staging repositories](https://repository.apache.org/#stagingRepositories) and click `Release`
+### Publish Docker Image and Helm Chart
+
+We have a [workflow](../../../../.github/workflows/publish-docker.yaml) to automatically publish Docker images
+and a [workflow](../../../../.github/workflows/publish-helm-chart.yaml) to automatically publish Helm Chart to Docker Hub,
+after you change the release from "pre-release" to "release", the workflow will be triggered. All you need to do
+is to observe the aforementioned workflows, and after they are completed, you can pull the Docker images locally and
+verify that they work as expected.
 
 ### Send Announcement E-mail Community
 
