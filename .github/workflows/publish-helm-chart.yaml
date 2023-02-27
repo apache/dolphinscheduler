@@ -24,9 +24,6 @@ on:
     types:
       - released
 
-env:
-  HUB: ghcr.io/apache/dolphinscheduler
-
 jobs:
   build:
     if: github.repository == 'apache/dolphinscheduler'
@@ -39,7 +36,6 @@ jobs:
       - uses: actions/checkout@v2
       - name: Set environment variables
         run: |
-          # TODO
           if [[ ${{ github.event_name }} == "release" ]]; then
             echo "HUB=registry-1.docker.io/apache" >> $GITHUB_ENV
             echo "DOCKER_REGISTRY=docker.io" >> $GITHUB_ENV
