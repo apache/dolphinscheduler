@@ -33,7 +33,7 @@ Tenant is an important concept while using DolphinScheduler, so
 let's briefly introduce the concept of tenant first.
 
 The account named `admin` logged into DolphinScheduler is called user in dolphinscheduler.
-To better control system resources, DolphinScheduler introduce the concept of
+To better control system resources, DolphinScheduler introduces the concept of
 tenants, which are used to execute tasks.
 
 The brief is as follows:
