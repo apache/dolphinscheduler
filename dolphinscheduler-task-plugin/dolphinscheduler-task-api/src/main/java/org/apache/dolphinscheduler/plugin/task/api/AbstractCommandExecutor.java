@@ -155,7 +155,7 @@ public abstract class AbstractCommandExecutor {
 
     /**
      * generate systemd command.
-     * eg: sudo systemd-run -q --scope -p CPUQuota=100% -p MemoryMax=200M --uid=root
+     * eg: sudo systemd-run -q --scope -p CPUQuota=100% -p MemoryLimit=200M --uid=root
      * @param command command
      */
     private void generateCgroupCommand(List<String> command) {
@@ -175,12 +175,13 @@ public abstract class AbstractCommandExecutor {
             command.add(String.format("CPUQuota=%s%%", taskRequest.getCpuQuota()));
         }
 
+        // use `man systemd.resource-control` to find available parameter
         if (memoryMax == -1) {
             command.add("-p");
-            command.add(String.format("MemoryMax=%s", "infinity"));
+            command.add(String.format("MemoryLimit=%s", "infinity"));
         } else {
             command.add("-p");
-            command.add(String.format("MemoryMax=%sM", taskRequest.getMemoryMax()));
+            command.add(String.format("MemoryLimit=%sM", taskRequest.getMemoryMax()));
         }
 
         command.add(String.format("--uid=%s", taskRequest.getTenantCode()));
