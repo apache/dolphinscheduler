@@ -91,7 +91,7 @@ only thing missing from the current workflow is task dependency. We can add depe
 the mouse to drag the arrow from the upstream task to the downstream and then release the mouse.
 And you can see the link with the arrow between the two tasks is created, from the upstream
 task to the downstream one. Finally, we can click the `Save` button from the top right corner
-to save the workflow, do not forget to fill name of the workflow.
+to save the workflow, do not forget to enter the name of the workflow.
 
 ![set-dependence](../../../../img/start/set-dep.gif)
 
