@@ -47,7 +47,7 @@ We can create a tenant in DolphinScheduler `Security -> Tenant Manage` page.
 
 #### Assign Tenant to User
 
-As we talked about above in Create Tenant, the user can only run the task unless the user is assigned to a tenant.
+As we have shown above in `Create Tenant` section, the`user` can not run tasks until we assign it with a `tenant`.
 
 We can assign a tenant to a specific user in DolphinScheduler `Security -> User Manage` page.
 
