@@ -42,7 +42,7 @@ public class UserGroupInformationFactory {
     private static final Map<String, UserGroupInformation> userGroupInformationMap = new HashMap<>();
 
     private static final ScheduledExecutorService kerberosRenewalService =
-            ThreadUtils.newSingleDaemonScheduledExecutorService("Hive-Kerberos-Renewal-Thread-");
+            ThreadUtils.newSingleDaemonScheduledExecutorService("Kyuubi-Kerberos-Renewal-Thread-");
 
     static {
         kerberosRenewalService.scheduleWithFixedDelay(() -> {
