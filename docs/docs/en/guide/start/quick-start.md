@@ -32,7 +32,7 @@ is `admin/dolphinscheduler123`.
 Tenant is an important concept while using DolphinScheduler, so
 let's briefly introduce the concept of tenant first.
 
-The account named `admin` logged into DolphinScheduler is called user in dolphinscheduler.
+DolphinScheduler maps the `admin` account you use to log into DolphinScheduler to `user`.
 To better control system resources, DolphinScheduler introduces the concept of
 tenants, which are used to execute tasks.
 
