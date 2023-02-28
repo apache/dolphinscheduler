@@ -14,7 +14,7 @@ provide both video and text in this tutorial, you can choose the way you prefer
 
 ### Setup Dolphinscheduler
 
-You have to install and start dolphinscheduler first before go ahead. For the beginner, we recommend setup up
+You have to install and start dolphinscheduler first before go ahead. For beginners, we recommend setting up
 dolphionscheduler with the official Docker image or starting the standalone server.
 
 * [standalone server](https://dolphinscheduler.apache.org/en-us/docs/3.1.3/guide/installation/standalone)
