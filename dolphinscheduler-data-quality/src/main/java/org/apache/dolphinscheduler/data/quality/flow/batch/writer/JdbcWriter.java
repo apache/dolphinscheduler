@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.data.quality.config.Config;
 import org.apache.dolphinscheduler.data.quality.config.ValidateResult;
 import org.apache.dolphinscheduler.data.quality.execution.SparkRuntimeEnvironment;
 import org.apache.dolphinscheduler.data.quality.flow.batch.BatchWriter;
+import org.apache.dolphinscheduler.data.quality.utils.ParserUtils;
 
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -75,13 +76,13 @@ public class JdbcWriter implements BatchWriter {
         }
 
         data.write()
-            .format(JDBC)
-            .option(DRIVER,config.getString(DRIVER))
-            .option(URL,config.getString(URL))
-            .option(DB_TABLE, config.getString(TABLE))
-            .option(USER, config.getString(USER))
-            .option(PASSWORD, config.getString(PASSWORD))
-            .mode(config.getString(SAVE_MODE))
-            .save();
+                .format(JDBC)
+                .option(DRIVER, config.getString(DRIVER))
+                .option(URL, config.getString(URL))
+                .option(DB_TABLE, config.getString(TABLE))
+                .option(USER, config.getString(USER))
+                .option(PASSWORD, ParserUtils.decode(config.getString(PASSWORD)))
+                .mode(config.getString(SAVE_MODE))
+                .save();
     }
 }
