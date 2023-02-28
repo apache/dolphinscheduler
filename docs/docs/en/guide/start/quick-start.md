@@ -22,7 +22,7 @@ DolphinScheduler with the official Docker image or with the standalone server.
 
 ### Build Your First Workflow
 
-You can log in dolphinscheduler with http://localhost:12345/dolphinscheduler/ui the default username/password
+You can log in DolphinScheduler through http://localhost:12345/dolphinscheduler/ui and the default username/password
 is `admin/dolphinscheduler123`.
 
 ![login](../../../../img/start/login.gif)
