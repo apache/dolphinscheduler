@@ -110,7 +110,7 @@ list, then find the task you want to view the log, right-click the mouse and sel
 from the context dialog, and you can see the detailed log of the task.
 
 You can the task print the `Hello DolphinScheduler` and `Ending...` which is the same as we
-define in create the task.
+defined when creating the tasks.
 
 ![view-log](../../../../img/start/view-log.gif)
 
