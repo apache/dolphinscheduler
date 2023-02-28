@@ -29,7 +29,7 @@ is `admin/dolphinscheduler123`.
 
 #### Create Tenant
 
-Tenant is a concept that cannot be bypassed while using DolphinScheduler, so
+Tenant is an important concept while using DolphinScheduler, so
 let's briefly introduce the concept of tenant first.
 
 The account named `admin` logged into DolphinScheduler is called user in dolphinscheduler.
