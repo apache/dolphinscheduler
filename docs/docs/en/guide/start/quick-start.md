@@ -58,7 +58,7 @@ simple workflow in DolphinScheduler.
 
 #### Create Project
 
-But in DolphinScheduler, all workflow must belong to a project, so we need
+But in DolphinScheduler, all workflows must belong to a project, so we need
 to create a project first.
 
 We can create a project in DolphinScheduler `Project` page by clicking
