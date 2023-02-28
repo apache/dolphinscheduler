@@ -114,5 +114,5 @@ defined when creating the tasks.
 
 ![view-log](../../../../img/start/view-log.gif)
 
-You just finished the first tutorial of DolphinScheduler, you can now run some simple workflow
+You just finished the first tutorial of DolphinScheduler, you can now run some simple workflows
 in DolphinScheduler, congratulations!
