@@ -79,7 +79,7 @@ to the workflow detail page.
 We can use the mouse to drag the task you want to create from the toolbar in the workflow canvas.
 In this case, we create a `Shell` task. Entering the necessary information for the task,
 we just fill the attribute `Node Name` with `Script` to the task for this simple workflow.
-After that, we can click the `Save` button save the task into the workflow. We create another task
+After that, we can click the `Save` button to save the task into the workflow. We create another task
 using the same way.
 
 ![create-task](../../../../img/start/create-task.gif)
