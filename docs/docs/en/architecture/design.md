@@ -30,20 +30,27 @@
 
   #### The Service Mainly Includes:
 
-  - **DistributedQuartz** distributed scheduling component, which is mainly responsible for the start and stop operations of scheduled tasks. When quartz start the task, there will be a thread pool inside the Master responsible for the follow-up operation of the processing task;
-
-  - **MasterSchedulerService** is a scanning thread that regularly scans the `t_ds_command` table in the database, runs different business operations according to different **command types**;
-
-  - **WorkflowExecuteRunnable** is mainly responsible for DAG task segmentation, task submission monitoring, and logical processing of different event types;
-
-  - **TaskExecuteRunnable** is mainly responsible for the processing and persistence of tasks, and generates task events and submits them to the event queue of the process instance;
-
-  - **EventExecuteService** is mainly responsible for the polling of the event queue of the process instances;
-
-  - **StateWheelExecuteThread** is mainly responsible for process instance and task timeout, task retry, task-dependent polling, and generates the corresponding process instance or task event and submits it to the event queue of the process instance;
-
-  - **FailoverExecuteThread** is mainly responsible for the logic of Master fault tolerance and Worker fault tolerance;
-
+  - **QuartzScheduler** distributed scheduling component, which is mainly responsible for the start and stop operations of scheduled tasks. When quartz start the task, there will be a thread pool inside the Master responsible for the follow-up operation of the processing task;
+  - **MasterRegistryClient**：ZooKeeper client encapsulates operations related to MasterServer and ZooKeeper, such as registration, monitoring, deletion, logout, etc.;
+    - **MasterConnectionStateListener**：Monitor the connection status between MasterServer and ZooKeeper, and trigger the suicide logic of MasterServer once disconnected;
+    - **MasterRegistryDataListener**：Listen to ZooKeeper's MasterServer temporary node event. Once a node removal event occurs, remove the temporary node on ZooKeeper first, and then trigger the failover of MasterServer (the process is consistent with `FailoverExecuteThread`);
+  - **MasterSchedulerBootstrap** Scheduling threads scan the `t_ds_command` table at regular intervals, take out Commands in batches according to the sharding strategy, encapsulate them into a workflow task execution thread `WorkflowExecuteThread`, put them into the buffer queue, and wait for the next thread to consume;
+  - **TaskPluginManager**：The task plugin manager will persist all implementation classes of `TaskChannelFactory` into the `t_ds_plugin` table when it starts; therefore, if developers need to customize task plugins, they only need to integrate and implement TaskChannelFactory;
+  - **WorkflowExecuteRunnable**：Responsible for DAG task segmentation, task submission monitoring, and logic processing of various event types;
+  - **TaskExecuteRunnable**：Responsible for the processing and persistence of tasks, and generates task events and submits them to the event queue of the workflow;
+  - **EventExecuteService**：Responsible for the polling of the event queue of the workflow instance;
+  - **StateWheelExecuteThread**：Responsible for workflow and task timeout, task retry, polling of task dependencies, and generating corresponding workflow or task events to submit to the event queue of workflow;
+  - **FailoverExecuteThread**：Responsible for the relevant logic of Master fault tolerance and Worker fault tolerance;
+  - **TaskPriorityQueueConsumer**：The task queue consumption thread distributes tasks to Workers according to the load balancing algorithm;
+  - **MasterRPCServer**：The MasterServer RPC server encapsulates common logic such as Netty server creation, and registers various message processors:
+    - **CacheProcessor**：Receive `CacheExpireCommand` request from ApiServer to force refresh the cache;
+    - **LoggerRequestProcessor**：Receive `GetLogBytesRequestCommand`, `ViewLogRequestCommand`, `RollViewLogRequestCommand`, `RemoveTaskLogRequestCommand` requests from ApiServer, and operate logs;
+    - **StateEventProcessor**：Receive `StateEventChangeCommand` request, process workflow instance/task instance state change, including workflow instance/task instance submission success, running, success, failure, timeout, kill, prepare to pause, pause, prepare to stop, stop, Prepare to block, block, failover, etc.;
+    - **TaskEventProcessor**：Receive `TaskEventChangeCommand` request, process the state change of the task instance, including: forced start, wake-up;
+    - **TaskKillResponseProcessor**：Receive `TaskKillResponseCommand` request from WorkerServer, the content of the request is the response result of the request to kill the task instance;
+    - **TaskExecuteRunningProcessor**：Receive the `TaskExecuteRunningCommand` request from WorkerServer, the content of the request is the running information of the task instance (workflow instance ID, task instance ID, running status, execution machine information, start time, program running directory, log directory, etc.);
+    - **TaskExecuteResponseProcessor**：Receive the `TaskExecuteResultCommand` request from WorkerServer, the request content is the running result information of the task instance (workflow instance ID, task instance ID, start time, end time, running status, execution machine information, program running directory, log directory, etc.);
+    - **WorkflowExecutingDataRequestProcessor**：Receive the `WorkflowExecutingDataRequestCommand` request from the ApiServer, and query the workflow instance information in execution from the specified WorkerServer;
 * **WorkerServer**
 
   WorkerServer also adopts a distributed and decentralized design concept. WorkerServer is mainly responsible for task execution and providing log services.
@@ -199,23 +206,23 @@ In the early schedule design, if there is no priority design and use the fair sc
 ```xml
 <conversionRule conversionWord="message" converterClass="org.apache.dolphinscheduler.common.log.SensitiveDataConverter"/>
 <appender name="TASKLOGFILE" class="ch.qos.logback.classic.sift.SiftingAppender">
-    <filter class="org.apache.dolphinscheduler.plugin.task.api.log.TaskLogFilter"/>
-    <Discriminator class="org.apache.dolphinscheduler.plugin.task.api.log.TaskLogDiscriminator">
-        <key>taskAppId</key>
-        <logBase>${log.base}</logBase>
-    </Discriminator>
-    <sift>
-        <appender name="FILE-${taskAppId}" class="ch.qos.logback.core.FileAppender">
-            <file>${log.base}/${taskAppId}.log</file>
-            <encoder>
-                <pattern>
-                            [%level] %date{yyyy-MM-dd HH:mm:ss.SSS Z} [%thread] %logger{96}:[%line] - %message%n
-                </pattern>
-                <charset>UTF-8</charset>
-            </encoder>
-            <append>true</append>
-        </appender>
-    </sift>
+<filter class="org.apache.dolphinscheduler.plugin.task.api.log.TaskLogFilter"/>
+<Discriminator class="org.apache.dolphinscheduler.plugin.task.api.log.TaskLogDiscriminator">
+  <key>taskAppId</key>
+  <logBase>${log.base}</logBase>
+</Discriminator>
+<sift>
+  <appender name="FILE-${taskAppId}" class="ch.qos.logback.core.FileAppender">
+    <file>${log.base}/${taskAppId}.log</file>
+    <encoder>
+      <pattern>
+        [%level] %date{yyyy-MM-dd HH:mm:ss.SSS Z} [%thread] %logger{96}:[%line] - %message%n
+      </pattern>
+      <charset>UTF-8</charset>
+    </encoder>
+    <append>true</append>
+  </appender>
+</sift>
 </appender>
 ```
 

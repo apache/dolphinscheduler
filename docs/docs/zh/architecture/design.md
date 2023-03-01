@@ -22,58 +22,64 @@
 
 ### 架构说明
 
-* **MasterServer**
+#### MasterServer
 
-  MasterServer采用分布式无中心设计理念，MasterServer主要负责 DAG 任务切分、任务提交监控，并同时监听其它MasterServer和WorkerServer的健康状态。
-  MasterServer服务启动时向Zookeeper注册临时节点，通过监听Zookeeper临时节点变化来进行容错处理。
-  MasterServer基于netty提供监听服务。
+职责说明：
+- MasterServer采用分布式无中心设计理念，MasterServer主要负责 DAG 任务切分、任务提交监控，并同时监听其它MasterServer和WorkerServer的健康状态。
+- MasterServer服务启动时向Zookeeper注册临时节点，通过监听Zookeeper临时节点变化来进行容错处理。
+- MasterServer基于netty提供监听服务。
 
-  ##### 该服务内主要包含:
+核心服务说明:
+- **QuartzScheduler**：分布式调度组件，主要负责定时任务的启停操作，当quartz调起任务后，Master内部会有线程池具体负责处理任务的后续操作；
+- **MasterRegistryClient**：ZooKeeper客户端，封装了MasterServer与ZooKeeper相关的操作，例如注册、监听、删除、注销等；
+- **MasterConnectionStateListener**：监听MasterServer和ZooKeeper连接状态，一旦断连则触发MasterServer的自杀逻辑；
+- **MasterRegistryDataListener**：监听ZooKeeper的MasterServer临时节点事件，一旦发生节点移除事件，则先移除ZooKeeper上的临时节点，再触发MasterServer的故障转移（过程和`FailoverExecuteThread`一致）；
+- **MasterSchedulerBootstrap**：调度线程，每隔一段时间扫描`t_ds_command`表，按照分片策略批量取出Command，封装成工作流任务执行线程`WorkflowExecuteThread`，投放至缓冲队列中，等待下一个线程消费；
+- **TaskPluginManager**：任务插件管理器，启动时会将`TaskChannelFactory`的所有实现类持久化到`t_ds_plugin`表中；因此，如果开发者需要自定义任务插件，只需集成实现TaskChannelFactory即可；
+- **WorkflowExecuteRunnable**：主要是负责DAG任务切分、任务提交监控、各种不同事件类型的逻辑处理；
+- **TaskExecuteRunnable**：主要负责任务的处理和持久化，并生成任务事件提交到工作流的事件队列；
+- **EventExecuteService**：主要负责工作流实例的事件队列的轮询；
+- **StateWheelExecuteThread**：主要负责工作流和任务超时、任务重试、任务依赖的轮询，并生成对应的工作流或任务事件提交到工作流的事件队列；
+- **FailoverExecuteThread**：主要负责Master容错和Worker容错的相关逻辑；
+- **TaskPriorityQueueConsumer**：任务队列消费线程，根据负载均衡算法将任务分发至Worker；
+- **MasterRPCServer**：MasterServer RPC服务端，封装了Netty服务端创建等通用逻辑，并注册了各种消息处理器：
+- **CacheProcessor**：接收来自ApiServer的`CacheExpireCommand`请求，强制刷新缓存；
+- **LoggerRequestProcessor**：接收来自ApiServer的`GetLogBytesRequestCommand`、`ViewLogRequestCommand`、`RollViewLogRequestCommand`、`RemoveTaskLogRequestCommand`请求，操作日志；
+- **StateEventProcessor**：接收`StateEventChangeCommand`请求，处理工作流实例/任务实例的状态变更，包括工作流实例/任务实例的提交成功、运行中、成功、失败、超时、杀死、准备暂停、暂停、准备停止、停止、准备阻塞、阻塞、故障转移等；
+- **TaskEventProcessor**：接收`TaskEventChangeCommand`请求，处理任务实例的状态变更，包括：强制启动、唤醒；
+- **TaskKillResponseProcessor**：接收来自WorkerServer的`TaskKillResponseCommand`请求，请求内容是杀死任务实例请求的响应结果；
+- **TaskExecuteRunningProcessor**：接收来自WorkerServer的`TaskExecuteRunningCommand`请求，请求内容是任务实例的运行信息（工作流实例ID、任务实例ID、运行状态、执行机器信息、开始时间、程序运行目录、日志目录等）；
+- **TaskExecuteResponseProcessor**：接收来自WorkerServer的`TaskExecuteResultCommand`请求，请求内容是任务实例的运行结果信息（工作流实例ID、任务实例ID、开始时间、结束时间、运行状态、执行机器信息、程序运行目录、日志目录等）；
+- **WorkflowExecutingDataRequestProcessor**：接收来自ApiServer的`WorkflowExecutingDataRequestCommand`请求，向指定的WorkerServer查询执行中的工作流实例信息；
 
-  - **DistributedQuartz**分布式调度组件，主要负责定时任务的启停操作，当quartz调起任务后，Master内部会有线程池具体负责处理任务的后续操作；
+#### WorkerServer
 
-  - **MasterSchedulerService**是一个扫描线程，定时扫描数据库中的`t_ds_command`表，根据不同的命令类型进行不同的业务操作；
+职责说明：
+- WorkerServer也采用分布式无中心设计理念，WorkerServer主要负责任务的执行和提供日志服务。
+- WorkerServer服务启动时向Zookeeper注册临时节点，并维持心跳。
+- WorkerServer基于netty提供监听服务。
 
-  - **WorkflowExecuteRunnable**主要是负责DAG任务切分、任务提交监控、各种不同事件类型的逻辑处理；
+核心服务说明：
+- **WorkerManagerThread**：主要负责任务队列的提交，不断从任务队列中领取任务，提交到线程池处理；
+- **TaskExecuteThread**：主要负责任务执行的流程，根据不同的任务类型进行任务的实际处理；
+- **RetryReportTaskStatusThread**：主要负责定时轮询向Master汇报任务的状态，直到Master回复状态的ack，避免任务状态丢失；
 
-  - **TaskExecuteRunnable**主要负责任务的处理和持久化，并生成任务事件提交到工作流的事件队列；
+#### ZooKeeper
 
-  - **EventExecuteService**主要负责工作流实例的事件队列的轮询；
+ZooKeeper服务，系统中的MasterServer和WorkerServer节点都通过ZooKeeper来进行集群管理和容错。另外系统还基于ZooKeeper进行事件监听和分布式锁。
+我们也曾经基于Redis实现过队列，不过我们希望DolphinScheduler依赖到的组件尽量地少，所以最后还是去掉了Redis实现。
 
-  - **StateWheelExecuteThread**主要负责工作流和任务超时、任务重试、任务依赖的轮询，并生成对应的工作流或任务事件提交到工作流的事件队列；
+#### AlertServer
 
-  - **FailoverExecuteThread**主要负责Master容错和Worker容错的相关逻辑；
+提供告警服务，通过告警插件的方式实现丰富的告警手段。
 
-* **WorkerServer**
+#### ApiServer
 
-  WorkerServer也采用分布式无中心设计理念，WorkerServer主要负责任务的执行和提供日志服务。
-  WorkerServer服务启动时向Zookeeper注册临时节点，并维持心跳。
-  WorkerServer基于netty提供监听服务。
+API接口层，主要负责处理前端UI层的请求。该服务统一提供RESTful api向外部提供请求服务。
 
-  ##### 该服务包含：
+#### UI
 
-  - **WorkerManagerThread**主要负责任务队列的提交，不断从任务队列中领取任务，提交到线程池处理；
-
-  - **TaskExecuteThread**主要负责任务执行的流程，根据不同的任务类型进行任务的实际处理；
-
-  - **RetryReportTaskStatusThread**主要负责定时轮询向Master汇报任务的状态，直到Master回复状态的ack，避免任务状态丢失；
-
-* **ZooKeeper**
-
-  ZooKeeper服务，系统中的MasterServer和WorkerServer节点都通过ZooKeeper来进行集群管理和容错。另外系统还基于ZooKeeper进行事件监听和分布式锁。
-  我们也曾经基于Redis实现过队列，不过我们希望DolphinScheduler依赖到的组件尽量地少，所以最后还是去掉了Redis实现。
-
-* **AlertServer**
-
-  提供告警服务，通过告警插件的方式实现丰富的告警手段。
-
-* **ApiServer**
-
-  API接口层，主要负责处理前端UI层的请求。该服务统一提供RESTful api向外部提供请求服务。
-
-* **UI**
-
-  系统的前端页面，提供系统的各种可视化操作界面。
+系统的前端页面，提供系统的各种可视化操作界面。
 
 ### 架构设计思想
 
@@ -197,23 +203,23 @@
 ```xml
 <conversionRule conversionWord="message" converterClass="org.apache.dolphinscheduler.common.log.SensitiveDataConverter"/>
 <appender name="TASKLOGFILE" class="ch.qos.logback.classic.sift.SiftingAppender">
-    <filter class="org.apache.dolphinscheduler.plugin.task.api.log.TaskLogFilter"/>
-    <Discriminator class="org.apache.dolphinscheduler.plugin.task.api.log.TaskLogDiscriminator">
-        <key>taskAppId</key>
-        <logBase>${log.base}</logBase>
-    </Discriminator>
-    <sift>
-        <appender name="FILE-${taskAppId}" class="ch.qos.logback.core.FileAppender">
-            <file>${log.base}/${taskAppId}.log</file>
-            <encoder>
-                <pattern>
-                            [%level] %date{yyyy-MM-dd HH:mm:ss.SSS Z} [%thread] %logger{96}:[%line] - %message%n
-                </pattern>
-                <charset>UTF-8</charset>
-            </encoder>
-            <append>true</append>
-        </appender>
-    </sift>
+<filter class="org.apache.dolphinscheduler.plugin.task.api.log.TaskLogFilter"/>
+<Discriminator class="org.apache.dolphinscheduler.plugin.task.api.log.TaskLogDiscriminator">
+  <key>taskAppId</key>
+  <logBase>${log.base}</logBase>
+</Discriminator>
+<sift>
+  <appender name="FILE-${taskAppId}" class="ch.qos.logback.core.FileAppender">
+    <file>${log.base}/${taskAppId}.log</file>
+    <encoder>
+      <pattern>
+        [%level] %date{yyyy-MM-dd HH:mm:ss.SSS Z} [%thread] %logger{96}:[%line] - %message%n
+      </pattern>
+      <charset>UTF-8</charset>
+    </encoder>
+    <append>true</append>
+  </appender>
+</sift>
 </appender>
 ```
 
