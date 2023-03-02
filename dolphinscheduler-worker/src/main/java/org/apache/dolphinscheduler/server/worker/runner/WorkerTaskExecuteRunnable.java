@@ -44,6 +44,7 @@ import org.apache.dolphinscheduler.remote.command.alert.AlertSendRequestCommand;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
+import org.apache.dolphinscheduler.server.worker.log.TaskInstanceLogHeader;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcClient;
 import org.apache.dolphinscheduler.server.worker.utils.TaskExecutionCheckerUtils;
@@ -154,8 +155,8 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
 
             LogUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(),
                     taskExecutionContext.getTaskInstanceId());
-            log.info("Begin to pulling task");
 
+            log.info("\n{}", TaskInstanceLogHeader.INITIALIZE_TASK_CONTEXT_HEADER);
             initializeTask();
 
             if (DRY_RUN_FLAG_YES == taskExecutionContext.getDryRun()) {
@@ -169,12 +170,18 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
                 return;
             }
 
+            log.info("\n{}", TaskInstanceLogHeader.LOAD_TASK_INSTANCE_PLUGIN_HEADER);
             beforeExecute();
 
-            TaskCallBack taskCallBack = TaskCallbackImpl.builder().workerMessageSender(workerMessageSender)
-                    .masterAddress(masterAddress).build();
+            TaskCallBack taskCallBack = TaskCallbackImpl.builder()
+                    .workerMessageSender(workerMessageSender)
+                    .masterAddress(masterAddress)
+                    .build();
+
+            log.info("\n{}", TaskInstanceLogHeader.EXECUTE_TASK_HEADER);
             executeTask(taskCallBack);
 
+            log.info("\n{}", TaskInstanceLogHeader.FINALIZE_TASK_HEADER);
             afterExecute();
 
         } catch (Throwable ex) {
