@@ -41,7 +41,7 @@ public class RemoteLogService {
                 return;
             }
             remoteLogHandler.sendRemoteLog(logPath);
-            log.info("Succeed to send log {} to remote target {}", logPath,
+            log.info("End send log {} to remote target {}", logPath,
                     PropertyUtils.getString(Constants.REMOTE_LOGGING_TARGET));
         }
     }
