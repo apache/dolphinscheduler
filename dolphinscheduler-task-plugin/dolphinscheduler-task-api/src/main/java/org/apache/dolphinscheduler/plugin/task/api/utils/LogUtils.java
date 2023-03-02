@@ -49,7 +49,6 @@ import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
@@ -66,11 +65,11 @@ public class LogUtils {
 
     public List<String> getAppIds(@NonNull String logPath, @NonNull String appInfoPath, String fetchWay) {
         if (!StringUtils.isEmpty(fetchWay) && fetchWay.equals("aop")) {
-            log.info("Start finding appId in {}, fetch way: {} ", appInfoPath);
-            return getAppIdsFromAppInfoFile(appInfoPath, log);
+            log.info("Start finding appId in {}, fetch way: {} ", appInfoPath, fetchWay);
+            return getAppIdsFromAppInfoFile(appInfoPath);
         } else {
-            log.info("Start finding appId in {}, fetch way: {} ", logPath);
-            return getAppIdsFromLogFile(logPath, log);
+            log.info("Start finding appId in {}, fetch way: {} ", logPath, fetchWay);
+            return getAppIdsFromLogFile(logPath);
         }
     }
 
@@ -123,7 +122,7 @@ public class LogUtils {
                 processDefineCode, processDefineVersion, processInstId, taskId);
     }
 
-    public List<String> getAppIdsFromAppInfoFile(@NonNull String appInfoPath, Logger logger) {
+    public List<String> getAppIdsFromAppInfoFile(@NonNull String appInfoPath) {
         File appInfoFile = new File(appInfoPath);
         if (!appInfoFile.exists() || !appInfoFile.isFile()) {
             return Collections.emptyList();
@@ -133,12 +132,12 @@ public class LogUtils {
             stream.forEach(appIds::add);
             return new ArrayList<>(appIds);
         } catch (IOException e) {
-            logger.error("Get appId from appInfo file error, appInfoPath: {}", appInfoPath, e);
+            log.error("Get appId from appInfo file error, appInfoPath: {}", appInfoPath, e);
             return Collections.emptyList();
         }
     }
 
-    public List<String> getAppIdsFromLogFile(@NonNull String logPath, Logger logger) {
+    public List<String> getAppIdsFromLogFile(@NonNull String logPath) {
         File logFile = new File(logPath);
         if (!logFile.exists() || !logFile.isFile()) {
             return Collections.emptyList();
@@ -153,13 +152,13 @@ public class LogUtils {
                 if (matcher.find()) {
                     String appId = matcher.group();
                     if (appIds.add(appId)) {
-                        logger.info("Find appId: {} from {}", appId, logPath);
+                        log.info("Find appId: {} from {}", appId, logPath);
                     }
                 }
             });
             return new ArrayList<>(appIds);
         } catch (IOException e) {
-            logger.error("Get appId from log file error, logPath: {}", logPath, e);
+            log.error("Get appId from log file error, logPath: {}", logPath, e);
             return Collections.emptyList();
         }
     }

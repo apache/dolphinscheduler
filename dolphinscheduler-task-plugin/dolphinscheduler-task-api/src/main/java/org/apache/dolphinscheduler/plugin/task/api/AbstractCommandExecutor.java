@@ -40,8 +40,10 @@ import java.lang.reflect.Field;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
@@ -95,6 +97,8 @@ public abstract class AbstractCommandExecutor {
      * taskRequest
      */
     protected TaskExecutionContext taskRequest;
+
+    protected Future<?> taskOutputFuture;
 
     public AbstractCommandExecutor(Consumer<LinkedBlockingQueue<String>> logHandler,
                                    TaskExecutionContext taskRequest,
@@ -236,6 +240,15 @@ public abstract class AbstractCommandExecutor {
 
         // waiting for the run to finish
         boolean status = process.waitFor(remainTime, TimeUnit.SECONDS);
+
+        if (taskOutputFuture != null) {
+            try {
+                // Wait the task log process finished.
+                taskOutputFuture.get();
+            } catch (ExecutionException e) {
+                logger.info("Handle task log error", e);
+            }
+        }
 
         TaskExecutionStatus kubernetesStatus =
                 ProcessUtils.getApplicationStatus(taskRequest.getK8sTaskExecutionContext(), taskRequest.getTaskAppId());
@@ -400,7 +413,7 @@ public abstract class AbstractCommandExecutor {
         getOutputLogService.shutdown();
 
         ExecutorService parseProcessOutputExecutorService = newDaemonSingleThreadExecutor(threadLoggerInfoName);
-        parseProcessOutputExecutorService.submit(() -> {
+        taskOutputFuture = parseProcessOutputExecutorService.submit(() -> {
             try {
                 while (!logBuffer.isEmpty() || !logOutputIsSuccess) {
                     if (!logBuffer.isEmpty()) {

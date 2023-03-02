@@ -69,7 +69,6 @@ public class TaskCallbackImpl implements TaskCallBack {
             return;
         }
 
-        log.info("send remote taskExecutionContext info {}", taskExecutionContext);
         workerMessageSender.sendMessageWithRetry(taskExecutionContext, masterAddress, CommandType.TASK_UPDATE_PID);
     }
 
