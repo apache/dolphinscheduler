@@ -144,5 +144,7 @@ public enum CommandType {
     /**
      * workflow executing data response, from master to api
      */
-    WORKFLOW_EXECUTING_DATA_RESPONSE;
+    WORKFLOW_EXECUTING_DATA_RESPONSE,
+
+    WORKFLOW_METRICS_CLEANUP;
 }

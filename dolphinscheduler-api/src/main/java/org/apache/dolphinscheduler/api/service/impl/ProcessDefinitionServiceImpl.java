@@ -54,6 +54,7 @@ import org.apache.dolphinscheduler.api.dto.workflow.WorkflowFilterRequest;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowUpdateRequest;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.service.MetricsCleanUpService;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -251,6 +252,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
     @Autowired
     private WorkFlowLineageService workFlowLineageService;
+
+    @Autowired
+    private MetricsCleanUpService metricsCleanUpService;
 
     /**
      * create process definition
@@ -1033,6 +1037,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         for (ProcessDefinition process : processDefinitionList) {
             try {
                 this.deleteProcessDefinitionByCode(loginUser, process.getCode());
+                metricsCleanUpService.cleanUpWorkflowMetricsByDefinitionCode(String.valueOf(process.getCode()));
             } catch (Exception e) {
                 throw new ServiceException(Status.DELETE_PROCESS_DEFINE_ERROR, process.getName(), e.getMessage());
             }
@@ -1117,6 +1122,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         // we delete the workflow definition at last to avoid using transaction here.
         // If delete error, we can call this interface again.
         processDefinitionDao.deleteByWorkflowDefinitionCode(processDefinition.getCode());
+        metricsCleanUpService.cleanUpWorkflowMetricsByDefinitionCode(String.valueOf(code));
         log.info("Success delete workflow definition workflowDefinitionCode: {}", code);
     }
 
