@@ -62,9 +62,6 @@ public class WorkerServer implements IStoppable {
     @Autowired
     private WorkerManagerThread workerManagerThread;
 
-    /**
-     * worker registry
-     */
     @Autowired
     private WorkerRegistryClient workerRegistryClient;
 
@@ -141,9 +138,6 @@ public class WorkerServer implements IStoppable {
         close(cause);
     }
 
-    /**
-     * kill all tasks which are running
-     */
     public void killAllRunningTasks() {
         Collection<TaskExecutionContext> taskRequests = TaskExecutionContextCacheManager.getAllTaskRequestList();
         if (CollectionUtils.isEmpty(taskRequests)) {
