@@ -190,7 +190,7 @@ public class KubernetesApplicationManager implements ApplicationManager {
                 return logs;
             }
         } catch (Exception e) {
-            log.error("Collect pod log failed:", e.getMessage());
+            log.error("Collect pod log failed", e);
         }
         return "";
     }
