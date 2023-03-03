@@ -55,7 +55,7 @@ export function useCellUpdate(options: Options) {
    * @param {string} id
    * @param {string} flag
    */
-  function setNodeFlag(id: string, flag: string) {
+  function setNodeFlag(id: string, flag?: string) {
     const node = graph.value?.getCellById(id);
     if (node) {
       node.attr('rect/fill', flag === 'NO' ? '#f3f3f5' : '#ffffff');
