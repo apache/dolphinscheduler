@@ -47,7 +47,8 @@ export function useTaskEdit(options: Options) {
     getSources,
     getTargets,
     setNodeName,
-    setNodeEdge
+    setNodeEdge,
+    setNodeFlag
   } = useCellUpdate({
     graph
   })
@@ -167,7 +168,7 @@ export function useTaskEdit(options: Options) {
       processDefinition.value.taskDefinitionList.map((task) => {
         if (task.code === currTask.value?.code) {
           setNodeName(task.code + '', taskDef.name)
-
+          setNodeFlag(task.code + '', taskDef.flag);
           setNodeEdge(String(task.code), data.preTasks)
           updatePreTasks(data.preTasks, task.code)
           return {
