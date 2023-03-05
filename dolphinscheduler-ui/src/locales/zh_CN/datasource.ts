@@ -56,6 +56,8 @@ export default {
   oracle_connect_type_tips: '请选择服务名或SID',
   oracle_service_name: '服务名',
   oracle_sid: 'SID',
+  compatible_mode: '兼容模式',
+  compatible_mode_tips: '请输入兼容模式',
   jdbc_connect_parameters: 'jdbc连接参数',
   principal_tips: '请输入Principal',
   krb5_conf_tips: '请输入kerberos认证参数 java.security.krb5.conf',

@@ -31,6 +31,7 @@ type IDataBase =
   | 'AZURESQL'
   | 'STARROCKS'
   | 'DAMENG'
+  | 'OCEANBASE'
 
 type IDataBaseLabel =
 | 'MYSQL'
@@ -48,6 +49,7 @@ type IDataBaseLabel =
 | 'AZURESQL'
 | 'STARROCKS'
 | 'DAMENG'
+| 'OCEANBASE'
 
 interface IDataSource {
   id?: number
@@ -73,6 +75,7 @@ interface IDataSource {
   endpoint?: string
   MSIClientId?: string
   dbUser?: string
+  compatibleMode?: string
 }
 
 interface ListReq {
