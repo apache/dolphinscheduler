@@ -102,7 +102,7 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
             // set cache, it will be used when kill task
             TaskExecutionContextCacheManager.cacheTaskExecutionContext(taskExecutionContext);
             taskExecutionContext.setHost(workerConfig.getWorkerAddress());
-            taskExecutionContext.setLogPath(LogUtils.getTaskLogPath(taskExecutionContext));
+            taskExecutionContext.setLogPath(LogUtils.getTaskInstanceLogFullPath(taskExecutionContext));
 
             // delay task process
             long remainTime =

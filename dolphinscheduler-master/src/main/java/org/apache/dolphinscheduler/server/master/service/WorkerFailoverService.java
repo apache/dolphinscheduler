@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.server.master.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
@@ -38,7 +39,6 @@ import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPoo
 import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactory;
 import org.apache.dolphinscheduler.service.log.LogClient;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 import org.apache.dolphinscheduler.service.utils.ProcessUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -119,7 +119,7 @@ public class WorkerFailoverService {
                 needFailoverTaskInstanceList.stream().map(TaskInstance::getId).collect(Collectors.toList()));
         final Map<Integer, ProcessInstance> processInstanceCacheMap = new HashMap<>();
         for (TaskInstance taskInstance : needFailoverTaskInstanceList) {
-            LoggerUtils.setWorkflowAndTaskInstanceIDMDC(taskInstance.getProcessInstanceId(), taskInstance.getId());
+            LogUtils.setWorkflowAndTaskInstanceIDMDC(taskInstance.getProcessInstanceId(), taskInstance.getId());
             try {
                 ProcessInstance processInstance = processInstanceCacheMap.computeIfAbsent(
                         taskInstance.getProcessInstanceId(), k -> {
@@ -142,7 +142,7 @@ public class WorkerFailoverService {
             } catch (Exception ex) {
                 log.info("Worker[{}] failover taskInstance occur exception", workerHost, ex);
             } finally {
-                LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
+                LogUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
         }
         failoverTimeCost.stop();

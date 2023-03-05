@@ -60,9 +60,19 @@ import ch.qos.logback.core.spi.AppenderAttachable;
 @UtilityClass
 public class LogUtils {
 
-    private static final String LOG_TAILFIX = ".log";
+    private static final Path TASK_INSTANCE_LOG_BASE_PATH = getTaskInstanceLogBasePath();
+    public static final String TASK_INSTANCE_LOG_FULL_PATH_MDC_KEY = "taskInstanceLogFullPath";
+
     private static final Pattern APPLICATION_REGEX = Pattern.compile(TaskConstants.YARN_APPLICATION_REGEX);
 
+    /**
+     * Get application_id from log file.
+     *
+     * @param logPath     log file path
+     * @param appInfoPath appInfo file path
+     * @param fetchWay    fetch way
+     * @return application id list.
+     */
     public List<String> getAppIds(@NonNull String logPath, @NonNull String appInfoPath, String fetchWay) {
         if (!StringUtils.isEmpty(fetchWay) && fetchWay.equals("aop")) {
             log.info("Start finding appId in {}, fetch way: {} ", appInfoPath, fetchWay);
@@ -73,53 +83,65 @@ public class LogUtils {
         }
     }
 
-    public static String getTaskLogPath(TaskExecutionContext taskExecutionContext) {
-        return getTaskLogPath(DateUtils.timeStampToDate(taskExecutionContext.getFirstSubmitTime()),
+    /**
+     * Get task instance log full path.
+     *
+     * @param taskExecutionContext task execution context.
+     * @return task instance log full path.
+     */
+    public static String getTaskInstanceLogFullPath(TaskExecutionContext taskExecutionContext) {
+        return getTaskInstanceLogFullPath(
+                DateUtils.timeStampToDate(taskExecutionContext.getFirstSubmitTime()),
                 taskExecutionContext.getProcessDefineCode(),
                 taskExecutionContext.getProcessDefineVersion(),
                 taskExecutionContext.getProcessInstanceId(),
                 taskExecutionContext.getTaskInstanceId());
     }
 
-    public static String getTaskLogPath(Date firstSubmitTime,
-                                        Long processDefineCode,
-                                        int processDefineVersion,
-                                        int processInstanceId,
-                                        int taskInstanceId) {
-        // format /logs/YYYYMMDD/defintion-code_defintion_version-processInstanceId-taskInstanceId.log
-        final String taskLogFileName = new StringBuilder(String.valueOf(processDefineCode))
-                .append(Constants.UNDERLINE)
-                .append(processDefineVersion)
-                .append(Constants.SUBTRACT_CHAR)
-                .append(processInstanceId)
-                .append(Constants.SUBTRACT_CHAR)
-                .append(taskInstanceId)
-                .append(LOG_TAILFIX)
+    /**
+     * todo: Remove the submitTime parameter?
+     * The task instance log full path, the path is like:{log.base}/{taskSubmitTime}/{workflowDefinitionCode}/{workflowDefinitionVersion}/{}workflowInstance}/{taskInstance}.log
+     *
+     * @param taskFirstSubmitTime       task first submit time
+     * @param workflowDefinitionCode    workflow definition code
+     * @param workflowDefinitionVersion workflow definition version
+     * @param workflowInstanceId        workflow instance id
+     * @param taskInstanceId            task instance id.
+     * @return task instance log full path.
+     */
+    public static String getTaskInstanceLogFullPath(Date taskFirstSubmitTime,
+                                                    Long workflowDefinitionCode,
+                                                    int workflowDefinitionVersion,
+                                                    int workflowInstanceId,
+                                                    int taskInstanceId) {
+        if (TASK_INSTANCE_LOG_BASE_PATH == null) {
+            throw new IllegalArgumentException(
+                    "Cannot find the task instance log base path, please check your logback.xml file");
+        }
+        final String taskLogFileName = Paths.get(
+                String.valueOf(workflowDefinitionCode),
+                String.valueOf(workflowDefinitionVersion),
+                String.valueOf(workflowInstanceId),
+                String.format("%s.log", taskInstanceId)).toString();
+        return TASK_INSTANCE_LOG_BASE_PATH
+                .resolve(DateUtils.format(taskFirstSubmitTime, DateConstants.YYYYMMDD, null))
+                .resolve(taskLogFileName)
                 .toString();
-        // Optional.map will be skipped if null
+    }
+
+    /**
+     * Get task instance log base absolute path, this is defined in logback.xml
+     *
+     * @return
+     */
+    public static Path getTaskInstanceLogBasePath() {
         return Optional.of(LoggerFactory.getILoggerFactory())
                 .map(e -> (AppenderAttachable<ILoggingEvent>) (e.getLogger("ROOT")))
                 .map(e -> (SiftingAppender) (e.getAppender("TASKLOGFILE")))
                 .map(e -> ((TaskLogDiscriminator) (e.getDiscriminator())))
                 .map(TaskLogDiscriminator::getLogBase)
-                .map(e -> Paths.get(e)
-                        .toAbsolutePath()
-                        .resolve(DateUtils.format(firstSubmitTime, DateConstants.YYYYMMDD, null))
-                        .resolve(taskLogFileName))
-                .map(Path::toString)
-                .orElse("");
-    }
-
-    public static String buildTaskId(Date firstSubmitTime,
-                                     Long processDefineCode,
-                                     int processDefineVersion,
-                                     int processInstId,
-                                     int taskId) {
-        // like TaskAppId=TASK-20211107-798_1-4084-15210
-        String firstSubmitTimeStr = DateUtils.format(firstSubmitTime, DateConstants.YYYYMMDD, null);
-        return String.format("%s=%s-%s-%s_%s-%s-%s",
-                TaskConstants.TASK_APPID_LOG_FORMAT, TaskConstants.TASK_LOGGER_INFO_PREFIX, firstSubmitTimeStr,
-                processDefineCode, processDefineVersion, processInstId, taskId);
+                .map(e -> Paths.get(e).toAbsolutePath())
+                .orElse(null);
     }
 
     public List<String> getAppIdsFromAppInfoFile(@NonNull String appInfoPath) {
@@ -175,6 +197,18 @@ public class LogUtils {
             log.error("read file error", e);
         }
         return "";
+    }
+
+    public static String getTaskInstanceLogFullPathMdc() {
+        return MDC.get(TASK_INSTANCE_LOG_FULL_PATH_MDC_KEY);
+    }
+
+    public static void setTaskInstanceLogFullPathMDC(String taskInstanceLogFullPath) {
+        MDC.put(TASK_INSTANCE_LOG_FULL_PATH_MDC_KEY, taskInstanceLogFullPath);
+    }
+
+    public static void removeTaskInstanceLogFullPathMDC() {
+        MDC.remove(TASK_INSTANCE_LOG_FULL_PATH_MDC_KEY);
     }
 
     public static void setWorkflowAndTaskInstanceIDMDC(Integer workflowInstanceId, Integer taskInstanceId) {

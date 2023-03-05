@@ -18,13 +18,13 @@
 package org.apache.dolphinscheduler.server.master.processor;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteResultCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
-import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -62,13 +62,13 @@ public class TaskExecuteResponseProcessor implements NettyRequestProcessor {
                 channel,
                 taskExecuteResultMessage.getMessageSenderAddress());
         try {
-            LoggerUtils.setWorkflowAndTaskInstanceIDMDC(taskResultEvent.getProcessInstanceId(),
+            LogUtils.setWorkflowAndTaskInstanceIDMDC(taskResultEvent.getProcessInstanceId(),
                     taskResultEvent.getTaskInstanceId());
             log.info("Received task execute result, event: {}", taskResultEvent);
 
             taskEventService.addEvent(taskResultEvent);
         } finally {
-            LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
+            LogUtils.removeWorkflowAndTaskInstanceIdMDC();
         }
     }
 }

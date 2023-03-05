@@ -53,7 +53,6 @@ import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.DataQualityTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -71,6 +70,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourc
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.UdfFuncParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.JdbcUrlParser;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.plugin.task.spark.SparkParameters;
 import org.apache.dolphinscheduler.server.master.builder.TaskExecutionContextBuilder;
@@ -78,7 +78,6 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.dolphinscheduler.spi.plugin.SPIIdentify;
@@ -91,6 +90,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 
 import lombok.NonNull;
@@ -103,7 +103,7 @@ import com.zaxxer.hikari.HikariDataSource;
 public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     protected final Logger log =
-            LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
+            LoggerFactory.getLogger(BaseTaskProcessor.class);
 
     protected boolean killed = false;
 
@@ -190,9 +190,9 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     @Override
     public boolean action(TaskAction taskAction) {
-        String threadName = Thread.currentThread().getName();
+        String oldTaskInstanceLogPathMdc = Optional.ofNullable(LogUtils.getTaskInstanceLogFullPathMdc()).orElse(null);
         if (StringUtils.isNotEmpty(threadLoggerInfoName)) {
-            Thread.currentThread().setName(threadLoggerInfoName);
+            LogUtils.setTaskInstanceLogFullPathMDC(threadLoggerInfoName);
         }
         boolean result = false;
         try {
@@ -223,9 +223,11 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
             }
             return result;
         } finally {
-            // reset thread name
-            Thread.currentThread().setName(threadName);
-
+            LogUtils.removeTaskInstanceLogFullPathMDC();
+            // reset MDC value, this should be removed.
+            if (oldTaskInstanceLogPathMdc != null) {
+                LogUtils.setTaskInstanceLogFullPathMDC(oldTaskInstanceLogPathMdc);
+            }
         }
     }
 
@@ -288,12 +290,13 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
      * set master task running log.
      */
     public void setTaskExecutionLogger() {
-        threadLoggerInfoName = LoggerUtils.buildTaskId(taskInstance.getFirstSubmitTime(),
+        threadLoggerInfoName = LogUtils.getTaskInstanceLogFullPath(
+                taskInstance.getFirstSubmitTime(),
                 processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion(),
                 taskInstance.getProcessInstanceId(),
                 taskInstance.getId());
-        Thread.currentThread().setName(threadLoggerInfoName);
+        LogUtils.setTaskInstanceLogFullPathMDC(threadLoggerInfoName);
     }
 
     /**
