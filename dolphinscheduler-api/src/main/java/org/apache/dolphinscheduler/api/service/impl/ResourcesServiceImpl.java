@@ -886,7 +886,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 List<User> userList = userMapper.selectList(null);
                 Set<String> visitedTenantEntityCode = new HashSet<>();
                 for (User userEntity : userList) {
-                    Tenant tt = tenantMapper.queryById(userEntity.getTenantId());
                     String tenantEntityCode = tenantMapper.queryById(userEntity.getTenantId()).getTenantCode();
                     if (!visitedTenantEntityCode.contains(tenantEntityCode)) {
                         defaultPath = storageOperate.getResDir(tenantEntityCode);
