@@ -24,6 +24,8 @@ import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
+import org.apache.commons.collections4.CollectionUtils;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -174,25 +176,21 @@ public class KubernetesApplicationManager implements ApplicationManager {
      * @return
      */
     public String collectPodLog(KubernetesApplicationManagerContext kubernetesApplicationManagerContext) {
-        try {
-            KubernetesClient client = getClient(kubernetesApplicationManagerContext);
-            FilterWatchListDeletable<Pod, PodList> watchList = getDriverPod(kubernetesApplicationManagerContext);
-            List<Pod> driverPod = watchList.list().getItems();
-            if (!driverPod.isEmpty()) {
-                Pod driver = driverPod.get(0);
-                String driverPodName = driver.getMetadata().getName();
-                String logs = client.pods()
-                        .inNamespace(kubernetesApplicationManagerContext.getK8sTaskExecutionContext().getNamespace())
-                        .withName(driverPodName).getLog();
-
-                // delete driver pod only after successful execution
-                killApplication(kubernetesApplicationManagerContext);
-                return logs;
-            }
-        } catch (Exception e) {
-            log.error("Collect pod log failed", e);
+        KubernetesClient client = getClient(kubernetesApplicationManagerContext);
+        FilterWatchListDeletable<Pod, PodList> watchList = getDriverPod(kubernetesApplicationManagerContext);
+        List<Pod> driverPod = watchList.list().getItems();
+        if (CollectionUtils.isEmpty(driverPod)) {
+            return "The driver pod does not exist.";
         }
-        return "";
+        Pod driver = driverPod.get(0);
+        String driverPodName = driver.getMetadata().getName();
+        String logs = client.pods()
+                .inNamespace(kubernetesApplicationManagerContext.getK8sTaskExecutionContext().getNamespace())
+                .withName(driverPodName).getLog();
+
+        // delete driver pod only after successful execution
+        killApplication(kubernetesApplicationManagerContext);
+        return logs;
     }
 
 }

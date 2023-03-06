@@ -26,9 +26,7 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.amazonaws.services.sagemaker.AmazonSageMaker;
 import com.amazonaws.services.sagemaker.model.DescribePipelineExecutionRequest;
@@ -41,10 +39,9 @@ import com.amazonaws.services.sagemaker.model.StartPipelineExecutionResult;
 import com.amazonaws.services.sagemaker.model.StopPipelineExecutionRequest;
 import com.amazonaws.services.sagemaker.model.StopPipelineExecutionResult;
 
+@Slf4j
 public class PipelineUtils {
 
-    protected final Logger log =
-            LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
     private static final String EXECUTING = "Executing";
     private static final String SUCCEEDED = "Succeeded";
 

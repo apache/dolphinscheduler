@@ -93,7 +93,6 @@ import org.apache.dolphinscheduler.service.process.ProcessDag;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.queue.PeerTaskInstancePriorityQueue;
 import org.apache.dolphinscheduler.service.utils.DagHelper;
-import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -297,12 +296,13 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         int loopTimes = stateEvents.size() * 2;
         for (int i = 0; i < loopTimes; i++) {
             final StateEvent stateEvent = this.stateEvents.peek();
-            try {
-                if (stateEvent == null) {
-                    return;
-                }
-                LoggerUtils.setWorkflowAndTaskInstanceIDMDC(stateEvent.getProcessInstanceId(),
-                        stateEvent.getTaskInstanceId());
+            if (stateEvent == null) {
+                return;
+            }
+            try (
+                    final LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
+                            LogUtils.setWorkflowAndTaskInstanceIDMDC(stateEvent.getProcessInstanceId(),
+                                    stateEvent.getTaskInstanceId())) {
                 // if state handle success then will remove this state, otherwise will retry this state next time.
                 // The state should always handle success except database error.
                 checkProcessInstance(stateEvent);
@@ -338,8 +338,6 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                         stateEvent,
                         e);
                 ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
-            } finally {
-                LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
         }
     }
@@ -725,7 +723,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         }
 
         try {
-            LoggerUtils.setWorkflowInstanceIdMDC(processInstance.getId());
+            LogUtils.setWorkflowInstanceIdMDC(processInstance.getId());
             if (workflowRunnableStatus == WorkflowRunnableStatus.CREATED) {
                 buildFlowDag();
                 workflowRunnableStatus = WorkflowRunnableStatus.INITIALIZE_DAG;
@@ -746,7 +744,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             log.error("Start workflow error", e);
             return WorkflowSubmitStatue.FAILED;
         } finally {
-            LoggerUtils.removeWorkflowInstanceIdMDC();
+            LogUtils.removeWorkflowInstanceIdMDC();
         }
     }
 
@@ -862,8 +860,9 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                     taskInstanceDao.findValidTaskListByProcessId(processInstance.getId(),
                             processInstance.getTestFlag());
             for (TaskInstance task : validTaskInstanceList) {
-                try {
-                    LoggerUtils.setWorkflowAndTaskInstanceIDMDC(task.getProcessInstanceId(), task.getId());
+                try (
+                        final LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
+                                LogUtils.setWorkflowAndTaskInstanceIDMDC(task.getProcessInstanceId(), task.getId());) {
                     log.info(
                             "Check the taskInstance from a exist workflowInstance, existTaskInstanceCode: {}, taskInstanceStatus: {}",
                             task.getTaskCode(),
@@ -911,8 +910,6 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                     if (task.getState().isFailure()) {
                         errorTaskMap.put(task.getTaskCode(), task.getId());
                     }
-                } finally {
-                    LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
                 }
             }
             clearDataIfExecuteTask();
@@ -993,7 +990,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             }
 
             // in a dag, only one taskInstance is valid per taskCode, so need to set the old taskInstance invalid
-            LoggerUtils.setWorkflowAndTaskInstanceIDMDC(taskInstance.getProcessInstanceId(), taskInstance.getId());
+            LogUtils.setWorkflowAndTaskInstanceIDMDC(taskInstance.getProcessInstanceId(), taskInstance.getId());
             if (validTaskMap.containsKey(taskInstance.getTaskCode())) {
                 int oldTaskInstanceId = validTaskMap.get(taskInstance.getTaskCode());
                 if (taskInstance.getId() != oldTaskInstanceId) {
@@ -1063,7 +1060,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                     taskInstance.getTaskCode(), e);
             return Optional.empty();
         } finally {
-            LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
+            LogUtils.removeWorkflowAndTaskInstanceIdMDC();
         }
     }
 
@@ -1830,8 +1827,9 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             if (taskInstanceId == null || taskInstanceId.equals(0)) {
                 continue;
             }
-            LogUtils.setWorkflowAndTaskInstanceIDMDC(processInstance.getId(), taskInstanceId);
-            try {
+            try (
+                    final LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
+                            LogUtils.setWorkflowAndTaskInstanceIDMDC(processInstance.getId(), taskInstanceId)) {
                 TaskInstance taskInstance = taskInstanceDao.findTaskInstanceById(taskInstanceId);
                 if (taskInstance == null || taskInstance.getState().isFinished()) {
                     continue;
@@ -1846,8 +1844,6 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                             .build();
                     this.addStateEvent(taskStateEvent);
                 }
-            } finally {
-                LogUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
         }
     }
