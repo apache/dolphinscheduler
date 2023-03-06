@@ -21,7 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
 import org.apache.dolphinscheduler.plugin.datasource.api.provider.JDBCDataSourceProvider;
-import org.apache.dolphinscheduler.plugin.datasource.kyuubi.security.*;
+import org.apache.dolphinscheduler.plugin.datasource.kyuubi.security.UserGroupInformationFactory;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.hadoop.conf.Configuration;
