@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.kyuubi.param;
 
-import com.google.auto.service.AutoService;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -31,6 +29,8 @@ import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
+import org.apache.commons.collections4.MapUtils;
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -38,6 +38,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import com.google.auto.service.AutoService;
 
 @AutoService(DataSourceProcessor.class)
 public class KyuubiDataSourceProcessor extends AbstractDataSourceProcessor {
@@ -120,7 +122,6 @@ public class KyuubiDataSourceProcessor extends AbstractDataSourceProcessor {
     public String getJdbcUrl(ConnectionParam connectionParam) {
         KyuubiConnectionParam kyuubiConnectionParam = (KyuubiConnectionParam) connectionParam;
         String jdbcUrl = kyuubiConnectionParam.getJdbcUrl();
-
 
         if (MapUtils.isNotEmpty(kyuubiConnectionParam.getOther())) {
             return jdbcUrl + "?" + transformOther(kyuubiConnectionParam.getOther());

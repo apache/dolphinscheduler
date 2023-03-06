@@ -17,12 +17,14 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.kyuubi.security;
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+import static org.apache.dolphinscheduler.common.constants.Constants.JAVA_SECURITY_KRB5_CONF;
+
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
 
@@ -32,7 +34,7 @@ import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static org.apache.dolphinscheduler.common.constants.Constants.JAVA_SECURITY_KRB5_CONF;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class UserGroupInformationFactory {
