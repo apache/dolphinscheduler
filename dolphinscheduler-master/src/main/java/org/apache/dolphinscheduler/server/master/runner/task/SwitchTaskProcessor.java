@@ -20,15 +20,14 @@ package org.apache.dolphinscheduler.server.master.runner.task;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SWITCH;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.SwitchResultVo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.master.utils.SwitchTaskUtils;
-import org.apache.dolphinscheduler.service.utils.LogUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -73,11 +72,12 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
     public boolean runTask() {
         log.info("switch task starting");
         taskInstance.setLogPath(
-                LogUtils.getTaskLogPath(taskInstance.getFirstSubmitTime(), processInstance.getProcessDefinitionCode(),
+                LogUtils.getTaskInstanceLogFullPath(taskInstance.getFirstSubmitTime(),
+                        processInstance.getProcessDefinitionCode(),
                         processInstance.getProcessDefinitionVersion(),
                         taskInstance.getProcessInstanceId(),
                         taskInstance.getId()));
-        taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
+        taskInstance.setHost(masterConfig.getMasterAddress());
         taskInstance.setState(TaskExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());
         taskInstanceDao.updateTaskInstance(taskInstance);

@@ -42,6 +42,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.remote.command.TaskDispatchCommand;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningAckMessage;
 import org.apache.dolphinscheduler.remote.command.TaskExecuteStartCommand;
@@ -58,7 +59,6 @@ import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -221,7 +221,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
         while (!this.taskEvents.isEmpty()) {
             try {
                 taskEvent = this.taskEvents.peek();
-                LoggerUtils.setTaskInstanceIdMDC(taskEvent.getTaskInstanceId());
+                LogUtils.setTaskInstanceIdMDC(taskEvent.getTaskInstanceId());
 
                 log.info("Begin to handle state event, {}", taskEvent);
                 if (this.handleTaskEvent(taskEvent)) {
@@ -244,7 +244,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
                         e);
                 ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
             } finally {
-                LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
+                LogUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
         }
     }

@@ -64,7 +64,7 @@ import com.amazonaws.services.databasemigrationservice.model.TestConnectionReque
 public class DmsHook {
 
     protected final Logger log =
-            LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
+            LoggerFactory.getLogger(DmsHook.class);
     private AWSDatabaseMigrationService client;
     private String replicationTaskIdentifier;
     private String sourceEndpointArn;

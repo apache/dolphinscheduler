@@ -39,7 +39,6 @@ import org.apache.dolphinscheduler.remote.command.log.ViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.factory.NettyRemotingClientFactory;
 import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 
 import java.util.List;
 
@@ -115,7 +114,7 @@ public class LogClient implements AutoCloseable {
         final Host address = new Host(host, port);
         try {
             if (NetUtils.getHost().equals(host)) {
-                return LoggerUtils.readWholeFileContent(request.getPath());
+                return LogUtils.readWholeFileContentFromLocal(request.getPath());
             } else {
                 Command command = request.convert2Command();
                 Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);

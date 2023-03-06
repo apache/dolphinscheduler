@@ -47,7 +47,7 @@ public class DatafactoryHook {
     public static DatafactoryStatus[] taskFinishFlags =
             {DatafactoryStatus.Failed, DatafactoryStatus.Succeeded, DatafactoryStatus.Cancelled};
     protected final Logger log =
-            LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
+            LoggerFactory.getLogger(DatafactoryHook.class);
     private final int QUERY_INTERVAL = PropertyUtils.getInt(TaskConstants.QUERY_INTERVAL, 10000);
     private DataFactoryManager client;
     private static AzureProfile profile;

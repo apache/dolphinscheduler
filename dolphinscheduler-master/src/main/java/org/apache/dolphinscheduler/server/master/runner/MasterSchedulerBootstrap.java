@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
@@ -43,7 +44,6 @@ import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -180,7 +180,7 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
 
                 processInstances.forEach(processInstance -> {
                     try {
-                        LoggerUtils.setWorkflowInstanceIdMDC(processInstance.getId());
+                        LogUtils.setWorkflowInstanceIdMDC(processInstance.getId());
                         if (processInstanceExecCacheManager.contains(processInstance.getId())) {
                             log.error(
                                     "The workflow instance is already been cached, this case shouldn't be happened");
@@ -200,7 +200,7 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
                         workflowEventQueue.addEvent(new WorkflowEvent(WorkflowEventType.START_WORKFLOW,
                                 processInstance.getId()));
                     } finally {
-                        LoggerUtils.removeWorkflowInstanceIdMDC();
+                        LogUtils.removeWorkflowInstanceIdMDC();
                     }
                 });
             } catch (InterruptedException interruptedException) {

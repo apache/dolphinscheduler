@@ -45,7 +45,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -206,11 +205,11 @@ public class LoggerRequestProcessor implements NettyRequestProcessor {
                 return stream.skip(skipLine).limit(limit).collect(Collectors.toList());
             } catch (IOException e) {
                 log.error("read file error", e);
+                throw new RuntimeException(String.format("Read file: %s error", filePath), e);
             }
         } else {
-            log.info("file path: {} not exists", filePath);
+            throw new RuntimeException("The file path: " + filePath + " not exists");
         }
-        return Collections.emptyList();
     }
 
     private List<String> readPartFileContentFromRemote(String filePath,

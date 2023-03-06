@@ -17,19 +17,18 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
+import static ch.qos.logback.classic.ClassicConstants.FINALIZE_SESSION_MARKER;
 import static org.apache.dolphinscheduler.common.constants.Constants.DRY_RUN_FLAG_YES;
 import static org.apache.dolphinscheduler.common.constants.Constants.SINGLE_SLASH;
 
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.log.remote.RemoteLogUtils;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
@@ -65,8 +64,7 @@ import com.google.common.base.Strings;
 
 public abstract class WorkerTaskExecuteRunnable implements Runnable {
 
-    protected final Logger log = LoggerFactory
-            .getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, WorkerTaskExecuteRunnable.class));
+    protected static final Logger log = LoggerFactory.getLogger(WorkerTaskExecuteRunnable.class);
 
     protected final TaskExecutionContext taskExecutionContext;
     protected final WorkerConfig workerConfig;
@@ -93,14 +91,6 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         this.workerRpcClient = workerRpcClient;
         this.taskPluginManager = taskPluginManager;
         this.storageOperate = storageOperate;
-        String taskLogName =
-                LogUtils.buildTaskId(DateUtils.timeStampToDate(taskExecutionContext.getFirstSubmitTime()),
-                        taskExecutionContext.getProcessDefineCode(),
-                        taskExecutionContext.getProcessDefineVersion(),
-                        taskExecutionContext.getProcessInstanceId(),
-                        taskExecutionContext.getTaskInstanceId());
-        taskExecutionContext.setTaskLogName(taskLogName);
-        log.info("Set task log name: {}", taskLogName);
     }
 
     protected abstract void executeTask(TaskCallBack taskCallBack);
@@ -117,7 +107,6 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         log.info("Remove the current task execute context from worker cache");
         clearTaskExecPathIfNeeded();
 
-        sendTaskLogOnWorkerToRemoteIfNeeded();
     }
 
     protected void afterThrowing(Throwable throwable) throws TaskException {
@@ -130,7 +119,6 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
                 "Get a exception when execute the task, will send the task execute result to master, the current task execute result is {}",
                 TaskExecutionStatus.FAILURE);
 
-        sendTaskLogOnWorkerToRemoteIfNeeded();
     }
 
     public void cancelTask() {
@@ -149,13 +137,11 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
 
     @Override
     public void run() {
-        try {
-            // set the thread name to make sure the log be written to the task log file
-            Thread.currentThread().setName(taskExecutionContext.getTaskLogName());
-
-            LogUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(),
-                    taskExecutionContext.getTaskInstanceId());
-
+        try (
+                final LogUtils.MDCAutoClosableContext mdcAutoClosableContext = LogUtils.setWorkflowAndTaskInstanceIDMDC(
+                        taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId());
+                final LogUtils.MDCAutoClosableContext mdcAutoClosableContext1 =
+                        LogUtils.setTaskInstanceLogFullPathMDC(taskExecutionContext.getLogPath())) {
             log.info("\n{}", TaskInstanceLogHeader.INITIALIZE_TASK_CONTEXT_HEADER);
             initializeTask();
 
@@ -183,12 +169,11 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
 
             log.info("\n{}", TaskInstanceLogHeader.FINALIZE_TASK_HEADER);
             afterExecute();
-
+            closeLogAppender();
         } catch (Throwable ex) {
             log.error("Task execute failed, due to meet an exception", ex);
             afterThrowing(ex);
-        } finally {
-            LogUtils.removeWorkflowAndTaskInstanceIdMDC();
+            closeLogAppender();
         }
     }
 
@@ -279,18 +264,6 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
                 taskExecutionContext.getCurrentExecutionStatus());
     }
 
-    protected void sendTaskLogOnWorkerToRemoteIfNeeded() {
-        if (taskExecutionContext.isLogBufferEnable()) {
-            return;
-        }
-
-        if (RemoteLogUtils.isRemoteLoggingEnable()) {
-            RemoteLogUtils.sendRemoteLog(taskExecutionContext.getLogPath());
-            log.info("Worker sends task log {} to remote storage asynchronously.",
-                    taskExecutionContext.getLogPath());
-        }
-    }
-
     protected void clearTaskExecPathIfNeeded() {
         String execLocalPath = taskExecutionContext.getExecutePath();
         if (!CommonUtils.isDevelopMode()) {
@@ -322,6 +295,30 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         } else {
             log.info("The current execute mode is develop mode, will not clear the task execute file: {}",
                     execLocalPath);
+        }
+    }
+
+    protected void writePodLodIfNeeded() {
+        if (null == taskExecutionContext.getK8sTaskExecutionContext()) {
+            return;
+        }
+        log.info("The current task is k8s task, begin to write pod log");
+        ProcessUtils.getPodLog(taskExecutionContext.getK8sTaskExecutionContext(), taskExecutionContext.getTaskAppId());
+    }
+
+    protected void closeLogAppender() {
+        try {
+            writePodLodIfNeeded();
+            if (RemoteLogUtils.isRemoteLoggingEnable()) {
+                RemoteLogUtils.sendRemoteLog(taskExecutionContext.getLogPath());
+                log.info("Log handler sends task log {} to remote storage asynchronously.",
+                        taskExecutionContext.getLogPath());
+            }
+        } catch (Exception ex) {
+            log.error("Write k8s pod log failed", ex);
+        } finally {
+            log.info(FINALIZE_SESSION_MARKER, FINALIZE_SESSION_MARKER.toString());
+
         }
     }
 

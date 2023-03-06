@@ -21,13 +21,13 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEvent;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEventHandleError;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEventHandleException;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEventHandler;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEventQueue;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEventType;
-import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -75,7 +75,7 @@ public class WorkflowEventLooper extends BaseDaemonThread {
         while (!ServerLifeCycleManager.isStopped()) {
             try {
                 workflowEvent = workflowEventQueue.poolEvent();
-                LoggerUtils.setWorkflowInstanceIdMDC(workflowEvent.getWorkflowInstanceId());
+                LogUtils.setWorkflowInstanceIdMDC(workflowEvent.getWorkflowInstanceId());
                 log.info("Workflow event looper receive a workflow event: {}, will handle this", workflowEvent);
                 WorkflowEventHandler workflowEventHandler =
                         workflowEventHandlerMap.get(workflowEvent.getWorkflowEventType());
@@ -100,7 +100,7 @@ public class WorkflowEventLooper extends BaseDaemonThread {
                 workflowEventQueue.addEvent(workflowEvent);
                 ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
             } finally {
-                LoggerUtils.removeWorkflowInstanceIdMDC();
+                LogUtils.removeWorkflowInstanceIdMDC();
             }
         }
     }

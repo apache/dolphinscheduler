@@ -30,18 +30,13 @@ import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-import org.slf4j.MarkerFactory;
 
 /**
  * executive task
  */
 public abstract class AbstractTask {
 
-    public static final Marker FINALIZE_SESSION_MARKER = MarkerFactory.getMarker("FINALIZE_SESSION");
-
-    protected final Logger log =
-            LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
+    protected final Logger log = LoggerFactory.getLogger(AbstractTask.class);
 
     public String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
 
@@ -197,16 +192,12 @@ public abstract class AbstractTask {
      * @param logs log list
      */
     public void logHandle(LinkedBlockingQueue<String> logs) {
-        // note that the "new line" is added here to facilitate log parsing
-        if (logs.contains(FINALIZE_SESSION_MARKER.toString())) {
-            log.info(FINALIZE_SESSION_MARKER, FINALIZE_SESSION_MARKER.toString());
-        } else {
-            StringJoiner joiner = new StringJoiner("\n\t");
-            while (!logs.isEmpty()) {
-                joiner.add(logs.poll());
-            }
-            log.info(" -> {}", joiner);
+
+        StringJoiner joiner = new StringJoiner("\n\t");
+        while (!logs.isEmpty()) {
+            joiner.add(logs.poll());
         }
+        log.info(" -> {}", joiner);
     }
 
     /**

@@ -55,7 +55,6 @@ public class PigeonTaskTest {
         String taskParams = "{\"targetJobName\":\"mysql_elastic\"}";
 
         taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
-        Mockito.when(taskExecutionContext.getTaskLogName()).thenReturn("pigeonlogger");
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(taskParams);
         Mockito.when(taskExecutionContext.getExecutePath()).thenReturn("/tmp");
         Mockito.when(taskExecutionContext.getTaskAppId()).thenReturn(UUID.randomUUID().toString());
