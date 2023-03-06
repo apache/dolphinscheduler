@@ -6,11 +6,11 @@
 
 ## Datasource Parameters
 
-|       **Datasource**       | **Description**                                         |
-|----------------------------|---------------------------------------------------------|
-| Datasource                 | Select KYUUBI.                                          |
-| Datasource name            | Enter the name of the DataSource.                       |
-| Description                | Enter a description of the DataSource.                  |
+|       **Datasource**       |                      **Description**                      |
+|----------------------------|-----------------------------------------------------------|
+| Datasource                 | Select KYUUBI.                                            |
+| Datasource name            | Enter the name of the DataSource.                         |
+| Description                | Enter a description of the DataSource.                    |
 | IP/Host Name               | Enter the KYUUBI service IP.                              |
 | Port                       | Enter the KYUUBI service port.                            |
 | Username                   | Set the username for KYUUBI connection.                   |
