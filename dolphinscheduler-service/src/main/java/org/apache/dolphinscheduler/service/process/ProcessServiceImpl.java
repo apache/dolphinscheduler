@@ -1772,9 +1772,7 @@ public class ProcessServiceImpl implements ProcessService {
                         JSONUtils.toJsonString(mainJarObj),
                         ResourceInfo.class);
                 ResourceInfo resourceInfo = updateResourceInfo(mainJar);
-                if (resourceInfo != null) {
-                    taskParameters.put("mainJar", resourceInfo);
-                }
+                taskParameters.put("mainJar", resourceInfo);
             }
             // update resourceList information
             if (taskParameters.containsKey("resourceList")) {
