@@ -62,14 +62,11 @@ public class StateEventProcessor implements NettyRequestProcessor {
             stateEvent = createTaskStateEvent(workflowStateEventChangeCommand);
         }
 
-        try {
-            LogUtils.setWorkflowAndTaskInstanceIDMDC(stateEvent.getProcessInstanceId(),
-                    stateEvent.getTaskInstanceId());
-
+        try (
+                final LogUtils.MDCAutoClosableContext mdcAutoClosableContext = LogUtils.setWorkflowAndTaskInstanceIDMDC(
+                        stateEvent.getProcessInstanceId(), stateEvent.getTaskInstanceId())) {
             log.info("Received state change command, event: {}", stateEvent);
             stateEventResponseService.addStateChangeEvent(stateEvent);
-        } finally {
-            LogUtils.removeWorkflowAndTaskInstanceIdMDC();
         }
 
     }

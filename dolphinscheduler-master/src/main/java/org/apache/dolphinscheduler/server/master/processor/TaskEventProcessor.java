@@ -59,13 +59,11 @@ public class TaskEventProcessor implements NettyRequestProcessor {
                 .key(taskEventChangeCommand.getKey())
                 .type(StateEventType.WAKE_UP_TASK_GROUP)
                 .build();
-        try {
-            LogUtils.setWorkflowAndTaskInstanceIDMDC(stateEvent.getProcessInstanceId(),
-                    stateEvent.getTaskInstanceId());
+        try (
+                LogUtils.MDCAutoClosableContext mdcAutoClosableContext = LogUtils.setWorkflowAndTaskInstanceIDMDC(
+                        stateEvent.getProcessInstanceId(), stateEvent.getTaskInstanceId())) {
             log.info("Received task event change command, event: {}", stateEvent);
             stateEventResponseService.addEvent2WorkflowExecute(stateEvent);
-        } finally {
-            LogUtils.removeWorkflowAndTaskInstanceIdMDC();
         }
     }
 

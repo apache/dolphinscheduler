@@ -95,9 +95,9 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
             log.error("task execution context is null");
             return;
         }
-        try {
-            LogUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(),
-                    taskExecutionContext.getTaskInstanceId());
+        try (
+                final LogUtils.MDCAutoClosableContext mdcAutoClosableContext = LogUtils.setWorkflowAndTaskInstanceIDMDC(
+                        taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId())) {
             TaskMetrics.incrTaskTypeExecuteCount(taskExecutionContext.getTaskType());
             // set cache, it will be used when kill task
             TaskExecutionContextCacheManager.cacheTaskExecutionContext(taskExecutionContext);
@@ -137,8 +137,6 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
                 log.info("Submit task to wait queue success, current queue size is {}",
                         workerManager.getWaitSubmitQueueSize());
             }
-        } finally {
-            LogUtils.removeWorkflowAndTaskInstanceIdMDC();
         }
     }
 

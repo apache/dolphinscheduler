@@ -296,12 +296,13 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         int loopTimes = stateEvents.size() * 2;
         for (int i = 0; i < loopTimes; i++) {
             final StateEvent stateEvent = this.stateEvents.peek();
-            try {
-                if (stateEvent == null) {
-                    return;
-                }
-                LogUtils.setWorkflowAndTaskInstanceIDMDC(stateEvent.getProcessInstanceId(),
-                        stateEvent.getTaskInstanceId());
+            if (stateEvent == null) {
+                return;
+            }
+            try (
+                    final LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
+                            LogUtils.setWorkflowAndTaskInstanceIDMDC(stateEvent.getProcessInstanceId(),
+                                    stateEvent.getTaskInstanceId())) {
                 // if state handle success then will remove this state, otherwise will retry this state next time.
                 // The state should always handle success except database error.
                 checkProcessInstance(stateEvent);
@@ -337,8 +338,6 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                         stateEvent,
                         e);
                 ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
-            } finally {
-                LogUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
         }
     }
@@ -861,8 +860,9 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                     taskInstanceDao.findValidTaskListByProcessId(processInstance.getId(),
                             processInstance.getTestFlag());
             for (TaskInstance task : validTaskInstanceList) {
-                try {
-                    LogUtils.setWorkflowAndTaskInstanceIDMDC(task.getProcessInstanceId(), task.getId());
+                try (
+                        final LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
+                                LogUtils.setWorkflowAndTaskInstanceIDMDC(task.getProcessInstanceId(), task.getId());) {
                     log.info(
                             "Check the taskInstance from a exist workflowInstance, existTaskInstanceCode: {}, taskInstanceStatus: {}",
                             task.getTaskCode(),
@@ -910,8 +910,6 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                     if (task.getState().isFailure()) {
                         errorTaskMap.put(task.getTaskCode(), task.getId());
                     }
-                } finally {
-                    LogUtils.removeWorkflowAndTaskInstanceIdMDC();
                 }
             }
             clearDataIfExecuteTask();
@@ -1829,8 +1827,9 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             if (taskInstanceId == null || taskInstanceId.equals(0)) {
                 continue;
             }
-            LogUtils.setWorkflowAndTaskInstanceIDMDC(processInstance.getId(), taskInstanceId);
-            try {
+            try (
+                    final LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
+                            LogUtils.setWorkflowAndTaskInstanceIDMDC(processInstance.getId(), taskInstanceId)) {
                 TaskInstance taskInstance = taskInstanceDao.findTaskInstanceById(taskInstanceId);
                 if (taskInstance == null || taskInstance.getState().isFinished()) {
                     continue;
@@ -1845,8 +1844,6 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                             .build();
                     this.addStateEvent(taskStateEvent);
                 }
-            } finally {
-                LogUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
         }
     }

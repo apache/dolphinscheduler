@@ -139,10 +139,11 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
 
     @Override
     public void run() {
-        try {
-            LogUtils.setTaskInstanceLogFullPathMDC(taskExecutionContext.getLogPath());
-            LogUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(),
-                    taskExecutionContext.getTaskInstanceId());
+        try (
+                final LogUtils.MDCAutoClosableContext mdcAutoClosableContext = LogUtils.setWorkflowAndTaskInstanceIDMDC(
+                        taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId());
+                final LogUtils.MDCAutoClosableContext mdcAutoClosableContext1 =
+                        LogUtils.setTaskInstanceLogFullPathMDC(taskExecutionContext.getLogPath())) {
             log.info("\n{}", TaskInstanceLogHeader.INITIALIZE_TASK_CONTEXT_HEADER);
             initializeTask();
 
@@ -175,9 +176,6 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
             log.error("Task execute failed, due to meet an exception", ex);
             afterThrowing(ex);
             closeLogAppender();
-        } finally {
-            LogUtils.removeTaskInstanceLogFullPathMDC();
-            LogUtils.removeWorkflowAndTaskInstanceIdMDC();
         }
     }
 

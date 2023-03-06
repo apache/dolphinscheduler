@@ -61,14 +61,12 @@ public class TaskExecuteResponseProcessor implements NettyRequestProcessor {
         TaskEvent taskResultEvent = TaskEvent.newResultEvent(taskExecuteResultMessage,
                 channel,
                 taskExecuteResultMessage.getMessageSenderAddress());
-        try {
-            LogUtils.setWorkflowAndTaskInstanceIDMDC(taskResultEvent.getProcessInstanceId(),
-                    taskResultEvent.getTaskInstanceId());
+        try (
+                final LogUtils.MDCAutoClosableContext mdcAutoClosableContext = LogUtils.setWorkflowAndTaskInstanceIDMDC(
+                        taskResultEvent.getProcessInstanceId(), taskResultEvent.getTaskInstanceId())) {
             log.info("Received task execute result, event: {}", taskResultEvent);
 
             taskEventService.addEvent(taskResultEvent);
-        } finally {
-            LogUtils.removeWorkflowAndTaskInstanceIdMDC();
         }
     }
 }

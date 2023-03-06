@@ -180,7 +180,7 @@ public class KubernetesApplicationManager implements ApplicationManager {
         FilterWatchListDeletable<Pod, PodList> watchList = getDriverPod(kubernetesApplicationManagerContext);
         List<Pod> driverPod = watchList.list().getItems();
         if (CollectionUtils.isEmpty(driverPod)) {
-            return "The driver pod is not exist.";
+            return "The driver pod does not exist.";
         }
         Pod driver = driverPod.get(0);
         String driverPodName = driver.getMetadata().getName();

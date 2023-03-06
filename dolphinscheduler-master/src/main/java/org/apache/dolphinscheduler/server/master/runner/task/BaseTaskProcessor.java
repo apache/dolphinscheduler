@@ -90,7 +90,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Properties;
 
 import lombok.NonNull;
@@ -190,7 +189,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     @Override
     public boolean action(TaskAction taskAction) {
-        String oldTaskInstanceLogPathMdc = Optional.ofNullable(LogUtils.getTaskInstanceLogFullPathMdc()).orElse(null);
+        String oldTaskInstanceLogPathMdc = LogUtils.getTaskInstanceLogFullPathMdc();
         if (StringUtils.isNotEmpty(threadLoggerInfoName)) {
             LogUtils.setTaskInstanceLogFullPathMDC(threadLoggerInfoName);
         }

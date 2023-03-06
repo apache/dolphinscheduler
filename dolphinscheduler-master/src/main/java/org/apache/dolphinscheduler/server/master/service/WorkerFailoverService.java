@@ -119,8 +119,10 @@ public class WorkerFailoverService {
                 needFailoverTaskInstanceList.stream().map(TaskInstance::getId).collect(Collectors.toList()));
         final Map<Integer, ProcessInstance> processInstanceCacheMap = new HashMap<>();
         for (TaskInstance taskInstance : needFailoverTaskInstanceList) {
-            LogUtils.setWorkflowAndTaskInstanceIDMDC(taskInstance.getProcessInstanceId(), taskInstance.getId());
-            try {
+            try (
+                    final LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
+                            LogUtils.setWorkflowAndTaskInstanceIDMDC(taskInstance.getProcessInstanceId(),
+                                    taskInstance.getId())) {
                 ProcessInstance processInstance = processInstanceCacheMap.computeIfAbsent(
                         taskInstance.getProcessInstanceId(), k -> {
                             WorkflowExecuteRunnable workflowExecuteRunnable = cacheManager.getByProcessInstanceId(
@@ -141,8 +143,6 @@ public class WorkerFailoverService {
                 log.info("Worker[{}] failover: Finish failover taskInstance", workerHost);
             } catch (Exception ex) {
                 log.info("Worker[{}] failover taskInstance occur exception", workerHost, ex);
-            } finally {
-                LogUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
         }
         failoverTimeCost.stop();

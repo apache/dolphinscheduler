@@ -45,6 +45,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -203,25 +204,30 @@ public class LogUtils {
         return MDC.get(TASK_INSTANCE_LOG_FULL_PATH_MDC_KEY);
     }
 
-    public static void setTaskInstanceLogFullPathMDC(String taskInstanceLogFullPath) {
+    public static MDCAutoClosableContext setTaskInstanceLogFullPathMDC(String taskInstanceLogFullPath) {
         MDC.put(TASK_INSTANCE_LOG_FULL_PATH_MDC_KEY, taskInstanceLogFullPath);
+        return new MDCAutoClosableContext(LogUtils::removeTaskInstanceLogFullPathMDC);
     }
 
     public static void removeTaskInstanceLogFullPathMDC() {
         MDC.remove(TASK_INSTANCE_LOG_FULL_PATH_MDC_KEY);
     }
 
-    public static void setWorkflowAndTaskInstanceIDMDC(Integer workflowInstanceId, Integer taskInstanceId) {
-        setWorkflowInstanceIdMDC(workflowInstanceId);
-        setTaskInstanceIdMDC(taskInstanceId);
-    }
-
-    public static void setWorkflowInstanceIdMDC(Integer workflowInstanceId) {
+    public static MDCAutoClosableContext setWorkflowAndTaskInstanceIDMDC(Integer workflowInstanceId,
+                                                                         Integer taskInstanceId) {
         MDC.put(Constants.WORKFLOW_INSTANCE_ID_MDC_KEY, String.valueOf(workflowInstanceId));
+        MDC.put(Constants.TASK_INSTANCE_ID_MDC_KEY, String.valueOf(taskInstanceId));
+        return new MDCAutoClosableContext(LogUtils::removeWorkflowAndTaskInstanceIdMDC);
     }
 
-    public static void setTaskInstanceIdMDC(Integer taskInstanceId) {
+    public static MDCAutoClosableContext setWorkflowInstanceIdMDC(Integer workflowInstanceId) {
+        MDC.put(Constants.WORKFLOW_INSTANCE_ID_MDC_KEY, String.valueOf(workflowInstanceId));
+        return new MDCAutoClosableContext(LogUtils::removeWorkflowInstanceIdMDC);
+    }
+
+    public static MDCAutoClosableContext setTaskInstanceIdMDC(Integer taskInstanceId) {
         MDC.put(Constants.TASK_INSTANCE_ID_MDC_KEY, String.valueOf(taskInstanceId));
+        return new MDCAutoClosableContext(LogUtils::removeTaskInstanceIdMDC);
     }
 
     public static void removeWorkflowAndTaskInstanceIdMDC() {
@@ -235,5 +241,16 @@ public class LogUtils {
 
     public static void removeTaskInstanceIdMDC() {
         MDC.remove(Constants.TASK_INSTANCE_ID_MDC_KEY);
+    }
+
+    @AllArgsConstructor
+    public static class MDCAutoClosableContext implements AutoCloseable {
+
+        private final Runnable closeAction;
+
+        @Override
+        public void close() {
+            closeAction.run();
+        }
     }
 }
