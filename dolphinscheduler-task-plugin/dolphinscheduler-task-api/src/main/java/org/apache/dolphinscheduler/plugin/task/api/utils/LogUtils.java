@@ -61,7 +61,7 @@ import ch.qos.logback.core.spi.AppenderAttachable;
 @UtilityClass
 public class LogUtils {
 
-    private static final Path TASK_INSTANCE_LOG_BASE_PATH = getTaskInstanceLogBasePath();
+    private static Path TASK_INSTANCE_LOG_BASE_PATH = getTaskInstanceLogBasePath();
     public static final String TASK_INSTANCE_LOG_FULL_PATH_MDC_KEY = "taskInstanceLogFullPath";
 
     private static final Pattern APPLICATION_REGEX = Pattern.compile(TaskConstants.YARN_APPLICATION_REGEX);
