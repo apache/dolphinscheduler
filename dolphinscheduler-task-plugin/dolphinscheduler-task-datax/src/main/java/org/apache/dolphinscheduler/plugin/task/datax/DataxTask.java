@@ -544,7 +544,7 @@ public class DataxTask extends AbstractTask {
                 }
 
                 if (SELECT_ALL_CHARACTER.equals(item.toString())) {
-                    log.info("sql contain *,grammatical analysis sql failed");
+                    log.info("sql contains *, grammatical analysis failed");
                     return new String[0];
                 }
 
