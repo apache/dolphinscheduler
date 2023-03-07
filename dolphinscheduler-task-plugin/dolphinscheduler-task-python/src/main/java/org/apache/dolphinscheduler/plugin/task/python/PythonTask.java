@@ -88,17 +88,6 @@ public class PythonTask extends AbstractTask {
     }
 
     @Override
-    public String getPreScript() {
-        String rawPythonScript = pythonParameters.getRawScript().replaceAll("\\r\\n", System.lineSeparator());
-        try {
-            rawPythonScript = convertPythonScriptPlaceholders(rawPythonScript);
-        } catch (StringIndexOutOfBoundsException e) {
-            log.error("setShareVar field format error, raw python script : {}", rawPythonScript);
-        }
-        return rawPythonScript;
-    }
-
-    @Override
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             // generate the content of this python script
