@@ -19,12 +19,12 @@ package org.apache.dolphinscheduler.server.master.processor.queue;
 
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.remote.command.StateEventResponseCommand;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
-import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,13 +74,11 @@ public class StateEventResponseService {
             List<StateEvent> remainEvents = new ArrayList<>(eventQueue.size());
             eventQueue.drainTo(remainEvents);
             for (StateEvent event : remainEvents) {
-                try {
-                    LoggerUtils.setWorkflowAndTaskInstanceIDMDC(event.getProcessInstanceId(),
-                            event.getTaskInstanceId());
+                try (
+                        final LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
+                                LogUtils.setWorkflowAndTaskInstanceIDMDC(event.getProcessInstanceId(),
+                                        event.getTaskInstanceId())) {
                     this.persist(event);
-
-                } finally {
-                    LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
                 }
             }
         }
@@ -112,18 +110,20 @@ public class StateEventResponseService {
         public void run() {
             log.info("State event loop service started");
             while (!ServerLifeCycleManager.isStopped()) {
+                StateEvent stateEvent;
                 try {
-                    // if not task , blocking here
-                    StateEvent stateEvent = eventQueue.take();
-                    LoggerUtils.setWorkflowAndTaskInstanceIDMDC(stateEvent.getProcessInstanceId(),
-                            stateEvent.getTaskInstanceId());
-                    persist(stateEvent);
+                    stateEvent = eventQueue.take();
                 } catch (InterruptedException e) {
                     log.warn("State event loop service interrupted, will stop this loop", e);
                     Thread.currentThread().interrupt();
                     break;
-                } finally {
-                    LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
+                }
+                try (
+                        final LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
+                                LogUtils.setWorkflowAndTaskInstanceIDMDC(stateEvent.getProcessInstanceId(),
+                                        stateEvent.getTaskInstanceId())) {
+                    // if not task , blocking here
+                    persist(stateEvent);
                 }
             }
             log.info("State event loop service stopped");

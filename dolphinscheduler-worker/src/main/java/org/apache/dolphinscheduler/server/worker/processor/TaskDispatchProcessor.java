@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.server.worker.processor;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
@@ -42,8 +44,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Preconditions;
-
 import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
 import io.netty.channel.Channel;
@@ -58,24 +58,15 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
     @Autowired
     private WorkerConfig workerConfig;
 
-    /**
-     * task callback service
-     */
     @Autowired
     private WorkerMessageSender workerMessageSender;
 
-    /**
-     * alert client service
-     */
     @Autowired
     private WorkerRpcClient workerRpcClient;
 
     @Autowired
     private TaskPluginManager taskPluginManager;
 
-    /**
-     * task execute manager
-     */
     @Autowired
     private WorkerManagerThread workerManager;
 
@@ -86,7 +77,7 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
     @Timed(value = "ds.task.execution.duration", percentiles = {0.5, 0.75, 0.95, 0.99}, histogram = true)
     @Override
     public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.TASK_DISPATCH_REQUEST == command.getType(),
+        checkArgument(CommandType.TASK_DISPATCH_REQUEST == command.getType(),
                 String.format("invalid command type : %s", command.getType()));
 
         TaskDispatchCommand taskDispatchCommand = JSONUtils.parseObject(command.getBody(), TaskDispatchCommand.class);
@@ -104,14 +95,14 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
             log.error("task execution context is null");
             return;
         }
-        try {
-            LogUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(),
-                    taskExecutionContext.getTaskInstanceId());
+        try (
+                final LogUtils.MDCAutoClosableContext mdcAutoClosableContext = LogUtils.setWorkflowAndTaskInstanceIDMDC(
+                        taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId())) {
             TaskMetrics.incrTaskTypeExecuteCount(taskExecutionContext.getTaskType());
             // set cache, it will be used when kill task
             TaskExecutionContextCacheManager.cacheTaskExecutionContext(taskExecutionContext);
             taskExecutionContext.setHost(workerConfig.getWorkerAddress());
-            taskExecutionContext.setLogPath(LogUtils.getTaskLogPath(taskExecutionContext));
+            taskExecutionContext.setLogPath(LogUtils.getTaskInstanceLogFullPath(taskExecutionContext));
 
             // delay task process
             long remainTime =
@@ -146,8 +137,6 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
                 log.info("Submit task to wait queue success, current queue size is {}",
                         workerManager.getWaitSubmitQueueSize());
             }
-        } finally {
-            LogUtils.removeWorkflowAndTaskInstanceIdMDC();
         }
     }
 

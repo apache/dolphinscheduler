@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.server.master.runner.task;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_CONDITIONS;
 
-import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -28,7 +27,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentTaskModel;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.DependentUtils;
-import org.apache.dolphinscheduler.service.utils.LogUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -131,11 +130,12 @@ public class ConditionTaskProcessor extends BaseTaskProcessor {
 
     private void initTaskParameters() {
         taskInstance.setLogPath(
-                LogUtils.getTaskLogPath(taskInstance.getFirstSubmitTime(), processInstance.getProcessDefinitionCode(),
+                LogUtils.getTaskInstanceLogFullPath(taskInstance.getFirstSubmitTime(),
+                        processInstance.getProcessDefinitionCode(),
                         processInstance.getProcessDefinitionVersion(),
                         taskInstance.getProcessInstanceId(),
                         taskInstance.getId()));
-        this.taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
+        this.taskInstance.setHost(masterConfig.getMasterAddress());
         taskInstance.setState(TaskExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());
         this.taskInstanceDao.upsertTaskInstance(taskInstance);
