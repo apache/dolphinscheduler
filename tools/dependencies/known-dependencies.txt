@@ -432,3 +432,5 @@ nimbus-jose-jwt-9.22.jar
 woodstox-core-6.4.0.jar
 azure-core-management-1.9.0.jar
 kyuubi-hive-jdbc-1.6.0-incubating.jar
+jcl-over-slf4j-1.7.36.jar
+
