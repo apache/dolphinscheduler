@@ -62,9 +62,6 @@ public class WorkerServer implements IStoppable {
     @Autowired
     private WorkerManagerThread workerManagerThread;
 
-    /**
-     * worker registry
-     */
     @Autowired
     private WorkerRegistryClient workerRegistryClient;
 
@@ -141,9 +138,6 @@ public class WorkerServer implements IStoppable {
         close(cause);
     }
 
-    /**
-     * kill all tasks which are running
-     */
     public void killAllRunningTasks() {
         Collection<TaskExecutionContext> taskRequests = TaskExecutionContextCacheManager.getAllTaskRequestList();
         if (CollectionUtils.isEmpty(taskRequests)) {
@@ -153,14 +147,13 @@ public class WorkerServer implements IStoppable {
         int killNumber = 0;
         for (TaskExecutionContext taskRequest : taskRequests) {
             // kill task when it's not finished yet
-            try {
-                LogUtils.setWorkflowAndTaskInstanceIDMDC(taskRequest.getProcessInstanceId(),
-                        taskRequest.getTaskInstanceId());
+            try (
+                    final LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
+                            LogUtils.setWorkflowAndTaskInstanceIDMDC(taskRequest.getProcessInstanceId(),
+                                    taskRequest.getTaskInstanceId())) {
                 if (ProcessUtils.kill(taskRequest)) {
                     killNumber++;
                 }
-            } finally {
-                LogUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
         }
         log.info("Worker after kill all cache task, task size: {}, killed number: {}", taskRequests.size(),

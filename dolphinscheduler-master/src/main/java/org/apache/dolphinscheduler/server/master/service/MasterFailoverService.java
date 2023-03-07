@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
 import org.apache.dolphinscheduler.remote.utils.Host;
@@ -40,7 +41,6 @@ import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactory;
 import org.apache.dolphinscheduler.service.log.LogClient;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 import org.apache.dolphinscheduler.service.utils.ProcessUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -167,7 +167,7 @@ public class MasterFailoverService {
 
         for (ProcessInstance processInstance : needFailoverProcessInstanceList) {
             try {
-                LoggerUtils.setWorkflowInstanceIdMDC(processInstance.getId());
+                LogUtils.setWorkflowInstanceIdMDC(processInstance.getId());
                 log.info("WorkflowInstance failover starting");
                 if (!checkProcessInstanceNeedFailover(masterStartupTimeOptional, processInstance)) {
                     log.info("WorkflowInstance doesn't need to failover");
@@ -180,7 +180,7 @@ public class MasterFailoverService {
                         taskInstanceDao.findValidTaskListByProcessId(processInstanceId, processInstance.getTestFlag());
                 for (TaskInstance taskInstance : taskInstanceList) {
                     try {
-                        LoggerUtils.setTaskInstanceIdMDC(taskInstance.getId());
+                        LogUtils.setTaskInstanceIdMDC(taskInstance.getId());
                         log.info("TaskInstance failover starting");
                         if (!checkTaskInstanceNeedFailover(taskInstance)) {
                             log.info("The taskInstance doesn't need to failover");
@@ -189,7 +189,7 @@ public class MasterFailoverService {
                         failoverTaskInstance(processInstance, taskInstance);
                         log.info("TaskInstance failover finished");
                     } finally {
-                        LoggerUtils.removeTaskInstanceIdMDC();
+                        LogUtils.removeTaskInstanceIdMDC();
                     }
                 }
 
@@ -200,7 +200,7 @@ public class MasterFailoverService {
                 processService.processNeedFailoverProcessInstances(processInstance);
                 log.info("WorkflowInstance failover finished");
             } finally {
-                LoggerUtils.removeWorkflowInstanceIdMDC();
+                LogUtils.removeWorkflowInstanceIdMDC();
             }
         }
 

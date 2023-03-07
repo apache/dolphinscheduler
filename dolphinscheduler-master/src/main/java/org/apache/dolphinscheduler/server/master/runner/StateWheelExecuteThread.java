@@ -28,12 +28,12 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.event.TaskStateEvent;
 import org.apache.dolphinscheduler.server.master.event.WorkflowStateEvent;
 import org.apache.dolphinscheduler.server.master.runner.task.TaskInstanceKey;
-import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 
 import java.util.Optional;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -137,7 +137,7 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
         }
         for (Integer processInstanceId : processInstanceTimeoutCheckList) {
             try {
-                LoggerUtils.setWorkflowInstanceIdMDC(processInstanceId);
+                LogUtils.setWorkflowInstanceIdMDC(processInstanceId);
                 WorkflowExecuteRunnable workflowExecuteThread = processInstanceExecCacheManager.getByProcessInstanceId(
                         processInstanceId);
                 if (workflowExecuteThread == null) {
@@ -163,7 +163,7 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
             } catch (Exception ex) {
                 log.error("Check workflow instance timeout error");
             } finally {
-                LoggerUtils.removeWorkflowInstanceIdMDC();
+                LogUtils.removeWorkflowInstanceIdMDC();
             }
         }
     }
@@ -252,7 +252,7 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
         for (TaskInstanceKey taskInstanceKey : taskInstanceTimeoutCheckList) {
             try {
                 int processInstanceId = taskInstanceKey.getProcessInstanceId();
-                LoggerUtils.setWorkflowInstanceIdMDC(processInstanceId);
+                LogUtils.setWorkflowInstanceIdMDC(processInstanceId);
                 long taskCode = taskInstanceKey.getTaskCode();
 
                 WorkflowExecuteRunnable workflowExecuteThread =
@@ -287,7 +287,7 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
             } catch (Exception ex) {
                 log.error("Check task timeout error, taskInstanceKey: {}", taskInstanceKey, ex);
             } finally {
-                LoggerUtils.removeWorkflowInstanceIdMDC();
+                LogUtils.removeWorkflowInstanceIdMDC();
             }
         }
     }
@@ -301,7 +301,7 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
             int processInstanceId = taskInstanceKey.getProcessInstanceId();
             long taskCode = taskInstanceKey.getTaskCode();
             try {
-                LoggerUtils.setWorkflowInstanceIdMDC(processInstanceId);
+                LogUtils.setWorkflowInstanceIdMDC(processInstanceId);
 
                 WorkflowExecuteRunnable workflowExecuteThread =
                         processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
@@ -353,7 +353,7 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
             } catch (Exception ex) {
                 log.error("Check task retry error, taskInstanceKey: {}", taskInstanceKey, ex);
             } finally {
-                LoggerUtils.removeWorkflowInstanceIdMDC();
+                LogUtils.removeWorkflowInstanceIdMDC();
             }
         }
     }
@@ -367,7 +367,7 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
             long taskCode = taskInstanceKey.getTaskCode();
 
             try {
-                LoggerUtils.setTaskInstanceIdMDC(processInstanceId);
+                LogUtils.setTaskInstanceIdMDC(processInstanceId);
                 WorkflowExecuteRunnable workflowExecuteThread =
                         processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
                 if (workflowExecuteThread == null) {
@@ -392,7 +392,7 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
             } catch (Exception ex) {
                 log.error("Task state check error, taskInstanceKey: {}", taskInstanceKey, ex);
             } finally {
-                LoggerUtils.removeWorkflowInstanceIdMDC();
+                LogUtils.removeWorkflowInstanceIdMDC();
             }
         }
     }

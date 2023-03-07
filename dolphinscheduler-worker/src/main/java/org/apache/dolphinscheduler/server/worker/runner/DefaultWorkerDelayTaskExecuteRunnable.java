@@ -51,7 +51,7 @@ public class DefaultWorkerDelayTaskExecuteRunnable extends WorkerDelayTaskExecut
     @Override
     public void executeTask(TaskCallBack taskCallBack) throws TaskException {
         if (task == null) {
-            throw new TaskException("The task plugin instance is not initialized");
+            throw new IllegalArgumentException("The task plugin instance is not initialized");
         }
         task.handle(taskCallBack);
     }
