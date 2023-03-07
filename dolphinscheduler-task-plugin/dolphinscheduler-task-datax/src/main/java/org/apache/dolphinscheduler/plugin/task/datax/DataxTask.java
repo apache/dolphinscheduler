@@ -90,6 +90,11 @@ public class DataxTask extends AbstractTask {
      */
     private static final String DATAX_PYTHON = "python2.7";
     private static final Pattern PYTHON_PATH_PATTERN = Pattern.compile("/bin/python[\\d.]*$");
+
+    /**
+     * select all
+     */
+    private static final String SELECT_ALL_CHARACTER = "*";
     /**
      * datax path
      */
@@ -536,6 +541,11 @@ public class DataxTask extends AbstractTask {
                 } else {
                     throw new RuntimeException(
                             String.format("grammatical analysis sql column [ %s ] failed", item));
+                }
+
+                if (SELECT_ALL_CHARACTER.equals(item.toString())) {
+                    log.info("sql contains *, grammatical analysis failed");
+                    return new String[0];
                 }
 
                 if (columnName == null) {
