@@ -21,11 +21,12 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_COD
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils.getPidsStr;
 
-import org.apache.dolphinscheduler.common.log.remote.RemoteLogUtils;
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.utils.AbstractCommandExecutorConstants;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
 
@@ -39,9 +40,10 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
@@ -95,6 +97,8 @@ public abstract class AbstractCommandExecutor {
      * taskRequest
      */
     protected TaskExecutionContext taskRequest;
+
+    protected Future<?> taskOutputFuture;
 
     public AbstractCommandExecutor(Consumer<LinkedBlockingQueue<String>> logHandler,
                                    TaskExecutionContext taskRequest,
@@ -155,7 +159,7 @@ public abstract class AbstractCommandExecutor {
 
     /**
      * generate systemd command.
-     * eg: sudo systemd-run -q --scope -p CPUQuota=100% -p MemoryMax=200M --uid=root
+     * eg: sudo systemd-run -q --scope -p CPUQuota=100% -p MemoryLimit=200M --uid=root
      * @param command command
      */
     private void generateCgroupCommand(List<String> command) {
@@ -175,12 +179,13 @@ public abstract class AbstractCommandExecutor {
             command.add(String.format("CPUQuota=%s%%", taskRequest.getCpuQuota()));
         }
 
+        // use `man systemd.resource-control` to find available parameter
         if (memoryMax == -1) {
             command.add("-p");
-            command.add(String.format("MemoryMax=%s", "infinity"));
+            command.add(String.format("MemoryLimit=%s", "infinity"));
         } else {
             command.add("-p");
-            command.add(String.format("MemoryMax=%sM", taskRequest.getMemoryMax()));
+            command.add(String.format("MemoryLimit=%sM", taskRequest.getMemoryMax()));
         }
 
         command.add(String.format("--uid=%s", taskRequest.getTenantCode()));
@@ -236,6 +241,15 @@ public abstract class AbstractCommandExecutor {
         // waiting for the run to finish
         boolean status = process.waitFor(remainTime, TimeUnit.SECONDS);
 
+        if (taskOutputFuture != null) {
+            try {
+                // Wait the task log process finished.
+                taskOutputFuture.get();
+            } catch (ExecutionException e) {
+                logger.info("Handle task log error", e);
+            }
+        }
+
         TaskExecutionStatus kubernetesStatus =
                 ProcessUtils.getApplicationStatus(taskRequest.getK8sTaskExecutionContext(), taskRequest.getTaskAppId());
 
@@ -274,19 +288,18 @@ public abstract class AbstractCommandExecutor {
             return;
         }
 
-        // clear log
-        clear();
-
         int processId = getProcessId(process);
-
-        logger.info("cancel process: {}", processId);
-
+        logger.info("Begin to kill process process, pid is : {}", processId);
         // kill , waiting for completion
         boolean alive = softKill(processId);
 
         if (alive) {
-            // hard kill
-            hardKill(processId);
+            String cmd = String.format("kill -9 %s", getPidsStr(processId));
+            cmd = OSUtils.getSudoCmd(taskRequest.getTenantCode(), cmd);
+            OSUtils.exeCmd(cmd);
+            logger.info("Success kill task: {}, pid: {}, cmd: {}", taskRequest.getTaskAppId(), processId, cmd);
+        } else {
+            logger.info("The process: {} is not alive, no need to kill", processId);
         }
     }
 
@@ -314,71 +327,19 @@ public abstract class AbstractCommandExecutor {
         return process.isAlive();
     }
 
-    /**
-     * hard kill
-     *
-     * @param processId process id
-     */
-    private void hardKill(int processId) {
-        if (processId != 0 && process.isAlive()) {
-            try {
-                String cmd = String.format("kill -9 %s", getPidsStr(processId));
-                cmd = OSUtils.getSudoCmd(taskRequest.getTenantCode(), cmd);
-                logger.info("hard kill task:{}, process id:{}, cmd:{}", taskRequest.getTaskAppId(), processId, cmd);
-
-                OSUtils.exeCmd(cmd);
-            } catch (Exception e) {
-                logger.error("kill attempt failed ", e);
-            }
-        }
-    }
-
     private void printCommand(List<String> commands) {
         logger.info("task run command: {}", String.join(" ", commands));
     }
 
-    /**
-     * clear
-     */
-    private void clear() {
-
-        LinkedBlockingQueue<String> markerLog = new LinkedBlockingQueue<>(1);
-        markerLog.add(ch.qos.logback.classic.ClassicConstants.FINALIZE_SESSION_MARKER.toString());
-        String logs = appendPodLogIfNeeded();
-        if (StringUtils.isNotEmpty(logs)) {
-            logBuffer.add("Dump logs from driver pod:");
-            logBuffer.add(logs);
-        }
-        if (!logBuffer.isEmpty()) {
-            // log handle
-            logHandler.accept(logBuffer);
-            logBuffer.clear();
-        }
-        logHandler.accept(markerLog);
-
-        if (RemoteLogUtils.isRemoteLoggingEnable()) {
-            RemoteLogUtils.sendRemoteLog(taskRequest.getLogPath());
-            logger.info("Log handler sends task log {} to remote storage asynchronously.", taskRequest.getLogPath());
-        }
-    }
-
-    private String appendPodLogIfNeeded() {
-        if (Objects.isNull(taskRequest.getK8sTaskExecutionContext())) {
-            return "";
-        }
-        return ProcessUtils.getPodLog(taskRequest.getK8sTaskExecutionContext(), taskRequest.getTaskAppId());
-    }
-
-    /**
-     * get the standard output of the process
-     *
-     * @param process process
-     */
     private void parseProcessOutput(Process process) {
-        String threadLoggerInfoName = taskRequest.getTaskLogName();
-        ExecutorService getOutputLogService = newDaemonSingleThreadExecutor(threadLoggerInfoName);
+        // todo: remove this this thread pool.
+        ExecutorService getOutputLogService = ThreadUtils
+                .newSingleDaemonScheduledExecutorService("ResolveOutputLog-thread-" + taskRequest.getTaskName());
         getOutputLogService.submit(() -> {
-            try (BufferedReader inReader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+            try (
+                    final LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
+                            LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());
+                    BufferedReader inReader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 String line;
                 while ((line = inReader.readLine()) != null) {
                     if (line.startsWith("${setValue(") || line.startsWith("#{setValue(")) {
@@ -398,9 +359,12 @@ public abstract class AbstractCommandExecutor {
 
         getOutputLogService.shutdown();
 
-        ExecutorService parseProcessOutputExecutorService = newDaemonSingleThreadExecutor(threadLoggerInfoName);
-        parseProcessOutputExecutorService.submit(() -> {
-            try {
+        ExecutorService parseProcessOutputExecutorService = ThreadUtils
+                .newSingleDaemonScheduledExecutorService("TaskInstanceLogOutput-thread-" + taskRequest.getTaskName());
+        taskOutputFuture = parseProcessOutputExecutorService.submit(() -> {
+            try (
+                    final LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
+                            LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());) {
                 while (!logBuffer.isEmpty() || !logOutputIsSuccess) {
                     if (!logBuffer.isEmpty()) {
                         logHandler.accept(logBuffer);
@@ -411,8 +375,6 @@ public abstract class AbstractCommandExecutor {
                 }
             } catch (Exception e) {
                 logger.error("Output task log error", e);
-            } finally {
-                clear();
             }
         });
         parseProcessOutputExecutorService.shutdown();
@@ -463,7 +425,7 @@ public abstract class AbstractCommandExecutor {
 
             processId = f.getInt(process);
         } catch (Throwable e) {
-            logger.error(e.getMessage(), e);
+            logger.error("Get task pid failed", e);
         }
 
         return processId;

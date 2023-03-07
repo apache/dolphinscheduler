@@ -306,8 +306,6 @@ public class ExecutorController extends BaseController {
                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                           @RequestParam("processInstanceId") Integer processInstanceId,
                           @RequestParam("executeType") ExecuteType executeType) {
-        log.info("Start to execute process instance, projectCode:{}, processInstanceId:{}.", projectCode,
-                processInstanceId);
         Map<String, Object> result = execService.execute(loginUser, projectCode, processInstanceId, executeType);
         return returnDataList(result);
     }

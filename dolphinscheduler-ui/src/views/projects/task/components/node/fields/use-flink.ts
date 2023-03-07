@@ -102,7 +102,7 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
   )
 
   watchEffect(() => {
-    model.flinkVersion = model.programType === 'SQL' ? '>=1.13' : '<1.10'
+    model.flinkVersion = model.programType === 'SQL' ? '>=1.13' : model.flinkVersion
   })
 
   return [
