@@ -33,6 +33,7 @@
         <module>dolphinscheduler-datasource-db2</module>
         <module>dolphinscheduler-datasource-hive</module>
         <module>dolphinscheduler-datasource-mysql</module>
+        <module>dolphinscheduler-datasource-oceanbase</module>
         <module>dolphinscheduler-datasource-oracle</module>
         <module>dolphinscheduler-datasource-postgresql</module>
         <module>dolphinscheduler-datasource-spark</module>

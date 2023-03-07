@@ -65,6 +65,7 @@ export function useForm(id?: number) {
     showHost: true,
     showPort: true,
     showAwsRegion: false,
+    showCompatibleMode: false,
     showConnectType: false,
     showPrincipal: false,
     showMode: false,
@@ -255,6 +256,8 @@ export function useForm(id?: number) {
     }
     state.showConnectType = type === 'ORACLE'
 
+    state.showCompatibleMode = type == 'OCEANBASE'
+
     if (type === 'HIVE' || type === 'SPARK') {
       state.showPrincipal = await getKerberosStartupState()
     } else {
@@ -398,6 +401,11 @@ export const datasourceType: IDataBaseOptionKeys = {
     value: 'DAMENG',
     label: 'DAMENG',
     defaultPort: 5236
+  },
+  OCEANBASE: {
+    value: 'OCEANBASE',
+    label: 'OCEANBASE',
+    defaultPort: 2881
   }
 }
 
