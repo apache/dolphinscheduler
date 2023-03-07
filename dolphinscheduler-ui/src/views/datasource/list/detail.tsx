@@ -158,6 +158,7 @@ const DetailModal = defineComponent({
       showHost,
       showPort,
       showAwsRegion,
+      showCompatibleMode,
       showConnectType,
       showPrincipal,
       showMode,
@@ -567,6 +568,21 @@ const DetailModal = defineComponent({
                       </NRadio>
                     </NSpace>
                   </NRadioGroup>
+                </NFormItem>
+                <NFormItem
+                  v-show={showCompatibleMode}
+                  label={t('datasource.compatible_mode')}
+                  path='compatibleMode'
+                  show-require-mark
+                >
+                  <NInput
+                    allowInput={this.trim}
+                    class='input-data-base'
+                    v-model={[detailForm.compatibleMode, 'value']}
+                    type='text'
+                    maxlength={60}
+                    placeholder={t('datasource.compatible_mode_tips')}
+                  />
                 </NFormItem>
                 <NFormItem
                   label={t('datasource.jdbc_connect_parameters')}
