@@ -80,7 +80,7 @@ public class S3RemoteLogHandler implements RemoteLogHandler, Closeable {
     }
 
     protected AmazonS3 buildS3Client() {
-        if (!StringUtils.isEmpty(endPoint)) {
+        if (StringUtils.isNotEmpty(endPoint)) {
             return AmazonS3ClientBuilder
                     .standard()
                     .withPathStyleAccessEnabled(true)
