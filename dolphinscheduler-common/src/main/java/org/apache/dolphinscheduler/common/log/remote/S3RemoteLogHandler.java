@@ -123,15 +123,15 @@ public class S3RemoteLogHandler implements RemoteLogHandler, Closeable {
         try {
             log.info("get remote log on S3 {} to {}", objectName, logPath);
             S3Object o = s3Client.getObject(bucketName, objectName);
-            S3ObjectInputStream s3is = o.getObjectContent();
-            FileOutputStream fos = new FileOutputStream(logPath);
-            byte[] readBuf = new byte[1024];
-            int readLen = 0;
-            while ((readLen = s3is.read(readBuf)) > 0) {
-                fos.write(readBuf, 0, readLen);
+            try (
+                    S3ObjectInputStream s3is = o.getObjectContent();
+                    FileOutputStream fos = new FileOutputStream(logPath)) {
+                byte[] readBuf = new byte[1024];
+                int readLen = 0;
+                while ((readLen = s3is.read(readBuf)) > 0) {
+                    fos.write(readBuf, 0, readLen);
+                }
             }
-            s3is.close();
-            fos.close();
         } catch (Exception e) {
             log.error("error while getting remote log on S3 {} to {}", objectName, logPath, e);
         }
