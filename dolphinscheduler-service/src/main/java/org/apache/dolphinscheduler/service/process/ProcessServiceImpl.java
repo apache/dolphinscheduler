@@ -1809,7 +1809,7 @@ public class ProcessServiceImpl implements ProcessService {
             // get resource from database, only one resource should be returned
             Resource resource = getResourceById(resourceId);
             if (Objects.isNull(resource)) {
-                logger.error("not found resource by resourceId:{} from t_ds_resources.", resourceId);
+                logger.error("resource not found, resourceId: {}", resourceId);
                 return null;
             }
             resourceInfo.setId(resourceId);
