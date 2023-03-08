@@ -769,7 +769,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         List<StorageEntity> slicedResourcesList = filteredResourceList.stream().skip((long) (pageNo - 1) * pageSize)
                 .limit(pageSize).collect(Collectors.toList());
 
-        pageInfo.setTotal(resourcesList.size());
+        pageInfo.setTotal(filteredResourceList.size());
         pageInfo.setTotalList(slicedResourcesList);
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
