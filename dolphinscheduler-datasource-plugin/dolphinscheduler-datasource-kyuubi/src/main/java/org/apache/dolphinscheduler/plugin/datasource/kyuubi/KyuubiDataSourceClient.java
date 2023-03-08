@@ -37,13 +37,10 @@ import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
-
+@Slf4j
 public class KyuubiDataSourceClient extends CommonDataSourceClient {
-
-    private static final Logger logger = LoggerFactory.getLogger(KyuubiDataSourceClient.class);
 
     public KyuubiDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
         super(baseConnectionParam, dbType);
@@ -51,17 +48,17 @@ public class KyuubiDataSourceClient extends CommonDataSourceClient {
 
     @Override
     protected void preInit() {
-        logger.info("PreInit in {}", getClass().getName());
+        log.info("PreInit in {}", getClass().getName());
     }
 
     @Override
     protected void initClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        logger.info("Create UserGroupInformation.");
+        log.info("Create UserGroupInformation.");
         UserGroupInformationFactory.login(baseConnectionParam.getUser());
-        logger.info("Create ugi success.");
+        log.info("Create ugi success.");
         this.dataSource = JDBCDataSourceProvider.createOneSessionJdbcDataSource(baseConnectionParam, dbType);
         this.jdbcTemplate = new JdbcTemplate(dataSource);
-        logger.info("Init {} success.", getClass().getName());
+        log.info("Init {} success.", getClass().getName());
     }
 
     @Override
@@ -114,7 +111,7 @@ public class KyuubiDataSourceClient extends CommonDataSourceClient {
         } finally {
             UserGroupInformationFactory.logout(baseConnectionParam.getUser());
         }
-        logger.info("Closed Kyuubi datasource client.");
+        log.info("Closed Kyuubi datasource client.");
 
     }
 }
