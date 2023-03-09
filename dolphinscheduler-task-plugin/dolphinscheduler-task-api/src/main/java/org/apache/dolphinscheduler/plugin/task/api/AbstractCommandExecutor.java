@@ -276,7 +276,7 @@ public abstract class AbstractCommandExecutor {
         return varPool.toString();
     }
 
-    public void cancelApplication() {
+    public void cancelApplication() throws InterruptedException {
         if (process == null) {
             return;
         }
@@ -284,7 +284,7 @@ public abstract class AbstractCommandExecutor {
         // soft kill
         logger.info("Begin to kill process process, pid is : {}", taskRequest.getProcessId());
         process.destroy();
-        if (process.isAlive()) {
+        if (!process.waitFor(5, TimeUnit.SECONDS)) {
             process.destroyForcibly();
         }
         logger.info("Success kill task: {}, pid: {}", taskRequest.getTaskAppId(), taskRequest.getProcessId());
