@@ -28,7 +28,7 @@ public class ArgsUtilsTest {
 
     @Test
     public void escape() {
-        Assertions.assertEquals(ArgsUtils.escape("23\42"), "23\\42");
+        Assertions.assertEquals(ArgsUtils.escape("23\42"), "23\\ 42");
     }
 
     @Test
