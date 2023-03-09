@@ -56,11 +56,6 @@ public abstract class AbstractTask {
     protected int processId;
 
     /**
-     * SHELL result string
-     */
-    protected String resultString;
-
-    /**
      * other resource manager appId , for example : YARN etc
      */
     protected String appIds;
@@ -89,10 +84,7 @@ public abstract class AbstractTask {
     public void init() {
     }
 
-    public String getPreScript() {
-        return null;
-    }
-
+    // todo: return TaskResult rather than store the result in Task
     public abstract void handle(TaskCallBack taskCallBack) throws TaskException;
 
     public abstract void cancel() throws TaskException;
@@ -124,14 +116,6 @@ public abstract class AbstractTask {
 
     public void setProcessId(int processId) {
         this.processId = processId;
-    }
-
-    public String getResultString() {
-        return resultString;
-    }
-
-    public void setResultString(String resultString) {
-        this.resultString = resultString;
     }
 
     public String getAppIds() {
