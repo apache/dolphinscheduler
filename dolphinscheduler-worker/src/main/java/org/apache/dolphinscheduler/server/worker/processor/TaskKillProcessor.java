@@ -186,6 +186,7 @@ public class TaskKillProcessor implements NettyRequestProcessor {
      * @param processId
      */
     protected boolean killProcess(String tenantCode, Integer processId) {
+        // todo: directly interrupt the process
         boolean processFlag = true;
         if (processId == null || processId.equals(0)) {
             return true;

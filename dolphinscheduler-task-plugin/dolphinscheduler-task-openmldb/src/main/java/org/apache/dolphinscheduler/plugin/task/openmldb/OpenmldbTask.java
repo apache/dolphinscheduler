@@ -70,12 +70,6 @@ public class OpenmldbTask extends PythonTask {
         }
     }
 
-    @Override
-    @Deprecated
-    public String getPreScript() {
-        return "";
-    }
-
     /**
      * build python command file path
      *

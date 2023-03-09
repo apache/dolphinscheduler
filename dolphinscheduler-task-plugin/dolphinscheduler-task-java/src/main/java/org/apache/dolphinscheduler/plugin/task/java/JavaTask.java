@@ -100,22 +100,6 @@ public class JavaTask extends AbstractTask {
     }
 
     /**
-     *  Gets the Java source file that was initially processed
-     *
-     * @return String
-     **/
-    @Override
-    public String getPreScript() {
-        String rawJavaScript = javaParameters.getRawScript().replaceAll("\\r\\n", "\n");
-        try {
-            rawJavaScript = convertJavaSourceCodePlaceholders(rawJavaScript);
-        } catch (StringIndexOutOfBoundsException e) {
-            log.error("setShareVar field format error, raw java script: {}", rawJavaScript);
-        }
-        return rawJavaScript;
-    }
-
-    /**
      * Execute Java tasks
      *
      * @return void

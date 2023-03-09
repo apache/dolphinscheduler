@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.plugin.task.api;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils.getPidsStr;
 
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
@@ -191,7 +190,7 @@ public abstract class AbstractCommandExecutor {
         command.add(String.format("--uid=%s", taskRequest.getTenantCode()));
     }
 
-    public TaskResponse run(String execCommand, TaskCallBack taskCallBack) throws IOException, InterruptedException {
+    public TaskResponse run(String execCommand, TaskCallBack taskCallBack) throws Exception {
         TaskResponse result = new TaskResponse();
         int taskInstanceId = taskRequest.getTaskInstanceId();
         if (null == TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId)) {
@@ -223,8 +222,8 @@ public abstract class AbstractCommandExecutor {
         boolean updateTaskExecutionContextStatus =
                 TaskExecutionContextCacheManager.updateTaskExecutionContext(taskRequest);
         if (Boolean.FALSE.equals(updateTaskExecutionContextStatus)) {
-            ProcessUtils.kill(taskRequest);
             result.setExitStatusCode(EXIT_CODE_KILL);
+            cancelApplication();
             return result;
         }
         // print process id
@@ -262,14 +261,13 @@ public abstract class AbstractCommandExecutor {
         } else {
             logger.error("process has failure, the task timeout configuration value is:{}, ready to kill ...",
                     taskRequest.getTaskTimeout());
-            ProcessUtils.kill(taskRequest);
             result.setExitStatusCode(EXIT_CODE_FAILURE);
+            cancelApplication();
         }
         int exitCode = process.exitValue();
         String exitLogMessage = EXIT_CODE_KILL == exitCode ? "process has killed." : "process has exited.";
-        logger.info(exitLogMessage
-                + " execute path:{}, processId:{} ,exitStatusCode:{} ,processWaitForStatus:{} ,processExitValue:{}",
-                taskRequest.getExecutePath(), processId, result.getExitStatusCode(), status, exitCode);
+        logger.info("{} execute path:{}, processId:{} ,exitStatusCode:{} ,processWaitForStatus:{} ,processExitValue:{}",
+                exitLogMessage, taskRequest.getExecutePath(), processId, result.getExitStatusCode(), status, exitCode);
         return result;
 
     }
@@ -278,53 +276,18 @@ public abstract class AbstractCommandExecutor {
         return varPool.toString();
     }
 
-    /**
-     * cancel application
-     *
-     * @throws Exception exception
-     */
-    public void cancelApplication() throws Exception {
+    public void cancelApplication() throws InterruptedException {
         if (process == null) {
             return;
         }
 
-        int processId = getProcessId(process);
-        logger.info("Begin to kill process process, pid is : {}", processId);
-        // kill , waiting for completion
-        boolean alive = softKill(processId);
-
-        if (alive) {
-            String cmd = String.format("kill -9 %s", getPidsStr(processId));
-            cmd = OSUtils.getSudoCmd(taskRequest.getTenantCode(), cmd);
-            OSUtils.exeCmd(cmd);
-            logger.info("Success kill task: {}, pid: {}, cmd: {}", taskRequest.getTaskAppId(), processId, cmd);
-        } else {
-            logger.info("The process: {} is not alive, no need to kill", processId);
+        // soft kill
+        logger.info("Begin to kill process process, pid is : {}", taskRequest.getProcessId());
+        process.destroy();
+        if (!process.waitFor(5, TimeUnit.SECONDS)) {
+            process.destroyForcibly();
         }
-    }
-
-    /**
-     * soft kill
-     *
-     * @param processId process id
-     * @return process is alive
-     */
-    private boolean softKill(int processId) {
-
-        if (processId != 0 && process.isAlive()) {
-            try {
-                // sudo -u user command to run command
-                String cmd = String.format("kill %d", processId);
-                cmd = OSUtils.getSudoCmd(taskRequest.getTenantCode(), cmd);
-                logger.info("soft kill task:{}, process id:{}, cmd:{}", taskRequest.getTaskAppId(), processId, cmd);
-
-                Runtime.getRuntime().exec(cmd);
-            } catch (IOException e) {
-                logger.info("kill attempt failed", e);
-            }
-        }
-
-        return process.isAlive();
+        logger.info("Success kill task: {}, pid: {}", taskRequest.getTaskAppId(), taskRequest.getProcessId());
     }
 
     private void printCommand(List<String> commands) {
@@ -424,7 +387,7 @@ public abstract class AbstractCommandExecutor {
             f.setAccessible(true);
 
             processId = f.getInt(process);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             logger.error("Get task pid failed", e);
         }
 

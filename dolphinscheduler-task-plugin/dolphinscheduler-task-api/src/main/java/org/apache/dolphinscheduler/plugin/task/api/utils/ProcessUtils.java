@@ -79,6 +79,7 @@ public final class ProcessUtils {
     /**
      * kill tasks according to different task types.
      */
+    @Deprecated
     public static boolean kill(@NonNull TaskExecutionContext request) {
         try {
             log.info("Begin kill task instance, processId: {}", request.getProcessId());
