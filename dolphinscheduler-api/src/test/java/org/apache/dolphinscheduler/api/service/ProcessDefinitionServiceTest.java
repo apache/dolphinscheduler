@@ -30,6 +30,7 @@ import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT;
 import static org.apache.dolphinscheduler.common.constants.Constants.EMPTY_STRING;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.times;
 
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowCreateRequest;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowFilterRequest;
@@ -174,6 +175,9 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
 
     @Mock
     private WorkFlowLineageService workFlowLineageService;
+
+    @Mock
+    private MetricsCleanUpService metricsCleanUpService;
 
     @Mock
     private TaskDefinitionService taskDefinitionService;
@@ -478,6 +482,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
     @Test
     public void deleteProcessDefinitionByCodeTest() {
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
+        Mockito.doNothing().when(metricsCleanUpService).cleanUpWorkflowMetricsByDefinitionCode(String.valueOf(46L));
 
         Project project = getProject(projectCode);
 
@@ -525,6 +530,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         Mockito.when(workFlowLineageService.queryTaskDepOnProcess(project.getCode(), processDefinition.getCode()))
                 .thenReturn(Collections.emptySet());
         processDefinitionService.deleteProcessDefinitionByCode(user, 46L);
+        Mockito.verify(metricsCleanUpService, times(1)).cleanUpWorkflowMetricsByDefinitionCode(String.valueOf(46L));
 
         // scheduler online
         Schedule schedule = getSchedule();
@@ -551,7 +557,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         Mockito.when(workFlowLineageService.queryTaskDepOnProcess(project.getCode(), processDefinition.getCode()))
                 .thenReturn(Collections.emptySet());
         Assertions.assertDoesNotThrow(() -> processDefinitionService.deleteProcessDefinitionByCode(user, 46L));
-
+        Mockito.verify(metricsCleanUpService, times(2)).cleanUpWorkflowMetricsByDefinitionCode(String.valueOf(46L));
     }
 
     @Test
@@ -600,9 +606,11 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         Mockito.when(workFlowLineageService.queryTaskDepOnProcess(project.getCode(), process.getCode()))
                 .thenReturn(Collections.emptySet());
         putMsg(result, Status.SUCCESS, projectCode);
+        Mockito.doNothing().when(metricsCleanUpService).cleanUpWorkflowMetricsByDefinitionCode(String.valueOf(11L));
         Map<String, Object> deleteSuccess =
                 processDefinitionService.batchDeleteProcessDefinitionByCodes(user, projectCode, singleCodes);
         Assertions.assertEquals(Status.SUCCESS, deleteSuccess.get(Constants.STATUS));
+        Mockito.verify(metricsCleanUpService, times(2)).cleanUpWorkflowMetricsByDefinitionCode(String.valueOf(11L));
     }
 
     @Test
