@@ -193,7 +193,8 @@ public class MasterFailoverService {
                     }
                 }
 
-                ProcessInstanceMetrics.incProcessInstanceByState("failover");
+                ProcessInstanceMetrics.incProcessInstanceByStateAndProcessDefinitionCode("failover",
+                        processInstance.getProcessDefinitionCode().toString());
                 // updateProcessInstance host is null to mark this processInstance has been failover
                 // and insert a failover command
                 processInstance.setHost(Constants.NULL);

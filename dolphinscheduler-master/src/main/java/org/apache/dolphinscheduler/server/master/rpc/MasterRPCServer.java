@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProce
 import org.apache.dolphinscheduler.server.master.processor.TaskRecallProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskUpdatePidProcessor;
 import org.apache.dolphinscheduler.server.master.processor.WorkflowExecutingDataRequestProcessor;
+import org.apache.dolphinscheduler.server.master.processor.WorkflowMetricsCleanUpProcessor;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -83,6 +84,9 @@ public class MasterRPCServer implements AutoCloseable {
     @Autowired
     private TaskExecuteStartProcessor taskExecuteStartProcessor;
 
+    @Autowired
+    private WorkflowMetricsCleanUpProcessor workflowMetricsCleanUpProcessor;
+
     public void start() {
         log.info("Starting Master RPC Server...");
         // init remoting server
@@ -101,6 +105,8 @@ public class MasterRPCServer implements AutoCloseable {
         this.nettyRemotingServer.registerProcessor(CommandType.WORKFLOW_EXECUTING_DATA_REQUEST,
                 workflowExecutingDataRequestProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_START, taskExecuteStartProcessor);
+        this.nettyRemotingServer.registerProcessor(CommandType.WORKFLOW_METRICS_CLEANUP,
+                workflowMetricsCleanUpProcessor);
 
         // log server
         this.nettyRemotingServer.registerProcessor(CommandType.GET_LOG_BYTES_REQUEST, loggerRequestProcessor);

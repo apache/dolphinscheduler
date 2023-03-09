@@ -83,7 +83,8 @@ For example, you can get the master metrics by `curl http://localhost:5679/actua
 - ds.workflow.create.command.count: (counter) the number of commands created and inserted by workflows
 - ds.workflow.instance.submit.count: (counter) the number of submitted workflow instances
 - ds.workflow.instance.running: (gauge) the number of running workflow instances
-- ds.workflow.instance.count: (counter) the number of workflow instances, sliced by the tag `state`:
+- ds.workflow.instance.count: (counter) the number of workflow instances, sliced by tags `process.definition.code` and `state`. To monitor a specific workflow, you could filter the metrics by tag `process.definition.code`, which refers to the definition code of your workflow. There are seven different states for workflow instances as follows:
+  - submit: the number of submitted workflow instances
   - timeout: the number of timeout workflow instances
   - finish: the number of finished workflow instances, both successes and failures included
   - success: the number of successful workflow instances

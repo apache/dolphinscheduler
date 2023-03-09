@@ -148,6 +148,7 @@ public class FailoverServiceTest {
         processInstance.setRestartTime(new Date());
         processInstance.setHistoryCmd("xxx");
         processInstance.setCommandType(CommandType.STOP);
+        processInstance.setProcessDefinitionCode(123L);
 
         masterTaskInstance = new TaskInstance();
         masterTaskInstance.setId(1);

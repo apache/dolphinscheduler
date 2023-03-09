@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.event;
 
 import org.apache.dolphinscheduler.common.enums.StateEventType;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 
@@ -32,7 +33,9 @@ public class WorkflowTimeoutStateEventHandler implements StateEventHandler {
     @Override
     public boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable, StateEvent stateEvent) {
         log.info("Handle workflow instance timeout event");
-        ProcessInstanceMetrics.incProcessInstanceByState("timeout");
+        ProcessInstance processInstance = workflowExecuteRunnable.getProcessInstance();
+        ProcessInstanceMetrics.incProcessInstanceByStateAndProcessDefinitionCode("timeout",
+                processInstance.getProcessDefinitionCode().toString());
         workflowExecuteRunnable.processTimeout();
         return true;
     }
