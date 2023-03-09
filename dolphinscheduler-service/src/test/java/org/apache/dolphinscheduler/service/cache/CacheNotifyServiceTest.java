@@ -21,35 +21,30 @@ import org.apache.dolphinscheduler.common.enums.CacheType;
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CacheExpireCommand;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.apache.dolphinscheduler.service.cache.impl.CacheNotifyServiceImpl;
-import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
  * tenant cache proxy test
  */
-@RunWith(MockitoJUnitRunner.Silent.class)
+@ExtendWith(MockitoExtension.class)
 public class CacheNotifyServiceTest {
-
-    @Rule
-    public final ExpectedException exception = ExpectedException.none();
 
     @InjectMocks
     private CacheNotifyServiceImpl cacheNotifyService;
@@ -67,7 +62,7 @@ public class CacheNotifyServiceTest {
 
         NettyRemotingServer nettyRemotingServer = new NettyRemotingServer(serverConfig);
         nettyRemotingServer.registerProcessor(CommandType.CACHE_EXPIRE, (channel, command) -> {
-            Assert.assertEquals(cacheExpireCommand, command);
+            Assertions.assertEquals(cacheExpireCommand, command);
         });
         nettyRemotingServer.start();
 

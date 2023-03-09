@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.registry.zookeeper;
 
 import org.apache.dolphinscheduler.registry.api.Event;
-import org.apache.dolphinscheduler.registry.api.RegistryProperties;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 
 import org.apache.curator.test.TestingServer;
@@ -28,11 +27,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,11 +44,11 @@ public class ZookeeperRegistryTest {
 
     ZookeeperRegistry registry;
 
-    @Before
+    @BeforeEach
     public void before() throws Exception {
         server = new TestingServer(true);
 
-        RegistryProperties p = new RegistryProperties();
+        ZookeeperRegistryProperties p = new ZookeeperRegistryProperties();
         p.getZookeeper().setConnectString(server.getConnectString());
         registry = new ZookeeperRegistry(p);
         registry.start();
@@ -59,10 +59,10 @@ public class ZookeeperRegistryTest {
     public void persistTest() {
         registry.put("/nodes/m1", "", false);
         registry.put("/nodes/m2", "", false);
-        Assert.assertEquals(Arrays.asList("m2", "m1"), registry.children("/nodes"));
-        Assert.assertTrue(registry.exists("/nodes/m1"));
+        Assertions.assertEquals(Arrays.asList("m2", "m1"), registry.children("/nodes"));
+        Assertions.assertTrue(registry.exists("/nodes/m1"));
         registry.delete("/nodes/m2");
-        Assert.assertFalse(registry.exists("/nodes/m2"));
+        Assertions.assertFalse(registry.exists("/nodes/m2"));
     }
 
     @Test
@@ -73,7 +73,8 @@ public class ZookeeperRegistryTest {
         new Thread(() -> {
             registry.acquireLock("/lock");
             preCountDownLatch.countDown();
-            logger.info(Thread.currentThread().getName() + " :I got the lock, but I don't want to work. I want to rest for a while");
+            logger.info(Thread.currentThread().getName()
+                    + " :I got the lock, but I don't want to work. I want to rest for a while");
             try {
                 Thread.sleep(1000);
                 logger.info(Thread.currentThread().getName() + " :I'm going to start working");
@@ -87,7 +88,7 @@ public class ZookeeperRegistryTest {
                 allCountDownLatch.countDown();
             }
         }).start();
-        preCountDownLatch.await();
+        preCountDownLatch.await(5, TimeUnit.SECONDS);
         new Thread(() -> {
             try {
                 logger.info(Thread.currentThread().getName() + " :I am trying to acquire the lock");
@@ -101,26 +102,27 @@ public class ZookeeperRegistryTest {
             }
 
         }).start();
-        allCountDownLatch.await();
-        Assert.assertEquals(testData, Arrays.asList("thread1", "thread2"));
+        allCountDownLatch.await(5, TimeUnit.SECONDS);
+        Assertions.assertEquals(testData, Arrays.asList("thread1", "thread2"));
 
     }
 
     @Test
     public void subscribeTest() {
         boolean status = registry.subscribe("/sub", new TestListener());
-        Assert.assertTrue(status);
+        Assertions.assertTrue(status);
 
     }
 
     static class TestListener implements SubscribeListener {
+
         @Override
         public void notify(Event event) {
             logger.info("I'm test listener");
         }
     }
 
-    @After
+    @AfterEach
     public void after() throws IOException {
         registry.close();
         server.close();

@@ -17,15 +17,20 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.dolphinscheduler.common.Constants;
-import org.junit.Test;
+import org.apache.dolphinscheduler.common.constants.Constants;
 
-import static org.junit.Assert.assertNotNull;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class PropertyUtilsTest {
 
     @Test
     public void getString() {
-        assertNotNull(PropertyUtils.getString(Constants.FS_DEFAULTFS));
+        Assertions.assertNotNull(PropertyUtils.getString(Constants.FS_DEFAULT_FS));
+    }
+
+    @Test
+    public void getResUploadStartupState() {
+        Assertions.assertTrue(PropertyUtils.getResUploadStartupState());
     }
 }

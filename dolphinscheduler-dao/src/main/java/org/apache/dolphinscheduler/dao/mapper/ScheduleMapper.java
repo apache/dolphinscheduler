@@ -64,6 +64,16 @@ public interface ScheduleMapper extends BaseMapper<Schedule> {
                                                    @Param("searchVal") String searchVal);
 
     /**
+     * Filter schedule
+     *
+     * @param page page
+     * @param schedule schedule
+     * @return schedule IPage
+     */
+    IPage<Schedule> filterSchedules(IPage<Schedule> page,
+                                    @Param("schedule") Schedule schedule);
+
+    /**
      * query schedule list by project name
      *
      * @param projectName projectName
@@ -86,4 +96,12 @@ public interface ScheduleMapper extends BaseMapper<Schedule> {
      * @return schedule
      */
     Schedule queryByProcessDefinitionCode(@Param("processDefinitionCode") long processDefinitionCode);
+
+    /**
+     * query worker group list by process definition code
+     *
+     * @param processDefinitionCodeList processDefinitionCodeList
+     * @return schedule
+     */
+    List<Schedule> querySchedulesByProcessDefinitionCodes(@Param("processDefinitionCodeList") List<Long> processDefinitionCodeList);
 }

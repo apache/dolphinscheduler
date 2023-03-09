@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch;
 
-
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
@@ -26,9 +25,11 @@ import org.apache.dolphinscheduler.server.master.dispatch.executor.ExecutorManag
 import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
 import org.apache.dolphinscheduler.server.master.dispatch.host.HostManager;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.concurrent.ConcurrentHashMap;
+
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,7 @@ import org.springframework.stereotype.Service;
  * executor dispatcher
  */
 @Service
+@Slf4j
 public class ExecutorDispatcher implements InitializingBean {
 
     /**
@@ -60,7 +62,7 @@ public class ExecutorDispatcher implements InitializingBean {
     /**
      * constructor
      */
-    public ExecutorDispatcher(){
+    public ExecutorDispatcher() {
         this.executorManagers = new ConcurrentHashMap<>();
     }
 
@@ -71,32 +73,25 @@ public class ExecutorDispatcher implements InitializingBean {
      * @return result
      * @throws ExecuteException if error throws ExecuteException
      */
-    public Boolean dispatch(final ExecutionContext context) throws ExecuteException {
-        /**
-         * get executor manager
-         */
+    public void dispatch(final ExecutionContext context) throws ExecuteException {
+        // get executor manager
         ExecutorManager<Boolean> executorManager = this.executorManagers.get(context.getExecutorType());
-        if(executorManager == null){
+        if (executorManager == null) {
             throw new ExecuteException("no ExecutorManager for type : " + context.getExecutorType());
         }
 
-        /**
-         * host select
-         */
-
+        // host select
         Host host = hostManager.select(context);
         if (StringUtils.isEmpty(host.getAddress())) {
-            throw new ExecuteException(String.format("fail to execute : %s due to no suitable worker, "
-                            + "current task needs worker group %s to execute",
-                    context.getCommand(),context.getWorkerGroup()));
+            log.warn("fail to execute : {} due to no suitable worker, current task needs worker group {} to execute",
+                    context.getCommand(), context.getWorkerGroup());
+            throw new ExecuteException("no suitable worker");
         }
         context.setHost(host);
         executorManager.beforeExecute(context);
         try {
-            /**
-             * task execute
-             */
-            return executorManager.execute(context);
+            // task execute
+            executorManager.execute(context);
         } finally {
             executorManager.afterExecute(context);
         }
@@ -117,7 +112,7 @@ public class ExecutorDispatcher implements InitializingBean {
      * @param type executor type
      * @param executorManager executorManager
      */
-    public void register(ExecutorType type, ExecutorManager executorManager){
+    public void register(ExecutorType type, ExecutorManager executorManager) {
         executorManagers.put(type, executorManager);
     }
 }

@@ -19,131 +19,44 @@ package org.apache.dolphinscheduler.remote.command;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
-import java.io.Serializable;
-import java.util.Date;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
- * execute task request command
+ * task execute response ack command
+ * from master to worker
  */
-public class TaskExecuteAckCommand implements Serializable {
+@Data
+@NoArgsConstructor
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
+public class TaskExecuteAckCommand extends BaseCommand {
 
-    /**
-     * taskInstanceId
-     */
     private int taskInstanceId;
+    private boolean success;
 
-    /**
-     * process instance id
-     */
-    private int processInstanceId;
-
-    /**
-     * startTime
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date startTime;
-
-    /**
-     * host
-     */
-    private String host;
-
-    /**
-     * status
-     */
-    private int status;
-
-    /**
-     * logPath
-     */
-    private String logPath;
-
-    /**
-     * executePath
-     */
-    private String executePath;
-
-    public Date getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
-    }
-
-    public String getHost() {
-        return host;
-    }
-
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
-    public int getTaskInstanceId() {
-        return taskInstanceId;
-    }
-
-    public void setTaskInstanceId(int taskInstanceId) {
+    public TaskExecuteAckCommand(boolean success,
+                                 int taskInstanceId,
+                                 String sourceServerAddress,
+                                 String messageReceiverAddress,
+                                 long messageSendTime) {
+        super(sourceServerAddress, messageReceiverAddress, messageSendTime);
+        this.success = success;
         this.taskInstanceId = taskInstanceId;
     }
 
-    public String getLogPath() {
-        return logPath;
-    }
-
-    public void setLogPath(String logPath) {
-        this.logPath = logPath;
-    }
-
-    public String getExecutePath() {
-        return executePath;
-    }
-
-    public void setExecutePath(String executePath) {
-        this.executePath = executePath;
-    }
-
     /**
-     * package request command
+     * package response command
      *
      * @return command
      */
     public Command convert2Command() {
         Command command = new Command();
-        command.setType(CommandType.TASK_EXECUTE_ACK);
+        command.setType(CommandType.TASK_EXECUTE_RESULT_ACK);
         byte[] body = JSONUtils.toJsonByteArray(this);
         command.setBody(body);
         return command;
-    }
-
-    @Override
-    public String toString() {
-        return "TaskExecuteAckCommand{"
-                + "taskInstanceId=" + taskInstanceId
-                + ", startTime=" + startTime
-                + ", host='" + host + '\''
-                + ", status=" + status
-                + ", logPath='" + logPath + '\''
-                + ", executePath='" + executePath + '\''
-                + ", processInstanceId='" + processInstanceId + '\''
-                + '}';
-    }
-
-    public int getProcessInstanceId() {
-        return processInstanceId;
-    }
-
-    public void setProcessInstanceId(int processInstanceId) {
-        this.processInstanceId = processInstanceId;
     }
 }

@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.dao.entity;
 import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * process task relation log
@@ -36,7 +35,6 @@ public class ProcessTaskRelationLog extends ProcessTaskRelation {
     /**
      * operate time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date operateTime;
 
     public ProcessTaskRelationLog() {
@@ -45,7 +43,6 @@ public class ProcessTaskRelationLog extends ProcessTaskRelation {
 
     public ProcessTaskRelationLog(ProcessTaskRelation processTaskRelation) {
         super();
-        this.setId(processTaskRelation.getId());
         this.setName(processTaskRelation.getName());
         this.setProcessDefinitionCode(processTaskRelation.getProcessDefinitionCode());
         this.setProcessDefinitionVersion(processTaskRelation.getProcessDefinitionVersion());

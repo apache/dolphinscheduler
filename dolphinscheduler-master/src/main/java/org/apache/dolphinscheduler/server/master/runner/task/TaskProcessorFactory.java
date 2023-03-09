@@ -17,39 +17,66 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
-import static org.apache.dolphinscheduler.common.Constants.COMMON_TASK_TYPE;
+import static org.apache.dolphinscheduler.common.constants.Constants.COMMON_TASK_TYPE;
+
+import org.apache.dolphinscheduler.spi.plugin.PrioritySPIFactory;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
-import java.util.Objects;
-import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
+
+import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * the factory to create task processor
  */
-public class TaskProcessorFactory {
+@UtilityClass
+@Slf4j
+public final class TaskProcessorFactory {
 
-    public static final Map<String, ITaskProcessor> PROCESS_MAP = new ConcurrentHashMap<>();
+    private static final Map<String, Constructor<ITaskProcessor>> PROCESS_MAP = new ConcurrentHashMap<>();
 
     private static final String DEFAULT_PROCESSOR = COMMON_TASK_TYPE;
 
     static {
-        for (ITaskProcessor iTaskProcessor : ServiceLoader.load(ITaskProcessor.class)) {
-            PROCESS_MAP.put(iTaskProcessor.getType(), iTaskProcessor);
+        PrioritySPIFactory<ITaskProcessor> prioritySPIFactory = new PrioritySPIFactory<>(ITaskProcessor.class);
+        for (Map.Entry<String, ITaskProcessor> entry : prioritySPIFactory.getSPIMap().entrySet()) {
+            try {
+                log.info("Registering task processor: {} - {}", entry.getKey(), entry.getValue().getClass());
+                PROCESS_MAP.put(entry.getKey(),
+                        (Constructor<ITaskProcessor>) entry.getValue().getClass().getConstructor());
+                log.info("Registered task processor: {} - {}", entry.getKey(), entry.getValue().getClass());
+            } catch (NoSuchMethodException e) {
+                throw new IllegalArgumentException(
+                        String.format("The task processor: %s should has a no args constructor", entry.getKey()));
+            }
         }
     }
 
-    public static ITaskProcessor getTaskProcessor(String type) throws InstantiationException, IllegalAccessException {
+    public static ITaskProcessor getTaskProcessor(String type) throws InvocationTargetException, InstantiationException, IllegalAccessException {
         if (StringUtils.isEmpty(type)) {
             type = DEFAULT_PROCESSOR;
         }
-        ITaskProcessor iTaskProcessor = PROCESS_MAP.get(type);
-        if (Objects.isNull(iTaskProcessor)) {
-            iTaskProcessor = PROCESS_MAP.get(DEFAULT_PROCESSOR);
+        Constructor<ITaskProcessor> iTaskProcessorConstructor = PROCESS_MAP.get(type);
+        if (iTaskProcessorConstructor == null) {
+            iTaskProcessorConstructor = PROCESS_MAP.get(DEFAULT_PROCESSOR);
         }
 
-        return iTaskProcessor.getClass().newInstance();
+        return iTaskProcessorConstructor.newInstance();
     }
+
+    /**
+     * if match master processor, then this task type is processed on the master
+     *
+     * @param type
+     * @return
+     */
+    public static boolean isMasterTask(String type) {
+        return PROCESS_MAP.containsKey(type);
+    }
+
 }

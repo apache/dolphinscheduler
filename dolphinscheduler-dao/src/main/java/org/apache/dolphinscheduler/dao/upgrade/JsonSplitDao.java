@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.upgrade;
 
-import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
@@ -27,12 +26,10 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class JsonSplitDao {
-
-    public static final Logger logger = LoggerFactory.getLogger(JsonSplitDao.class);
 
     /**
      * executeJsonSplitProcessDefinition
@@ -41,9 +38,11 @@ public class JsonSplitDao {
      * @param processDefinitionLogs processDefinitionLogs
      */
     public void executeJsonSplitProcessDefinition(Connection conn, List<ProcessDefinitionLog> processDefinitionLogs) {
-        String updateSql = "UPDATE t_ds_process_definition SET global_params=?,timeout=?,tenant_id=?,locations=?,update_time=? where id=?";
-        String insertLogSql = "insert into t_ds_process_definition_log (code,name,version,description,project_code,release_state,user_id,"
-            + "global_params,flag,locations,timeout,tenant_id,operator,operate_time,create_time,update_time) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        String updateSql =
+                "UPDATE t_ds_process_definition SET global_params=?,timeout=?,tenant_id=?,locations=?,update_time=? where id=?";
+        String insertLogSql =
+                "insert into t_ds_process_definition_log (code,name,version,description,project_code,release_state,user_id,"
+                        + "global_params,flag,locations,timeout,tenant_id,operator,operate_time,create_time,update_time) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try {
             PreparedStatement processUpdate = conn.prepareStatement(updateSql);
             PreparedStatement insertLog = conn.prepareStatement(insertLogSql);
@@ -88,10 +87,8 @@ public class JsonSplitDao {
             processUpdate.close();
             insertLog.close();
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new RuntimeException(e);
-        } finally {
-            ConnectionUtils.releaseResource(conn);
         }
     }
 
@@ -101,12 +98,15 @@ public class JsonSplitDao {
      * @param conn jdbc connection
      * @param processTaskRelationLogs processTaskRelationLogs
      */
-    public void executeJsonSplitProcessTaskRelation(Connection conn, List<ProcessTaskRelationLog> processTaskRelationLogs) {
-        String insertSql = "insert into t_ds_process_task_relation (project_code,process_definition_code,process_definition_version,pre_task_code,pre_task_version,"
-            + "post_task_code,post_task_version,condition_type,condition_params,create_time,update_time) values (?,?,?,?,?,?,?,?,?,?,?)";
-        String insertLogSql = "insert into t_ds_process_task_relation_log (project_code,process_definition_code,process_definition_version,pre_task_code,"
-            + "pre_task_version,post_task_code,post_task_version,condition_type,condition_params,operator,operate_time,create_time,update_time) "
-            + "values (?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    public void executeJsonSplitProcessTaskRelation(Connection conn,
+                                                    List<ProcessTaskRelationLog> processTaskRelationLogs) {
+        String insertSql =
+                "insert into t_ds_process_task_relation (project_code,process_definition_code,process_definition_version,pre_task_code,pre_task_version,"
+                        + "post_task_code,post_task_version,condition_type,condition_params,create_time,update_time) values (?,?,?,?,?,?,?,?,?,?,?)";
+        String insertLogSql =
+                "insert into t_ds_process_task_relation_log (project_code,process_definition_code,process_definition_version,pre_task_code,"
+                        + "pre_task_version,post_task_code,post_task_version,condition_type,condition_params,operator,operate_time,create_time,update_time) "
+                        + "values (?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try {
             PreparedStatement insert = conn.prepareStatement(insertSql);
             PreparedStatement insertLog = conn.prepareStatement(insertLogSql);
@@ -153,10 +153,8 @@ public class JsonSplitDao {
             insert.close();
             insertLog.close();
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new RuntimeException(e);
-        } finally {
-            ConnectionUtils.releaseResource(conn);
         }
     }
 
@@ -167,12 +165,14 @@ public class JsonSplitDao {
      * @param taskDefinitionLogs taskDefinitionLogs
      */
     public void executeJsonSplitTaskDefinition(Connection conn, List<TaskDefinitionLog> taskDefinitionLogs) {
-        String insertSql = "insert into t_ds_task_definition (code,name,version,description,project_code,user_id,task_type,task_params,flag,task_priority,"
-            + "worker_group,environment_code,fail_retry_times,fail_retry_interval,timeout_flag,timeout_notify_strategy,timeout,delay_time,resource_ids,"
-            + "create_time,update_time) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-        String insertLogSql = "insert into t_ds_task_definition_log (code,name,version,description,project_code,user_id,task_type,task_params,flag,task_priority,"
-            + "worker_group,environment_code,fail_retry_times,fail_retry_interval,timeout_flag,timeout_notify_strategy,timeout,delay_time,resource_ids,operator,"
-            + "operate_time,create_time,update_time) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        String insertSql =
+                "insert into t_ds_task_definition (code,name,version,description,project_code,user_id,task_type,task_params,flag,task_priority,"
+                        + "worker_group,environment_code,fail_retry_times,fail_retry_interval,timeout_flag,timeout_notify_strategy,timeout,delay_time,resource_ids,"
+                        + "create_time,update_time) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        String insertLogSql =
+                "insert into t_ds_task_definition_log (code,name,version,description,project_code,user_id,task_type,task_params,flag,task_priority,"
+                        + "worker_group,environment_code,fail_retry_times,fail_retry_interval,timeout_flag,timeout_notify_strategy,timeout,delay_time,resource_ids,operator,"
+                        + "operate_time,create_time,update_time) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try {
             PreparedStatement insert = conn.prepareStatement(insertSql);
             PreparedStatement insertLog = conn.prepareStatement(insertLogSql);
@@ -193,7 +193,8 @@ public class JsonSplitDao {
                 insert.setInt(13, taskDefinitionLog.getFailRetryTimes());
                 insert.setInt(14, taskDefinitionLog.getFailRetryInterval());
                 insert.setInt(15, taskDefinitionLog.getTimeoutFlag().getCode());
-                insert.setInt(16, taskDefinitionLog.getTimeoutNotifyStrategy() == null ? 0 : taskDefinitionLog.getTimeoutNotifyStrategy().getCode());
+                insert.setInt(16, taskDefinitionLog.getTimeoutNotifyStrategy() == null ? 0
+                        : taskDefinitionLog.getTimeoutNotifyStrategy().getCode());
                 insert.setInt(17, taskDefinitionLog.getTimeout());
                 insert.setInt(18, taskDefinitionLog.getDelayTime());
                 insert.setString(19, taskDefinitionLog.getResourceIds());
@@ -216,7 +217,8 @@ public class JsonSplitDao {
                 insertLog.setInt(13, taskDefinitionLog.getFailRetryTimes());
                 insertLog.setInt(14, taskDefinitionLog.getFailRetryInterval());
                 insertLog.setInt(15, taskDefinitionLog.getTimeoutFlag().getCode());
-                insertLog.setInt(16, taskDefinitionLog.getTimeoutNotifyStrategy() == null ? 0 : taskDefinitionLog.getTimeoutNotifyStrategy().getCode());
+                insertLog.setInt(16, taskDefinitionLog.getTimeoutNotifyStrategy() == null ? 0
+                        : taskDefinitionLog.getTimeoutNotifyStrategy().getCode());
                 insertLog.setInt(17, taskDefinitionLog.getTimeout());
                 insertLog.setInt(18, taskDefinitionLog.getDelayTime());
                 insertLog.setString(19, taskDefinitionLog.getResourceIds());
@@ -239,10 +241,8 @@ public class JsonSplitDao {
             insert.close();
             insertLog.close();
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new RuntimeException(e);
-        } finally {
-            ConnectionUtils.releaseResource(conn);
         }
     }
 }

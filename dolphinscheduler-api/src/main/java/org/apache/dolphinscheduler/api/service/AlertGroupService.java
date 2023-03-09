@@ -30,9 +30,10 @@ public interface AlertGroupService {
     /**
      * query alert group list
      *
+     * @param loginUser
      * @return alert group list
      */
-    Map<String, Object> queryAlertgroup();
+    Map<String, Object> queryAlertgroup(User loginUser);
 
     /**
      * query alert group by id
@@ -42,6 +43,7 @@ public interface AlertGroupService {
      * @return one alert group
      */
     Map<String, Object> queryAlertGroupById(User loginUser, Integer id);
+
     /**
      * paging query alarm group list
      *
@@ -74,7 +76,8 @@ public interface AlertGroupService {
      * @param alertInstanceIds alertInstanceIds
      * @return update result code
      */
-    Map<String, Object> updateAlertgroup(User loginUser, int id, String groupName, String desc, String alertInstanceIds);
+    Map<String, Object> updateAlertgroup(User loginUser, int id, String groupName, String desc,
+                                         String alertInstanceIds);
 
     /**
      * delete alert group by id

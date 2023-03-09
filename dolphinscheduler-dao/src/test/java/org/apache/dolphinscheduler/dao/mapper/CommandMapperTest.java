@@ -17,14 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
@@ -43,7 +36,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -63,7 +57,7 @@ public class CommandMapperTest extends BaseDaoTest {
     @Test
     public void testInsert() {
         Command command = createCommand();
-        assertThat(command.getId(),greaterThan(0));
+        Assertions.assertTrue(command.getId() > 0);
     }
 
     /**
@@ -72,11 +66,11 @@ public class CommandMapperTest extends BaseDaoTest {
     @Test
     public void testSelectById() {
         Command expectedCommand = createCommand();
-        //query
+        // query
         Command actualCommand = commandMapper.selectById(expectedCommand.getId());
 
-        assertNotNull(actualCommand);
-        assertEquals(expectedCommand.getProcessDefinitionCode(), actualCommand.getProcessDefinitionCode());
+        Assertions.assertNotNull(actualCommand);
+        Assertions.assertEquals(expectedCommand.getProcessDefinitionCode(), actualCommand.getProcessDefinitionCode());
     }
 
     /**
@@ -94,8 +88,8 @@ public class CommandMapperTest extends BaseDaoTest {
 
         Command actualCommand = commandMapper.selectById(expectedCommand.getId());
 
-        assertNotNull(actualCommand);
-        assertEquals(expectedCommand.getUpdateTime(),actualCommand.getUpdateTime());
+        Assertions.assertNotNull(actualCommand);
+        Assertions.assertEquals(expectedCommand.getUpdateTime(), actualCommand.getUpdateTime());
 
     }
 
@@ -110,10 +104,8 @@ public class CommandMapperTest extends BaseDaoTest {
 
         Command actualCommand = commandMapper.selectById(expectedCommand.getId());
 
-        assertNull(actualCommand);
+        Assertions.assertNull(actualCommand);
     }
-
-
 
     /**
      * test query all
@@ -126,7 +118,7 @@ public class CommandMapperTest extends BaseDaoTest {
 
         List<Command> actualCommands = commandMapper.selectList(null);
 
-        assertThat(actualCommands.size(), greaterThanOrEqualTo(count));
+        Assertions.assertTrue(actualCommands.size() >= count);
     }
 
     /**
@@ -139,9 +131,9 @@ public class CommandMapperTest extends BaseDaoTest {
 
         createCommand(CommandType.START_PROCESS, processDefinition.getCode());
 
-        List<Command> actualCommand = commandMapper.queryCommandPage(1,0);
+        List<Command> actualCommand = commandMapper.queryCommandPage(1, 0);
 
-        assertNotNull(actualCommand);
+        Assertions.assertNotNull(actualCommand);
     }
 
     /**
@@ -161,9 +153,39 @@ public class CommandMapperTest extends BaseDaoTest {
 
         Date endTime = DateUtils.stringToDate("2019-12-29 23:59:59");
 
-        List<CommandCount> actualCommandCounts = commandMapper.countCommandState(0, startTime, endTime, projectCodeArray);
+        List<CommandCount> actualCommandCounts = commandMapper.countCommandState(startTime, endTime, projectCodeArray);
 
-        assertThat(actualCommandCounts.size(),greaterThanOrEqualTo(1));
+        Assertions.assertTrue(actualCommandCounts.size() >= 1);
+    }
+
+    /**
+     * test query command page by slot
+     */
+    @Test
+    public void testQueryCommandPageBySlot() {
+        int masterCount = 4;
+        int thisMasterSlot = 2;
+        // for hit or miss
+        toTestQueryCommandPageBySlot(masterCount, thisMasterSlot);
+        toTestQueryCommandPageBySlot(masterCount, thisMasterSlot);
+        toTestQueryCommandPageBySlot(masterCount, thisMasterSlot);
+        toTestQueryCommandPageBySlot(masterCount, thisMasterSlot);
+    }
+
+    private boolean toTestQueryCommandPageBySlot(int masterCount, int thisMasterSlot) {
+        Command command = createCommand();
+        Integer id = command.getId();
+        boolean hit = id % masterCount == thisMasterSlot;
+        List<Command> commandList = commandMapper.queryCommandPageBySlot(1, masterCount, thisMasterSlot);
+        if (hit) {
+            Assertions.assertEquals(id, commandList.get(0).getId());
+        } else {
+            commandList.forEach(o -> {
+                Assertions.assertNotEquals(id, o.getId());
+                Assertions.assertEquals(thisMasterSlot, o.getId() % masterCount);
+            });
+        }
+        return hit;
     }
 
     /**
@@ -174,13 +196,13 @@ public class CommandMapperTest extends BaseDaoTest {
      * @return command map
      */
     private CommandCount createCommandMap(
-            Integer count,
-            CommandType commandType,
-            long processDefinitionCode) {
+                                          Integer count,
+                                          CommandType commandType,
+                                          long processDefinitionCode) {
 
         CommandCount commandCount = new CommandCount();
 
-        for (int i = 0;i < count;i++) {
+        for (int i = 0; i < count; i++) {
             createCommand(commandType, processDefinitionCode);
         }
         commandCount.setCommandType(commandType);
@@ -213,12 +235,12 @@ public class CommandMapperTest extends BaseDaoTest {
      * @param count map count
      * @return command map
      */
-    private Map<Integer,Command> createCommandMap(Integer count) {
-        Map<Integer,Command> commandMap = new HashMap<>();
+    private Map<Integer, Command> createCommandMap(Integer count) {
+        Map<Integer, Command> commandMap = new HashMap<>();
 
-        for (int i = 0;i < count;i++) {
+        for (int i = 0; i < count; i++) {
             Command command = createCommand();
-            commandMap.put(command.getId(),command);
+            commandMap.put(command.getId(), command);
         }
         return commandMap;
     }
@@ -228,7 +250,7 @@ public class CommandMapperTest extends BaseDaoTest {
      * @return
      */
     private Command createCommand() {
-        return createCommand(CommandType.START_PROCESS,1);
+        return createCommand(CommandType.START_PROCESS, 1);
     }
 
     /**

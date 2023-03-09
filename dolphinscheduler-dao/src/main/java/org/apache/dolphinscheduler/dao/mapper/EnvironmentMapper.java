@@ -25,6 +25,7 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * environment mapper interface
@@ -68,4 +69,14 @@ public interface EnvironmentMapper extends BaseMapper<Environment> {
      * @return int
      */
     int deleteByCode(@Param("code") Long code);
+
+    /**
+     * queryEnvironmentListPagingByIds
+     * @param page
+     * @param ids
+     * @param searchVal
+     * @return
+     */
+    IPage<Environment> queryEnvironmentListPagingByIds(Page<Environment> page, @Param("ids") List<Integer> ids,
+                                                       @Param("searchName") String searchVal);
 }

@@ -24,12 +24,14 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
 import lombok.Getter;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 @Getter
 public final class WorkflowRunDialog {
     private final WorkflowDefinitionTab parent;
 
-    @FindBy(id = "btnSubmit")
+    @FindBy(className = "btn-submit")
     private WebElement buttonSubmit;
 
     public WorkflowRunDialog(WorkflowDefinitionTab parent) {
@@ -39,6 +41,8 @@ public final class WorkflowRunDialog {
     }
 
     public WorkflowDefinitionTab submit() {
+        new WebDriverWait(parent().driver(), 5).until(ExpectedConditions.elementToBeClickable(buttonSubmit()));
+
         buttonSubmit().click();
 
         return parent();

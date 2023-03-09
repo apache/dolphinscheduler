@@ -17,8 +17,12 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.dto.taskRelation.TaskRelationCreateRequest;
+import org.apache.dolphinscheduler.api.dto.taskRelation.TaskRelationUpdateUpstreamRequest;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,20 +47,14 @@ public interface ProcessTaskRelationService {
                                                   long postTaskCode);
 
     /**
-     * move task to other processDefinition
+     * create resource process task relation
      *
-     * @param loginUser login user info
-     * @param projectCode project code
-     * @param processDefinitionCode process definition code
-     * @param targetProcessDefinitionCode target process definition code
-     * @param taskCode the current task code (the post task code)
-     * @return move result code
+     * @param loginUser login user
+     * @param taskRelationCreateRequest project code
+     * @return ProcessTaskRelation object
      */
-    Map<String, Object> moveTaskProcessRelation(User loginUser,
-                                                long projectCode,
-                                                long processDefinitionCode,
-                                                long targetProcessDefinitionCode,
-                                                long taskCode);
+    ProcessTaskRelation createProcessTaskRelationV2(User loginUser,
+                                                    TaskRelationCreateRequest taskRelationCreateRequest);
 
     /**
      * delete process task relation
@@ -71,6 +69,30 @@ public interface ProcessTaskRelationService {
                                                   long projectCode,
                                                   long processDefinitionCode,
                                                   long taskCode);
+
+    /**
+     * delete process task relation, will delete exists relation preTaskCode -> postTaskCode, throw error if not exists
+     *
+     * @param loginUser login user
+     * @param preTaskCode relation upstream code
+     * @param postTaskCode relation downstream code
+     */
+    void deleteTaskProcessRelationV2(User loginUser,
+                                     long preTaskCode,
+                                     long postTaskCode);
+
+    /**
+     * delete process task relation, will delete exists relation upstream -> downstream, throw error if not exists
+     *
+     * @param loginUser login user
+     * @param taskCode relation upstream code
+     * @param needSyncDag needSyncDag
+     * @param taskRelationUpdateUpstreamRequest relation downstream code
+     */
+    List<ProcessTaskRelation> updateUpstreamTaskDefinitionWithSyncDag(User loginUser,
+                                                                      long taskCode,
+                                                                      Boolean needSyncDag,
+                                                                      TaskRelationUpdateUpstreamRequest taskRelationUpdateUpstreamRequest);
 
     /**
      * delete task upstream relation
@@ -134,5 +156,10 @@ public interface ProcessTaskRelationService {
      * @param postTaskCode post task code
      * @return delete result code
      */
-    Map<String, Object> deleteEdge(User loginUser, long projectCode, long processDefinitionCode, long preTaskCode, long postTaskCode);
+    Map<String, Object> deleteEdge(User loginUser, long projectCode, long processDefinitionCode, long preTaskCode,
+                                   long postTaskCode);
+
+    List<ProcessTaskRelation> queryByWorkflowDefinitionCode(long workflowDefinitionCode, int workflowDefinitionVersion);
+
+    void deleteByWorkflowDefinitionCode(long workflowDefinitionCode, int workflowDefinitionVersion);
 }

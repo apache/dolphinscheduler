@@ -38,22 +38,32 @@ public final class WorkflowSaveDialog {
     private final WebDriver driver;
     private final WorkflowForm parent;
 
-    @FindBy(id = "inputName")
+    @FindBys({
+            @FindBy(className = "input-name"),
+            @FindBy(tagName = "input")
+    })
     private WebElement inputName;
-    @FindBy(id = "btnSubmit")
+
+    @FindBy(className = "btn-submit")
     private WebElement buttonSubmit;
+
     @FindBys({
-        @FindBy(className = "input-param-key"),
-        @FindBy(tagName = "input"),
+            @FindBy(className = "input-global-params"),
+            @FindBy(tagName = "button"),
     })
-    private List<WebElement> inputParamKey;
+    private WebElement buttonGlobalCustomParameters;
+
     @FindBys({
-        @FindBy(className = "input-param-val"),
-        @FindBy(tagName = "input"),
+            @FindBy(className = "btn-select-tenant-code"),
+            @FindBy(className = "n-base-selection"),
     })
-    private List<WebElement> inputParamVal;
-    @FindBy(id = "selectTenant")
     private WebElement selectTenant;
+
+    @FindBy(className = "n-base-select-option__content")
+    private List<WebElement> selectTenantOption;
+
+    @FindBy(className = "input-global-params")
+    private WebElement globalParamsItems;
 
     public WorkflowSaveDialog(WorkflowForm parent) {
         this.parent = parent;
@@ -71,37 +81,33 @@ public final class WorkflowSaveDialog {
     public WorkflowSaveDialog tenant(String tenant) {
         selectTenant().click();
 
-        final By optionsLocator = By.className("option-tenants");
-
-        new WebDriverWait(driver, 10)
-            .until(ExpectedConditions.visibilityOfElementLocated(optionsLocator));
-
-        driver().findElements(optionsLocator)
+        selectTenantOption()
                 .stream()
-                .filter(it -> it.getText().contains(tenant))
+                .filter(it -> it.getAttribute("innerText").contains(tenant))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("No such tenant: " + tenant))
-                .click()
-        ;
+                .orElseThrow(() -> new RuntimeException(String.format("No %s in workflow save dialog tenant dropdown " +
+                        "list", tenant)))
+                .click();
 
         return this;
     }
 
-    public WorkflowSaveDialog addGlobalParam(String key, String val) {
-        assert inputParamKey().size() == inputParamVal().size();
-
-        final int len = inputParamKey().size();
+    public WorkflowSaveDialog addGlobalParam(String key, String value) {
+        final int len = globalParamsItems().findElements(By.tagName("input")).size();
 
         final WebDriver driver = parent().driver();
-        Stream.concat(
-                  driver.findElements(new ByChained(By.className("user-def-params-model"), By.className("add"))).stream(),
-                  driver.findElements(new ByChained(By.className("user-def-params-model"), By.className("add-dp"))).stream())
-              .findFirst()
-              .orElseThrow(() -> new RuntimeException("Cannot find button to add param"))
-              .click();
 
-        inputParamKey().get(len).sendKeys(key);
-        inputParamVal().get(len).sendKeys(val);
+        if (len == 0) {
+            buttonGlobalCustomParameters().click();
+
+            globalParamsItems().findElements(By.tagName("input")).get(0).sendKeys(key);
+            globalParamsItems().findElements(By.tagName("input")).get(1).sendKeys(value);
+        } else {
+            globalParamsItems().findElements(By.tagName("button")).get(len-1).click();
+
+            globalParamsItems().findElements(By.tagName("input")).get(len).sendKeys(key);
+            globalParamsItems().findElements(By.tagName("input")).get(len+1).sendKeys(value);
+        }
 
         return this;
     }

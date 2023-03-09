@@ -20,25 +20,30 @@ package org.apache.dolphinscheduler.plugin.alert.email.template;
 import static java.util.Objects.requireNonNull;
 
 import org.apache.dolphinscheduler.alert.api.ShowType;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.alert.email.EmailConstants;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.boot.configurationprocessor.json.JSONArray;
+import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.boot.configurationprocessor.json.JSONTokener;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
+@Slf4j
 public class DefaultHTMLTemplate implements AlertTemplate {
-
-    public static final Logger logger = LoggerFactory.getLogger(DefaultHTMLTemplate.class);
 
     @Override
     public String getMessageFromTemplate(String content, ShowType showType, boolean showAll) {
@@ -49,7 +54,8 @@ public class DefaultHTMLTemplate implements AlertTemplate {
             case TEXT:
                 return getTextTypeMessage(content);
             default:
-                throw new IllegalArgumentException(String.format("not support showType: %s in DefaultHTMLTemplate", showType));
+                throw new IllegalArgumentException(
+                        String.format("not support showType: %s in DefaultHTMLTemplate", showType));
         }
     }
 
@@ -113,6 +119,16 @@ public class DefaultHTMLTemplate implements AlertTemplate {
     private String getTextTypeMessage(String content) {
 
         if (StringUtils.isNotEmpty(content)) {
+            // Converts an object type to an array type to prevent subsequent conversions from reporting errors
+            try {
+                Object contentObject = new JSONTokener(content).nextValue();
+                if (!(contentObject instanceof JSONArray)) {
+                    ObjectNode jsonNodes = JSONUtils.parseObject(content);
+                    content = JSONUtils.toJsonString(Collections.singletonList(jsonNodes));
+                }
+            } catch (JSONException e) {
+                log.error("alert content is null");
+            }
             ArrayNode list = JSONUtils.parseArray(content);
             StringBuilder contents = new StringBuilder(100);
             for (JsonNode jsonNode : list) {

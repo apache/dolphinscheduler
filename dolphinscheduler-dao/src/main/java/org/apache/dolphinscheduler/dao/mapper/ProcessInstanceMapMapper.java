@@ -14,13 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
  * process instance map mapper interface
@@ -35,7 +38,6 @@ public interface ProcessInstanceMapMapper extends BaseMapper<ProcessInstanceMap>
      */
     ProcessInstanceMap queryByParentId(@Param("parentProcessId") int parentProcessId,
                                        @Param("parentTaskId") int parentTaskId);
-
 
     /**
      * query by sub process id
@@ -58,4 +60,5 @@ public interface ProcessInstanceMapMapper extends BaseMapper<ProcessInstanceMap>
      */
     List<Integer> querySubIdListByParentId(@Param("parentInstanceId") int parentInstanceId);
 
+    void deleteByParentId(@Param("parentWorkflowInstanceId") int workflowInstanceId);
 }

@@ -32,8 +32,14 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 @Getter
 public class ResourcePage extends NavBarPage implements NavBarPage.NavBarItem {
-    @FindBy(className = "tab-file-manage")
-    private WebElement fileMagageManage;
+    @FindBy(css = ".tab-vertical > .n-menu-item:nth-child(1) > .n-menu-item-content")
+    private WebElement fileManageTab;
+
+    @FindBy(css = ".tab-vertical .n-submenu:nth-of-type(2) > .n-submenu-children > .n-menu-item:nth-of-type(1) > .n-menu-item-content")
+    private WebElement udfManageTab;
+
+    @FindBy(css = ".tab-vertical .n-submenu:nth-of-type(2) > .n-submenu-children > .n-menu-item:nth-of-type(2) > .n-menu-item-content")
+    private WebElement functionManageTab;
 
     public ResourcePage(RemoteWebDriver driver) {
         super(driver);
@@ -41,10 +47,26 @@ public class ResourcePage extends NavBarPage implements NavBarPage.NavBarItem {
 
     public <T extends ResourcePage.Tab> T goToTab(Class<T> tab) {
         if (tab == FileManagePage.class) {
-            WebElement fileMagageManageElement = new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(fileMagageManage));
-            fileMagageManageElement.click();
+            new WebDriverWait(driver, 10).until(ExpectedConditions.urlContains("/resource"));
+            new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(fileManageTab));
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", fileManageTab());
             return tab.cast(new FileManagePage(driver));
         }
+
+        if (tab == UdfManagePage.class) {
+            new WebDriverWait(driver, 10).until(ExpectedConditions.urlContains("/resource"));
+            new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(udfManageTab));
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", udfManageTab());
+            return tab.cast(new UdfManagePage(driver));
+        }
+
+        if (tab == FunctionManagePage.class) {
+            new WebDriverWait(driver, 10).until(ExpectedConditions.urlContains("/resource"));
+            new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(functionManageTab));
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", functionManageTab());
+            return tab.cast(new FunctionManagePage(driver));
+        }
+
         throw new UnsupportedOperationException("Unknown tab: " + tab.getName());
     }
 

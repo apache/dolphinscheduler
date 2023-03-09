@@ -27,10 +27,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface AccessLogAnnotation {
+
     // ignore request args
     String[] ignoreRequestArgs() default {"loginUser"};
 
     boolean ignoreRequest() default false;
-
-    boolean ignoreResponse() default true;
 }

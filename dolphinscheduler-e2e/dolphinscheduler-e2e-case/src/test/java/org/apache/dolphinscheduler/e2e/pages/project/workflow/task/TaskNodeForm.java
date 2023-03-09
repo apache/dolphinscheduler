@@ -22,32 +22,56 @@ package org.apache.dolphinscheduler.e2e.pages.project.workflow.task;
 import lombok.Getter;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.pagefactory.ByChained;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.List;
 import java.util.stream.Stream;
 
 @Getter
 public abstract class TaskNodeForm {
-    @FindBy(id = "inputNodeName")
+    @FindBys({
+            @FindBy(className = "input-node-name"),
+            @FindBy(tagName = "input")
+    })
     private WebElement inputNodeName;
-    @FindBy(id = "btnSubmit")
+
+    @FindBy(className = "btn-submit")
     private WebElement buttonSubmit;
+
     @FindBys({
         @FindBy(className = "input-param-key"),
         @FindBy(tagName = "input"),
     })
     private List<WebElement> inputParamKey;
+
     @FindBys({
-        @FindBy(className = "input-param-val"),
+        @FindBy(className = "input-param-value"),
         @FindBy(tagName = "input"),
     })
-    private List<WebElement> inputParamVal;
+    private List<WebElement> inputParamValue;
+
+    @FindBys({
+            @FindBy(className = "pre-tasks-model"),
+            @FindBy(className = "n-base-selection"),
+    })
+    private WebElement selectPreTasks;
+
+    @FindBys({
+            @FindBy(className = "btn-custom-parameters"),
+            @FindBy(tagName = "button"),
+    })
+    private WebElement buttonCustomParameters;
+
+    @FindBy(className = "btn-create-custom-parameter")
+    private WebElement buttonCreateCustomParameters;
 
     private final WorkflowForm parent;
 
@@ -65,21 +89,44 @@ public abstract class TaskNodeForm {
         return this;
     }
 
-    public TaskNodeForm addParam(String key, String val) {
-        assert inputParamKey().size() == inputParamVal().size();
+    public TaskNodeForm addParam(String key, String value) {
+        assert inputParamKey().size() == inputParamValue().size();
 
         final int len = inputParamKey().size();
 
         final WebDriver driver = parent().driver();
-        Stream.concat(
-                  driver.findElements(new ByChained(By.className("user-def-params-model"), By.className("add"))).stream(),
-                  driver.findElements(new ByChained(By.className("user-def-params-model"), By.className("add-dp"))).stream())
-              .findFirst()
-              .orElseThrow(() -> new RuntimeException("Cannot find button to add param"))
-              .click();
 
-        inputParamKey().get(len).sendKeys(key);
-        inputParamVal().get(len).sendKeys(val);
+        if (len == 0) {
+            buttonCustomParameters().click();
+
+            inputParamKey().get(0).sendKeys(key);
+            inputParamValue().get(0).sendKeys(value);
+        } else {
+            buttonCreateCustomParameters().click();
+
+            inputParamKey().get(len).sendKeys(key);
+            inputParamValue().get(len).sendKeys(value);
+        }
+
+        return this;
+    }
+
+    public TaskNodeForm preTask(String preTaskName) {
+        ((JavascriptExecutor)parent().driver()).executeScript("arguments[0].click();", selectPreTasks);
+
+        final By optionsLocator = By.className("option-pre-tasks");
+
+        new WebDriverWait(parent.driver(), 10)
+                .until(ExpectedConditions.visibilityOfElementLocated(optionsLocator));
+
+        List<WebElement> webElements =  parent.driver().findElements(optionsLocator);
+        webElements.stream()
+                .filter(it -> it.getText().contains(preTaskName))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No such task: " + preTaskName))
+                .click();
+
+        inputNodeName().click();
 
         return this;
     }

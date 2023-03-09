@@ -32,16 +32,17 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
@@ -50,19 +51,13 @@ import io.netty.handler.timeout.IdleStateHandler;
 /**
  * remoting netty server
  */
+@Slf4j
 public class NettyRemotingServer {
-
-    private final Logger logger = LoggerFactory.getLogger(NettyRemotingServer.class);
 
     /**
      * server bootstrap
      */
     private final ServerBootstrap serverBootstrap = new ServerBootstrap();
-
-    /**
-     * encoder
-     */
-    private final NettyEncoder encoder = new NettyEncoder();
 
     /**
      * default executor
@@ -106,42 +101,16 @@ public class NettyRemotingServer {
      */
     public NettyRemotingServer(final NettyServerConfig serverConfig) {
         this.serverConfig = serverConfig;
-        if (NettyUtils.useEpoll()) {
-            this.bossGroup = new EpollEventLoopGroup(1, new ThreadFactory() {
-                private final AtomicInteger threadIndex = new AtomicInteger(0);
-
-                @Override
-                public Thread newThread(Runnable r) {
-                    return new Thread(r, String.format("NettyServerBossThread_%d", this.threadIndex.incrementAndGet()));
-                }
-            });
-
-            this.workGroup = new EpollEventLoopGroup(serverConfig.getWorkerThread(), new ThreadFactory() {
-                private final AtomicInteger threadIndex = new AtomicInteger(0);
-
-                @Override
-                public Thread newThread(Runnable r) {
-                    return new Thread(r, String.format("NettyServerWorkerThread_%d", this.threadIndex.incrementAndGet()));
-                }
-            });
+        ThreadFactory bossThreadFactory =
+                new ThreadFactoryBuilder().setDaemon(true).setNameFormat("NettyServerBossThread_%s").build();
+        ThreadFactory workerThreadFactory =
+                new ThreadFactoryBuilder().setDaemon(true).setNameFormat("NettyServerWorkerThread_%s").build();
+        if (Epoll.isAvailable()) {
+            this.bossGroup = new EpollEventLoopGroup(1, bossThreadFactory);
+            this.workGroup = new EpollEventLoopGroup(serverConfig.getWorkerThread(), workerThreadFactory);
         } else {
-            this.bossGroup = new NioEventLoopGroup(1, new ThreadFactory() {
-                private final AtomicInteger threadIndex = new AtomicInteger(0);
-
-                @Override
-                public Thread newThread(Runnable r) {
-                    return new Thread(r, String.format("NettyServerBossThread_%d", this.threadIndex.incrementAndGet()));
-                }
-            });
-
-            this.workGroup = new NioEventLoopGroup(serverConfig.getWorkerThread(), new ThreadFactory() {
-                private final AtomicInteger threadIndex = new AtomicInteger(0);
-
-                @Override
-                public Thread newThread(Runnable r) {
-                    return new Thread(r, String.format("NettyServerWorkerThread_%d", this.threadIndex.incrementAndGet()));
-                }
-            });
+            this.bossGroup = new NioEventLoopGroup(1, bossThreadFactory);
+            this.workGroup = new NioEventLoopGroup(serverConfig.getWorkerThread(), workerThreadFactory);
         }
     }
 
@@ -171,13 +140,14 @@ public class NettyRemotingServer {
             try {
                 future = serverBootstrap.bind(serverConfig.getListenPort()).sync();
             } catch (Exception e) {
-                logger.error("NettyRemotingServer bind fail {}, exit", e.getMessage(), e);
+                log.error("NettyRemotingServer bind fail {}, exit", e.getMessage(), e);
                 throw new RemoteException(String.format(NETTY_BIND_FAILURE_MSG, serverConfig.getListenPort()));
             }
             if (future.isSuccess()) {
-                logger.info("NettyRemotingServer bind success at port : {}", serverConfig.getListenPort());
+                log.info("NettyRemotingServer bind success at port : {}", serverConfig.getListenPort());
             } else if (future.cause() != null) {
-                throw new RemoteException(String.format(NETTY_BIND_FAILURE_MSG, serverConfig.getListenPort()), future.cause());
+                throw new RemoteException(String.format(NETTY_BIND_FAILURE_MSG, serverConfig.getListenPort()),
+                        future.cause());
             } else {
                 throw new RemoteException(String.format(NETTY_BIND_FAILURE_MSG, serverConfig.getListenPort()));
             }
@@ -191,9 +161,10 @@ public class NettyRemotingServer {
      */
     private void initNettyChannel(SocketChannel ch) {
         ch.pipeline()
-                .addLast("encoder", encoder)
+                .addLast("encoder", new NettyEncoder())
                 .addLast("decoder", new NettyDecoder())
-                .addLast("server-idle-handle", new IdleStateHandler(0, 0, Constants.NETTY_SERVER_HEART_BEAT_TIME, TimeUnit.MILLISECONDS))
+                .addLast("server-idle-handle",
+                        new IdleStateHandler(0, 0, Constants.NETTY_SERVER_HEART_BEAT_TIME, TimeUnit.MILLISECONDS))
                 .addLast("handler", serverHandler);
     }
 
@@ -214,7 +185,8 @@ public class NettyRemotingServer {
      * @param processor processor
      * @param executor thread executor
      */
-    public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor, final ExecutorService executor) {
+    public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor,
+                                  final ExecutorService executor) {
         this.serverHandler.registerProcessor(commandType, processor, executor);
     }
 
@@ -238,9 +210,9 @@ public class NettyRemotingServer {
                 }
                 defaultExecutor.shutdown();
             } catch (Exception ex) {
-                logger.error("netty server close exception", ex);
+                log.error("netty server close exception", ex);
             }
-            logger.info("netty server closed");
+            log.info("netty server closed");
         }
     }
 }

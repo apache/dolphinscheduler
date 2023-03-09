@@ -17,13 +17,10 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import static org.apache.commons.collections.CollectionUtils.isEqualCollection;
-
 import org.apache.commons.beanutils.BeanMap;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,27 +45,6 @@ public class CollectionUtils {
     }
 
     /**
-     * returns {@code true} iff the given {@link Collection}s contain
-     * exactly the same elements with exactly the same cardinalities.
-     *
-     * @param a the first collection
-     * @param b the second collection
-     * @return Returns true iff the given Collections contain exactly the same elements with exactly the same cardinalities.
-     * That is, iff the cardinality of e in a is equal to the cardinality of e in b, for each element e in a or b.
-     */
-    public static boolean equalLists(Collection<?> a, Collection<?> b) {
-        if (a == null && b == null) {
-            return true;
-        }
-
-        if (a == null || b == null) {
-            return false;
-        }
-
-        return isEqualCollection(a, b);
-    }
-
-    /**
      * Removes certain attributes of each object in the list
      *
      * @param originList origin list
@@ -76,11 +52,9 @@ public class CollectionUtils {
      * @param <T> T
      * @return removes certain attributes of each object in the list
      */
-    public static <T extends Object> List<Map<String, Object>> getListByExclusion(List<T> originList, Set<String> exclusionSet) {
+    public static <T extends Object> List<Map<String, Object>> getListByExclusion(List<T> originList,
+                                                                                  Set<String> exclusionSet) {
         List<Map<String, Object>> instanceList = new ArrayList<>();
-        if (exclusionSet == null) {
-            exclusionSet = new HashSet<>();
-        }
         if (originList == null) {
             return instanceList;
         }
@@ -89,7 +63,7 @@ public class CollectionUtils {
             BeanMap beanMap = new BeanMap(instance);
             instanceMap = new LinkedHashMap<>(16, 0.75f, true);
             for (Map.Entry<Object, Object> entry : beanMap.entrySet()) {
-                if (exclusionSet.contains(entry.getKey())) {
+                if (exclusionSet != null && exclusionSet.contains(entry.getKey())) {
                     continue;
                 }
                 instanceMap.put((String) entry.getKey(), entry.getValue());

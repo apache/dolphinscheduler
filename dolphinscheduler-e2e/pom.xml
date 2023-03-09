@@ -41,8 +41,8 @@
         <assertj-core.version>3.20.2</assertj-core.version>
         <awaitility.version>4.1.0</awaitility.version>
         <kotlin.version>1.5.30</kotlin.version>
-        <slf4j-api.version>1.7.32</slf4j-api.version>
-        <log4j-slf4j-impl.version>2.14.1</log4j-slf4j-impl.version>
+        <slf4j-api.version>1.7.36</slf4j-api.version>
+        <log4j-slf4j-impl.version>2.17.2</log4j-slf4j-impl.version>
         <guava.version>31.0.1-jre</guava.version>
     </properties>
 
@@ -127,7 +127,7 @@
             <dependency>
                 <groupId>org.testcontainers</groupId>
                 <artifactId>testcontainers-bom</artifactId>
-                <version>1.16.1</version>
+                <version>1.16.3</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>

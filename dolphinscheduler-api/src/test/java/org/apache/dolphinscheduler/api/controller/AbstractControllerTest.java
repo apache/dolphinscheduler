@@ -22,12 +22,12 @@ import org.apache.dolphinscheduler.api.controller.AbstractControllerTest.Registr
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.api.service.UsersService;
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.ProfileType;
+import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.DaoConfiguration;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.curator.test.TestingServer;
 
 import java.text.MessageFormat;
@@ -36,24 +36,19 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 /**
  * abstract controller test
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = {ApiApplicationServer.class, DaoConfiguration.class, RegistryServer.class})
 @AutoConfigureMockMvc
 @DirtiesContext
@@ -74,13 +69,13 @@ public abstract class AbstractControllerTest {
 
     protected String sessionId;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         user = usersService.queryUser(1);
         createSession(user);
     }
 
-    @After
+    @AfterEach
     public void after() throws Exception {
         sessionService.signOut("127.0.0.1", user);
     }
@@ -92,7 +87,7 @@ public abstract class AbstractControllerTest {
         String session = sessionService.createSession(loginUser, "127.0.0.1");
         sessionId = session;
 
-        Assert.assertFalse(StringUtils.isEmpty(session));
+        Assertions.assertFalse(StringUtils.isEmpty(session));
     }
 
     public Map<String, Object> success() {
@@ -110,8 +105,18 @@ public abstract class AbstractControllerTest {
         }
     }
 
+    public void putMsg(Result<Object> result, Status status, Object... statusParams) {
+        result.setCode(status.getCode());
+        if (statusParams != null && statusParams.length > 0) {
+            result.setMsg(MessageFormat.format(status.getMsg(), statusParams));
+        } else {
+            result.setMsg(status.getMsg());
+        }
+    }
+
     @Configuration
     public static class RegistryServer {
+
         @PostConstruct
         public void startEmbedRegistryServer() throws Exception {
             final TestingServer server = new TestingServer(true);

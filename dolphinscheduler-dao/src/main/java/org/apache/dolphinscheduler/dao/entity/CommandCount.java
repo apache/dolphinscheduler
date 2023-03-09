@@ -14,13 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.dao.entity;
 
+package org.apache.dolphinscheduler.dao.entity;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
 
 public class CommandCount {
-
 
     /**
      * execution state
@@ -31,7 +30,6 @@ public class CommandCount {
      * count for state
      */
     private int count;
-
 
     public CommandType getCommandType() {
         return commandType;
@@ -76,9 +74,9 @@ public class CommandCount {
 
     @Override
     public String toString() {
-        return "CommandCount{" +
-                "commandType=" + commandType +
-                ", count=" + count +
-                '}';
+        return "CommandCount{"
+                + "commandType=" + commandType
+                + ", count=" + count
+                + '}';
     }
 }

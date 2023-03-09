@@ -14,48 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.entity;
 
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-/**
- * count execute state
- *
- */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ExecuteStatusCount {
 
     /**
      * execution state
      */
-    private ExecutionStatus state;
+    private TaskExecutionStatus state;
 
     /**
      * count for state
      */
     private int count;
-
-    public ExecutionStatus getExecutionStatus() {
-        return state;
-    }
-
-    public void setExecutionStatus(ExecutionStatus executionStatus) {
-        this.state = executionStatus;
-    }
-
-    public int getCount() {
-        return count;
-    }
-
-    public void setCount(int count) {
-        this.count = count;
-    }
-
-    @Override
-    public String toString() {
-        return "ExecuteStatusCount{" +
-                "state=" + state +
-                ", count=" + count +
-                '}';
-    }
 }

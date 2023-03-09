@@ -27,15 +27,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * response future
  */
+@Slf4j
 public class ResponseFuture {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ResponseFuture.class);
 
     private static final ConcurrentHashMap<Long, ResponseFuture> FUTURE_TABLE = new ConcurrentHashMap<>(256);
 
@@ -72,7 +70,8 @@ public class ResponseFuture {
 
     private Throwable cause;
 
-    public ResponseFuture(long opaque, long timeoutMillis, InvokeCallback invokeCallback, ReleaseSemaphore releaseSemaphore) {
+    public ResponseFuture(long opaque, long timeoutMillis, InvokeCallback invokeCallback,
+                          ReleaseSemaphore releaseSemaphore) {
         this.opaque = opaque;
         this.timeoutMillis = timeoutMillis;
         this.invokeCallback = invokeCallback;
@@ -189,7 +188,7 @@ public class ResponseFuture {
             if ((future.getBeginTimestamp() + future.getTimeoutMillis() + 1000) <= System.currentTimeMillis()) {
                 futureList.add(future);
                 it.remove();
-                LOGGER.warn("remove timeout request : {}", future);
+                log.warn("remove timeout request : {}", future);
             }
         }
         for (ResponseFuture future : futureList) {
@@ -197,7 +196,7 @@ public class ResponseFuture {
                 future.release();
                 future.executeInvokeCallback();
             } catch (Exception ex) {
-                LOGGER.warn("scanFutureTable, execute callback error", ex);
+                log.warn("scanFutureTable, execute callback error", ex);
             }
         }
     }

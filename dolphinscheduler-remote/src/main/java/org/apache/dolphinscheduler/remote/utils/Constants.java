@@ -49,13 +49,7 @@ public class Constants {
      */
     public static final int CPUS = Runtime.getRuntime().availableProcessors();
 
-
     public static final String LOCAL_ADDRESS = NetUtils.getHost();
-
-    /**
-     * netty epoll enable switch
-     */
-    public static final String NETTY_EPOLL_ENABLE = System.getProperty("netty.epoll.enable", "true");
 
     /**
      * OS Name

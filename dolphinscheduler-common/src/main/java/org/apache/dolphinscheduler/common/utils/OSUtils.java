@@ -17,12 +17,19 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.shell.ShellExecutor;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.SystemUtils;
+import oshi.SystemInfo;
+import oshi.hardware.CentralProcessor;
+import oshi.hardware.GlobalMemory;
+import oshi.hardware.HardwareAbstractionLayer;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -38,20 +45,13 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import oshi.SystemInfo;
-import oshi.hardware.CentralProcessor;
-import oshi.hardware.GlobalMemory;
-import oshi.hardware.HardwareAbstractionLayer;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * os utils
  */
+@Slf4j
 public class OSUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(OSUtils.class);
 
     private static final SystemInfo SI = new SystemInfo();
     public static final String TWO_DECIMAL = "0.00";
@@ -63,6 +63,9 @@ public class OSUtils {
     public static final double NEGATIVE_ONE = -1;
 
     private static final HardwareAbstractionLayer hal = SI.getHardware();
+    private static long[] prevTicks = new long[CentralProcessor.TickType.values().length];
+    private static long prevTickTime = 0L;
+    private static double cpuUsage = 0.0D;
 
     private OSUtils() {
         throw new UnsupportedOperationException("Construct OSUtils");
@@ -87,6 +90,23 @@ public class OSUtils {
         DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
         df.setRoundingMode(RoundingMode.HALF_UP);
         return Double.parseDouble(df.format(memoryUsage));
+    }
+
+    /**
+     * get disk usage
+     * Keep 2 decimal
+     *
+     * @return disk free size, unit: GB
+     */
+    public static double diskAvailable() {
+        File file = new File(".");
+        long freeSpace = file.getFreeSpace(); // unallocated / free disk space in bytes.
+
+        double diskAvailable = freeSpace / 1024.0 / 1024 / 1024;
+
+        DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
+        df.setRoundingMode(RoundingMode.HALF_UP);
+        return Double.parseDouble(df.format(diskAvailable));
     }
 
     /**
@@ -116,8 +136,8 @@ public class OSUtils {
             OperatingSystemMXBean osBean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
             loadAverage = osBean.getSystemLoadAverage();
         } catch (Exception e) {
-            logger.error("get operation system load average exception, try another method ", e);
-            loadAverage = hal.getProcessor().getSystemLoadAverage();
+            log.error("get operation system load average exception, try another method ", e);
+            loadAverage = hal.getProcessor().getSystemLoadAverage(1)[0];
             if (Double.isNaN(loadAverage)) {
                 return NEGATIVE_ONE;
             }
@@ -134,7 +154,16 @@ public class OSUtils {
      */
     public static double cpuUsage() {
         CentralProcessor processor = hal.getProcessor();
-        double cpuUsage = processor.getSystemCpuLoad();
+
+        // Check if > ~ 0.95 seconds since last tick count.
+        long now = System.currentTimeMillis();
+        if (now - prevTickTime > 950) {
+            // Enough time has elapsed.
+            cpuUsage = processor.getSystemCpuLoadBetweenTicks(prevTicks);
+            prevTickTime = System.currentTimeMillis();
+            prevTicks = processor.getSystemCpuLoadTicks();
+        }
+
         if (Double.isNaN(cpuUsage)) {
             return NEGATIVE_ONE;
         }
@@ -154,7 +183,7 @@ public class OSUtils {
                 return getUserListFromLinux();
             }
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
 
         return Collections.emptyList();
@@ -168,8 +197,9 @@ public class OSUtils {
     private static List<String> getUserListFromLinux() throws IOException {
         List<String> userList = new ArrayList<>();
 
-        try (BufferedReader bufferedReader = new BufferedReader(
-                new InputStreamReader(new FileInputStream("/etc/passwd")))) {
+        try (
+                BufferedReader bufferedReader = new BufferedReader(
+                        new InputStreamReader(new FileInputStream("/etc/passwd")))) {
             String line;
 
             while ((line = bufferedReader.readLine()) != null) {
@@ -209,7 +239,7 @@ public class OSUtils {
         int startPos = 0;
         int endPos = lines.length - 2;
         for (int i = 0; i < lines.length; i++) {
-            if (lines[i].isEmpty()) {
+            if (StringUtils.isEmpty(lines[i])) {
                 continue;
             }
 
@@ -238,6 +268,25 @@ public class OSUtils {
     }
 
     /**
+     * whether the user exists in linux
+     *
+     * @return boolean
+     */
+    public static boolean existTenantCodeInLinux(String tenantCode) {
+        try {
+            String result = exeCmd("id " + tenantCode);
+            if (!StringUtils.isEmpty(result)) {
+                return result.contains("uid=");
+            }
+        } catch (Exception e) {
+            // because ShellExecutor method throws exception to the linux return status is not 0
+            // not exist user return status is 1
+            log.error(e.getMessage(), e);
+        }
+        return false;
+    }
+
+    /**
      * create user
      *
      * @param userName user name
@@ -246,7 +295,7 @@ public class OSUtils {
         // if not exists this user, then create
         if (!getUserList().contains(userName)) {
             boolean isSuccess = createUser(userName);
-            logger.info("create user {} {}", userName, isSuccess ? "success" : "fail");
+            log.info("create user {} {}", userName, isSuccess ? "success" : "fail");
         }
     }
 
@@ -261,7 +310,7 @@ public class OSUtils {
             String userGroup = getGroup();
             if (StringUtils.isEmpty(userGroup)) {
                 String errorLog = String.format("%s group does not exist for this operating system.", userGroup);
-                logger.error(errorLog);
+                log.error(errorLog);
                 return false;
             }
             if (SystemUtils.IS_OS_MAC) {
@@ -273,7 +322,7 @@ public class OSUtils {
             }
             return true;
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
 
         return false;
@@ -287,9 +336,9 @@ public class OSUtils {
      * @throws IOException in case of an I/O error
      */
     private static void createLinuxUser(String userName, String userGroup) throws IOException {
-        logger.info("create linux os user: {}", userName);
+        log.info("create linux os user: {}", userName);
         String cmd = String.format("sudo useradd -g %s %s", userGroup, userName);
-        logger.info("execute cmd: {}", cmd);
+        log.info("execute cmd: {}", cmd);
         exeCmd(cmd);
     }
 
@@ -301,14 +350,14 @@ public class OSUtils {
      * @throws IOException in case of an I/O error
      */
     private static void createMacUser(String userName, String userGroup) throws IOException {
-        logger.info("create mac os user: {}", userName);
+        log.info("create mac os user: {}", userName);
 
         String createUserCmd = String.format("sudo sysadminctl -addUser %s -password %s", userName, userName);
-        logger.info("create user command: {}", createUserCmd);
+        log.info("create user command: {}", createUserCmd);
         exeCmd(createUserCmd);
 
         String appendGroupCmd = String.format("sudo dseditgroup -o edit -a %s -t user %s", userName, userGroup);
-        logger.info("append user to group: {}", appendGroupCmd);
+        log.info("append user to group: {}", appendGroupCmd);
         exeCmd(appendGroupCmd);
     }
 
@@ -320,14 +369,14 @@ public class OSUtils {
      * @throws IOException in case of an I/O error
      */
     private static void createWindowsUser(String userName, String userGroup) throws IOException {
-        logger.info("create windows os user: {}", userName);
+        log.info("create windows os user: {}", userName);
 
         String userCreateCmd = String.format("net user \"%s\" /add", userName);
-        logger.info("execute create user command: {}", userCreateCmd);
+        log.info("execute create user command: {}", userCreateCmd);
         exeCmd(userCreateCmd);
 
         String appendGroupCmd = String.format("net localgroup \"%s\" \"%s\" /add", userGroup, userName);
-        logger.info("execute append user to group: {}", appendGroupCmd);
+        log.info("execute append user to group: {}", appendGroupCmd);
         exeCmd(appendGroupCmd);
     }
 
@@ -367,10 +416,14 @@ public class OSUtils {
      * @return result of sudo execute command
      */
     public static String getSudoCmd(String tenantCode, String command) {
-        if (!CommonUtils.isSudoEnable() || StringUtils.isEmpty(tenantCode)) {
+        if (!isSudoEnable() || StringUtils.isEmpty(tenantCode)) {
             return command;
         }
         return String.format("sudo -u %s %s", tenantCode, command);
+    }
+
+    public static boolean isSudoEnable() {
+        return PropertyUtils.getBoolean(Constants.SUDO_ENABLE, true);
     }
 
     /**
@@ -411,24 +464,28 @@ public class OSUtils {
     }
 
     /**
-     * check memory and cpu usage
+     * Check memory and cpu usage is overload the given thredshod.
      *
-     * @param maxCpuloadAvg maxCpuloadAvg
+     * @param maxCpuLoadAvg  maxCpuLoadAvg
      * @param reservedMemory reservedMemory
-     * @return check memory and cpu usage
+     * @return True, if the cpu or memory exceed the given thredshod.
      */
-    public static Boolean checkResource(double maxCpuloadAvg, double reservedMemory) {
+    public static Boolean isOverload(double maxCpuLoadAvg, double reservedMemory) {
         // system load average
         double loadAverage = loadAverage();
         // system available physical memory
         double availablePhysicalMemorySize = availablePhysicalMemorySize();
-        if (loadAverage > maxCpuloadAvg || availablePhysicalMemorySize < reservedMemory) {
-            logger.warn("current cpu load average {} is too high or available memory {}G is too low, under max.cpuload.avg={} and reserved.memory={}G",
-                    loadAverage, availablePhysicalMemorySize, maxCpuloadAvg, reservedMemory);
-            return false;
-        } else {
+        if (loadAverage > maxCpuLoadAvg) {
+            log.warn("Current cpu load average {} is too high, max.cpuLoad.avg={}", loadAverage, maxCpuLoadAvg);
             return true;
         }
+
+        if (availablePhysicalMemorySize < reservedMemory) {
+            log.warn(
+                    "Current available memory {}G is too low, reserved.memory={}G", maxCpuLoadAvg, reservedMemory);
+            return true;
+        }
+        return false;
     }
 
 }

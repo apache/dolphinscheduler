@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.spark;
 
-import org.apache.dolphinscheduler.spi.task.AbstractParameters;
-import org.apache.dolphinscheduler.spi.task.ResourceInfo;
+import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +39,7 @@ public class SparkParameters extends AbstractParameters {
     private String mainClass;
 
     /**
-     * deploy mode
+     * deploy mode  local / cluster / client
      */
     private String deployMode;
 
@@ -91,14 +91,27 @@ public class SparkParameters extends AbstractParameters {
 
     /**
      * program type
-     * 0 JAVA,1 SCALA,2 PYTHON
+     * 0 JAVA,1 SCALA,2 PYTHON,3 SQL
      */
     private ProgramType programType;
 
     /**
-     * spark version
+     * spark sql script
      */
-    private String sparkVersion;
+    private String rawScript;
+
+    /**
+     * kubernetes cluster namespace
+     */
+    private String namespace;
+
+    public String getNamespace() {
+        return namespace;
+    }
+
+    public void setNamespace(String namespace) {
+        this.namespace = namespace;
+    }
 
     /**
      * resource list
@@ -217,17 +230,22 @@ public class SparkParameters extends AbstractParameters {
         this.programType = programType;
     }
 
-    public String getSparkVersion() {
-        return sparkVersion;
+    public String getRawScript() {
+        return rawScript;
     }
 
-    public void setSparkVersion(String sparkVersion) {
-        this.sparkVersion = sparkVersion;
+    public void setRawScript(String rawScript) {
+        this.rawScript = rawScript;
     }
 
     @Override
     public boolean checkParameters() {
-        return mainJar != null && programType != null;
+        /**
+         * When saving a task, the parameters cannot be empty and mainJar or rawScript cannot be empty:
+         * (1) When ProgramType is SQL, rawScript cannot be empty.
+         * (2) When ProgramType is Java/Scala/Python, mainJar cannot be empty.
+         */
+        return programType != null && (mainJar != null || rawScript != null);
     }
 
     @Override

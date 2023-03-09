@@ -26,17 +26,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 
 import java.util.Date;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +49,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
  * alert group controller test
  */
 public class AlertGroupControllerTest extends AbstractControllerTest {
+
     private static final Logger logger = LoggerFactory.getLogger(AlertGroupController.class);
 
     private static final String defaultTestAlertGroupName = "cxc test group name";
@@ -67,17 +66,18 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
         return alertGroup.getId();
     }
 
-    @After
+    @AfterEach
     public void clear() {
-        alertGroupMapper.delete(new QueryWrapper<AlertGroup>().lambda().eq(AlertGroup::getGroupName, defaultTestAlertGroupName));
+        alertGroupMapper.delete(
+                new QueryWrapper<AlertGroup>().lambda().eq(AlertGroup::getGroupName, defaultTestAlertGroupName));
     }
 
     @Test
     public void test010CreateAlertGroup() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("groupName", defaultTestAlertGroupName);
-        paramsMap.add("groupType", AlertType.EMAIL.toString());
-        paramsMap.add("description", "cxc junit 测试告警描述");
+        paramsMap.add("groupType", "email");
+        paramsMap.add("description", "cxc junit test alert description");
         paramsMap.add("alertInstanceIds", "");
         MvcResult mvcResult = mockMvc.perform(post("/alert-groups")
                 .header("sessionId", sessionId)
@@ -86,7 +86,7 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -101,7 +101,7 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
 
     }
@@ -111,7 +111,7 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
         createEntity();
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("pageNo", "1");
-        paramsMap.add("searchVal", AlertType.EMAIL.toString());
+        paramsMap.add("searchVal", "email");
         paramsMap.add("pageSize", "1");
         MvcResult mvcResult = mockMvc.perform(get("/alert-groups")
                 .header("sessionId", sessionId)
@@ -120,7 +120,7 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -136,7 +136,7 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -145,7 +145,7 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
         int entityId = createEntity();
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("groupName", defaultTestAlertGroupName);
-        paramsMap.add("groupType", AlertType.EMAIL.toString());
+        paramsMap.add("groupType", "email");
         paramsMap.add("description", "update alter group");
         paramsMap.add("alertInstanceIds", "");
         MvcResult mvcResult = mockMvc.perform(put("/alert-groups/" + entityId)
@@ -155,7 +155,7 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -170,7 +170,7 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -185,7 +185,7 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -200,7 +200,7 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -208,13 +208,13 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
     public void test090DelAlertGroupById() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         MvcResult mvcResult = mockMvc.perform(delete("/alert-groups/1")
-            .header("sessionId", sessionId)
-            .params(paramsMap))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andReturn();
+                .header("sessionId", sessionId)
+                .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertEquals(Status.NOT_ALLOW_TO_DELETE_DEFAULT_ALARM_GROUP.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(Status.NOT_ALLOW_TO_DELETE_DEFAULT_ALARM_GROUP.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 }

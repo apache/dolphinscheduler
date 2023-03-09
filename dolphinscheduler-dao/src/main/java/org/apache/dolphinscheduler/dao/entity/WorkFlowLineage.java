@@ -14,11 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.entity;
 
 import java.util.Date;
 
 public class WorkFlowLineage {
+
     private long workFlowCode;
     private String workFlowName;
     private String workFlowPublishStatus;

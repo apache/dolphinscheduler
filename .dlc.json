@@ -1,0 +1,39 @@
+{
+  "ignorePatterns": [
+    {
+      "pattern": "^http://localhost"
+    },
+    {
+      "pattern": "^https://img.shields.io/badge"
+    },
+    {
+      "pattern": "/community/community.html$"
+    },
+    {
+      "pattern": "^https://dolphinscheduler.apache.org"
+    }
+  ],
+  "replacementPatterns": [
+    {
+      "pattern": "^/en-us/download/download.html$",
+      "replacement": "https://dolphinscheduler.apache.org/en-us/download"
+    },
+    {
+      "pattern": "^/zh-cn/download/download.html$",
+      "replacement": "https://dolphinscheduler.apache.org/zh-cn/download"
+    }
+  ],
+  "httpHeaders": [
+    {
+      "urls": ["https://docs.github.com/"],
+      "headers": {
+        "Accept-Encoding": "zstd, br, gzip, deflate"
+      }
+    }
+  ],
+  "timeout": "10s",
+  "retryOn429": true,
+  "retryCount": 10,
+  "fallbackRetryDelay": "1000s",
+  "aliveStatusCodes": [200, 401, 403, 0]
+}

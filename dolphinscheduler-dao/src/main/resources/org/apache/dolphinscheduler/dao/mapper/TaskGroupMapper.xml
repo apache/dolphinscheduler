@@ -32,7 +32,7 @@
     </resultMap>
 
     <sql id = "baseSql">
-        id,name,description,project_code,group_size,use_size,status,create_time,update_time
+        id,name,description,user_id,project_code,group_size,use_size,status,create_time,update_time
     </sql>
 
     <select id="queryTaskGroupPaging" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroup">
@@ -41,8 +41,11 @@
         </include>
         from t_ds_task_group
         <where>
-            <if test="userId != 0">
-                and user_id = #{userId}
+            <if test="ids != null and ids.size() > 0">
+                and id in
+                <foreach collection="ids" item="i" open="(" close=")" separator=",">
+                    #{i}
+                </foreach>
             </if>
             <if test="status != null">
                 and status = #{status}
@@ -51,6 +54,7 @@
                 and name like concat('%', #{name}, '%')
             </if>
         </where>
+        order by update_time desc
     </select>
 
     <select id="queryTaskGroupPagingByProjectCode" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroup">
@@ -58,15 +62,32 @@
         <include refid="baseSql">
         </include>
         from t_ds_task_group
-        where project_code in ( #{projectCode} ,  0)
+        where 1=1
+        <if test="ids != null and ids.size() > 0">
+            and id in
+            <foreach collection="ids" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
+        </if>
+        and project_code in ( #{projectCode} , 0)
+        order by update_time desc
+    </select>
+
+    <select id="selectByProjectCode" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroup">
+        select
+        <include refid="baseSql"/>
+        from t_ds_task_group
+        where project_code = #{projectCode}
     </select>
 
     <!--modify data by id-->
-    <update id="updateTaskGroupResource">
+    <update id="robTaskGroupResource">
         update t_ds_task_group
-           set use_size = use_size+1
-        where id = #{id} and use_size  &lt; group_size and
-         (select count(1) FROM t_ds_task_group_queue where id = #{queueId} and status = #{queueStatus} ) = 1
+        set use_size = use_size + 1
+        where id = #{id}
+          and use_size &lt; group_size
+          and use_size = #{currentUseSize}
+          and (select count(1) FROM t_ds_task_group_queue where id = #{queueId} and status = #{queueStatus}) = 1
     </update>
 
     <!--modify data by id-->
@@ -99,6 +120,16 @@
         from t_ds_task_group
         where
         id = #{id} and status = #{status}
+    </select>
+
+    <select id="listAuthorizedResource" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroup">
+        select
+        <include refid="baseSql" />
+        from t_ds_task_group
+        where 1=1
+        <if test="userId != 0">
+            and user_id = #{userId}
+        </if>
     </select>
 
 </mapper>

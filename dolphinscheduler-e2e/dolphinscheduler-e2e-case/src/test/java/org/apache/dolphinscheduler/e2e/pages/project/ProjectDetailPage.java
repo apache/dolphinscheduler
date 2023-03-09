@@ -20,6 +20,7 @@
 package org.apache.dolphinscheduler.e2e.pages.project;
 
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
+import org.apache.dolphinscheduler.e2e.pages.project.workflow.TaskInstanceTab;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowDefinitionTab;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowInstanceTab;
 
@@ -31,10 +32,14 @@ import lombok.Getter;
 
 @Getter
 public final class ProjectDetailPage extends NavBarPage {
-    @FindBy(className = "tab-process-definition")
+    @FindBy(css = ".tab-vertical .n-submenu:nth-of-type(2) .n-menu-item:nth-of-type(2) > .n-menu-item-content")
     private WebElement menuProcessDefinition;
-    @FindBy(className = "tab-process-instance")
+
+    @FindBy(css = ".tab-vertical .n-submenu:nth-of-type(2) .n-menu-item:nth-of-type(3) > .n-menu-item-content")
     private WebElement menuProcessInstances;
+
+    @FindBy(css = ".tab-vertical .n-submenu:nth-of-type(3) .n-menu-item:nth-of-type(2) > .n-menu-item-content")
+    private WebElement menuTaskInstances;
 
     public ProjectDetailPage(RemoteWebDriver driver) {
         super(driver);
@@ -48,6 +53,10 @@ public final class ProjectDetailPage extends NavBarPage {
         if (tab == WorkflowInstanceTab.class) {
             menuProcessInstances().click();
             return tab.cast(new WorkflowInstanceTab(driver));
+        }
+        if (tab == TaskInstanceTab.class) {
+            menuTaskInstances().click();
+            return tab.cast(new TaskInstanceTab(driver));
         }
 
         throw new UnsupportedOperationException("Unknown tab: " + tab.getName());

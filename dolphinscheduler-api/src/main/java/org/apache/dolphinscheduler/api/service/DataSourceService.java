@@ -55,7 +55,7 @@ public interface DataSourceService {
      * @param id datasource id
      * @return data source detail
      */
-    Map<String, Object> queryDataSource(int id);
+    Map<String, Object> queryDataSource(int id, User loginUser);
 
     /**
      * query datasource list by keyword
@@ -69,13 +69,13 @@ public interface DataSourceService {
     Result queryDataSourceListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
 
     /**
-     * query data resource list
+     * query online/test data resource list
      *
      * @param loginUser login user
      * @param type      data source type
      * @return data source list page
      */
-    Map<String, Object> queryDataSourceList(User loginUser, Integer type);
+    Map<String, Object> queryDataSourceList(User loginUser, Integer type, int testFlag);
 
     /**
      * verify datasource exists
@@ -128,4 +128,19 @@ public interface DataSourceService {
      * @return authorized result code
      */
     Map<String, Object> authedDatasource(User loginUser, Integer userId);
+
+    /**
+     * get tables
+     * @param datasourceId
+     * @return
+     */
+    Map<String, Object> getTables(Integer datasourceId);
+
+    /**
+     * get table columns
+     * @param datasourceId
+     * @param tableName
+     * @return
+     */
+    Map<String, Object> getTableColumns(Integer datasourceId, String tableName);
 }

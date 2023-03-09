@@ -19,22 +19,24 @@ package org.apache.dolphinscheduler.server.master.runner.task;
 
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import java.lang.reflect.InvocationTargetException;
 
-@Ignore
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
+@Disabled
 public class TaskProcessorFactoryTest {
 
     @Test
-    public void testFactory() throws InstantiationException, IllegalAccessException {
+    public void testFactory() throws InvocationTargetException, InstantiationException, IllegalAccessException {
 
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setTaskType("shell");
 
         ITaskProcessor iTaskProcessor = TaskProcessorFactory.getTaskProcessor(taskInstance.getTaskType());
 
-        Assert.assertNotNull(iTaskProcessor);
+        Assertions.assertNotNull(iTaskProcessor);
     }
 
 }

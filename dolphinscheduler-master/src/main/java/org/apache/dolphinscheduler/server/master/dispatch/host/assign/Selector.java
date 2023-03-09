@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
 
 import java.util.Collection;
 
-
 /**
  * selector
  * @param <T> T
@@ -28,7 +27,7 @@ public interface Selector<T> {
 
     /**
      * select
-     * @param source source
+     * @param source source, the given source should not be empty.
      * @return T
      */
     T select(Collection<T> source);

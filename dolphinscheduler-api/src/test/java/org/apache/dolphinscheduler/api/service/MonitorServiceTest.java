@@ -17,34 +17,47 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
+import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.MonitorServiceImpl;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.NodeType;
+import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.MonitorDBDao;
 import org.apache.dolphinscheduler.dao.entity.MonitorRecord;
+import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * monitor service test
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class MonitorServiceTest {
 
     private static final Logger logger = LoggerFactory.getLogger(MonitorServiceTest.class);
@@ -55,30 +68,74 @@ public class MonitorServiceTest {
     @Mock
     private MonitorDBDao monitorDBDao;
 
-    @Test
-    public  void testQueryDatabaseState() {
+    @Mock
+    private ResourcePermissionCheckService resourcePermissionCheckService;
 
+    @Mock
+    private RegistryClient registryClient;
+
+    private User user;
+
+    public static final Logger serviceLogger = LoggerFactory.getLogger(BaseServiceImpl.class);
+
+    @BeforeEach
+    public void init() {
+        user = new User();
+        user.setUserType(UserType.ADMIN_USER);
+        user.setId(1);
+    }
+
+    @Test
+    public void testQueryDatabaseState() {
+        mockPermissionCheck(ApiFuncIdentificationConstant.MONITOR_DATABASES_VIEW, true);
         Mockito.when(monitorDBDao.queryDatabaseState()).thenReturn(getList());
-        Map<String,Object> result = monitorService.queryDatabaseState(null);
+        Map<String, Object> result = monitorService.queryDatabaseState(user);
         logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         List<MonitorRecord> monitorRecordList = (List<MonitorRecord>) result.get(Constants.DATA_LIST);
-        Assert.assertTrue(CollectionUtils.isNotEmpty(monitorRecordList));
+        Assertions.assertTrue(CollectionUtils.isNotEmpty(monitorRecordList));
+
+        mockPermissionCheck(ApiFuncIdentificationConstant.MONITOR_DATABASES_VIEW, false);
+        Map<String, Object> noPermission = monitorService.queryDatabaseState(user);
+        Assertions.assertEquals(Status.SUCCESS, noPermission.get(Constants.STATUS));
     }
 
     @Test
-    public  void testQueryMaster() {
-        //TODO need zk
-        /*Map<String,Object> result = monitorService.queryMaster(null);*/
-        /*logger.info(result.toString());*/
-        /*Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));*/
+    public void testQueryMaster() {
+        mockPermissionCheck(ApiFuncIdentificationConstant.MONITOR_MASTER_VIEW, true);
+        Mockito.when(registryClient.getServerList(NodeType.MASTER)).thenReturn(getServerList());
+        Map<String, Object> result = monitorService.queryMaster(user);
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+
+        mockPermissionCheck(ApiFuncIdentificationConstant.MONITOR_MASTER_VIEW, false);
+        Map<String, Object> noPermission = monitorService.queryMaster(user);
+        Assertions.assertEquals(Status.SUCCESS, noPermission.get(Constants.STATUS));
     }
 
     @Test
-    public  void testGetServerListFromZK() {
-        //TODO need zk
-        /*List<Server> serverList = monitorService.getServerListFromZK(true);*/
-        /*logger.info(serverList.toString());*/
+    public void testQueryWorker() {
+        mockPermissionCheck(ApiFuncIdentificationConstant.MONITOR_WORKER_VIEW, true);
+        Mockito.when(registryClient.getServerList(NodeType.WORKER)).thenReturn(getServerList());
+        Map<String, Object> result = monitorService.queryWorker(user);
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+
+        mockPermissionCheck(ApiFuncIdentificationConstant.MONITOR_WORKER_VIEW, false);
+        Map<String, Object> noPermission = monitorService.queryWorker(user);
+        Assertions.assertEquals(Status.SUCCESS, noPermission.get(Constants.STATUS));
+    }
+
+    @Test
+    public void testGetServerListFromZK() {
+        // TODO need zk
+        /* List<Server> serverList = monitorService.getServerListFromZK(true); */
+        /* logger.info(serverList.toString()); */
+    }
+
+    private void mockPermissionCheck(String permissionKey, boolean result) {
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.MONITOR, 1,
+                permissionKey, serviceLogger)).thenReturn(result);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.MONITOR, null, 0,
+                serviceLogger)).thenReturn(true);
     }
 
     private List<MonitorRecord> getList() {
@@ -88,14 +145,22 @@ public class MonitorServiceTest {
     }
 
     private MonitorRecord getEntity() {
-        MonitorRecord monitorRecord = new  MonitorRecord();
+        MonitorRecord monitorRecord = new MonitorRecord();
         monitorRecord.setDbType(DbType.MYSQL);
         return monitorRecord;
     }
 
     private List<Server> getServerList() {
+        Server server = new Server();
+        server.setId(1);
+        server.setHost("127.0.0.1");
+        server.setZkDirectory("ws/server");
+        server.setPort(123);
+        server.setCreateTime(new Date());
+        server.setLastHeartbeatTime(new Date());
+
         List<Server> servers = new ArrayList<>();
-        servers.add(new Server());
+        servers.add(server);
         return servers;
     }
 

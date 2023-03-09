@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
@@ -33,20 +34,27 @@ import org.openqa.selenium.support.FindBys;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.openqa.selenium.support.pagefactory.ByChained;
 
 @Getter
 public final class WorkflowInstanceTab extends NavBarPage implements ProjectDetailPage.Tab {
     @FindBy(className = "items-workflow-instances")
     private List<WebElement> instanceList;
-    @FindBy(className = "select-all")
+
+    @FindBys({
+        @FindBy(className = "btn-selected"),
+        @FindBy(className = "n-checkbox-box"),
+    })
     private WebElement checkBoxSelectAll;
+
     @FindBy(className = "btn-delete-all")
     private WebElement buttonDeleteAll;
+
     @FindBys({
-        @FindBy(className = "el-popconfirm"),
-        @FindBy(className = "el-button--primary"),
+            @FindBy(className = "n-popconfirm__action"),
+            @FindBy(className = "n-button--primary-type"),
     })
-    private List<WebElement> buttonConfirm;
+    private WebElement buttonConfirm;
 
     public WorkflowInstanceTab(RemoteWebDriver driver) {
         super(driver);
@@ -66,13 +74,10 @@ public final class WorkflowInstanceTab extends NavBarPage implements ProjectDeta
         }
 
         checkBoxSelectAll().click();
+
         buttonDeleteAll().click();
-        buttonConfirm()
-            .stream()
-            .filter(WebElement::isDisplayed)
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("No confirm button is displayed"))
-            .click();
+
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", buttonConfirm());
 
         return this;
     }
@@ -90,11 +95,11 @@ public final class WorkflowInstanceTab extends NavBarPage implements ProjectDeta
         }
 
         public int executionTime() {
-            return Integer.parseInt(row.findElement(By.className("execution-time")).getText());
+            return Integer.parseInt(row.findElement(By.className("workflow-run-times")).getText());
         }
 
         public Row rerun() {
-            row.findElements(By.className("btn-rerun"))
+            row.findElements(new ByChained(By.className("btn-rerun"), By.className("n-button__content")))
                .stream()
                .filter(WebElement::isDisplayed)
                .findFirst()

@@ -17,104 +17,86 @@
 
 package org.apache.dolphinscheduler.server.worker.config;
 
-import java.util.Set;
+import static org.apache.dolphinscheduler.common.constants.Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
+
+import org.apache.dolphinscheduler.common.utils.NetUtils;
+import org.apache.dolphinscheduler.registry.api.ConnectStrategyProperties;
+
+import java.time.Duration;
+
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
+import org.springframework.validation.annotation.Validated;
 
-@Component
-@EnableConfigurationProperties
-@ConfigurationProperties("worker")
-public class WorkerConfig {
-    private int listenPort;
-    private int execThreads;
-    private int heartbeatInterval;
-    private int hostWeight;
-    private boolean tenantAutoCreate;
-    private int maxCpuLoadAvg;
-    private double reservedMemory;
-    private Set<String> groups;
-    private String alertListenHost;
-    private int alertListenPort;
+@Data
+@Validated
+@Configuration
+@ConfigurationProperties(prefix = "worker")
+@Slf4j
+public class WorkerConfig implements Validator {
 
-    public int getListenPort() {
-        return listenPort;
+    private int listenPort = 1234;
+    private int execThreads = 10;
+    private Duration heartbeatInterval = Duration.ofSeconds(10);
+    private int hostWeight = 100;
+    private boolean tenantAutoCreate = true;
+    private boolean tenantDistributedUser = false;
+    private int maxCpuLoadAvg = -1;
+    private double reservedMemory = 0.3;
+    private String alertListenHost = "localhost";
+    private int alertListenPort = 50052;
+    private ConnectStrategyProperties registryDisconnectStrategy = new ConnectStrategyProperties();
+
+    /**
+     * This field doesn't need to set at config file, it will be calculated by workerIp:listenPort
+     */
+    private String workerAddress;
+    private String workerRegistryPath;
+
+    private TaskExecuteThreadsFullPolicy taskExecuteThreadsFullPolicy = TaskExecuteThreadsFullPolicy.REJECT;
+
+    @Override
+    public boolean supports(Class<?> clazz) {
+        return WorkerConfig.class.isAssignableFrom(clazz);
     }
 
-    public void setListenPort(int listenPort) {
-        this.listenPort = listenPort;
+    @Override
+    public void validate(Object target, Errors errors) {
+        WorkerConfig workerConfig = (WorkerConfig) target;
+        if (workerConfig.getExecThreads() <= 0) {
+            errors.rejectValue("exec-threads", null, "should be a positive value");
+        }
+        if (workerConfig.getHeartbeatInterval().getSeconds() <= 0) {
+            errors.rejectValue("heartbeat-interval", null, "shoule be a valid duration");
+        }
+        if (workerConfig.getMaxCpuLoadAvg() <= 0) {
+            workerConfig.setMaxCpuLoadAvg(Runtime.getRuntime().availableProcessors() * 2);
+        }
+        workerConfig.setWorkerAddress(NetUtils.getAddr(workerConfig.getListenPort()));
+
+        workerConfig.setWorkerRegistryPath(REGISTRY_DOLPHINSCHEDULER_WORKERS + "/" + workerConfig.getWorkerAddress());
+        printConfig();
     }
 
-    public int getExecThreads() {
-        return execThreads;
-    }
-
-    public void setExecThreads(int execThreads) {
-        this.execThreads = execThreads;
-    }
-
-    public int getHeartbeatInterval() {
-        return heartbeatInterval;
-    }
-
-    public void setHeartbeatInterval(int heartbeatInterval) {
-        this.heartbeatInterval = heartbeatInterval;
-    }
-
-    public int getHostWeight() {
-        return hostWeight;
-    }
-
-    public void setHostWeight(int hostWeight) {
-        this.hostWeight = hostWeight;
-    }
-
-    public boolean isTenantAutoCreate() {
-        return tenantAutoCreate;
-    }
-
-    public void setTenantAutoCreate(boolean tenantAutoCreate) {
-        this.tenantAutoCreate = tenantAutoCreate;
-    }
-
-    public int getMaxCpuLoadAvg() {
-        return maxCpuLoadAvg > 0 ? maxCpuLoadAvg : Runtime.getRuntime().availableProcessors() * 2;
-    }
-
-    public void setMaxCpuLoadAvg(int maxCpuLoadAvg) {
-        this.maxCpuLoadAvg = maxCpuLoadAvg;
-    }
-
-    public double getReservedMemory() {
-        return reservedMemory;
-    }
-
-    public void setReservedMemory(double reservedMemory) {
-        this.reservedMemory = reservedMemory;
-    }
-
-    public Set<String> getGroups() {
-        return groups;
-    }
-
-    public void setGroups(Set<String> groups) {
-        this.groups = groups;
-    }
-
-    public String getAlertListenHost() {
-        return alertListenHost;
-    }
-
-    public void setAlertListenHost(String alertListenHost) {
-        this.alertListenHost = alertListenHost;
-    }
-
-    public int getAlertListenPort() {
-        return alertListenPort;
-    }
-
-    public void setAlertListenPort(final int alertListenPort) {
-        this.alertListenPort = alertListenPort;
+    private void printConfig() {
+        log.info("Worker config: listenPort -> {}", listenPort);
+        log.info("Worker config: execThreads -> {}", execThreads);
+        log.info("Worker config: heartbeatInterval -> {}", heartbeatInterval);
+        log.info("Worker config: hostWeight -> {}", hostWeight);
+        log.info("Worker config: tenantAutoCreate -> {}", tenantAutoCreate);
+        log.info("Worker config: tenantDistributedUser -> {}", tenantDistributedUser);
+        log.info("Worker config: maxCpuLoadAvg -> {}", maxCpuLoadAvg);
+        log.info("Worker config: reservedMemory -> {}", reservedMemory);
+        log.info("Worker config: alertListenHost -> {}", alertListenHost);
+        log.info("Worker config: alertListenPort -> {}", alertListenPort);
+        log.info("Worker config: registryDisconnectStrategy -> {}", registryDisconnectStrategy);
+        log.info("Worker config: workerAddress -> {}", registryDisconnectStrategy);
+        log.info("Worker config: workerRegistryPath: {}", workerRegistryPath);
+        log.info("Worker config: taskExecuteThreadsFullPolicy: {}", taskExecuteThreadsFullPolicy);
     }
 }

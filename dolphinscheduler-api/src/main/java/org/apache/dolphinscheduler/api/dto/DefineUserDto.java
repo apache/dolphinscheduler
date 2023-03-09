@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.dto;
 
 import org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser;
@@ -31,7 +32,7 @@ public class DefineUserDto {
 
     public DefineUserDto(List<DefinitionGroupByUser> defineGroupByUsers) {
 
-        for(DefinitionGroupByUser define : defineGroupByUsers){
+        for (DefinitionGroupByUser define : defineGroupByUsers) {
             count += define.getCount();
         }
         this.userList = defineGroupByUsers;

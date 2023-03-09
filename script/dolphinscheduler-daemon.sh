@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -16,7 +16,7 @@
 # limitations under the License.
 #
 
-usage="Usage: dolphinscheduler-daemon.sh (start|stop|status) <api-server|master-server|worker-server|alert-server|python-gateway-server|standalone-server> "
+usage="Usage: dolphinscheduler-daemon.sh (start|stop|status) <api-server|master-server|worker-server|alert-server|standalone-server> "
 
 # if no args specified, show usage
 if [ $# -le 1 ]; then
@@ -34,8 +34,21 @@ echo "Begin $startStop $command......"
 BIN_DIR=`dirname $0`
 BIN_DIR=`cd "$BIN_DIR"; pwd`
 DOLPHINSCHEDULER_HOME=`cd "$BIN_DIR/.."; pwd`
+BIN_ENV_FILE="${DOLPHINSCHEDULER_HOME}/bin/env/dolphinscheduler_env.sh"
 
-source "${DOLPHINSCHEDULER_HOME}/bin/env/dolphinscheduler_env.sh"
+# Overwrite server dolphinscheduler_env.sh in path `<server>/conf/dolphinscheduler_env.sh` when exists
+# `bin/env/dolphinscheduler_env.sh` file. User could only change `bin/env/dolphinscheduler_env.sh` instead
+# of each server's dolphinscheduler_env.sh when they want to start the server
+function overwrite_server_env() {
+  local server=$1
+  local server_env_file="${DOLPHINSCHEDULER_HOME}/${server}/conf/dolphinscheduler_env.sh"
+  if [ -f "${BIN_ENV_FILE}" ]; then
+    echo "Overwrite ${server}/conf/dolphinscheduler_env.sh using bin/env/dolphinscheduler_env.sh."
+    cp "${BIN_ENV_FILE}" "${server_env_file}"
+  else
+    echo "Start server ${server} using env config path ${server_env_file}, because file ${BIN_ENV_FILE} not exists."
+  fi
+}
 
 export HOSTNAME=`hostname`
 
@@ -61,17 +74,33 @@ elif [ "$command" = "alert-server" ]; then
   log=$DOLPHINSCHEDULER_HOME/alert-server/logs/$command-$HOSTNAME.out
 elif [ "$command" = "standalone-server" ]; then
   log=$DOLPHINSCHEDULER_HOME/standalone-server/logs/$command-$HOSTNAME.out
-elif [ "$command" = "python-gateway-server" ]; then
-  log=$DOLPHINSCHEDULER_HOME/python-gateway-server/logs/$command-$HOSTNAME.out
 else
   echo "Error: No command named '$command' was found."
   exit 1
 fi
 
+state=""
+function get_server_running_status() {
+  state="STOP"
+  if [ -f $pid ]; then
+    TARGET_PID=`cat $pid`
+    if [[ $(ps -p "$TARGET_PID" -o comm=) =~ "bash" ]]; then
+      state="RUNNING"
+    fi
+  fi
+}
+
 case $startStop in
   (start)
+    # if server is already started, cancel this launch
+    get_server_running_status
+    if [[ $state == "RUNNING" ]]; then
+      echo "$command running as process $TARGET_PID.  Stop it first."
+      exit 1
+    fi
     echo starting $command, logging to $DOLPHINSCHEDULER_LOG_DIR
-    nohup "$DOLPHINSCHEDULER_HOME/$command/bin/start.sh" > $log 2>&1 &
+    overwrite_server_env "${command}"
+    nohup /bin/bash "$DOLPHINSCHEDULER_HOME/$command/bin/start.sh" > $log 2>&1 &
     echo $! > $pid
     ;;
 
@@ -96,13 +125,11 @@ case $startStop in
       ;;
 
   (status)
-    # more details about the status can be added later
-    serverCount=`ps -ef | grep "$DOLPHINSCHEDULER_HOME" | grep "$CLASS" | grep -v "grep" | wc -l`
-    state="STOP"
-    #  font color - red
-    state="[ \033[1;31m $state \033[0m ]"
-    if [[ $serverCount -gt 0 ]];then
-      state="RUNNING"
+    get_server_running_status
+    if [[ $state == "STOP" ]]; then
+      #  font color - red
+      state="[ \033[1;31m $state \033[0m ]"
+    else
       # font color - green
       state="[ \033[1;32m $state \033[0m ]"
     fi

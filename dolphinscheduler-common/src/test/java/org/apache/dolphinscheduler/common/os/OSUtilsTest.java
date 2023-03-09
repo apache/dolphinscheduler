@@ -16,14 +16,16 @@
  */
 package org.apache.dolphinscheduler.common.os;
 
-
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.apache.commons.lang3.SystemUtils;
+
+import java.util.List;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 /**
  * OSUtilsTest
@@ -36,20 +38,62 @@ public class OSUtilsTest {
     public void memoryUsage() {
         double memoryUsage = OSUtils.memoryUsage();
         logger.info("memoryUsage : {}", memoryUsage);
-        Assert.assertTrue(memoryUsage >= 0.0);
+        Assertions.assertTrue(memoryUsage >= 0.0);
+    }
+
+    @Test
+    public void diskAvailable() {
+        double diskAvailable = OSUtils.diskAvailable();
+        logger.info("diskAvailable : {}", diskAvailable);
+        Assertions.assertTrue(diskAvailable >= 0.0);
     }
 
     @Test
     public void loadAverage() {
         double loadAverage = OSUtils.loadAverage();
         logger.info("loadAverage : {}", loadAverage);
-        Assert.assertTrue(loadAverage >= 0.0);
+        Assertions.assertTrue(loadAverage >= 0.0);
     }
 
     @Test
     public void cpuUsage() {
         double cpuUsage = OSUtils.cpuUsage();
         logger.info("cpuUsage : {}", cpuUsage);
-        Assert.assertTrue(cpuUsage >= 0.0);
+        Assertions.assertTrue(cpuUsage >= 0.0);
     }
+
+    @Test
+    public void availablePhysicalMemorySize() {
+        double physicalMemorySize = OSUtils.availablePhysicalMemorySize();
+        logger.info("physicalMemorySize : {}", physicalMemorySize);
+        Assertions.assertTrue(physicalMemorySize >= 0.0);
+
+    }
+
+    @Test
+    public void existTenantCodeInLinux() {
+        if (SystemUtils.IS_OS_LINUX) {
+            boolean test = OSUtils.existTenantCodeInLinux("root");
+            Assertions.assertTrue(test);
+            boolean test1 = OSUtils.existTenantCodeInLinux("xxxtt");
+            Assertions.assertFalse(test1);
+        } else {
+            Assertions.assertFalse(false, "system must be linux");
+        }
+
+    }
+
+    @Test
+    public void existOSTenandCode() {
+        if (SystemUtils.IS_OS_LINUX) {
+            List<String> userList = OSUtils.getUserList();
+            Assertions.assertTrue(userList.contains("root"));
+            Assertions.assertFalse(userList.contains("xxxtt"));
+        } else {
+            Assertions.assertFalse(false, "system must be linux");
+
+        }
+
+    }
+
 }

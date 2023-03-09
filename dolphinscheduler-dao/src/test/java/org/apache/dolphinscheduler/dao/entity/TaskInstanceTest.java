@@ -14,21 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.entity;
 
-import org.apache.dolphinscheduler.common.enums.DependentRelation;
-import org.apache.dolphinscheduler.common.enums.TaskType;
-import org.apache.dolphinscheduler.common.model.DependentItem;
-import org.apache.dolphinscheduler.common.model.DependentTaskModel;
-import org.apache.dolphinscheduler.common.model.TaskNode;
-import org.apache.dolphinscheduler.common.task.dependent.DependentParameters;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_CONDITIONS;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DEPENDENT;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SUB_PROCESS;
+
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DependentRelation;
+import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
+import org.apache.dolphinscheduler.plugin.task.api.model.DependentTaskModel;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class TaskInstanceTest {
 
@@ -39,21 +42,21 @@ public class TaskInstanceTest {
     public void testTaskInstanceIsSubProcess() {
         TaskInstance taskInstance = new TaskInstance();
 
-        //sub process
-        taskInstance.setTaskType(TaskType.SUB_PROCESS.getDesc());
-        Assert.assertTrue(taskInstance.isSubProcess());
+        // sub process
+        taskInstance.setTaskType(TASK_TYPE_SUB_PROCESS);
+        Assertions.assertTrue(taskInstance.isSubProcess());
 
-        //not sub process
-        taskInstance.setTaskType(TaskType.HTTP.getDesc());
-        Assert.assertFalse(taskInstance.isSubProcess());
+        // not sub process
+        taskInstance.setTaskType("HTTP");
+        Assertions.assertFalse(taskInstance.isSubProcess());
 
-        //sub process
-        taskInstance.setTaskType(TaskType.CONDITIONS.getDesc());
-        Assert.assertTrue(taskInstance.isConditionsTask());
+        // sub process
+        taskInstance.setTaskType(TASK_TYPE_CONDITIONS);
+        Assertions.assertTrue(taskInstance.isConditionsTask());
 
-        //sub process
-        taskInstance.setTaskType(TaskType.DEPENDENT.getDesc());
-        Assert.assertTrue(taskInstance.isDependTask());
+        // sub process
+        taskInstance.setTaskType(TASK_TYPE_DEPENDENT);
+        Assertions.assertTrue(taskInstance.isDependTask());
     }
 
     /**

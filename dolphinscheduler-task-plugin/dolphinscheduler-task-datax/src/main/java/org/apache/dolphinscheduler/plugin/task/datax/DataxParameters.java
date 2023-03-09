@@ -17,13 +17,18 @@
 
 package org.apache.dolphinscheduler.plugin.task.datax;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
+import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.spi.enums.Flag;
-import org.apache.dolphinscheduler.spi.task.AbstractParameters;
-import org.apache.dolphinscheduler.spi.task.ResourceInfo;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
-import java.util.ArrayList;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.List;
+import java.util.Objects;
 
 /**
  * DataX parameter
@@ -99,6 +104,11 @@ public class DataxParameters extends AbstractParameters {
      * Xmx memory
      */
     private int xmx;
+
+    /**
+     * resource list
+     */
+    private List<ResourceInfo> resourceList;
 
     public int getCustomConfig() {
         return customConfig;
@@ -212,6 +222,14 @@ public class DataxParameters extends AbstractParameters {
         this.xmx = xmx;
     }
 
+    public List<ResourceInfo> getResourceList() {
+        return resourceList;
+    }
+
+    public void setResourceList(List<ResourceInfo> resourceList) {
+        this.resourceList = resourceList;
+    }
+
     @Override
     public boolean checkParameters() {
         if (customConfig == Flag.NO.ordinal()) {
@@ -226,7 +244,7 @@ public class DataxParameters extends AbstractParameters {
 
     @Override
     public List<ResourceInfo> getResourceFilesList() {
-        return new ArrayList<>();
+        return resourceList;
     }
 
     @Override
@@ -246,6 +264,46 @@ public class DataxParameters extends AbstractParameters {
                 + ", jobSpeedRecord=" + jobSpeedRecord
                 + ", xms=" + xms
                 + ", xmx=" + xmx
+                + ", resourceList=" + JSONUtils.toJsonString(resourceList)
                 + '}';
+    }
+
+    @Override
+    public ResourceParametersHelper getResources() {
+        ResourceParametersHelper resources = super.getResources();
+
+        if (customConfig == Flag.YES.ordinal()) {
+            return resources;
+        }
+        resources.put(ResourceType.DATASOURCE, dataSource);
+        resources.put(ResourceType.DATASOURCE, dataTarget);
+        return resources;
+    }
+
+    public DataxTaskExecutionContext generateExtendedContext(ResourceParametersHelper parametersHelper) {
+
+        DataxTaskExecutionContext dataxTaskExecutionContext = new DataxTaskExecutionContext();
+
+        if (customConfig == Flag.YES.ordinal()) {
+            return dataxTaskExecutionContext;
+        }
+
+        DataSourceParameters dbSource =
+                (DataSourceParameters) parametersHelper.getResourceParameters(ResourceType.DATASOURCE, dataSource);
+        DataSourceParameters dbTarget =
+                (DataSourceParameters) parametersHelper.getResourceParameters(ResourceType.DATASOURCE, dataTarget);
+
+        if (Objects.nonNull(dbSource)) {
+            dataxTaskExecutionContext.setDataSourceId(dataSource);
+            dataxTaskExecutionContext.setSourcetype(dbSource.getType());
+            dataxTaskExecutionContext.setSourceConnectionParams(dbSource.getConnectionParams());
+        }
+
+        if (Objects.nonNull(dbTarget)) {
+            dataxTaskExecutionContext.setDataTargetId(dataTarget);
+            dataxTaskExecutionContext.setTargetType(dbTarget.getType());
+            dataxTaskExecutionContext.setTargetConnectionParams(dbTarget.getConnectionParams());
+        }
+        return dataxTaskExecutionContext;
     }
 }

@@ -16,7 +16,7 @@
 #
 
 apiVersion: v2
-name: dolphinscheduler
+name: dolphinscheduler-helm
 description: Dolphin Scheduler is a distributed and easy-to-expand visual DAG workflow scheduling system, dedicated to solving the complex dependencies in data processing, making the scheduling system out of the box for data processing.
 home: https://dolphinscheduler.apache.org
 icon: https://dolphinscheduler.apache.org/img/hlogo_colorful.svg
@@ -35,18 +35,32 @@ type: application
 
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
-version: 2.0.0
+version: 3.1.0
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application.
-appVersion: 2.0.0-SNAPSHOT
+appVersion: 3.1.0
 
 dependencies:
 - name: postgresql
   version: 10.3.18
-  repository: https://charts.bitnami.com/bitnami
+  # Due to a change in the Bitnami repo, https://charts.bitnami.com/bitnami was truncated only
+  # containing entries for the latest 6 months (from January 2022 on).
+  # This URL: https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
+  # contains the full 'index.yaml'.
+  # See detail here: https://github.com/bitnami/charts/issues/10833
+  repository: https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
   condition: postgresql.enabled
 - name: zookeeper
   version: 6.5.3
-  repository: https://charts.bitnami.com/bitnami
+  # Same as above.
+  repository: https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
   condition: zookeeper.enabled
+- name: mysql
+  version: 9.4.1
+  repository: https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
+  condition: mysql.enabled
+- name: minio
+  version: 11.10.13
+  repository: https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
+  condition: minio.enabled

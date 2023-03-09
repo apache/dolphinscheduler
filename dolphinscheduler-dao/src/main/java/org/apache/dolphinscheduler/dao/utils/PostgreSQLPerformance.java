@@ -23,15 +23,13 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class PostgreSQLPerformance extends BaseDBPerformance {
-    private static final Logger logger = LoggerFactory.getLogger(PostgreSQLPerformance.class);
 
     /**
      * get monitor record
@@ -45,10 +43,8 @@ public class PostgreSQLPerformance extends BaseDBPerformance {
         monitorRecord.setDate(new Date());
         monitorRecord.setState(Flag.YES);
         monitorRecord.setDbType(DbType.POSTGRESQL);
-        Statement pstmt = null;
-        try {
-            pstmt = conn.createStatement();
 
+        try (Statement pstmt = conn.createStatement()) {
             try (ResultSet rs1 = pstmt.executeQuery("select count(*) from pg_stat_activity;")) {
                 if (rs1.next()) {
                     monitorRecord.setThreadsConnections(rs1.getInt("count"));
@@ -61,22 +57,16 @@ public class PostgreSQLPerformance extends BaseDBPerformance {
                 }
             }
 
-            try (ResultSet rs3 = pstmt.executeQuery("select count(*) from pg_stat_activity pg where pg.state = 'active';")) {
+            try (
+                    ResultSet rs3 =
+                            pstmt.executeQuery("select count(*) from pg_stat_activity pg where pg.state = 'active';")) {
                 if (rs3.next()) {
                     monitorRecord.setThreadsRunningConnections(rs3.getInt("count"));
                 }
             }
         } catch (Exception e) {
             monitorRecord.setState(Flag.NO);
-            logger.error("SQLException ", e);
-        } finally {
-            try {
-                if (pstmt != null) {
-                    pstmt.close();
-                }
-            } catch (SQLException e) {
-                logger.error("SQLException ", e);
-            }
+            log.error("SQLException ", e);
         }
         return monitorRecord;
     }

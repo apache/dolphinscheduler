@@ -18,6 +18,10 @@
 package org.apache.dolphinscheduler.plugin.task.sqoop.generator.sources;
 
 import static org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils.decodePassword;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.COMMA;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.DOUBLE_QUOTES;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EQUAL_SIGN;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SPACE;
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.COLUMNS;
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.DB_CONNECT;
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.DB_PWD;
@@ -29,76 +33,72 @@ import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.QUERY
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.QUERY_WHERE;
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.QUERY_WITHOUT_CONDITION;
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.TABLE;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.COMMA;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.DOUBLE_QUOTES;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.EQUAL_SIGN;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.SPACE;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopQueryType;
+import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.ISourceGenerator;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SqoopParameters;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.sources.SourceMysqlParameter;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.task.Property;
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * mysql source generator
  */
+@Slf4j
 public class MySQLSourceGenerator implements ISourceGenerator {
 
-    private static final Logger logger = LoggerFactory.getLogger(MySQLSourceGenerator.class);
-
     @Override
-    public String generate(SqoopParameters sqoopParameters, TaskRequest taskExecutionContext) {
+    public String generate(SqoopParameters sqoopParameters, SqoopTaskExecutionContext sqoopTaskExecutionContext) {
 
         StringBuilder mysqlSourceSb = new StringBuilder();
 
         try {
-            SourceMysqlParameter sourceMysqlParameter = JSONUtils.parseObject(sqoopParameters.getSourceParams(), SourceMysqlParameter.class);
+            SourceMysqlParameter sourceMysqlParameter =
+                    JSONUtils.parseObject(sqoopParameters.getSourceParams(), SourceMysqlParameter.class);
 
             if (null != sourceMysqlParameter) {
                 BaseConnectionParam baseDataSource = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
-                        DbType.of(taskExecutionContext.getSqoopTaskExecutionContext().getSourcetype()),
-                        taskExecutionContext.getSqoopTaskExecutionContext().getSourceConnectionParams());
+                        sqoopTaskExecutionContext.getSourcetype(),
+                        sqoopTaskExecutionContext.getSourceConnectionParams());
 
                 if (null != baseDataSource) {
 
                     mysqlSourceSb.append(SPACE).append(DB_CONNECT)
                             .append(SPACE).append(DOUBLE_QUOTES)
                             .append(DataSourceUtils.getJdbcUrl(DbType.MYSQL, baseDataSource)).append(DOUBLE_QUOTES)
-                        .append(SPACE).append(DB_USERNAME)
-                        .append(SPACE).append(baseDataSource.getUser())
-                        .append(SPACE).append(DB_PWD)
-                        .append(SPACE).append(DOUBLE_QUOTES)
+                            .append(SPACE).append(DB_USERNAME)
+                            .append(SPACE).append(baseDataSource.getUser())
+                            .append(SPACE).append(DB_PWD)
+                            .append(SPACE).append(DOUBLE_QUOTES)
                             .append(decodePassword(baseDataSource.getPassword())).append(DOUBLE_QUOTES);
 
-                    //sqoop table & sql query
+                    // sqoop table & sql query
                     if (sourceMysqlParameter.getSrcQueryType() == SqoopQueryType.FORM.getCode()) {
                         if (StringUtils.isNotEmpty(sourceMysqlParameter.getSrcTable())) {
                             mysqlSourceSb.append(SPACE).append(TABLE)
-                                .append(SPACE).append(sourceMysqlParameter.getSrcTable());
+                                    .append(SPACE).append(sourceMysqlParameter.getSrcTable());
                         }
 
                         if (StringUtils.isNotEmpty(sourceMysqlParameter.getSrcColumns())) {
                             mysqlSourceSb.append(SPACE).append(COLUMNS)
-                                .append(SPACE).append(sourceMysqlParameter.getSrcColumns());
+                                    .append(SPACE).append(sourceMysqlParameter.getSrcColumns());
                         }
                     } else if (sourceMysqlParameter.getSrcQueryType() == SqoopQueryType.SQL.getCode()
-                        && StringUtils.isNotEmpty(sourceMysqlParameter.getSrcQuerySql())) {
+                            && StringUtils.isNotEmpty(sourceMysqlParameter.getSrcQuerySql())) {
 
                         String srcQuery = sourceMysqlParameter.getSrcQuerySql();
                         mysqlSourceSb.append(SPACE).append(QUERY)
-                            .append(SPACE).append(DOUBLE_QUOTES).append(srcQuery);
+                                .append(SPACE).append(DOUBLE_QUOTES).append(srcQuery);
 
                         if (srcQuery.toLowerCase().contains(QUERY_WHERE)) {
                             mysqlSourceSb.append(SPACE).append(QUERY_CONDITION).append(DOUBLE_QUOTES);
@@ -107,7 +107,7 @@ public class MySQLSourceGenerator implements ISourceGenerator {
                         }
                     }
 
-                    //sqoop hive map column
+                    // sqoop hive map column
                     List<Property> mapColumnHive = sourceMysqlParameter.getMapColumnHive();
 
                     if (null != mapColumnHive && !mapColumnHive.isEmpty()) {
@@ -118,11 +118,11 @@ public class MySQLSourceGenerator implements ISourceGenerator {
 
                         if (StringUtils.isNotEmpty(columnMap.toString())) {
                             mysqlSourceSb.append(SPACE).append(MAP_COLUMN_HIVE)
-                                .append(SPACE).append(columnMap.substring(0, columnMap.length() - 1));
+                                    .append(SPACE).append(columnMap.substring(0, columnMap.length() - 1));
                         }
                     }
 
-                    //sqoop map column java
+                    // sqoop map column java
                     List<Property> mapColumnJava = sourceMysqlParameter.getMapColumnJava();
 
                     if (null != mapColumnJava && !mapColumnJava.isEmpty()) {
@@ -133,13 +133,13 @@ public class MySQLSourceGenerator implements ISourceGenerator {
 
                         if (StringUtils.isNotEmpty(columnMap.toString())) {
                             mysqlSourceSb.append(SPACE).append(MAP_COLUMN_JAVA)
-                                .append(SPACE).append(columnMap.substring(0, columnMap.length() - 1));
+                                    .append(SPACE).append(columnMap.substring(0, columnMap.length() - 1));
                         }
                     }
                 }
             }
         } catch (Exception e) {
-            logger.error(String.format("Sqoop task mysql source params build failed: [%s]", e.getMessage()));
+            log.error(String.format("Sqoop task mysql source params build failed: [%s]", e.getMessage()));
         }
 
         return mysqlSourceSb.toString();

@@ -32,8 +32,7 @@ import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * analysis of DAG
@@ -41,8 +40,8 @@ import org.slf4j.LoggerFactory;
  * NodeInfo：node description information
  * EdgeInfo: edge description information
  */
+@Slf4j
 public class DAG<Node, NodeInfo, EdgeInfo> {
-    private static final Logger logger = LoggerFactory.getLogger(DAG.class);
 
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
@@ -122,7 +121,7 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
         try {
             // Whether an edge can be successfully added(fromNode -> toNode)
             if (!isLegalAddEdge(fromNode, toNode, createNode)) {
-                logger.error("serious error: add edge({} -> {}) is invalid, cause cycle！", fromNode, toNode);
+                log.error("serious error: add edge({} -> {}) is invalid, cause cycle！", fromNode, toNode);
                 return false;
             }
 
@@ -380,13 +379,13 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
      */
     private boolean isLegalAddEdge(Node fromNode, Node toNode, boolean createNode) {
         if (fromNode.equals(toNode)) {
-            logger.error("edge fromNode({}) can't equals toNode({})", fromNode, toNode);
+            log.error("edge fromNode({}) can't equals toNode({})", fromNode, toNode);
             return false;
         }
 
         if (!createNode) {
             if (!containsNode(fromNode) || !containsNode(toNode)) {
-                logger.error("edge fromNode({}) or toNode({}) is not in vertices map", fromNode, toNode);
+                log.error("edge fromNode({}) or toNode({}) is not in vertices map", fromNode, toNode);
                 return false;
             }
         }
@@ -466,8 +465,7 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
         }
 
         /*
-         * After scanning, there is no node with 0 degree of entry,
-         * indicating that there is a ring, and return directly
+         * After scanning, there is no node with 0 degree of entry, indicating that there is a ring, and return directly
          */
         if (zeroIndegreeNodeQueue.isEmpty()) {
             return new AbstractMap.SimpleEntry<>(false, topoResultList);
@@ -498,5 +496,24 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
         return new AbstractMap.SimpleEntry<>(notZeroIndegreeNodeMap.size() == 0, topoResultList);
     }
 
-}
+    /**
+     * Get all the nodes that are in the graph
+     *
+     * @return all nodes in the graph
+     */
+    public Set<Node> getAllNodesList() {
+        return nodesMap.keySet();
+    }
 
+    @Override
+    public String toString() {
+        return "DAG{"
+                + "nodesMap="
+                + nodesMap
+                + ", edgesMap="
+                + edgesMap
+                + ", reverseEdgesMap="
+                + reverseEdgesMap
+                + '}';
+    }
+}

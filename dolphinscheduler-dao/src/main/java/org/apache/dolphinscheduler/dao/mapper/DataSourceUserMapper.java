@@ -14,17 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.DatasourceUser;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
 import org.apache.ibatis.annotations.Param;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
  * datasource user realtion mapper interface
  */
 public interface DataSourceUserMapper extends BaseMapper<DatasourceUser> {
-
 
     /**
      * delete datasource by userId
@@ -39,6 +41,5 @@ public interface DataSourceUserMapper extends BaseMapper<DatasourceUser> {
      * @return delete result
      */
     int deleteByDatasourceId(@Param("datasourceId") int datasourceId);
-
 
 }

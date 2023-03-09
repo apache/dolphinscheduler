@@ -17,14 +17,14 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.spi.plugin.PrioritySPI;
 
 /**
  * interface of task processor in master
  */
-public interface ITaskProcessor {
+public interface ITaskProcessor extends PrioritySPI {
 
     void init(TaskInstance taskInstance, ProcessInstance processInstance);
 
@@ -32,6 +32,6 @@ public interface ITaskProcessor {
 
     String getType();
 
-    ExecutionStatus taskState();
+    TaskInstance taskInstance();
 
 }

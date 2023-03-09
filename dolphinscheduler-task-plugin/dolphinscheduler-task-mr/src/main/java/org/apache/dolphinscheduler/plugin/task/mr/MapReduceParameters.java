@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.mr;
 
-import org.apache.dolphinscheduler.spi.task.AbstractParameters;
-import org.apache.dolphinscheduler.spi.task.ResourceInfo;
+import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -153,7 +153,6 @@ public class MapReduceParameters extends AbstractParameters {
                 + "mainClass=" + mainClass
                 + "mainArgs=" + mainArgs
                 + "queue=" + queue
-                + "other mainArgs=" + others
-                ;
+                + "other mainArgs=" + others;
     }
 }

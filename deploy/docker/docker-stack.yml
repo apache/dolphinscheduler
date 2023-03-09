@@ -50,6 +50,7 @@ services:
     image: apache/dolphinscheduler-api
     ports:
       - 12345:12345
+      - 25333:25333
     env_file: .env
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:12345/actuator/health" ]
@@ -109,27 +110,6 @@ services:
       retries: 3
     volumes:
       - dolphinscheduler-worker-data:/tmp/dolphinscheduler
-      - dolphinscheduler-logs:/opt/dolphinscheduler/logs
-      - dolphinscheduler-shared-local:/opt/soft
-      - dolphinscheduler-resource-local:/dolphinscheduler
-    networks:
-      - dolphinscheduler
-    deploy:
-      mode: replicated
-      replicas: 1
-
-  dolphinscheduler-python-gateway:
-    image: apache/dolphinscheduler-python-gateway
-    ports:
-      - 54321:54321
-      - 25333:25333
-    env_file: .env
-    healthcheck:
-      test: [ "CMD", "curl", "http://localhost:54321/actuator/health" ]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-    volumes:
       - dolphinscheduler-logs:/opt/dolphinscheduler/logs
       - dolphinscheduler-shared-local:/opt/soft
       - dolphinscheduler-resource-local:/dolphinscheduler

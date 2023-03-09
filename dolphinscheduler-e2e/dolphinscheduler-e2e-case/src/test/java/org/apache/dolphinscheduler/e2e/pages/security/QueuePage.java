@@ -21,19 +21,22 @@ package org.apache.dolphinscheduler.e2e.pages.security;
 
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 
+import java.security.Key;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
 
 import lombok.Getter;
 
 @Getter
 public final class QueuePage extends NavBarPage implements SecurityPage.Tab {
-    @FindBy(id = "btnCreateQueue")
+    @FindBy(className = "btn-create-queue")
     private WebElement buttonCreateQueue;
 
     @FindBy(className = "items")
@@ -59,15 +62,21 @@ public final class QueuePage extends NavBarPage implements SecurityPage.Tab {
     public QueuePage update(String queueName, String editQueueName, String editQueueValue) {
         queueList()
                 .stream()
-                .filter(it -> it.findElement(By.className("queueName")).getAttribute("innerHTML").contains(queueName))
+                .filter(it -> it.findElement(By.className("queue-name")).getAttribute("innerHTML").contains(queueName))
                 .flatMap(it -> it.findElements(By.className("edit")).stream())
                 .filter(WebElement::isDisplayed)
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("No edit button in queue list"))
                 .click();
 
+        editQueueForm().inputQueueName().sendKeys(Keys.CONTROL + "a");
+        editQueueForm().inputQueueName().sendKeys(Keys.BACK_SPACE);
         editQueueForm().inputQueueName().sendKeys(editQueueName);
+
+        editQueueForm().inputQueueValue().sendKeys(Keys.CONTROL + "a");
+        editQueueForm().inputQueueValue().sendKeys(Keys.BACK_SPACE);
         editQueueForm().inputQueueValue().sendKeys(editQueueValue);
+
         editQueueForm().buttonSubmit().click();
 
         return this;
@@ -79,16 +88,22 @@ public final class QueuePage extends NavBarPage implements SecurityPage.Tab {
             PageFactory.initElements(driver, this);
         }
 
-        @FindBy(id = "inputQueueName")
+        @FindBys({
+            @FindBy(className = "input-queue-name"),
+            @FindBy(tagName = "input"),
+        })
         private WebElement inputQueueName;
 
-        @FindBy(id = "inputQueueValue")
+        @FindBys({
+                @FindBy(className = "input-queue-value"),
+                @FindBy(tagName = "input"),
+        })
         private WebElement inputQueueValue;
 
-        @FindBy(id = "btnSubmit")
+        @FindBy(className = "btn-submit")
         private WebElement buttonSubmit;
 
-        @FindBy(id = "btnCancel")
+        @FindBy(className = "btn-cancel")
         private WebElement buttonCancel;
     }
 }

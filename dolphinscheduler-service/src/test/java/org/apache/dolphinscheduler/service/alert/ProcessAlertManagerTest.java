@@ -18,28 +18,29 @@
 package org.apache.dolphinscheduler.service.alert;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * ProcessAlertManager Test
  */
-@RunWith(PowerMockRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ProcessAlertManagerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ProcessAlertManagerTest.class);
@@ -69,7 +70,6 @@ public class ProcessAlertManagerTest {
         processAlertManager.sendAlertWorkerToleranceFault(processInstance, taskInstanceList);
     }
 
-
     /**
      * send worker alert fault tolerance
      */
@@ -78,7 +78,7 @@ public class ProcessAlertManagerTest {
         // process instance
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setWarningType(WarningType.SUCCESS);
-        processInstance.setState(ExecutionStatus.SUCCESS);
+        processInstance.setState(WorkflowExecutionStatus.SUCCESS);
         processInstance.setCommandType(CommandType.COMPLEMENT_DATA);
         processInstance.setWarningGroupId(1);
 
@@ -90,4 +90,25 @@ public class ProcessAlertManagerTest {
         processAlertManager.sendAlertProcessInstance(processInstance, taskInstanceList, projectUser);
     }
 
+    /**
+     * send blocking alert
+     */
+    @Test
+    public void sendBlockingAlertTest() {
+        // process instance
+        ProcessInstance processInstance = new ProcessInstance();
+        processInstance.setId(1);
+        processInstance.setName("test-process-01");
+        processInstance.setCommandType(CommandType.START_PROCESS);
+        processInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
+        processInstance.setRunTimes(0);
+        processInstance.setStartTime(new Date());
+        processInstance.setEndTime(new Date());
+        processInstance.setHost("127.0.0.1");
+        processInstance.setWarningGroupId(1);
+
+        ProjectUser projectUser = new ProjectUser();
+
+        processAlertManager.sendProcessBlockingAlert(processInstance, projectUser);
+    }
 }

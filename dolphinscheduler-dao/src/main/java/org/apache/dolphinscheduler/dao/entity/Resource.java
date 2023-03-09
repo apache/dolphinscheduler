@@ -21,18 +21,24 @@ import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import java.util.Date;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonFormat;
 
+@Data
+@NoArgsConstructor
 @TableName("t_ds_resources")
 public class Resource {
+
     /**
      * id
      */
     @TableId(value = "id", type = IdType.AUTO)
-    private int id;
+    private Integer id;
 
     /**
      * parent id
@@ -82,17 +88,18 @@ public class Resource {
     /**
      * create time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
     /**
      * update time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
-    public Resource() {
-    }
+    /**
+     * user name
+     */
+    @TableField(exist = false)
+    private String userName;
 
     public Resource(int id, String alias, String fileName, String description, int userId,
                     ResourceType type, long size,
@@ -116,7 +123,8 @@ public class Resource {
         this.isDirectory = isDirectory;
     }
 
-    public Resource(int pid, String alias, String fullName, boolean isDirectory, String description, String fileName, int userId, ResourceType type, long size, Date createTime, Date updateTime) {
+    public Resource(int pid, String alias, String fullName, boolean isDirectory, String description, String fileName,
+                    int userId, ResourceType type, long size, Date createTime, Date updateTime) {
         this.pid = pid;
         this.alias = alias;
         this.fullName = fullName;
@@ -128,121 +136,6 @@ public class Resource {
         this.size = size;
         this.createTime = createTime;
         this.updateTime = updateTime;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getAlias() {
-        return alias;
-    }
-
-    public void setAlias(String alias) {
-        this.alias = alias;
-    }
-
-    public int getPid() {
-        return pid;
-    }
-
-    public void setPid(int pid) {
-        this.pid = pid;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public boolean isDirectory() {
-        return isDirectory;
-    }
-
-    public void setDirectory(boolean directory) {
-        isDirectory = directory;
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
-
-    public ResourceType getType() {
-        return type;
-    }
-
-    public void setType(ResourceType type) {
-        this.type = type;
-    }
-
-    public long getSize() {
-        return size;
-    }
-
-    public void setSize(long size) {
-        this.size = size;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    @Override
-    public String toString() {
-        return "Resource{" +
-            "id=" + id +
-            ", pid=" + pid +
-            ", alias='" + alias + '\'' +
-            ", fullName='" + fullName + '\'' +
-            ", isDirectory=" + isDirectory +
-            ", description='" + description + '\'' +
-            ", fileName='" + fileName + '\'' +
-            ", userId=" + userId +
-            ", type=" + type +
-            ", size=" + size +
-            ", createTime=" + createTime +
-            ", updateTime=" + updateTime +
-            '}';
     }
 
     @Override

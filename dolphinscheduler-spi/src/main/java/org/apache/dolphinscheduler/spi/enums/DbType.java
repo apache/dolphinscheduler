@@ -21,11 +21,13 @@ import static java.util.stream.Collectors.toMap;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.google.common.base.Functions;
 
 public enum DbType {
+
     MYSQL(0, "mysql"),
     POSTGRESQL(1, "postgresql"),
     HIVE(2, "hive"),
@@ -35,8 +37,17 @@ public enum DbType {
     SQLSERVER(6, "sqlserver"),
     DB2(7, "db2"),
     PRESTO(8, "presto"),
-    H2(9, "h2");
+    H2(9, "h2"),
+    REDSHIFT(10, "redshift"),
+    ATHENA(11, "athena"),
+    TRINO(12, "trino"),
+    STARROCKS(13, "starrocks"),
+    AZURESQL(14, "azuresql"),
+    DAMENG(15, "dameng"),
+    OCEANBASE(16, "oceanbase");
 
+    private static final Map<Integer, DbType> DB_TYPE_MAP =
+            Arrays.stream(DbType.values()).collect(toMap(DbType::getCode, Functions.identity()));
     @EnumValue
     private final int code;
     private final String descp;
@@ -44,6 +55,18 @@ public enum DbType {
     DbType(int code, String descp) {
         this.code = code;
         this.descp = descp;
+    }
+
+    public static DbType of(int type) {
+        if (DB_TYPE_MAP.containsKey(type)) {
+            return DB_TYPE_MAP.get(type);
+        }
+        return null;
+    }
+
+    public static DbType ofName(String name) {
+        return Arrays.stream(DbType.values()).filter(e -> e.name().equals(name)).findFirst()
+                .orElseThrow(() -> new NoSuchElementException("no such db type"));
     }
 
     public int getCode() {
@@ -54,14 +77,16 @@ public enum DbType {
         return descp;
     }
 
-    private static final Map<Integer, DbType> DB_TYPE_MAP =
-            Arrays.stream(DbType.values()).collect(toMap(DbType::getCode, Functions.identity()));
-
-    public static DbType of(int type) {
-        if (DB_TYPE_MAP.containsKey(type)) {
-            return DB_TYPE_MAP.get(type);
-        }
-        return null;
+    public boolean isHive() {
+        return this == DbType.HIVE;
     }
 
+    /**
+     * support execute multiple segmented statements at a time
+     *
+     * @return
+     */
+    public boolean isSupportMultipleStatement() {
+        return isHive() || this == DbType.SPARK;
+    }
 }

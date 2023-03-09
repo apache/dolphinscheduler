@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.sql;
 
-import org.apache.dolphinscheduler.spi.task.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
 import java.util.Map;
 
@@ -25,6 +25,7 @@ import java.util.Map;
  * Used to contains both prepared sql string and its to-be-bind parameters
  */
 public class SqlBinds {
+
     private final String sql;
     private final Map<Integer, Property> paramsMap;
 

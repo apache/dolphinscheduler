@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -33,28 +34,41 @@ import lombok.SneakyThrows;
 
 @Getter
 public final class LoginPage extends NavBarPage {
-    @FindBy(id = "inputUsername")
+    @FindBys({
+        @FindBy(className = "input-user-name"),
+        @FindBy(tagName = "input"),
+    })
     private WebElement inputUsername;
 
-    @FindBy(id = "inputPassword")
+    @FindBys( {
+        @FindBy(className = "input-password"),
+        @FindBy(tagName = "input"),
+    })
     private WebElement inputPassword;
 
-    @FindBy(id = "btnLogin")
+    @FindBy(className = "btn-login")
     private WebElement buttonLogin;
+
+    @FindBy(className = "n-switch__button")
+    private WebElement buttonSwitchLanguage;
 
     public LoginPage(RemoteWebDriver driver) {
         super(driver);
     }
 
     @SneakyThrows
-    public TenantPage login(String username, String password) {
+    public NavBarPage login(String username, String password) {
+        new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(buttonSwitchLanguage));
+
+        buttonSwitchLanguage().click();
+
         inputUsername().sendKeys(username);
         inputPassword().sendKeys(password);
         buttonLogin().click();
 
         new WebDriverWait(driver, 10)
-            .until(ExpectedConditions.urlContains("/#/security"));
+            .until(ExpectedConditions.urlContains("/home"));
 
-        return new TenantPage(driver);
+        return new NavBarPage(driver);
     }
 }

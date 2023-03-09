@@ -17,11 +17,13 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
+
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 
 /**
  * udf function mapper interface
@@ -41,27 +43,27 @@ public interface UdfFuncMapper extends BaseMapper<UdfFunc> {
      * @param funcNames funcNames
      * @return udf function list
      */
-    List<UdfFunc> queryUdfByIdStr(@Param("ids") int[] ids,
+    List<UdfFunc> queryUdfByIdStr(@Param("ids") Integer[] ids,
                                   @Param("funcNames") String funcNames);
 
     /**
      * udf function page
      * @param page page
-     * @param userId userId
+     * @param ids userId
      * @param searchVal searchVal
      * @return udf function IPage
      */
     IPage<UdfFunc> queryUdfFuncPaging(IPage<UdfFunc> page,
-                                      @Param("userId") int userId,
+                                      @Param("ids") List<Integer> ids,
                                       @Param("searchVal") String searchVal);
 
     /**
      * query udf function by type
-     * @param userId userId
+     * @param ids userId
      * @param type type
      * @return udf function list
      */
-    List<UdfFunc> getUdfFuncByType(@Param("userId") int userId,
+    List<UdfFunc> getUdfFuncByType(@Param("ids") List<Integer> ids,
                                    @Param("type") Integer type);
 
     /**
@@ -84,7 +86,7 @@ public interface UdfFuncMapper extends BaseMapper<UdfFunc> {
      * @param udfIds UDF function id array
      * @return UDF function list
      */
-    <T> List<UdfFunc> listAuthorizedUdfFunc (@Param("userId") int userId,@Param("udfIds")T[] udfIds);
+    <T> List<UdfFunc> listAuthorizedUdfFunc(@Param("userId") int userId, @Param("udfIds") T[] udfIds);
 
     /**
      * list UDF by resource id
@@ -94,11 +96,18 @@ public interface UdfFuncMapper extends BaseMapper<UdfFunc> {
     List<UdfFunc> listUdfByResourceId(@Param("resourceIds") Integer[] resourceIds);
 
     /**
+     * list UDF by resource fullName
+     * @param   resourceFullNames  resource fullName array
+     * @return  UDF function list
+     */
+    List<UdfFunc> listUdfByResourceFullName(@Param("resourceFullNames") String[] resourceFullNames);
+
+    /**
      * list authorized UDF by resource id
      * @param   resourceIds  resource id array
      * @return  UDF function list
      */
-    List<UdfFunc> listAuthorizedUdfByResourceId(@Param("userId") int userId,@Param("resourceIds") int[] resourceIds);
+    List<UdfFunc> listAuthorizedUdfByResourceId(@Param("userId") int userId, @Param("resourceIds") int[] resourceIds);
 
     /**
      * batch update udf func
@@ -107,5 +116,10 @@ public interface UdfFuncMapper extends BaseMapper<UdfFunc> {
      */
     int batchUpdateUdfFunc(@Param("udfFuncList") List<UdfFunc> udfFuncList);
 
-
+    /**
+     * listAuthorizedUdfByUserId
+     * @param userId
+     * @return
+     */
+    List<UdfFunc> listAuthorizedUdfByUserId(@Param("userId") int userId);
 }

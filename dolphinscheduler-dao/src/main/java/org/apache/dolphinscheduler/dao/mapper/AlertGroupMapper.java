@@ -32,7 +32,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  */
 public interface AlertGroupMapper extends BaseMapper<AlertGroup> {
 
-
     /**
      * alertgroup page
      * @param page page
@@ -41,7 +40,6 @@ public interface AlertGroupMapper extends BaseMapper<AlertGroup> {
      */
     IPage<AlertGroup> queryAlertGroupPage(Page page,
                                           @Param("groupName") String groupName);
-
 
     /**
      * query by group name
@@ -83,4 +81,22 @@ public interface AlertGroupMapper extends BaseMapper<AlertGroup> {
      */
     String queryAlertGroupInstanceIdsById(@Param("alertGroupId") int alertGroupId);
 
+    /**
+     * list authorized AlertGroup
+     * @param userId
+     * @param alertGroupsIds
+     * @return
+     */
+    <T> List<AlertGroup> listAuthorizedAlertGroupList(@Param("userId") int userId,
+                                                      @Param("alertGroupsIds") List<Integer> alertGroupsIds);
+
+    /**
+     * queryAlertGroupPageByIds
+     * @param page
+     * @param ids
+     * @param searchVal
+     * @return
+     */
+    IPage<AlertGroup> queryAlertGroupPageByIds(Page<AlertGroup> page, @Param("ids") List<Integer> ids,
+                                               @Param("searchVal") String searchVal);
 }

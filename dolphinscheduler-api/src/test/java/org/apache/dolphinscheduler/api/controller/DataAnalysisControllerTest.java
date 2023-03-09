@@ -28,12 +28,12 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 
-import org.junit.Test;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
+import java.util.Date;
+
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
@@ -43,20 +43,30 @@ import org.springframework.util.MultiValueMap;
  * data analysis controller test
  */
 public class DataAnalysisControllerTest extends AbstractControllerTest {
+
     private static final Logger logger = LoggerFactory.getLogger(DataAnalysisControllerTest.class);
 
-    @MockBean(name = "projectMapper")
+    @Autowired
     private ProjectMapper projectMapper;
+
+    private int createProject() {
+        Project project = new Project();
+        project.setCode(16L);
+        project.setName("ut project");
+        project.setUserId(1);
+        project.setCreateTime(new Date());
+        projectMapper.insert(project);
+        return project.getId();
+    }
 
     @Test
     public void testCountTaskState() throws Exception {
-        PowerMockito.when(projectMapper.queryByCode(Mockito.anyLong())).thenReturn(getProject("test"));
+        int projectId = createProject();
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("startDate","2019-12-01 00:00:00");
-        paramsMap.add("endDate","2019-12-28 00:00:00");
-        paramsMap.add("projectCode","16");
-
+        paramsMap.add("startDate", "2019-12-01 00:00:00");
+        paramsMap.add("endDate", "2019-12-28 00:00:00");
+        paramsMap.add("projectCode", "16");
         MvcResult mvcResult = mockMvc.perform(get("/projects/analysis/task-state-count")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
@@ -66,16 +76,18 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
         logger.info(mvcResult.getResponse().getContentAsString());
+
+        projectMapper.deleteById(projectId);
     }
 
     @Test
     public void testCountProcessInstanceState() throws Exception {
-        PowerMockito.when(projectMapper.queryByCode(Mockito.anyLong())).thenReturn(getProject("test"));
+        int projectId = createProject();
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("startDate","2019-12-01 00:00:00");
-        paramsMap.add("endDate","2019-12-28 00:00:00");
-        paramsMap.add("projectCode","16");
+        paramsMap.add("startDate", "2019-12-01 00:00:00");
+        paramsMap.add("endDate", "2019-12-28 00:00:00");
+        paramsMap.add("projectCode", "16");
 
         MvcResult mvcResult = mockMvc.perform(get("/projects/analysis/process-state-count")
                 .header("sessionId", sessionId)
@@ -86,14 +98,15 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
         logger.info(mvcResult.getResponse().getContentAsString());
+
+        projectMapper.deleteById(projectId);
     }
 
     @Test
     public void testCountDefinitionByUser() throws Exception {
-        PowerMockito.when(projectMapper.queryByCode(Mockito.anyLong())).thenReturn(getProject("test"));
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("projectId","16");
+        paramsMap.add("projectId", "16");
 
         MvcResult mvcResult = mockMvc.perform(get("/projects/analysis/define-user-count")
                 .header("sessionId", sessionId)
@@ -128,20 +141,5 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
         logger.info(mvcResult.getResponse().getContentAsString());
-    }
-
-    /**
-     * get mock Project
-     *
-     * @param projectName projectName
-     * @return Project
-     */
-    private Project getProject(String projectName) {
-        Project project = new Project();
-        project.setCode(11L);
-        project.setId(1);
-        project.setName(projectName);
-        project.setUserId(1);
-        return project;
     }
 }

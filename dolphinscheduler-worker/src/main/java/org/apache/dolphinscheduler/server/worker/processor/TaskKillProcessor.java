@@ -17,66 +17,51 @@
 
 package org.apache.dolphinscheduler.server.worker.processor;
 
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
 import org.apache.dolphinscheduler.remote.command.TaskKillResponseCommand;
-import org.apache.dolphinscheduler.remote.processor.NettyRemoteChannel;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
-import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.remote.utils.Pair;
-import org.apache.dolphinscheduler.server.utils.ProcessUtils;
-import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
+import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
-import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.log.LogClientService;
-import org.apache.dolphinscheduler.service.queue.entity.TaskExecutionContext;
-import org.apache.dolphinscheduler.spi.task.TaskExecutionContextCacheManager;
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
+import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecuteRunnable;
 
-import org.apache.commons.lang.StringUtils;
+import java.util.Arrays;
 
-import java.util.Collections;
-import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 
 /**
  * task kill processor
  */
+@Slf4j
+@Component
 public class TaskKillProcessor implements NettyRequestProcessor {
 
-    private final Logger logger = LoggerFactory.getLogger(TaskKillProcessor.class);
+    @Autowired
+    private WorkerManagerThread workerManager;
 
-    /**
-     * worker config
-     */
-    private final WorkerConfig workerConfig;
-
-    /**
-     * task callback service
-     */
-    private final TaskCallbackService taskCallbackService;
-
-    /*
-     * task execute manager
-     */
-    private final WorkerManagerThread workerManager;
-
-    public TaskKillProcessor() {
-        this.taskCallbackService = SpringApplicationContext.getBean(TaskCallbackService.class);
-        this.workerConfig = SpringApplicationContext.getBean(WorkerConfig.class);
-        this.workerManager = SpringApplicationContext.getBean(WorkerManagerThread.class);
-    }
+    @Autowired
+    private MessageRetryRunner messageRetryRunner;
 
     /**
      * task kill process
@@ -86,20 +71,72 @@ public class TaskKillProcessor implements NettyRequestProcessor {
      */
     @Override
     public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.TASK_KILL_REQUEST == command.getType(), String.format("invalid command type : %s", command.getType()));
+        Preconditions.checkArgument(CommandType.TASK_KILL_REQUEST == command.getType(),
+                String.format("invalid command type : %s", command.getType()));
         TaskKillRequestCommand killCommand = JSONUtils.parseObject(command.getBody(), TaskKillRequestCommand.class);
-        logger.info("received kill command : {}", killCommand);
+        if (killCommand == null) {
+            log.error("task kill request command is null");
+            return;
+        }
+        log.info("task kill command : {}", killCommand);
 
-        Pair<Boolean, List<String>> result = doKill(killCommand);
+        int taskInstanceId = killCommand.getTaskInstanceId();
+        try {
+            LogUtils.setTaskInstanceIdMDC(taskInstanceId);
+            TaskExecutionContext taskExecutionContext =
+                    TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
+            if (taskExecutionContext == null) {
+                log.error("taskRequest cache is null, taskInstanceId: {}", killCommand.getTaskInstanceId());
+                return;
+            }
 
-        taskCallbackService.addRemoteChannel(killCommand.getTaskInstanceId(),
-                new NettyRemoteChannel(channel, command.getOpaque()));
+            int processId = taskExecutionContext.getProcessId();
+            if (processId == 0) {
+                this.cancelApplication(taskInstanceId);
+                workerManager.killTaskBeforeExecuteByInstanceId(taskInstanceId);
+                taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.KILL);
+                TaskExecutionContextCacheManager.removeByTaskInstanceId(taskInstanceId);
+                sendTaskKillResponseCommand(channel, taskExecutionContext);
+                log.info("the task has not been executed and has been cancelled, task id:{}", taskInstanceId);
+                return;
+            }
 
-        TaskKillResponseCommand taskKillResponseCommand = buildKillTaskResponseCommand(killCommand, result);
-        taskCallbackService.sendResult(taskKillResponseCommand.getTaskInstanceId(), taskKillResponseCommand.convert2Command());
-        TaskExecutionContextCacheManager.removeByTaskInstanceId(taskKillResponseCommand.getTaskInstanceId());
-        TaskCallbackService.remove(killCommand.getTaskInstanceId());
-        logger.info("remove REMOTE_CHANNELS, task instance id:{}", killCommand.getTaskInstanceId());
+            // if processId > 0, it should call cancelApplication to cancel remote application too.
+            this.cancelApplication(taskInstanceId);
+            boolean result = doKill(taskExecutionContext);
+
+            taskExecutionContext.setCurrentExecutionStatus(
+                    result ? TaskExecutionStatus.SUCCESS : TaskExecutionStatus.FAILURE);
+            sendTaskKillResponseCommand(channel, taskExecutionContext);
+
+            TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+            messageRetryRunner.removeRetryMessages(taskExecutionContext.getTaskInstanceId());
+
+            log.info("remove REMOTE_CHANNELS, task instance id:{}", killCommand.getTaskInstanceId());
+        } finally {
+            LogUtils.removeTaskInstanceIdMDC();
+        }
+    }
+
+    private void sendTaskKillResponseCommand(Channel channel, TaskExecutionContext taskExecutionContext) {
+        TaskKillResponseCommand taskKillResponseCommand = new TaskKillResponseCommand();
+        taskKillResponseCommand.setStatus(taskExecutionContext.getCurrentExecutionStatus());
+        if (taskExecutionContext.getAppIds() != null) {
+            taskKillResponseCommand
+                    .setAppIds(Arrays.asList(taskExecutionContext.getAppIds().split(TaskConstants.COMMA)));
+        }
+        taskKillResponseCommand.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+        taskKillResponseCommand.setHost(taskExecutionContext.getHost());
+        taskKillResponseCommand.setProcessId(taskExecutionContext.getProcessId());
+        channel.writeAndFlush(taskKillResponseCommand.convert2Command()).addListener(new ChannelFutureListener() {
+
+            @Override
+            public void operationComplete(ChannelFuture future) throws Exception {
+                if (!future.isSuccess()) {
+                    log.error("Submit kill response to master error, kill command: {}", taskKillResponseCommand);
+                }
+            }
+        });
     }
 
     /**
@@ -107,97 +144,66 @@ public class TaskKillProcessor implements NettyRequestProcessor {
      *
      * @return kill result
      */
-    private Pair<Boolean, List<String>> doKill(TaskKillRequestCommand killCommand) {
-        boolean processFlag = true;
-        List<String> appIds = Collections.emptyList();
-        int taskInstanceId = killCommand.getTaskInstanceId();
-        TaskRequest taskRequest = TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
-        TaskExecutionContext taskExecutionContext = JSONUtils.parseObject(JSONUtils.toJsonString(taskRequest), TaskExecutionContext.class);
+    private boolean doKill(TaskExecutionContext taskExecutionContext) {
+        // kill system process
+        boolean processFlag = killProcess(taskExecutionContext.getTenantCode(), taskExecutionContext.getProcessId());
 
+        // kill yarn or k8s application
         try {
-            Integer processId = taskExecutionContext.getProcessId();
-            if (processId.equals(0)) {
-                workerManager.killTaskBeforeExecuteByInstanceId(taskInstanceId);
-                TaskExecutionContextCacheManager.removeByTaskInstanceId(taskInstanceId);
-                logger.info("the task has not been executed and has been cancelled, task id:{}", taskInstanceId);
-                return Pair.of(true, appIds);
-            }
+            ProcessUtils.cancelApplication(taskExecutionContext);
+        } catch (TaskException e) {
+            return false;
+        }
+        return processFlag;
+    }
 
-            String pidsStr = ProcessUtils.getPidsStr(taskExecutionContext.getProcessId());
-            if (!StringUtils.isEmpty(pidsStr)) {
+    /**
+     * kill task by cancel application
+     * @param taskInstanceId
+     */
+    protected void cancelApplication(int taskInstanceId) {
+        WorkerTaskExecuteRunnable workerTaskExecuteRunnable = workerManager.getTaskExecuteThread(taskInstanceId);
+        if (workerTaskExecuteRunnable == null) {
+            log.warn("taskExecuteThread not found, taskInstanceId:{}", taskInstanceId);
+            return;
+        }
+        AbstractTask task = workerTaskExecuteRunnable.getTask();
+        if (task == null) {
+            log.warn("task not found, taskInstanceId:{}", taskInstanceId);
+            return;
+        }
+        try {
+            task.cancel();
+        } catch (Exception e) {
+            log.error("kill task error", e);
+        }
+        log.info("kill task by cancelApplication, task id:{}", taskInstanceId);
+    }
+
+    /**
+     * kill system process
+     * @param tenantCode
+     * @param processId
+     */
+    protected boolean killProcess(String tenantCode, Integer processId) {
+        // todo: directly interrupt the process
+        boolean processFlag = true;
+        if (processId == null || processId.equals(0)) {
+            return true;
+        }
+        try {
+            String pidsStr = ProcessUtils.getPidsStr(processId);
+            if (!Strings.isNullOrEmpty(pidsStr)) {
                 String cmd = String.format("kill -9 %s", pidsStr);
-                cmd = OSUtils.getSudoCmd(taskExecutionContext.getTenantCode(), cmd);
-                logger.info("process id:{}, cmd:{}", taskExecutionContext.getProcessId(), cmd);
+                cmd = OSUtils.getSudoCmd(tenantCode, cmd);
+                log.info("process id:{}, cmd:{}", processId, cmd);
                 OSUtils.exeCmd(cmd);
             }
-
         } catch (Exception e) {
             processFlag = false;
-            logger.error("kill task error", e);
+            log.error("kill task error", e);
         }
-        // find log and kill yarn job
-        Pair<Boolean, List<String>> yarnResult = killYarnJob(Host.of(taskExecutionContext.getHost()),
-                taskExecutionContext.getLogPath(),
-                taskExecutionContext.getExecutePath(),
-                taskExecutionContext.getTenantCode());
-        return Pair.of(processFlag && yarnResult.getLeft(), yarnResult.getRight());
-    }
-
-    /**
-     * build TaskKillResponseCommand
-     *
-     * @param killCommand kill command
-     * @param result exe result
-     * @return build TaskKillResponseCommand
-     */
-    private TaskKillResponseCommand buildKillTaskResponseCommand(TaskKillRequestCommand killCommand,
-                                                                 Pair<Boolean, List<String>> result) {
-        TaskKillResponseCommand taskKillResponseCommand = new TaskKillResponseCommand();
-        taskKillResponseCommand.setStatus(result.getLeft() ? ExecutionStatus.SUCCESS.getCode() : ExecutionStatus.FAILURE.getCode());
-        taskKillResponseCommand.setAppIds(result.getRight());
-        TaskRequest taskRequest = TaskExecutionContextCacheManager.getByTaskInstanceId(killCommand.getTaskInstanceId());
-        if (taskRequest == null) {
-            return taskKillResponseCommand;
-        }
-        TaskExecutionContext taskExecutionContext = JSONUtils.parseObject(JSONUtils.toJsonString(taskRequest), TaskExecutionContext.class);
-        if (taskExecutionContext != null) {
-            taskKillResponseCommand.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-            taskKillResponseCommand.setHost(taskExecutionContext.getHost());
-            taskKillResponseCommand.setProcessId(taskExecutionContext.getProcessId());
-        }
-        return taskKillResponseCommand;
-    }
-
-    /**
-     * kill yarn job
-     *
-     * @param host host
-     * @param logPath logPath
-     * @param executePath executePath
-     * @param tenantCode tenantCode
-     * @return Pair<Boolean, List < String>> yarn kill result
-     */
-    private Pair<Boolean, List<String>> killYarnJob(Host host, String logPath, String executePath, String tenantCode) {
-        try (LogClientService logClient = new LogClientService();) {
-            logger.info("log host : {} , logPath : {} , port : {}", host.getIp(), logPath,
-                    host.getPort());
-            String log = logClient.viewLog(host.getIp(), host.getPort(), logPath);
-            List<String> appIds = Collections.emptyList();
-            if (!StringUtils.isEmpty(log)) {
-                appIds = LoggerUtils.getAppIds(log, logger);
-                if (StringUtils.isEmpty(executePath)) {
-                    logger.error("task instance execute path is empty");
-                    throw new RuntimeException("task instance execute path is empty");
-                }
-                if (appIds.size() > 0) {
-                    ProcessUtils.cancelApplication(appIds, logger, tenantCode, executePath);
-                }
-            }
-            return Pair.of(true, appIds);
-        } catch (Exception e) {
-            logger.error("kill yarn job error", e);
-        }
-        return Pair.of(false, Collections.emptyList());
+        return processFlag;
     }
 
 }

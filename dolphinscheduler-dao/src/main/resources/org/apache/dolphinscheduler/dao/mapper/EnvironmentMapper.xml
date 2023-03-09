@@ -43,6 +43,23 @@
         </if>
         order by create_time desc
     </select>
+    <select id="queryEnvironmentListPagingByIds" resultType="org.apache.dolphinscheduler.dao.entity.Environment">
+        select
+        <include refid="baseSql"/>
+        from t_ds_environment
+        where 1=1
+        <if test="ids != null and ids.size() > 0">
+            and id  in
+            <foreach item="id" index="index" collection="ids" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </if>
+        <if test="searchName!=null and searchName != ''">
+            and name like concat('%', #{searchName}, '%')
+        </if>
+        order by create_time desc
+    </select>
+
     <select id="queryByEnvironmentCode" resultType="org.apache.dolphinscheduler.dao.entity.Environment">
         select
         <include refid="baseSql"/>

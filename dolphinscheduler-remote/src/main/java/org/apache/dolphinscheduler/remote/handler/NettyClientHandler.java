@@ -31,9 +31,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import lombok.extern.slf4j.Slf4j;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
@@ -45,9 +43,8 @@ import io.netty.handler.timeout.IdleStateEvent;
  * netty client request handler
  */
 @ChannelHandler.Sharable
+@Slf4j
 public class NettyClientHandler extends ChannelInboundHandlerAdapter {
-
-    private final Logger logger = LoggerFactory.getLogger(NettyClientHandler.class);
 
     /**
      * netty client
@@ -117,7 +114,8 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
      * @param processor processor
      * @param executor thread executor
      */
-    public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor, final ExecutorService executor) {
+    public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor,
+                                  final ExecutorService executor) {
         ExecutorService executorRef = executor;
         if (executorRef == null) {
             executorRef = defaultExecutor;
@@ -153,16 +151,17 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
                 try {
                     pair.getLeft().process(channel, command);
                 } catch (Exception e) {
-                    logger.error(String.format("process command %s exception", command), e);
+                    log.error(String.format("process command %s exception", command), e);
                 }
             };
             try {
                 pair.getRight().submit(run);
             } catch (RejectedExecutionException e) {
-                logger.warn("thread pool is full, discard command {} from {}", command, ChannelUtils.getRemoteAddress(channel));
+                log.warn("thread pool is full, discard command {} from {}", command,
+                        ChannelUtils.getRemoteAddress(channel));
             }
         } else {
-            logger.warn("receive response {}, but not matched any request ", command);
+            log.warn("receive response {}, but not matched any request ", command);
         }
     }
 
@@ -174,7 +173,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        logger.error("exceptionCaught : {}", cause.getMessage(), cause);
+        log.error("exceptionCaught : {}", cause.getMessage(), cause);
         nettyRemotingClient.closeChannel(ChannelUtils.toAddress(ctx.channel()));
         ctx.channel().close();
     }
@@ -187,8 +186,8 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
             heartBeat.setBody(heartBeatData);
             ctx.channel().writeAndFlush(heartBeat)
                     .addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
-            if (logger.isDebugEnabled()) {
-                logger.debug("Client send heart beat to: {}", ChannelUtils.getRemoteAddress(ctx.channel()));
+            if (log.isDebugEnabled()) {
+                log.debug("Client send heart beat to: {}", ChannelUtils.getRemoteAddress(ctx.channel()));
             }
         } else {
             super.userEventTriggered(ctx, evt);

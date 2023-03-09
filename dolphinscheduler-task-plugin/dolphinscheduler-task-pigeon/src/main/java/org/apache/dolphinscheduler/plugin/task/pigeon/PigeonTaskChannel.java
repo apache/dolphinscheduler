@@ -17,23 +17,36 @@
 
 package org.apache.dolphinscheduler.plugin.task.pigeon;
 
-import org.apache.dolphinscheduler.spi.task.AbstractTask;
-import org.apache.dolphinscheduler.spi.task.TaskChannel;
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
+import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class PigeonTaskChannel implements TaskChannel {
-    private static final Logger logger = LoggerFactory.getLogger(PigeonTaskChannel.class);
 
     @Override
     public void cancelApplication(boolean status) {
-        logger.info("pigeon task cancel");
+        log.info("pigeon task cancel");
     }
 
     @Override
-    public AbstractTask createTask(TaskRequest taskRequest) {
+    public AbstractTask createTask(TaskExecutionContext taskRequest) {
         return new PigeonTask(taskRequest);
+    }
+
+    @Override
+    public AbstractParameters parseParameters(ParametersNode parametersNode) {
+        return JSONUtils.parseObject(parametersNode.getTaskParams(), PigeonParameters.class);
+    }
+
+    @Override
+    public ResourceParametersHelper getResources(String parameters) {
+        return null;
     }
 }

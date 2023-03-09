@@ -22,9 +22,10 @@ package org.apache.dolphinscheduler.common.enums;
  */
 public enum ProgramType {
     /**
-     * 0 JAVA,1 SCALA,2 PYTHON
+     * 0 JAVA,1 SCALA,2 PYTHON,3 SQL
      */
     JAVA,
     SCALA,
-    PYTHON
+    PYTHON,
+    SQL
 }

@@ -24,9 +24,7 @@ import org.apache.dolphinscheduler.remote.command.CommandType;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import lombok.extern.slf4j.Slf4j;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ReplayingDecoder;
@@ -34,8 +32,8 @@ import io.netty.handler.codec.ReplayingDecoder;
 /**
  * netty decoder
  */
+@Slf4j
 public class NettyDecoder extends ReplayingDecoder<NettyDecoder.State> {
-    private static final Logger logger = LoggerFactory.getLogger(NettyDecoder.class);
 
     public NettyDecoder() {
         super(State.MAGIC);
@@ -97,7 +95,7 @@ public class NettyDecoder extends ReplayingDecoder<NettyDecoder.State> {
                 checkpoint(State.MAGIC);
                 break;
             default:
-                logger.warn("unknown decoder state {}", state());
+                log.warn("unknown decoder state {}", state());
         }
     }
 

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.apache.dolphinscheduler.dao.mapper.K8sNamespaceMapper">
+
+    <sql id="baseSql">
+        id, code, namespace, user_id, limits_memory, limits_cpu, pod_replicas, pod_request_cpu, pod_request_memory, cluster_code, create_time, update_time
+    </sql>
+
+    <sql id="baseSqlV2">
+        ${alias}.id, ${alias}.code, ${alias}.namespace, ${alias}.user_id, ${alias}.limits_memory, ${alias}.limits_cpu, ${alias}.pod_replicas, ${alias}.pod_request_cpu, ${alias}.pod_request_memory, ${alias}.cluster_code, ${alias}.create_time, ${alias}.update_time
+    </sql>
+
+    <select id="queryK8sNamespacePaging" resultType="org.apache.dolphinscheduler.dao.entity.K8sNamespace">
+        select
+        <include refid="baseSqlV2">
+            <property name="alias" value="p"/>
+        </include>
+        ,u.name as cluster_name
+        from t_ds_k8s_namespace p
+        left join t_ds_cluster u on u.code=p.cluster_code
+        where 1= 1
+        <if test="searchVal != null and searchVal != ''">
+            and p.namespace like concat('%', #{searchVal}, '%')
+        </if>
+        order by p.update_time desc
+    </select>
+
+    <select id="existNamespace" resultType="java.lang.Boolean">
+        select 1 = 1
+        from t_ds_k8s_namespace
+        where 1 = 1
+        <if test="namespace != null and namespace != ''">
+            and namespace = #{namespace}
+        </if>
+        <if test="clusterCode != null and clusterCode != ''">
+            and cluster_code =#{clusterCode}
+        </if>
+    </select>
+
+    <select id="queryNamespaceExceptUserId" resultType="org.apache.dolphinscheduler.dao.entity.K8sNamespace">
+        select
+        <include refid="baseSql"/>
+        from t_ds_k8s_namespace
+        where user_id <![CDATA[ <> ]]> #{userId}
+    </select>
+
+    <select id="queryAuthedNamespaceListByUserId" resultType="org.apache.dolphinscheduler.dao.entity.K8sNamespace">
+        select
+        <include refid="baseSqlV2">
+            <property name="alias" value="p"/>
+        </include>
+        from t_ds_k8s_namespace p,t_ds_relation_namespace_user rel
+        where p.id = rel.namespace_id and rel.user_id= #{userId}
+    </select>
+
+    <select id="queryByNamespaceCode" resultType="org.apache.dolphinscheduler.dao.entity.K8sNamespace">
+        select
+        <include refid="baseSql"/>
+        from t_ds_k8s_namespace
+        where code = #{namespaceCode}
+    </select>
+</mapper>

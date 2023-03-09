@@ -23,9 +23,16 @@ import org.apache.dolphinscheduler.remote.command.CommandType;
 
 import java.io.Serializable;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
  *  roll view log request command
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class RollViewLogRequestCommand implements Serializable {
 
     /**
@@ -42,39 +49,6 @@ public class RollViewLogRequestCommand implements Serializable {
      *  query line number
      */
     private int limit;
-
-    public RollViewLogRequestCommand() {
-    }
-
-    public RollViewLogRequestCommand(String path, int skipLineNum, int limit) {
-        this.path = path;
-        this.skipLineNum = skipLineNum;
-        this.limit = limit;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    public int getSkipLineNum() {
-        return skipLineNum;
-    }
-
-    public void setSkipLineNum(int skipLineNum) {
-        this.skipLineNum = skipLineNum;
-    }
-
-    public int getLimit() {
-        return limit;
-    }
-
-    public void setLimit(int limit) {
-        this.limit = limit;
-    }
 
     /**
      * package request command

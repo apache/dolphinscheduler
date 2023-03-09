@@ -22,22 +22,21 @@ import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.google.common.base.Preconditions;
-
 import io.netty.channel.Channel;
 
+@Slf4j
 public class HostUpdateResponseProcessor implements NettyRequestProcessor {
-
-    private final Logger logger = LoggerFactory.getLogger(HostUpdateResponseProcessor.class);
 
     @Override
     public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.PROCESS_HOST_UPDATE_RESPONSE == command.getType(), String.format("invalid command type : %s", command.getType()));
+        Preconditions.checkArgument(CommandType.PROCESS_HOST_UPDATE_RESPONSE == command.getType(),
+                String.format("invalid command type : %s", command.getType()));
 
-        HostUpdateResponseProcessor responseCommand = JSONUtils.parseObject(command.getBody(), HostUpdateResponseProcessor.class);
-        logger.info("received process host response command : {}", responseCommand);
+        HostUpdateResponseProcessor responseCommand =
+                JSONUtils.parseObject(command.getBody(), HostUpdateResponseProcessor.class);
+        log.info("received process host response command : {}", responseCommand);
     }
 }

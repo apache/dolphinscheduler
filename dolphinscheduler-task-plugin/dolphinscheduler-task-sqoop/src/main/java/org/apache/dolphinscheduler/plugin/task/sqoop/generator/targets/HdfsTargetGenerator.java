@@ -17,51 +17,50 @@
 
 package org.apache.dolphinscheduler.plugin.task.sqoop.generator.targets;
 
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SINGLE_QUOTES;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SPACE;
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.COMPRESSION_CODEC;
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.DELETE_TARGET_DIR;
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.FIELDS_TERMINATED_BY;
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.FIELD_NULL_PLACEHOLDER;
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.LINES_TERMINATED_BY;
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.TARGET_DIR;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.SINGLE_QUOTES;
-import static org.apache.dolphinscheduler.spi.task.TaskConstants.SPACE;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.ITargetGenerator;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SqoopParameters;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets.TargetHdfsParameter;
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.utils.StringUtils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.lang3.StringUtils;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * hdfs target generator
  */
+@Slf4j
 public class HdfsTargetGenerator implements ITargetGenerator {
 
-    private static final Logger logger = LoggerFactory.getLogger(HdfsTargetGenerator.class);
-
     @Override
-    public String generate(SqoopParameters sqoopParameters, TaskRequest taskExecutionContext) {
+    public String generate(SqoopParameters sqoopParameters, SqoopTaskExecutionContext sqoopTaskExecutionContext) {
 
         StringBuilder hdfsTargetSb = new StringBuilder();
 
         try {
             TargetHdfsParameter targetHdfsParameter =
-                JSONUtils.parseObject(sqoopParameters.getTargetParams(), TargetHdfsParameter.class);
+                    JSONUtils.parseObject(sqoopParameters.getTargetParams(), TargetHdfsParameter.class);
 
             if (null != targetHdfsParameter) {
 
                 if (StringUtils.isNotEmpty(targetHdfsParameter.getTargetPath())) {
                     hdfsTargetSb.append(SPACE).append(TARGET_DIR)
-                        .append(SPACE).append(targetHdfsParameter.getTargetPath());
+                            .append(SPACE).append(targetHdfsParameter.getTargetPath());
                 }
 
                 if (StringUtils.isNotEmpty(targetHdfsParameter.getCompressionCodec())) {
                     hdfsTargetSb.append(SPACE).append(COMPRESSION_CODEC)
-                        .append(SPACE).append(targetHdfsParameter.getCompressionCodec());
+                            .append(SPACE).append(targetHdfsParameter.getCompressionCodec());
                 }
 
                 if (StringUtils.isNotEmpty(targetHdfsParameter.getFileType())) {
@@ -74,18 +73,20 @@ public class HdfsTargetGenerator implements ITargetGenerator {
 
                 if (StringUtils.isNotEmpty(targetHdfsParameter.getFieldsTerminated())) {
                     hdfsTargetSb.append(SPACE).append(FIELDS_TERMINATED_BY)
-                        .append(SPACE).append(SINGLE_QUOTES).append(targetHdfsParameter.getFieldsTerminated()).append(SINGLE_QUOTES);
+                            .append(SPACE).append(SINGLE_QUOTES).append(targetHdfsParameter.getFieldsTerminated())
+                            .append(SINGLE_QUOTES);
                 }
 
                 if (StringUtils.isNotEmpty(targetHdfsParameter.getLinesTerminated())) {
                     hdfsTargetSb.append(SPACE).append(LINES_TERMINATED_BY)
-                        .append(SPACE).append(SINGLE_QUOTES).append(targetHdfsParameter.getLinesTerminated()).append(SINGLE_QUOTES);
+                            .append(SPACE).append(SINGLE_QUOTES).append(targetHdfsParameter.getLinesTerminated())
+                            .append(SINGLE_QUOTES);
                 }
 
                 hdfsTargetSb.append(SPACE).append(FIELD_NULL_PLACEHOLDER);
             }
         } catch (Exception e) {
-            logger.error(String.format("Sqoop hdfs target params build failed: [%s]", e.getMessage()));
+            log.error(String.format("Sqoop hdfs target params build failed: [%s]", e.getMessage()));
         }
 
         return hdfsTargetSb.toString();

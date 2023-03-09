@@ -23,8 +23,6 @@ import org.apache.dolphinscheduler.registry.api.ConnectionListener;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.Registry;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
-import org.apache.dolphinscheduler.registry.api.RegistryProperties;
-import org.apache.dolphinscheduler.registry.api.RegistryProperties.ZookeeperProperties;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 
 import org.apache.curator.framework.CuratorFramework;
@@ -51,6 +49,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
 
+import lombok.NonNull;
+
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -59,28 +59,29 @@ import com.google.common.base.Strings;
 @Component
 @ConditionalOnProperty(prefix = "registry", name = "type", havingValue = "zookeeper")
 public final class ZookeeperRegistry implements Registry {
-    private final ZookeeperProperties properties;
+
+    private final ZookeeperRegistryProperties.ZookeeperProperties properties;
     private final CuratorFramework client;
 
     private final Map<String, TreeCache> treeCacheMap = new ConcurrentHashMap<>();
 
     private static final ThreadLocal<Map<String, InterProcessMutex>> threadLocalLockMap = new ThreadLocal<>();
 
-    public ZookeeperRegistry(RegistryProperties registryProperties) {
+    public ZookeeperRegistry(ZookeeperRegistryProperties registryProperties) {
         properties = registryProperties.getZookeeper();
 
         final ExponentialBackoffRetry retryPolicy = new ExponentialBackoffRetry(
-            (int) properties.getRetryPolicy().getBaseSleepTime().toMillis(),
-            properties.getRetryPolicy().getMaxRetries(),
-            (int) properties.getRetryPolicy().getMaxSleep().toMillis());
+                (int) properties.getRetryPolicy().getBaseSleepTime().toMillis(),
+                properties.getRetryPolicy().getMaxRetries(),
+                (int) properties.getRetryPolicy().getMaxSleep().toMillis());
 
         CuratorFrameworkFactory.Builder builder =
-            CuratorFrameworkFactory.builder()
-                                   .connectString(properties.getConnectString())
-                                   .retryPolicy(retryPolicy)
-                                   .namespace(properties.getNamespace())
-                                   .sessionTimeoutMs((int) properties.getSessionTimeout().toMillis())
-                                   .connectionTimeoutMs((int) properties.getConnectionTimeout().toMillis());
+                CuratorFrameworkFactory.builder()
+                        .connectString(properties.getConnectString())
+                        .retryPolicy(retryPolicy)
+                        .namespace(properties.getNamespace())
+                        .sessionTimeoutMs((int) properties.getSessionTimeout().toMillis())
+                        .connectionTimeoutMs((int) properties.getConnectionTimeout().toMillis());
 
         final String digest = properties.getDigest();
         if (!Strings.isNullOrEmpty(digest)) {
@@ -91,17 +92,18 @@ public final class ZookeeperRegistry implements Registry {
 
     private void buildDigest(CuratorFrameworkFactory.Builder builder, String digest) {
         builder.authorization("digest", digest.getBytes(StandardCharsets.UTF_8))
-               .aclProvider(new ACLProvider() {
-                   @Override
-                   public List<ACL> getDefaultAcl() {
-                       return ZooDefs.Ids.CREATOR_ALL_ACL;
-                   }
+                .aclProvider(new ACLProvider() {
 
-                   @Override
-                   public List<ACL> getAclForPath(final String path) {
-                       return ZooDefs.Ids.CREATOR_ALL_ACL;
-                   }
-               });
+                    @Override
+                    public List<ACL> getDefaultAcl() {
+                        return ZooDefs.Ids.CREATOR_ALL_ACL;
+                    }
+
+                    @Override
+                    public List<ACL> getAclForPath(final String path) {
+                        return ZooDefs.Ids.CREATOR_ALL_ACL;
+                    }
+                });
     }
 
     @PostConstruct
@@ -114,12 +116,29 @@ public final class ZookeeperRegistry implements Registry {
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+            throw new RegistryException("Zookeeper registry start failed", e);
         }
     }
 
     @Override
     public void addConnectionStateListener(ConnectionListener listener) {
         client.getConnectionStateListenable().addListener(new ZookeeperConnectionStateListener(listener));
+    }
+
+    @Override
+    public void connectUntilTimeout(@NonNull Duration timeout) throws RegistryException {
+        try {
+            if (!client.blockUntilConnected((int) timeout.toMillis(), MILLISECONDS)) {
+                throw new RegistryException(
+                        String.format("Cannot connect to the Zookeeper registry in %s s", timeout.getSeconds()));
+            }
+        } catch (RegistryException e) {
+            throw e;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RegistryException(
+                    String.format("Cannot connect to the Zookeeper registry in %s s", timeout.getSeconds()), e);
+        }
     }
 
     @Override
@@ -164,10 +183,10 @@ public final class ZookeeperRegistry implements Registry {
 
         try {
             client.create()
-                  .orSetData()
-                  .creatingParentsIfNeeded()
-                  .withMode(mode)
-                  .forPath(key, value.getBytes(StandardCharsets.UTF_8));
+                    .orSetData()
+                    .creatingParentsIfNeeded()
+                    .withMode(mode)
+                    .forPath(key, value.getBytes(StandardCharsets.UTF_8));
         } catch (Exception e) {
             throw new RegistryException("Failed to put registry key: " + key, e);
         }
@@ -188,8 +207,8 @@ public final class ZookeeperRegistry implements Registry {
     public void delete(String nodePath) {
         try {
             client.delete()
-                  .deletingChildrenIfNeeded()
-                  .forPath(nodePath);
+                    .deletingChildrenIfNeeded()
+                    .forPath(nodePath);
         } catch (KeeperException.NoNodeException ignored) {
             // Is already deleted or does not exist
         } catch (Exception e) {
@@ -235,17 +254,13 @@ public final class ZookeeperRegistry implements Registry {
     }
 
     @Override
-    public Duration getSessionTimeout() {
-        return properties.getSessionTimeout();
-    }
-
-    @Override
     public void close() {
         treeCacheMap.values().forEach(CloseableUtils::closeQuietly);
         CloseableUtils.closeQuietly(client);
     }
 
     static final class EventAdaptor extends Event {
+
         public EventAdaptor(TreeCacheEvent event, String key) {
             key(key);
 

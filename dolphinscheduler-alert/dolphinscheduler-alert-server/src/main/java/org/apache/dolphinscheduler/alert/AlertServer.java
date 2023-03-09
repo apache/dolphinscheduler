@@ -17,103 +17,106 @@
 
 package org.apache.dolphinscheduler.alert;
 
-import org.apache.dolphinscheduler.common.thread.Stopper;
-import org.apache.dolphinscheduler.dao.AlertDao;
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.PluginDao;
-import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
+import org.apache.dolphinscheduler.remote.factory.NettyRemotingServerFactory;
 
 import java.io.Closeable;
-import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringApplication;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.event.EventListener;
 
 @SpringBootApplication
 @ComponentScan("org.apache.dolphinscheduler")
+@Slf4j
 public class AlertServer implements Closeable {
-    private static final Logger logger = LoggerFactory.getLogger(AlertServer.class);
 
     private final PluginDao pluginDao;
-    private final AlertDao alertDao;
-    private final AlertPluginManager alertPluginManager;
-    private final AlertSender alertSender;
+    private final AlertSenderService alertSenderService;
     private final AlertRequestProcessor alertRequestProcessor;
+    private final AlertConfig alertConfig;
+    private NettyRemotingServer nettyRemotingServer;
 
-    private NettyRemotingServer server;
-
-    @Autowired
-    private AlertConfig config;
-
-    public AlertServer(PluginDao pluginDao, AlertDao alertDao, AlertPluginManager alertPluginManager, AlertSender alertSender, AlertRequestProcessor alertRequestProcessor) {
+    public AlertServer(PluginDao pluginDao,
+                       AlertSenderService alertSenderService,
+                       AlertRequestProcessor alertRequestProcessor,
+                       AlertConfig alertConfig) {
         this.pluginDao = pluginDao;
-        this.alertDao = alertDao;
-        this.alertPluginManager = alertPluginManager;
-        this.alertSender = alertSender;
+        this.alertSenderService = alertSenderService;
         this.alertRequestProcessor = alertRequestProcessor;
+        this.alertConfig = alertConfig;
     }
 
     public static void main(String[] args) {
-        SpringApplication.run(AlertServer.class, args);
+        Thread.currentThread().setName(Constants.THREAD_NAME_ALERT_SERVER);
+        new SpringApplicationBuilder(AlertServer.class).run(args);
     }
 
-    @PostConstruct
-    public void start() {
-        logger.info("Starting Alert server");
+    @EventListener
+    public void run(ApplicationReadyEvent readyEvent) {
+        log.info("Alert server is staring ...");
 
         checkTable();
         startServer();
-
-        Executors.newScheduledThreadPool(1)
-                 .scheduleAtFixedRate(new Sender(), 5, 5, TimeUnit.SECONDS);
+        alertSenderService.start();
+        log.info("Alert server is started ...");
     }
 
     @Override
     @PreDestroy
     public void close() {
-        server.close();
+        destroy("alert server destroy");
     }
 
-    private void checkTable() {
+    /**
+     * gracefully stop
+     *
+     * @param cause stop cause
+     */
+    public void destroy(String cause) {
+
+        try {
+            // set stop signal is true
+            // execute only once
+            if (!ServerLifeCycleManager.toStopped()) {
+                log.warn("AlterServer is already stopped");
+                return;
+            }
+
+            log.info("Alert server is stopping, cause: {}", cause);
+
+            // thread sleep 3 seconds for thread quietly stop
+            ThreadUtils.sleep(Constants.SERVER_CLOSE_WAIT_TIME.toMillis());
+
+            // close
+            this.nettyRemotingServer.close();
+            log.info("Alter server stopped, cause: {}", cause);
+        } catch (Exception e) {
+            log.error("Alert server stop failed, cause: {}", cause, e);
+        }
+    }
+
+    protected void checkTable() {
         if (!pluginDao.checkPluginDefineTableExist()) {
-            logger.error("Plugin Define Table t_ds_plugin_define Not Exist . Please Create it First !");
+            log.error("Plugin Define Table t_ds_plugin_define Not Exist . Please Create it First !");
             System.exit(1);
         }
     }
 
-    private void startServer() {
-        NettyServerConfig serverConfig = new NettyServerConfig();
-        serverConfig.setListenPort(config.getPort());
-
-        server = new NettyRemotingServer(serverConfig);
-        server.registerProcessor(CommandType.ALERT_SEND_REQUEST, alertRequestProcessor);
-        server.start();
-    }
-
-    final class Sender implements Runnable {
-        @Override
-        public void run() {
-            if (!Stopper.isRunning()) {
-                return;
-            }
-
-            try {
-                final List<Alert> alerts = alertDao.listPendingAlerts();
-                alertSender.send(alerts);
-            } catch (Exception e) {
-                logger.error("Failed to send alert", e);
-            }
-        }
+    protected void startServer() {
+        nettyRemotingServer = NettyRemotingServerFactory.buildNettyRemotingServer(alertConfig.getPort());
+        nettyRemotingServer.registerProcessor(CommandType.ALERT_SEND_REQUEST, alertRequestProcessor);
+        nettyRemotingServer.start();
     }
 }

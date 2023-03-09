@@ -29,6 +29,12 @@
         <if test="searchVal != null and searchVal != ''">
             and queue_name like concat('%', #{searchVal}, '%')
         </if>
+        <if test="ids != null and ids.size() > 0">
+            and id in
+            <foreach collection="ids" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
+        </if>
         order by update_time desc
     </select>
     <select id="queryAllQueueList" resultType="org.apache.dolphinscheduler.dao.entity.Queue">
@@ -58,9 +64,13 @@
         select
         <include refid="baseSql"/>
         from t_ds_queue
-        where 1 = 1
-        <if test="queueName != null and queueName != ''">
-            and queue_name =#{queueName}
-        </if>
+        <where>
+            <if test="queue != null and queue != ''">
+                and queue =#{queue}
+            </if>
+            <if test="queueName != null and queueName != ''">
+                and queue_name =#{queueName}
+            </if>
+        </where>
     </select>
 </mapper>

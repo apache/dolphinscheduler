@@ -46,6 +46,7 @@
                 and group_id = #{groupId}
             </if>
         </where>
+        order by update_time desc
     </select>
 
     <select id="queryByStatus" resultMap="TaskGroupQueueMap" resultType="map">
@@ -79,13 +80,13 @@
 
     <update id="updateForceStart">
         update t_ds_task_group_queue
-               set priority = #{priority}
+        set force_start = #{forceStart}
         where id = #{queueId}
     </update>
 
     <update id="modifyPriority">
         update t_ds_task_group_queue
-               set force_start = #{forceStart}
+        set priority = #{priority}
         where id = #{queueId}
     </update>
 
@@ -111,9 +112,9 @@
         select
         <include refid="baseSql" />
         from t_ds_task_group_queue
-        where priority = (select max(priority) from t_ds_task_group_queue where group_id = #{groupId}
-        and status = #{status} and  in_queue = #{inQueue} and force_start = #{forceStart} ) and group_id = #{groupId}
-        and status = #{status} and  in_queue = #{inQueue} and force_start = #{forceStart} limit 1
+        where group_id = #{groupId} and status = #{status} and  in_queue = #{inQueue} and force_start = #{forceStart}
+        order by priority desc
+        limit 1
     </select>
 
     <select id="queryByTaskId" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroupQueue">
@@ -133,22 +134,50 @@
         left join t_ds_process_definition p_f on process.process_definition_code = p_f.code
         and process.process_definition_version = p_f.version
         join t_ds_project as p on p_f.project_code = p.code
-        where queue.group_id = #{groupId}
-        <if test="taskName != null and taskName != ''">
-            and task_name =#{taskName}
-        </if>
-        <if test="processName != null and processName != ''">
-            and process.name =#{processName}
-        </if>
-        <if test="status != null">
-            and queue.status =#{status}
-        </if>
-        <if test="projects != null and projects.size() > 0">
-            and p.code in
-            <foreach collection="projects" index="index" item="i" open="(" separator="," close=")">
-                #{i.code}
-            </foreach>
-        </if>
+        <where>
+            <if test="groupId != null and groupId != -1">
+                queue.group_id = #{groupId}
+            </if>
+            <if test="taskName != null and taskName != ''">
+                and task_name like concat('%', #{taskName}, '%')
+            </if>
+            <if test="processName != null and processName != ''">
+                and process.name like concat('%', #{processName}, '%')
+            </if>
+            <if test="status != null">
+                and queue.status =#{status}
+            </if>
+            <if test="projects != null and projects.size() > 0">
+                and p.code in
+                <foreach collection="projects" index="index" item="i" open="(" separator="," close=")">
+                    #{i.code}
+                </foreach>
+            </if>
+        </where>
+        order by queue.update_time desc
     </select>
+
+    <delete id="deleteByTaskIds">
+        delete from t_ds_task_group_queue
+        where task_id in
+        <foreach collection="taskInstanceIds" index="index" item="i" open="(" separator="," close=")">
+            #{i}
+        </foreach>
+    </delete>
+
+    <delete id="deleteByWorkflowInstanceId">
+        delete
+        from t_ds_task_group_queue
+        where process_id = #{workflowInstanceId}
+    </delete>
+
+    <delete id="deleteByTaskGroupIds">
+        delete
+        from t_ds_task_group_queue
+        where group_id in
+        <foreach collection="taskGroupIds" index="index" item="i" open="(" separator="," close=")">
+            #{i}
+        </foreach>
+    </delete>
 
 </mapper>

@@ -20,20 +20,20 @@ package org.apache.dolphinscheduler.plugin.alert.slack;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class SlackSenderTest {
 
     @Test
     public void testSendMessage() {
         Map<String, String> alertparam = new HashMap<>();
-        alertparam.put(SlackParamsConstants.SLACK_WEN_HOOK_URL_NAME,
-            "https://hooks.slack.com/services/123456");
+        alertparam.put(SlackParamsConstants.SLACK_WEB_HOOK_URL_NAME,
+                "https://hooks.slack.com/services/123456");
         alertparam.put(SlackParamsConstants.SLACK_BOT_NAME, "Dolphinscheduler");
 
         SlackSender slackSender = new SlackSender(alertparam);
         String response = slackSender.sendMessage("test title", "test content");
-        Assert.assertNotEquals("ok", response);
+        Assertions.assertNotEquals("ok", response);
     }
 }

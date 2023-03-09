@@ -17,29 +17,32 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.UdfFuncService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UdfType;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,9 +54,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * udf func service impl
  */
 @Service
+@Slf4j
 public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncService {
-
-    private static final Logger logger = LoggerFactory.getLogger(UdfFuncServiceImpl.class);
 
     @Autowired
     private ResourceMapper resourceMapper;
@@ -64,6 +66,9 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
     @Autowired
     private UDFUserMapper udfUserMapper;
 
+    @Autowired(required = false)
+    private StorageOperate storageOperate;
+
     /**
      * create udf function
      *
@@ -73,42 +78,61 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
      * @param argTypes argument types
      * @param database database
      * @param desc description
-     * @param resourceId resource id
      * @param className class name
      * @return create result code
      */
     @Override
+    @Transactional
     public Result<Object> createUdfFunction(User loginUser,
                                             String funcName,
                                             String className,
+                                            String fullName,
                                             String argTypes,
                                             String database,
                                             String desc,
-                                            UdfType type,
-                                            int resourceId) {
+                                            UdfType type) {
         Result<Object> result = new Result<>();
 
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.UDF,
+                ApiFuncIdentificationConstant.UDF_FUNCTION_CREATE);
+        if (!canOperatorPermissions) {
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
+        }
+        if (checkDescriptionLength(desc)) {
+            log.warn("Parameter description is too long.");
+            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
+            return result;
+        }
         // if resource upload startup
         if (!PropertyUtils.getResUploadStartupState()) {
-            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
+            log.error("Storage does not start up, resource upload startup state: {}.",
+                    PropertyUtils.getResUploadStartupState());
             putMsg(result, Status.HDFS_NOT_STARTUP);
             return result;
         }
 
         // verify udf func name exist
         if (checkUdfFuncNameExists(funcName)) {
+            log.warn("Udf function with the same name already exists.");
             putMsg(result, Status.UDF_FUNCTION_EXISTS);
             return result;
         }
 
-        Resource resource = resourceMapper.selectById(resourceId);
-        if (resource == null) {
-            logger.error("resourceId {} is not exist", resourceId);
+        Boolean existResource = false;
+        try {
+            existResource = storageOperate.exists(fullName);
+        } catch (IOException e) {
+            log.error("Check resource error: {}", fullName, e);
+        }
+
+        if (!existResource) {
+            log.error("resource full name {} is not exist", fullName);
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
         }
 
-        //save data
+        // save data
         UdfFunc udf = new UdfFunc();
         Date now = new Date();
         udf.setUserId(loginUser.getId());
@@ -121,15 +145,18 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
             udf.setDatabase(database);
         }
         udf.setDescription(desc);
-        udf.setResourceId(resourceId);
-        udf.setResourceName(resource.getFullName());
+        // set resourceId to -1 because we do not store resource to db anymore, instead we use fullName
+        udf.setResourceId(-1);
+        udf.setResourceName(fullName);
         udf.setType(type);
 
         udf.setCreateTime(now);
         udf.setUpdateTime(now);
 
         udfFuncMapper.insert(udf);
+        log.info("UDF function create complete, udfFuncName:{}.", udf.getFuncName());
         putMsg(result, Status.SUCCESS);
+        permissionPostHandle(AuthorizationType.UDF, loginUser.getId(), Collections.singletonList(udf.getId()), log);
         return result;
     }
 
@@ -150,14 +177,21 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
      * @return udf function detail
      */
     @Override
-    public Map<String, Object> queryUdfFuncDetail(int id) {
-        Map<String, Object> result = new HashMap<>();
+    public Result<Object> queryUdfFuncDetail(User loginUser, int id) {
+        Result<Object> result = new Result<>();
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{id}, AuthorizationType.UDF,
+                ApiFuncIdentificationConstant.UDF_FUNCTION_VIEW);
+        if (!canOperatorPermissions) {
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
+        }
         UdfFunc udfFunc = udfFuncMapper.selectById(id);
         if (udfFunc == null) {
+            log.error("Resource does not exist, udf func id:{}.", id);
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             return result;
         }
-        result.put(Constants.DATA_LIST, udfFunc);
+        result.setData(udfFunc);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -171,32 +205,47 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
      * @param argTypes argument types
      * @param database data base
      * @param desc description
-     * @param resourceId resource id
+     * @param fullName resource full name
      * @param className class name
      * @return update result code
      */
     @Override
-    public Map<String, Object> updateUdfFunc(int udfFuncId,
-                                             String funcName,
-                                             String className,
-                                             String argTypes,
-                                             String database,
-                                             String desc,
-                                             UdfType type,
-                                             int resourceId) {
-        Map<String, Object> result = new HashMap<>();
+    public Result<Object> updateUdfFunc(User loginUser,
+                                        int udfFuncId,
+                                        String funcName,
+                                        String className,
+                                        String argTypes,
+                                        String database,
+                                        String desc,
+                                        UdfType type,
+                                        String fullName) {
+        Result<Object> result = new Result<>();
+
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{udfFuncId},
+                AuthorizationType.UDF, ApiFuncIdentificationConstant.UDF_FUNCTION_UPDATE);
+        if (!canOperatorPermissions) {
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
+        }
+        if (checkDescriptionLength(desc)) {
+            log.warn("Parameter description is too long.");
+            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
+            return result;
+        }
         // verify udfFunc is exist
         UdfFunc udf = udfFuncMapper.selectUdfById(udfFuncId);
 
         if (udf == null) {
-            result.put(Constants.STATUS, Status.UDF_FUNCTION_NOT_EXIST);
-            result.put(Constants.MSG, Status.UDF_FUNCTION_NOT_EXIST.getMsg());
+            log.error("UDF function does not exist, udfFuncId:{}.", udfFuncId);
+            result.setCode(Status.UDF_FUNCTION_NOT_EXIST.getCode());
+            result.setMsg(Status.UDF_FUNCTION_NOT_EXIST.getMsg());
             return result;
         }
 
         // if resource upload startup
         if (!PropertyUtils.getResUploadStartupState()) {
-            logger.error("resource upload startup state: {}", PropertyUtils.getResUploadStartupState());
+            log.error("Storage does not start up, resource upload startup state: {}.",
+                    PropertyUtils.getResUploadStartupState());
             putMsg(result, Status.HDFS_NOT_STARTUP);
             return result;
         }
@@ -204,20 +253,30 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         // verify udfFuncName is exist
         if (!funcName.equals(udf.getFuncName())) {
             if (checkUdfFuncNameExists(funcName)) {
-                logger.error("UdfFuncRequest {} has exist, can't create again.", funcName);
-                result.put(Constants.STATUS, Status.UDF_FUNCTION_EXISTS);
-                result.put(Constants.MSG, Status.UDF_FUNCTION_EXISTS.getMsg());
+                log.warn("Udf function exists, can not create again, udfFuncName:{}.", funcName);
+                result.setCode(Status.UDF_FUNCTION_EXISTS.getCode());
+                result.setMsg(Status.UDF_FUNCTION_EXISTS.getMsg());
                 return result;
             }
         }
 
-        Resource resource = resourceMapper.selectById(resourceId);
-        if (resource == null) {
-            logger.error("resourceId {} is not exist", resourceId);
-            result.put(Constants.STATUS, Status.RESOURCE_NOT_EXIST);
-            result.put(Constants.MSG, Status.RESOURCE_NOT_EXIST.getMsg());
+        Boolean doesResExist = false;
+        try {
+            doesResExist = storageOperate.exists(fullName);
+        } catch (Exception e) {
+            log.error("udf resource checking error", fullName);
+            result.setCode(Status.RESOURCE_NOT_EXIST.getCode());
+            result.setMsg(Status.RESOURCE_NOT_EXIST.getMsg());
             return result;
         }
+
+        if (!doesResExist) {
+            log.error("resource full name {} is not exist", fullName);
+            result.setCode(Status.RESOURCE_NOT_EXIST.getCode());
+            result.setMsg(Status.RESOURCE_NOT_EXIST.getMsg());
+            return result;
+        }
+
         Date now = new Date();
         udf.setFuncName(funcName);
         udf.setClassName(className);
@@ -226,13 +285,15 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
             udf.setDatabase(database);
         }
         udf.setDescription(desc);
-        udf.setResourceId(resourceId);
-        udf.setResourceName(resource.getFullName());
+        // set resourceId to -1 because we do not store resource to db anymore, instead we use fullName
+        udf.setResourceId(-1);
+        udf.setResourceName(fullName);
         udf.setType(type);
 
         udf.setUpdateTime(now);
 
         udfFuncMapper.updateById(udf);
+        log.info("UDF function update complete, udfFuncId:{}, udfFuncName:{}.", udfFuncId, funcName);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -247,11 +308,17 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
      * @return udf function list page
      */
     @Override
-    public Result queryUdfFuncListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
-        Result result = new Result();
+    public Result<Object> queryUdfFuncListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
+        Result<Object> result = new Result();
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.UDF,
+                ApiFuncIdentificationConstant.UDF_FUNCTION_VIEW);
+        if (!canOperatorPermissions) {
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
+        }
         PageInfo<UdfFunc> pageInfo = new PageInfo<>(pageNo, pageSize);
         IPage<UdfFunc> udfFuncList = getUdfFuncsPage(loginUser, searchVal, pageSize, pageNo);
-        pageInfo.setTotal((int)udfFuncList.getTotal());
+        pageInfo.setTotal((int) udfFuncList.getTotal());
         pageInfo.setTotalList(udfFuncList.getRecords());
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
@@ -268,12 +335,13 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
      * @return udf function list page
      */
     private IPage<UdfFunc> getUdfFuncsPage(User loginUser, String searchVal, Integer pageSize, int pageNo) {
-        int userId = loginUser.getId();
-        if (isAdmin(loginUser)) {
-            userId = 0;
-        }
+        Set<Integer> udfFuncIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.UDF,
+                loginUser.getId(), log);
         Page<UdfFunc> page = new Page<>(pageNo, pageSize);
-        return udfFuncMapper.queryUdfFuncPaging(page, userId, searchVal);
+        if (udfFuncIds.isEmpty()) {
+            return page;
+        }
+        return udfFuncMapper.queryUdfFuncPaging(page, new ArrayList<>(udfFuncIds), searchVal);
     }
 
     /**
@@ -284,15 +352,25 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
      * @return udf func list
      */
     @Override
-    public Map<String, Object> queryUdfFuncList(User loginUser, Integer type) {
-        Map<String, Object> result = new HashMap<>();
-        int userId = loginUser.getId();
-        if (isAdmin(loginUser)) {
-            userId = 0;
-        }
-        List<UdfFunc> udfFuncList = udfFuncMapper.getUdfFuncByType(userId, type);
+    public Result<Object> queryUdfFuncList(User loginUser, Integer type) {
+        Result<Object> result = new Result<>();
 
-        result.put(Constants.DATA_LIST, udfFuncList);
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.UDF,
+                ApiFuncIdentificationConstant.UDF_FUNCTION_VIEW);
+        if (!canOperatorPermissions) {
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
+        }
+        Set<Integer> udfFuncIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.UDF,
+                loginUser.getId(), log);
+        if (udfFuncIds.isEmpty()) {
+            result.setData(Collections.emptyList());
+            putMsg(result, Status.SUCCESS);
+            return result;
+        }
+        List<UdfFunc> udfFuncList = udfFuncMapper.getUdfFuncByType(new ArrayList<>(udfFuncIds), type);
+
+        result.setData(udfFuncList);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -304,11 +382,19 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
      * @return delete result code
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
-    public Result<Object> delete(int id) {
+    @Transactional
+    public Result<Object> delete(User loginUser, int id) {
         Result<Object> result = new Result<>();
+
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{id}, AuthorizationType.UDF,
+                ApiFuncIdentificationConstant.UDF_FUNCTION_DELETE);
+        if (!canOperatorPermissions) {
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
+        }
         udfFuncMapper.deleteById(id);
         udfUserMapper.deleteByUdfFuncId(id);
+        log.info("UDF function delete complete, udfFuncId:{}.", id);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -320,14 +406,21 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
      * @return true if the name can user, otherwise return false
      */
     @Override
-    public Result<Object> verifyUdfFuncByName(String name) {
+    public Result<Object> verifyUdfFuncByName(User loginUser, String name) {
         Result<Object> result = new Result<>();
+        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.UDF,
+                ApiFuncIdentificationConstant.UDF_FUNCTION_VIEW);
+        if (!canOperatorPermissions) {
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
+        }
+
         if (checkUdfFuncNameExists(name)) {
+            log.warn("Udf function with the same already exists.");
             putMsg(result, Status.UDF_FUNCTION_EXISTS);
         } else {
             putMsg(result, Status.SUCCESS);
         }
         return result;
     }
-
 }

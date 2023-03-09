@@ -18,11 +18,16 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import java.io.IOException;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
+
+import org.slf4j.Logger;
 
 /**
  * base service
@@ -45,6 +50,15 @@ public interface BaseService {
      * @return true if not administrator, otherwise false
      */
     boolean isNotAdmin(User loginUser, Map<String, Object> result);
+
+    /**
+     * permissionPostHandle
+     * @param authorizationType
+     * @param userId
+     * @param ids
+     * @param logger
+     */
+    void permissionPostHandle(AuthorizationType authorizationType, Integer userId, List<Integer> ids, Logger logger);
 
     /**
      * put message to map
@@ -75,27 +89,35 @@ public interface BaseService {
     boolean check(Map<String, Object> result, boolean bool, Status userNoOperationPerm);
 
     /**
-     * create tenant dir if not exists
-     *
-     * @param tenantCode tenant code
-     * @throws IOException if hdfs operation exception
-     */
-    void createTenantDirIfNotExists(String tenantCode) throws IOException;
-
-    /**
-     * has perm
+     * Verify that the operator has permissions
      *
      * @param operateUser operate user
      * @param createUserId create user id
+     * @return check result
      */
-    boolean hasPerm(User operateUser, int createUserId);
+    boolean canOperator(User operateUser, int createUserId);
+
+    /**
+     * Verify that the operator has permissions
+     * @param user operate user
+     * @param ids Object[]
+     * @Param type authorizationType
+     * @Param perm String
+     * @return check result
+     */
+    boolean canOperatorPermissions(User user, Object[] ids, AuthorizationType type, String perm);
 
     /**
      * check and parse date parameters
-     *
-     * @param startDateStr start date string
-     * @param endDateStr end date string
-     * @return map<status,startDate,endDate>
      */
-    Map<String, Object> checkAndParseDateParameters(String startDateStr, String endDateStr);
+    Date checkAndParseDateParameters(String startDateStr) throws ServiceException;
+
+    /**
+     * check checkDescriptionLength
+     *
+     * @param description input String
+     * @return ture if Length acceptable, Length exceeds return false
+     */
+    boolean checkDescriptionLength(String description);
+
 }

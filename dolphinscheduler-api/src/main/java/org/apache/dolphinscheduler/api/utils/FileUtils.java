@@ -20,13 +20,14 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,8 +35,8 @@ import org.springframework.web.multipart.MultipartFile;
 /**
  * file utils
  */
+@Slf4j
 public class FileUtils {
-    private static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
 
     /**
      * copy source InputStream to target file
@@ -46,7 +47,7 @@ public class FileUtils {
         try {
             org.apache.commons.io.FileUtils.copyInputStreamToFile(file.getInputStream(), new File(destFilename));
         } catch (IOException e) {
-            logger.error("failed to copy file , {} is empty file", file.getOriginalFilename(), e);
+            log.error("failed to copy file , {} is empty file", file.getOriginalFilename(), e);
         }
     }
 
@@ -64,8 +65,7 @@ public class FileUtils {
         if (resource.exists() || resource.isReadable()) {
             return resource;
         } else {
-            logger.error("file can not read : {}", filename);
-
+            log.error("File can not be read, fileName:{}", filename);
         }
         return null;
     }
@@ -76,10 +76,10 @@ public class FileUtils {
      * @return file content string
      */
     public static String file2String(MultipartFile file) {
-        try {
-            return IOUtils.toString(file.getInputStream(), StandardCharsets.UTF_8);
+        try (InputStream inputStream = file.getInputStream()) {
+            return IOUtils.toString(inputStream, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            logger.error("file convert to string failed: {}", file.getName());
+            log.error("file convert to string failed: {}", file.getName());
         }
 
         return "";

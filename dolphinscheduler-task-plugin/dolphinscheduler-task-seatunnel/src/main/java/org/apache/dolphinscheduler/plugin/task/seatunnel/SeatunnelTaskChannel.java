@@ -17,8 +17,14 @@
 
 package org.apache.dolphinscheduler.plugin.task.seatunnel;
 
-import org.apache.dolphinscheduler.spi.task.TaskChannel;
-import org.apache.dolphinscheduler.spi.task.request.TaskRequest;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
+import org.apache.dolphinscheduler.plugin.task.seatunnel.flink.SeatunnelFlinkTask;
+import org.apache.dolphinscheduler.plugin.task.seatunnel.spark.SeatunnelSparkTask;
 
 public class SeatunnelTaskChannel implements TaskChannel {
 
@@ -28,8 +34,25 @@ public class SeatunnelTaskChannel implements TaskChannel {
     }
 
     @Override
-    public SeatunnelTask createTask(TaskRequest taskRequest) {
-        return new SeatunnelTask(taskRequest);
+    public SeatunnelTask createTask(TaskExecutionContext taskRequest) {
+        SeatunnelParameters seatunnelParameters =
+                JSONUtils.parseObject(taskRequest.getTaskParams(), SeatunnelParameters.class);
+        if (EngineEnum.FLINK == seatunnelParameters.getEngine()) {
+            return new SeatunnelFlinkTask(taskRequest);
+        } else if (EngineEnum.SPARK == seatunnelParameters.getEngine()) {
+            return new SeatunnelSparkTask(taskRequest);
+        }
+        throw new IllegalArgumentException("Unsupported engine type:" + seatunnelParameters.getEngine());
+    }
+
+    @Override
+    public AbstractParameters parseParameters(ParametersNode parametersNode) {
+        return JSONUtils.parseObject(parametersNode.getTaskParams(), SeatunnelParameters.class);
+    }
+
+    @Override
+    public ResourceParametersHelper getResources(String parameters) {
+        return null;
     }
 
 }

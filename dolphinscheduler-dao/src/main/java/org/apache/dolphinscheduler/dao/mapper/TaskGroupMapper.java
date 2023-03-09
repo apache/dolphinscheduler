@@ -17,13 +17,15 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.dao.entity.TaskGroup;
 
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * the Dao interfaces of task group
@@ -33,14 +35,10 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
  */
 public interface TaskGroupMapper extends BaseMapper<TaskGroup> {
 
-    /**
-     * compard and set to update table of task group
-     *
-     * @param id primary key
-     * @return affected rows
-     */
-    int updateTaskGroupResource(@Param("id") int id, @Param("queueId") int queueId,
-                                @Param("queueStatus") int queueStatus);
+    int robTaskGroupResource(@Param("id") int id,
+                             @Param("currentUseSize") int currentUseSize,
+                             @Param("queueId") int queueId,
+                             @Param("queueStatus") int queueStatus);
 
     /**
      * update table of task group
@@ -60,7 +58,7 @@ public interface TaskGroupMapper extends BaseMapper<TaskGroup> {
      * @param status status
      * @return result page
      */
-    IPage<TaskGroup> queryTaskGroupPaging(IPage<TaskGroup> page, @Param("userId") int userId,
+    IPage<TaskGroup> queryTaskGroupPaging(IPage<TaskGroup> page, @Param("ids") List<Integer> ids,
                                           @Param("name") String name, @Param("status") Integer status);
 
     /**
@@ -72,9 +70,23 @@ public interface TaskGroupMapper extends BaseMapper<TaskGroup> {
      */
     TaskGroup queryByName(@Param("userId") int userId, @Param("name") String name);
 
+    /**
+     * Select the groupSize > useSize Count
+     */
     int selectAvailableCountById(@Param("groupId") int groupId);
 
-    int selectCountByIdStatus(@Param("id") int id,@Param("status") int status);
+    int selectCountByIdStatus(@Param("id") int id, @Param("status") int status);
 
-    IPage<TaskGroup> queryTaskGroupPagingByProjectCode(Page<TaskGroup> page, @Param("projectCode") Long projectCode);
+    IPage<TaskGroup> queryTaskGroupPagingByProjectCode(Page<TaskGroup> page, @Param("ids") List<Integer> ids,
+                                                       @Param("projectCode") Long projectCode);
+
+    /**
+     * listAuthorizedResource
+     *
+     * @param userId
+     * @return
+     */
+    List<TaskGroup> listAuthorizedResource(@Param("userId") int userId);
+
+    List<TaskGroup> selectByProjectCode(@Param("projectCode") long projectCode);
 }

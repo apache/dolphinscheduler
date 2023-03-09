@@ -15,18 +15,17 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <artifactId>dolphinscheduler</artifactId>
-        <groupId>org.apache.dolphinscheduler</groupId>
-        <version>2.0.0-SNAPSHOT</version>
-    </parent>
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.apache.dolphinscheduler</groupId>
+        <artifactId>dolphinscheduler</artifactId>
+        <version>dev-SNAPSHOT</version>
+    </parent>
     <artifactId>dolphinscheduler-datasource-plugin</artifactId>
-    <name>${project.artifactId}</name>
     <packaging>pom</packaging>
+    <name>${project.artifactId}</name>
 
     <modules>
         <module>dolphinscheduler-datasource-sqlserver</module>
@@ -34,9 +33,37 @@
         <module>dolphinscheduler-datasource-db2</module>
         <module>dolphinscheduler-datasource-hive</module>
         <module>dolphinscheduler-datasource-mysql</module>
+        <module>dolphinscheduler-datasource-oceanbase</module>
         <module>dolphinscheduler-datasource-oracle</module>
         <module>dolphinscheduler-datasource-postgresql</module>
+        <module>dolphinscheduler-datasource-spark</module>
+        <module>dolphinscheduler-datasource-presto</module>
         <module>dolphinscheduler-datasource-api</module>
         <module>dolphinscheduler-datasource-all</module>
+        <module>dolphinscheduler-datasource-redshift</module>
+        <module>dolphinscheduler-datasource-athena</module>
+        <module>dolphinscheduler-datasource-trino</module>
+        <module>dolphinscheduler-datasource-starrocks</module>
+        <module>dolphinscheduler-datasource-azure-sql</module>
+        <module>dolphinscheduler-datasource-dameng</module>
     </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-bom</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-common</artifactId>
+        </dependency>
+    </dependencies>
 </project>

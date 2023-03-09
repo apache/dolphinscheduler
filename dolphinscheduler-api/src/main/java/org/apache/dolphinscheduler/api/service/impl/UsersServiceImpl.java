@@ -17,22 +17,24 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.USER_MANAGER;
+
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
-import org.apache.dolphinscheduler.api.dto.resources.visitor.ResourceTreeVisitor;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
-import org.apache.dolphinscheduler.common.utils.HadoopUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.DatasourceUser;
+import org.apache.dolphinscheduler.dao.entity.K8sNamespaceUser;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.Resource;
@@ -43,6 +45,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
+import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
@@ -52,24 +55,27 @@ import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
-import org.apache.dolphinscheduler.spi.enums.ResourceType;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -81,9 +87,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * users service impl
  */
 @Service
+@Slf4j
 public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
-
-    private static final Logger logger = LoggerFactory.getLogger(UsersServiceImpl.class);
 
     @Autowired
     private AccessTokenMapper accessTokenMapper;
@@ -118,16 +123,22 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Autowired
     private ProjectMapper projectMapper;
 
+    @Autowired(required = false)
+    private StorageOperate storageOperate;
+
+    @Autowired
+    private K8sNamespaceUserMapper k8sNamespaceUserMapper;
+
     /**
      * create user, only system admin have permission
      *
-     * @param loginUser login user
-     * @param userName user name
+     * @param loginUser    login user
+     * @param userName     user name
      * @param userPassword user password
-     * @param email email
-     * @param tenantId tenant id
-     * @param phone phone
-     * @param queue queue
+     * @param email        email
+     * @param tenantId     tenant id
+     * @param phone        phone
+     * @param queue        queue
      * @return create result code
      * @throws Exception exception
      */
@@ -140,22 +151,28 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
                                           int tenantId,
                                           String phone,
                                           String queue,
-                                          int state) throws IOException {
+                                          int state) throws Exception {
         Map<String, Object> result = new HashMap<>();
 
-        //check all user params
+        // check all user params
         String msg = this.checkUserParams(userName, userPassword, email, phone);
-
-        if (!StringUtils.isEmpty(msg)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, msg);
+        if (resourcePermissionCheckService.functionDisabled()) {
+            putMsg(result, Status.FUNCTION_DISABLED, msg);
             return result;
         }
+
         if (!isAdmin(loginUser)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
 
+        if (!StringUtils.isEmpty(msg)) {
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, msg);
+            return result;
+        }
+
         if (!checkTenantExists(tenantId)) {
+            log.warn("Tenant does not exist, tenantId:{}.", tenantId);
             putMsg(result, Status.TENANT_NOT_EXIST);
             return result;
         }
@@ -165,22 +182,17 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         Tenant tenant = tenantMapper.queryById(tenantId);
         // resource upload startup
         if (PropertyUtils.getResUploadStartupState()) {
-            // if tenant not exists
-            if (!HadoopUtils.getInstance().exists(HadoopUtils.getHdfsTenantDir(tenant.getTenantCode()))) {
-                createTenantDirIfNotExists(tenant.getTenantCode());
-            }
-            String userPath = HadoopUtils.getHdfsUserDir(tenant.getTenantCode(), user.getId());
-            HadoopUtils.getInstance().mkdir(userPath);
+            storageOperate.createTenantDirIfNotExists(tenant.getTenantCode());
         }
 
+        log.info("User is created and id is {}.", user.getId());
         result.put(Constants.DATA_LIST, user);
         putMsg(result, Status.SUCCESS);
         return result;
-
     }
 
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public User createUser(String userName,
                            String userPassword,
                            String email,
@@ -215,7 +227,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * create User for ldap login
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public User createUser(UserType userType, String userId, String email) {
         User user = new User();
         Date now = new Date();
@@ -227,6 +239,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         user.setCreateTime(now);
         user.setUpdateTime(now);
         user.setQueue("");
+        user.setState(Flag.YES.getCode());
 
         // save user
         userMapper.insert(user);
@@ -277,7 +290,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     /**
      * query user
      *
-     * @param name name
+     * @param name     name
      * @param password password
      * @return user info
      */
@@ -295,7 +308,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      */
     @Override
     public int getUserIdByName(String name) {
-        //executor name query
+        // executor name query
         int executorId = 0;
         if (StringUtils.isNotEmpty(name)) {
             User executor = queryUser(name);
@@ -313,15 +326,21 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * query user list
      *
      * @param loginUser login user
-     * @param pageNo page number
+     * @param pageNo    page number
      * @param searchVal search value
-     * @param pageSize page size
+     * @param pageSize  page size
      * @return user list page
      */
     @Override
-    public Result queryUserList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
-        Result result = new Result();
+    public Result<Object> queryUserList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
+        Result<Object> result = new Result<>();
+        if (resourcePermissionCheckService.functionDisabled()) {
+            putMsg(result, Status.FUNCTION_DISABLED);
+            return result;
+        }
         if (!isAdmin(loginUser)) {
+            log.warn("User does not have permission for this feature, userId:{}, userName:{}.", loginUser.getId(),
+                    loginUser.getUserName());
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
@@ -342,13 +361,15 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     /**
      * updateProcessInstance user
      *
-     * @param userId user id
-     * @param userName user name
+     * @param userId       user id
+     * @param userName     user name
      * @param userPassword user password
-     * @param email email
-     * @param tenantId tenant id
-     * @param phone phone
-     * @param queue queue
+     * @param email        email
+     * @param tenantId     tenant id
+     * @param phone        phone
+     * @param queue        queue
+     * @param state        state
+     * @param timeZone     timeZone
      * @return update result code
      * @throws Exception exception
      */
@@ -360,27 +381,37 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
                                           int tenantId,
                                           String phone,
                                           String queue,
-                                          int state) throws IOException {
+                                          int state,
+                                          String timeZone) throws IOException {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
-        if (check(result, !hasPerm(loginUser, userId), Status.USER_NO_OPERATION_PERM)) {
+        if (resourcePermissionCheckService.functionDisabled()) {
+            putMsg(result, Status.FUNCTION_DISABLED);
+            return result;
+        }
+        if (check(result, !canOperator(loginUser, userId), Status.USER_NO_OPERATION_PERM)) {
+            log.warn("User does not have permission for this feature, userId:{}, userName:{}.", loginUser.getId(),
+                    loginUser.getUserName());
             return result;
         }
         User user = userMapper.selectById(userId);
         if (user == null) {
+            log.error("User does not exist, userId:{}.", userId);
             putMsg(result, Status.USER_NOT_EXIST, userId);
             return result;
         }
         if (StringUtils.isNotEmpty(userName)) {
 
             if (!CheckUtils.checkUserName(userName)) {
+                log.warn("Parameter userName check failed.");
                 putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, userName);
                 return result;
             }
 
             User tempUser = userMapper.queryByUserNameAccurately(userName);
             if (tempUser != null && tempUser.getId() != userId) {
+                log.warn("User name already exists, userName:{}.", tempUser.getUserName());
                 putMsg(result, Status.USER_NAME_EXIST);
                 return result;
             }
@@ -388,8 +419,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         if (StringUtils.isNotEmpty(userPassword)) {
-            if (!CheckUtils.checkPassword(userPassword)) {
-                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, userPassword);
+            if (!CheckUtils.checkPasswordLength(userPassword)) {
+                log.warn("Parameter userPassword check failed.");
+                putMsg(result, Status.USER_PASSWORD_LENGTH_ERROR);
                 return result;
             }
             user.setUserPassword(EncryptionUtils.getMd5(userPassword));
@@ -397,6 +429,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         if (StringUtils.isNotEmpty(email)) {
             if (!CheckUtils.checkEmail(email)) {
+                log.warn("Parameter email check failed.");
                 putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, email);
                 return result;
             }
@@ -404,13 +437,25 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         if (StringUtils.isNotEmpty(phone) && !CheckUtils.checkPhone(phone)) {
+            log.warn("Parameter phone check failed.");
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, phone);
             return result;
         }
 
-        if (state == 0 && user.getState() != state && loginUser.getId() == user.getId()) {
+        if (state == 0 && user.getState() != state && Objects.equals(loginUser.getId(), user.getId())) {
+            log.warn("Not allow to disable your own account, userId:{}, userName:{}.", user.getId(),
+                    user.getUserName());
             putMsg(result, Status.NOT_ALLOW_TO_DISABLE_OWN_ACCOUNT);
             return result;
+        }
+
+        if (StringUtils.isNotEmpty(timeZone)) {
+            if (!CheckUtils.checkTimeZone(timeZone)) {
+                log.warn("Parameter time zone is illegal.");
+                putMsg(result, Status.TIME_ZONE_ILLEGAL, timeZone);
+                return result;
+            }
+            user.setTimeZone(timeZone);
         }
 
         user.setPhone(phone);
@@ -418,68 +463,17 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         user.setState(state);
         Date now = new Date();
         user.setUpdateTime(now);
-
-        //if user switches the tenant, the user's resources need to be copied to the new tenant
-        if (user.getTenantId() != tenantId) {
-            Tenant oldTenant = tenantMapper.queryById(user.getTenantId());
-            //query tenant
-            Tenant newTenant = tenantMapper.queryById(tenantId);
-            if (newTenant != null) {
-                // if hdfs startup
-                if (PropertyUtils.getResUploadStartupState() && oldTenant != null) {
-                    String newTenantCode = newTenant.getTenantCode();
-                    String oldResourcePath = HadoopUtils.getHdfsResDir(oldTenant.getTenantCode());
-                    String oldUdfsPath = HadoopUtils.getHdfsUdfDir(oldTenant.getTenantCode());
-
-                    // if old tenant dir exists
-                    if (HadoopUtils.getInstance().exists(oldResourcePath)) {
-                        String newResourcePath = HadoopUtils.getHdfsResDir(newTenantCode);
-                        String newUdfsPath = HadoopUtils.getHdfsUdfDir(newTenantCode);
-
-                        //file resources list
-                        List<Resource> fileResourcesList = resourceMapper.queryResourceList(
-                                null, userId, ResourceType.FILE.ordinal());
-                        if (CollectionUtils.isNotEmpty(fileResourcesList)) {
-                            ResourceTreeVisitor resourceTreeVisitor = new ResourceTreeVisitor(fileResourcesList);
-                            ResourceComponent resourceComponent = resourceTreeVisitor.visit();
-                            copyResourceFiles(resourceComponent, oldResourcePath, newResourcePath);
-                        }
-
-                        //udf resources
-                        List<Resource> udfResourceList = resourceMapper.queryResourceList(
-                                null, userId, ResourceType.UDF.ordinal());
-                        if (CollectionUtils.isNotEmpty(udfResourceList)) {
-                            ResourceTreeVisitor resourceTreeVisitor = new ResourceTreeVisitor(udfResourceList);
-                            ResourceComponent resourceComponent = resourceTreeVisitor.visit();
-                            copyResourceFiles(resourceComponent, oldUdfsPath, newUdfsPath);
-                        }
-
-                        //Delete the user from the old tenant directory
-                        String oldUserPath = HadoopUtils.getHdfsUserDir(oldTenant.getTenantCode(), userId);
-                        HadoopUtils.getInstance().delete(oldUserPath, true);
-                    } else {
-                        // if old tenant dir not exists , create
-                        createTenantDirIfNotExists(oldTenant.getTenantCode());
-                    }
-
-                    if (HadoopUtils.getInstance().exists(HadoopUtils.getHdfsTenantDir(newTenant.getTenantCode()))) {
-                        //create user in the new tenant directory
-                        String newUserPath = HadoopUtils.getHdfsUserDir(newTenant.getTenantCode(), user.getId());
-                        HadoopUtils.getInstance().mkdir(newUserPath);
-                    } else {
-                        // if new tenant dir not exists , create
-                        createTenantDirIfNotExists(newTenant.getTenantCode());
-                    }
-
-                }
-            }
-            user.setTenantId(tenantId);
+        user.setTenantId(tenantId);
+        // updateProcessInstance user
+        int update = userMapper.updateById(user);
+        if (update > 0) {
+            log.info("User is updated and id is :{}.", userId);
+            putMsg(result, Status.SUCCESS);
+        } else {
+            log.error("User update error, userId:{}.", userId);
+            putMsg(result, Status.UPDATE_USER_ERROR);
         }
 
-        // updateProcessInstance user
-        userMapper.updateById(user);
-
-        putMsg(result, Status.SUCCESS);
         return result;
     }
 
@@ -487,22 +481,29 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * delete user
      *
      * @param loginUser login user
-     * @param id user id
+     * @param id        user id
      * @return delete result code
      * @throws Exception exception when operate hdfs
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> deleteUserById(User loginUser, int id) throws IOException {
         Map<String, Object> result = new HashMap<>();
-        //only admin can operate
+        if (resourcePermissionCheckService.functionDisabled()) {
+            putMsg(result, Status.FUNCTION_DISABLED);
+            return result;
+        }
+        // only admin can operate
         if (!isAdmin(loginUser)) {
+            log.warn("User does not have permission for this feature, userId:{}, userName:{}.", loginUser.getId(),
+                    loginUser.getUserName());
             putMsg(result, Status.USER_NO_OPERATION_PERM, id);
             return result;
         }
-        //check exist
+        // check exist
         User tempUser = userMapper.selectById(id);
         if (tempUser == null) {
+            log.error("User does not exist, userId:{}.", id);
             putMsg(result, Status.USER_NOT_EXIST, id);
             return result;
         }
@@ -511,138 +512,43 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         if (CollectionUtils.isNotEmpty(projects)) {
             String projectNames = projects.stream().map(Project::getName).collect(Collectors.joining(","));
             putMsg(result, Status.TRANSFORM_PROJECT_OWNERSHIP, projectNames);
+            log.warn("Please transfer the project ownership before deleting the user, userId:{}, projects:{}.", id,
+                    projectNames);
             return result;
         }
         // delete user
-        User user = userMapper.queryTenantCodeByUserId(id);
-
-        if (user != null) {
-            if (PropertyUtils.getResUploadStartupState()) {
-                String userPath = HadoopUtils.getHdfsUserDir(user.getTenantCode(), id);
-                if (HadoopUtils.getInstance().exists(userPath)) {
-                    HadoopUtils.getInstance().delete(userPath, true);
-                }
-            }
-        }
+        userMapper.queryTenantCodeByUserId(id);
 
         accessTokenMapper.deleteAccessTokenByUserId(id);
 
-        userMapper.deleteById(id);
-
-        putMsg(result, Status.SUCCESS);
-
-        return result;
+        if (userMapper.deleteById(id) > 0) {
+            log.info("User is deleted and id is :{}.", id);
+            putMsg(result, Status.SUCCESS);
+            return result;
+        } else {
+            log.error("User delete error, userId:{}.", id);
+            putMsg(result, Status.DELETE_USER_BY_ID_ERROR);
+            return result;
+        }
     }
 
     /**
-     * grant project
-     *
-     * @param loginUser login user
-     * @param userId user id
-     * @param projectIds project id array
-     * @return grant result code
-     */
-    @Override
-    @Transactional(rollbackFor = RuntimeException.class)
-    public Map<String, Object> grantProject(User loginUser, int userId, String projectIds) {
-        Map<String, Object> result = new HashMap<>();
-        result.put(Constants.STATUS, false);
-
-        //only admin can operate
-        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
-            return result;
-        }
-
-        //check exist
-        User tempUser = userMapper.selectById(userId);
-        if (tempUser == null) {
-            putMsg(result, Status.USER_NOT_EXIST, userId);
-            return result;
-        }
-
-        //if the selected projectIds are empty, delete all items associated with the user
-        if (check(result, StringUtils.isEmpty(projectIds), Status.SUCCESS)) {
-            projectUserMapper.deleteProjectRelation(0, userId);
-            return result;
-        }
-
-        String[] projectIdArr = projectIds.split(",");
-
-        for (String projectId : projectIdArr) {
-            Date now = new Date();
-            ProjectUser projectUser = new ProjectUser();
-            projectUser.setUserId(userId);
-            projectUser.setProjectId(Integer.parseInt(projectId));
-            projectUser.setPerm(7);
-            projectUser.setCreateTime(now);
-            projectUser.setUpdateTime(now);
-            projectUserMapper.insert(projectUser);
-        }
-
-        putMsg(result, Status.SUCCESS);
-
-        return result;
-    }
-
-    /**
-     * grant project by code
-     *
-     * @param loginUser login user
-     * @param userId user id
-     * @param projectCode project code
-     * @return grant result code
-     */
-    @Override
-    public Map<String, Object> grantProjectByCode(final User loginUser, final int userId, final long projectCode) {
-        Map<String, Object> result = new HashMap<>();
-        result.put(Constants.STATUS, false);
-
-        // 1. check if user is existed
-        User tempUser = this.userMapper.selectById(userId);
-        if (tempUser == null) {
-            this.putMsg(result, Status.USER_NOT_EXIST, userId);
-            return result;
-        }
-
-        // 2. check if project is existed
-        Project project = this.projectMapper.queryByCode(projectCode);
-        if (project == null) {
-            this.putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
-            return result;
-        }
-
-        // 3. only project owner can operate
-        if (!this.hasPerm(loginUser, project.getUserId())) {
-            this.putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
-        }
-
-        // 4. maintain the relationship between project and user
-        final Date today = new Date();
-        ProjectUser projectUser = new ProjectUser();
-        projectUser.setUserId(userId);
-        projectUser.setProjectId(project.getId());
-        projectUser.setPerm(7);
-        projectUser.setCreateTime(today);
-        projectUser.setUpdateTime(today);
-        this.projectUserMapper.insert(projectUser);
-
-        this.putMsg(result, Status.SUCCESS);
-        return result;
-    }
-
-    /**
-     * revoke the project permission for specified user.
+     * revoke the project permission for specified user by id
      * @param loginUser     Login user
      * @param userId        User id
-     * @param projectCode   Project Code
+     * @param projectIds   project id array
      * @return
      */
     @Override
-    public Map<String, Object> revokeProject(User loginUser, int userId, long projectCode) {
+    @Transactional(rollbackFor = RuntimeException.class)
+    public Map<String, Object> revokeProjectById(User loginUser, int userId, String projectIds) {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
+        if (resourcePermissionCheckService.functionDisabled()) {
+            putMsg(result, Status.FUNCTION_DISABLED);
+            return result;
+        }
         // 1. only admin can operate
         if (this.check(result, !this.isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
             return result;
@@ -655,15 +561,218 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             return result;
         }
 
+        Arrays.stream(projectIds.split(",")).distinct().forEach(projectId -> {
+            // 3. check if project is existed
+            Project project = this.projectMapper.queryDetailById(Integer.parseInt(projectId));
+            if (project == null) {
+                this.putMsg(result, Status.PROJECT_NOT_FOUND, Integer.parseInt(projectId));
+            } else {
+                // 4. delete the relationship between project and user
+                this.projectUserMapper.deleteProjectRelation(project.getId(), user.getId());
+            }
+        });
+
+        this.putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    /**
+     * grant project with read permission
+     *
+     * @param loginUser login user
+     * @param userId user id
+     * @param projectIds project id array
+     * @return grant result code
+     */
+    @Override
+    @Transactional(rollbackFor = RuntimeException.class)
+    public Map<String, Object> grantProjectWithReadPerm(User loginUser, int userId, String projectIds) {
+        Map<String, Object> result = new HashMap<>();
+        result.put(Constants.STATUS, false);
+
+        if (resourcePermissionCheckService.functionDisabled()) {
+            putMsg(result, Status.FUNCTION_DISABLED);
+            return result;
+        }
+        // check exist
+        User tempUser = userMapper.selectById(userId);
+        if (tempUser == null) {
+            putMsg(result, Status.USER_NOT_EXIST, userId);
+            return result;
+        }
+
+        if (check(result, StringUtils.isEmpty(projectIds), Status.SUCCESS)) {
+            return result;
+        }
+        Arrays.stream(projectIds.split(Constants.COMMA)).distinct().forEach(projectId -> {
+            ProjectUser projectUserOld = projectUserMapper.queryProjectRelation(Integer.parseInt(projectId), userId);
+            if (projectUserOld != null) {
+                projectUserMapper.deleteProjectRelation(Integer.parseInt(projectId), userId);
+            }
+            Date now = new Date();
+            ProjectUser projectUser = new ProjectUser();
+            projectUser.setUserId(userId);
+            projectUser.setProjectId(Integer.parseInt(projectId));
+            projectUser.setPerm(Constants.READ_PERMISSION);
+            projectUser.setCreateTime(now);
+            projectUser.setUpdateTime(now);
+            projectUserMapper.insert(projectUser);
+        });
+        putMsg(result, Status.SUCCESS);
+
+        return result;
+    }
+
+    /**
+     * grant project
+     *
+     * @param loginUser  login user
+     * @param userId     user id
+     * @param projectIds project id array
+     * @return grant result code
+     */
+    @Override
+    @Transactional
+    public Map<String, Object> grantProject(User loginUser, int userId, String projectIds) {
+        Map<String, Object> result = new HashMap<>();
+        result.put(Constants.STATUS, false);
+
+        if (resourcePermissionCheckService.functionDisabled()) {
+            putMsg(result, Status.FUNCTION_DISABLED);
+            return result;
+        }
+        // check exist
+        User tempUser = userMapper.selectById(userId);
+        if (tempUser == null) {
+            log.error("User does not exist, userId:{}.", userId);
+            putMsg(result, Status.USER_NOT_EXIST, userId);
+            return result;
+        }
+
+        if (check(result, StringUtils.isEmpty(projectIds), Status.SUCCESS)) {
+            log.warn("Parameter projectIds is empty.");
+            return result;
+        }
+        Arrays.stream(projectIds.split(",")).distinct().forEach(projectId -> {
+            ProjectUser projectUserOld = projectUserMapper.queryProjectRelation(Integer.parseInt(projectId), userId);
+            if (projectUserOld != null) {
+                projectUserMapper.deleteProjectRelation(Integer.parseInt(projectId), userId);
+            }
+            Date now = new Date();
+            ProjectUser projectUser = new ProjectUser();
+            projectUser.setUserId(userId);
+            projectUser.setProjectId(Integer.parseInt(projectId));
+            projectUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
+            projectUser.setCreateTime(now);
+            projectUser.setUpdateTime(now);
+            projectUserMapper.insert(projectUser);
+        });
+        putMsg(result, Status.SUCCESS);
+
+        return result;
+    }
+
+    /**
+     * grant project by code
+     *
+     * @param loginUser   login user
+     * @param userId      user id
+     * @param projectCode project code
+     * @return grant result code
+     */
+    @Override
+    public Map<String, Object> grantProjectByCode(final User loginUser, final int userId, final long projectCode) {
+        Map<String, Object> result = new HashMap<>();
+        result.put(Constants.STATUS, false);
+
+        if (resourcePermissionCheckService.functionDisabled()) {
+            putMsg(result, Status.FUNCTION_DISABLED);
+            return result;
+        }
+
+        // 1. check if user is existed
+        User tempUser = this.userMapper.selectById(userId);
+        if (tempUser == null) {
+            log.error("User does not exist, userId:{}.", userId);
+            this.putMsg(result, Status.USER_NOT_EXIST, userId);
+            return result;
+        }
+
+        // 2. check if project is existed
+        Project project = this.projectMapper.queryByCode(projectCode);
+        if (project == null) {
+            log.error("Project does not exist, projectCode:{}.", projectCode);
+            this.putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
+            return result;
+        }
+
+        // 3. only project owner can operate
+        if (!this.canOperator(loginUser, project.getUserId())) {
+            log.warn("User does not have permission for project, userId:{}, userName:{}, projectCode:{}.",
+                    loginUser.getId(), loginUser.getUserName(), projectCode);
+            this.putMsg(result, Status.USER_NO_OPERATION_PERM);
+            return result;
+        }
+
+        // 4. maintain the relationship between project and user if not exists
+        ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), userId);
+        if (projectUser == null) {
+            Date today = new Date();
+            projectUser = new ProjectUser();
+            projectUser.setUserId(userId);
+            projectUser.setProjectId(project.getId());
+            projectUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
+            projectUser.setCreateTime(today);
+            projectUser.setUpdateTime(today);
+            this.projectUserMapper.insert(projectUser);
+        }
+        log.info("User is granted permission for projects, userId:{}, projectCode:{}.", userId, projectCode);
+        this.putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    /**
+     * revoke the project permission for specified user.
+     *
+     * @param loginUser   Login user
+     * @param userId      User id
+     * @param projectCode Project Code
+     * @return
+     */
+    @Override
+    public Map<String, Object> revokeProject(User loginUser, int userId, long projectCode) {
+        Map<String, Object> result = new HashMap<>();
+        result.put(Constants.STATUS, false);
+
+        if (resourcePermissionCheckService.functionDisabled()) {
+            putMsg(result, Status.FUNCTION_DISABLED);
+            return result;
+        }
+        // 1. only admin can operate
+        if (this.check(result, !this.isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
+            log.warn("Only admin can revoke the project permission.");
+            return result;
+        }
+
+        // 2. check if user is existed
+        User user = this.userMapper.selectById(userId);
+        if (user == null) {
+            log.error("User does not exist, userId:{}.", userId);
+            this.putMsg(result, Status.USER_NOT_EXIST, userId);
+            return result;
+        }
+
         // 3. check if project is existed
         Project project = this.projectMapper.queryByCode(projectCode);
         if (project == null) {
+            log.error("Project does not exist, projectCode:{}.", projectCode);
             this.putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
             return result;
         }
 
         // 4. delete th relationship between project and user
         this.projectUserMapper.deleteProjectRelation(project.getId(), user.getId());
+        log.info("User is revoked permission for projects, userId:{}, projectCode:{}.", userId, projectCode);
         this.putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -671,21 +780,23 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     /**
      * grant resource
      *
-     * @param loginUser login user
-     * @param userId user id
+     * @param loginUser   login user
+     * @param userId      user id
      * @param resourceIds resource id array
      * @return grant result code
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> grantResources(User loginUser, int userId, String resourceIds) {
         Map<String, Object> result = new HashMap<>();
-        //only admin can operate
-        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
+
+        if (resourcePermissionCheckService.functionDisabled()) {
+            putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
         User user = userMapper.selectById(userId);
         if (user == null) {
+            log.error("User does not exist, userId:{}.", userId);
             putMsg(result, Status.USER_NOT_EXIST, userId);
             return result;
         }
@@ -703,27 +814,30 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             }
         }
 
-        //get the authorized resource id list by user id
-        List<Integer> resIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, Constants.AUTHORIZE_WRITABLE_PERM);
-        List<Resource> oldAuthorizedRes = CollectionUtils.isEmpty(resIds) ? new ArrayList<>() : resourceMapper.queryResourceListById(resIds);
-        //if resource type is UDF,need check whether it is bound by UDF function
+        // get the authorized resource id list by user id
+        List<Integer> resIds =
+                resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, Constants.AUTHORIZE_WRITABLE_PERM);
+        List<Resource> oldAuthorizedRes =
+                CollectionUtils.isEmpty(resIds) ? new ArrayList<>() : resourceMapper.queryResourceListById(resIds);
+        // if resource type is UDF,need check whether it is bound by UDF function
         Set<Integer> oldAuthorizedResIds = oldAuthorizedRes.stream().map(Resource::getId).collect(Collectors.toSet());
 
-        //get the unauthorized resource id list
+        // get the unauthorized resource id list
         oldAuthorizedResIds.removeAll(needAuthorizeResIds);
 
         if (CollectionUtils.isNotEmpty(oldAuthorizedResIds)) {
 
-            // get all resource id of process definitions those is released
+            // get all resource id of process definitions those are released
             List<Map<String, Object>> list = processDefinitionMapper.listResourcesByUser(userId);
-            Map<Integer, Set<Long>> resourceProcessMap = ResourceProcessDefinitionUtils.getResourceProcessDefinitionMap(list);
+            Map<Integer, Set<Long>> resourceProcessMap =
+                    ResourceProcessDefinitionUtils.getResourceProcessDefinitionMap(list);
             Set<Integer> resourceIdSet = resourceProcessMap.keySet();
 
             resourceIdSet.retainAll(oldAuthorizedResIds);
             if (CollectionUtils.isNotEmpty(resourceIdSet)) {
-                logger.error("can't be deleted,because it is used of process definition");
                 for (Integer resId : resourceIdSet) {
-                    logger.error("resource id:{} is used of process definition {}", resId, resourceProcessMap.get(resId));
+                    log.error("Resource id:{} is used by process definition {}", resId,
+                            resourceProcessMap.get(resId));
                 }
                 putMsg(result, Status.RESOURCE_IS_USED);
                 return result;
@@ -734,12 +848,14 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         resourceUserMapper.deleteResourceUser(userId, 0);
 
         if (check(result, StringUtils.isEmpty(resourceIds), Status.SUCCESS)) {
+            log.warn("Parameter resourceIds is empty.");
             return result;
         }
 
         for (int resourceIdValue : needAuthorizeResIds) {
             Resource resource = resourceMapper.selectById(resourceIdValue);
             if (resource == null) {
+                log.error("Resource does not exist, resourceId:{}.", resourceIdValue);
                 putMsg(result, Status.RESOURCE_NOT_EXIST);
                 return result;
             }
@@ -760,6 +876,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         }
 
+        log.info("User is granted permission for resources, userId:{}, resourceIds:{}.", user.getId(),
+                needAuthorizeResIds);
+
         putMsg(result, Status.SUCCESS);
 
         return result;
@@ -769,21 +888,22 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * grant udf function
      *
      * @param loginUser login user
-     * @param userId user id
-     * @param udfIds udf id array
+     * @param userId    user id
+     * @param udfIds    udf id array
      * @return grant result code
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> grantUDFFunction(User loginUser, int userId, String udfIds) {
         Map<String, Object> result = new HashMap<>();
 
-        //only admin can operate
-        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
+        if (resourcePermissionCheckService.functionDisabled()) {
+            putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
         User user = userMapper.selectById(userId);
         if (user == null) {
+            log.error("User does not exist, userId:{}.", userId);
             putMsg(result, Status.USER_NOT_EXIST, userId);
             return result;
         }
@@ -791,6 +911,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         udfUserMapper.deleteByUserId(userId);
 
         if (check(result, StringUtils.isEmpty(udfIds), Status.SUCCESS)) {
+            log.warn("Parameter udfIds is empty.");
             return result;
         }
 
@@ -801,11 +922,66 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             UDFUser udfUser = new UDFUser();
             udfUser.setUserId(userId);
             udfUser.setUdfId(Integer.parseInt(udfId));
-            udfUser.setPerm(7);
+            udfUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
             udfUser.setCreateTime(now);
             udfUser.setUpdateTime(now);
             udfUserMapper.insert(udfUser);
         }
+
+        log.info("User is granted permission for UDF, userName:{}.", user.getUserName());
+
+        putMsg(result, Status.SUCCESS);
+
+        return result;
+    }
+
+    /**
+     * grant namespace
+     *
+     * @param loginUser    login user
+     * @param userId       user id
+     * @param namespaceIds namespace id array
+     * @return grant result code
+     */
+    @Override
+    @Transactional
+    public Map<String, Object> grantNamespaces(User loginUser, int userId, String namespaceIds) {
+        Map<String, Object> result = new HashMap<>();
+        result.put(Constants.STATUS, false);
+        if (resourcePermissionCheckService.functionDisabled()) {
+            putMsg(result, Status.FUNCTION_DISABLED);
+            return result;
+        }
+        // only admin can operate
+        if (this.check(result, !this.isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
+            log.warn("Only admin can grant namespaces.");
+            return result;
+        }
+
+        // check exist
+        User tempUser = userMapper.selectById(userId);
+        if (tempUser == null) {
+            log.error("User does not exist, userId:{}.", userId);
+            putMsg(result, Status.USER_NOT_EXIST, userId);
+            return result;
+        }
+
+        k8sNamespaceUserMapper.deleteNamespaceRelation(0, userId);
+        if (StringUtils.isNotEmpty(namespaceIds)) {
+            String[] namespaceIdArr = namespaceIds.split(",");
+            for (String namespaceId : namespaceIdArr) {
+                Date now = new Date();
+                K8sNamespaceUser namespaceUser = new K8sNamespaceUser();
+                namespaceUser.setUserId(userId);
+                namespaceUser.setNamespaceId(Integer.parseInt(namespaceId));
+                namespaceUser.setPerm(7);
+                namespaceUser.setCreateTime(now);
+                namespaceUser.setUpdateTime(now);
+                k8sNamespaceUserMapper.insert(namespaceUser);
+            }
+        }
+
+        log.info("User is granted permission for namespace, userId:{}.", tempUser.getId());
 
         putMsg(result, Status.SUCCESS);
 
@@ -815,19 +991,19 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     /**
      * grant datasource
      *
-     * @param loginUser login user
-     * @param userId user id
+     * @param loginUser     login user
+     * @param userId        user id
      * @param datasourceIds data source id array
      * @return grant result code
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> grantDataSource(User loginUser, int userId, String datasourceIds) {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
 
-        //only admin can operate
-        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
+        if (resourcePermissionCheckService.functionDisabled()) {
+            putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
         User user = userMapper.selectById(userId);
@@ -850,7 +1026,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             DatasourceUser datasourceUser = new DatasourceUser();
             datasourceUser.setUserId(userId);
             datasourceUser.setDatasourceId(Integer.parseInt(datasourceId));
-            datasourceUser.setPerm(7);
+            datasourceUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
             datasourceUser.setCreateTime(now);
             datasourceUser.setUpdateTime(now);
             datasourceUserMapper.insert(datasourceUser);
@@ -872,6 +1048,10 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         Map<String, Object> result = new HashMap<>();
 
+        if (resourcePermissionCheckService.functionDisabled()) {
+            putMsg(result, Status.FUNCTION_DISABLED);
+            return result;
+        }
         User user = null;
         if (loginUser.getUserType() == UserType.ADMIN_USER) {
             user = loginUser;
@@ -884,11 +1064,16 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
             if (alertGroups != null && !alertGroups.isEmpty()) {
                 for (int i = 0; i < alertGroups.size() - 1; i++) {
-                    sb.append(alertGroups.get(i).getGroupName() + ",");
+                    sb.append(alertGroups.get(i).getGroupName()).append(",");
                 }
                 sb.append(alertGroups.get(alertGroups.size() - 1));
                 user.setAlertGroup(sb.toString());
             }
+        }
+
+        // add system default timezone if not user timezone
+        if (StringUtils.isEmpty(user.getTimeZone())) {
+            user.setTimeZone(TimeZone.getDefault().toZoneId().getId());
         }
 
         result.put(Constants.DATA_LIST, user);
@@ -906,8 +1091,13 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Override
     public Map<String, Object> queryAllGeneralUsers(User loginUser) {
         Map<String, Object> result = new HashMap<>();
-        //only admin can operate
+        if (resourcePermissionCheckService.functionDisabled()) {
+            putMsg(result, Status.FUNCTION_DISABLED);
+            return result;
+        }
+        // only admin can operate
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
+            log.warn("Only admin can query all general users.");
             return result;
         }
 
@@ -927,12 +1117,12 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Override
     public Map<String, Object> queryUserList(User loginUser) {
         Map<String, Object> result = new HashMap<>();
-        //only admin can operate
-        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
+        // only admin can operate
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.ACCESS_TOKEN, USER_MANAGER)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
         }
-
-        List<User> userList = userMapper.selectList(null);
+        List<User> userList = userMapper.queryEnabledUsers();
         result.put(Constants.DATA_LIST, userList);
         putMsg(result, Status.SUCCESS);
 
@@ -962,7 +1152,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     /**
      * unauthorized user
      *
-     * @param loginUser login user
+     * @param loginUser    login user
      * @param alertgroupId alert group id
      * @return unauthorize result code
      */
@@ -970,8 +1160,13 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     public Map<String, Object> unauthorizedUser(User loginUser, Integer alertgroupId) {
 
         Map<String, Object> result = new HashMap<>();
-        //only admin can operate
+        if (resourcePermissionCheckService.functionDisabled()) {
+            putMsg(result, Status.FUNCTION_DISABLED);
+            return result;
+        }
+        // only admin can operate
         if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
+            log.warn("Only admin can deauthorize user.");
             return result;
         }
 
@@ -999,18 +1194,23 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     /**
      * authorized user
      *
-     * @param loginUser login user
-     * @param alertgroupId alert group id
+     * @param loginUser    login user
+     * @param alertGroupId alert group id
      * @return authorized result code
      */
     @Override
-    public Map<String, Object> authorizedUser(User loginUser, Integer alertgroupId) {
+    public Map<String, Object> authorizedUser(User loginUser, Integer alertGroupId) {
         Map<String, Object> result = new HashMap<>();
-        //only admin can operate
-        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
+        if (resourcePermissionCheckService.functionDisabled()) {
+            putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
-        List<User> userList = userMapper.queryUserListByAlertGroupId(alertgroupId);
+        // only admin can operate
+        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
+            log.warn("Only admin can authorize user.");
+            return result;
+        }
+        List<User> userList = userMapper.queryUserListByAlertGroupId(alertGroupId);
         result.put(Constants.DATA_LIST, userList);
         putMsg(result, Status.SUCCESS);
 
@@ -1032,16 +1232,16 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         String msg = null;
         if (!CheckUtils.checkUserName(userName)) {
-
+            log.warn("Parameter userName check failed.");
             msg = userName;
         } else if (!CheckUtils.checkPassword(password)) {
-
+            log.warn("Parameter password check failed.");
             msg = password;
         } else if (!CheckUtils.checkEmail(email)) {
-
+            log.warn("Parameter email check failed.");
             msg = email;
         } else if (!CheckUtils.checkPhone(phone)) {
-
+            log.warn("Parameter phone check failed.");
             msg = phone;
         }
 
@@ -1050,59 +1250,73 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
     /**
      * copy resource files
+     * xxx unchecked
      *
      * @param resourceComponent resource component
-     * @param srcBasePath src base path
-     * @param dstBasePath dst base path
+     * @param srcBasePath       src base path
+     * @param dstBasePath       dst base path
      * @throws IOException io exception
      */
-    private void copyResourceFiles(ResourceComponent resourceComponent, String srcBasePath, String dstBasePath) throws IOException {
+    private void copyResourceFiles(String oldTenantCode, String newTenantCode, ResourceComponent resourceComponent,
+                                   String srcBasePath, String dstBasePath) {
         List<ResourceComponent> components = resourceComponent.getChildren();
 
-        if (CollectionUtils.isNotEmpty(components)) {
-            for (ResourceComponent component : components) {
-                // verify whether exist
-                if (!HadoopUtils.getInstance().exists(String.format("%s/%s", srcBasePath, component.getFullName()))) {
-                    logger.error("resource file: {} not exist,copy error", component.getFullName());
-                    throw new ServiceException(Status.RESOURCE_NOT_EXIST);
-                }
-
-                if (!component.isDirctory()) {
-                    // copy it to dst
-                    HadoopUtils.getInstance().copy(String.format("%s/%s", srcBasePath, component.getFullName()), String.format("%s/%s", dstBasePath, component.getFullName()), false, true);
-                    continue;
-                }
-
-                if (CollectionUtils.isEmpty(component.getChildren())) {
-                    // if not exist,need create it
-                    if (!HadoopUtils.getInstance().exists(String.format("%s/%s", dstBasePath, component.getFullName()))) {
-                        HadoopUtils.getInstance().mkdir(String.format("%s/%s", dstBasePath, component.getFullName()));
+        try {
+            if (CollectionUtils.isNotEmpty(components)) {
+                for (ResourceComponent component : components) {
+                    // verify whether exist
+                    if (!storageOperate.exists(
+                            String.format(Constants.FORMAT_S_S, srcBasePath, component.getFullName()))) {
+                        log.error("Resource file: {} does not exist, copy error.", component.getFullName());
+                        throw new ServiceException(Status.RESOURCE_NOT_EXIST);
                     }
-                } else {
-                    copyResourceFiles(component, srcBasePath, dstBasePath);
+
+                    if (!component.isDirctory()) {
+                        // copy it to dst
+                        storageOperate.copy(String.format(Constants.FORMAT_S_S, srcBasePath, component.getFullName()),
+                                String.format(Constants.FORMAT_S_S, dstBasePath, component.getFullName()), false, true);
+                        continue;
+                    }
+
+                    if (CollectionUtils.isEmpty(component.getChildren())) {
+                        // if not exist,need create it
+                        if (!storageOperate
+                                .exists(String.format(Constants.FORMAT_S_S, dstBasePath, component.getFullName()))) {
+                            storageOperate.mkdir(newTenantCode,
+                                    String.format(Constants.FORMAT_S_S, dstBasePath, component.getFullName()));
+                        }
+                    } else {
+                        copyResourceFiles(oldTenantCode, newTenantCode, component, srcBasePath, dstBasePath);
+                    }
                 }
+
             }
+        } catch (IOException e) {
+            log.error("copy the resources failed,the error message  is {}", e.getMessage());
         }
     }
 
     /**
      * registry user, default state is 0, default tenant_id is 1, no phone, no queue
      *
-     * @param userName user name
-     * @param userPassword user password
+     * @param userName       user name
+     * @param userPassword   user password
      * @param repeatPassword repeat password
-     * @param email email
+     * @param email          email
      * @return registry result code
      * @throws Exception exception
      */
     @Override
-    @Transactional(rollbackFor = RuntimeException.class)
+    @Transactional
     public Map<String, Object> registerUser(String userName, String userPassword, String repeatPassword, String email) {
         Map<String, Object> result = new HashMap<>();
 
-        //check user params
+        // check user params
         String msg = this.checkUserParams(userName, userPassword, email, "");
-
+        if (resourcePermissionCheckService.functionDisabled()) {
+            putMsg(result, Status.FUNCTION_DISABLED);
+            return result;
+        }
         if (!StringUtils.isEmpty(msg)) {
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, msg);
             return result;
@@ -1122,14 +1336,17 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * activate user, only system admin have permission, change user state code 0 to 1
      *
      * @param loginUser login user
-     * @param userName user name
+     * @param userName  user name
      * @return create result code
      */
     @Override
     public Map<String, Object> activateUser(User loginUser, String userName) {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
-
+        if (resourcePermissionCheckService.functionDisabled()) {
+            putMsg(result, Status.FUNCTION_DISABLED);
+            return result;
+        }
         if (!isAdmin(loginUser)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
@@ -1174,6 +1391,10 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     public Map<String, Object> batchActivateUser(User loginUser, List<String> userNames) {
         Map<String, Object> result = new HashMap<>();
 
+        if (resourcePermissionCheckService.functionDisabled()) {
+            putMsg(result, Status.FUNCTION_DISABLED);
+            return result;
+        }
         if (!isAdmin(loginUser)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
             return result;
@@ -1210,5 +1431,37 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, res);
         return result;
+    }
+
+    /**
+     * Make sure user with given name exists, and create the user if not exists
+     * <p>
+     * ONLY for python gateway server, and should not use this in web ui function
+     *
+     * @param userName     user name
+     * @param userPassword user password
+     * @param email        user email
+     * @param phone        user phone
+     * @param tenantCode   tenant code
+     * @param queue        queue
+     * @param state        state
+     * @return create result code
+     */
+    @Override
+    @Transactional
+    public User createUserIfNotExists(String userName, String userPassword, String email, String phone,
+                                      String tenantCode,
+                                      String queue,
+                                      int state) throws IOException {
+        User user = userMapper.queryByUserNameAccurately(userName);
+        if (Objects.isNull(user)) {
+            Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
+            user = createUser(userName, userPassword, email, tenant.getId(), phone, queue, state);
+            return user;
+        }
+
+        updateUser(user, user.getId(), userName, userPassword, email, user.getTenantId(), phone, queue, state, null);
+        user = userMapper.queryDetailsById(user.getId());
+        return user;
     }
 }

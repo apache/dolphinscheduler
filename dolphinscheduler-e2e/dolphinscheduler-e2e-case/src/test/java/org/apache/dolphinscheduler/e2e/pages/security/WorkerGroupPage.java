@@ -22,6 +22,8 @@ package org.apache.dolphinscheduler.e2e.pages.security;
 import lombok.Getter;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
@@ -33,17 +35,17 @@ import java.util.List;
 
 @Getter
 public final class WorkerGroupPage extends NavBarPage implements SecurityPage.Tab {
-    @FindBy(id = "btnCreateWorkerGroup")
+    @FindBy(className = "btn-create-worker-group")
     private WebElement buttonCreateWorkerGroup;
 
     @FindBy(className = "items")
     private List<WebElement> workerGroupList;
 
     @FindBys({
-        @FindBy(className = "el-popconfirm"),
-        @FindBy(className = "el-button--primary"),
+        @FindBy(className = "n-popconfirm__action"),
+        @FindBy(className = "n-button--primary-type"),
     })
-    private List<WebElement> buttonConfirm;
+    private WebElement buttonConfirm;
 
     private final WorkerGroupForm createWorkerForm = new WorkerGroupForm();
     private final WorkerGroupForm editWorkerForm = new WorkerGroupForm();
@@ -58,7 +60,7 @@ public final class WorkerGroupPage extends NavBarPage implements SecurityPage.Ta
         buttonCreateWorkerGroup().click();
 
         createWorkerForm().inputWorkerGroupName().sendKeys(workerGroupName);
-        createWorkerForm().selectWorkerAddress().click();
+        createWorkerForm().btnSelectWorkerAddress().click();
         createWorkerForm().workerAddressList().click();
 
         createWorkerForm().buttonSubmit().click();
@@ -76,7 +78,8 @@ public final class WorkerGroupPage extends NavBarPage implements SecurityPage.Ta
                 .orElseThrow(() -> new RuntimeException("No edit button in workerGroup list"))
                 .click();
 
-        editWorkerForm().inputWorkerGroupName().clear();
+        editWorkerForm().inputWorkerGroupName().sendKeys(Keys.CONTROL + "a");
+        editWorkerForm().inputWorkerGroupName().sendKeys(Keys.BACK_SPACE);
         editWorkerForm().inputWorkerGroupName().sendKeys(editWorkerGroupName);
 
         editWorkerForm().buttonSubmit().click();
@@ -95,12 +98,7 @@ public final class WorkerGroupPage extends NavBarPage implements SecurityPage.Ta
             .orElseThrow(() -> new RuntimeException("No delete button in workerGroup list"))
             .click();
 
-        buttonConfirm()
-            .stream()
-            .filter(WebElement::isDisplayed)
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("No confirm button when deleting"))
-            .click();
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", buttonConfirm());
 
         return this;
     }
@@ -111,19 +109,25 @@ public final class WorkerGroupPage extends NavBarPage implements SecurityPage.Ta
             PageFactory.initElements(driver, this);
         }
 
-        @FindBy(id = "inputWorkerGroupName")
+        @FindBys({
+            @FindBy(className = "input-worker-group-name"),
+            @FindBy(tagName = "input"),
+        })
         private WebElement inputWorkerGroupName;
 
-        @FindBy(id = "selectWorkerAddress")
-        private WebElement selectWorkerAddress;
+        @FindBys({
+            @FindBy(className = "select-worker-address"),
+            @FindBy(className = "n-base-selection"),
+        })
+        private WebElement btnSelectWorkerAddress;
 
-        @FindBy(className = "vue-treeselect__menu")
+        @FindBy(className = "n-base-select-option__content")
         private WebElement workerAddressList;
 
-        @FindBy(id = "btnSubmit")
+        @FindBy(className = "btn-submit")
         private WebElement buttonSubmit;
 
-        @FindBy(id = "btnCancel")
+        @FindBy(className = "btn-cancel")
         private WebElement buttonCancel;
     }
 }
