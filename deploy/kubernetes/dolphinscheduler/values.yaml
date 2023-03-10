@@ -382,14 +382,12 @@ worker:
       storageClassName: "-"
       storage: "20Gi"
   env:
-    WORKER_GROUPS_0: default
     WORKER_MAX_CPU_LOAD_AVG: "-1"
     WORKER_RESERVED_MEMORY: "0.3"
     WORKER_EXEC_THREADS: "100"
     WORKER_HEARTBEAT_INTERVAL: "10s"
     WORKER_HEART_ERROR_THRESHOLD: "5"
     WORKER_HOST_WEIGHT: "100"
-    WORKER_GROUPS: "default"
   keda:
     enabled: false
     namespaceLabels: { }
