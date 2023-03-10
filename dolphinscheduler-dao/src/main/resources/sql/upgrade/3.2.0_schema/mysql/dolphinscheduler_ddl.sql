@@ -319,7 +319,6 @@ alter table t_ds_relation_project_user CONVERT TO CHARACTER SET utf8 COLLATE utf
 alter table t_ds_relation_resources_user CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;
 alter table t_ds_relation_udfs_user CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;
 alter table t_ds_resources CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;
-alter table t_ds_relation_resources_task CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;
 alter table t_ds_schedules CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;
 alter table t_ds_session CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;
 alter table t_ds_task_instance CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;
