@@ -37,7 +37,6 @@ public class RemoteLogService {
 
             RemoteLogHandler remoteLogHandler = RemoteLogHandlerFactory.getRemoteLogHandler();
             if (remoteLogHandler == null) {
-                log.error("remote log handler is null");
                 return;
             }
             remoteLogHandler.sendRemoteLog(logPath);

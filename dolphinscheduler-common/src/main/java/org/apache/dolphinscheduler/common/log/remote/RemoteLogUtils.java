@@ -61,7 +61,6 @@ public class RemoteLogUtils {
             mkdirOfLog(logPath);
             RemoteLogHandler remoteLogHandler = RemoteLogHandlerFactory.getRemoteLogHandler();
             if (remoteLogHandler == null) {
-                log.error("remote log handler is null");
                 return;
             }
             remoteLogHandler.getRemoteLog(logPath);
