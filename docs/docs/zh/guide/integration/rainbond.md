@@ -27,7 +27,7 @@
 
 ![](../../../../img/rainbond/topology-dolphinscheduler.png)
 
-4. 点击应用内的访问按钮，即可通过 Rainbond 默认提供的域名访问 DolphinScheduler-API 组件，默认的用户密码是 **admin/dolphinscheduler123**。
+4. 点击应用内的访问按钮，当出现404时需要在弹出的域名后加上"/dolphinscheduler/ui"地址，即可通过 Rainbond 默认提供的域名访问 DolphinScheduler-API 组件，默认的用户密码是 **admin/dolphinscheduler123**。
 
 ## API Master Worker 节点伸缩
 
