@@ -31,6 +31,7 @@ import {
 import type { Router } from 'vue-router'
 import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 import { useFileState } from "@/views/resource/components/resource/use-file";
+import {StorageImpl} from '@/utils/storage'
 
 const goSubFolder = (router: Router, item: ResourceFileTableData) => {
   if (item.directory) {
@@ -47,6 +48,7 @@ const goSubFolder = (router: Router, item: ResourceFileTableData) => {
 export function useTable() {
   const { t } = useI18n()
   const router: Router = useRouter()
+  const storageResource = new StorageImpl()
 
   const variables = reactive({
     fullName: ref(String(router.currentRoute.value.query.prefix || "")),
@@ -210,6 +212,18 @@ export function useTable() {
       variables.pagination.page,
       variables.pagination.pageSize
     )
+    console.log("打印消息variables.resourceType：")
+    console.log(variables.resourceType!)
+    storageResource.set("resourceType",variables.resourceType!)
+    storageResource.set("fullName",variables.fullName)
+    storageResource.set("tenantCode",variables.tenantCode)
+    storageResource.set("itemCount",variables.pagination.itemCount)
+    storageResource.set("searchValue",variables.searchRef||"")
+    console.log("打印消息：")
+    console.log(variables.searchRef||"")
+    storageResource.set("page",variables.pagination.page)
+    storageResource.set("pageSize",variables.pagination.pageSize)
+    storageResource.set("pageSizes",variables.pagination.pageSizes)
   }
 
 

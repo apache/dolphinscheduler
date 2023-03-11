@@ -46,7 +46,8 @@ import styles from './index.module.scss'
 import type { Router } from 'vue-router'
 import Search from "@/components/input-search"
 import { ResourceType } from "@/views/resource/components/resource/types";
-
+import {StorageImpl} from '@/utils/storage'
+import isEmpty from '@/utils/isEmpty'
 
 const props = {
   resourceType: {
@@ -74,6 +75,7 @@ export default defineComponent({
 
 
     variables.resourceType = props.resourceType
+    const storageResource = new StorageImpl()
 
     const handleUpdatePage = (page: number) => {
       variables.pagination.page = page
@@ -102,6 +104,40 @@ export default defineComponent({
     const handleRenameFile = () => {
       variables.renameShowRef = true
     }
+
+    const handleDetailBackList = () => {
+      console.log("handleDetailBackList："+storageResource.get("isDetailPage").value)
+      if(!isEmpty(storageResource.get("isDetailPage").value)){
+        variables.resourceType = storageResource.get("resourceType").value
+        variables.fullName = isEmpty(storageResource.get("fullName").value) ? "" : storageResource.get("searchValue").value
+        variables.tenantCode = isEmpty(storageResource.get("tenantCode").value) ? "" : storageResource.get("tenantCode").value
+        variables.searchRef = storageResource.get("searchValue").value
+        variables.pagination.page = Number(storageResource.get("page").value)
+        variables.pagination.pageSize = Number(storageResource.get("pageSize").value)
+        //variables.pagination.pageSizes = storageResource.get("pageSizes").value
+        //variables.pagination.itemCount = Number(storageResource.get("itemCount").value)
+        console.log("handleDetailBackList fullName:"+variables.fullName)
+        console.log("handleDetailBackList tenantCode:"+variables.tenantCode)
+        console.log("handleDetailBackList searchRef:"+variables.searchRef)
+        console.log("handleDetailBackList page:"+variables.pagination.page)
+        if(!isEmpty(variables.searchRef)){
+          handleConditions()
+        }
+        storageResource.clear()
+      }else{
+        storageResource.clear()
+        //storageResource.remove("isDetailPage")
+        //storageResource.remove("fileId")
+        //storageResource.remove("searchValue")
+        //storageResource.remove("page")
+        //storageResource.remove("pageSize")
+        //storageResource.remove("itemCount")
+      }
+    }
+
+    onMounted(() => {
+      handleDetailBackList()
+    })
 
     onMounted(() => {
       fileStore.setCurrentDir(variables.fullName)
