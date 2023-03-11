@@ -19,6 +19,7 @@ import { useRouter } from 'vue-router'
 import {
   defineComponent,
   onMounted,
+  onUnmounted,
   ref,
   getCurrentInstance,
   PropType,
@@ -73,7 +74,6 @@ export default defineComponent({
       handleCreateFile,
     } = useTable()
 
-
     variables.resourceType = props.resourceType
     const storageResource = new StorageImpl()
 
@@ -106,7 +106,8 @@ export default defineComponent({
     }
 
     const handleDetailBackList = () => {
-      console.log("handleDetailBackList："+storageResource.get("isDetailPage").value)
+      console.log("isDetailPage:")
+      console.log(storageResource.get("isDetailPage").value)
       if(!isEmpty(storageResource.get("isDetailPage").value)){
         variables.resourceType = storageResource.get("resourceType").value
         variables.fullName = isEmpty(storageResource.get("fullName").value) ? "" : storageResource.get("searchValue").value
@@ -114,31 +115,21 @@ export default defineComponent({
         variables.searchRef = storageResource.get("searchValue").value
         variables.pagination.page = Number(storageResource.get("page").value)
         variables.pagination.pageSize = Number(storageResource.get("pageSize").value)
-        //variables.pagination.pageSizes = storageResource.get("pageSizes").value
-        //variables.pagination.itemCount = Number(storageResource.get("itemCount").value)
-        console.log("handleDetailBackList fullName:"+variables.fullName)
-        console.log("handleDetailBackList tenantCode:"+variables.tenantCode)
-        console.log("handleDetailBackList searchRef:"+variables.searchRef)
-        console.log("handleDetailBackList page:"+variables.pagination.page)
         if(!isEmpty(variables.searchRef)){
           handleConditions()
         }
         storageResource.clear()
       }else{
         storageResource.clear()
-        //storageResource.remove("isDetailPage")
-        //storageResource.remove("fileId")
-        //storageResource.remove("searchValue")
-        //storageResource.remove("page")
-        //storageResource.remove("pageSize")
-        //storageResource.remove("itemCount")
       }
     }
 
     onMounted(() => {
       handleDetailBackList()
     })
-
+    onUnmounted(() => {
+      storageResource.remove("isDetailPage")
+    })
     onMounted(() => {
       fileStore.setCurrentDir(variables.fullName)
       breadListRef.value = fileStore.getCurrentDir.replace(/\/+$/g, '')

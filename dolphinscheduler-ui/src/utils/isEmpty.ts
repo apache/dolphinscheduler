@@ -22,5 +22,4 @@ const isEmpty = (string: any): boolean => {
         return false
     }
 }
-
 export default isEmpty

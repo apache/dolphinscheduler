@@ -212,20 +212,13 @@ export function useTable() {
       variables.pagination.page,
       variables.pagination.pageSize
     )
-    console.log("打印消息variables.resourceType：")
-    console.log(variables.resourceType!)
     storageResource.set("resourceType",variables.resourceType!)
     storageResource.set("fullName",variables.fullName)
     storageResource.set("tenantCode",variables.tenantCode)
-    storageResource.set("itemCount",variables.pagination.itemCount)
     storageResource.set("searchValue",variables.searchRef||"")
-    console.log("打印消息：")
-    console.log(variables.searchRef||"")
     storageResource.set("page",variables.pagination.page)
     storageResource.set("pageSize",variables.pagination.pageSize)
-    storageResource.set("pageSizes",variables.pagination.pageSizes)
   }
-
 
   const updateList = () => {
     variables.pagination.page = 1
