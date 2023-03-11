@@ -58,4 +58,5 @@ export class StorageImpl implements StorageInterface {
     public clear() {
         localStorage.clear()
     }
+
 }
