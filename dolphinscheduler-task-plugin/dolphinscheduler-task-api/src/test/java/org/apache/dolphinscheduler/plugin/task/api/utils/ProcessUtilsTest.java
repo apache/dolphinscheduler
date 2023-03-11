@@ -33,6 +33,7 @@ public class ProcessUtilsTest {
     @Test
     public void kill() throws IOException {
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
+        taskExecutionContext.setAppIds("12345");
         Assertions.assertFalse(ProcessUtils.kill(taskExecutionContext));
     }
 }
