@@ -15,22 +15,30 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api;
+package org.apache.dolphinscheduler.remote.command;
 
-import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
-public interface TaskChannel {
+import java.io.Serializable;
 
-    void cancelApplication(boolean status);
+import lombok.Data;
 
-    // todo: return ITask
-    AbstractTask createTask(TaskExecutionContext taskRequest);
+@Data
+public class WorkflowMetricsCleanUpCommand implements Serializable {
 
-    // todo: return IParameters
-    AbstractParameters parseParameters(ParametersNode parametersNode);
+    private String processDefinitionCode;
 
-    ResourceParametersHelper getResources(String parameters);
+    /**
+     * package request command
+     *
+     * @return command
+     */
+    public Command convert2Command() {
+        Command command = new Command();
+        command.setType(CommandType.WORKFLOW_METRICS_CLEANUP);
+        byte[] body = JSONUtils.toJsonByteArray(this);
+        command.setBody(body);
+        return command;
+    }
 
 }

@@ -83,7 +83,7 @@ metrics exporter端口`server.port`是在application.yaml里定义的: master: `
 
 - ds.workflow.create.command.count: (counter) 工作量创建并插入的命令数量
 - ds.workflow.instance.running: (gauge) 正在运行的工作流实例数量
-- ds.workflow.instance.count: (counter) 工作流实例数量，由tag `state`按状态切分：
+- ds.workflow.instance.count: (counter) 工作流实例数量，由tag `process.definition.code` 和 `state` 切分。您可以通过 `process.definition.code` 这个tag筛选出和某个workflow相关的指标，这里的 `process.definition.code` 指的是您工作流定义的编号代码。工作流实例有如下七种状态：
   - submit：已提交的工作量实例数量
   - timeout：运行超时的工作流实例数量
   - finish：已完成的工作流实例数量，包含成功和失败

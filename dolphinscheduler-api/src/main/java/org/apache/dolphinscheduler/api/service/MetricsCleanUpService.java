@@ -15,22 +15,10 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api;
+package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
+public interface MetricsCleanUpService {
 
-public interface TaskChannel {
-
-    void cancelApplication(boolean status);
-
-    // todo: return ITask
-    AbstractTask createTask(TaskExecutionContext taskRequest);
-
-    // todo: return IParameters
-    AbstractParameters parseParameters(ParametersNode parametersNode);
-
-    ResourceParametersHelper getResources(String parameters);
+    void cleanUpWorkflowMetricsByDefinitionCode(String workflowDefinitionCode);
 
 }
