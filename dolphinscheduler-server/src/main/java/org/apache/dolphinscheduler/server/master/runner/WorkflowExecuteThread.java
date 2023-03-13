@@ -553,9 +553,9 @@ public class WorkflowExecuteThread implements Runnable {
                 return true;
             }
             int index = complementListDate.indexOf(scheduleDate);
-            if (index >= complementListDate.size() - 1) {
+            if (index >= complementListDate.size() - 1 || !processInstance.getState().typeIsSuccess()) {
                 logger.info("process complement end. process id:{}", processInstance.getId());
-                // complement data ends
+                // complement data ends || no success
                 return true;
             }
             logger.info("process complement continue. process id:{}, schedule time:{} complementListDate:{}",
