@@ -45,7 +45,6 @@ export class StorageImpl implements StorageInterface {
                 }
             }
         } else {
-            console.warn('key value is invalid')
             return {
                 message:`key value is invalid`,
                 value:null
