@@ -10,7 +10,7 @@ Apache DolphinScheduler支持将任务日志传输到远端存储上。当配置
 ```properties
 # 是否开启远程日志存储
 remote.logging.enable=true
-# 任务日志写入的远端存储，目前仅支持OSS
+# 任务日志写入的远端存储，目前支持OSS, S3
 remote.logging.target=OSS
 # 任务日志在远端存储上的目录
 remote.logging.base.dir=logs
@@ -31,5 +31,22 @@ remote.logging.oss.access.key.secret=<access.key.secret>
 remote.logging.oss.bucket.name=<bucket.name>
 # oss endpoint, required if you set remote.logging.target=OSS
 remote.logging.oss.endpoint=<endpoint>
+```
+
+## 将任务日志写入[Amazon S3](https://aws.amazon.com/cn/s3/)
+
+配置`common.propertis`如下：
+
+```properties
+# s3 access key id, required if you set remote.logging.target=S3
+remote.logging.s3.access.key.id=<access.key.id>
+# s3 access key secret, required if you set remote.logging.target=S3
+remote.logging.s3.access.key.secret=<access.key.secret>
+# s3 bucket name, required if you set remote.logging.target=S3
+remote.logging.s3.bucket.name=<bucket.name>
+# s3 endpoint, required if you set remote.logging.target=S3
+remote.logging.s3.endpoint=<endpoint>
+# s3 region, required if you set remote.logging.target=S3
+remote.logging.s3.region=<region>
 ```
 

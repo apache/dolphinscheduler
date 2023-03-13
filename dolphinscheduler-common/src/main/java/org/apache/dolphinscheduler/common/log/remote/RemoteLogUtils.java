@@ -36,6 +36,8 @@ public class RemoteLogUtils {
 
     private static RemoteLogService remoteLogService;
 
+    private static final int OBJECT_NAME_COUNT = 2;
+
     @Autowired
     private RemoteLogService autowiredRemoteLogService;
 
@@ -59,7 +61,6 @@ public class RemoteLogUtils {
             mkdirOfLog(logPath);
             RemoteLogHandler remoteLogHandler = RemoteLogHandlerFactory.getRemoteLogHandler();
             if (remoteLogHandler == null) {
-                log.error("remote log handler is null");
                 return;
             }
             remoteLogHandler.getRemoteLog(logPath);
@@ -75,5 +76,19 @@ public class RemoteLogUtils {
 
     public static boolean isRemoteLoggingEnable() {
         return PropertyUtils.getBoolean(Constants.REMOTE_LOGGING_ENABLE, Boolean.FALSE);
+    }
+
+    public static String getObjectNameFromLogPath(String logPath) {
+        Path path = Paths.get(logPath);
+        int nameCount = path.getNameCount();
+
+        String logBaseDir = PropertyUtils.getString(Constants.REMOTE_LOGGING_BASE_DIR);
+
+        if (nameCount < OBJECT_NAME_COUNT) {
+            return Paths.get(logBaseDir, logPath).toString();
+        } else {
+            return Paths.get(logBaseDir, path.subpath(nameCount - OBJECT_NAME_COUNT, nameCount).toString())
+                    .toString();
+        }
     }
 }
