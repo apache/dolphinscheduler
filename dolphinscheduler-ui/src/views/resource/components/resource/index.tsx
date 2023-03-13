@@ -106,8 +106,6 @@ export default defineComponent({
     }
 
     const handleDetailBackList = () => {
-      console.log("isDetailPage:")
-      console.log(storageResource.get("isDetailPage").value)
       if(!isEmpty(storageResource.get("isDetailPage").value)){
         variables.resourceType = storageResource.get("resourceType").value
         variables.fullName = isEmpty(storageResource.get("fullName").value) ? "" : storageResource.get("searchValue").value
