@@ -20,8 +20,6 @@ package org.apache.dolphinscheduler.common.log.remote;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 
-import java.lang.reflect.Method;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,22 +28,18 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class OssRemoteLogHandlerTest {
+public class RemoteLogHandlerTest {
 
     @Test
-    public void testGetObjectNameFromLogPath() throws Exception {
+    public void testGetObjectNameFromLogPath() {
         final String logPath = "/path/to/dolphinscheduler/logs/20230116/8245922982496_1-1-3.log";
         final String expectedObjectName = "logs/20230116/8245922982496_1-1-3.log";
-
-        OssRemoteLogHandler ossRemoteLogHandler = new OssRemoteLogHandler();
 
         try (MockedStatic<PropertyUtils> propertyUtilsMockedStatic = Mockito.mockStatic(PropertyUtils.class)) {
             propertyUtilsMockedStatic.when(() -> PropertyUtils.getString(Constants.REMOTE_LOGGING_BASE_DIR))
                     .thenReturn("logs");
 
-            Method method = OssRemoteLogHandler.class.getDeclaredMethod("getObjectNameFromLogPath", String.class);
-            method.setAccessible(true);
-            String objectName = (String) method.invoke(ossRemoteLogHandler, logPath);
+            String objectName = RemoteLogUtils.getObjectNameFromLogPath(logPath);
 
             Assertions.assertEquals(expectedObjectName, objectName);
         }

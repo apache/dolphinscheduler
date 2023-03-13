@@ -829,4 +829,18 @@ public final class Constants {
     public static final String REMOTE_LOGGING_OSS_BUCKET_NAME = "remote.logging.oss.bucket.name";
 
     public static final String REMOTE_LOGGING_OSS_ENDPOINT = "remote.logging.oss.endpoint";
+
+    /**
+     * remote logging for S3
+     */
+
+    public static final String REMOTE_LOGGING_S3_ACCESS_KEY_ID = "remote.logging.s3.access.key.id";
+
+    public static final String REMOTE_LOGGING_S3_ACCESS_KEY_SECRET = "remote.logging.s3.access.key.secret";
+
+    public static final String REMOTE_LOGGING_S3_BUCKET_NAME = "remote.logging.s3.bucket.name";
+
+    public static final String REMOTE_LOGGING_S3_ENDPOINT = "remote.logging.s3.endpoint";
+
+    public static final String REMOTE_LOGGING_S3_REGION = "remote.logging.s3.region";
 }

@@ -37,11 +37,10 @@ public class RemoteLogService {
 
             RemoteLogHandler remoteLogHandler = RemoteLogHandlerFactory.getRemoteLogHandler();
             if (remoteLogHandler == null) {
-                log.error("remote log handler is null");
                 return;
             }
             remoteLogHandler.sendRemoteLog(logPath);
-            log.info("Succeed to send log {} to remote target {}", logPath,
+            log.info("End send log {} to remote target {}", logPath,
                     PropertyUtils.getString(Constants.REMOTE_LOGGING_TARGET));
         }
     }

@@ -33,3 +33,20 @@ remote.logging.oss.bucket.name=<bucket.name>
 remote.logging.oss.endpoint=<endpoint>
 ```
 
+## Writing task logs to [Amazon S3](https://aws.amazon.com/cn/s3/)
+
+Configure `common.properties` as follows:
+
+```properties
+# s3 access key id, required if you set remote.logging.target=S3
+remote.logging.s3.access.key.id=<access.key.id>
+# s3 access key secret, required if you set remote.logging.target=S3
+remote.logging.s3.access.key.secret=<access.key.secret>
+# s3 bucket name, required if you set remote.logging.target=S3
+remote.logging.s3.bucket.name=<bucket.name>
+# s3 endpoint, required if you set remote.logging.target=S3
+remote.logging.s3.endpoint=<endpoint>
+# s3 region, required if you set remote.logging.target=S3
+remote.logging.s3.region=<region>
+```
+
