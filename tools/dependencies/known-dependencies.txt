@@ -431,3 +431,4 @@ azure-storage-file-share-12.16.1.jar
 nimbus-jose-jwt-9.22.jar
 woodstox-core-6.4.0.jar
 azure-core-management-1.9.0.jar
+snowflake-jdbc:3.13.10.jar

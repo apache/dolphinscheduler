@@ -105,6 +105,8 @@
         <aws-java-sdk-redshift.version>1.12.300</aws-java-sdk-redshift.version>
         <azure-resourcemanager.version>2.21.0</azure-resourcemanager.version>
         <azure-resourcemanager-datafactory.version>1.0.0-beta.19</azure-resourcemanager-datafactory.version>
+        <snowflake-jdbc.version>3.13.10</snowflake-jdbc.version>
+
     </properties>
 
     <dependencyManagement>
@@ -821,6 +823,12 @@
                 <artifactId>aws-java-sdk-redshift</artifactId>
                 <version>${aws-java-sdk-redshift.version}</version>
                 <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>net.snowflake</groupId>
+                <artifactId>snowflake-jdbc</artifactId>
+                <version>${snowflake-jdbc.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
