@@ -24,12 +24,14 @@ import { useEdit } from './use-edit'
 import Card from '@/components/card'
 import MonacoEditor from '@/components/monaco-editor'
 import styles from '../index.module.scss'
+import {StorageImpl} from "@/utils/storage"
 
 export default defineComponent({
   name: 'ResourceEdit',
   setup() {
     const route = useRoute()
     const router = useRouter()
+    const storageResource = new StorageImpl()
 
     const componentName = route.name
     // fullname is now the id of resources
@@ -41,10 +43,12 @@ export default defineComponent({
 
     const handleFileContent = () => {
       state.fileForm.content = resourceViewRef.state.value.content
+      storageResource.set("isDetailPage",true)
       handleUpdateContent(fullName, tenantCode)
     }
 
     const handleReturn = () => {
+      storageResource.set("isDetailPage",true)
       router.go(-1)
     }
 

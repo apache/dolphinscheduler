@@ -19,6 +19,7 @@ import { useRouter } from 'vue-router'
 import {
   defineComponent,
   onMounted,
+  onUnmounted,
   ref,
   getCurrentInstance,
   PropType,
@@ -46,6 +47,8 @@ import styles from './index.module.scss'
 import type { Router } from 'vue-router'
 import Search from "@/components/input-search"
 import { ResourceType } from "@/views/resource/components/resource/types";
+import {StorageImpl} from '@/utils/storage'
+import isEmpty from '@/utils/isEmpty'
 
 
 const props = {
@@ -74,6 +77,7 @@ export default defineComponent({
 
 
     variables.resourceType = props.resourceType
+    const storageResource = new StorageImpl()
 
     const handleUpdatePage = (page: number) => {
       variables.pagination.page = page
@@ -103,6 +107,30 @@ export default defineComponent({
       variables.renameShowRef = true
     }
 
+    const handleDetailBackList = () => {
+      if(!isEmpty(storageResource.get("isDetailPage").value)){
+        variables.resourceType = storageResource.get("resourceType").value
+        variables.fullName = isEmpty(storageResource.get("fullName").value) ? "" : storageResource.get("searchValue").value
+        variables.tenantCode = isEmpty(storageResource.get("tenantCode").value) ? "" : storageResource.get("tenantCode").value
+        variables.searchRef = storageResource.get("searchValue").value
+        variables.pagination.page = Number(storageResource.get("page").value)
+        variables.pagination.pageSize = Number(storageResource.get("pageSize").value)
+        if(!isEmpty(variables.searchRef)){
+          handleConditions()
+        }
+        storageResource.clear()
+      }else{
+        storageResource.clear()
+      }
+    }
+
+    onMounted(() => {
+      handleDetailBackList()
+    })
+
+    onUnmounted(() => {
+      storageResource.remove("isDetailPage")
+    })
     onMounted(() => {
       fileStore.setCurrentDir(variables.fullName)
       breadListRef.value = fileStore.getCurrentDir.replace(/\/+$/g, '')

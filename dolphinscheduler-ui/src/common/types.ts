@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 import { Component } from 'vue'
+import { Dictionaries } from "./enum"
 
 export type ITaskState =
   | 'SUBMITTED_SUCCESS'
@@ -62,4 +63,23 @@ export type IWorkflowExecutionStateConfig = {
     isSpin: boolean
     classNames?: string
   }
+}
+
+export type StorageKey = string
+export type StorageExpire = Dictionaries.StoragePermanent | number
+export interface StorageData<T> {
+  value: T
+  [Dictionaries.StorageExpire]: Dictionaries.StorageExpire | number
+}
+
+export interface StorageResult<T> {
+  message: string,
+  value: T | null
+}
+
+export interface StorageInterface {
+  set: <T>(key: StorageKey, value: T, expire: StorageExpire) => void
+  get: <T>(key: StorageKey) => StorageResult<T | null>
+  remove: (key: StorageKey) => void
+  clear: () => void
 }
