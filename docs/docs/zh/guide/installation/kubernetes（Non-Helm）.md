@@ -12,7 +12,7 @@
 
 ## 安装 dolphinscheduler
 
-下载官网 docker 镜像 
+下载官网 docker 镜像
 
 ```
 docker pull apache/dolphinscheduler-master:<version>
@@ -22,9 +22,10 @@ docker pull apache/dolphinscheduler-api:<version>
 docker pull apache/dolphinscheduler-alert-server:<version>
 ```
 
-基于官网镜像修改成内网 Harbor 镜像 
+基于官网镜像修改成内网 Harbor 镜像
 
 如果你的构建环境无法链接外网，需要提前准备内网可访问的 apt sources.list 文件，示例如下：
+
 ```shell
 deb http://mirrors.tencent.com/ubuntu-ports/ focal main restricted
 deb http://mirrors.tencent.com/ubuntu-ports/ focal-updates main restricted
@@ -54,7 +55,7 @@ RUN apt-get update && apt-get install -y sudo telnet iputils-ping curl dnsutils 
 
 下载解压之后，进入deploy/kubernetes/dolphinscheduler目录。
 
-1, 修改 Chart.yaml 
+1, 修改 Chart.yaml
 
 移除 Chart 依赖的 postgresql，mysql，zookeeper 组件，推荐使用外置的单独安装的 mysql 和 zookeeper 组件
 
@@ -68,15 +69,19 @@ RUN apt-get update && apt-get install -y sudo telnet iputils-ping curl dnsutils 
 - 其他的 JVM 内存，探针，Pod副本，监控心跳间隔，滚动策略，可根据实际情况配置
 
 3，生成部署 YAML 集
+
 ```shell
 helm template --namespace dolphinscheduler  dolphinscheduler . --output-dir prod_yamls
 ```
+
 上面的命令执行之后，dolphinscheduler 所有的资源对象的 YAML 配置都会生成在 prod_yamls 目录中
 
 注意：生成后的 YAML 部署集，如果有资源对象的 apiVersion 版本有问题，就使用如下的命令再校验一遍 (在 values.yaml 的上级目录执行)：
+
 ```shell
 helm install --dry-run --debug dolphinscheduler  ./dolphinscheduler
 ```
+
 4，将生成的 YAML 目录，提交到Git代码仓库，然后在生产环境检出后部署
 
 ```shell
@@ -86,5 +91,4 @@ kubectl apply -f prod_yamls
 ## 访问 DolphinScheduler 前端页面
 
 后续的步骤和用 Helm 步骤的一样，请参考部署章节的[kubernetes](./kubernetes.md) 访问 DolphinScheduler 前端页面
-
 

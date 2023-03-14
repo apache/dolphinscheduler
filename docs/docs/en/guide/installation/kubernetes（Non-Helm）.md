@@ -25,6 +25,7 @@ docker pull apache/dolphinscheduler-alert-server:<version>
 Based on the official website image modified to intranet Harbor image
 
 If your build environment cannot be connected to the external network, you need to prepare an apt sources.list file that is accessible from the internal network in advance. The example is as follows:
+
 ```shell
 deb http://mirrors.tencent.com/ubuntu-ports/ focal main restricted
 deb http://mirrors.tencent.com/ubuntu-ports/ focal-updates main restricted
@@ -68,15 +69,19 @@ Modify Chart.yaml to remove the postgresql, mysql, and zookeeper components that
 - Other JVM memory, probe, Pod copy, monitoring heartbeat interval, rolling strategy, can be configured according to the actual situation
 
 3，Generate deployment YAML set
+
 ```shell
 helm template --namespace dolphinscheduler  dolphinscheduler . --output-dir prod_yamls
 ```
+
 After the above command is executed, the YAML configuration of all resource objects of dolphinscheduler will be generated in the prod_yamls directory
 
 Note: In the generated YAML deployment set, if there is a problem with the apiVersion version of the resource object, use the following command to verify it again (executed in the upper-level directory of values.yaml):
+
 ```shell
 helm install --dry-run --debug dolphinscheduler  ./dolphinscheduler
 ```
+
 4，Submit the generated YAML directory to the Git code warehouse, and then check out and deploy it in the production environment
 
 ```shell
@@ -86,5 +91,4 @@ kubectl apply -f prod_yamls
 ## Access DolphinScheduler UI
 
 Subsequent steps are the same as using Helm, please refer to the Deployment chapter [kubernetes](./kubernetes.md) Access DolphinScheduler UI
-
 
