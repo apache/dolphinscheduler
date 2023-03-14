@@ -469,6 +469,10 @@ export default {
                         link: '/en-us/docs/dev/user_doc/guide/installation/kubernetes.html',
                     },
                     {
+                        title: 'Kubernetes Deployment（Non-Helm）',
+                        link: '/en-us/docs/dev/user_doc/guide/installation/kubernetes（Non-Helm）.md',
+                    },
+                    {
                         title: 'integration',
                         children: [
                             {
@@ -1135,6 +1139,10 @@ export default {
                     {
                         title: 'Kubernetes部署(Kubernetes)',
                         link: '/zh-cn/docs/dev/user_doc/guide/installation/kubernetes.html',
+                    },
+                    {
+                        title: 'Kubernetes部署(Non-Helm)',
+                        link: '/zh-cn/docs/dev/user_doc/guide/installation/kubernetes（Non-Helm）.md',
                     },
                     {
                         title: '集成',
