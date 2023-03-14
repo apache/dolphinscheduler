@@ -53,8 +53,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -82,9 +82,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "PROCESS_DEFINITION_TAG")
 @RestController
 @RequestMapping("projects/{projectCode}/process-definition")
+@Slf4j
 public class ProcessDefinitionController extends BaseController {
-
-    private static final Logger logger = LoggerFactory.getLogger(ProcessDefinitionController.class);
 
     @Autowired
     private ProcessDefinitionService processDefinitionService;
@@ -634,14 +633,6 @@ public class ProcessDefinitionController extends BaseController {
         return returnDataList(result);
     }
 
-    /**
-     * delete process definition by code
-     *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param code process definition code
-     * @return delete result code
-     */
     @Operation(summary = "deleteByCode", description = "DELETE_PROCESS_DEFINITION_BY_ID_NOTES")
     @Parameters({
             @Parameter(name = "code", description = "PROCESS_DEFINITION_CODE", schema = @Schema(implementation = int.class, example = "100"))
@@ -652,8 +643,8 @@ public class ProcessDefinitionController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteProcessDefinitionByCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                 @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                @PathVariable("code") long code) {
-        processDefinitionService.deleteProcessDefinitionByCode(loginUser, code);
+                                                @PathVariable("code") long workflowDefinitionCode) {
+        processDefinitionService.deleteProcessDefinitionByCode(loginUser, workflowDefinitionCode);
         return new Result(Status.SUCCESS);
     }
 
@@ -704,7 +695,7 @@ public class ProcessDefinitionController extends BaseController {
         try {
             processDefinitionService.batchExportProcessDefinitionByCodes(loginUser, projectCode, codes, response);
         } catch (Exception e) {
-            logger.error(Status.BATCH_EXPORT_PROCESS_DEFINE_BY_IDS_ERROR.getMsg(), e);
+            log.error(Status.BATCH_EXPORT_PROCESS_DEFINE_BY_IDS_ERROR.getMsg(), e);
         }
     }
 

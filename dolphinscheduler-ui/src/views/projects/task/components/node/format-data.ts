@@ -60,6 +60,9 @@ export function formatParams(data: INodeData): {
     taskParams.appName = data.appName
     taskParams.mainArgs = data.mainArgs
     taskParams.others = data.others
+    if (data.namespace) {
+      taskParams.namespace = data.namespace
+    }
   }
 
   if (data.taskType === 'SPARK') {
@@ -449,11 +452,17 @@ export function formatParams(data: INodeData): {
     taskParams.yamlContent = data.yamlContent
     taskParams.namespace = data.namespace
   }
-  
+
   if (data.taskType === 'LINKIS') {
     taskParams.useCustom = data.useCustom
     taskParams.paramScript = data.paramScript
     taskParams.rawScript = data.rawScript
+  }
+
+  if (data.taskType === 'DATA_FACTORY') {
+    taskParams.factoryName = data.factoryName
+    taskParams.resourceGroupName = data.resourceGroupName
+    taskParams.pipelineName = data.pipelineName
   }
 
   let timeoutNotifyStrategy = ''
@@ -478,6 +487,7 @@ export function formatParams(data: INodeData): {
         : '0',
       failRetryTimes: data.failRetryTimes ? String(data.failRetryTimes) : '0',
       flag: data.flag,
+      isCache: data.isCache ? "YES" : "NO",
       name: data.name,
       taskGroupId: data.taskGroupId,
       taskGroupPriority: data.taskGroupPriority,
@@ -526,6 +536,7 @@ export function formatModel(data: ITaskData) {
     ...omit(data.taskParams, ['resourceList', 'mainJar', 'localParams']),
     environmentCode: data.environmentCode === -1 ? null : data.environmentCode,
     timeoutFlag: data.timeoutFlag === 'OPEN',
+    isCache: data.isCache === 'YES',
     timeoutNotifyStrategy: data.timeoutNotifyStrategy
       ? [data.timeoutNotifyStrategy]
       : [],

@@ -21,9 +21,9 @@ import static org.mockito.BDDMockito.given;
 
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
+import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
-import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import java.time.Duration;
 import java.util.Set;
@@ -47,7 +47,7 @@ import com.google.common.collect.Sets;
 @ExtendWith(MockitoExtension.class)
 public class WorkerRegistryClientTest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(WorkerRegistryClientTest.class);
+    private static final Logger log = LoggerFactory.getLogger(WorkerRegistryClientTest.class);
 
     private static final String TEST_WORKER_GROUP = "test";
 

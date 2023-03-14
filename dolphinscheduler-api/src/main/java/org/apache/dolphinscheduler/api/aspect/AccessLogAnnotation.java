@@ -32,6 +32,4 @@ public @interface AccessLogAnnotation {
     String[] ignoreRequestArgs() default {"loginUser"};
 
     boolean ignoreRequest() default false;
-
-    boolean ignoreResponse() default true;
 }

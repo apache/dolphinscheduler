@@ -21,12 +21,7 @@ import org.apache.dolphinscheduler.plugin.datasource.hive.HiveDataSourceClient;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class SparkDataSourceClient extends HiveDataSourceClient {
-
-    private static final Logger logger = LoggerFactory.getLogger(SparkDataSourceClient.class);
 
     public SparkDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
         super(baseConnectionParam, dbType);

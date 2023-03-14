@@ -24,12 +24,15 @@ import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-/**
- *  execution context
- */
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ExecutionContext {
 
     /**
@@ -40,19 +43,16 @@ public class ExecutionContext {
     /**
      * command
      */
-    private final Command command;
+    private Command command;
 
-    private final TaskInstance taskInstance;
+    private TaskInstance taskInstance;
 
-    /**
-     * executor type : worker or client
-     */
-    private final ExecutorType executorType;
+    private ExecutorType executorType;
 
     /**
      * worker group
      */
-    private final String workerGroup;
+    private String workerGroup;
 
     public ExecutionContext(Command command, ExecutorType executorType, TaskInstance taskInstance) {
         this(command, executorType, DEFAULT_WORKER_GROUP, taskInstance);

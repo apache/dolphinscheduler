@@ -19,21 +19,21 @@ package org.apache.dolphinscheduler.service.cache.impl;
 
 import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
+import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.processor.NettyRemoteChannel;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.cache.CacheNotifyService;
-import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,9 +43,8 @@ import io.netty.channel.Channel;
  * cache notify service
  */
 @Service
+@Slf4j
 public class CacheNotifyServiceImpl implements CacheNotifyService {
-
-    private final Logger logger = LoggerFactory.getLogger(CacheNotifyServiceImpl.class);
 
     @Autowired
     private RegistryClient registryClient;
@@ -113,7 +112,7 @@ public class CacheNotifyServiceImpl implements CacheNotifyService {
      */
     @Override
     public void notifyMaster(Command command) {
-        logger.info("send result, command:{}", command.toString());
+        log.info("send result, command:{}", command.toString());
         try {
             List<Server> serverList = registryClient.getServerList(NodeType.MASTER);
             if (CollectionUtils.isEmpty(serverList)) {
@@ -129,7 +128,7 @@ public class CacheNotifyServiceImpl implements CacheNotifyService {
                 nettyRemoteChannel.writeAndFlush(command);
             }
         } catch (Exception e) {
-            logger.error("notify master error", e);
+            log.error("notify master error", e);
         }
     }
 }

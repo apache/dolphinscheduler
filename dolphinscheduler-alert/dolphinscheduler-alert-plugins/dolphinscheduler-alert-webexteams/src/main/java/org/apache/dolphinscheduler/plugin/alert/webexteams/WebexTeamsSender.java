@@ -34,13 +34,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 
 import com.google.common.base.Preconditions;
 
+@Slf4j
 public final class WebexTeamsSender {
-
-    private static final Logger log = org.slf4j.LoggerFactory.getLogger(WebexTeamsSender.class);
 
     private final String botAccessToken;
     private final String roomId;
@@ -159,7 +158,7 @@ public final class WebexTeamsSender {
             for (Map map : list) {
                 for (Map.Entry<String, Object> entry : (Iterable<Map.Entry<String, Object>>) map.entrySet()) {
                     String key = entry.getKey();
-                    String value = entry.getValue().toString();
+                    String value = entry.getValue() == null ? "" : entry.getValue().toString();
                     contents.append(key).append(":").append(value);
                     contents.append("\n");
                 }

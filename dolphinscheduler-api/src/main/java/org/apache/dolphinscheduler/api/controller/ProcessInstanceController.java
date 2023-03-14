@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR;
+
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -37,8 +39,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -64,9 +66,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "PROCESS_INSTANCE_TAG")
 @RestController
 @RequestMapping("/projects/{projectCode}/process-instances")
+@Slf4j
 public class ProcessInstanceController extends BaseController {
-
-    private static final Logger logger = LoggerFactory.getLogger(ProcessInstanceController.class);
 
     @Autowired
     private ProcessInstanceService processInstanceService;
@@ -267,11 +268,11 @@ public class ProcessInstanceController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(Status.DELETE_PROCESS_INSTANCE_BY_ID_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result<ProcessInstance> deleteProcessInstanceById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                             @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                             @PathVariable("id") Integer id) {
-        Map<String, Object> result = processInstanceService.deleteProcessInstanceById(loginUser, projectCode, id);
-        return returnDataList(result);
+    public Result<Void> deleteProcessInstanceById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                  @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                  @PathVariable("id") Integer id) {
+        processInstanceService.deleteProcessInstanceById(loginUser, id);
+        return Result.success();
     }
 
     /**
@@ -396,13 +397,9 @@ public class ProcessInstanceController extends BaseController {
             for (String strProcessInstanceId : processInstanceIdArray) {
                 int processInstanceId = Integer.parseInt(strProcessInstanceId);
                 try {
-                    Map<String, Object> deleteResult =
-                            processInstanceService.deleteProcessInstanceById(loginUser, projectCode, processInstanceId);
-                    if (!Status.SUCCESS.equals(deleteResult.get(Constants.STATUS))) {
-                        deleteFailedIdList.add((String) deleteResult.get(Constants.MSG));
-                        logger.error((String) deleteResult.get(Constants.MSG));
-                    }
+                    processInstanceService.deleteProcessInstanceById(loginUser, processInstanceId);
                 } catch (Exception e) {
+                    log.error("Delete workflow instance: {} error", strProcessInstanceId, e);
                     deleteFailedIdList
                             .add(MessageFormat.format(Status.PROCESS_INSTANCE_ERROR.getMsg(), strProcessInstanceId));
                 }
@@ -413,6 +410,22 @@ public class ProcessInstanceController extends BaseController {
         } else {
             putMsg(result, Status.SUCCESS);
         }
+        return returnDataList(result);
+    }
+
+    @Operation(summary = "queryProcessInstanceListByTrigger", description = "QUERY_PROCESS_INSTANCE_BY_TRIGGER_NOTES")
+    @Parameters({
+            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = Long.class)),
+            @Parameter(name = "triggerCode", description = "TRIGGER_CODE", required = true, schema = @Schema(implementation = Long.class))
+    })
+    @GetMapping("/trigger")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR)
+    @AccessLogAnnotation()
+    public Result queryProcessInstancesByTriggerCode(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                     @PathVariable long projectCode,
+                                                     @RequestParam(value = "triggerCode") Long triggerCode) {
+        Map<String, Object> result = processInstanceService.queryByTriggerCode(loginUser, projectCode, triggerCode);
         return returnDataList(result);
     }
 }

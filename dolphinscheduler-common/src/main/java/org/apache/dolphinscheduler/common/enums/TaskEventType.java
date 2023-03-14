@@ -22,5 +22,7 @@ public enum TaskEventType {
     DELAY,
     RUNNING,
     RESULT,
-    WORKER_REJECT
+    UPDATE_PID,
+    WORKER_REJECT,
+    CACHE,
 }

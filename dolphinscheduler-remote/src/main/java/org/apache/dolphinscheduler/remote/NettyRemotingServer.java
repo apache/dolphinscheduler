@@ -33,8 +33,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
@@ -52,9 +51,8 @@ import io.netty.handler.timeout.IdleStateHandler;
 /**
  * remoting netty server
  */
+@Slf4j
 public class NettyRemotingServer {
-
-    private final Logger logger = LoggerFactory.getLogger(NettyRemotingServer.class);
 
     /**
      * server bootstrap
@@ -142,11 +140,11 @@ public class NettyRemotingServer {
             try {
                 future = serverBootstrap.bind(serverConfig.getListenPort()).sync();
             } catch (Exception e) {
-                logger.error("NettyRemotingServer bind fail {}, exit", e.getMessage(), e);
+                log.error("NettyRemotingServer bind fail {}, exit", e.getMessage(), e);
                 throw new RemoteException(String.format(NETTY_BIND_FAILURE_MSG, serverConfig.getListenPort()));
             }
             if (future.isSuccess()) {
-                logger.info("NettyRemotingServer bind success at port : {}", serverConfig.getListenPort());
+                log.info("NettyRemotingServer bind success at port : {}", serverConfig.getListenPort());
             } else if (future.cause() != null) {
                 throw new RemoteException(String.format(NETTY_BIND_FAILURE_MSG, serverConfig.getListenPort()),
                         future.cause());
@@ -212,9 +210,9 @@ public class NettyRemotingServer {
                 }
                 defaultExecutor.shutdown();
             } catch (Exception ex) {
-                logger.error("netty server close exception", ex);
+                log.error("netty server close exception", ex);
             }
-            logger.info("netty server closed");
+            log.info("netty server closed");
         }
     }
 }

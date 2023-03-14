@@ -17,21 +17,20 @@
 
 package org.apache.dolphinscheduler.server.worker.registry;
 
+import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.StrategyType;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
-import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 @Service
 @ConditionalOnProperty(prefix = "worker.registry-disconnect-strategy", name = "strategy", havingValue = "stop", matchIfMissing = true)
+@Slf4j
 public class WorkerStopStrategy implements WorkerConnectStrategy {
-
-    private final Logger logger = LoggerFactory.getLogger(WorkerStopStrategy.class);
 
     @Autowired
     public RegistryClient registryClient;
@@ -46,7 +45,7 @@ public class WorkerStopStrategy implements WorkerConnectStrategy {
 
     @Override
     public void reconnect() {
-        logger.warn("The current connect strategy is stop, so the worker will not reconnect to registry");
+        log.warn("The current connect strategy is stop, so the worker will not reconnect to registry");
     }
 
     @Override

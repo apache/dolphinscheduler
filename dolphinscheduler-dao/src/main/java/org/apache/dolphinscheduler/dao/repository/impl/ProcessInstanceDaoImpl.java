@@ -21,6 +21,10 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 
+import org.apache.commons.collections4.CollectionUtils;
+
+import java.util.List;
+
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
@@ -51,5 +55,23 @@ public class ProcessInstanceDaoImpl implements ProcessInstanceDao {
         } else {
             return insertProcessInstance(processInstance);
         }
+    }
+
+    @Override
+    public void deleteByIds(List<Integer> needToDeleteWorkflowInstanceIds) {
+        if (CollectionUtils.isEmpty(needToDeleteWorkflowInstanceIds)) {
+            return;
+        }
+        processInstanceMapper.deleteBatchIds(needToDeleteWorkflowInstanceIds);
+    }
+
+    @Override
+    public void deleteById(Integer workflowInstanceId) {
+        processInstanceMapper.deleteById(workflowInstanceId);
+    }
+
+    @Override
+    public ProcessInstance queryByWorkflowInstanceId(Integer workflowInstanceId) {
+        return processInstanceMapper.selectById(workflowInstanceId);
     }
 }

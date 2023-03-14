@@ -1,0 +1,102 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+################################
+## DolphinScheduler Worker KEDA Scaler
+#################################
+{{- if and .Values.worker.keda.enabled }}
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ include "dolphinscheduler.fullname" . }}-worker
+  labels:
+    component: worker-horizontalpodautoscaler
+    deploymentName: {{ include "dolphinscheduler.fullname" . }}-worker
+spec:
+  scaleTargetRef:
+    kind: StatefulSet
+    name: {{ include "dolphinscheduler.fullname" . }}-worker
+  pollingInterval:  {{ .Values.worker.keda.pollingInterval }}
+  cooldownPeriod: {{ .Values.worker.keda.cooldownPeriod }}
+  minReplicaCount: {{ .Values.worker.keda.minReplicaCount }}
+  maxReplicaCount: {{ .Values.worker.keda.maxReplicaCount }}
+  {{- if .Values.worker.keda.advanced }}
+  advanced:
+    {{ toYaml .Values.worker.keda.advanced | indent 4 }}
+  {{- end }}
+  # This is just an example, you could customize the trigger rule.
+  # FYI, check TaskExecutionStatus.java for the human-readable meaning of state values below.
+  triggers:
+    {{- if .Values.postgresql.enabled }}
+    - type: postgresql
+      metadata:
+        host: {{ template "dolphinscheduler.postgresql.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
+        port: "5432"
+        dbName: {{ .Values.postgresql.postgresqlDatabase }}
+        userName: {{ .Values.postgresql.postgresqlUsername }}
+        passwordFromEnv: SPRING_DATASOURCE_PASSWORD
+        sslmode: "disable"
+        targetQueryValue: "1"
+        query: >-
+          SELECT ceil(COUNT(*)::decimal / {{ .Values.worker.env.WORKER_EXEC_THREADS }})
+          FROM t_ds_task_instance
+          WHERE state IN (0, 1, 8, 12, 17)
+    {{- else if .Values.mysql.enabled }}
+    - type: mysql
+      metadata:
+        host: {{ template "dolphinscheduler.mysql.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
+        port: "3306"
+        dbName: {{ .Values.mysql.auth.database }}
+        username: {{ .Values.mysql.auth.username }}
+        passwordFromEnv: SPRING_DATASOURCE_PASSWORD
+        queryValue: "1"
+        query: >-
+          SELECT CEIL(COUNT(*) / {{ .Values.worker.env.WORKER_EXEC_THREADS }})
+          FROM t_ds_task_instance
+          WHERE state IN (0, 1, 8, 12, 17)
+    {{- else if .Values.externalDatabase.enabled }}
+      {{- if eq .Values.externalDatabase.type "mysql" }}
+    - type: mysql
+      metadata:
+        host: {{ .Values.externalDatabase.host }}
+        # mysql scaler requests port in string format
+        port: "{{ .Values.externalDatabase.port }}"
+        dbName: {{ .Values.externalDatabase.database }}
+        username: {{ .Values.externalDatabase.username }}
+        passwordFromEnv: SPRING_DATASOURCE_PASSWORD
+        queryValue: "1"
+        query: >-
+          SELECT CEIL(COUNT(*) / {{ .Values.worker.env.WORKER_EXEC_THREADS }})
+          FROM t_ds_task_instance
+          WHERE state IN (0, 1, 8, 12, 17)
+      {{- else if eq .Values.externalDatabase.type "postgresql" }}
+    - type: postgresql
+        metadata:
+          host: {{ .Values.externalDatabase.host }}
+          port: "{{ .Values.externalDatabase.port }}"
+          dbName: {{ .Values.externalDatabase.database }}
+          userName: {{ .Values.externalDatabase.username }}
+          passwordFromEnv: SPRING_DATASOURCE_PASSWORD
+          sslmode: "disable"
+          targetQueryValue: "1"
+          query: >-
+            SELECT ceil(COUNT(*)::decimal / {{ .Values.worker.env.WORKER_EXEC_THREADS }})
+            FROM t_ds_task_instance
+            WHERE state IN (0, 1, 8, 12, 17)
+      {{- end }}
+    {{- end }}
+{{- end }}

@@ -34,18 +34,15 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 /**
  * Used to refresh if the subscribe path has been changed.
  */
+@Slf4j
 public class SubscribeDataManager implements AutoCloseable {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(SubscribeDataManager.class);
 
     private final MysqlOperator mysqlOperator;
     private final MysqlRegistryProperties registryProperties;
@@ -137,7 +134,7 @@ public class SubscribeDataManager implements AutoCloseable {
                     triggerListener(updatedData, subscribeKey, subscribeListeners, Event.Type.UPDATE);
                 }
             } catch (Exception e) {
-                LOGGER.error("Query data from mysql registry error");
+                log.error("Query data from mysql registry error");
             }
         }
 

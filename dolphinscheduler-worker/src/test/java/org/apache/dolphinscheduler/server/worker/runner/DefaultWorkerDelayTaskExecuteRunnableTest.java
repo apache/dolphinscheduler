@@ -18,13 +18,13 @@
 package org.apache.dolphinscheduler.server.worker.runner;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
-import org.apache.dolphinscheduler.service.alert.AlertClientService;
-import org.apache.dolphinscheduler.service.storage.StorageOperate;
-import org.apache.dolphinscheduler.service.task.TaskPluginManager;
+import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcClient;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -40,7 +40,7 @@ public class DefaultWorkerDelayTaskExecuteRunnableTest {
 
     private WorkerMessageSender workerMessageSender = Mockito.mock(WorkerMessageSender.class);
 
-    private AlertClientService alertClientService = Mockito.mock(AlertClientService.class);
+    private WorkerRpcClient alertClientService = Mockito.mock(WorkerRpcClient.class);
 
     private TaskPluginManager taskPluginManager = Mockito.mock(TaskPluginManager.class);
 
@@ -53,7 +53,6 @@ public class DefaultWorkerDelayTaskExecuteRunnableTest {
                 .taskInstanceId(0)
                 .processDefineId(0)
                 .firstSubmitTime(System.currentTimeMillis())
-                .taskLogName("TestLogName")
                 .build();
         WorkerTaskExecuteRunnable workerTaskExecuteRunnable = new DefaultWorkerDelayTaskExecuteRunnable(
                 taskExecutionContext,
@@ -76,7 +75,6 @@ public class DefaultWorkerDelayTaskExecuteRunnableTest {
                 .taskInstanceId(0)
                 .processDefineId(0)
                 .firstSubmitTime(System.currentTimeMillis())
-                .taskLogName("TestLogName")
                 .taskType("SQL")
                 .taskParams(
                         "{\"localParams\":[],\"resourceList\":[],\"type\":\"POSTGRESQL\",\"datasource\":null,\"sql\":\"select * from t_ds_user\",\"sqlType\":\"0\",\"preStatements\":[],\"postStatements\":[],\"segmentSeparator\":\"\",\"displayRows\":10,\"conditionResult\":\"null\",\"dependence\":\"null\",\"switchResult\":\"null\",\"waitStartTimeout\":null}")

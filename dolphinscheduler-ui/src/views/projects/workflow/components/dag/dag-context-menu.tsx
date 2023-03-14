@@ -63,7 +63,7 @@ const props = {
 export default defineComponent({
   name: 'dag-context-menu',
   props,
-  emits: ['hide', 'start', 'edit', 'viewLog', 'copyTask', 'removeTasks', 'executeTask'],
+  emits: ['hide', 'start', 'edit', 'viewLog', 'copyTask', 'removeTasks', 'executeTask', 'removeTaskInstanceCache'],
   setup(props, ctx) {
     const graph = inject('graph', ref())
     const route = useRoute()
@@ -103,6 +103,12 @@ export default defineComponent({
       }
     }
 
+    const handleRemoveTaskInstanceCache = () => {
+      if (props.taskInstance) {
+        ctx.emit('removeTaskInstanceCache', props.taskInstance.id)
+      }
+    }
+
     const handleCopy = () => {
       const genNums = 1
       const type = props.cell?.data.taskType
@@ -138,7 +144,8 @@ export default defineComponent({
       handleViewLog,
       handleExecuteTaskOnly,
       handleExecuteTaskPOST,
-      handleExecuteTaskPRE
+      handleExecuteTaskPRE,
+      handleRemoveTaskInstanceCache
     }
   },
   render() {
@@ -181,12 +188,20 @@ export default defineComponent({
             </>
           )}
           {this.taskInstance && (
-              <NButton
-                  class={`${styles['menu-item']}`}
-                  onClick={this.handleViewLog}
-              >
-                {t('project.node.view_log')}
-              </NButton>
+              <>
+                <NButton
+                    class={`${styles['menu-item']}`}
+                    onClick={this.handleViewLog}
+                >
+                  {t('project.node.view_log')}
+                </NButton>
+                <NButton
+                    class={`${styles['menu-item']}`}
+                    onClick={this.handleRemoveTaskInstanceCache}
+                >
+                  {t('project.task.remove_task_cache')}
+                </NButton>
+              </>
           )}
           {this.executeTaskDisplay && (
               <>

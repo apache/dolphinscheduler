@@ -55,7 +55,7 @@ public class JupyterTask extends AbstractRemoteTask {
         this.taskExecutionContext = taskExecutionContext;
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
                 taskExecutionContext,
-                logger);
+                log);
     }
 
     @Override
@@ -67,10 +67,10 @@ public class JupyterTask extends AbstractRemoteTask {
     public void init() {
 
         jupyterParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), JupyterParameters.class);
-        logger.info("Initialize jupyter task params {}", JSONUtils.toPrettyJsonString(jupyterParameters));
+        log.info("Initialize jupyter task params {}", JSONUtils.toPrettyJsonString(jupyterParameters));
 
         if (null == jupyterParameters) {
-            logger.error("jupyter params is null");
+            log.error("jupyter params is null");
             return;
         }
 
@@ -83,17 +83,17 @@ public class JupyterTask extends AbstractRemoteTask {
     @Override
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
-            TaskResponse response = shellCommandExecutor.run(buildCommand());
+            TaskResponse response = shellCommandExecutor.run(buildCommand(), taskCallBack);
             setExitStatusCode(response.getExitStatusCode());
             setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
             setProcessId(response.getProcessId());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            logger.error("The current Jupyter task has been interrupted", e);
+            log.error("The current Jupyter task has been interrupted", e);
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
             throw new TaskException("The current Jupyter task has been interrupted", e);
         } catch (Exception e) {
-            logger.error("jupyter task execution failure", e);
+            log.error("jupyter task execution failure", e);
             exitStatusCode = -1;
             throw new TaskException("Execute jupyter task failed", e);
         }
@@ -153,7 +153,7 @@ public class JupyterTask extends AbstractRemoteTask {
         String command = ParameterUtils
                 .convertParameterPlaceholders(String.join(" ", args), ParamUtils.convert(paramsMap));
 
-        logger.info("jupyter task command: {}", command);
+        log.info("jupyter task command: {}", command);
 
         return command;
     }
@@ -177,7 +177,7 @@ public class JupyterTask extends AbstractRemoteTask {
                 }
 
             } catch (IOException e) {
-                logger.error("fail to parse jupyter parameterization", e);
+                log.error("fail to parse jupyter parameterization", e);
                 throw e;
             }
         }

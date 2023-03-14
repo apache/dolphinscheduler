@@ -405,6 +405,9 @@ interface ITaskParams {
   cloudWatchLogGroupArn?: string
   yamlContent?: string
   paramScript?: ILocalParam[]
+  factoryName?: string
+  resourceGroupName?: string
+  pipelineName?: string
 }
 
 interface INodeData
@@ -434,6 +437,7 @@ interface INodeData
   cpuQuota?: number
   memoryMax?: number
   flag?: 'YES' | 'NO'
+  isCache?: boolean
   taskGroupId?: number
   taskGroupPriority?: number
   taskPriority?: string
@@ -465,10 +469,11 @@ interface INodeData
 interface ITaskData
   extends Omit<
     INodeData,
-    'timeoutFlag' | 'taskPriority' | 'timeoutNotifyStrategy'
+    'isCache' | 'timeoutFlag' | 'taskPriority' | 'timeoutNotifyStrategy'
   > {
   name?: string
   taskPriority?: string
+  isCache?: "YES" | "NO"
   timeoutFlag?: 'OPEN' | 'CLOSE'
   timeoutNotifyStrategy?: string | []
   taskParams?: ITaskParams

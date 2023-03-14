@@ -21,6 +21,8 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceMapDao;
 
+import java.util.List;
+
 import lombok.NonNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,5 +50,15 @@ public class ProcessInstanceMapDaoImpl implements ProcessInstanceMapDao {
     @Override
     public ProcessInstanceMap findWorkProcessMapByParent(Integer parentWorkProcessId, Integer parentTaskId) {
         return processInstanceMapMapper.queryByParentId(parentWorkProcessId, parentTaskId);
+    }
+
+    @Override
+    public List<Integer> querySubWorkflowInstanceIds(int workflowInstanceId) {
+        return processInstanceMapMapper.querySubIdListByParentId(workflowInstanceId);
+    }
+
+    @Override
+    public void deleteByParentId(int workflowInstanceId) {
+        processInstanceMapMapper.deleteByParentId(workflowInstanceId);
     }
 }
