@@ -105,6 +105,7 @@
         <aws-java-sdk-redshift.version>1.12.300</aws-java-sdk-redshift.version>
         <azure-resourcemanager.version>2.21.0</azure-resourcemanager.version>
         <azure-resourcemanager-datafactory.version>1.0.0-beta.19</azure-resourcemanager-datafactory.version>
+        <google-cloud-storage.version>2.18.0</google-cloud-storage.version>
     </properties>
 
     <dependencyManagement>
@@ -668,6 +669,12 @@
                 <groupId>com.aliyun.oss</groupId>
                 <artifactId>aliyun-sdk-oss</artifactId>
                 <version>${aliyun-sdk-oss.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.cloud</groupId>
+                <artifactId>google-cloud-storage</artifactId>
+                <version>${google-cloud-storage.version}</version>
             </dependency>
 
             <dependency>

@@ -519,6 +519,35 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     DmJdbcDriver18 8.1.2.79: https://mvnrepository.com/artifact/com.dameng/DmJdbcDriver18/8.1.2.79, Apache 2.0
     nimbus-jose-jwt 9.22: https://mvnrepository.com/artifact/com.nimbusds/nimbus-jose-jwt/9.22, Apache 2.0
     woodstox-core 6.4.0: https://mvnrepository.com/artifact/com.fasterxml.woodstox/woodstox-core/6.4.0, Apache 2.0
+    auto-value 1.10.1: https://mvnrepository.com/artifact/com.google.auto.value/auto-value/1.10.1, Apache 2.0
+    auto-value-annotations 1.10.1: https://mvnrepository.com/artifact/com.google.auto.value/auto-value-annotations/1.10.1, Apache 2.0
+    conscrypt-openjdk-uber 2.5.2: https://mvnrepository.com/artifact/org.conscrypt/conscrypt-openjdk-uber/2.5.2, Apache 2.0
+    gapic-google-cloud-storage-v2 2.18.0-alpha: https://mvnrepository.com/artifact/com.google.api.grpc/gapic-google-cloud-storage-v2/2.18.0-alpha, Apache 2.0
+    google-api-client 2.2.0: https://mvnrepository.com/artifact/com.google.api-client/google-api-client/2.2.0, Apache 2.0
+    google-api-services-storage v1-rev20220705-2.0.0: https://mvnrepository.com/artifact/com.google.apis/google-api-services-storage/v1-rev20220705-2.0.0, Apache 2.0
+    google-cloud-core 2.10.0: https://mvnrepository.com/artifact/com.google.cloud/google-cloud-core/2.10.0, Apache 2.0
+    google-cloud-core-grpc 2.10.0: https://mvnrepository.com/artifact/com.google.cloud/google-cloud-core-grpc/2.10.0, Apache 2.0
+    google-cloud-core-http 2.10.0: https://mvnrepository.com/artifact/com.google.cloud/google-cloud-core-http/2.10.0, Apache 2.0
+    google-cloud-storage 2.18.0: https://mvnrepository.com/artifact/com.google.cloud/google-cloud-storage/2.18.0, Apache 2.0
+    google-http-client 1.42.3: https://mvnrepository.com/artifact/com.google.http-client/google-http-client/1.42.3 Apache 2.0
+    google-http-client-apache-v2 1.42.3: https://mvnrepository.com/artifact/com.google.http-client/google-http-client-apache-v2/1.42.3, Apache 2.0
+    google-http-client-appengine 1.42.3: https://mvnrepository.com/artifact/com.google.http-client/google-http-client-appengine/1.42.3, Apache 2.0
+    google-http-client-gson 1.42.3: https://mvnrepository.com/artifact/com.google.http-client/google-http-client-gson/1.42.3, Apache 2.0
+    google-http-client-jackson2 1.42.3: https://mvnrepository.com/artifact/com.google.http-client/google-http-client-jackson2/1.42.3, Apache 2.0
+    google-oauth-client 1.34.1: https://mvnrepository.com/artifact/com.google.oauth-client/google-oauth-client/1.34.1, Apache 2.0
+    grpc-alts 1.41.0: https://mvnrepository.com/artifact/io.grpc/grpc-alts/1.41.0, Apache 2.0
+    grpc-auth 1.41.0: https://mvnrepository.com/artifact/io.grpc/grpc-auth/1.41.0, Apache 2.0
+    grpc-google-cloud-storage-v2 2.18.0-alpha: https://mvnrepository.com/artifact/com.google.api.grpc/grpc-google-cloud-storage-v2/2.18.0-alpha, Apache 2.0
+    grpc-googleapis 1.52.1: https://mvnrepository.com/artifact/io.grpc/grpc-googleapis/1.52.1, Apache 2.0
+    grpc-netty-shaded 1.41.0: https://mvnrepository.com/artifact/io.grpc/grpc-netty-shaded/1.41.0, Apache 2.0
+    grpc-services 1.41.0: https://mvnrepository.com/artifact/io.grpc/grpc-services/1.41.0, Apache 2.0
+    grpc-xds 1.41.0: https://mvnrepository.com/artifact/io.grpc/grpc-xds/1.41.0, Apache 2.0
+    opencensus-api 0.31.1: https://mvnrepository.com/artifact/io.opencensus/opencensus-api/0.31.1, Apache 2.0
+    opencensus-contrib-http-util 0.31.1: https://mvnrepository.com/artifact/io.opencensus/opencensus-contrib-http-util/0.31.1, Apache 2.0
+    opencensus-proto 0.2.0: https://mvnrepository.com/artifact/io.opencensus/opencensus-proto/0.2.0, Apache 2.0
+    proto-google-cloud-storage-v2 2.18.0-alpha: https://mvnrepository.com/artifact/com.google.api.grpc/proto-google-cloud-storage-v2/2.18.0-alpha, Apache 2.0
+    proto-google-iam-v1 1.9.0: https://mvnrepository.com/artifact/com.google.api.grpc/proto-google-iam-v1/1.9.0, Apache 2.0
+
 
 jna-platform
 
@@ -552,6 +581,13 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     automaton 1.11-8 https://mvnrepository.com/artifact/dk.brics.automaton/automaton/1.11-8, BSD 2-clause
     protobuf-java 3.17.2: https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java/3.17.2 BSD 3-clause
     protobuf-java-util 3.17.2: https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java-util/3.17.2 BSD 3-clause
+    api-common 2.6.0: https://mvnrepository.com/artifact/com.google.api/api-common/2.6.0, BSD
+    gax 2.23.0: https://mvnrepository.com/artifact/com.google.api/gax/2.23.0, BSD
+    gax-grpc 2.23.0: https://mvnrepository.com/artifact/com.google.api/gax-grpc/2.23.0, BSD
+    gax-httpjson 0.108.0: https://mvnrepository.com/artifact/com.google.api/gax-httpjson/0.108.0, BSD
+    google-auth-library-credentials 1.15.0: https://mvnrepository.com/artifact/com.google.auth/google-auth-library-credentials/1.15.0, BSD 3-clause
+    google-auth-library-oauth2-http 1.15.0: https://mvnrepository.com/artifact/com.google.auth/google-auth-library-oauth2-http/1.15.0, BSD 3-clause
+    threetenbp 1.6.5: https://mvnrepository.com/artifact/org.threeten/threetenbp/1.6.5, BSD 3-clause
 
 ========================================================================
 CDDL licenses

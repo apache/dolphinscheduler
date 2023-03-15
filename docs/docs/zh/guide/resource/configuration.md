@@ -53,7 +53,7 @@ Dolphinscheduler 资源中心使用本地系统默认是开启的，不需要用
 # user data local directory path, please make sure the directory exists and have read write permissions
 data.basedir.path=/tmp/dolphinscheduler
 
-# resource storage type: LOCAL, HDFS, S3, OSS
+# resource storage type: LOCAL, HDFS, S3, OSS, GCS
 resource.storage.type=LOCAL
 
 # resource store on HDFS/S3/OSS path, resource file will store to this hadoop hdfs path, self configuration,
