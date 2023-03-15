@@ -143,6 +143,10 @@ public final class Constants {
     public static final String ALIBABA_CLOUD_OSS_BUCKET_NAME = "resource.alibaba.cloud.oss.bucket.name";
     public static final String ALIBABA_CLOUD_OSS_END_POINT = "resource.alibaba.cloud.oss.endpoint";
 
+    public static final String GOOGLE_CLOUD_STORAGE_BUCKET_NAME = "resource.google.cloud.storage.bucket.name";
+
+    public static final String GOOGLE_CLOUD_STORAGE_CREDENTIAL = "resource.google.cloud.storage.credential";
+
     /**
      * fetch applicationId way
      */
