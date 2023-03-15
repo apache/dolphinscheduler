@@ -104,22 +104,24 @@ public class DependentExecute {
                                                  int testFlag) {
 
         DependResult result = DependResult.FAILED;
+        ProcessInstance lastNonNullProcessInstance = null; // Add a variable to store the last non-null processInstance
         for (DateInterval dateInterval : dateIntervals) {
             ProcessInstance processInstance = findLastProcessInterval(dependentItem.getDefinitionCode(),
                     dateInterval, testFlag);
-            if (processInstance == null) {
-                return DependResult.WAITING;
-            }
-            // need to check workflow for updates, so get all task and check the task state
-            if (dependentItem.getDepTaskCode() == Constants.DEPENDENT_ALL_TASK_CODE) {
-                result = dependResultByProcessInstance(processInstance);
-            } else {
-                result = getDependTaskResult(dependentItem.getDepTaskCode(), processInstance, testFlag);
-            }
-            if (result != DependResult.SUCCESS) {
-                break;
+            if (processInstance != null) {
+                lastNonNullProcessInstance = processInstance; // Update the last non-null processInstance
             }
         }
+        if (lastNonNullProcessInstance == null) {
+            return DependResult.WAITING;
+        }
+        // need to check workflow for updates, so get all task and check the task state
+        if (dependentItem.getDepTaskCode() == Constants.DEPENDENT_ALL_TASK_CODE) {
+            result = dependResultByProcessInstance(lastNonNullProcessInstance);
+        } else {
+            result = getDependTaskResult(dependentItem.getDepTaskCode(), lastNonNullProcessInstance, testFlag);
+        }
+
         return result;
     }
 
