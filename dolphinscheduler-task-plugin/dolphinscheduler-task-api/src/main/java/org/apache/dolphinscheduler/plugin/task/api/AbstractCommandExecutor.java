@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.api;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -39,6 +40,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -53,6 +55,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import io.fabric8.kubernetes.client.dsl.LogWatch;
 
 /**
  * abstract command executor
@@ -85,7 +88,9 @@ public abstract class AbstractCommandExecutor {
      */
     protected LinkedBlockingQueue<String> logBuffer;
 
-    protected boolean logOutputIsSuccess = false;
+    protected boolean processLogOutputIsSuccess = false;
+
+    protected boolean podLogOutputIsSuccess = false;
 
     /*
      * SHELL result string
@@ -99,6 +104,8 @@ public abstract class AbstractCommandExecutor {
 
     protected Future<?> taskOutputFuture;
 
+    protected Future<?> podLogOutputFuture;
+
     public AbstractCommandExecutor(Consumer<LinkedBlockingQueue<String>> logHandler,
                                    TaskExecutionContext taskRequest,
                                    Logger logger) {
@@ -106,6 +113,7 @@ public abstract class AbstractCommandExecutor {
         this.taskRequest = taskRequest;
         this.logger = logger;
         this.logBuffer = new LinkedBlockingQueue<>();
+        this.logBuffer.add("\n");
 
         if (this.taskRequest != null) {
             // set logBufferEnable=true if the task uses logHandler and logBuffer to buffer log messages
@@ -213,6 +221,9 @@ public abstract class AbstractCommandExecutor {
         // parse process output
         parseProcessOutput(process);
 
+        // collect pod log
+        collectPodLogIfNeeded();
+
         int processId = getProcessId(process);
 
         result.setProcessId(processId);
@@ -246,6 +257,22 @@ public abstract class AbstractCommandExecutor {
                 taskOutputFuture.get();
             } catch (ExecutionException e) {
                 logger.info("Handle task log error", e);
+            }
+        }
+
+        if (podLogOutputFuture != null) {
+            try {
+                // Wait kubernetes pod log collection finished
+                String msg = (String) podLogOutputFuture.get();
+                if (StringUtils.isEmpty(msg)) {
+                    // delete pod after successful execution
+                    ProcessUtils.cancelApplication(taskRequest);
+                } else {
+                    // contains error message
+                    logger.error(msg);
+                }
+            } catch (ExecutionException e) {
+                logger.info("Handle pod log error", e);
             }
         }
 
@@ -294,6 +321,43 @@ public abstract class AbstractCommandExecutor {
         logger.info("task run command: {}", String.join(" ", commands));
     }
 
+    private void collectPodLogIfNeeded() {
+        if (null == taskRequest.getK8sTaskExecutionContext()) {
+            podLogOutputIsSuccess = true;
+            return;
+        }
+
+        // wait for launching (driver) pod
+        ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS * 5L);
+        LogWatch watcher =
+                ProcessUtils.getPodLogWatcher(taskRequest.getK8sTaskExecutionContext(), taskRequest.getTaskAppId());
+        if (watcher != null) {
+            ExecutorService collectPodLogExecutorService = ThreadUtils
+                    .newSingleDaemonScheduledExecutorService("CollectPodLogOutput-thread-" + taskRequest.getTaskName());
+
+            podLogOutputFuture = collectPodLogExecutorService.submit(() -> {
+                try {
+                    String line;
+                    try (BufferedReader reader = new BufferedReader(new InputStreamReader(watcher.getOutput()))) {
+                        while ((line = reader.readLine()) != null) {
+                            logBuffer.add(String.format("[K8S-pod-log-%s]: %s", taskRequest.getTaskName(), line));
+                        }
+                    }
+                } catch (Exception e) {
+                    logger.error("Collect pod log error", e);
+                } finally {
+                    watcher.close();
+                }
+            });
+
+            collectPodLogExecutorService.shutdown();
+        } else {
+            podLogOutputFuture = CompletableFuture.completedFuture("The driver pod does not exist.");
+        }
+
+        podLogOutputIsSuccess = true;
+    }
+
     private void parseProcessOutput(Process process) {
         // todo: remove this this thread pool.
         ExecutorService getOutputLogService = ThreadUtils
@@ -313,10 +377,10 @@ public abstract class AbstractCommandExecutor {
                         taskResultString = line;
                     }
                 }
-                logOutputIsSuccess = true;
+                processLogOutputIsSuccess = true;
             } catch (Exception e) {
                 logger.error("Parse var pool error", e);
-                logOutputIsSuccess = true;
+                processLogOutputIsSuccess = true;
             }
         });
 
@@ -328,10 +392,11 @@ public abstract class AbstractCommandExecutor {
             try (
                     final LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
                             LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());) {
-                while (!logBuffer.isEmpty() || !logOutputIsSuccess) {
-                    if (!logBuffer.isEmpty()) {
+                while (logBuffer.size() > 1 || !processLogOutputIsSuccess || !podLogOutputIsSuccess) {
+                    if (logBuffer.size() > 1) {
                         logHandler.accept(logBuffer);
                         logBuffer.clear();
+                        logBuffer.add("\n");
                     } else {
                         Thread.sleep(TaskConstants.DEFAULT_LOG_FLUSH_INTERVAL);
                     }
