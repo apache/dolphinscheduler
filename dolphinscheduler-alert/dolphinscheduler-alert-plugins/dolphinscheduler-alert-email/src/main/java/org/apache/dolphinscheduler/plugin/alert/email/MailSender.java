@@ -108,7 +108,7 @@ public final class MailSender {
         mailPasswd = config.get(MailParamsConstants.NAME_MAIL_PASSWD);
 
         // Needs to check user && password only if enableSmtpAuth is true
-        if(Constants.STRING_TRUE.equals(enableSmtpAuth)) {
+        if (Constants.STRING_TRUE.equals(enableSmtpAuth)) {
             requireNonNull(mailUser, MailParamsConstants.NAME_MAIL_USER + mustNotNull);
             requireNonNull(mailPasswd, MailParamsConstants.NAME_MAIL_PASSWD + mustNotNull);
         }

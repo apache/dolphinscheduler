@@ -94,13 +94,13 @@ public class MailUtilsTest {
         mailSender = new MailSender(emailConfig);
         mailSender.sendMails(title, content);
 
-        try{
+        try {
             // test auth true and user null will throw exception
             emailConfig.put(MailParamsConstants.NAME_MAIL_SMTP_AUTH, "true");
             emailConfig.put(MailParamsConstants.NAME_MAIL_USER, null);
             mailSender = new MailSender(emailConfig);
             mailSender.sendMails(title, content);
-        }catch(Exception e){
+        } catch (Exception e) {
             Assertions.assertTrue(e.getMessage().contains(MailParamsConstants.NAME_MAIL_USER));
         }
 
