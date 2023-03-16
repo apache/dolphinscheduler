@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
+import static org.apache.dolphinscheduler.common.constants.Constants.EMPTY_STRING;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
 
@@ -113,7 +114,7 @@ public abstract class AbstractCommandExecutor {
         this.taskRequest = taskRequest;
         this.logger = logger;
         this.logBuffer = new LinkedBlockingQueue<>();
-        this.logBuffer.add("\n");
+        this.logBuffer.add(EMPTY_STRING);
 
         if (this.taskRequest != null) {
             // set logBufferEnable=true if the task uses logHandler and logBuffer to buffer log messages
@@ -396,7 +397,7 @@ public abstract class AbstractCommandExecutor {
                     if (logBuffer.size() > 1) {
                         logHandler.accept(logBuffer);
                         logBuffer.clear();
-                        logBuffer.add("\n");
+                        logBuffer.add(EMPTY_STRING);
                     } else {
                         Thread.sleep(TaskConstants.DEFAULT_LOG_FLUSH_INTERVAL);
                     }
