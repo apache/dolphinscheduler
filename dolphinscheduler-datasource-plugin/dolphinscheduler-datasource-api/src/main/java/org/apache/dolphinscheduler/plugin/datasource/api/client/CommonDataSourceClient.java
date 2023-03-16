@@ -28,16 +28,15 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.google.common.base.Stopwatch;
 import com.zaxxer.hikari.HikariDataSource;
 
+@Slf4j
 public class CommonDataSourceClient implements DataSourceClient {
-
-    private static final Logger logger = LoggerFactory.getLogger(CommonDataSourceClient.class);
 
     public static final String COMMON_USER = "root";
     public static final String COMMON_VALIDATION_QUERY = "select 1";
@@ -55,7 +54,7 @@ public class CommonDataSourceClient implements DataSourceClient {
     }
 
     protected void preInit() {
-        logger.info("preInit in CommonDataSourceClient");
+        log.info("preInit in CommonDataSourceClient");
     }
 
     protected void checkEnv(BaseConnectionParam baseConnectionParam) {
@@ -97,7 +96,7 @@ public class CommonDataSourceClient implements DataSourceClient {
         } catch (Exception e) {
             throw new RuntimeException("JDBC connect failed", e);
         } finally {
-            logger.info("Time to execute check jdbc client with sql {} for {} ms ",
+            log.info("Time to execute check jdbc client with sql {} for {} ms ",
                     this.baseConnectionParam.getValidationQuery(), stopwatch.elapsed(TimeUnit.MILLISECONDS));
         }
     }
@@ -107,14 +106,14 @@ public class CommonDataSourceClient implements DataSourceClient {
         try {
             return this.dataSource.getConnection();
         } catch (SQLException e) {
-            logger.error("get druidDataSource Connection fail SQLException: {}", e.getMessage(), e);
+            log.error("get druidDataSource Connection fail SQLException: {}", e.getMessage(), e);
             return null;
         }
     }
 
     @Override
     public void close() {
-        logger.info("do close dataSource {}.", baseConnectionParam.getDatabase());
+        log.info("do close dataSource {}.", baseConnectionParam.getDatabase());
         try (HikariDataSource closedDatasource = dataSource) {
             // only close the resource
         }

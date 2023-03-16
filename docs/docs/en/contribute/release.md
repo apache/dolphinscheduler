@@ -480,7 +480,7 @@ Website should be present before you send the announce mail this section will te
 the release version is `<VERSION>`, the following updates are required(note it will take effect immediately when the PR is merged):
 
 - Repository **apache/dolphinscheduler-website**:
-  - `download/en-us/download.md` and `download/zh-cn/download.md`: add the download of the `<VERSION>` release package
+  - `config/download.json`: add the download of the `<VERSION>` release package
   - `scripts/conf.sh`: Add new release version `<VERSION>` key-value pair to variable `DEV_RELEASE_DOCS_VERSIONS`
 - Repository **apache/dolphinscheduler** (dev branch):
   - `docs/configs/site.js`:
@@ -492,53 +492,13 @@ the release version is `<VERSION>`, the following updates are required(note it w
     issue template have **Version** selection bottom. So after released we should add the new `<VERSION>` to
     bug-report.yml
 
-### Publish Docker Image
+### Publish Docker Image and Helm Chart
 
-we already have the exists CI to publish the latest Docker image to GitHub container register with [config](https://github.com/apache/dolphinscheduler/blob/d80cf21456265c9d84e642bdb4db4067c7577fc6/.github/workflows/publish-docker.yaml#L55-L63).
-We could reuse the main command the CI run and publish our Docker images to Docker Hub by single command.
-
-It is highly recommended to build and test docker images locally first before push to docker hub
-
-```shell
-# Checkout and create to target tag
-git checkout -b "${VERSION}" "${VERSION}"
-
-# Build docker images locally
-./mvnw -B clean package \
-    -Dmaven.test.skip \
-    -Dmaven.javadoc.skip \
-    -Dmaven.checkstyle.skip \
-    -Dmaven.deploy.skip \
-    -Ddocker.tag="${VERSION}" \
-    -Pdocker,release
-
-# You should test whether the standalone-server images work or not
-docker run --name dolphinscheduler-standalone-server -p 12345:12345 -p 25333:25333 -d apache/dolphinscheduler-standalone-server:"${DOLPHINSCHEDULER_VERSION}"
-
-# If success, push to dockerhub
-docker push apache/dolphinscheduler-tools:"${VERSION}"
-docker push apache/dolphinscheduler-standalone-server:"${VERSION}"
-docker push apache/dolphinscheduler-master:"${VERSION}"
-docker push apache/dolphinscheduler-worker:"${VERSION}"
-docker push apache/dolphinscheduler-api:"${VERSION}"
-docker push apache/dolphinscheduler-alert-server:"${VERSION}"
-```
-
-> Note: To push to dockerhub, you must have Apache organization permission of dockerhub. If you don’t you need to require
-> from Apache infra Jira. You can refer to here to submit an application from [here](https://issues.apache.org/jira/projects/INFRA/issues/INFRA-23314)
->
-> You can also build and push docker by single command if you make sure the images work fine
->
-> ```shell
-> ./mvnw -B clean deploy \
->     -Dmaven.test.skip \
->     -Dmaven.javadoc.skip \
->     -Dmaven.checkstyle.skip \
->     -Dmaven.deploy.skip \
->     -Ddocker.tag="${VERSION}" \
->     -Ddocker.hub=apache \
->     -Pdocker,release
-> ```
+We have a [workflow](../../../../.github/workflows/publish-docker.yaml) to automatically publish Docker images
+and a [workflow](../../../../.github/workflows/publish-helm-chart.yaml) to automatically publish Helm Chart to Docker Hub,
+after you change the release from "pre-release" to "release", the workflow will be triggered. All you need to do
+is to observe the aforementioned workflows, and after they are completed, you can pull the Docker images locally and
+verify that they work as expected.
 
 ### Send Announcement E-mail Community
 
@@ -564,7 +524,7 @@ Dolphin Scheduler is a distributed and easy-to-extend visual workflow scheduler 
 dedicated to solving the complex task dependencies in data processing, making the scheduler system out of the box for data processing.
 
 
-Download Links: https://dolphinscheduler.apache.org/#/en-us/download
+Download Links: https://dolphinscheduler.apache.org/en-us/download
 
 Release Notes: https://github.com/apache/dolphinscheduler/releases/tag/<VERSION>
 
@@ -573,7 +533,7 @@ Website: https://dolphinscheduler.apache.org/
 DolphinScheduler Resources:
 - Issue: https://github.com/apache/dolphinscheduler/issues/
 - Mailing list: dev@dolphinscheduler.apache.org
-- Documents: https://dolphinscheduler.apache.org/#/zh-cn/docs/<VERSION>/about/introduction
+- Documents: https://dolphinscheduler.apache.org/zh-cn/docs/<VERSION>/about/introduction
 ```
 
 ## News

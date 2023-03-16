@@ -47,14 +47,14 @@ public class PytorchTask extends AbstractTask {
 
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
                 taskExecutionContext,
-                logger);
+                log);
     }
 
     @Override
     public void init() {
 
         pytorchParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), PytorchParameters.class);
-        logger.info("Initialize pytorch task params {}", JSONUtils.toPrettyJsonString(taskExecutionContext));
+        log.info("Initialize pytorch task params {}", JSONUtils.toPrettyJsonString(taskExecutionContext));
 
         if (pytorchParameters == null || !pytorchParameters.checkParameters()) {
             throw new TaskException("python task params is not valid");
@@ -69,13 +69,13 @@ public class PytorchTask extends AbstractTask {
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             String command = buildPythonExecuteCommand();
-            TaskResponse taskResponse = shellCommandExecutor.run(command);
+            TaskResponse taskResponse = shellCommandExecutor.run(command, taskCallBack);
             setExitStatusCode(taskResponse.getExitStatusCode());
             setProcessId(taskResponse.getProcessId());
             setVarPool(shellCommandExecutor.getVarPool());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            logger.error("The current Pytorch task has been interrupted", e);
+            log.error("The current Pytorch task has been interrupted", e);
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
             throw new TaskException("The current Pytorch task has been interrupted", e);
         } catch (Exception e) {

@@ -182,8 +182,8 @@ Wait for database to be ready.
 */}}
 {{- define "dolphinscheduler.database.wait-for-ready" -}}
 - name: wait-for-database
-  image: busybox:1.30
-  imagePullPolicy: IfNotPresent
+  image: {{ .Values.initImage.busybox }}
+  imagePullPolicy: {{ .Values.initImage.pullPolicy }}
 {{- if .Values.postgresql.enabled }}
   command: ['sh', '-xc', 'for i in $(seq 1 180); do nc -z -w3 {{ template "dolphinscheduler.postgresql.fullname" . }} 5432 && exit 0 || sleep 5; done; exit 1']
 {{- else if .Values.mysql.enabled }}
@@ -199,8 +199,8 @@ Wait for minio to be ready.
 {{- define "dolphinscheduler.minio.wait-for-ready" -}}
 {{- if .Values.minio.enabled }}
 - name: wait-for-minio
-  image: busybox:1.30
-  imagePullPolicy: IfNotPresent
+  image: {{ .Values.initImage.busybox }}
+  imagePullPolicy: {{ .Values.initImage.pullPolicy }}
   command: ['sh', '-xc', 'for i in $(seq 1 180); do nc -z -w3 {{ template "dolphinscheduler.minio.fullname" . }} 9000 && exit 0 || sleep 5; done; exit 1']
 {{- end }}
 {{- end -}}

@@ -28,9 +28,8 @@ import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import java.time.Duration;
 
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.Errors;
@@ -41,9 +40,8 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 @Configuration
 @ConfigurationProperties(prefix = "master")
+@Slf4j
 public class MasterConfig implements Validator {
-
-    private Logger logger = LoggerFactory.getLogger(MasterConfig.class);
 
     /**
      * The master RPC server listen port.
@@ -90,7 +88,7 @@ public class MasterConfig implements Validator {
     private double maxCpuLoadAvg = -1;
     private double reservedMemory = 0.3;
     private Duration failoverInterval = Duration.ofMinutes(10);
-    private boolean killYarnJobWhenTaskFailover = true;
+    private boolean killApplicationWhenTaskFailover = true;
     private ConnectStrategyProperties registryDisconnectStrategy = new ConnectStrategyProperties();
 
     private Duration workerGroupRefreshInterval = Duration.ofSeconds(10L);
@@ -157,6 +155,7 @@ public class MasterConfig implements Validator {
     }
 
     private void printConfig() {
+
         logger.info("Master config: listenPort -> {} ", listenPort);
         logger.info("Master config: fetchCommandNum -> {} ", fetchCommandNum);
         logger.info("Master config: preExecThreads -> {} ", preExecThreads);

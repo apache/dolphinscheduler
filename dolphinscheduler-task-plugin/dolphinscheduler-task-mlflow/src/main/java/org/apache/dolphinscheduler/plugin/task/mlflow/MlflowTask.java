@@ -69,7 +69,7 @@ public class MlflowTask extends AbstractTask {
         super(taskExecutionContext);
 
         this.taskExecutionContext = taskExecutionContext;
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskExecutionContext, logger);
+        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskExecutionContext, log);
     }
 
     static public String getPresetRepository() {
@@ -105,7 +105,7 @@ public class MlflowTask extends AbstractTask {
 
         mlflowParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), MlflowParameters.class);
 
-        logger.info("Initialize MLFlow task params {}", JSONUtils.toPrettyJsonString(mlflowParameters));
+        log.info("Initialize MLFlow task params {}", JSONUtils.toPrettyJsonString(mlflowParameters));
         if (mlflowParameters == null || !mlflowParameters.checkParameters()) {
             throw new RuntimeException("MLFlow task params is not valid");
         }
@@ -116,7 +116,7 @@ public class MlflowTask extends AbstractTask {
         try {
             // construct process
             String command = buildCommand();
-            TaskResponse commandExecuteResult = shellCommandExecutor.run(command);
+            TaskResponse commandExecuteResult = shellCommandExecutor.run(command, taskCallBack);
             int exitCode;
             if (mlflowParameters.getIsDeployDocker()) {
                 exitCode = checkDockerHealth();
@@ -128,11 +128,11 @@ public class MlflowTask extends AbstractTask {
             mlflowParameters.dealOutParam(shellCommandExecutor.getVarPool());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            logger.error("The current Mlflow task has been interrupted", e);
+            log.error("The current Mlflow task has been interrupted", e);
             setExitStatusCode(EXIT_CODE_FAILURE);
             throw new TaskException("The current Mlflow task has been interrupted", e);
         } catch (Exception e) {
-            logger.error("Mlflow task error", e);
+            log.error("Mlflow task error", e);
             setExitStatusCode(EXIT_CODE_FAILURE);
             throw new TaskException("Execute Mlflow task failed", e);
         }
@@ -155,7 +155,7 @@ public class MlflowTask extends AbstractTask {
         } else if (mlflowParameters.getMlflowTaskType().equals(MlflowConstants.MLFLOW_TASK_TYPE_MODELS)) {
             command = buildCommandForMlflowModels();
         }
-        logger.info("mlflow task command: \n{}", command);
+        log.info("mlflow task command: \n{}", command);
         return command;
     }
 
@@ -259,7 +259,7 @@ public class MlflowTask extends AbstractTask {
     }
 
     public int checkDockerHealth() {
-        logger.info("checking container healthy ... ");
+        log.info("checking container healthy ... ");
         int exitCode = -1;
         String[] command =
                 {"sh", "-c", String.format(MlflowConstants.DOCKER_HEALTH_CHECK, mlflowParameters.getContainerName())};
@@ -270,20 +270,20 @@ public class MlflowTask extends AbstractTask {
             } catch (Exception e) {
                 status = String.format("error --- %s", e.getMessage());
             }
-            logger.info("container healthy status: {}", status);
+            log.info("container healthy status: {}", status);
 
             if (status.equals("healthy")) {
                 exitCode = 0;
-                logger.info("container is healthy");
+                log.info("container is healthy");
                 return exitCode;
             } else {
-                logger.info("The health check has been running for {} seconds",
+                log.info("The health check has been running for {} seconds",
                         x * MlflowConstants.DOCKER_HEALTH_CHECK_INTERVAL / 1000);
                 ThreadUtils.sleep(MlflowConstants.DOCKER_HEALTH_CHECK_INTERVAL);
             }
         }
 
-        logger.info("health check fail");
+        log.info("health check fail");
         return exitCode;
     }
 

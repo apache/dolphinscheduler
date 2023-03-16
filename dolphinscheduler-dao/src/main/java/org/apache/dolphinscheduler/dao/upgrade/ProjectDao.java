@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.dao.upgrade;
 
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
-import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -26,12 +25,10 @@ import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class ProjectDao {
-
-    public static final Logger logger = LoggerFactory.getLogger(ProjectDao.class);
 
     /**
      * queryAllProject
@@ -42,11 +39,9 @@ public class ProjectDao {
     public Map<Integer, Long> queryAllProject(Connection conn) {
         Map<Integer, Long> projectMap = new HashMap<>();
         String sql = "SELECT id,code FROM t_ds_project";
-        ResultSet rs = null;
-        PreparedStatement pstmt = null;
-        try {
-            pstmt = conn.prepareStatement(sql);
-            rs = pstmt.executeQuery();
+        try (
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
                 Integer id = rs.getInt(1);
                 long code = rs.getLong(2);
@@ -56,10 +51,8 @@ public class ProjectDao {
                 projectMap.put(id, code);
             }
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new RuntimeException("sql: " + sql, e);
-        } finally {
-            ConnectionUtils.releaseResource(rs, pstmt, conn);
         }
         return projectMap;
     }
@@ -81,10 +74,8 @@ public class ProjectDao {
                 }
             }
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new RuntimeException("sql: " + sql, e);
-        } finally {
-            ConnectionUtils.releaseResource(conn);
         }
     }
 }

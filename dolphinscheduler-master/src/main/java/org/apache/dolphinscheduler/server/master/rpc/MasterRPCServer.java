@@ -30,10 +30,12 @@ import org.apache.dolphinscheduler.server.master.processor.TaskExecuteRunningPro
 import org.apache.dolphinscheduler.server.master.processor.TaskExecuteStartProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskRecallProcessor;
+import org.apache.dolphinscheduler.server.master.processor.TaskUpdatePidProcessor;
 import org.apache.dolphinscheduler.server.master.processor.WorkflowExecutingDataRequestProcessor;
+import org.apache.dolphinscheduler.server.master.processor.WorkflowMetricsCleanUpProcessor;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,9 +43,8 @@ import org.springframework.stereotype.Service;
  * Master RPC Server, used to send/receive request to other system.
  */
 @Service
+@Slf4j
 public class MasterRPCServer implements AutoCloseable {
-
-    private static final Logger logger = LoggerFactory.getLogger(MasterRPCServer.class);
 
     private NettyRemotingServer nettyRemotingServer;
 
@@ -69,6 +70,9 @@ public class MasterRPCServer implements AutoCloseable {
     private TaskKillResponseProcessor taskKillResponseProcessor;
 
     @Autowired
+    private TaskUpdatePidProcessor updatePidProcessor;
+
+    @Autowired
     private TaskRecallProcessor taskRecallProcessor;
 
     @Autowired
@@ -80,13 +84,17 @@ public class MasterRPCServer implements AutoCloseable {
     @Autowired
     private TaskExecuteStartProcessor taskExecuteStartProcessor;
 
+    @Autowired
+    private WorkflowMetricsCleanUpProcessor workflowMetricsCleanUpProcessor;
+
     public void start() {
-        logger.info("Starting Master RPC Server...");
+        log.info("Starting Master RPC Server...");
         // init remoting server
         NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(masterConfig.getListenPort());
         this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RUNNING, taskExecuteRunningProcessor);
+        this.nettyRemotingServer.registerProcessor(CommandType.TASK_UPDATE_PID, updatePidProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RESULT, taskExecuteResponseProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_RESPONSE, taskKillResponseProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.STATE_EVENT_REQUEST, stateEventProcessor);
@@ -97,22 +105,24 @@ public class MasterRPCServer implements AutoCloseable {
         this.nettyRemotingServer.registerProcessor(CommandType.WORKFLOW_EXECUTING_DATA_REQUEST,
                 workflowExecutingDataRequestProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_START, taskExecuteStartProcessor);
+        this.nettyRemotingServer.registerProcessor(CommandType.WORKFLOW_METRICS_CLEANUP,
+                workflowMetricsCleanUpProcessor);
 
-        // logger server
+        // log server
         this.nettyRemotingServer.registerProcessor(CommandType.GET_LOG_BYTES_REQUEST, loggerRequestProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.ROLL_VIEW_LOG_REQUEST, loggerRequestProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.VIEW_WHOLE_LOG_REQUEST, loggerRequestProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.REMOVE_TAK_LOG_REQUEST, loggerRequestProcessor);
 
         this.nettyRemotingServer.start();
-        logger.info("Started Master RPC Server...");
+        log.info("Started Master RPC Server...");
     }
 
     @Override
     public void close() {
-        logger.info("Closing Master RPC Server...");
+        log.info("Closing Master RPC Server...");
         this.nettyRemotingServer.close();
-        logger.info("Closed Master RPC Server...");
+        log.info("Closed Master RPC Server...");
     }
 
 }

@@ -155,8 +155,13 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
 
             @Override
             public void eventReceived(Action action, Job job) {
+                log.info("event received : job:{} action:{}", job.getMetadata().getName(), action);
                 if (action != Action.ADDED) {
                     int jobStatus = getK8sJobStatus(job);
+                    log.info("job {} status {}", job.getMetadata().getName(), jobStatus);
+                    if (jobStatus == TaskConstants.RUNNING_CODE) {
+                        return;
+                    }
                     setTaskStatus(jobStatus, taskInstanceId, taskResponse, k8STaskMainParameters);
                     countDownLatch.countDown();
                 }
@@ -183,11 +188,11 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
             }
             flushLog(taskResponse);
         } catch (InterruptedException e) {
-            logger.error("job failed in k8s: {}", e.getMessage(), e);
+            log.error("job failed in k8s: {}", e.getMessage(), e);
             Thread.currentThread().interrupt();
             taskResponse.setExitStatusCode(EXIT_CODE_FAILURE);
         } catch (Exception e) {
-            logger.error("job failed in k8s: {}", e.getMessage(), e);
+            log.error("job failed in k8s: {}", e.getMessage(), e);
             taskResponse.setExitStatusCode(EXIT_CODE_FAILURE);
         } finally {
             if (watch != null) {
@@ -238,14 +243,14 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         K8sTaskMainParameters k8STaskMainParameters =
                 JSONUtils.parseObject(k8sParameterStr, K8sTaskMainParameters.class);
         try {
-            logger.info("[K8sJobExecutor-{}-{}] start to submit job", taskName, taskInstanceId);
+            log.info("[K8sJobExecutor-{}-{}] start to submit job", taskName, taskInstanceId);
             job = buildK8sJob(k8STaskMainParameters);
             stopJobOnK8s(k8sParameterStr);
             String namespaceName = k8STaskMainParameters.getNamespaceName();
             k8sUtils.createJob(namespaceName, job);
-            logger.info("[K8sJobExecutor-{}-{}]  submitted job successfully", taskName, taskInstanceId);
+            log.info("[K8sJobExecutor-{}-{}]  submitted job successfully", taskName, taskInstanceId);
         } catch (Exception e) {
-            logger.error("[K8sJobExecutor-{}-{}]  fail to submit job", taskName, taskInstanceId);
+            log.error("[K8sJobExecutor-{}-{}]  fail to submit job", taskName, taskInstanceId);
             throw new TaskException("K8sJobExecutor fail to submit job", e);
         }
     }
@@ -261,7 +266,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 k8sUtils.deleteJob(jobName, namespaceName);
             }
         } catch (Exception e) {
-            logger.error("[K8sJobExecutor-{}]  fail to stop job", jobName);
+            log.error("[K8sJobExecutor-{}]  fail to stop job", jobName);
             throw new TaskException("K8sJobExecutor fail to stop job", e);
         }
     }

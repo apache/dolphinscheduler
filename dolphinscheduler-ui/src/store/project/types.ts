@@ -56,6 +56,7 @@ type TaskType =
   | 'DATASYNC'
   | 'KUBEFLOW'
   | 'LINKIS'
+  | 'DATA_FACTORY'
 
 type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON'
 

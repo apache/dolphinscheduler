@@ -16,11 +16,11 @@
  */
 package org.apache.dolphinscheduler.plugin.task.api.log;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
+import org.slf4j.MDC;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.sift.AbstractDiscriminator;
@@ -28,42 +28,20 @@ import ch.qos.logback.core.sift.AbstractDiscriminator;
 /**
  * Task Log Discriminator
  */
+@Slf4j
 public class TaskLogDiscriminator extends AbstractDiscriminator<ILoggingEvent> {
 
-    private static Logger logger = LoggerFactory.getLogger(TaskLogDiscriminator.class);
-
-    /**
-     * key
-     */
     private String key;
 
-    /**
-     * log base
-     */
     private String logBase;
 
-    /**
-     * logger name should be like:
-     * Task Logger name should be like: Task-{processDefinitionId}-{processInstanceId}-{taskInstanceId}
-     */
     @Override
     public String getDiscriminatingValue(ILoggingEvent event) {
-        String key = "unknown_task";
-        if (event.getLoggerName().startsWith(TaskConstants.TASK_LOG_LOGGER_NAME)) {
-            String threadName = event.getThreadName();
-            if (threadName.endsWith(TaskConstants.GET_OUTPUT_LOG_SERVICE)) {
-                threadName =
-                        threadName.substring(0, threadName.length() - TaskConstants.GET_OUTPUT_LOG_SERVICE.length());
-            }
-            String part1 = threadName.split(Constants.EQUAL_SIGN)[1];
-            String prefix = TaskConstants.TASK_LOGGER_INFO_PREFIX + "-";
-            if (part1.startsWith(prefix)) {
-                key = part1.substring(prefix.length()).replaceFirst("-", "/");
-            }
+        String taskInstanceLogPath = MDC.get(LogUtils.TASK_INSTANCE_LOG_FULL_PATH_MDC_KEY);
+        if (taskInstanceLogPath == null) {
+            log.error("The task instance log path is null, please check the logback configuration, log: {}", event);
         }
-        logger.debug("task log discriminator end, key is:{}, thread name:{}, loggerName:{}", key, event.getThreadName(),
-                event.getLoggerName());
-        return key;
+        return taskInstanceLogPath;
     }
 
     @Override

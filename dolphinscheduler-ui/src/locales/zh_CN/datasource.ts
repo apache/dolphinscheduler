@@ -56,6 +56,8 @@ export default {
   oracle_connect_type_tips: '请选择服务名或SID',
   oracle_service_name: '服务名',
   oracle_sid: 'SID',
+  compatible_mode: '兼容模式',
+  compatible_mode_tips: '请输入兼容模式',
   jdbc_connect_parameters: 'jdbc连接参数',
   principal_tips: '请输入Principal',
   krb5_conf_tips: '请输入kerberos认证参数 java.security.krb5.conf',
@@ -82,5 +84,11 @@ export default {
   clientId: 'ClientId',
   clientSecret: 'ClientSecret',
   OAuth_token_endpoint: 'OAuth 2.0 token endpoint',
-  endpoint_tips: '请输入OAuth'
+  endpoint_tips: '请输入OAuth',
+  AccessKeyID:'AccessKeyID',
+  AccessKeyID_tips:'请输入AccessKeyID',
+  SecretAccessKey:'SecretAccessKey',
+  SecretAccessKey_tips:'请输入SecretAccessKey',
+  dbUser:'DbUser',
+  dbUser_tips:'请输入DbUser',
 }

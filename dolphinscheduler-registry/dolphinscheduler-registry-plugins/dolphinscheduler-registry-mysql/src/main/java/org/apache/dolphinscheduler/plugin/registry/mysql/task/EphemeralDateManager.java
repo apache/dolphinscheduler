@@ -34,17 +34,15 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 /**
  * This thread is used to check the connect state to mysql.
  */
+@Slf4j
 public class EphemeralDateManager implements AutoCloseable {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(EphemeralDateManager.class);
 
     private ConnectionState connectionState;
     private final MysqlOperator mysqlOperator;
@@ -89,7 +87,7 @@ public class EphemeralDateManager implements AutoCloseable {
         connectionListeners.clear();
         scheduledExecutorService.shutdownNow();
         for (Long ephemeralDateId : ephemeralDateIds) {
-            mysqlOperator.deleteEphemeralData(ephemeralDateId);
+            mysqlOperator.deleteDataById(ephemeralDateId);
         }
     }
 
@@ -132,7 +130,7 @@ public class EphemeralDateManager implements AutoCloseable {
                     triggerListener(connectionState);
                 }
             } catch (Exception e) {
-                LOGGER.error("Mysql Registry connect state check task execute failed", e);
+                log.error("Mysql Registry connect state check task execute failed", e);
                 connectionState = ConnectionState.DISCONNECTED;
                 triggerListener(ConnectionState.DISCONNECTED);
             }
@@ -148,14 +146,14 @@ public class EphemeralDateManager implements AutoCloseable {
                 mysqlOperator.clearExpireEphemeralDate();
                 return ConnectionState.CONNECTED;
             } catch (Exception ex) {
-                LOGGER.error("Get connection state error, meet an unknown exception", ex);
+                log.error("Get connection state error, meet an unknown exception", ex);
                 return ConnectionState.DISCONNECTED;
             }
         }
 
         private void updateEphemeralDateTerm() throws SQLException {
             if (!mysqlOperator.updateEphemeralDataTerm(ephemeralDateIds)) {
-                LOGGER.warn("Update mysql registry ephemeral data: {} term error", ephemeralDateIds);
+                log.warn("Update mysql registry ephemeral data: {} term error", ephemeralDateIds);
             }
         }
 

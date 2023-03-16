@@ -103,18 +103,18 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
                 this.initQueue();
             }
             if (taskInstance.getState().isFinished()) {
-                logger.info("Task {} has already finished, no need to submit to task queue, taskState: {}",
+                log.info("Task {} has already finished, no need to submit to task queue, taskState: {}",
                         taskInstance.getName(), taskInstance.getState());
                 return true;
             }
             // task cannot be submitted because its execution state is RUNNING or DELAY.
             if (taskInstance.getState() == TaskExecutionStatus.RUNNING_EXECUTION
                     || taskInstance.getState() == TaskExecutionStatus.DELAY_EXECUTION) {
-                logger.info("Task {} is already running or delayed, no need to submit to task queue, taskState: {}",
+                log.info("Task {} is already running or delayed, no need to submit to task queue, taskState: {}",
                         taskInstance.getName(), taskInstance.getState());
                 return true;
             }
-            logger.info("Task {} is ready to dispatch to worker", taskInstance.getName());
+            log.info("Task {} is ready to dispatch to worker", taskInstance.getName());
 
             TaskPriority taskPriority = new TaskPriority(processInstance.getProcessInstancePriority().getCode(),
                     processInstance.getId(), taskInstance.getProcessInstancePriority().getCode(),
@@ -123,17 +123,17 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
 
             TaskExecutionContext taskExecutionContext = getTaskExecutionContext(taskInstance);
             if (taskExecutionContext == null) {
-                logger.error("Get taskExecutionContext fail, task: {}", taskInstance);
+                log.error("Get taskExecutionContext fail, task: {}", taskInstance);
                 return false;
             }
 
             taskPriority.setTaskExecutionContext(taskExecutionContext);
 
             taskUpdateQueue.put(taskPriority);
-            logger.info("Task {} is submitted to priority queue success by master", taskInstance.getName());
+            log.info("Task {} is submitted to priority queue success by master", taskInstance.getName());
             return true;
         } catch (Exception e) {
-            logger.error("Task {} is submitted to priority queue error", taskInstance.getName(), e);
+            log.error("Task {} is submitted to priority queue error", taskInstance.getName(), e);
             return false;
         }
     }
@@ -146,11 +146,13 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
     public boolean killTask() {
 
         try {
-            taskInstance = taskInstanceDao.findTaskInstanceById(taskInstance.getId());
+            log.info("Begin to kill task: {}", taskInstance.getName());
             if (taskInstance == null) {
+                log.warn("Kill task failed, the task instance is not exist");
                 return true;
             }
             if (taskInstance.getState().isFinished()) {
+                log.warn("Kill task failed, the task instance is already finished");
                 return true;
             }
             // we don't wait the kill response
@@ -161,12 +163,12 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
                 killRemoteTask();
             }
         } catch (Exception e) {
-            logger.error("master kill task error, taskInstance id: {}", taskInstance.getId(), e);
+            log.error("Master kill task: {} error, taskInstance id: {}", taskInstance.getName(),
+                    taskInstance.getId(), e);
             return false;
         }
 
-        logger.info("master success kill taskInstance name: {} taskInstance id: {}",
-                taskInstance.getName(), taskInstance.getId());
+        log.info("Master success kill task: {}, taskInstanceId: {}", taskInstance.getName(), taskInstance.getId());
         return true;
     }
 
@@ -200,9 +202,9 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
             taskInstance.getTaskDefine().setTaskParams(JSONUtils.toJsonString(taskDefinitionParams));
             taskInstance.setTaskParams(JSONUtils.toJsonString(taskInstanceParams));
             if (null == testDataSourceId) {
-                logger.warn("task name :{}, test data source replacement failed", taskInstance.getName());
+                log.warn("task name :{}, test data source replacement failed", taskInstance.getName());
             } else {
-                logger.info("task name :{}, test data source replacement succeeded", taskInstance.getName());
+                log.info("task name :{}, test data source replacement succeeded", taskInstance.getName());
             }
         }
     }

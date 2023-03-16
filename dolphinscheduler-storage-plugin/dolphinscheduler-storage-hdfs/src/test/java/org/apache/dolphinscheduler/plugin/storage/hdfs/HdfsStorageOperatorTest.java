@@ -39,34 +39,39 @@ public class HdfsStorageOperatorTest {
 
     @Test
     public void getHdfsTenantDir() {
-        logger.info(HdfsStorageOperator.getHdfsTenantDir("1234"));
+        HdfsStorageOperator hdfsStorageOperator = new HdfsStorageOperator();
+        logger.info(hdfsStorageOperator.getHdfsTenantDir("1234"));
         Assertions.assertTrue(true);
     }
 
     @Test
     public void getHdfsUdfFileName() {
-        logger.info(HdfsStorageOperator.getHdfsUdfFileName("admin", "file_name"));
+        HdfsStorageOperator hdfsStorageOperator = new HdfsStorageOperator();
+        logger.info(hdfsStorageOperator.getHdfsUdfFileName("admin", "file_name"));
         Assertions.assertTrue(true);
     }
 
     @Test
     public void getHdfsResourceFileName() {
-        logger.info(HdfsStorageOperator.getHdfsResourceFileName("admin", "file_name"));
+        HdfsStorageOperator hdfsStorageOperator = new HdfsStorageOperator();
+        logger.info(hdfsStorageOperator.getHdfsResourceFileName("admin", "file_name"));
         Assertions.assertTrue(true);
     }
 
     @Test
     public void getHdfsFileName() {
-        logger.info(HdfsStorageOperator.getHdfsFileName(ResourceType.FILE, "admin", "file_name"));
+        HdfsStorageOperator hdfsStorageOperator = new HdfsStorageOperator();
+        logger.info(hdfsStorageOperator.getHdfsFileName(ResourceType.FILE, "admin", "file_name"));
         Assertions.assertTrue(true);
     }
 
     @Test
     public void getAppAddress() {
+        HdfsStorageOperator hdfsStorageOperator = new HdfsStorageOperator();
         try (MockedStatic<HttpUtils> mockedHttpUtils = Mockito.mockStatic(HttpUtils.class)) {
             mockedHttpUtils.when(() -> HttpUtils.get("http://ds1:8088/ws/v1/cluster/info"))
                     .thenReturn("{\"clusterInfo\":{\"state\":\"STARTED\",\"haState\":\"ACTIVE\"}}");
-            logger.info(HdfsStorageOperator.getAppAddress("http://ds1:8088/ws/v1/cluster/apps/%s", "ds1,ds2"));
+            logger.info(hdfsStorageOperator.getAppAddress("http://ds1:8088/ws/v1/cluster/apps/%s", "ds1,ds2"));
             Assertions.assertTrue(true);
         }
     }

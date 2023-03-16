@@ -56,6 +56,8 @@ export default {
   oracle_connect_type_tips: 'Please select serviceName or SID',
   oracle_service_name: 'ServiceName',
   oracle_sid: 'SID',
+  compatible_mode: 'Compatible Mode',
+  compatible_mode_tips: 'Please enter compatible mode',
   jdbc_connect_parameters: 'jdbc connect parameters',
   principal_tips: 'Please enter Principal',
   krb5_conf_tips:
@@ -86,4 +88,10 @@ export default {
   clientSecret: 'ClientSecret',
   OAuth_token_endpoint: 'OAuth 2.0 token endpoint',
   endpoint_tips: 'Please enter OAuth Token',
+  AccessKeyID:'AccessKeyID',
+  AccessKeyID_tips:'Please input AccessKeyID',
+  SecretAccessKey:'SecretAccessKey',
+  SecretAccessKey_tips:'Please input SecretAccessKey',
+  dbUser:'DbUser',
+  dbUser_tips:'Please input DbUser',
 }

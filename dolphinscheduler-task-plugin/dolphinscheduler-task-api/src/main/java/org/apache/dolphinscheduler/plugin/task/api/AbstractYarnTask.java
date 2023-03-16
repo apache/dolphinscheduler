@@ -52,7 +52,7 @@ public abstract class AbstractYarnTask extends AbstractRemoteTask {
         super(taskRequest);
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
                 taskRequest,
-                logger);
+                log);
     }
 
     // todo split handle to submit and track
@@ -60,18 +60,18 @@ public abstract class AbstractYarnTask extends AbstractRemoteTask {
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             // SHELL task exit code
-            TaskResponse response = shellCommandExecutor.run(buildCommand());
+            TaskResponse response = shellCommandExecutor.run(buildCommand(), taskCallBack);
             setExitStatusCode(response.getExitStatusCode());
             // set appIds
             setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
             setProcessId(response.getProcessId());
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
-            logger.info("The current yarn task has been interrupted", ex);
+            log.info("The current yarn task has been interrupted", ex);
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
             throw new TaskException("The current yarn task has been interrupted", ex);
         } catch (Exception e) {
-            logger.error("yarn process failure", e);
+            log.error("yarn process failure", e);
             exitStatusCode = -1;
             throw new TaskException("Execute task failed", e);
         }
