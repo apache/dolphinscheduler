@@ -82,6 +82,10 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
 
     @Override
     protected void setMainJarName() {
+        if (flinkParameters.getProgramType() == ProgramType.SQL) {
+            logger.info("The current flink stream job type is SQL, will no need to set main jar");
+            return;
+        }
         ResourceInfo mainJar = flinkParameters.getMainJar();
         String resourceName = getResourceNameOfMainJar(mainJar);
         mainJar.setRes(resourceName);
