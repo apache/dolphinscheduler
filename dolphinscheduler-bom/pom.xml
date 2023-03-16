@@ -107,6 +107,8 @@
         <azure-resourcemanager-datafactory.version>1.0.0-beta.19</azure-resourcemanager-datafactory.version>
         <snowflake-jdbc.version>3.13.10</snowflake-jdbc.version>
         <google-cloud-storage.version>2.18.0</google-cloud-storage.version>
+        <snowflake-jdbc.version>3.13.10</snowflake-jdbc.version>
+
     </properties>
 
     <dependencyManagement>
