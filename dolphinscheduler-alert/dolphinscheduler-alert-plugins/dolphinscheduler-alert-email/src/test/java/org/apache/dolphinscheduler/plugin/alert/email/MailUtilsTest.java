@@ -83,7 +83,7 @@ public class MailUtilsTest {
     }
 
     @Test
-    public void testAuthCheck() {
+    void testAuthCheck() {
         String title = "Auth Exception";
         String content = list2String();
 
