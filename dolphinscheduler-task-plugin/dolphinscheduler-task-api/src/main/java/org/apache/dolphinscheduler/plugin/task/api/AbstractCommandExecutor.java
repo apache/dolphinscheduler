@@ -349,14 +349,15 @@ public abstract class AbstractCommandExecutor {
                 } finally {
                     watcher.close();
                 }
+
+                podLogOutputIsSuccess = true;
             });
 
             collectPodLogExecutorService.shutdown();
         } else {
             podLogOutputFuture = CompletableFuture.completedFuture("The driver pod does not exist.");
+            podLogOutputIsSuccess = true;
         }
-
-        podLogOutputIsSuccess = true;
     }
 
     private void parseProcessOutput(Process process) {

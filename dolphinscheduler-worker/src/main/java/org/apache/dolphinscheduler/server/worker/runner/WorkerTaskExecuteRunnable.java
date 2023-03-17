@@ -306,10 +306,9 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
                         taskExecutionContext.getLogPath());
             }
         } catch (Exception ex) {
-            log.error("Write k8s pod log failed", ex);
+            log.error("Send remote log failed", ex);
         } finally {
             log.info(FINALIZE_SESSION_MARKER, FINALIZE_SESSION_MARKER.toString());
-
         }
     }
 
