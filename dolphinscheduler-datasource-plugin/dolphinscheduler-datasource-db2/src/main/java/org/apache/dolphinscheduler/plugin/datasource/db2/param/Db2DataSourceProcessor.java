@@ -54,7 +54,7 @@ public class Db2DataSourceProcessor extends AbstractDataSourceProcessor {
         Db2DataSourceParamDTO db2DatasourceParamDTO = new Db2DataSourceParamDTO();
         db2DatasourceParamDTO.setDatabase(connectionParams.getDatabase());
         db2DatasourceParamDTO.setOther(connectionParams.getOther());
-        db2DatasourceParamDTO.setUserName(db2DatasourceParamDTO.getUserName());
+        db2DatasourceParamDTO.setUserName(connectionParams.getUserName());
 
         String[] hostSeperator = connectionParams.getAddress().split(Constants.DOUBLE_SLASH);
         String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);
