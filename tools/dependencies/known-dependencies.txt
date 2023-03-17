@@ -470,4 +470,4 @@ proto-google-cloud-storage-v2-2.18.0-alpha.jar
 proto-google-iam-v1-1.9.0.jar
 re2j-1.6.jar
 threetenbp-1.6.5.jar
-snowflake-jdbc:3.13.10.jar
+snowflake-jdbc-3.13.10.jar
