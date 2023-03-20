@@ -1,6 +1,6 @@
 # 快速试用 Kubernetes 部署
 
-Kubernetes部署目的是在Kubernetes集群中部署 DolphinScheduler 服务，能调度大量任务，可用于在生产中部署。
+Kubernetes 部署目的是在 Kubernetes 集群中部署 DolphinScheduler 服务，能调度大量任务，可用于在生产中部署。
 
 如果你是新手，想要体验 DolphinScheduler 的功能，推荐使用[Standalone](standalone.md)方式体检。如果你想体验更完整的功能，或者更大的任务量，推荐使用[伪集群部署](pseudo-cluster.md)。如果你是在生产中使用，推荐使用[集群部署](cluster.md)或者[kubernetes](kubernetes.md)
 
@@ -12,7 +12,7 @@ Kubernetes部署目的是在Kubernetes集群中部署 DolphinScheduler 服务，
 
 ## 安装 dolphinscheduler
 
-请下载源码包 apache-dolphinscheduler-<version>-src.tar.gz，下载地址: [下载](/zh-cn/download/download.html)
+请下载源码包 apache-dolphinscheduler-<version>-src.tar.gz，下载地址: [下载](https://dolphinscheduler.apache.org/zh-cn/download)
 
 发布一个名为 `dolphinscheduler` 的版本(release)，请执行以下命令：
 
@@ -32,7 +32,7 @@ $ helm install dolphinscheduler . -n test
 
 > **提示**: 如果名为 `test` 的命名空间被使用, 选项参数 `-n test` 需要添加到 `helm` 和 `kubectl` 命令中
 
-这些命令以默认配置在 Kubernetes 集群上部署 DolphinScheduler，[附录-配置](#appendix-configuration)部分列出了可以在安装过程中配置的参数  <!-- markdown-link-check-disable-line -->
+这些命令以默认配置在 Kubernetes 集群上部署 DolphinScheduler，[附录-配置](#appendix-configuration)部分列出了可以在安装过程中配置的参数 <!-- markdown-link-check-disable-line -->
 
 > **提示**: 列出所有已发布的版本，使用 `helm list`
 
@@ -67,7 +67,7 @@ echo http://$NODE_IP:$NODE_PORT/dolphinscheduler
 
 默认的用户是`admin`，默认的密码是`dolphinscheduler123`
 
-请参考用户手册章节的[快速上手](../start/quick-start.md)查看如何使用DolphinScheduler
+请参考用户手册章节的[快速上手](../start/quick-start.md)查看如何使用 DolphinScheduler
 
 ## 卸载 dolphinscheduler
 
@@ -77,19 +77,55 @@ echo http://$NODE_IP:$NODE_PORT/dolphinscheduler
 $ helm uninstall dolphinscheduler
 ```
 
-该命令将删除与 `dolphinscheduler` 相关的所有 Kubernetes 组件（但PVC除外），并删除版本(release)
+该命令将删除与 `dolphinscheduler` 相关的所有 Kubernetes 组件（但 PVC 除外），并删除版本(release)
 
-要删除与 `dolphinscheduler` 相关的PVC，请执行：
+要删除与 `dolphinscheduler` 相关的 PVC，请执行：
 
 ```bash
 $ kubectl delete pvc -l app.kubernetes.io/instance=dolphinscheduler
 ```
 
-> **注意**: 删除PVC也会删除所有数据，请谨慎操作！
+> **注意**: 删除 PVC 也会删除所有数据，请谨慎操作！
+
+## [试验性] worker 自动扩缩容
+
+> **警告**: 目前此功能尚在试验阶段，不建议在生产环境使用！
+
+`DolphinScheduler` 使用 [KEDA](https://github.com/kedacore/keda) 对 worker 进行自动扩缩容。但是 `DolphinScheduler` 默认是不启用该功能的。
+您需要做下列配置来启用该功能：
+
+首先您需要创建一个单独的命名空间并使用 `helm` 安装 `KEDA`：
+
+```bash
+helm repo add kedacore https://kedacore.github.io/charts
+
+helm repo update
+
+kubectl create namespace keda
+
+helm install keda kedacore/keda \
+    --namespace keda \
+    --version "v2.0.0"
+```
+
+其次，您需要将 `values.yaml` 中的 `worker.keda.enabled` 配置设置成 `true`，或者您可以通过以下命令安装 chart：
+
+```bash
+helm install dolphinscheduler . --set worker.keda.enabled=true -n <your-namespace-to-deploy-dolphinscheduler>
+```
+
+一旦自动扩缩容功能启用，worker的数量将基于任务状态在 `minReplicaCount` 和 `maxReplicaCount` 之间弹性扩缩。
+举例来说，当您的 `DolphinScheduler` 实例中没有任务在运行时，将不会有 worker。因此，这个功能会显著节约资源，降低您的使用成本。
+
+自动扩缩容功能目前支持 `DolphinScheduler 官方 helm chart` 中自带的 `postgresql` and `mysql`。
+如果您要使用外部的数据库，自动扩缩容功能目前只支持 `mysql` 和 `postgresql` 类型的外部数据库。
+
+如果您在使用自动扩缩容时需要改变 worker `WORKER_EXEC_THREADS` 的值，请直接在 `values.yaml` 中修改 `worker.env.WORKER_EXEC_THREADS` 的值，
+而不要通过 `configmap` 来更新。
 
 ## 配置
 
-配置文件为 `values.yaml`，[附录-配置](#appendix-configuration) 表格列出了 DolphinScheduler 的可配置参数及其默认值  <!-- markdown-link-check-disable-line -->
+配置文件为 `values.yaml`，[附录-配置](#appendix-configuration) 表格列出了 DolphinScheduler 的可配置参数及其默认值 <!-- markdown-link-check-disable-line -->
 
 ## 支持矩阵
 
@@ -188,7 +224,7 @@ kubectl scale --replicas=6 sts dolphinscheduler-worker -n test # with test names
 >
 > 如果你要使用 MySQL, 你可以基于官方镜像 `apache/dolphinscheduler-<service>` 进行构建.
 >
-> 从3.0.0版本起，dolphinscheduler已经微服务化，更改元数据存储需要对把所有的服务都替换为 MySQL 驱动包，包括 dolphinscheduler-tools, dolphinscheduler-master, dolphinscheduler-worker, dolphinscheduler-api, dolphinscheduler-alert-server .
+> 从 3.0.0 版本起，dolphinscheduler 已经微服务化，更改元数据存储需要对把所有的服务都替换为 MySQL 驱动包，包括 dolphinscheduler-tools, dolphinscheduler-master, dolphinscheduler-worker, dolphinscheduler-api, dolphinscheduler-alert-server .
 
 1. 下载 MySQL 驱动包 [mysql-connector-java-8.0.16.jar](https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.16/mysql-connector-java-8.0.16.jar)
 
@@ -386,7 +422,7 @@ $SPARK_HOME/bin/spark-submit --class org.apache.spark.examples.SparkPi $SPARK_HO
 
 文件 `spark-examples_2.11-2.4.7.jar` 需要先被上传到资源中心，然后创建一个 Spark 任务并设置:
 
-- 主函数的Class: `org.apache.spark.examples.SparkPi`
+- 主函数的 Class: `org.apache.spark.examples.SparkPi`
 - 主程序包: `spark-examples_2.11-2.4.7.jar`
 - 部署方式: `local`
 
@@ -410,7 +446,7 @@ common:
     enabled: false
     mountPath: "/opt/soft"
     accessModes:
-    - "ReadWriteMany"
+      - "ReadWriteMany"
     storageClassName: "-"
     storage: "20Gi"
 ```
@@ -436,7 +472,7 @@ common:
   fsFileResourcePersistence:
     enabled: true
     accessModes:
-    - "ReadWriteMany"
+      - "ReadWriteMany"
     storageClassName: "-"
     storage: "20Gi"
 ```
@@ -485,7 +521,7 @@ common:
 |                                                                      |                                                                                                                               |                                       |
 | `image.repository`                                                   | Docker image repository for the DolphinScheduler                                                                              | `apache/dolphinscheduler`             |
 | `image.tag`                                                          | Docker image version for the DolphinScheduler                                                                                 | `latest`                              |
-| `image.pullPolicy`                                                   | Image pull policy. One of Always, Never, IfNotPresent                                                                         | `IfNotPresent`                        |
+| `image.pullPolicy`                                                   | Image pull policy. Options: Always, Never, IfNotPresent                                                                       | `IfNotPresent`                        |
 | `image.pullSecret`                                                   | Image pull secret. An optional reference to secret in the same namespace to use for pulling any of the images                 | `nil`                                 |
 |                                                                      |                                                                                                                               |                                       |
 | `postgresql.enabled`                                                 | If not exists external PostgreSQL, by default, the DolphinScheduler will use a internal PostgreSQL                            | `true`                                |
@@ -495,6 +531,7 @@ common:
 | `postgresql.persistence.enabled`                                     | Set `postgresql.persistence.enabled` to `true` to mount a new volume for internal PostgreSQL                                  | `false`                               |
 | `postgresql.persistence.size`                                        | `PersistentVolumeClaim` size                                                                                                  | `20Gi`                                |
 | `postgresql.persistence.storageClass`                                | PostgreSQL data persistent volume storage class. If set to "-", storageClassName: "", which disables dynamic provisioning     | `-`                                   |
+| `minio.enabled`                                                      | Deploy minio and configure it as the default storage for DolphinScheduler, note this is for demo only, not for production.    | `false`                               |
 | `externalDatabase.type`                                              | If exists external PostgreSQL, and set `postgresql.enabled` value to false. DolphinScheduler's database type will use it      | `postgresql`                          |
 | `externalDatabase.driver`                                            | If exists external PostgreSQL, and set `postgresql.enabled` value to false. DolphinScheduler's database driver will use it    | `org.postgresql.Driver`               |
 | `externalDatabase.host`                                              | If exists external PostgreSQL, and set `postgresql.enabled` value to false. DolphinScheduler's database host will use it      | `localhost`                           |
@@ -504,19 +541,18 @@ common:
 | `externalDatabase.database`                                          | If exists external PostgreSQL, and set `postgresql.enabled` value to false. DolphinScheduler's database database will use it  | `dolphinscheduler`                    |
 | `externalDatabase.params`                                            | If exists external PostgreSQL, and set `postgresql.enabled` value to false. DolphinScheduler's database params will use it    | `characterEncoding=utf8`              |
 |                                                                      |                                                                                                                               |                                       |
-| `zookeeper.enabled`                                                  | If not exists external Zookeeper, by default, the DolphinScheduler will use a internal Zookeeper                              | `true`                                |
+| `zookeeper.enabled`                                                  | If not exists external ZooKeeper, by default, the DolphinScheduler will use a internal ZooKeeper                              | `true`                                |
 | `zookeeper.service.port`                                             | The port of zookeeper                                                                                                         | `2181`                                |
 | `zookeeper.fourlwCommandsWhitelist`                                  | A list of comma separated Four Letter Words commands to use                                                                   | `srvr,ruok,wchs,cons`                 |
-| `zookeeper.persistence.enabled`                                      | Set `zookeeper.persistence.enabled` to `true` to mount a new volume for internal Zookeeper                                    | `false`                               |
+| `zookeeper.persistence.enabled`                                      | Set `zookeeper.persistence.enabled` to `true` to mount a new volume for internal ZooKeeper                                    | `false`                               |
 | `zookeeper.persistence.size`                                         | `PersistentVolumeClaim` size                                                                                                  | `20Gi`                                |
-| `zookeeper.persistence.storageClass`                                 | Zookeeper data persistent volume storage class. If set to "-", storageClassName: "", which disables dynamic provisioning      | `-`                                   |
-| `externalRegistry.registryPluginDir`                                 | If exists external registry and set `zookeeper.enable` to `false`, specify the external registry plugin directory             | `lib/plugin/registry`                 |
+| `zookeeper.persistence.storageClass`                                 | ZooKeeper data persistent volume storage class. If set to "-", storageClassName: "", which disables dynamic provisioning      | `-`                                   |
 | `externalRegistry.registryPluginName`                                | If exists external registry and set `zookeeper.enable` to `false`, specify the external registry plugin name                  | `zookeeper`                           |
 | `externalRegistry.registryServers`                                   | If exists external registry and set `zookeeper.enable` to `false`, specify the external registry servers                      | `127.0.0.1:2181`                      |
 |                                                                      |                                                                                                                               |                                       |
 | `common.configmap.DOLPHINSCHEDULER_OPTS`                             | The jvm options for dolphinscheduler, suitable for all servers                                                                | `""`                                  |
 | `common.configmap.DATA_BASEDIR_PATH`                                 | User data directory path, self configuration, please make sure the directory exists and have read write permissions           | `/tmp/dolphinscheduler`               |
-| `common.configmap.RESOURCE_STORAGE_TYPE`                             | Resource storage type: HDFS, S3, NONE                                                                                         | `HDFS`                                |
+| `common.configmap.RESOURCE_STORAGE_TYPE`                             | Resource storage type: HDFS, S3, OSS, GCS, NONE                                                                               | `HDFS`                                |
 | `common.configmap.RESOURCE_UPLOAD_PATH`                              | Resource store on HDFS/S3 path, please make sure the directory exists on hdfs and have read write permissions                 | `/dolphinscheduler`                   |
 | `common.configmap.FS_DEFAULT_FS`                                     | Resource storage file system like `file:///`, `hdfs://mycluster:8020` or `s3a://dolphinscheduler`                             | `file:///`                            |
 | `common.configmap.FS_S3A_ENDPOINT`                                   | S3 endpoint when `common.configmap.RESOURCE_STORAGE_TYPE` is set to `S3`                                                      | `s3.xxx.amazonaws.com`                |
@@ -539,7 +575,7 @@ common:
 | `common.configmap.HADOOP_CONF_DIR`                                   | Set `HADOOP_CONF_DIR` for DolphinScheduler's task environment                                                                 | `/opt/soft/hadoop/etc/hadoop`         |
 | `common.configmap.SPARK_HOME`                                        | Set `SPARK_HOME` for DolphinScheduler's task environment                                                                      | `/opt/soft/spark`                     |
 | `common.configmap.PYTHON_HOME`                                       | Set `PYTHON_HOME` for DolphinScheduler's task environment                                                                     | `/usr/bin/python`                     |
-| `common.configmap.JAVA_HOME`                                         | Set `JAVA_HOME` for DolphinScheduler's task environment                                                                       | `/usr/local/openjdk-8`                |
+| `common.configmap.JAVA_HOME`                                         | Set `JAVA_HOME` for DolphinScheduler's task environment                                                                       | `/opt/java/openjdk`                   |
 | `common.configmap.HIVE_HOME`                                         | Set `HIVE_HOME` for DolphinScheduler's task environment                                                                       | `/opt/soft/hive`                      |
 | `common.configmap.FLINK_HOME`                                        | Set `FLINK_HOME` for DolphinScheduler's task environment                                                                      | `/opt/soft/flink`                     |
 | `common.configmap.DATAX_HOME`                                        | Set `DATAX_HOME` for DolphinScheduler's task environment                                                                      | `/opt/soft/datax`                     |
@@ -560,16 +596,16 @@ common:
 | `master.nodeSelector`                                                | NodeSelector is a selector which must be true for the pod to fit on a node                                                    | `{}`                                  |
 | `master.tolerations`                                                 | If specified, the pod's tolerations                                                                                           | `{}`                                  |
 | `master.resources`                                                   | The `resource` limit and request config for master server                                                                     | `{}`                                  |
-| `master.configmap.MASTER_SERVER_OPTS`                                | The jvm options for master server                                                                                             | `-Xms1g -Xmx1g -Xmn512m`              |
-| `master.configmap.MASTER_EXEC_THREADS`                               | Master execute thread number to limit process instances                                                                       | `100`                                 |
-| `master.configmap.MASTER_EXEC_TASK_NUM`                              | Master execute task number in parallel per process instance                                                                   | `20`                                  |
-| `master.configmap.MASTER_DISPATCH_TASK_NUM`                          | Master dispatch task number per batch                                                                                         | `3`                                   |
-| `master.configmap.MASTER_HOST_SELECTOR`                              | Master host selector to select a suitable worker, optional values include Random, RoundRobin, LowerWeight                     | `LowerWeight`                         |
-| `master.configmap.MASTER_HEARTBEAT_INTERVAL`                         | Master heartbeat interval, the unit is second                                                                                 | `10`                                  |
-| `master.configmap.MASTER_TASK_COMMIT_RETRYTIMES`                     | Master commit task retry times                                                                                                | `5`                                   |
-| `master.configmap.MASTER_TASK_COMMIT_INTERVAL`                       | master commit task interval, the unit is second                                                                               | `1`                                   |
-| `master.configmap.MASTER_MAX_CPULOAD_AVG`                            | Master max cpuload avg, only higher than the system cpu load average, master server can schedule                              | `-1` (`the number of cpu cores * 2`)  |
-| `master.configmap.MASTER_RESERVED_MEMORY`                            | Master reserved memory, only lower than system available memory, master server can schedule, the unit is G                    | `0.3`                                 |
+| `master.env.JAVA_OPTS`                                               | The jvm options for master server                                                                                             | `-Xms1g -Xmx1g -Xmn512m`              |
+| `master.env.MASTER_EXEC_THREADS`                                     | Master execute thread number to limit process instances                                                                       | `100`                                 |
+| `master.env.MASTER_EXEC_TASK_NUM`                                    | Master execute task number in parallel per process instance                                                                   | `20`                                  |
+| `master.env.MASTER_DISPATCH_TASK_NUM`                                | Master dispatch task number per batch                                                                                         | `3`                                   |
+| `master.env.MASTER_HOST_SELECTOR`                                    | Master host selector to select a suitable worker, optional values include Random, RoundRobin, LowerWeight                     | `LowerWeight`                         |
+| `master.env.MASTER_HEARTBEAT_INTERVAL`                               | Master heartbeat interval, the unit is second                                                                                 | `10s`                                 |
+| `master.env.MASTER_TASK_COMMIT_RETRYTIMES`                           | Master commit task retry times                                                                                                | `5`                                   |
+| `master.env.MASTER_TASK_COMMIT_INTERVAL`                             | master commit task interval, the unit is second                                                                               | `1s`                                  |
+| `master.env.MASTER_MAX_CPULOAD_AVG`                                  | Master max cpuload avg, only higher than the system cpu load average, master server can schedule                              | `-1` (`the number of cpu cores * 2`)  |
+| `master.env.MASTER_RESERVED_MEMORY`                                  | Master reserved memory, only lower than system available memory, master server can schedule, the unit is G                    | `0.3`                                 |
 | `master.livenessProbe.enabled`                                       | Turn on and off liveness probe                                                                                                | `true`                                |
 | `master.livenessProbe.initialDelaySeconds`                           | Delay before liveness probe is initiated                                                                                      | `30`                                  |
 | `master.livenessProbe.periodSeconds`                                 | How often to perform the probe                                                                                                | `30`                                  |
@@ -594,12 +630,11 @@ common:
 | `worker.nodeSelector`                                                | NodeSelector is a selector which must be true for the pod to fit on a node                                                    | `{}`                                  |
 | `worker.tolerations`                                                 | If specified, the pod's tolerations                                                                                           | `{}`                                  |
 | `worker.resources`                                                   | The `resource` limit and request config for worker server                                                                     | `{}`                                  |
-| `worker.configmap.WORKER_SERVER_OPTS`                                | The jvm options for worker server                                                                                             | `-Xms1g -Xmx1g -Xmn512m`              |
-| `worker.configmap.WORKER_EXEC_THREADS`                               | Worker execute thread number to limit task instances                                                                          | `100`                                 |
-| `worker.configmap.WORKER_HEARTBEAT_INTERVAL`                         | Worker heartbeat interval, the unit is second                                                                                 | `10`                                  |
-| `worker.configmap.WORKER_MAX_CPULOAD_AVG`                            | Worker max cpuload avg, only higher than the system cpu load average, worker server can be dispatched tasks                   | `-1` (`the number of cpu cores * 2`)  |
-| `worker.configmap.WORKER_RESERVED_MEMORY`                            | Worker reserved memory, only lower than system available memory, worker server can be dispatched tasks, the unit is G         | `0.3`                                 |
-| `worker.configmap.WORKER_GROUPS`                                     | Worker groups                                                                                                                 | `default`                             |
+| `worker.env.WORKER_EXEC_THREADS`                                     | Worker execute thread number to limit task instances                                                                          | `100`                                 |
+| `worker.env.WORKER_HEARTBEAT_INTERVAL`                               | Worker heartbeat interval, the unit is second                                                                                 | `10s`                                 |
+| `worker.env.WORKER_MAX_CPU_LOAD_AVG`                                 | Worker max cpu load avg, only higher than the system cpu load average, worker server can be dispatched tasks                  | `-1` (`the number of cpu cores * 2`)  |
+| `worker.env.WORKER_RESERVED_MEMORY`                                  | Worker reserved memory, only lower than system available memory, worker server can be dispatched tasks, the unit is G         | `0.3`                                 |
+| `worker.env.HOST_WEIGHT`                                             | Worker host weight to dispatch tasks                                                                                          | `100`                                 |
 | `worker.livenessProbe.enabled`                                       | Turn on and off liveness probe                                                                                                | `true`                                |
 | `worker.livenessProbe.initialDelaySeconds`                           | Delay before liveness probe is initiated                                                                                      | `30`                                  |
 | `worker.livenessProbe.periodSeconds`                                 | How often to perform the probe                                                                                                | `30`                                  |

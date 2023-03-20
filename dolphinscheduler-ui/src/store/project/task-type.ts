@@ -141,6 +141,18 @@ export const TASK_TYPES_MAP = {
   DATASYNC: {
     alias: 'DATASYNC',
     helperLinkDisable: true
+  },
+  KUBEFLOW: {
+    alias: 'KUBEFLOW',
+    helperLinkDisable: true
+  },
+  LINKIS: {
+    alias: 'LINKIS',
+    helperLinkDisable: true
+  },
+  DATA_FACTORY: {
+    alias: 'DATA_FACTORY',
+    helperLinkDisable: true
   }
 } as {
   [key in TaskType]: {

@@ -22,7 +22,7 @@ import static org.apache.dolphinscheduler.common.constants.Constants.COMMON_PROP
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,14 +31,12 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.google.common.base.Strings;
 
+@Slf4j
 public class PropertyUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(PropertyUtils.class);
 
     private static final Properties properties = new Properties();
 
@@ -56,11 +54,11 @@ public class PropertyUtils {
                 Properties subProperties = new Properties();
                 subProperties.load(fis);
                 subProperties.forEach((k, v) -> {
-                    logger.debug("Get property {} -> {}", k, v);
+                    log.debug("Get property {} -> {}", k, v);
                 });
                 properties.putAll(subProperties);
             } catch (IOException e) {
-                logger.error(e.getMessage(), e);
+                log.error(e.getMessage(), e);
                 System.exit(1);
             }
         }
@@ -68,7 +66,7 @@ public class PropertyUtils {
         // Override from system properties
         System.getProperties().forEach((k, v) -> {
             final String key = String.valueOf(k);
-            logger.info("Overriding property from system property: {}", key);
+            log.info("Overriding property from system property: {}", key);
             PropertyUtils.setValue(key, String.valueOf(v));
         });
     }
@@ -140,7 +138,7 @@ public class PropertyUtils {
         try {
             return Integer.parseInt(value);
         } catch (NumberFormatException e) {
-            logger.info(e.getMessage(), e);
+            log.info(e.getMessage(), e);
         }
         return defaultValue;
     }
@@ -183,7 +181,7 @@ public class PropertyUtils {
         try {
             return Long.parseLong(value);
         } catch (NumberFormatException e) {
-            logger.info(e.getMessage(), e);
+            log.info(e.getMessage(), e);
         }
         return defaultValue;
     }
@@ -210,7 +208,7 @@ public class PropertyUtils {
         try {
             return Double.parseDouble(value);
         } catch (NumberFormatException e) {
-            logger.info(e.getMessage(), e);
+            log.info(e.getMessage(), e);
         }
         return defaultValue;
     }
@@ -247,7 +245,7 @@ public class PropertyUtils {
         try {
             return Enum.valueOf(type, value);
         } catch (IllegalArgumentException e) {
-            logger.info(e.getMessage(), e);
+            log.info(e.getMessage(), e);
         }
         return defaultValue;
     }

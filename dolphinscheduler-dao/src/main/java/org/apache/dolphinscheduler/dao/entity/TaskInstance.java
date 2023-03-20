@@ -40,6 +40,7 @@ import java.util.Map;
 
 import lombok.Data;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -69,30 +70,16 @@ public class TaskInstance implements Serializable {
      */
     private String taskType;
 
-    /**
-     * process instance id
-     */
     private int processInstanceId;
 
-    /**
-     * task code
-     */
-    private long taskCode;
-
-    /**
-     * task definition version
-     */
-    private int taskDefinitionVersion;
-
-    /**
-     * process instance name
-     */
-    @TableField(exist = false)
     private String processInstanceName;
 
-    /**
-     * process definition name
-     */
+    private Long projectCode;
+
+    private long taskCode;
+
+    private int taskDefinitionVersion;
+
     @TableField(exist = false)
     private String processDefinitionName;
 
@@ -188,6 +175,17 @@ public class TaskInstance implements Serializable {
     private Flag flag;
 
     /**
+     * task is cache: yes/no
+     */
+    private Flag isCache;
+
+    /**
+     * cache_key
+     */
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
+    private String cacheKey;
+
+    /**
      * dependency
      */
     @TableField(exist = false)
@@ -257,10 +255,6 @@ public class TaskInstance implements Serializable {
      */
     private String varPool;
 
-    /**
-     * executor name
-     */
-    @TableField(exist = false)
     private String executorName;
 
     @TableField(exist = false)
@@ -409,4 +403,5 @@ public class TaskInstance implements Serializable {
         // task retry does not over time, return false
         return getRetryInterval() * SEC_2_MINUTES_TIME_UNIT < failedTimeInterval;
     }
+
 }

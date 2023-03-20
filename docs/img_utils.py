@@ -112,8 +112,10 @@ def check() -> None:
     img_docs, img_img = check_diff_img()
     assert not img_docs and not img_img, (
         f"Images assert failed: \n"
-        f"* difference `docs` imgs to `img` is: {img_docs if img_docs else 'None'}\n"
-        f"* difference `img` imgs to `docs` is: {img_img if img_img else 'None'}\n"
+        f"* Some images use in documents but do not exists in `img` directory, please add them: "
+        f"{img_docs if img_docs else 'None'}\n"
+        f"* Some images not use in documents but exists in `img` directory, please delete them: "
+        f"{img_img if img_img else 'None'}\n"
     )
 
 
@@ -135,7 +137,9 @@ def dev_syntax() -> None:
     for path in dev_files_path:
         content = path.read_text()
         find = pattern.findall(content)
-        assert not find, f"File {str(path)} contain temporary not support syntax: {find}."
+        assert (
+            not find
+        ), f"File {str(path)} contain temporary not support syntax: {find}."
 
 
 def build_argparse() -> argparse.ArgumentParser:
@@ -167,7 +171,8 @@ def build_argparse() -> argparse.ArgumentParser:
     parser_prune.set_defaults(func=prune)
 
     parser_prune = subparsers.add_parser(
-        "dev-syntax", help="Check whether temporary does not support syntax in development directory."
+        "dev-syntax",
+        help="Check whether temporary does not support syntax in development directory.",
     )
     parser_prune.set_defaults(func=dev_syntax)
 

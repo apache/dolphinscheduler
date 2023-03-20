@@ -50,9 +50,9 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
 
     @Override
     public void init() {
-        logger.info("flink task params {}", taskExecutionContext.getTaskParams());
 
         flinkParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), FlinkStreamParameters.class);
+        log.info("Initialize Flink task params {}", JSONUtils.toPrettyJsonString(flinkParameters));
 
         if (flinkParameters == null || !flinkParameters.checkParameters()) {
             throw new RuntimeException("flink task params is not valid");
@@ -76,7 +76,7 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
         String command = ParameterUtils
                 .convertParameterPlaceholders(String.join(" ", args), taskExecutionContext.getDefinedParams());
 
-        logger.info("flink task command : {}", command);
+        log.info("flink task command : {}", command);
         return command;
     }
 
@@ -97,13 +97,13 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
     public void cancelApplication() throws TaskException {
         List<String> appIds = getApplicationIds();
         if (CollectionUtils.isEmpty(appIds)) {
-            logger.error("can not get appId, taskInstanceId:{}", taskExecutionContext.getTaskInstanceId());
+            log.error("can not get appId, taskInstanceId:{}", taskExecutionContext.getTaskInstanceId());
             return;
         }
         taskExecutionContext.setAppIds(String.join(TaskConstants.COMMA, appIds));
         List<String> args = FlinkArgsUtils.buildCancelCommandLine(taskExecutionContext);
 
-        logger.info("cancel application args:{}", args);
+        log.info("cancel application args:{}", args);
 
         ProcessBuilder processBuilder = new ProcessBuilder();
         processBuilder.command(args);
@@ -118,13 +118,13 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
     public void savePoint() throws Exception {
         List<String> appIds = getApplicationIds();
         if (CollectionUtils.isEmpty(appIds)) {
-            logger.warn("can not get appId, taskInstanceId:{}", taskExecutionContext.getTaskInstanceId());
+            log.warn("can not get appId, taskInstanceId:{}", taskExecutionContext.getTaskInstanceId());
             return;
         }
 
         taskExecutionContext.setAppIds(String.join(TaskConstants.COMMA, appIds));
         List<String> args = FlinkArgsUtils.buildSavePointCommandLine(taskExecutionContext);
-        logger.info("savepoint args:{}", args);
+        log.info("savepoint args:{}", args);
 
         ProcessBuilder processBuilder = new ProcessBuilder();
         processBuilder.command(args);

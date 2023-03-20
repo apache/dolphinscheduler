@@ -54,13 +54,18 @@ type TaskType =
   | 'HIVECLI'
   | 'DMS'
   | 'DATASYNC'
+  | 'KUBEFLOW'
+  | 'LINKIS'
+  | 'DATA_FACTORY'
 
 type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON'
+
 type DependentResultType = {
-  [key: string]: 'SUCCESS' | 'WAITING_THREAD' | 'FAILURE'
+  [key: string]: 'SUCCESS' | 'FAILURE'
 }
+
 type BDependentResultType = {
-  [key: string]: 'SUCCESS' | 'WAITING_THREAD' | 'FAILED'
+  [key: string]: 'SUCCESS' | 'FAILED'
 }
 
 interface IResource {

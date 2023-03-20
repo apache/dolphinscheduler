@@ -41,7 +41,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.service.utils.ParamUtils;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
@@ -50,9 +50,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -64,9 +64,8 @@ import io.micrometer.core.annotation.Counted;
  * Command Service implementation
  */
 @Component
+@Slf4j
 public class CommandServiceImpl implements CommandService {
-
-    private final Logger logger = LoggerFactory.getLogger(CommandServiceImpl.class);
 
     @Autowired
     private ErrorCommandMapper errorCommandMapper;
@@ -109,11 +108,11 @@ public class CommandServiceImpl implements CommandService {
     }
 
     @Override
-    public List<Command> findCommandPageBySlot(int pageSize, int pageNumber, int masterCount, int thisMasterSlot) {
+    public List<Command> findCommandPageBySlot(int pageSize, int masterCount, int thisMasterSlot) {
         if (masterCount <= 0) {
             return Lists.newArrayList();
         }
-        return commandMapper.queryCommandPageBySlot(pageSize, pageNumber * pageSize, masterCount, thisMasterSlot);
+        return commandMapper.queryCommandPageBySlot(pageSize, masterCount, thisMasterSlot);
     }
 
     @Override
@@ -218,7 +217,7 @@ public class CommandServiceImpl implements CommandService {
                         Long.parseLong(
                                 String.valueOf(subProcessParam.get(CMD_PARAM_SUB_PROCESS_DEFINE_CODE)));
             } catch (NumberFormatException nfe) {
-                logger.error("processDefinitionCode is not a number", nfe);
+                log.error("processDefinitionCode is not a number", nfe);
                 return null;
             }
         }

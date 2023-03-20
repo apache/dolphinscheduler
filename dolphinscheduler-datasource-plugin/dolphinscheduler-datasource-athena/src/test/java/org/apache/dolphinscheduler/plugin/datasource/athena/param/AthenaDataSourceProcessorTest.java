@@ -31,6 +31,8 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.google.common.collect.ImmutableMap;
+
 @ExtendWith(MockitoExtension.class)
 public class AthenaDataSourceProcessorTest {
 
@@ -76,9 +78,13 @@ public class AthenaDataSourceProcessorTest {
     @Test
     public void testGetJdbcUrl() {
         AthenaConnectionParam athenaConnectionParam = new AthenaConnectionParam();
-        athenaConnectionParam.setJdbcUrl("jdbc:awsathena://AwsRegion=cn-north-1;");
-        athenaConnectionParam.setOther("LogLevel=6;LogPath=/tmp;");
-        Assertions.assertEquals("jdbc:awsathena://AwsRegion=cn-north-1;LogLevel=6;LogPath=/tmp;",
+        athenaConnectionParam.setJdbcUrl("jdbc:awsathena://AwsRegion=cn-north-1");
+        ImmutableMap<String, String> map = new ImmutableMap.Builder<String, String>()
+                .put("LogLevel", "6")
+                .put("LogPath", "/tmp")
+                .build();
+        athenaConnectionParam.setOther(map);
+        Assertions.assertEquals("jdbc:awsathena://AwsRegion=cn-north-1;LogLevel=6;LogPath=/tmp",
                 this.athenaDataSourceProcessor.getJdbcUrl(athenaConnectionParam));
 
     }
@@ -87,7 +93,6 @@ public class AthenaDataSourceProcessorTest {
     public void testGetJdbcUrlNoOther() {
         AthenaConnectionParam athenaConnectionParam = new AthenaConnectionParam();
         athenaConnectionParam.setJdbcUrl("jdbc:awsathena://AwsRegion=cn-north-1;");
-        athenaConnectionParam.setOther("");
         Assertions.assertEquals("jdbc:awsathena://AwsRegion=cn-north-1;",
                 this.athenaDataSourceProcessor.getJdbcUrl(athenaConnectionParam));
 

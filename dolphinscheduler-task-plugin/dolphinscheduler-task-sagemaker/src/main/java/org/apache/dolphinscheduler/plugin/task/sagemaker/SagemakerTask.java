@@ -46,18 +46,20 @@ import com.amazonaws.services.sagemaker.AmazonSageMakerClientBuilder;
 import com.amazonaws.services.sagemaker.model.StartPipelineExecutionRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 
 /**
  * SagemakerTask task, Used to start Sagemaker pipeline
  */
 public class SagemakerTask extends AbstractRemoteTask {
 
-    private static final ObjectMapper objectMapper =
-            new ObjectMapper().configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
-                    .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
-                    .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
-                    .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
-                    .setPropertyNamingStrategy(new PropertyNamingStrategy.UpperCamelCaseStrategy());
+    private static final ObjectMapper objectMapper = JsonMapper.builder()
+            .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
+            .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
+            .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
+            .propertyNamingStrategy(new PropertyNamingStrategy.UpperCamelCaseStrategy())
+            .build();
     /**
      * SageMaker parameters
      */
@@ -80,10 +82,10 @@ public class SagemakerTask extends AbstractRemoteTask {
 
     @Override
     public void init() {
-        logger.info("Sagemaker task params {}", taskRequest.getTaskParams());
 
         parameters = JSONUtils.parseObject(taskRequest.getTaskParams(), SagemakerParameters.class);
 
+        log.info("Initialize Sagemaker task params {}", JSONUtils.toPrettyJsonString(parameters));
         if (parameters == null) {
             throw new SagemakerTaskException("Sagemaker task params is empty");
         }
@@ -150,11 +152,11 @@ public class SagemakerTask extends AbstractRemoteTask {
         try {
             startPipelineRequest = objectMapper.readValue(requestJson, StartPipelineExecutionRequest.class);
         } catch (Exception e) {
-            logger.error("can not parse SagemakerRequestJson from json: {}", requestJson);
+            log.error("can not parse SagemakerRequestJson from json: {}", requestJson);
             throw new SagemakerTaskException("can not parse SagemakerRequestJson ", e);
         }
 
-        logger.info("Sagemaker task create StartPipelineRequest: {}", startPipelineRequest);
+        log.info("Sagemaker task create StartPipelineRequest: {}", startPipelineRequest);
         return startPipelineRequest;
     }
 

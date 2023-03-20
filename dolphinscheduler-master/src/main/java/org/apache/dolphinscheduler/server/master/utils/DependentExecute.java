@@ -36,9 +36,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * dependent item execute
  */
@@ -70,11 +67,6 @@ public class DependentExecute {
      * depend result map
      */
     private Map<String, DependResult> dependResultMap = new HashMap<>();
-
-    /**
-     * logger
-     */
-    private Logger logger = LoggerFactory.getLogger(DependentExecute.class);
 
     /**
      * constructor
@@ -205,8 +197,8 @@ public class DependentExecute {
             return lastManualProcess;
         }
 
-        return (lastManualProcess.getEndTime().after(lastSchedulerProcess.getEndTime())) ? lastManualProcess
-                : lastSchedulerProcess;
+        // In the time range, there are both manual and scheduled workflow instances, return the last workflow instance
+        return lastManualProcess.getId() > lastSchedulerProcess.getId() ? lastManualProcess : lastSchedulerProcess;
     }
 
     /**

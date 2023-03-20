@@ -26,14 +26,12 @@ import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.google.common.base.Strings;
 
+@Slf4j
 public class MasterRegistryDataListener implements SubscribeListener {
-
-    private static final Logger logger = LoggerFactory.getLogger(MasterRegistryDataListener.class);
 
     private final MasterRegistryClient masterRegistryClient;
 
@@ -60,7 +58,7 @@ public class MasterRegistryDataListener implements SubscribeListener {
         final String path = event.path();
         switch (event.type()) {
             case ADD:
-                logger.info("master node added : {}", path);
+                log.info("master node added : {}", path);
                 break;
             case REMOVE:
                 masterRegistryClient.removeMasterNodePath(path, NodeType.MASTER, true);
@@ -75,10 +73,10 @@ public class MasterRegistryDataListener implements SubscribeListener {
         final String path = event.path();
         switch (event.type()) {
             case ADD:
-                logger.info("worker node added : {}", path);
+                log.info("worker node added : {}", path);
                 break;
             case REMOVE:
-                logger.info("worker node deleted : {}", path);
+                log.info("worker node deleted : {}", path);
                 masterRegistryClient.removeWorkerNodePath(path, NodeType.WORKER, true);
                 break;
             default:

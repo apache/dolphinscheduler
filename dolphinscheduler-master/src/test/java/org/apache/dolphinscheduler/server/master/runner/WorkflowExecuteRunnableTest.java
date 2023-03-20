@@ -22,9 +22,11 @@ import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.C
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_RECOVERY_START_NODE_STRING;
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_START_NODES;
 
+import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.graph.DAG;
+import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -39,6 +41,7 @@ import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
+import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.lang.reflect.Field;
@@ -256,6 +259,61 @@ public class WorkflowExecuteRunnableTest {
         } catch (Exception e) {
             Assertions.fail();
         }
+    }
+
+    @Test
+    public void testClearDataIfExecuteTask() throws NoSuchFieldException, IllegalAccessException {
+        TaskInstance taskInstance1 = new TaskInstance();
+        taskInstance1.setId(1);
+        taskInstance1.setTaskCode(1);
+
+        TaskInstance taskInstance2 = new TaskInstance();
+        taskInstance2.setId(2);
+        taskInstance2.setTaskCode(2);
+
+        Map<Integer, TaskInstance> taskInstanceMap = new ConcurrentHashMap<>();
+        taskInstanceMap.put(taskInstance1.getId(), taskInstance1);
+        taskInstanceMap.put(taskInstance2.getId(), taskInstance2);
+
+        Map<Long, Integer> completeTaskList = new ConcurrentHashMap<>();
+        completeTaskList.put(taskInstance1.getTaskCode(), taskInstance1.getId());
+        completeTaskList.put(taskInstance2.getTaskCode(), taskInstance2.getId());
+
+        Class<WorkflowExecuteRunnable> masterExecThreadClass = WorkflowExecuteRunnable.class;
+
+        Field completeTaskMapField = masterExecThreadClass.getDeclaredField("completeTaskMap");
+        completeTaskMapField.setAccessible(true);
+        completeTaskMapField.set(workflowExecuteThread, completeTaskList);
+
+        Field taskInstanceMapField = masterExecThreadClass.getDeclaredField("taskInstanceMap");
+        taskInstanceMapField.setAccessible(true);
+        taskInstanceMapField.set(workflowExecuteThread, taskInstanceMap);
+
+        Mockito.when(processInstance.getCommandType()).thenReturn(CommandType.EXECUTE_TASK);
+        Mockito.when(processInstance.getId()).thenReturn(123);
+
+        DAG<String, TaskNode, TaskNodeRelation> dag = Mockito.mock(DAG.class);
+        Set<String> taskCodesString = new HashSet<>();
+        taskCodesString.add("1");
+        taskCodesString.add("2");
+        Mockito.when(dag.getAllNodesList()).thenReturn(taskCodesString);
+        Mockito.when(dag.containsNode("1")).thenReturn(true);
+        Mockito.when(dag.containsNode("2")).thenReturn(false);
+
+        Field dagField = masterExecThreadClass.getDeclaredField("dag");
+        dagField.setAccessible(true);
+        dagField.set(workflowExecuteThread, dag);
+
+        Mockito.when(taskInstanceDao.findTaskByInstanceIdAndCode(processInstance.getId(), taskInstance1.getTaskCode()))
+                .thenReturn(taskInstance1);
+        Mockito.when(taskInstanceDao.findTaskByInstanceIdAndCode(processInstance.getId(), taskInstance2.getTaskCode()))
+                .thenReturn(null);
+
+        workflowExecuteThread.clearDataIfExecuteTask();
+
+        Assertions.assertEquals(1, taskInstanceMap.size());
+        Assertions.assertEquals(1, completeTaskList.size());
+
     }
 
     private List<Schedule> zeroSchedulerList() {

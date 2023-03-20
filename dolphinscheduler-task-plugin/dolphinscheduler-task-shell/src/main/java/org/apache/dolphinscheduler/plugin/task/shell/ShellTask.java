@@ -71,17 +71,17 @@ public class ShellTask extends AbstractTask {
         this.taskExecutionContext = taskExecutionContext;
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
                 taskExecutionContext,
-                logger);
+                log);
     }
 
     @Override
     public void init() {
-        logger.info("shell task params {}", taskExecutionContext.getTaskParams());
 
         shellParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), ShellParameters.class);
+        log.info("Initialize shell task params {}", JSONUtils.toPrettyJsonString(shellParameters));
 
-        if (!shellParameters.checkParameters()) {
-            throw new RuntimeException("shell task params is not valid");
+        if (shellParameters == null || !shellParameters.checkParameters()) {
+            throw new TaskException("shell task params is not valid");
         }
     }
 
@@ -90,17 +90,17 @@ public class ShellTask extends AbstractTask {
         try {
             // construct process
             String command = buildCommand();
-            TaskResponse commandExecuteResult = shellCommandExecutor.run(command);
+            TaskResponse commandExecuteResult = shellCommandExecutor.run(command, taskCallBack);
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
             setProcessId(commandExecuteResult.getProcessId());
             shellParameters.dealOutParam(shellCommandExecutor.getVarPool());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            logger.error("The current Shell task has been interrupted", e);
+            log.error("The current Shell task has been interrupted", e);
             setExitStatusCode(EXIT_CODE_FAILURE);
             throw new TaskException("The current Shell task has been interrupted", e);
         } catch (Exception e) {
-            logger.error("shell task error", e);
+            log.error("shell task error", e);
             setExitStatusCode(EXIT_CODE_FAILURE);
             throw new TaskException("Execute shell task error", e);
         }
@@ -133,16 +133,16 @@ public class ShellTask extends AbstractTask {
 
         if (Files.exists(path)) {
             // this shouldn't happen
-            logger.warn("The command file: {} is already exist", path);
+            log.warn("The command file: {} is already exist", path);
             return fileName;
         }
 
-        String script = shellParameters.getRawScript().replaceAll("\\r\\n", "\n");
+        String script = shellParameters.getRawScript().replaceAll("\\r\\n", System.lineSeparator());
         script = parseScript(script);
         shellParameters.setRawScript(script);
 
-        logger.info("raw script : {}", shellParameters.getRawScript());
-        logger.info("task execute path : {}", taskExecutionContext.getExecutePath());
+        log.info("raw script : {}", shellParameters.getRawScript());
+        log.info("task execute path : {}", taskExecutionContext.getExecutePath());
 
         FileUtils.createFileWith755(path);
         Files.write(path, shellParameters.getRawScript().getBytes(), StandardOpenOption.APPEND);

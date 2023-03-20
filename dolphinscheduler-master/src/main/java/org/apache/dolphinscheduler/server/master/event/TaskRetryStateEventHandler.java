@@ -24,22 +24,20 @@ import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.google.auto.service.AutoService;
 
 @AutoService(StateEventHandler.class)
+@Slf4j
 public class TaskRetryStateEventHandler implements StateEventHandler {
-
-    private static final Logger logger = LoggerFactory.getLogger(TaskRetryStateEventHandler.class);
 
     @Override
     public boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable,
                                     StateEvent stateEvent) throws StateEventHandleException {
         TaskStateEvent taskStateEvent = (TaskStateEvent) stateEvent;
 
-        logger.info("Handle task instance retry event, taskInstanceId: {}", taskStateEvent.getTaskInstanceId());
+        log.info("Handle task instance retry event, taskCode: {}", taskStateEvent.getTaskCode());
 
         TaskMetrics.incTaskInstanceByState("retry");
         Map<Long, TaskInstance> waitToRetryTaskInstanceMap = workflowExecuteRunnable.getWaitToRetryTaskInstanceMap();

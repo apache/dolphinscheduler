@@ -18,7 +18,9 @@
 package org.apache.dolphinscheduler.plugin.task.api;
 
 import org.apache.dolphinscheduler.plugin.task.api.utils.FileUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ShellUtils;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -27,6 +29,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.Objects;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
 
@@ -91,25 +94,36 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
 
         StringBuilder sb = new StringBuilder();
         if (SystemUtils.IS_OS_WINDOWS) {
-            sb.append("@echo off\n");
-            sb.append("cd /d %~dp0\n");
-            if (StringUtils.isNotBlank(taskRequest.getEnvironmentConfig())) {
-                sb.append(taskRequest.getEnvironmentConfig()).append("\n");
-            } else {
-                if (taskRequest.getEnvFile() != null) {
-                    sb.append("call ").append(taskRequest.getEnvFile()).append("\n");
+            sb.append("@echo off").append(System.lineSeparator());
+            sb.append("cd /d %~dp0").append(System.lineSeparator());
+            if (CollectionUtils.isNotEmpty(ShellUtils.ENV_SOURCE_LIST)) {
+                for (String envSourceFile : ShellUtils.ENV_SOURCE_LIST) {
+                    sb.append("call ").append(envSourceFile).append("\n");
                 }
             }
-        } else {
-            sb.append("#!/bin/bash\n");
-            sb.append("BASEDIR=$(cd `dirname $0`; pwd)\n");
-            sb.append("cd $BASEDIR\n");
             if (StringUtils.isNotBlank(taskRequest.getEnvironmentConfig())) {
-                sb.append(taskRequest.getEnvironmentConfig()).append("\n");
-            } else {
-                if (taskRequest.getEnvFile() != null) {
-                    sb.append("source ").append(taskRequest.getEnvFile()).append("\n");
+                sb.append(taskRequest.getEnvironmentConfig()).append(System.lineSeparator());
+            }
+        } else {
+            sb.append("#!/bin/bash").append(System.lineSeparator());
+            sb.append("BASEDIR=$(cd `dirname $0`; pwd)").append(System.lineSeparator());
+            sb.append("cd $BASEDIR").append(System.lineSeparator());
+            if (CollectionUtils.isNotEmpty(ShellUtils.ENV_SOURCE_LIST)) {
+                for (String envSourceFile : ShellUtils.ENV_SOURCE_LIST) {
+                    sb.append("source ").append(envSourceFile).append("\n");
                 }
+            }
+            if (StringUtils.isNotBlank(taskRequest.getEnvironmentConfig())) {
+                sb.append(taskRequest.getEnvironmentConfig()).append(System.lineSeparator());
+            }
+            if (Objects.nonNull(taskRequest.getK8sTaskExecutionContext())) {
+                String configYaml = taskRequest.getK8sTaskExecutionContext().getConfigYaml();
+                Path kubeConfigPath = Paths.get(org.apache.dolphinscheduler.common.utils.FileUtils
+                        .getKubeConfigPath(taskRequest.getExecutePath()));
+                FileUtils.createFileWith755(kubeConfigPath);
+                Files.write(kubeConfigPath, configYaml.getBytes(), StandardOpenOption.APPEND);
+                sb.append("export KUBECONFIG=" + kubeConfigPath).append(System.lineSeparator());
+                logger.info("Create kubernetes configuration file: {}.", kubeConfigPath);
             }
         }
         sb.append(execCommand);

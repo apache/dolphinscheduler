@@ -30,13 +30,11 @@ import org.apache.dolphinscheduler.spi.enums.DbConnectType;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -57,7 +55,7 @@ public class OracleDataSourceProcessor extends AbstractDataSourceProcessor {
 
         oracleDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
         oracleDatasourceParamDTO.setUserName(connectionParams.getUser());
-        oracleDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
+        oracleDatasourceParamDTO.setOther(connectionParams.getOther());
 
         String hostSeperator = Constants.DOUBLE_SLASH;
         if (DbConnectType.ORACLE_SID.equals(connectionParams.connectType)) {
@@ -95,8 +93,7 @@ public class OracleDataSourceProcessor extends AbstractDataSourceProcessor {
         oracleConnectionParam.setConnectType(oracleParam.getConnectType());
         oracleConnectionParam.setDriverClassName(getDatasourceDriver());
         oracleConnectionParam.setValidationQuery(getValidationQuery());
-        oracleConnectionParam.setOther(transformOther(oracleParam.getOther()));
-        oracleConnectionParam.setProps(oracleParam.getOther());
+        oracleConnectionParam.setOther(oracleParam.getOther());
 
         return oracleConnectionParam;
     }
@@ -119,8 +116,9 @@ public class OracleDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public String getJdbcUrl(ConnectionParam connectionParam) {
         OracleConnectionParam oracleConnectionParam = (OracleConnectionParam) connectionParam;
-        if (!StringUtils.isEmpty(oracleConnectionParam.getOther())) {
-            return String.format("%s?%s", oracleConnectionParam.getJdbcUrl(), oracleConnectionParam.getOther());
+        if (MapUtils.isNotEmpty(oracleConnectionParam.getOther())) {
+            return String.format("%s?%s", oracleConnectionParam.getJdbcUrl(),
+                    transformOther(oracleConnectionParam.getOther()));
         }
         return oracleConnectionParam.getJdbcUrl();
     }
@@ -147,20 +145,9 @@ public class OracleDataSourceProcessor extends AbstractDataSourceProcessor {
         if (MapUtils.isEmpty(otherMap)) {
             return null;
         }
-        List<String> list = new ArrayList<>();
-        otherMap.forEach((key, value) -> list.add(String.format("%s=%s", key, value)));
-        return String.join("&", list);
+        List<String> otherList = new ArrayList<>();
+        otherMap.forEach((key, value) -> otherList.add(String.format("%s=%s", key, value)));
+        return String.join("&", otherList);
     }
 
-    private Map<String, String> parseOther(String other) {
-        if (StringUtils.isEmpty(other)) {
-            return null;
-        }
-        Map<String, String> otherMap = new LinkedHashMap<>();
-        String[] configs = other.split("&");
-        for (String config : configs) {
-            otherMap.put(config.split("=")[0], config.split("=")[1]);
-        }
-        return otherMap;
-    }
 }

@@ -39,7 +39,7 @@ public class WorkflowStateEvent implements StateEvent {
     /**
      * Some event may contains taskInstanceId
      */
-    private int taskInstanceId;
+    private Integer taskInstanceId;
 
     private WorkflowExecutionStatus status;
 

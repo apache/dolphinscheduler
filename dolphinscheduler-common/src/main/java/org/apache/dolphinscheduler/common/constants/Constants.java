@@ -28,6 +28,8 @@ public final class Constants {
         throw new UnsupportedOperationException("Construct Constants");
     }
 
+    public static final String AUTO_CLOSE_ALERT = "alert.auto-close";
+
     /**
      * common properties path
      */
@@ -50,12 +52,6 @@ public final class Constants {
     public static final String RESOURCE_TYPE_FILE = "resources";
 
     public static final String RESOURCE_TYPE_UDF = "udfs";
-
-    public static final String STORAGE_S3 = "S3";
-
-    public static final String STORAGE_OSS = "OSS";
-
-    public static final String STORAGE_HDFS = "HDFS";
 
     public static final String EMPTY_STRING = "";
 
@@ -147,6 +143,10 @@ public final class Constants {
     public static final String ALIBABA_CLOUD_OSS_BUCKET_NAME = "resource.alibaba.cloud.oss.bucket.name";
     public static final String ALIBABA_CLOUD_OSS_END_POINT = "resource.alibaba.cloud.oss.endpoint";
 
+    public static final String GOOGLE_CLOUD_STORAGE_BUCKET_NAME = "resource.google.cloud.storage.bucket.name";
+
+    public static final String GOOGLE_CLOUD_STORAGE_CREDENTIAL = "resource.google.cloud.storage.credential";
+
     /**
      * fetch applicationId way
      */
@@ -228,7 +228,7 @@ public final class Constants {
     public static final int HTTP_CONNECTION_REQUEST_TIMEOUT = 60 * 1000;
 
     /**
-     * httpclient soceket time out
+     * httpclient socket time out
      */
     public static final int SOCKET_TIMEOUT = 60 * 1000;
 
@@ -303,7 +303,7 @@ public final class Constants {
     public static final int DEFAULT_WORKER_HOST_WEIGHT = 100;
 
     /**
-     * time unit secong to minutes
+     * time unit second to minutes
      */
     public static final int SEC_2_MINUTES_TIME_UNIT = 60;
 
@@ -332,6 +332,9 @@ public final class Constants {
     public static final String THREAD_NAME_MASTER_SERVER = "Master-Server";
     public static final String THREAD_NAME_WORKER_SERVER = "Worker-Server";
     public static final String THREAD_NAME_ALERT_SERVER = "Alert-Server";
+
+    // suffix of crc file
+    public static final String CRC_SUFFIX = ".crc";
 
     /**
      * complement date default cron string
@@ -802,4 +805,44 @@ public final class Constants {
     public static final String KERBEROS_KRB5_CONF_PATH = "javaSecurityKrb5Conf";
     public static final String KERBEROS_KEY_TAB_USERNAME = "loginUserKeytabUsername";
     public static final String KERBEROS_KEY_TAB_PATH = "loginUserKeytabPath";
+
+    public static final Integer QUERY_ALL_ON_SYSTEM = 0;
+    public static final Integer QUERY_ALL_ON_PROJECT = 1;
+    public static final Integer QUERY_ALL_ON_WORKFLOW = 2;
+    public static final Integer QUERY_ALL_ON_TASK = 3;
+
+    /**
+     * remote logging
+     */
+    public static final String REMOTE_LOGGING_ENABLE = "remote.logging.enable";
+
+    public static final String REMOTE_LOGGING_TARGET = "remote.logging.target";
+
+    public static final String REMOTE_LOGGING_BASE_DIR = "remote.logging.base.dir";
+
+    public static final String REMOTE_LOGGING_THREAD_POOL_SIZE = "remote.logging.thread.pool.size";
+
+    /**
+     * remote logging for OSS
+     */
+    public static final String REMOTE_LOGGING_OSS_ACCESS_KEY_ID = "remote.logging.oss.access.key.id";
+
+    public static final String REMOTE_LOGGING_OSS_ACCESS_KEY_SECRET = "remote.logging.oss.access.key.secret";
+
+    public static final String REMOTE_LOGGING_OSS_BUCKET_NAME = "remote.logging.oss.bucket.name";
+
+    public static final String REMOTE_LOGGING_OSS_ENDPOINT = "remote.logging.oss.endpoint";
+
+    /**
+     * remote logging for S3
+     */
+    public static final String REMOTE_LOGGING_S3_ACCESS_KEY_ID = "remote.logging.s3.access.key.id";
+
+    public static final String REMOTE_LOGGING_S3_ACCESS_KEY_SECRET = "remote.logging.s3.access.key.secret";
+
+    public static final String REMOTE_LOGGING_S3_BUCKET_NAME = "remote.logging.s3.bucket.name";
+
+    public static final String REMOTE_LOGGING_S3_ENDPOINT = "remote.logging.s3.endpoint";
+
+    public static final String REMOTE_LOGGING_S3_REGION = "remote.logging.s3.region";
 }

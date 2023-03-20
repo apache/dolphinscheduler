@@ -82,13 +82,13 @@ public class DataQualityTask extends AbstractYarnTask {
 
     @Override
     public void init() {
-        logger.info("data quality task params {}", dqTaskExecutionContext.getTaskParams());
 
         dataQualityParameters =
                 JSONUtils.parseObject(dqTaskExecutionContext.getTaskParams(), DataQualityParameters.class);
+        log.info("Initialize data quality task params {}", JSONUtils.toPrettyJsonString(dataQualityParameters));
 
         if (null == dataQualityParameters) {
-            logger.error("data quality params is null");
+            log.error("data quality params is null");
             return;
         }
 
@@ -175,7 +175,7 @@ public class DataQualityTask extends AbstractYarnTask {
         Map<String, Property> paramsMap = dqTaskExecutionContext.getPrepareParamsMap();
         String command =
                 ParameterUtils.convertParameterPlaceholders(String.join(" ", args), ParamUtils.convert(paramsMap));
-        logger.info("data quality task command: {}", command);
+        log.info("data quality task command: {}", command);
 
         return command;
     }

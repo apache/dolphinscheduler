@@ -23,20 +23,14 @@ import {
   toRefs,
   watch
 } from 'vue'
-import {
-  NButton,
-  NInput,
-  NIcon,
-  NDataTable,
-  NPagination,
-  NSpace
-} from 'naive-ui'
+import { NButton, NIcon, NDataTable, NPagination, NSpace } from 'naive-ui'
 import { SearchOutlined } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
 import { useColumns } from './use-columns'
 import { useTable } from './use-table'
 import { DefaultTableWidth } from '@/common/column-width-config'
 import Card from '@/components/card'
+import Search from '@/components/input-search'
 import DetailModal from './detail'
 import type { TableColumns } from './types'
 import SourceModal from './source-modal'
@@ -56,15 +50,17 @@ const list = defineComponent({
     const { data, changePage, changePageSize, deleteRecord, updateList } =
       useTable()
 
-    const { getColumns } = useColumns((id: number, type: 'edit' | 'delete', row?: any) => {
-      if (type === 'edit') {
-        showDetailModal.value = true
-        selectId.value = id
-        selectType.value = row.type
-      } else {
-        deleteRecord(id)
+    const { getColumns } = useColumns(
+      (id: number, type: 'edit' | 'delete', row?: any) => {
+        if (type === 'edit') {
+          showDetailModal.value = true
+          selectId.value = id
+          selectType.value = row.type
+        } else {
+          deleteRecord(id)
+        }
       }
-    })
+    )
 
     const onCreate = () => {
       selectId.value = null
@@ -81,6 +77,10 @@ const list = defineComponent({
 
     const handleSourceModalOpen = () => {
       showSourceModal.value = true
+    }
+
+    const handleSourceModalClose = () => {
+      showSourceModal.value = false
     }
 
     onMounted(() => {
@@ -106,7 +106,8 @@ const list = defineComponent({
       trim,
       handleSelectSourceType,
       selectType,
-      handleSourceModalOpen
+      handleSourceModalOpen,
+      handleSourceModalClose
     }
   },
   render() {
@@ -127,7 +128,8 @@ const list = defineComponent({
       onUpdatedList,
       handleSelectSourceType,
       selectType,
-      handleSourceModalOpen
+      handleSourceModalOpen,
+      handleSourceModalClose
     } = this
 
     return (
@@ -143,11 +145,10 @@ const list = defineComponent({
               {t('datasource.create_datasource')}
             </NButton>
             <NSpace justify='end' wrap={false}>
-              <NInput
-                allowInput={this.trim}
-                v-model={[this.searchVal, 'value']}
-                size='small'
-                placeholder={`${t('datasource.search_input_tips')}`}
+              <Search
+                v-model:value={this.searchVal}
+                placeholder={t('datasource.search_input_tips')}
+                onSearch={onUpdatedList}
               />
               <NButton type='primary' size='small' onClick={onUpdatedList}>
                 <NIcon>
@@ -181,7 +182,11 @@ const list = defineComponent({
             </NSpace>
           </NSpace>
         </Card>
-        <SourceModal show={showSourceModal} onChange={handleSelectSourceType}></SourceModal>
+        <SourceModal
+          show={showSourceModal}
+          onChange={handleSelectSourceType}
+          onMaskClick={handleSourceModalClose}
+        ></SourceModal>
         <DetailModal
           show={showDetailModal}
           id={id}

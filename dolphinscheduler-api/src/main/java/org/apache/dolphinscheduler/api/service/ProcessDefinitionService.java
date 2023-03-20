@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -146,18 +147,22 @@ public interface ProcessDefinitionService {
      * Get resource workflow
      *
      * @param loginUser login user
-     * @param code process definition code
+     * @param code      process definition code
      * @return Process definition Object
      */
     ProcessDefinition getProcessDefinition(User loginUser,
                                            long code);
 
+    Optional<ProcessDefinition> queryWorkflowDefinition(long workflowDefinitionCode, int workflowDefinitionVersion);
+    ProcessDefinition queryWorkflowDefinitionThrowExceptionIfNotFound(long workflowDefinitionCode,
+                                                                      int workflowDefinitionVersion);
+
     /**
      * query detail of process definition
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param name process definition name
+     * @param name        process definition name
      * @return process definition detail
      */
 
@@ -248,14 +253,7 @@ public interface ProcessDefinitionService {
                                                             long projectCode,
                                                             String codes);
 
-    /**
-     * delete process definition by code
-     *
-     * @param loginUser login user
-     * @param code process definition code
-     */
-    void deleteProcessDefinitionByCode(User loginUser,
-                                       long code);
+    void deleteProcessDefinitionByCode(User loginUser, long workflowDefinitionCode);
 
     /**
      * release process definition: online / offline

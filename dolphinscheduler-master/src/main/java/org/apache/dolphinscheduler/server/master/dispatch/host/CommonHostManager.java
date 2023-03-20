@@ -20,10 +20,11 @@ package org.apache.dolphinscheduler.server.master.dispatch.host;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
+import org.apache.dolphinscheduler.server.master.dispatch.exceptions.WorkerGroupNotFoundException;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostWorker;
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -48,9 +49,10 @@ public abstract class CommonHostManager implements HostManager {
      *
      * @param context context
      * @return host
+     * @throws WorkerGroupNotFoundException If the worker group not found
      */
     @Override
-    public Host select(ExecutionContext context) {
+    public Host select(ExecutionContext context) throws WorkerGroupNotFoundException {
         List<HostWorker> candidates = null;
         String workerGroup = context.getWorkerGroup();
         ExecutorType executorType = context.getExecutorType();
@@ -72,7 +74,7 @@ public abstract class CommonHostManager implements HostManager {
 
     protected abstract HostWorker select(Collection<HostWorker> nodes);
 
-    protected List<HostWorker> getWorkerCandidates(String workerGroup) {
+    protected List<HostWorker> getWorkerCandidates(String workerGroup) throws WorkerGroupNotFoundException {
         List<HostWorker> hostWorkers = new ArrayList<>();
         Set<String> nodes = serverNodeManager.getWorkerGroupNodes(workerGroup);
         if (CollectionUtils.isNotEmpty(nodes)) {

@@ -17,8 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.sqoop;
 
+import org.apache.dolphinscheduler.common.log.SensitiveDataConverter;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
@@ -53,20 +55,21 @@ public class SqoopTask extends AbstractYarnTask {
 
     @Override
     public void init() {
-        logger.info("sqoop task params {}", taskExecutionContext.getTaskParams());
         sqoopParameters =
                 JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SqoopParameters.class);
-        // check sqoop task params
+        log.info("Initialize sqoop task params {}", JSONUtils.toPrettyJsonString(sqoopParameters));
         if (null == sqoopParameters) {
-            throw new IllegalArgumentException("Sqoop Task params is null");
+            throw new TaskException("Sqoop Task params is null");
         }
 
         if (!sqoopParameters.checkParameters()) {
-            throw new IllegalArgumentException("Sqoop Task params check fail");
+            throw new TaskException("Sqoop Task params check fail");
         }
 
         sqoopTaskExecutionContext =
                 sqoopParameters.generateExtendedContext(taskExecutionContext.getResourceParametersHelper());
+
+        SensitiveDataConverter.addMaskPattern(SqoopConstants.SQOOP_PASSWORD_REGEX);
     }
 
     @Override
@@ -79,7 +82,7 @@ public class SqoopTask extends AbstractYarnTask {
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
 
         String resultScripts = ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
-        logger.info("sqoop script: {}", resultScripts);
+        log.info("sqoop script: {}", resultScripts);
         return resultScripts;
 
     }

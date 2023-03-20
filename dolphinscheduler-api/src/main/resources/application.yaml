@@ -61,17 +61,14 @@ spring:
     jdbc:
       initialize-schema: never
     properties:
-      org.quartz.threadPool.threadPriority: 5
       org.quartz.jobStore.isClustered: true
       org.quartz.jobStore.class: org.springframework.scheduling.quartz.LocalDataSourceJobStore
       org.quartz.scheduler.instanceId: AUTO
       org.quartz.jobStore.tablePrefix: QRTZ_
       org.quartz.jobStore.acquireTriggersWithinLock: true
       org.quartz.scheduler.instanceName: DolphinScheduler
-      org.quartz.threadPool.class: org.quartz.simpl.SimpleThreadPool
+      org.quartz.threadPool.class: org.apache.dolphinscheduler.scheduler.quartz.QuartzZeroSizeThreadPool
       org.quartz.jobStore.useProperties: false
-      org.quartz.threadPool.makeThreadsDaemons: true
-      org.quartz.threadPool.threadCount: 25
       org.quartz.jobStore.misfireThreshold: 60000
       org.quartz.scheduler.makeSchedulerThreadDaemon: true
       org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
@@ -80,6 +77,7 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
+    static-path-pattern: /static/**
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
@@ -126,6 +124,9 @@ metrics:
 python-gateway:
   # Weather enable python gateway server or not. The default value is true.
   enabled: true
+  # Authentication token for connection from python api to python gateway server. Should be changed the default value
+  # when you deploy in public network.
+  auth-token: jwUDzpLsNKEFER4*a8gruBH_GsAurNxU7A@Xc
   # The address of Python gateway server start. Set its value to `0.0.0.0` if your Python API run in different
   # between Python gateway server. It could be be specific to other address like `127.0.0.1` or `localhost`
   gateway-server-address: 0.0.0.0

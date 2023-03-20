@@ -68,16 +68,10 @@ public class LdapServiceTest {
     public void ldapLogin() {
         String email = ldapService.ldapLogin("tesla", "password");
         Assertions.assertEquals("tesla@ldap.forumsys.com", email);
-
-        String email2 = ldapService.ldapLogin("tesla", "error password");
-        Assertions.assertNull(email2);
     }
 
     @Test
     public void ldapLoginError() {
-        String email = ldapService.ldapLogin("tesla", "password");
-        Assertions.assertEquals("tesla@ldap.forumsys.com", email);
-
         String email2 = ldapService.ldapLogin("tesla", "error password");
         Assertions.assertNull(email2);
     }

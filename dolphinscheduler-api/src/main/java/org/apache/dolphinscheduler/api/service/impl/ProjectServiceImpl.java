@@ -24,6 +24,7 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectService;
+import org.apache.dolphinscheduler.api.service.TaskGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -56,10 +57,10 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,9 +71,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * project service impl
  **/
 @Service
+@Slf4j
 public class ProjectServiceImpl extends BaseServiceImpl implements ProjectService {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProjectServiceImpl.class);
+    @Lazy
+    @Autowired
+    private TaskGroupService taskGroupService;
 
     @Autowired
     private ProjectMapper projectMapper;
@@ -90,8 +94,8 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      * create project
      *
      * @param loginUser login user
-     * @param name project name
-     * @param desc description
+     * @param name      project name
+     * @param desc      description
      * @return returns an error if it exists
      */
     @Override
@@ -110,7 +114,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
 
         Project project = projectMapper.queryByName(name);
         if (project != null) {
-            logger.warn("Project {} already exists.", project.getName());
+            log.warn("Project {} already exists.", project.getName());
             putMsg(result, Status.PROJECT_ALREADY_EXISTS, name);
             return result;
         }
@@ -129,19 +133,19 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
                     .updateTime(now)
                     .build();
         } catch (CodeGenerateException e) {
-            logger.error("Generate process definition code error.", e);
+            log.error("Generate process definition code error.", e);
             putMsg(result, Status.CREATE_PROJECT_ERROR);
             return result;
         }
 
         if (projectMapper.insert(project) > 0) {
-            logger.info("Project is created and id is :{}", project.getId());
+            log.info("Project is created and id is :{}", project.getId());
             result.setData(project);
             putMsg(result, Status.SUCCESS);
             permissionPostHandle(AuthorizationType.PROJECTS, loginUser.getId(),
-                    Collections.singletonList(project.getId()), logger);
+                    Collections.singletonList(project.getId()), log);
         } else {
-            logger.error("Project create error, projectName:{}.", project.getName());
+            log.error("Project create error, projectName:{}.", project.getName());
             putMsg(result, Status.CREATE_PROJECT_ERROR);
         }
         return result;
@@ -155,7 +159,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      */
     public static void checkDesc(Result result, String desc) {
         if (!StringUtils.isEmpty(desc) && desc.codePointCount(0, desc.length()) > 255) {
-            logger.warn("Parameter description check failed.");
+            log.warn("Parameter description check failed.");
             result.setCode(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode());
             result.setMsg(MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), "desc length"));
         } else {
@@ -212,12 +216,12 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
                                                    String permission) {
         Map<String, Object> result = new HashMap<>();
         if (project == null) {
-            logger.error("Project does not exist, projectCode:{}.", projectCode);
+            log.error("Project does not exist, projectCode:{}.", projectCode);
             putMsg(result, Status.PROJECT_NOT_EXIST);
         } else if (!canOperatorPermissions(loginUser, new Object[]{project.getId()}, AuthorizationType.PROJECTS,
                 permission)) {
             // check read permission
-            logger.error("User does not have {} permission to operate project, userName:{}, projectCode:{}.",
+            log.error("User does not have {} permission to operate project, userName:{}, projectCode:{}.",
                     permission, loginUser.getUserName(), projectCode);
             putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(), projectCode);
         } else {
@@ -239,14 +243,20 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     }
 
     @Override
+    public void checkProjectAndAuthThrowException(User loginUser, long projectCode, String permission) {
+        Project project = projectMapper.queryByCode(projectCode);
+        checkProjectAndAuthThrowException(loginUser, project, permission);
+    }
+
+    @Override
     public boolean hasProjectAndPerm(User loginUser, Project project, Map<String, Object> result, String permission) {
         boolean checkResult = false;
         if (project == null) {
-            logger.error("Project does not exist.");
+            log.error("Project does not exist.");
             putMsg(result, Status.PROJECT_NOT_FOUND, "");
         } else if (!canOperatorPermissions(loginUser, new Object[]{project.getId()}, AuthorizationType.PROJECTS,
                 permission)) {
-            logger.error("User does not have {} permission to operate project, userName:{}, projectCode:{}.",
+            log.error("User does not have {} permission to operate project, userName:{}, projectCode:{}.",
                     permission, loginUser.getUserName(), project.getCode());
             putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(), project.getCode());
         } else {
@@ -259,7 +269,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     public boolean hasProjectAndWritePerm(User loginUser, Project project, Result result) {
         boolean checkResult = false;
         if (project == null) {
-            logger.error("Project does not exist.");
+            log.error("Project does not exist.");
             putMsg(result, Status.PROJECT_NOT_FOUND, "");
         } else {
             // case 1: user is admin
@@ -286,7 +296,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     public boolean hasProjectAndWritePerm(User loginUser, Project project, Map<String, Object> result) {
         boolean checkResult = false;
         if (project == null) {
-            logger.error("Project does not exist.");
+            log.error("Project does not exist.");
             putMsg(result, Status.PROJECT_NOT_FOUND, "");
         } else {
             // case 1: user is admin
@@ -313,11 +323,11 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     public boolean hasProjectAndPerm(User loginUser, Project project, Result result, String permission) {
         boolean checkResult = false;
         if (project == null) {
-            logger.error("Project does not exist.");
+            log.error("Project does not exist.");
             putMsg(result, Status.PROJECT_NOT_FOUND, "");
         } else if (!canOperatorPermissions(loginUser, new Object[]{project.getId()}, AuthorizationType.PROJECTS,
                 permission)) {
-            logger.error("User does not have {} permission to operate project, userName:{}, projectCode:{}.",
+            log.error("User does not have {} permission to operate project, userName:{}, projectCode:{}.",
                     permission, loginUser.getUserName(), project.getCode());
             putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(), project.getName());
         } else {
@@ -331,8 +341,8 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageSize page size
-     * @param pageNo page number
+     * @param pageSize  page size
+     * @param pageNo    page number
      * @return project list which the login user have permission to see
      */
     @Override
@@ -341,7 +351,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         PageInfo<Project> pageInfo = new PageInfo<>(pageNo, pageSize);
         Page<Project> page = new Page<>(pageNo, pageSize);
         Set<Integer> projectIds = resourcePermissionCheckService
-                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), logger);
+                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), log);
         if (projectIds.isEmpty()) {
             result.setData(pageInfo);
             putMsg(result, Status.SUCCESS);
@@ -366,11 +376,11 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     /**
      * admin can view all projects
      *
-     * @param userId user id
+     * @param userId    user id
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageSize page size
-     * @param pageNo page number
+     * @param pageSize  page size
+     * @param pageNo    page number
      * @return project list which with the login user's authorized level
      */
     @Override
@@ -380,9 +390,9 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         PageInfo<Project> pageInfo = new PageInfo<>(pageNo, pageSize);
         Page<Project> page = new Page<>(pageNo, pageSize);
         Set<Integer> allProjectIds = resourcePermissionCheckService
-                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), logger);
+                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), log);
         Set<Integer> userProjectIds = resourcePermissionCheckService
-                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, userId, logger);
+                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, userId, log);
         if (allProjectIds.isEmpty()) {
             result.setData(pageInfo);
             putMsg(result, Status.SUCCESS);
@@ -417,7 +427,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     /**
      * delete project by code
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
      * @return delete result code
      */
@@ -442,17 +452,20 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
                 processDefinitionMapper.queryAllDefinitionList(project.getCode());
 
         if (!processDefinitionList.isEmpty()) {
-            logger.warn("Please delete the process definitions in project first! project code:{}.", projectCode);
+            log.warn("Please delete the process definitions in project first! project code:{}.", projectCode);
             putMsg(result, Status.DELETE_PROJECT_ERROR_DEFINES_NOT_NULL);
             return result;
         }
+        // delete the task group
+        taskGroupService.deleteTaskGroupByProjectCode(project.getCode());
+
         int delete = projectMapper.deleteById(project.getId());
         if (delete > 0) {
-            logger.info("Project is deleted and id is :{}.", project.getId());
+            log.info("Project is deleted and id is :{}.", project.getId());
             result.setData(Boolean.TRUE);
             putMsg(result, Status.SUCCESS);
         } else {
-            logger.error("Project delete error, project code:{}, project name:{}.", projectCode, project.getName());
+            log.error("Project delete error, project code:{}, project name:{}.", projectCode, project.getName());
             putMsg(result, Status.DELETE_PROJECT_ERROR);
         }
         return result;
@@ -462,7 +475,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      * get check result
      *
      * @param loginUser login user
-     * @param project project
+     * @param project   project
      * @return check result
      */
     private Map<String, Object> getCheckResult(User loginUser, Project project, String perm) {
@@ -478,11 +491,11 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     /**
      * updateProcessInstance project
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
      * @param projectName project name
-     * @param desc description
-     * @param userName project owner
+     * @param desc        description
+     * @param userName    project owner
      * @return update result code
      */
     @Override
@@ -506,7 +519,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         }
         User user = userMapper.queryByUserNameAccurately(userName);
         if (user == null) {
-            logger.error("User does not exist.");
+            log.error("User does not exist.");
             putMsg(result, Status.USER_NOT_EXIST, userName);
             return result;
         }
@@ -516,11 +529,11 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         project.setUserId(user.getId());
         int update = projectMapper.updateById(project);
         if (update > 0) {
-            logger.info("Project is updated and id is :{}", project.getId());
+            log.info("Project is updated and id is :{}", project.getId());
             result.setData(project);
             putMsg(result, Status.SUCCESS);
         } else {
-            logger.error("Project update error, projectCode:{}, projectName:{}.", project.getCode(), project.getName());
+            log.error("Project update error, projectCode:{}, projectName:{}.", project.getCode(), project.getName());
             putMsg(result, Status.UPDATE_PROJECT_ERROR);
         }
         return result;
@@ -528,6 +541,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
 
     /**
      * query all project with authorized level
+     *
      * @param loginUser login user
      * @return project list
      */
@@ -536,7 +550,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         Result result = new Result();
 
         Set<Integer> projectIds = resourcePermissionCheckService
-                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), logger);
+                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), log);
         List<Project> projectList = projectMapper.listAuthorizedProjects(
                 loginUser.getUserType().equals(UserType.ADMIN_USER) ? 0 : loginUser.getId(),
                 new ArrayList<>(projectIds));
@@ -571,7 +585,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      * query unauthorized project
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return the projects which user have not permission to see
      */
     @Override
@@ -579,7 +593,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         Result result = new Result();
 
         Set<Integer> projectIds = resourcePermissionCheckService
-                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), logger);
+                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), log);
         if (projectIds.isEmpty()) {
             result.setData(Collections.emptyList());
             putMsg(result, Status.SUCCESS);
@@ -606,7 +620,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     /**
      * get unauthorized project
      *
-     * @param projectSet project set
+     * @param projectSet        project set
      * @param authedProjectList authed project list
      * @return project list that unauthorized
      */
@@ -625,7 +639,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      * query authorized project
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return projects which the user have permission to see, Except for items created by this user
      */
     @Override
@@ -642,8 +656,8 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     /**
      * query authorized user
      *
-     * @param loginUser     login user
-     * @param projectCode   project code
+     * @param loginUser   login user
+     * @param projectCode project code
      * @return users        who have permission for the specified project
      */
     @Override
@@ -692,7 +706,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         Result result = new Result();
 
         Set<Integer> projectIds = resourcePermissionCheckService
-                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), logger);
+                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), log);
         if (projectIds.isEmpty()) {
             result.setData(Collections.emptyList());
             putMsg(result, Status.SUCCESS);
@@ -709,7 +723,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     /**
      * check whether have read permission
      *
-     * @param user user
+     * @param user    user
      * @param project project
      * @return true if the user have permission to see the project, otherwise return false
      */
@@ -721,7 +735,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     /**
      * query permission id
      *
-     * @param user user
+     * @param user    user
      * @param project project
      * @return permission
      */
@@ -746,6 +760,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
 
     /**
      * query all project list
+     *
      * @param user
      * @return project list
      */
@@ -773,7 +788,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     public void checkProjectAndAuth(Result result, User loginUser, Project project, long projectCode,
                                     String permission) {
         if (project == null) {
-            logger.error("Project does not exist, project code:{}.", projectCode);
+            log.error("Project does not exist, project code:{}.", projectCode);
             putMsg(result, Status.PROJECT_NOT_EXIST);
         } else if (!canOperatorPermissions(loginUser, new Object[]{project.getId()}, AuthorizationType.PROJECTS,
                 permission)) {
@@ -798,5 +813,4 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         putMsg(result, Status.SUCCESS);
         return result;
     }
-
 }

@@ -62,8 +62,8 @@ public class DatasyncHook {
     public static TaskExecutionStatus[] doneStatus =
             {TaskExecutionStatus.ERROR, TaskExecutionStatus.SUCCESS, TaskExecutionStatus.UNKNOWN_TO_SDK_VERSION};
     public static TaskStatus[] taskFinishFlags = {TaskStatus.UNAVAILABLE, TaskStatus.UNKNOWN_TO_SDK_VERSION};
-    protected final Logger logger =
-            LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
+    protected final Logger log =
+            LoggerFactory.getLogger(DatasyncHook.class);
     private DataSyncClient client;
     private String taskArn;
     private String taskExecArn;
@@ -86,7 +86,7 @@ public class DatasyncHook {
     }
 
     public Boolean createDatasyncTask(DatasyncParameters parameters) {
-        logger.info("createDatasyncTask ......");
+        log.info("createDatasyncTask ......");
         CreateTaskRequest.Builder builder = CreateTaskRequest.builder()
                 .name(parameters.getName())
                 .sourceLocationArn(parameters.getSourceLocationArn())
@@ -102,12 +102,12 @@ public class DatasyncHook {
         if (task.sdkHttpResponse().isSuccessful()) {
             taskArn = task.taskArn();
         }
-        logger.info("finished createDatasyncTask ......");
+        log.info("finished createDatasyncTask ......");
         return doubleCheckTaskStatus(TaskStatus.AVAILABLE, taskFinishFlags);
     }
 
     public Boolean startDatasyncTask() {
-        logger.info("startDatasyncTask ......");
+        log.info("startDatasyncTask ......");
         StartTaskExecutionRequest start = StartTaskExecutionRequest.builder().taskArn(taskArn).build();
         StartTaskExecutionResponse response = client.startTaskExecution(start);
         if (response.sdkHttpResponse().isSuccessful()) {
@@ -117,7 +117,7 @@ public class DatasyncHook {
     }
 
     public Boolean cancelDatasyncTask() {
-        logger.info("cancelTask ......");
+        log.info("cancelTask ......");
         CancelTaskExecutionRequest cancel = CancelTaskExecutionRequest.builder().taskExecutionArn(taskExecArn).build();
         CancelTaskExecutionResponse response = client.cancelTaskExecution(cancel);
         if (response.sdkHttpResponse().isSuccessful()) {
@@ -127,26 +127,26 @@ public class DatasyncHook {
     }
 
     public TaskStatus queryDatasyncTaskStatus() {
-        logger.info("queryDatasyncTaskStatus ......");
+        log.info("queryDatasyncTaskStatus ......");
 
         DescribeTaskRequest request = DescribeTaskRequest.builder().taskArn(taskArn).build();
         DescribeTaskResponse describe = client.describeTask(request);
 
         if (describe.sdkHttpResponse().isSuccessful()) {
-            logger.info("queryDatasyncTaskStatus ......{}", describe.statusAsString());
+            log.info("queryDatasyncTaskStatus ......{}", describe.statusAsString());
             return describe.status();
         }
         return null;
     }
 
     public TaskExecutionStatus queryDatasyncTaskExecStatus() {
-        logger.info("queryDatasyncTaskExecStatus ......");
+        log.info("queryDatasyncTaskExecStatus ......");
         DescribeTaskExecutionRequest request =
                 DescribeTaskExecutionRequest.builder().taskExecutionArn(taskExecArn).build();
         DescribeTaskExecutionResponse describe = client.describeTaskExecution(request);
 
         if (describe.sdkHttpResponse().isSuccessful()) {
-            logger.info("queryDatasyncTaskExecStatus ......{}", describe.statusAsString());
+            log.info("queryDatasyncTaskExecStatus ......{}", describe.statusAsString());
             return describe.status();
         }
         return null;
@@ -165,13 +165,13 @@ public class DatasyncHook {
             }
 
             if (exceptStatus.equals(status)) {
-                logger.info("double check success");
+                log.info("double check success");
                 return true;
             } else if (stopStatusSet.contains(status)) {
                 break;
             }
         }
-        logger.warn("double check error");
+        log.warn("double check error");
         return false;
     }
 
@@ -188,13 +188,13 @@ public class DatasyncHook {
             }
 
             if (exceptStatus.equals(status)) {
-                logger.info("double check success");
+                log.info("double check success");
                 return true;
             } else if (stopStatusSet.contains(status)) {
                 break;
             }
         }
-        logger.warn("double check error");
+        log.warn("double check error");
         return false;
     }
 
@@ -210,15 +210,15 @@ public class DatasyncHook {
             }
 
             if (expectStatus.equals(status)) {
-                logger.info("double check finish status success");
+                log.info("double check finish status success");
                 return true;
             } else if (stopStatusSet.contains(status)) {
                 break;
             }
-            logger.debug("wait 10s to recheck finish status....");
+            log.debug("wait 10s to recheck finish status....");
             Thread.sleep(10000);
         }
-        logger.warn("double check error");
+        log.warn("double check error");
         return false;
     }
 

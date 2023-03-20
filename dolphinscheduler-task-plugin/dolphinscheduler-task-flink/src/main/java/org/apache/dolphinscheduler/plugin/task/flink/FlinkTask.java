@@ -53,9 +53,9 @@ public class FlinkTask extends AbstractYarnTask {
 
     @Override
     public void init() {
-        logger.info("flink task params {}", taskExecutionContext.getTaskParams());
 
         flinkParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), FlinkParameters.class);
+        log.info("Initialize flink task params {}", JSONUtils.toPrettyJsonString(flinkParameters));
 
         if (flinkParameters == null || !flinkParameters.checkParameters()) {
             throw new RuntimeException("flink task params is not valid");
@@ -79,14 +79,14 @@ public class FlinkTask extends AbstractYarnTask {
         String command = ParameterUtils
                 .convertParameterPlaceholders(String.join(" ", args), taskExecutionContext.getDefinedParams());
 
-        logger.info("flink task command : {}", command);
+        log.info("flink task command : {}", command);
         return command;
     }
 
     @Override
     protected void setMainJarName() {
         if (flinkParameters.getProgramType() == ProgramType.SQL) {
-            logger.info("The current flink job type is SQL, will no need to set main jar");
+            log.info("The current flink job type is SQL, will no need to set main jar");
             return;
         }
 
@@ -94,7 +94,7 @@ public class FlinkTask extends AbstractYarnTask {
         String resourceName = getResourceNameOfMainJar(mainJar);
         mainJar.setRes(resourceName);
         flinkParameters.setMainJar(mainJar);
-        logger.info("Success set flink jar: {}", resourceName);
+        log.info("Success set flink jar: {}", resourceName);
     }
 
     @Override

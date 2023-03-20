@@ -126,9 +126,11 @@ public class FlinkArgsUtils {
         /**
          * Currently flink sql on yarn only supports yarn-per-job mode
          */
-        if (FlinkDeployMode.CLUSTER == deployMode) {
+        if (FlinkDeployMode.LOCAL == deployMode) {
             // execution.target
-            initOptions.add(String.format(FlinkConstants.FLINK_FORMAT_EXECUTION_TARGET, "local"));
+            initOptions.add(String.format(FlinkConstants.FLINK_FORMAT_EXECUTION_TARGET, FlinkConstants.FLINK_LOCAL));
+        } else if (FlinkDeployMode.STANDALONE == deployMode) {
+            // standalone exec
         } else {
             // execution.target
             initOptions.add(
@@ -209,6 +211,9 @@ public class FlinkArgsUtils {
             case LOCAL:
                 args.add(FlinkConstants.FLINK_RUN); // run
                 break;
+            case STANDALONE:
+                args.add(FlinkConstants.FLINK_RUN); // run
+                break;
         }
 
         String others = flinkParameters.getOthers();
@@ -258,6 +263,8 @@ public class FlinkArgsUtils {
                 }
                 break;
             case LOCAL:
+                break;
+            case STANDALONE:
                 break;
         }
 

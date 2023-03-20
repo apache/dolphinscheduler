@@ -33,8 +33,8 @@ import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -42,9 +42,8 @@ import org.springframework.web.servlet.ModelAndView;
 /**
  * login interceptor, must log in first
  */
+@Slf4j
 public class LoginHandlerInterceptor implements HandlerInterceptor {
-
-    private static final Logger logger = LoggerFactory.getLogger(LoginHandlerInterceptor.class);
 
     @Autowired
     private UserMapper userMapper;
@@ -70,14 +69,14 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
             // if user is null
             if (user == null) {
                 response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-                logger.info("user does not exist");
+                log.info("user does not exist");
                 return false;
             }
         } else {
             user = userMapper.queryUserByToken(token, new Date());
             if (user == null) {
                 response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-                logger.info("user token has expired");
+                log.info("user token has expired");
                 return false;
             }
         }
@@ -85,7 +84,7 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
         // check user state
         if (user.getState() == Flag.NO.ordinal()) {
             response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-            logger.info(Status.USER_DISABLED.getMsg());
+            log.info(Status.USER_DISABLED.getMsg());
             return false;
         }
         request.setAttribute(Constants.SESSION_USER, user);

@@ -118,6 +118,15 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 {{/*
+Create a default fully qualified minio name.
+We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
+*/}}
+{{- define "dolphinscheduler.minio.fullname" -}}
+{{- $name := default "minio" .Values.minio.nameOverride -}}
+{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{/*
 Create a default fully qualified zookkeeper quorum.
 */}}
 {{- define "dolphinscheduler.zookeeper.quorum" -}}
@@ -173,14 +182,26 @@ Wait for database to be ready.
 */}}
 {{- define "dolphinscheduler.database.wait-for-ready" -}}
 - name: wait-for-database
-  image: busybox:1.30
-  imagePullPolicy: IfNotPresent
+  image: {{ .Values.initImage.busybox }}
+  imagePullPolicy: {{ .Values.initImage.pullPolicy }}
 {{- if .Values.postgresql.enabled }}
   command: ['sh', '-xc', 'for i in $(seq 1 180); do nc -z -w3 {{ template "dolphinscheduler.postgresql.fullname" . }} 5432 && exit 0 || sleep 5; done; exit 1']
 {{- else if .Values.mysql.enabled }}
   command: ['sh', '-xc', 'for i in $(seq 1 180); do nc -z -w3 {{ template "dolphinscheduler.mysql.fullname" . }} 3306 && exit 0 || sleep 5; done; exit 1']
 {{- else }}
   command: ['sh', '-xc', 'for i in $(seq 1 180); do nc -z -w3 {{ .Values.externalDatabase.host }} {{ .Values.externalDatabase.port }} && exit 0 || sleep 5; done; exit 1']
+{{- end }}
+{{- end -}}
+
+{{/*
+Wait for minio to be ready.
+*/}}
+{{- define "dolphinscheduler.minio.wait-for-ready" -}}
+{{- if .Values.minio.enabled }}
+- name: wait-for-minio
+  image: {{ .Values.initImage.busybox }}
+  imagePullPolicy: {{ .Values.initImage.pullPolicy }}
+  command: ['sh', '-xc', 'for i in $(seq 1 180); do nc -z -w3 {{ template "dolphinscheduler.minio.fullname" . }} 9000 && exit 0 || sleep 5; done; exit 1']
 {{- end }}
 {{- end -}}
 

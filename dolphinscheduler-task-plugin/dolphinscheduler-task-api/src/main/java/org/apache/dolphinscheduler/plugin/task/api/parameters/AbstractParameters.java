@@ -139,7 +139,7 @@ public abstract class AbstractParameters implements IParameters {
             return;
         }
         if (StringUtils.isEmpty(result)) {
-            varPool.addAll(outProperty);
+            outProperty.forEach(this::addPropertyToValPool);
             return;
         }
         Map<String, String> taskResult = getMapByString(result);
@@ -199,7 +199,7 @@ public abstract class AbstractParameters implements IParameters {
         return new ResourceParametersHelper();
     }
 
-    private void addPropertyToValPool(Property property) {
+    public void addPropertyToValPool(Property property) {
         varPool.removeIf(p -> p.getProp().equals(property.getProp()));
         varPool.add(property);
     }

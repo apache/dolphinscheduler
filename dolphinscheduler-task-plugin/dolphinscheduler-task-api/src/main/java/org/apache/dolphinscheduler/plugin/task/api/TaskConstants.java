@@ -18,6 +18,10 @@
 package org.apache.dolphinscheduler.plugin.task.api;
 
 import java.time.Duration;
+import java.util.Set;
+import java.util.regex.Pattern;
+
+import com.google.common.collect.Sets;
 
 public class TaskConstants {
 
@@ -131,11 +135,6 @@ public class TaskConstants {
     public static final String SH = "sh";
 
     /**
-     * default log cache rows num,output when reach the number
-     */
-    public static final int DEFAULT_LOG_ROWS_NUM = 4 * 16;
-
-    /**
      * log flush interval?output when reach the interval
      */
     public static final int DEFAULT_LOG_FLUSH_INTERVAL = 1000;
@@ -146,31 +145,6 @@ public class TaskConstants {
     public static final String PSTREE = "pstree";
 
     public static final String RWXR_XR_X = "rwxr-xr-x";
-
-    /**
-     * task log info format
-     */
-    public static final String TASK_LOG_LOGGER_NAME = "TaskLogLogger";
-
-    /**
-     * task log logger name format
-     */
-    public static final String TASK_LOG_LOGGER_NAME_FORMAT = TASK_LOG_LOGGER_NAME + "-%s";
-
-    /**
-     * Task Logger's prefix
-     */
-    public static final String TASK_LOGGER_INFO_PREFIX = "TASK";
-
-    /**
-     * Task Logger Thread's name
-     */
-    public static final String TASK_APPID_LOG_FORMAT = "taskAppId";
-
-    /**
-     * get output log service
-     */
-    public static final String GET_OUTPUT_LOG_SERVICE = "-getOutputLogService";
 
     /**
      * date format of yyyyMMdd
@@ -339,7 +313,7 @@ public class TaskConstants {
     public static final String ORG_POSTGRESQL_DRIVER = "org.postgresql.Driver";
     public static final String COM_MYSQL_CJ_JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
     public static final String ORG_APACHE_HIVE_JDBC_HIVE_DRIVER = "org.apache.hive.jdbc.HiveDriver";
-    public static final String COM_CLICKHOUSE_JDBC_DRIVER = "ru.yandex.clickhouse.ClickHouseDriver";
+    public static final String COM_CLICKHOUSE_JDBC_DRIVER = "com.clickhouse.jdbc.ClickHouseDriver";
     public static final String COM_ORACLE_JDBC_DRIVER = "oracle.jdbc.driver.OracleDriver";
     public static final String COM_SQLSERVER_JDBC_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
     public static final String COM_DB2_JDBC_DRIVER = "com.ibm.db2.jcc.DB2Driver";
@@ -431,11 +405,22 @@ public class TaskConstants {
 
     public static final String TASK_TYPE_DATA_QUALITY = "DATA_QUALITY";
 
-    public static final String TASK_TYPE_K8S = "K8S";
+    public static final String DEPLOY_MODE_KUBERNETES = "Kubernetes";
+
+    public static final Set<String> TASK_TYPE_SET_K8S = Sets.newHashSet("K8S", "KUBEFLOW");
 
     public static final String TASK_TYPE_BLOCKING = "BLOCKING";
 
     public static final String TASK_TYPE_STREAM = "STREAM";
+
+    /**
+     * azure config
+     */
+    public static final String AZURE_CLIENT_ID = "resource.azure.client.id";
+    public static final String AZURE_CLIENT_SECRET = "resource.azure.client.secret";
+    public static final String AZURE_ACCESS_SUB_ID = "resource.azure.subId";
+    public static final String AZURE_SECRET_TENANT_ID = "resource.azure.tenant.id";
+    public static final String QUERY_INTERVAL = "resource.query.interval";
 
     /**
      * aws config
@@ -468,7 +453,12 @@ public class TaskConstants {
     public static final int LOG_LINES = 500;
     public static final String NAMESPACE_NAME = "name";
     public static final String CLUSTER = "cluster";
-    public static final String COMMAND_SPLIT_REGEX = "[^\\s\"'`]+|\"([^\"]+)\"|'([^']+)'|`([^`]+)`";
+    public static final Pattern COMMAND_SPLIT_REGEX = Pattern.compile("[^\\s\"'`]+|\"([^\"]+)\"|'([^']+)'|`([^`]+)`");
+
+    /**
+     * spark / flink on k8s label name
+     */
+    public static final String UNIQUE_LABEL_NAME = "dolphinscheduler-label";
 
     /**
      * conda config used by jupyter task plugin

@@ -28,14 +28,15 @@ import org.apache.dolphinscheduler.dao.repository.ProcessInstanceMapDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -43,9 +44,8 @@ import org.springframework.stereotype.Repository;
  * Task Instance DAO implementation
  */
 @Repository
+@Slf4j
 public class TaskInstanceDaoImpl implements TaskInstanceDao {
-
-    private final Logger logger = LoggerFactory.getLogger(TaskInstanceDaoImpl.class);
 
     @Autowired
     private TaskInstanceMapper taskInstanceMapper;
@@ -81,7 +81,7 @@ public class TaskInstanceDaoImpl implements TaskInstanceDao {
     public TaskInstance submitTaskInstanceToDB(TaskInstance taskInstance, ProcessInstance processInstance) {
         WorkflowExecutionStatus processInstanceState = processInstance.getState();
         if (processInstanceState.isFinished() || processInstanceState == WorkflowExecutionStatus.READY_STOP) {
-            logger.warn("processInstance: {} state was: {}, skip submit this task, taskCode: {}",
+            log.warn("processInstance: {} state was: {}, skip submit this task, taskCode: {}",
                     processInstance.getId(),
                     processInstanceState,
                     taskInstance.getTaskCode());
@@ -91,6 +91,7 @@ public class TaskInstanceDaoImpl implements TaskInstanceDao {
             taskInstance.setState(TaskExecutionStatus.PAUSE);
         }
         taskInstance.setExecutorId(processInstance.getExecutorId());
+        taskInstance.setExecutorName(processInstance.getExecutorName());
         taskInstance.setState(getSubmitTaskState(taskInstance, processInstance));
         if (taskInstance.getSubmitTime() == null) {
             taskInstance.setSubmitTime(new Date());
@@ -148,6 +149,11 @@ public class TaskInstanceDaoImpl implements TaskInstanceDao {
     }
 
     @Override
+    public TaskInstance findTaskByInstanceIdAndCode(Integer processInstanceId, Long taskCode) {
+        return taskInstanceMapper.queryByInstanceIdAndCode(processInstanceId, taskCode);
+    }
+
+    @Override
     public List<TaskInstance> findPreviousTaskListByWorkProcessId(Integer processInstanceId) {
         ProcessInstance processInstance = processInstanceMapper.selectById(processInstanceId);
         return taskInstanceMapper.findValidTaskListByProcessId(processInstanceId, Flag.NO,
@@ -160,11 +166,40 @@ public class TaskInstanceDaoImpl implements TaskInstanceDao {
     }
 
     @Override
+    public TaskInstance findTaskInstanceByCacheKey(String cacheKey) {
+        if (StringUtils.isEmpty(cacheKey)) {
+            return null;
+        }
+        return taskInstanceMapper.queryByCacheKey(cacheKey);
+    }
+
+    @Override
+    public Boolean clearCacheByCacheKey(String cacheKey) {
+        try {
+            taskInstanceMapper.clearCacheByCacheKey(cacheKey);
+            return true;
+        } catch (Exception e) {
+            log.error("clear cache by cacheKey failed", e);
+            return false;
+        }
+    }
+
+    @Override
     public List<TaskInstance> findTaskInstanceByIdList(List<Integer> idList) {
         if (CollectionUtils.isEmpty(idList)) {
             return new ArrayList<>();
         }
         return taskInstanceMapper.selectBatchIds(idList);
+    }
+
+    @Override
+    public void deleteByWorkflowInstanceId(int workflowInstanceId) {
+        taskInstanceMapper.deleteByWorkflowInstanceId(workflowInstanceId);
+    }
+
+    @Override
+    public List<TaskInstance> findTaskInstanceByWorkflowInstanceId(Integer workflowInstanceId) {
+        return taskInstanceMapper.findByWorkflowInstanceId(workflowInstanceId);
     }
 
 }
