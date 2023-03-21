@@ -400,7 +400,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
                     .orElse(e.getMessage());
             log.error("Datasource test connection error, dbType:{}, connectionParam:{}, message:{}.", type,
                     connectionParam, message);
-            return new Result<>(Status.CONNECTION_TEST_FAILURE.getCode(), message);
+            return new Result<>(Status.CONNECTION_TEST_FAILURE);
         }
     }
 
