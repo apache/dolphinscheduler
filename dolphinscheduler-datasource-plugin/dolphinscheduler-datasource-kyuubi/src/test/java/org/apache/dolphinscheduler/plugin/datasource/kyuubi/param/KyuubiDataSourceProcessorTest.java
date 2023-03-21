@@ -18,8 +18,11 @@
 package org.apache.dolphinscheduler.plugin.datasource.kyuubi.param;
 
 import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
+import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.util.HashMap;
@@ -36,7 +39,50 @@ import org.mockito.junit.jupiter.MockitoExtension;
 public class KyuubiDataSourceProcessorTest {
 
     private KyuubiDataSourceProcessor kyuubiDatasourceProcessor = new KyuubiDataSourceProcessor();
+    @Test
+    public void testCheckDatasourceParam() {
+        KyuubiDataSourceParamDTO kyuubiDatasourceParamDTO = new KyuubiDataSourceParamDTO();
+        kyuubiDatasourceParamDTO.setHost("localhost");
+        kyuubiDatasourceParamDTO.setDatabase("default");
+        Map<String, String> other = new HashMap<>();
+        other.put("serverTimezone", "Asia/Shanghai");
+        kyuubiDatasourceParamDTO.setOther(other);
+        DataSourceUtils.checkDatasourceParam(kyuubiDatasourceParamDTO);
+        Assertions.assertTrue(true);
+    }
 
+    @Test
+    public void testBuildConnectionParams() {
+        KyuubiDataSourceParamDTO kyuubiDataSourceParamDTO = new KyuubiDataSourceParamDTO();
+        kyuubiDataSourceParamDTO.setHost("localhost");
+        kyuubiDataSourceParamDTO.setDatabase("default");
+        kyuubiDataSourceParamDTO.setUserName("root");
+        kyuubiDataSourceParamDTO.setPort(3306);
+        kyuubiDataSourceParamDTO.setPassword("123456");
+
+        try (
+                MockedStatic<PasswordUtils> mockedStaticPasswordUtils = Mockito.mockStatic(PasswordUtils.class);
+                MockedStatic<CommonUtils> mockedStaticCommonUtils = Mockito.mockStatic(CommonUtils.class)) {
+            mockedStaticPasswordUtils.when(() -> PasswordUtils.encodePassword(Mockito.anyString()))
+                    .thenReturn("123456");
+            mockedStaticCommonUtils.when(CommonUtils::getKerberosStartupState).thenReturn(false);
+            ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(kyuubiDataSourceParamDTO);
+            Assertions.assertNotNull(connectionParam);
+        }
+    }
+
+    @Test
+    public void testBuildConnectionParams2() {
+        KyuubiDataSourceParamDTO kyuubiDataSourceParamDTO = new KyuubiDataSourceParamDTO();
+        kyuubiDataSourceParamDTO.setHost("localhost");
+        kyuubiDataSourceParamDTO.setDatabase("default");
+        kyuubiDataSourceParamDTO.setUserName("root");
+        kyuubiDataSourceParamDTO.setPort(3306);
+        kyuubiDataSourceParamDTO.setPassword("123456");
+        ConnectionParam connectionParam =
+                DataSourceUtils.buildConnectionParams(DbType.KYUUBI, JSONUtils.toJsonString(kyuubiDataSourceParamDTO));
+        Assertions.assertNotNull(connectionParam);
+    }
     @Test
     public void testCreateConnectionParams() {
         Map<String, String> props = new HashMap<>();
