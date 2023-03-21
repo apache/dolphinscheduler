@@ -97,7 +97,7 @@ public class Db2DataSourceProcessor extends AbstractDataSourceProcessor {
     public String getJdbcUrl(ConnectionParam connectionParam) {
         Db2ConnectionParam db2ConnectionParam = (Db2ConnectionParam) connectionParam;
         if (MapUtils.isNotEmpty(db2ConnectionParam.getOther())) {
-            return String.format("%s;%s", db2ConnectionParam.getJdbcUrl(),
+            return String.format("%s:%s", db2ConnectionParam.getJdbcUrl(),
                     transformOther(db2ConnectionParam.getOther()));
         }
         return db2ConnectionParam.getJdbcUrl();
