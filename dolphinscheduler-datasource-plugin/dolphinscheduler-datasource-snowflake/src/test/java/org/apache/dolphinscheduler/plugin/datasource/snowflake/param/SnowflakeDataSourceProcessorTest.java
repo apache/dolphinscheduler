@@ -18,8 +18,11 @@
 package org.apache.dolphinscheduler.plugin.datasource.snowflake.param;
 
 import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
+import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.util.HashMap;
@@ -36,6 +39,50 @@ import org.mockito.junit.jupiter.MockitoExtension;
 public class SnowflakeDataSourceProcessorTest {
 
     private SnowflakeDatasourceProcessor snowflakeDataSourceProcessor = new SnowflakeDatasourceProcessor();
+    @Test
+    public void testCheckDatasourceParam() {
+        SnowflakeDatasourceParamDTO snowflakeDatasourceParamDTO = new SnowflakeDatasourceParamDTO();
+        snowflakeDatasourceParamDTO.setHost("localhost");
+        snowflakeDatasourceParamDTO.setDatabase("default");
+        Map<String, String> other = new HashMap<>();
+        other.put("serverTimezone", "Asia/Shanghai");
+        snowflakeDatasourceParamDTO.setOther(other);
+        DataSourceUtils.checkDatasourceParam(snowflakeDatasourceParamDTO);
+        Assertions.assertTrue(true);
+    }
+
+    @Test
+    public void testBuildConnectionParams() {
+        SnowflakeDatasourceParamDTO snowflakeDatasourceParamDTO = new SnowflakeDatasourceParamDTO();
+        snowflakeDatasourceParamDTO.setHost("localhost");
+        snowflakeDatasourceParamDTO.setDatabase("default");
+        snowflakeDatasourceParamDTO.setUserName("root");
+        snowflakeDatasourceParamDTO.setPort(3306);
+        snowflakeDatasourceParamDTO.setPassword("123456");
+
+        try (
+                MockedStatic<PasswordUtils> mockedStaticPasswordUtils = Mockito.mockStatic(PasswordUtils.class);
+                MockedStatic<CommonUtils> mockedStaticCommonUtils = Mockito.mockStatic(CommonUtils.class)) {
+            mockedStaticPasswordUtils.when(() -> PasswordUtils.encodePassword(Mockito.anyString()))
+                    .thenReturn("123456");
+            mockedStaticCommonUtils.when(CommonUtils::getKerberosStartupState).thenReturn(false);
+            ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(snowflakeDatasourceParamDTO);
+            Assertions.assertNotNull(connectionParam);
+        }
+    }
+
+    @Test
+    public void testBuildConnectionParams2() {
+        SnowflakeDatasourceParamDTO snowflakeDatasourceParamDTO = new SnowflakeDatasourceParamDTO();
+        snowflakeDatasourceParamDTO.setHost("localhost");
+        snowflakeDatasourceParamDTO.setDatabase("default");
+        snowflakeDatasourceParamDTO.setUserName("root");
+        snowflakeDatasourceParamDTO.setPort(3306);
+        snowflakeDatasourceParamDTO.setPassword("123456");
+        ConnectionParam connectionParam =
+                DataSourceUtils.buildConnectionParams(DbType.SNOWFLAKE, JSONUtils.toJsonString(snowflakeDatasourceParamDTO));
+        Assertions.assertNotNull(connectionParam);
+    }
 
     @Test
     public void testCreateConnectionParams() {
@@ -93,5 +140,18 @@ public class SnowflakeDataSourceProcessorTest {
     public void testGetValidationQuery() {
         Assertions.assertEquals(DataSourceConstants.SNOWFLAKE_VALIDATION_QUERY,
                 snowflakeDataSourceProcessor.getValidationQuery());
+    }
+
+    @Test
+    public void testGetDatasourceUniqueId() {
+        SnowflakeConnectionParam connectionParam = new SnowflakeConnectionParam();
+        connectionParam.setJdbcUrl("jdbc:snowflake://localhost:3306/default");
+        connectionParam.setUser("root");
+        connectionParam.setPassword("123456");
+        try (MockedStatic<PasswordUtils> mockedPasswordUtils = Mockito.mockStatic(PasswordUtils.class)) {
+            Mockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("123456");
+            Assertions.assertEquals("snowflake@root@123456@jdbc:snowflake://localhost:3306/default",
+                    snowflakeDataSourceProcessor.getDatasourceUniqueId(connectionParam, DbType.SNOWFLAKE));
+        }
     }
 }

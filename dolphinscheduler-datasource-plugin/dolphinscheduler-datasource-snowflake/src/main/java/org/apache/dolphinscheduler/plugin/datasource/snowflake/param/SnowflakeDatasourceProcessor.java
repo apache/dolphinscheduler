@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.snowflake.param;
 
+import com.google.auto.service.AutoService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -33,7 +35,8 @@ import org.apache.commons.collections4.MapUtils;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-
+@AutoService(DataSourceProcessor.class)
+@Slf4j
 public class SnowflakeDatasourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
