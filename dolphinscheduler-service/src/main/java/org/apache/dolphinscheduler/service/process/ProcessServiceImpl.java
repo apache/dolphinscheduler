@@ -69,7 +69,6 @@ import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.Resource;
-import org.apache.dolphinscheduler.dao.entity.ResourcesTask;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
@@ -98,7 +97,6 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ResourceTaskMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
@@ -148,7 +146,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -231,9 +228,6 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Autowired
     private ResourceMapper resourceMapper;
-
-    @Autowired
-    private ResourceTaskMapper resourceTaskMapper;
 
     @Autowired
     private ResourceUserMapper resourceUserMapper;
@@ -1414,13 +1408,9 @@ public class ProcessServiceImpl implements ProcessService {
                 return new ResourceInfo();
             }
             resourceInfo = new ResourceInfo();
-            // get resource from database, only one resource should be returned
-            Integer resultList = resourceTaskMapper.existResourceByTaskIdNFullName(task_id, resourceFullName);
-            if (resultList != null) {
-                resourceInfo.setId(resultList);
-                resourceInfo.setRes(res.getRes());
-                resourceInfo.setResourceName(resourceFullName);
-            }
+            resourceInfo.setId(-1);
+            resourceInfo.setRes(res.getRes());
+            resourceInfo.setResourceName(resourceFullName);
             log.info("updated resource info {}",
                     JSONUtils.toJsonString(resourceInfo));
         }
@@ -2061,42 +2051,9 @@ public class ProcessServiceImpl implements ProcessService {
 
         if (CollectionUtils.isNotEmpty(newTaskDefinitionLogs) && Boolean.TRUE.equals(syncDefine)) {
             updateResult += taskDefinitionMapper.batchInsert(newTaskDefinitionLogs);
-
-            for (TaskDefinitionLog newTaskDefinitionLog : newTaskDefinitionLogs) {
-                Set<String> resourceFullNameSet = getResourceFullNames(newTaskDefinitionLog);
-                for (String resourceFullName : resourceFullNameSet) {
-                    List<TaskDefinition> taskDefinitionList = taskDefinitionMapper.selectByMap(
-                            Collections.singletonMap("code", newTaskDefinitionLog.getCode()));
-                    if (taskDefinitionList.size() > 0) {
-                        createRelationTaskResourcesIfNotExist(
-                                taskDefinitionList.get(0).getId(), resourceFullName);
-                    }
-                }
-            }
-
         }
         if (CollectionUtils.isNotEmpty(updateTaskDefinitionLogs) && Boolean.TRUE.equals(syncDefine)) {
             for (TaskDefinitionLog taskDefinitionLog : updateTaskDefinitionLogs) {
-                Set<String> resourceFullNameSet = getResourceFullNames(taskDefinitionLog);
-
-                // remove resources that user deselected.
-                for (ResourcesTask resourcesTask : resourceTaskMapper.selectByMap(
-                        Collections.singletonMap("task_id",
-                                taskDefinitionMapper.queryByCode(taskDefinitionLog.getCode()).getId()))) {
-                    if (!resourceFullNameSet.contains(resourcesTask.getFullName())) {
-                        resourceTaskMapper.deleteById(resourcesTask.getId());
-                    }
-                }
-
-                for (String resourceFullName : resourceFullNameSet) {
-                    List<TaskDefinition> taskDefinitionList = taskDefinitionMapper.selectByMap(
-                            Collections.singletonMap("code", taskDefinitionLog.getCode()));
-                    if (taskDefinitionList.size() > 0) {
-                        createRelationTaskResourcesIfNotExist(
-                                taskDefinitionList.get(0).getId(), resourceFullName);
-                    }
-                }
-
                 updateResult += taskDefinitionMapper.updateById(taskDefinitionLog);
             }
         }
@@ -2717,35 +2674,4 @@ public class ProcessServiceImpl implements ProcessService {
         triggerRelationService.saveCommandTrigger(commandId, processInstanceId);
     }
 
-    private Set<String> getResourceFullNames(TaskDefinition taskDefinition) {
-        Set<String> resourceFullNames = null;
-        AbstractParameters params = taskPluginManager.getParameters(ParametersNode.builder()
-                .taskType(taskDefinition.getTaskType()).taskParams(taskDefinition.getTaskParams()).build());
-
-        if (params != null && CollectionUtils.isNotEmpty(params.getResourceFilesList())) {
-            resourceFullNames = params.getResourceFilesList().stream()
-                    .filter(t -> !StringUtils.isBlank(t.getResourceName()))
-                    .map(ResourceInfo::getResourceName)
-                    .collect(toSet());
-        }
-
-        if (CollectionUtils.isEmpty(resourceFullNames)) {
-            return new HashSet<String>();
-        }
-
-        return resourceFullNames;
-    }
-
-    private Integer createRelationTaskResourcesIfNotExist(int taskId, String resourceFullName) {
-
-        Integer resourceId = resourceTaskMapper.existResourceByTaskIdNFullName(taskId, resourceFullName);
-        if (null == resourceId) {
-            // create the relation if not exist
-            ResourcesTask resourcesTask = new ResourcesTask(taskId, resourceFullName, ResourceType.FILE);
-            resourceTaskMapper.insert(resourcesTask);
-            return resourcesTask.getId();
-        }
-
-        return resourceId;
-    }
 }
