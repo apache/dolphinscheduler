@@ -39,22 +39,19 @@ import org.apache.dolphinscheduler.remote.command.log.ViewLogResponseCommand;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.factory.NettyRemotingClientFactory;
 import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 
 import java.util.List;
 
 import javax.annotation.Nullable;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class LogClient implements AutoCloseable {
-
-    private static final Logger logger = LoggerFactory.getLogger(LogClient.class);
 
     private static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
 
@@ -77,7 +74,7 @@ public class LogClient implements AutoCloseable {
      * @return log content
      */
     public String rollViewLog(String host, int port, String path, int skipLineNum, int limit) {
-        logger.info("Roll view log from host : {}, port : {}, path {}, skipLineNum {} ,limit {}", host, port, path,
+        log.info("Roll view log from host : {}, port : {}, path {}, skipLineNum {} ,limit {}", host, port, path,
                 skipLineNum, limit);
         RollViewLogRequestCommand request = new RollViewLogRequestCommand(path, skipLineNum, limit);
         final Host address = new Host(host, port);
@@ -92,12 +89,12 @@ public class LogClient implements AutoCloseable {
             return "Roll view log response is null";
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
-            logger.error(
+            log.error(
                     "Roll view log from host : {}, port : {}, path {}, skipLineNum {} ,limit {} error, the current thread has been interrupted",
                     host, port, path, skipLineNum, limit, ex);
             return "Roll view log error: " + ex.getMessage();
         } catch (Exception e) {
-            logger.error("Roll view log from host : {}, port : {}, path {}, skipLineNum {} ,limit {} error", host, port,
+            log.error("Roll view log from host : {}, port : {}, path {}, skipLineNum {} ,limit {} error", host, port,
                     path, skipLineNum, limit, e);
             return "Roll view log error: " + e.getMessage();
         }
@@ -112,12 +109,12 @@ public class LogClient implements AutoCloseable {
      * @return log content
      */
     public String viewLog(String host, int port, String path) {
-        logger.info("View log from host: {}, port: {}, logPath: {}", host, port, path);
+        log.info("View log from host: {}, port: {}, logPath: {}", host, port, path);
         ViewLogRequestCommand request = new ViewLogRequestCommand(path);
         final Host address = new Host(host, port);
         try {
             if (NetUtils.getHost().equals(host)) {
-                return LoggerUtils.readWholeFileContent(request.getPath());
+                return LogUtils.readWholeFileContentFromLocal(request.getPath());
             } else {
                 Command command = request.convert2Command();
                 Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
@@ -130,11 +127,11 @@ public class LogClient implements AutoCloseable {
             }
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
-            logger.error("View log from host: {}, port: {}, logPath: {} error, the current thread has been interrupted",
+            log.error("View log from host: {}, port: {}, logPath: {} error, the current thread has been interrupted",
                     host, port, path, ex);
             return "View log error: " + ex.getMessage();
         } catch (Exception e) {
-            logger.error("View log from host: {}, port: {}, logPath: {} error", host, port, path, e);
+            log.error("View log from host: {}, port: {}, logPath: {} error", host, port, path, e);
             return "View log error: " + e.getMessage();
         }
     }
@@ -148,7 +145,7 @@ public class LogClient implements AutoCloseable {
      * @return log content bytes
      */
     public byte[] getLogBytes(String host, int port, String path) {
-        logger.info("Get log bytes from host: {}, port: {}, logPath {}", host, port, path);
+        log.info("Get log bytes from host: {}, port: {}, logPath {}", host, port, path);
         GetLogBytesRequestCommand request = new GetLogBytesRequestCommand(path);
         final Host address = new Host(host, port);
         try {
@@ -162,12 +159,12 @@ public class LogClient implements AutoCloseable {
             return EMPTY_BYTE_ARRAY;
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
-            logger.error(
+            log.error(
                     "Get logSize from host: {}, port: {}, logPath: {} error, the current thread has been interrupted",
                     host, port, path, ex);
             return EMPTY_BYTE_ARRAY;
         } catch (Exception e) {
-            logger.error("Get logSize from host: {}, port: {}, logPath: {} error", host, port, path, e);
+            log.error("Get logSize from host: {}, port: {}, logPath: {} error", host, port, path, e);
             return EMPTY_BYTE_ARRAY;
         }
     }
@@ -177,35 +174,44 @@ public class LogClient implements AutoCloseable {
      *
      * @param host host
      * @param path path
-     * @return remove task status
      */
-    public Boolean removeTaskLog(@NonNull Host host, String path) {
-        logger.info("Remove task log from host: {} logPath {}", host, path);
+    public void removeTaskLog(@NonNull Host host, String path) {
+        log.info("Begin remove task log from host: {} logPath {}", host, path);
         RemoveTaskLogRequestCommand request = new RemoveTaskLogRequestCommand(path);
         try {
             Command command = request.convert2Command();
-            Command response = this.client.sendSync(host, command, LOG_REQUEST_TIMEOUT);
-            if (response != null) {
-                RemoveTaskLogResponseCommand taskLogResponse =
+            client.sendAsync(host, command, LOG_REQUEST_TIMEOUT, responseFuture -> {
+                if (responseFuture.getCause() != null) {
+                    log.error("Remove task log from host: {} logPath {} error, meet an unknown exception", host,
+                            path, responseFuture.getCause());
+                    return;
+                }
+                Command response = responseFuture.getResponseCommand();
+                if (response == null) {
+                    log.error("Remove task log from host: {} logPath {} error, response is null", host, path);
+                    return;
+                }
+                RemoveTaskLogResponseCommand removeTaskLogResponse =
                         JSONUtils.parseObject(response.getBody(), RemoveTaskLogResponseCommand.class);
-                return taskLogResponse.getStatus();
-            }
-            return false;
-        } catch (InterruptedException ex) {
+                if (removeTaskLogResponse.getStatus()) {
+                    log.info("Success remove task log from host: {} logPath {}", host, path);
+                } else {
+                    log.error("Remove task log from host: {} logPath {} error", host, path);
+                }
+            });
+        } catch (InterruptedException interruptedException) {
             Thread.currentThread().interrupt();
-            logger.error(
-                    "Remove task log from host: {}, logPath: {} error, the current thread has been interrupted",
-                    host, path, ex);
-            return false;
+            log.error("Remove task log from host: {} logPath {} error, the current thread has been interrupted",
+                    host,
+                    path, interruptedException);
         } catch (Exception e) {
-            logger.error("Remove task log from host: {},  logPath: {} error", host, path, e);
-            return false;
+            log.error("Remove task log from host: {},  logPath: {} error", host, path, e);
         }
     }
 
     public @Nullable List<String> getAppIds(@NonNull String host, int port, @NonNull String taskLogFilePath,
                                             @NonNull String taskAppInfoPath) throws RemotingException, InterruptedException {
-        logger.info("Begin to get appIds from worker: {}:{} taskLogPath: {}, taskAppInfoPath: {}", host, port,
+        log.info("Begin to get appIds from worker: {}:{} taskLogPath: {}, taskAppInfoPath: {}", host, port,
                 taskLogFilePath, taskAppInfoPath);
         final Host workerAddress = new Host(host, port);
         List<String> appIds = null;
@@ -221,7 +227,7 @@ public class LogClient implements AutoCloseable {
                 appIds = responseCommand.getAppIds();
             }
         }
-        logger.info("Get appIds: {} from worker: {}:{} taskLogPath: {}, taskAppInfoPath: {}", appIds, host, port,
+        log.info("Get appIds: {} from worker: {}:{} taskLogPath: {}, taskAppInfoPath: {}", appIds, host, port,
                 taskLogFilePath, taskAppInfoPath);
         return appIds;
     }
@@ -229,7 +235,7 @@ public class LogClient implements AutoCloseable {
     @Override
     public void close() {
         this.client.close();
-        logger.info("LogClientService closed");
+        log.info("LogClientService closed");
     }
 
 }

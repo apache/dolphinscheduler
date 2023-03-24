@@ -25,16 +25,16 @@ import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
+import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.service.FailoverService;
 import org.apache.dolphinscheduler.server.master.task.MasterHeartBeatTask;
-import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
 import org.apache.commons.lang3.StringUtils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -43,9 +43,8 @@ import org.springframework.stereotype.Component;
  * <p>When the Master node startup, it will register in registry center. And start a {@link MasterHeartBeatTask} to update its metadata in registry.
  */
 @Component
+@Slf4j
 public class MasterRegistryClient implements AutoCloseable {
-
-    private static final Logger logger = LoggerFactory.getLogger(MasterRegistryClient.class);
 
     @Autowired
     private FailoverService failoverService;
@@ -92,29 +91,29 @@ public class MasterRegistryClient implements AutoCloseable {
      * @param failover is failover
      */
     public void removeMasterNodePath(String path, NodeType nodeType, boolean failover) {
-        logger.info("{} node deleted : {}", nodeType, path);
+        log.info("{} node deleted : {}", nodeType, path);
 
         if (StringUtils.isEmpty(path)) {
-            logger.error("server down error: empty path: {}, nodeType:{}", path, nodeType);
+            log.error("server down error: empty path: {}, nodeType:{}", path, nodeType);
             return;
         }
 
         String serverHost = registryClient.getHostByEventDataPath(path);
         if (StringUtils.isEmpty(serverHost)) {
-            logger.error("server down error: unknown path: {}, nodeType:{}", path, nodeType);
+            log.error("server down error: unknown path: {}, nodeType:{}", path, nodeType);
             return;
         }
 
         try {
             if (!registryClient.exists(path)) {
-                logger.info("path: {} not exists", path);
+                log.info("path: {} not exists", path);
             }
             // failover server
             if (failover) {
                 failoverService.failoverServerWhenDown(serverHost, nodeType);
             }
         } catch (Exception e) {
-            logger.error("{} server failover failed, host:{}", nodeType, serverHost, e);
+            log.error("{} server failover failed, host:{}", nodeType, serverHost, e);
         }
     }
 
@@ -126,17 +125,17 @@ public class MasterRegistryClient implements AutoCloseable {
      * @param failover is failover
      */
     public void removeWorkerNodePath(String path, NodeType nodeType, boolean failover) {
-        logger.info("{} node deleted : {}", nodeType, path);
+        log.info("{} node deleted : {}", nodeType, path);
         try {
             String serverHost = null;
             if (!StringUtils.isEmpty(path)) {
                 serverHost = registryClient.getHostByEventDataPath(path);
                 if (StringUtils.isEmpty(serverHost)) {
-                    logger.error("server down error: unknown path: {}", path);
+                    log.error("server down error: unknown path: {}", path);
                     return;
                 }
                 if (!registryClient.exists(path)) {
-                    logger.info("path: {} not exists", path);
+                    log.info("path: {} not exists", path);
                 }
             }
             // failover server
@@ -144,7 +143,7 @@ public class MasterRegistryClient implements AutoCloseable {
                 failoverService.failoverServerWhenDown(serverHost, nodeType);
             }
         } catch (Exception e) {
-            logger.error("{} server failover failed", nodeType, e);
+            log.error("{} server failover failed", nodeType, e);
         }
     }
 
@@ -152,7 +151,7 @@ public class MasterRegistryClient implements AutoCloseable {
      * Registry the current master server itself to registry.
      */
     void registry() {
-        logger.info("Master node : {} registering to registry center", masterConfig.getMasterAddress());
+        log.info("Master node : {} registering to registry center", masterConfig.getMasterAddress());
         String masterRegistryPath = masterConfig.getMasterRegistryPath();
 
         // remove before persist
@@ -160,7 +159,7 @@ public class MasterRegistryClient implements AutoCloseable {
         registryClient.persistEphemeral(masterRegistryPath, JSONUtils.toJsonString(masterHeartBeatTask.getHeartBeat()));
 
         while (!registryClient.checkNodeExists(NetUtils.getHost(), NodeType.MASTER)) {
-            logger.warn("The current master server node:{} cannot find in registry", NetUtils.getHost());
+            log.warn("The current master server node:{} cannot find in registry", NetUtils.getHost());
             ThreadUtils.sleep(SLEEP_TIME_MILLIS);
         }
 
@@ -168,20 +167,20 @@ public class MasterRegistryClient implements AutoCloseable {
         ThreadUtils.sleep(SLEEP_TIME_MILLIS);
 
         masterHeartBeatTask.start();
-        logger.info("Master node : {} registered to registry center successfully", masterConfig.getMasterAddress());
+        log.info("Master node : {} registered to registry center successfully", masterConfig.getMasterAddress());
 
     }
 
     public void deregister() {
         try {
             registryClient.remove(masterConfig.getMasterRegistryPath());
-            logger.info("Master node : {} unRegistry to register center.", masterConfig.getMasterAddress());
+            log.info("Master node : {} unRegistry to register center.", masterConfig.getMasterAddress());
             if (masterHeartBeatTask != null) {
                 masterHeartBeatTask.shutdown();
             }
             registryClient.close();
         } catch (Exception e) {
-            logger.error("MasterServer remove registry path exception ", e);
+            log.error("MasterServer remove registry path exception ", e);
         }
     }
 

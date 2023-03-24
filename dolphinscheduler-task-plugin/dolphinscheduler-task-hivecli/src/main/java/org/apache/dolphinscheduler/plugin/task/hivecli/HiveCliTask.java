@@ -53,7 +53,7 @@ public class HiveCliTask extends AbstractRemoteTask {
 
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
                 taskExecutionContext,
-                logger);
+                log);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class HiveCliTask extends AbstractRemoteTask {
 
     @Override
     public void init() {
-        logger.info("hiveCli task params {}", taskExecutionContext.getTaskParams());
+        log.info("hiveCli task params {}", taskExecutionContext.getTaskParams());
 
         hiveCliParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), HiveCliParameters.class);
 
@@ -76,18 +76,18 @@ public class HiveCliTask extends AbstractRemoteTask {
     @Override
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
-            final TaskResponse taskResponse = shellCommandExecutor.run(buildCommand());
+            final TaskResponse taskResponse = shellCommandExecutor.run(buildCommand(), taskCallBack);
             setExitStatusCode(taskResponse.getExitStatusCode());
             setAppIds(taskResponse.getAppIds());
             setProcessId(taskResponse.getProcessId());
             setVarPool(shellCommandExecutor.getVarPool());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            logger.error("The current HiveCLI Task has been interrupted", e);
+            log.error("The current HiveCLI Task has been interrupted", e);
             setExitStatusCode(EXIT_CODE_FAILURE);
             throw new TaskException("The current HiveCLI Task has been interrupted", e);
         } catch (Exception e) {
-            logger.error("hiveCli task failure", e);
+            log.error("hiveCli task failure", e);
             setExitStatusCode(EXIT_CODE_FAILURE);
             throw new TaskException("run hiveCli task error", e);
         }
@@ -114,7 +114,7 @@ public class HiveCliTask extends AbstractRemoteTask {
             args.add(HiveCliConstants.HIVE_CLI_EXECUTE_FILE);
             final List<ResourceInfo> resourceInfos = hiveCliParameters.getResourceList();
             if (resourceInfos.size() > 1) {
-                logger.warn("more than 1 files detected, use the first one by default");
+                log.warn("more than 1 files detected, use the first one by default");
             }
 
             args.add(StringUtils.stripStart(resourceInfos.get(0).getResourceName(), "/"));
@@ -132,7 +132,7 @@ public class HiveCliTask extends AbstractRemoteTask {
         final String command =
                 ParameterUtils.convertParameterPlaceholders(String.join(" ", args), ParamUtils.convert(paramsMap));
 
-        logger.info("hiveCli task command: {}", command);
+        log.info("hiveCli task command: {}", command);
 
         return command;
 

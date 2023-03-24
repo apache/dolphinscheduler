@@ -34,8 +34,8 @@ import javax.naming.directory.SearchResult;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.ldap.filter.EqualsFilter;
@@ -43,9 +43,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Configuration
+@Slf4j
 public class LdapService {
-
-    private static final Logger logger = LoggerFactory.getLogger(LdapService.class);
 
     @Value("${security.authentication.ldap.user.admin:#{null}}")
     private String adminUserId;
@@ -109,7 +108,7 @@ public class LdapService {
                     try {
                         new InitialDirContext(searchEnv);
                     } catch (Exception e) {
-                        logger.warn("invalid ldap credentials or ldap search error", e);
+                        log.warn("invalid ldap credentials or ldap search error", e);
                         return null;
                     }
                     Attribute attr = attrs.next();
@@ -119,7 +118,7 @@ public class LdapService {
                 }
             }
         } catch (NamingException e) {
-            logger.error("ldap search error", e);
+            log.error("ldap search error", e);
             return null;
         } finally {
             try {
@@ -127,7 +126,7 @@ public class LdapService {
                     ctx.close();
                 }
             } catch (NamingException e) {
-                logger.error("ldap context close error", e);
+                log.error("ldap context close error", e);
             }
         }
 
@@ -150,7 +149,7 @@ public class LdapService {
 
     public LdapUserNotExistActionType getLdapUserNotExistAction() {
         if (StringUtils.isBlank(ldapUserNotExistAction)) {
-            logger.info(
+            log.info(
                     "security.authentication.ldap.user.not.exist.action configuration is empty, the default value 'CREATE'");
             return LdapUserNotExistActionType.CREATE;
         }

@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.server.worker.runner;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
@@ -26,15 +25,11 @@ import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
 
 import lombok.Builder;
+import lombok.extern.slf4j.Slf4j;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+@Slf4j
 @Builder
 public class TaskCallbackImpl implements TaskCallBack {
-
-    protected final Logger logger =
-            LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, TaskCallbackImpl.class));
 
     private final WorkerMessageSender workerMessageSender;
 
@@ -50,13 +45,26 @@ public class TaskCallbackImpl implements TaskCallBack {
         TaskExecutionContext taskExecutionContext =
                 TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
         if (taskExecutionContext == null) {
-            logger.error("task execution context is empty, taskInstanceId: {}, applicationInfo:{}", taskInstanceId,
+            log.error("task execution context is empty, taskInstanceId: {}, applicationInfo:{}", taskInstanceId,
                     applicationInfo);
             return;
         }
 
-        logger.info("send remote application info {}", applicationInfo);
+        log.info("send remote application info {}", applicationInfo);
         taskExecutionContext.setAppIds(applicationInfo.getAppIds());
         workerMessageSender.sendMessageWithRetry(taskExecutionContext, masterAddress, CommandType.TASK_EXECUTE_RUNNING);
     }
+
+    @Override
+    public void updateTaskInstanceInfo(int taskInstanceId) {
+        TaskExecutionContext taskExecutionContext =
+                TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
+        if (taskExecutionContext == null) {
+            log.error("task execution context is empty, taskInstanceId: {}", taskInstanceId);
+            return;
+        }
+
+        workerMessageSender.sendMessageWithRetry(taskExecutionContext, masterAddress, CommandType.TASK_UPDATE_PID);
+    }
+
 }

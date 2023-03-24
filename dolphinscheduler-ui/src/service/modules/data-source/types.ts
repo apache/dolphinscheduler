@@ -30,6 +30,8 @@ type IDataBase =
   | 'TRINO'
   | 'AZURESQL'
   | 'STARROCKS'
+  | 'DAMENG'
+  | 'OCEANBASE'
 
 type IDataBaseLabel =
 | 'MYSQL'
@@ -46,6 +48,8 @@ type IDataBaseLabel =
 | 'TRINO'
 | 'AZURESQL'
 | 'STARROCKS'
+| 'DAMENG'
+| 'OCEANBASE'
 
 interface IDataSource {
   id?: number
@@ -70,6 +74,8 @@ interface IDataSource {
   bindTestId?: number
   endpoint?: string
   MSIClientId?: string
+  dbUser?: string
+  compatibleMode?: string
 }
 
 interface ListReq {

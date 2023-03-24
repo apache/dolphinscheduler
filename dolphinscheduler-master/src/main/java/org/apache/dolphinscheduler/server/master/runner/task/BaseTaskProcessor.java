@@ -25,8 +25,8 @@ import static org.apache.dolphinscheduler.common.constants.Constants.PASSWORD;
 import static org.apache.dolphinscheduler.common.constants.Constants.SINGLE_SLASH;
 import static org.apache.dolphinscheduler.common.constants.Constants.USER;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.CLUSTER;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.NAMESPACE_NAME;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DATA_QUALITY;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SET_K8S;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_NAME;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_TABLE;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.COMPARISON_TYPE;
@@ -49,11 +49,12 @@ import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.DataQualityTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ConnectorType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ExecuteSqlType;
@@ -69,15 +70,14 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourc
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.UdfFuncParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.JdbcUrlParser;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
+import org.apache.dolphinscheduler.plugin.task.spark.SparkParameters;
 import org.apache.dolphinscheduler.server.master.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.storage.impl.HadoopUtils;
-import org.apache.dolphinscheduler.service.task.TaskPluginManager;
-import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.dolphinscheduler.spi.plugin.SPIIdentify;
@@ -101,8 +101,8 @@ import com.zaxxer.hikari.HikariDataSource;
 
 public abstract class BaseTaskProcessor implements ITaskProcessor {
 
-    protected final Logger logger =
-            LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
+    protected final Logger log =
+            LoggerFactory.getLogger(BaseTaskProcessor.class);
 
     protected boolean killed = false;
 
@@ -124,6 +124,8 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     protected ProcessInstanceDao processInstanceDao;
 
+    protected StorageOperate storageOperate;
+
     protected MasterConfig masterConfig;
 
     protected TaskPluginManager taskPluginManager;
@@ -140,6 +142,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         taskPluginManager = SpringApplicationContext.getBean(TaskPluginManager.class);
         curingParamsService = SpringApplicationContext.getBean(CuringParamsService.class);
         taskInstanceDao = SpringApplicationContext.getBean(TaskInstanceDao.class);
+        storageOperate = SpringApplicationContext.getBean(StorageOperate.class, null);
         this.taskInstance = taskInstance;
         this.processInstance = processInstance;
         this.maxRetryTimes = masterConfig.getTaskCommitRetryTimes();
@@ -186,9 +189,9 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     @Override
     public boolean action(TaskAction taskAction) {
-        String threadName = Thread.currentThread().getName();
+        String oldTaskInstanceLogPathMdc = LogUtils.getTaskInstanceLogFullPathMdc();
         if (StringUtils.isNotEmpty(threadLoggerInfoName)) {
-            Thread.currentThread().setName(threadLoggerInfoName);
+            LogUtils.setTaskInstanceLogFullPathMDC(threadLoggerInfoName);
         }
         boolean result = false;
         try {
@@ -215,13 +218,15 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
                     result = resubmit();
                     break;
                 default:
-                    logger.error("unknown task action: {}", taskAction);
+                    log.error("unknown task action: {}", taskAction);
             }
             return result;
         } finally {
-            // reset thread name
-            Thread.currentThread().setName(threadName);
-
+            LogUtils.removeTaskInstanceLogFullPathMDC();
+            // reset MDC value, this should be removed.
+            if (oldTaskInstanceLogPathMdc != null) {
+                LogUtils.setTaskInstanceLogFullPathMDC(oldTaskInstanceLogPathMdc);
+            }
         }
     }
 
@@ -281,15 +286,16 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
     }
 
     /**
-     * set master task running logger.
+     * set master task running log.
      */
     public void setTaskExecutionLogger() {
-        threadLoggerInfoName = LoggerUtils.buildTaskId(taskInstance.getFirstSubmitTime(),
+        threadLoggerInfoName = LogUtils.getTaskInstanceLogFullPath(
+                taskInstance.getFirstSubmitTime(),
                 processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion(),
                 taskInstance.getProcessInstanceId(),
                 taskInstance.getId());
-        Thread.currentThread().setName(threadLoggerInfoName);
+        LogUtils.setTaskInstanceLogFullPathMDC(threadLoggerInfoName);
     }
 
     /**
@@ -304,7 +310,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
         // verify tenant is null
         if (verifyTenantIsNull(tenant, taskInstance)) {
-            logger.info("Task state changes to {}", TaskExecutionStatus.FAILURE);
+            log.info("Task state changes to {}", TaskExecutionStatus.FAILURE);
             taskInstance.setState(TaskExecutionStatus.FAILURE);
             taskInstanceDao.upsertTaskInstance(taskInstance);
             return null;
@@ -325,11 +331,8 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
             dataQualityTaskExecutionContext = new DataQualityTaskExecutionContext();
             setDataQualityTaskRelation(dataQualityTaskExecutionContext, taskInstance, tenant.getTenantCode());
         }
-        K8sTaskExecutionContext k8sTaskExecutionContext = null;
-        if (TASK_TYPE_SET_K8S.contains(taskInstance.getTaskType())) {
-            k8sTaskExecutionContext = new K8sTaskExecutionContext();
-            setK8sTaskRelation(k8sTaskExecutionContext, taskInstance);
-        }
+
+        K8sTaskExecutionContext k8sTaskExecutionContext = setK8sTaskRelation(taskInstance);
 
         Map<String, Property> businessParamsMap = curingParamsService.preBuildBusinessParams(processInstance);
 
@@ -395,7 +398,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         udfFuncList.forEach(udfFunc -> {
             UdfFuncParameters udfFuncParameters =
                     JSONUtils.parseObject(JSONUtils.toJsonString(udfFunc), UdfFuncParameters.class);
-            udfFuncParameters.setDefaultFS(HadoopUtils.getInstance().getDefaultFS());
+            udfFuncParameters.setDefaultFS(PropertyUtils.getString(Constants.FS_DEFAULT_FS));
             String tenantCode = processService.queryTenantCodeByResName(udfFunc.getResourceName(), ResourceType.UDF);
             udfFuncParameters.setTenantCode(tenantCode);
             map.put(udfFunc.getId(), udfFuncParameters);
@@ -421,7 +424,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         int ruleId = dataQualityParameters.getRuleId();
         DqRule dqRule = processService.getDqRule(ruleId);
         if (dqRule == null) {
-            logger.error("Can not get dataQuality rule by id {}", ruleId);
+            log.error("Can not get dataQuality rule by id {}", ruleId);
             return;
         }
 
@@ -431,7 +434,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
         List<DqRuleInputEntry> ruleInputEntryList = processService.getRuleInputEntry(ruleId);
         if (CollectionUtils.isEmpty(ruleInputEntryList)) {
-            logger.error("Rule input entry list is empty, ruleId: {}", ruleId);
+            log.error("Rule input entry list is empty, ruleId: {}", ruleId);
             return;
         }
         List<DqRuleExecuteSql> executeSqlList = processService.getDqExecuteSql(ruleId);
@@ -606,7 +609,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
      */
     protected boolean verifyTenantIsNull(Tenant tenant, TaskInstance taskInstance) {
         if (tenant == null) {
-            logger.error("Tenant does not exists");
+            log.error("Tenant does not exists");
             return true;
         }
         return false;
@@ -632,18 +635,39 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
     }
 
     /**
-     * set k8s task relation
-     * @param k8sTaskExecutionContext k8sTaskExecutionContext
+     * get k8s task execution context based on task type and deploy mode
+     *
      * @param taskInstance taskInstance
      */
-    private void setK8sTaskRelation(K8sTaskExecutionContext k8sTaskExecutionContext, TaskInstance taskInstance) {
-        K8sTaskParameters k8sTaskParameters =
-                JSONUtils.parseObject(taskInstance.getTaskParams(), K8sTaskParameters.class);
-        Map<String, String> namespace = JSONUtils.toMap(k8sTaskParameters.getNamespace());
-        String clusterName = namespace.get(CLUSTER);
-        String configYaml = processService.findConfigYamlByName(clusterName);
-        if (configYaml != null) {
-            k8sTaskExecutionContext.setConfigYaml(configYaml);
+    private K8sTaskExecutionContext setK8sTaskRelation(TaskInstance taskInstance) {
+        K8sTaskExecutionContext k8sTaskExecutionContext = null;
+        String namespace = "";
+        switch (taskInstance.getTaskType()) {
+            case "K8S":
+            case "KUBEFLOW":
+                K8sTaskParameters k8sTaskParameters =
+                        JSONUtils.parseObject(taskInstance.getTaskParams(), K8sTaskParameters.class);
+                namespace = k8sTaskParameters.getNamespace();
+                break;
+            case "SPARK":
+                SparkParameters sparkParameters =
+                        JSONUtils.parseObject(taskInstance.getTaskParams(), SparkParameters.class);
+                if (StringUtils.isNotEmpty(sparkParameters.getNamespace())) {
+                    namespace = sparkParameters.getNamespace();
+                }
+                break;
+            default:
+                break;
         }
+
+        if (StringUtils.isNotEmpty(namespace)) {
+            String clusterName = JSONUtils.toMap(namespace).get(CLUSTER);
+            String configYaml = processService.findConfigYamlByName(clusterName);
+            if (configYaml != null) {
+                k8sTaskExecutionContext =
+                        new K8sTaskExecutionContext(configYaml, JSONUtils.toMap(namespace).get(NAMESPACE_NAME));
+            }
+        }
+        return k8sTaskExecutionContext;
     }
 }

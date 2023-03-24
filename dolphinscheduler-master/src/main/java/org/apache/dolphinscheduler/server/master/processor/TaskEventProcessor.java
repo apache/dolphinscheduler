@@ -19,16 +19,16 @@ package org.apache.dolphinscheduler.server.master.processor;
 
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.TaskEventChangeCommand;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.master.event.TaskStateEvent;
 import org.apache.dolphinscheduler.server.master.processor.queue.StateEventResponseService;
-import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -39,9 +39,8 @@ import io.netty.channel.Channel;
  * handle state event received from master/api
  */
 @Component
+@Slf4j
 public class TaskEventProcessor implements NettyRequestProcessor {
-
-    private final Logger logger = LoggerFactory.getLogger(TaskEventProcessor.class);
 
     @Autowired
     private StateEventResponseService stateEventResponseService;
@@ -58,15 +57,13 @@ public class TaskEventProcessor implements NettyRequestProcessor {
                 .processInstanceId(taskEventChangeCommand.getProcessInstanceId())
                 .taskInstanceId(taskEventChangeCommand.getTaskInstanceId())
                 .key(taskEventChangeCommand.getKey())
-                .type(StateEventType.WAIT_TASK_GROUP)
+                .type(StateEventType.WAKE_UP_TASK_GROUP)
                 .build();
-        try {
-            LoggerUtils.setWorkflowAndTaskInstanceIDMDC(stateEvent.getProcessInstanceId(),
-                    stateEvent.getTaskInstanceId());
-            logger.info("Received task event change command, event: {}", stateEvent);
+        try (
+                LogUtils.MDCAutoClosableContext mdcAutoClosableContext = LogUtils.setWorkflowAndTaskInstanceIDMDC(
+                        stateEvent.getProcessInstanceId(), stateEvent.getTaskInstanceId())) {
+            log.info("Received task event change command, event: {}", stateEvent);
             stateEventResponseService.addEvent2WorkflowExecute(stateEvent);
-        } finally {
-            LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
         }
     }
 

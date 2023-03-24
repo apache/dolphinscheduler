@@ -34,22 +34,21 @@ import java.util.stream.IntStream;
 
 import javax.servlet.http.HttpServletRequest;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Aspect
 @Component
+@Slf4j
 public class AccessLogAspect {
-
-    private static final Logger logger = LoggerFactory.getLogger(AccessLogAspect.class);
 
     private static final String TRACE_ID = "traceId";
 
@@ -66,6 +65,15 @@ public class AccessLogAspect {
     public Object doAround(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         long startTime = System.currentTimeMillis();
 
+        String URI = null;
+        String requestMethod = null;
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attributes != null) {
+            HttpServletRequest request = attributes.getRequest();
+            URI = request.getRequestURI();
+            requestMethod = request.getMethod();
+        }
+
         // fetch AccessLogAnnotation
         MethodSignature sign = (MethodSignature) proceedingJoinPoint.getSignature();
         Method method = sign.getMethod();
@@ -75,12 +83,10 @@ public class AccessLogAspect {
 
         // log request
         if (!annotation.ignoreRequest()) {
-            ServletRequestAttributes attributes =
-                    (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
             if (attributes != null) {
                 HttpServletRequest request = attributes.getRequest();
                 String traceIdFromHeader = request.getHeader(TRACE_ID);
-                if (!StringUtils.isEmpty(traceIdFromHeader)) {
+                if (StringUtils.isNotEmpty(traceIdFromHeader)) {
                     traceId = traceIdFromHeader;
                 }
                 // handle login info
@@ -90,7 +96,7 @@ public class AccessLogAspect {
                 String argsString = parseArgs(proceedingJoinPoint, annotation);
                 // handle sensitive data in the string
                 argsString = handleSensitiveData(argsString);
-                logger.info("REQUEST TRACE_ID:{}, LOGIN_USER:{}, URI:{}, METHOD:{}, HANDLER:{}, ARGS:{}",
+                log.info("REQUEST TRACE_ID:{}, LOGIN_USER:{}, URI:{}, METHOD:{}, HANDLER:{}, ARGS:{}",
                         traceId,
                         userName,
                         request.getRequestURI(),
@@ -104,11 +110,7 @@ public class AccessLogAspect {
 
         Object ob = proceedingJoinPoint.proceed();
 
-        // log response
-        if (!annotation.ignoreResponse()) {
-            logger.info("RESPONSE TRACE_ID:{}, BODY:{}, REQUEST DURATION:{} milliseconds", traceId, ob,
-                    (System.currentTimeMillis() - startTime));
-        }
+        log.info("Call {}:{} success, cost: {}ms", requestMethod, URI, (System.currentTimeMillis() - startTime));
 
         return ob;
     }

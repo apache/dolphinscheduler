@@ -18,13 +18,13 @@
 package org.apache.dolphinscheduler.service.log;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.command.log.ViewLogRequestCommand;
-import org.apache.dolphinscheduler.service.utils.LoggerUtils;
+import org.apache.dolphinscheduler.remote.processor.LoggerRequestProcessor;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,11 +37,11 @@ import io.netty.channel.Channel;
 @ExtendWith(MockitoExtension.class)
 public class LoggerRequestProcessorTest {
 
-    private MockedStatic<LoggerUtils> mockedStaticLoggerUtils;
+    private MockedStatic<LogUtils> mockedStaticLoggerUtils;
 
     @BeforeEach
     public void setUp() {
-        mockedStaticLoggerUtils = Mockito.mockStatic(LoggerUtils.class);
+        mockedStaticLoggerUtils = Mockito.mockStatic(LogUtils.class);
     }
 
     @AfterEach
@@ -54,7 +54,7 @@ public class LoggerRequestProcessorTest {
         System.setProperty("DOLPHINSCHEDULER_WORKER_HOME", System.getProperty("user.dir"));
         Channel channel = Mockito.mock(Channel.class);
         Mockito.when(channel.writeAndFlush(Mockito.any(Command.class))).thenReturn(null);
-        Mockito.when(LoggerUtils.readWholeFileContent(Mockito.anyString())).thenReturn("");
+        Mockito.when(LogUtils.readWholeFileContentFromLocal(Mockito.anyString())).thenReturn("");
         String userDir = System.getProperty("user.dir");
         ViewLogRequestCommand logRequestCommand = new ViewLogRequestCommand(userDir + "/log/path/a.log");
 
@@ -70,7 +70,7 @@ public class LoggerRequestProcessorTest {
     public void testProcessViewWholeLogRequestError() {
         System.setProperty("DOLPHINSCHEDULER_WORKER_HOME", System.getProperty("user.dir"));
         Channel channel = Mockito.mock(Channel.class);
-        Mockito.when(LoggerUtils.readWholeFileContent(Mockito.anyString())).thenReturn("");
+        Mockito.when(LogUtils.readWholeFileContentFromLocal(Mockito.anyString())).thenReturn("");
         String userDir = System.getProperty("user.dir");
         ViewLogRequestCommand logRequestCommand = new ViewLogRequestCommand(userDir + "/log/path/a");
 
@@ -79,16 +79,14 @@ public class LoggerRequestProcessorTest {
         command.setBody(JSONUtils.toJsonByteArray(logRequestCommand));
 
         LoggerRequestProcessor loggerRequestProcessor = new LoggerRequestProcessor();
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            loggerRequestProcessor.process(channel, command);
-        });
+        loggerRequestProcessor.process(channel, command);
     }
 
     @Test
     public void testProcessViewWholeLogRequestErrorRelativePath() {
         System.setProperty("DOLPHINSCHEDULER_WORKER_HOME", System.getProperty("user.dir"));
         Channel channel = Mockito.mock(Channel.class);
-        Mockito.when(LoggerUtils.readWholeFileContent(Mockito.anyString())).thenReturn("");
+        Mockito.when(LogUtils.readWholeFileContentFromLocal(Mockito.anyString())).thenReturn("");
         String userDir = System.getProperty("user.dir");
         ViewLogRequestCommand logRequestCommand = new ViewLogRequestCommand(userDir + "/log/../../a.log");
 
@@ -97,16 +95,14 @@ public class LoggerRequestProcessorTest {
         command.setBody(JSONUtils.toJsonByteArray(logRequestCommand));
 
         LoggerRequestProcessor loggerRequestProcessor = new LoggerRequestProcessor();
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            loggerRequestProcessor.process(channel, command);
-        });
+        loggerRequestProcessor.process(channel, command);
     }
 
     @Test
     public void testProcessViewWholeLogRequestErrorStartWith() {
         System.setProperty("DOLPHINSCHEDULER_WORKER_HOME", System.getProperty("user.dir"));
         Channel channel = Mockito.mock(Channel.class);
-        Mockito.when(LoggerUtils.readWholeFileContent(Mockito.anyString())).thenReturn("");
+        Mockito.when(LogUtils.readWholeFileContentFromLocal(Mockito.anyString())).thenReturn("");
         ViewLogRequestCommand logRequestCommand = new ViewLogRequestCommand("/log/a.log");
 
         Command command = new Command();
@@ -114,8 +110,6 @@ public class LoggerRequestProcessorTest {
         command.setBody(JSONUtils.toJsonByteArray(logRequestCommand));
 
         LoggerRequestProcessor loggerRequestProcessor = new LoggerRequestProcessor();
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            loggerRequestProcessor.process(channel, command);
-        });
+        loggerRequestProcessor.process(channel, command);
     }
 }

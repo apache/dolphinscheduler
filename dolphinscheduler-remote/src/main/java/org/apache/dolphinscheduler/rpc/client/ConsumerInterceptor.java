@@ -35,15 +35,11 @@ import net.bytebuddy.implementation.bind.annotation.AllArguments;
 import net.bytebuddy.implementation.bind.annotation.Origin;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * ConsumerInterceptor
  */
 public class ConsumerInterceptor {
 
-    private static final Logger logger = LoggerFactory.getLogger(ConsumerInterceptor.class);
     private Host host;
 
     private NettyClient nettyClient = NettyClient.getInstance();

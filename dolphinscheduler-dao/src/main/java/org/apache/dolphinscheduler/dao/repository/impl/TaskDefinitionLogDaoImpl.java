@@ -24,6 +24,8 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 
+import org.apache.commons.collections4.CollectionUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,8 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -43,8 +43,6 @@ import com.google.common.collect.Lists;
  */
 @Repository
 public class TaskDefinitionLogDaoImpl implements TaskDefinitionLogDao {
-
-    private final Logger logger = LoggerFactory.getLogger(TaskDefinitionLogDaoImpl.class);
 
     @Autowired
     private TaskDefinitionDao taskDefinitionDao;
@@ -87,5 +85,13 @@ public class TaskDefinitionLogDaoImpl implements TaskDefinitionLogDao {
             taskDefinitionLogs.add((TaskDefinitionLog) taskDefinitionDao.findTaskDefinition(code, version));
         });
         return taskDefinitionLogs;
+    }
+
+    @Override
+    public void deleteByTaskDefinitionCodes(Set<Long> taskDefinitionCodes) {
+        if (CollectionUtils.isEmpty(taskDefinitionCodes)) {
+            return;
+        }
+        taskDefinitionLogMapper.deleteByTaskDefinitionCodes(taskDefinitionCodes);
     }
 }

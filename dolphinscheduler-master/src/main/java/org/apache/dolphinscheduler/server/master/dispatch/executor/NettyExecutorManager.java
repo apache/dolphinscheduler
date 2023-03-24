@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
+import org.apache.dolphinscheduler.server.master.dispatch.exceptions.WorkerGroupNotFoundException;
 import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
 import org.apache.dolphinscheduler.server.master.processor.TaskRecallProcessor;
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
@@ -40,8 +41,8 @@ import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,9 +50,8 @@ import org.springframework.stereotype.Service;
  * netty executor manager
  */
 @Service
+@Slf4j
 public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
-
-    private final Logger logger = LoggerFactory.getLogger(NettyExecutorManager.class);
 
     /**
      * server node manager
@@ -92,7 +92,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
      * @throws ExecuteException if error throws ExecuteException
      */
     @Override
-    public Boolean execute(ExecutionContext context) throws ExecuteException {
+    public void execute(ExecutionContext context) throws ExecuteException {
         // all nodes
         Set<String> allNodes = getAllNodes(context);
         // fail nodes
@@ -101,25 +101,24 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
         Command command = context.getCommand();
         // execute task host
         Host host = context.getHost();
-        boolean success = false;
-        while (!success) {
+        for (int i = 0; i < allNodes.size(); i++) {
             try {
                 doExecute(host, command);
-                success = true;
                 context.setHost(host);
                 // We set the host to taskInstance to avoid when the worker down, this taskInstance may not be
                 // failovered, due to the taskInstance's host
                 // is not belongs to the down worker ISSUE-10842.
                 context.getTaskInstance().setHost(host.getAddress());
+                return;
             } catch (ExecuteException ex) {
-                logger.error("Execute command {} error", command, ex);
+                log.error("Execute command {} error", command, ex);
                 try {
                     failNodeSet.add(host.getAddress());
                     Set<String> tmpAllIps = new HashSet<>(allNodes);
                     Collection<String> remained = CollectionUtils.subtract(tmpAllIps, failNodeSet);
-                    if (remained != null && remained.size() > 0) {
+                    if (CollectionUtils.isNotEmpty(remained)) {
                         host = Host.of(remained.iterator().next());
-                        logger.error("retry execute command : {} host : {}", command, host);
+                        log.error("retry execute command : {} host : {}", command, host);
                     } else {
                         throw new ExecuteException("fail after try all nodes");
                     }
@@ -128,8 +127,6 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
                 }
             }
         }
-
-        return success;
     }
 
     @Override
@@ -154,7 +151,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
                 nettyRemotingClient.send(host, command);
                 success = true;
             } catch (Exception ex) {
-                logger.error("Send command to {} error, command: {}", host, command, ex);
+                log.error("Send command to {} error, command: {}", host, command, ex);
                 retryCount--;
                 ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
             }
@@ -171,7 +168,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
      * @param context context
      * @return nodes
      */
-    private Set<String> getAllNodes(ExecutionContext context) {
+    private Set<String> getAllNodes(ExecutionContext context) throws WorkerGroupNotFoundException {
         Set<String> nodes = Collections.emptySet();
         /**
          * executor type

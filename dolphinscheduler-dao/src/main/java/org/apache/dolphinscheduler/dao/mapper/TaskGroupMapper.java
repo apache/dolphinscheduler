@@ -82,8 +82,11 @@ public interface TaskGroupMapper extends BaseMapper<TaskGroup> {
 
     /**
      * listAuthorizedResource
+     *
      * @param userId
      * @return
      */
     List<TaskGroup> listAuthorizedResource(@Param("userId") int userId);
+
+    List<TaskGroup> selectByProjectCode(@Param("projectCode") long projectCode);
 }

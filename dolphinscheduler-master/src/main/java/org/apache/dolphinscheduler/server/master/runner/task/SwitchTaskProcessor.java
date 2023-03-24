@@ -20,15 +20,14 @@ package org.apache.dolphinscheduler.server.master.runner.task;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SWITCH;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.SwitchResultVo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.master.utils.SwitchTaskUtils;
-import org.apache.dolphinscheduler.service.utils.LogUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -65,19 +64,20 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
             return false;
         }
         this.setTaskExecutionLogger();
-        logger.info("switch task submit success");
+        log.info("switch task submit success");
         return true;
     }
 
     @Override
     public boolean runTask() {
-        logger.info("switch task starting");
+        log.info("switch task starting");
         taskInstance.setLogPath(
-                LogUtils.getTaskLogPath(taskInstance.getFirstSubmitTime(), processInstance.getProcessDefinitionCode(),
+                LogUtils.getTaskInstanceLogFullPath(taskInstance.getFirstSubmitTime(),
+                        processInstance.getProcessDefinitionCode(),
                         processInstance.getProcessDefinitionVersion(),
                         taskInstance.getProcessInstanceId(),
                         taskInstance.getId()));
-        taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
+        taskInstance.setHost(masterConfig.getMasterAddress());
         taskInstance.setState(TaskExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());
         taskInstanceDao.updateTaskInstance(taskInstance);
@@ -86,7 +86,7 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
             setSwitchResult();
         }
         endTaskState();
-        logger.info("switch task finished");
+        log.info("switch task finished");
         return true;
     }
 
@@ -142,23 +142,23 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
         int i = 0;
         conditionResult = DependResult.SUCCESS;
         for (SwitchResultVo info : switchResultVos) {
-            logger.info("the {} execution ", (i + 1));
-            logger.info("original condition sentence：{}", info.getCondition());
+            log.info("the {} execution ", (i + 1));
+            log.info("original condition sentence：{}", info.getCondition());
             if (StringUtils.isEmpty(info.getCondition())) {
                 finalConditionLocation = i;
                 break;
             }
             String content = setTaskParams(info.getCondition().replaceAll("'", "\""), rgex);
-            logger.info("format condition sentence::{}", content);
+            log.info("format condition sentence::{}", content);
             Boolean result = null;
             try {
                 result = SwitchTaskUtils.evaluate(content);
             } catch (Exception e) {
-                logger.info("error sentence : {}", content);
+                log.info("error sentence : {}", content);
                 conditionResult = DependResult.FAILED;
                 break;
             }
-            logger.info("condition result : {}", result);
+            log.info("condition result : {}", result);
             if (result) {
                 finalConditionLocation = i;
                 break;
@@ -171,12 +171,12 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
 
         if (!isValidSwitchResult(switchResultVos.get(finalConditionLocation))) {
             conditionResult = DependResult.FAILED;
-            logger.error("the switch task depend result is invalid, result:{}, switch branch:{}", conditionResult,
+            log.error("the switch task depend result is invalid, result:{}, switch branch:{}", conditionResult,
                     finalConditionLocation);
             return true;
         }
 
-        logger.info("the switch task depend result:{}, switch branch:{}", conditionResult, finalConditionLocation);
+        log.info("the switch task depend result:{}, switch branch:{}", conditionResult, finalConditionLocation);
         return true;
     }
 
@@ -216,7 +216,7 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
             if (!org.apache.commons.lang3.math.NumberUtils.isCreatable(value)) {
                 value = "\"" + value + "\"";
             }
-            logger.info("paramName:{}，paramValue:{}", paramName, value);
+            log.info("paramName:{}，paramValue:{}", paramName, value);
             content = content.replace("${" + paramName + "}", value);
         }
         return content;

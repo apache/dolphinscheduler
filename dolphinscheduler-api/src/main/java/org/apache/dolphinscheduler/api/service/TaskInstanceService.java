@@ -110,4 +110,6 @@ public interface TaskInstanceService {
      * @return
      */
     TaskInstanceRemoveCacheResponse removeTaskInstanceCache(User loginUser, long projectCode, Integer taskInstanceId);
+
+    void deleteByWorkflowInstanceId(Integer workflowInstanceId);
 }

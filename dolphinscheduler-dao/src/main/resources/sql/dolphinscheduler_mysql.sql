@@ -29,7 +29,7 @@ CREATE TABLE `QRTZ_BLOB_TRIGGERS` (
   PRIMARY KEY (`SCHED_NAME`,`TRIGGER_NAME`,`TRIGGER_GROUP`),
   KEY `SCHED_NAME` (`SCHED_NAME`,`TRIGGER_NAME`,`TRIGGER_GROUP`),
   CONSTRAINT `QRTZ_BLOB_TRIGGERS_ibfk_1` FOREIGN KEY (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`) REFERENCES `QRTZ_TRIGGERS` (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Records of QRTZ_BLOB_TRIGGERS
@@ -44,7 +44,7 @@ CREATE TABLE `QRTZ_CALENDARS` (
   `CALENDAR_NAME` varchar(200) NOT NULL,
   `CALENDAR` blob NOT NULL,
   PRIMARY KEY (`SCHED_NAME`,`CALENDAR_NAME`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Records of QRTZ_CALENDARS
@@ -62,7 +62,7 @@ CREATE TABLE `QRTZ_CRON_TRIGGERS` (
   `TIME_ZONE_ID` varchar(80) DEFAULT NULL,
   PRIMARY KEY (`SCHED_NAME`,`TRIGGER_NAME`,`TRIGGER_GROUP`),
   CONSTRAINT `QRTZ_CRON_TRIGGERS_ibfk_1` FOREIGN KEY (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`) REFERENCES `QRTZ_TRIGGERS` (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Records of QRTZ_CRON_TRIGGERS
@@ -93,7 +93,7 @@ CREATE TABLE `QRTZ_FIRED_TRIGGERS` (
   KEY `IDX_QRTZ_FT_JG` (`SCHED_NAME`,`JOB_GROUP`),
   KEY `IDX_QRTZ_FT_T_G` (`SCHED_NAME`,`TRIGGER_NAME`,`TRIGGER_GROUP`),
   KEY `IDX_QRTZ_FT_TG` (`SCHED_NAME`,`TRIGGER_GROUP`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Records of QRTZ_FIRED_TRIGGERS
@@ -117,7 +117,7 @@ CREATE TABLE `QRTZ_JOB_DETAILS` (
   PRIMARY KEY (`SCHED_NAME`,`JOB_NAME`,`JOB_GROUP`),
   KEY `IDX_QRTZ_J_REQ_RECOVERY` (`SCHED_NAME`,`REQUESTS_RECOVERY`),
   KEY `IDX_QRTZ_J_GRP` (`SCHED_NAME`,`JOB_GROUP`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Records of QRTZ_JOB_DETAILS
@@ -131,7 +131,7 @@ CREATE TABLE `QRTZ_LOCKS` (
   `SCHED_NAME` varchar(120) NOT NULL,
   `LOCK_NAME` varchar(40) NOT NULL,
   PRIMARY KEY (`SCHED_NAME`,`LOCK_NAME`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Records of QRTZ_LOCKS
@@ -145,7 +145,7 @@ CREATE TABLE `QRTZ_PAUSED_TRIGGER_GRPS` (
   `SCHED_NAME` varchar(120) NOT NULL,
   `TRIGGER_GROUP` varchar(200) NOT NULL,
   PRIMARY KEY (`SCHED_NAME`,`TRIGGER_GROUP`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Records of QRTZ_PAUSED_TRIGGER_GRPS
@@ -161,7 +161,7 @@ CREATE TABLE `QRTZ_SCHEDULER_STATE` (
   `LAST_CHECKIN_TIME` bigint(13) NOT NULL,
   `CHECKIN_INTERVAL` bigint(13) NOT NULL,
   PRIMARY KEY (`SCHED_NAME`,`INSTANCE_NAME`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Records of QRTZ_SCHEDULER_STATE
@@ -180,7 +180,7 @@ CREATE TABLE `QRTZ_SIMPLE_TRIGGERS` (
   `TIMES_TRIGGERED` bigint(10) NOT NULL,
   PRIMARY KEY (`SCHED_NAME`,`TRIGGER_NAME`,`TRIGGER_GROUP`),
   CONSTRAINT `QRTZ_SIMPLE_TRIGGERS_ibfk_1` FOREIGN KEY (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`) REFERENCES `QRTZ_TRIGGERS` (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Records of QRTZ_SIMPLE_TRIGGERS
@@ -207,7 +207,7 @@ CREATE TABLE `QRTZ_SIMPROP_TRIGGERS` (
   `BOOL_PROP_2` varchar(1) DEFAULT NULL,
   PRIMARY KEY (`SCHED_NAME`,`TRIGGER_NAME`,`TRIGGER_GROUP`),
   CONSTRAINT `QRTZ_SIMPROP_TRIGGERS_ibfk_1` FOREIGN KEY (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`) REFERENCES `QRTZ_TRIGGERS` (`SCHED_NAME`, `TRIGGER_NAME`, `TRIGGER_GROUP`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Records of QRTZ_SIMPROP_TRIGGERS
@@ -248,7 +248,7 @@ CREATE TABLE `QRTZ_TRIGGERS` (
   KEY `IDX_QRTZ_T_NFT_ST_MISFIRE` (`SCHED_NAME`,`MISFIRE_INSTR`,`NEXT_FIRE_TIME`,`TRIGGER_STATE`),
   KEY `IDX_QRTZ_T_NFT_ST_MISFIRE_GRP` (`SCHED_NAME`,`MISFIRE_INSTR`,`NEXT_FIRE_TIME`,`TRIGGER_GROUP`,`TRIGGER_STATE`),
   CONSTRAINT `QRTZ_TRIGGERS_ibfk_1` FOREIGN KEY (`SCHED_NAME`, `JOB_NAME`, `JOB_GROUP`) REFERENCES `QRTZ_JOB_DETAILS` (`SCHED_NAME`, `JOB_NAME`, `JOB_GROUP`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Records of QRTZ_TRIGGERS
@@ -266,7 +266,7 @@ CREATE TABLE `t_ds_access_token` (
   `create_time` datetime DEFAULT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Records of t_ds_access_token
@@ -278,7 +278,7 @@ CREATE TABLE `t_ds_access_token` (
 DROP TABLE IF EXISTS `t_ds_alert`;
 CREATE TABLE `t_ds_alert` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
-  `title` varchar(64) DEFAULT NULL COMMENT 'title',
+  `title` varchar(512) DEFAULT NULL COMMENT 'title',
   `sign` char(40) NOT NULL DEFAULT '' COMMENT 'sign=sha1(content)',
   `content` text COMMENT 'Message content (can be email, can be SMS. Mail is stored in JSON map, and SMS is string)',
   `alert_status` tinyint(4) DEFAULT '0' COMMENT '0:wait running,1:success,2:failed',
@@ -294,7 +294,7 @@ CREATE TABLE `t_ds_alert` (
   PRIMARY KEY (`id`),
   KEY `idx_status` (`alert_status`) USING BTREE,
   KEY `idx_sign` (`sign`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Records of t_ds_alert
@@ -314,7 +314,7 @@ CREATE TABLE `t_ds_alertgroup`(
   `update_time`    datetime     DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
   UNIQUE KEY `t_ds_alertgroup_name_un` (`group_name`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Records of t_ds_alertgroup
@@ -340,13 +340,13 @@ CREATE TABLE `t_ds_command` (
   `executor_id`               int(11) DEFAULT NULL COMMENT 'executor id',
   `update_time`               datetime DEFAULT NULL COMMENT 'update time',
   `process_instance_priority` int(11) DEFAULT '2' COMMENT 'process instance priority: 0 Highest,1 High,2 Medium,3 Low,4 Lowest',
-  `worker_group`              varchar(64)  COMMENT 'worker group',
+  `worker_group`              varchar(255)  COMMENT 'worker group',
   `environment_code`          bigint(20) DEFAULT '-1' COMMENT 'environment code',
   `dry_run`                   tinyint(4) DEFAULT '0' COMMENT 'dry run flag：0 normal, 1 dry run',
   `test_flag`                 tinyint(4) DEFAULT null COMMENT 'test flag：0 normal, 1 test run',
   PRIMARY KEY (`id`),
   KEY `priority_id_index` (`process_instance_priority`,`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Records of t_ds_command
@@ -369,7 +369,7 @@ CREATE TABLE `t_ds_datasource` (
   `bind_test_id` int(11)  DEFAULT NULL COMMENT 'bind testDataSource id',
   PRIMARY KEY (`id`),
   UNIQUE KEY `t_ds_datasource_name_un` (`name`, `type`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Records of t_ds_datasource
@@ -395,13 +395,13 @@ CREATE TABLE `t_ds_error_command` (
   `start_time` datetime DEFAULT NULL COMMENT 'start time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   `process_instance_priority` int(11) DEFAULT '2' COMMENT 'process instance priority, 0 Highest,1 High,2 Medium,3 Low,4 Lowest',
-  `worker_group` varchar(64)  COMMENT 'worker group',
+  `worker_group` varchar(255)  COMMENT 'worker group',
   `environment_code` bigint(20) DEFAULT '-1' COMMENT 'environment code',
   `message` text COMMENT 'message',
   `dry_run` tinyint(4) DEFAULT '0' COMMENT 'dry run flag: 0 normal, 1 dry run',
   `test_flag` tinyint(4) DEFAULT null COMMENT 'test flag：0 normal, 1 test run',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Records of t_ds_error_command
@@ -431,7 +431,7 @@ CREATE TABLE `t_ds_process_definition` (
   `update_time` datetime NOT NULL COMMENT 'update time',
   PRIMARY KEY (`id`,`code`),
   UNIQUE KEY `process_unique` (`name`,`project_code`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Records of t_ds_process_definition
@@ -444,7 +444,7 @@ DROP TABLE IF EXISTS `t_ds_process_definition_log`;
 CREATE TABLE `t_ds_process_definition_log` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
   `code` bigint(20) NOT NULL COMMENT 'encoding',
-  `name` varchar(200) DEFAULT NULL COMMENT 'process definition name',
+  `name` varchar(255) DEFAULT NULL COMMENT 'process definition name',
   `version` int(11) DEFAULT '0' COMMENT 'process definition version',
   `description` text COMMENT 'description',
   `project_code` bigint(20) NOT NULL COMMENT 'project code',
@@ -463,7 +463,7 @@ CREATE TABLE `t_ds_process_definition_log` (
   `update_time` datetime NOT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uniq_idx_code_version` (`code`,`version`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Table structure for t_ds_task_definition
@@ -472,7 +472,7 @@ DROP TABLE IF EXISTS `t_ds_task_definition`;
 CREATE TABLE `t_ds_task_definition` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
   `code` bigint(20) NOT NULL COMMENT 'encoding',
-  `name` varchar(200) DEFAULT NULL COMMENT 'task definition name',
+  `name` varchar(255) DEFAULT NULL COMMENT 'task definition name',
   `version` int(11) DEFAULT '0' COMMENT 'task definition version',
   `description` text COMMENT 'description',
   `project_code` bigint(20) NOT NULL COMMENT 'project code',
@@ -483,7 +483,7 @@ CREATE TABLE `t_ds_task_definition` (
   `flag` tinyint(2) DEFAULT NULL COMMENT '0 not available, 1 available',
   `is_cache` tinyint(2) DEFAULT '0' COMMENT '0 not available, 1 available',
   `task_priority` tinyint(4) DEFAULT '2' COMMENT 'job priority',
-  `worker_group` varchar(200) DEFAULT NULL COMMENT 'worker grouping',
+  `worker_group` varchar(255) DEFAULT NULL COMMENT 'worker grouping',
   `environment_code` bigint(20) DEFAULT '-1' COMMENT 'environment code',
   `fail_retry_times` int(11) DEFAULT NULL COMMENT 'number of failed retries',
   `fail_retry_interval` int(11) DEFAULT NULL COMMENT 'failed retry interval',
@@ -499,7 +499,7 @@ CREATE TABLE `t_ds_task_definition` (
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime NOT NULL COMMENT 'update time',
   PRIMARY KEY (`id`,`code`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Table structure for t_ds_task_definition_log
@@ -508,7 +508,7 @@ DROP TABLE IF EXISTS `t_ds_task_definition_log`;
 CREATE TABLE `t_ds_task_definition_log` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
   `code` bigint(20) NOT NULL COMMENT 'encoding',
-  `name` varchar(200) DEFAULT NULL COMMENT 'task definition name',
+  `name` varchar(255) DEFAULT NULL COMMENT 'task definition name',
   `version` int(11) DEFAULT '0' COMMENT 'task definition version',
   `description` text COMMENT 'description',
   `project_code` bigint(20) NOT NULL COMMENT 'project code',
@@ -519,7 +519,7 @@ CREATE TABLE `t_ds_task_definition_log` (
   `flag` tinyint(2) DEFAULT NULL COMMENT '0 not available, 1 available',
   `is_cache` tinyint(2) DEFAULT '0' COMMENT '0 not available, 1 available',
   `task_priority` tinyint(4) DEFAULT '2' COMMENT 'job priority',
-  `worker_group` varchar(200) DEFAULT NULL COMMENT 'worker grouping',
+  `worker_group` varchar(255) DEFAULT NULL COMMENT 'worker grouping',
   `environment_code` bigint(20) DEFAULT '-1' COMMENT 'environment code',
   `fail_retry_times` int(11) DEFAULT NULL COMMENT 'number of failed retries',
   `fail_retry_interval` int(11) DEFAULT NULL COMMENT 'failed retry interval',
@@ -539,7 +539,7 @@ CREATE TABLE `t_ds_task_definition_log` (
   PRIMARY KEY (`id`),
   KEY `idx_code_version` (`code`,`version`),
   KEY `idx_project_code` (`project_code`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Table structure for t_ds_process_task_relation
@@ -547,7 +547,7 @@ CREATE TABLE `t_ds_task_definition_log` (
 DROP TABLE IF EXISTS `t_ds_process_task_relation`;
 CREATE TABLE `t_ds_process_task_relation` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
-  `name` varchar(200) DEFAULT NULL COMMENT 'relation name',
+  `name` varchar(255) DEFAULT NULL COMMENT 'relation name',
   `project_code` bigint(20) NOT NULL COMMENT 'project code',
   `process_definition_code` bigint(20) NOT NULL COMMENT 'process code',
   `process_definition_version` int(11) NOT NULL COMMENT 'process version',
@@ -563,7 +563,7 @@ CREATE TABLE `t_ds_process_task_relation` (
   KEY `idx_code` (`project_code`,`process_definition_code`),
   KEY `idx_pre_task_code_version` (`pre_task_code`,`pre_task_version`),
   KEY `idx_post_task_code_version` (`post_task_code`,`post_task_version`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Table structure for t_ds_process_task_relation_log
@@ -571,7 +571,7 @@ CREATE TABLE `t_ds_process_task_relation` (
 DROP TABLE IF EXISTS `t_ds_process_task_relation_log`;
 CREATE TABLE `t_ds_process_task_relation_log` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
-  `name` varchar(200) DEFAULT NULL COMMENT 'relation name',
+  `name` varchar(255) DEFAULT NULL COMMENT 'relation name',
   `project_code` bigint(20) NOT NULL COMMENT 'project code',
   `process_definition_code` bigint(20) NOT NULL COMMENT 'process code',
   `process_definition_version` int(11) NOT NULL COMMENT 'process version',
@@ -587,7 +587,7 @@ CREATE TABLE `t_ds_process_task_relation_log` (
   `update_time` datetime NOT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
   KEY `idx_process_code_version` (`process_definition_code`,`process_definition_version`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Table structure for t_ds_process_instance
@@ -598,6 +598,7 @@ CREATE TABLE `t_ds_process_instance` (
   `name` varchar(255) DEFAULT NULL COMMENT 'process instance name',
   `process_definition_code` bigint(20) NOT NULL COMMENT 'process definition code',
   `process_definition_version` int(11) DEFAULT '0' COMMENT 'process definition version',
+  `project_code` bigint(20) DEFAULT NULL COMMENT 'project code',
   `state` tinyint(4) DEFAULT NULL COMMENT 'process instance Status: 0 commit succeeded, 1 running, 2 prepare to pause, 3 pause, 4 prepare to stop, 5 stop, 6 fail, 7 succeed, 8 need fault tolerance, 9 kill, 10 wait for thread, 11 wait for dependency to complete',
   `state_history` text DEFAULT NULL COMMENT 'state history desc',
   `recovery` tinyint(4) DEFAULT NULL COMMENT 'process instance failover flag：0:normal,1:failover instance',
@@ -619,12 +620,14 @@ CREATE TABLE `t_ds_process_instance` (
   `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `is_sub_process` int(11) DEFAULT '0' COMMENT 'flag, whether the process is sub process',
   `executor_id` int(11) NOT NULL COMMENT 'executor id',
+  `executor_name` varchar(64) DEFAULT NULL COMMENT 'execute user name',
   `history_cmd` text COMMENT 'history commands of process instance operation',
   `process_instance_priority` int(11) DEFAULT '2' COMMENT 'process instance priority. 0 Highest,1 High,2 Medium,3 Low,4 Lowest',
-  `worker_group` varchar(64) DEFAULT NULL COMMENT 'worker group id',
+  `worker_group` varchar(255) DEFAULT NULL COMMENT 'worker group id',
   `environment_code` bigint(20) DEFAULT '-1' COMMENT 'environment code',
   `timeout` int(11) DEFAULT '0' COMMENT 'time out',
   `tenant_id` int(11) NOT NULL DEFAULT '-1' COMMENT 'tenant id',
+  `tenant_code` varchar(64) DEFAULT NULL COMMENT 'tenant code',
   `var_pool` longtext COMMENT 'var_pool',
   `dry_run` tinyint(4) DEFAULT '0' COMMENT 'dry run flag：0 normal, 1 dry run',
   `next_process_instance_id` int(11) DEFAULT '0' COMMENT 'serial queue next processInstanceId',
@@ -633,7 +636,7 @@ CREATE TABLE `t_ds_process_instance` (
   PRIMARY KEY (`id`),
   KEY `process_instance_index` (`process_definition_code`,`id`) USING BTREE,
   KEY `start_time_index` (`start_time`,`end_time`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Records of t_ds_process_instance
@@ -645,7 +648,7 @@ CREATE TABLE `t_ds_process_instance` (
 DROP TABLE IF EXISTS `t_ds_project`;
 CREATE TABLE `t_ds_project` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
-  `name` varchar(100) DEFAULT NULL COMMENT 'project name',
+  `name` varchar(255) DEFAULT NULL COMMENT 'project name',
   `code` bigint(20) NOT NULL COMMENT 'encoding',
   `description` varchar(255) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL COMMENT 'creator id',
@@ -656,7 +659,7 @@ CREATE TABLE `t_ds_project` (
   KEY `user_id_index` (`user_id`) USING BTREE,
   UNIQUE KEY `unique_name`(`name`),
   UNIQUE KEY `unique_code`(`code`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Records of t_ds_project
@@ -674,7 +677,7 @@ CREATE TABLE `t_ds_queue` (
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_queue_name`(`queue_name`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Records of t_ds_queue
@@ -693,7 +696,7 @@ CREATE TABLE `t_ds_relation_datasource_user` (
   `create_time` datetime DEFAULT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Records of t_ds_relation_datasource_user
@@ -711,7 +714,7 @@ CREATE TABLE `t_ds_relation_process_instance` (
   PRIMARY KEY (`id`),
   KEY `idx_parent_process_task` (`parent_process_instance_id`,`parent_task_instance_id`) ,
   KEY `idx_process_instance_id` (`process_instance_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Records of t_ds_relation_process_instance
@@ -730,7 +733,7 @@ CREATE TABLE `t_ds_relation_project_user` (
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
   UNIQUE KEY uniq_uid_pid(user_id,project_id)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Records of t_ds_relation_project_user
@@ -748,7 +751,7 @@ CREATE TABLE `t_ds_relation_resources_user` (
   `create_time` datetime DEFAULT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Records of t_ds_relation_resources_user
@@ -766,7 +769,7 @@ CREATE TABLE `t_ds_relation_udfs_user` (
   `create_time` datetime DEFAULT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Table structure for t_ds_resources
@@ -787,27 +790,10 @@ CREATE TABLE `t_ds_resources` (
   `is_directory` tinyint(4) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `t_ds_resources_un` (`full_name`,`type`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Records of t_ds_resources
--- ----------------------------
-
--- ----------------------------
--- Table structure for t_ds_relation_resources_task
--- ----------------------------
-DROP TABLE IF EXISTS `t_ds_relation_resources_task`;
-CREATE TABLE `t_ds_relation_resources_task` (
-  `id` int NOT NULL AUTO_INCREMENT COMMENT 'key',
-  `task_id` int(11) DEFAULT NULL COMMENT 'task id',
-  `full_name` varchar(255) DEFAULT NULL,
-  `type` tinyint DEFAULT NULL COMMENT 'resource type,0:FILE,1:UDF',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `t_ds_relation_resources_task_un` (`task_id`, `full_name`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
--- ----------------------------
--- Records of t_ds_relation_resources_task
 -- ----------------------------
 
 -- ----------------------------
@@ -827,12 +813,12 @@ CREATE TABLE `t_ds_schedules` (
   `warning_type` tinyint(4) NOT NULL COMMENT 'Alarm type: 0 is not sent, 1 process is sent successfully, 2 process is sent failed, 3 process is sent successfully and all failures are sent',
   `warning_group_id` int(11) DEFAULT NULL COMMENT 'alert group id',
   `process_instance_priority` int(11) DEFAULT '2' COMMENT 'process instance priority：0 Highest,1 High,2 Medium,3 Low,4 Lowest',
-  `worker_group` varchar(64) DEFAULT '' COMMENT 'worker group id',
+  `worker_group` varchar(255) DEFAULT '' COMMENT 'worker group id',
   `environment_code` bigint(20) DEFAULT '-1' COMMENT 'environment code',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime NOT NULL COMMENT 'update time',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Records of t_ds_schedules
@@ -848,7 +834,7 @@ CREATE TABLE `t_ds_session` (
   `ip` varchar(45) DEFAULT NULL COMMENT 'ip',
   `last_login_time` datetime DEFAULT NULL COMMENT 'last login time',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Records of t_ds_session
@@ -866,6 +852,8 @@ CREATE TABLE `t_ds_task_instance` (
   `task_code` bigint(20) NOT NULL COMMENT 'task definition code',
   `task_definition_version` int(11) DEFAULT '0' COMMENT 'task definition version',
   `process_instance_id` int(11) DEFAULT NULL COMMENT 'process instance id',
+  `process_instance_name` varchar(255) DEFAULT NULL COMMENT 'process instance name',
+  `project_code` bigint(20) DEFAULT NULL COMMENT 'project code',
   `state` tinyint(4) DEFAULT NULL COMMENT 'Status: 0 commit succeeded, 1 running, 2 prepare to pause, 3 pause, 4 prepare to stop, 5 stop, 6 fail, 7 succeed, 8 need fault tolerance, 9 kill, 10 wait for thread, 11 wait for dependency to complete',
   `submit_time` datetime DEFAULT NULL COMMENT 'task submit time',
   `start_time` datetime DEFAULT NULL COMMENT 'task start time',
@@ -884,10 +872,11 @@ CREATE TABLE `t_ds_task_instance` (
   `retry_interval` int(4) DEFAULT NULL COMMENT 'retry interval when task failed ',
   `max_retry_times` int(2) DEFAULT NULL COMMENT 'max retry times',
   `task_instance_priority` int(11) DEFAULT NULL COMMENT 'task instance priority:0 Highest,1 High,2 Medium,3 Low,4 Lowest',
-  `worker_group` varchar(64) DEFAULT NULL COMMENT 'worker group id',
+  `worker_group` varchar(255) DEFAULT NULL COMMENT 'worker group id',
   `environment_code` bigint(20) DEFAULT '-1' COMMENT 'environment code',
   `environment_config` text COMMENT 'this config contains many environment variables config',
   `executor_id` int(11) DEFAULT NULL,
+  `executor_name` varchar(64) DEFAULT NULL,
   `first_submit_time` datetime DEFAULT NULL COMMENT 'task first submit time',
   `delay_time` int(4) DEFAULT '0' COMMENT 'task delay execution time',
   `var_pool` longtext COMMENT 'var_pool',
@@ -900,7 +889,7 @@ CREATE TABLE `t_ds_task_instance` (
   KEY `process_instance_id` (`process_instance_id`) USING BTREE,
   KEY `idx_code_version` (`task_code`, `task_definition_version`) USING BTREE,
   KEY `idx_cache_key` (`cache_key`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Records of t_ds_task_instance
@@ -919,7 +908,7 @@ CREATE TABLE `t_ds_tenant` (
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_tenant_code`(`tenant_code`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Records of t_ds_tenant
@@ -932,7 +921,7 @@ DROP TABLE IF EXISTS `t_ds_udfs`;
 CREATE TABLE `t_ds_udfs` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
   `user_id` int(11) NOT NULL COMMENT 'user id',
-  `func_name` varchar(100) NOT NULL COMMENT 'UDF function name',
+  `func_name` varchar(255) NOT NULL COMMENT 'UDF function name',
   `class_name` varchar(255) NOT NULL COMMENT 'class of udf',
   `type` tinyint(4) NOT NULL COMMENT 'Udf function type',
   `arg_types` varchar(255) DEFAULT NULL COMMENT 'arguments types',
@@ -944,7 +933,7 @@ CREATE TABLE `t_ds_udfs` (
   `update_time` datetime NOT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_func_name`(`func_name`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Records of t_ds_udfs
@@ -969,7 +958,7 @@ CREATE TABLE `t_ds_user` (
   `time_zone` varchar(32) DEFAULT NULL COMMENT 'time zone',
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_name_unique` (`user_name`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Records of t_ds_user
@@ -989,7 +978,7 @@ CREATE TABLE `t_ds_worker_group` (
   `other_params_json` text NULL DEFAULT NULL COMMENT 'other params json',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name_unique` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Records of t_ds_worker_group
@@ -1001,10 +990,10 @@ CREATE TABLE `t_ds_worker_group` (
 DROP TABLE IF EXISTS `t_ds_version`;
 CREATE TABLE `t_ds_version` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `version` varchar(200) NOT NULL,
+  `version` varchar(63) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `version_UNIQUE` (`version`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COMMENT='version';
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE = utf8_bin COMMENT='version';
 
 -- ----------------------------
 -- Records of t_ds_version
@@ -1031,14 +1020,14 @@ SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
 DROP TABLE IF EXISTS `t_ds_plugin_define`;
 CREATE TABLE `t_ds_plugin_define` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `plugin_name` varchar(100) NOT NULL COMMENT 'the name of plugin eg: email',
-  `plugin_type` varchar(100) NOT NULL COMMENT 'plugin type . alert=alert plugin, job=job plugin',
+  `plugin_name` varchar(255) NOT NULL COMMENT 'the name of plugin eg: email',
+  `plugin_type` varchar(63) NOT NULL COMMENT 'plugin type . alert=alert plugin, job=job plugin',
   `plugin_params` text COMMENT 'plugin params',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `t_ds_plugin_define_UN` (`plugin_name`,`plugin_type`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Table structure for t_ds_alert_plugin_instance
@@ -1050,9 +1039,9 @@ CREATE TABLE `t_ds_alert_plugin_instance` (
   `plugin_instance_params` text COMMENT 'plugin instance params. Also contain the params value which user input in web ui.',
   `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `instance_name` varchar(200) DEFAULT NULL COMMENT 'alert instance name',
+  `instance_name` varchar(255) DEFAULT NULL COMMENT 'alert instance name',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 --
 -- Table structure for table `t_ds_dq_comparison_type`
@@ -1060,15 +1049,15 @@ CREATE TABLE `t_ds_alert_plugin_instance` (
 DROP TABLE IF EXISTS `t_ds_dq_comparison_type`;
 CREATE TABLE `t_ds_dq_comparison_type` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
-    `type` varchar(100) NOT NULL,
+    `type` varchar(255) NOT NULL,
     `execute_sql` text DEFAULT NULL,
     `output_table` varchar(100) DEFAULT NULL,
-    `name` varchar(100) DEFAULT NULL,
+    `name` varchar(255) DEFAULT NULL,
     `create_time` datetime DEFAULT NULL,
     `update_time` datetime DEFAULT NULL,
     `is_inner_source` tinyint(1) DEFAULT '0',
     PRIMARY KEY (`id`)
-)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+)ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 INSERT IGNORE INTO `t_ds_dq_comparison_type`
 (`id`, `type`, `execute_sql`, `output_table`, `name`, `create_time`, `update_time`, `is_inner_source`)
@@ -1119,7 +1108,7 @@ CREATE TABLE `t_ds_dq_execute_result` (
     `create_time` datetime DEFAULT NULL,
     `update_time` datetime DEFAULT NULL,
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 --
 -- Table structure for table t_ds_dq_rule
@@ -1127,13 +1116,13 @@ CREATE TABLE `t_ds_dq_execute_result` (
 DROP TABLE IF EXISTS `t_ds_dq_rule`;
 CREATE TABLE `t_ds_dq_rule` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
-    `name` varchar(100) DEFAULT NULL,
+    `name` varchar(255) DEFAULT NULL,
     `type` int(11) DEFAULT NULL,
     `user_id` int(11) DEFAULT NULL,
     `create_time` datetime DEFAULT NULL,
     `update_time` datetime DEFAULT NULL,
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 INSERT IGNORE INTO `t_ds_dq_rule`
 (`id`, `name`, `type`, `user_id`, `create_time`, `update_time`)
@@ -1180,7 +1169,7 @@ CREATE TABLE `t_ds_dq_rule_execute_sql` (
     `create_time` datetime DEFAULT NULL,
     `update_time` datetime DEFAULT NULL,
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 INSERT IGNORE INTO `t_ds_dq_rule_execute_sql`
 (`id`, `index`, `sql`, `table_alias`, `type`, `is_error_output_sql`, `create_time`, `update_time`)
@@ -1256,7 +1245,7 @@ CREATE TABLE `t_ds_dq_rule_input_entry` (
     `create_time` datetime DEFAULT NULL,
     `update_time` datetime DEFAULT NULL,
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 INSERT IGNORE INTO `t_ds_dq_rule_input_entry`
 (`id`, `field`, `type`, `title`, `value`, `options`, `placeholder`, `option_source_type`, `value_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
@@ -1362,7 +1351,7 @@ CREATE TABLE `t_ds_dq_task_statistics_value` (
     `create_time` datetime DEFAULT NULL,
     `update_time` datetime DEFAULT NULL,
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 --
 -- Table structure for table `t_ds_relation_rule_execute_sql`
@@ -1375,7 +1364,7 @@ CREATE TABLE `t_ds_relation_rule_execute_sql` (
     `create_time` datetime NULL,
     `update_time` datetime NULL,
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 INSERT IGNORE INTO `t_ds_relation_rule_execute_sql`
 (`id`, `rule_id`, `execute_sql_id`, `create_time`, `update_time`)
@@ -1436,7 +1425,7 @@ CREATE TABLE `t_ds_relation_rule_input_entry` (
     `create_time` datetime DEFAULT NULL,
     `update_time` datetime DEFAULT NULL,
     PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 INSERT IGNORE INTO `t_ds_relation_rule_input_entry`
 (`id`, `rule_id`, `rule_input_entry_id`, `values_map`, `index`, `create_time`, `update_time`)
@@ -1839,7 +1828,7 @@ DROP TABLE IF EXISTS `t_ds_environment`;
 CREATE TABLE `t_ds_environment` (
   `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `code` bigint(20)  DEFAULT NULL COMMENT 'encoding',
-  `name` varchar(100) NOT NULL COMMENT 'environment name',
+  `name` varchar(255) NOT NULL COMMENT 'environment name',
   `config` text NULL DEFAULT NULL COMMENT 'this config contains many environment variables config',
   `description` text NULL DEFAULT NULL COMMENT 'the details',
   `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
@@ -1848,7 +1837,7 @@ CREATE TABLE `t_ds_environment` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `environment_name_unique` (`name`),
   UNIQUE KEY `environment_code_unique` (`code`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Table structure for t_ds_environment_worker_group_relation
@@ -1863,7 +1852,7 @@ CREATE TABLE `t_ds_environment_worker_group_relation` (
   `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `environment_worker_group_unique` (`environment_code`,`worker_group`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Table structure for t_ds_task_group_queue
@@ -1872,7 +1861,7 @@ DROP TABLE IF EXISTS `t_ds_task_group_queue`;
 CREATE TABLE `t_ds_task_group_queue` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT'key',
   `task_id` int(11) DEFAULT NULL COMMENT 'taskintanceid',
-  `task_name` varchar(100) DEFAULT NULL COMMENT 'TaskInstance name',
+  `task_name` varchar(255) DEFAULT NULL COMMENT 'TaskInstance name',
   `group_id`  int(11) DEFAULT NULL COMMENT 'taskGroup id',
   `process_id` int(11) DEFAULT NULL COMMENT 'processInstace id',
   `priority` int(8) DEFAULT '0' COMMENT 'priority',
@@ -1882,7 +1871,7 @@ CREATE TABLE `t_ds_task_group_queue` (
   `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY( `id` )
-)ENGINE= INNODB AUTO_INCREMENT= 1 DEFAULT CHARSET= utf8;
+)ENGINE= INNODB AUTO_INCREMENT= 1 DEFAULT CHARSET= utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Table structure for t_ds_task_group
@@ -1890,7 +1879,7 @@ CREATE TABLE `t_ds_task_group_queue` (
 DROP TABLE IF EXISTS `t_ds_task_group`;
 CREATE TABLE `t_ds_task_group` (
    `id`  int(11)  NOT NULL AUTO_INCREMENT COMMENT'key',
-   `name` varchar(100) DEFAULT NULL COMMENT 'task_group name',
+   `name` varchar(255) DEFAULT NULL COMMENT 'task_group name',
    `description` varchar(255) DEFAULT NULL,
    `group_size` int (11) NOT NULL COMMENT'group size',
    `use_size` int (11) DEFAULT '0' COMMENT 'used size',
@@ -1900,7 +1889,7 @@ CREATE TABLE `t_ds_task_group` (
    `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
    `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
    PRIMARY KEY(`id`)
-) ENGINE= INNODB AUTO_INCREMENT= 1 DEFAULT CHARSET= utf8;
+) ENGINE= INNODB AUTO_INCREMENT= 1 DEFAULT CHARSET= utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Table structure for t_ds_audit_log
@@ -1914,7 +1903,7 @@ CREATE TABLE `t_ds_audit_log` (
   `time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
   `resource_id` int(11) NULL DEFAULT NULL COMMENT 'resource id',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT= 1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT= 1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Table structure for t_ds_k8s
@@ -1922,12 +1911,12 @@ CREATE TABLE `t_ds_audit_log` (
 DROP TABLE IF EXISTS `t_ds_k8s`;
 CREATE TABLE `t_ds_k8s` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `k8s_name` varchar(100) DEFAULT NULL,
+  `k8s_name` varchar(255) DEFAULT NULL,
   `k8s_config` text DEFAULT NULL,
   `create_time` datetime DEFAULT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`)
-) ENGINE= INNODB AUTO_INCREMENT= 1 DEFAULT CHARSET= utf8;
+) ENGINE= INNODB AUTO_INCREMENT= 1 DEFAULT CHARSET= utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Table structure for t_ds_k8s_namespace
@@ -1937,7 +1926,7 @@ CREATE TABLE `t_ds_k8s_namespace` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `code` bigint(20) NOT NULL DEFAULT '0',
   `limits_memory` int(11) DEFAULT NULL,
-  `namespace` varchar(100) DEFAULT NULL,
+  `namespace` varchar(255) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL,
   `pod_replicas` int(11) DEFAULT NULL,
   `pod_request_cpu` decimal(14,3) DEFAULT NULL,
@@ -1948,7 +1937,7 @@ CREATE TABLE `t_ds_k8s_namespace` (
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
   UNIQUE KEY `k8s_namespace_unique` (`namespace`,`cluster_code`)
-) ENGINE= INNODB AUTO_INCREMENT= 1 DEFAULT CHARSET= utf8;
+) ENGINE= INNODB AUTO_INCREMENT= 1 DEFAULT CHARSET= utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Table structure for t_ds_relation_namespace_user
@@ -1963,7 +1952,7 @@ CREATE TABLE `t_ds_relation_namespace_user` (
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
   UNIQUE KEY `namespace_user_unique` (`user_id`,`namespace_id`)
-) ENGINE=InnoDB AUTO_INCREMENT= 1 DEFAULT CHARSET= utf8;
+) ENGINE=InnoDB AUTO_INCREMENT= 1 DEFAULT CHARSET= utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Table structure for t_ds_alert_send_status
@@ -1978,7 +1967,7 @@ CREATE TABLE t_ds_alert_send_status (
   `create_time`                   datetime DEFAULT NULL COMMENT 'create time',
   PRIMARY KEY (`id`),
   UNIQUE KEY `alert_send_status_unique` (`alert_id`,`alert_plugin_instance_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 
 -- ----------------------------
@@ -1988,7 +1977,7 @@ DROP TABLE IF EXISTS `t_ds_cluster`;
 CREATE TABLE `t_ds_cluster`(
                                `id`          bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
                                `code`        bigint(20) DEFAULT NULL COMMENT 'encoding',
-                               `name`        varchar(100) NOT NULL COMMENT 'cluster name',
+                               `name`        varchar(255) NOT NULL COMMENT 'cluster name',
                                `config`      text NULL DEFAULT NULL COMMENT 'this config contains many cluster variables config',
                                `description` text NULL DEFAULT NULL COMMENT 'the details',
                                `operator`    int(11) DEFAULT NULL COMMENT 'operator user id',
@@ -1997,7 +1986,7 @@ CREATE TABLE `t_ds_cluster`(
                                PRIMARY KEY (`id`),
                                UNIQUE KEY `cluster_name_unique` (`name`),
                                UNIQUE KEY `cluster_code_unique` (`code`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
 -- Table structure for t_ds_fav_task
@@ -2011,4 +2000,16 @@ CREATE TABLE `t_ds_fav_task`
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
-  DEFAULT CHARSET = utf8;
+  DEFAULT CHARSET = utf8 COLLATE = utf8_bin;
+
+CREATE TABLE `t_ds_trigger_relation` (
+    `id` bigint(20) NOT NULL AUTO_INCREMENT,
+    `trigger_type` int(11) NOT NULL DEFAULT '0' COMMENT '0 process 1 task',
+    `trigger_code` bigint(20) NOT NULL,
+    `job_id` bigint(20) NOT NULL,
+    `create_time` datetime DEFAULT NULL,
+    `update_time` datetime DEFAULT NULL,
+    PRIMARY KEY (`id`),
+    KEY `t_ds_trigger_relation_trigger_code_IDX` (`trigger_code`),
+    UNIQUE KEY `t_ds_trigger_relation_UN` (`trigger_type`,`job_id`,`trigger_code`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;

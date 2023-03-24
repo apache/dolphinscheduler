@@ -358,7 +358,7 @@ svn --username="${A_USERNAME}" commit -m "release ${VERSION}"
 
 #### 检查二进制包的文件内容
 
-解压缩`apache-dolphinscheduler-<VERSION>-src.tar.gz`进行如下检查:
+解压缩`apache-dolphinscheduler-<VERSION>-bin.tar.gz`进行如下检查:
 
 - 存在`LICENSE`和`NOTICE`文件
 - 所有文本文件开头都有 ASF 许可证
@@ -415,7 +415,7 @@ Release Commit ID: https://github.com/apache/dolphinscheduler/commit/<SHA-VALUE>
 
 Keys to verify the Release Candidate: https://downloads.apache.org/dolphinscheduler/KEYS
 
-Look at here for how to verify this release candidate: https://dolphinscheduler.apache.org/#/zh-cn/docs/3.1.2/contribute/release/release
+Look at here for how to verify this release candidate: https://dolphinscheduler.apache.org/zh-cn/docs/3.1.2/contribute/release/release
 
 The vote will be open for at least 72 hours or until necessary number of votes are reached.
 
@@ -482,7 +482,7 @@ git push --delete "${GH_REMOTE}" "${VERSION}-prepare"
 官网应该在您发送通知邮件之前完成更新，本节将告诉您如何更改网站。假设发版的版本是 `<VERSION>`，需要进行以下更新（注意，当修改 pull requests 被 merge 后就会生效）:
 
 - **apache/dolphinscheduler-website** 仓库：
-  - `download/en-us/download.md` 和 `download/zh-cn/download.md`: 增加 `<VERSION>` 版本发布包的下载
+  - `config/download.json`: 增加 `<VERSION>` 版本发布包的下载
   - `scripts/conf.sh`: 在变量 `DEV_RELEASE_DOCS_VERSIONS` 中增加版本为 `<VERSION>` 的新键值对
 - **apache/dolphinscheduler** 仓库 (dev 分支)：
   - `docs/configs/site.js`:
@@ -495,51 +495,10 @@ git push --delete "${GH_REMOTE}" "${VERSION}-prepare"
 
 ### 发布 Docker Image
 
-我们已经有了现有的 CI，可以将最新的 Docker image 发布到 GitHub 容器注册 [config](https://github.com/apache/dolphinscheduler/blob/d80cf21456265c9d84e642bdb4db4067c7577fc6/.github/workflows/publish-docker.yaml#L55- L63).
-我们可以重用 CI 运行的主要命令，并通过单个命令将 Docker iamge 发布到 DockerHub。
-
-强烈建议在推送到 docker hub 之前先在本地构建和测试 docker 镜像
-
-```shell
-# Checkout and create to target tag
-git checkout -b "${VERSION}" "${VERSION}"
-
-# Build docker images locally
-./mvnw -B clean package \
-    -Dmaven.test.skip \
-    -Dmaven.javadoc.skip \
-    -Dmaven.checkstyle.skip \
-    -Dmaven.deploy.skip \
-    -Ddocker.tag="${VERSION}" \
-    -Pdocker,release
-
-# You should test whether the standalone-server images work or not
-docker run --name dolphinscheduler-standalone-server -p 12345:12345 -p 25333:25333 -d apache/dolphinscheduler-standalone-server:"${DOLPHINSCHEDULER_VERSION}"
-
-# If success, push to dockerhub
-docker push apache/dolphinscheduler-tools:"${VERSION}"
-docker push apache/dolphinscheduler-standalone-server:"${VERSION}"
-docker push apache/dolphinscheduler-master:"${VERSION}"
-docker push apache/dolphinscheduler-worker:"${VERSION}"
-docker push apache/dolphinscheduler-api:"${VERSION}"
-docker push apache/dolphinscheduler-alert-server:"${VERSION}"
-```
-
-> 注意：推送到 dockerhub，必须有 dockerhub 的 Apache 组织权限。 如果你不需要，你需要向 Apache infra Jira 申请。 您可以参考
-> [此处](https://issues.apache.org/jira/projects/INFRA/issues/INFRA-23314)提交申请
->
-> 如果您确保 docker image 正常工作，您也可以通过单个命令构建和推送 docker
->
-> ```shell
-> ./mvnw -B clean deploy \
->     -Dmaven.test.skip \
->     -Dmaven.javadoc.skip \
->     -Dmaven.checkstyle.skip \
->     -Dmaven.deploy.skip \
->     -Ddocker.tag="${VERSION}" \
->     -Ddocker.hub=apache \
->     -Pdocker,release
-> ```
+我们有一个 [工作流](../../../../.github/workflows/publish-docker.yaml) 来自动发布 Docker 镜像，
+以及一个 [工作流](../../../../.github/workflows/publish-helm-chart.yaml) 来自动发布 Helm Chart 到 Docker Hub。
+当你将发版从 "pre-release" 改为 "release" 后，这两个工作流就会被触发。你需要做的就是观察上述的工作流，
+当它们完成后，你可以在本地拉取 Docker 镜像并验证它们是否按预期工作。
 
 ### 发送公告邮件通知社区
 
@@ -564,7 +523,7 @@ Dolphin Scheduler is a distributed and easy-to-extend visual workflow scheduler 
 dedicated to solving the complex task dependencies in data processing, making the scheduler system out of the box for data processing.
 
 
-Download Links: https://dolphinscheduler.apache.org/#/zh-cn/download
+Download Links: https://dolphinscheduler.apache.org/zh-cn/download
 
 Release Notes: https://github.com/apache/dolphinscheduler/releases/tag/<VERSION>
 
@@ -573,7 +532,7 @@ Website: https://dolphinscheduler.apache.org/
 DolphinScheduler Resources:
 - Issue: https://github.com/apache/dolphinscheduler/issues/
 - Mailing list: dev@dolphinscheduler.apache.org
-- Documents: https://dolphinscheduler.apache.org/#/zh-cn/docs/<VERSION>/about/introduction
+- Documents: https://dolphinscheduler.apache.org/zh-cn/docs/<VERSION>/about/introduction
 ```
 
 ## News

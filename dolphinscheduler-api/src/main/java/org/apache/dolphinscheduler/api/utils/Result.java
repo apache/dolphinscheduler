@@ -75,7 +75,7 @@ public class Result<T> {
         return new Result<>(Status.SUCCESS.getCode(), Status.SUCCESS.getMsg(), data);
     }
 
-    public static Result success() {
+    public static <T> Result<T> success() {
         return success(null);
     }
 

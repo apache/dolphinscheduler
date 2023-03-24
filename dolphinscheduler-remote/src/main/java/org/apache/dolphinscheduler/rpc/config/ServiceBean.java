@@ -25,16 +25,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.reflections.Reflections;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * ServiceBean find all rpcService
  */
+@Slf4j
 public class ServiceBean {
-
-    private static final Logger logger = LoggerFactory.getLogger(ServiceBean.class);
 
     private static Map<String, Class> serviceMap = new HashMap<>();
 
@@ -54,7 +53,7 @@ public class ServiceBean {
         list.forEach(rpcClass -> {
             RpcService rpcService = rpcClass.getAnnotation(RpcService.class);
             serviceMap.put(rpcService.value(), rpcClass);
-            logger.info("load rpc service {}", rpcService.value());
+            log.info("load rpc service {}", rpcService.value());
         });
         initialized.set(true);
     }

@@ -60,6 +60,9 @@ export function formatParams(data: INodeData): {
     taskParams.appName = data.appName
     taskParams.mainArgs = data.mainArgs
     taskParams.others = data.others
+    if (data.namespace) {
+      taskParams.namespace = data.namespace
+    }
   }
 
   if (data.taskType === 'SPARK') {
@@ -449,11 +452,17 @@ export function formatParams(data: INodeData): {
     taskParams.yamlContent = data.yamlContent
     taskParams.namespace = data.namespace
   }
-  
+
   if (data.taskType === 'LINKIS') {
     taskParams.useCustom = data.useCustom
     taskParams.paramScript = data.paramScript
     taskParams.rawScript = data.rawScript
+  }
+
+  if (data.taskType === 'DATA_FACTORY') {
+    taskParams.factoryName = data.factoryName
+    taskParams.resourceGroupName = data.resourceGroupName
+    taskParams.pipelineName = data.pipelineName
   }
 
   let timeoutNotifyStrategy = ''

@@ -22,6 +22,7 @@ import static java.util.Objects.requireNonNull;
 import org.apache.dolphinscheduler.alert.api.AlertConstants;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.alert.api.ShowType;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.plugin.alert.email.exception.AlertEmailException;
 import org.apache.dolphinscheduler.plugin.alert.email.template.AlertTemplate;
 import org.apache.dolphinscheduler.plugin.alert.email.template.DefaultHTMLTemplate;
@@ -54,14 +55,12 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.MimeUtility;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.sun.mail.smtp.SMTPProvider;
 
+@Slf4j
 public final class MailSender {
-
-    private static final Logger logger = LoggerFactory.getLogger(MailSender.class);
 
     private final List<String> receivers;
     private final List<String> receiverCcs;
@@ -105,12 +104,14 @@ public final class MailSender {
         requireNonNull(mailSenderEmail, MailParamsConstants.NAME_MAIL_SENDER + mustNotNull);
 
         enableSmtpAuth = config.get(MailParamsConstants.NAME_MAIL_SMTP_AUTH);
-
         mailUser = config.get(MailParamsConstants.NAME_MAIL_USER);
-        requireNonNull(mailUser, MailParamsConstants.NAME_MAIL_USER + mustNotNull);
-
         mailPasswd = config.get(MailParamsConstants.NAME_MAIL_PASSWD);
-        requireNonNull(mailPasswd, MailParamsConstants.NAME_MAIL_PASSWD + mustNotNull);
+
+        // Needs to check user && password only if enableSmtpAuth is true
+        if (Constants.STRING_TRUE.equals(enableSmtpAuth)) {
+            requireNonNull(mailUser, MailParamsConstants.NAME_MAIL_USER + mustNotNull);
+            requireNonNull(mailPasswd, MailParamsConstants.NAME_MAIL_PASSWD + mustNotNull);
+        }
 
         mailUseStartTLS = config.get(MailParamsConstants.NAME_MAIL_SMTP_STARTTLS_ENABLE);
         requireNonNull(mailUseStartTLS, MailParamsConstants.NAME_MAIL_SMTP_STARTTLS_ENABLE + mustNotNull);
@@ -390,12 +391,12 @@ public final class MailSender {
     public void deleteFile(File file) {
         if (file.exists()) {
             if (file.delete()) {
-                logger.info("delete success: {}", file.getAbsolutePath());
+                log.info("delete success: {}", file.getAbsolutePath());
             } else {
-                logger.info("delete fail: {}", file.getAbsolutePath());
+                log.info("delete fail: {}", file.getAbsolutePath());
             }
         } else {
-            logger.info("file not exists: {}", file.getAbsolutePath());
+            log.info("file not exists: {}", file.getAbsolutePath());
         }
     }
 
@@ -403,7 +404,7 @@ public final class MailSender {
      * handle exception
      */
     private void handleException(AlertResult alertResult, Exception e) {
-        logger.error("Send email to {} failed", receivers, e);
+        log.error("Send email to {} failed", receivers, e);
         alertResult.setMessage("Send email to {" + String.join(",", receivers) + "} failed，" + e.toString());
     }
 

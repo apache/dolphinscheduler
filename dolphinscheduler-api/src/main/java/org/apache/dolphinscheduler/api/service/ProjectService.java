@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -66,7 +67,9 @@ public interface ProjectService {
      */
     Map<String, Object> checkProjectAndAuth(User loginUser, Project project, long projectCode, String perm);
 
-    void checkProjectAndAuthThrowException(User loginUser, Project project, String permission);
+    void checkProjectAndAuthThrowException(User loginUser, Project project, String permission) throws ServiceException;
+
+    void checkProjectAndAuthThrowException(User loginUser, long projectCode, String permission) throws ServiceException;
 
     boolean hasProjectAndPerm(User loginUser, Project project, Map<String, Object> result, String perm);
 
