@@ -353,3 +353,32 @@ alter table t_ds_trigger_relation CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin
 ALTER TABLE `t_ds_alert`
     MODIFY `title` varchar (512) null comment 'title';
 
+ALTER TABLE `t_ds_command` MODIFY `worker_group` varchar(255)  COMMENT 'worker group';
+ALTER TABLE `t_ds_error_command` MODIFY `worker_group` varchar(255)  COMMENT 'worker group';
+ALTER TABLE `t_ds_process_definition_log` MODIFY `name` varchar(255) DEFAULT NULL COMMENT 'process definition name';
+ALTER TABLE `t_ds_task_definition` MODIFY `name` varchar(255) DEFAULT NULL COMMENT 'task definition name';
+ALTER TABLE `t_ds_task_definition` MODIFY `worker_group` varchar(255) DEFAULT NULL COMMENT 'worker grouping';
+ALTER TABLE `t_ds_task_definition_log` MODIFY `name` varchar(255) DEFAULT NULL COMMENT 'task definition name';
+ALTER TABLE `t_ds_task_definition_log` MODIFY `worker_group` varchar(255) DEFAULT NULL COMMENT 'worker grouping';
+ALTER TABLE `t_ds_process_task_relation` MODIFY `name` varchar(255) DEFAULT NULL COMMENT 'relation name';
+ALTER TABLE `t_ds_process_task_relation_log` MODIFY `name` varchar(255) DEFAULT NULL COMMENT 'relation name';
+ALTER TABLE `t_ds_process_instance` MODIFY `worker_group` varchar(255) DEFAULT NULL COMMENT 'worker group id';
+ALTER TABLE `t_ds_project` MODIFY `name` varchar(255) DEFAULT NULL COMMENT 'project name';
+ALTER TABLE `t_ds_schedules` MODIFY `worker_group` varchar(255) DEFAULT '' COMMENT 'worker group id';
+ALTER TABLE `t_ds_task_instance` MODIFY `worker_group` varchar(255) DEFAULT NULL COMMENT 'worker group id';
+ALTER TABLE `t_ds_udfs` MODIFY `func_name` varchar(255) NOT NULL COMMENT 'UDF function name';
+ALTER TABLE `t_ds_version` MODIFY `version` varchar(63) NOT NULL;
+ALTER TABLE `t_ds_plugin_define` MODIFY `plugin_name` varchar(255) NOT NULL COMMENT 'the name of plugin eg: email';
+ALTER TABLE `t_ds_plugin_define` MODIFY `plugin_type` varchar(63) NOT NULL COMMENT 'plugin type . alert=alert plugin, job=job plugin';
+ALTER TABLE `t_ds_alert_plugin_instance` MODIFY `instance_name` varchar(255) DEFAULT NULL COMMENT 'alert instance name';
+ALTER TABLE `t_ds_dq_comparison_type` MODIFY `type` varchar(255) NOT NULL;
+ALTER TABLE `t_ds_dq_comparison_type` MODIFY `name` varchar(255) DEFAULT NULL;
+ALTER TABLE `t_ds_dq_rule` MODIFY `name` varchar(255) DEFAULT NULL;
+ALTER TABLE `t_ds_environment` MODIFY `name` varchar(255) NOT NULL COMMENT 'environment name';
+ALTER TABLE `t_ds_task_group_queue` MODIFY `task_name` varchar(255) DEFAULT NULL COMMENT 'TaskInstance name';
+ALTER TABLE `t_ds_task_group` MODIFY `name` varchar(255) DEFAULT NULL COMMENT 'task_group name';
+ALTER TABLE `t_ds_k8s` MODIFY `k8s_name` varchar(255) DEFAULT NULL;
+ALTER TABLE `t_ds_k8s_namespace` MODIFY `namespace` varchar(255) DEFAULT NULL;
+ALTER TABLE `t_ds_cluster` MODIFY `name`        varchar(255) NOT NULL COMMENT 'cluster name';
+
+
