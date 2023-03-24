@@ -225,3 +225,20 @@ DROP FUNCTION add_t_ds_task_instance_add_project_code();
 
 ALTER TABLE `t_ds_alert`
     MODIFY `title` varchar(512) DEFAULT NULL ;
+
+ALTER TABLE `t_ds_command` MODIFY `worker_group` varchar(255);
+ALTER TABLE `t_ds_project` MODIFY name varchar(255) DEFAULT NULL ;
+ALTER TABLE `t_ds_schedules` MODIFY worker_group varchar(255);
+ALTER TABLE `t_ds_task_instance` MODIFY worker_group varchar(255);
+ALTER TABLE `t_ds_udfs` MODIFY func_name varchar(255) NOT NULL ;
+ALTER TABLE `t_ds_version` MODIFY version varchar(63) NOT NULL;
+ALTER TABLE `t_ds_plugin_define` MODIFY plugin_name varchar(255) NOT NULL;
+ALTER TABLE `t_ds_plugin_define` MODIFY plugin_type varchar(63) NOT NULL;
+ALTER TABLE `t_ds_alert_plugin_instance` MODIFY instance_name varchar(255) NULL;
+ALTER TABLE `t_ds_dq_rule` MODIFY "name" varchar(255) DEFAULT NULL;
+ALTER TABLE `t_ds_environment` MODIFY name varchar(255) DEFAULT NULL;
+ALTER TABLE `t_ds_task_group_queue` MODIFY task_name    VARCHAR(255) DEFAULT NULL ;
+ALTER TABLE `t_ds_task_group` MODIFY name        varchar(255) DEFAULT NULL ;
+ALTER TABLE `t_ds_k8s` MODIFY k8s_name    VARCHAR(255) DEFAULT NULL ;
+ALTER TABLE `t_ds_k8s_namespace` MODIFY namespace          varchar(255) DEFAULT NULL ;
+ALTER TABLE `t_ds_cluster` MODIFY name        varchar(255) DEFAULT NULL;
