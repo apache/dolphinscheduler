@@ -1135,6 +1135,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         // todo relative function: TaskInstance.retryTaskIntervalOverTime
         newTaskInstance.setState(taskInstance.getState());
         newTaskInstance.setEndTime(taskInstance.getEndTime());
+        newTaskInstance.setVarPool(taskInstance.getVarPool());
 
         if (taskInstance.getState() == TaskExecutionStatus.NEED_FAULT_TOLERANCE) {
             newTaskInstance.setAppLink(taskInstance.getAppLink());
@@ -1162,6 +1163,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         newTaskInstance.setRetryTimes(taskInstance.getRetryTimes());
         newTaskInstance.setState(taskInstance.getState());
         newTaskInstance.setAppLink(taskInstance.getAppLink());
+        newTaskInstance.setVarPool(taskInstance.getVarPool());
         return newTaskInstance;
     }
 
