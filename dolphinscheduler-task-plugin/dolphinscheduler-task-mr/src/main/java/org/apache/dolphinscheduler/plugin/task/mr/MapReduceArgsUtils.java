@@ -22,6 +22,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.JAR;
 import static org.apache.dolphinscheduler.plugin.task.mr.MapReduceTaskConstants.MR_NAME;
 import static org.apache.dolphinscheduler.plugin.task.mr.MapReduceTaskConstants.MR_QUEUE;
 
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ArgsUtils;
 
@@ -45,13 +46,13 @@ public class MapReduceArgsUtils {
      * @param param param
      * @return argument list
      */
-    public static List<String> buildArgs(MapReduceParameters param) {
+    public static List<String> buildArgs(MapReduceParameters param, TaskExecutionContext taskExecutionContext) {
         List<String> args = new ArrayList<>();
 
         ResourceInfo mainJar = param.getMainJar();
         if (mainJar != null) {
             args.add(JAR);
-            args.add(mainJar.getRes());
+            args.add(taskExecutionContext.getResources().get(mainJar.getResourceName()));
         }
 
         ProgramType programType = param.getProgramType();

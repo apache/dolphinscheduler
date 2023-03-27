@@ -33,12 +33,12 @@ public class FlinkParametersTest {
         Assertions.assertTrue(flinkParameters.getResourceFilesList().isEmpty());
 
         ResourceInfo mainResource = new ResourceInfo();
-        mainResource.setRes("testFlinkMain-1.0.0-SNAPSHOT.jar");
+        mainResource.setResourceName("/testFlinkMain-1.0.0-SNAPSHOT.jar");
         flinkParameters.setMainJar(mainResource);
 
         List<ResourceInfo> resourceInfos = new LinkedList<>();
         ResourceInfo resourceInfo1 = new ResourceInfo();
-        resourceInfo1.setRes("testFlinkParameters1.jar");
+        resourceInfo1.setResourceName("/testFlinkParameters1.jar");
         resourceInfos.add(resourceInfo1);
 
         flinkParameters.setResourceList(resourceInfos);
@@ -47,7 +47,7 @@ public class FlinkParametersTest {
         Assertions.assertEquals(2, resourceFilesList.size());
 
         ResourceInfo resourceInfo2 = new ResourceInfo();
-        resourceInfo2.setRes("testFlinkParameters2.jar");
+        resourceInfo2.setResourceName("/testFlinkParameters2.jar");
         resourceInfos.add(resourceInfo2);
 
         flinkParameters.setResourceList(resourceInfos);

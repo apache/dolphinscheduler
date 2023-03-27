@@ -297,7 +297,7 @@ public class FlinkArgsUtils {
             if (ProgramType.PYTHON == programType) {
                 args.add(FlinkConstants.FLINK_PYTHON);
             }
-            args.add(mainJar.getRes());
+            args.add(taskExecutionContext.getResources().get(mainJar.getResourceName()));
         }
 
         String mainArgs = flinkParameters.getMainArgs();

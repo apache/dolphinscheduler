@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.java;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SINGLE_SLASH;
+import static org.apache.dolphinscheduler.common.constants.Constants.FOLDER_SEPARATOR;
 import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.JAVA_HOME_VAR;
 import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.PUBLIC_CLASS_NAME_REGEX;
 
@@ -93,9 +93,6 @@ public class JavaTask extends AbstractTask {
         if (javaParameters == null || !javaParameters.checkParameters()) {
             throw new TaskException("java task params is not valid");
         }
-        if (javaParameters.getRunType().equals(JavaConstants.RUN_TYPE_JAR)) {
-            setMainJarName();
-        }
         log.info("Initialize java task params {}", JSONUtils.toPrettyJsonString(javaParameters));
     }
 
@@ -169,42 +166,23 @@ public class JavaTask extends AbstractTask {
         return builder.toString();
     }
 
-    private void setMainJarName() {
-        ResourceInfo mainJar = javaParameters.getMainJar();
-        String resourceName = getResourceNameOfMainJar(mainJar);
-        mainJar.setRes(resourceName);
-        javaParameters.setMainJar(mainJar);
-    }
-
     /**
      * Construct a shell command for the java -jar Run mode
      *
      * @return String
      **/
     protected String buildJarCommand() {
-        String fullName = javaParameters.getMainJar().getResourceName();
-        String mainJarName = fullName.substring(0, fullName.lastIndexOf('.'));
-        mainJarName = mainJarName.substring(mainJarName.lastIndexOf('.') + 1) + ".jar";
+        String mainJarName = taskRequest.getResources().get(javaParameters.getMainJar().getResourceName());
         StringBuilder builder = new StringBuilder();
         builder.append(getJavaCommandPath())
                 .append("java").append(" ")
                 .append(buildResourcePath()).append(" ")
                 .append("-jar").append(" ")
-                .append(taskRequest.getExecutePath())
+                .append(taskRequest.getExecutePath()).append(FOLDER_SEPARATOR)
                 .append(mainJarName).append(" ")
                 .append(javaParameters.getMainArgs().trim()).append(" ")
                 .append(javaParameters.getJvmArgs().trim());
         return builder.toString();
-    }
-
-    private String getResourceNameOfMainJar(ResourceInfo mainJar) {
-        if (null == mainJar) {
-            throw new RuntimeException("The jar for the task is required.");
-        }
-        return mainJar.getId() == 0
-                ? mainJar.getRes()
-                // when update resource maybe has error
-                : mainJar.getResourceName().replaceFirst(SINGLE_SLASH, "");
     }
 
     @Override
@@ -300,10 +278,11 @@ public class JavaTask extends AbstractTask {
         builder.append(" ").append(JavaConstants.CLASSPATH_CURRENT_DIR)
                 .append(JavaConstants.PATH_SEPARATOR)
                 .append(taskRequest.getExecutePath());
+        Map<String, String> resourceMap = taskRequest.getResources();
         for (ResourceInfo info : javaParameters.getResourceFilesList()) {
             builder.append(JavaConstants.PATH_SEPARATOR);
-            builder.append(taskRequest.getExecutePath())
-                    .append(info.getResourceName());
+            builder.append(taskRequest.getExecutePath()).append(FOLDER_SEPARATOR)
+                    .append(resourceMap.get(info.getResourceName()));
         }
         return builder.toString();
     }
