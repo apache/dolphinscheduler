@@ -34,7 +34,7 @@ public interface MessageSender<T extends BaseCommand> {
     /**
      * Build the message from task context and message received address.
      */
-    T buildMessage(TaskExecutionContext taskExecutionContext, String messageReceiverAddress);
+    T buildMessage(TaskExecutionContext taskExecutionContext);
 
     /**
      * The message type can be sent by this sender.

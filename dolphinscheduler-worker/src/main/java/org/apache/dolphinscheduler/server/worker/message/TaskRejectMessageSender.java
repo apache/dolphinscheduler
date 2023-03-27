@@ -42,9 +42,10 @@ public class TaskRejectMessageSender implements MessageSender<TaskRejectCommand>
         workerRpcClient.send(Host.of(message.getMessageReceiverAddress()), message.convert2Command());
     }
 
-    public TaskRejectCommand buildMessage(TaskExecutionContext taskExecutionContext, String masterAddress) {
+    @Override
+    public TaskRejectCommand buildMessage(TaskExecutionContext taskExecutionContext) {
         TaskRejectCommand taskRejectMessage = new TaskRejectCommand(workerConfig.getWorkerAddress(),
-                masterAddress,
+                taskExecutionContext.getWorkflowInstanceHost(),
                 System.currentTimeMillis());
         taskRejectMessage.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
         taskRejectMessage.setProcessInstanceId(taskExecutionContext.getProcessInstanceId());

@@ -15,28 +15,42 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.processor;
+package org.apache.dolphinscheduler.remote.command.task;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 
-import lombok.extern.slf4j.Slf4j;
+import java.io.Serializable;
 
-import com.google.common.base.Preconditions;
-import io.netty.channel.Channel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Slf4j
-public class HostUpdateResponseProcessor implements NettyRequestProcessor {
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class WorkflowHostChangeResponse implements Serializable {
 
-    @Override
-    public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.PROCESS_HOST_UPDATE_RESPONSE == command.getType(),
-                String.format("invalid command type : %s", command.getType()));
+    boolean success;
 
-        HostUpdateResponseProcessor responseCommand =
-                JSONUtils.parseObject(command.getBody(), HostUpdateResponseProcessor.class);
-        log.info("received process host response command : {}", responseCommand);
+    public static WorkflowHostChangeResponse success() {
+        WorkflowHostChangeResponse response = new WorkflowHostChangeResponse();
+        response.setSuccess(true);
+        return response;
+    }
+
+    public static WorkflowHostChangeResponse failed() {
+        WorkflowHostChangeResponse response = new WorkflowHostChangeResponse();
+        response.setSuccess(false);
+        return response;
+    }
+
+    public Command convert2Command(long opaque) {
+        Command command = new Command(opaque);
+        command.setType(CommandType.WORKFLOW_HOST_CHANGE_RESPONSE);
+        byte[] body = JSONUtils.toJsonByteArray(this);
+        command.setBody(body);
+        return command;
     }
 }

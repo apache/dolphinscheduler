@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.apache.dolphinscheduler.remote.processor.LoggerRequestProcessor;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
-import org.apache.dolphinscheduler.server.worker.processor.HostUpdateProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskDispatchProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteResultAckProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteRunningAckProcessor;
@@ -30,6 +29,7 @@ import org.apache.dolphinscheduler.server.worker.processor.TaskKillProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskRejectAckProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskSavePointProcessor;
 import org.apache.dolphinscheduler.server.worker.processor.TaskUpdatePidAckProcessor;
+import org.apache.dolphinscheduler.server.worker.processor.WorkflowHostChangeProcessor;
 
 import java.io.Closeable;
 
@@ -66,7 +66,7 @@ public class WorkerRpcServer implements Closeable {
     private TaskExecuteResultAckProcessor taskExecuteResultAckProcessor;
 
     @Autowired
-    private HostUpdateProcessor hostUpdateProcessor;
+    private WorkflowHostChangeProcessor workflowHostChangeProcessor;
 
     @Autowired
     private LoggerRequestProcessor loggerRequestProcessor;
@@ -89,7 +89,8 @@ public class WorkerRpcServer implements Closeable {
                 taskUpdatePidAckProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RESULT_ACK, taskExecuteResultAckProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_REJECT_ACK, taskRejectAckProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.PROCESS_HOST_UPDATE_REQUEST, hostUpdateProcessor);
+        this.nettyRemotingServer.registerProcessor(CommandType.WORKFLOW_HOST_CHANGE_REQUEST,
+                workflowHostChangeProcessor);
         this.nettyRemotingServer.registerProcessor(CommandType.TASK_SAVEPOINT_REQUEST, taskSavePointProcessor);
         // log server
         this.nettyRemotingServer.registerProcessor(CommandType.GET_APP_ID_REQUEST, loggerRequestProcessor);
