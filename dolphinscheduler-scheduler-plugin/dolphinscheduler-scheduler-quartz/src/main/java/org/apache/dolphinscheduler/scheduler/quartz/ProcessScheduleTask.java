@@ -22,7 +22,9 @@ import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.scheduler.quartz.utils.QuartzTaskUtils;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -52,6 +54,9 @@ public class ProcessScheduleTask extends QuartzJobBean {
     @Autowired
     private CommandService commandService;
 
+    @Autowired
+    private ProjectDao projectDao;
+
     @Counted(value = "ds.master.quartz.job.executed")
     @Timed(value = "ds.master.quartz.job.execution.time", percentiles = {0.5, 0.75, 0.95, 0.99}, histogram = true)
     @Override
@@ -72,6 +77,14 @@ public class ProcessScheduleTask extends QuartzJobBean {
         if (schedule == null || ReleaseState.OFFLINE == schedule.getReleaseState()) {
             log.warn(
                     "process schedule does not exist in db or process schedule offline，delete schedule job in quartz, projectId:{}, scheduleId:{}",
+                    projectId, scheduleId);
+            deleteJob(context, projectId, scheduleId);
+            return;
+        }
+
+        Project project = projectDao.queryProjectById(projectId);
+        if (project == null) {
+            log.warn("Project does not exist in db, delete schedule job in quartz, projectId:{}, scheduleId:{}",
                     projectId, scheduleId);
             deleteJob(context, projectId, scheduleId);
             return;
