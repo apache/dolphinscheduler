@@ -273,7 +273,7 @@ public abstract class AbstractCommandExecutor {
                     logger.error(msg);
                 }
             } catch (ExecutionException e) {
-                logger.info("Handle pod log error", e);
+                logger.error("Handle pod log error", e);
             }
         }
 
