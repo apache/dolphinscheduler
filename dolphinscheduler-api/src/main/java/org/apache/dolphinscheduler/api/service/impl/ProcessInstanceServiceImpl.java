@@ -804,7 +804,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             task.getEndDate().add(endTime.getTime());
             task.setIsoStart(startTime);
             task.setIsoEnd(endTime);
-            task.setStatus(taskInstance.getState().getDescp().toUpperCase());
+            task.setStatus(taskInstance.getState().name());
             task.setExecutionDate(taskInstance.getStartTime());
             task.setDuration(DateUtils.format2Readable(endTime.getTime() - startTime.getTime()));
             taskList.add(task);
