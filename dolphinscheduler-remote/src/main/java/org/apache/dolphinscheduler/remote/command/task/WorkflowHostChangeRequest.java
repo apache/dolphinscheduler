@@ -15,23 +15,26 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.remote.command;
+package org.apache.dolphinscheduler.remote.command.task;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.remote.command.Command;
+import org.apache.dolphinscheduler.remote.command.CommandType;
 
 import java.io.Serializable;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-/**
- * process host update
- */
 @Data
-public class HostUpdateCommand implements Serializable {
+@AllArgsConstructor
+@NoArgsConstructor
+public class WorkflowHostChangeRequest implements Serializable {
 
     private int taskInstanceId;
 
-    private String processHost;
+    private String workflowHost;
 
     /**
      * package request command
@@ -40,10 +43,9 @@ public class HostUpdateCommand implements Serializable {
      */
     public Command convert2Command() {
         Command command = new Command();
-        command.setType(CommandType.PROCESS_HOST_UPDATE_REQUEST);
+        command.setType(CommandType.WORKFLOW_HOST_CHANGE_REQUEST);
         byte[] body = JSONUtils.toJsonByteArray(this);
         command.setBody(body);
         return command;
     }
-
 }

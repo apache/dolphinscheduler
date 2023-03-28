@@ -56,13 +56,12 @@ public class WorkerMessageSender {
 
     // todo: use message rather than context
     public void sendMessageWithRetry(@NonNull TaskExecutionContext taskExecutionContext,
-                                     @NonNull String messageReceiverAddress,
                                      @NonNull CommandType messageType) {
         MessageSender messageSender = messageSenderMap.get(messageType);
         if (messageSender == null) {
             throw new IllegalArgumentException("The messageType is invalidated, messageType: " + messageType);
         }
-        BaseCommand baseCommand = messageSender.buildMessage(taskExecutionContext, messageReceiverAddress);
+        BaseCommand baseCommand = messageSender.buildMessage(taskExecutionContext);
         try {
             messageRetryRunner.addRetryMessage(taskExecutionContext.getTaskInstanceId(), messageType, baseCommand);
             messageSender.sendMessage(baseCommand);
@@ -71,14 +70,12 @@ public class WorkerMessageSender {
         }
     }
 
-    public void sendMessage(@NonNull TaskExecutionContext taskExecutionContext,
-                            @NonNull String messageReceiverAddress,
-                            @NonNull CommandType messageType) {
+    public void sendMessage(@NonNull TaskExecutionContext taskExecutionContext, @NonNull CommandType messageType) {
         MessageSender messageSender = messageSenderMap.get(messageType);
         if (messageSender == null) {
             throw new IllegalArgumentException("The messageType is invalidated, messageType: " + messageType);
         }
-        BaseCommand baseCommand = messageSender.buildMessage(taskExecutionContext, messageReceiverAddress);
+        BaseCommand baseCommand = messageSender.buildMessage(taskExecutionContext);
         try {
             messageSender.sendMessage(baseCommand);
         } catch (RemotingException e) {

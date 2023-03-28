@@ -69,6 +69,8 @@ public class TaskExecutionContext implements Serializable {
      */
     private String taskType;
 
+    private String workflowInstanceHost;
+
     /**
      * host
      */

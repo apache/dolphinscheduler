@@ -34,14 +34,12 @@ public class DefaultWorkerDelayTaskExecuteRunnableFactory
 
     protected DefaultWorkerDelayTaskExecuteRunnableFactory(@NonNull TaskExecutionContext taskExecutionContext,
                                                            @NonNull WorkerConfig workerConfig,
-                                                           @NonNull String workflowMasterAddress,
                                                            @NonNull WorkerMessageSender workerMessageSender,
                                                            @NonNull WorkerRpcClient workerRpcClient,
                                                            @NonNull TaskPluginManager taskPluginManager,
                                                            @Nullable StorageOperate storageOperate) {
         super(taskExecutionContext,
                 workerConfig,
-                workflowMasterAddress,
                 workerMessageSender,
                 workerRpcClient,
                 taskPluginManager,
@@ -53,7 +51,6 @@ public class DefaultWorkerDelayTaskExecuteRunnableFactory
         return new DefaultWorkerDelayTaskExecuteRunnable(
                 taskExecutionContext,
                 workerConfig,
-                workflowMasterAddress,
                 workerMessageSender,
                 workerRpcClient,
                 taskPluginManager,

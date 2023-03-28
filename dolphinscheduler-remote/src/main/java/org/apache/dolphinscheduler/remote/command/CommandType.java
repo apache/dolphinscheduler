@@ -99,15 +99,8 @@ public enum CommandType {
 
     ALERT_SEND_RESPONSE,
 
-    /**
-     * process host update
-     */
-    PROCESS_HOST_UPDATE_REQUEST,
-
-    /**
-     * process host update response
-     */
-    PROCESS_HOST_UPDATE_RESPONSE,
+    WORKFLOW_HOST_CHANGE_REQUEST,
+    WORKFLOW_HOST_CHANGE_RESPONSE,
 
     /**
      * state event request
