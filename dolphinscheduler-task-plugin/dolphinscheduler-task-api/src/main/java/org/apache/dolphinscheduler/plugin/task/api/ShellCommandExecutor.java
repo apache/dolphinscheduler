@@ -17,12 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
-import org.apache.dolphinscheduler.plugin.task.api.utils.FileUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.ShellUtils;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.FileUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ShellUtils;
+import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -32,8 +32,6 @@ import java.nio.file.StandardOpenOption;
 import java.util.Objects;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
-
-import org.slf4j.Logger;
 
 /**
  * shell command executor
@@ -49,6 +47,11 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
      * For Windows, using cmd.exe
      */
     private static final String CMD = "cmd.exe";
+
+    /**
+     * For Windows 10 or later, using powershell.exe
+     */
+    private static final String POWERSHELL = "powershell.exe";
 
     /**
      * constructor
@@ -137,7 +140,15 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
 
     @Override
     protected String commandInterpreter() {
-        return SystemUtils.IS_OS_WINDOWS ? CMD : SH;
+        if (SystemUtils.IS_OS_WINDOWS) {
+            if (SystemUtils.IS_OS_WINDOWS_10) {
+                return POWERSHELL;
+            } else {
+                return CMD;
+            }
+        } else {
+            return SH;
+        }
     }
 
 }
