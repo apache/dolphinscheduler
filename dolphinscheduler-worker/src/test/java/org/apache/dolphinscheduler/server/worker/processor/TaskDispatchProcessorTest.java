@@ -73,7 +73,7 @@ public class TaskDispatchProcessorTest {
 
         Mockito.verify(workerManagerThread, Mockito.atMostOnce()).offer(Mockito.any());
         Mockito.verify(workerMessageSender, Mockito.never()).sendMessageWithRetry(taskExecutionContext,
-                "localhost:5678", CommandType.TASK_REJECT);
+                CommandType.TASK_REJECT);
     }
 
     public Command createDispatchCommand(TaskExecutionContext taskExecutionContext) {

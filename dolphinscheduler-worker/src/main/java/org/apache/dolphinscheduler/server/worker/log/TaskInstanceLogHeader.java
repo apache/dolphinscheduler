@@ -14,27 +14,50 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.server.worker.log;
 
+import java.util.List;
+
+import lombok.extern.slf4j.Slf4j;
+
+import com.google.common.collect.Lists;
+
+@Slf4j
 public class TaskInstanceLogHeader {
 
-    public static final String INITIALIZE_TASK_CONTEXT_HEADER = "" +
-            "***********************************************************************************************\n" +
-            "*********************************  Initialize task context  ***********************************\n" +
-            "***********************************************************************************************\n";
+    private static final List<String> INITIALIZE_TASK_CONTEXT_HEADER = Lists.newArrayList(
+            "***********************************************************************************************",
+            "*********************************  Initialize task context  ***********************************",
+            "***********************************************************************************************");
+    private static final List<String> LOAD_TASK_INSTANCE_PLUGIN_HEADER = Lists.newArrayList(
+            "***********************************************************************************************",
+            "*********************************  Load task instance plugin  *********************************",
+            "***********************************************************************************************");
 
-    public static final String LOAD_TASK_INSTANCE_PLUGIN_HEADER = "" +
-            "***********************************************************************************************\n" +
-            "*********************************  Load task instance plugin  *********************************\n" +
-            "***********************************************************************************************\n";
+    public static void printInitializeTaskContextHeader() {
+        INITIALIZE_TASK_CONTEXT_HEADER.forEach(log::info);
+    }
 
-    public static final String EXECUTE_TASK_HEADER = "" +
-            "***********************************************************************************************\n" +
-            "*********************************  Execute task instance  *************************************\n" +
-            "***********************************************************************************************\n";
+    private static final List<String> EXECUTE_TASK_HEADER = Lists.newArrayList(
+            "***********************************************************************************************",
+            "*********************************  Execute task instance  *************************************",
+            "***********************************************************************************************");
 
-    public static final String FINALIZE_TASK_HEADER = "" +
-            "***********************************************************************************************\n" +
-            "*********************************  Finalize task instance  ************************************\n" +
-            "***********************************************************************************************\n";
+    private static final List<String> FINALIZE_TASK_HEADER = Lists.newArrayList(
+            "***********************************************************************************************",
+            "*********************************  Finalize task instance  ************************************",
+            "***********************************************************************************************");
+
+    public static void printLoadTaskInstancePluginHeader() {
+        LOAD_TASK_INSTANCE_PLUGIN_HEADER.forEach(log::info);
+    }
+
+    public static void printExecuteTaskHeader() {
+        EXECUTE_TASK_HEADER.forEach(log::info);
+    }
+
+    public static void printFinalizeTaskHeader() {
+        FINALIZE_TASK_HEADER.forEach(log::info);
+    }
 }

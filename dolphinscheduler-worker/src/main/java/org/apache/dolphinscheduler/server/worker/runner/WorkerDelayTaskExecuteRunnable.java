@@ -36,14 +36,12 @@ public abstract class WorkerDelayTaskExecuteRunnable extends WorkerTaskExecuteRu
 
     protected WorkerDelayTaskExecuteRunnable(@NonNull TaskExecutionContext taskExecutionContext,
                                              @NonNull WorkerConfig workerConfig,
-                                             @NonNull String masterAddress,
                                              @NonNull WorkerMessageSender workerMessageSender,
                                              @NonNull WorkerRpcClient workerRpcClient,
                                              @NonNull TaskPluginManager taskPluginManager,
                                              @Nullable StorageOperate storageOperate) {
         super(taskExecutionContext,
                 workerConfig,
-                masterAddress,
                 workerMessageSender,
                 workerRpcClient,
                 taskPluginManager,

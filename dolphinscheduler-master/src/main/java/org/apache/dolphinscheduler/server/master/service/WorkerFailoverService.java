@@ -170,6 +170,7 @@ public class WorkerFailoverService {
         if (!isMasterTask) {
             log.info("The failover taskInstance is not master task");
             TaskExecutionContext taskExecutionContext = TaskExecutionContextBuilder.get()
+                    .buildWorkflowInstanceHost(masterConfig.getMasterAddress())
                     .buildTaskInstanceRelatedInfo(taskInstance)
                     .buildProcessInstanceRelatedInfo(processInstance)
                     .buildProcessDefinitionRelatedInfo(processInstance.getProcessDefinition())
@@ -181,7 +182,7 @@ public class WorkerFailoverService {
                 ProcessUtils.killApplication(logClient, taskExecutionContext);
             }
         } else {
-            log.info("The failover taskInstance is a master task");
+            log.info("The failover taskInstance is a master task, no need to failover in worker failover");
         }
 
         taskInstance.setState(TaskExecutionStatus.NEED_FAULT_TOLERANCE);

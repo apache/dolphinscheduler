@@ -57,7 +57,6 @@ public class DefaultWorkerDelayTaskExecuteRunnableTest {
         WorkerTaskExecuteRunnable workerTaskExecuteRunnable = new DefaultWorkerDelayTaskExecuteRunnable(
                 taskExecutionContext,
                 workerConfig,
-                masterAddress,
                 workerMessageSender,
                 alertClientService,
                 taskPluginManager,
@@ -82,7 +81,6 @@ public class DefaultWorkerDelayTaskExecuteRunnableTest {
         WorkerTaskExecuteRunnable workerTaskExecuteRunnable = new DefaultWorkerDelayTaskExecuteRunnable(
                 taskExecutionContext,
                 workerConfig,
-                masterAddress,
                 workerMessageSender,
                 alertClientService,
                 taskPluginManager,

@@ -111,15 +111,13 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
             if (remainTime > 0) {
                 log.info("Current taskInstance is choose delay execution, delay time: {}s", remainTime);
                 taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.DELAY_EXECUTION);
-                workerMessageSender.sendMessage(taskExecutionContext, workflowMasterAddress,
-                        CommandType.TASK_EXECUTE_RESULT);
+                workerMessageSender.sendMessage(taskExecutionContext, CommandType.TASK_EXECUTE_RESULT);
             }
 
             WorkerDelayTaskExecuteRunnable workerTaskExecuteRunnable = WorkerTaskExecuteRunnableFactoryBuilder
                     .createWorkerDelayTaskExecuteRunnableFactory(
                             taskExecutionContext,
                             workerConfig,
-                            workflowMasterAddress,
                             workerMessageSender,
                             workerRpcClient,
                             taskPluginManager,
@@ -131,8 +129,7 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
                 log.warn(
                         "submit task to wait queue error, queue is full, current queue size is {}, will send a task reject message to master",
                         workerManager.getWaitSubmitQueueSize());
-                workerMessageSender.sendMessageWithRetry(taskExecutionContext, workflowMasterAddress,
-                        CommandType.TASK_REJECT);
+                workerMessageSender.sendMessageWithRetry(taskExecutionContext, CommandType.TASK_REJECT);
             } else {
                 log.info("Submit task to wait queue success, current queue size is {}",
                         workerManager.getWaitSubmitQueueSize());

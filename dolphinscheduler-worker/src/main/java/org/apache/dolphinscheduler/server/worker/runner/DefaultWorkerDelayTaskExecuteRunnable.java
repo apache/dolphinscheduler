@@ -34,14 +34,12 @@ public class DefaultWorkerDelayTaskExecuteRunnable extends WorkerDelayTaskExecut
 
     public DefaultWorkerDelayTaskExecuteRunnable(@NonNull TaskExecutionContext taskExecutionContext,
                                                  @NonNull WorkerConfig workerConfig,
-                                                 @NonNull String workflowMaster,
                                                  @NonNull WorkerMessageSender workerMessageSender,
                                                  @NonNull WorkerRpcClient workerRpcClient,
                                                  @NonNull TaskPluginManager taskPluginManager,
                                                  @Nullable StorageOperate storageOperate) {
         super(taskExecutionContext,
                 workerConfig,
-                workflowMaster,
                 workerMessageSender,
                 workerRpcClient,
                 taskPluginManager,

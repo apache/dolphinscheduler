@@ -45,11 +45,10 @@ public class TaskUpdatePidMessageSender implements MessageSender<TaskUpdatePidCo
     }
 
     @Override
-    public TaskUpdatePidCommand buildMessage(@NonNull TaskExecutionContext taskExecutionContext,
-                                             @NonNull String messageReceiverAddress) {
+    public TaskUpdatePidCommand buildMessage(@NonNull TaskExecutionContext taskExecutionContext) {
         TaskUpdatePidCommand taskUpdatePidCommand =
                 new TaskUpdatePidCommand(workerConfig.getWorkerAddress(),
-                        messageReceiverAddress,
+                        taskExecutionContext.getWorkflowInstanceHost(),
                         System.currentTimeMillis());
         taskUpdatePidCommand.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
         taskUpdatePidCommand.setProcessInstanceId(taskExecutionContext.getProcessInstanceId());
