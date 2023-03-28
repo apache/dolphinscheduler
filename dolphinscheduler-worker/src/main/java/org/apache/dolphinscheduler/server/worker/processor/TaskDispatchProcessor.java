@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.server.worker.processor;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
@@ -29,7 +27,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.TaskDispatchCommand;
+import org.apache.dolphinscheduler.remote.command.task.TaskDispatchMessage;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.metrics.TaskMetrics;
@@ -49,7 +47,7 @@ import io.micrometer.core.annotation.Timed;
 import io.netty.channel.Channel;
 
 /**
- * Used to handle {@link CommandType#TASK_DISPATCH_REQUEST}
+ * Used to handle {@link CommandType#TASK_DISPATCH_MESSAGE}
  */
 @Component
 @Slf4j
@@ -77,19 +75,16 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
     @Timed(value = "ds.task.execution.duration", percentiles = {0.5, 0.75, 0.95, 0.99}, histogram = true)
     @Override
     public void process(Channel channel, Command command) {
-        checkArgument(CommandType.TASK_DISPATCH_REQUEST == command.getType(),
-                String.format("invalid command type : %s", command.getType()));
+        TaskDispatchMessage taskDispatchMessage = JSONUtils.parseObject(command.getBody(), TaskDispatchMessage.class);
 
-        TaskDispatchCommand taskDispatchCommand = JSONUtils.parseObject(command.getBody(), TaskDispatchCommand.class);
-
-        if (taskDispatchCommand == null) {
+        if (taskDispatchMessage == null) {
             log.error("task execute request command content is null");
             return;
         }
-        final String workflowMasterAddress = taskDispatchCommand.getMessageSenderAddress();
-        log.info("Receive task dispatch request, command: {}", taskDispatchCommand);
+        final String workflowMasterAddress = taskDispatchMessage.getMessageSenderAddress();
+        log.info("Receive task dispatch request, command: {}", taskDispatchMessage);
 
-        TaskExecutionContext taskExecutionContext = taskDispatchCommand.getTaskExecutionContext();
+        TaskExecutionContext taskExecutionContext = taskDispatchMessage.getTaskExecutionContext();
 
         if (taskExecutionContext == null) {
             log.error("task execution context is null");
@@ -111,7 +106,7 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
             if (remainTime > 0) {
                 log.info("Current taskInstance is choose delay execution, delay time: {}s", remainTime);
                 taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.DELAY_EXECUTION);
-                workerMessageSender.sendMessage(taskExecutionContext, CommandType.TASK_EXECUTE_RESULT);
+                workerMessageSender.sendMessage(taskExecutionContext, CommandType.TASK_EXECUTE_RESULT_MESSAGE);
             }
 
             WorkerDelayTaskExecuteRunnable workerTaskExecuteRunnable = WorkerTaskExecuteRunnableFactoryBuilder
@@ -135,6 +130,11 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
                         workerManager.getWaitSubmitQueueSize());
             }
         }
+    }
+
+    @Override
+    public CommandType getCommandType() {
+        return CommandType.TASK_DISPATCH_MESSAGE;
     }
 
 }

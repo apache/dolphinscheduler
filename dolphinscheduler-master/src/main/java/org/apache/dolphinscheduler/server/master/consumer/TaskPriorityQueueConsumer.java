@@ -31,7 +31,7 @@ import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.TaskDispatchCommand;
+import org.apache.dolphinscheduler.remote.command.task.TaskDispatchMessage;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
@@ -278,7 +278,7 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
 
     private Command toCommand(TaskExecutionContext taskExecutionContext) {
         // todo: we didn't set the host here, since right now we didn't need to retry this message.
-        TaskDispatchCommand requestCommand = new TaskDispatchCommand(taskExecutionContext,
+        TaskDispatchMessage requestCommand = new TaskDispatchMessage(taskExecutionContext,
                 masterConfig.getMasterAddress(),
                 taskExecutionContext.getHost(),
                 System.currentTimeMillis());

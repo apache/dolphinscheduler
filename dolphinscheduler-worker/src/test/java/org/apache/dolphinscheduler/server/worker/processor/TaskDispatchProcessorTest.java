@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.TaskDispatchCommand;
+import org.apache.dolphinscheduler.remote.command.task.TaskDispatchMessage;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcClient;
@@ -77,7 +77,7 @@ public class TaskDispatchProcessorTest {
     }
 
     public Command createDispatchCommand(TaskExecutionContext taskExecutionContext) {
-        return new TaskDispatchCommand(
+        return new TaskDispatchMessage(
                 taskExecutionContext,
                 "localhost:5678",
                 "localhost:1234",

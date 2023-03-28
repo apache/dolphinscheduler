@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.remote.command.BaseCommand;
+import org.apache.dolphinscheduler.remote.command.BaseMessage;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 
 import org.apache.commons.collections4.MapUtils;
@@ -54,9 +54,9 @@ public class MessageRetryRunner extends BaseDaemonThread {
     @Autowired
     private List<MessageSender> messageSenders;
 
-    private Map<CommandType, MessageSender<BaseCommand>> messageSenderMap = new HashMap<>();
+    private Map<CommandType, MessageSender<BaseMessage>> messageSenderMap = new HashMap<>();
 
-    private Map<Integer, Map<CommandType, BaseCommand>> needToRetryMessages = new ConcurrentHashMap<>();
+    private Map<Integer, Map<CommandType, BaseMessage>> needToRetryMessages = new ConcurrentHashMap<>();
 
     @Override
     public synchronized void start() {
@@ -69,13 +69,13 @@ public class MessageRetryRunner extends BaseDaemonThread {
         log.info("Message retry runner started");
     }
 
-    public void addRetryMessage(int taskInstanceId, @NonNull CommandType messageType, BaseCommand baseCommand) {
+    public void addRetryMessage(int taskInstanceId, @NonNull CommandType messageType, BaseMessage baseMessage) {
         needToRetryMessages.computeIfAbsent(taskInstanceId, k -> new ConcurrentHashMap<>()).put(messageType,
-                baseCommand);
+                baseMessage);
     }
 
     public void removeRetryMessage(int taskInstanceId, @NonNull CommandType messageType) {
-        Map<CommandType, BaseCommand> retryMessages = needToRetryMessages.get(taskInstanceId);
+        Map<CommandType, BaseMessage> retryMessages = needToRetryMessages.get(taskInstanceId);
         if (retryMessages != null) {
             retryMessages.remove(messageType);
         }
@@ -86,7 +86,7 @@ public class MessageRetryRunner extends BaseDaemonThread {
     }
 
     public void updateMessageHost(int taskInstanceId, String messageReceiverHost) {
-        Map<CommandType, BaseCommand> needToRetryMessages = this.needToRetryMessages.get(taskInstanceId);
+        Map<CommandType, BaseMessage> needToRetryMessages = this.needToRetryMessages.get(taskInstanceId);
         if (needToRetryMessages != null) {
             needToRetryMessages.values().forEach(baseMessage -> {
                 baseMessage.setMessageReceiverAddress(messageReceiverHost);
@@ -102,21 +102,21 @@ public class MessageRetryRunner extends BaseDaemonThread {
                 }
 
                 long now = System.currentTimeMillis();
-                Iterator<Map.Entry<Integer, Map<CommandType, BaseCommand>>> iterator =
+                Iterator<Map.Entry<Integer, Map<CommandType, BaseMessage>>> iterator =
                         needToRetryMessages.entrySet().iterator();
                 while (iterator.hasNext()) {
-                    Map.Entry<Integer, Map<CommandType, BaseCommand>> taskEntry = iterator.next();
+                    Map.Entry<Integer, Map<CommandType, BaseMessage>> taskEntry = iterator.next();
                     Integer taskInstanceId = taskEntry.getKey();
-                    Map<CommandType, BaseCommand> retryMessageMap = taskEntry.getValue();
+                    Map<CommandType, BaseMessage> retryMessageMap = taskEntry.getValue();
                     if (retryMessageMap.isEmpty()) {
                         iterator.remove();
                         continue;
                     }
                     LogUtils.setTaskInstanceIdMDC(taskInstanceId);
                     try {
-                        for (Map.Entry<CommandType, BaseCommand> messageEntry : retryMessageMap.entrySet()) {
+                        for (Map.Entry<CommandType, BaseMessage> messageEntry : retryMessageMap.entrySet()) {
                             CommandType messageType = messageEntry.getKey();
-                            BaseCommand message = messageEntry.getValue();
+                            BaseMessage message = messageEntry.getValue();
                             if (now - message.getMessageSendTime() > MESSAGE_RETRY_WINDOW) {
                                 log.info("Begin retry send message to master, message: {}", message);
                                 message.setMessageSendTime(now);

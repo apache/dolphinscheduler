@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.server.worker.rpc;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.remote.command.BaseCommand;
+import org.apache.dolphinscheduler.remote.command.BaseMessage;
 import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
@@ -61,12 +61,12 @@ public class WorkerMessageSender {
         if (messageSender == null) {
             throw new IllegalArgumentException("The messageType is invalidated, messageType: " + messageType);
         }
-        BaseCommand baseCommand = messageSender.buildMessage(taskExecutionContext);
+        BaseMessage baseMessage = messageSender.buildMessage(taskExecutionContext);
         try {
-            messageRetryRunner.addRetryMessage(taskExecutionContext.getTaskInstanceId(), messageType, baseCommand);
-            messageSender.sendMessage(baseCommand);
+            messageRetryRunner.addRetryMessage(taskExecutionContext.getTaskInstanceId(), messageType, baseMessage);
+            messageSender.sendMessage(baseMessage);
         } catch (RemotingException e) {
-            log.error("Send message error, messageType: {}, message: {}", messageType, baseCommand);
+            log.error("Send message error, messageType: {}, message: {}", messageType, baseMessage);
         }
     }
 
@@ -75,11 +75,11 @@ public class WorkerMessageSender {
         if (messageSender == null) {
             throw new IllegalArgumentException("The messageType is invalidated, messageType: " + messageType);
         }
-        BaseCommand baseCommand = messageSender.buildMessage(taskExecutionContext);
+        BaseMessage baseMessage = messageSender.buildMessage(taskExecutionContext);
         try {
-            messageSender.sendMessage(baseCommand);
+            messageSender.sendMessage(baseMessage);
         } catch (RemotingException e) {
-            log.error("Send message error, messageType: {}, message: {}", messageType, baseCommand);
+            log.error("Send message error, messageType: {}, message: {}", messageType, baseMessage);
         }
     }
 

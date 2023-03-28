@@ -21,15 +21,13 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
+import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.WorkerGroupNotFoundException;
-import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
-import org.apache.dolphinscheduler.server.master.processor.TaskRecallProcessor;
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -37,6 +35,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -60,10 +59,7 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
     private ServerNodeManager serverNodeManager;
 
     @Autowired
-    private TaskKillResponseProcessor taskKillResponseProcessor;
-
-    @Autowired
-    private TaskRecallProcessor taskRecallProcessor;
+    private List<NettyRequestProcessor> nettyRequestProcessors;
 
     /**
      * netty remote client
@@ -80,8 +76,9 @@ public class NettyExecutorManager extends AbstractExecutorManager<Boolean> {
 
     @PostConstruct
     public void init() {
-        this.nettyRemotingClient.registerProcessor(CommandType.TASK_KILL_RESPONSE, taskKillResponseProcessor);
-        this.nettyRemotingClient.registerProcessor(CommandType.TASK_REJECT, taskRecallProcessor);
+        for (NettyRequestProcessor nettyRequestProcessor : nettyRequestProcessors) {
+            this.nettyRemotingClient.registerProcessor(nettyRequestProcessor);
+        }
     }
 
     /**

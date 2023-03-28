@@ -50,11 +50,16 @@ public class NettyRemotingClientTest {
         NettyServerConfig serverConfig = new NettyServerConfig();
 
         NettyRemotingServer server = new NettyRemotingServer(serverConfig);
-        server.registerProcessor(CommandType.PING, new NettyRequestProcessor() {
+        server.registerProcessor(new NettyRequestProcessor() {
 
             @Override
             public void process(Channel channel, Command command) {
                 channel.writeAndFlush(Pong.create(command.getOpaque()));
+            }
+
+            @Override
+            public CommandType getCommandType() {
+                return CommandType.PING;
             }
         });
 
@@ -81,11 +86,16 @@ public class NettyRemotingClientTest {
         NettyServerConfig serverConfig = new NettyServerConfig();
 
         NettyRemotingServer server = new NettyRemotingServer(serverConfig);
-        server.registerProcessor(CommandType.PING, new NettyRequestProcessor() {
+        server.registerProcessor(new NettyRequestProcessor() {
 
             @Override
             public void process(Channel channel, Command command) {
                 channel.writeAndFlush(Pong.create(command.getOpaque()));
+            }
+
+            @Override
+            public CommandType getCommandType() {
+                return CommandType.PING;
             }
         });
         server.start();

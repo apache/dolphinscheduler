@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.server.master.processor;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.TaskUpdatePidCommand;
+import org.apache.dolphinscheduler.remote.command.task.TaskUpdatePidMessage;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
@@ -30,7 +30,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Preconditions;
 import io.netty.channel.Channel;
 
 /**
@@ -51,16 +50,19 @@ public class TaskUpdatePidProcessor implements NettyRequestProcessor {
      */
     @Override
     public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.TASK_UPDATE_PID == command.getType(),
-                String.format("invalid command type : %s", command.getType()));
-        TaskUpdatePidCommand taskUpdatePidCommand =
-                JSONUtils.parseObject(command.getBody(), TaskUpdatePidCommand.class);
-        log.info("taskUpdatePidCommand: {}", taskUpdatePidCommand);
+        TaskUpdatePidMessage taskUpdatePidRequest =
+                JSONUtils.parseObject(command.getBody(), TaskUpdatePidMessage.class);
+        log.info("taskUpdatePidCommand: {}", taskUpdatePidRequest);
 
-        TaskEvent taskEvent = TaskEvent.newUpdatePidEvent(taskUpdatePidCommand,
+        TaskEvent taskEvent = TaskEvent.newUpdatePidEvent(taskUpdatePidRequest,
                 channel,
-                taskUpdatePidCommand.getMessageSenderAddress());
+                taskUpdatePidRequest.getMessageSenderAddress());
         taskEventService.addEvent(taskEvent);
+    }
+
+    @Override
+    public CommandType getCommandType() {
+        return CommandType.TASK_UPDATE_PID_MESSAGE;
     }
 
 }

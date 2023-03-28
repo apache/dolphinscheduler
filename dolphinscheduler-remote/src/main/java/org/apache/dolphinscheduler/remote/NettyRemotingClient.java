@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.remote;
 import org.apache.dolphinscheduler.remote.codec.NettyDecoder;
 import org.apache.dolphinscheduler.remote.codec.NettyEncoder;
 import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingTimeoutException;
@@ -270,23 +269,21 @@ public class NettyRemotingClient implements AutoCloseable {
     /**
      * register processor
      *
-     * @param commandType command type
      * @param processor processor
      */
-    public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor) {
-        this.registerProcessor(commandType, processor, null);
+    public void registerProcessor(final NettyRequestProcessor processor) {
+        this.registerProcessor(processor, null);
     }
 
     /**
      * register processor
      *
-     * @param commandType command type
      * @param processor processor
      * @param executor thread executor
      */
-    public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor,
+    public void registerProcessor(final NettyRequestProcessor processor,
                                   final ExecutorService executor) {
-        this.clientHandler.registerProcessor(commandType, processor, executor);
+        this.clientHandler.registerProcessor(processor.getCommandType(), processor, executor);
     }
 
     /**

@@ -52,7 +52,7 @@ public class TaskCallbackImpl implements TaskCallBack {
 
         log.info("send remote application info {}", applicationInfo);
         taskExecutionContext.setAppIds(applicationInfo.getAppIds());
-        workerMessageSender.sendMessageWithRetry(taskExecutionContext, CommandType.TASK_EXECUTE_RUNNING);
+        workerMessageSender.sendMessageWithRetry(taskExecutionContext, CommandType.TASK_EXECUTE_RUNNING_MESSAGE);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class TaskCallbackImpl implements TaskCallBack {
             return;
         }
 
-        workerMessageSender.sendMessageWithRetry(taskExecutionContext, CommandType.TASK_UPDATE_PID);
+        workerMessageSender.sendMessageWithRetry(taskExecutionContext, CommandType.TASK_UPDATE_PID_MESSAGE);
     }
 
 }

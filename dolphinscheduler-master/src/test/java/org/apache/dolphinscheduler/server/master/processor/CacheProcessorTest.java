@@ -19,8 +19,8 @@ package org.apache.dolphinscheduler.server.master.processor;
 
 import org.apache.dolphinscheduler.common.enums.CacheType;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.remote.command.CacheExpireCommand;
 import org.apache.dolphinscheduler.remote.command.Command;
+import org.apache.dolphinscheduler.remote.command.cache.CacheExpireRequest;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -61,8 +61,8 @@ public class CacheProcessorTest {
     public void testProcess() {
         Tenant tenant = new Tenant();
         tenant.setId(1);
-        CacheExpireCommand cacheExpireCommand = new CacheExpireCommand(CacheType.TENANT, "1");
-        Command command = cacheExpireCommand.convert2Command();
+        CacheExpireRequest cacheExpireRequest = new CacheExpireRequest(CacheType.TENANT, "1");
+        Command command = cacheExpireRequest.convert2Command();
 
         cacheProcessor.process(channel, command);
     }

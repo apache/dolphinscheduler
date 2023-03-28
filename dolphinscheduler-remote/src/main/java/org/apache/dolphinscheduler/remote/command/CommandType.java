@@ -49,27 +49,27 @@ public enum CommandType {
     /**
      * dispatch task request
      */
-    TASK_DISPATCH_REQUEST,
+    TASK_DISPATCH_MESSAGE,
 
     /**
      * task execute running, from worker to master
      */
-    TASK_EXECUTE_RUNNING,
+    TASK_EXECUTE_RUNNING_MESSAGE,
 
     /**
      * task execute running ack, from master to worker
      */
-    TASK_EXECUTE_RUNNING_ACK,
+    TASK_EXECUTE_RUNNING_MESSAGE_ACK,
 
     /**
      * task execute response, from worker to master
      */
-    TASK_EXECUTE_RESULT,
+    TASK_EXECUTE_RESULT_MESSAGE,
 
     /**
      * task execute response ack, from master to worker
      */
-    TASK_EXECUTE_RESULT_ACK,
+    TASK_EXECUTE_RESULT_MESSAGE_ACK,
 
     TASK_KILL_REQUEST,
 
@@ -77,7 +77,7 @@ public enum CommandType {
 
     TASK_REJECT,
 
-    TASK_REJECT_ACK,
+    TASK_REJECT_MESSAGE_ACK,
 
     /**
      * task savepoint, for stream task
@@ -127,12 +127,12 @@ public enum CommandType {
     /**
      * update taskInstance's PID request
      */
-    TASK_UPDATE_PID,
+    TASK_UPDATE_PID_MESSAGE,
 
     /**
      * update taskInstance's PID response ack, from master to worker
      */
-    TASK_UPDATE_PID_ACK,
+    TASK_UPDATE_PID__MESSAGE_ACK,
 
     /**
      * workflow executing data response, from master to api

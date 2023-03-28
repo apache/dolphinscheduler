@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.server.master.processor;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningCommand;
+import org.apache.dolphinscheduler.remote.command.task.TaskExecuteRunningMessage;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
@@ -30,7 +30,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Preconditions;
 import io.netty.channel.Channel;
 
 /**
@@ -51,16 +50,19 @@ public class TaskExecuteRunningProcessor implements NettyRequestProcessor {
      */
     @Override
     public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.TASK_EXECUTE_RUNNING == command.getType(),
-                String.format("invalid command type : %s", command.getType()));
-        TaskExecuteRunningCommand taskExecuteRunningMessage =
-                JSONUtils.parseObject(command.getBody(), TaskExecuteRunningCommand.class);
+        TaskExecuteRunningMessage taskExecuteRunningMessage =
+                JSONUtils.parseObject(command.getBody(), TaskExecuteRunningMessage.class);
         log.info("taskExecuteRunningCommand: {}", taskExecuteRunningMessage);
 
         TaskEvent taskEvent = TaskEvent.newRunningEvent(taskExecuteRunningMessage,
                 channel,
                 taskExecuteRunningMessage.getMessageSenderAddress());
         taskEventService.addEvent(taskEvent);
+    }
+
+    @Override
+    public CommandType getCommandType() {
+        return CommandType.TASK_EXECUTE_RUNNING_MESSAGE;
     }
 
 }

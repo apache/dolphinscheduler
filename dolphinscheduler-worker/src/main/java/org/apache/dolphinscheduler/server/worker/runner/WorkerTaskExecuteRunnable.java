@@ -39,7 +39,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.alert.AlertSendRequestCommand;
+import org.apache.dolphinscheduler.remote.command.alert.AlertSendRequest;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
@@ -111,7 +111,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
         taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.FAILURE);
         taskExecutionContext.setEndTime(System.currentTimeMillis());
-        workerMessageSender.sendMessageWithRetry(taskExecutionContext, CommandType.TASK_EXECUTE_RESULT);
+        workerMessageSender.sendMessageWithRetry(taskExecutionContext, CommandType.TASK_EXECUTE_RESULT_MESSAGE);
         log.info(
                 "Get a exception when execute the task, will send the task execute result to master, the current task execute result is {}",
                 TaskExecutionStatus.FAILURE);
@@ -146,7 +146,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
                 taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.SUCCESS);
                 taskExecutionContext.setEndTime(System.currentTimeMillis());
                 TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-                workerMessageSender.sendMessageWithRetry(taskExecutionContext, CommandType.TASK_EXECUTE_RESULT);
+                workerMessageSender.sendMessageWithRetry(taskExecutionContext, CommandType.TASK_EXECUTE_RESULT_MESSAGE);
                 log.info(
                         "The current execute mode is dry run, will stop the subsequent process and set the taskInstance status to success");
                 return;
@@ -189,7 +189,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
 
     protected void beforeExecute() {
         taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.RUNNING_EXECUTION);
-        workerMessageSender.sendMessageWithRetry(taskExecutionContext, CommandType.TASK_EXECUTE_RUNNING);
+        workerMessageSender.sendMessageWithRetry(taskExecutionContext, CommandType.TASK_EXECUTE_RUNNING_MESSAGE);
         log.info("Set task status to {}", TaskExecutionStatus.RUNNING_EXECUTION);
 
         TaskExecutionCheckerUtils.checkTenantExist(workerConfig, taskExecutionContext);
@@ -232,7 +232,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         TaskAlertInfo taskAlertInfo = task.getTaskAlertInfo();
         int strategy =
                 status == TaskExecutionStatus.SUCCESS ? WarningType.SUCCESS.getCode() : WarningType.FAILURE.getCode();
-        AlertSendRequestCommand alertCommand = new AlertSendRequestCommand(
+        AlertSendRequest alertCommand = new AlertSendRequest(
                 taskAlertInfo.getAlertGroupId(),
                 taskAlertInfo.getTitle(),
                 taskAlertInfo.getContent(),
@@ -253,7 +253,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         taskExecutionContext.setVarPool(JSONUtils.toJsonString(task.getParameters().getVarPool()));
         // upload out files and modify the "OUT FILE" property in VarPool
         TaskFilesTransferUtils.uploadOutputFiles(taskExecutionContext, storageOperate);
-        workerMessageSender.sendMessageWithRetry(taskExecutionContext, CommandType.TASK_EXECUTE_RESULT);
+        workerMessageSender.sendMessageWithRetry(taskExecutionContext, CommandType.TASK_EXECUTE_RESULT_MESSAGE);
 
         log.info("Send task execute result to master, the current task status: {}",
                 taskExecutionContext.getCurrentExecutionStatus());

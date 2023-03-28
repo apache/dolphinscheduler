@@ -67,6 +67,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
+import org.apache.dolphinscheduler.remote.command.task.TaskWakeupRequest;
 import org.apache.dolphinscheduler.remote.command.task.WorkflowHostChangeRequest;
 import org.apache.dolphinscheduler.remote.command.task.WorkflowHostChangeResponse;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
@@ -476,7 +477,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      * release task group
      *
      */
-    public void releaseTaskGroup(TaskInstance taskInstance) {
+    public void releaseTaskGroup(TaskInstance taskInstance) throws RemotingException, InterruptedException {
         if (taskInstance.getTaskGroupId() > 0) {
             TaskInstance nextTaskInstance = this.processService.releaseTaskGroup(taskInstance);
             if (nextTaskInstance != null) {
@@ -490,8 +491,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                 } else {
                     ProcessInstance processInstance =
                             this.processService.findProcessInstanceById(nextTaskInstance.getProcessInstanceId());
-                    this.processService.sendStartTask2Master(processInstance, nextTaskInstance.getId(),
-                            org.apache.dolphinscheduler.remote.command.CommandType.TASK_WAKEUP_EVENT_REQUEST);
+                    this.masterRpcClient.sendSyncCommand(Host.of(processInstance.getHost()),
+                            new TaskWakeupRequest(processInstance.getId(), nextTaskInstance.getId()).convert2Command());
                 }
             }
         }

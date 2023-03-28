@@ -20,14 +20,13 @@ package org.apache.dolphinscheduler.server.master.processor;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.TaskKillResponseCommand;
+import org.apache.dolphinscheduler.remote.command.task.TaskKillResponse;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Preconditions;
 import io.netty.channel.Channel;
 
 /**
@@ -46,13 +45,14 @@ public class TaskKillResponseProcessor implements NettyRequestProcessor {
      */
     @Override
     public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.TASK_KILL_RESPONSE == command.getType(),
-                String.format("invalid command type : %s", command.getType()));
-
-        TaskKillResponseCommand responseCommand =
-                JSONUtils.parseObject(command.getBody(), TaskKillResponseCommand.class);
+        TaskKillResponse responseCommand = JSONUtils.parseObject(command.getBody(), TaskKillResponse.class);
         log.info("[TaskInstance-{}] Received task kill response command : {}",
                 responseCommand.getTaskInstanceId(), responseCommand);
+    }
+
+    @Override
+    public CommandType getCommandType() {
+        return CommandType.TASK_KILL_RESPONSE;
     }
 
 }

@@ -33,8 +33,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Preconditions;
-
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 
@@ -52,8 +50,6 @@ public class WorkflowHostChangeProcessor implements NettyRequestProcessor {
 
     @Override
     public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.WORKFLOW_HOST_CHANGE_REQUEST == command.getType(),
-                String.format("invalid command type : %s", command.getType()));
         WorkflowHostChangeRequest workflowHostChangeRequest =
                 JSONUtils.parseObject(command.getBody(), WorkflowHostChangeRequest.class);
         if (workflowHostChangeRequest == null) {
@@ -86,6 +82,11 @@ public class WorkflowHostChangeProcessor implements NettyRequestProcessor {
                         }
                     });
         }
+    }
+
+    @Override
+    public CommandType getCommandType() {
+        return CommandType.WORKFLOW_HOST_CHANGE_REQUEST;
     }
 
 }

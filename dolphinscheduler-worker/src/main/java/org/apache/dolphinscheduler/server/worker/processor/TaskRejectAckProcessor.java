@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.TaskRejectAckCommand;
+import org.apache.dolphinscheduler.remote.command.task.TaskRejectMessageAck;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 
@@ -30,7 +30,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Preconditions;
 import io.netty.channel.Channel;
 
 @Component
@@ -42,29 +41,32 @@ public class TaskRejectAckProcessor implements NettyRequestProcessor {
 
     @Override
     public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.TASK_REJECT_ACK == command.getType(),
-                String.format("invalid command type : %s", command.getType()));
 
-        TaskRejectAckCommand taskRejectAckMessage = JSONUtils.parseObject(command.getBody(),
-                TaskRejectAckCommand.class);
-        if (taskRejectAckMessage == null) {
+        TaskRejectMessageAck taskRejectMessageAck =
+                JSONUtils.parseObject(command.getBody(), TaskRejectMessageAck.class);
+        if (taskRejectMessageAck == null) {
             log.error("Receive task reject response, the response message is null");
             return;
         }
 
         try {
-            LogUtils.setTaskInstanceIdMDC(taskRejectAckMessage.getTaskInstanceId());
-            log.info("Receive task reject response ack command: {}", taskRejectAckMessage);
-            if (taskRejectAckMessage.isSuccess()) {
-                messageRetryRunner.removeRetryMessage(taskRejectAckMessage.getTaskInstanceId(),
+            LogUtils.setTaskInstanceIdMDC(taskRejectMessageAck.getTaskInstanceId());
+            log.info("Receive task reject response ack command: {}", taskRejectMessageAck);
+            if (taskRejectMessageAck.isSuccess()) {
+                messageRetryRunner.removeRetryMessage(taskRejectMessageAck.getTaskInstanceId(),
                         CommandType.TASK_REJECT);
-                log.debug("removeRecallCache: task instance id:{}", taskRejectAckMessage.getTaskInstanceId());
+                log.debug("removeRecallCache: task instance id:{}", taskRejectMessageAck.getTaskInstanceId());
             } else {
                 log.error("Receive task reject ack message, the message status is not success, message: {}",
-                        taskRejectAckMessage);
+                        taskRejectMessageAck);
             }
         } finally {
             LogUtils.removeTaskInstanceIdMDC();
         }
+    }
+
+    @Override
+    public CommandType getCommandType() {
+        return CommandType.TASK_REJECT_MESSAGE_ACK;
     }
 }

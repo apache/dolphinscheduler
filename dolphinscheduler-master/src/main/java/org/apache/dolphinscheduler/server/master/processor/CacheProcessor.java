@@ -19,9 +19,9 @@ package org.apache.dolphinscheduler.server.master.processor;
 
 import org.apache.dolphinscheduler.common.enums.CacheType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.remote.command.CacheExpireCommand;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.cache.CacheExpireRequest;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +31,6 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Preconditions;
 import io.netty.channel.Channel;
 
 /**
@@ -46,27 +45,29 @@ public class CacheProcessor implements NettyRequestProcessor {
 
     @Override
     public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.CACHE_EXPIRE == command.getType(),
-                String.format("invalid command type: %s", command.getType()));
+        CacheExpireRequest cacheExpireRequest = JSONUtils.parseObject(command.getBody(), CacheExpireRequest.class);
 
-        CacheExpireCommand cacheExpireCommand = JSONUtils.parseObject(command.getBody(), CacheExpireCommand.class);
+        log.info("received command : {}", cacheExpireRequest);
 
-        log.info("received command : {}", cacheExpireCommand);
-
-        this.cacheExpire(cacheExpireCommand);
+        this.cacheExpire(cacheExpireRequest);
     }
 
-    private void cacheExpire(CacheExpireCommand cacheExpireCommand) {
+    @Override
+    public CommandType getCommandType() {
+        return CommandType.CACHE_EXPIRE;
+    }
 
-        if (cacheExpireCommand.getCacheKey().isEmpty()) {
+    private void cacheExpire(CacheExpireRequest cacheExpireRequest) {
+
+        if (cacheExpireRequest.getCacheKey().isEmpty()) {
             return;
         }
 
-        CacheType cacheType = cacheExpireCommand.getCacheType();
+        CacheType cacheType = cacheExpireRequest.getCacheType();
         Cache cache = cacheManager.getCache(cacheType.getCacheName());
         if (cache != null) {
-            cache.evict(cacheExpireCommand.getCacheKey());
-            log.info("cache evict, type:{}, key:{}", cacheType.getCacheName(), cacheExpireCommand.getCacheKey());
+            cache.evict(cacheExpireRequest.getCacheKey());
+            log.info("cache evict, type:{}, key:{}", cacheType.getCacheName(), cacheExpireRequest.getCacheKey());
         }
     }
 }

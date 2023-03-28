@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.api.aspect;
 
 import org.apache.dolphinscheduler.common.enums.CacheType;
-import org.apache.dolphinscheduler.remote.command.CacheExpireCommand;
+import org.apache.dolphinscheduler.remote.command.cache.CacheExpireRequest;
 import org.apache.dolphinscheduler.service.cache.CacheNotifyService;
 import org.apache.dolphinscheduler.service.cache.impl.CacheKeyGenerator;
 
@@ -96,7 +96,7 @@ public class CacheEvictAspect {
                 }
             }
             if (StringUtils.isNotEmpty(cacheKey)) {
-                cacheNotifyService.notifyMaster(new CacheExpireCommand(cacheType, cacheKey).convert2Command());
+                cacheNotifyService.notifyMaster(new CacheExpireRequest(cacheType, cacheKey).convert2Command());
             }
         }
 

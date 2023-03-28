@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.master.event;
 
 import org.apache.dolphinscheduler.common.enums.TaskEventType;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.remote.command.TaskRejectAckCommand;
+import org.apache.dolphinscheduler.remote.command.task.TaskRejectMessageAck;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
@@ -69,12 +69,12 @@ public class TaskRejectByWorkerEventHandler implements TaskEventHandler {
     }
 
     public void sendAckToWorker(TaskEvent taskEvent) {
-        TaskRejectAckCommand taskRejectAckMessage = new TaskRejectAckCommand(true,
+        TaskRejectMessageAck taskRejectMessageAck = new TaskRejectMessageAck(true,
                 taskEvent.getTaskInstanceId(),
                 masterConfig.getMasterAddress(),
                 taskEvent.getWorkerAddress(),
                 System.currentTimeMillis());
-        taskEvent.getChannel().writeAndFlush(taskRejectAckMessage.convert2Command());
+        taskEvent.getChannel().writeAndFlush(taskRejectMessageAck.convert2Command());
     }
 
     @Override

@@ -31,7 +31,7 @@ import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
-import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseCommand;
+import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,10 +79,10 @@ public class AlertSenderServiceTest {
         when(alertDao.listInstanceByAlertGroupId(alertGroupId)).thenReturn(null);
         when(alertConfig.getWaitTimeout()).thenReturn(0);
 
-        AlertSendResponseCommand alertSendResponseCommand =
+        AlertSendResponse alertSendResponse =
                 alertSenderService.syncHandler(alertGroupId, title, content, WarningType.ALL.getCode());
-        Assertions.assertFalse(alertSendResponseCommand.isSuccess());
-        alertSendResponseCommand.getResResults().forEach(result -> logger
+        Assertions.assertFalse(alertSendResponse.isSuccess());
+        alertSendResponse.getResResults().forEach(result -> logger
                 .info("alert send response result, status:{}, message:{}", result.isSuccess(), result.getMessage()));
 
         // 2.alert plugin does not exist
@@ -100,10 +100,10 @@ public class AlertSenderServiceTest {
         PluginDefine pluginDefine = new PluginDefine(pluginName, "1", null);
         when(pluginDao.getPluginDefineById(pluginDefineId)).thenReturn(pluginDefine);
 
-        alertSendResponseCommand =
+        alertSendResponse =
                 alertSenderService.syncHandler(alertGroupId, title, content, WarningType.ALL.getCode());
-        Assertions.assertFalse(alertSendResponseCommand.isSuccess());
-        alertSendResponseCommand.getResResults().forEach(result -> logger
+        Assertions.assertFalse(alertSendResponse.isSuccess());
+        alertSendResponse.getResResults().forEach(result -> logger
                 .info("alert send response result, status:{}, message:{}", result.isSuccess(), result.getMessage()));
 
         // 3.alert result value is null
@@ -112,10 +112,10 @@ public class AlertSenderServiceTest {
         when(alertPluginManager.getAlertChannel(1)).thenReturn(Optional.of(alertChannelMock));
         when(alertConfig.getWaitTimeout()).thenReturn(0);
 
-        alertSendResponseCommand =
+        alertSendResponse =
                 alertSenderService.syncHandler(alertGroupId, title, content, WarningType.ALL.getCode());
-        Assertions.assertFalse(alertSendResponseCommand.isSuccess());
-        alertSendResponseCommand.getResResults().forEach(result -> logger
+        Assertions.assertFalse(alertSendResponse.isSuccess());
+        alertSendResponse.getResResults().forEach(result -> logger
                 .info("alert send response result, status:{}, message:{}", result.isSuccess(), result.getMessage()));
 
         // 4.abnormal information inside the alert plug-in code
@@ -125,10 +125,10 @@ public class AlertSenderServiceTest {
         when(alertChannelMock.process(Mockito.any())).thenReturn(alertResult);
         when(alertPluginManager.getAlertChannel(1)).thenReturn(Optional.of(alertChannelMock));
 
-        alertSendResponseCommand =
+        alertSendResponse =
                 alertSenderService.syncHandler(alertGroupId, title, content, WarningType.ALL.getCode());
-        Assertions.assertFalse(alertSendResponseCommand.isSuccess());
-        alertSendResponseCommand.getResResults().forEach(result -> logger
+        Assertions.assertFalse(alertSendResponse.isSuccess());
+        alertSendResponse.getResResults().forEach(result -> logger
                 .info("alert send response result, status:{}, message:{}", result.isSuccess(), result.getMessage()));
 
         // 5.alert plugin send success
@@ -139,10 +139,10 @@ public class AlertSenderServiceTest {
         when(alertPluginManager.getAlertChannel(1)).thenReturn(Optional.of(alertChannelMock));
         when(alertConfig.getWaitTimeout()).thenReturn(5000);
 
-        alertSendResponseCommand =
+        alertSendResponse =
                 alertSenderService.syncHandler(alertGroupId, title, content, WarningType.ALL.getCode());
-        Assertions.assertTrue(alertSendResponseCommand.isSuccess());
-        alertSendResponseCommand.getResResults().forEach(result -> logger
+        Assertions.assertTrue(alertSendResponse.isSuccess());
+        alertSendResponse.getResResults().forEach(result -> logger
                 .info("alert send response result, status:{}, message:{}", result.isSuccess(), result.getMessage()));
 
     }

@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.server.master.processor;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.Command;
 import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.TaskKillResponseCommand;
+import org.apache.dolphinscheduler.remote.command.task.TaskKillResponse;
 
 import java.util.ArrayList;
 
@@ -38,7 +38,7 @@ public class TaskKillResponseProcessorTest {
 
     private TaskKillResponseProcessor taskKillResponseProcessor;
 
-    private TaskKillResponseCommand taskKillResponseCommand;
+    private TaskKillResponse taskKillResponse;
 
     private Channel channel;
 
@@ -46,24 +46,24 @@ public class TaskKillResponseProcessorTest {
     public void before() {
         taskKillResponseProcessor = new TaskKillResponseProcessor();
         channel = Mockito.mock(Channel.class);
-        taskKillResponseCommand = new TaskKillResponseCommand();
-        taskKillResponseCommand.setAppIds(
+        taskKillResponse = new TaskKillResponse();
+        taskKillResponse.setAppIds(
                 new ArrayList<String>() {
 
                     {
                         add("task_1");
                     }
                 });
-        taskKillResponseCommand.setHost("localhost");
-        taskKillResponseCommand.setProcessId(1);
-        taskKillResponseCommand.setStatus(TaskExecutionStatus.RUNNING_EXECUTION);
-        taskKillResponseCommand.setTaskInstanceId(1);
+        taskKillResponse.setHost("localhost");
+        taskKillResponse.setProcessId(1);
+        taskKillResponse.setStatus(TaskExecutionStatus.RUNNING_EXECUTION);
+        taskKillResponse.setTaskInstanceId(1);
 
     }
 
     @Test
     public void testProcess() {
-        Command command = taskKillResponseCommand.convert2Command();
+        Command command = taskKillResponse.convert2Command(1);
         Assertions.assertEquals(CommandType.TASK_KILL_RESPONSE, command.getType());
         taskKillResponseProcessor.process(channel, command);
     }
