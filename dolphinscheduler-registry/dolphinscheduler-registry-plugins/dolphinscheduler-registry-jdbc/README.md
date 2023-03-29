@@ -38,7 +38,7 @@ You can get the detail about <a href="https://dolphinscheduler.apache.org/en-us/
 ## Use Postgresql as registry center
 If you want to set Postgresql as the registry center, you need to do the below two steps:
 
-1. Initialize the mysql table
+1. Initialize the PostgreSQL table
 
 You can directly execute the sql script `src/main/resources/postgresql_registry_init.sql`.
 
