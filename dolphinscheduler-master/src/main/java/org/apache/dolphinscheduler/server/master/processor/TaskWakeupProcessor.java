@@ -20,8 +20,8 @@ package org.apache.dolphinscheduler.server.master.processor;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.task.TaskWakeupRequest;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.master.event.TaskStateEvent;
@@ -45,9 +45,9 @@ public class TaskWakeupProcessor implements NettyRequestProcessor {
     private StateEventResponseService stateEventResponseService;
 
     @Override
-    public void process(Channel channel, Command command) {
+    public void process(Channel channel, Message message) {
         TaskWakeupRequest taskEventChangeCommand =
-                JSONUtils.parseObject(command.getBody(), TaskWakeupRequest.class);
+                JSONUtils.parseObject(message.getBody(), TaskWakeupRequest.class);
         TaskStateEvent stateEvent = TaskStateEvent.builder()
                 .processInstanceId(taskEventChangeCommand.getProcessInstanceId())
                 .taskInstanceId(taskEventChangeCommand.getTaskInstanceId())
@@ -63,8 +63,8 @@ public class TaskWakeupProcessor implements NettyRequestProcessor {
     }
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.TASK_WAKEUP_EVENT_REQUEST;
+    public MessageType getCommandType() {
+        return MessageType.TASK_WAKEUP_EVENT_REQUEST;
     }
 
 }

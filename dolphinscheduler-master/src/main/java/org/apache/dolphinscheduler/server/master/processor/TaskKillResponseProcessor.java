@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.server.master.processor;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.task.TaskKillResponse;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 
@@ -41,18 +41,18 @@ public class TaskKillResponseProcessor implements NettyRequestProcessor {
      * need master process , state persistence
      *
      * @param channel channel
-     * @param command command
+     * @param message command
      */
     @Override
-    public void process(Channel channel, Command command) {
-        TaskKillResponse responseCommand = JSONUtils.parseObject(command.getBody(), TaskKillResponse.class);
+    public void process(Channel channel, Message message) {
+        TaskKillResponse responseCommand = JSONUtils.parseObject(message.getBody(), TaskKillResponse.class);
         log.info("[TaskInstance-{}] Received task kill response command : {}",
                 responseCommand.getTaskInstanceId(), responseCommand);
     }
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.TASK_KILL_RESPONSE;
+    public MessageType getCommandType() {
+        return MessageType.TASK_KILL_RESPONSE;
     }
 
 }

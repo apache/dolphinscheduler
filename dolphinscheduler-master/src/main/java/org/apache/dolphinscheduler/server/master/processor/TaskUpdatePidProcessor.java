@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.server.master.processor;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.task.TaskUpdatePidMessage;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
@@ -46,12 +46,12 @@ public class TaskUpdatePidProcessor implements NettyRequestProcessor {
      * task ack process
      *
      * @param channel channel channel
-     * @param command command TaskExecuteAckCommand
+     * @param message command TaskExecuteAckCommand
      */
     @Override
-    public void process(Channel channel, Command command) {
+    public void process(Channel channel, Message message) {
         TaskUpdatePidMessage taskUpdatePidRequest =
-                JSONUtils.parseObject(command.getBody(), TaskUpdatePidMessage.class);
+                JSONUtils.parseObject(message.getBody(), TaskUpdatePidMessage.class);
         log.info("taskUpdatePidCommand: {}", taskUpdatePidRequest);
 
         TaskEvent taskEvent = TaskEvent.newUpdatePidEvent(taskUpdatePidRequest,
@@ -61,8 +61,8 @@ public class TaskUpdatePidProcessor implements NettyRequestProcessor {
     }
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.TASK_UPDATE_PID_MESSAGE;
+    public MessageType getCommandType() {
+        return MessageType.TASK_UPDATE_PID_MESSAGE;
     }
 
 }

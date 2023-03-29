@@ -33,7 +33,7 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-public abstract class BaseMessage implements Serializable, MessageCommandBuilder {
+public abstract class BaseMessage implements Serializable, RequestMessageBuilder {
 
     private static final long serialVersionUID = -1L;
 

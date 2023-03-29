@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.worker.rpc;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.remote.command.BaseMessage;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 import org.apache.dolphinscheduler.server.worker.message.MessageSender;
@@ -46,7 +46,7 @@ public class WorkerMessageSender {
     @Autowired
     private List<MessageSender> messageSenders;
 
-    private Map<CommandType, MessageSender> messageSenderMap = new HashMap<>();
+    private Map<MessageType, MessageSender> messageSenderMap = new HashMap<>();
 
     @PostConstruct
     public void init() {
@@ -56,7 +56,7 @@ public class WorkerMessageSender {
 
     // todo: use message rather than context
     public void sendMessageWithRetry(@NonNull TaskExecutionContext taskExecutionContext,
-                                     @NonNull CommandType messageType) {
+                                     @NonNull MessageType messageType) {
         MessageSender messageSender = messageSenderMap.get(messageType);
         if (messageSender == null) {
             throw new IllegalArgumentException("The messageType is invalidated, messageType: " + messageType);
@@ -70,7 +70,7 @@ public class WorkerMessageSender {
         }
     }
 
-    public void sendMessage(@NonNull TaskExecutionContext taskExecutionContext, @NonNull CommandType messageType) {
+    public void sendMessage(@NonNull TaskExecutionContext taskExecutionContext, @NonNull MessageType messageType) {
         MessageSender messageSender = messageSenderMap.get(messageType);
         if (messageSender == null) {
             throw new IllegalArgumentException("The messageType is invalidated, messageType: " + messageType);

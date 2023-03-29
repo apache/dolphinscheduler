@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.remote.command.task;
 
-import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.RequestCommandBuilder;
+import org.apache.dolphinscheduler.remote.command.MessageType;
+import org.apache.dolphinscheduler.remote.command.RequestMessageBuilder;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,7 +27,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TaskForceStartRequest implements RequestCommandBuilder {
+public class TaskForceStartRequest implements RequestMessageBuilder {
 
     private String key;
 
@@ -45,7 +45,7 @@ public class TaskForceStartRequest implements RequestCommandBuilder {
     }
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.TASK_FORCE_STATE_EVENT_REQUEST;
+    public MessageType getCommandType() {
+        return MessageType.TASK_FORCE_STATE_EVENT_REQUEST;
     }
 }

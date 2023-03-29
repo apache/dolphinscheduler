@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.remote.command.task;
 
 import org.apache.dolphinscheduler.remote.command.BaseMessage;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.MessageType;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -69,8 +69,8 @@ public class TaskUpdatePidMessage extends BaseMessage {
     }
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.TASK_UPDATE_PID_MESSAGE;
+    public MessageType getCommandType() {
+        return MessageType.TASK_UPDATE_PID_MESSAGE;
     }
 
 }

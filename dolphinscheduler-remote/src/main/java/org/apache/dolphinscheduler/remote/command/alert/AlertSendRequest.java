@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.remote.command.alert;
 
-import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.RequestCommandBuilder;
+import org.apache.dolphinscheduler.remote.command.MessageType;
+import org.apache.dolphinscheduler.remote.command.RequestMessageBuilder;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,7 +27,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AlertSendRequest implements RequestCommandBuilder {
+public class AlertSendRequest implements RequestMessageBuilder {
 
     private int groupId;
 
@@ -38,7 +38,7 @@ public class AlertSendRequest implements RequestCommandBuilder {
     private int warnType;
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.ALERT_SEND_REQUEST;
+    public MessageType getCommandType() {
+        return MessageType.ALERT_SEND_REQUEST;
     }
 }

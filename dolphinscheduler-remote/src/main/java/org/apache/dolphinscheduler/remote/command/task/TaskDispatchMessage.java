@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.remote.command.task;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.remote.command.BaseMessage;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.MessageType;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -48,8 +48,8 @@ public class TaskDispatchMessage extends BaseMessage {
     }
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.TASK_DISPATCH_MESSAGE;
+    public MessageType getCommandType() {
+        return MessageType.TASK_DISPATCH_MESSAGE;
     }
 
 }

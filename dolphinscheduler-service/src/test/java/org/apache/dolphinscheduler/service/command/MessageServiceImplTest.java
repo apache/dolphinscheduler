@@ -56,7 +56,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-class CommandServiceImplTest {
+class MessageServiceImplTest {
 
     @InjectMocks
     private CommandServiceImpl commandService;

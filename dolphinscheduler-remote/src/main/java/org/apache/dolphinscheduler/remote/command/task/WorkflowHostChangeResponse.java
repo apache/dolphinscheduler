@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.remote.command.task;
 
-import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.ResponseCommandBuilder;
+import org.apache.dolphinscheduler.remote.command.MessageType;
+import org.apache.dolphinscheduler.remote.command.ResponseMessageBuilder;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,7 +27,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class WorkflowHostChangeResponse implements ResponseCommandBuilder {
+public class WorkflowHostChangeResponse implements ResponseMessageBuilder {
 
     boolean success;
 
@@ -44,7 +44,7 @@ public class WorkflowHostChangeResponse implements ResponseCommandBuilder {
     }
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.WORKFLOW_HOST_CHANGE_RESPONSE;
+    public MessageType getCommandType() {
+        return MessageType.WORKFLOW_HOST_CHANGE_RESPONSE;
     }
 }

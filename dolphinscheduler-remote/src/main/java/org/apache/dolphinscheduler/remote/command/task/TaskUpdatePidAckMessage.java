@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.remote.command.task;
 
-import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.RequestCommandBuilder;
+import org.apache.dolphinscheduler.remote.command.MessageType;
+import org.apache.dolphinscheduler.remote.command.RequestMessageBuilder;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,14 +33,14 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class TaskUpdatePidAckMessage implements RequestCommandBuilder {
+public class TaskUpdatePidAckMessage implements RequestMessageBuilder {
 
     private boolean success;
     private int taskInstanceId;
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.TASK_UPDATE_PID__MESSAGE_ACK;
+    public MessageType getCommandType() {
+        return MessageType.TASK_UPDATE_PID__MESSAGE_ACK;
     }
 
 }

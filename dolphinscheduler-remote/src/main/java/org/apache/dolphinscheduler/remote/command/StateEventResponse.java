@@ -25,13 +25,13 @@ import lombok.Data;
  */
 @Data
 @AllArgsConstructor
-public class StateEventResponse implements RequestCommandBuilder {
+public class StateEventResponse implements RequestMessageBuilder {
 
     private String key;
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.TASK_EXECUTE_RESULT_MESSAGE_ACK;
+    public MessageType getCommandType() {
+        return MessageType.TASK_EXECUTE_RESULT_MESSAGE_ACK;
     }
 
 }

@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.service.alert;
 
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
-import org.apache.dolphinscheduler.remote.command.Command;
+import org.apache.dolphinscheduler.remote.command.Message;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendRequest;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponse;
 import org.apache.dolphinscheduler.remote.factory.NettyRemotingClientFactory;
@@ -51,15 +51,6 @@ public class AlertClientService implements AutoCloseable {
     public AlertClientService() {
         this.client = NettyRemotingClientFactory.buildNettyRemotingClient();
         this.isRunning = new AtomicBoolean(true);
-    }
-
-    /**
-     * alert client
-     */
-    public AlertClientService(String host, int port) {
-        this();
-        this.host = host;
-        this.port = port;
     }
 
     /**
@@ -104,8 +95,8 @@ public class AlertClientService implements AutoCloseable {
         AlertSendRequest request = new AlertSendRequest(groupId, title, content, strategy);
         final Host address = new Host(host, port);
         try {
-            Command command = request.convert2Command();
-            Command response = this.client.sendSync(address, command, ALERT_REQUEST_TIMEOUT);
+            Message message = request.convert2Command();
+            Message response = this.client.sendSync(address, message, ALERT_REQUEST_TIMEOUT);
             if (response != null) {
                 return JsonSerializer.deserialize(response.getBody(), AlertSendResponse.class);
             }

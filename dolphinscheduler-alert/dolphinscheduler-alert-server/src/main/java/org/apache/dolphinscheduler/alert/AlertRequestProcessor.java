@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.alert;
 
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendRequest;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponse;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
@@ -41,8 +41,8 @@ public final class AlertRequestProcessor implements NettyRequestProcessor {
     }
 
     @Override
-    public void process(Channel channel, Command command) {
-        AlertSendRequest alertSendRequest = JsonSerializer.deserialize(command.getBody(), AlertSendRequest.class);
+    public void process(Channel channel, Message message) {
+        AlertSendRequest alertSendRequest = JsonSerializer.deserialize(message.getBody(), AlertSendRequest.class);
 
         log.info("Received command : {}", alertSendRequest);
 
@@ -51,11 +51,11 @@ public final class AlertRequestProcessor implements NettyRequestProcessor {
                 alertSendRequest.getTitle(),
                 alertSendRequest.getContent(),
                 alertSendRequest.getWarnType());
-        channel.writeAndFlush(alertSendResponse.convert2Command(command.getOpaque()));
+        channel.writeAndFlush(alertSendResponse.convert2Command(message.getOpaque()));
     }
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.ALERT_SEND_REQUEST;
+    public MessageType getCommandType() {
+        return MessageType.ALERT_SEND_REQUEST;
     }
 }

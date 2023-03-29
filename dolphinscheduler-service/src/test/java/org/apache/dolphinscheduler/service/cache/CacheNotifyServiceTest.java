@@ -23,8 +23,8 @@ import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.cache.CacheExpireRequest;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
@@ -59,7 +59,7 @@ public class CacheNotifyServiceTest {
     public void testNotifyMaster() {
         User user1 = new User();
         user1.setId(100);
-        Command cacheExpireCommand = new CacheExpireRequest(CacheType.USER, "100").convert2Command();
+        Message cacheExpireMessage = new CacheExpireRequest(CacheType.USER, "100").convert2Command();
 
         NettyServerConfig serverConfig = new NettyServerConfig();
 
@@ -67,13 +67,13 @@ public class CacheNotifyServiceTest {
         nettyRemotingServer.registerProcessor(new NettyRequestProcessor() {
 
             @Override
-            public void process(Channel channel, Command command) {
-                Assertions.assertEquals(cacheExpireCommand, command);
+            public void process(Channel channel, Message message) {
+                Assertions.assertEquals(cacheExpireMessage, message);
             }
 
             @Override
-            public CommandType getCommandType() {
-                return CommandType.CACHE_EXPIRE;
+            public MessageType getCommandType() {
+                return MessageType.CACHE_EXPIRE;
             }
         });
         nettyRemotingServer.start();
@@ -86,7 +86,7 @@ public class CacheNotifyServiceTest {
 
         Mockito.when(registryClient.getServerList(NodeType.MASTER)).thenReturn(serverList);
 
-        cacheNotifyService.notifyMaster(cacheExpireCommand);
+        cacheNotifyService.notifyMaster(cacheExpireMessage);
 
         nettyRemotingServer.close();
     }

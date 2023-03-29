@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.remote.command.log;
 
-import org.apache.dolphinscheduler.remote.command.Command;
+import org.apache.dolphinscheduler.remote.command.Message;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,7 @@ public class RollViewLogRequestTest {
         rollViewLogRequest.setPath("/opt/test");
         rollViewLogRequest.setSkipLineNum(1);
         rollViewLogRequest.setLimit(1);
-        Command command = rollViewLogRequest.convert2Command();
-        Assertions.assertNotNull(command);
+        Message message = rollViewLogRequest.convert2Command();
+        Assertions.assertNotNull(message);
     }
 }

@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.remote.command.log;
 
-import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.ResponseCommandBuilder;
+import org.apache.dolphinscheduler.remote.command.MessageType;
+import org.apache.dolphinscheduler.remote.command.ResponseMessageBuilder;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,7 +30,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RemoveTaskLogResponse implements ResponseCommandBuilder {
+public class RemoveTaskLogResponse implements ResponseMessageBuilder {
 
     /*
      * TaskPriorityQueueConsumer.* log path
@@ -38,7 +38,7 @@ public class RemoveTaskLogResponse implements ResponseCommandBuilder {
     private Boolean status;
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.REMOVE_TAK_LOG_RESPONSE;
+    public MessageType getCommandType() {
+        return MessageType.REMOVE_TAK_LOG_RESPONSE;
     }
 }

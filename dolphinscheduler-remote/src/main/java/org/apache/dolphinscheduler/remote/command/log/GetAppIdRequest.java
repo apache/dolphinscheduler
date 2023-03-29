@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.remote.command.log;
 
-import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.RequestCommandBuilder;
+import org.apache.dolphinscheduler.remote.command.MessageType;
+import org.apache.dolphinscheduler.remote.command.RequestMessageBuilder;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,15 +27,15 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetAppIdRequest implements RequestCommandBuilder {
+public class GetAppIdRequest implements RequestMessageBuilder {
 
     private String logPath;
 
     private String appInfoPath;
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.GET_APP_ID_REQUEST;
+    public MessageType getCommandType() {
+        return MessageType.GET_APP_ID_REQUEST;
     }
 
 }

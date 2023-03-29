@@ -23,8 +23,8 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.plugin.task.api.stream.StreamTask;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.task.TaskSavePointRequest;
 import org.apache.dolphinscheduler.remote.command.task.TaskSavePointResponse;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
@@ -57,12 +57,12 @@ public class TaskSavePointProcessor implements NettyRequestProcessor {
      * task save point process
      *
      * @param channel channel channel
-     * @param command command command
+     * @param message command command
      */
     @Override
-    public void process(Channel channel, Command command) {
+    public void process(Channel channel, Message message) {
         TaskSavePointRequest taskSavePointRequest =
-                JSONUtils.parseObject(command.getBody(), TaskSavePointRequest.class);
+                JSONUtils.parseObject(message.getBody(), TaskSavePointRequest.class);
         if (taskSavePointRequest == null) {
             log.error("task savepoint request command is null");
             return;
@@ -89,8 +89,8 @@ public class TaskSavePointProcessor implements NettyRequestProcessor {
     }
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.TASK_SAVEPOINT_REQUEST;
+    public MessageType getCommandType() {
+        return MessageType.TASK_SAVEPOINT_REQUEST;
     }
 
     private void sendTaskSavePointResponseCommand(Channel channel, TaskExecutionContext taskExecutionContext) {

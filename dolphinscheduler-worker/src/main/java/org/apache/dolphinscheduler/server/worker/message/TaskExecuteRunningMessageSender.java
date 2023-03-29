@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.server.worker.message;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.task.TaskExecuteRunningMessage;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.utils.Host;
@@ -62,7 +62,7 @@ public class TaskExecuteRunningMessageSender implements MessageSender<TaskExecut
     }
 
     @Override
-    public CommandType getMessageType() {
-        return CommandType.TASK_EXECUTE_RUNNING_MESSAGE;
+    public MessageType getMessageType() {
+        return MessageType.TASK_EXECUTE_RUNNING_MESSAGE;
     }
 }

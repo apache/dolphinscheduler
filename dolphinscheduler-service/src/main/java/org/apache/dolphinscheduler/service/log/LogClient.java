@@ -25,7 +25,7 @@ import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
-import org.apache.dolphinscheduler.remote.command.Command;
+import org.apache.dolphinscheduler.remote.command.Message;
 import org.apache.dolphinscheduler.remote.command.log.GetAppIdRequest;
 import org.apache.dolphinscheduler.remote.command.log.GetAppIdResponse;
 import org.apache.dolphinscheduler.remote.command.log.GetLogBytesRequest;
@@ -79,8 +79,8 @@ public class LogClient implements AutoCloseable {
         RollViewLogRequest request = new RollViewLogRequest(path, skipLineNum, limit);
         final Host address = new Host(host, port);
         try {
-            Command command = request.convert2Command();
-            Command response = client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
+            Message message = request.convert2Command();
+            Message response = client.sendSync(address, message, LOG_REQUEST_TIMEOUT);
             if (response != null) {
                 RollViewLogResponse rollReviewLog =
                         JSONUtils.parseObject(response.getBody(), RollViewLogResponse.class);
@@ -116,8 +116,8 @@ public class LogClient implements AutoCloseable {
             if (NetUtils.getHost().equals(host)) {
                 return LogUtils.readWholeFileContentFromLocal(request.getPath());
             } else {
-                Command command = request.convert2Command();
-                Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
+                Message message = request.convert2Command();
+                Message response = this.client.sendSync(address, message, LOG_REQUEST_TIMEOUT);
                 if (response != null) {
                     ViewLogResponseResponse viewLog =
                             JSONUtils.parseObject(response.getBody(), ViewLogResponseResponse.class);
@@ -149,8 +149,8 @@ public class LogClient implements AutoCloseable {
         GetLogBytesRequest request = new GetLogBytesRequest(path);
         final Host address = new Host(host, port);
         try {
-            Command command = request.convert2Command();
-            Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
+            Message message = request.convert2Command();
+            Message response = this.client.sendSync(address, message, LOG_REQUEST_TIMEOUT);
             if (response != null) {
                 GetLogBytesResponse getLog =
                         JSONUtils.parseObject(response.getBody(), GetLogBytesResponse.class);
@@ -179,14 +179,14 @@ public class LogClient implements AutoCloseable {
         log.info("Begin remove task log from host: {} logPath {}", host, path);
         RemoveTaskLogRequest request = new RemoveTaskLogRequest(path);
         try {
-            Command command = request.convert2Command();
-            client.sendAsync(host, command, LOG_REQUEST_TIMEOUT, responseFuture -> {
+            Message message = request.convert2Command();
+            client.sendAsync(host, message, LOG_REQUEST_TIMEOUT, responseFuture -> {
                 if (responseFuture.getCause() != null) {
                     log.error("Remove task log from host: {} logPath {} error, meet an unknown exception", host,
                             path, responseFuture.getCause());
                     return;
                 }
-                Command response = responseFuture.getResponseCommand();
+                Message response = responseFuture.getResponseCommand();
                 if (response == null) {
                     log.error("Remove task log from host: {} logPath {} error, response is null", host, path);
                     return;
@@ -219,8 +219,8 @@ public class LogClient implements AutoCloseable {
             appIds = LogUtils.getAppIds(taskLogFilePath, taskAppInfoPath,
                     PropertyUtils.getString(APPID_COLLECT, DEFAULT_COLLECT_WAY));
         } else {
-            final Command command = new GetAppIdRequest(taskLogFilePath, taskAppInfoPath).convert2Command();
-            Command response = this.client.sendSync(workerAddress, command, LOG_REQUEST_TIMEOUT);
+            final Message message = new GetAppIdRequest(taskLogFilePath, taskAppInfoPath).convert2Command();
+            Message response = this.client.sendSync(workerAddress, message, LOG_REQUEST_TIMEOUT);
             if (response != null) {
                 GetAppIdResponse responseCommand =
                         JSONUtils.parseObject(response.getBody(), GetAppIdResponse.class);

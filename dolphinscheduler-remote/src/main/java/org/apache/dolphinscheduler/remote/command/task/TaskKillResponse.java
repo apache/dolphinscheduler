@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.remote.command.task;
 
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.ResponseCommandBuilder;
+import org.apache.dolphinscheduler.remote.command.MessageType;
+import org.apache.dolphinscheduler.remote.command.ResponseMessageBuilder;
 
 import java.util.List;
 
@@ -35,7 +35,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TaskKillResponse implements ResponseCommandBuilder {
+public class TaskKillResponse implements ResponseMessageBuilder {
 
     private int taskInstanceId;
 
@@ -51,7 +51,7 @@ public class TaskKillResponse implements ResponseCommandBuilder {
     private List<String> appIds;
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.TASK_KILL_RESPONSE;
+    public MessageType getCommandType() {
+        return MessageType.TASK_KILL_RESPONSE;
     }
 }

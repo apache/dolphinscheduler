@@ -19,8 +19,8 @@ package org.apache.dolphinscheduler.server.worker.processor;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.task.TaskExecuteResultMessageAck;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
@@ -43,9 +43,9 @@ public class TaskExecuteResultAckProcessor implements NettyRequestProcessor {
     private MessageRetryRunner messageRetryRunner;
 
     @Override
-    public void process(Channel channel, Command command) {
+    public void process(Channel channel, Message message) {
         TaskExecuteResultMessageAck taskExecuteAckMessage =
-                JSONUtils.parseObject(command.getBody(), TaskExecuteResultMessageAck.class);
+                JSONUtils.parseObject(message.getBody(), TaskExecuteResultMessageAck.class);
 
         if (taskExecuteAckMessage == null) {
             log.error("task execute response ack command is null");
@@ -58,7 +58,7 @@ public class TaskExecuteResultAckProcessor implements NettyRequestProcessor {
             log.info("Receive task execute response ack command : {}", taskExecuteAckMessage);
             if (taskExecuteAckMessage.isSuccess()) {
                 messageRetryRunner.removeRetryMessage(taskExecuteAckMessage.getTaskInstanceId(),
-                        CommandType.TASK_EXECUTE_RESULT_MESSAGE);
+                        MessageType.TASK_EXECUTE_RESULT_MESSAGE);
                 log.debug("remove REMOTE_CHANNELS, task instance id:{}", taskExecuteAckMessage.getTaskInstanceId());
             } else {
                 // master handle worker response error, will still retry
@@ -69,8 +69,8 @@ public class TaskExecuteResultAckProcessor implements NettyRequestProcessor {
     }
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.TASK_EXECUTE_RESULT_MESSAGE_ACK;
+    public MessageType getCommandType() {
+        return MessageType.TASK_EXECUTE_RESULT_MESSAGE_ACK;
     }
 
 }

@@ -19,8 +19,8 @@ package org.apache.dolphinscheduler.service.log;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.log.ViewLogRequest;
 import org.apache.dolphinscheduler.remote.processor.ViewWholeLogProcessor;
 
@@ -53,17 +53,17 @@ public class LoggerRequestProcessorTest {
     public void testProcessViewWholeLogRequest() {
         System.setProperty("DOLPHINSCHEDULER_WORKER_HOME", System.getProperty("user.dir"));
         Channel channel = Mockito.mock(Channel.class);
-        Mockito.when(channel.writeAndFlush(Mockito.any(Command.class))).thenReturn(null);
+        Mockito.when(channel.writeAndFlush(Mockito.any(Message.class))).thenReturn(null);
         Mockito.when(LogUtils.readWholeFileContentFromLocal(Mockito.anyString())).thenReturn("");
         String userDir = System.getProperty("user.dir");
         ViewLogRequest logRequestCommand = new ViewLogRequest(userDir + "/log/path/a.log");
 
-        Command command = new Command();
-        command.setType(CommandType.VIEW_WHOLE_LOG_REQUEST);
-        command.setBody(JSONUtils.toJsonByteArray(logRequestCommand));
+        Message message = new Message();
+        message.setType(MessageType.VIEW_WHOLE_LOG_REQUEST);
+        message.setBody(JSONUtils.toJsonByteArray(logRequestCommand));
 
         ViewWholeLogProcessor loggerRequestProcessor = new ViewWholeLogProcessor();
-        loggerRequestProcessor.process(channel, command);
+        loggerRequestProcessor.process(channel, message);
     }
 
     @Test
@@ -74,12 +74,12 @@ public class LoggerRequestProcessorTest {
         String userDir = System.getProperty("user.dir");
         ViewLogRequest logRequestCommand = new ViewLogRequest(userDir + "/log/path/a");
 
-        Command command = new Command();
-        command.setType(CommandType.VIEW_WHOLE_LOG_REQUEST);
-        command.setBody(JSONUtils.toJsonByteArray(logRequestCommand));
+        Message message = new Message();
+        message.setType(MessageType.VIEW_WHOLE_LOG_REQUEST);
+        message.setBody(JSONUtils.toJsonByteArray(logRequestCommand));
 
         ViewWholeLogProcessor loggerRequestProcessor = new ViewWholeLogProcessor();
-        loggerRequestProcessor.process(channel, command);
+        loggerRequestProcessor.process(channel, message);
     }
 
     @Test
@@ -90,12 +90,12 @@ public class LoggerRequestProcessorTest {
         String userDir = System.getProperty("user.dir");
         ViewLogRequest logRequestCommand = new ViewLogRequest(userDir + "/log/../../a.log");
 
-        Command command = new Command();
-        command.setType(CommandType.VIEW_WHOLE_LOG_REQUEST);
-        command.setBody(JSONUtils.toJsonByteArray(logRequestCommand));
+        Message message = new Message();
+        message.setType(MessageType.VIEW_WHOLE_LOG_REQUEST);
+        message.setBody(JSONUtils.toJsonByteArray(logRequestCommand));
 
         ViewWholeLogProcessor loggerRequestProcessor = new ViewWholeLogProcessor();
-        loggerRequestProcessor.process(channel, command);
+        loggerRequestProcessor.process(channel, message);
     }
 
     @Test
@@ -105,11 +105,11 @@ public class LoggerRequestProcessorTest {
         Mockito.when(LogUtils.readWholeFileContentFromLocal(Mockito.anyString())).thenReturn("");
         ViewLogRequest logRequestCommand = new ViewLogRequest("/log/a.log");
 
-        Command command = new Command();
-        command.setType(CommandType.VIEW_WHOLE_LOG_REQUEST);
-        command.setBody(JSONUtils.toJsonByteArray(logRequestCommand));
+        Message message = new Message();
+        message.setType(MessageType.VIEW_WHOLE_LOG_REQUEST);
+        message.setBody(JSONUtils.toJsonByteArray(logRequestCommand));
 
         ViewWholeLogProcessor loggerRequestProcessor = new ViewWholeLogProcessor();
-        loggerRequestProcessor.process(channel, command);
+        loggerRequestProcessor.process(channel, message);
     }
 }

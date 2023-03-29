@@ -19,8 +19,8 @@ package org.apache.dolphinscheduler.server.worker.processor;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.task.TaskExecuteRunningMessageAck;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
@@ -43,8 +43,8 @@ public class TaskExecuteRunningAckProcessor implements NettyRequestProcessor {
     private MessageRetryRunner messageRetryRunner;
 
     @Override
-    public void process(Channel channel, Command command) {
-        TaskExecuteRunningMessageAck runningAckCommand = JSONUtils.parseObject(command.getBody(),
+    public void process(Channel channel, Message message) {
+        TaskExecuteRunningMessageAck runningAckCommand = JSONUtils.parseObject(message.getBody(),
                 TaskExecuteRunningMessageAck.class);
         if (runningAckCommand == null) {
             log.error("task execute running ack command is null");
@@ -56,7 +56,7 @@ public class TaskExecuteRunningAckProcessor implements NettyRequestProcessor {
 
             if (runningAckCommand.isSuccess()) {
                 messageRetryRunner.removeRetryMessage(runningAckCommand.getTaskInstanceId(),
-                        CommandType.TASK_EXECUTE_RUNNING_MESSAGE);
+                        MessageType.TASK_EXECUTE_RUNNING_MESSAGE);
             }
         } finally {
             LogUtils.removeTaskInstanceIdMDC();
@@ -64,8 +64,8 @@ public class TaskExecuteRunningAckProcessor implements NettyRequestProcessor {
     }
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.TASK_EXECUTE_RUNNING_MESSAGE_ACK;
+    public MessageType getCommandType() {
+        return MessageType.TASK_EXECUTE_RUNNING_MESSAGE_ACK;
     }
 
 }

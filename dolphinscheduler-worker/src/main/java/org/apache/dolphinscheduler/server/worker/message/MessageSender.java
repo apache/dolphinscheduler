@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.worker.message;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.remote.command.BaseMessage;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 
 public interface MessageSender<T extends BaseMessage> {
@@ -39,5 +39,5 @@ public interface MessageSender<T extends BaseMessage> {
     /**
      * The message type can be sent by this sender.
      */
-    CommandType getMessageType();
+    MessageType getMessageType();
 }

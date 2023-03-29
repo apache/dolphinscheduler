@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.remote.processor;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.log.RemoveTaskLogRequest;
 import org.apache.dolphinscheduler.remote.command.log.RemoveTaskLogResponse;
 
@@ -36,9 +36,9 @@ import io.netty.channel.Channel;
 public class RemoveTaskLogProcessor extends BaseLogProcessor implements NettyRequestProcessor {
 
     @Override
-    public void process(Channel channel, Command command) {
+    public void process(Channel channel, Message message) {
         RemoveTaskLogRequest removeTaskLogRequest = JSONUtils.parseObject(
-                command.getBody(), RemoveTaskLogRequest.class);
+                message.getBody(), RemoveTaskLogRequest.class);
 
         String taskLogPath = removeTaskLogRequest.getPath();
         File taskLogFile = new File(taskLogPath);
@@ -52,11 +52,11 @@ public class RemoveTaskLogProcessor extends BaseLogProcessor implements NettyReq
         }
 
         RemoveTaskLogResponse removeTaskLogResponse = new RemoveTaskLogResponse(status);
-        channel.writeAndFlush(removeTaskLogResponse.convert2Command(command.getOpaque()));
+        channel.writeAndFlush(removeTaskLogResponse.convert2Command(message.getOpaque()));
     }
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.REMOVE_TAK_LOG_REQUEST;
+    public MessageType getCommandType() {
+        return MessageType.REMOVE_TAK_LOG_REQUEST;
     }
 }

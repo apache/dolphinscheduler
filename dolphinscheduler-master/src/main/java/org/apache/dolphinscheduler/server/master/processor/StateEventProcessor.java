@@ -21,8 +21,8 @@ import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.workflow.WorkflowStateEventChangeRequest;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.master.event.StateEvent;
@@ -48,9 +48,9 @@ public class StateEventProcessor implements NettyRequestProcessor {
     private StateEventResponseService stateEventResponseService;
 
     @Override
-    public void process(Channel channel, Command command) {
+    public void process(Channel channel, Message message) {
         WorkflowStateEventChangeRequest workflowStateEventChangeRequest =
-                JSONUtils.parseObject(command.getBody(), WorkflowStateEventChangeRequest.class);
+                JSONUtils.parseObject(message.getBody(), WorkflowStateEventChangeRequest.class);
         StateEvent stateEvent;
         if (workflowStateEventChangeRequest.getDestTaskInstanceId() == 0) {
             stateEvent = createWorkflowStateEvent(workflowStateEventChangeRequest);
@@ -68,8 +68,8 @@ public class StateEventProcessor implements NettyRequestProcessor {
     }
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.STATE_EVENT_REQUEST;
+    public MessageType getCommandType() {
+        return MessageType.STATE_EVENT_REQUEST;
     }
 
     private TaskStateEvent createTaskStateEvent(WorkflowStateEventChangeRequest workflowStateEventChangeRequest) {

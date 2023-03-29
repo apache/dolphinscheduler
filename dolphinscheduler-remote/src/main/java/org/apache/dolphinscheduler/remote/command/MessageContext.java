@@ -26,7 +26,7 @@ import java.util.Map;
 /**
  *  command context
  */
-public class CommandContext implements Serializable {
+public class MessageContext implements Serializable {
 
     private Map<String, String> items = new LinkedHashMap<>();
 
@@ -50,7 +50,7 @@ public class CommandContext implements Serializable {
         return JSONUtils.toJsonByteArray(this);
     }
 
-    public static CommandContext valueOf(byte[] src) {
-        return JSONUtils.parseObject(src, CommandContext.class);
+    public static MessageContext valueOf(byte[] src) {
+        return JSONUtils.parseObject(src, MessageContext.class);
     }
 }

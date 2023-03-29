@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.server.master.processor;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.workflow.WorkflowExecutingDataRequest;
 import org.apache.dolphinscheduler.remote.command.workflow.WorkflowExecutingDataResponse;
 import org.apache.dolphinscheduler.remote.dto.WorkflowExecuteDto;
@@ -46,9 +46,9 @@ public class WorkflowExecutingDataRequestProcessor implements NettyRequestProces
     private ExecutingService executingService;
 
     @Override
-    public void process(Channel channel, Command command) {
+    public void process(Channel channel, Message message) {
         WorkflowExecutingDataRequest requestCommand =
-                JSONUtils.parseObject(command.getBody(), WorkflowExecutingDataRequest.class);
+                JSONUtils.parseObject(message.getBody(), WorkflowExecutingDataRequest.class);
 
         log.info("received command, processInstanceId:{}", requestCommand.getProcessInstanceId());
 
@@ -57,11 +57,11 @@ public class WorkflowExecutingDataRequestProcessor implements NettyRequestProces
 
         WorkflowExecutingDataResponse responseCommand = new WorkflowExecutingDataResponse();
         workflowExecuteDtoOptional.ifPresent(responseCommand::setWorkflowExecuteDto);
-        channel.writeAndFlush(responseCommand.convert2Command(command.getOpaque()));
+        channel.writeAndFlush(responseCommand.convert2Command(message.getOpaque()));
     }
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.WORKFLOW_EXECUTING_DATA_REQUEST;
+    public MessageType getCommandType() {
+        return MessageType.WORKFLOW_EXECUTING_DATA_REQUEST;
     }
 }

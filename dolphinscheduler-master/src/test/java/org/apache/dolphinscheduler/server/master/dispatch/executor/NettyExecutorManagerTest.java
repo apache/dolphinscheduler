@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
-import org.apache.dolphinscheduler.remote.command.Command;
+import org.apache.dolphinscheduler.remote.command.Message;
 import org.apache.dolphinscheduler.remote.command.task.TaskDispatchMessage;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.apache.dolphinscheduler.remote.utils.Host;
@@ -93,7 +93,7 @@ public class NettyExecutorManagerTest {
         });
 
     }
-    private Command toCommand(TaskExecutionContext taskExecutionContext) {
+    private Message toCommand(TaskExecutionContext taskExecutionContext) {
         TaskDispatchMessage requestCommand = new TaskDispatchMessage(taskExecutionContext,
                 "127.0.0.1:5678",
                 "127.0.0.1:1234",

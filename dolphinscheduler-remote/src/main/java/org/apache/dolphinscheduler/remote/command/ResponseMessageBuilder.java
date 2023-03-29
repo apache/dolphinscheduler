@@ -21,15 +21,15 @@ import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
 
 import java.io.Serializable;
 
-public interface RequestCommandBuilder extends Serializable {
+public interface ResponseMessageBuilder extends Serializable {
 
-    default Command convert2Command() {
-        Command command = new Command();
-        command.setType(getCommandType());
+    default Message convert2Command(long opaque) {
+        Message message = new Message(opaque);
+        message.setType(getCommandType());
         byte[] body = JsonSerializer.serialize(this);
-        command.setBody(body);
-        return command;
+        message.setBody(body);
+        return message;
     }
 
-    CommandType getCommandType();
+    MessageType getCommandType();
 }

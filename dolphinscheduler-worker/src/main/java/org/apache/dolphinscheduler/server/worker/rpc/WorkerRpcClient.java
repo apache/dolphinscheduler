@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.server.worker.rpc;
 
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
-import org.apache.dolphinscheduler.remote.command.Command;
+import org.apache.dolphinscheduler.remote.command.Message;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
@@ -57,8 +57,8 @@ public class WorkerRpcClient implements AutoCloseable {
         log.info("Worker rpc client started");
     }
 
-    public void send(Host host, Command command) throws RemotingException {
-        nettyRemotingClient.send(host, command);
+    public void send(Host host, Message message) throws RemotingException {
+        nettyRemotingClient.send(host, message);
     }
 
     public void close() {

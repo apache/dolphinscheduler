@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.remote.command;
 
-public enum CommandType {
+public enum MessageType {
 
     GET_APP_ID_REQUEST,
     GET_APP_ID_RESPONSE,

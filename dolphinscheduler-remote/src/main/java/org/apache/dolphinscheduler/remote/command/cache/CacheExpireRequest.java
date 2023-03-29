@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.remote.command.cache;
 
 import org.apache.dolphinscheduler.common.enums.CacheType;
-import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.RequestCommandBuilder;
+import org.apache.dolphinscheduler.remote.command.MessageType;
+import org.apache.dolphinscheduler.remote.command.RequestMessageBuilder;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,14 +28,14 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CacheExpireRequest implements RequestCommandBuilder {
+public class CacheExpireRequest implements RequestMessageBuilder {
 
     private CacheType cacheType;
     private String cacheKey;
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.CACHE_EXPIRE;
+    public MessageType getCommandType() {
+        return MessageType.CACHE_EXPIRE;
     }
 
 }

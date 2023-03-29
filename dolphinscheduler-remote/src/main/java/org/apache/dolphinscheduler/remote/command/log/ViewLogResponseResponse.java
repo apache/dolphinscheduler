@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.remote.command.log;
 
-import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.ResponseCommandBuilder;
+import org.apache.dolphinscheduler.remote.command.MessageType;
+import org.apache.dolphinscheduler.remote.command.ResponseMessageBuilder;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,7 +30,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ViewLogResponseResponse implements ResponseCommandBuilder {
+public class ViewLogResponseResponse implements ResponseMessageBuilder {
 
     /**
      * response data
@@ -38,7 +38,7 @@ public class ViewLogResponseResponse implements ResponseCommandBuilder {
     private String msg;
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.VIEW_WHOLE_LOG_RESPONSE;
+    public MessageType getCommandType() {
+        return MessageType.VIEW_WHOLE_LOG_RESPONSE;
     }
 }

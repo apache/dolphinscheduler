@@ -20,8 +20,8 @@ package org.apache.dolphinscheduler.server.master.processor;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.task.TaskExecuteStartMessage;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.master.runner.StreamTaskExecuteRunnable;
@@ -48,9 +48,9 @@ public class TaskExecuteStartProcessor implements NettyRequestProcessor {
     private TaskDefinitionDao taskDefinitionDao;
 
     @Override
-    public void process(Channel channel, Command command) {
+    public void process(Channel channel, Message message) {
         TaskExecuteStartMessage taskExecuteStartMessage =
-                JSONUtils.parseObject(command.getBody(), TaskExecuteStartMessage.class);
+                JSONUtils.parseObject(message.getBody(), TaskExecuteStartMessage.class);
         log.info("taskExecuteStartCommand: {}", taskExecuteStartMessage);
 
         TaskDefinition taskDefinition = taskDefinitionDao.findTaskDefinition(
@@ -64,15 +64,15 @@ public class TaskExecuteStartProcessor implements NettyRequestProcessor {
         streamTaskExecuteThreadPool.execute(new StreamTaskExecuteRunnable(taskDefinition, taskExecuteStartMessage));
 
         // response
-        Command response = new Command(command.getOpaque());
-        response.setType(CommandType.TASK_EXECUTE_START);
+        Message response = new Message(message.getOpaque());
+        response.setType(MessageType.TASK_EXECUTE_START);
         response.setBody(new byte[0]);
         channel.writeAndFlush(response);
     }
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.TASK_EXECUTE_START;
+    public MessageType getCommandType() {
+        return MessageType.TASK_EXECUTE_START;
     }
 
 }

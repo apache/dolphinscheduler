@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.server.worker.message;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.task.TaskUpdatePidMessage;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.utils.Host;
@@ -58,7 +58,7 @@ public class TaskUpdatePidMessageSender implements MessageSender<TaskUpdatePidMe
     }
 
     @Override
-    public CommandType getMessageType() {
-        return CommandType.TASK_UPDATE_PID_MESSAGE;
+    public MessageType getMessageType() {
+        return MessageType.TASK_UPDATE_PID_MESSAGE;
     }
 }

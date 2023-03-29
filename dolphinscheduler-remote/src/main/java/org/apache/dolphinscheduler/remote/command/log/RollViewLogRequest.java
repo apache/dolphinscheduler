@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.remote.command.log;
 
-import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.RequestCommandBuilder;
+import org.apache.dolphinscheduler.remote.command.MessageType;
+import org.apache.dolphinscheduler.remote.command.RequestMessageBuilder;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,7 +30,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RollViewLogRequest implements RequestCommandBuilder {
+public class RollViewLogRequest implements RequestMessageBuilder {
 
     /**
      *  log path
@@ -48,7 +48,7 @@ public class RollViewLogRequest implements RequestCommandBuilder {
     private int limit;
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.ROLL_VIEW_LOG_REQUEST;
+    public MessageType getCommandType() {
+        return MessageType.ROLL_VIEW_LOG_REQUEST;
     }
 }

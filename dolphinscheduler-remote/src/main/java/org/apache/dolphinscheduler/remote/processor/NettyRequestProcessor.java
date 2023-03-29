@@ -16,8 +16,8 @@
  */
 package org.apache.dolphinscheduler.remote.processor;
 
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
 
 import io.netty.channel.Channel;
 
@@ -29,9 +29,9 @@ public interface NettyRequestProcessor {
     /**
      *  process logic
      * @param channel channel
-     * @param command command
+     * @param message command
      */
-    void process(final Channel channel, final Command command);
+    void process(final Channel channel, final Message message);
 
-    CommandType getCommandType();
+    MessageType getCommandType();
 }

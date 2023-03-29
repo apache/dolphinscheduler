@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.remote.command.alert;
 
-import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.ResponseCommandBuilder;
+import org.apache.dolphinscheduler.remote.command.MessageType;
+import org.apache.dolphinscheduler.remote.command.ResponseMessageBuilder;
 
 import java.io.Serializable;
 import java.util.List;
@@ -30,7 +30,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AlertSendResponse implements ResponseCommandBuilder {
+public class AlertSendResponse implements ResponseMessageBuilder {
 
     /**
      * true:All alert are successful,
@@ -41,8 +41,8 @@ public class AlertSendResponse implements ResponseCommandBuilder {
     private List<AlertSendResponseResult> resResults;
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.ALERT_SEND_RESPONSE;
+    public MessageType getCommandType() {
+        return MessageType.ALERT_SEND_RESPONSE;
     }
 
     @Data

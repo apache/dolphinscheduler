@@ -81,6 +81,7 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.remote.command.Message;
 import org.apache.dolphinscheduler.remote.command.task.TaskExecuteStartMessage;
 import org.apache.dolphinscheduler.remote.command.task.TaskForceStartRequest;
 import org.apache.dolphinscheduler.remote.command.workflow.WorkflowExecutingDataRequest;
@@ -679,8 +680,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         taskGroupQueue.setForceStart(Flag.YES.getCode());
         processService.updateTaskGroupQueue(taskGroupQueue);
-        log.info("Sending force start command to master.");
-        stateEventCallbackService.sendResult(Host.of(processInstance.getHost()),
+        log.info("Sending force start command to master: {}.", processInstance.getHost());
+        stateEventCallbackService.sendResult(
+                Host.of(processInstance.getHost()),
                 new TaskForceStartRequest(processInstance.getId(), taskGroupQueue.getTaskId()).convert2Command());
         putMsg(result, Status.SUCCESS);
         return result;
@@ -1151,15 +1153,15 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         Host host = new Host(processInstance.getHost());
         WorkflowExecutingDataRequest requestCommand = new WorkflowExecutingDataRequest();
         requestCommand.setProcessInstanceId(processInstanceId);
-        org.apache.dolphinscheduler.remote.command.Command command =
+        Message message =
                 stateEventCallbackService.sendSync(host, requestCommand.convert2Command());
-        if (command == null) {
+        if (message == null) {
             log.error("Query executing process instance from master error, processInstanceId:{}.",
                     processInstanceId);
             return null;
         }
         WorkflowExecutingDataResponse responseCommand =
-                JSONUtils.parseObject(command.getBody(), WorkflowExecutingDataResponse.class);
+                JSONUtils.parseObject(message.getBody(), WorkflowExecutingDataResponse.class);
         return responseCommand.getWorkflowExecuteDto();
     }
 
@@ -1193,7 +1195,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         taskExecuteStartMessage.setStartParams(startParams);
         taskExecuteStartMessage.setDryRun(dryRun);
 
-        org.apache.dolphinscheduler.remote.command.Command response =
+        Message response =
                 stateEventCallbackService.sendSync(host, taskExecuteStartMessage.convert2Command());
         if (response != null) {
             log.info("Send task execute start command complete, response is {}.", response);

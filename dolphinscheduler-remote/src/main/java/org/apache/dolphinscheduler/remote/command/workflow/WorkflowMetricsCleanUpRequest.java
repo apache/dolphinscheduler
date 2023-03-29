@@ -17,18 +17,18 @@
 
 package org.apache.dolphinscheduler.remote.command.workflow;
 
-import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.RequestCommandBuilder;
+import org.apache.dolphinscheduler.remote.command.MessageType;
+import org.apache.dolphinscheduler.remote.command.RequestMessageBuilder;
 
 import lombok.Data;
 
 @Data
-public class WorkflowMetricsCleanUpRequest implements RequestCommandBuilder {
+public class WorkflowMetricsCleanUpRequest implements RequestMessageBuilder {
 
     private String processDefinitionCode;
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.WORKFLOW_METRICS_CLEANUP;
+    public MessageType getCommandType() {
+        return MessageType.WORKFLOW_METRICS_CLEANUP;
     }
 }

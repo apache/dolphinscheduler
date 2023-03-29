@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.remote.command.cache;
 
 import org.apache.dolphinscheduler.common.enums.CacheType;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ public class CacheExpireRequestTest {
     @Test
     public void testConvert2Command() {
         CacheExpireRequest cacheExpireRequest = new CacheExpireRequest(CacheType.TENANT, "1");
-        Command command = cacheExpireRequest.convert2Command();
-        Assertions.assertEquals(CommandType.CACHE_EXPIRE, command.getType());
+        Message message = cacheExpireRequest.convert2Command();
+        Assertions.assertEquals(MessageType.CACHE_EXPIRE, message.getType());
     }
 }

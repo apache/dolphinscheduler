@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.remote.command.task;
 
 import org.apache.dolphinscheduler.remote.command.BaseMessage;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.MessageType;
 
 import java.util.Map;
 
@@ -63,8 +63,8 @@ public class TaskExecuteStartMessage extends BaseMessage {
     }
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.TASK_EXECUTE_START;
+    public MessageType getCommandType() {
+        return MessageType.TASK_EXECUTE_START;
     }
 
 }

@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.remote.command.workflow;
 
-import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.ResponseCommandBuilder;
+import org.apache.dolphinscheduler.remote.command.MessageType;
+import org.apache.dolphinscheduler.remote.command.ResponseMessageBuilder;
 import org.apache.dolphinscheduler.remote.dto.WorkflowExecuteDto;
 
 import lombok.AllArgsConstructor;
@@ -31,12 +31,12 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class WorkflowExecutingDataResponse implements ResponseCommandBuilder {
+public class WorkflowExecutingDataResponse implements ResponseMessageBuilder {
 
     private WorkflowExecuteDto workflowExecuteDto;
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.WORKFLOW_EXECUTING_DATA_RESPONSE;
+    public MessageType getCommandType() {
+        return MessageType.WORKFLOW_EXECUTING_DATA_RESPONSE;
     }
 }

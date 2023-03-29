@@ -19,8 +19,8 @@ package org.apache.dolphinscheduler.server.worker.processor;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.task.TaskUpdatePidAckMessage;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
@@ -44,9 +44,9 @@ public class TaskUpdatePidAckProcessor implements NettyRequestProcessor {
     private MessageRetryRunner messageRetryRunner;
 
     @Override
-    public void process(Channel channel, Command command) {
+    public void process(Channel channel, Message message) {
 
-        TaskUpdatePidAckMessage updatePidAckCommand = JSONUtils.parseObject(command.getBody(),
+        TaskUpdatePidAckMessage updatePidAckCommand = JSONUtils.parseObject(message.getBody(),
                 TaskUpdatePidAckMessage.class);
         if (updatePidAckCommand == null) {
             log.error("task execute update pid ack command is null");
@@ -58,7 +58,7 @@ public class TaskUpdatePidAckProcessor implements NettyRequestProcessor {
 
             if (updatePidAckCommand.isSuccess()) {
                 messageRetryRunner.removeRetryMessage(updatePidAckCommand.getTaskInstanceId(),
-                        CommandType.TASK_UPDATE_PID_MESSAGE);
+                        MessageType.TASK_UPDATE_PID_MESSAGE);
             }
         } finally {
             LogUtils.removeTaskInstanceIdMDC();
@@ -66,8 +66,8 @@ public class TaskUpdatePidAckProcessor implements NettyRequestProcessor {
     }
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.TASK_UPDATE_PID__MESSAGE_ACK;
+    public MessageType getCommandType() {
+        return MessageType.TASK_UPDATE_PID__MESSAGE_ACK;
     }
 
 }

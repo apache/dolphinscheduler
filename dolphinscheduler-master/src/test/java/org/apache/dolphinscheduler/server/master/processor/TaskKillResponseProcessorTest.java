@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.server.master.processor;
 
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.task.TaskKillResponse;
 
 import java.util.ArrayList;
@@ -63,8 +63,8 @@ public class TaskKillResponseProcessorTest {
 
     @Test
     public void testProcess() {
-        Command command = taskKillResponse.convert2Command(1);
-        Assertions.assertEquals(CommandType.TASK_KILL_RESPONSE, command.getType());
-        taskKillResponseProcessor.process(channel, command);
+        Message message = taskKillResponse.convert2Command(1);
+        Assertions.assertEquals(MessageType.TASK_KILL_RESPONSE, message.getType());
+        taskKillResponseProcessor.process(channel, message);
     }
 }

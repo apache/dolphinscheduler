@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.remote.command.alert;
 
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +43,7 @@ public class AlertSendResponseTest {
         responseResults.add(responseResult2);
         alertSendResponse.setResResults(responseResults);
 
-        Command command = alertSendResponse.convert2Command(1);
-        Assertions.assertEquals(CommandType.ALERT_SEND_RESPONSE, command.getType());
+        Message message = alertSendResponse.convert2Command(1);
+        Assertions.assertEquals(MessageType.ALERT_SEND_RESPONSE, message.getType());
     }
 }

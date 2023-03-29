@@ -19,8 +19,8 @@ package org.apache.dolphinscheduler.server.master.processor;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.task.TaskRejectMessage;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
@@ -47,11 +47,11 @@ public class TaskRecallProcessor implements NettyRequestProcessor {
      * task ack process
      *
      * @param channel channel channel
-     * @param command command TaskExecuteAckCommand
+     * @param message command TaskExecuteAckCommand
      */
     @Override
-    public void process(Channel channel, Command command) {
-        TaskRejectMessage recallCommand = JSONUtils.parseObject(command.getBody(), TaskRejectMessage.class);
+    public void process(Channel channel, Message message) {
+        TaskRejectMessage recallCommand = JSONUtils.parseObject(message.getBody(), TaskRejectMessage.class);
         TaskEvent taskEvent = TaskEvent.newRecallEvent(recallCommand, channel);
         try (
                 final LogUtils.MDCAutoClosableContext mdcAutoClosableContext = LogUtils.setWorkflowAndTaskInstanceIDMDC(
@@ -62,7 +62,7 @@ public class TaskRecallProcessor implements NettyRequestProcessor {
     }
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.TASK_REJECT;
+    public MessageType getCommandType() {
+        return MessageType.TASK_REJECT;
     }
 }

@@ -19,8 +19,8 @@ package org.apache.dolphinscheduler.server.master.processor;
 
 import org.apache.dolphinscheduler.common.enums.CacheType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.cache.CacheExpireRequest;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 
@@ -44,8 +44,8 @@ public class CacheProcessor implements NettyRequestProcessor {
     private CacheManager cacheManager;
 
     @Override
-    public void process(Channel channel, Command command) {
-        CacheExpireRequest cacheExpireRequest = JSONUtils.parseObject(command.getBody(), CacheExpireRequest.class);
+    public void process(Channel channel, Message message) {
+        CacheExpireRequest cacheExpireRequest = JSONUtils.parseObject(message.getBody(), CacheExpireRequest.class);
 
         log.info("received command : {}", cacheExpireRequest);
 
@@ -53,8 +53,8 @@ public class CacheProcessor implements NettyRequestProcessor {
     }
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.CACHE_EXPIRE;
+    public MessageType getCommandType() {
+        return MessageType.CACHE_EXPIRE;
     }
 
     private void cacheExpire(CacheExpireRequest cacheExpireRequest) {

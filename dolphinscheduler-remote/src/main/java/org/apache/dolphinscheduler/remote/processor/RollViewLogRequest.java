@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.remote.processor;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.log.RollViewLogResponse;
 
 import java.nio.charset.StandardCharsets;
@@ -36,9 +36,9 @@ import io.netty.channel.Channel;
 public class RollViewLogRequest extends BaseLogProcessor implements NettyRequestProcessor {
 
     @Override
-    public void process(Channel channel, Command command) {
+    public void process(Channel channel, Message message) {
         org.apache.dolphinscheduler.remote.command.log.RollViewLogRequest rollViewLogRequest = JSONUtils.parseObject(
-                command.getBody(), org.apache.dolphinscheduler.remote.command.log.RollViewLogRequest.class);
+                message.getBody(), org.apache.dolphinscheduler.remote.command.log.RollViewLogRequest.class);
 
         String rollViewLogPath = rollViewLogRequest.getPath();
 
@@ -66,11 +66,11 @@ public class RollViewLogRequest extends BaseLogProcessor implements NettyRequest
         }
         RollViewLogResponse rollViewLogRequestResponse =
                 new RollViewLogResponse(builder.toString());
-        channel.writeAndFlush(rollViewLogRequestResponse.convert2Command(command.getOpaque()));
+        channel.writeAndFlush(rollViewLogRequestResponse.convert2Command(message.getOpaque()));
     }
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.ROLL_VIEW_LOG_REQUEST;
+    public MessageType getCommandType() {
+        return MessageType.ROLL_VIEW_LOG_REQUEST;
     }
 }

@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.remote.codec;
 
-import org.apache.dolphinscheduler.remote.command.Command;
+import org.apache.dolphinscheduler.remote.command.Message;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 
 import io.netty.buffer.ByteBuf;
@@ -29,7 +29,7 @@ import io.netty.handler.codec.MessageToByteEncoder;
  * netty encoder
  */
 @Sharable
-public class NettyEncoder extends MessageToByteEncoder<Command> {
+public class NettyEncoder extends MessageToByteEncoder<Message> {
 
     /**
      * encode
@@ -39,12 +39,12 @@ public class NettyEncoder extends MessageToByteEncoder<Command> {
      * @param out byte buffer
      */
     @Override
-    protected void encode(ChannelHandlerContext ctx, Command msg, ByteBuf out) throws Exception {
+    protected void encode(ChannelHandlerContext ctx, Message msg, ByteBuf out) throws Exception {
         if (msg == null) {
             throw new RemotingException("encode msg is null");
         }
-        out.writeByte(Command.MAGIC);
-        out.writeByte(Command.VERSION);
+        out.writeByte(Message.MAGIC);
+        out.writeByte(Message.VERSION);
         out.writeByte(msg.getType().ordinal());
         out.writeLong(msg.getOpaque());
         writeContext(msg, out);
@@ -52,7 +52,7 @@ public class NettyEncoder extends MessageToByteEncoder<Command> {
         out.writeBytes(msg.getBody());
     }
 
-    private void writeContext(Command msg, ByteBuf out) {
+    private void writeContext(Message msg, ByteBuf out) {
         byte[] headerBytes = msg.getContext().toBytes();
         out.writeInt(headerBytes.length);
         out.writeBytes(headerBytes);

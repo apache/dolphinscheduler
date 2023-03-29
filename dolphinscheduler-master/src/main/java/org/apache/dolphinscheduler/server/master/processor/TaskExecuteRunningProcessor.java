@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.server.master.processor;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.task.TaskExecuteRunningMessage;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
@@ -46,12 +46,12 @@ public class TaskExecuteRunningProcessor implements NettyRequestProcessor {
      * task ack process
      *
      * @param channel channel channel
-     * @param command command TaskExecuteAckCommand
+     * @param message command TaskExecuteAckCommand
      */
     @Override
-    public void process(Channel channel, Command command) {
+    public void process(Channel channel, Message message) {
         TaskExecuteRunningMessage taskExecuteRunningMessage =
-                JSONUtils.parseObject(command.getBody(), TaskExecuteRunningMessage.class);
+                JSONUtils.parseObject(message.getBody(), TaskExecuteRunningMessage.class);
         log.info("taskExecuteRunningCommand: {}", taskExecuteRunningMessage);
 
         TaskEvent taskEvent = TaskEvent.newRunningEvent(taskExecuteRunningMessage,
@@ -61,8 +61,8 @@ public class TaskExecuteRunningProcessor implements NettyRequestProcessor {
     }
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.TASK_EXECUTE_RUNNING_MESSAGE;
+    public MessageType getCommandType() {
+        return MessageType.TASK_EXECUTE_RUNNING_MESSAGE;
     }
 
 }

@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.remote.command.workflow;
 
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
-import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.RequestCommandBuilder;
+import org.apache.dolphinscheduler.remote.command.MessageType;
+import org.apache.dolphinscheduler.remote.command.RequestMessageBuilder;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,7 +29,7 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-public class WorkflowStateEventChangeRequest implements RequestCommandBuilder {
+public class WorkflowStateEventChangeRequest implements RequestMessageBuilder {
 
     private String key;
 
@@ -62,7 +62,7 @@ public class WorkflowStateEventChangeRequest implements RequestCommandBuilder {
     }
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.STATE_EVENT_REQUEST;
+    public MessageType getCommandType() {
+        return MessageType.STATE_EVENT_REQUEST;
     }
 }

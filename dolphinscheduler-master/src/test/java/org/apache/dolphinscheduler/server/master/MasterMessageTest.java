@@ -33,9 +33,9 @@ import org.slf4j.LoggerFactory;
  *  master test
  */
 @Disabled
-public class MasterCommandTest {
+public class MasterMessageTest {
 
-    private final Logger logger = LoggerFactory.getLogger(MasterCommandTest.class);
+    private final Logger logger = LoggerFactory.getLogger(MasterMessageTest.class);
 
     private CommandMapper commandMapper;
 

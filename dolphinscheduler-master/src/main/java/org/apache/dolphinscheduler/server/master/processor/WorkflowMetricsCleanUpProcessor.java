@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.server.master.processor;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.workflow.WorkflowMetricsCleanUpRequest;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
@@ -32,17 +32,17 @@ import io.netty.channel.Channel;
 public class WorkflowMetricsCleanUpProcessor implements NettyRequestProcessor {
 
     @Override
-    public void process(Channel channel, Command command) {
+    public void process(Channel channel, Message message) {
         WorkflowMetricsCleanUpRequest workflowMetricsCleanUpRequest =
-                JSONUtils.parseObject(command.getBody(), WorkflowMetricsCleanUpRequest.class);
+                JSONUtils.parseObject(message.getBody(), WorkflowMetricsCleanUpRequest.class);
 
         ProcessInstanceMetrics.cleanUpProcessInstanceCountMetricsByDefinitionCode(
                 workflowMetricsCleanUpRequest.getProcessDefinitionCode());
     }
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.WORKFLOW_METRICS_CLEANUP;
+    public MessageType getCommandType() {
+        return MessageType.WORKFLOW_METRICS_CLEANUP;
     }
 
 }

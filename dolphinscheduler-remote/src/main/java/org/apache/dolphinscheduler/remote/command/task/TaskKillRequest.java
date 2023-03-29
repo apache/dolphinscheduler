@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.remote.command.task;
 
-import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.RequestCommandBuilder;
+import org.apache.dolphinscheduler.remote.command.MessageType;
+import org.apache.dolphinscheduler.remote.command.RequestMessageBuilder;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,7 +30,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TaskKillRequest implements RequestCommandBuilder {
+public class TaskKillRequest implements RequestMessageBuilder {
 
     /**
      *  task id
@@ -38,7 +38,7 @@ public class TaskKillRequest implements RequestCommandBuilder {
     private int taskInstanceId;
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.TASK_KILL_REQUEST;
+    public MessageType getCommandType() {
+        return MessageType.TASK_KILL_REQUEST;
     }
 }

@@ -25,7 +25,7 @@ import lombok.Data;
  *  command header
  */
 @Data
-public class CommandHeader implements Serializable {
+public class MessageHeader implements Serializable {
 
     /**
      * type

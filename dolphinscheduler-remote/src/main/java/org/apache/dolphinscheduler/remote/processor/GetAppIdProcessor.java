@@ -23,8 +23,8 @@ import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_COL
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.log.GetAppIdRequest;
 import org.apache.dolphinscheduler.remote.command.log.GetAppIdResponse;
 
@@ -41,19 +41,19 @@ import io.netty.channel.Channel;
 public class GetAppIdProcessor extends BaseLogProcessor implements NettyRequestProcessor {
 
     @Override
-    public void process(Channel channel, Command command) {
+    public void process(Channel channel, Message message) {
         GetAppIdRequest getAppIdRequest =
-                JSONUtils.parseObject(command.getBody(), GetAppIdRequest.class);
+                JSONUtils.parseObject(message.getBody(), GetAppIdRequest.class);
         String appInfoPath = getAppIdRequest.getAppInfoPath();
         String logPath = getAppIdRequest.getLogPath();
         List<String> appIds = LogUtils.getAppIds(logPath, appInfoPath,
                 PropertyUtils.getString(APPID_COLLECT, DEFAULT_COLLECT_WAY));
         channel.writeAndFlush(
-                new GetAppIdResponse(appIds).convert2Command(command.getOpaque()));
+                new GetAppIdResponse(appIds).convert2Command(message.getOpaque()));
     }
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.GET_APP_ID_REQUEST;
+    public MessageType getCommandType() {
+        return MessageType.GET_APP_ID_REQUEST;
     }
 }

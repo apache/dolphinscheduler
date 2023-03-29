@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.remote.command.task;
 
 import org.apache.dolphinscheduler.remote.command.BaseMessage;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.MessageType;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -45,8 +45,8 @@ public class TaskRejectMessageAck extends BaseMessage {
     }
 
     @Override
-    public CommandType getCommandType() {
-        return CommandType.TASK_REJECT_MESSAGE_ACK;
+    public MessageType getCommandType() {
+        return MessageType.TASK_REJECT_MESSAGE_ACK;
     }
 
 }

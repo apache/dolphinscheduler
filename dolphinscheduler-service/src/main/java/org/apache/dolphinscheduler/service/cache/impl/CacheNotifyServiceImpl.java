@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
-import org.apache.dolphinscheduler.remote.command.Command;
+import org.apache.dolphinscheduler.remote.command.Message;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.processor.NettyRemoteChannel;
 import org.apache.dolphinscheduler.remote.utils.Host;
@@ -108,11 +108,11 @@ public class CacheNotifyServiceImpl implements CacheNotifyService {
     /**
      * send result to master
      *
-     * @param command command
+     * @param message command
      */
     @Override
-    public void notifyMaster(Command command) {
-        log.info("send result, command:{}", command.toString());
+    public void notifyMaster(Message message) {
+        log.info("send result, command:{}", message.toString());
         try {
             List<Server> serverList = registryClient.getServerList(NodeType.MASTER);
             if (CollectionUtils.isEmpty(serverList)) {
@@ -125,7 +125,7 @@ public class CacheNotifyServiceImpl implements CacheNotifyService {
                 if (nettyRemoteChannel == null) {
                     continue;
                 }
-                nettyRemoteChannel.writeAndFlush(command);
+                nettyRemoteChannel.writeAndFlush(message);
             }
         } catch (Exception e) {
             log.error("notify master error", e);
