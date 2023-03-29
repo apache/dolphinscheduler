@@ -17,12 +17,15 @@
 
 package org.apache.dolphinscheduler.dao.repository.impl;
 
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.plugin.task.api.model.DateInterval;
 
 import org.apache.commons.collections4.CollectionUtils;
 
+import java.util.Date;
 import java.util.List;
 
 import lombok.NonNull;
@@ -73,5 +76,75 @@ public class ProcessInstanceDaoImpl implements ProcessInstanceDao {
     @Override
     public ProcessInstance queryByWorkflowInstanceId(Integer workflowInstanceId) {
         return processInstanceMapper.selectById(workflowInstanceId);
+    }
+
+    /**
+     * find last scheduler process instance in the date interval
+     *
+     * @param definitionCode definitionCode
+     * @param dateInterval   dateInterval
+     * @return process instance
+     */
+    @Override
+    public ProcessInstance findLastSchedulerProcessInterval(Long definitionCode, DateInterval dateInterval,
+                                                            int testFlag) {
+        return processInstanceMapper.queryLastSchedulerProcess(definitionCode,
+                dateInterval.getStartTime(),
+                dateInterval.getEndTime(),
+                testFlag);
+    }
+
+    /**
+     * find last manual process instance interval
+     *
+     * @param definitionCode process definition code
+     * @param dateInterval   dateInterval
+     * @return process instance
+     */
+    @Override
+    public ProcessInstance findLastManualProcessInterval(Long definitionCode, DateInterval dateInterval, int testFlag) {
+        return processInstanceMapper.queryLastManualProcess(definitionCode,
+                dateInterval.getStartTime(),
+                dateInterval.getEndTime(),
+                testFlag);
+    }
+
+    /**
+     * find last running process instance
+     *
+     * @param definitionCode process definition code
+     * @param startTime      start time
+     * @param endTime        end time
+     * @return process instance
+     */
+    @Override
+    public ProcessInstance findLastRunningProcess(Long definitionCode, Date startTime, Date endTime, int testFlag) {
+        return processInstanceMapper.queryLastRunningProcess(definitionCode,
+                startTime,
+                endTime,
+                testFlag,
+                WorkflowExecutionStatus.getNeedFailoverWorkflowInstanceState());
+    }
+
+    /**
+     * query first schedule process instance
+     *
+     * @param definitionCode definitionCode
+     * @return process instance
+     */
+    @Override
+    public ProcessInstance queryFirstScheduleProcessInstance(Long definitionCode) {
+        return processInstanceMapper.queryFirstScheduleProcessInstance(definitionCode);
+    }
+
+    /**
+     * query first manual process instance
+     *
+     * @param definitionCode definitionCode
+     * @return process instance
+     */
+    @Override
+    public ProcessInstance queryFirstStartProcessInstance(Long definitionCode) {
+        return processInstanceMapper.queryFirstStartProcessInstance(definitionCode);
     }
 }
