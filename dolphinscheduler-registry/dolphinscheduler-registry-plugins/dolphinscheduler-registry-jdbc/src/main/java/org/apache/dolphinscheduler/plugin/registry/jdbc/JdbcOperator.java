@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.registry.mysql;
+package org.apache.dolphinscheduler.plugin.registry.jdbc;
 
-import org.apache.dolphinscheduler.plugin.registry.mysql.mapper.MysqlRegistryDataMapper;
-import org.apache.dolphinscheduler.plugin.registry.mysql.mapper.MysqlRegistryLockMapper;
-import org.apache.dolphinscheduler.plugin.registry.mysql.model.DataType;
-import org.apache.dolphinscheduler.plugin.registry.mysql.model.MysqlRegistryData;
-import org.apache.dolphinscheduler.plugin.registry.mysql.model.MysqlRegistryLock;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.mapper.JdbcRegistryDataMapper;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.mapper.JdbcRegistryLockMapper;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DataType;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.model.JdbcRegistryData;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.model.JdbcRegistryLock;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -37,115 +37,115 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConditionalOnProperty(prefix = "registry", name = "type", havingValue = "mysql")
-public class MysqlOperator {
+@ConditionalOnProperty(prefix = "registry", name = "type", havingValue = "jdbc")
+public class JdbcOperator {
 
     @Autowired
-    private MysqlRegistryDataMapper mysqlRegistryDataMapper;
+    private JdbcRegistryDataMapper jdbcRegistryDataMapper;
     @Autowired
-    private MysqlRegistryLockMapper mysqlRegistryLockMapper;
+    private JdbcRegistryLockMapper jdbcRegistryLockMapper;
 
     private final long expireTimeWindow;
 
-    public MysqlOperator(MysqlRegistryProperties registryProperties) {
+    public JdbcOperator(JdbcRegistryProperties registryProperties) {
         this.expireTimeWindow =
                 registryProperties.getTermExpireTimes() * registryProperties.getTermRefreshInterval().toMillis();
     }
 
     public void healthCheck() {
-        mysqlRegistryLockMapper.countAll();
+        jdbcRegistryLockMapper.countAll();
     }
 
-    public List<MysqlRegistryData> queryAllMysqlRegistryData() {
-        return mysqlRegistryDataMapper.selectAll();
+    public List<JdbcRegistryData> queryAllJdbcRegistryData() {
+        return jdbcRegistryDataMapper.selectAll();
     }
 
     public Long insertOrUpdateEphemeralData(String key, String value) throws SQLException {
-        MysqlRegistryData mysqlRegistryData = mysqlRegistryDataMapper.selectByKey(key);
-        if (mysqlRegistryData != null) {
-            long id = mysqlRegistryData.getId();
-            if (mysqlRegistryDataMapper.updateDataAndTermById(id, value, System.currentTimeMillis()) <= 0) {
+        JdbcRegistryData jdbcRegistryData = jdbcRegistryDataMapper.selectByKey(key);
+        if (jdbcRegistryData != null) {
+            long id = jdbcRegistryData.getId();
+            if (jdbcRegistryDataMapper.updateDataAndTermById(id, value, System.currentTimeMillis()) <= 0) {
                 throw new SQLException(String.format("update registry value failed, key: %s, value: %s", key, value));
             }
             return id;
         }
-        mysqlRegistryData = MysqlRegistryData.builder()
+        jdbcRegistryData = JdbcRegistryData.builder()
                 .key(key)
                 .data(value)
                 .type(DataType.EPHEMERAL.getTypeValue())
                 .lastTerm(System.currentTimeMillis())
                 .build();
-        mysqlRegistryDataMapper.insert(mysqlRegistryData);
-        return mysqlRegistryData.getId();
+        jdbcRegistryDataMapper.insert(jdbcRegistryData);
+        return jdbcRegistryData.getId();
     }
 
     public long insertOrUpdatePersistentData(String key, String value) throws SQLException {
-        MysqlRegistryData mysqlRegistryData = mysqlRegistryDataMapper.selectByKey(key);
-        if (mysqlRegistryData != null) {
-            long id = mysqlRegistryData.getId();
-            if (mysqlRegistryDataMapper.updateDataAndTermById(id, value, System.currentTimeMillis()) <= 0) {
+        JdbcRegistryData jdbcRegistryData = jdbcRegistryDataMapper.selectByKey(key);
+        if (jdbcRegistryData != null) {
+            long id = jdbcRegistryData.getId();
+            if (jdbcRegistryDataMapper.updateDataAndTermById(id, value, System.currentTimeMillis()) <= 0) {
                 throw new SQLException(String.format("update registry value failed, key: %s, value: %s", key, value));
             }
             return id;
         }
-        mysqlRegistryData = MysqlRegistryData.builder()
+        jdbcRegistryData = JdbcRegistryData.builder()
                 .key(key)
                 .data(value)
                 .type(DataType.PERSISTENT.getTypeValue())
                 .lastTerm(System.currentTimeMillis())
                 .build();
-        mysqlRegistryDataMapper.insert(mysqlRegistryData);
-        return mysqlRegistryData.getId();
+        jdbcRegistryDataMapper.insert(jdbcRegistryData);
+        return jdbcRegistryData.getId();
     }
 
     public void deleteDataByKey(String key) {
-        mysqlRegistryDataMapper.deleteByKey(key);
+        jdbcRegistryDataMapper.deleteByKey(key);
     }
 
     public void deleteDataById(long id) {
-        mysqlRegistryDataMapper.deleteById(id);
+        jdbcRegistryDataMapper.deleteById(id);
     }
 
     public void clearExpireLock() {
-        mysqlRegistryLockMapper.clearExpireLock(System.currentTimeMillis() - expireTimeWindow);
+        jdbcRegistryLockMapper.clearExpireLock(System.currentTimeMillis() - expireTimeWindow);
     }
 
     public void clearExpireEphemeralDate() {
-        mysqlRegistryDataMapper.clearExpireEphemeralDate(System.currentTimeMillis() - expireTimeWindow,
+        jdbcRegistryDataMapper.clearExpireEphemeralDate(System.currentTimeMillis() - expireTimeWindow,
                 DataType.EPHEMERAL.getTypeValue());
     }
 
-    public MysqlRegistryData getData(String key) throws SQLException {
-        return mysqlRegistryDataMapper.selectByKey(key);
+    public JdbcRegistryData getData(String key) throws SQLException {
+        return jdbcRegistryDataMapper.selectByKey(key);
     }
 
     public List<String> getChildren(String key) throws SQLException {
-        return mysqlRegistryDataMapper.fuzzyQueryByKey(key)
+        return jdbcRegistryDataMapper.fuzzyQueryByKey(key)
                 .stream()
-                .map(MysqlRegistryData::getKey)
+                .map(JdbcRegistryData::getKey)
                 .filter(fullPath -> fullPath.length() > key.length())
                 .map(fullPath -> StringUtils.substringBefore(fullPath.substring(key.length() + 1), "/"))
                 .collect(Collectors.toList());
     }
 
     public boolean existKey(String key) throws SQLException {
-        MysqlRegistryData mysqlRegistryData = mysqlRegistryDataMapper.selectByKey(key);
-        return mysqlRegistryData != null;
+        JdbcRegistryData jdbcRegistryData = jdbcRegistryDataMapper.selectByKey(key);
+        return jdbcRegistryData != null;
     }
 
     /**
      * Try to acquire the target Lock, if cannot acquire, return null.
      */
     @SuppressWarnings("checkstyle:IllegalCatch")
-    public MysqlRegistryLock tryToAcquireLock(String key) throws SQLException {
-        MysqlRegistryLock mysqlRegistryLock = MysqlRegistryLock.builder()
+    public JdbcRegistryLock tryToAcquireLock(String key) throws SQLException {
+        JdbcRegistryLock jdbcRegistryLock = JdbcRegistryLock.builder()
                 .key(key)
-                .lockOwner(MysqlRegistryConstant.LOCK_OWNER)
+                .lockOwner(JdbcRegistryConstant.LOCK_OWNER)
                 .lastTerm(System.currentTimeMillis())
                 .build();
         try {
-            mysqlRegistryLockMapper.insert(mysqlRegistryLock);
-            return mysqlRegistryLock;
+            jdbcRegistryLockMapper.insert(jdbcRegistryLock);
+            return jdbcRegistryLock;
         } catch (Exception e) {
             if (e instanceof SQLIntegrityConstraintViolationException) {
                 return null;
@@ -154,26 +154,26 @@ public class MysqlOperator {
         }
     }
 
-    public MysqlRegistryLock getLockById(long lockId) throws SQLException {
-        return mysqlRegistryLockMapper.selectById(lockId);
+    public JdbcRegistryLock getLockById(long lockId) throws SQLException {
+        return jdbcRegistryLockMapper.selectById(lockId);
     }
 
     public boolean releaseLock(long lockId) throws SQLException {
-        return mysqlRegistryLockMapper.deleteById(lockId) > 0;
+        return jdbcRegistryLockMapper.deleteById(lockId) > 0;
     }
 
     public boolean updateEphemeralDataTerm(Collection<Long> ephemeralDateIds) throws SQLException {
         if (CollectionUtils.isEmpty(ephemeralDateIds)) {
             return true;
         }
-        return mysqlRegistryDataMapper.updateTermByIds(ephemeralDateIds, System.currentTimeMillis()) > 0;
+        return jdbcRegistryDataMapper.updateTermByIds(ephemeralDateIds, System.currentTimeMillis()) > 0;
     }
 
     public boolean updateLockTerm(List<Long> lockIds) {
         if (CollectionUtils.isEmpty(lockIds)) {
             return true;
         }
-        return mysqlRegistryLockMapper.updateTermByIds(lockIds, System.currentTimeMillis()) > 0;
+        return jdbcRegistryLockMapper.updateTermByIds(lockIds, System.currentTimeMillis()) > 0;
     }
 
 }

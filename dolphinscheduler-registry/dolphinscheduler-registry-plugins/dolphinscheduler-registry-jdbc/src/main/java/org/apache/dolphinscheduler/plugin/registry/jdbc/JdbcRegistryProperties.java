@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.registry.mysql;
+package org.apache.dolphinscheduler.plugin.registry.jdbc;
 
 import java.time.Duration;
 
@@ -29,9 +29,9 @@ import com.zaxxer.hikari.HikariConfig;
 
 @Data
 @Configuration
-@ConditionalOnProperty(prefix = "registry", name = "type", havingValue = "mysql")
+@ConditionalOnProperty(prefix = "registry", name = "type", havingValue = "jdbc")
 @ConfigurationProperties(prefix = "registry")
-public class MysqlRegistryProperties {
+public class JdbcRegistryProperties {
 
     /**
      * Used to schedule refresh the ephemeral data/ lock.

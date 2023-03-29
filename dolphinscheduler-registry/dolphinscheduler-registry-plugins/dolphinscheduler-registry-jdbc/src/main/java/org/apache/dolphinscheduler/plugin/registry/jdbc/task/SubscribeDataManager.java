@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.registry.mysql.task;
+package org.apache.dolphinscheduler.plugin.registry.jdbc.task;
 
-import org.apache.dolphinscheduler.plugin.registry.mysql.MysqlOperator;
-import org.apache.dolphinscheduler.plugin.registry.mysql.MysqlRegistryProperties;
-import org.apache.dolphinscheduler.plugin.registry.mysql.model.MysqlRegistryData;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.JdbcOperator;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.JdbcRegistryProperties;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.model.JdbcRegistryData;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 
@@ -44,24 +44,24 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 @Slf4j
 public class SubscribeDataManager implements AutoCloseable {
 
-    private final MysqlOperator mysqlOperator;
-    private final MysqlRegistryProperties registryProperties;
+    private final JdbcOperator jdbcOperator;
+    private final JdbcRegistryProperties registryProperties;
     private final Map<String, List<SubscribeListener>> dataSubScribeMap = new ConcurrentHashMap<>();
     private final ScheduledExecutorService dataSubscribeCheckThreadPool;
-    private final Map<String, MysqlRegistryData> mysqlRegistryDataMap = new ConcurrentHashMap<>();
+    private final Map<String, JdbcRegistryData> jdbcRegistryDataMap = new ConcurrentHashMap<>();
 
-    public SubscribeDataManager(MysqlRegistryProperties registryProperties, MysqlOperator mysqlOperator) {
+    public SubscribeDataManager(JdbcRegistryProperties registryProperties, JdbcOperator jdbcOperator) {
         this.registryProperties = registryProperties;
-        this.mysqlOperator = mysqlOperator;
+        this.jdbcOperator = jdbcOperator;
         this.dataSubscribeCheckThreadPool = Executors.newScheduledThreadPool(
                 1,
-                new ThreadFactoryBuilder().setNameFormat("MysqlRegistrySubscribeDataCheckThread").setDaemon(true)
+                new ThreadFactoryBuilder().setNameFormat("JdbcRegistrySubscribeDataCheckThread").setDaemon(true)
                         .build());
     }
 
     public void start() {
         dataSubscribeCheckThreadPool.scheduleWithFixedDelay(
-                new RegistrySubscribeDataCheckTask(dataSubScribeMap, mysqlOperator, mysqlRegistryDataMap),
+                new RegistrySubscribeDataCheckTask(dataSubScribeMap, jdbcOperator, jdbcRegistryDataMap),
                 registryProperties.getTermRefreshInterval().toMillis(),
                 registryProperties.getTermRefreshInterval().toMillis(),
                 TimeUnit.MILLISECONDS);
@@ -76,11 +76,11 @@ public class SubscribeDataManager implements AutoCloseable {
     }
 
     public String getData(String path) {
-        MysqlRegistryData mysqlRegistryData = mysqlRegistryDataMap.get(path);
-        if (mysqlRegistryData == null) {
+        JdbcRegistryData jdbcRegistryData = jdbcRegistryDataMap.get(path);
+        if (jdbcRegistryData == null) {
             return null;
         }
-        return mysqlRegistryData.getData();
+        return jdbcRegistryData.getData();
     }
 
     @Override
@@ -93,23 +93,23 @@ public class SubscribeDataManager implements AutoCloseable {
     static class RegistrySubscribeDataCheckTask implements Runnable {
 
         private final Map<String, List<SubscribeListener>> dataSubScribeMap;
-        private final MysqlOperator mysqlOperator;
-        private final Map<String, MysqlRegistryData> mysqlRegistryDataMap;
+        private final JdbcOperator jdbcOperator;
+        private final Map<String, JdbcRegistryData> jdbcRegistryDataMap;
 
         @Override
         public void run() {
-            // query the full data from database, and update the mysqlRegistryDataMap
+            // query the full data from database, and update the jdbcRegistryDataMap
             try {
-                Map<String, MysqlRegistryData> currentMysqlDataMap = mysqlOperator.queryAllMysqlRegistryData()
+                Map<String, JdbcRegistryData> currentJdbcDataMap = jdbcOperator.queryAllJdbcRegistryData()
                         .stream()
-                        .collect(Collectors.toMap(MysqlRegistryData::getKey, Function.identity()));
+                        .collect(Collectors.toMap(JdbcRegistryData::getKey, Function.identity()));
                 // find the different
-                List<MysqlRegistryData> addedData = new ArrayList<>();
-                List<MysqlRegistryData> deletedData = new ArrayList<>();
-                List<MysqlRegistryData> updatedData = new ArrayList<>();
-                for (Map.Entry<String, MysqlRegistryData> entry : currentMysqlDataMap.entrySet()) {
-                    MysqlRegistryData newData = entry.getValue();
-                    MysqlRegistryData oldData = mysqlRegistryDataMap.get(entry.getKey());
+                List<JdbcRegistryData> addedData = new ArrayList<>();
+                List<JdbcRegistryData> deletedData = new ArrayList<>();
+                List<JdbcRegistryData> updatedData = new ArrayList<>();
+                for (Map.Entry<String, JdbcRegistryData> entry : currentJdbcDataMap.entrySet()) {
+                    JdbcRegistryData newData = entry.getValue();
+                    JdbcRegistryData oldData = jdbcRegistryDataMap.get(entry.getKey());
                     if (oldData == null) {
                         addedData.add(newData);
                     } else {
@@ -118,13 +118,13 @@ public class SubscribeDataManager implements AutoCloseable {
                         }
                     }
                 }
-                for (Map.Entry<String, MysqlRegistryData> entry : mysqlRegistryDataMap.entrySet()) {
-                    if (!currentMysqlDataMap.containsKey(entry.getKey())) {
+                for (Map.Entry<String, JdbcRegistryData> entry : jdbcRegistryDataMap.entrySet()) {
+                    if (!currentJdbcDataMap.containsKey(entry.getKey())) {
                         deletedData.add(entry.getValue());
                     }
                 }
-                mysqlRegistryDataMap.clear();
-                mysqlRegistryDataMap.putAll(currentMysqlDataMap);
+                jdbcRegistryDataMap.clear();
+                jdbcRegistryDataMap.putAll(currentJdbcDataMap);
                 // trigger listener
                 for (Map.Entry<String, List<SubscribeListener>> entry : dataSubScribeMap.entrySet()) {
                     String subscribeKey = entry.getKey();
@@ -134,15 +134,15 @@ public class SubscribeDataManager implements AutoCloseable {
                     triggerListener(updatedData, subscribeKey, subscribeListeners, Event.Type.UPDATE);
                 }
             } catch (Exception e) {
-                log.error("Query data from mysql registry error");
+                log.error("Query data from jdbc registry error");
             }
         }
 
-        private void triggerListener(List<MysqlRegistryData> dataList,
+        private void triggerListener(List<JdbcRegistryData> dataList,
                                      String subscribeKey,
                                      List<SubscribeListener> subscribeListeners,
                                      Event.Type type) {
-            for (MysqlRegistryData data : dataList) {
+            for (JdbcRegistryData data : dataList) {
                 if (data.getKey().startsWith(subscribeKey)) {
                     subscribeListeners.forEach(subscribeListener -> subscribeListener
                             .notify(new Event(data.getKey(), data.getKey(), data.getData(), type)));

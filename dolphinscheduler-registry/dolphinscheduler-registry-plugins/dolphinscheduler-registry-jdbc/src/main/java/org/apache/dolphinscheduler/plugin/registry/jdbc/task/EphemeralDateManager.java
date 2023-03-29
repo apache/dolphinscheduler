@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.registry.mysql.task;
+package org.apache.dolphinscheduler.plugin.registry.jdbc.task;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.apache.dolphinscheduler.plugin.registry.mysql.MysqlOperator;
-import org.apache.dolphinscheduler.plugin.registry.mysql.MysqlRegistryProperties;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.JdbcOperator;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.JdbcRegistryProperties;
 import org.apache.dolphinscheduler.registry.api.ConnectionListener;
 import org.apache.dolphinscheduler.registry.api.ConnectionState;
 
@@ -39,21 +39,21 @@ import lombok.extern.slf4j.Slf4j;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 /**
- * This thread is used to check the connect state to mysql.
+ * This thread is used to check the connect state to jdbc.
  */
 @Slf4j
 public class EphemeralDateManager implements AutoCloseable {
 
     private ConnectionState connectionState;
-    private final MysqlOperator mysqlOperator;
-    private final MysqlRegistryProperties registryProperties;
+    private final JdbcOperator jdbcOperator;
+    private final JdbcRegistryProperties registryProperties;
     private final List<ConnectionListener> connectionListeners = Collections.synchronizedList(new ArrayList<>());
     private final Set<Long> ephemeralDateIds = Collections.synchronizedSet(new HashSet<>());
     private final ScheduledExecutorService scheduledExecutorService;
 
-    public EphemeralDateManager(MysqlRegistryProperties registryProperties, MysqlOperator mysqlOperator) {
+    public EphemeralDateManager(JdbcRegistryProperties registryProperties, JdbcOperator jdbcOperator) {
         this.registryProperties = registryProperties;
-        this.mysqlOperator = checkNotNull(mysqlOperator);
+        this.jdbcOperator = checkNotNull(jdbcOperator);
         this.scheduledExecutorService = Executors.newScheduledThreadPool(
                 1,
                 new ThreadFactoryBuilder().setNameFormat("EphemeralDateTermRefreshThread").setDaemon(true).build());
@@ -61,7 +61,7 @@ public class EphemeralDateManager implements AutoCloseable {
 
     public void start() {
         this.scheduledExecutorService.scheduleWithFixedDelay(
-                new EphemeralDateTermRefreshTask(mysqlOperator, connectionListeners, ephemeralDateIds),
+                new EphemeralDateTermRefreshTask(jdbcOperator, connectionListeners, ephemeralDateIds),
                 registryProperties.getTermRefreshInterval().toMillis(),
                 registryProperties.getTermRefreshInterval().toMillis(),
                 TimeUnit.MILLISECONDS);
@@ -72,7 +72,7 @@ public class EphemeralDateManager implements AutoCloseable {
     }
 
     public long insertOrUpdateEphemeralData(String key, String value) throws SQLException {
-        long ephemeralId = mysqlOperator.insertOrUpdateEphemeralData(key, value);
+        long ephemeralId = jdbcOperator.insertOrUpdateEphemeralData(key, value);
         ephemeralDateIds.add(ephemeralId);
         return ephemeralId;
     }
@@ -87,7 +87,7 @@ public class EphemeralDateManager implements AutoCloseable {
         connectionListeners.clear();
         scheduledExecutorService.shutdownNow();
         for (Long ephemeralDateId : ephemeralDateIds) {
-            mysqlOperator.deleteDataById(ephemeralDateId);
+            jdbcOperator.deleteDataById(ephemeralDateId);
         }
     }
 
@@ -96,12 +96,12 @@ public class EphemeralDateManager implements AutoCloseable {
 
         private final List<ConnectionListener> connectionListeners;
         private final Set<Long> ephemeralDateIds;
-        private final MysqlOperator mysqlOperator;
+        private final JdbcOperator jdbcOperator;
 
-        private EphemeralDateTermRefreshTask(MysqlOperator mysqlOperator,
+        private EphemeralDateTermRefreshTask(JdbcOperator jdbcOperator,
                                              List<ConnectionListener> connectionListeners,
                                              Set<Long> ephemeralDateIds) {
-            this.mysqlOperator = checkNotNull(mysqlOperator);
+            this.jdbcOperator = checkNotNull(jdbcOperator);
             this.connectionListeners = checkNotNull(connectionListeners);
             this.ephemeralDateIds = checkNotNull(ephemeralDateIds);
         }
@@ -130,7 +130,7 @@ public class EphemeralDateManager implements AutoCloseable {
                     triggerListener(connectionState);
                 }
             } catch (Exception e) {
-                log.error("Mysql Registry connect state check task execute failed", e);
+                log.error("Jdbc Registry connect state check task execute failed", e);
                 connectionState = ConnectionState.DISCONNECTED;
                 triggerListener(ConnectionState.DISCONNECTED);
             }
@@ -139,11 +139,11 @@ public class EphemeralDateManager implements AutoCloseable {
         private ConnectionState getConnectionState() {
             try {
                 if (ephemeralDateIds.isEmpty()) {
-                    mysqlOperator.healthCheck();
+                    jdbcOperator.healthCheck();
                 } else {
                     updateEphemeralDateTerm();
                 }
-                mysqlOperator.clearExpireEphemeralDate();
+                jdbcOperator.clearExpireEphemeralDate();
                 return ConnectionState.CONNECTED;
             } catch (Exception ex) {
                 log.error("Get connection state error, meet an unknown exception", ex);
@@ -152,8 +152,8 @@ public class EphemeralDateManager implements AutoCloseable {
         }
 
         private void updateEphemeralDateTerm() throws SQLException {
-            if (!mysqlOperator.updateEphemeralDataTerm(ephemeralDateIds)) {
-                log.warn("Update mysql registry ephemeral data: {} term error", ephemeralDateIds);
+            if (!jdbcOperator.updateEphemeralDataTerm(ephemeralDateIds)) {
+                log.warn("Update jdbc registry ephemeral data: {} term error", ephemeralDateIds);
             }
         }
 

@@ -17,8 +17,8 @@
 
 SET FOREIGN_KEY_CHECKS = 0;
 
-DROP TABLE IF EXISTS `t_ds_mysql_registry_data`;
-CREATE TABLE `t_ds_mysql_registry_data`
+DROP TABLE IF EXISTS `t_ds_jdbc_registry_data`;
+CREATE TABLE `t_ds_jdbc_registry_data`
 (
     `id`               bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'primary key',
     `key`              varchar(256) NOT NULL COMMENT 'key, like zookeeper node path',
@@ -33,8 +33,8 @@ CREATE TABLE `t_ds_mysql_registry_data`
   DEFAULT CHARSET = utf8;
 
 
-DROP TABLE IF EXISTS `t_ds_mysql_registry_lock`;
-CREATE TABLE `t_ds_mysql_registry_lock`
+DROP TABLE IF EXISTS `t_ds_jdbc_registry_lock`;
+CREATE TABLE `t_ds_jdbc_registry_lock`
 (
     `id`               bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'primary key',
     `key`              varchar(256) NOT NULL COMMENT 'lock path',

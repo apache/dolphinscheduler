@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.registry.mysql;
+package org.apache.dolphinscheduler.plugin.registry.jdbc;
 
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.common.utils.OSUtils;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public final class MysqlRegistryConstant {
+public final class JdbcRegistryConstant {
 
     public static final long LOCK_ACQUIRE_INTERVAL = 1_000;
 

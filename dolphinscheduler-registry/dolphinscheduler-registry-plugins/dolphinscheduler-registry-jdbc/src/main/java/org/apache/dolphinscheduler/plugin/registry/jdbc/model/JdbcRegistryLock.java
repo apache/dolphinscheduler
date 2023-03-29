@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.registry.mysql.model;
+package org.apache.dolphinscheduler.plugin.registry.jdbc.model;
 
 import java.util.Date;
 
@@ -29,26 +29,38 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
-@TableName(value = "t_ds_mysql_registry_data")
+@TableName(value = "t_ds_jdbc_registry_lock")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MysqlRegistryData {
+public class JdbcRegistryLock {
 
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
-    @TableField(value = "`key`")
+    /**
+     * The lock key.
+     */
+    @TableField(value = "key")
     private String key;
-    @TableField(value = "`data`")
-    private String data;
-    @TableField(value = "`type`")
-    private int type;
-    @TableField(value = "`last_term`")
-    private long lastTerm;
-    @TableField(value = "`create_time`")
-    private Date createTime;
-    @TableField(value = "`last_time`")
+    /**
+     * acquire lock host.
+     */
+    @TableField(value = "lock_owner")
+    private String lockOwner;
+    /**
+     * The last term, if the (currentTime - lastTerm) > termExpire time, the lock will be expired.
+     */
+    @TableField(value = "last_term")
+    private Long lastTerm;
+    /**
+     * The lock last update time.
+     */
+    @TableField(value = "last_update_time")
     private Date lastUpdateTime;
-
+    /**
+     * The lock create time.
+     */
+    @TableField(value = "create_time")
+    private Date createTime;
 }

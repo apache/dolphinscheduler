@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.registry.mysql.mapper;
+package org.apache.dolphinscheduler.plugin.registry.jdbc.mapper;
 
-import org.apache.dolphinscheduler.plugin.registry.mysql.model.MysqlRegistryLock;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.model.JdbcRegistryLock;
 
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
@@ -28,17 +28,17 @@ import java.util.Collection;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
-public interface MysqlRegistryLockMapper extends BaseMapper<MysqlRegistryLock> {
+public interface JdbcRegistryLockMapper extends BaseMapper<JdbcRegistryLock> {
 
-    @Select("select count(1) from t_ds_mysql_registry_lock")
+    @Select("select count(1) from t_ds_jdbc_registry_lock")
     int countAll();
 
-    @Delete("delete from t_ds_mysql_registry_lock where `last_term` < #{term}")
+    @Delete("delete from t_ds_jdbc_registry_lock where last_term < #{term}")
     void clearExpireLock(@Param("term") long term);
 
     @Update({"<script>",
-            "update t_ds_mysql_registry_lock",
-            "set `last_term` = #{term}",
+            "update t_ds_jdbc_registry_lock",
+            "set last_term = #{term}",
             "where id IN ",
             "<foreach item='id' index='index' collection='ids' open='(' separator=',' close=')'>",
             "   #{id}",
