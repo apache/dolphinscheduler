@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.registry.mysql.mapper;
+package org.apache.dolphinscheduler.plugin.registry.jdbc.mapper;
 
-import org.apache.dolphinscheduler.plugin.registry.mysql.model.MysqlRegistryData;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.model.JdbcRegistryData;
 
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
@@ -29,29 +29,29 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
-public interface MysqlRegistryDataMapper extends BaseMapper<MysqlRegistryData> {
+public interface JdbcRegistryDataMapper extends BaseMapper<JdbcRegistryData> {
 
-    @Select("select * from t_ds_mysql_registry_data")
-    List<MysqlRegistryData> selectAll();
+    @Select("select * from t_ds_jdbc_registry_data")
+    List<JdbcRegistryData> selectAll();
 
-    @Select("select * from t_ds_mysql_registry_data where `key` = #{key}")
-    MysqlRegistryData selectByKey(@Param("key") String key);
+    @Select("select * from t_ds_jdbc_registry_data where key = #{key}")
+    JdbcRegistryData selectByKey(@Param("key") String key);
 
-    @Select("select * from t_ds_mysql_registry_data where `key` like CONCAT (#{key}, '%')")
-    List<MysqlRegistryData> fuzzyQueryByKey(@Param("key") String key);
+    @Select("select * from t_ds_jdbc_registry_data where key like CONCAT (#{key}, '%')")
+    List<JdbcRegistryData> fuzzyQueryByKey(@Param("key") String key);
 
-    @Update("update t_ds_mysql_registry_data set `data` = #{data}, `last_term` = #{term} where `id` = #{id}")
+    @Update("update t_ds_jdbc_registry_data set data = #{data}, last_term = #{term} where id = #{id}")
     int updateDataAndTermById(@Param("id") long id, @Param("data") String data, @Param("term") long term);
 
-    @Delete("delete from t_ds_mysql_registry_data where `key` = #{key}")
+    @Delete("delete from t_ds_jdbc_registry_data where key = #{key}")
     void deleteByKey(@Param("key") String key);
 
-    @Delete("delete from t_ds_mysql_registry_data where `last_term` < #{term} and `type` = #{type}")
+    @Delete("delete from t_ds_jdbc_registry_data where last_term < #{term} and type = #{type}")
     void clearExpireEphemeralDate(@Param("term") long term, @Param("type") int type);
 
     @Update({"<script>",
-            "update t_ds_mysql_registry_data",
-            "set `last_term` = #{term}",
+            "update t_ds_jdbc_registry_data",
+            "set last_term = #{term}",
             "where id IN ",
             "<foreach item='id' index='index' collection='ids' open='(' separator=',' close=')'>",
             "   #{id}",
