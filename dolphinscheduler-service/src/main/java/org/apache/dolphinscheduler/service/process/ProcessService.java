@@ -49,12 +49,10 @@ import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.plugin.task.api.model.DateInterval;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -135,12 +133,6 @@ public interface ProcessService {
     String queryTenantCodeByResName(String resName, ResourceType resourceType);
 
     List<Schedule> selectAllByProcessDefineCode(long[] codes);
-
-    ProcessInstance findLastSchedulerProcessInterval(Long definitionCode, DateInterval dateInterval, int testFlag);
-
-    ProcessInstance findLastManualProcessInterval(Long definitionCode, DateInterval dateInterval, int testFlag);
-
-    ProcessInstance findLastRunningProcess(Long definitionCode, Date startTime, Date endTime, int testFlag);
 
     String queryUserQueueByProcessInstance(ProcessInstance processInstance);
 
