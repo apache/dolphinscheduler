@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.registry.mysql.model;
+package org.apache.dolphinscheduler.plugin.registry.jdbc.model;
 
 public enum DataType {
 

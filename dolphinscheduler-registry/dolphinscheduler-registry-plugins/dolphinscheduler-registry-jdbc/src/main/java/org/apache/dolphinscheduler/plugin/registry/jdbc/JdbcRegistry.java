@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.registry.mysql;
+package org.apache.dolphinscheduler.plugin.registry.jdbc;
 
-import org.apache.dolphinscheduler.plugin.registry.mysql.task.EphemeralDateManager;
-import org.apache.dolphinscheduler.plugin.registry.mysql.task.RegistryLockManager;
-import org.apache.dolphinscheduler.plugin.registry.mysql.task.SubscribeDataManager;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.task.EphemeralDateManager;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.task.RegistryLockManager;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.task.SubscribeDataManager;
 import org.apache.dolphinscheduler.registry.api.ConnectionListener;
 import org.apache.dolphinscheduler.registry.api.ConnectionState;
 import org.apache.dolphinscheduler.registry.api.Registry;
@@ -43,36 +43,36 @@ import org.springframework.stereotype.Component;
  * store the DolphinScheduler master/worker's metadata and do the server registry/unRegistry.
  */
 @Component
-@ConditionalOnProperty(prefix = "registry", name = "type", havingValue = "mysql")
+@ConditionalOnProperty(prefix = "registry", name = "type", havingValue = "jdbc")
 @Slf4j
-public class MysqlRegistry implements Registry {
+public class JdbcRegistry implements Registry {
 
-    private final MysqlRegistryProperties mysqlRegistryProperties;
+    private final JdbcRegistryProperties jdbcRegistryProperties;
     private final EphemeralDateManager ephemeralDateManager;
     private final SubscribeDataManager subscribeDataManager;
     private final RegistryLockManager registryLockManager;
-    private MysqlOperator mysqlOperator;
+    private JdbcOperator jdbcOperator;
 
-    public MysqlRegistry(MysqlRegistryProperties mysqlRegistryProperties,
-                         MysqlOperator mysqlOperator) {
-        this.mysqlOperator = mysqlOperator;
-        mysqlOperator.clearExpireLock();
-        mysqlOperator.clearExpireEphemeralDate();
-        this.mysqlRegistryProperties = mysqlRegistryProperties;
-        this.ephemeralDateManager = new EphemeralDateManager(mysqlRegistryProperties, mysqlOperator);
-        this.subscribeDataManager = new SubscribeDataManager(mysqlRegistryProperties, mysqlOperator);
-        this.registryLockManager = new RegistryLockManager(mysqlRegistryProperties, mysqlOperator);
-        log.info("Initialize Mysql Registry...");
+    public JdbcRegistry(JdbcRegistryProperties jdbcRegistryProperties,
+                        JdbcOperator jdbcOperator) {
+        this.jdbcOperator = jdbcOperator;
+        jdbcOperator.clearExpireLock();
+        jdbcOperator.clearExpireEphemeralDate();
+        this.jdbcRegistryProperties = jdbcRegistryProperties;
+        this.ephemeralDateManager = new EphemeralDateManager(jdbcRegistryProperties, jdbcOperator);
+        this.subscribeDataManager = new SubscribeDataManager(jdbcRegistryProperties, jdbcOperator);
+        this.registryLockManager = new RegistryLockManager(jdbcRegistryProperties, jdbcOperator);
+        log.info("Initialize Jdbc Registry...");
     }
 
     @PostConstruct
     public void start() {
-        log.info("Starting Mysql Registry...");
-        // start a mysql connect check
+        log.info("Starting Jdbc Registry...");
+        // start a jdbc connect check
         ephemeralDateManager.start();
         subscribeDataManager.start();
         registryLockManager.start();
-        log.info("Started Mysql Registry...");
+        log.info("Started Jdbc Registry...");
     }
 
     @Override
@@ -82,16 +82,16 @@ public class MysqlRegistry implements Registry {
         while (true) {
             if (System.currentTimeMillis() > endTimeMills) {
                 throw new RegistryException(
-                        String.format("Cannot connect to mysql registry in %s s", timeout.getSeconds()));
+                        String.format("Cannot connect to jdbc registry in %s s", timeout.getSeconds()));
             }
             if (ephemeralDateManager.getConnectionState() == ConnectionState.CONNECTED) {
                 return;
             }
             try {
-                Thread.sleep(mysqlRegistryProperties.getTermRefreshInterval().toMillis());
+                Thread.sleep(jdbcRegistryProperties.getTermRefreshInterval().toMillis());
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                throw new RegistryException("Cannot connect to mysql registry due to interrupted exception", e);
+                throw new RegistryException("Cannot connect to jdbc registry due to interrupted exception", e);
             }
         }
     }
@@ -127,7 +127,7 @@ public class MysqlRegistry implements Registry {
                 // when put a ephemeralData will new a scheduler thread to update it
                 ephemeralDateManager.insertOrUpdateEphemeralData(key, value);
             } else {
-                mysqlOperator.insertOrUpdatePersistentData(key, value);
+                jdbcOperator.insertOrUpdatePersistentData(key, value);
             }
         } catch (Exception ex) {
             throw new RegistryException(String.format("put key:%s, value:%s error", key, value), ex);
@@ -137,7 +137,7 @@ public class MysqlRegistry implements Registry {
     @Override
     public void delete(String key) {
         try {
-            mysqlOperator.deleteDataByKey(key);
+            jdbcOperator.deleteDataByKey(key);
         } catch (Exception e) {
             throw new RegistryException(String.format("Delete key: %s error", key), e);
         }
@@ -146,7 +146,7 @@ public class MysqlRegistry implements Registry {
     @Override
     public Collection<String> children(String key) {
         try {
-            return mysqlOperator.getChildren(key);
+            return jdbcOperator.getChildren(key);
         } catch (SQLException e) {
             throw new RegistryException(String.format("Get key: %s children error", key), e);
         }
@@ -155,7 +155,7 @@ public class MysqlRegistry implements Registry {
     @Override
     public boolean exists(String key) {
         try {
-            return mysqlOperator.existKey(key);
+            return jdbcOperator.existKey(key);
         } catch (Exception e) {
             throw new RegistryException(String.format("Check key: %s exist error", key), e);
         }
@@ -181,15 +181,15 @@ public class MysqlRegistry implements Registry {
 
     @Override
     public void close() {
-        log.info("Closing Mysql Registry...");
-        // remove the current Ephemeral node, if can connect to mysql
+        log.info("Closing Jdbc Registry...");
+        // remove the current Ephemeral node, if can connect to jdbc
         try (
                 EphemeralDateManager closed1 = ephemeralDateManager;
                 SubscribeDataManager close2 = subscribeDataManager;
                 RegistryLockManager close3 = registryLockManager) {
         } catch (Exception e) {
-            log.error("Close Mysql Registry error", e);
+            log.error("Close Jdbc Registry error", e);
         }
-        log.info("Closed Mysql Registry...");
+        log.info("Closed Jdbc Registry...");
     }
 }

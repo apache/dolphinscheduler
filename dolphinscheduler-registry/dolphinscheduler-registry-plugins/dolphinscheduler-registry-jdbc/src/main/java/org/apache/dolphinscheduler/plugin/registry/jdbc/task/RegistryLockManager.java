@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.registry.mysql.task;
+package org.apache.dolphinscheduler.plugin.registry.jdbc.task;
 
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.plugin.registry.mysql.MysqlOperator;
-import org.apache.dolphinscheduler.plugin.registry.mysql.MysqlRegistryConstant;
-import org.apache.dolphinscheduler.plugin.registry.mysql.MysqlRegistryProperties;
-import org.apache.dolphinscheduler.plugin.registry.mysql.model.MysqlRegistryLock;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.JdbcOperator;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.JdbcRegistryConstant;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.JdbcRegistryProperties;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.model.JdbcRegistryLock;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
 
 import java.sql.SQLException;
@@ -42,22 +42,22 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 @Slf4j
 public class RegistryLockManager implements AutoCloseable {
 
-    private final MysqlOperator mysqlOperator;
-    private final MysqlRegistryProperties registryProperties;
-    private final Map<String, MysqlRegistryLock> lockHoldMap;
+    private final JdbcOperator jdbcOperator;
+    private final JdbcRegistryProperties registryProperties;
+    private final Map<String, JdbcRegistryLock> lockHoldMap;
     private final ScheduledExecutorService lockTermUpdateThreadPool;
 
-    public RegistryLockManager(MysqlRegistryProperties registryProperties, MysqlOperator mysqlOperator) {
+    public RegistryLockManager(JdbcRegistryProperties registryProperties, JdbcOperator jdbcOperator) {
         this.registryProperties = registryProperties;
-        this.mysqlOperator = mysqlOperator;
+        this.jdbcOperator = jdbcOperator;
         this.lockHoldMap = new ConcurrentHashMap<>();
         this.lockTermUpdateThreadPool = Executors.newSingleThreadScheduledExecutor(
-                new ThreadFactoryBuilder().setNameFormat("MysqlRegistryLockTermRefreshThread").setDaemon(true).build());
+                new ThreadFactoryBuilder().setNameFormat("JdbcRegistryLockTermRefreshThread").setDaemon(true).build());
     }
 
     public void start() {
         lockTermUpdateThreadPool.scheduleWithFixedDelay(
-                new LockTermRefreshTask(lockHoldMap, mysqlOperator),
+                new LockTermRefreshTask(lockHoldMap, jdbcOperator),
                 registryProperties.getTermRefreshInterval().toMillis(),
                 registryProperties.getTermRefreshInterval().toMillis(),
                 TimeUnit.MILLISECONDS);
@@ -69,26 +69,26 @@ public class RegistryLockManager implements AutoCloseable {
     public void acquireLock(String lockKey) throws RegistryException {
         // maybe we can use the computeIf absent
         lockHoldMap.computeIfAbsent(lockKey, key -> {
-            MysqlRegistryLock mysqlRegistryLock;
+            JdbcRegistryLock jdbcRegistryLock;
             try {
-                while ((mysqlRegistryLock = mysqlOperator.tryToAcquireLock(lockKey)) == null) {
+                while ((jdbcRegistryLock = jdbcOperator.tryToAcquireLock(lockKey)) == null) {
                     log.debug("Acquire the lock {} failed try again", key);
                     // acquire failed, wait and try again
-                    ThreadUtils.sleep(MysqlRegistryConstant.LOCK_ACQUIRE_INTERVAL);
+                    ThreadUtils.sleep(JdbcRegistryConstant.LOCK_ACQUIRE_INTERVAL);
                 }
             } catch (SQLException e) {
                 throw new RegistryException("Acquire the lock error", e);
             }
-            return mysqlRegistryLock;
+            return jdbcRegistryLock;
         });
     }
 
     public void releaseLock(String lockKey) {
-        MysqlRegistryLock mysqlRegistryLock = lockHoldMap.get(lockKey);
-        if (mysqlRegistryLock != null) {
+        JdbcRegistryLock jdbcRegistryLock = lockHoldMap.get(lockKey);
+        if (jdbcRegistryLock != null) {
             try {
                 // the lock is unExit
-                mysqlOperator.releaseLock(mysqlRegistryLock.getId());
+                jdbcOperator.releaseLock(jdbcRegistryLock.getId());
                 lockHoldMap.remove(lockKey);
             } catch (SQLException e) {
                 throw new RegistryException(String.format("Release lock: %s error", lockKey), e);
@@ -99,7 +99,7 @@ public class RegistryLockManager implements AutoCloseable {
     @Override
     public void close() {
         lockTermUpdateThreadPool.shutdownNow();
-        for (Map.Entry<String, MysqlRegistryLock> lockEntry : lockHoldMap.entrySet()) {
+        for (Map.Entry<String, JdbcRegistryLock> lockEntry : lockHoldMap.entrySet()) {
             releaseLock(lockEntry.getKey());
         }
     }
@@ -110,8 +110,8 @@ public class RegistryLockManager implements AutoCloseable {
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     static class LockTermRefreshTask implements Runnable {
 
-        private final Map<String, MysqlRegistryLock> lockHoldMap;
-        private final MysqlOperator mysqlOperator;
+        private final Map<String, JdbcRegistryLock> lockHoldMap;
+        private final JdbcOperator jdbcOperator;
 
         public void run() {
             try {
@@ -120,12 +120,12 @@ public class RegistryLockManager implements AutoCloseable {
                 }
                 List<Long> lockIds = lockHoldMap.values()
                         .stream()
-                        .map(MysqlRegistryLock::getId)
+                        .map(JdbcRegistryLock::getId)
                         .collect(Collectors.toList());
-                if (!mysqlOperator.updateLockTerm(lockIds)) {
+                if (!jdbcOperator.updateLockTerm(lockIds)) {
                     log.warn("Update the lock: {} term failed.", lockIds);
                 }
-                mysqlOperator.clearExpireLock();
+                jdbcOperator.clearExpireLock();
             } catch (Exception e) {
                 log.error("Update lock term error", e);
             }

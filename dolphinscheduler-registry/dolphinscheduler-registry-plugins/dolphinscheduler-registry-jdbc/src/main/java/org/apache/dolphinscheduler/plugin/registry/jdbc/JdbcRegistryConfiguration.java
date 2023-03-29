@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.registry.mysql;
+package org.apache.dolphinscheduler.plugin.registry.jdbc;
 
-import org.apache.dolphinscheduler.plugin.registry.mysql.mapper.MysqlRegistryDataMapper;
-import org.apache.dolphinscheduler.plugin.registry.mysql.mapper.MysqlRegistryLockMapper;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.mapper.JdbcRegistryDataMapper;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.mapper.JdbcRegistryLockMapper;
 
 import org.apache.ibatis.session.SqlSessionFactory;
 
@@ -31,31 +31,31 @@ import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
-@ConditionalOnProperty(prefix = "registry", name = "type", havingValue = "mysql")
-public class MysqlRegistryConfiguration {
+@ConditionalOnProperty(prefix = "registry", name = "type", havingValue = "jdbc")
+public class JdbcRegistryConfiguration {
 
     @Bean
-    public SqlSessionFactory mysqlRegistrySqlSessionFactory(MysqlRegistryProperties mysqlRegistryProperties) throws Exception {
+    public SqlSessionFactory jdbcRegistrySqlSessionFactory(JdbcRegistryProperties jdbcRegistryProperties) throws Exception {
         MybatisSqlSessionFactoryBean sqlSessionFactoryBean = new MybatisSqlSessionFactoryBean();
-        sqlSessionFactoryBean.setDataSource(new HikariDataSource(mysqlRegistryProperties.getHikariConfig()));
+        sqlSessionFactoryBean.setDataSource(new HikariDataSource(jdbcRegistryProperties.getHikariConfig()));
         return sqlSessionFactoryBean.getObject();
     }
 
     @Bean
-    public SqlSessionTemplate mysqlRegistrySqlSessionTemplate(SqlSessionFactory mysqlRegistrySqlSessionFactory) {
-        mysqlRegistrySqlSessionFactory.getConfiguration().addMapper(MysqlRegistryDataMapper.class);
-        mysqlRegistrySqlSessionFactory.getConfiguration().addMapper(MysqlRegistryLockMapper.class);
-        return new SqlSessionTemplate(mysqlRegistrySqlSessionFactory);
+    public SqlSessionTemplate jdbcRegistrySqlSessionTemplate(SqlSessionFactory jdbcRegistrySqlSessionFactory) {
+        jdbcRegistrySqlSessionFactory.getConfiguration().addMapper(JdbcRegistryDataMapper.class);
+        jdbcRegistrySqlSessionFactory.getConfiguration().addMapper(JdbcRegistryLockMapper.class);
+        return new SqlSessionTemplate(jdbcRegistrySqlSessionFactory);
     }
 
     @Bean
-    public MysqlRegistryDataMapper mysqlRegistryDataMapper(SqlSessionTemplate mysqlRegistrySqlSessionTemplate) {
-        return mysqlRegistrySqlSessionTemplate.getMapper(MysqlRegistryDataMapper.class);
+    public JdbcRegistryDataMapper jdbcRegistryDataMapper(SqlSessionTemplate jdbcRegistrySqlSessionTemplate) {
+        return jdbcRegistrySqlSessionTemplate.getMapper(JdbcRegistryDataMapper.class);
     }
 
     @Bean
-    public MysqlRegistryLockMapper mysqlRegistryLockMapper(SqlSessionTemplate mysqlRegistrySqlSessionTemplate) {
-        return mysqlRegistrySqlSessionTemplate.getMapper(MysqlRegistryLockMapper.class);
+    public JdbcRegistryLockMapper jdbcRegistryLockMapper(SqlSessionTemplate jdbcRegistrySqlSessionTemplate) {
+        return jdbcRegistrySqlSessionTemplate.getMapper(JdbcRegistryLockMapper.class);
     }
 
 }
