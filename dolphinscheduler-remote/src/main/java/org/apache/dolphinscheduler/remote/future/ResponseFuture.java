@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.remote.future;
 
-import org.apache.dolphinscheduler.remote.command.Command;
+import org.apache.dolphinscheduler.remote.command.Message;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -64,7 +64,7 @@ public class ResponseFuture {
     /**
      * response command
      */
-    private Command responseCommand;
+    private Message responseMessage;
 
     private volatile boolean sendOk = true;
 
@@ -84,18 +84,18 @@ public class ResponseFuture {
      *
      * @return command
      */
-    public Command waitResponse() throws InterruptedException {
+    public Message waitResponse() throws InterruptedException {
         this.latch.await(timeoutMillis, TimeUnit.MILLISECONDS);
-        return this.responseCommand;
+        return this.responseMessage;
     }
 
     /**
      * put response
      *
-     * @param responseCommand responseCommand
+     * @param responseMessage responseCommand
      */
-    public void putResponse(final Command responseCommand) {
-        this.responseCommand = responseCommand;
+    public void putResponse(final Message responseMessage) {
+        this.responseMessage = responseMessage;
         this.latch.countDown();
         FUTURE_TABLE.remove(opaque);
     }
@@ -155,12 +155,12 @@ public class ResponseFuture {
         return beginTimestamp;
     }
 
-    public Command getResponseCommand() {
-        return responseCommand;
+    public Message getResponseCommand() {
+        return responseMessage;
     }
 
-    public void setResponseCommand(Command responseCommand) {
-        this.responseCommand = responseCommand;
+    public void setResponseCommand(Message responseMessage) {
+        this.responseMessage = responseMessage;
     }
 
     public InvokeCallback getInvokeCallback() {
@@ -210,7 +210,7 @@ public class ResponseFuture {
                 + ", releaseSemaphore=" + releaseSemaphore
                 + ", latch=" + latch
                 + ", beginTimestamp=" + beginTimestamp
-                + ", responseCommand=" + responseCommand
+                + ", responseCommand=" + responseMessage
                 + ", sendOk=" + sendOk
                 + ", cause=" + cause
                 + '}';

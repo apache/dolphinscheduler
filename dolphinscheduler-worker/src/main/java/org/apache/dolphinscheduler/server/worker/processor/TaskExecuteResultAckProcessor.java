@@ -19,9 +19,9 @@ package org.apache.dolphinscheduler.server.worker.processor;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
+import org.apache.dolphinscheduler.remote.command.task.TaskExecuteResultMessageAck;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 
@@ -30,7 +30,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Preconditions;
 import io.netty.channel.Channel;
 
 /**
@@ -44,34 +43,34 @@ public class TaskExecuteResultAckProcessor implements NettyRequestProcessor {
     private MessageRetryRunner messageRetryRunner;
 
     @Override
-    public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.TASK_EXECUTE_RESULT_ACK == command.getType(),
-                String.format("invalid command type : %s", command.getType()));
-
-        TaskExecuteAckCommand taskExecuteAckMessage = JSONUtils.parseObject(command.getBody(),
-                TaskExecuteAckCommand.class);
+    public void process(Channel channel, Message message) {
+        TaskExecuteResultMessageAck taskExecuteAckMessage =
+                JSONUtils.parseObject(message.getBody(), TaskExecuteResultMessageAck.class);
 
         if (taskExecuteAckMessage == null) {
             log.error("task execute response ack command is null");
             return;
         }
 
-        try {
-            LogUtils.setTaskInstanceIdMDC(taskExecuteAckMessage.getTaskInstanceId());
+        try (
+                LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
+                        LogUtils.setTaskInstanceIdMDC(taskExecuteAckMessage.getTaskInstanceId())) {
             log.info("Receive task execute response ack command : {}", taskExecuteAckMessage);
             if (taskExecuteAckMessage.isSuccess()) {
                 messageRetryRunner.removeRetryMessage(taskExecuteAckMessage.getTaskInstanceId(),
-                        CommandType.TASK_EXECUTE_RESULT);
+                        MessageType.TASK_EXECUTE_RESULT_MESSAGE);
                 log.debug("remove REMOTE_CHANNELS, task instance id:{}", taskExecuteAckMessage.getTaskInstanceId());
             } else {
                 // master handle worker response error, will still retry
                 log.error("Receive task execute result ack message, the message status is not success, message: {}",
                         taskExecuteAckMessage);
             }
-        } finally {
-            LogUtils.removeTaskInstanceIdMDC();
-
         }
+    }
+
+    @Override
+    public MessageType getCommandType() {
+        return MessageType.TASK_EXECUTE_RESULT_MESSAGE_ACK;
     }
 
 }
