@@ -22,15 +22,17 @@ import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
-import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.factory.NettyRemotingServerFactory;
+import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 
 import java.io.Closeable;
+import java.util.List;
 
 import javax.annotation.PreDestroy;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -42,21 +44,16 @@ import org.springframework.context.event.EventListener;
 @Slf4j
 public class AlertServer implements Closeable {
 
-    private final PluginDao pluginDao;
-    private final AlertSenderService alertSenderService;
-    private final AlertRequestProcessor alertRequestProcessor;
-    private final AlertConfig alertConfig;
-    private NettyRemotingServer nettyRemotingServer;
+    @Autowired
+    private PluginDao pluginDao;
 
-    public AlertServer(PluginDao pluginDao,
-                       AlertSenderService alertSenderService,
-                       AlertRequestProcessor alertRequestProcessor,
-                       AlertConfig alertConfig) {
-        this.pluginDao = pluginDao;
-        this.alertSenderService = alertSenderService;
-        this.alertRequestProcessor = alertRequestProcessor;
-        this.alertConfig = alertConfig;
-    }
+    @Autowired
+    private AlertSenderService alertSenderService;
+    @Autowired
+    private List<NettyRequestProcessor> nettyRequestProcessors;
+    @Autowired
+    private AlertConfig alertConfig;
+    private NettyRemotingServer nettyRemotingServer;
 
     public static void main(String[] args) {
         Thread.currentThread().setName(Constants.THREAD_NAME_ALERT_SERVER);
@@ -116,7 +113,10 @@ public class AlertServer implements Closeable {
 
     protected void startServer() {
         nettyRemotingServer = NettyRemotingServerFactory.buildNettyRemotingServer(alertConfig.getPort());
-        nettyRemotingServer.registerProcessor(CommandType.ALERT_SEND_REQUEST, alertRequestProcessor);
+        for (NettyRequestProcessor nettyRequestProcessor : nettyRequestProcessors) {
+            nettyRemotingServer.registerProcessor(nettyRequestProcessor);
+            log.info("Success register netty processor: {}", nettyRequestProcessor.getClass().getName());
+        }
         nettyRemotingServer.start();
     }
 }

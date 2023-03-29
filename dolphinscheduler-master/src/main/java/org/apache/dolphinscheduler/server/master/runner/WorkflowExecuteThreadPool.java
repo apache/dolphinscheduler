@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.remote.command.WorkflowStateEventChangeCommand;
+import org.apache.dolphinscheduler.remote.command.workflow.WorkflowStateEventChangeRequest;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
@@ -203,10 +203,10 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
                     taskInstance.getName(), taskInstance.getId());
             return;
         }
-        WorkflowStateEventChangeCommand workflowStateEventChangeCommand = new WorkflowStateEventChangeCommand(
+        WorkflowStateEventChangeRequest workflowStateEventChangeRequest = new WorkflowStateEventChangeRequest(
                 finishProcessInstance.getId(), 0, finishProcessInstance.getState(), processInstance.getId(),
                 taskInstance.getId());
         Host host = new Host(processInstanceHost);
-        stateEventCallbackService.sendResult(host, workflowStateEventChangeCommand.convert2Command());
+        stateEventCallbackService.sendResult(host, workflowStateEventChangeRequest.convert2Command());
     }
 }

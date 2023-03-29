@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.service.cache;
 
-import org.apache.dolphinscheduler.remote.command.Command;
+import org.apache.dolphinscheduler.remote.command.Message;
 
 public interface CacheNotifyService {
 
-    void notifyMaster(Command command);
+    void notifyMaster(Message message);
 }

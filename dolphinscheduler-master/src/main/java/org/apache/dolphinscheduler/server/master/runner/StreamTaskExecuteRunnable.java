@@ -43,9 +43,9 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.remote.command.TaskDispatchCommand;
-import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningAckMessage;
-import org.apache.dolphinscheduler.remote.command.TaskExecuteStartCommand;
+import org.apache.dolphinscheduler.remote.command.task.TaskDispatchMessage;
+import org.apache.dolphinscheduler.remote.command.task.TaskExecuteRunningMessageAck;
+import org.apache.dolphinscheduler.remote.command.task.TaskExecuteStartMessage;
 import org.apache.dolphinscheduler.server.master.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.cache.StreamTaskInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
@@ -103,7 +103,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
 
     protected ProcessDefinition processDefinition;
 
-    protected TaskExecuteStartCommand taskExecuteStartCommand;
+    protected TaskExecuteStartMessage taskExecuteStartMessage;
 
     /**
      * task event queue
@@ -112,7 +112,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
 
     private TaskRunnableStatus taskRunnableStatus = TaskRunnableStatus.CREATED;
 
-    public StreamTaskExecuteRunnable(TaskDefinition taskDefinition, TaskExecuteStartCommand taskExecuteStartCommand) {
+    public StreamTaskExecuteRunnable(TaskDefinition taskDefinition, TaskExecuteStartMessage taskExecuteStartMessage) {
         this.processService = SpringApplicationContext.getBean(ProcessService.class);
         this.masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
         this.dispatcher = SpringApplicationContext.getBean(ExecutorDispatcher.class);
@@ -122,7 +122,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
         this.streamTaskInstanceExecCacheManager =
                 SpringApplicationContext.getBean(StreamTaskInstanceExecCacheManager.class);
         this.taskDefinition = taskDefinition;
-        this.taskExecuteStartCommand = taskExecuteStartCommand;
+        this.taskExecuteStartMessage = taskExecuteStartMessage;
     }
 
     public TaskInstance getTaskInstance() {
@@ -153,7 +153,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
             return;
         }
 
-        TaskDispatchCommand dispatchCommand = new TaskDispatchCommand(taskExecutionContext,
+        TaskDispatchMessage dispatchCommand = new TaskDispatchMessage(taskExecutionContext,
                 masterConfig.getMasterAddress(),
                 taskExecutionContext.getHost(),
                 System.currentTimeMillis());
@@ -296,7 +296,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
         taskInstance.setDelayTime(taskDefinition.getDelayTime());
 
         // task dry run flag
-        taskInstance.setDryRun(taskExecuteStartCommand.getDryRun());
+        taskInstance.setDryRun(taskExecuteStartMessage.getDryRun());
 
         taskInstance.setWorkerGroup(StringUtils.isBlank(taskDefinition.getWorkerGroup()) ? DEFAULT_WORKER_GROUP
                 : taskDefinition.getWorkerGroup());
@@ -318,8 +318,8 @@ public class StreamTaskExecuteRunnable implements Runnable {
         }
 
         taskInstance.setTaskExecuteType(taskDefinition.getTaskExecuteType());
-        taskInstance.setExecutorId(taskExecuteStartCommand.getExecutorId());
-        taskInstance.setExecutorName(taskExecuteStartCommand.getExecutorName());
+        taskInstance.setExecutorId(taskExecuteStartMessage.getExecutorId());
+        taskInstance.setExecutorName(taskExecuteStartMessage.getExecutorName());
 
         return taskInstance;
     }
@@ -461,7 +461,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
     public Map<String, Property> paramParsingPreparation(@NonNull TaskInstance taskInstance,
                                                          @NonNull AbstractParameters parameters) {
         // assign value to definedParams here
-        Map<String, String> globalParamsMap = taskExecuteStartCommand.getStartParams();
+        Map<String, String> globalParamsMap = taskExecuteStartMessage.getStartParams();
         Map<String, Property> globalParams = ParamUtils.getUserDefParamsMap(globalParamsMap);
 
         // combining local and global parameters
@@ -487,9 +487,14 @@ public class StreamTaskExecuteRunnable implements Runnable {
 
     private void sendAckToWorker(TaskEvent taskEvent) {
         // If event handle success, send ack to worker to otherwise the worker will retry this event
-        TaskExecuteRunningAckMessage taskExecuteRunningAckMessage =
-                new TaskExecuteRunningAckMessage(true, taskEvent.getTaskInstanceId());
-        taskEvent.getChannel().writeAndFlush(taskExecuteRunningAckMessage.convert2Command());
+        TaskExecuteRunningMessageAck taskExecuteRunningMessageAck =
+                new TaskExecuteRunningMessageAck(
+                        true,
+                        taskEvent.getTaskInstanceId(),
+                        masterConfig.getMasterAddress(),
+                        taskEvent.getWorkerAddress(),
+                        System.currentTimeMillis());
+        taskEvent.getChannel().writeAndFlush(taskExecuteRunningMessageAck.convert2Command());
     }
 
     private enum TaskRunnableStatus {

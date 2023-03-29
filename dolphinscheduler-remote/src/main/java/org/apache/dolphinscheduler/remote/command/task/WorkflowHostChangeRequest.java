@@ -17,11 +17,8 @@
 
 package org.apache.dolphinscheduler.remote.command.task;
 
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
-
-import java.io.Serializable;
+import org.apache.dolphinscheduler.remote.command.MessageType;
+import org.apache.dolphinscheduler.remote.command.RequestMessageBuilder;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,22 +27,14 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class WorkflowHostChangeRequest implements Serializable {
+public class WorkflowHostChangeRequest implements RequestMessageBuilder {
 
     private int taskInstanceId;
 
     private String workflowHost;
 
-    /**
-     * package request command
-     *
-     * @return command
-     */
-    public Command convert2Command() {
-        Command command = new Command();
-        command.setType(CommandType.WORKFLOW_HOST_CHANGE_REQUEST);
-        byte[] body = JSONUtils.toJsonByteArray(this);
-        command.setBody(body);
-        return command;
+    @Override
+    public MessageType getCommandType() {
+        return MessageType.WORKFLOW_HOST_CHANGE_REQUEST;
     }
 }

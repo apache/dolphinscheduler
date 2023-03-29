@@ -231,9 +231,6 @@ public interface ProcessService {
 
     TaskGroupQueue loadTaskGroupQueue(int taskId);
 
-    void sendStartTask2Master(ProcessInstance processInstance, int taskId,
-                              org.apache.dolphinscheduler.remote.command.CommandType taskType);
-
     ProcessInstance loadNextProcess4Serial(long code, int state, int id);
 
     public String findConfigYamlByName(String clusterName);

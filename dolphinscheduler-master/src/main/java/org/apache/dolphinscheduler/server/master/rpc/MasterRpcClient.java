@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.server.master.rpc;
 
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
-import org.apache.dolphinscheduler.remote.command.Command;
+import org.apache.dolphinscheduler.remote.command.Message;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.utils.Host;
@@ -41,9 +41,9 @@ public class MasterRpcClient {
         log.info("Success initialized ApiServerRPCClient...");
     }
 
-    public Command sendSyncCommand(@NonNull Host host,
-                                   @NonNull Command rpcCommand) throws RemotingException, InterruptedException {
-        return client.sendSync(host, rpcCommand, DEFAULT_TIME_OUT_MILLS);
+    public Message sendSyncCommand(@NonNull Host host,
+                                   @NonNull Message rpcMessage) throws RemotingException, InterruptedException {
+        return client.sendSync(host, rpcMessage, DEFAULT_TIME_OUT_MILLS);
     }
 
 }

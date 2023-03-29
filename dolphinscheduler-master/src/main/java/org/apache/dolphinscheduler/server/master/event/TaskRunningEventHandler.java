@@ -22,8 +22,9 @@ import org.apache.dolphinscheduler.common.enums.TaskEventType;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.TaskInstanceUtils;
-import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningAckMessage;
+import org.apache.dolphinscheduler.remote.command.task.TaskExecuteRunningMessageAck;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
@@ -44,6 +45,9 @@ public class TaskRunningEventHandler implements TaskEventHandler {
 
     @Autowired
     private TaskInstanceDao taskInstanceDao;
+
+    @Autowired
+    private MasterConfig masterConfig;
 
     @Override
     public void handleTaskEvent(TaskEvent taskEvent) throws TaskEventHandleError {
@@ -103,9 +107,14 @@ public class TaskRunningEventHandler implements TaskEventHandler {
 
     private void sendAckToWorker(TaskEvent taskEvent) {
         // If event handle success, send ack to worker to otherwise the worker will retry this event
-        TaskExecuteRunningAckMessage taskExecuteRunningAckMessage =
-                new TaskExecuteRunningAckMessage(true, taskEvent.getTaskInstanceId());
-        taskEvent.getChannel().writeAndFlush(taskExecuteRunningAckMessage.convert2Command());
+        TaskExecuteRunningMessageAck taskExecuteRunningMessageAck =
+                new TaskExecuteRunningMessageAck(
+                        true,
+                        taskEvent.getTaskInstanceId(),
+                        masterConfig.getMasterAddress(),
+                        taskEvent.getWorkerAddress(),
+                        System.currentTimeMillis());
+        taskEvent.getChannel().writeAndFlush(taskExecuteRunningMessageAck.convert2Command());
     }
 
     @Override

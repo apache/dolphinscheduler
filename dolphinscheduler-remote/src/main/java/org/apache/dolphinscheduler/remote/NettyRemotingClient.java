@@ -19,8 +19,7 @@ package org.apache.dolphinscheduler.remote;
 
 import org.apache.dolphinscheduler.remote.codec.NettyDecoder;
 import org.apache.dolphinscheduler.remote.codec.NettyEncoder;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.Message;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingTimeoutException;
@@ -142,7 +141,7 @@ public class NettyRemotingClient implements AutoCloseable {
      * @param timeoutMillis timeoutMillis
      * @param invokeCallback callback function
      */
-    public void sendAsync(final Host host, final Command command,
+    public void sendAsync(final Host host, final Message command,
                           final long timeoutMillis,
                           final InvokeCallback invokeCallback) throws InterruptedException, RemotingException {
         final Channel channel = getChannel(host);
@@ -201,19 +200,19 @@ public class NettyRemotingClient implements AutoCloseable {
      * sync send
      *
      * @param host host
-     * @param command command
+     * @param message command
      * @param timeoutMillis timeoutMillis
      * @return command
      */
-    public Command sendSync(final Host host, final Command command,
+    public Message sendSync(final Host host, final Message message,
                             final long timeoutMillis) throws InterruptedException, RemotingException {
         final Channel channel = getChannel(host);
         if (channel == null) {
             throw new RemotingException(String.format("connect to : %s fail", host));
         }
-        final long opaque = command.getOpaque();
+        final long opaque = message.getOpaque();
         final ResponseFuture responseFuture = new ResponseFuture(opaque, timeoutMillis, null, null);
-        channel.writeAndFlush(command).addListener(future -> {
+        channel.writeAndFlush(message).addListener(future -> {
             if (future.isSuccess()) {
                 responseFuture.setSendOk(true);
                 return;
@@ -222,12 +221,12 @@ public class NettyRemotingClient implements AutoCloseable {
             }
             responseFuture.setCause(future.cause());
             responseFuture.putResponse(null);
-            log.error("send command {} to host {} failed", command, host);
+            log.error("send command {} to host {} failed", message, host);
         });
         /*
          * sync wait for result
          */
-        Command result = responseFuture.waitResponse();
+        Message result = responseFuture.waitResponse();
         if (result == null) {
             if (responseFuture.isSendOK()) {
                 throw new RemotingTimeoutException(host.toString(), timeoutMillis, responseFuture.getCause());
@@ -242,51 +241,49 @@ public class NettyRemotingClient implements AutoCloseable {
      * send task
      *
      * @param host host
-     * @param command command
+     * @param message command
      */
-    public void send(final Host host, final Command command) throws RemotingException {
+    public void send(final Host host, final Message message) throws RemotingException {
         Channel channel = getChannel(host);
         if (channel == null) {
             throw new RemotingException(String.format("connect to : %s fail", host));
         }
         try {
-            ChannelFuture future = channel.writeAndFlush(command).await();
+            ChannelFuture future = channel.writeAndFlush(message).await();
             if (future.isSuccess()) {
-                log.debug("send command : {} , to : {} successfully.", command, host.getAddress());
+                log.debug("send command : {} , to : {} successfully.", message, host.getAddress());
             } else {
-                String msg = String.format("send command : %s , to :%s failed", command, host.getAddress());
+                String msg = String.format("send command : %s , to :%s failed", message, host.getAddress());
                 log.error(msg, future.cause());
                 throw new RemotingException(msg);
             }
         } catch (RemotingException remotingException) {
             throw remotingException;
         } catch (Exception e) {
-            log.error("Send command {} to address {} encounter error.", command, host.getAddress());
+            log.error("Send command {} to address {} encounter error.", message, host.getAddress());
             throw new RemotingException(
-                    String.format("Send command : %s , to :%s encounter error", command, host.getAddress()), e);
+                    String.format("Send command : %s , to :%s encounter error", message, host.getAddress()), e);
         }
     }
 
     /**
      * register processor
      *
-     * @param commandType command type
      * @param processor processor
      */
-    public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor) {
-        this.registerProcessor(commandType, processor, null);
+    public void registerProcessor(final NettyRequestProcessor processor) {
+        this.registerProcessor(processor, null);
     }
 
     /**
      * register processor
      *
-     * @param commandType command type
      * @param processor processor
      * @param executor thread executor
      */
-    public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor,
+    public void registerProcessor(final NettyRequestProcessor processor,
                                   final ExecutorService executor) {
-        this.clientHandler.registerProcessor(commandType, processor, executor);
+        this.clientHandler.registerProcessor(processor.getCommandType(), processor, executor);
     }
 
     /**

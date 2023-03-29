@@ -17,12 +17,10 @@
 
 package org.apache.dolphinscheduler.alert;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.alert.AlertSendRequestCommand;
-import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseCommand;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
+import org.apache.dolphinscheduler.remote.command.alert.AlertSendRequest;
+import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponse;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
 
@@ -43,20 +41,21 @@ public final class AlertRequestProcessor implements NettyRequestProcessor {
     }
 
     @Override
-    public void process(Channel channel, Command command) {
-        checkArgument(CommandType.ALERT_SEND_REQUEST == command.getType(), "invalid command type: %s",
-                command.getType());
+    public void process(Channel channel, Message message) {
+        AlertSendRequest alertSendRequest = JsonSerializer.deserialize(message.getBody(), AlertSendRequest.class);
 
-        AlertSendRequestCommand alertSendRequestCommand = JsonSerializer.deserialize(
-                command.getBody(), AlertSendRequestCommand.class);
+        log.info("Received command : {}", alertSendRequest);
 
-        log.info("Received command : {}", alertSendRequestCommand);
+        AlertSendResponse alertSendResponse = alertSenderService.syncHandler(
+                alertSendRequest.getGroupId(),
+                alertSendRequest.getTitle(),
+                alertSendRequest.getContent(),
+                alertSendRequest.getWarnType());
+        channel.writeAndFlush(alertSendResponse.convert2Command(message.getOpaque()));
+    }
 
-        AlertSendResponseCommand alertSendResponseCommand = alertSenderService.syncHandler(
-                alertSendRequestCommand.getGroupId(),
-                alertSendRequestCommand.getTitle(),
-                alertSendRequestCommand.getContent(),
-                alertSendRequestCommand.getWarnType());
-        channel.writeAndFlush(alertSendResponseCommand.convert2Command(command.getOpaque()));
+    @Override
+    public MessageType getCommandType() {
+        return MessageType.ALERT_SEND_REQUEST;
     }
 }

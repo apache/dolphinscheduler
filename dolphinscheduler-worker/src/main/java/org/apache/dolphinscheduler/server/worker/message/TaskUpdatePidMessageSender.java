@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.server.worker.message;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.TaskUpdatePidCommand;
+import org.apache.dolphinscheduler.remote.command.MessageType;
+import org.apache.dolphinscheduler.remote.command.task.TaskUpdatePidMessage;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
@@ -31,7 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TaskUpdatePidMessageSender implements MessageSender<TaskUpdatePidCommand> {
+public class TaskUpdatePidMessageSender implements MessageSender<TaskUpdatePidMessage> {
 
     @Autowired
     private WorkerRpcClient workerRpcClient;
@@ -40,25 +40,25 @@ public class TaskUpdatePidMessageSender implements MessageSender<TaskUpdatePidCo
     private WorkerConfig workerConfig;
 
     @Override
-    public void sendMessage(TaskUpdatePidCommand message) throws RemotingException {
+    public void sendMessage(TaskUpdatePidMessage message) throws RemotingException {
         workerRpcClient.send(Host.of(message.getMessageReceiverAddress()), message.convert2Command());
     }
 
     @Override
-    public TaskUpdatePidCommand buildMessage(@NonNull TaskExecutionContext taskExecutionContext) {
-        TaskUpdatePidCommand taskUpdatePidCommand =
-                new TaskUpdatePidCommand(workerConfig.getWorkerAddress(),
+    public TaskUpdatePidMessage buildMessage(@NonNull TaskExecutionContext taskExecutionContext) {
+        TaskUpdatePidMessage taskUpdatePidRequest =
+                new TaskUpdatePidMessage(workerConfig.getWorkerAddress(),
                         taskExecutionContext.getWorkflowInstanceHost(),
                         System.currentTimeMillis());
-        taskUpdatePidCommand.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-        taskUpdatePidCommand.setProcessInstanceId(taskExecutionContext.getProcessInstanceId());
-        taskUpdatePidCommand.setHost(taskExecutionContext.getHost());
-        taskUpdatePidCommand.setStartTime(taskExecutionContext.getStartTime());
-        return taskUpdatePidCommand;
+        taskUpdatePidRequest.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+        taskUpdatePidRequest.setProcessInstanceId(taskExecutionContext.getProcessInstanceId());
+        taskUpdatePidRequest.setHost(taskExecutionContext.getHost());
+        taskUpdatePidRequest.setStartTime(taskExecutionContext.getStartTime());
+        return taskUpdatePidRequest;
     }
 
     @Override
-    public CommandType getMessageType() {
-        return CommandType.TASK_UPDATE_PID;
+    public MessageType getMessageType() {
+        return MessageType.TASK_UPDATE_PID_MESSAGE;
     }
 }
