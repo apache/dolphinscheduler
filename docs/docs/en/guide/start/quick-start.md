@@ -43,6 +43,8 @@ The brief is as follows:
 
 We can create a tenant in DolphinScheduler `Security -> Tenant Manage` page.
 
+> NOTE: The user will bind to a default tenant when it is created, if you use the default tenant, the task will be executed by worker's bootstrap user.
+
 ![create-tenant](../../../../img/start/create-tenant.gif)
 
 #### Assign Tenant to User

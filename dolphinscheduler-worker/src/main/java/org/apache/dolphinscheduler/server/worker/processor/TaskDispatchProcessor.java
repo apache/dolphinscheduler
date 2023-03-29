@@ -81,7 +81,6 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
             log.error("task execute request command content is null");
             return;
         }
-        final String workflowMasterAddress = taskDispatchMessage.getMessageSenderAddress();
         log.info("Receive task dispatch request, command: {}", taskDispatchMessage);
 
         TaskExecutionContext taskExecutionContext = taskDispatchMessage.getTaskExecutionContext();

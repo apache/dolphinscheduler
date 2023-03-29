@@ -70,7 +70,6 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
@@ -241,13 +240,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 processDefinition.getVersion());
         // check current version whether include startNodeList
         checkStartNodeList(startNodeList, processDefinitionCode, processDefinition.getVersion());
-        if (!checkTenantSuitable(processDefinition)) {
-            log.error(
-                    "There is not any valid tenant for the process definition, processDefinitionCode:{}, processDefinitionName:{}.",
-                    processDefinition.getCode(), processDefinition.getName());
-            putMsg(result, Status.TENANT_NOT_SUITABLE);
-            return result;
-        }
 
         checkScheduleTimeNumExceed(commandType, cronTime);
         checkMasterExists();
@@ -466,14 +458,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         this.checkProcessDefinitionValid(projectCode, processDefinition, processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion());
 
-        if (!checkTenantSuitable(processDefinition)) {
-            log.error(
-                    "There is not any valid tenant for the process definition, processDefinitionId:{}, processDefinitionCode:{}, ",
-                    processDefinition.getId(), processDefinition.getName());
-            putMsg(response, Status.TENANT_NOT_SUITABLE);
-            return response;
-        }
-
         // get the startParams user specified at the first starting while repeat running is needed
 
         long startNodeListLong;
@@ -552,18 +536,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         checkMasterExists();
         return forceStart(processInstance, taskGroupQueue);
-    }
-
-    /**
-     * check tenant suitable
-     *
-     * @param processDefinition process definition
-     * @return true if tenant suitable, otherwise return false
-     */
-    private boolean checkTenantSuitable(ProcessDefinition processDefinition) {
-        Tenant tenant =
-                processService.getTenantForProcess(processDefinition.getTenantId(), processDefinition.getUserId());
-        return tenant != null;
     }
 
     public void checkStartNodeList(String startNodeList, Long processDefinitionCode, int version) {
