@@ -54,6 +54,7 @@ public class AbstractDataSourceProcessorTest {
         AbstractDataSourceProcessor mockDataSourceProcessor = mock(AbstractDataSourceProcessor.class);
         Map<String, String> other = new HashMap<>();
         other.put("allowLoadLocalInfile", "whatever");
+        other.put("OutputLocation", "s3://test-data-xini/athena-query");
         doThrow(new IllegalArgumentException()).when(mockDataSourceProcessor).checkOther(other);
     }
 
