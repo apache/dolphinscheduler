@@ -74,10 +74,10 @@ public final class FeiShuAlertChannelFactory implements AlertChannelFactory {
         InputParam portParam =
                 InputParam.newBuilder(FeiShuParamsConstants.NAME_FEI_SHU_PORT, FeiShuParamsConstants.FEI_SHU_PORT)
                         .addValidate(
-                            Validate.newBuilder()
-                                .setRequired(false)
-                                .setType(DataType.NUMBER.getDataType())
-                                .build())
+                                Validate.newBuilder()
+                                        .setRequired(false)
+                                        .setType(DataType.NUMBER.getDataType())
+                                        .build())
                         .build();
 
         InputParam userParam =
