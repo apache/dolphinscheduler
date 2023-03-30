@@ -10,7 +10,7 @@ Apache DolphinScheduler支持将任务日志传输到远端存储上。当配置
 ```properties
 # 是否开启远程日志存储
 remote.logging.enable=true
-# 任务日志写入的远端存储，目前支持OSS, S3
+# 任务日志写入的远端存储，目前支持OSS, S3, GCS
 remote.logging.target=OSS
 # 任务日志在远端存储上的目录
 remote.logging.base.dir=logs
@@ -48,5 +48,16 @@ remote.logging.s3.bucket.name=<bucket.name>
 remote.logging.s3.endpoint=<endpoint>
 # s3 region, required if you set remote.logging.target=S3
 remote.logging.s3.region=<region>
+```
+
+## 将任务日志写入[Google Cloud Storage (GCS)](https://cloud.google.com/storage)
+
+配置`common.propertis`如下：
+
+```properties
+# the location of the google cloud credential, required if you set remote.logging.target=GCS
+remote.logging.google.cloud.storage.credential=/path/to/credential
+# gcs bucket name, required if you set remote.logging.target=GCS
+remote.logging.google.cloud.storage.bucket.name=<your-bucket>
 ```
 

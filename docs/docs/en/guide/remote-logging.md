@@ -50,3 +50,14 @@ remote.logging.s3.endpoint=<endpoint>
 remote.logging.s3.region=<region>
 ```
 
+## Writing task logs to [Google Cloud Storage (GCS)](https://cloud.google.com/storage)
+
+Configure `common.properties` as follows:
+
+```properties
+# the location of the google cloud credential, required if you set remote.logging.target=GCS
+remote.logging.google.cloud.storage.credential=/path/to/credential
+# gcs bucket name, required if you set remote.logging.target=GCS
+remote.logging.google.cloud.storage.bucket.name=<your-bucket>
+```
+

@@ -35,6 +35,10 @@ import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.LoggerContext;
+
 @Slf4j
 public class LogUtils {
 
@@ -160,4 +164,9 @@ public class LogUtils {
 
         return builder.toString();
     }
+    public static String getLocalLogBaseDir() {
+        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+        return loggerContext.getProperty("log.base.ctx");
+    }
+
 }
