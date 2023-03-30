@@ -128,7 +128,7 @@ public class RemoteShellTask extends AbstractTask {
      * @return file name
      * @throws Exception exception
      */
-    private String buildCommand() throws Exception {
+    public String buildCommand() throws Exception {
         // generate scripts
         String fileName = String.format("%s/%s_node.%s",
                 taskExecutionContext.getExecutePath(),
@@ -172,7 +172,7 @@ public class RemoteShellTask extends AbstractTask {
         return ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
     }
 
-    private void initRemoteExecutor() {
+    public void initRemoteExecutor() {
         DataSourceParameters dbSource = (DataSourceParameters) taskExecutionContext.getResourceParametersHelper()
                 .getResourceParameters(ResourceType.DATASOURCE, remoteShellParameters.getDatasource());
         taskExecutionContext.getResourceParametersHelper().getResourceParameters(ResourceType.DATASOURCE,

@@ -18,8 +18,11 @@
 package org.apache.dolphinscheduler.plugin.task.remoteshell;
 
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.plugin.datasource.ssh.SSHUtils;
@@ -46,7 +49,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 public class RemoteExecutorTest {
 
     private String connectJson =
-            "{\"user\":\"lucky\",\"password\":\"123456\",\"host\":\"dolphinscheduler.com\",\"port\":22, \"publicKey\":\"ssh-rsa AAAAB\"}";
+            "{\"user\":\"root\",\"password\":\"123456\",\"host\":\"dolphinscheduler.com\",\"port\":22, \"publicKey\":\"ssh-rsa AAAAB\"}";
 
     SSHConnectionParam sshConnectionParam;
 
@@ -87,9 +90,47 @@ public class RemoteExecutorTest {
         RemoteExecutor remoteExecutor = spy(new RemoteExecutor(sshConnectionParam));
         String taskId = "1234";
         String command = String.format("ps -ef | grep \"%s.sh\" | grep -v grep | awk '{print $2}'", taskId);
-
         doReturn("10001").when(remoteExecutor).runRemote(command);
-
         Assertions.assertEquals("10001", remoteExecutor.getTaskPid(taskId));
+    }
+
+    @Test
+    void testSaveCommand() throws IOException {
+        RemoteExecutor remoteExecutor = spy(new RemoteExecutor(sshConnectionParam));
+        doNothing().when(remoteExecutor).uploadScript(Mockito.anyString(), Mockito.anyString());
+        String checkDirCommand =
+                "if [ ! -d /tmp/dolphinscheduler-remote-shell-root/ ]; then mkdir -p /tmp/dolphinscheduler-remote-shell-root/; fi";
+        String catScriptCommand = "cat /tmp/dolphinscheduler-remote-shell-root/1234.sh";
+        doReturn("").when(remoteExecutor).runRemote(checkDirCommand);
+        doReturn("").when(remoteExecutor).runRemote(catScriptCommand);
+
+        remoteExecutor.saveCommand("1234", "/tmp/dolphinscheduler/test.sh");
+        verify(remoteExecutor).runRemote(checkDirCommand);
+    }
+
+    @Test
+    void testCleanData() throws IOException {
+        RemoteExecutor remoteExecutor = spy(new RemoteExecutor(sshConnectionParam));
+        String cleanCommand =
+                "rm /tmp/dolphinscheduler-remote-shell-root/1234.sh /tmp/dolphinscheduler-remote-shell-root/1234.log";
+        doReturn("").when(remoteExecutor).runRemote(cleanCommand);
+        remoteExecutor.cleanData("1234");
+        String cleanCommandError =
+                "rm /tmp/dolphinscheduler-remote-shell-root/abcd.sh /tmp/dolphinscheduler-remote-shell-root/abcd.log";
+        doThrow(new TaskException()).when(remoteExecutor).runRemote(cleanCommandError);
+        remoteExecutor.cleanData("abcd");
+    }
+
+    @Test
+    void testGetTaskExitCode() throws IOException {
+        RemoteExecutor remoteExecutor = spy(new RemoteExecutor(sshConnectionParam));
+        String taskId = "1234";
+        doNothing().when(remoteExecutor).cleanData(taskId);
+        String trackCommand = "tail -n 1 /tmp/dolphinscheduler-remote-shell-root/1234.log";
+        doReturn("DOLPHINSCHEDULER-REMOTE-SHELL-TASK-STATUS-0").when(remoteExecutor).runRemote(trackCommand);
+        Assertions.assertEquals(0, remoteExecutor.getTaskExitCode(taskId));
+
+        doReturn("DOLPHINSCHEDULER-REMOTE-SHELL-TASK-STATUS-1").when(remoteExecutor).runRemote(trackCommand);
+        Assertions.assertEquals(1, remoteExecutor.getTaskExitCode(taskId));
     }
 }
