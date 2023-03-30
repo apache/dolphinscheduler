@@ -18,10 +18,10 @@
 package org.apache.dolphinscheduler.plugin.task.api;
 
 import static org.apache.dolphinscheduler.common.constants.Constants.EMPTY_STRING;
+import static org.apache.dolphinscheduler.common.constants.Constants.SLEEP_TIME_MILLIS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -91,7 +91,7 @@ public abstract class AbstractCommandExecutor {
 
     protected boolean processLogOutputIsSuccess = false;
 
-    protected boolean podLogOutputIsSuccess = false;
+    protected boolean podLogOutputIsFinished = false;
 
     /*
      * SHELL result string
@@ -264,14 +264,9 @@ public abstract class AbstractCommandExecutor {
         if (podLogOutputFuture != null) {
             try {
                 // Wait kubernetes pod log collection finished
-                String msg = (String) podLogOutputFuture.get();
-                if (StringUtils.isEmpty(msg)) {
-                    // delete pod after successful execution
-                    ProcessUtils.cancelApplication(taskRequest);
-                } else {
-                    // contains error message
-                    logger.error(msg);
-                }
+                podLogOutputFuture.get();
+                // delete pod after successful execution and log collection
+                ProcessUtils.cancelApplication(taskRequest);
             } catch (ExecutionException e) {
                 logger.error("Handle pod log error", e);
             }
@@ -324,12 +319,12 @@ public abstract class AbstractCommandExecutor {
 
     private void collectPodLogIfNeeded() {
         if (null == taskRequest.getK8sTaskExecutionContext()) {
-            podLogOutputIsSuccess = true;
+            podLogOutputIsFinished = true;
             return;
         }
 
         // wait for launching (driver) pod
-        ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS * 5L);
+        ThreadUtils.sleep(SLEEP_TIME_MILLIS * 5L);
         LogWatch watcher =
                 ProcessUtils.getPodLogWatcher(taskRequest.getK8sTaskExecutionContext(), taskRequest.getTaskAppId());
         if (watcher != null) {
@@ -345,18 +340,19 @@ public abstract class AbstractCommandExecutor {
                         }
                     }
                 } catch (Exception e) {
-                    logger.error("Collect pod log error", e);
+                    throw new RuntimeException(e);
                 } finally {
                     watcher.close();
+                    podLogOutputIsFinished = true;
                 }
-
-                podLogOutputIsSuccess = true;
             });
 
             collectPodLogExecutorService.shutdown();
         } else {
-            podLogOutputFuture = CompletableFuture.completedFuture("The driver pod does not exist.");
-            podLogOutputIsSuccess = true;
+            CompletableFuture<String> exceptionalFuture = new CompletableFuture<>();
+            exceptionalFuture.completeExceptionally(new RuntimeException("The driver pod does not exist."));
+            podLogOutputFuture = exceptionalFuture;
+            podLogOutputIsFinished = true;
         }
     }
 
@@ -394,7 +390,7 @@ public abstract class AbstractCommandExecutor {
             try (
                     final LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
                             LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());) {
-                while (logBuffer.size() > 1 || !processLogOutputIsSuccess || !podLogOutputIsSuccess) {
+                while (logBuffer.size() > 1 || !processLogOutputIsSuccess || !podLogOutputIsFinished) {
                     if (logBuffer.size() > 1) {
                         logHandler.accept(logBuffer);
                         logBuffer.clear();
