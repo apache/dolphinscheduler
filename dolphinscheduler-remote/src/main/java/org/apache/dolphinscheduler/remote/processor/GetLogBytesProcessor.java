@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.remote.processor;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.LogUtils;
 import org.apache.dolphinscheduler.remote.command.Message;
 import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.log.GetLogBytesRequest;
@@ -38,7 +39,7 @@ public class GetLogBytesProcessor extends BaseLogProcessor implements NettyReque
         GetLogBytesRequest getLogRequest = JSONUtils.parseObject(
                 message.getBody(), GetLogBytesRequest.class);
         String path = getLogRequest.getPath();
-        byte[] bytes = getFileContentBytes(path);
+        byte[] bytes = LogUtils.getFileContentBytes(path);
         GetLogBytesResponse getLogResponse = new GetLogBytesResponse(bytes);
         channel.writeAndFlush(getLogResponse.convert2Command(message.getOpaque()));
     }

@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.service.log;
 
 import static org.apache.dolphinscheduler.common.constants.Constants.APPID_COLLECT;
 import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_COLLECT_WAY;
+import static org.apache.dolphinscheduler.common.utils.LogUtils.readWholeFileContentFromLocal;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
@@ -114,7 +115,7 @@ public class LogClient implements AutoCloseable {
         final Host address = new Host(host, port);
         try {
             if (NetUtils.getHost().equals(host)) {
-                return LogUtils.readWholeFileContentFromLocal(request.getPath());
+                return readWholeFileContentFromLocal(request.getPath());
             } else {
                 Message message = request.convert2Command();
                 Message response = this.client.sendSync(address, message, LOG_REQUEST_TIMEOUT);
