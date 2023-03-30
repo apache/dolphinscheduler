@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertChannelFactory;
 import org.apache.dolphinscheduler.alert.api.AlertInputTips;
 import org.apache.dolphinscheduler.spi.params.PasswordParam;
+import org.apache.dolphinscheduler.spi.params.base.DataType;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
@@ -122,8 +123,10 @@ public final class DingTalkAlertChannelFactory implements AlertChannelFactory {
 
         InputParam portParam = InputParam
                 .newBuilder(DingTalkParamsConstants.NAME_DING_TALK_PORT, DingTalkParamsConstants.DING_TALK_PORT)
-                .addValidate(Validate.newBuilder()
+                .addValidate(
+                    Validate.newBuilder()
                         .setRequired(false)
+                        .setType(DataType.NUMBER.getDataType())
                         .build())
                 .build();
 
