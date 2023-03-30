@@ -508,7 +508,7 @@ public class PythonGateway {
                 .filter(dataSource -> type == null || StringUtils.equalsIgnoreCase(dataSource.getType().name(), type))
                 .collect(Collectors.toList());
 
-        log.info("Get the datasource list match the type are: {}", dataSourceListMatchType);
+        logger.info("Get the datasource list match the type are: {}", dataSourceListMatchType);
         if (dataSourceListMatchType.size() > 1) {
             String msg = String.format("Get more than one datasource by name %s", datasourceName);
             logger.error(msg);
@@ -517,7 +517,7 @@ public class PythonGateway {
 
         return dataSourceListMatchType.stream().findFirst().orElseThrow(() -> {
             String msg = String.format("Can not find any datasource by name %s and type %s", datasourceName, type);
-            log.error(msg);
+            logger.error(msg);
             return new IllegalArgumentException(msg);
         });
     }
