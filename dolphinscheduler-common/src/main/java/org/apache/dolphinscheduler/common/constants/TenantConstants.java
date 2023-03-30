@@ -13,6 +13,13 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
-INSERT INTO t_ds_tenant(id, tenant_code, description, queue_id, create_time, update_time) VALUES (-1, 'default', 'default tenant', '0', '2018-03-27 15:48:50', '2018-10-24 17:40:22');
+package org.apache.dolphinscheduler.common.constants;
+
+public class TenantConstants {
+
+    public static final String DEFAULT_TENANT_CODE = "default";
+
+    public static final String BOOTSTRAPT_SYSTEM_USER = System.getProperty("user.name");
+}

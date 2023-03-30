@@ -193,7 +193,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         log.info("Set task status to {}", TaskExecutionStatus.RUNNING_EXECUTION);
 
         TaskExecutionCheckerUtils.checkTenantExist(workerConfig, taskExecutionContext);
-        log.info("TenantCode:{} check success", taskExecutionContext.getTenantCode());
+        log.info("TenantCode: {} check success", taskExecutionContext.getTenantCode());
 
         TaskExecutionCheckerUtils.createProcessLocalPathIfAbsent(taskExecutionContext);
         log.info("ProcessExecDir:{} check success", taskExecutionContext.getExecutePath());

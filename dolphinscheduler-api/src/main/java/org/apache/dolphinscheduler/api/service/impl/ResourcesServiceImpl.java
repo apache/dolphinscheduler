@@ -161,14 +161,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        Tenant tenant = tenantMapper.queryById(user.getTenantId());
-        if (tenant == null) {
-            log.error("tenant not exists");
-            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
-            return result;
-        }
-
-        String tenantCode = tenant.getTenantCode();
+        String tenantCode = getTenantCode(user);
 
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, "")) {
             log.error("current user does not have permission");
@@ -240,14 +233,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        Tenant tenant = tenantMapper.queryById(user.getTenantId());
-        if (tenant == null) {
-            log.error("tenant not exists");
-            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
-            return result;
-        }
-
-        String tenantCode = tenant.getTenantCode();
+        String tenantCode = getTenantCode(user);
 
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, "")) {
             log.error("current user does not have permission");
@@ -378,14 +364,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        Tenant tenant = tenantMapper.queryById(user.getTenantId());
-        if (tenant == null) {
-            log.error("tenant not exists");
-            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
-            return result;
-        }
-
-        String tenantCode = tenant.getTenantCode();
+        String tenantCode = getTenantCode(user);
 
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)) {
             log.error("current user does not have permission");
@@ -594,14 +573,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        Tenant tenant = tenantMapper.queryById(user.getTenantId());
-        if (tenant == null) {
-            log.error("tenant not exists");
-            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
-            return result;
-        }
-
-        String tenantCode = tenant.getTenantCode();
+        String tenantCode = getTenantCode(user);
 
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)) {
             log.error("current user does not have permission");
@@ -619,7 +591,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             List<User> userList = userMapper.selectList(null);
             Set<String> visitedTenantEntityCode = new HashSet<>();
             for (User userEntity : userList) {
-                String tenantEntityCode = tenantMapper.queryById(userEntity.getTenantId()).getTenantCode();
+                String tenantEntityCode = getTenantCode(userEntity);
                 if (!visitedTenantEntityCode.contains(tenantEntityCode)) {
                     defaultPath = storageOperate.getResDir(tenantEntityCode);
                     if (type.equals(ResourceType.UDF)) {
@@ -723,7 +695,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return false;
         }
         // query tenant
-        String tenantCode = tenantMapper.queryById(loginUser.getTenantId()).getTenantCode();
+        String tenantCode = getTenantCode(loginUser);
         // random file name
         String localFilename = FileUtils.getUploadFilename(tenantCode, UUID.randomUUID().toString());
 
@@ -768,13 +740,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return null;
         }
 
-        Tenant tenant = tenantMapper.queryById(user.getTenantId());
-        if (tenant == null) {
-            log.error("tenant not exists");
-            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
-            return null;
-        }
-        String tenantCode = tenant.getTenantCode();
+        String tenantCode = getTenantCode(user);
 
         String defaultPath = "";
         List<StorageEntity> resourcesList = new ArrayList<>();
@@ -785,7 +751,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 Set<String> visitedTenantEntityCode = new HashSet<>();
                 for (User userEntity : userList) {
 
-                    String tenantEntityCode = tenantMapper.queryById(userEntity.getTenantId()).getTenantCode();
+                    String tenantEntityCode = getTenantCode(userEntity);
                     if (!visitedTenantEntityCode.contains(tenantEntityCode)) {
                         defaultPath = storageOperate.getResDir(tenantEntityCode);
                         if (type.equals(ResourceType.UDF)) {
@@ -911,14 +877,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        Tenant tenant = tenantMapper.queryById(user.getTenantId());
-        if (tenant == null) {
-            log.error("tenant not exists");
-            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
-            return result;
-        }
-
-        String tenantCode = tenant.getTenantCode();
+        String tenantCode = getTenantCode(user);
 
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)) {
             log.error("current user does not have permission");
@@ -1042,14 +1001,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        Tenant tenant = tenantMapper.queryById(user.getTenantId());
-        if (tenant == null) {
-            log.error("tenant not exists");
-            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
-            return result;
-        }
-
-        String tenantCode = tenant.getTenantCode();
+        String tenantCode = getTenantCode(user);
 
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)) {
             log.error("current user does not have permission");
@@ -1095,14 +1047,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        Tenant tenant = tenantMapper.queryById(user.getTenantId());
-        if (tenant == null) {
-            log.error("tenant not exists");
-            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
-            return result;
-        }
-
-        String tenantCode = tenant.getTenantCode();
+        String tenantCode = getTenantCode(user);
 
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)) {
             log.error("current user does not have permission");
@@ -1153,14 +1098,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        Tenant tenant = tenantMapper.queryById(user.getTenantId());
-        if (tenant == null) {
-            log.error("tenant not exists");
-            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
-            return result;
-        }
-
-        String tenantCode = tenant.getTenantCode();
+        String tenantCode = getTenantCode(user);
 
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)) {
             log.error("current user does not have permission");
@@ -1236,14 +1174,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        Tenant tenant = tenantMapper.queryById(user.getTenantId());
-        if (tenant == null) {
-            log.error("tenant not exists");
-            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
-            return result;
-        }
-
-        String tenantCode = tenant.getTenantCode();
+        String tenantCode = getTenantCode(user);
 
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, "")) {
             log.error("current user does not have permission");
@@ -1384,14 +1315,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        Tenant tenant = tenantMapper.queryById(user.getTenantId());
-        if (tenant == null) {
-            log.error("tenant not exists");
-            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
-            return result;
-        }
-
-        String tenantCode = tenant.getTenantCode();
+        String tenantCode = getTenantCode(user);
 
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)) {
             log.error("current user does not have permission");
@@ -1510,17 +1434,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             throw new ServiceException(String.format("Resource owner id %d does not exist", userId));
         }
 
-        String tenantCode = "";
-
-        if (user.getTenantId() != 0) {
-            Tenant tenant = tenantMapper.queryById(user.getTenantId());
-            if (tenant == null) {
-                log.error("Tenant id {} not exists", user.getTenantId());
-                throw new ServiceException(
-                        String.format("The tenant id %d of resource owner not exist", user.getTenantId()));
-            }
-            tenantCode = tenant.getTenantCode();
-        }
+        String tenantCode = getTenantCode(user);
 
         String[] aliasArr = fullName.split("/");
         String alias = aliasArr[aliasArr.length - 1];
@@ -1598,14 +1512,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        Tenant tenant = tenantMapper.queryById(user.getTenantId());
-        if (tenant == null) {
-            log.error("tenant not exists");
-            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
-            return result;
-        }
-
-        String tenantCode = tenant.getTenantCode();
+        String tenantCode = getTenantCode(user);
 
         String baseFolder = storageOperate.getResourceFileName(tenantCode, "DATA_TRANSFER");
 
@@ -1874,5 +1781,13 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         return true;
+    }
+
+    private String getTenantCode(User user) {
+        Tenant tenant = tenantMapper.queryById(user.getTenantId());
+        if (tenant == null) {
+            throw new ServiceException(Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
+        }
+        return tenant.getTenantCode();
     }
 }

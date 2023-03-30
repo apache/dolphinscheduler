@@ -14,3 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+
+-- ############################# t_ds_tenant #############################
+drop PROCEDURE if EXISTS dolphin_t_ds_tenant_insert_default;
+delimiter d//
+CREATE PROCEDURE dolphin_t_ds_tenant_insert_default()
+BEGIN
+    IF
+NOT EXISTS(SELECT 1
+                   FROM t_ds_tenant
+                   WHERE id = -1)
+    THEN
+        INSERT INTO `t_ds_tenant` VALUES ('-1', 'default', 'default tenant', '1', current_timestamp, current_timestamp);
+END IF;
+END;
+d//
+
+delimiter ;
+CALL dolphin_t_ds_tenant_insert_default();
+DROP PROCEDURE dolphin_t_ds_tenant_insert_default;
