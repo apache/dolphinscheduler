@@ -51,6 +51,7 @@ export type TaskType =
   | 'KUBEFLOW'
   | 'LINKIS'
   | 'DATA_FACTORY'
+  | 'REMOTESHELL'
 
 export type TaskExecuteType = 'STREAM' | 'BATCH'
 
@@ -184,6 +185,10 @@ export const TASK_TYPES_MAP = {
   },
   DATA_FACTORY: {
     alias: 'DATA_FACTORY',
+    helperLinkDisable: true
+  },
+  REMOTESHELL: {
+    alias: 'REMOTESHELL',
     helperLinkDisable: true
   }
 } as {

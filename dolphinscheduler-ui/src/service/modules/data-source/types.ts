@@ -32,6 +32,7 @@ type IDataBase =
   | 'STARROCKS'
   | 'DAMENG'
   | 'OCEANBASE'
+  | 'SSH'
 
 type IDataBaseLabel =
 | 'MYSQL'
@@ -50,6 +51,7 @@ type IDataBaseLabel =
 | 'STARROCKS'
 | 'DAMENG'
 | 'OCEANBASE'
+| 'SSH'
 
 interface IDataSource {
   id?: number
@@ -76,6 +78,7 @@ interface IDataSource {
   MSIClientId?: string
   dbUser?: string
   compatibleMode?: string
+  publicKey?: string
 }
 
 interface ListReq {

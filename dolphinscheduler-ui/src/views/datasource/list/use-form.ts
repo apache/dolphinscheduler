@@ -69,6 +69,9 @@ export function useForm(id?: number) {
     showConnectType: false,
     showPrincipal: false,
     showMode: false,
+    showDataBaseName: true,
+    showJDBCConnectParameters: true,
+    showPublicKey: false,
     bindTestDataSourceExample: [] as { label: string; value: number }[],
     rules: {
       name: {
@@ -263,6 +266,19 @@ export function useForm(id?: number) {
     } else {
       state.showPrincipal = false
     }
+    if (type === 'SSH') {
+      state.showDataBaseName = false
+      state.requiredDataBase = false
+      state.showJDBCConnectParameters = false
+      state.showPublicKey = true
+    }else {
+      state.showDataBaseName = true
+      state.requiredDataBase = true
+      state.showJDBCConnectParameters = true
+      state.showPublicKey = false
+
+    }
+
     if (state.detailForm.id === undefined) {
       await getSameTypeTestDataSource()
     }
@@ -406,6 +422,11 @@ export const datasourceType: IDataBaseOptionKeys = {
     value: 'OCEANBASE',
     label: 'OCEANBASE',
     defaultPort: 2881
+  },
+  SSH: {
+    value: 'SSH',
+    label: 'SSH',
+    defaultPort: 22
   }
 }
 

@@ -465,6 +465,11 @@ export function formatParams(data: INodeData): {
     taskParams.pipelineName = data.pipelineName
   }
 
+  if (data.taskType === 'REMOTESHELL') {
+    taskParams.type = data.type
+    taskParams.datasource = data.datasource
+  }
+
   let timeoutNotifyStrategy = ''
   if (data.timeoutNotifyStrategy) {
     if (data.timeoutNotifyStrategy.length === 1) {
