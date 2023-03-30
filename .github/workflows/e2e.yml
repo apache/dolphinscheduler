@@ -165,6 +165,7 @@ jobs:
             echo "Skip E2E!"
             exit 0
           fi
+
           if [[ ${{ needs.e2e.result }} != 'success' ]]; then
             echo "E2E Failed!"
             exit -1
