@@ -121,13 +121,13 @@ public class CheckUtils {
     }
 
     /**
-     * check phone phone can be empty.
+     * check phone, phone can be empty.
      *
      * @param phone phone
      * @return true if phone regex valid, otherwise return false
      */
     public static boolean checkPhone(String phone) {
-        return StringUtils.isEmpty(phone) || phone.length() == 11;
+        return StringUtils.isEmpty(phone) || Constants.REGEX_PHONE_NUMBER.matcher(phone).matches();
     }
 
     /**

@@ -845,4 +845,10 @@ public final class Constants {
     public static final String REMOTE_LOGGING_S3_ENDPOINT = "remote.logging.s3.endpoint";
 
     public static final String REMOTE_LOGGING_S3_REGION = "remote.logging.s3.region";
+
+    /**
+     * phone number regex
+     */
+    public static final Pattern REGEX_PHONE_NUMBER =
+            Pattern.compile("^1(3\\d|4[5-9]|5[0-3,5-9]|6[567]|7[0-8]|8\\d|9[0-3,5-9])\\d{8}$");
 }
