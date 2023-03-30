@@ -29,10 +29,8 @@ import org.apache.dolphinscheduler.spi.params.PasswordParam;
 import org.apache.dolphinscheduler.spi.params.base.DataType;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
-import org.apache.dolphinscheduler.spi.params.base.PropsType;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
 import org.apache.dolphinscheduler.spi.params.input.InputParam;
-import org.apache.dolphinscheduler.spi.params.input.InputParamProps;
 import org.apache.dolphinscheduler.spi.params.input.number.InputNumberParam;
 import org.apache.dolphinscheduler.spi.params.radio.RadioParam;
 
@@ -75,11 +73,11 @@ public final class FeiShuAlertChannelFactory implements AlertChannelFactory {
                         .build();
 
         InputNumberParam portParam =
-            InputNumberParam.newBuilder(FeiShuParamsConstants.NAME_FEI_SHU_PORT, FeiShuParamsConstants.FEI_SHU_PORT)
+                InputNumberParam.newBuilder(FeiShuParamsConstants.NAME_FEI_SHU_PORT, FeiShuParamsConstants.FEI_SHU_PORT)
                         .addValidate(Validate.newBuilder()
-                                        .setRequired(false)
-                                        .setType(DataType.NUMBER.getDataType())
-                                        .build())
+                                .setRequired(false)
+                                .setType(DataType.NUMBER.getDataType())
+                                .build())
                         .build();
 
         InputParam userParam =

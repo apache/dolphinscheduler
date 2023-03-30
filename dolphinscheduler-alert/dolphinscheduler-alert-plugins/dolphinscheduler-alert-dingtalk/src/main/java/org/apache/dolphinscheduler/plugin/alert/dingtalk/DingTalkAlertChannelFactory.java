@@ -125,9 +125,9 @@ public final class DingTalkAlertChannelFactory implements AlertChannelFactory {
         InputNumberParam portParam = InputNumberParam
                 .newBuilder(DingTalkParamsConstants.NAME_DING_TALK_PORT, DingTalkParamsConstants.DING_TALK_PORT)
                 .addValidate(Validate.newBuilder()
-                                .setRequired(false)
-                                .setType(DataType.NUMBER.getDataType())
-                                .build())
+                        .setRequired(false)
+                        .setType(DataType.NUMBER.getDataType())
+                        .build())
                 .build();
 
         InputParam userParam = InputParam

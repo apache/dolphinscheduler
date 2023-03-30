@@ -116,11 +116,12 @@ public final class TelegramAlertChannelFactory implements AlertChannelFactory {
                 .build();
 
         InputNumberParam portParam =
-            InputNumberParam.newBuilder(TelegramParamsConstants.NAME_TELEGRAM_PORT, TelegramParamsConstants.TELEGRAM_PORT)
+                InputNumberParam
+                        .newBuilder(TelegramParamsConstants.NAME_TELEGRAM_PORT, TelegramParamsConstants.TELEGRAM_PORT)
                         .addValidate(Validate.newBuilder()
-                                        .setRequired(false)
-                                        .setType(DataType.NUMBER.getDataType())
-                                        .build())
+                                .setRequired(false)
+                                .setType(DataType.NUMBER.getDataType())
+                                .build())
                         .build();
 
         InputParam userParam =

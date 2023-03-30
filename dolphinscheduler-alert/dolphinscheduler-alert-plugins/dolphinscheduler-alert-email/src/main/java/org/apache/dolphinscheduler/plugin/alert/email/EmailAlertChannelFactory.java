@@ -72,12 +72,12 @@ public final class EmailAlertChannelFactory implements AlertChannelFactory {
                         .build();
 
         InputNumberParam mailSmtpPort =
-            InputNumberParam.newBuilder(MailParamsConstants.NAME_MAIL_SMTP_PORT, MailParamsConstants.MAIL_SMTP_PORT)
+                InputNumberParam.newBuilder(MailParamsConstants.NAME_MAIL_SMTP_PORT, MailParamsConstants.MAIL_SMTP_PORT)
                         .setValue(25)
                         .addValidate(Validate.newBuilder()
-                                        .setRequired(true)
-                                        .setType(DataType.NUMBER.getDataType())
-                                        .build())
+                                .setRequired(true)
+                                .setType(DataType.NUMBER.getDataType())
+                                .build())
                         .build();
 
         InputParam mailSender =
