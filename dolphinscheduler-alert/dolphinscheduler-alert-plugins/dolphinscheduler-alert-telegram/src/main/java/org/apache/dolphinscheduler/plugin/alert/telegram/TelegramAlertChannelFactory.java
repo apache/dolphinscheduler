@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
 import org.apache.dolphinscheduler.spi.params.input.InputParam;
+import org.apache.dolphinscheduler.spi.params.input.number.InputNumberParam;
 import org.apache.dolphinscheduler.spi.params.radio.RadioParam;
 import org.apache.dolphinscheduler.spi.params.select.SelectParam;
 
@@ -114,10 +115,9 @@ public final class TelegramAlertChannelFactory implements AlertChannelFactory {
                         .build())
                 .build();
 
-        InputParam portParam =
-                InputParam.newBuilder(TelegramParamsConstants.NAME_TELEGRAM_PORT, TelegramParamsConstants.TELEGRAM_PORT)
-                        .addValidate(
-                                Validate.newBuilder()
+        InputNumberParam portParam =
+            InputNumberParam.newBuilder(TelegramParamsConstants.NAME_TELEGRAM_PORT, TelegramParamsConstants.TELEGRAM_PORT)
+                        .addValidate(Validate.newBuilder()
                                         .setRequired(false)
                                         .setType(DataType.NUMBER.getDataType())
                                         .build())
