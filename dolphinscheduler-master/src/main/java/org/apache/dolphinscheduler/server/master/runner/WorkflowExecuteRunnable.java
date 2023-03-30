@@ -383,13 +383,13 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                 retryTaskInstance(taskInstance);
             } else if (taskInstance.getState().typeIsFailure()) {
                 completeTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
-                errorTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
                 // There are child nodes and the failure policy is: CONTINUE
                 if (processInstance.getFailureStrategy() == FailureStrategy.CONTINUE && DagHelper.haveAllNodeAfterNode(
                     Long.toString(taskInstance.getTaskCode()),
                     dag)) {
                     submitPostNode(Long.toString(taskInstance.getTaskCode()));
                 } else {
+                    errorTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
                     if (processInstance.getFailureStrategy() == FailureStrategy.END) {
                         killAllTasks();
                     }
