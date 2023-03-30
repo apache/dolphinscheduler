@@ -916,6 +916,8 @@ CREATE TABLE t_ds_tenant
 -- ----------------------------
 -- Records of t_ds_tenant
 -- ----------------------------
+INSERT IGNORE INTO `t_ds_tenant`
+VALUES ('-1', 'default', 'default tenant', '1', current_timestamp, current_timestamp);
 
 -- ----------------------------
 -- Table structure for t_ds_udfs
@@ -955,7 +957,7 @@ CREATE TABLE t_ds_user
     user_type     tinyint(4) DEFAULT NULL,
     email         varchar(64) DEFAULT NULL,
     phone         varchar(11) DEFAULT NULL,
-    tenant_id     int(11) DEFAULT NULL,
+    tenant_id     int(11) DEFAULT -1,
     create_time   datetime    DEFAULT NULL,
     update_time   datetime    DEFAULT NULL,
     queue         varchar(64) DEFAULT NULL,
@@ -1020,7 +1022,7 @@ VALUES (NULL, 1, 'default admin warning group', 'default admin warning group', '
 -- Records of t_ds_user
 -- ----------------------------
 INSERT INTO t_ds_user
-VALUES ('1', 'admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '0', '2018-03-27 15:48:50',
+VALUES ('1', 'admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '-1', '2018-03-27 15:48:50',
         '2018-10-24 17:40:22', null, 1, null);
 
 -- ----------------------------

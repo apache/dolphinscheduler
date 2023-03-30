@@ -847,7 +847,7 @@ CREATE TABLE t_ds_user (
   user_type int DEFAULT NULL ,
   email varchar(64) DEFAULT NULL ,
   phone varchar(11) DEFAULT NULL ,
-  tenant_id int DEFAULT NULL ,
+  tenant_id int DEFAULT -1 ,
   create_time timestamp DEFAULT NULL ,
   update_time timestamp DEFAULT NULL ,
   queue varchar(64) DEFAULT NULL ,
@@ -977,7 +977,11 @@ ALTER TABLE t_ds_worker_group ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_worker_g
 
 -- Records of t_ds_user?user : admin , password : dolphinscheduler123
 INSERT INTO t_ds_user(user_name, user_password, user_type, email, phone, tenant_id, state, create_time, update_time, time_zone)
-VALUES ('admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '0', 1, '2018-03-27 15:48:50', '2018-10-24 17:40:22', null);
+VALUES ('admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '-1', 1, '2018-03-27 15:48:50', '2018-10-24 17:40:22', null);
+
+-- Records of t_ds_tenant
+INSERT INTO t_ds_tenant(id, tenant_code, description, queue_id, create_time, update_time)
+VALUES (-1, 'default', 'default tenant', '0', '2018-03-27 15:48:50', '2018-10-24 17:40:22');
 
 -- Records of t_ds_alertgroup, default admin warning group
 INSERT INTO t_ds_alertgroup(alert_instance_ids, create_user_id, group_name, description, create_time, update_time)

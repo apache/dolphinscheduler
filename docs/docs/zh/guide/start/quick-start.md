@@ -33,7 +33,9 @@ Tenant是使用DolphinScheduler时绕不开的一个概念，所以先简单介�
 
 我们可以在 DolphinScheduler `Security -> Tenant Manage` 页面创建租户。
 
-![create-tenant](../../../../img/start/create-tenant.gif)
+> ![create-tenant](../../../../img/start/create-tenant.gif)
+>
+> 注意：如果没有关联租户，则会使用默认租户，默认租户为default，会使用程序启动用户执行任务。
 
 #### 将租户分配给用户
 

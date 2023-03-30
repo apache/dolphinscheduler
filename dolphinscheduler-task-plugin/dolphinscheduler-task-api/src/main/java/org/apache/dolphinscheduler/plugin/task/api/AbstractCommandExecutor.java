@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.api;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
 
+import org.apache.dolphinscheduler.common.constants.TenantConstants;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -135,7 +136,8 @@ public abstract class AbstractCommandExecutor {
         processBuilder.redirectErrorStream(true);
 
         // if sudo.enable=true,setting up user to run commands
-        if (OSUtils.isSudoEnable()) {
+        // todo: Create a ShellExecuteClass to generate the shell and execute shell commands
+        if (OSUtils.isSudoEnable() && !TenantConstants.DEFAULT_TENANT_CODE.equals(taskRequest.getTenantCode())) {
             if (SystemUtils.IS_OS_LINUX
                     && PropertyUtils.getBoolean(AbstractCommandExecutorConstants.TASK_RESOURCE_LIMIT_STATE)) {
                 generateCgroupCommand(command);
