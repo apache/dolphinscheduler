@@ -26,11 +26,8 @@ import org.apache.dolphinscheduler.plugin.task.api.log.TaskLogDiscriminator;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -184,20 +181,6 @@ public class LogUtils {
             log.error("Get appId from log file error, logPath: {}", logPath, e);
             return Collections.emptyList();
         }
-    }
-
-    public static String readWholeFileContentFromLocal(String filePath) {
-        String line;
-        StringBuilder sb = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath)))) {
-            while ((line = br.readLine()) != null) {
-                sb.append(line + "\r\n");
-            }
-            return sb.toString();
-        } catch (IOException e) {
-            log.error("read file error", e);
-        }
-        return "";
     }
 
     public static String getTaskInstanceLogFullPathMdc() {
