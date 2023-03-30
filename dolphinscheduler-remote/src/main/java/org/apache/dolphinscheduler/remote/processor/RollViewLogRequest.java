@@ -18,11 +18,11 @@
 package org.apache.dolphinscheduler.remote.processor;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.LogUtils;
 import org.apache.dolphinscheduler.remote.command.Message;
 import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.log.RollViewLogResponse;
 
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
@@ -42,30 +42,12 @@ public class RollViewLogRequest extends BaseLogProcessor implements NettyRequest
 
         String rollViewLogPath = rollViewLogRequest.getPath();
 
-        List<String> lines = readPartFileContent(rollViewLogPath,
+        List<String> lines = LogUtils.readPartFileContent(rollViewLogPath,
                 rollViewLogRequest.getSkipLineNum(), rollViewLogRequest.getLimit());
-        StringBuilder builder = new StringBuilder();
-        final int MaxResponseLogSize = 65535;
-        int totalLogByteSize = 0;
-        for (String line : lines) {
-            // If a single line of log is exceed max response size, cut off the line
-            final int lineByteSize = line.getBytes(StandardCharsets.UTF_8).length;
-            if (lineByteSize >= MaxResponseLogSize) {
-                builder.append(line, 0, MaxResponseLogSize)
-                        .append(" [this line's size ").append(lineByteSize).append(" bytes is exceed ")
-                        .append(MaxResponseLogSize).append(" bytes, so only ")
-                        .append(MaxResponseLogSize).append(" characters are reserved for performance reasons.]")
-                        .append("\r\n");
-            } else {
-                builder.append(line).append("\r\n");
-            }
-            totalLogByteSize += lineByteSize;
-            if (totalLogByteSize >= MaxResponseLogSize) {
-                break;
-            }
-        }
+
+        String logContent = LogUtils.rollViewLogLines(lines);
         RollViewLogResponse rollViewLogRequestResponse =
-                new RollViewLogResponse(builder.toString());
+                new RollViewLogResponse(logContent);
         channel.writeAndFlush(rollViewLogRequestResponse.convert2Command(message.getOpaque()));
     }
 

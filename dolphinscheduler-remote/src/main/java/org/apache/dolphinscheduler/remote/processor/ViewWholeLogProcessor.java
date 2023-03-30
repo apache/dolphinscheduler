@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.remote.processor;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.LogUtils;
 import org.apache.dolphinscheduler.remote.command.Message;
 import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.log.ViewLogRequest;
@@ -38,7 +39,7 @@ public class ViewWholeLogProcessor extends BaseLogProcessor implements NettyRequ
         ViewLogRequest viewLogRequest = JSONUtils.parseObject(
                 message.getBody(), ViewLogRequest.class);
         String viewLogPath = viewLogRequest.getPath();
-        String msg = readWholeFileContent(viewLogPath);
+        String msg = LogUtils.readWholeFileContent(viewLogPath);
         ViewLogResponseResponse viewLogResponse = new ViewLogResponseResponse(msg);
         channel.writeAndFlush(viewLogResponse.convert2Command(message.getOpaque()));
     }
