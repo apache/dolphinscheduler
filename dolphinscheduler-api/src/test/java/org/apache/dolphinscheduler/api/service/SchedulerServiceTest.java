@@ -243,7 +243,7 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         Assertions.assertEquals(Status.SCHEDULE_CRON_CHECK_FAILED.getCode(), ((ServiceException) exception).getCode());
 
         // error schedule crontab
-        String badCrontab2 = "0 0 123 * * ? *";
+        String badCrontab2 = "0 0 13/0 * * ? *";
         scheduleCreateRequest.setStartTime(startTime);
         scheduleCreateRequest.setCrontab(badCrontab2);
         exception = Assertions.assertThrows(ServiceException.class,
