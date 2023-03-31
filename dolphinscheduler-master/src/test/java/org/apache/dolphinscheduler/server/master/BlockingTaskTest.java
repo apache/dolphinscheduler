@@ -216,6 +216,7 @@ public class BlockingTaskTest {
         Mockito.when(
                 taskInstanceDao.findValidTaskListByProcessId(processInstance.getId(), processInstance.getTestFlag()))
                 .thenReturn(conditions);
+        taskInstance.setProcessInstance(processInstance);
         return taskInstance;
     }
 

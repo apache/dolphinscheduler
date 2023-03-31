@@ -29,7 +29,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.remote.command.WorkflowStateEventChangeCommand;
+import org.apache.dolphinscheduler.remote.command.workflow.WorkflowStateEventChangeRequest;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
@@ -224,11 +224,11 @@ public class SubTaskProcessor extends BaseTaskProcessor {
     }
 
     private void sendToSubProcess() {
-        WorkflowStateEventChangeCommand workflowStateEventChangeCommand = new WorkflowStateEventChangeCommand(
+        WorkflowStateEventChangeRequest workflowStateEventChangeRequest = new WorkflowStateEventChangeRequest(
                 processInstance.getId(), taskInstance.getId(), subProcessInstance.getState(),
                 subProcessInstance.getId(), 0);
         Host host = new Host(subProcessInstance.getHost());
-        this.stateEventCallbackService.sendResult(host, workflowStateEventChangeCommand.convert2Command());
+        this.stateEventCallbackService.sendResult(host, workflowStateEventChangeRequest.convert2Command());
     }
 
     @Override

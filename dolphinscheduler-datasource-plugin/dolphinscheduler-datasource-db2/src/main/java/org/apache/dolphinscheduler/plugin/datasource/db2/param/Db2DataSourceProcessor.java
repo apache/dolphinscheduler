@@ -54,7 +54,7 @@ public class Db2DataSourceProcessor extends AbstractDataSourceProcessor {
         Db2DataSourceParamDTO db2DatasourceParamDTO = new Db2DataSourceParamDTO();
         db2DatasourceParamDTO.setDatabase(connectionParams.getDatabase());
         db2DatasourceParamDTO.setOther(connectionParams.getOther());
-        db2DatasourceParamDTO.setUserName(db2DatasourceParamDTO.getUserName());
+        db2DatasourceParamDTO.setUserName(connectionParams.getUser());
 
         String[] hostSeperator = connectionParams.getAddress().split(Constants.DOUBLE_SLASH);
         String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);
@@ -97,7 +97,7 @@ public class Db2DataSourceProcessor extends AbstractDataSourceProcessor {
     public String getJdbcUrl(ConnectionParam connectionParam) {
         Db2ConnectionParam db2ConnectionParam = (Db2ConnectionParam) connectionParam;
         if (MapUtils.isNotEmpty(db2ConnectionParam.getOther())) {
-            return String.format("%s;%s", db2ConnectionParam.getJdbcUrl(),
+            return String.format("%s:%s", db2ConnectionParam.getJdbcUrl(),
                     transformOther(db2ConnectionParam.getOther()));
         }
         return db2ConnectionParam.getJdbcUrl();

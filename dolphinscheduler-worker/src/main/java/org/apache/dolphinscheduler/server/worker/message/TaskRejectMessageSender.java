@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.server.worker.message;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.TaskRejectCommand;
+import org.apache.dolphinscheduler.remote.command.MessageType;
+import org.apache.dolphinscheduler.remote.command.task.TaskRejectMessage;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
@@ -29,7 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TaskRejectMessageSender implements MessageSender<TaskRejectCommand> {
+public class TaskRejectMessageSender implements MessageSender<TaskRejectMessage> {
 
     @Autowired
     private WorkerRpcClient workerRpcClient;
@@ -38,13 +38,14 @@ public class TaskRejectMessageSender implements MessageSender<TaskRejectCommand>
     private WorkerConfig workerConfig;
 
     @Override
-    public void sendMessage(TaskRejectCommand message) throws RemotingException {
+    public void sendMessage(TaskRejectMessage message) throws RemotingException {
         workerRpcClient.send(Host.of(message.getMessageReceiverAddress()), message.convert2Command());
     }
 
-    public TaskRejectCommand buildMessage(TaskExecutionContext taskExecutionContext, String masterAddress) {
-        TaskRejectCommand taskRejectMessage = new TaskRejectCommand(workerConfig.getWorkerAddress(),
-                masterAddress,
+    @Override
+    public TaskRejectMessage buildMessage(TaskExecutionContext taskExecutionContext) {
+        TaskRejectMessage taskRejectMessage = new TaskRejectMessage(workerConfig.getWorkerAddress(),
+                taskExecutionContext.getWorkflowInstanceHost(),
                 System.currentTimeMillis());
         taskRejectMessage.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
         taskRejectMessage.setProcessInstanceId(taskExecutionContext.getProcessInstanceId());
@@ -53,7 +54,7 @@ public class TaskRejectMessageSender implements MessageSender<TaskRejectCommand>
     }
 
     @Override
-    public CommandType getMessageType() {
-        return CommandType.TASK_REJECT;
+    public MessageType getMessageType() {
+        return MessageType.TASK_REJECT;
     }
 }

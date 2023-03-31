@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.remote;
 
 import org.apache.dolphinscheduler.remote.codec.NettyDecoder;
 import org.apache.dolphinscheduler.remote.codec.NettyEncoder;
-import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.apache.dolphinscheduler.remote.exceptions.RemoteException;
 import org.apache.dolphinscheduler.remote.handler.NettyServerHandler;
@@ -171,23 +170,21 @@ public class NettyRemotingServer {
     /**
      * register processor
      *
-     * @param commandType command type
      * @param processor processor
      */
-    public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor) {
-        this.registerProcessor(commandType, processor, null);
+    public void registerProcessor(final NettyRequestProcessor processor) {
+        this.registerProcessor(processor, null);
     }
 
     /**
      * register processor
      *
-     * @param commandType command type
-     * @param processor processor
-     * @param executor thread executor
+     * @param processor   processor
+     * @param executor    thread executor
      */
-    public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor,
+    public void registerProcessor(final NettyRequestProcessor processor,
                                   final ExecutorService executor) {
-        this.serverHandler.registerProcessor(commandType, processor, executor);
+        this.serverHandler.registerProcessor(processor.getCommandType(), processor, executor);
     }
 
     /**

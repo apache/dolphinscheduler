@@ -34,7 +34,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-registry-mysql</artifactId>
+            <artifactId>dolphinscheduler-registry-jdbc</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

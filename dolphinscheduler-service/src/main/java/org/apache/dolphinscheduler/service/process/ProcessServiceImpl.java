@@ -69,7 +69,6 @@ import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.Resource;
-import org.apache.dolphinscheduler.dao.entity.ResourcesTask;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
@@ -98,7 +97,6 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ResourceTaskMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
@@ -120,15 +118,13 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqTaskState;
-import org.apache.dolphinscheduler.plugin.task.api.model.DateInterval;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SubProcessParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.TaskTimeoutParameter;
-import org.apache.dolphinscheduler.remote.command.TaskEventChangeCommand;
-import org.apache.dolphinscheduler.remote.command.WorkflowStateEventChangeCommand;
+import org.apache.dolphinscheduler.remote.command.workflow.WorkflowStateEventChangeRequest;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.command.CommandService;
@@ -148,7 +144,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -231,9 +226,6 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Autowired
     private ResourceMapper resourceMapper;
-
-    @Autowired
-    private ResourceTaskMapper resourceTaskMapper;
 
     @Autowired
     private ResourceUserMapper resourceUserMapper;
@@ -396,12 +388,12 @@ public class ProcessServiceImpl implements ProcessService {
                 int update = processInstanceDao.updateProcessInstance(info);
                 // determine whether the process is normal
                 if (update > 0) {
-                    WorkflowStateEventChangeCommand workflowStateEventChangeCommand =
-                            new WorkflowStateEventChangeCommand(
+                    WorkflowStateEventChangeRequest workflowStateEventChangeRequest =
+                            new WorkflowStateEventChangeRequest(
                                     info.getId(), 0, info.getState(), info.getId(), 0);
                     try {
                         Host host = new Host(info.getHost());
-                        stateEventCallbackService.sendResult(host, workflowStateEventChangeCommand.convert2Command());
+                        stateEventCallbackService.sendResult(host, workflowStateEventChangeRequest.convert2Command());
                     } catch (Exception e) {
                         log.error("sendResultError", e);
                     }
@@ -1414,13 +1406,9 @@ public class ProcessServiceImpl implements ProcessService {
                 return new ResourceInfo();
             }
             resourceInfo = new ResourceInfo();
-            // get resource from database, only one resource should be returned
-            Integer resultList = resourceTaskMapper.existResourceByTaskIdNFullName(task_id, resourceFullName);
-            if (resultList != null) {
-                resourceInfo.setId(resultList);
-                resourceInfo.setRes(res.getRes());
-                resourceInfo.setResourceName(resourceFullName);
-            }
+            resourceInfo.setId(-1);
+            resourceInfo.setRes(res.getRes());
+            resourceInfo.setResourceName(resourceFullName);
             log.info("updated resource info {}",
                     JSONUtils.toJsonString(resourceInfo));
         }
@@ -1599,17 +1587,15 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     @Transactional
     public void processNeedFailoverProcessInstances(ProcessInstance processInstance) {
-        // 1 update processInstance host is null
+        // updateProcessInstance host is null to mark this processInstance has been failover
+        // and insert a failover command
         processInstance.setHost(Constants.NULL);
         processInstanceMapper.updateById(processInstance);
 
-        ProcessDefinition processDefinition = findProcessDefinition(processInstance.getProcessDefinitionCode(),
-                processInstance.getProcessDefinitionVersion());
-
         // 2 insert into recover command
         Command cmd = new Command();
-        cmd.setProcessDefinitionCode(processDefinition.getCode());
-        cmd.setProcessDefinitionVersion(processDefinition.getVersion());
+        cmd.setProcessDefinitionCode(processInstance.getProcessDefinitionCode());
+        cmd.setProcessDefinitionVersion(processInstance.getProcessDefinitionVersion());
         cmd.setProcessInstanceId(processInstance.getId());
         cmd.setCommandParam(
                 String.format("{\"%s\":%d}", CMD_PARAM_RECOVER_PROCESS_ID_STRING, processInstance.getId()));
@@ -1694,54 +1680,6 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public List<Schedule> selectAllByProcessDefineCode(long[] codes) {
         return scheduleMapper.selectAllByProcessDefineArray(codes);
-    }
-
-    /**
-     * find last scheduler process instance in the date interval
-     *
-     * @param definitionCode definitionCode
-     * @param dateInterval   dateInterval
-     * @return process instance
-     */
-    @Override
-    public ProcessInstance findLastSchedulerProcessInterval(Long definitionCode, DateInterval dateInterval,
-                                                            int testFlag) {
-        return processInstanceMapper.queryLastSchedulerProcess(definitionCode,
-                dateInterval.getStartTime(),
-                dateInterval.getEndTime(),
-                testFlag);
-    }
-
-    /**
-     * find last manual process instance interval
-     *
-     * @param definitionCode process definition code
-     * @param dateInterval   dateInterval
-     * @return process instance
-     */
-    @Override
-    public ProcessInstance findLastManualProcessInterval(Long definitionCode, DateInterval dateInterval, int testFlag) {
-        return processInstanceMapper.queryLastManualProcess(definitionCode,
-                dateInterval.getStartTime(),
-                dateInterval.getEndTime(),
-                testFlag);
-    }
-
-    /**
-     * find last running process instance
-     *
-     * @param definitionCode process definition code
-     * @param startTime      start time
-     * @param endTime        end time
-     * @return process instance
-     */
-    @Override
-    public ProcessInstance findLastRunningProcess(Long definitionCode, Date startTime, Date endTime, int testFlag) {
-        return processInstanceMapper.queryLastRunningProcess(definitionCode,
-                startTime,
-                endTime,
-                testFlag,
-                WorkflowExecutionStatus.getNeedFailoverWorkflowInstanceState());
     }
 
     /**
@@ -2061,42 +1999,9 @@ public class ProcessServiceImpl implements ProcessService {
 
         if (CollectionUtils.isNotEmpty(newTaskDefinitionLogs) && Boolean.TRUE.equals(syncDefine)) {
             updateResult += taskDefinitionMapper.batchInsert(newTaskDefinitionLogs);
-
-            for (TaskDefinitionLog newTaskDefinitionLog : newTaskDefinitionLogs) {
-                Set<String> resourceFullNameSet = getResourceFullNames(newTaskDefinitionLog);
-                for (String resourceFullName : resourceFullNameSet) {
-                    List<TaskDefinition> taskDefinitionList = taskDefinitionMapper.selectByMap(
-                            Collections.singletonMap("code", newTaskDefinitionLog.getCode()));
-                    if (taskDefinitionList.size() > 0) {
-                        createRelationTaskResourcesIfNotExist(
-                                taskDefinitionList.get(0).getId(), resourceFullName);
-                    }
-                }
-            }
-
         }
         if (CollectionUtils.isNotEmpty(updateTaskDefinitionLogs) && Boolean.TRUE.equals(syncDefine)) {
             for (TaskDefinitionLog taskDefinitionLog : updateTaskDefinitionLogs) {
-                Set<String> resourceFullNameSet = getResourceFullNames(taskDefinitionLog);
-
-                // remove resources that user deselected.
-                for (ResourcesTask resourcesTask : resourceTaskMapper.selectByMap(
-                        Collections.singletonMap("task_id",
-                                taskDefinitionMapper.queryByCode(taskDefinitionLog.getCode()).getId()))) {
-                    if (!resourceFullNameSet.contains(resourcesTask.getFullName())) {
-                        resourceTaskMapper.deleteById(resourcesTask.getId());
-                    }
-                }
-
-                for (String resourceFullName : resourceFullNameSet) {
-                    List<TaskDefinition> taskDefinitionList = taskDefinitionMapper.selectByMap(
-                            Collections.singletonMap("code", taskDefinitionLog.getCode()));
-                    if (taskDefinitionList.size() > 0) {
-                        createRelationTaskResourcesIfNotExist(
-                                taskDefinitionList.get(0).getId(), resourceFullName);
-                    }
-                }
-
                 updateResult += taskDefinitionMapper.updateById(taskDefinitionLog);
             }
         }
@@ -2630,16 +2535,6 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
-    public void sendStartTask2Master(ProcessInstance processInstance, int taskId,
-                                     org.apache.dolphinscheduler.remote.command.CommandType taskType) {
-        TaskEventChangeCommand taskEventChangeCommand = new TaskEventChangeCommand(
-                processInstance.getId(), taskId);
-        Host host = new Host(processInstance.getHost());
-        stateEventCallbackService.sendResult(host, taskEventChangeCommand.convert2Command(taskType));
-        log.info("Success send command to master: {}, command: {}", host, taskEventChangeCommand);
-    }
-
-    @Override
     public ProcessInstance loadNextProcess4Serial(long code, int state, int id) {
         return this.processInstanceMapper.loadNextProcess4Serial(code, state, id);
     }
@@ -2717,35 +2612,4 @@ public class ProcessServiceImpl implements ProcessService {
         triggerRelationService.saveCommandTrigger(commandId, processInstanceId);
     }
 
-    private Set<String> getResourceFullNames(TaskDefinition taskDefinition) {
-        Set<String> resourceFullNames = null;
-        AbstractParameters params = taskPluginManager.getParameters(ParametersNode.builder()
-                .taskType(taskDefinition.getTaskType()).taskParams(taskDefinition.getTaskParams()).build());
-
-        if (params != null && CollectionUtils.isNotEmpty(params.getResourceFilesList())) {
-            resourceFullNames = params.getResourceFilesList().stream()
-                    .filter(t -> !StringUtils.isBlank(t.getResourceName()))
-                    .map(ResourceInfo::getResourceName)
-                    .collect(toSet());
-        }
-
-        if (CollectionUtils.isEmpty(resourceFullNames)) {
-            return new HashSet<String>();
-        }
-
-        return resourceFullNames;
-    }
-
-    private Integer createRelationTaskResourcesIfNotExist(int taskId, String resourceFullName) {
-
-        Integer resourceId = resourceTaskMapper.existResourceByTaskIdNFullName(taskId, resourceFullName);
-        if (null == resourceId) {
-            // create the relation if not exist
-            ResourcesTask resourcesTask = new ResourcesTask(taskId, resourceFullName, ResourceType.FILE);
-            resourceTaskMapper.insert(resourcesTask);
-            return resourcesTask.getId();
-        }
-
-        return resourceId;
-    }
 }

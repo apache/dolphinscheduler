@@ -30,7 +30,7 @@
 
     <modules>
         <module>dolphinscheduler-registry-zookeeper</module>
-        <module>dolphinscheduler-registry-mysql</module>
+        <module>dolphinscheduler-registry-jdbc</module>
         <module>dolphinscheduler-registry-etcd</module>
     </modules>
 </project>

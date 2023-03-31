@@ -34,7 +34,6 @@ public abstract class WorkerDelayTaskExecuteRunnableFactory<T extends WorkerDela
 
     protected final @NonNull TaskExecutionContext taskExecutionContext;
     protected final @NonNull WorkerConfig workerConfig;
-    protected final @NonNull String workflowMasterAddress;
     protected final @NonNull WorkerMessageSender workerMessageSender;
     protected final @NonNull WorkerRpcClient workerRpcClient;
     protected final @NonNull TaskPluginManager taskPluginManager;
@@ -43,14 +42,12 @@ public abstract class WorkerDelayTaskExecuteRunnableFactory<T extends WorkerDela
     protected WorkerDelayTaskExecuteRunnableFactory(
                                                     @NonNull TaskExecutionContext taskExecutionContext,
                                                     @NonNull WorkerConfig workerConfig,
-                                                    @NonNull String workflowMasterAddress,
                                                     @NonNull WorkerMessageSender workerMessageSender,
                                                     @NonNull WorkerRpcClient workerRpcClient,
                                                     @NonNull TaskPluginManager taskPluginManager,
                                                     @Nullable StorageOperate storageOperate) {
         this.taskExecutionContext = taskExecutionContext;
         this.workerConfig = workerConfig;
-        this.workflowMasterAddress = workflowMasterAddress;
         this.workerMessageSender = workerMessageSender;
         this.workerRpcClient = workerRpcClient;
         this.taskPluginManager = taskPluginManager;

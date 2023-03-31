@@ -70,7 +70,6 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
@@ -81,10 +80,12 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
-import org.apache.dolphinscheduler.remote.command.TaskExecuteStartCommand;
-import org.apache.dolphinscheduler.remote.command.WorkflowExecutingDataRequestCommand;
-import org.apache.dolphinscheduler.remote.command.WorkflowExecutingDataResponseCommand;
-import org.apache.dolphinscheduler.remote.command.WorkflowStateEventChangeCommand;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.task.TaskExecuteStartMessage;
+import org.apache.dolphinscheduler.remote.command.task.TaskForceStartRequest;
+import org.apache.dolphinscheduler.remote.command.workflow.WorkflowExecutingDataRequest;
+import org.apache.dolphinscheduler.remote.command.workflow.WorkflowExecutingDataResponse;
+import org.apache.dolphinscheduler.remote.command.workflow.WorkflowStateEventChangeRequest;
 import org.apache.dolphinscheduler.remote.dto.WorkflowExecuteDto;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.remote.utils.Host;
@@ -239,13 +240,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 processDefinition.getVersion());
         // check current version whether include startNodeList
         checkStartNodeList(startNodeList, processDefinitionCode, processDefinition.getVersion());
-        if (!checkTenantSuitable(processDefinition)) {
-            log.error(
-                    "There is not any valid tenant for the process definition, processDefinitionCode:{}, processDefinitionName:{}.",
-                    processDefinition.getCode(), processDefinition.getName());
-            putMsg(result, Status.TENANT_NOT_SUITABLE);
-            return result;
-        }
 
         checkScheduleTimeNumExceed(commandType, cronTime);
         checkMasterExists();
@@ -464,14 +458,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         this.checkProcessDefinitionValid(projectCode, processDefinition, processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion());
 
-        if (!checkTenantSuitable(processDefinition)) {
-            log.error(
-                    "There is not any valid tenant for the process definition, processDefinitionId:{}, processDefinitionCode:{}, ",
-                    processDefinition.getId(), processDefinition.getName());
-            putMsg(response, Status.TENANT_NOT_SUITABLE);
-            return response;
-        }
-
         // get the startParams user specified at the first starting while repeat running is needed
 
         long startNodeListLong;
@@ -550,18 +536,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         checkMasterExists();
         return forceStart(processInstance, taskGroupQueue);
-    }
-
-    /**
-     * check tenant suitable
-     *
-     * @param processDefinition process definition
-     * @return true if tenant suitable, otherwise return false
-     */
-    private boolean checkTenantSuitable(ProcessDefinition processDefinition) {
-        Tenant tenant =
-                processService.getTenantForProcess(processDefinition.getTenantId(), processDefinition.getUserId());
-        return tenant != null;
     }
 
     public void checkStartNodeList(String startNodeList, Long processDefinitionCode, int version) {
@@ -650,10 +624,10 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                     executionStatus.getDesc(), processInstance.getName());
             // directly send the process instance state change event to target master, not guarantee the event send
             // success
-            WorkflowStateEventChangeCommand workflowStateEventChangeCommand = new WorkflowStateEventChangeCommand(
+            WorkflowStateEventChangeRequest workflowStateEventChangeRequest = new WorkflowStateEventChangeRequest(
                     processInstance.getId(), 0, processInstance.getState(), processInstance.getId(), 0);
             Host host = new Host(processInstance.getHost());
-            stateEventCallbackService.sendResult(host, workflowStateEventChangeCommand.convert2Command());
+            stateEventCallbackService.sendResult(host, workflowStateEventChangeRequest.convert2Command());
             putMsg(result, Status.SUCCESS);
         } else {
             log.error("Process instance state update error, processInstanceName:{}.", processInstance.getName());
@@ -678,9 +652,10 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         taskGroupQueue.setForceStart(Flag.YES.getCode());
         processService.updateTaskGroupQueue(taskGroupQueue);
-        log.info("Sending force start command to master.");
-        processService.sendStartTask2Master(processInstance, taskGroupQueue.getTaskId(),
-                org.apache.dolphinscheduler.remote.command.CommandType.TASK_FORCE_STATE_EVENT_REQUEST);
+        log.info("Sending force start command to master: {}.", processInstance.getHost());
+        stateEventCallbackService.sendResult(
+                Host.of(processInstance.getHost()),
+                new TaskForceStartRequest(processInstance.getId(), taskGroupQueue.getTaskId()).convert2Command());
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -1148,17 +1123,17 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             return null;
         }
         Host host = new Host(processInstance.getHost());
-        WorkflowExecutingDataRequestCommand requestCommand = new WorkflowExecutingDataRequestCommand();
+        WorkflowExecutingDataRequest requestCommand = new WorkflowExecutingDataRequest();
         requestCommand.setProcessInstanceId(processInstanceId);
-        org.apache.dolphinscheduler.remote.command.Command command =
+        Message message =
                 stateEventCallbackService.sendSync(host, requestCommand.convert2Command());
-        if (command == null) {
+        if (message == null) {
             log.error("Query executing process instance from master error, processInstanceId:{}.",
                     processInstanceId);
             return null;
         }
-        WorkflowExecutingDataResponseCommand responseCommand =
-                JSONUtils.parseObject(command.getBody(), WorkflowExecutingDataResponseCommand.class);
+        WorkflowExecutingDataResponse responseCommand =
+                JSONUtils.parseObject(message.getBody(), WorkflowExecutingDataResponse.class);
         return responseCommand.getWorkflowExecuteDto();
     }
 
@@ -1180,20 +1155,20 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         List<Server> masterServerList = monitorService.getServerListFromRegistry(true);
         Host host = new Host(masterServerList.get(0).getHost(), masterServerList.get(0).getPort());
 
-        TaskExecuteStartCommand taskExecuteStartCommand = new TaskExecuteStartCommand();
-        taskExecuteStartCommand.setExecutorId(loginUser.getId());
-        taskExecuteStartCommand.setExecutorName(loginUser.getUserName());
-        taskExecuteStartCommand.setProjectCode(projectCode);
-        taskExecuteStartCommand.setTaskDefinitionCode(taskDefinitionCode);
-        taskExecuteStartCommand.setTaskDefinitionVersion(taskDefinitionVersion);
-        taskExecuteStartCommand.setWorkerGroup(workerGroup);
-        taskExecuteStartCommand.setWarningGroupId(warningGroupId);
-        taskExecuteStartCommand.setEnvironmentCode(environmentCode);
-        taskExecuteStartCommand.setStartParams(startParams);
-        taskExecuteStartCommand.setDryRun(dryRun);
+        TaskExecuteStartMessage taskExecuteStartMessage = new TaskExecuteStartMessage();
+        taskExecuteStartMessage.setExecutorId(loginUser.getId());
+        taskExecuteStartMessage.setExecutorName(loginUser.getUserName());
+        taskExecuteStartMessage.setProjectCode(projectCode);
+        taskExecuteStartMessage.setTaskDefinitionCode(taskDefinitionCode);
+        taskExecuteStartMessage.setTaskDefinitionVersion(taskDefinitionVersion);
+        taskExecuteStartMessage.setWorkerGroup(workerGroup);
+        taskExecuteStartMessage.setWarningGroupId(warningGroupId);
+        taskExecuteStartMessage.setEnvironmentCode(environmentCode);
+        taskExecuteStartMessage.setStartParams(startParams);
+        taskExecuteStartMessage.setDryRun(dryRun);
 
-        org.apache.dolphinscheduler.remote.command.Command response =
-                stateEventCallbackService.sendSync(host, taskExecuteStartCommand.convert2Command());
+        Message response =
+                stateEventCallbackService.sendSync(host, taskExecuteStartMessage.convert2Command());
         if (response != null) {
             log.info("Send task execute start command complete, response is {}.", response);
             putMsg(result, Status.SUCCESS);

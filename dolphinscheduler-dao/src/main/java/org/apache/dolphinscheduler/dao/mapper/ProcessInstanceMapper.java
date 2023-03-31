@@ -228,6 +228,22 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
                                            @Param("testFlag") int testFlag);
 
     /**
+     * query first schedule process instance
+     *
+     * @param definitionCode definitionCode
+     * @return process instance
+     */
+    ProcessInstance queryFirstScheduleProcessInstance(@Param("processDefinitionCode") Long definitionCode);
+
+    /**
+     * query first manual process instance
+     *
+     * @param definitionCode definitionCode
+     * @return process instance
+     */
+    ProcessInstance queryFirstStartProcessInstance(@Param("processDefinitionCode") Long definitionCode);
+
+    /**
      * query top n process instance order by running duration
      *
      * @param size        size
