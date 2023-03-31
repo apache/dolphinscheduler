@@ -32,6 +32,7 @@ type IDataBase =
   | 'STARROCKS'
   | 'DAMENG'
   | 'OCEANBASE'
+  | 'SSH'
   | 'SNOWFLAKE'
 
 type IDataBaseLabel =
@@ -51,6 +52,7 @@ type IDataBaseLabel =
 | 'STARROCKS'
 | 'DAMENG'
 | 'OCEANBASE'
+| 'SSH'
 
 interface IDataSource {
   id?: number
@@ -77,6 +79,7 @@ interface IDataSource {
   MSIClientId?: string
   dbUser?: string
   compatibleMode?: string
+  publicKey?: string
   datawarehouse?: string
 }
 

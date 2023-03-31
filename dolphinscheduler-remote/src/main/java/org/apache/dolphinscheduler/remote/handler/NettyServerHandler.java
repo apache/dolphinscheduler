@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.remote.handler;
 
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.ChannelUtils;
 import org.apache.dolphinscheduler.remote.utils.Pair;
@@ -51,7 +51,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
     /**
      * server processors queue
      */
-    private final ConcurrentHashMap<CommandType, Pair<NettyRequestProcessor, ExecutorService>> processors =
+    private final ConcurrentHashMap<MessageType, Pair<NettyRequestProcessor, ExecutorService>> processors =
             new ConcurrentHashMap<>();
 
     public NettyServerHandler(NettyRemotingServer nettyRemotingServer) {
@@ -77,33 +77,33 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        processReceived(ctx.channel(), (Command) msg);
+        processReceived(ctx.channel(), (Message) msg);
     }
 
     /**
      * register processor
      *
-     * @param commandType command type
+     * @param messageType command type
      * @param processor processor
      */
-    public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor) {
-        this.registerProcessor(commandType, processor, null);
+    public void registerProcessor(final MessageType messageType, final NettyRequestProcessor processor) {
+        this.registerProcessor(messageType, processor, null);
     }
 
     /**
      * register processor
      *
-     * @param commandType command type
+     * @param messageType command type
      * @param processor processor
      * @param executor thread executor
      */
-    public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor,
+    public void registerProcessor(final MessageType messageType, final NettyRequestProcessor processor,
                                   final ExecutorService executor) {
         ExecutorService executorRef = executor;
         if (executorRef == null) {
             executorRef = nettyRemotingServer.getDefaultExecutor();
         }
-        this.processors.putIfAbsent(commandType, new Pair<>(processor, executorRef));
+        this.processors.putIfAbsent(messageType, new Pair<>(processor, executorRef));
     }
 
     /**
@@ -112,15 +112,15 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
      * @param channel channel
      * @param msg message
      */
-    private void processReceived(final Channel channel, final Command msg) {
-        final CommandType commandType = msg.getType();
-        if (CommandType.HEART_BEAT.equals(commandType)) {
+    private void processReceived(final Channel channel, final Message msg) {
+        final MessageType messageType = msg.getType();
+        if (MessageType.HEART_BEAT.equals(messageType)) {
             if (log.isDebugEnabled()) {
                 log.debug("server receive heart beat from: host: {}", ChannelUtils.getRemoteAddress(channel));
             }
             return;
         }
-        final Pair<NettyRequestProcessor, ExecutorService> pair = processors.get(commandType);
+        final Pair<NettyRequestProcessor, ExecutorService> pair = processors.get(messageType);
         if (pair != null) {
             Runnable r = () -> {
                 try {
@@ -135,7 +135,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
                 log.warn("thread pool is full, discard msg {} from {}", msg, ChannelUtils.getRemoteAddress(channel));
             }
         } else {
-            log.warn("commandType {} not support", commandType);
+            log.warn("commandType {} not support", messageType);
         }
     }
 

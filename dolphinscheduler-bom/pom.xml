@@ -107,7 +107,7 @@
         <azure-resourcemanager-datafactory.version>1.0.0-beta.19</azure-resourcemanager-datafactory.version>
         <snowflake-jdbc.version>3.13.10</snowflake-jdbc.version>
         <google-cloud-storage.version>2.18.0</google-cloud-storage.version>
-
+        <sshd.version>2.8.0</sshd.version>
     </properties>
 
     <dependencyManagement>
@@ -738,6 +738,17 @@
                         <artifactId>jackson-module-scala_2.11</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.sshd</groupId>
+                <artifactId>sshd-sftp</artifactId>
+                <version>${sshd.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.sshd</groupId>
+                <artifactId>sshd-scp</artifactId>
+                <version>${sshd.version}</version>
             </dependency>
 
             <dependency>

@@ -45,7 +45,8 @@ public enum DbType {
     AZURESQL(14, "azuresql"),
     DAMENG(15, "dameng"),
     OCEANBASE(16, "oceanbase"),
-    SNOWFLAKE(17, "snowflake");
+    SSH(17, "ssh"),
+    SNOWFLAKE(19, "snowflake");
 
     private static final Map<Integer, DbType> DB_TYPE_MAP =
             Arrays.stream(DbType.values()).collect(toMap(DbType::getCode, Functions.identity()));

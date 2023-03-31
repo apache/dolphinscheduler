@@ -32,7 +32,6 @@ import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEvent;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEventQueue;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEventType;
@@ -40,6 +39,7 @@ import org.apache.dolphinscheduler.server.master.exception.MasterException;
 import org.apache.dolphinscheduler.server.master.metrics.MasterServerMetrics;
 import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
+import org.apache.dolphinscheduler.server.master.rpc.MasterRpcClient;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
@@ -87,7 +87,7 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
     private ProcessAlertManager processAlertManager;
 
     @Autowired
-    private NettyExecutorManager nettyExecutorManager;
+    private MasterRpcClient masterRpcClient;
 
     /**
      * master prepare exec service
@@ -189,7 +189,7 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
                                 commandService,
                                 processService,
                                 processInstanceDao,
-                                nettyExecutorManager,
+                                masterRpcClient,
                                 processAlertManager,
                                 masterConfig,
                                 stateWheelExecuteThread,

@@ -34,14 +34,12 @@ public class WorkerTaskExecuteRunnableFactoryBuilder {
 
     public static WorkerDelayTaskExecuteRunnableFactory<?> createWorkerDelayTaskExecuteRunnableFactory(@NonNull TaskExecutionContext taskExecutionContext,
                                                                                                        @NonNull WorkerConfig workerConfig,
-                                                                                                       @NonNull String workflowMasterAddress,
                                                                                                        @NonNull WorkerMessageSender workerMessageSender,
                                                                                                        @NonNull WorkerRpcClient workerRpcClient,
                                                                                                        @NonNull TaskPluginManager taskPluginManager,
                                                                                                        @Nullable StorageOperate storageOperate) {
         return new DefaultWorkerDelayTaskExecuteRunnableFactory(taskExecutionContext,
                 workerConfig,
-                workflowMasterAddress,
                 workerMessageSender,
                 workerRpcClient,
                 taskPluginManager,

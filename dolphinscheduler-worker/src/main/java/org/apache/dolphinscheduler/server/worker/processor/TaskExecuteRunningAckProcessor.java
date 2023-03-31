@@ -19,9 +19,9 @@ package org.apache.dolphinscheduler.server.worker.processor;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningAckMessage;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
+import org.apache.dolphinscheduler.remote.command.task.TaskExecuteRunningMessageAck;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 
@@ -30,7 +30,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Preconditions;
 import io.netty.channel.Channel;
 
 /**
@@ -44,12 +43,9 @@ public class TaskExecuteRunningAckProcessor implements NettyRequestProcessor {
     private MessageRetryRunner messageRetryRunner;
 
     @Override
-    public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.TASK_EXECUTE_RUNNING_ACK == command.getType(),
-                String.format("invalid command type : %s", command.getType()));
-
-        TaskExecuteRunningAckMessage runningAckCommand = JSONUtils.parseObject(command.getBody(),
-                TaskExecuteRunningAckMessage.class);
+    public void process(Channel channel, Message message) {
+        TaskExecuteRunningMessageAck runningAckCommand = JSONUtils.parseObject(message.getBody(),
+                TaskExecuteRunningMessageAck.class);
         if (runningAckCommand == null) {
             log.error("task execute running ack command is null");
             return;
@@ -60,11 +56,16 @@ public class TaskExecuteRunningAckProcessor implements NettyRequestProcessor {
 
             if (runningAckCommand.isSuccess()) {
                 messageRetryRunner.removeRetryMessage(runningAckCommand.getTaskInstanceId(),
-                        CommandType.TASK_EXECUTE_RUNNING);
+                        MessageType.TASK_EXECUTE_RUNNING_MESSAGE);
             }
         } finally {
             LogUtils.removeTaskInstanceIdMDC();
         }
+    }
+
+    @Override
+    public MessageType getCommandType() {
+        return MessageType.TASK_EXECUTE_RUNNING_MESSAGE_ACK;
     }
 
 }

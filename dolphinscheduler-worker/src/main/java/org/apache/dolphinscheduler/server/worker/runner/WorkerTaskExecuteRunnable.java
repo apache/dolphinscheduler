@@ -38,8 +38,8 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
-import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.alert.AlertSendRequestCommand;
+import org.apache.dolphinscheduler.remote.command.MessageType;
+import org.apache.dolphinscheduler.remote.command.alert.AlertSendRequest;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
@@ -68,7 +68,6 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
 
     protected final TaskExecutionContext taskExecutionContext;
     protected final WorkerConfig workerConfig;
-    protected final String masterAddress;
     protected final WorkerMessageSender workerMessageSender;
     protected final TaskPluginManager taskPluginManager;
     protected final @Nullable StorageOperate storageOperate;
@@ -79,14 +78,12 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
     protected WorkerTaskExecuteRunnable(
                                         @NonNull TaskExecutionContext taskExecutionContext,
                                         @NonNull WorkerConfig workerConfig,
-                                        @NonNull String masterAddress,
                                         @NonNull WorkerMessageSender workerMessageSender,
                                         @NonNull WorkerRpcClient workerRpcClient,
                                         @NonNull TaskPluginManager taskPluginManager,
                                         @Nullable StorageOperate storageOperate) {
         this.taskExecutionContext = taskExecutionContext;
         this.workerConfig = workerConfig;
-        this.masterAddress = masterAddress;
         this.workerMessageSender = workerMessageSender;
         this.workerRpcClient = workerRpcClient;
         this.taskPluginManager = taskPluginManager;
@@ -114,7 +111,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
         taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.FAILURE);
         taskExecutionContext.setEndTime(System.currentTimeMillis());
-        workerMessageSender.sendMessageWithRetry(taskExecutionContext, masterAddress, CommandType.TASK_EXECUTE_RESULT);
+        workerMessageSender.sendMessageWithRetry(taskExecutionContext, MessageType.TASK_EXECUTE_RESULT_MESSAGE);
         log.info(
                 "Get a exception when execute the task, will send the task execute result to master, the current task execute result is {}",
                 TaskExecutionStatus.FAILURE);
@@ -142,32 +139,30 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
                         taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId());
                 final LogUtils.MDCAutoClosableContext mdcAutoClosableContext1 =
                         LogUtils.setTaskInstanceLogFullPathMDC(taskExecutionContext.getLogPath())) {
-            log.info("\n{}", TaskInstanceLogHeader.INITIALIZE_TASK_CONTEXT_HEADER);
+            TaskInstanceLogHeader.printInitializeTaskContextHeader();
             initializeTask();
 
             if (DRY_RUN_FLAG_YES == taskExecutionContext.getDryRun()) {
                 taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.SUCCESS);
                 taskExecutionContext.setEndTime(System.currentTimeMillis());
                 TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-                workerMessageSender.sendMessageWithRetry(taskExecutionContext, masterAddress,
-                        CommandType.TASK_EXECUTE_RESULT);
+                workerMessageSender.sendMessageWithRetry(taskExecutionContext, MessageType.TASK_EXECUTE_RESULT_MESSAGE);
                 log.info(
                         "The current execute mode is dry run, will stop the subsequent process and set the taskInstance status to success");
                 return;
             }
-
-            log.info("\n{}", TaskInstanceLogHeader.LOAD_TASK_INSTANCE_PLUGIN_HEADER);
+            TaskInstanceLogHeader.printLoadTaskInstancePluginHeader();
             beforeExecute();
 
             TaskCallBack taskCallBack = TaskCallbackImpl.builder()
                     .workerMessageSender(workerMessageSender)
-                    .masterAddress(masterAddress)
+                    .taskExecutionContext(taskExecutionContext)
                     .build();
 
-            log.info("\n{}", TaskInstanceLogHeader.EXECUTE_TASK_HEADER);
+            TaskInstanceLogHeader.printExecuteTaskHeader();
             executeTask(taskCallBack);
 
-            log.info("\n{}", TaskInstanceLogHeader.FINALIZE_TASK_HEADER);
+            TaskInstanceLogHeader.printFinalizeTaskHeader();
             afterExecute();
             closeLogAppender();
         } catch (Throwable ex) {
@@ -194,11 +189,11 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
 
     protected void beforeExecute() {
         taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.RUNNING_EXECUTION);
-        workerMessageSender.sendMessageWithRetry(taskExecutionContext, masterAddress, CommandType.TASK_EXECUTE_RUNNING);
+        workerMessageSender.sendMessageWithRetry(taskExecutionContext, MessageType.TASK_EXECUTE_RUNNING_MESSAGE);
         log.info("Set task status to {}", TaskExecutionStatus.RUNNING_EXECUTION);
 
         TaskExecutionCheckerUtils.checkTenantExist(workerConfig, taskExecutionContext);
-        log.info("TenantCode:{} check success", taskExecutionContext.getTenantCode());
+        log.info("TenantCode: {} check success", taskExecutionContext.getTenantCode());
 
         TaskExecutionCheckerUtils.createProcessLocalPathIfAbsent(taskExecutionContext);
         log.info("ProcessExecDir:{} check success", taskExecutionContext.getExecutePath());
@@ -237,7 +232,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         TaskAlertInfo taskAlertInfo = task.getTaskAlertInfo();
         int strategy =
                 status == TaskExecutionStatus.SUCCESS ? WarningType.SUCCESS.getCode() : WarningType.FAILURE.getCode();
-        AlertSendRequestCommand alertCommand = new AlertSendRequestCommand(
+        AlertSendRequest alertCommand = new AlertSendRequest(
                 taskAlertInfo.getAlertGroupId(),
                 taskAlertInfo.getTitle(),
                 taskAlertInfo.getContent(),
@@ -258,7 +253,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         taskExecutionContext.setVarPool(JSONUtils.toJsonString(task.getParameters().getVarPool()));
         // upload out files and modify the "OUT FILE" property in VarPool
         TaskFilesTransferUtils.uploadOutputFiles(taskExecutionContext, storageOperate);
-        workerMessageSender.sendMessageWithRetry(taskExecutionContext, masterAddress, CommandType.TASK_EXECUTE_RESULT);
+        workerMessageSender.sendMessageWithRetry(taskExecutionContext, MessageType.TASK_EXECUTE_RESULT_MESSAGE);
 
         log.info("Send task execute result to master, the current task status: {}",
                 taskExecutionContext.getCurrentExecutionStatus());

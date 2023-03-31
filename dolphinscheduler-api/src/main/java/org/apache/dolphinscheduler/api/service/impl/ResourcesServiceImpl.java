@@ -32,7 +32,6 @@ import org.apache.dolphinscheduler.api.dto.resources.visitor.ResourceTreeVisitor
 import org.apache.dolphinscheduler.api.dto.resources.visitor.Visitor;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
-import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.ResourcesService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.RegexUtils;
@@ -44,27 +43,20 @@ import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.Resource;
-import org.apache.dolphinscheduler.dao.entity.ResourcesTask;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ResourceTaskMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -111,19 +103,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     private ResourceMapper resourcesMapper;
 
     @Autowired
-    private ResourceTaskMapper resourceTaskMapper;
-
-    @Autowired
-    private TaskDefinitionMapper taskDefinitionMapper;
-
-    @Autowired
     private UdfFuncMapper udfFunctionMapper;
-
-    @Autowired
-    private ProcessService processService;
-
-    @Autowired
-    private ProcessDefinitionService processDefinitionService;
 
     @Autowired
     private TenantMapper tenantMapper;
@@ -181,14 +161,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        Tenant tenant = tenantMapper.queryById(user.getTenantId());
-        if (tenant == null) {
-            log.error("tenant not exists");
-            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
-            return result;
-        }
-
-        String tenantCode = tenant.getTenantCode();
+        String tenantCode = getTenantCode(user);
 
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, "")) {
             log.error("current user does not have permission");
@@ -260,14 +233,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        Tenant tenant = tenantMapper.queryById(user.getTenantId());
-        if (tenant == null) {
-            log.error("tenant not exists");
-            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
-            return result;
-        }
-
-        String tenantCode = tenant.getTenantCode();
+        String tenantCode = getTenantCode(user);
 
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, "")) {
             log.error("current user does not have permission");
@@ -398,14 +364,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        Tenant tenant = tenantMapper.queryById(user.getTenantId());
-        if (tenant == null) {
-            log.error("tenant not exists");
-            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
-            return result;
-        }
-
-        String tenantCode = tenant.getTenantCode();
+        String tenantCode = getTenantCode(user);
 
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)) {
             log.error("current user does not have permission");
@@ -475,7 +434,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         Date now = new Date();
-        long originFileSize = resource.getSize();
 
         resource.setAlias(name);
         resource.setFileName(name);
@@ -489,87 +447,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         // if name unchanged, return directly without moving on HDFS
         if (originResourceName.equals(name) && file == null) {
             return result;
-        }
-
-        List<ResourcesTask> existResourcesList;
-        if (resource.isDirectory()) {
-            existResourcesList = resourceTaskMapper.selectSubfoldersFullNames(originFullName + FOLDER_SEPARATOR);
-        } else {
-            existResourcesList = resourceTaskMapper.selectByMap(
-                    Collections.singletonMap("full_name", originFullName));
-        }
-
-        if (existResourcesList.size() > 0 && !fullName.equals(originFullName)) {
-            // check if any related task is online. If it is, it can not be updated.
-            for (ResourcesTask existResource : existResourcesList) {
-                int taskId = existResource.getTaskId();
-                if (processService.isTaskOnline(taskDefinitionMapper.selectById(taskId).getCode())) {
-                    log.error("can't be updated,because it is used of process definition that's online");
-                    log.error("resource task relation id:{} is used of task code {}", existResource.getId(),
-                            taskDefinitionMapper.selectById(taskId).getCode());
-                    putMsg(result, Status.RESOURCE_IS_USED);
-                    return result;
-                }
-            }
-
-            for (ResourcesTask existResource : existResourcesList) {
-                int taskId = existResource.getTaskId();
-                long taskCode = taskDefinitionMapper.selectById(taskId).getCode();
-
-                List<ProcessTaskRelation> processTaskRelation = processTaskRelationMapper.selectByMap(
-                        Collections.singletonMap("post_task_code", taskCode));
-                if (processTaskRelation.size() > 0) {
-                    long processDefinitionCode = processTaskRelation.get(0).getProcessDefinitionCode();
-                    int processDefinitionVersion = processTaskRelation.get(0).getProcessDefinitionVersion();
-                    List<ProcessTaskRelation> taskRelationList = processTaskRelationMapper.queryByProcessCode(
-                            processTaskRelation.get(0).getProjectCode(),
-                            processDefinitionCode);
-
-                    List<TaskDefinition> taskDefinitionLogList = new ArrayList<>();
-
-                    if (taskRelationList.size() > 0) {
-                        ProcessDefinitionLog processDefinition =
-                                processDefinitionLogMapper.queryByDefinitionCodeAndVersion(
-                                        processDefinitionCode, processDefinitionVersion);
-                        for (ProcessTaskRelation taskRelation : taskRelationList) {
-                            long taskCodeInProcess = taskRelation.getPostTaskCode();
-                            TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCodeInProcess);
-                            if (taskCodeInProcess == taskCode) {
-                                // originFullName is a prefix if isDirectory is true
-                                taskDefinition.setTaskParams(RemoveResourceFromResourceList(originFullName,
-                                        taskDefinition.getTaskParams(),
-                                        resource.isDirectory()));
-                                // if isDirectory is true, fullName is the new prefix. we replace old prefix
-                                // of resource fullname with the new prefix.
-                                // if isDirectory is false, fullName is the new path.
-                                taskDefinition.setTaskParams(AddResourceToResourceList(originFullName,
-                                        fullName,
-                                        existResource.getFullName(),
-                                        taskDefinition.getTaskParams(),
-                                        resource.isDirectory()));
-                            }
-                            taskDefinitionLogList.add(taskDefinition);
-                        }
-
-                        // update workflow & task definition associated to the resource
-                        if (processDefinition != null) {
-                            processDefinitionService.updateProcessDefinition(loginUser,
-                                    processDefinition.getProjectCode(),
-                                    processDefinition.getName(),
-                                    processDefinition.getCode(),
-                                    processDefinition.getDescription(),
-                                    processDefinition.getGlobalParams(),
-                                    processDefinition.getLocations(),
-                                    processDefinition.getTimeout(),
-                                    tenantCode,
-                                    JSONUtils.toJsonString(taskRelationList.toArray()),
-                                    JSONUtils.toJsonString(taskDefinitionLogList.toArray()),
-                                    "",
-                                    processDefinition.getExecutionType());
-                        }
-                    }
-                }
-            }
         }
 
         if (file != null) {
@@ -696,14 +573,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        Tenant tenant = tenantMapper.queryById(user.getTenantId());
-        if (tenant == null) {
-            log.error("tenant not exists");
-            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
-            return result;
-        }
-
-        String tenantCode = tenant.getTenantCode();
+        String tenantCode = getTenantCode(user);
 
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)) {
             log.error("current user does not have permission");
@@ -721,7 +591,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             List<User> userList = userMapper.selectList(null);
             Set<String> visitedTenantEntityCode = new HashSet<>();
             for (User userEntity : userList) {
-                String tenantEntityCode = tenantMapper.queryById(userEntity.getTenantId()).getTenantCode();
+                String tenantEntityCode = getTenantCode(userEntity);
                 if (!visitedTenantEntityCode.contains(tenantEntityCode)) {
                     defaultPath = storageOperate.getResDir(tenantEntityCode);
                     if (type.equals(ResourceType.UDF)) {
@@ -825,7 +695,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return false;
         }
         // query tenant
-        String tenantCode = tenantMapper.queryById(loginUser.getTenantId()).getTenantCode();
+        String tenantCode = getTenantCode(loginUser);
         // random file name
         String localFilename = FileUtils.getUploadFilename(tenantCode, UUID.randomUUID().toString());
 
@@ -870,13 +740,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return null;
         }
 
-        Tenant tenant = tenantMapper.queryById(user.getTenantId());
-        if (tenant == null) {
-            log.error("tenant not exists");
-            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
-            return null;
-        }
-        String tenantCode = tenant.getTenantCode();
+        String tenantCode = getTenantCode(user);
 
         String defaultPath = "";
         List<StorageEntity> resourcesList = new ArrayList<>();
@@ -887,7 +751,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 Set<String> visitedTenantEntityCode = new HashSet<>();
                 for (User userEntity : userList) {
 
-                    String tenantEntityCode = tenantMapper.queryById(userEntity.getTenantId()).getTenantCode();
+                    String tenantEntityCode = getTenantCode(userEntity);
                     if (!visitedTenantEntityCode.contains(tenantEntityCode)) {
                         defaultPath = storageOperate.getResDir(tenantEntityCode);
                         if (type.equals(ResourceType.UDF)) {
@@ -1013,14 +877,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        Tenant tenant = tenantMapper.queryById(user.getTenantId());
-        if (tenant == null) {
-            log.error("tenant not exists");
-            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
-            return result;
-        }
-
-        String tenantCode = tenant.getTenantCode();
+        String tenantCode = getTenantCode(user);
 
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)) {
             log.error("current user does not have permission");
@@ -1049,14 +906,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 resTenantCode, resource.getType()).stream().map(storageEntity -> storageEntity.getFullName())
                 .collect(Collectors.toList());
 
-        Set<ResourcesTask> resourcesNeedToDeleteSet = new HashSet<>();
         String[] allChildrenFullNameArray = allChildren.stream().toArray(String[]::new);
-
-        // check before using allChildrenFullNameArray to query full names.
-        if (allChildrenFullNameArray.length != 0) {
-            resourcesNeedToDeleteSet.addAll(
-                    resourceTaskMapper.selectBatchFullNames(allChildrenFullNameArray));
-        }
 
         // if resource type is UDF,need check whether it is bound by UDF function
         if (resource.getType() == (ResourceType.UDF)) {
@@ -1066,70 +916,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                         udfFuncs);
                 putMsg(result, Status.UDF_RESOURCE_IS_BOUND, udfFuncs.get(0).getFuncName());
                 return result;
-            }
-        }
-
-        // delete data in database
-        if (resourcesNeedToDeleteSet.size() > 0) {
-            for (ResourcesTask resourcesTask : resourcesNeedToDeleteSet) {
-                int taskId = resourcesTask.getTaskId();
-                if (processService.isTaskOnline(taskDefinitionMapper.selectById(taskId).getCode())) {
-                    log.error("can't be deleted,because it is used of process definition that's online");
-                    log.error("resource task relation id:{} is used of task code {}", resourcesTask.getId(),
-                            taskDefinitionMapper.selectById(taskId).getCode());
-                    putMsg(result, Status.RESOURCE_IS_USED);
-                    return result;
-                }
-            }
-
-            for (ResourcesTask existResource : resourcesNeedToDeleteSet) {
-                int taskId = existResource.getTaskId();
-                long taskCode = taskDefinitionMapper.selectById(taskId).getCode();
-
-                // use taskCode to get processDefinitionCode, then get a list of processDefinitionLog.
-                List<ProcessTaskRelation> processTaskRelation = processTaskRelationMapper.selectByMap(
-                        Collections.singletonMap("post_task_code", taskCode));
-                if (processTaskRelation.size() > 0) {
-                    long processDefinitionCode = processTaskRelation.get(0).getProcessDefinitionCode();
-                    int processDefinitionVersion = processTaskRelation.get(0).getProcessDefinitionVersion();
-                    List<ProcessTaskRelation> taskRelationList = processTaskRelationMapper.queryByProcessCode(
-                            processTaskRelation.get(0).getProjectCode(),
-                            processDefinitionCode);
-
-                    List<TaskDefinition> taskDefinitionLogList = new ArrayList<>();
-
-                    if (taskRelationList.size() > 0) {
-                        ProcessDefinitionLog processDefinition =
-                                processDefinitionLogMapper.queryByDefinitionCodeAndVersion(
-                                        processDefinitionCode, processDefinitionVersion);
-                        for (ProcessTaskRelation taskRelation : taskRelationList) {
-                            long taskCodeInProcess = taskRelation.getPostTaskCode();
-                            TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCodeInProcess);
-                            if (taskCodeInProcess == taskCode) {
-                                taskDefinition.setTaskParams(RemoveResourceFromResourceList(existResource.getFullName(),
-                                        taskDefinition.getTaskParams(), false));
-                            }
-                            taskDefinitionLogList.add(taskDefinition);
-                        }
-
-                        // update workflow & task definition associated to the resource
-                        if (processDefinition != null) {
-                            processDefinitionService.updateProcessDefinition(loginUser,
-                                    processDefinition.getProjectCode(),
-                                    processDefinition.getName(),
-                                    processDefinition.getCode(),
-                                    processDefinition.getDescription(),
-                                    processDefinition.getGlobalParams(),
-                                    processDefinition.getLocations(),
-                                    processDefinition.getTimeout(),
-                                    tenantCode,
-                                    JSONUtils.toJsonString(taskRelationList.toArray()),
-                                    JSONUtils.toJsonString(taskDefinitionLogList.toArray()),
-                                    "",
-                                    processDefinition.getExecutionType());
-                        }
-                    }
-                }
             }
         }
 
@@ -1167,50 +953,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return JSONUtils.toJsonString(taskParameters);
         }
         return taskParameter;
-    }
-
-    private String AddResourceToResourceList(String oldPrefix, String newPrefix, String resFullName,
-                                             String taskParameter, boolean isDir) {
-        Map<String, Object> taskParameters = JSONUtils.parseObject(
-                taskParameter,
-                new TypeReference<Map<String, Object>>() {
-                });
-
-        if (taskParameters.containsKey("resourceList")) {
-            String resourceListStr = JSONUtils.toJsonString(taskParameters.get("resourceList"));
-            List<ResourceInfo> resourceInfos = JSONUtils.toList(resourceListStr, ResourceInfo.class);
-
-            // add updated resource to replace the original resource.
-            ResourceInfo newResource = new ResourceInfo();
-            if (isDir) {
-                // we add spearator here because we dont want rare cases like
-                // oldFullName: .../folderToDelete and a resource path: .../folderToDeleteAnotherFolder
-                // Therefore, we make sure the oldFullName has a format of .../folderToDelete/ when
-                // modifying resourceFullNames in taskDefinition.
-                String oldFullNameWSeparator = oldPrefix + FOLDER_SEPARATOR;
-                String newFullNameWSpearator = newPrefix + FOLDER_SEPARATOR;
-
-                newResource.setResourceName(resFullName.replace(oldFullNameWSeparator, newFullNameWSpearator));
-            } else {
-                newResource.setResourceName(newPrefix);
-            }
-            resourceInfos.add(newResource);
-
-            taskParameters.put("resourceList", resourceInfos);
-
-            return JSONUtils.toJsonString(taskParameters);
-        }
-        return taskParameter;
-    }
-
-    private String RemoveResourceFromIdsNew(int idToDelete, String idNews) {
-
-        String[] resourceIds = idNews.split(",");
-        Set<Integer> resourceIdSet = Arrays.stream(resourceIds)
-                .map(Integer::parseInt)
-                .filter(integerId -> !integerId.equals(idToDelete))
-                .collect(Collectors.toSet());
-        return Joiner.on(",").join(resourceIdSet);
     }
 
     /**
@@ -1259,14 +1001,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        Tenant tenant = tenantMapper.queryById(user.getTenantId());
-        if (tenant == null) {
-            log.error("tenant not exists");
-            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
-            return result;
-        }
-
-        String tenantCode = tenant.getTenantCode();
+        String tenantCode = getTenantCode(user);
 
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)) {
             log.error("current user does not have permission");
@@ -1312,14 +1047,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        Tenant tenant = tenantMapper.queryById(user.getTenantId());
-        if (tenant == null) {
-            log.error("tenant not exists");
-            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
-            return result;
-        }
-
-        String tenantCode = tenant.getTenantCode();
+        String tenantCode = getTenantCode(user);
 
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)) {
             log.error("current user does not have permission");
@@ -1370,14 +1098,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        Tenant tenant = tenantMapper.queryById(user.getTenantId());
-        if (tenant == null) {
-            log.error("tenant not exists");
-            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
-            return result;
-        }
-
-        String tenantCode = tenant.getTenantCode();
+        String tenantCode = getTenantCode(user);
 
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)) {
             log.error("current user does not have permission");
@@ -1453,14 +1174,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        Tenant tenant = tenantMapper.queryById(user.getTenantId());
-        if (tenant == null) {
-            log.error("tenant not exists");
-            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
-            return result;
-        }
-
-        String tenantCode = tenant.getTenantCode();
+        String tenantCode = getTenantCode(user);
 
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, "")) {
             log.error("current user does not have permission");
@@ -1601,14 +1315,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        Tenant tenant = tenantMapper.queryById(user.getTenantId());
-        if (tenant == null) {
-            log.error("tenant not exists");
-            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
-            return result;
-        }
-
-        String tenantCode = tenant.getTenantCode();
+        String tenantCode = getTenantCode(user);
 
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)) {
             log.error("current user does not have permission");
@@ -1727,17 +1434,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             throw new ServiceException(String.format("Resource owner id %d does not exist", userId));
         }
 
-        String tenantCode = "";
-
-        if (user.getTenantId() != 0) {
-            Tenant tenant = tenantMapper.queryById(user.getTenantId());
-            if (tenant == null) {
-                log.error("Tenant id {} not exists", user.getTenantId());
-                throw new ServiceException(
-                        String.format("The tenant id %d of resource owner not exist", user.getTenantId()));
-            }
-            tenantCode = tenant.getTenantCode();
-        }
+        String tenantCode = getTenantCode(user);
 
         String[] aliasArr = fullName.split("/");
         String alias = aliasArr[aliasArr.length - 1];
@@ -1815,14 +1512,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        Tenant tenant = tenantMapper.queryById(user.getTenantId());
-        if (tenant == null) {
-            log.error("tenant not exists");
-            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
-            return result;
-        }
-
-        String tenantCode = tenant.getTenantCode();
+        String tenantCode = getTenantCode(user);
 
         String baseFolder = storageOperate.getResourceFileName(tenantCode, "DATA_TRANSFER");
 
@@ -2091,5 +1781,13 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         return true;
+    }
+
+    private String getTenantCode(User user) {
+        Tenant tenant = tenantMapper.queryById(user.getTenantId());
+        if (tenant == null) {
+            throw new ServiceException(Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
+        }
+        return tenant.getTenantCode();
     }
 }

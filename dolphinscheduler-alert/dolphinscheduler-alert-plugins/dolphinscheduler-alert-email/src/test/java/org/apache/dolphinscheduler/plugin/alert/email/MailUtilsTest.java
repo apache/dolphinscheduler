@@ -29,6 +29,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -79,6 +80,35 @@ public class MailUtilsTest {
         mailSender.sendMails(
                 "Mysql Exception",
                 content);
+    }
+
+    @Test
+    void testAuthCheck() {
+        String title = "Auth Exception";
+        String content = list2String();
+
+        // test auth false and user && pwd null will pass
+        emailConfig.put(MailParamsConstants.NAME_MAIL_SMTP_AUTH, "false");
+        emailConfig.put(MailParamsConstants.NAME_MAIL_USER, null);
+        emailConfig.put(MailParamsConstants.NAME_MAIL_PASSWD, null);
+        mailSender = new MailSender(emailConfig);
+        mailSender.sendMails(title, content);
+
+        try {
+            // test auth true and user null will throw exception
+            emailConfig.put(MailParamsConstants.NAME_MAIL_SMTP_AUTH, "true");
+            emailConfig.put(MailParamsConstants.NAME_MAIL_USER, null);
+            mailSender = new MailSender(emailConfig);
+            mailSender.sendMails(title, content);
+        } catch (Exception e) {
+            Assertions.assertTrue(e.getMessage().contains(MailParamsConstants.NAME_MAIL_USER));
+        }
+
+        // test auth true and user && pwd not null will pass
+        emailConfig.put(MailParamsConstants.NAME_MAIL_USER, "user");
+        emailConfig.put(MailParamsConstants.NAME_MAIL_PASSWD, "passwd");
+        mailSender = new MailSender(emailConfig);
+        mailSender.sendMails(title, content);
     }
 
     public String list2String() {

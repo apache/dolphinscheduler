@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.remote.handler;
 
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.future.ResponseFuture;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.ChannelUtils;
@@ -61,7 +61,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
     /**
      * processors
      */
-    private final ConcurrentHashMap<CommandType, Pair<NettyRequestProcessor, ExecutorService>> processors;
+    private final ConcurrentHashMap<MessageType, Pair<NettyRequestProcessor, ExecutorService>> processors;
 
     /**
      * default executor
@@ -94,74 +94,74 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        processReceived(ctx.channel(), (Command) msg);
+        processReceived(ctx.channel(), (Message) msg);
     }
 
     /**
      * register processor
      *
-     * @param commandType command type
+     * @param messageType command type
      * @param processor processor
      */
-    public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor) {
-        this.registerProcessor(commandType, processor, null);
+    public void registerProcessor(final MessageType messageType, final NettyRequestProcessor processor) {
+        this.registerProcessor(messageType, processor, null);
     }
 
     /**
      * register processor
      *
-     * @param commandType command type
+     * @param messageType command type
      * @param processor processor
      * @param executor thread executor
      */
-    public void registerProcessor(final CommandType commandType, final NettyRequestProcessor processor,
+    public void registerProcessor(final MessageType messageType, final NettyRequestProcessor processor,
                                   final ExecutorService executor) {
         ExecutorService executorRef = executor;
         if (executorRef == null) {
             executorRef = defaultExecutor;
         }
-        this.processors.putIfAbsent(commandType, new Pair<>(processor, executorRef));
+        this.processors.putIfAbsent(messageType, new Pair<>(processor, executorRef));
     }
 
     /**
      * process received logic
      *
-     * @param command command
+     * @param message command
      */
-    private void processReceived(final Channel channel, final Command command) {
-        ResponseFuture future = ResponseFuture.getFuture(command.getOpaque());
+    private void processReceived(final Channel channel, final Message message) {
+        ResponseFuture future = ResponseFuture.getFuture(message.getOpaque());
         if (future != null) {
-            future.setResponseCommand(command);
+            future.setResponseCommand(message);
             future.release();
             if (future.getInvokeCallback() != null) {
                 future.removeFuture();
                 this.callbackExecutor.submit(future::executeInvokeCallback);
             } else {
-                future.putResponse(command);
+                future.putResponse(message);
             }
         } else {
-            processByCommandType(channel, command);
+            processByCommandType(channel, message);
         }
     }
 
-    public void processByCommandType(final Channel channel, final Command command) {
-        final Pair<NettyRequestProcessor, ExecutorService> pair = processors.get(command.getType());
+    public void processByCommandType(final Channel channel, final Message message) {
+        final Pair<NettyRequestProcessor, ExecutorService> pair = processors.get(message.getType());
         if (pair != null) {
             Runnable run = () -> {
                 try {
-                    pair.getLeft().process(channel, command);
+                    pair.getLeft().process(channel, message);
                 } catch (Exception e) {
-                    log.error(String.format("process command %s exception", command), e);
+                    log.error(String.format("process command %s exception", message), e);
                 }
             };
             try {
                 pair.getRight().submit(run);
             } catch (RejectedExecutionException e) {
-                log.warn("thread pool is full, discard command {} from {}", command,
+                log.warn("thread pool is full, discard command {} from {}", message,
                         ChannelUtils.getRemoteAddress(channel));
             }
         } else {
-            log.warn("receive response {}, but not matched any request ", command);
+            log.warn("receive response {}, but not matched any request ", message);
         }
     }
 
@@ -181,8 +181,8 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof IdleStateEvent) {
-            Command heartBeat = new Command();
-            heartBeat.setType(CommandType.HEART_BEAT);
+            Message heartBeat = new Message();
+            heartBeat.setType(MessageType.HEART_BEAT);
             heartBeat.setBody(heartBeatData);
             ctx.channel().writeAndFlush(heartBeat)
                     .addListener(ChannelFutureListener.CLOSE_ON_FAILURE);

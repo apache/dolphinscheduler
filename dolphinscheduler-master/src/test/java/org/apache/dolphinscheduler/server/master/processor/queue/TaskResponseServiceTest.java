@@ -20,8 +20,8 @@ package org.apache.dolphinscheduler.server.master.processor.queue;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.remote.command.TaskExecuteResultCommand;
-import org.apache.dolphinscheduler.remote.command.TaskExecuteRunningCommand;
+import org.apache.dolphinscheduler.remote.command.task.TaskExecuteResultMessage;
+import org.apache.dolphinscheduler.remote.command.task.TaskExecuteRunningMessage;
 import org.apache.dolphinscheduler.server.master.cache.impl.ProcessInstanceExecCacheManagerImpl;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
 import org.apache.dolphinscheduler.server.master.utils.DataQualityResultOperator;
@@ -71,7 +71,7 @@ public class TaskResponseServiceTest {
     public void before() {
         taskEventService.start();
 
-        TaskExecuteRunningCommand taskExecuteRunningMessage = new TaskExecuteRunningCommand("127.0.0.1:5678",
+        TaskExecuteRunningMessage taskExecuteRunningMessage = new TaskExecuteRunningMessage("127.0.0.1:5678",
                 "127.0.0.1:1234",
                 System.currentTimeMillis());
         taskExecuteRunningMessage.setProcessId(1);
@@ -86,7 +86,7 @@ public class TaskResponseServiceTest {
                 channel,
                 taskExecuteRunningMessage.getMessageSenderAddress());
 
-        TaskExecuteResultCommand taskExecuteResultMessage = new TaskExecuteResultCommand(NetUtils.getAddr(1234),
+        TaskExecuteResultMessage taskExecuteResultMessage = new TaskExecuteResultMessage(NetUtils.getAddr(1234),
                 NetUtils.getAddr(5678),
                 System.currentTimeMillis());
         taskExecuteResultMessage.setProcessInstanceId(1);

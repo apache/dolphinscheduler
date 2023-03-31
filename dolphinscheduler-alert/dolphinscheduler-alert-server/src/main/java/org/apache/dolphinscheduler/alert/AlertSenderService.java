@@ -33,8 +33,7 @@ import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.AlertSendStatus;
-import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseCommand;
-import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseResult;
+import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponse;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -166,7 +165,7 @@ public final class AlertSenderService extends Thread {
      * @param content      content
      * @return AlertSendResponseCommand
      */
-    public AlertSendResponseCommand syncHandler(int alertGroupId, String title, String content, int warnType) {
+    public AlertSendResponse syncHandler(int alertGroupId, String title, String content, int warnType) {
         List<AlertPluginInstance> alertInstanceList = alertDao.listInstanceByAlertGroupId(alertGroupId);
         AlertData alertData = AlertData.builder()
                 .content(content)
@@ -175,29 +174,32 @@ public final class AlertSenderService extends Thread {
                 .build();
 
         boolean sendResponseStatus = true;
-        List<AlertSendResponseResult> sendResponseResults = new ArrayList<>();
+        List<AlertSendResponse.AlertSendResponseResult> sendResponseResults = new ArrayList<>();
 
         if (CollectionUtils.isEmpty(alertInstanceList)) {
-            AlertSendResponseResult alertSendResponseResult = new AlertSendResponseResult();
+            AlertSendResponse.AlertSendResponseResult alertSendResponseResult =
+                    new AlertSendResponse.AlertSendResponseResult();
             String message = String.format("Alert GroupId %s send error : not found alert instance", alertGroupId);
             alertSendResponseResult.setSuccess(false);
             alertSendResponseResult.setMessage(message);
             sendResponseResults.add(alertSendResponseResult);
             log.error("Alert GroupId {} send error : not found alert instance", alertGroupId);
-            return new AlertSendResponseCommand(false, sendResponseResults);
+            return new AlertSendResponse(false, sendResponseResults);
         }
 
         for (AlertPluginInstance instance : alertInstanceList) {
             AlertResult alertResult = this.alertResultHandler(instance, alertData);
             if (alertResult != null) {
-                AlertSendResponseResult alertSendResponseResult = new AlertSendResponseResult(
-                        Boolean.parseBoolean(String.valueOf(alertResult.getStatus())), alertResult.getMessage());
+                AlertSendResponse.AlertSendResponseResult alertSendResponseResult =
+                        new AlertSendResponse.AlertSendResponseResult(
+                                Boolean.parseBoolean(String.valueOf(alertResult.getStatus())),
+                                alertResult.getMessage());
                 sendResponseStatus = sendResponseStatus && alertSendResponseResult.isSuccess();
                 sendResponseResults.add(alertSendResponseResult);
             }
         }
 
-        return new AlertSendResponseCommand(sendResponseStatus, sendResponseResults);
+        return new AlertSendResponse(sendResponseStatus, sendResponseResults);
     }
 
     /**

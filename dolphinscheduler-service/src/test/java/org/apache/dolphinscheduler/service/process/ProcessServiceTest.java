@@ -59,7 +59,6 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ResourceTaskMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
@@ -77,7 +76,6 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ExecuteSqlType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.InputType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.OptionSourceType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ValueType;
-import org.apache.dolphinscheduler.plugin.task.api.model.DateInterval;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.service.cron.CronUtilsTest;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
@@ -153,8 +151,6 @@ public class ProcessServiceTest {
     private ProcessDefinitionLogMapper processDefineLogMapper;
     @Mock
     private ResourceMapper resourceMapper;
-    @Mock
-    private ResourceTaskMapper resourceTaskMapper;
     @Mock
     private TaskGroupMapper taskGroupMapper;
     @Mock
@@ -720,11 +716,10 @@ public class ProcessServiceTest {
         resourceInfoNormal.setId(1);
         resourceInfoNormal.setRes("test.txt");
         resourceInfoNormal.setResourceName("/test.txt");
-        Mockito.when(resourceTaskMapper.existResourceByTaskIdNFullName(0, "/test.txt")).thenReturn(1);
 
         ResourceInfo updatedResourceInfo3 = processService.updateResourceInfo(0, resourceInfoNormal);
 
-        Assertions.assertEquals(1, updatedResourceInfo3.getId().intValue());
+        Assertions.assertEquals(-1, updatedResourceInfo3.getId().intValue());
         Assertions.assertEquals("test.txt", updatedResourceInfo3.getRes());
         Assertions.assertEquals("/test.txt", updatedResourceInfo3.getResourceName());
 
@@ -752,24 +747,6 @@ public class ProcessServiceTest {
 
         processService.releaseTaskGroup(taskInstance);
 
-    }
-
-    @Test
-    public void testFindLastManualProcessInterval() {
-        long definitionCode = 1L;
-        DateInterval dateInterval = new DateInterval(new Date(), new Date());
-        int testFlag = 1;
-
-        // find test lastManualProcessInterval
-        ProcessInstance lastManualProcessInterval =
-                processService.findLastManualProcessInterval(definitionCode, dateInterval, testFlag);
-        Assertions.assertNull(lastManualProcessInterval);
-
-        // find online lastManualProcessInterval
-        testFlag = 0;
-        lastManualProcessInterval =
-                processService.findLastManualProcessInterval(definitionCode, dateInterval, testFlag);
-        Assertions.assertNull(lastManualProcessInterval);
     }
 
     @Test
