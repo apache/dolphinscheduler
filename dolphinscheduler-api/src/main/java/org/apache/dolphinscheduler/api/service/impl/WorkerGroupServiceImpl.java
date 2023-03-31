@@ -279,10 +279,9 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         } else {
             workerGroups = workerGroupMapper.queryAllWorkerGroup();
         }
-
-        Optional<Boolean> containDefaultWorkerGroups = workerGroups.stream()
-                .map(workerGroup -> Constants.DEFAULT_WORKER_GROUP.equals(workerGroup.getName())).findAny();
-        if (!containDefaultWorkerGroups.isPresent() || !containDefaultWorkerGroups.get()) {
+        boolean containDefaultWorkerGroups = workerGroups.stream()
+                .anyMatch(workerGroup -> Constants.DEFAULT_WORKER_GROUP.equals(workerGroup.getName()));
+        if (!containDefaultWorkerGroups) {
             // there doesn't exist a default WorkerGroup, we will add all worker to the default worker group.
             Set<String> activeWorkerNodes = registryClient.getServerNodeSet(NodeType.WORKER);
             WorkerGroup defaultWorkerGroup = new WorkerGroup();
