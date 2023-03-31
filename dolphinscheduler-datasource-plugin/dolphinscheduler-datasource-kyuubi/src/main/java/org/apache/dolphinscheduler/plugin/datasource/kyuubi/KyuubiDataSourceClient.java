@@ -40,6 +40,7 @@ import java.sql.SQLException;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.jdbc.core.JdbcTemplate;
+
 @Slf4j
 public class KyuubiDataSourceClient extends CommonDataSourceClient {
 

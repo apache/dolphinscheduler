@@ -272,6 +272,10 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/datasource/hive.html',
                             },
                             {
+                                title: 'KYUUBI',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/kyuubi.html',
+                            },
+                            {
                                 title: 'Spark',
                                 link: '/en-us/docs/dev/user_doc/guide/datasource/spark.html',
                             },
@@ -963,6 +967,10 @@ export default {
                             {
                                 title: 'HIVE',
                                 link: '/zh-cn/docs/dev/user_doc/guide/datasource/hive.html',
+                            },
+                            {
+                                title: 'KYUUBI',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/kyuubi.html',
                             },
                             {
                                 title: 'Spark',
