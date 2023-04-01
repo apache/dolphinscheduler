@@ -52,6 +52,6 @@ public class TaskKillResponse implements ResponseMessageBuilder {
 
     @Override
     public MessageType getCommandType() {
-        return MessageType.TASK_KILL_RESPONSE;
+        return MessageType.RESPONSE;
     }
 }

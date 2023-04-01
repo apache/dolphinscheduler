@@ -64,7 +64,7 @@ public class TaskKillResponseProcessorTest {
     @Test
     public void testProcess() {
         Message message = taskKillResponse.convert2Command(1);
-        Assertions.assertEquals(MessageType.TASK_KILL_RESPONSE, message.getType());
+        Assertions.assertEquals(MessageType.RESPONSE, message.getType());
         taskKillResponseProcessor.process(channel, message);
     }
 }

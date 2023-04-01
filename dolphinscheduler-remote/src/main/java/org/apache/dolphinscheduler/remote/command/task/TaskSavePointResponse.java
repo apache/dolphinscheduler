@@ -39,6 +39,6 @@ public class TaskSavePointResponse implements RequestMessageBuilder {
 
     @Override
     public MessageType getCommandType() {
-        return MessageType.TASK_SAVEPOINT_RESPONSE;
+        return MessageType.RESPONSE;
     }
 }

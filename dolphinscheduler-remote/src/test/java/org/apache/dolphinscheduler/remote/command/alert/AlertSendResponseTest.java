@@ -44,6 +44,6 @@ public class AlertSendResponseTest {
         alertSendResponse.setResResults(responseResults);
 
         Message message = alertSendResponse.convert2Command(1);
-        Assertions.assertEquals(MessageType.ALERT_SEND_RESPONSE, message.getType());
+        Assertions.assertEquals(MessageType.RESPONSE, message.getType());
     }
 }

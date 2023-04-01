@@ -37,6 +37,6 @@ public class WorkflowExecutingDataResponse implements ResponseMessageBuilder {
 
     @Override
     public MessageType getCommandType() {
-        return MessageType.WORKFLOW_EXECUTING_DATA_RESPONSE;
+        return MessageType.RESPONSE;
     }
 }
