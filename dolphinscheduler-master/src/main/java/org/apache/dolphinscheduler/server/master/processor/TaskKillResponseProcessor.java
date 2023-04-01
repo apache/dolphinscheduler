@@ -52,7 +52,7 @@ public class TaskKillResponseProcessor implements NettyRequestProcessor {
 
     @Override
     public MessageType getCommandType() {
-        return MessageType.TASK_KILL_RESPONSE;
+        return MessageType.RESPONSE;
     }
 
 }

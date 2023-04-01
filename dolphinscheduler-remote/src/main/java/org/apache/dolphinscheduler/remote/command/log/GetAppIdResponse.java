@@ -35,6 +35,6 @@ public class GetAppIdResponse implements ResponseMessageBuilder {
 
     @Override
     public MessageType getCommandType() {
-        return MessageType.GET_APP_ID_RESPONSE;
+        return MessageType.RESPONSE;
     }
 }

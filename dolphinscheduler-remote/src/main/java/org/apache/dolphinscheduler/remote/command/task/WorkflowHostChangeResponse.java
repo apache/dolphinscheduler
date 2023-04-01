@@ -45,6 +45,6 @@ public class WorkflowHostChangeResponse implements ResponseMessageBuilder {
 
     @Override
     public MessageType getCommandType() {
-        return MessageType.WORKFLOW_HOST_CHANGE_RESPONSE;
+        return MessageType.RESPONSE;
     }
 }
