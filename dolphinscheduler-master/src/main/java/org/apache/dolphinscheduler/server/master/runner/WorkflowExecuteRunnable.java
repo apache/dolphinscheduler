@@ -730,7 +730,6 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
         try {
             LogUtils.setWorkflowInstanceIdMDC(processInstance.getId());
             if (workflowRunnableStatus == WorkflowRunnableStatus.CREATED) {
-                // 初始化workflow DAG
                 buildFlowDag();
                 workflowRunnableStatus = WorkflowRunnableStatus.INITIALIZE_DAG;
                 log.info("workflowStatue changed to :{}", workflowRunnableStatus);
@@ -862,7 +861,6 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
             log.info("The workflowInstance is not a newly running instance, runtimes: {}, recover flag: {}",
                     processInstance.getRunTimes(),
                     processInstance.getRecovery());
-            // 任务实例
             List<TaskInstance> validTaskInstanceList =
                     taskInstanceDao.findValidTaskListByProcessId(processInstance.getId(),
                             processInstance.getTestFlag());
