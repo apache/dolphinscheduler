@@ -19,23 +19,24 @@ package org.apache.dolphinscheduler.service.log;
 
 import static org.apache.dolphinscheduler.common.constants.Constants.APPID_COLLECT;
 import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_COLLECT_WAY;
+import static org.apache.dolphinscheduler.common.utils.LogUtils.readWholeFileContentFromLocal;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.log.GetAppIdRequestCommand;
-import org.apache.dolphinscheduler.remote.command.log.GetAppIdResponseCommand;
-import org.apache.dolphinscheduler.remote.command.log.GetLogBytesRequestCommand;
-import org.apache.dolphinscheduler.remote.command.log.GetLogBytesResponseCommand;
-import org.apache.dolphinscheduler.remote.command.log.RemoveTaskLogRequestCommand;
-import org.apache.dolphinscheduler.remote.command.log.RemoveTaskLogResponseCommand;
-import org.apache.dolphinscheduler.remote.command.log.RollViewLogRequestCommand;
-import org.apache.dolphinscheduler.remote.command.log.RollViewLogResponseCommand;
-import org.apache.dolphinscheduler.remote.command.log.ViewLogRequestCommand;
-import org.apache.dolphinscheduler.remote.command.log.ViewLogResponseCommand;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.log.GetAppIdRequest;
+import org.apache.dolphinscheduler.remote.command.log.GetAppIdResponse;
+import org.apache.dolphinscheduler.remote.command.log.GetLogBytesRequest;
+import org.apache.dolphinscheduler.remote.command.log.GetLogBytesResponse;
+import org.apache.dolphinscheduler.remote.command.log.RemoveTaskLogRequest;
+import org.apache.dolphinscheduler.remote.command.log.RemoveTaskLogResponse;
+import org.apache.dolphinscheduler.remote.command.log.RollViewLogRequest;
+import org.apache.dolphinscheduler.remote.command.log.RollViewLogResponse;
+import org.apache.dolphinscheduler.remote.command.log.ViewLogRequest;
+import org.apache.dolphinscheduler.remote.command.log.ViewLogResponseResponse;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.factory.NettyRemotingClientFactory;
 import org.apache.dolphinscheduler.remote.utils.Host;
@@ -76,14 +77,14 @@ public class LogClient implements AutoCloseable {
     public String rollViewLog(String host, int port, String path, int skipLineNum, int limit) {
         log.info("Roll view log from host : {}, port : {}, path {}, skipLineNum {} ,limit {}", host, port, path,
                 skipLineNum, limit);
-        RollViewLogRequestCommand request = new RollViewLogRequestCommand(path, skipLineNum, limit);
+        RollViewLogRequest request = new RollViewLogRequest(path, skipLineNum, limit);
         final Host address = new Host(host, port);
         try {
-            Command command = request.convert2Command();
-            Command response = client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
+            Message message = request.convert2Command();
+            Message response = client.sendSync(address, message, LOG_REQUEST_TIMEOUT);
             if (response != null) {
-                RollViewLogResponseCommand rollReviewLog =
-                        JSONUtils.parseObject(response.getBody(), RollViewLogResponseCommand.class);
+                RollViewLogResponse rollReviewLog =
+                        JSONUtils.parseObject(response.getBody(), RollViewLogResponse.class);
                 return rollReviewLog.getMsg();
             }
             return "Roll view log response is null";
@@ -110,17 +111,17 @@ public class LogClient implements AutoCloseable {
      */
     public String viewLog(String host, int port, String path) {
         log.info("View log from host: {}, port: {}, logPath: {}", host, port, path);
-        ViewLogRequestCommand request = new ViewLogRequestCommand(path);
+        ViewLogRequest request = new ViewLogRequest(path);
         final Host address = new Host(host, port);
         try {
             if (NetUtils.getHost().equals(host)) {
-                return LogUtils.readWholeFileContentFromLocal(request.getPath());
+                return readWholeFileContentFromLocal(request.getPath());
             } else {
-                Command command = request.convert2Command();
-                Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
+                Message message = request.convert2Command();
+                Message response = this.client.sendSync(address, message, LOG_REQUEST_TIMEOUT);
                 if (response != null) {
-                    ViewLogResponseCommand viewLog =
-                            JSONUtils.parseObject(response.getBody(), ViewLogResponseCommand.class);
+                    ViewLogResponseResponse viewLog =
+                            JSONUtils.parseObject(response.getBody(), ViewLogResponseResponse.class);
                     return viewLog.getMsg();
                 }
                 return "View log response is null";
@@ -146,14 +147,14 @@ public class LogClient implements AutoCloseable {
      */
     public byte[] getLogBytes(String host, int port, String path) {
         log.info("Get log bytes from host: {}, port: {}, logPath {}", host, port, path);
-        GetLogBytesRequestCommand request = new GetLogBytesRequestCommand(path);
+        GetLogBytesRequest request = new GetLogBytesRequest(path);
         final Host address = new Host(host, port);
         try {
-            Command command = request.convert2Command();
-            Command response = this.client.sendSync(address, command, LOG_REQUEST_TIMEOUT);
+            Message message = request.convert2Command();
+            Message response = this.client.sendSync(address, message, LOG_REQUEST_TIMEOUT);
             if (response != null) {
-                GetLogBytesResponseCommand getLog =
-                        JSONUtils.parseObject(response.getBody(), GetLogBytesResponseCommand.class);
+                GetLogBytesResponse getLog =
+                        JSONUtils.parseObject(response.getBody(), GetLogBytesResponse.class);
                 return getLog.getData() == null ? EMPTY_BYTE_ARRAY : getLog.getData();
             }
             return EMPTY_BYTE_ARRAY;
@@ -177,22 +178,22 @@ public class LogClient implements AutoCloseable {
      */
     public void removeTaskLog(@NonNull Host host, String path) {
         log.info("Begin remove task log from host: {} logPath {}", host, path);
-        RemoveTaskLogRequestCommand request = new RemoveTaskLogRequestCommand(path);
+        RemoveTaskLogRequest request = new RemoveTaskLogRequest(path);
         try {
-            Command command = request.convert2Command();
-            client.sendAsync(host, command, LOG_REQUEST_TIMEOUT, responseFuture -> {
+            Message message = request.convert2Command();
+            client.sendAsync(host, message, LOG_REQUEST_TIMEOUT, responseFuture -> {
                 if (responseFuture.getCause() != null) {
                     log.error("Remove task log from host: {} logPath {} error, meet an unknown exception", host,
                             path, responseFuture.getCause());
                     return;
                 }
-                Command response = responseFuture.getResponseCommand();
+                Message response = responseFuture.getResponseCommand();
                 if (response == null) {
                     log.error("Remove task log from host: {} logPath {} error, response is null", host, path);
                     return;
                 }
-                RemoveTaskLogResponseCommand removeTaskLogResponse =
-                        JSONUtils.parseObject(response.getBody(), RemoveTaskLogResponseCommand.class);
+                RemoveTaskLogResponse removeTaskLogResponse =
+                        JSONUtils.parseObject(response.getBody(), RemoveTaskLogResponse.class);
                 if (removeTaskLogResponse.getStatus()) {
                     log.info("Success remove task log from host: {} logPath {}", host, path);
                 } else {
@@ -219,11 +220,11 @@ public class LogClient implements AutoCloseable {
             appIds = LogUtils.getAppIds(taskLogFilePath, taskAppInfoPath,
                     PropertyUtils.getString(APPID_COLLECT, DEFAULT_COLLECT_WAY));
         } else {
-            final Command command = new GetAppIdRequestCommand(taskLogFilePath, taskAppInfoPath).convert2Command();
-            Command response = this.client.sendSync(workerAddress, command, LOG_REQUEST_TIMEOUT);
+            final Message message = new GetAppIdRequest(taskLogFilePath, taskAppInfoPath).convert2Command();
+            Message response = this.client.sendSync(workerAddress, message, LOG_REQUEST_TIMEOUT);
             if (response != null) {
-                GetAppIdResponseCommand responseCommand =
-                        JSONUtils.parseObject(response.getBody(), GetAppIdResponseCommand.class);
+                GetAppIdResponse responseCommand =
+                        JSONUtils.parseObject(response.getBody(), GetAppIdResponse.class);
                 appIds = responseCommand.getAppIds();
             }
         }

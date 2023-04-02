@@ -67,6 +67,8 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.task.TaskWakeupRequest;
 import org.apache.dolphinscheduler.remote.command.task.WorkflowHostChangeRequest;
 import org.apache.dolphinscheduler.remote.command.task.WorkflowHostChangeResponse;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
@@ -443,13 +445,13 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
                 retryTaskInstance(taskInstance);
             } else if (taskInstance.getState().isFailure()) {
                 completeTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
-                errorTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
                 // There are child nodes and the failure policy is: CONTINUE
                 if (processInstance.getFailureStrategy() == FailureStrategy.CONTINUE && DagHelper.haveAllNodeAfterNode(
                         Long.toString(taskInstance.getTaskCode()),
                         dag)) {
                     submitPostNode(Long.toString(taskInstance.getTaskCode()));
                 } else {
+                    errorTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
                     if (processInstance.getFailureStrategy() == FailureStrategy.END) {
                         killAllTasks();
                     }
@@ -476,7 +478,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
      * release task group
      *
      */
-    public void releaseTaskGroup(TaskInstance taskInstance) {
+    public void releaseTaskGroup(TaskInstance taskInstance) throws RemotingException, InterruptedException {
         if (taskInstance.getTaskGroupId() > 0) {
             TaskInstance nextTaskInstance = this.processService.releaseTaskGroup(taskInstance);
             if (nextTaskInstance != null) {
@@ -490,8 +492,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
                 } else {
                     ProcessInstance processInstance =
                             this.processService.findProcessInstanceById(nextTaskInstance.getProcessInstanceId());
-                    this.processService.sendStartTask2Master(processInstance, nextTaskInstance.getId(),
-                            org.apache.dolphinscheduler.remote.command.CommandType.TASK_WAKEUP_EVENT_REQUEST);
+                    this.masterRpcClient.sendSyncCommand(Host.of(processInstance.getHost()),
+                            new TaskWakeupRequest(processInstance.getId(), nextTaskInstance.getId()).convert2Command());
                 }
             }
         }
@@ -1422,17 +1424,17 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
             return false;
         }
         try {
-            org.apache.dolphinscheduler.remote.command.Command command =
+            Message message =
                     masterRpcClient.sendSyncCommand(Host.of(taskInstance.getHost()),
                             new WorkflowHostChangeRequest(taskInstance.getId(), masterAddress).convert2Command());
-            if (command == null) {
+            if (message == null) {
                 log.error(
                         "Takeover task instance failed, the worker {} might not be alive, will try to create a new task instance",
                         taskInstance.getHost());
                 return false;
             }
             WorkflowHostChangeResponse workflowHostChangeResponse =
-                    JSONUtils.parseObject(command.getBody(), WorkflowHostChangeResponse.class);
+                    JSONUtils.parseObject(message.getBody(), WorkflowHostChangeResponse.class);
             if (workflowHostChangeResponse == null || !workflowHostChangeResponse.isSuccess()) {
                 log.error(
                         "Takeover task instance failed, receive a failed response from worker: {}, will try to create a new task instance",
@@ -1513,8 +1515,11 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
      */
     private void setIndirectDepList(String taskCode, List<String> indirectDepCodeList) {
         TaskNode taskNode = dag.getNode(taskCode);
-        List<String> depCodeList = taskNode.getDepList();
-        for (String depsNode : depCodeList) {
+        // If workflow start with startNode or recoveryNode, taskNode may be null
+        if (taskNode == null) {
+            return;
+        }
+        for (String depsNode : taskNode.getDepList()) {
             if (forbiddenTaskMap.containsKey(Long.parseLong(depsNode))) {
                 setIndirectDepList(depsNode, indirectDepCodeList);
             } else {

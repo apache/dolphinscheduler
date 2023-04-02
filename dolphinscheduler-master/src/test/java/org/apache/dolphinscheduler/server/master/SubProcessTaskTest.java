@@ -106,7 +106,7 @@ public class SubProcessTaskTest {
         Mockito.when(processService
                 .findSubProcessInstance(processInstance.getId(), taskInstance.getId()))
                 .thenReturn(subProcessInstance);
-
+        taskInstance.setProcessInstance(processInstance);
         return taskInstance;
     }
 

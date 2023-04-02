@@ -19,9 +19,9 @@ package org.apache.dolphinscheduler.server.worker.processor;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.TaskUpdatePidAckMessage;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
+import org.apache.dolphinscheduler.remote.command.task.TaskUpdatePidAckMessage;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 
@@ -31,7 +31,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Preconditions;
 import io.netty.channel.Channel;
 
 /**
@@ -45,11 +44,9 @@ public class TaskUpdatePidAckProcessor implements NettyRequestProcessor {
     private MessageRetryRunner messageRetryRunner;
 
     @Override
-    public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.TASK_UPDATE_PID_ACK == command.getType(),
-                String.format("invalid command type : %s", command.getType()));
+    public void process(Channel channel, Message message) {
 
-        TaskUpdatePidAckMessage updatePidAckCommand = JSONUtils.parseObject(command.getBody(),
+        TaskUpdatePidAckMessage updatePidAckCommand = JSONUtils.parseObject(message.getBody(),
                 TaskUpdatePidAckMessage.class);
         if (updatePidAckCommand == null) {
             log.error("task execute update pid ack command is null");
@@ -61,11 +58,16 @@ public class TaskUpdatePidAckProcessor implements NettyRequestProcessor {
 
             if (updatePidAckCommand.isSuccess()) {
                 messageRetryRunner.removeRetryMessage(updatePidAckCommand.getTaskInstanceId(),
-                        CommandType.TASK_UPDATE_PID);
+                        MessageType.TASK_UPDATE_PID_MESSAGE);
             }
         } finally {
             LogUtils.removeTaskInstanceIdMDC();
         }
+    }
+
+    @Override
+    public MessageType getCommandType() {
+        return MessageType.TASK_UPDATE_PID__MESSAGE_ACK;
     }
 
 }

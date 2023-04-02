@@ -20,9 +20,9 @@ package org.apache.dolphinscheduler.server.master.processor;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.TaskExecuteStartCommand;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
+import org.apache.dolphinscheduler.remote.command.task.TaskExecuteStartMessage;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.master.runner.StreamTaskExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.StreamTaskExecuteThreadPool;
@@ -32,7 +32,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Preconditions;
 import io.netty.channel.Channel;
 
 /**
@@ -49,28 +48,31 @@ public class TaskExecuteStartProcessor implements NettyRequestProcessor {
     private TaskDefinitionDao taskDefinitionDao;
 
     @Override
-    public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.TASK_EXECUTE_START == command.getType(),
-                String.format("invalid command type : %s", command.getType()));
-        TaskExecuteStartCommand taskExecuteStartCommand =
-                JSONUtils.parseObject(command.getBody(), TaskExecuteStartCommand.class);
-        log.info("taskExecuteStartCommand: {}", taskExecuteStartCommand);
+    public void process(Channel channel, Message message) {
+        TaskExecuteStartMessage taskExecuteStartMessage =
+                JSONUtils.parseObject(message.getBody(), TaskExecuteStartMessage.class);
+        log.info("taskExecuteStartCommand: {}", taskExecuteStartMessage);
 
         TaskDefinition taskDefinition = taskDefinitionDao.findTaskDefinition(
-                taskExecuteStartCommand.getTaskDefinitionCode(), taskExecuteStartCommand.getTaskDefinitionVersion());
+                taskExecuteStartMessage.getTaskDefinitionCode(), taskExecuteStartMessage.getTaskDefinitionVersion());
         if (taskDefinition == null) {
             log.error("Task definition can not be found, taskDefinitionCode:{}, taskDefinitionVersion:{}",
-                    taskExecuteStartCommand.getTaskDefinitionCode(),
-                    taskExecuteStartCommand.getTaskDefinitionVersion());
+                    taskExecuteStartMessage.getTaskDefinitionCode(),
+                    taskExecuteStartMessage.getTaskDefinitionVersion());
             return;
         }
-        streamTaskExecuteThreadPool.execute(new StreamTaskExecuteRunnable(taskDefinition, taskExecuteStartCommand));
+        streamTaskExecuteThreadPool.execute(new StreamTaskExecuteRunnable(taskDefinition, taskExecuteStartMessage));
 
         // response
-        Command response = new Command(command.getOpaque());
-        response.setType(CommandType.TASK_EXECUTE_START);
+        Message response = new Message(message.getOpaque());
+        response.setType(MessageType.TASK_EXECUTE_START);
         response.setBody(new byte[0]);
         channel.writeAndFlush(response);
+    }
+
+    @Override
+    public MessageType getCommandType() {
+        return MessageType.TASK_EXECUTE_START;
     }
 
 }

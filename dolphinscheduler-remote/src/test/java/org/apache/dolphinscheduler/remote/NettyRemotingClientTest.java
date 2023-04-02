@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.remote;
 
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.apache.dolphinscheduler.remote.future.InvokeCallback;
@@ -50,11 +50,16 @@ public class NettyRemotingClientTest {
         NettyServerConfig serverConfig = new NettyServerConfig();
 
         NettyRemotingServer server = new NettyRemotingServer(serverConfig);
-        server.registerProcessor(CommandType.PING, new NettyRequestProcessor() {
+        server.registerProcessor(new NettyRequestProcessor() {
 
             @Override
-            public void process(Channel channel, Command command) {
-                channel.writeAndFlush(Pong.create(command.getOpaque()));
+            public void process(Channel channel, Message message) {
+                channel.writeAndFlush(Pong.create(message.getOpaque()));
+            }
+
+            @Override
+            public MessageType getCommandType() {
+                return MessageType.PING;
             }
         });
 
@@ -62,10 +67,10 @@ public class NettyRemotingClientTest {
         //
         final NettyClientConfig clientConfig = new NettyClientConfig();
         NettyRemotingClient client = new NettyRemotingClient(clientConfig);
-        Command commandPing = Ping.create();
+        Message messagePing = Ping.create();
         try {
-            Command response = client.sendSync(new Host("127.0.0.1", serverConfig.getListenPort()), commandPing, 2000);
-            Assertions.assertEquals(commandPing.getOpaque(), response.getOpaque());
+            Message response = client.sendSync(new Host("127.0.0.1", serverConfig.getListenPort()), messagePing, 2000);
+            Assertions.assertEquals(messagePing.getOpaque(), response.getOpaque());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -81,11 +86,16 @@ public class NettyRemotingClientTest {
         NettyServerConfig serverConfig = new NettyServerConfig();
 
         NettyRemotingServer server = new NettyRemotingServer(serverConfig);
-        server.registerProcessor(CommandType.PING, new NettyRequestProcessor() {
+        server.registerProcessor(new NettyRequestProcessor() {
 
             @Override
-            public void process(Channel channel, Command command) {
-                channel.writeAndFlush(Pong.create(command.getOpaque()));
+            public void process(Channel channel, Message message) {
+                channel.writeAndFlush(Pong.create(message.getOpaque()));
+            }
+
+            @Override
+            public MessageType getCommandType() {
+                return MessageType.PING;
             }
         });
         server.start();
@@ -93,10 +103,10 @@ public class NettyRemotingClientTest {
         final NettyClientConfig clientConfig = new NettyClientConfig();
         NettyRemotingClient client = new NettyRemotingClient(clientConfig);
         CountDownLatch latch = new CountDownLatch(1);
-        Command commandPing = Ping.create();
+        Message messagePing = Ping.create();
         try {
             final AtomicLong opaque = new AtomicLong(0);
-            client.sendAsync(new Host("127.0.0.1", serverConfig.getListenPort()), commandPing, 2000,
+            client.sendAsync(new Host("127.0.0.1", serverConfig.getListenPort()), messagePing, 2000,
                     new InvokeCallback() {
 
                         @Override
@@ -106,7 +116,7 @@ public class NettyRemotingClientTest {
                         }
                     });
             latch.await();
-            Assertions.assertEquals(commandPing.getOpaque(), opaque.get());
+            Assertions.assertEquals(messagePing.getOpaque(), opaque.get());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -130,8 +140,8 @@ public class NettyRemotingClientTest {
 
         static {
             ByteBuf ping = Unpooled.buffer();
-            ping.writeByte(Command.MAGIC);
-            ping.writeByte(CommandType.PING.ordinal());
+            ping.writeByte(Message.MAGIC);
+            ping.writeByte(MessageType.PING.ordinal());
             ping.writeLong(0);
             ping.writeInt(0);
             ping.writeBytes(EMPTY_BODY);
@@ -152,11 +162,11 @@ public class NettyRemotingClientTest {
          *
          * @return command
          */
-        public static Command create() {
-            Command command = new Command();
-            command.setType(CommandType.PING);
-            command.setBody(EMPTY_BODY_ARRAY);
-            return command;
+        public static Message create() {
+            Message message = new Message();
+            message.setType(MessageType.PING);
+            message.setBody(EMPTY_BODY_ARRAY);
+            return message;
         }
     }
 
@@ -179,8 +189,8 @@ public class NettyRemotingClientTest {
 
         static {
             ByteBuf ping = Unpooled.buffer();
-            ping.writeByte(Command.MAGIC);
-            ping.writeByte(CommandType.PONG.ordinal());
+            ping.writeByte(Message.MAGIC);
+            ping.writeByte(MessageType.PONG.ordinal());
             ping.writeLong(0);
             ping.writeInt(0);
             ping.writeBytes(EMPTY_BODY);
@@ -202,11 +212,11 @@ public class NettyRemotingClientTest {
          * @param opaque request unique identification
          * @return command
          */
-        public static Command create(long opaque) {
-            Command command = new Command(opaque);
-            command.setType(CommandType.PONG);
-            command.setBody(EMPTY_BODY_ARRAY);
-            return command;
+        public static Message create(long opaque) {
+            Message message = new Message(opaque);
+            message.setType(MessageType.PONG);
+            message.setBody(EMPTY_BODY_ARRAY);
+            return message;
         }
     }
 }

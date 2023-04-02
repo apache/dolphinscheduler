@@ -162,6 +162,9 @@ const DetailModal = defineComponent({
       showConnectType,
       showPrincipal,
       showMode,
+      showDataBaseName,
+      showJDBCConnectParameters,
+      showPublicKey,
       modeOptions,
       redShitModeOptions,
       loading,
@@ -539,6 +542,7 @@ const DetailModal = defineComponent({
                   />
                 </NFormItem>
                 <NFormItem
+                  v-show={showDataBaseName}
                   label={t('datasource.database_name')}
                   path='database'
                   show-require-mark={requiredDataBase}
@@ -585,6 +589,7 @@ const DetailModal = defineComponent({
                   />
                 </NFormItem>
                 <NFormItem
+                  v-show={showJDBCConnectParameters}
                   label={t('datasource.jdbc_connect_parameters')}
                   path='other'
                 >
@@ -632,6 +637,19 @@ const DetailModal = defineComponent({
                     class='select-bind-test-data-source-type-drop-down'
                     v-model={[detailForm.bindTestId, 'value']}
                     options={this.bindTestDataSourceExample}
+                  />
+                </NFormItem>
+                <NFormItem
+                    v-show={showPublicKey}
+                    label='PublicKey'
+                    path='publicKey'
+                >
+                  <NInput
+                      v-model={[detailForm.publicKey, 'value']}
+                      type='textarea'
+                      autosize={{
+                        minRows: 4
+                      }}
                   />
                 </NFormItem>
               </NForm>

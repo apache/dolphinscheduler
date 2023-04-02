@@ -21,8 +21,8 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.task.WorkflowHostChangeRequest;
 import org.apache.dolphinscheduler.remote.command.task.WorkflowHostChangeResponse;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
@@ -32,8 +32,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.google.common.base.Preconditions;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
@@ -51,11 +49,9 @@ public class WorkflowHostChangeProcessor implements NettyRequestProcessor {
     private MessageRetryRunner messageRetryRunner;
 
     @Override
-    public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.WORKFLOW_HOST_CHANGE_REQUEST == command.getType(),
-                String.format("invalid command type : %s", command.getType()));
+    public void process(Channel channel, Message message) {
         WorkflowHostChangeRequest workflowHostChangeRequest =
-                JSONUtils.parseObject(command.getBody(), WorkflowHostChangeRequest.class);
+                JSONUtils.parseObject(message.getBody(), WorkflowHostChangeRequest.class);
         if (workflowHostChangeRequest == null) {
             logger.error("host update command is null");
             return;
@@ -79,13 +75,18 @@ public class WorkflowHostChangeProcessor implements NettyRequestProcessor {
                 logger.error("Cannot find the taskExecutionContext, taskInstanceId : {}",
                         workflowHostChangeRequest.getTaskInstanceId());
             }
-            channel.writeAndFlush(workflowHostChangeResponse.convert2Command(command.getOpaque())).addListener(
+            channel.writeAndFlush(workflowHostChangeResponse.convert2Command(message.getOpaque())).addListener(
                     (ChannelFutureListener) channelFuture -> {
                         if (!channelFuture.isSuccess()) {
                             logger.error("send host update response failed");
                         }
                     });
         }
+    }
+
+    @Override
+    public MessageType getCommandType() {
+        return MessageType.WORKFLOW_HOST_CHANGE_REQUEST;
     }
 
 }

@@ -28,7 +28,7 @@ import com.google.common.base.Functions;
 public enum FormType {
 
     INPUT("input"),
-    INPUTNUMBER("inputNumber"),
+    INPUTNUMBER("input-number"),
     RADIO("radio"),
     SELECT("select"),
     SWITCH("switch"),
