@@ -133,7 +133,7 @@ import com.google.common.collect.Sets;
  * Workflow execute task, used to execute a workflow instance.
  */
 @Slf4j
-public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
+public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
 
     private final ProcessService processService;
 
@@ -718,16 +718,17 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      * ProcessInstance start entrypoint.
      */
     @Override
-    public WorkflowSubmitStatue call() {
+    public WorkflowSubmitStatus call() {
         if (isStart()) {
             // This case should not been happened
             log.warn("[WorkflowInstance-{}] The workflow has already been started", processInstance.getId());
-            return WorkflowSubmitStatue.DUPLICATED_SUBMITTED;
+            return WorkflowSubmitStatus.DUPLICATED_SUBMITTED;
         }
 
         try {
             LogUtils.setWorkflowInstanceIdMDC(processInstance.getId());
             if (workflowRunnableStatus == WorkflowRunnableStatus.CREATED) {
+                // 初始化workflow DAG
                 buildFlowDag();
                 workflowRunnableStatus = WorkflowRunnableStatus.INITIALIZE_DAG;
                 log.info("workflowStatue changed to :{}", workflowRunnableStatus);
@@ -742,10 +743,10 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                 workflowRunnableStatus = WorkflowRunnableStatus.STARTED;
                 log.info("workflowStatue changed to :{}", workflowRunnableStatus);
             }
-            return WorkflowSubmitStatue.SUCCESS;
+            return WorkflowSubmitStatus.SUCCESS;
         } catch (Exception e) {
             log.error("Start workflow error", e);
-            return WorkflowSubmitStatue.FAILED;
+            return WorkflowSubmitStatus.FAILED;
         } finally {
             LogUtils.removeWorkflowInstanceIdMDC();
         }
@@ -859,6 +860,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             log.info("The workflowInstance is not a newly running instance, runtimes: {}, recover flag: {}",
                     processInstance.getRunTimes(),
                     processInstance.getRecovery());
+            // 任务实例
             List<TaskInstance> validTaskInstanceList =
                     taskInstanceDao.findValidTaskListByProcessId(processInstance.getId(),
                             processInstance.getTestFlag());
