@@ -71,6 +71,6 @@ jobs:
           -Dmaven.javadoc.skip \
           -Dcheckstyle.skip=true \
           -Dmaven.deploy.skip \
-          -Ddocker.tag=${{ github.sha }} \
+          -Ddocker.tag=${{ github.ref_name }} \
           -Ddocker.hub=${{ env.HUB }} \
           -Pdocker,release
