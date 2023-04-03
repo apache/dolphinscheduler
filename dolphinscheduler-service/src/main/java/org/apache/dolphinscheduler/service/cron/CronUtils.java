@@ -79,7 +79,7 @@ public class CronUtils {
     public static Cron parse2Cron(String cronExpression) throws CronParseException {
         try {
             return QUARTZ_CRON_PARSER.parse(cronExpression);
-        } catch (Exception ex) {
+        } catch (IllegalArgumentException ex) {
             throw new CronParseException(String.format("Parse corn expression: [%s] error", cronExpression), ex);
         }
     }
