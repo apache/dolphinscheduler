@@ -534,7 +534,7 @@ Website: https://dolphinscheduler.apache.org/
 DolphinScheduler Resources:
 - Issue: https://github.com/apache/dolphinscheduler/issues/
 - Mailing list: dev@dolphinscheduler.apache.org
-- Documents: https://dolphinscheduler.apache.org/zh-cn/docs/<VERSION>/about/introduction
+- Documents: https://dolphinscheduler.apache.org/en-us/docs/<VERSION>/about/introduction
 ```
 
 ## News
