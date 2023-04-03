@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.zeppelin.client.ClientConfig;
 import org.apache.zeppelin.client.NoteResult;
 import org.apache.zeppelin.client.ParagraphResult;
@@ -78,11 +79,37 @@ public class ZeppelinTask extends AbstractRemoteTask {
         log.info("Initialize zeppelin task params:{}", JSONUtils.toPrettyJsonString(taskParams));
         this.zClient = getZeppelinClient();
     }
+    /**
+     * zeppelin_userName key 
+     */
+    public static String ZEPPELIN_USERNAME = "zeppelin_userName";
+    /**
+     * zeppelin_passWord key
+     */
+    public static String ZEPPELIN_PASSWORD = "zeppelin_passWord";
+
+    @SuppressWarnings("unchecked")
+    public boolean login() throws Exception {
+        final String parameters = this.zeppelinParameters.getParameters();
+        Map<String, String> zeppelinParamsMap = new HashMap<>();
+        if (parameters != null) {
+            ObjectMapper mapper = new ObjectMapper();
+            zeppelinParamsMap = mapper.readValue(parameters, Map.class);
+        }
+        String userName = zeppelinParamsMap.get(ZEPPELIN_USERNAME);
+        String passWord = zeppelinParamsMap.get(ZEPPELIN_PASSWORD);
+        if (StringUtils.isNotBlank(userName) && StringUtils.isNotBlank(passWord)) {
+            this.zClient.login(userName, passWord);
+        }
+        return true;
+    }
 
     // todo split handle to submit and track
     @Override
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
+            // login
+            login();
             final String paragraphId = this.zeppelinParameters.getParagraphId();
             final String productionNoteDirectory = this.zeppelinParameters.getProductionNoteDirectory();
             final String parameters = this.zeppelinParameters.getParameters();
