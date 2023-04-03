@@ -315,7 +315,7 @@ cp -f "${SOURCE_CODE_DIR}"/dolphinscheduler-dist/target/*.tar.gz "${SVN_DIR_DEV}
 cp -f "${SOURCE_CODE_DIR}"/dolphinscheduler-dist/target/*.tar.gz.asc "${SVN_DIR_DEV}/${VERSION}"
 
 # Create sign
-cd "${SVN_DIR_DEV}"
+cd "${SVN_DIR_DEV}/${VERSION}"
 shasum -a 512 apache-dolphinscheduler-"${VERSION}"-src.tar.gz >> apache-dolphinscheduler-"${VERSION}"-src.tar.gz.sha512
 shasum -b -a 512 apache-dolphinscheduler-"${VERSION}"-bin.tar.gz >> apache-dolphinscheduler-"${VERSION}"-bin.tar.gz.sha512
 
@@ -327,7 +327,8 @@ gpg --verify apache-dolphinscheduler-"${VERSION}"-src.tar.gz.asc
 gpg --verify apache-dolphinscheduler-"${VERSION}"-bin.tar.gz.asc
 
 # Commit to Apache SVN
-svn add *
+cd "${SVN_DIR_DEV}"
+svn add "${VERSION}"
 svn --username="${A_USERNAME}" commit -m "release ${VERSION}"
 ```
 
