@@ -4,6 +4,8 @@
 
 DataX task type for executing DataX programs. For DataX nodes, the worker will execute `${DATAX_HOME}/bin/datax.py` to analyze the input json file.
 
+By default, the datax.py will be executed by python2.7, if you want to use other python version, you can set the `DATAX_PYTHON` environment variable to specify a version.
+
 ## Create Task
 
 - Click `Project Management -> Project Name -> Workflow Definition`, and click the `Create Workflow` button to enter the DAG editing page.

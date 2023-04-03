@@ -246,16 +246,6 @@ public class DataxTaskTest {
     }
 
     @Test
-    public void testGetPythonCommand() {
-        Assertions.assertEquals(dataxTask.getPythonCommand(""), "python2.7");
-        Assertions.assertEquals(dataxTask.getPythonCommand("/bin/python"), "/bin/python2.7");
-
-        String pythonCommand = dataxTask.getPythonCommand("/opt/python");
-        pythonCommand = pythonCommand.replace(File.separator, "/");
-        Assertions.assertEquals(pythonCommand, "/opt/python/bin/python2.7");
-    }
-
-    @Test
     public void testLoadJvmEnv() {
         DataxParameters dataXParameters = createDataxParameters();
         dataXParameters.setXms(3);
