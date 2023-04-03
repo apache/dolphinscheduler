@@ -88,6 +88,9 @@ public class PropertyUtils {
      * @return property value
      */
     public static String getString(String key) {
+        if (key == null) {
+            return null;
+        }
         return properties.getProperty(key.trim());
     }
 
