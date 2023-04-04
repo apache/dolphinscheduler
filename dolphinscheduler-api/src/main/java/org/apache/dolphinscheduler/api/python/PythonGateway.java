@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.python;
 
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -247,6 +248,10 @@ public class PythonGateway {
         } else {
             Map<String, Object> result = processDefinitionService.createProcessDefinition(user, projectCode, name, description, globalParams,
                     locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson, executionType);
+            if (result.get(Constants.STATUS) != Status.SUCCESS) {
+                logger.error(result.get(Constants.MSG).toString());
+                throw new ServiceException(result.get(Constants.MSG).toString());
+            }
             processDefinition = (ProcessDefinition) result.get(Constants.DATA_LIST);
             processDefinitionCode = processDefinition.getCode();
         }
