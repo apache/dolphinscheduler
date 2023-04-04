@@ -17,6 +17,11 @@
 
 package org.apache.dolphinscheduler.registry.api.enums;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
 public enum RegistryNodeType {
 
     ALL_SERVERS("nodes", "/nodes"),
@@ -29,19 +34,7 @@ public enum RegistryNodeType {
     ;
 
     private final String name;
+
     private final String registryPath;
-
-    RegistryNodeType(String name, String registryPath) {
-        this.name = name;
-        this.registryPath = registryPath;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getRegistryPath() {
-        return registryPath;
-    }
 
 }

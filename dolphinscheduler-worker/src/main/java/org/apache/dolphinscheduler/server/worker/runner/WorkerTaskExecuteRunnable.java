@@ -53,6 +53,7 @@ import org.apache.dolphinscheduler.server.worker.utils.TaskFilesTransferUtils;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 
@@ -233,11 +234,12 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         }
 
         // todo: We need to send the alert to the master rather than directly send to the alert server
-        Host alertServerAddress = workerRegistryClient.getAlertServerAddress();
-        if (alertServerAddress == null) {
+        Optional<Host> alertServerAddressOptional = workerRegistryClient.getAlertServerAddress();
+        if (!alertServerAddressOptional.isPresent()) {
             log.error("Cannot get alert server address, please check the alert server is running");
             return;
         }
+        Host alertServerAddress = alertServerAddressOptional.get();
 
         log.info("The current task need to send alert, begin to send alert");
         TaskExecutionStatus status = task.getExitStatus();

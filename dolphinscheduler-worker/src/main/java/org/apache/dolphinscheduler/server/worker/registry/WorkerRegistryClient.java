@@ -37,12 +37,14 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.PostConstruct;
 
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -59,6 +61,7 @@ public class WorkerRegistryClient implements AutoCloseable {
     private RegistryClient registryClient;
 
     @Autowired
+    @Lazy
     private WorkerConnectStrategy workerConnectStrategy;
 
     private WorkerHeartBeatTask workerHeartBeatTask;
@@ -103,13 +106,13 @@ public class WorkerRegistryClient implements AutoCloseable {
         log.info("Worker node: {} registry finished", workerConfig.getWorkerAddress());
     }
 
-    public Host getAlertServerAddress() {
+    public Optional<Host> getAlertServerAddress() {
         List<Server> serverList = registryClient.getServerList(RegistryNodeType.ALERT_SERVER);
         if (CollectionUtils.isEmpty(serverList)) {
-            return null;
+            return Optional.empty();
         }
         Server server = serverList.get(0);
-        return new Host(server.getHost(), server.getPort());
+        return Optional.of(new Host(server.getHost(), server.getPort()));
     }
 
     public void setRegistryStoppable(IStoppable stoppable) {
