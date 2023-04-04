@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.remote.command.Message;
 import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.task.TaskDispatchMessage;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
+import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcClient;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
@@ -63,6 +64,9 @@ public class TaskDispatchProcessorTest {
 
     @Mock
     private StorageOperate storageOperate;
+
+    @Mock
+    private WorkerRegistryClient workerRegistryClient;
 
     @Test
     public void process() {

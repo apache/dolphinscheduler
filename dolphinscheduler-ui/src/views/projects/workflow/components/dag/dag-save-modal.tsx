@@ -81,7 +81,6 @@ export default defineComponent({
             label: t.tenantCode,
             value: t.tenantCode
           }))
-          .concat({ label: 'default', value: 'default' })
       }
       return []
     })
