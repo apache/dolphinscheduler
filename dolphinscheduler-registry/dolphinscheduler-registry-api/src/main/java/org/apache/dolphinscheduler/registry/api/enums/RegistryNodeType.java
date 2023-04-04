@@ -15,32 +15,33 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.alert;
+package org.apache.dolphinscheduler.registry.api.enums;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+public enum RegistryNodeType {
 
-@Component
-@ConfigurationProperties("alert")
-public final class AlertConfig {
+    ALL_SERVERS("nodes", "/nodes"),
+    MASTER("Master", "/nodes/master"),
+    MASTER_NODE_LOCK("MasterNodeLock", "/lock/master-node"),
+    MASTER_FAILOVER_LOCK("MasterFailoverLock", "/lock/master-failover"),
+    WORKER("Worker", "/nodes/worker"),
+    ALERT_SERVER("AlertServer", "/nodes/alert-server"),
+    ALERT_LOCK("AlertNodeLock", "/lock/alert"),
+    ;
 
-    private int port;
+    private final String name;
+    private final String registryPath;
 
-    private int waitTimeout;
-
-    public int getPort() {
-        return port;
+    RegistryNodeType(String name, String registryPath) {
+        this.name = name;
+        this.registryPath = registryPath;
     }
 
-    public void setPort(final int port) {
-        this.port = port;
+    public String getName() {
+        return name;
     }
 
-    public int getWaitTimeout() {
-        return waitTimeout;
+    public String getRegistryPath() {
+        return registryPath;
     }
 
-    public void setWaitTimeout(final int waitTimeout) {
-        this.waitTimeout = waitTimeout;
-    }
 }

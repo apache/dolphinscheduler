@@ -48,8 +48,6 @@ public class WorkerConfig implements Validator {
     private boolean tenantDistributedUser = false;
     private int maxCpuLoadAvg = -1;
     private double reservedMemory = 0.3;
-    private String alertListenHost = "localhost";
-    private int alertListenPort = 50052;
     private ConnectStrategyProperties registryDisconnectStrategy = new ConnectStrategyProperties();
 
     /**
@@ -92,8 +90,6 @@ public class WorkerConfig implements Validator {
         log.info("Worker config: tenantDistributedUser -> {}", tenantDistributedUser);
         log.info("Worker config: maxCpuLoadAvg -> {}", maxCpuLoadAvg);
         log.info("Worker config: reservedMemory -> {}", reservedMemory);
-        log.info("Worker config: alertListenHost -> {}", alertListenHost);
-        log.info("Worker config: alertListenPort -> {}", alertListenPort);
         log.info("Worker config: registryDisconnectStrategy -> {}", registryDisconnectStrategy);
         log.info("Worker config: workerAddress -> {}", registryDisconnectStrategy);
         log.info("Worker config: workerRegistryPath: {}", workerRegistryPath);

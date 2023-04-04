@@ -15,8 +15,9 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.alert;
+package org.apache.dolphinscheduler.alert.rpc;
 
+import org.apache.dolphinscheduler.alert.service.AlertBootstrapService;
 import org.apache.dolphinscheduler.remote.command.Message;
 import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.alert.AlertSendRequest;
@@ -34,10 +35,10 @@ import io.netty.channel.Channel;
 @Slf4j
 public final class AlertRequestProcessor implements NettyRequestProcessor {
 
-    private final AlertSenderService alertSenderService;
+    private final AlertBootstrapService alertBootstrapService;
 
-    public AlertRequestProcessor(AlertSenderService alertSenderService) {
-        this.alertSenderService = alertSenderService;
+    public AlertRequestProcessor(AlertBootstrapService alertBootstrapService) {
+        this.alertBootstrapService = alertBootstrapService;
     }
 
     @Override
@@ -46,7 +47,7 @@ public final class AlertRequestProcessor implements NettyRequestProcessor {
 
         log.info("Received command : {}", alertSendRequest);
 
-        AlertSendResponse alertSendResponse = alertSenderService.syncHandler(
+        AlertSendResponse alertSendResponse = alertBootstrapService.syncHandler(
                 alertSendRequest.getGroupId(),
                 alertSendRequest.getTitle(),
                 alertSendRequest.getContent(),

@@ -52,9 +52,6 @@ worker:
   max-cpu-load-avg: -1
   # worker reserved memory, only lower than system available memory, worker server can be dispatched tasks. default value 0.3, the unit is G
   reserved-memory: 0.3
-  # alert server listen host
-  alert-listen-host: localhost
-  alert-listen-port: 50052
   registry-disconnect-strategy:
     # The disconnect strategy: stop, waiting
     strategy: waiting

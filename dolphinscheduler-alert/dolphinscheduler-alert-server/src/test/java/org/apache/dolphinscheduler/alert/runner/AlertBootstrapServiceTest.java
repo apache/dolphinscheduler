@@ -20,11 +20,11 @@ package org.apache.dolphinscheduler.alert.runner;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.apache.dolphinscheduler.alert.AlertConfig;
-import org.apache.dolphinscheduler.alert.AlertPluginManager;
-import org.apache.dolphinscheduler.alert.AlertSenderService;
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
+import org.apache.dolphinscheduler.alert.config.AlertConfig;
+import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
+import org.apache.dolphinscheduler.alert.service.AlertBootstrapService;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.PluginDao;
@@ -47,9 +47,9 @@ import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AlertSenderServiceTest {
+public class AlertBootstrapServiceTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(AlertSenderServiceTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(AlertBootstrapServiceTest.class);
 
     @Mock
     private AlertDao alertDao;
@@ -61,7 +61,7 @@ public class AlertSenderServiceTest {
     private AlertConfig alertConfig;
 
     @InjectMocks
-    private AlertSenderService alertSenderService;
+    private AlertBootstrapService alertBootstrapService;
 
     @BeforeEach
     public void before() {
@@ -80,7 +80,7 @@ public class AlertSenderServiceTest {
         when(alertConfig.getWaitTimeout()).thenReturn(0);
 
         AlertSendResponse alertSendResponse =
-                alertSenderService.syncHandler(alertGroupId, title, content, WarningType.ALL.getCode());
+                alertBootstrapService.syncHandler(alertGroupId, title, content, WarningType.ALL.getCode());
         Assertions.assertFalse(alertSendResponse.isSuccess());
         alertSendResponse.getResResults().forEach(result -> logger
                 .info("alert send response result, status:{}, message:{}", result.isSuccess(), result.getMessage()));
@@ -101,7 +101,7 @@ public class AlertSenderServiceTest {
         when(pluginDao.getPluginDefineById(pluginDefineId)).thenReturn(pluginDefine);
 
         alertSendResponse =
-                alertSenderService.syncHandler(alertGroupId, title, content, WarningType.ALL.getCode());
+                alertBootstrapService.syncHandler(alertGroupId, title, content, WarningType.ALL.getCode());
         Assertions.assertFalse(alertSendResponse.isSuccess());
         alertSendResponse.getResResults().forEach(result -> logger
                 .info("alert send response result, status:{}, message:{}", result.isSuccess(), result.getMessage()));
@@ -113,7 +113,7 @@ public class AlertSenderServiceTest {
         when(alertConfig.getWaitTimeout()).thenReturn(0);
 
         alertSendResponse =
-                alertSenderService.syncHandler(alertGroupId, title, content, WarningType.ALL.getCode());
+                alertBootstrapService.syncHandler(alertGroupId, title, content, WarningType.ALL.getCode());
         Assertions.assertFalse(alertSendResponse.isSuccess());
         alertSendResponse.getResResults().forEach(result -> logger
                 .info("alert send response result, status:{}, message:{}", result.isSuccess(), result.getMessage()));
@@ -126,7 +126,7 @@ public class AlertSenderServiceTest {
         when(alertPluginManager.getAlertChannel(1)).thenReturn(Optional.of(alertChannelMock));
 
         alertSendResponse =
-                alertSenderService.syncHandler(alertGroupId, title, content, WarningType.ALL.getCode());
+                alertBootstrapService.syncHandler(alertGroupId, title, content, WarningType.ALL.getCode());
         Assertions.assertFalse(alertSendResponse.isSuccess());
         alertSendResponse.getResResults().forEach(result -> logger
                 .info("alert send response result, status:{}, message:{}", result.isSuccess(), result.getMessage()));
@@ -140,7 +140,7 @@ public class AlertSenderServiceTest {
         when(alertConfig.getWaitTimeout()).thenReturn(5000);
 
         alertSendResponse =
-                alertSenderService.syncHandler(alertGroupId, title, content, WarningType.ALL.getCode());
+                alertBootstrapService.syncHandler(alertGroupId, title, content, WarningType.ALL.getCode());
         Assertions.assertTrue(alertSendResponse.isSuccess());
         alertSendResponse.getResResults().forEach(result -> logger
                 .info("alert send response result, status:{}, message:{}", result.isSuccess(), result.getMessage()));
@@ -184,6 +184,6 @@ public class AlertSenderServiceTest {
         when(alertPluginManager.getAlertChannel(1)).thenReturn(Optional.of(alertChannelMock));
         Assertions.assertTrue(Boolean.parseBoolean(alertResult.getStatus()));
         when(alertDao.listInstanceByAlertGroupId(1)).thenReturn(new ArrayList<>());
-        alertSenderService.send(alertList);
+        alertBootstrapService.send(alertList);
     }
 }

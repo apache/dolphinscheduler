@@ -18,10 +18,10 @@
 package org.apache.dolphinscheduler.service.cache;
 
 import org.apache.dolphinscheduler.common.enums.CacheType;
-import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.Message;
 import org.apache.dolphinscheduler.remote.command.MessageType;
@@ -84,7 +84,7 @@ public class CacheNotifyServiceTest {
         server.setPort(serverConfig.getListenPort());
         serverList.add(server);
 
-        Mockito.when(registryClient.getServerList(NodeType.MASTER)).thenReturn(serverList);
+        Mockito.when(registryClient.getServerList(RegistryNodeType.MASTER)).thenReturn(serverList);
 
         cacheNotifyService.notifyMaster(cacheExpireMessage);
 

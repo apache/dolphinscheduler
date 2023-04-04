@@ -21,17 +21,22 @@ import static org.apache.dolphinscheduler.common.constants.Constants.SLEEP_TIME_
 
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.enums.NodeType;
+import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
+import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.server.worker.task.WorkerHeartBeatTask;
 
+import org.apache.commons.collections4.CollectionUtils;
+
 import java.io.IOException;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 
@@ -87,7 +92,7 @@ public class WorkerRegistryClient implements AutoCloseable {
         registryClient.persistEphemeral(workerZKPath, JSONUtils.toJsonString(workerHeartBeat));
         log.info("Worker node: {} registry to ZK {} successfully", workerConfig.getWorkerAddress(), workerZKPath);
 
-        while (!registryClient.checkNodeExists(workerConfig.getWorkerAddress(), NodeType.WORKER)) {
+        while (!registryClient.checkNodeExists(workerConfig.getWorkerAddress(), RegistryNodeType.WORKER)) {
             ThreadUtils.sleep(SLEEP_TIME_MILLIS);
         }
 
@@ -96,6 +101,15 @@ public class WorkerRegistryClient implements AutoCloseable {
 
         workerHeartBeatTask.start();
         log.info("Worker node: {} registry finished", workerConfig.getWorkerAddress());
+    }
+
+    public Host getAlertServerAddress() {
+        List<Server> serverList = registryClient.getServerList(RegistryNodeType.ALERT_SERVER);
+        if (CollectionUtils.isEmpty(serverList)) {
+            return null;
+        }
+        Server server = serverList.get(0);
+        return new Host(server.getHost(), server.getPort());
     }
 
     public void setRegistryStoppable(IStoppable stoppable) {

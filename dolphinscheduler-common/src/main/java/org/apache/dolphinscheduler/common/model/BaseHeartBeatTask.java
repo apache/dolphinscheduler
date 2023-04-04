@@ -39,9 +39,9 @@ public abstract class BaseHeartBeatTask<T> extends BaseDaemonThread {
 
     @Override
     public synchronized void start() {
-        log.info("Starting {}", threadName);
+        log.info("Starting {}...", threadName);
         super.start();
-        log.info("Started {}, heartBeatInterval: {}", threadName, heartBeatInterval);
+        log.info("Started {}, heartBeatInterval: {}...", threadName, heartBeatInterval);
     }
 
     @Override
@@ -68,8 +68,8 @@ public abstract class BaseHeartBeatTask<T> extends BaseDaemonThread {
     }
 
     public void shutdown() {
-        log.warn("{} task finished", threadName);
         runningFlag = false;
+        log.warn("{} finished...", threadName);
     }
 
     private void handleInterruptException(InterruptedException ex) {
