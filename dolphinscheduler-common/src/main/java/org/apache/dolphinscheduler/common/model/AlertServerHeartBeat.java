@@ -15,32 +15,25 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.alert;
+package org.apache.dolphinscheduler.common.model;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Component
-@ConfigurationProperties("alert")
-public final class AlertConfig {
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class AlertServerHeartBeat implements HeartBeat {
 
-    private int port;
-
-    private int waitTimeout;
-
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(final int port) {
-        this.port = port;
-    }
-
-    public int getWaitTimeout() {
-        return waitTimeout;
-    }
-
-    public void setWaitTimeout(final int waitTimeout) {
-        this.waitTimeout = waitTimeout;
-    }
+    private int processId;
+    private long startupTime;
+    private long reportTime;
+    private double cpuUsage;
+    private double memoryUsage;
+    private double loadAverage;
+    private double availablePhysicalMemorySize;
+    private String alertServerAddress;
 }

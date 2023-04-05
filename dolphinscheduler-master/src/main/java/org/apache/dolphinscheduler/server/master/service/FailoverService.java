@@ -17,16 +17,13 @@
 
 package org.apache.dolphinscheduler.server.master.service;
 
-import org.apache.dolphinscheduler.common.enums.NodeType;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Component;
 
-/**
- * failover service
- */
 @Component
 @Slf4j
 public class FailoverService {
@@ -46,7 +43,7 @@ public class FailoverService {
      * @param serverHost server host
      * @param nodeType   node type
      */
-    public void failoverServerWhenDown(String serverHost, NodeType nodeType) {
+    public void failoverServerWhenDown(String serverHost, RegistryNodeType nodeType) {
         switch (nodeType) {
             case MASTER:
                 log.info("Master failover starting, masterServer: {}", serverHost);

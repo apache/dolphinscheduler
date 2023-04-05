@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.alert;
+package org.apache.dolphinscheduler.alert.plugin;
 
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertChannelFactory;
@@ -39,8 +39,6 @@ import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -53,24 +51,32 @@ public final class AlertPluginManager {
         this.pluginDao = pluginDao;
     }
 
-    private final Map<Integer, AlertChannel> channelKeyedById = new HashMap<>();
+    private final Map<Integer, AlertChannel> alertPluginMap = new HashMap<>();
 
-    private final PluginParams warningTypeParams = getWarningTypeParams();
-
-    public PluginParams getWarningTypeParams() {
-        return RadioParam.newBuilder(AlertConstants.NAME_WARNING_TYPE, AlertConstants.WARNING_TYPE)
-                .addParamsOptions(
-                        new ParamsOptions(WarningType.SUCCESS.getDescp(), WarningType.SUCCESS.getDescp(), false))
-                .addParamsOptions(
-                        new ParamsOptions(WarningType.FAILURE.getDescp(), WarningType.FAILURE.getDescp(), false))
-                .addParamsOptions(new ParamsOptions(WarningType.ALL.getDescp(), WarningType.ALL.getDescp(), false))
-                .setValue(WarningType.ALL.getDescp())
-                .addValidate(Validate.newBuilder().setRequired(true).build())
-                .build();
+    public void start() {
+        log.info("AlertPluginManager start ...");
+        checkAlertPluginExist();
+        installAlertPlugin();
+        log.info("AlertPluginManager started ...");
     }
 
-    @EventListener
-    public void installPlugin(ApplicationReadyEvent readyEvent) {
+    public Optional<AlertChannel> getAlertChannel(int id) {
+        return Optional.ofNullable(alertPluginMap.get(id));
+    }
+
+    public int size() {
+        return alertPluginMap.size();
+    }
+
+    private void checkAlertPluginExist() {
+        if (!pluginDao.checkPluginDefineTableExist()) {
+            log.error("Plugin Define Table t_ds_plugin_define Not Exist . Please Create it First !");
+            System.exit(1);
+        }
+    }
+
+    private void installAlertPlugin() {
+        final PluginParams warningTypeParams = getWarningTypeParams();
 
         PrioritySPIFactory<AlertChannelFactory> prioritySPIFactory =
                 new PrioritySPIFactory<>(AlertChannelFactory.class);
@@ -92,15 +98,19 @@ public final class AlertPluginManager {
             final PluginDefine pluginDefine = new PluginDefine(name, PluginType.ALERT.getDesc(), paramsJson);
             final int id = pluginDao.addOrUpdatePluginDefine(pluginDefine);
 
-            channelKeyedById.put(id, alertChannel);
+            alertPluginMap.put(id, alertChannel);
         }
     }
 
-    public Optional<AlertChannel> getAlertChannel(int id) {
-        return Optional.ofNullable(channelKeyedById.get(id));
-    }
-
-    public int size() {
-        return channelKeyedById.size();
+    private PluginParams getWarningTypeParams() {
+        return RadioParam.newBuilder(AlertConstants.NAME_WARNING_TYPE, AlertConstants.WARNING_TYPE)
+                .addParamsOptions(
+                        new ParamsOptions(WarningType.SUCCESS.getDescp(), WarningType.SUCCESS.getDescp(), false))
+                .addParamsOptions(
+                        new ParamsOptions(WarningType.FAILURE.getDescp(), WarningType.FAILURE.getDescp(), false))
+                .addParamsOptions(new ParamsOptions(WarningType.ALL.getDescp(), WarningType.ALL.getDescp(), false))
+                .setValue(WarningType.ALL.getDescp())
+                .addValidate(Validate.newBuilder().setRequired(true).build())
+                .build();
     }
 }

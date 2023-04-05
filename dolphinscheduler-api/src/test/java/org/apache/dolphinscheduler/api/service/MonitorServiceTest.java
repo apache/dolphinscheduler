@@ -24,13 +24,13 @@ import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.MonitorServiceImpl;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
-import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.MonitorDBDao;
 import org.apache.dolphinscheduler.dao.entity.MonitorRecord;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -103,7 +103,7 @@ public class MonitorServiceTest {
     @Test
     public void testQueryMaster() {
         mockPermissionCheck(ApiFuncIdentificationConstant.MONITOR_MASTER_VIEW, true);
-        Mockito.when(registryClient.getServerList(NodeType.MASTER)).thenReturn(getServerList());
+        Mockito.when(registryClient.getServerList(RegistryNodeType.MASTER)).thenReturn(getServerList());
         Map<String, Object> result = monitorService.queryMaster(user);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
@@ -115,7 +115,7 @@ public class MonitorServiceTest {
     @Test
     public void testQueryWorker() {
         mockPermissionCheck(ApiFuncIdentificationConstant.MONITOR_WORKER_VIEW, true);
-        Mockito.when(registryClient.getServerList(NodeType.WORKER)).thenReturn(getServerList());
+        Mockito.when(registryClient.getServerList(RegistryNodeType.WORKER)).thenReturn(getServerList());
         Map<String, Object> result = monitorService.queryWorker(user);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 

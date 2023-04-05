@@ -17,16 +17,13 @@
 
 package org.apache.dolphinscheduler.alert;
 
+import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
+import org.apache.dolphinscheduler.alert.registry.AlertRegistryClient;
+import org.apache.dolphinscheduler.alert.rpc.AlertRpcServer;
+import org.apache.dolphinscheduler.alert.service.AlertBootstrapService;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.dao.PluginDao;
-import org.apache.dolphinscheduler.remote.NettyRemotingServer;
-import org.apache.dolphinscheduler.remote.factory.NettyRemotingServerFactory;
-import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
-
-import java.io.Closeable;
-import java.util.List;
 
 import javax.annotation.PreDestroy;
 
@@ -42,18 +39,16 @@ import org.springframework.context.event.EventListener;
 @SpringBootApplication
 @ComponentScan("org.apache.dolphinscheduler")
 @Slf4j
-public class AlertServer implements Closeable {
+public class AlertServer {
 
     @Autowired
-    private PluginDao pluginDao;
-
+    private AlertBootstrapService alertBootstrapService;
     @Autowired
-    private AlertSenderService alertSenderService;
+    private AlertRpcServer alertRpcServer;
     @Autowired
-    private List<NettyRequestProcessor> nettyRequestProcessors;
+    private AlertPluginManager alertPluginManager;
     @Autowired
-    private AlertConfig alertConfig;
-    private NettyRemotingServer nettyRemotingServer;
+    private AlertRegistryClient alertRegistryClient;
 
     public static void main(String[] args) {
         Thread.currentThread().setName(Constants.THREAD_NAME_ALERT_SERVER);
@@ -63,14 +58,13 @@ public class AlertServer implements Closeable {
     @EventListener
     public void run(ApplicationReadyEvent readyEvent) {
         log.info("Alert server is staring ...");
-
-        checkTable();
-        startServer();
-        alertSenderService.start();
+        alertPluginManager.start();
+        alertRegistryClient.start();
+        alertBootstrapService.start();
+        alertRpcServer.start();
         log.info("Alert server is started ...");
     }
 
-    @Override
     @PreDestroy
     public void close() {
         destroy("alert server destroy");
@@ -90,33 +84,18 @@ public class AlertServer implements Closeable {
                 log.warn("AlterServer is already stopped");
                 return;
             }
-
             log.info("Alert server is stopping, cause: {}", cause);
-
+            try (
+                    AlertRpcServer closedAlertRpcServer = alertRpcServer;
+                    AlertBootstrapService closedAlertBootstrapService = alertBootstrapService;
+                    AlertRegistryClient closedAlertRegistryClient = alertRegistryClient) {
+                // close resource
+            }
             // thread sleep 3 seconds for thread quietly stop
             ThreadUtils.sleep(Constants.SERVER_CLOSE_WAIT_TIME.toMillis());
-
-            // close
-            this.nettyRemotingServer.close();
             log.info("Alter server stopped, cause: {}", cause);
         } catch (Exception e) {
             log.error("Alert server stop failed, cause: {}", cause, e);
         }
-    }
-
-    protected void checkTable() {
-        if (!pluginDao.checkPluginDefineTableExist()) {
-            log.error("Plugin Define Table t_ds_plugin_define Not Exist . Please Create it First !");
-            System.exit(1);
-        }
-    }
-
-    protected void startServer() {
-        nettyRemotingServer = NettyRemotingServerFactory.buildNettyRemotingServer(alertConfig.getPort());
-        for (NettyRequestProcessor nettyRequestProcessor : nettyRequestProcessors) {
-            nettyRemotingServer.registerProcessor(nettyRequestProcessor);
-            log.info("Success register netty processor: {}", nettyRequestProcessor.getClass().getName());
-        }
-        nettyRemotingServer.start();
     }
 }
