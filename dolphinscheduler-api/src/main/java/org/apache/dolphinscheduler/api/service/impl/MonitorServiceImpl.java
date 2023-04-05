@@ -20,13 +20,13 @@ package org.apache.dolphinscheduler.api.service.impl;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.MonitorService;
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.model.WorkerServerModel;
 import org.apache.dolphinscheduler.dao.MonitorDBDao;
 import org.apache.dolphinscheduler.dao.entity.MonitorRecord;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
 import java.util.HashMap;
 import java.util.List;
@@ -130,8 +130,8 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
     @Override
     public List<Server> getServerListFromRegistry(boolean isMaster) {
         return isMaster
-                ? registryClient.getServerList(NodeType.MASTER)
-                : registryClient.getServerList(NodeType.WORKER);
+                ? registryClient.getServerList(RegistryNodeType.MASTER)
+                : registryClient.getServerList(RegistryNodeType.WORKER);
     }
 
 }

@@ -17,16 +17,15 @@
 
 package org.apache.dolphinscheduler.server.master.registry;
 
-import static org.apache.dolphinscheduler.common.constants.Constants.REGISTRY_DOLPHINSCHEDULER_NODE;
 import static org.apache.dolphinscheduler.common.constants.Constants.SLEEP_TIME_MILLIS;
 
 import org.apache.dolphinscheduler.common.IStoppable;
-import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.service.FailoverService;
 import org.apache.dolphinscheduler.server.master.task.MasterHeartBeatTask;
@@ -67,7 +66,7 @@ public class MasterRegistryClient implements AutoCloseable {
             registry();
             registryClient.addConnectionStateListener(
                     new MasterConnectionStateListener(masterConfig, registryClient, masterConnectStrategy));
-            registryClient.subscribe(REGISTRY_DOLPHINSCHEDULER_NODE, new MasterRegistryDataListener());
+            registryClient.subscribe(RegistryNodeType.ALL_SERVERS.getRegistryPath(), new MasterRegistryDataListener());
         } catch (Exception e) {
             throw new RegistryException("Master registry client start up error", e);
         }
@@ -86,11 +85,11 @@ public class MasterRegistryClient implements AutoCloseable {
     /**
      * remove master node path
      *
-     * @param path node path
+     * @param path     node path
      * @param nodeType node type
      * @param failover is failover
      */
-    public void removeMasterNodePath(String path, NodeType nodeType, boolean failover) {
+    public void removeMasterNodePath(String path, RegistryNodeType nodeType, boolean failover) {
         log.info("{} node deleted : {}", nodeType, path);
 
         if (StringUtils.isEmpty(path)) {
@@ -124,7 +123,7 @@ public class MasterRegistryClient implements AutoCloseable {
      * @param nodeType node type
      * @param failover is failover
      */
-    public void removeWorkerNodePath(String path, NodeType nodeType, boolean failover) {
+    public void removeWorkerNodePath(String path, RegistryNodeType nodeType, boolean failover) {
         log.info("{} node deleted : {}", nodeType, path);
         try {
             String serverHost = null;
@@ -158,7 +157,7 @@ public class MasterRegistryClient implements AutoCloseable {
         registryClient.remove(masterRegistryPath);
         registryClient.persistEphemeral(masterRegistryPath, JSONUtils.toJsonString(masterHeartBeatTask.getHeartBeat()));
 
-        while (!registryClient.checkNodeExists(NetUtils.getHost(), NodeType.MASTER)) {
+        while (!registryClient.checkNodeExists(NetUtils.getHost(), RegistryNodeType.MASTER)) {
             log.warn("The current master server node:{} cannot find in registry", NetUtils.getHost());
             ThreadUtils.sleep(SLEEP_TIME_MILLIS);
         }

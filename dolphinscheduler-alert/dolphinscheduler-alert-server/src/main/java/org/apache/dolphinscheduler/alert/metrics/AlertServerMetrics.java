@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.alert;
+package org.apache.dolphinscheduler.alert.metrics;
 
 import java.util.function.Supplier;
 

@@ -15,8 +15,26 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.enums;
+package org.apache.dolphinscheduler.registry.api.enums;
 
-public enum NodeType {
-    MASTER, WORKER, DEAD_SERVER
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
+public enum RegistryNodeType {
+
+    ALL_SERVERS("nodes", "/nodes"),
+    MASTER("Master", "/nodes/master"),
+    MASTER_NODE_LOCK("MasterNodeLock", "/lock/master-node"),
+    MASTER_FAILOVER_LOCK("MasterFailoverLock", "/lock/master-failover"),
+    WORKER("Worker", "/nodes/worker"),
+    ALERT_SERVER("AlertServer", "/nodes/alert-server"),
+    ALERT_LOCK("AlertNodeLock", "/lock/alert"),
+    ;
+
+    private final String name;
+
+    private final String registryPath;
+
 }
