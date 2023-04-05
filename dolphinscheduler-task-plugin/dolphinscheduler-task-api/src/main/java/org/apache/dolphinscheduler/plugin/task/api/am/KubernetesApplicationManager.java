@@ -41,6 +41,7 @@ import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.FilterWatchListDeletable;
+import io.fabric8.kubernetes.client.dsl.LogWatch;
 
 @Slf4j
 @AutoService(ApplicationManager.class)
@@ -170,27 +171,23 @@ public class KubernetesApplicationManager implements ApplicationManager {
     }
 
     /**
-     * collect pod's log
+     * get pod's log watcher
      *
      * @param kubernetesApplicationManagerContext
      * @return
      */
-    public String collectPodLog(KubernetesApplicationManagerContext kubernetesApplicationManagerContext) {
+    public LogWatch getPodLogWatcher(KubernetesApplicationManagerContext kubernetesApplicationManagerContext) {
         KubernetesClient client = getClient(kubernetesApplicationManagerContext);
         FilterWatchListDeletable<Pod, PodList> watchList = getDriverPod(kubernetesApplicationManagerContext);
         List<Pod> driverPod = watchList.list().getItems();
         if (CollectionUtils.isEmpty(driverPod)) {
-            return "The driver pod does not exist.";
+            return null;
         }
         Pod driver = driverPod.get(0);
-        String driverPodName = driver.getMetadata().getName();
-        String logs = client.pods()
-                .inNamespace(kubernetesApplicationManagerContext.getK8sTaskExecutionContext().getNamespace())
-                .withName(driverPodName).getLog();
 
-        // delete driver pod only after successful execution
-        killApplication(kubernetesApplicationManagerContext);
-        return logs;
+        return client.pods().inNamespace(driver.getMetadata().getNamespace())
+                .withName(driver.getMetadata().getName())
+                .watchLog();
     }
 
 }

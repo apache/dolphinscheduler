@@ -293,27 +293,17 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         }
     }
 
-    protected void writePodLodIfNeeded() {
-        if (null == taskExecutionContext.getK8sTaskExecutionContext()) {
-            return;
-        }
-        log.info("The current task is k8s task, begin to write pod log");
-        ProcessUtils.getPodLog(taskExecutionContext.getK8sTaskExecutionContext(), taskExecutionContext.getTaskAppId());
-    }
-
     protected void closeLogAppender() {
         try {
-            writePodLodIfNeeded();
             if (RemoteLogUtils.isRemoteLoggingEnable()) {
                 RemoteLogUtils.sendRemoteLog(taskExecutionContext.getLogPath());
                 log.info("Log handler sends task log {} to remote storage asynchronously.",
                         taskExecutionContext.getLogPath());
             }
         } catch (Exception ex) {
-            log.error("Write k8s pod log failed", ex);
+            log.error("Send remote log failed", ex);
         } finally {
             log.info(FINALIZE_SESSION_MARKER, FINALIZE_SESSION_MARKER.toString());
-
         }
     }
 

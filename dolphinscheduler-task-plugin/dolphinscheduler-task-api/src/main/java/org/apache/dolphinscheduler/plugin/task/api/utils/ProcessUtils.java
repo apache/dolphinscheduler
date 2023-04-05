@@ -49,6 +49,7 @@ import java.util.regex.Pattern;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import io.fabric8.kubernetes.client.dsl.LogWatch;
 
 @Slf4j
 public final class ProcessUtils {
@@ -204,12 +205,12 @@ public final class ProcessUtils {
      * @param taskAppId
      * @return
      */
-    public static String getPodLog(K8sTaskExecutionContext k8sTaskExecutionContext, String taskAppId) {
+    public static LogWatch getPodLogWatcher(K8sTaskExecutionContext k8sTaskExecutionContext, String taskAppId) {
         KubernetesApplicationManager applicationManager =
                 (KubernetesApplicationManager) applicationManagerMap.get(ResourceManagerType.KUBERNETES);
 
         return applicationManager
-                .collectPodLog(new KubernetesApplicationManagerContext(k8sTaskExecutionContext, taskAppId));
+                .getPodLogWatcher(new KubernetesApplicationManagerContext(k8sTaskExecutionContext, taskAppId));
     }
 
 }
