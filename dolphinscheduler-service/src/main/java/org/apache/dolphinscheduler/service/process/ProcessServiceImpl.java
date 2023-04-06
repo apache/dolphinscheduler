@@ -1772,9 +1772,7 @@ public class ProcessServiceImpl implements ProcessService {
                         JSONUtils.toJsonString(mainJarObj),
                         ResourceInfo.class);
                 ResourceInfo resourceInfo = updateResourceInfo(mainJar);
-                if (resourceInfo != null) {
-                    taskParameters.put("mainJar", resourceInfo);
-                }
+                taskParameters.put("mainJar", resourceInfo);
             }
             // update resourceList information
             if (taskParameters.containsKey("resourceList")) {
@@ -1810,6 +1808,10 @@ public class ProcessServiceImpl implements ProcessService {
             resourceInfo = new ResourceInfo();
             // get resource from database, only one resource should be returned
             Resource resource = getResourceById(resourceId);
+            if (Objects.isNull(resource)) {
+                logger.error("resource not found, resourceId: {}", resourceId);
+                return null;
+            }
             resourceInfo.setId(resourceId);
             resourceInfo.setRes(resource.getFileName());
             resourceInfo.setResourceName(resource.getFullName());
