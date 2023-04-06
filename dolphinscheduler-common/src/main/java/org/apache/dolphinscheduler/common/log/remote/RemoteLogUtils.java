@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.common.log.remote;
 
+import static org.apache.dolphinscheduler.common.utils.LogUtils.getLocalLogBaseDir;
+
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 
@@ -35,8 +37,6 @@ import org.springframework.stereotype.Component;
 public class RemoteLogUtils {
 
     private static RemoteLogService remoteLogService;
-
-    private static final int OBJECT_NAME_COUNT = 2;
 
     @Autowired
     private RemoteLogService autowiredRemoteLogService;
@@ -79,16 +79,13 @@ public class RemoteLogUtils {
     }
 
     public static String getObjectNameFromLogPath(String logPath) {
+        Path localLogBaseDirPath = Paths.get(getLocalLogBaseDir()).toAbsolutePath();
+
         Path path = Paths.get(logPath);
         int nameCount = path.getNameCount();
 
-        String logBaseDir = PropertyUtils.getString(Constants.REMOTE_LOGGING_BASE_DIR);
-
-        if (nameCount < OBJECT_NAME_COUNT) {
-            return Paths.get(logBaseDir, logPath).toString();
-        } else {
-            return Paths.get(logBaseDir, path.subpath(nameCount - OBJECT_NAME_COUNT, nameCount).toString())
-                    .toString();
-        }
+        String remoteLogBaseDir = PropertyUtils.getString(Constants.REMOTE_LOGGING_BASE_DIR);
+        return Paths.get(remoteLogBaseDir, path.subpath(localLogBaseDirPath.getNameCount(), nameCount).toString())
+                .toString();
     }
 }

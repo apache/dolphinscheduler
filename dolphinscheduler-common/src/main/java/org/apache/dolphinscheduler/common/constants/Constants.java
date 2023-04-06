@@ -839,4 +839,11 @@ public final class Constants {
     public static final String REMOTE_LOGGING_S3_ENDPOINT = "remote.logging.s3.endpoint";
 
     public static final String REMOTE_LOGGING_S3_REGION = "remote.logging.s3.region";
+
+    /**
+     * remote logging for GCS
+     */
+    public static final String REMOTE_LOGGING_GCS_CREDENTIAL = "remote.logging.google.cloud.storage.credential";
+
+    public static final String REMOTE_LOGGING_GCS_BUCKET_NAME = "remote.logging.google.cloud.storage.bucket.name";
 }
