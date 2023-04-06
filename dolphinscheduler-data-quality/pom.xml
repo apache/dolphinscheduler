@@ -122,6 +122,11 @@
         </dependency>
 
         <dependency>
+            <groupId>com.databend</groupId>
+            <artifactId>databend-jdbc</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>com.microsoft.sqlserver</groupId>
             <artifactId>mssql-jdbc</artifactId>
             <exclusions>
