@@ -38,6 +38,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.executor.ExecuteClient;
 import org.apache.dolphinscheduler.api.executor.ExecuteContext;
+import org.apache.dolphinscheduler.api.resource.ResourceCheck;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.MonitorService;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
@@ -94,6 +95,7 @@ import org.apache.dolphinscheduler.service.cron.CronUtils;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.process.TriggerRelationService;
+import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections4.CollectionUtils;
@@ -235,6 +237,20 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         } else {
             processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
         }
+
+        // check if all resources exist
+        List<TaskDefinition> allDefinitionList =
+                taskDefinitionMapper.queryAllDefinitionList(processDefinition.getProjectCode());
+        for (TaskDefinition taskDefinition : allDefinitionList) {
+            try {
+                new ResourceCheck(ResourceType.FILE, processService, taskDefinition.getResourceIds(),
+                        taskDefinition.getName(), log).checkAllExist();
+            } catch (ServiceException e) {
+                putMsg(result, Status.TASK_RESOURCE_NOT_EXIST, taskDefinition.getName());
+                return result;
+            }
+        }
+
         // check process define release state
         this.checkProcessDefinitionValid(projectCode, processDefinition, processDefinitionCode,
                 processDefinition.getVersion());

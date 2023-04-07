@@ -33,6 +33,7 @@ import org.apache.dolphinscheduler.api.dto.workflow.WorkflowUpdateRequest;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.permission.PermissionCheck;
+import org.apache.dolphinscheduler.api.resource.ResourceCheck;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.ProcessTaskRelationService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -68,6 +69,7 @@ import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -766,6 +768,16 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         taskDefinitionToUpdate.setTaskType(taskDefinitionToUpdate.getTaskType().toUpperCase());
         taskDefinitionToUpdate.setResourceIds(processService.getResourceIds(taskDefinitionToUpdate));
         taskDefinitionToUpdate.setUpdateTime(now);
+
+        // check if all resources exist
+        try {
+            new ResourceCheck(ResourceType.FILE, processService,
+                    taskDefinitionToUpdate.getResourceIds(), taskDefinitionToUpdate.getName(), log).checkAllExist();
+        } catch (ServiceException e) {
+            putMsg(result, Status.TASK_RESOURCE_NOT_EXIST, taskDefinitionToUpdate.getName());
+            return null;
+        }
+
         int update = taskDefinitionMapper.updateById(taskDefinitionToUpdate);
         taskDefinitionToUpdate.setOperator(loginUser.getId());
         taskDefinitionToUpdate.setOperateTime(now);
@@ -1288,6 +1300,15 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                     } catch (Exception e) {
                         log.error("Resources permission check error, resourceIds:{}.", resourceIds, e);
                         putMsg(result, Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION);
+                        return result;
+                    }
+
+                    // check if all resources exist
+                    try {
+                        new ResourceCheck(ResourceType.FILE, processService,
+                                taskDefinition.getResourceIds(), taskDefinition.getName(), log).checkAllExist();
+                    } catch (ServiceException e) {
+                        putMsg(result, Status.TASK_RESOURCE_NOT_EXIST, taskDefinition.getName());
                         return result;
                     }
                 }

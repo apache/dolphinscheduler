@@ -54,6 +54,7 @@ import org.apache.dolphinscheduler.api.dto.workflow.WorkflowFilterRequest;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowUpdateRequest;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.resource.ResourceCheck;
 import org.apache.dolphinscheduler.api.service.MetricsCleanUpService;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
@@ -124,6 +125,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -307,6 +309,18 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
         List<TaskDefinitionLog> taskDefinitionLogs = generateTaskDefinitionList(taskDefinitionJson);
         List<ProcessTaskRelationLog> taskRelationList = generateTaskRelationList(taskRelationJson, taskDefinitionLogs);
+
+        // check if all resources exist
+        for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
+            try {
+                new ResourceCheck(ResourceType.FILE, processService, processService.getResourceIds(taskDefinitionLog),
+                        taskDefinitionLog.getName(), log).checkAllExist();
+            } catch (ServiceException e) {
+                putMsg(result, Status.TASK_RESOURCE_NOT_EXIST, taskDefinitionLog.getName());
+                return result;
+            }
+        }
+
         int tenantId = -1;
         if (!Constants.DEFAULT.equals(tenantCode)) {
             Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
@@ -1168,6 +1182,15 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     putMsg(result, Status.PROCESS_DAG_IS_EMPTY);
                     return result;
                 }
+
+                // Check if all resources exist
+                DagData dagData = processService.genDagData(processDefinition);
+                List<TaskDefinition> taskDefinitionList = dagData.getTaskDefinitionList();
+                for (TaskDefinition taskDefinition : taskDefinitionList) {
+                    new ResourceCheck(ResourceType.FILE, processService,
+                            taskDefinition.getResourceIds(), taskDefinition.getName(), log).checkAllExist();
+                }
+
                 processDefinition.setReleaseState(releaseState);
                 processDefinitionMapper.updateById(processDefinition);
                 log.info("Set process definition online, projectCode:{}, processDefinitionCode:{}.", projectCode,
