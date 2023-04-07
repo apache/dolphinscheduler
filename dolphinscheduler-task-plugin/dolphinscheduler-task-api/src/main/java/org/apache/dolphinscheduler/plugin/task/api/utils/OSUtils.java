@@ -39,7 +39,7 @@ public class OSUtils {
      * @return result of sudo execute command
      */
     public static String getSudoCmd(String tenantCode, String command) {
-        return StringUtils.isEmpty(tenantCode) ? command : "sudo -u " + tenantCode + " " + command;
+        return StringUtils.isEmpty(tenantCode) || !isSudoEnable() ? command : "sudo -u " + tenantCode + " " + command;
     }
 
     /**
