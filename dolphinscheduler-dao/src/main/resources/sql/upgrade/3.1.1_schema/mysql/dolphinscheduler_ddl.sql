@@ -85,4 +85,20 @@ delimiter ;
 call modify_t_ds_worker_group_description();
 drop procedure if exists modify_t_ds_worker_group_description;
 
-
+-- Dealing with table name case issues
+drop PROCEDURE if EXISTS drop_qrtz_job_details_capitalization;
+delimiter d//
+CREATE PROCEDURE drop_qrtz_job_details_capitalization()
+BEGIN
+    IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS
+        WHERE TABLE_NAME='qrtz_job_details'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+                                )
+    THEN
+RENAME TABLE `qrtz_job_details` TO `QRTZ_JOB_DETAILS`;
+END IF;
+END;
+d//
+delimiter ;
+CALL drop_qrtz_job_details_capitalization;
+DROP PROCEDURE drop_qrtz_job_details_capitalization;
