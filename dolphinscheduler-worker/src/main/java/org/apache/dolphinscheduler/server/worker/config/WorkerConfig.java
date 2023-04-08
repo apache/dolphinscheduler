@@ -47,7 +47,7 @@ public class WorkerConfig implements Validator {
     private boolean tenantAutoCreate = true;
     private boolean tenantDistributedUser = false;
     private int maxCpuLoadAvg = -1;
-    private double reservedMemory = 0.3;
+    private double reservedMemory = 0.1;
     private ConnectStrategyProperties registryDisconnectStrategy = new ConnectStrategyProperties();
 
     /**

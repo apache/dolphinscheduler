@@ -56,9 +56,8 @@ public class AlertHeartbeatTask extends BaseHeartBeatTask<AlertServerHeartBeat> 
                 .processId(processId)
                 .startupTime(startupTime)
                 .reportTime(System.currentTimeMillis())
-                .cpuUsage(OSUtils.cpuUsage())
-                .memoryUsage(OSUtils.memoryUsage())
-                .loadAverage(OSUtils.loadAverage())
+                .cpuUsage(OSUtils.cpuUsagePercentage())
+                .memoryUsage(OSUtils.memoryUsagePercentage())
                 .availablePhysicalMemorySize(OSUtils.availablePhysicalMemorySize())
                 .alertServerAddress(alertConfig.getAlertServerAddress())
                 .build();
