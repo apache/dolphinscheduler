@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useDeployMode, useResources, useCustomParams } from '.'
 import type { IJsonItem } from '../types'
@@ -24,18 +24,21 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
 
   const configEditorSpan = computed(() => (model.useCustom ? 24 : 0))
   const resourceEditorSpan = computed(() => (model.useCustom ? 0 : 24))
-  const flinkSpan = computed(() => (model.engine === 'FLINK' ? 24 : 0))
-  const deployModeSpan = computed(() => (model.engine === 'SPARK' ? 24 : 0))
+  const flinkSpan = computed(() => (model.engine === 'FLINK' || model.engine === 'FLINK_V2' ? 24 : 0))
+  const deployModeSpan = computed(() => (model.engine === 'SPARK' || model.engine === 'SPARK_V2' || model.engine === "SEATUNNEL_ENGINE" ? 24 : 0))
   const masterSpan = computed(() =>
-    model.engine === 'SPARK' && model.deployMode !== 'local' ? 12 : 0
+      (model.engine === 'SPARK' || model.engine === 'SPARK_V2') && model.deployMode !== 'local' ? 12 : 0
   )
   const masterUrlSpan = computed(() =>
-    model.engine === 'SPARK' &&
+    (model.engine === 'SPARK' || model.engine === 'SPARK_V2') &&
     model.deployMode !== 'local' &&
     (model.master === 'SPARK' || model.master === 'MESOS')
       ? 12
       : 0
   )
+  const showClient = computed(() => model.engine === 'SPARK' || model.engine === 'SPARK_V2')
+  const showLocal = computed(() => model.engine === 'SEATUNNEL_ENGINE')
+  const othersSpan = computed(() => (model.engine === 'FLINK' || model.engine === 'FLINK_V2' || model.engine === 'SEATUNNEL_ENGINE' ? 24 : 0))
 
   return [
     {
@@ -64,7 +67,7 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
       type: 'input',
       field: 'others',
       name: t('project.node.option_parameters'),
-      span: flinkSpan,
+      span: othersSpan,
       props: {
         type: 'textarea',
         placeholder: t('project.node.option_parameters_tips')
@@ -72,7 +75,7 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
     },
 
     // SeaTunnel spark parameter
-    useDeployMode(deployModeSpan),
+    useDeployMode(deployModeSpan, showClient, ref(true), showLocal),
     {
       type: 'select',
       field: 'master',
@@ -135,6 +138,18 @@ export const ENGINE = [
   {
     label: 'FLINK',
     value: 'FLINK'
+  },
+  {
+    label: 'SPARK_V2',
+    value: 'SPARK_V2'
+  },
+  {
+    label: 'FLINK_V2',
+    value: 'FLINK_V2'
+  },
+  {
+    label: 'SEATUNNEL_ENGINE',
+    value: 'SEATUNNEL_ENGINE'
   }
 ]
 
