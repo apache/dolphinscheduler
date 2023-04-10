@@ -28,7 +28,6 @@ clientPrincipal: Kerberos principal for client authentication
 serverPrincipal: Kerberos principal configured by kyuubi.kinit.principal at the server side.
 ```
 
-
 ## Native Supported
 
 Yes, could use this datasource by default.

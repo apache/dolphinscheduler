@@ -61,8 +61,8 @@ public class KyuubiDataSourceProcessorTest {
         kyuubiDataSourceParamDTO.setPassword("123456");
 
         try (
-            MockedStatic<PasswordUtils> mockedStaticPasswordUtils = Mockito.mockStatic(PasswordUtils.class);
-            MockedStatic<CommonUtils> mockedStaticCommonUtils = Mockito.mockStatic(CommonUtils.class)) {
+                MockedStatic<PasswordUtils> mockedStaticPasswordUtils = Mockito.mockStatic(PasswordUtils.class);
+                MockedStatic<CommonUtils> mockedStaticCommonUtils = Mockito.mockStatic(CommonUtils.class)) {
             mockedStaticPasswordUtils.when(() -> PasswordUtils.encodePassword(Mockito.anyString()))
                     .thenReturn("123456");
             mockedStaticCommonUtils.when(CommonUtils::getKerberosStartupState).thenReturn(false);
@@ -95,8 +95,8 @@ public class KyuubiDataSourceProcessorTest {
         kyuubiDataSourceParamDTO.setOther(props);
 
         try (
-            MockedStatic<PasswordUtils> mockedStaticPasswordUtils = Mockito.mockStatic(PasswordUtils.class);
-            MockedStatic<CommonUtils> mockedStaticCommonUtils = Mockito.mockStatic(CommonUtils.class)) {
+                MockedStatic<PasswordUtils> mockedStaticPasswordUtils = Mockito.mockStatic(PasswordUtils.class);
+                MockedStatic<CommonUtils> mockedStaticCommonUtils = Mockito.mockStatic(CommonUtils.class)) {
             mockedStaticPasswordUtils.when(() -> PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
             mockedStaticCommonUtils.when(CommonUtils::getKerberosStartupState).thenReturn(false);
             KyuubiConnectionParam connectionParams = (KyuubiConnectionParam) kyuubiDatasourceProcessor
