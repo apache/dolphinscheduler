@@ -86,9 +86,9 @@ call modify_t_ds_worker_group_description();
 drop procedure if exists modify_t_ds_worker_group_description;
 
 -- Dealing with table name case issues
-drop PROCEDURE if EXISTS drop_qrtz_job_details_capitalization;
+drop PROCEDURE if EXISTS drop_qrtz_job_details_table_name_lowercase_to_uppercase;
 delimiter d//
-CREATE PROCEDURE drop_qrtz_job_details_capitalization()
+CREATE PROCEDURE drop_qrtz_job_details_table_name_lowercase_to_uppercase()
 BEGIN
     IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS
         WHERE TABLE_NAME='qrtz_job_details'
@@ -100,5 +100,5 @@ END IF;
 END;
 d//
 delimiter ;
-CALL drop_qrtz_job_details_capitalization;
-DROP PROCEDURE drop_qrtz_job_details_capitalization;
+CALL drop_qrtz_job_details_table_name_lowercase_to_uppercase;
+DROP PROCEDURE drop_qrtz_job_details_table_name_lowercase_to_uppercase;
