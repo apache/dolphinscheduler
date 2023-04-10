@@ -20,10 +20,11 @@ package org.apache.dolphinscheduler.server.worker.processor;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.TaskDispatchCommand;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
+import org.apache.dolphinscheduler.remote.command.task.TaskDispatchMessage;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
+import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcClient;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
@@ -64,20 +65,23 @@ public class TaskDispatchProcessorTest {
     @Mock
     private StorageOperate storageOperate;
 
+    @Mock
+    private WorkerRegistryClient workerRegistryClient;
+
     @Test
     public void process() {
         Channel channel = Mockito.mock(Channel.class);
         TaskExecutionContext taskExecutionContext = getTaskExecutionContext();
-        Command dispatchCommand = createDispatchCommand(taskExecutionContext);
-        taskDispatchProcessor.process(channel, dispatchCommand);
+        Message dispatchMessage = createDispatchCommand(taskExecutionContext);
+        taskDispatchProcessor.process(channel, dispatchMessage);
 
         Mockito.verify(workerManagerThread, Mockito.atMostOnce()).offer(Mockito.any());
         Mockito.verify(workerMessageSender, Mockito.never()).sendMessageWithRetry(taskExecutionContext,
-                CommandType.TASK_REJECT);
+                MessageType.TASK_REJECT);
     }
 
-    public Command createDispatchCommand(TaskExecutionContext taskExecutionContext) {
-        return new TaskDispatchCommand(
+    public Message createDispatchCommand(TaskExecutionContext taskExecutionContext) {
+        return new TaskDispatchMessage(
                 taskExecutionContext,
                 "localhost:5678",
                 "localhost:1234",

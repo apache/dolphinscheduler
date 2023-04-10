@@ -24,6 +24,10 @@
 
 #### Links： [3.1.0 文档](../3.1.0/user_doc/about/introduction.md)
 
+### Versions: 3.0.5
+
+#### Links： [3.0.5 文档](../3.0.5/user_doc/about/introduction.md)
+
 ### Versions: 3.0.4
 
 #### Links： [3.0.4 文档](../3.0.4/user_doc/about/introduction.md)

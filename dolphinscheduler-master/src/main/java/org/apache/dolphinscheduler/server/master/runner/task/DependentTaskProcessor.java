@@ -222,7 +222,8 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
                             dependentItem.getKey());
                 }
             }
-            this.dependentTaskList.add(new DependentExecute(taskModel.getDependItemList(), taskModel.getRelation()));
+            this.dependentTaskList.add(new DependentExecute(taskModel.getDependItemList(), taskModel.getRelation(),
+                    processInstance, taskInstance));
         }
     }
 

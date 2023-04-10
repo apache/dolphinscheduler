@@ -23,10 +23,10 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.plugin.task.api.stream.StreamTask;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.TaskSavePointRequestCommand;
-import org.apache.dolphinscheduler.remote.command.TaskSavePointResponseCommand;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
+import org.apache.dolphinscheduler.remote.command.task.TaskSavePointRequest;
+import org.apache.dolphinscheduler.remote.command.task.TaskSavePointResponse;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecuteRunnable;
@@ -35,8 +35,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.google.common.base.Preconditions;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -59,26 +57,24 @@ public class TaskSavePointProcessor implements NettyRequestProcessor {
      * task save point process
      *
      * @param channel channel channel
-     * @param command command command
+     * @param message command command
      */
     @Override
-    public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.TASK_SAVEPOINT_REQUEST == command.getType(),
-                String.format("invalid command type : %s", command.getType()));
-        TaskSavePointRequestCommand taskSavePointRequestCommand =
-                JSONUtils.parseObject(command.getBody(), TaskSavePointRequestCommand.class);
-        if (taskSavePointRequestCommand == null) {
+    public void process(Channel channel, Message message) {
+        TaskSavePointRequest taskSavePointRequest =
+                JSONUtils.parseObject(message.getBody(), TaskSavePointRequest.class);
+        if (taskSavePointRequest == null) {
             log.error("task savepoint request command is null");
             return;
         }
-        log.info("Receive task savepoint command : {}", taskSavePointRequestCommand);
+        log.info("Receive task savepoint command : {}", taskSavePointRequest);
 
-        int taskInstanceId = taskSavePointRequestCommand.getTaskInstanceId();
+        int taskInstanceId = taskSavePointRequest.getTaskInstanceId();
         TaskExecutionContext taskExecutionContext =
                 TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
         if (taskExecutionContext == null) {
             log.error("taskRequest cache is null, taskInstanceId: {}",
-                    taskSavePointRequestCommand.getTaskInstanceId());
+                    taskSavePointRequest.getTaskInstanceId());
             return;
         }
 
@@ -92,19 +88,24 @@ public class TaskSavePointProcessor implements NettyRequestProcessor {
         }
     }
 
+    @Override
+    public MessageType getCommandType() {
+        return MessageType.TASK_SAVEPOINT_REQUEST;
+    }
+
     private void sendTaskSavePointResponseCommand(Channel channel, TaskExecutionContext taskExecutionContext) {
-        TaskSavePointResponseCommand taskSavePointResponseCommand = new TaskSavePointResponseCommand();
-        taskSavePointResponseCommand.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-        channel.writeAndFlush(taskSavePointResponseCommand.convert2Command()).addListener(new ChannelFutureListener() {
+        TaskSavePointResponse taskSavePointResponse = new TaskSavePointResponse();
+        taskSavePointResponse.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+        channel.writeAndFlush(taskSavePointResponse.convert2Command()).addListener(new ChannelFutureListener() {
 
             @Override
             public void operationComplete(ChannelFuture future) throws Exception {
                 if (!future.isSuccess()) {
                     log.error("Submit kill response to master error, kill command: {}",
-                            taskSavePointResponseCommand);
+                            taskSavePointResponse);
                 } else
                     log.info("Submit kill response to master success, kill command: {}",
-                            taskSavePointResponseCommand);
+                            taskSavePointResponse);
             }
         });
     }

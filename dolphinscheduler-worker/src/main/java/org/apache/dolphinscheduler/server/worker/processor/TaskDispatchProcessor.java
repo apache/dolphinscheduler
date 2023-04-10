@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.server.worker.processor;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
@@ -27,12 +25,13 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheMana
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.TaskDispatchCommand;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
+import org.apache.dolphinscheduler.remote.command.task.TaskDispatchMessage;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.metrics.TaskMetrics;
+import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcClient;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerDelayTaskExecuteRunnable;
@@ -49,7 +48,7 @@ import io.micrometer.core.annotation.Timed;
 import io.netty.channel.Channel;
 
 /**
- * Used to handle {@link CommandType#TASK_DISPATCH_REQUEST}
+ * Used to handle {@link MessageType#TASK_DISPATCH_MESSAGE}
  */
 @Component
 @Slf4j
@@ -73,23 +72,22 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
     @Autowired(required = false)
     private StorageOperate storageOperate;
 
+    @Autowired
+    private WorkerRegistryClient workerRegistryClient;
+
     @Counted(value = "ds.task.execution.count", description = "task execute total count")
     @Timed(value = "ds.task.execution.duration", percentiles = {0.5, 0.75, 0.95, 0.99}, histogram = true)
     @Override
-    public void process(Channel channel, Command command) {
-        checkArgument(CommandType.TASK_DISPATCH_REQUEST == command.getType(),
-                String.format("invalid command type : %s", command.getType()));
+    public void process(Channel channel, Message message) {
+        TaskDispatchMessage taskDispatchMessage = JSONUtils.parseObject(message.getBody(), TaskDispatchMessage.class);
 
-        TaskDispatchCommand taskDispatchCommand = JSONUtils.parseObject(command.getBody(), TaskDispatchCommand.class);
-
-        if (taskDispatchCommand == null) {
+        if (taskDispatchMessage == null) {
             log.error("task execute request command content is null");
             return;
         }
-        final String workflowMasterAddress = taskDispatchCommand.getMessageSenderAddress();
-        log.info("Receive task dispatch request, command: {}", taskDispatchCommand);
+        log.info("Receive task dispatch request, command: {}", taskDispatchMessage);
 
-        TaskExecutionContext taskExecutionContext = taskDispatchCommand.getTaskExecutionContext();
+        TaskExecutionContext taskExecutionContext = taskDispatchMessage.getTaskExecutionContext();
 
         if (taskExecutionContext == null) {
             log.error("task execution context is null");
@@ -111,7 +109,7 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
             if (remainTime > 0) {
                 log.info("Current taskInstance is choose delay execution, delay time: {}s", remainTime);
                 taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.DELAY_EXECUTION);
-                workerMessageSender.sendMessage(taskExecutionContext, CommandType.TASK_EXECUTE_RESULT);
+                workerMessageSender.sendMessage(taskExecutionContext, MessageType.TASK_EXECUTE_RESULT_MESSAGE);
             }
 
             WorkerDelayTaskExecuteRunnable workerTaskExecuteRunnable = WorkerTaskExecuteRunnableFactoryBuilder
@@ -121,7 +119,8 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
                             workerMessageSender,
                             workerRpcClient,
                             taskPluginManager,
-                            storageOperate)
+                            storageOperate,
+                            workerRegistryClient)
                     .createWorkerTaskExecuteRunnable();
             // submit task to manager
             boolean offer = workerManager.offer(workerTaskExecuteRunnable);
@@ -129,12 +128,17 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
                 log.warn(
                         "submit task to wait queue error, queue is full, current queue size is {}, will send a task reject message to master",
                         workerManager.getWaitSubmitQueueSize());
-                workerMessageSender.sendMessageWithRetry(taskExecutionContext, CommandType.TASK_REJECT);
+                workerMessageSender.sendMessageWithRetry(taskExecutionContext, MessageType.TASK_REJECT);
             } else {
                 log.info("Submit task to wait queue success, current queue size is {}",
                         workerManager.getWaitSubmitQueueSize());
             }
         }
+    }
+
+    @Override
+    public MessageType getCommandType() {
+        return MessageType.TASK_DISPATCH_MESSAGE;
     }
 
 }

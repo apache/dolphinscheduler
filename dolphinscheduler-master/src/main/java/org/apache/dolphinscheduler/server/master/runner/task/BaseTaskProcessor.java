@@ -104,6 +104,8 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
     protected final Logger log =
             LoggerFactory.getLogger(BaseTaskProcessor.class);
 
+    private String tenantCode;
+
     protected boolean killed = false;
 
     protected boolean paused = false;
@@ -147,6 +149,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         this.processInstance = processInstance;
         this.maxRetryTimes = masterConfig.getTaskCommitRetryTimes();
         this.commitInterval = masterConfig.getTaskCommitInterval().toMillis();
+        this.tenantCode = getTenantCode();
     }
 
     protected javax.sql.DataSource defaultDataSource =
@@ -305,20 +308,13 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
      * @return TaskExecutionContext
      */
     protected TaskExecutionContext getTaskExecutionContext(TaskInstance taskInstance) {
-        int userId = taskInstance.getProcessDefine() == null ? 0 : taskInstance.getProcessDefine().getUserId();
-        Tenant tenant = processService.getTenantForProcess(taskInstance.getProcessInstance().getTenantId(), userId);
-
-        // verify tenant is null
-        if (verifyTenantIsNull(tenant, taskInstance)) {
+        if (tenantCode == null) {
             log.info("Task state changes to {}", TaskExecutionStatus.FAILURE);
             taskInstance.setState(TaskExecutionStatus.FAILURE);
             taskInstanceDao.upsertTaskInstance(taskInstance);
             return null;
         }
-        // set queue for process instance, user-specified queue takes precedence over tenant queue
-        String userQueue = processService.queryUserQueueByProcessInstance(taskInstance.getProcessInstance());
-        taskInstance.getProcessInstance().setQueue(StringUtils.isEmpty(userQueue) ? tenant.getQueue() : userQueue);
-        taskInstance.getProcessInstance().setTenantCode(tenant.getTenantCode());
+        taskInstance.getProcessInstance().setTenantCode(tenantCode);
         taskInstance.setResources(getResourceFullNames(taskInstance));
 
         TaskChannel taskChannel = taskPluginManager.getTaskChannel(taskInstance.getTaskType());
@@ -329,7 +325,7 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         DataQualityTaskExecutionContext dataQualityTaskExecutionContext = null;
         if (TASK_TYPE_DATA_QUALITY.equalsIgnoreCase(taskInstance.getTaskType())) {
             dataQualityTaskExecutionContext = new DataQualityTaskExecutionContext();
-            setDataQualityTaskRelation(dataQualityTaskExecutionContext, taskInstance, tenant.getTenantCode());
+            setDataQualityTaskRelation(dataQualityTaskExecutionContext, taskInstance, tenantCode);
         }
 
         K8sTaskExecutionContext k8sTaskExecutionContext = setK8sTaskRelation(taskInstance);
@@ -602,21 +598,6 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
     }
 
     /**
-     * whehter tenant is null
-     *
-     * @param tenant tenant
-     * @param taskInstance taskInstance
-     * @return result
-     */
-    protected boolean verifyTenantIsNull(Tenant tenant, TaskInstance taskInstance) {
-        if (tenant == null) {
-            log.error("Tenant does not exists");
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * get resource map key is full name and value is tenantCode
      */
     public Map<String, String> getResourceFullNames(TaskInstance taskInstance) {
@@ -670,5 +651,11 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
             }
         }
         return k8sTaskExecutionContext;
+    }
+
+    private String getTenantCode() {
+        int userId = taskInstance.getProcessDefine() == null ? 0 : taskInstance.getProcessDefine().getUserId();
+        Tenant tenant = processService.getTenantForProcess(taskInstance.getProcessInstance().getTenantId(), userId);
+        return tenant == null ? null : tenant.getTenantCode();
     }
 }

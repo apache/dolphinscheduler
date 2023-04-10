@@ -242,6 +242,25 @@
         </if>
         order by end_time desc limit 1
     </select>
+
+    <select id="queryFirstScheduleProcessInstance" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
+        select
+        <include refid="baseSql"/>
+        from t_ds_process_instance
+        where process_definition_code = #{processDefinitionCode} and schedule_time is not null
+        order by schedule_time
+        limit 1
+    </select>
+
+    <select id="queryFirstStartProcessInstance" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
+        select
+        <include refid="baseSql"/>
+        from t_ds_process_instance
+        where process_definition_code = #{processDefinitionCode} and start_time is not null
+        order by start_time
+        limit 1
+    </select>
+
     <select id="queryByProcessDefineCodeAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select
         <include refid="baseSql"/>

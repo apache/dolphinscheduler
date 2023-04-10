@@ -100,6 +100,9 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
+    depends_on:
+      dolphinscheduler-zookeeper:
+        condition: service_healthy
     volumes:
       - dolphinscheduler-logs:/opt/dolphinscheduler/logs
     networks:

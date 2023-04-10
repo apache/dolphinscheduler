@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.master.event;
 
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.task.ITaskProcessor;
@@ -76,7 +77,11 @@ public class TaskStateEventHandler implements StateEventHandler {
             workflowExecuteRunnable.taskFinished(task);
             if (task.getTaskGroupId() > 0) {
                 log.info("The task instance need to release task Group: {}", task.getTaskGroupId());
-                workflowExecuteRunnable.releaseTaskGroup(task);
+                try {
+                    workflowExecuteRunnable.releaseTaskGroup(task);
+                } catch (RemotingException | InterruptedException e) {
+                    throw new StateEventHandleException("Release task group failed", e);
+                }
             }
             return true;
         }

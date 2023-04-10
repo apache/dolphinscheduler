@@ -19,9 +19,9 @@ package org.apache.dolphinscheduler.server.worker.registry;
 
 import static org.mockito.BDDMockito.given;
 
-import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 
@@ -83,7 +83,8 @@ public class WorkerRegistryClientTest {
 
         given(workerConfig.getWorkerAddress()).willReturn(NetUtils.getAddr(1234));
         given(workerConfig.getHeartbeatInterval()).willReturn(Duration.ofSeconds(1));
-        given(registryClient.checkNodeExists(Mockito.anyString(), Mockito.any(NodeType.class))).willReturn(true);
+        given(registryClient.checkNodeExists(Mockito.anyString(), Mockito.any(RegistryNodeType.class)))
+                .willReturn(true);
 
         workerRegistryClient.initWorkRegistry();
         workerRegistryClient.start();

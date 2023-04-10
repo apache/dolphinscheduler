@@ -221,6 +221,10 @@ export default {
                                 title: 'Apache Linkis',
                                 link: '/en-us/docs/dev/user_doc/guide/task/linkis.html',
                             },
+                            {
+                                title: 'SSH',
+                                link: '/en-us/docs/dev/user_doc/guide/task/ssh.html',
+                            },
                         ],
                     },
                     {
@@ -318,6 +322,10 @@ export default {
                             {
                                 title: 'OceanBase',
                                 link: '/en-us/docs/dev/user_doc/guide/datasource/oceanbase.html',
+                            },
+                            {
+                                title: 'SSH',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/ssh.html',
                             },
                         ],
                     },
@@ -906,6 +914,10 @@ export default {
                                 title: 'Apache Linkis',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/linkis.html',
                             },
+                            {
+                                title: 'SSH',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/ssh.html',
+                            },
                         ],
                     },
                     {
@@ -987,6 +999,10 @@ export default {
                             {
                                 title: 'OceanBase',
                                 link: '/zh-cn/docs/dev/user_doc/guide/datasource/oceanbase.html',
+                            },
+                            {
+                                title: 'SSH',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/ssh.html',
                             },
                         ],
                     },

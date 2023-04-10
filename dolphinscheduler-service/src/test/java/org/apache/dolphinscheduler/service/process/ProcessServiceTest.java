@@ -76,7 +76,6 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ExecuteSqlType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.InputType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.OptionSourceType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ValueType;
-import org.apache.dolphinscheduler.plugin.task.api.model.DateInterval;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.service.cron.CronUtilsTest;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
@@ -748,24 +747,6 @@ public class ProcessServiceTest {
 
         processService.releaseTaskGroup(taskInstance);
 
-    }
-
-    @Test
-    public void testFindLastManualProcessInterval() {
-        long definitionCode = 1L;
-        DateInterval dateInterval = new DateInterval(new Date(), new Date());
-        int testFlag = 1;
-
-        // find test lastManualProcessInterval
-        ProcessInstance lastManualProcessInterval =
-                processService.findLastManualProcessInterval(definitionCode, dateInterval, testFlag);
-        Assertions.assertNull(lastManualProcessInterval);
-
-        // find online lastManualProcessInterval
-        testFlag = 0;
-        lastManualProcessInterval =
-                processService.findLastManualProcessInterval(definitionCode, dateInterval, testFlag);
-        Assertions.assertNull(lastManualProcessInterval);
     }
 
     @Test

@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
+import org.apache.dolphinscheduler.remote.command.task.TaskKillRequest;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
@@ -173,7 +173,7 @@ public class CommonTaskProcessor extends BaseTaskProcessor {
     }
 
     private void killRemoteTask() throws ExecuteException {
-        TaskKillRequestCommand killCommand = new TaskKillRequestCommand();
+        TaskKillRequest killCommand = new TaskKillRequest();
         killCommand.setTaskInstanceId(taskInstance.getId());
 
         ExecutionContext executionContext =
