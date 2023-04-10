@@ -17,11 +17,19 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import org.apache.dolphinscheduler.api.service.CloudService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
+
+import java.util.Collections;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,13 +38,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-
-import java.util.Collections;
-
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * cloud controller test
@@ -49,7 +50,6 @@ public class CloudControllerTest extends AbstractControllerTest {
     @Autowired
     private UsersService usersService;
 
-
     @Test
     public void testListDataFactory() throws Exception {
         user = usersService.queryUser(1);
@@ -58,8 +58,8 @@ public class CloudControllerTest extends AbstractControllerTest {
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         MvcResult mvcResult = mockMvc.perform(get("/cloud/azure/datafactory/factories")
-                        .header(sessionId, sessionId)
-                        .params(paramsMap))
+                .header(sessionId, sessionId)
+                .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -71,8 +71,8 @@ public class CloudControllerTest extends AbstractControllerTest {
     public void testListResourceGroup() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         MvcResult mvcResult = mockMvc.perform(get("/cloud/azure/datafactory/resourceGroups")
-                        .header(sessionId, sessionId)
-                        .params(paramsMap))
+                .header(sessionId, sessionId)
+                .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -86,8 +86,8 @@ public class CloudControllerTest extends AbstractControllerTest {
         paramsMap.add("factoryName", "test name");
         paramsMap.add("resourceGroupName", "test group");
         MvcResult mvcResult = mockMvc.perform(get("/cloud/azure/datafactory/pipelines")
-                        .header(sessionId, sessionId)
-                        .params(paramsMap))
+                .header(sessionId, sessionId)
+                .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
