@@ -44,6 +44,8 @@ services:
       ZOO_4LW_COMMANDS_WHITELIST: srvr,ruok,wchs,cons
     volumes:
       - dolphinscheduler-zookeeper:/bitnami/zookeeper
+    ports:
+      - "2181:2181"
     healthcheck:
       test: ["CMD", "bash", "-c", "cat < /dev/null > /dev/tcp/127.0.0.1/2181"]
       interval: 5s
@@ -107,6 +109,8 @@ services:
     image: ${HUB}/dolphinscheduler-master:${TAG}
     profiles: ["all"]
     env_file: .env
+    ports:
+      - "5679:5679"
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:5679/actuator/health" ]
       interval: 30s
@@ -125,6 +129,8 @@ services:
     image: ${HUB}/dolphinscheduler-worker:${TAG}
     profiles: ["all"]
     env_file: .env
+    ports:
+      - "1235:1235"
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:1235/actuator/health" ]
       interval: 30s
