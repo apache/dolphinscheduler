@@ -495,6 +495,104 @@ delimiter ;
 CALL alter_t_ds_task_instance_col_log_path;
 DROP PROCEDURE alter_t_ds_task_instance_col_log_path;
 
+-- Dealing with table name case issues
+drop PROCEDURE if EXISTS qrtz_table_name_lowercase_to_uppercase;
+delimiter d//
+CREATE PROCEDURE qrtz_table_name_lowercase_to_uppercase()
+BEGIN
+IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS
+        WHERE TABLE_NAME='qrtz_blob_triggers'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+                                )
+    THEN
+RENAME TABLE `qrtz_blob_triggers` TO `QRTZ_BLOB_TRIGGERS`;
+END IF;
+
+IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS
+        WHERE TABLE_NAME='qrtz_calendars'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+                                )
+    THEN
+RENAME TABLE `qrtz_calendars` TO `QRTZ_CALENDARS`;
+END IF;
+
+IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS
+        WHERE TABLE_NAME='qrtz_cron_triggers'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+                                )
+    THEN
+RENAME TABLE `qrtz_cron_triggers` TO `QRTZ_CRON_TRIGGERS`;
+END IF;
+
+IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS
+        WHERE TABLE_NAME='qrtz_fired_triggers'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+                                )
+    THEN
+RENAME TABLE `qrtz_fired_triggers` TO `QRTZ_FIRED_TRIGGERS`;
+END IF;
+
+IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS
+        WHERE TABLE_NAME='qrtz_job_details'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+                                )
+    THEN
+RENAME TABLE `qrtz_job_details` TO `QRTZ_JOB_DETAILS`;
+END IF;
+
+IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS
+        WHERE TABLE_NAME='qrtz_locks'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+                                )
+    THEN
+RENAME TABLE `qrtz_locks` TO `QRTZ_LOCKS`;
+END IF;
+
+IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS
+        WHERE TABLE_NAME='qrtz_paused_trigger_grps'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+                                )
+    THEN
+RENAME TABLE `qrtz_paused_trigger_grps` TO `QRTZ_PAUSED_TRIGGER_GRPS`;
+END IF;
+
+IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS
+        WHERE TABLE_NAME='qrtz_scheduler_state'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+                                )
+    THEN
+RENAME TABLE `qrtz_scheduler_state` TO `QRTZ_SCHEDULER_STATE`;
+END IF;
+
+IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS
+        WHERE TABLE_NAME='qrtz_simple_triggers'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+                                )
+    THEN
+RENAME TABLE `qrtz_simple_triggers` TO `QRTZ_SIMPLE_TRIGGERS`;
+END IF;
+
+IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS
+        WHERE TABLE_NAME='qrtz_simprop_triggers'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+                                )
+    THEN
+RENAME TABLE `qrtz_simprop_triggers` TO `QRTZ_SIMPROP_TRIGGERS`;
+END IF;
+
+IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS
+        WHERE TABLE_NAME='qrtz_triggers'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+                                )
+    THEN
+RENAME TABLE `qrtz_triggers` TO `QRTZ_TRIGGERS`;
+END IF;
+END;
+d//
+delimiter ;
+CALL qrtz_table_name_lowercase_to_uppercase;
+DROP PROCEDURE qrtz_table_name_lowercase_to_uppercase;
+
 --
 -- Table structure for table `t_ds_dq_comparison_type`
 --
