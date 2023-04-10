@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.kyuubi.param;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseHDFSConnectionParam;
+import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 
-public class KyuubiConnectionParam extends BaseHDFSConnectionParam {
+public class KyuubiConnectionParam extends BaseConnectionParam {
 
     @Override
     public String toString() {
@@ -33,10 +33,6 @@ public class KyuubiConnectionParam extends BaseHDFSConnectionParam {
                 + ", driverClassName='" + driverClassName + '\''
                 + ", validationQuery='" + validationQuery + '\''
                 + ", other='" + other + '\''
-                + ", principal='" + principal + '\''
-                + ", javaSecurityKrb5Conf='" + javaSecurityKrb5Conf + '\''
-                + ", loginUserKeytabUsername='" + loginUserKeytabUsername + '\''
-                + ", loginUserKeytabPath='" + loginUserKeytabPath + '\''
                 + '}';
     }
 }

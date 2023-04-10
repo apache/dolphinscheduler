@@ -541,12 +541,6 @@
                 <groupId>org.apache.kyuubi</groupId>
                 <artifactId>kyuubi-hive-jdbc-shaded</artifactId>
                 <version>${kyuubi-jdbc.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.apache.orc</groupId>
-                        <artifactId>orc-core</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>commons-io</groupId>

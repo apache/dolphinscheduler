@@ -23,7 +23,6 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
-import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
@@ -31,7 +30,6 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.collections4.MapUtils;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -56,9 +54,6 @@ public class KyuubiDataSourceProcessor extends AbstractDataSourceProcessor {
         kyuubiDataSourceParamDTO.setDatabase(kyuubiConnectionParam.getDatabase());
         kyuubiDataSourceParamDTO.setUserName(kyuubiConnectionParam.getUser());
         kyuubiDataSourceParamDTO.setOther(kyuubiConnectionParam.getOther());
-        kyuubiDataSourceParamDTO.setLoginUserKeytabUsername(kyuubiConnectionParam.getLoginUserKeytabUsername());
-        kyuubiDataSourceParamDTO.setLoginUserKeytabPath(kyuubiConnectionParam.getLoginUserKeytabPath());
-        kyuubiDataSourceParamDTO.setJavaSecurityKrb5Conf(kyuubiConnectionParam.getJavaSecurityKrb5Conf());
 
         String[] tmpArray = kyuubiConnectionParam.getAddress().split(Constants.DOUBLE_SLASH);
         StringBuilder hosts = new StringBuilder();
@@ -91,13 +86,6 @@ public class KyuubiDataSourceProcessor extends AbstractDataSourceProcessor {
         kyuubiConnectionParam.setPassword(PasswordUtils.encodePassword(kyuubiParam.getPassword()));
         kyuubiConnectionParam.setDriverClassName(getDatasourceDriver());
         kyuubiConnectionParam.setValidationQuery(getValidationQuery());
-
-        if (CommonUtils.getKerberosStartupState()) {
-            kyuubiConnectionParam.setPrincipal(kyuubiParam.getPrincipal());
-            kyuubiConnectionParam.setJavaSecurityKrb5Conf(kyuubiParam.getJavaSecurityKrb5Conf());
-            kyuubiConnectionParam.setLoginUserKeytabPath(kyuubiParam.getLoginUserKeytabPath());
-            kyuubiConnectionParam.setLoginUserKeytabUsername(kyuubiParam.getLoginUserKeytabUsername());
-        }
         kyuubiConnectionParam.setOther(kyuubiParam.getOther());
         return kyuubiConnectionParam;
     }
@@ -130,10 +118,8 @@ public class KyuubiDataSourceProcessor extends AbstractDataSourceProcessor {
     }
 
     @Override
-    public Connection getConnection(ConnectionParam connectionParam) throws IOException, ClassNotFoundException, SQLException {
+    public Connection getConnection(ConnectionParam connectionParam) throws ClassNotFoundException, SQLException {
         KyuubiConnectionParam kyuubiConnectionParam = (KyuubiConnectionParam) connectionParam;
-        CommonUtils.loadKerberosConf(kyuubiConnectionParam.getJavaSecurityKrb5Conf(),
-                kyuubiConnectionParam.getLoginUserKeytabUsername(), kyuubiConnectionParam.getLoginUserKeytabPath());
         Class.forName(getDatasourceDriver());
         return DriverManager.getConnection(getJdbcUrl(connectionParam),
                 kyuubiConnectionParam.getUser(), PasswordUtils.decodePassword(kyuubiConnectionParam.getPassword()));

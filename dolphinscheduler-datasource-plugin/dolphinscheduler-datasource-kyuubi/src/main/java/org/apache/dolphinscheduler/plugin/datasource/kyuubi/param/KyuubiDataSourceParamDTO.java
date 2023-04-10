@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.kyuubi.param;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseHDFSDataSourceParamDTO;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-public class KyuubiDataSourceParamDTO extends BaseHDFSDataSourceParamDTO {
+public class KyuubiDataSourceParamDTO extends BaseDataSourceParamDTO {
 
     @Override
     public String toString() {
@@ -28,13 +28,9 @@ public class KyuubiDataSourceParamDTO extends BaseHDFSDataSourceParamDTO {
                 + "host='" + host + '\''
                 + ", port=" + port
                 + ", database='" + database + '\''
-                + ", principal='" + principal + '\''
                 + ", userName='" + userName + '\''
                 + ", password='" + password + '\''
                 + ", other='" + other + '\''
-                + ", javaSecurityKrb5Conf='" + javaSecurityKrb5Conf + '\''
-                + ", loginUserKeytabUsername='" + loginUserKeytabUsername + '\''
-                + ", loginUserKeytabPath='" + loginUserKeytabPath + '\''
                 + '}';
     }
 

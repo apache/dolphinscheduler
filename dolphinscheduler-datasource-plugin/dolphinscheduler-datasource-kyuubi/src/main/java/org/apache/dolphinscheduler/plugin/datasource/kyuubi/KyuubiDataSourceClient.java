@@ -17,23 +17,13 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.kyuubi;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.JAVA_SECURITY_KRB5_CONF;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.JAVA_SECURITY_KRB5_CONF_PATH;
 
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+
 import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
 import org.apache.dolphinscheduler.plugin.datasource.api.provider.JDBCDataSourceProvider;
-import org.apache.dolphinscheduler.plugin.datasource.kyuubi.security.UserGroupInformationFactory;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-import sun.security.krb5.Config;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.hadoop.conf.Configuration;
-
-import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -55,9 +45,7 @@ public class KyuubiDataSourceClient extends CommonDataSourceClient {
 
     @Override
     protected void initClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        log.info("Create UserGroupInformation.");
-        UserGroupInformationFactory.login(baseConnectionParam.getUser());
-        log.info("Create ugi success.");
+
         this.dataSource = JDBCDataSourceProvider.createOneSessionJdbcDataSource(baseConnectionParam, dbType);
         this.jdbcTemplate = new JdbcTemplate(dataSource);
         log.info("Init {} success.", getClass().getName());
@@ -66,31 +54,8 @@ public class KyuubiDataSourceClient extends CommonDataSourceClient {
     @Override
     protected void checkEnv(BaseConnectionParam baseConnectionParam) {
         super.checkEnv(baseConnectionParam);
-        checkKerberosEnv();
     }
 
-    private void checkKerberosEnv() {
-        String krb5File = PropertyUtils.getString(JAVA_SECURITY_KRB5_CONF_PATH);
-        Boolean kerberosStartupState = PropertyUtils.getBoolean(HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
-        if (kerberosStartupState && StringUtils.isNotBlank(krb5File)) {
-            System.setProperty(JAVA_SECURITY_KRB5_CONF, krb5File);
-            try {
-                Config.refresh();
-                Class<?> kerberosName = Class.forName("org.apache.hadoop.security.authentication.util.KerberosName");
-                Field field = kerberosName.getDeclaredField("defaultRealm");
-                field.setAccessible(true);
-                field.set(null, Config.getInstance().getDefaultRealm());
-            } catch (Exception e) {
-                throw new RuntimeException("Update Kerberos environment failed.", e);
-            }
-        }
-    }
-
-    protected Configuration createHadoopConf() {
-        Configuration hadoopConf = new Configuration();
-        hadoopConf.setBoolean("ipc.client.fallback-to-simple-auth-allowed", true);
-        return hadoopConf;
-    }
 
     @Override
     public Connection getConnection() {
@@ -99,8 +64,7 @@ public class KyuubiDataSourceClient extends CommonDataSourceClient {
             try {
                 connection = dataSource.getConnection();
             } catch (SQLException e) {
-                UserGroupInformationFactory.logout(baseConnectionParam.getUser());
-                UserGroupInformationFactory.login(baseConnectionParam.getUser());
+                log.error("Failed to get Kyuubi Connection.", e);
             }
         }
         return connection;
@@ -108,12 +72,7 @@ public class KyuubiDataSourceClient extends CommonDataSourceClient {
 
     @Override
     public void close() {
-        try {
-            super.close();
-        } finally {
-            UserGroupInformationFactory.logout(baseConnectionParam.getUser());
-        }
+        super.close();
         log.info("Closed Kyuubi datasource client.");
-
     }
 }
