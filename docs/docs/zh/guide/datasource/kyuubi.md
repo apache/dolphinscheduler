@@ -20,8 +20,6 @@
 clientKeytab: 用户客户端验证的keytab文件路径
 
 clientPrincipal: 用户客户端验证的Kerberos principal
-
-serverPrincipal: 在服务端通过kyuubi.kinit.principal配置的Kerberos principal. serverPrincipal在kyuubi 1.7.0后启用，针对老版本请使用principal
 ```
 
 ## 是否原生支持
