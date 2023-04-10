@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-public enum WorkflowSubmitStatue {
+public enum WorkflowSubmitStatus {
     /**
      * Submit success
      */

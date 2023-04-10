@@ -42,7 +42,7 @@ public class AlertSendResponse implements ResponseMessageBuilder {
 
     @Override
     public MessageType getCommandType() {
-        return MessageType.ALERT_SEND_RESPONSE;
+        return MessageType.RESPONSE;
     }
 
     @Data

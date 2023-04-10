@@ -15,32 +15,30 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.alert;
+package org.apache.dolphinscheduler.plugin.task.seatunnel.self;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import org.apache.dolphinscheduler.plugin.task.seatunnel.DeployModeEnum;
+import org.apache.dolphinscheduler.plugin.task.seatunnel.SeatunnelParameters;
 
-@Component
-@ConfigurationProperties("alert")
-public final class AlertConfig {
+public class SeatunnelEngineParameters extends SeatunnelParameters {
 
-    private int port;
+    private DeployModeEnum deployMode;
 
-    private int waitTimeout;
+    private String others;
 
-    public int getPort() {
-        return port;
+    public DeployModeEnum getDeployMode() {
+        return deployMode;
     }
 
-    public void setPort(final int port) {
-        this.port = port;
+    public void setDeployMode(DeployModeEnum deployMode) {
+        this.deployMode = deployMode;
     }
 
-    public int getWaitTimeout() {
-        return waitTimeout;
+    public String getOthers() {
+        return others;
     }
 
-    public void setWaitTimeout(final int waitTimeout) {
-        this.waitTimeout = waitTimeout;
+    public void setOthers(String others) {
+        this.others = others;
     }
 }

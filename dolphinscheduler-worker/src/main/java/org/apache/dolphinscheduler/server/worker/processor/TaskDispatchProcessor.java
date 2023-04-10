@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.remote.command.task.TaskDispatchMessage;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.metrics.TaskMetrics;
+import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcClient;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerDelayTaskExecuteRunnable;
@@ -70,6 +71,9 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
 
     @Autowired(required = false)
     private StorageOperate storageOperate;
+
+    @Autowired
+    private WorkerRegistryClient workerRegistryClient;
 
     @Counted(value = "ds.task.execution.count", description = "task execute total count")
     @Timed(value = "ds.task.execution.duration", percentiles = {0.5, 0.75, 0.95, 0.99}, histogram = true)
@@ -115,7 +119,8 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
                             workerMessageSender,
                             workerRpcClient,
                             taskPluginManager,
-                            storageOperate)
+                            storageOperate,
+                            workerRegistryClient)
                     .createWorkerTaskExecuteRunnable();
             // submit task to manager
             boolean offer = workerManager.offer(workerTaskExecuteRunnable);

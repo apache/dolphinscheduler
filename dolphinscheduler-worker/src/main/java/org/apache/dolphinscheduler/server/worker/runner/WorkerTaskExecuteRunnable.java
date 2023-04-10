@@ -44,6 +44,7 @@ import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.log.TaskInstanceLogHeader;
+import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcClient;
 import org.apache.dolphinscheduler.server.worker.utils.TaskExecutionCheckerUtils;
@@ -52,6 +53,7 @@ import org.apache.dolphinscheduler.server.worker.utils.TaskFilesTransferUtils;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 
@@ -72,6 +74,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
     protected final TaskPluginManager taskPluginManager;
     protected final @Nullable StorageOperate storageOperate;
     protected final WorkerRpcClient workerRpcClient;
+    protected final WorkerRegistryClient workerRegistryClient;
 
     protected @Nullable AbstractTask task;
 
@@ -81,13 +84,15 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
                                         @NonNull WorkerMessageSender workerMessageSender,
                                         @NonNull WorkerRpcClient workerRpcClient,
                                         @NonNull TaskPluginManager taskPluginManager,
-                                        @Nullable StorageOperate storageOperate) {
+                                        @Nullable StorageOperate storageOperate,
+                                        @NonNull WorkerRegistryClient workerRegistryClient) {
         this.taskExecutionContext = taskExecutionContext;
         this.workerConfig = workerConfig;
         this.workerMessageSender = workerMessageSender;
         this.workerRpcClient = workerRpcClient;
         this.taskPluginManager = taskPluginManager;
         this.storageOperate = storageOperate;
+        this.workerRegistryClient = workerRegistryClient;
     }
 
     protected abstract void executeTask(TaskCallBack taskCallBack);
@@ -227,6 +232,15 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         if (!task.getNeedAlert()) {
             return;
         }
+
+        // todo: We need to send the alert to the master rather than directly send to the alert server
+        Optional<Host> alertServerAddressOptional = workerRegistryClient.getAlertServerAddress();
+        if (!alertServerAddressOptional.isPresent()) {
+            log.error("Cannot get alert server address, please check the alert server is running");
+            return;
+        }
+        Host alertServerAddress = alertServerAddressOptional.get();
+
         log.info("The current task need to send alert, begin to send alert");
         TaskExecutionStatus status = task.getExitStatus();
         TaskAlertInfo taskAlertInfo = task.getTaskAlertInfo();
@@ -238,10 +252,10 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
                 taskAlertInfo.getContent(),
                 strategy);
         try {
-            workerRpcClient.send(Host.of(workerConfig.getAlertListenHost()), alertCommand.convert2Command());
-            log.info("Success send alert");
+            workerRpcClient.send(alertServerAddress, alertCommand.convert2Command());
+            log.info("Success send alert to : {}", alertServerAddress);
         } catch (RemotingException e) {
-            log.error("Send alert failed, alertCommand: {}", alertCommand, e);
+            log.error("Send alert to: {} failed, alertCommand: {}", alertServerAddress, alertCommand, e);
         }
     }
 
@@ -293,27 +307,17 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         }
     }
 
-    protected void writePodLodIfNeeded() {
-        if (null == taskExecutionContext.getK8sTaskExecutionContext()) {
-            return;
-        }
-        log.info("The current task is k8s task, begin to write pod log");
-        ProcessUtils.getPodLog(taskExecutionContext.getK8sTaskExecutionContext(), taskExecutionContext.getTaskAppId());
-    }
-
     protected void closeLogAppender() {
         try {
-            writePodLodIfNeeded();
             if (RemoteLogUtils.isRemoteLoggingEnable()) {
                 RemoteLogUtils.sendRemoteLog(taskExecutionContext.getLogPath());
                 log.info("Log handler sends task log {} to remote storage asynchronously.",
                         taskExecutionContext.getLogPath());
             }
         } catch (Exception ex) {
-            log.error("Write k8s pod log failed", ex);
+            log.error("Send remote log failed", ex);
         } finally {
             log.info(FINALIZE_SESSION_MARKER, FINALIZE_SESSION_MARKER.toString());
-
         }
     }
 

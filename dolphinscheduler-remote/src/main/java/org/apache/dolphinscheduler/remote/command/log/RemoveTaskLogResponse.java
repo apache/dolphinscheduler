@@ -39,6 +39,6 @@ public class RemoveTaskLogResponse implements ResponseMessageBuilder {
 
     @Override
     public MessageType getCommandType() {
-        return MessageType.REMOVE_TAK_LOG_RESPONSE;
+        return MessageType.RESPONSE;
     }
 }
