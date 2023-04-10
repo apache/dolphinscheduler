@@ -242,6 +242,14 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
                 () -> schedulerService.createSchedulesV2(user, scheduleCreateRequest));
         Assertions.assertEquals(Status.SCHEDULE_CRON_CHECK_FAILED.getCode(), ((ServiceException) exception).getCode());
 
+        // error schedule crontab
+        String badCrontab2 = "0 0 13/0 * * ? *";
+        scheduleCreateRequest.setStartTime(startTime);
+        scheduleCreateRequest.setCrontab(badCrontab2);
+        exception = Assertions.assertThrows(ServiceException.class,
+                () -> schedulerService.createSchedulesV2(user, scheduleCreateRequest));
+        Assertions.assertEquals(Status.SCHEDULE_CRON_CHECK_FAILED.getCode(), ((ServiceException) exception).getCode());
+
         // error create error
         scheduleCreateRequest.setCrontab(crontab);
         Mockito.when(scheduleMapper.insert(isA(Schedule.class))).thenReturn(0);
