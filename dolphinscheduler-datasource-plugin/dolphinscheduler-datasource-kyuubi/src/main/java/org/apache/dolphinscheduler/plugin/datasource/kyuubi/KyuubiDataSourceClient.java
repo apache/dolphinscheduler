@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.kyuubi;
 
-
-
 import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
 import org.apache.dolphinscheduler.plugin.datasource.api.provider.JDBCDataSourceProvider;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
@@ -55,7 +53,6 @@ public class KyuubiDataSourceClient extends CommonDataSourceClient {
     protected void checkEnv(BaseConnectionParam baseConnectionParam) {
         super.checkEnv(baseConnectionParam);
     }
-
 
     @Override
     public Connection getConnection() {
