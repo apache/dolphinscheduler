@@ -14,23 +14,14 @@
 - 数据库名：输入连接 KYUUBI 的数据库名称
 - Jdbc 连接参数：用于 KYUUBI 连接的参数设置，以 JSON 形式填写
 
-## 使用 HiveServer2 HA Zookeeper
+```Kerberos 验证
+如需Kerberos验证，请直接配置相应参数在jdbc连接参数中
 
-注意：如果没有开启 kerberos,请保证参数 `hadoop.security.authentication.startup.state` 值为 `false`,
-参数 `java.security.krb5.conf.path` 值为空. 开启了 **kerberos**，则需要在 `common.properties` 配置以下参数
+clientKeytab: 用户客户端验证的keytab文件路径
 
-```conf
-# whether to startup kerberos
-hadoop.security.authentication.startup.state=true
+clientPrincipal: 用户客户端验证的Kerberos principal
 
-# java.security.krb5.conf path
-java.security.krb5.conf.path=/opt/krb5.conf
-
-# login user from keytab username
-login.user.keytab.username=hdfs-mycluster@ESZ.COM
-
-# login user from keytab path
-login.user.keytab.path=/opt/hdfs.headless.keytab
+serverPrincipal: 在服务端通过kyuubi.kinit.principal配置的Kerberos principal. serverPrincipal在kyuubi 1.7.0后启用，针对老版本请使用principal
 ```
 
 ## 是否原生支持

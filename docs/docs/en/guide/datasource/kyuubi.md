@@ -18,24 +18,16 @@
 | Database name              | Enter the database name of the KYUUBI connection.         |
 | Jdbc connection parameters | Parameter settings for KYUUBI connection, in JSON format. |
 
-## Use HiveServer2 HA ZooKeeper
+```Kerberos Authentication
+just simply configure them in the connection parameters if kerberos authentication is required.
 
-NOTICE: If Kerberos is disabled, ensure the parameter `hadoop.security.authentication.startup.state` is false, and parameter `java.security.krb5.conf.path` value sets null.
-If **Kerberos** is enabled, needs to set the following parameters  in `common.properties`:
+clientKeytab: path of Kerberos keytab file for client authentication
 
-```conf
-# whether to startup kerberos
-hadoop.security.authentication.startup.state=true
+clientPrincipal: Kerberos principal for client authentication
 
-# java.security.krb5.conf path
-java.security.krb5.conf.path=/opt/krb5.conf
-
-# login user from keytab username
-login.user.keytab.username=hdfs-mycluster@ESZ.COM
-
-# login user from keytab path
-login.user.keytab.path=/opt/hdfs.headless.keytab
+serverPrincipal: Kerberos principal configured by kyuubi.kinit.principal at the server side. serverPrincipal is available since 1.7.0, for previous versions, use principal instead.
 ```
+
 
 ## Native Supported
 

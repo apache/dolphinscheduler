@@ -64,6 +64,7 @@ public class DataSourceConstants {
     public static final String JDBC_MYSQL = "jdbc:mysql://";
     public static final String JDBC_POSTGRESQL = "jdbc:postgresql://";
     public static final String JDBC_HIVE_2 = "jdbc:hive2://";
+    public static final String JDBC_KYUUBI = "jdbc:kyuubi://";
     public static final String JDBC_CLICKHOUSE = "jdbc:clickhouse://";
     public static final String JDBC_ORACLE_SID = "jdbc:oracle:thin:@";
     public static final String JDBC_ORACLE_SERVICE_NAME = "jdbc:oracle:thin:@//";

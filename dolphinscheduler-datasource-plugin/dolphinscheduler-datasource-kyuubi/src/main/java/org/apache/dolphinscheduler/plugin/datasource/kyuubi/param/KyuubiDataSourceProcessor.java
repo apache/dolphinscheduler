@@ -72,7 +72,7 @@ public class KyuubiDataSourceProcessor extends AbstractDataSourceProcessor {
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
         KyuubiDataSourceParamDTO kyuubiParam = (KyuubiDataSourceParamDTO) datasourceParam;
         StringBuilder address = new StringBuilder();
-        address.append(DataSourceConstants.JDBC_HIVE_2);
+        address.append(DataSourceConstants.JDBC_KYUUBI);
         for (String zkHost : kyuubiParam.getHost().split(",")) {
             address.append(String.format("%s:%s,", zkHost, kyuubiParam.getPort()));
         }

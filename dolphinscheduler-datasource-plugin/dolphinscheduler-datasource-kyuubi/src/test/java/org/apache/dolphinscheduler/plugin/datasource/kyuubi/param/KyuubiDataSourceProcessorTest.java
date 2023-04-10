@@ -102,14 +102,14 @@ public class KyuubiDataSourceProcessorTest {
             KyuubiConnectionParam connectionParams = (KyuubiConnectionParam) kyuubiDatasourceProcessor
                     .createConnectionParams(kyuubiDataSourceParamDTO);
             Assertions.assertNotNull(connectionParams);
-            Assertions.assertEquals("jdbc:hive2://localhost1:5142,localhost2:5142", connectionParams.getAddress());
+            Assertions.assertEquals("jdbc:kyuubi://localhost1:5142,localhost2:5142", connectionParams.getAddress());
         }
     }
 
     @Test
     public void testCreateConnectionParams2() {
-        String connectionParam = "{\"user\":\"default\",\"address\":\"jdbc:hive2://localhost1:5142,localhost2:5142\""
-                + ",\"jdbcUrl\":\"jdbc:hive2://localhost1:5142,localhost2:5142/default\"}";
+        String connectionParam = "{\"user\":\"default\",\"address\":\"jdbc:kyuubi://localhost1:5142,localhost2:5142\""
+                + ",\"jdbcUrl\":\"jdbc:kyuubi://localhost1:5142,localhost2:5142/default\"}";
         KyuubiConnectionParam connectionParams = (KyuubiConnectionParam) kyuubiDatasourceProcessor
                 .createConnectionParams(connectionParam);
         Assertions.assertNotNull(connectionParam);
@@ -125,8 +125,8 @@ public class KyuubiDataSourceProcessorTest {
     @Test
     public void testGetJdbcUrl() {
         KyuubiConnectionParam connectionParam = new KyuubiConnectionParam();
-        connectionParam.setJdbcUrl("jdbc:hive2://localhost1:5142,localhost2:5142/default");
-        Assertions.assertEquals("jdbc:hive2://localhost1:5142,localhost2:5142/default",
+        connectionParam.setJdbcUrl("jdbc:kyuubi://localhost1:5142,localhost2:5142/default");
+        Assertions.assertEquals("jdbc:kyuubi://localhost1:5142,localhost2:5142/default",
                 kyuubiDatasourceProcessor.getJdbcUrl(connectionParam));
     }
 

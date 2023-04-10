@@ -48,11 +48,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.hbase.thirdparty</groupId>
-            <artifactId>hbase-noop-htrace</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>org.apache.kyuubi</groupId>
             <artifactId>kyuubi-hive-jdbc-shaded</artifactId>
         </dependency>
