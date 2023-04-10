@@ -495,6 +495,62 @@ delimiter ;
 CALL alter_t_ds_task_instance_col_log_path;
 DROP PROCEDURE alter_t_ds_task_instance_col_log_path;
 
+-- t_ds_process_definition_add_column
+drop PROCEDURE if EXISTS t_ds_process_definition_add_column;
+delimiter d//
+CREATE PROCEDURE t_ds_process_definition_add_column()
+BEGIN
+	IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_process_definition'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME='execution_type')
+  THEN
+       ALTER TABLE t_ds_process_definition ADD COLUMN `execution_type` tinyint(4) DEFAULT '0' COMMENT 'execution_type 0:parallel,1:serial wait,2:serial discard,3:serial priority';
+  END IF;
+END;
+d//
+delimiter ;
+CALL t_ds_process_definition_add_column;
+DROP PROCEDURE t_ds_process_definition_add_column;
+
+
+-- t_ds_process_definition_log_add_column
+drop PROCEDURE if EXISTS t_ds_process_definition_log_add_column;
+delimiter d//
+CREATE PROCEDURE t_ds_process_definition_log_add_column()
+BEGIN
+	IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_process_definition_log'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME='execution_type')
+  THEN
+       ALTER TABLE t_ds_process_definition_log ADD COLUMN `execution_type` tinyint(4) DEFAULT '0' COMMENT 'execution_type 0:parallel,1:serial wait,2:serial discard,3:serial priority';
+  END IF;
+END;
+d//
+delimiter ;
+CALL t_ds_process_definition_log_add_column;
+DROP PROCEDURE t_ds_process_definition_log_add_column;
+
+
+-- t_ds_process_instance_add_column
+drop PROCEDURE if EXISTS t_ds_process_instance_add_column;
+delimiter d//
+CREATE PROCEDURE t_ds_process_instance_add_column()
+BEGIN
+	IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_process_instance'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME='next_process_instance_id')
+  THEN
+			ALTER TABLE t_ds_process_instance ADD COLUMN `next_process_instance_id` int(11) DEFAULT '0' COMMENT 'serial queue next processInstanceId';
+  END IF;
+END;
+d//
+delimiter ;
+CALL t_ds_process_instance_add_column;
+DROP PROCEDURE t_ds_process_instance_add_column;
+
 --
 -- Table structure for table `t_ds_dq_comparison_type`
 --
