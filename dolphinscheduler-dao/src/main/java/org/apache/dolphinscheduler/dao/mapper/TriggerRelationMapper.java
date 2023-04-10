@@ -54,7 +54,14 @@ public interface TriggerRelationMapper extends BaseMapper<TriggerRelation> {
      */
     List<TriggerRelation> queryByTriggerRelationCodeAndType(@Param("triggerCode") Long triggerCode,
                                                             @Param("triggerType") Integer triggerType);
+    /**
+     * if exists table
+     *
+     * @param triggerRelation triggerRelation
+     * @return int
+     */
 
+    int queryByTriggerRelationCodeAndTypeAndJobId (@Param("triggerRelation") TriggerRelation triggerRelation);
     /**
      * delete triggerRelation by code
      *
@@ -68,5 +75,9 @@ public interface TriggerRelationMapper extends BaseMapper<TriggerRelation> {
      *
      * @param triggerRelation
      */
-    void upsert(@Param("triggerRelation") TriggerRelation triggerRelation);
+    void insertTrigger(@Param("triggerRelation") TriggerRelation triggerRelation);
+
+    void updateTrigger(@Param("triggerRelation") TriggerRelation triggerRelation);
+
+
 }

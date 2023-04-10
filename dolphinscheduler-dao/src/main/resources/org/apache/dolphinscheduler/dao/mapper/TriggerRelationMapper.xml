@@ -43,15 +43,29 @@
         WHERE trigger_code = #{triggerCode} and trigger_type =  #{triggerType}
     </select>
 
+    <select id="queryByTriggerRelationCodeAndTypeAndJobId" resultType="org.apache.dolphinscheduler.dao.entity.TriggerRelation">
+        select
+        <include refid="baseSql"/>
+        from t_ds_trigger_relation
+        WHERE trigger_code = #{triggerCode} and trigger_type =  #{triggerType} and job_id = #{jobId}
+    </select>
+
     <delete id="deleteByCode">
         delete from t_ds_trigger_relation where triggerCode = #{triggerCode}
     </delete>
 
-    <insert id="upsert">
+    <insert id="insertTrigger">
         INSERT INTO t_ds_trigger_relation (trigger_code, trigger_type, job_id, create_time, update_time) VALUES(
             #{triggerRelation.triggerCode},#{triggerRelation.triggerType},#{triggerRelation.jobId},#{triggerRelation.createTime},#{triggerRelation.updateTime})
         ON CONFLICT (trigger_code, trigger_type, job_id)
         DO
         UPDATE SET update_time = #{triggerRelation.updateTime};
     </insert>
+
+    <update id="updateTrigger">
+        update t_ds_trigger_relation set
+        update_time = #{triggerRelation.updateTime}
+        where id = #{triggerRelation.id}
+    </update>
+
 </mapper>

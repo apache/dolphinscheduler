@@ -32,6 +32,7 @@ public interface TriggerRelationService {
 
     TriggerRelation queryByTypeAndJobId(ApiTriggerType apiTriggerType, int jobId);
 
+
     int saveCommandTrigger(Integer commandId, Integer processInstanceId);
 
     int saveProcessInstanceTrigger(Integer commandId, Integer processInstanceId);

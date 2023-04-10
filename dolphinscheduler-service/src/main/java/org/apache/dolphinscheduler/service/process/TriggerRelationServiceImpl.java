@@ -43,11 +43,20 @@ public class TriggerRelationServiceImpl implements TriggerRelationService {
         triggerRelation.setTriggerCode(triggerCode);
         triggerRelation.setCreateTime(new Date());
         triggerRelation.setUpdateTime(new Date());
-        triggerRelationMapper.upsert(triggerRelation);
+        if(queryByTriggerRelationCodeAndTypeAndJobId(triggerRelation) != 0){
+            triggerRelationMapper.updateTrigger(triggerRelation);
+        }
+        else{
+            triggerRelationMapper.insertTrigger(triggerRelation);
+        }
     }
     @Override
     public TriggerRelation queryByTypeAndJobId(ApiTriggerType apiTriggerType, int jobId) {
         return triggerRelationMapper.queryByTypeAndJobId(apiTriggerType.getCode(), jobId);
+    }
+
+    public int queryByTriggerRelationCodeAndTypeAndJobId(TriggerRelation triggerRelation) {
+        return triggerRelationMapper.queryByTriggerRelationCodeAndTypeAndJobId(triggerRelation);
     }
 
     @Override
