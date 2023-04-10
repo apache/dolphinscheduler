@@ -24,6 +24,8 @@ just simply configure them in the connection parameters if kerberos authenticati
 clientKeytab: path of Kerberos keytab file for client authentication
 
 clientPrincipal: Kerberos principal for client authentication
+
+serverPrincipal: Kerberos principal configured by kyuubi.kinit.principal at the server side.
 ```
 
 

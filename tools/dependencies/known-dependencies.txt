@@ -468,9 +468,11 @@ opencensus-proto-0.2.0.jar
 proto-google-cloud-storage-v2-2.18.0-alpha.jar
 proto-google-iam-v1-1.9.0.jar
 re2j-1.6.jar
+threetenbp-1.6.5.jar
 sshd-scp-2.8.0.jar
 sshd-sftp-2.8.0.jar
 sshd-common-2.8.0.jar
 sshd-core-2.8.0.jar
 jcl-over-slf4j-1.7.36.jar
-kyuubi-hive-jdbc-1.7.0.jar
+kyuubi-hive-jdbc-shaded-1.7.0.jar
+
