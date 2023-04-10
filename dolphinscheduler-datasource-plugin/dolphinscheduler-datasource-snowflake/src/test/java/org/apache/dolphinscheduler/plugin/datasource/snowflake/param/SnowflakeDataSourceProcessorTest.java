@@ -39,6 +39,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 public class SnowflakeDataSourceProcessorTest {
 
     private SnowflakeDatasourceProcessor snowflakeDataSourceProcessor = new SnowflakeDatasourceProcessor();
+
     @Test
     public void testCheckDatasourceParam() {
         SnowflakeDatasourceParamDTO snowflakeDatasourceParamDTO = new SnowflakeDatasourceParamDTO();
@@ -59,7 +60,6 @@ public class SnowflakeDataSourceProcessorTest {
         snowflakeDatasourceParamDTO.setUserName("root");
         snowflakeDatasourceParamDTO.setPort(3306);
         snowflakeDatasourceParamDTO.setPassword("123456");
-
         try (
                 MockedStatic<PasswordUtils> mockedStaticPasswordUtils = Mockito.mockStatic(PasswordUtils.class);
                 MockedStatic<CommonUtils> mockedStaticCommonUtils = Mockito.mockStatic(CommonUtils.class)) {
@@ -80,7 +80,8 @@ public class SnowflakeDataSourceProcessorTest {
         snowflakeDatasourceParamDTO.setPort(3306);
         snowflakeDatasourceParamDTO.setPassword("123456");
         ConnectionParam connectionParam =
-                DataSourceUtils.buildConnectionParams(DbType.SNOWFLAKE, JSONUtils.toJsonString(snowflakeDatasourceParamDTO));
+                DataSourceUtils.buildConnectionParams(DbType.SNOWFLAKE,
+                        JSONUtils.toJsonString(snowflakeDatasourceParamDTO));
         Assertions.assertNotNull(connectionParam);
     }
 
@@ -94,7 +95,6 @@ public class SnowflakeDataSourceProcessorTest {
         snowflakeDataSourceParamDTO.setUserName("default");
         snowflakeDataSourceParamDTO.setDatabase("default");
         snowflakeDataSourceParamDTO.setOther(props);
-
         try (
                 MockedStatic<PasswordUtils> mockedStaticPasswordUtils = Mockito.mockStatic(PasswordUtils.class);
                 MockedStatic<CommonUtils> mockedStaticCommonUtils = Mockito.mockStatic(CommonUtils.class)) {
