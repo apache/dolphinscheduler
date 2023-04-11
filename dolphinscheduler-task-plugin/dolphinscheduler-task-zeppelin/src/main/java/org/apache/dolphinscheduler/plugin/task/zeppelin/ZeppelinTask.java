@@ -17,6 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.task.zeppelin;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
@@ -25,21 +31,15 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-
 import org.apache.zeppelin.client.ClientConfig;
 import org.apache.zeppelin.client.NoteResult;
 import org.apache.zeppelin.client.ParagraphResult;
 import org.apache.zeppelin.client.Status;
 import org.apache.zeppelin.client.ZeppelinClient;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import kong.unirest.Unirest;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ZeppelinTask extends AbstractRemoteTask {
 
@@ -78,11 +78,22 @@ public class ZeppelinTask extends AbstractRemoteTask {
         log.info("Initialize zeppelin task params:{}", JSONUtils.toPrettyJsonString(taskParams));
         this.zClient = getZeppelinClient();
     }
+    
+    public boolean login() throws Exception {
+        String userName = this.zeppelinParameters.getUserName();
+        String passWord = this.zeppelinParameters.getPassWord();
+        if (StringUtils.isNotBlank(userName) && StringUtils.isNotBlank(passWord)) {
+            this.zClient.login(userName, passWord);
+            log.info("userName : {}  login  success ",userName);
+        }
+        return true;
+    }
 
     // todo split handle to submit and track
     @Override
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
+        	login();
             final String paragraphId = this.zeppelinParameters.getParagraphId();
             final String productionNoteDirectory = this.zeppelinParameters.getProductionNoteDirectory();
             final String parameters = this.zeppelinParameters.getParameters();
