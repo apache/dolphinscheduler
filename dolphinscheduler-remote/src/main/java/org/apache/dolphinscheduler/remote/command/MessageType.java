@@ -19,27 +19,17 @@ package org.apache.dolphinscheduler.remote.command;
 
 public enum MessageType {
 
+    RESPONSE,
+
     GET_APP_ID_REQUEST,
-    GET_APP_ID_RESPONSE,
 
     REMOVE_TAK_LOG_REQUEST,
 
-    REMOVE_TAK_LOG_RESPONSE,
-
     ROLL_VIEW_LOG_REQUEST,
-
-    ROLL_VIEW_LOG_RESPONSE,
 
     VIEW_WHOLE_LOG_REQUEST,
 
-    VIEW_WHOLE_LOG_RESPONSE,
-
     GET_LOG_BYTES_REQUEST,
-
-    GET_LOG_BYTES_RESPONSE,
-
-    WORKER_REQUEST,
-    MASTER_RESPONSE,
 
     /**
      * task execute start, from api to master
@@ -73,8 +63,6 @@ public enum MessageType {
 
     TASK_KILL_REQUEST,
 
-    TASK_KILL_RESPONSE,
-
     TASK_REJECT,
 
     TASK_REJECT_MESSAGE_ACK,
@@ -84,11 +72,6 @@ public enum MessageType {
      */
     TASK_SAVEPOINT_REQUEST,
 
-    /**
-     * task savepoint ack, for stream task
-     */
-    TASK_SAVEPOINT_RESPONSE,
-
     HEART_BEAT,
 
     PING,
@@ -97,10 +80,7 @@ public enum MessageType {
 
     ALERT_SEND_REQUEST,
 
-    ALERT_SEND_RESPONSE,
-
     WORKFLOW_HOST_CHANGE_REQUEST,
-    WORKFLOW_HOST_CHANGE_RESPONSE,
 
     /**
      * state event request
@@ -133,11 +113,6 @@ public enum MessageType {
      * update taskInstance's PID response ack, from master to worker
      */
     TASK_UPDATE_PID__MESSAGE_ACK,
-
-    /**
-     * workflow executing data response, from master to api
-     */
-    WORKFLOW_EXECUTING_DATA_RESPONSE,
 
     WORKFLOW_METRICS_CLEANUP;
 }

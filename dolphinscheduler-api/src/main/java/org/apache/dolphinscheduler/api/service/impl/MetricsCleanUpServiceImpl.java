@@ -19,9 +19,9 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.rpc.ApiRpcClient;
 import org.apache.dolphinscheduler.api.service.MetricsCleanUpService;
-import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.remote.command.workflow.WorkflowMetricsCleanUpRequest;
 import org.apache.dolphinscheduler.remote.utils.Host;
 
@@ -46,7 +46,7 @@ public class MetricsCleanUpServiceImpl implements MetricsCleanUpService {
     public void cleanUpWorkflowMetricsByDefinitionCode(String workflowDefinitionCode) {
         WorkflowMetricsCleanUpRequest workflowMetricsCleanUpRequest = new WorkflowMetricsCleanUpRequest();
         workflowMetricsCleanUpRequest.setProcessDefinitionCode(workflowDefinitionCode);
-        List<Server> masterNodeList = registryClient.getServerList(NodeType.MASTER);
+        List<Server> masterNodeList = registryClient.getServerList(RegistryNodeType.MASTER);
         for (Server server : masterNodeList) {
             try {
                 final String host = String.format("%s:%s", server.getHost(), server.getPort());

@@ -39,7 +39,7 @@ public class GetLogBytesResponse implements ResponseMessageBuilder {
 
     @Override
     public MessageType getCommandType() {
-        return MessageType.GET_LOG_BYTES_RESPONSE;
+        return MessageType.RESPONSE;
     }
 
 }

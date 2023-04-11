@@ -75,7 +75,6 @@ import java.util.stream.Collectors;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
-import org.quartz.CronExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -182,7 +181,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         scheduleObj.setStartTime(scheduleParam.getStartTime());
         scheduleObj.setEndTime(scheduleParam.getEndTime());
-        if (!org.quartz.CronExpression.isValidExpression(scheduleParam.getCrontab())) {
+        if (!CronUtils.isValidExpression(scheduleParam.getCrontab())) {
             log.error("Schedule crontab verify failure, crontab:{}.", scheduleParam.getCrontab());
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, scheduleParam.getCrontab());
             return result;
@@ -238,7 +237,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         if (scheduleParam.getStartTime().getTime() > scheduleParam.getEndTime().getTime()) {
             throw new ServiceException(Status.START_TIME_BIGGER_THAN_END_TIME_ERROR);
         }
-        if (!CronExpression.isValidExpression(scheduleParam.getCrontab())) {
+        if (!CronUtils.isValidExpression(scheduleParam.getCrontab())) {
             throw new ServiceException(Status.SCHEDULE_CRON_CHECK_FAILED, scheduleParam.getCrontab());
         }
     }
@@ -828,7 +827,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
             schedule.setStartTime(scheduleParam.getStartTime());
             schedule.setEndTime(scheduleParam.getEndTime());
-            if (!org.quartz.CronExpression.isValidExpression(scheduleParam.getCrontab())) {
+            if (!CronUtils.isValidExpression(scheduleParam.getCrontab())) {
                 log.error("Schedule crontab verify failure, crontab:{}.", scheduleParam.getCrontab());
                 putMsg(result, Status.SCHEDULE_CRON_CHECK_FAILED, scheduleParam.getCrontab());
                 return;

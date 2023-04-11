@@ -15,18 +15,22 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.alert;
+package org.apache.dolphinscheduler.alert.service;
 
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertConstants;
 import org.apache.dolphinscheduler.alert.api.AlertData;
 import org.apache.dolphinscheduler.alert.api.AlertInfo;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
+import org.apache.dolphinscheduler.alert.config.AlertConfig;
+import org.apache.dolphinscheduler.alert.metrics.AlertServerMetrics;
+import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
+import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
@@ -50,28 +54,24 @@ import javax.annotation.Nullable;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.common.collect.Lists;
 
 @Service
 @Slf4j
-public final class AlertSenderService extends Thread {
+public final class AlertBootstrapService extends BaseDaemonThread implements AutoCloseable {
 
-    private final AlertDao alertDao;
-    private final AlertPluginManager alertPluginManager;
-    private final AlertConfig alertConfig;
+    @Autowired
+    private AlertDao alertDao;
+    @Autowired
+    private AlertPluginManager alertPluginManager;
+    @Autowired
+    private AlertConfig alertConfig;
 
-    public AlertSenderService(AlertDao alertDao, AlertPluginManager alertPluginManager, AlertConfig alertConfig) {
-        this.alertDao = alertDao;
-        this.alertPluginManager = alertPluginManager;
-        this.alertConfig = alertConfig;
-    }
-
-    @Override
-    public synchronized void start() {
-        super.setName("AlertSenderService");
-        super.start();
+    public AlertBootstrapService() {
+        super("AlertBootstrapService");
     }
 
     @Override
@@ -301,4 +301,10 @@ public final class AlertSenderService extends Thread {
             return new AlertResult("false", e.getMessage());
         }
     }
+
+    @Override
+    public void close() {
+        log.info("Closed AlertBootstrapService...");
+    }
+
 }
