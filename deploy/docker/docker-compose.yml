@@ -19,8 +19,6 @@ version: "3.8"
 services:
   dolphinscheduler-postgresql:
     image: bitnami/postgresql:11.11.0
-    ports:
-      - "5432:5432"
     profiles: ["all", "schema"]
     environment:
       POSTGRESQL_USERNAME: root
@@ -44,8 +42,6 @@ services:
       ZOO_4LW_COMMANDS_WHITELIST: srvr,ruok,wchs,cons
     volumes:
       - dolphinscheduler-zookeeper:/bitnami/zookeeper
-    ports:
-      - "2181:2181"
     healthcheck:
       test: ["CMD", "bash", "-c", "cat < /dev/null > /dev/tcp/127.0.0.1/2181"]
       interval: 5s

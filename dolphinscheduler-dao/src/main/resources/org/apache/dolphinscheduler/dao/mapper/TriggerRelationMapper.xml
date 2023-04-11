@@ -43,9 +43,9 @@
         WHERE trigger_code = #{triggerCode} and trigger_type =  #{triggerType}
     </select>
 
-    <select id="queryByTriggerRelationCodeAndTypeAndJobId" resultType="org.apache.dolphinscheduler.dao.entity.TriggerRelation">
+    <select id="queryByTriggerRelationCodeAndTypeAndJobId" resultType="java.lang.Integer">
         select
-        <include refid="baseSql"/>
+        count(*)
         from t_ds_trigger_relation
         WHERE trigger_code = #{triggerCode} and trigger_type =  #{triggerType} and job_id = #{jobId}
     </select>
@@ -57,15 +57,13 @@
     <insert id="insertTrigger">
         INSERT INTO t_ds_trigger_relation (trigger_code, trigger_type, job_id, create_time, update_time) VALUES(
             #{triggerRelation.triggerCode},#{triggerRelation.triggerType},#{triggerRelation.jobId},#{triggerRelation.createTime},#{triggerRelation.updateTime})
-        ON CONFLICT (trigger_code, trigger_type, job_id)
-        DO
-        UPDATE SET update_time = #{triggerRelation.updateTime};
     </insert>
 
     <update id="updateTrigger">
         update t_ds_trigger_relation set
         update_time = #{triggerRelation.updateTime}
-        where id = #{triggerRelation.id}
+        where trigger_code = #{triggerRelation.triggerCode}
+        and trigger_type = #{triggerRelation.triggerType} and job_id = #{triggerRelation.jobId}
     </update>
 
 </mapper>

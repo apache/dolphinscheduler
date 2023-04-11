@@ -43,7 +43,7 @@ public class TriggerRelationServiceImpl implements TriggerRelationService {
         triggerRelation.setTriggerCode(triggerCode);
         triggerRelation.setCreateTime(new Date());
         triggerRelation.setUpdateTime(new Date());
-        if(queryByTriggerRelationCodeAndTypeAndJobId(triggerRelation) != 0){
+        if(queryByTriggerRelationCodeAndTypeAndJobId(triggerRelation.getTriggerType(),triggerCode,jobId) != 0){
             triggerRelationMapper.updateTrigger(triggerRelation);
         }
         else{
@@ -54,9 +54,9 @@ public class TriggerRelationServiceImpl implements TriggerRelationService {
     public TriggerRelation queryByTypeAndJobId(ApiTriggerType apiTriggerType, int jobId) {
         return triggerRelationMapper.queryByTypeAndJobId(apiTriggerType.getCode(), jobId);
     }
-
-    public int queryByTriggerRelationCodeAndTypeAndJobId(TriggerRelation triggerRelation) {
-        return triggerRelationMapper.queryByTriggerRelationCodeAndTypeAndJobId(triggerRelation);
+    @Override
+    public int queryByTriggerRelationCodeAndTypeAndJobId(Integer triggerType, Long triggerCode, Integer jobId) {
+        return triggerRelationMapper.queryByTriggerRelationCodeAndTypeAndJobId(triggerType, triggerCode, jobId);
     }
 
     @Override
