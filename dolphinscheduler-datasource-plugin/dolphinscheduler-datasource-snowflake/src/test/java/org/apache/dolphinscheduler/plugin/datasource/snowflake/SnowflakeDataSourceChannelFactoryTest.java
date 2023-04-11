@@ -30,4 +30,11 @@ public class SnowflakeDataSourceChannelFactoryTest {
         DataSourceChannel dataSourceChannel = sourceChannelFactory.create();
         Assertions.assertNotNull(dataSourceChannel);
     }
+
+
+    @Test
+    public void testGetName() {
+        SnowflakeDataSourceChannelFactory sourceChannelFactory = new SnowflakeDataSourceChannelFactory();
+        Assertions.assertEquals(sourceChannelFactory.getName(), "snowflake");
+    }
 }

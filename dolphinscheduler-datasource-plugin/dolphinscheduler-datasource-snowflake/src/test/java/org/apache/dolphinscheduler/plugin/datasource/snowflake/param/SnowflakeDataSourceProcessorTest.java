@@ -154,4 +154,32 @@ public class SnowflakeDataSourceProcessorTest {
                     snowflakeDataSourceProcessor.getDatasourceUniqueId(connectionParam, DbType.SNOWFLAKE));
         }
     }
+
+    @Test
+    public void testCreateDatasourceParamDTO() {
+        String connectionParam = "{\"user\":\"default\",\"address\":\"jdbc:snowflake://localhost1:5142,localhost2:5142\""
+                + ",\"jdbcUrl\":\"jdbc:snowflake://localhost1:5142,localhost2:5142/default\"}";
+        SnowflakeDatasourceParamDTO snowflakeDatasourceParamDTO = (SnowflakeDatasourceParamDTO) snowflakeDataSourceProcessor
+                .createDatasourceParamDTO(connectionParam);
+        Assertions.assertEquals("default", snowflakeDatasourceParamDTO.getUserName());
+    }
+
+    @Test
+    public void testDbType() {
+        Assertions.assertEquals(DbType.SNOWFLAKE.getCode(), 19);
+        Assertions.assertEquals(DbType.SNOWFLAKE.getDescp(), "snowflake");
+        Assertions.assertEquals(DbType.of(19), DbType.SNOWFLAKE);
+        Assertions.assertEquals(DbType.ofName("SNOWFLAKE"), DbType.SNOWFLAKE);
+    }
+
+    @Test
+    public void testBuildString() {
+        SnowflakeDatasourceParamDTO snowflakeDatasourceParamDT = new SnowflakeDatasourceParamDTO();
+        snowflakeDatasourceParamDT.setHost("localhost");
+        snowflakeDatasourceParamDT.setDatabase("default");
+        snowflakeDatasourceParamDT.setUserName("root");
+        snowflakeDatasourceParamDT.setPort(3306);
+        snowflakeDatasourceParamDT.setPassword("123456");
+        Assertions.assertNotNull(snowflakeDatasourceParamDT.toString());
+    }
 }
