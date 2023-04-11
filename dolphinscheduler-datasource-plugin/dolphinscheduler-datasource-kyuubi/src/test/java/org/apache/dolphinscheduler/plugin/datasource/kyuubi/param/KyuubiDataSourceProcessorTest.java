@@ -114,7 +114,7 @@ public class KyuubiDataSourceProcessorTest {
         Assertions.assertNotNull(connectionParam);
         Assertions.assertEquals("default", connectionParams.getUser());
     }
-
+    @Test
     public void testCreateDatasourceParamDTO() {
         String connectionParam = "{\"user\":\"default\",\"address\":\"jdbc:kyuubi://localhost1:5142,localhost2:5142\""
                 + ",\"jdbcUrl\":\"jdbc:kyuubi://localhost1:5142,localhost2:5142/default\"}";
