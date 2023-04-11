@@ -4,7 +4,7 @@
 
 ## Datasource Parameters
 
-|     **Datasource**      | **Description**                                             |
+|     **Datasource**      |                       **Description**                       |
 |-------------------------|-------------------------------------------------------------|
 | Datasource              | Select DATABEND.                                            |
 | Datasource Name         | Enter the name of the datasource.                           |
