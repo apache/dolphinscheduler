@@ -23,8 +23,8 @@ import javax.script.ScriptException;
 
 public class SwitchTaskUtils {
 
-    private static ScriptEngineManager manager;
-    private static ScriptEngine engine;
+    private static final ScriptEngineManager manager;
+    private static final ScriptEngine engine;
 
     static {
         manager = new ScriptEngineManager();
@@ -33,7 +33,7 @@ public class SwitchTaskUtils {
 
     public static boolean evaluate(String expression) throws ScriptException {
         Object result = engine.eval(expression);
-        return (Boolean) result;
+        return Boolean.TRUE.equals(result);
     }
 
 }

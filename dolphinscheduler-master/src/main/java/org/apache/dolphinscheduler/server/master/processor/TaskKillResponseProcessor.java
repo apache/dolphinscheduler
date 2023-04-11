@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.command.Message;
 import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.task.TaskKillResponse;
-import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
+import org.apache.dolphinscheduler.remote.processor.MasterRpcProcessor;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,7 +34,7 @@ import io.netty.channel.Channel;
  */
 @Component
 @Slf4j
-public class TaskKillResponseProcessor implements NettyRequestProcessor {
+public class TaskKillResponseProcessor implements MasterRpcProcessor {
 
     /**
      * task final result response

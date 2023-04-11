@@ -584,6 +584,14 @@ public final class DateUtils {
         return intervalSeconds - usedTime;
     }
 
+    public static long getRemainTime(Long baseTime, long intervalSeconds) {
+        if (baseTime == null) {
+            return 0;
+        }
+        long usedTime = (System.currentTimeMillis() - baseTime) / 1000;
+        return intervalSeconds - usedTime;
+    }
+
     /**
      * get current time stamp : yyyyMMddHHmmssSSS
      *

@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.command.Message;
 import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.cache.CacheExpireRequest;
-import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
+import org.apache.dolphinscheduler.remote.processor.MasterRpcProcessor;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,7 +38,7 @@ import io.netty.channel.Channel;
  */
 @Component
 @Slf4j
-public class CacheProcessor implements NettyRequestProcessor {
+public class CacheProcessor implements MasterRpcProcessor {
 
     @Autowired
     private CacheManager cacheManager;

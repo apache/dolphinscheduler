@@ -423,7 +423,7 @@ public class DagHelper {
         if (CollectionUtils.isEmpty(switchTaskList)) {
             switchTaskList = new ArrayList<>();
         }
-        conditionResultVoList.remove(resultConditionLocation);
+        // conditionResultVoList.remove(resultConditionLocation);
         for (SwitchResultVo info : conditionResultVoList) {
             if (CollectionUtils.isEmpty(info.getNextNode())) {
                 continue;

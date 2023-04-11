@@ -1119,17 +1119,15 @@ public class ProcessServiceImpl implements ProcessService {
      * retry submit task to db
      */
     @Override
-    public TaskInstance submitTaskWithRetry(ProcessInstance processInstance, TaskInstance taskInstance,
-                                            int commitRetryTimes, long commitInterval) {
+    public boolean submitTaskWithRetry(ProcessInstance processInstance, TaskInstance taskInstance,
+                                       int commitRetryTimes, long commitInterval) {
         int retryTimes = 1;
-        TaskInstance task = null;
         while (retryTimes <= commitRetryTimes) {
             try {
                 // submit task to db
                 // Only want to use transaction here
-                task = submitTask(processInstance, taskInstance);
-                if (task != null && task.getId() != null) {
-                    break;
+                if (submitTask(processInstance, taskInstance)) {
+                    return true;
                 }
                 log.error(
                         "task commit to db failed , taskCode: {} has already retry {} times, please check the database",
@@ -1142,7 +1140,7 @@ public class ProcessServiceImpl implements ProcessService {
                 retryTimes += 1;
             }
         }
-        return task;
+        return false;
     }
 
     /**
@@ -1156,33 +1154,32 @@ public class ProcessServiceImpl implements ProcessService {
      */
     @Override
     @Transactional
-    public TaskInstance submitTask(ProcessInstance processInstance, TaskInstance taskInstance) {
+    public boolean submitTask(ProcessInstance processInstance, TaskInstance taskInstance) {
         log.info("Start save taskInstance to database : {}, processInstance id:{}, state: {}",
                 taskInstance.getName(),
                 taskInstance.getProcessInstanceId(),
                 processInstance.getState());
         // submit to db
-        TaskInstance task = taskInstanceDao.submitTaskInstanceToDB(taskInstance, processInstance);
-        if (task == null) {
+        if (!taskInstanceDao.submitTaskInstanceToDB(taskInstance, processInstance)) {
             log.error("Save taskInstance to db error, task name:{}, process id:{} state: {} ",
                     taskInstance.getName(),
                     taskInstance.getProcessInstance().getId(),
                     processInstance.getState());
-            return null;
+            return false;
         }
 
-        if (!task.getState().isFinished()) {
-            createSubWorkProcess(processInstance, task);
+        if (!taskInstance.getState().isFinished()) {
+            createSubWorkProcess(processInstance, taskInstance);
         }
 
         log.info(
                 "End save taskInstance to db successfully:{}, taskInstanceName: {}, taskInstance state:{}, processInstanceId:{}, processInstanceState: {}",
-                task.getId(),
-                task.getName(),
-                task.getState(),
+                taskInstance.getId(),
+                taskInstance.getName(),
+                taskInstance.getState(),
                 processInstance.getId(),
                 processInstance.getState());
-        return task;
+        return true;
     }
 
     /**

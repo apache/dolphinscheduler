@@ -60,6 +60,11 @@ public class MasterConfig implements Validator {
      * Will create two thread poll to execute {@link WorkflowExecuteRunnable} and {@link TaskExecuteRunnable}.
      */
     private int execThreads = 10;
+
+    // todo: change to sync thread pool/ async thread pool ?
+    private int masterTaskExecuteThreadPoolSize = Runtime.getRuntime().availableProcessors();
+
+    private int masterAsyncTaskStateCheckThreadPoolSize = Runtime.getRuntime().availableProcessors();
     /**
      * The task dispatch thread pool size.
      */
