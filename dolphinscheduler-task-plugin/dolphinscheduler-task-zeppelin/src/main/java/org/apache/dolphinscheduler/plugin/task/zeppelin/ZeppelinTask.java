@@ -85,7 +85,7 @@ public class ZeppelinTask extends AbstractRemoteTask {
         if (StringUtils.isNotBlank(userName) && StringUtils.isNotBlank(passWord)) {
             this.zClient.login(userName, passWord);
             log.info("userName : {}  login  success ",userName);
-        }
+        } 
         return true;
     }
 
@@ -93,7 +93,7 @@ public class ZeppelinTask extends AbstractRemoteTask {
     @Override
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
-        	login();
+            login();
             final String paragraphId = this.zeppelinParameters.getParagraphId();
             final String productionNoteDirectory = this.zeppelinParameters.getProductionNoteDirectory();
             final String parameters = this.zeppelinParameters.getParameters();
