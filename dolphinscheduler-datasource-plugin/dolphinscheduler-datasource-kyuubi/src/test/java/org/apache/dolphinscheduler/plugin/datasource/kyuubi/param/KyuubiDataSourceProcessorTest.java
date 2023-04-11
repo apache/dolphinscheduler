@@ -98,7 +98,6 @@ public class KyuubiDataSourceProcessorTest {
                 MockedStatic<PasswordUtils> mockedStaticPasswordUtils = Mockito.mockStatic(PasswordUtils.class);
                 MockedStatic<CommonUtils> mockedStaticCommonUtils = Mockito.mockStatic(CommonUtils.class)) {
             mockedStaticPasswordUtils.when(() -> PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
-            mockedStaticCommonUtils.when(CommonUtils::getKerberosStartupState).thenReturn(false);
             KyuubiConnectionParam connectionParams = (KyuubiConnectionParam) kyuubiDatasourceProcessor
                     .createConnectionParams(kyuubiDataSourceParamDTO);
             Assertions.assertNotNull(connectionParams);
@@ -116,6 +115,14 @@ public class KyuubiDataSourceProcessorTest {
         Assertions.assertEquals("default", connectionParams.getUser());
     }
 
+    public void testCreateDatasourceParamDTO() {
+        String connectionParam = "{\"user\":\"default\",\"address\":\"jdbc:kyuubi://localhost1:5142,localhost2:5142\""
+                + ",\"jdbcUrl\":\"jdbc:kyuubi://localhost1:5142,localhost2:5142/default\"}";
+        KyuubiDataSourceParamDTO kyuubiDataSourceParamDTO = (KyuubiDataSourceParamDTO) kyuubiDatasourceProcessor
+                .createDatasourceParamDTO(connectionParam);
+        Assertions.assertEquals("default", kyuubiDataSourceParamDTO.getUserName());
+    }
+
     @Test
     public void testGetDatasourceDriver() {
         Assertions.assertEquals(DataSourceConstants.ORG_APACHE_KYUUBI_JDBC_DRIVER,
@@ -131,6 +138,14 @@ public class KyuubiDataSourceProcessorTest {
     }
 
     @Test
+    public void testDbType() {
+        Assertions.assertEquals(DbType.KYUUBI.getCode(), 18);
+        Assertions.assertEquals(DbType.KYUUBI.getDescp(), "kyuubi");
+        Assertions.assertEquals(DbType.of(18), DbType.KYUUBI);
+        Assertions.assertEquals(DbType.ofName("KYUUBI"), DbType.KYUUBI);
+    }
+
+    @Test
     public void testGetDbType() {
         Assertions.assertEquals(DbType.KYUUBI, kyuubiDatasourceProcessor.getDbType());
     }
@@ -140,4 +155,16 @@ public class KyuubiDataSourceProcessorTest {
         Assertions.assertEquals(DataSourceConstants.KYUUBI_VALIDATION_QUERY,
                 kyuubiDatasourceProcessor.getValidationQuery());
     }
+
+    @Test
+    public void testBuildString() {
+        KyuubiDataSourceParamDTO kyuubiDataSourceParamDTO = new KyuubiDataSourceParamDTO();
+        kyuubiDataSourceParamDTO.setHost("localhost");
+        kyuubiDataSourceParamDTO.setDatabase("default");
+        kyuubiDataSourceParamDTO.setUserName("root");
+        kyuubiDataSourceParamDTO.setPort(3306);
+        kyuubiDataSourceParamDTO.setPassword("123456");
+        Assertions.assertNotNull(kyuubiDataSourceParamDTO.toString());
+    }
+
 }

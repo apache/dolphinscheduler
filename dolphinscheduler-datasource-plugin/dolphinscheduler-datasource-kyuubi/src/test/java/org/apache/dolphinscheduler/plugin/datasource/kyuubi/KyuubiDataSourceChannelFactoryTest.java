@@ -30,4 +30,10 @@ public class KyuubiDataSourceChannelFactoryTest {
         DataSourceChannel dataSourceChannel = sourceChannelFactory.create();
         Assertions.assertNotNull(dataSourceChannel);
     }
+
+    @Test
+    public void testGetName() {
+        KyuubiDataSourceChannelFactory sourceChannelFactory = new KyuubiDataSourceChannelFactory();
+        Assertions.assertEquals(sourceChannelFactory.getName(), "kyuubi");
+    }
 }
