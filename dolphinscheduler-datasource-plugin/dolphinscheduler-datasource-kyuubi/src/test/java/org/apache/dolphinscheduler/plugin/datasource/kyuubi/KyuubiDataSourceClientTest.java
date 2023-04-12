@@ -20,9 +20,7 @@ package org.apache.dolphinscheduler.plugin.datasource.kyuubi;
 import org.apache.dolphinscheduler.plugin.datasource.kyuubi.param.KyuubiConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-import java.sql.Connection;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -37,7 +35,6 @@ public class KyuubiDataSourceClientTest {
 
     @Test
     public void testPreInit() {
-        Mockito.doNothing().when(kyuubiDataSourceClient).preInit();
         kyuubiDataSourceClient.preInit();
         Mockito.verify(kyuubiDataSourceClient).preInit();
     }
@@ -46,7 +43,6 @@ public class KyuubiDataSourceClientTest {
     public void testCheckEnv() {
 
         KyuubiConnectionParam kyuubiConnectionParam = new KyuubiConnectionParam();
-        Mockito.doNothing().when(kyuubiDataSourceClient).checkEnv(Mockito.any(KyuubiConnectionParam.class));
         kyuubiDataSourceClient.checkEnv(kyuubiConnectionParam);
         Mockito.verify(kyuubiDataSourceClient).checkEnv(Mockito.any(KyuubiConnectionParam.class));
     }
@@ -54,24 +50,21 @@ public class KyuubiDataSourceClientTest {
     @Test
     public void testInitClient() {
         KyuubiConnectionParam kyuubiConnectionParam = new KyuubiConnectionParam();
-        Mockito.doNothing().when(kyuubiDataSourceClient).initClient(Mockito.any(KyuubiConnectionParam.class),
-                Mockito.any());
         kyuubiDataSourceClient.initClient(kyuubiConnectionParam, DbType.KYUUBI);
         Mockito.verify(kyuubiDataSourceClient).initClient(Mockito.any(KyuubiConnectionParam.class), Mockito.any());
     }
 
     @Test
     public void testCheckClient() {
-        Mockito.doNothing().when(kyuubiDataSourceClient).checkClient();
         kyuubiDataSourceClient.checkClient();
         Mockito.verify(kyuubiDataSourceClient).checkClient();
     }
 
     @Test
     public void testGetConnection() {
-        Connection connection = Mockito.mock(Connection.class);
-        Mockito.when(kyuubiDataSourceClient.getConnection()).thenReturn(connection);
-        Assertions.assertNotNull(kyuubiDataSourceClient.getConnection());
+        kyuubiDataSourceClient.getConnection();
+        Mockito.verify(kyuubiDataSourceClient).getConnection();
+
     }
 
 }

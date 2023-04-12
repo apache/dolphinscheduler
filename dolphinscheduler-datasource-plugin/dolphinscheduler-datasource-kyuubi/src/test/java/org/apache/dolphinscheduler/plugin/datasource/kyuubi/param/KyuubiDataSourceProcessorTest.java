@@ -143,6 +143,7 @@ public class KyuubiDataSourceProcessorTest {
         Assertions.assertEquals(DbType.KYUUBI.getDescp(), "kyuubi");
         Assertions.assertEquals(DbType.of(18), DbType.KYUUBI);
         Assertions.assertEquals(DbType.ofName("KYUUBI"), DbType.KYUUBI);
+
     }
 
     @Test
