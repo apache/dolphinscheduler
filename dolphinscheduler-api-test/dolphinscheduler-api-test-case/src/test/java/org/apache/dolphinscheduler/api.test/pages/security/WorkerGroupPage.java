@@ -18,7 +18,8 @@ public class WorkerGroupPage {
     public HttpResponse saveWorkerGroup(User loginUser, int id, String name, String addrList, String description, String otherParamsJson) {
         Map<String, Object> params = new HashMap<>();
         params.put("loginUser", loginUser);
-        params.put("name", id);
+        params.put("id", id);
+        params.put("name", name);
         params.put("addrList", addrList);
         params.put("description", description);
         params.put("otherParamsJson", otherParamsJson);
@@ -29,6 +30,16 @@ public class WorkerGroupPage {
         RequestClient requestClient = new RequestClient();
 
         return requestClient.post("/worker-groups", headers, params);
+    }
+
+    public HttpResponse queryAllWorkerGroups(User loginUser) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("loginUser", loginUser);
+        Map<String, String> headers = new HashMap<>();
+        headers.put(Constants.SESSION_ID_KEY, sessionId);
+
+        RequestClient requestClient = new RequestClient();
+        return requestClient.get("/worker-groups/all", headers, params);
     }
 
 }

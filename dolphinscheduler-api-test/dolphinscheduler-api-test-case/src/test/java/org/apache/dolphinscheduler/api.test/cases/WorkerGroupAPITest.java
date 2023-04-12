@@ -77,8 +77,10 @@ public class WorkerGroupAPITest {
         loginUser.setId(123);
         loginUser.setUserType(UserType.GENERAL_USER);
         HttpResponse saveWorkerGroupHttpResponse = workerGroupPage
-            .saveWorkerGroup(loginUser, 1, "test_worker_group", "172.31.0.2:1234", "test", null);
-//        (User loginUser, int id, String name, String addrList, String description, String otherParamsJson)
+            .saveWorkerGroup(loginUser, 10, "test_worker_group", "10.5.0.5:1234", "test", null);
         Assertions.assertTrue(saveWorkerGroupHttpResponse.body().success());
+
+        HttpResponse querryAllWorkerGroupsResponse = workerGroupPage.queryAllWorkerGroups(loginUser);
+        LOGGER.info("[debug111] response {}" ,querryAllWorkerGroupsResponse.toString());
     }
 }
