@@ -34,6 +34,6 @@ public class KyuubiDataSourceChannelFactoryTest {
     @Test
     public void testGetName() {
         KyuubiDataSourceChannelFactory sourceChannelFactory = new KyuubiDataSourceChannelFactory();
-        Assertions.assertEquals(sourceChannelFactory.getName(), "kyuubi");
+        Assertions.assertEquals("kyuubi", sourceChannelFactory.getName());
     }
 }
