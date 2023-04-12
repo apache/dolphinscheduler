@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.plugin.datasource.kyuubi;
 import org.apache.dolphinscheduler.plugin.datasource.kyuubi.param.KyuubiConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
