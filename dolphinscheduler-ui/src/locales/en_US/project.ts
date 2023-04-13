@@ -681,9 +681,9 @@ export default {
     zeppelin_production_note_directory_tips:
       'Please enter the production note directory to enable production mode',
     zeppelin_username: 'zeppelinUsername',
-    zeppelin_user_name_tips: 'Please enter the zeppelin server user name',
+    zeppelin_username_tips: 'Please enter the zeppelin server username',
     zeppelin_password: 'zeppelinPassword',
-    zeppelin_pass_word_tips: 'Please enter the zeppelin server pass word',  
+    zeppelin_password_tips: 'Please enter the zeppelin server password',  
     hive_cli_task_execution_type: 'Hive Cli Task Execution Type',
     hive_sql_script: 'Hive SQL Script',
     hive_cli_options: 'Hive Cli Options',

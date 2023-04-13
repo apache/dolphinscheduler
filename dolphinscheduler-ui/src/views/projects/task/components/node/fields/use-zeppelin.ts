@@ -74,18 +74,18 @@ export function useZeppelin(model: { [field: string]: any }): IJsonItem[] {
     },
     {
       type: 'input',
-      field: 'userName',
-      name: t('project.node.zeppelin_user_name'),
+      field: 'username',
+      name: t('project.node.zeppelin_username'),
       props: {
-        placeholder: t('project.node.zeppelin_user_name_tips')
+        placeholder: t('project.node.zeppelin_username_tips')
       }
     },
     {
       type: 'input',
-      field: 'passWord',
-      name: t('project.node.zeppelin_pass_word'),
+      field: 'password',
+      name: t('project.node.zeppelin_password'),
       props: {
-        placeholder:  t('project.node.zeppelin_pass_word_tips')
+        placeholder:  t('project.node.zeppelin_password_tips')
       }
     },
     {
