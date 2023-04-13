@@ -46,7 +46,6 @@ public class ZeppelinParameters extends AbstractParameters {
     private String username;
     private String password;
 
-
     @Override
     public boolean checkParameters() {
         return StringUtils.isNotEmpty(this.noteId) && StringUtils.isNotEmpty(this.restEndpoint);

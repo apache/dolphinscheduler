@@ -17,12 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.zeppelin;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
@@ -31,15 +25,22 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.zeppelin.client.ClientConfig;
 import org.apache.zeppelin.client.NoteResult;
 import org.apache.zeppelin.client.ParagraphResult;
 import org.apache.zeppelin.client.Status;
 import org.apache.zeppelin.client.ZeppelinClient;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import kong.unirest.Unirest;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ZeppelinTask extends AbstractRemoteTask {
 
@@ -78,14 +79,14 @@ public class ZeppelinTask extends AbstractRemoteTask {
         log.info("Initialize zeppelin task params:{}", JSONUtils.toPrettyJsonString(taskParams));
         this.zClient = getZeppelinClient();
     }
-    
+
     public boolean login() throws Exception {
         String username = this.zeppelinParameters.getUsername();
         String password = this.zeppelinParameters.getPassword();
         if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
             this.zClient.login(username, password);
-            log.info("username : {}  login  success ",username);
-        } 
+            log.info("username : {}  login  success ", username);
+        }
         return true;
     }
 
