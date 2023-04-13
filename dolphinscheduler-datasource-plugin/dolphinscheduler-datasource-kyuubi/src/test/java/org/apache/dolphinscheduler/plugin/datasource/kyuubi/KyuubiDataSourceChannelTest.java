@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.datasource.kyuubi;
 import org.apache.dolphinscheduler.plugin.datasource.kyuubi.param.KyuubiConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -31,8 +32,9 @@ public class KyuubiDataSourceChannelTest {
     @Test
     public void testCreateDataSourceClient() {
         KyuubiDataSourceChannel sourceChannel = Mockito.mock(KyuubiDataSourceChannel.class);
-        sourceChannel.createDataSourceClient(new KyuubiConnectionParam(), DbType.KYUUBI);
-        Mockito.verify(sourceChannel).createDataSourceClient(new KyuubiConnectionParam(), DbType.KYUUBI);
-
+        KyuubiDataSourceClient dataSourceClient = Mockito.mock(KyuubiDataSourceClient.class);
+        Mockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
+        Assertions
+                .assertNotNull(sourceChannel.createDataSourceClient(new KyuubiConnectionParam(), DbType.KYUUBI));
     }
 }

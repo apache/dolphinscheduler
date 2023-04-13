@@ -133,7 +133,10 @@ public class KyuubiDataSourceProcessorTest {
     public void testGetJdbcUrl() {
         KyuubiConnectionParam connectionParam = new KyuubiConnectionParam();
         connectionParam.setJdbcUrl("jdbc:kyuubi://localhost1:5142,localhost2:5142/default");
-        Assertions.assertEquals("jdbc:kyuubi://localhost1:5142,localhost2:5142/default",
+        Map<String, String> other = new HashMap<>();
+        other.put("serverTimezone", "Asia/Shanghai");
+        connectionParam.setOther(other);
+        Assertions.assertEquals("jdbc:kyuubi://localhost1:5142,localhost2:5142/default?serverTimezone=Asia/Shanghai",
                 kyuubiDatasourceProcessor.getJdbcUrl(connectionParam));
     }
 
