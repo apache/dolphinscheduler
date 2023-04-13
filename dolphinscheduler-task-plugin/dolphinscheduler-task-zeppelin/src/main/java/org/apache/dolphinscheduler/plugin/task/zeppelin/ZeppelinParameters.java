@@ -43,7 +43,8 @@ public class ZeppelinParameters extends AbstractParameters {
     private String restEndpoint;
     private String productionNoteDirectory;
     private String parameters;
-    private String userName;
+    private String username;
+
     private String passWord;
 
     @Override
