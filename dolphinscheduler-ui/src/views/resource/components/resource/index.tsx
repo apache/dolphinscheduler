@@ -22,7 +22,8 @@ import {
   ref,
   getCurrentInstance,
   PropType,
-  toRefs
+  toRefs,
+  watch
 } from 'vue'
 import {
   NIcon,
@@ -65,10 +66,10 @@ export default defineComponent({
 
     const {
       variables,
-      columnsRef,
       tableWidth,
       requestData,
       updateList,
+      createColumns,
       handleCreateFile,
     } = useTable()
 
@@ -130,9 +131,16 @@ export default defineComponent({
       }
     }
 
+    onMounted(() => {
+      createColumns(variables)
+      requestData()
+    })
+    watch(useI18n().locale, () => {
+      createColumns(variables)
+    })
+
     return {
       breadListRef,
-      columnsRef,
       tableWidth,
       updateList,
       handleConditions,
@@ -155,7 +163,6 @@ export default defineComponent({
       handleCreateFolder,
       handleCreateFile,
       handleUploadFile,
-      columnsRef,
       tableWidth,
     } = this
     const manageTitle = this.resourceType === 'UDF'
@@ -220,7 +227,7 @@ export default defineComponent({
               <NSpace vertical>
                 <NDataTable
                   remote
-                  columns={columnsRef}
+                  columns={this.columns}
                   data={this.resourceList?.table}
                   striped
                   size={'small'}
