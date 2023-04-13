@@ -44,8 +44,9 @@ import ResourceUploadModal from './upload'
 import ResourceRenameModal from './rename'
 import styles from './index.module.scss'
 import type { Router } from 'vue-router'
-import Search from "@/components/input-search"
-import { ResourceType } from "@/views/resource/components/resource/types";
+import Search from '@/components/input-search'
+import { ResourceType } from '@/views/resource/components/resource/types'
+import { useUserStore } from '@/store/user/user'
 
 
 const props = {
@@ -72,6 +73,7 @@ export default defineComponent({
       handleCreateFile,
     } = useTable()
 
+    const userStore = useUserStore()
 
     variables.resourceType = props.resourceType
 
@@ -120,7 +122,8 @@ export default defineComponent({
 
     const goBread = (fullName: string) => {
       const { resourceType, tenantCode } = variables
-      if (fullName === '') {
+      const baseDir = resourceType === 'UDF' ? userStore.getBaseUdfDir : userStore.getBaseResDir
+      if (fullName === '' || !fullName.startsWith(baseDir)) {
         router.push({ name: resourceType === 'UDF' ? 'resource-manage' : 'file-manage' })
       } else {
         router.push({

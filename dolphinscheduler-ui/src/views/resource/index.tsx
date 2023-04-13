@@ -15,7 +15,9 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue'
+import { queryBaseDir } from "@/service/modules/resources";
+import { ResourceType } from "@/views/resource/components/resource/types";
 
 const resource = defineComponent({
   name: 'resource',

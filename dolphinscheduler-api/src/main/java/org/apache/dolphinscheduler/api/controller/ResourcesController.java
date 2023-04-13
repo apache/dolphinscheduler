@@ -772,4 +772,17 @@ public class ResourcesController extends BaseController {
 
         return resourceService.queryResourceByFullName(loginUser, fullName, tenantCode, type);
     }
+
+    @Operation(summary = "queryResourceBaseDir", description = "QUERY_RESOURCE_BASE_DIR")
+    @Parameters({
+            @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema = @Schema(implementation = ResourceType.class))
+    })
+    @GetMapping(value = "/base-dir")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(RESOURCE_NOT_EXIST)
+    @AccessLogAnnotation
+    public Result<Object> queryResourceBaseDir(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                               @RequestParam(value = "type") ResourceType type) {
+        return resourceService.queryResourceBaseDir(loginUser, type);
+    }
 }
