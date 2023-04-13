@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -141,7 +142,7 @@ public class EtcdRegistryTest {
         registry.close();
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void test() throws Exception {
         EtcdRegistryProperties properties = new EtcdRegistryProperties();
