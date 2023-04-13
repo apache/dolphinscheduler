@@ -45,7 +45,8 @@ public class ZeppelinParameters extends AbstractParameters {
     private String parameters;
     private String username;
 
-    private String passWord;
+    private String password;
+
 
     @Override
     public boolean checkParameters() {
