@@ -80,11 +80,11 @@ public class ZeppelinTask extends AbstractRemoteTask {
     }
     
     public boolean login() throws Exception {
-        String userName = this.zeppelinParameters.getUserName();
-        String passWord = this.zeppelinParameters.getPassWord();
-        if (StringUtils.isNotBlank(userName) && StringUtils.isNotBlank(passWord)) {
-            this.zClient.login(userName, passWord);
-            log.info("userName : {}  login  success ",userName);
+        String username = this.zeppelinParameters.getUsername();
+        String password = this.zeppelinParameters.getPassword();
+        if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
+            this.zClient.login(username, password);
+            log.info("username : {}  login  success ",username);
         } 
         return true;
     }
