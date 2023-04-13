@@ -212,15 +212,36 @@ Create a registry environment variables.
 - name: REGISTRY_TYPE
   {{- if .Values.zookeeper.enabled }}
   value: "zookeeper"
+  {{- else if .Values.etcd.enabled }}
+  value: "etcd"
   {{- else }}
   value: {{ .Values.externalRegistry.registryPluginName }}
   {{- end }}
+{{- if .Values.etcd.enabled }}
+- name: REGISTRY_ENDPOINTS
+  value: {{ .Values.etcd.endpoints }}
+- name: REGISTRY_NAMESPACE
+  value: {{ .Values.etcd.namespace }}
+- name: REGISTRY_USER
+  value: {{ .Values.etcd.user }}
+- name: REGISTRY_PASSWORD
+  value: {{ .Values.etcd.passWord }}
+- name: REGISTRY_AUTHORITY
+  value: {{ .Values.etcd.authority }}
+- name: REGISTRY_CERT_FILE
+  value: {{ .Values.etcd.certFile }}
+- name: REGISTRY_KEY_CERT_CHAIN_FILE
+  value: {{ .Values.etcd.keyCertChainFile }}
+- name: REGISTRY_KEY_FILE
+  value: {{ .Values.etcd.keyFile }}
+{{- else }}
 - name: REGISTRY_ZOOKEEPER_CONNECT_STRING
   {{- if .Values.zookeeper.enabled }}
   value: {{ template "dolphinscheduler.zookeeper.quorum" . }}
   {{- else }}
   value: {{ .Values.externalRegistry.registryServers }}
   {{- end }}
+{{- end }}
 {{- end -}}
 
 {{/*
@@ -262,5 +283,33 @@ Create a fsFileResourcePersistence volumeMount.
 {{- if .Values.common.fsFileResourcePersistence.enabled -}}
 - mountPath: {{ default "/dolphinscheduler" .Values.common.configmap.RESOURCE_UPLOAD_PATH | quote }}
   name: {{ include "dolphinscheduler.fullname" . }}-fs-file
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create a etcd ssl volume.
+*/}}
+{{- define "dolphinscheduler.etcd.ssl.volume" -}}
+{{- if .Values.etcd.enabled -}}
+- name: etcd-ssl
+  secret:
+    secretName: {{ include "dolphinscheduler.fullname" . }}-etcd-ssl
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create a etcd ssl volumeMount.
+*/}}
+{{- define "dolphinscheduler.etcd.ssl.volumeMount" -}}
+{{- if .Values.etcd.enabled -}}
+- mountPath: /opt/dolphinscheduler/{{ .Values.etcd.certFile }}
+  name: etcd-ssl
+  subPath: cert-file
+- mountPath: /opt/dolphinscheduler/{{ .Values.etcd.keyCertChainFile  }}
+  name: etcd-ssl
+  subPath: key-cert-chain-file
+- mountPath: /opt/dolphinscheduler/{{ .Values.etcd.keyFile }}
+  name: etcd-ssl
+  subPath: key-file
 {{- end -}}
 {{- end -}}

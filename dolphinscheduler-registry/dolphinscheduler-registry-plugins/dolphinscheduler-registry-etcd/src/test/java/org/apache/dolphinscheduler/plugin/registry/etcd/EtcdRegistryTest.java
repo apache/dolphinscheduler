@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Ignore;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -139,5 +140,21 @@ public class EtcdRegistryTest {
     @AfterAll
     public static void after() throws IOException {
         registry.close();
+    }
+
+    @Ignore
+    @Test
+    public void test() throws Exception {
+        EtcdRegistryProperties properties = new EtcdRegistryProperties();
+        properties.setEndpoints("");
+        /*
+            Please store your certs file in dolphinscheduler-registry/dolphinscheduler-registry-plugins/dolphinscheduler-registry-etcd/etcd-certs/ for running this test
+
+            If you pass this method and want to run api service, please store your certs file in deploy/kubernetes/dolphinscheduler/etcd-certs/
+        */
+        properties.setCertFile("etcd-certs/ca.crt");
+        properties.setKeyCertChainFile("etcd-certs/client.crt");
+        properties.setKeyFile("etcd-certs/client.pem");
+        registry = new EtcdRegistry(properties);
     }
 }

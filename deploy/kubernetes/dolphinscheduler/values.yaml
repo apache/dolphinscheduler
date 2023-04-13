@@ -94,6 +94,18 @@ zookeeper:
     size: "20Gi"
     storageClass: "-"
 
+etcd:
+  enabled: false
+  endpoints: ""
+  namespace: "dolphinscheduler"
+  user: ""
+  passWord: ""
+  authority: ""
+  # Please create a new folder: deploy/kubernetes/dolphinscheduler/etcd-certs
+  certFile: "etcd-certs/ca.crt"
+  keyCertChainFile: "etcd-certs/client.crt"
+  keyFile: "etcd-certs/client.pem"
+
 ## If exists external registry and set zookeeper.enable value to false, the external registry will be used.
 externalRegistry:
   registryPluginName: "zookeeper"
