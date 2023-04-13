@@ -680,7 +680,7 @@ export default {
       'Directory for cloned zeppelin note in production mode',
     zeppelin_production_note_directory_tips:
       'Please enter the production note directory to enable production mode',
-    zeppelin_user_name: 'zeppelinUserName',
+    zeppelin_username: 'zeppelinUsername',
     zeppelin_user_name_tips: 'Please enter the zeppelin server user name',
     zeppelin_password: 'zeppelinPassword',
     zeppelin_pass_word_tips: 'Please enter the zeppelin server pass word',  
