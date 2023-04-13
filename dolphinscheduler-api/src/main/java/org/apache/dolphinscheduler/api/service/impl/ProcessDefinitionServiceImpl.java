@@ -1255,7 +1255,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         try {
             out = response.getOutputStream();
             buff = new BufferedOutputStream(out);
-            buff.write(JSONUtils.toJsonString(dagDataSchedules).getBytes(StandardCharsets.UTF_8));
+            buff.write(JSONUtils.toPrettyJsonString(dagDataSchedules).getBytes(StandardCharsets.UTF_8));
             buff.flush();
             buff.close();
         } catch (IOException e) {
