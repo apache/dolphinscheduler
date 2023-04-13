@@ -268,8 +268,8 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn/applicationId�
 |master.task-commit-retry-times|5|任务重试次数|
 |master.task-commit-interval|1000|任务提交间隔,单位为毫秒|
 |master.state-wheel-interval|5|轮询检查状态时间|
-|master.max-cpu-load-avg|-1|master最大cpuload均值,只有高于系统cpuload均值时,master服务才能调度任务. 默认值为-1: cpu cores * 2|
-|master.reserved-memory|0.3|master预留内存,只有低于系统可用内存时,master服务才能调度任务,单位为G|
+|master.max-cpu-load-avg|1|master最大cpuload均值,只有高于系统cpuload均值时,master服务才能调度任务. 默认值为1: 会使用100%的CPU|
+|master.reserved-memory|0.3|master预留内存,只有低于系统可用内存时,master服务才能调度任务. 默认值为0.3：当系统内存低于30%时会停止调度新的工作流|
 |master.failover-interval|10|failover间隔，单位为分钟|
 |master.kill-application-when-task-failover|true|当任务实例failover时，是否kill掉yarn或k8s application|
 |master.registry-disconnect-strategy.strategy|stop|当Master与注册中心失联之后采取的策略, 默认值是: stop. 可选值包括： stop, waiting|
@@ -286,8 +286,8 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn/applicationId�
 |worker.heartbeat-interval|10|worker心跳间隔,单位为秒|
 |worker.host-weight|100|派发任务时，worker主机的权重|
 |worker.tenant-auto-create|true|租户对应于系统的用户,由worker提交作业.如果系统没有该用户,则在参数worker.tenant.auto.create为true后自动创建。|
-|worker.max-cpu-load-avg|-1|worker最大cpuload均值,只有高于系统cpuload均值时,worker服务才能被派发任务. 默认值为-1: cpu cores * 2|
-|worker.reserved-memory|0.3|worker预留内存,只有低于系统可用内存时,worker服务才能被派发任务,单位为G|
+|worker.max-cpu-load-avg|1|worker最大cpuload均值,只有高于系统cpuload均值时,worker服务才能被派发任务. 默认值为1: 会使用100%的CPU|
+|worker.reserved-memory|0.3|worker预留内存,只有低于系统可用内存时,worker服务才能被派发任务. 默认值为0.3：当系统内存低于30%时会停止调度新的工作流|
 |worker.alert-listen-host|localhost|alert监听host|
 |worker.alert-listen-port|50052|alert监听端口|
 |worker.registry-disconnect-strategy.strategy|stop|当Worker与注册中心失联之后采取的策略, 默认值是: stop. 可选值包括： stop, waiting|

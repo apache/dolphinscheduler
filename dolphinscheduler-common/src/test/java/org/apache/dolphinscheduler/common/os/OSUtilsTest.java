@@ -35,13 +35,6 @@ public class OSUtilsTest {
     private static Logger logger = LoggerFactory.getLogger(OSUtilsTest.class);
 
     @Test
-    public void memoryUsage() {
-        double memoryUsage = OSUtils.memoryUsage();
-        logger.info("memoryUsage : {}", memoryUsage);
-        Assertions.assertTrue(memoryUsage >= 0.0);
-    }
-
-    @Test
     public void diskAvailable() {
         double diskAvailable = OSUtils.diskAvailable();
         logger.info("diskAvailable : {}", diskAvailable);
@@ -49,15 +42,8 @@ public class OSUtilsTest {
     }
 
     @Test
-    public void loadAverage() {
-        double loadAverage = OSUtils.loadAverage();
-        logger.info("loadAverage : {}", loadAverage);
-        Assertions.assertTrue(loadAverage >= 0.0);
-    }
-
-    @Test
     public void cpuUsage() {
-        double cpuUsage = OSUtils.cpuUsage();
+        double cpuUsage = OSUtils.cpuUsagePercentage();
         logger.info("cpuUsage : {}", cpuUsage);
         Assertions.assertTrue(cpuUsage >= 0.0);
     }

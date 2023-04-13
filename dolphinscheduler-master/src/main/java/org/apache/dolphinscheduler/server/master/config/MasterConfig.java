@@ -84,8 +84,8 @@ public class MasterConfig implements Validator {
      * state wheel check interval, if this value is bigger, may increase the delay of task/processInstance.
      */
     private Duration stateWheelInterval = Duration.ofMillis(5);
-    private double maxCpuLoadAvg = -1;
-    private double reservedMemory = 0.3;
+    private double maxCpuLoadAvg = 1;
+    private double reservedMemory = 0.1;
     private Duration failoverInterval = Duration.ofMinutes(10);
     private boolean killApplicationWhenTaskFailover = true;
     private ConnectStrategyProperties registryDisconnectStrategy = new ConnectStrategyProperties();
@@ -137,8 +137,12 @@ public class MasterConfig implements Validator {
             errors.rejectValue("failover-interval", null, "should be a valid duration");
         }
         if (masterConfig.getMaxCpuLoadAvg() <= 0) {
-            masterConfig.setMaxCpuLoadAvg(Runtime.getRuntime().availableProcessors() * 2);
+            masterConfig.setMaxCpuLoadAvg(100);
         }
+        if (masterConfig.getReservedMemory() <= 0) {
+            masterConfig.setReservedMemory(100);
+        }
+
         if (masterConfig.getWorkerGroupRefreshInterval().getSeconds() < 10) {
             errors.rejectValue("worker-group-refresh-interval", null, "should >= 10s");
         }

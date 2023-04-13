@@ -273,8 +273,8 @@ Location: `master-server/conf/application.yaml`
 |master.task-commit-retry-times|5|master commit task retry times|
 |master.task-commit-interval|1000|master commit task interval, the unit is millisecond|
 |master.state-wheel-interval|5|time to check status|
-|master.max-cpu-load-avg|-1|master max CPU load avg, only higher than the system CPU load average, master server can schedule. default value -1: the number of CPU cores * 2|
-|master.reserved-memory|0.3|master reserved memory, only lower than system available memory, master server can schedule. default value 0.3, the unit is G|
+|master.max-cpu-load-avg|1|master max cpuload avg percentage, only higher than the system cpu load average, master server can schedule. default value 1: will use 100% cpu|
+|master.reserved-memory|0.3|master reserved memory, only lower than system available memory, master server can schedule. default value 0.3, only the available memory is higher than 30%, master server can schedule.|
 |master.failover-interval|10|failover interval, the unit is minute|
 |master.kill-application-when-task-failover|true|whether to kill yarn/k8s application when failover taskInstance|
 |master.registry-disconnect-strategy.strategy|stop|Used when the master disconnect from registry, default value: stop. Optional values include stop, waiting|
@@ -292,8 +292,8 @@ Location: `worker-server/conf/application.yaml`
 |worker.heartbeat-interval|10|worker-service heartbeat interval, the unit is second|
 |worker.host-weight|100|worker host weight to dispatch tasks|
 |worker.tenant-auto-create|true|tenant corresponds to the user of the system, which is used by the worker to submit the job. If system does not have this user, it will be automatically created after the parameter worker.tenant.auto.create is true.|
-|worker.max-cpu-load-avg|-1|worker max CPU load avg, only higher than the system CPU load average, worker server can be dispatched tasks. default value -1: the number of CPU cores * 2|
-|worker.reserved-memory|0.3|worker reserved memory, only lower than system available memory, worker server can be dispatched tasks. default value 0.3, the unit is G|
+|worker.max-cpu-load-avg|1|worker max cpuload avg, only higher than the system cpu load average, worker server can be dispatched tasks. default value 1: will use 100% cpu.|
+|worker.reserved-memory|0.3|worker reserved memory, only lower than system available memory, worker server can be dispatched tasks. default value 0.3, only the available memory is higher than 30%, worker server can receive task.|
 |worker.alert-listen-host|localhost|the alert listen host of worker|
 |worker.alert-listen-port|50052|the alert listen port of worker|
 |worker.registry-disconnect-strategy.strategy|stop|Used when the worker disconnect from registry, default value: stop. Optional values include stop, waiting|
