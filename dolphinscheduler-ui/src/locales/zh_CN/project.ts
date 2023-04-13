@@ -670,7 +670,7 @@ export default {
     zeppelin_rest_endpoint_tips: '请输入zeppelin server的rest endpoint',
     zeppelin_username: 'zeppelinUsername',
     zeppelin_user_name_tips: '请输入zeppelin server的登陆用户名',
-    zeppelin_pass_word: 'zeppelinPassWord',
+    zeppelin_password: 'zeppelinPassword',
     zeppelin_pass_word_tips: '请输入zeppelin server的登陆密码',
     hive_cli_task_execution_type: 'Hive Cli 任务类型',
     hive_sql_script: 'Hive SQL 脚本',
