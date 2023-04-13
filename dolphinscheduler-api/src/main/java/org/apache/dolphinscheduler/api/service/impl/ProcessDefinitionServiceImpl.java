@@ -1429,6 +1429,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         if (null != schedule) {
             ProcessDefinition newProcessDefinition = processDefinitionMapper.queryByCode(processDefinition.getCode());
             schedule.setProcessDefinitionCode(newProcessDefinition.getCode());
+            schedule.setId(null);
             schedule.setUserId(loginUser.getId());
             schedule.setCreateTime(now);
             schedule.setUpdateTime(now);
