@@ -48,6 +48,10 @@ interface IOption {
   value: string | number
 }
 
+interface IRenderOption extends IOption {
+  filterLabel: string
+}
+
 interface ITaskPriorityOption extends SelectOption {
   icon: VNode
   color: string
@@ -461,6 +465,7 @@ export {
   INodeData,
   ITaskParams,
   IOption,
+  IRenderOption,
   IDataBase,
   ModelType,
   SourceType,
