@@ -1071,6 +1071,11 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             }
         }
 
+        Tenant tenant = tenantMapper.selectById(user.getTenantId());
+        if (tenant != null) {
+            user.setTenantCode(tenant.getTenantCode());
+        }
+
         // add system default timezone if not user timezone
         if (StringUtils.isEmpty(user.getTimeZone())) {
             user.setTimeZone(TimeZone.getDefault().toZoneId().getId());
