@@ -39,8 +39,6 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.net.ssl.SSLException;
 
-import io.grpc.netty.GrpcSslContexts;
-import io.netty.handler.ssl.SslContext;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
@@ -64,6 +62,8 @@ import io.etcd.jetcd.options.PutOption;
 import io.etcd.jetcd.options.WatchOption;
 import io.etcd.jetcd.support.Observers;
 import io.etcd.jetcd.watch.WatchEvent;
+import io.grpc.netty.GrpcSslContexts;
+import io.netty.handler.ssl.SslContext;
 
 /**
  * This is one of the implementation of {@link Registry}, with this implementation, you need to rely on Etcd cluster to
@@ -104,7 +104,8 @@ public class EtcdRegistry implements Registry {
         if (StringUtils.hasLength(registryProperties.getAuthority())) {
             clientBuilder.authority(registryProperties.getAuthority());
         }
-        if (StringUtils.hasLength(registryProperties.getCertFile()) && StringUtils.hasLength(registryProperties.getKeyCertChainFile())
+        if (StringUtils.hasLength(registryProperties.getCertFile())
+                && StringUtils.hasLength(registryProperties.getKeyCertChainFile())
                 && StringUtils.hasLength(registryProperties.getKeyFile())) {
             String userDir = System.getProperty("user.dir") + "/";
             File certFile = new File(userDir + registryProperties.getCertFile());
