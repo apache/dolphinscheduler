@@ -20,7 +20,7 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { bytesToSize } from '@/common/common'
 import TableAction from './table-action'
-import { IRenameResource, IReuploadResource, ResourceFileTableData, ResourceType } from '../types'
+import { IRenameResource, IReuploadResource, ResourceType } from '../types'
 import ButtonLink from '@/components/button-link'
 import { NEllipsis } from 'naive-ui'
 import {
@@ -29,10 +29,9 @@ import {
   DefaultTableWidth
 } from '@/common/column-width-config'
 import type { Router } from 'vue-router'
-import type { TableColumns } from 'naive-ui/es/data-table/src/interface'
 import { useFileState } from "@/views/resource/components/resource/use-file";
 
-const goSubFolder = (router: Router, item: ResourceFileTableData) => {
+const goSubFolder = (router: Router, item: any) => {
   if (item.directory) {
     router.push({
       name: item.type === 'UDF' ? 'resource-sub-manage' : 'resource-file-subdirectory',
@@ -49,6 +48,7 @@ export function useTable() {
   const router: Router = useRouter()
 
   const variables = reactive({
+    columns: [],
     fullName: ref(String(router.currentRoute.value.query.prefix || "")),
     tenantCode: ref(String(router.currentRoute.value.query.tenantCode || "")),
     resourceType: ref<ResourceType>(),
@@ -79,89 +79,91 @@ export function useTable() {
     })
   })
 
-  const columnsRef: TableColumns<any> = [
-    {
-      title: '#',
-      key: 'id',
-      ...COLUMN_WIDTH_CONFIG['index'],
-      render: (_row, index) => index + 1
-    },
-    {
-      title: t('resource.file.name'),
-      key: 'name',
-      ...COLUMN_WIDTH_CONFIG['linkName'],
-      render: (row) => {
-        return !row.directory
-          ? row.alias
-          : h(
-            ButtonLink,
-            {
-              onClick: () => goSubFolder(router, row)
-            },
-            {
-              default: () =>
-                h(
-                  NEllipsis,
-                  COLUMN_WIDTH_CONFIG['linkEllipsis'],
-                  () => row.alias
-                )
-            }
-          )
+  const createColumns = (variables: any) => {
+    variables.columns = [
+      {
+        title: '#',
+        key: 'id',
+        ...COLUMN_WIDTH_CONFIG['index'],
+        render: (_row: any, index: number) => index + 1
+      },
+      {
+        title: t('resource.file.name'),
+        key: 'name',
+        ...COLUMN_WIDTH_CONFIG['linkName'],
+        render: (row: any) => {
+          return !row.directory
+              ? row.alias
+              : h(
+                  ButtonLink,
+                  {
+                    onClick: () => goSubFolder(router, row)
+                  },
+                  {
+                    default: () =>
+                        h(
+                            NEllipsis,
+                            COLUMN_WIDTH_CONFIG['linkEllipsis'],
+                            () => row.alias
+                        )
+                  }
+              )
+        }
+      },
+      {
+        title: t('resource.file.tenant_name'),
+        ...COLUMN_WIDTH_CONFIG['userName'],
+        key: 'user_name'
+      },
+      {
+        title: t('resource.file.whether_directory'),
+        key: 'whether_directory',
+        ...COLUMN_WIDTH_CONFIG['yesOrNo'],
+        render: (row: any) =>
+            row.directory ? t('resource.file.yes') : t('resource.file.no')
+      },
+      {
+        title: t('resource.file.file_name'),
+        ...COLUMN_WIDTH_CONFIG['name'],
+        key: 'file_name'
+      },
+      {
+        title: t('resource.file.description'),
+        ...COLUMN_WIDTH_CONFIG['note'],
+        key: 'description'
+      },
+      {
+        title: t('resource.file.size'),
+        key: 'size',
+        ...COLUMN_WIDTH_CONFIG['size'],
+        render: (row: any) => bytesToSize(row.size)
+      },
+      {
+        title: t('resource.file.create_time'),
+        ...COLUMN_WIDTH_CONFIG['time'],
+        key: 'create_time'
+      },
+      {
+        title: t('resource.file.update_time'),
+        ...COLUMN_WIDTH_CONFIG['time'],
+        key: 'update_time'
+      },
+      {
+        title: t('resource.file.operation'),
+        key: 'operation',
+        render: (row: any) =>
+            h(TableAction, {
+              row,
+              onReuploadResource: ( name, description, fullName, user_name ) =>
+                  reuploadResource( name, description, fullName, user_name ),
+              onRenameResource: ( name, description, fullName, user_name ) =>
+                  renameResource( name, description, fullName, user_name ),
+              onUpdateList: () => updateList()
+            }),
+        ...COLUMN_WIDTH_CONFIG['operation'](variables.resourceType === 'UDF' ? 4 : 5)
       }
-    },
-    {
-      title: t('resource.file.tenant_name'),
-      ...COLUMN_WIDTH_CONFIG['userName'],
-      key: 'user_name'
-    },
-    {
-      title: t('resource.file.whether_directory'),
-      key: 'whether_directory',
-      ...COLUMN_WIDTH_CONFIG['yesOrNo'],
-      render: (row) =>
-        row.directory ? t('resource.file.yes') : t('resource.file.no')
-    },
-    {
-      title: t('resource.file.file_name'),
-      ...COLUMN_WIDTH_CONFIG['name'],
-      key: 'file_name'
-    },
-    {
-      title: t('resource.file.description'),
-      ...COLUMN_WIDTH_CONFIG['note'],
-      key: 'description'
-    },
-    {
-      title: t('resource.file.size'),
-      key: 'size',
-      ...COLUMN_WIDTH_CONFIG['size'],
-      render: (row) => bytesToSize(row.size)
-    },
-    {
-      title: t('resource.file.create_time'),
-      ...COLUMN_WIDTH_CONFIG['time'],
-      key: 'create_time'
-    },
-    {
-      title: t('resource.file.update_time'),
-      ...COLUMN_WIDTH_CONFIG['time'],
-      key: 'update_time'
-    },
-    {
-      title: t('resource.file.operation'),
-      key: 'operation',
-      render: (row) =>
-        h(TableAction, {
-          row,
-          onReuploadResource: ( name, description, fullName, user_name ) =>
-            reuploadResource( name, description, fullName, user_name ),
-          onRenameResource: ( name, description, fullName, user_name ) =>
-            renameResource( name, description, fullName, user_name ),
-          onUpdateList: () => updateList()
-        }),
-      ...COLUMN_WIDTH_CONFIG['operation'](variables.resourceType === 'UDF' ? 4 : 5)
-    }
-  ]
+    ]
+  }
 
   const createFile = () => {
     const { fullName } = variables
@@ -220,10 +222,10 @@ export function useTable() {
 
   return {
     variables,
-    columnsRef,
-    tableWidth: calculateTableWidth(columnsRef) || DefaultTableWidth,
+    tableWidth: calculateTableWidth(variables.columns) || DefaultTableWidth,
     requestData,
     updateList,
+    createColumns,
     handleCreateFile: createFile,
   }
 }
