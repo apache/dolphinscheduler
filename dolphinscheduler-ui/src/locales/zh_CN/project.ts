@@ -668,7 +668,7 @@ export default {
     zeppelin_parameters_tips: '请输入zeppelin dynamic form参数',
     zeppelin_rest_endpoint: 'zeppelinRestEndpoint',
     zeppelin_rest_endpoint_tips: '请输入zeppelin server的rest endpoint',
-    zeppelin_user_name: 'zeppelinUserName',
+    zeppelin_username: 'zeppelinUsername',
     zeppelin_user_name_tips: '请输入zeppelin server的登陆用户名',
     zeppelin_pass_word: 'zeppelinPassWord',
     zeppelin_pass_word_tips: '请输入zeppelin server的登陆密码',
