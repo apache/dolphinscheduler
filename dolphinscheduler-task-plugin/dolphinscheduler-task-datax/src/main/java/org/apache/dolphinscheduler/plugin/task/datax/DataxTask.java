@@ -40,6 +40,7 @@ import org.apache.dolphinscheduler.spi.enums.Flag;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
@@ -87,7 +88,16 @@ public class DataxTask extends AbstractTask {
      * todo: Create a shell script to execute the datax task, and read the python version from the env, so we can support multiple versions of datax python
      */
     private static final String DATAX_PYTHON = Optional.ofNullable(System.getenv("DATAX_PYTHON")).orElse("python2.7");
-
+    /**
+     * datax on yarn jar path
+     * https://github.com/duhanmin/datax-on-yarn
+     */
+    private static final String dataxOnYarnJar = System.getenv("DATAX_ON_YARN_JAR");
+    /**
+     * example: HADOOP_OPTS="-Xms32m -Xmx128m" /usr/bin/yarn
+     */
+    private static final String YARN_BIN =
+            StringUtils.isEmpty(System.getenv("YARN_BIN")) ? "yarn" : System.getenv("YARN_BIN");
     /**
      * select all
      */
@@ -160,7 +170,17 @@ public class DataxTask extends AbstractTask {
 
             // run datax processDataSourceService
             String jsonFilePath = buildDataxJsonFile(paramsMap);
-            String shellCommandFilePath = buildShellCommandFile(jsonFilePath, paramsMap);
+            String shellCommandFilePath;
+            if (dataXParameters.getYarn() == 1) {
+                if (StringUtils.isNotBlank(dataxOnYarnJar)) {
+                    shellCommandFilePath = buildYarnShellCommandFile(jsonFilePath, paramsMap);
+                } else {
+                    throw new TaskException(
+                            "The environment variable 'DATAX_ON_YARN_JAR' does not exist,download address: https://github.com/duhanmin/datax-on-yarn");
+                }
+            } else {
+                shellCommandFilePath = buildShellCommandFile(jsonFilePath, paramsMap);
+            }
             TaskResponse commandExecuteResult = shellCommandExecutor.run(shellCommandFilePath, taskCallBack);
 
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
@@ -541,6 +561,60 @@ public class DataxTask extends AbstractTask {
         }
 
         return columnNames;
+    }
+
+    private String buildYarnShellCommandFile(String jobConfigFilePath,
+                                             Map<String, Property> paramsMap) throws Exception {
+        // generate scripts
+        String fileName = String.format("%s/%s_node.%s",
+                taskExecutionContext.getExecutePath(),
+                taskExecutionContext.getTaskAppId(),
+                SystemUtils.IS_OS_WINDOWS ? "bat" : "sh");
+
+        Path path = new File(fileName).toPath();
+
+        if (Files.exists(path)) {
+            return fileName;
+        }
+
+        int xms = Math.max(dataXParameters.getXms(), 1);
+        int xmx = Math.max(dataXParameters.getXmx(), 1);
+        int jvm = Math.max(xms, xmx);
+
+        StringBuilder sbr = new StringBuilder(YARN_BIN + " jar " + dataxOnYarnJar);;
+        sbr.append(" -jar_path " + dataxOnYarnJar);
+        sbr.append(" -appname datax-job");
+        sbr.append(" -master_memory " + (jvm * 1024));
+        sbr.append(" -datax_job " + jobConfigFilePath);
+        sbr.append(" -datax_home_hdfs " + System.getenv("DATAX_HOME"));
+
+        if (null != paramsMap && paramsMap.size() != 0) {
+            StringBuilder customParameters = new StringBuilder();
+            for (Map.Entry<String, Property> entry : paramsMap.entrySet()) {
+                customParameters.append(entry.getKey()).append("=").append(entry.getValue().getValue()).append(",");
+            }
+            sbr.append(" -p " + customParameters);
+        }
+
+        log.debug("datax yarn script : {}", sbr);
+        // replace placeholder
+        String dataxCommand =
+                ParameterUtils.convertParameterPlaceholders(sbr.toString(), ParamUtils.convert(paramsMap));
+        log.debug("raw script : {}", dataxCommand);
+
+        // create shell command file
+        Set<PosixFilePermission> perms = PosixFilePermissions.fromString(RWXR_XR_X);
+        FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
+
+        if (SystemUtils.IS_OS_WINDOWS) {
+            Files.createFile(path);
+        } else {
+            Files.createFile(path, attr);
+        }
+
+        Files.write(path, dataxCommand.getBytes(), StandardOpenOption.APPEND);
+
+        return fileName;
     }
 
     /**
