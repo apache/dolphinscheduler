@@ -58,11 +58,9 @@ export const useUserStore = defineStore({
     },
     setBaseResDir(baseResDir: string): void {
       this.baseResDir = baseResDir
-      console.log(baseResDir)
     },
     setBaseUdfDir(baseUdfDir: string): void {
       this.baseUdfDir = baseUdfDir
-      console.log(baseUdfDir)
     }
   }
 })
