@@ -38,7 +38,7 @@ public class DataSourceConstants {
     public static final String COM_TRINO_JDBC_DRIVER = "io.trino.jdbc.TrinoDriver";
     public static final String COM_DAMENG_JDBC_DRIVER = "dm.jdbc.driver.DmDriver";
     public static final String COM_OCEANBASE_JDBC_DRIVER = "com.oceanbase.jdbc.Driver";
-    public static final String COM_TERADATA_JDBC_DRIVER = "com.ncr.teradata.TeraDriver";
+    public static final String COM_TERADATA_JDBC_DRIVER = "com.teradata.jdbc.TeraDriver";
 
     /**
      * validation Query

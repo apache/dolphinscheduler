@@ -319,7 +319,7 @@ public class TaskConstants {
     public static final String COM_SQLSERVER_JDBC_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
     public static final String COM_DB2_JDBC_DRIVER = "com.ibm.db2.jcc.DB2Driver";
     public static final String COM_PRESTO_JDBC_DRIVER = "com.facebook.presto.jdbc.PrestoDriver";
-    public static final String COM_TERADATA_JDBC_DRIVER = "com.ncr.teradata.TeraDriver";
+    public static final String COM_TERADATA_JDBC_DRIVER = "com.teradata.jdbc.TeraDriver";
 
     /**
      * datasource encryption salt
