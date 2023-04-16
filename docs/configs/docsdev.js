@@ -327,6 +327,10 @@ export default {
                                 title: 'SSH',
                                 link: '/en-us/docs/dev/user_doc/guide/datasource/ssh.html',
                             },
+                            {
+                                title: 'TERADATA',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/teradata.html',
+                            },                            
                         ],
                     },
                     {
@@ -1004,6 +1008,10 @@ export default {
                                 title: 'SSH',
                                 link: '/zh-cn/docs/dev/user_doc/guide/datasource/ssh.html',
                             },
+                            {
+                                title: 'TERADATA',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/teradata.html',
+                            },                            
                         ],
                     },
                     {

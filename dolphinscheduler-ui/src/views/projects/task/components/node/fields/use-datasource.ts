@@ -118,6 +118,11 @@ export function useDatasource(
       code: 'SSH',
       disabled: true
     },
+    {
+      id: 15,
+      code: 'TERADATA',
+      disabled: false
+    },    
   ]
 
   const getDatasourceTypes = async () => {

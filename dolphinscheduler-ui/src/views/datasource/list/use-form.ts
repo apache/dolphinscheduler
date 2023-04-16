@@ -427,6 +427,11 @@ export const datasourceType: IDataBaseOptionKeys = {
     value: 'SSH',
     label: 'SSH',
     defaultPort: 22
+  },
+  TERADATA: {
+    value: 'TERADATA',
+    label: 'TERADATA',
+    defaultPort: 1025
   }
 }
 

@@ -306,6 +306,7 @@ public class TaskConstants {
     public static final String JDBC_SQLSERVER = "jdbc:sqlserver://";
     public static final String JDBC_DB2 = "jdbc:db2://";
     public static final String JDBC_PRESTO = "jdbc:presto://";
+    public static final String JDBC_TERADATA = "jdbc:teradata://";
 
     /**
      * driver
@@ -318,6 +319,7 @@ public class TaskConstants {
     public static final String COM_SQLSERVER_JDBC_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
     public static final String COM_DB2_JDBC_DRIVER = "com.ibm.db2.jcc.DB2Driver";
     public static final String COM_PRESTO_JDBC_DRIVER = "com.facebook.presto.jdbc.PrestoDriver";
+    public static final String COM_TERADATA_JDBC_DRIVER = "com.ncr.teradata.TeraDriver";
 
     /**
      * datasource encryption salt

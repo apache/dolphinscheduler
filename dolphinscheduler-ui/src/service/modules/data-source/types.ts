@@ -33,6 +33,7 @@ type IDataBase =
   | 'DAMENG'
   | 'OCEANBASE'
   | 'SSH'
+  | 'TERADATA'
 
 type IDataBaseLabel =
 | 'MYSQL'
@@ -52,6 +53,7 @@ type IDataBaseLabel =
 | 'DAMENG'
 | 'OCEANBASE'
 | 'SSH'
+| 'TERADATA'
 
 interface IDataSource {
   id?: number
