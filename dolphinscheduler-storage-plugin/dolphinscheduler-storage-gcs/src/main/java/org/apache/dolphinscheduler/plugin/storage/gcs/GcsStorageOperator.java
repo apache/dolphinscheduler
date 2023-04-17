@@ -252,6 +252,8 @@ public class GcsStorageOperator implements Closeable, StorageOperate {
                 return getUdfDir(tenantCode);
             case FILE:
                 return getResDir(tenantCode);
+            case ALL:
+                return getGcsDataBasePath();
             default:
                 return EMPTY_STRING;
         }

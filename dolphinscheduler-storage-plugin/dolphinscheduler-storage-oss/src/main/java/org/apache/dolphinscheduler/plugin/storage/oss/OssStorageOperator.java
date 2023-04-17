@@ -268,6 +268,8 @@ public class OssStorageOperator implements Closeable, StorageOperate {
                 return getUdfDir(tenantCode);
             case FILE:
                 return getResDir(tenantCode);
+            case ALL:
+                return getOssDataBasePath();
             default:
                 return "";
         }

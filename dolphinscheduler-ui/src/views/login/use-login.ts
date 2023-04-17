@@ -25,6 +25,7 @@ import type { UserInfoRes } from '@/service/modules/users/types'
 import { useRouteStore } from '@/store/route/route'
 import { useTimezoneStore } from '@/store/timezone/timezone'
 import cookies from 'js-cookie'
+import {queryBaseDir} from "@/service/modules/resources";
 
 export function useLogin(state: any) {
   const router: Router = useRouter()
@@ -42,6 +43,15 @@ export function useLogin(state: any) {
 
         const userInfoRes: UserInfoRes = await getUserInfo()
         await userStore.setUserInfo(userInfoRes)
+
+        const baseResDir = await queryBaseDir({
+          type: 'FILE'
+        })
+        const baseUdfDir = await queryBaseDir({
+          type: 'UDF'
+        })
+        await userStore.setBaseResDir(baseResDir)
+        await userStore.setBaseUdfDir(baseUdfDir)
 
         const timezone = userInfoRes.timeZone ? userInfoRes.timeZone : 'UTC'
         await timezoneStore.setTimezone(timezone)

@@ -24,6 +24,8 @@ export const useUserStore = defineStore({
   state: (): UserState => ({
     sessionId: '',
     securityConfigType: '',
+    baseResDir: '',
+    baseUdfDir: '',
     userInfo: {}
   }),
   persist: true,
@@ -36,6 +38,12 @@ export const useUserStore = defineStore({
     },
     getUserInfo(): UserInfoRes | {} {
       return this.userInfo
+    },
+    getBaseResDir(): string {
+      return this.baseResDir
+    },
+    getBaseUdfDir(): string {
+      return this.baseUdfDir
     }
   },
   actions: {
@@ -47,6 +55,12 @@ export const useUserStore = defineStore({
     },
     setUserInfo(userInfo: UserInfoRes | {}): void {
       this.userInfo = userInfo
+    },
+    setBaseResDir(baseResDir: string): void {
+      this.baseResDir = baseResDir
+    },
+    setBaseUdfDir(baseUdfDir: string): void {
+      this.baseUdfDir = baseUdfDir
     }
   }
 })

@@ -892,6 +892,24 @@ public class ResourcesServiceTest {
             logger.error("hadoop error", e);
         }
     }
+
+    @Test
+    void testQueryBaseDir() {
+        User user = getUser();
+        Mockito.when(userMapper.selectById(user.getId())).thenReturn(getUser());
+        Mockito.when(tenantMapper.queryById(user.getTenantId())).thenReturn(getTenant());
+        Mockito.when(storageOperate.getDir(ResourceType.FILE, "123")).thenReturn("/dolphinscheduler/123/resources/");
+        try {
+            Mockito.when(storageOperate.getFileStatus(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
+                    Mockito.any())).thenReturn(getStorageEntityResource());
+        } catch (Exception e) {
+            logger.error(e.getMessage() + " Resource path: {}", "/dolphinscheduler/123/resources/ResourcesServiceTest",
+                    e);
+        }
+        Result<Object> result = resourcesService.queryResourceBaseDir(user, ResourceType.FILE);
+        Assertions.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
+    }
+
     private List<Resource> getResourceList() {
 
         List<Resource> resources = new ArrayList<>();

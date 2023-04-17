@@ -48,7 +48,6 @@ public interface StorageOperate {
      * @param tenantCode
      * @return
      */
-
     String getUdfDir(String tenantCode);
 
     /**
