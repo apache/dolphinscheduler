@@ -1,14 +1,18 @@
 package org.apache.dolphinscheduler.api.test.pages.security;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.AllArgsConstructor;
 
 import org.apache.dolphinscheduler.api.test.core.Constants;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.utils.RequestClient;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.springframework.web.bind.annotation.RequestAttribute;
 
 @AllArgsConstructor
 public class WorkerGroupPage {
@@ -64,6 +68,16 @@ public class WorkerGroupPage {
         RequestClient requestClient = new RequestClient();
         final String url = String.format("/worker-groups/%s", id);
         return requestClient.delete(url, headers, params);
+    }
+
+    public HttpResponse queryWorkerAddressList(User loginUser) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("loginUser", loginUser);
+        Map<String, String> headers = new HashMap<>();
+        headers.put(Constants.SESSION_ID_KEY, sessionId);
+
+        RequestClient requestClient = new RequestClient();
+        return requestClient.get("/worker-groups/worker-address-list", headers, params);
     }
 
 

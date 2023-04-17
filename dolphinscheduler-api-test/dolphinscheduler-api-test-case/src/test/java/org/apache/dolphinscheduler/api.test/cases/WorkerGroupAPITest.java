@@ -25,17 +25,14 @@ import org.apache.dolphinscheduler.api.test.entity.LoginResponseData;
 import org.apache.dolphinscheduler.api.test.pages.LoginPage;;
 import org.apache.dolphinscheduler.api.test.pages.security.WorkerGroupPage;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
-import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.shaded.com.fasterxml.jackson.core.type.TypeReference;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -80,7 +77,7 @@ public class WorkerGroupAPITest {
     @Order(1)
     public void testSaveWorkerGroup() {
         HttpResponse saveWorkerGroupHttpResponse = workerGroupPage
-            .saveWorkerGroup(loginUser, 10, "test_worker_group", "10.5.0.5:1234", "test", null);
+            .saveWorkerGroup(loginUser, 1, "test_worker_group", "10.5.0.5:1234", "test", null);
         Assertions.assertTrue(saveWorkerGroupHttpResponse.getBody().getSuccess());
 
         HttpResponse queryAllWorkerGroupsResponse = workerGroupPage.queryAllWorkerGroups(loginUser);
@@ -95,13 +92,13 @@ public class WorkerGroupAPITest {
     public void testQueryAllWorkerGroupsPaging() {
         HttpResponse queryAllWorkerGroupsPagingResponse = workerGroupPage.queryAllWorkerGroupsPaging(loginUser, 1, 2, null);
         Assertions.assertTrue(queryAllWorkerGroupsPagingResponse.getBody().getSuccess());
-
+        log.info("[debug111] " + queryAllWorkerGroupsPagingResponse);
         String workerGroupPageInfoData =  queryAllWorkerGroupsPagingResponse.getBody().getData().toString();
         Assertions.assertTrue(workerGroupPageInfoData.contains("test_worker_group"));
     }
 
     @Test
-    @Order(2)
+    @Order(3)
     public void testQueryAllWorkerGroups() {
         HttpResponse queryAllWorkerGroupsResponse = workerGroupPage.queryAllWorkerGroups(loginUser);
         Assertions.assertTrue(queryAllWorkerGroupsResponse.getBody().getSuccess());
@@ -110,4 +107,28 @@ public class WorkerGroupAPITest {
         Assertions.assertTrue(workerGroupPageInfoData.contains("test_worker_group"));
     }
 
+    @Test
+    @Order(4)
+    public void queryWorkerAddressList() {
+        HttpResponse queryWorkerAddressListResponse = workerGroupPage.queryWorkerAddressList(loginUser);
+        Assertions.assertTrue(queryWorkerAddressListResponse.getBody().getSuccess());
+        Assertions.assertTrue(queryWorkerAddressListResponse.getBody().getData().toString().contains("10.5.0.5:1234"));
+    }
+
+    @Test
+    @Order(5)
+    public void testDeleteWorkerGroupById() {
+        HttpResponse queryAllWorkerGroupsResponse = workerGroupPage.queryAllWorkerGroups(loginUser);
+        String workerGroupsBeforeDelete = queryAllWorkerGroupsResponse.getBody().getData().toString();
+        log.info("[debug111] " + workerGroupsBeforeDelete);
+        Assertions.assertTrue(queryAllWorkerGroupsResponse.getBody().getSuccess());
+        Assertions.assertTrue(workerGroupsBeforeDelete.contains("test_worker_group"));
+
+        HttpResponse deleteWorkerGroupResponse = workerGroupPage.deleteWorkerGroupById(loginUser, 1);
+        Assertions.assertTrue(deleteWorkerGroupResponse.getBody().getSuccess());
+
+        queryAllWorkerGroupsResponse = workerGroupPage.queryAllWorkerGroups(loginUser);
+        String workerGroupsAfterDelete = queryAllWorkerGroupsResponse.getBody().getData().toString();
+        Assertions.assertTrue(!workerGroupsAfterDelete.contains("test_worker_group"));
+    }
 }
