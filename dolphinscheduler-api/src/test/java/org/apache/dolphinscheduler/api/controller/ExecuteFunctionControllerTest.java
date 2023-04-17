@@ -70,6 +70,7 @@ public class ExecuteFunctionControllerTest extends AbstractControllerTest {
     final RunMode runMode = RunMode.RUN_MODE_SERIAL;
     final Priority processInstancePriority = Priority.HIGH;
     final String workerGroup = "workerGroup";
+    final String tenantCode = "root";
     final Long environmentCode = 4L;
     final Integer timeout = 5;
     final ImmutableMap<String, String> startParams = ImmutableMap.of("start", "params");
@@ -104,6 +105,7 @@ public class ExecuteFunctionControllerTest extends AbstractControllerTest {
         paramsMap.add("runMode", String.valueOf(runMode));
         paramsMap.add("processInstancePriority", String.valueOf(processInstancePriority));
         paramsMap.add("workerGroup", workerGroup);
+        paramsMap.add("tenantCode", tenantCode);
         paramsMap.add("environmentCode", String.valueOf(environmentCode));
         paramsMap.add("timeout", String.valueOf(timeout));
         paramsMap.add("startParams", gson.toJson(startParams));
@@ -114,7 +116,7 @@ public class ExecuteFunctionControllerTest extends AbstractControllerTest {
         when(executorService.execProcessInstance(any(User.class), eq(projectCode), eq(processDefinitionCode),
                 eq(scheduleTime), eq(execType), eq(failureStrategy), eq(startNodeList), eq(taskDependType),
                 eq(warningType),
-                eq(warningGroupId), eq(runMode), eq(processInstancePriority), eq(workerGroup), eq(environmentCode),
+                eq(warningGroupId), eq(runMode), eq(processInstancePriority), eq(workerGroup), eq(tenantCode), eq(environmentCode),
                 eq(timeout), eq(startParams), eq(expectedParallelismNumber), eq(dryRun), eq(testFlag),
                 eq(complementDependentMode), eq(version)))
                         .thenReturn(executeServiceResult);
@@ -148,6 +150,7 @@ public class ExecuteFunctionControllerTest extends AbstractControllerTest {
         paramsMap.add("runMode", String.valueOf(runMode));
         paramsMap.add("processInstancePriority", String.valueOf(processInstancePriority));
         paramsMap.add("workerGroup", workerGroup);
+        paramsMap.add("tenantCode", tenantCode);
         paramsMap.add("environmentCode", String.valueOf(environmentCode));
         paramsMap.add("startParams", gson.toJson(startParams));
         paramsMap.add("expectedParallelismNumber", String.valueOf(expectedParallelismNumber));
@@ -157,7 +160,7 @@ public class ExecuteFunctionControllerTest extends AbstractControllerTest {
         when(executorService.execProcessInstance(any(User.class), eq(projectCode), eq(processDefinitionCode),
                 eq(scheduleTime), eq(execType), eq(failureStrategy), eq(startNodeList), eq(taskDependType),
                 eq(warningType),
-                eq(warningGroupId), eq(runMode), eq(processInstancePriority), eq(workerGroup), eq(environmentCode),
+                eq(warningGroupId), eq(runMode), eq(processInstancePriority), eq(workerGroup), eq(tenantCode), eq(environmentCode),
                 eq(Constants.MAX_TASK_TIMEOUT), eq(startParams), eq(expectedParallelismNumber), eq(dryRun),
                 eq(testFlag),
                 eq(complementDependentMode), eq(version))).thenReturn(executeServiceResult);
@@ -191,6 +194,7 @@ public class ExecuteFunctionControllerTest extends AbstractControllerTest {
         paramsMap.add("runMode", String.valueOf(runMode));
         paramsMap.add("processInstancePriority", String.valueOf(processInstancePriority));
         paramsMap.add("workerGroup", workerGroup);
+        paramsMap.add("tenantCode", tenantCode);
         paramsMap.add("environmentCode", String.valueOf(environmentCode));
         paramsMap.add("timeout", String.valueOf(timeout));
         paramsMap.add("expectedParallelismNumber", String.valueOf(expectedParallelismNumber));
@@ -200,7 +204,7 @@ public class ExecuteFunctionControllerTest extends AbstractControllerTest {
         when(executorService.execProcessInstance(any(User.class), eq(projectCode), eq(processDefinitionCode),
                 eq(scheduleTime), eq(execType), eq(failureStrategy), eq(startNodeList), eq(taskDependType),
                 eq(warningType),
-                eq(warningGroupId), eq(runMode), eq(processInstancePriority), eq(workerGroup), eq(environmentCode),
+                eq(warningGroupId), eq(runMode), eq(processInstancePriority), eq(workerGroup), eq(tenantCode), eq(environmentCode),
                 eq(timeout), eq(null), eq(expectedParallelismNumber), eq(dryRun), eq(testFlag),
                 eq(complementDependentMode), eq(version))).thenReturn(executeServiceResult);
 
@@ -229,7 +233,7 @@ public class ExecuteFunctionControllerTest extends AbstractControllerTest {
 
         when(executorService.execProcessInstance(any(User.class), eq(projectCode), eq(processDefinitionCode),
                 eq(scheduleTime), eq(null), eq(failureStrategy), eq(null), eq(null), eq(warningType),
-                eq(null), eq(null), eq(null), eq("default"), eq(-1L),
+                eq(null), eq(null), eq(null), eq("default"), eq("default"), eq(-1L),
                 eq(Constants.MAX_TASK_TIMEOUT), eq(null), eq(null), eq(0), eq(0),
                 eq(complementDependentMode), eq(version))).thenReturn(executeServiceResult);
 
