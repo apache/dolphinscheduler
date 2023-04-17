@@ -45,6 +45,16 @@ export function queryResourceListPaging(
   })
 }
 
+export function queryBaseDir(
+    params: ResourceTypeReq
+): any {
+  return axios({
+    url: '/resources/base-dir',
+    method: 'get',
+    params
+  })
+}
+
 export function queryCurrentResourceByFileName(
   params: ResourceTypeReq & FileNameReq & TenantCodeReq,
 ): any {
