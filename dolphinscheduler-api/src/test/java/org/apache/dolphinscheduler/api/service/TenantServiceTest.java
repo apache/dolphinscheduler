@@ -21,7 +21,6 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TENANT_DELETE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TENANT_UPDATE;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
@@ -48,6 +47,7 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -211,10 +211,10 @@ public class TenantServiceTest {
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TENANT, null, 0,
                 baseServiceLogger)).thenReturn(true);
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
-        Mockito.when(processInstanceMapper.queryByTenantCodeAndStatus(anyString(),
+        Mockito.when(processInstanceMapper.queryByTenantCodeAndStatus(tenantCode,
                 org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES))
                 .thenReturn(getInstanceList());
-        Mockito.when(scheduleMapper.queryScheduleListByTenant(any())).thenReturn(getScheduleList());
+        Mockito.when(scheduleMapper.queryScheduleListByTenant(tenantCode)).thenReturn(getScheduleList());
         Mockito.when(userMapper.queryUserListByTenant(3)).thenReturn(getUserList());
 
         // TENANT_NOT_EXIST
@@ -243,6 +243,10 @@ public class TenantServiceTest {
         Assertions.assertTrue(exception.getMessage().contains(prefix));
 
         // success
+        Mockito.when(processInstanceMapper.queryByTenantCodeAndStatus(tenantCode,
+                org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES))
+                .thenReturn(Collections.emptyList());
+        Mockito.when(scheduleMapper.queryScheduleListByTenant(tenantCode)).thenReturn(Collections.emptyList());
         Mockito.when(tenantMapper.queryById(4)).thenReturn(getTenant(4));
         Mockito.when(tenantMapper.deleteById(4)).thenReturn(1);
         Map<String, Object> result = tenantService.deleteTenantById(getLoginUser(), 4);

@@ -947,6 +947,8 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         Assertions.assertEquals(Status.PROCESS_DEFINITION_NAME_EXIST.getCode(),
                 ((ServiceException) exception).getCode());
 
+        Mockito.when(processDefinitionMapper.verifyByDefineName(project.getCode(), name)).thenReturn(null);
+
         // test success
         workflowCreateRequest.setDescription(description);
         workflowCreateRequest.setTimeout(timeout);

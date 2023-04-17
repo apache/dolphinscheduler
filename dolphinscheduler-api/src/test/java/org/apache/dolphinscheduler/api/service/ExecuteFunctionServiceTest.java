@@ -55,6 +55,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
+import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
@@ -63,6 +64,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
+import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.service.command.CommandService;
@@ -132,6 +134,9 @@ public class ExecuteFunctionServiceTest {
     private ProjectMapper projectMapper;
 
     @Mock
+    private TenantMapper tenantMapper;
+
+    @Mock
     private ProjectServiceImpl projectService;
 
     @Mock
@@ -166,7 +171,7 @@ public class ExecuteFunctionServiceTest {
 
     private int processInstanceId = 1;
 
-    private String tenantCode = "dolphinscheduler";
+    private String tenantCode = "root";
 
     private int userId = 1;
 
@@ -267,6 +272,7 @@ public class ExecuteFunctionServiceTest {
 
         Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
                 .thenReturn(zeroSchedulerList());
+        Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(new Tenant());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
                 processDefinitionCode,
                 "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
@@ -290,6 +296,7 @@ public class ExecuteFunctionServiceTest {
 
         Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
                 .thenReturn(zeroSchedulerList());
+        Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(new Tenant());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
                 processDefinitionCode,
                 "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
@@ -309,6 +316,7 @@ public class ExecuteFunctionServiceTest {
     public void testComplementWithOldStartNodeList() {
         Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
                 .thenReturn(zeroSchedulerList());
+        Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(new Tenant());
         Map<String, Object> result = new HashMap<>();
         try {
             result = executorService.execProcessInstance(loginUser, projectCode,
@@ -379,6 +387,7 @@ public class ExecuteFunctionServiceTest {
 
         Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
                 .thenReturn(zeroSchedulerList());
+        Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(new Tenant());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
                 processDefinitionCode,
                 "{\"complementStartDate\":\"2022-01-07 12:12:12\",\"complementEndDate\":\"2022-01-06 12:12:12\"}",
@@ -401,6 +410,7 @@ public class ExecuteFunctionServiceTest {
 
         Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
                 .thenReturn(zeroSchedulerList());
+        Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(new Tenant());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
                 processDefinitionCode,
                 "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
@@ -423,6 +433,7 @@ public class ExecuteFunctionServiceTest {
 
         Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
                 .thenReturn(zeroSchedulerList());
+        Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(new Tenant());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
                 processDefinitionCode,
                 "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
@@ -446,6 +457,7 @@ public class ExecuteFunctionServiceTest {
 
         Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
                 .thenReturn(oneSchedulerList());
+        Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(new Tenant());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
                 processDefinitionCode,
                 "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
@@ -510,6 +522,7 @@ public class ExecuteFunctionServiceTest {
         Mockito.when(commandService.verifyIsNeedCreateCommand(any(Command.class))).thenReturn(true);
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, RERUN))
                 .thenReturn(checkProjectAndAuth());
+        Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(new Tenant());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
                 processDefinitionCode,
                 "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
