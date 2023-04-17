@@ -116,7 +116,8 @@ public class ExecuteFunctionControllerTest extends AbstractControllerTest {
         when(executorService.execProcessInstance(any(User.class), eq(projectCode), eq(processDefinitionCode),
                 eq(scheduleTime), eq(execType), eq(failureStrategy), eq(startNodeList), eq(taskDependType),
                 eq(warningType),
-                eq(warningGroupId), eq(runMode), eq(processInstancePriority), eq(workerGroup), eq(tenantCode), eq(environmentCode),
+                eq(warningGroupId), eq(runMode), eq(processInstancePriority), eq(workerGroup), eq(tenantCode),
+                eq(environmentCode),
                 eq(timeout), eq(startParams), eq(expectedParallelismNumber), eq(dryRun), eq(testFlag),
                 eq(complementDependentMode), eq(version)))
                         .thenReturn(executeServiceResult);
@@ -160,7 +161,8 @@ public class ExecuteFunctionControllerTest extends AbstractControllerTest {
         when(executorService.execProcessInstance(any(User.class), eq(projectCode), eq(processDefinitionCode),
                 eq(scheduleTime), eq(execType), eq(failureStrategy), eq(startNodeList), eq(taskDependType),
                 eq(warningType),
-                eq(warningGroupId), eq(runMode), eq(processInstancePriority), eq(workerGroup), eq(tenantCode), eq(environmentCode),
+                eq(warningGroupId), eq(runMode), eq(processInstancePriority), eq(workerGroup), eq(tenantCode),
+                eq(environmentCode),
                 eq(Constants.MAX_TASK_TIMEOUT), eq(startParams), eq(expectedParallelismNumber), eq(dryRun),
                 eq(testFlag),
                 eq(complementDependentMode), eq(version))).thenReturn(executeServiceResult);
@@ -204,7 +206,8 @@ public class ExecuteFunctionControllerTest extends AbstractControllerTest {
         when(executorService.execProcessInstance(any(User.class), eq(projectCode), eq(processDefinitionCode),
                 eq(scheduleTime), eq(execType), eq(failureStrategy), eq(startNodeList), eq(taskDependType),
                 eq(warningType),
-                eq(warningGroupId), eq(runMode), eq(processInstancePriority), eq(workerGroup), eq(tenantCode), eq(environmentCode),
+                eq(warningGroupId), eq(runMode), eq(processInstancePriority), eq(workerGroup), eq(tenantCode),
+                eq(environmentCode),
                 eq(timeout), eq(null), eq(expectedParallelismNumber), eq(dryRun), eq(testFlag),
                 eq(complementDependentMode), eq(version))).thenReturn(executeServiceResult);
 
