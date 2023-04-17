@@ -14,7 +14,6 @@ aspectjweaver-1.9.7.jar
 aspectjrt-1.9.7.jar
 auth-2.17.282.jar
 audience-annotations-0.12.0.jar
-automaton-1.11-8.jar
 avro-1.7.7.jar
 aws-core-2.17.282.jar
 aws-java-sdk-core-1.12.300.jar
@@ -74,7 +73,6 @@ druid-1.2.4.jar
 eventstream-1.0.1.jar
 error_prone_annotations-2.5.1.jar
 failureaccess-1.0.1.jar
-generex-1.0.2.jar
 gson-2.9.1.jar
 guava-31.1-jre.jar
 guava-retrying-2.0.0.jar
@@ -189,7 +187,9 @@ kotlin-stdlib-1.6.21.jar
 kotlin-stdlib-common-1.6.21.jar
 kotlin-stdlib-jdk7-1.6.21.jar
 kotlin-stdlib-jdk8-1.6.21.jar
-kubernetes-client-5.10.2.jar
+kubernetes-client-6.0.0.jar
+kubernetes-client-api-6.0.0.jar
+kubernetes-httpclient-okhttp-6.0.0.jar
 kubernetes-model-admissionregistration-5.10.2.jar
 kubernetes-model-apiextensions-5.10.2.jar
 kubernetes-model-apps-5.10.2.jar
