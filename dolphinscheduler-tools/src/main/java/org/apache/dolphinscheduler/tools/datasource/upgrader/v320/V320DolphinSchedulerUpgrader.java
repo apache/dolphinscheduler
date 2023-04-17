@@ -17,15 +17,13 @@
 
 package org.apache.dolphinscheduler.tools.datasource.upgrader.v320;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.dao.entity.*;
-import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.tools.datasource.dao.UpgradeDao;
 import org.apache.dolphinscheduler.tools.datasource.upgrader.DolphinSchedulerUpgrader;
 import org.apache.dolphinscheduler.tools.datasource.upgrader.DolphinSchedulerVersion;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -67,7 +65,8 @@ public class V320DolphinSchedulerUpgrader implements DolphinSchedulerUpgrader {
     public void doUpgrade() {
         upgradeWorkflowInstance();
         upgradeTaskInstance();
-        upgradeDao.upgradeDolphinSchedulerDDL(getCurrentVersion().getVersionName() + "_schema", "dolphinscheduler_ddl_post.sql");
+        upgradeDao.upgradeDolphinSchedulerDDL(getCurrentVersion().getVersionName() + "_schema",
+                "dolphinscheduler_ddl_post.sql");
     }
 
     private void upgradeWorkflowInstance() {
@@ -90,10 +89,12 @@ public class V320DolphinSchedulerUpgrader implements DolphinSchedulerUpgrader {
                                 processDefinitionLogMapper.queryByDefinitionCodeAndVersion(
                                         processInstance.getProcessDefinitionCode(),
                                         processInstance.getProcessDefinitionVersion());
-                        Schedule schedule = scheduleMapper.queryByProcessDefinitionCode(processInstance.getProcessDefinitionCode());
+                        Schedule schedule =
+                                scheduleMapper.queryByProcessDefinitionCode(processInstance.getProcessDefinitionCode());
                         if (processDefinitionLog != null) {
                             processInstance.setProjectCode(processDefinitionLog.getProjectCode());
-                            processInstance.setTenantCode(StringUtils.defaultIfEmpty(schedule.getTenantCode(), Constants.DEFAULT));
+                            processInstance.setTenantCode(
+                                    StringUtils.defaultIfEmpty(schedule.getTenantCode(), Constants.DEFAULT));
                             processInstance.setExecutorName(userMap.get(processInstance.getExecutorId()));
                         } else {
                             processInstance.setProjectCode(-1L);
