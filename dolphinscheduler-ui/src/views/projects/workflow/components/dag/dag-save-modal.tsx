@@ -19,7 +19,6 @@ import {
   defineComponent,
   PropType,
   ref,
-  computed,
   onMounted,
   watch,
   getCurrentInstance
@@ -37,12 +36,10 @@ import {
   NCheckbox
 } from 'naive-ui'
 import { useRoute } from 'vue-router'
-import { useUserStore } from '@/store/user/user'
 import { verifyName } from '@/service/modules/process-definition'
 import './x6-style.scss'
 import { positiveIntegerRegex } from '@/utils/regex'
 import type { SaveForm, WorkflowDefinition, WorkflowInstance } from './types'
-import type { UserInfoRes } from '@/service/modules/users/types'
 
 const props = {
   visible: {
@@ -69,7 +66,6 @@ export default defineComponent({
     const { t } = useI18n()
 
     const projectCode = Number(route.params.projectCode)
-    const userInfo = useUserStore().getUserInfo as UserInfoRes
 
     const formValue = ref<SaveForm>({
       name: '',
