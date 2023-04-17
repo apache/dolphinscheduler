@@ -22,24 +22,29 @@ package org.apache.dolphinscheduler.api.test.cases;
 import org.apache.dolphinscheduler.api.test.core.DolphinScheduler;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.entity.LoginResponseData;
-import org.apache.dolphinscheduler.api.test.entity.TenantListPagingResponseData;
-import org.apache.dolphinscheduler.api.test.entity.TenantListPagingResponseTotalList;
-import org.apache.dolphinscheduler.api.test.pages.LoginPage;
-import org.apache.dolphinscheduler.api.test.pages.security.TenantPage;
+import org.apache.dolphinscheduler.api.test.pages.LoginPage;;
 import org.apache.dolphinscheduler.api.test.pages.security.WorkerGroupPage;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.testcontainers.shaded.com.fasterxml.jackson.core.type.TypeReference;
 
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 @Slf4j
@@ -49,38 +54,60 @@ public class WorkerGroupAPITest {
 
     private static final String password = "dolphinscheduler123";
 
-    private static String sessionId = null;
+    private static String sessionId;
+
+    private static User loginUser;
 
     private static WorkerGroupPage workerGroupPage;
-
-    private static User user;
 
     @BeforeAll
     public static void setup() {
         LoginPage loginPage = new LoginPage();
         HttpResponse loginHttpResponse = loginPage.login(username, password);
-        LOGGER.info(loginHttpResponse.toString());
-        sessionId = JSONUtils.convertValue(loginHttpResponse.body().data(), LoginResponseData.class).sessionId();
+        sessionId = JSONUtils.convertValue(loginHttpResponse.getBody().getData(), LoginResponseData.class).getSessionId();
         workerGroupPage = new WorkerGroupPage(sessionId);
+        loginUser = new User();
+        loginUser.setId(123);
+        loginUser.setUserType(UserType.GENERAL_USER);
     }
 
     @AfterAll
     public static void cleanup() {
-        LOGGER.info("success cleanup");
+        log.info("success cleanup");
     }
 
     @Test
     @Order(1)
     public void testSaveWorkerGroup() {
-        LOGGER.info("test");
-        User loginUser = new User();
-        loginUser.setId(123);
-        loginUser.setUserType(UserType.GENERAL_USER);
         HttpResponse saveWorkerGroupHttpResponse = workerGroupPage
             .saveWorkerGroup(loginUser, 10, "test_worker_group", "10.5.0.5:1234", "test", null);
-        Assertions.assertTrue(saveWorkerGroupHttpResponse.body().success());
+        Assertions.assertTrue(saveWorkerGroupHttpResponse.getBody().getSuccess());
 
-        HttpResponse querryAllWorkerGroupsResponse = workerGroupPage.queryAllWorkerGroups(loginUser);
-        LOGGER.info("[debug111] response {}" ,querryAllWorkerGroupsResponse.toString());
+        HttpResponse queryAllWorkerGroupsResponse = workerGroupPage.queryAllWorkerGroups(loginUser);
+        List<String> workerGroupsList = (List<String>) queryAllWorkerGroupsResponse.getBody().getData();
+        Set<String> workerGroupsActual = new HashSet<>(workerGroupsList);
+        Set<String> workerGroupsExpected = new HashSet<>(Arrays.asList("test_worker_group", "default"));
+        Assertions.assertEquals(workerGroupsExpected, workerGroupsActual);
     }
+
+    @Test
+    @Order(2)
+    public void testQueryAllWorkerGroupsPaging() {
+        HttpResponse queryAllWorkerGroupsPagingResponse = workerGroupPage.queryAllWorkerGroupsPaging(loginUser, 1, 2, null);
+        Assertions.assertTrue(queryAllWorkerGroupsPagingResponse.getBody().getSuccess());
+
+        String workerGroupPageInfoData =  queryAllWorkerGroupsPagingResponse.getBody().getData().toString();
+        Assertions.assertTrue(workerGroupPageInfoData.contains("test_worker_group"));
+    }
+
+    @Test
+    @Order(2)
+    public void testQueryAllWorkerGroups() {
+        HttpResponse queryAllWorkerGroupsResponse = workerGroupPage.queryAllWorkerGroups(loginUser);
+        Assertions.assertTrue(queryAllWorkerGroupsResponse.getBody().getSuccess());
+
+        String workerGroupPageInfoData =  queryAllWorkerGroupsResponse.getBody().getData().toString();
+        Assertions.assertTrue(workerGroupPageInfoData.contains("test_worker_group"));
+    }
+
 }

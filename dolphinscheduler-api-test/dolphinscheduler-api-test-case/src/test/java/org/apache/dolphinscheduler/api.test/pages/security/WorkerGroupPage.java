@@ -42,4 +42,29 @@ public class WorkerGroupPage {
         return requestClient.get("/worker-groups/all", headers, params);
     }
 
+    public HttpResponse queryAllWorkerGroupsPaging(User loginUser, Integer pageNo, Integer pageSize, String searchVal) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("loginUser", loginUser);
+        params.put("pageNo", pageNo);
+        params.put("pageSize", pageSize);
+        params.put("searchVal", searchVal);
+        Map<String, String> headers = new HashMap<>();
+        headers.put(Constants.SESSION_ID_KEY, sessionId);
+
+        RequestClient requestClient = new RequestClient();
+        return requestClient.get("/worker-groups", headers, params);
+    }
+
+    public HttpResponse deleteWorkerGroupById(User loginUser, Integer id) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("loginUser", loginUser);
+        params.put("id", id);
+        Map<String, String> headers = new HashMap<>();
+        headers.put(Constants.SESSION_ID_KEY, sessionId);
+        RequestClient requestClient = new RequestClient();
+        final String url = String.format("/worker-groups/%s", id);
+        return requestClient.delete(url, headers, params);
+    }
+
+
 }
