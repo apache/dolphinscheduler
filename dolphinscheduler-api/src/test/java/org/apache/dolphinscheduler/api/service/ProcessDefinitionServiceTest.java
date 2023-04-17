@@ -1065,6 +1065,9 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         Assertions.assertEquals(Status.PROCESS_DEFINITION_NAME_EXIST.getCode(),
                 ((ServiceException) exception).getCode());
 
+        Mockito.when(processDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(processDefinition);
+        Mockito.when(processDefinitionMapper.verifyByDefineName(projectCode, workflowUpdateRequest.getName()))
+                .thenReturn(null);
         // error update process definition mapper
         workflowUpdateRequest.setName(name);
         Mockito.when(processDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(processDefinition);
