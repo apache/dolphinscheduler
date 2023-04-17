@@ -312,9 +312,10 @@ public abstract class AbstractCommandExecutor {
             return;
         }
 
-        if (StringUtils.isNotBlank(appId)){
+        if (StringUtils.isNotBlank(appId)) {
             String commandFile = String.format("%s/%s.kill", taskRequest.getExecutePath(), appId);
-            YarnApplicationManager.execYarnKillCommand(taskRequest.getTenantCode(), appId, commandFile, "yarn application -kill " + appId);
+            YarnApplicationManager.execYarnKillCommand(taskRequest.getTenantCode(), appId, commandFile,
+                    "yarn application -kill " + appId);
         }
 
         // soft kill
@@ -387,9 +388,9 @@ public abstract class AbstractCommandExecutor {
                         logBuffer.add(line);
                         taskResultString = line;
                     }
-                    if (StringUtils.isBlank(appId)){
+                    if (StringUtils.isBlank(appId)) {
                         String appId = LogUtils.getAppIdsFromLogLine(line);
-                        if (StringUtils.isNotBlank(appId)){
+                        if (StringUtils.isNotBlank(appId)) {
                             this.appId = appId;
                         }
                     }

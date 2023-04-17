@@ -184,7 +184,8 @@ public class LogUtils {
     }
 
     public String getAppIdsFromLogLine(String logLine) {
-        if (StringUtils.isBlank(logLine)) return null;
+        if (StringUtils.isBlank(logLine))
+            return null;
         Matcher matcher = APPLICATION_REGEX.matcher(logLine);
         if (matcher.find()) {
             String appId = matcher.group();
