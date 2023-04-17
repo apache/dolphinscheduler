@@ -42,7 +42,6 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -254,6 +253,9 @@ public abstract class AbstractCommandExecutor {
         // waiting for the run to finish
         boolean status = process.waitFor(remainTime, TimeUnit.SECONDS);
 
+        TaskExecutionStatus kubernetesStatus =
+                ProcessUtils.getApplicationStatus(taskRequest.getK8sTaskExecutionContext(), taskRequest.getTaskAppId());
+
         if (taskOutputFuture != null) {
             try {
                 // Wait the task log process finished.
@@ -273,9 +275,6 @@ public abstract class AbstractCommandExecutor {
                 logger.error("Handle pod log error", e);
             }
         }
-
-        TaskExecutionStatus kubernetesStatus =
-                ProcessUtils.getApplicationStatus(taskRequest.getK8sTaskExecutionContext(), taskRequest.getTaskAppId());
 
         // if SHELL task exit
         if (status && kubernetesStatus.isSuccess()) {
@@ -325,37 +324,34 @@ public abstract class AbstractCommandExecutor {
             return;
         }
 
-        // wait for launching (driver) pod
-        ThreadUtils.sleep(SLEEP_TIME_MILLIS * 5L);
-        LogWatch watcher =
-                ProcessUtils.getPodLogWatcher(taskRequest.getK8sTaskExecutionContext(), taskRequest.getTaskAppId());
-        if (watcher != null) {
-            ExecutorService collectPodLogExecutorService = ThreadUtils
-                    .newSingleDaemonScheduledExecutorService("CollectPodLogOutput-thread-" + taskRequest.getTaskName());
+        ExecutorService collectPodLogExecutorService = ThreadUtils
+                .newSingleDaemonScheduledExecutorService("CollectPodLogOutput-thread-" + taskRequest.getTaskName());
 
-            podLogOutputFuture = collectPodLogExecutorService.submit(() -> {
-                try {
+        podLogOutputFuture = collectPodLogExecutorService.submit(() -> {
+            // wait for launching (driver) pod
+            ThreadUtils.sleep(SLEEP_TIME_MILLIS * 5L);
+            try (
+                    LogWatch watcher = ProcessUtils.getPodLogWatcher(taskRequest.getK8sTaskExecutionContext(),
+                            taskRequest.getTaskAppId())) {
+                if (watcher == null) {
+                    throw new RuntimeException("The driver pod does not exist.");
+                } else {
                     String line;
                     try (BufferedReader reader = new BufferedReader(new InputStreamReader(watcher.getOutput()))) {
                         while ((line = reader.readLine()) != null) {
                             logBuffer.add(String.format("[K8S-pod-log-%s]: %s", taskRequest.getTaskName(), line));
                         }
                     }
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                } finally {
-                    watcher.close();
-                    podLogOutputIsFinished = true;
                 }
-            });
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            } finally {
+                podLogOutputIsFinished = true;
+            }
 
-            collectPodLogExecutorService.shutdown();
-        } else {
-            CompletableFuture<String> exceptionalFuture = new CompletableFuture<>();
-            exceptionalFuture.completeExceptionally(new RuntimeException("The driver pod does not exist."));
-            podLogOutputFuture = exceptionalFuture;
-            podLogOutputIsFinished = true;
-        }
+        });
+
+        collectPodLogExecutorService.shutdown();
     }
 
     private void parseProcessOutput(Process process) {

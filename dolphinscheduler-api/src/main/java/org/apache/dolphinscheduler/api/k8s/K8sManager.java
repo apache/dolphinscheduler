@@ -31,8 +31,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import io.fabric8.kubernetes.client.Config;
-import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 
 /**
  * use multiple environment feature
@@ -107,7 +107,7 @@ public class K8sManager {
 
         String k8sConfig = ClusterConfUtils.getK8sConfig(cluster.getConfig());
         if (k8sConfig != null) {
-            DefaultKubernetesClient client = null;
+            KubernetesClient client = null;
             try {
                 client = getClient(k8sConfig);
                 clientMap.put(clusterCode, client);
@@ -118,10 +118,10 @@ public class K8sManager {
         }
     }
 
-    private DefaultKubernetesClient getClient(String configYaml) throws RemotingException {
+    private KubernetesClient getClient(String configYaml) throws RemotingException {
         try {
             Config config = Config.fromKubeconfig(configYaml);
-            return new DefaultKubernetesClient(config);
+            return new KubernetesClientBuilder().withConfig(config).build();
         } catch (Exception e) {
             log.error("Fail to get k8s ApiClient", e);
             throw new RemotingException("fail to get k8s ApiClient:" + e.getMessage());
