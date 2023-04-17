@@ -61,7 +61,6 @@ import org.apache.dolphinscheduler.dao.entity.ResponseTaskLog;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
@@ -265,10 +264,6 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             log.error("Process definition does not exist, projectCode:{}.", projectCode);
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processId);
         } else {
-            Tenant tenant = tenantMapper.queryById(processDefinition.getTenantId());
-            if (tenant != null) {
-                processDefinition.setTenantCode(tenant.getTenantCode());
-            }
             processInstance.setLocations(processDefinition.getLocations());
             processInstance.setDagData(processService.genDagData(processDefinition));
             result.put(DATA_LIST, processInstance);
@@ -693,18 +688,9 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-        int tenantId = -1;
-        if (!Constants.DEFAULT.equals(tenantCode)) {
-            Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
-            if (tenant == null) {
-                log.error("Tenant does not exist.");
-                putMsg(result, Status.TENANT_NOT_EXIST);
-                return result;
-            }
-            tenantId = tenant.getId();
-        }
+
         processDefinition.set(projectCode, processDefinition.getName(), processDefinition.getDescription(),
-                globalParams, locations, timeout, tenantId);
+                globalParams, locations, timeout);
         processDefinition.setUpdateTime(new Date());
         int insertVersion = processService.saveProcessDefine(loginUser, processDefinition, syncDefine, Boolean.FALSE);
         if (insertVersion == 0) {

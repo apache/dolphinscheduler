@@ -55,7 +55,6 @@ import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
@@ -167,7 +166,7 @@ public class ExecuteFunctionServiceTest {
 
     private int processInstanceId = 1;
 
-    private int tenantId = 1;
+    private String tenantCode = "dolphinscheduler";
 
     private int userId = 1;
 
@@ -199,7 +198,6 @@ public class ExecuteFunctionServiceTest {
         // processDefinition
         processDefinition.setId(processDefinitionId);
         processDefinition.setReleaseState(ReleaseState.ONLINE);
-        processDefinition.setTenantId(tenantId);
         processDefinition.setUserId(userId);
         processDefinition.setVersion(1);
         processDefinition.setCode(1L);
@@ -210,7 +208,6 @@ public class ExecuteFunctionServiceTest {
         processInstance.setProjectCode(projectCode);
         processInstance.setState(WorkflowExecutionStatus.FAILURE);
         processInstance.setExecutorId(userId);
-        processInstance.setTenantId(tenantId);
         processInstance.setHost("127.0.0.1:5678");
         processInstance.setProcessDefinitionVersion(1);
         processInstance.setProcessDefinitionCode(1L);
@@ -240,7 +237,7 @@ public class ExecuteFunctionServiceTest {
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_START))
                 .thenReturn(checkProjectAndAuth());
         Mockito.when(processDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(this.processDefinition);
-        Mockito.when(processService.getTenantForProcess(tenantId, userId)).thenReturn(new Tenant());
+        Mockito.when(processService.getTenantForProcess(tenantCode, userId)).thenReturn(tenantCode);
         doReturn(1).when(commandService).createCommand(argThat(c -> c.getId() == null));
         doReturn(0).when(commandService).createCommand(argThat(c -> c.getId() != null));
         Mockito.when(monitorService.getServerListFromRegistry(true)).thenReturn(getMasterServersList());
@@ -277,7 +274,7 @@ public class ExecuteFunctionServiceTest {
                 null, null,
                 null, null, null,
                 RunMode.RUN_MODE_SERIAL,
-                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 10, null, 0, Constants.DRY_RUN_FLAG_NO,
+                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 10, null, 0, Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
                 ComplementDependentMode.OFF_MODE, null);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
@@ -300,7 +297,7 @@ public class ExecuteFunctionServiceTest {
                 null, "123456789,987654321",
                 null, null, null,
                 RunMode.RUN_MODE_SERIAL,
-                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
+                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
                 ComplementDependentMode.OFF_MODE, null);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
@@ -321,7 +318,8 @@ public class ExecuteFunctionServiceTest {
                     null, "1123456789,987654321",
                     null, null, null,
                     RunMode.RUN_MODE_SERIAL,
-                    Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
+                    Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 0,
+                    Constants.DRY_RUN_FLAG_NO,
                     Constants.TEST_FLAG_NO,
                     ComplementDependentMode.OFF_MODE, null);
         } catch (ServiceException e) {
@@ -388,7 +386,7 @@ public class ExecuteFunctionServiceTest {
                 null, null,
                 null, null, null,
                 RunMode.RUN_MODE_SERIAL,
-                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
+                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
                 ComplementDependentMode.OFF_MODE, null);
         Assertions.assertEquals(Status.START_PROCESS_INSTANCE_ERROR, result.get(Constants.STATUS));
@@ -410,7 +408,7 @@ public class ExecuteFunctionServiceTest {
                 null, null,
                 null, null, null,
                 RunMode.RUN_MODE_SERIAL,
-                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
+                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
                 ComplementDependentMode.OFF_MODE, null);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
@@ -432,7 +430,7 @@ public class ExecuteFunctionServiceTest {
                 null, null,
                 null, null, null,
                 RunMode.RUN_MODE_PARALLEL,
-                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
+                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
                 ComplementDependentMode.OFF_MODE, null);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
@@ -455,7 +453,8 @@ public class ExecuteFunctionServiceTest {
                 null, null,
                 null, null, null,
                 RunMode.RUN_MODE_PARALLEL,
-                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 15, Constants.DRY_RUN_FLAG_NO,
+                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 15,
+                Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
                 ComplementDependentMode.OFF_MODE, null);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
@@ -481,6 +480,7 @@ public class ExecuteFunctionServiceTest {
                 RunMode.RUN_MODE_PARALLEL,
                 Priority.LOW,
                 Constants.DEFAULT_WORKER_GROUP,
+                tenantCode,
                 100L,
                 110,
                 null,
@@ -517,7 +517,8 @@ public class ExecuteFunctionServiceTest {
                 null, null,
                 null, null, 0,
                 RunMode.RUN_MODE_PARALLEL,
-                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 15, Constants.DRY_RUN_FLAG_NO,
+                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 15,
+                Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_YES,
                 ComplementDependentMode.OFF_MODE, null);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
@@ -630,7 +631,7 @@ public class ExecuteFunctionServiceTest {
         Mockito.when(processService.findProcessDefinition(Mockito.anyLong(), Mockito.anyInt()))
                 .thenReturn(processDefinition);
 
-        Mockito.when(processService.getTenantForProcess(Mockito.anyInt(), Mockito.anyInt())).thenReturn(new Tenant());
+        Mockito.when(processService.getTenantForProcess(Mockito.anyString(), Mockito.anyInt())).thenReturn(tenantCode);
 
         when(processInstanceMock.getState().isFinished()).thenReturn(false);
         WorkflowExecuteResponse responseInstanceIsNotFinished =

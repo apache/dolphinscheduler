@@ -32,15 +32,8 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.Queue;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.dao.entity.*;
+import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -77,7 +70,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     private ProcessInstanceMapper processInstanceMapper;
 
     @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private ScheduleMapper scheduleMapper;
 
     @Autowired
     private UserMapper userMapper;
@@ -278,12 +271,12 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             throw new ServiceException(Status.DELETE_TENANT_BY_ID_FAIL, processInstances.size());
         }
 
-        List<ProcessDefinition> processDefinitions =
-                processDefinitionMapper.queryDefinitionListByTenant(tenant.getId());
-        if (CollectionUtils.isNotEmpty(processDefinitions)) {
-            log.warn("Delete tenant failed, because there are {} process definitions using it.",
-                    processDefinitions.size());
-            throw new ServiceException(Status.DELETE_TENANT_BY_ID_FAIL_DEFINES, processDefinitions.size());
+        List<Schedule> schedules =
+                scheduleMapper.queryScheduleListByTenant(tenant.getTenantCode());
+        if (CollectionUtils.isNotEmpty(schedules)) {
+            log.warn("Delete tenant failed, because there are {} schedule using it.",
+                    schedules.size());
+            throw new ServiceException(Status.DELETE_TENANT_BY_ID_FAIL_DEFINES, schedules.size());
         }
 
         List<User> userList = userMapper.queryUserListByTenant(tenant.getId());
@@ -299,7 +292,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
 
         int delete = tenantMapper.deleteById(id);
         if (delete > 0) {
-            processInstanceMapper.updateProcessInstanceByTenantId(id, -1);
+            processInstanceMapper.updateProcessInstanceByTenantCode(tenant.getTenantCode(), Constants.DEFAULT);
             log.info("Tenant is deleted and id is {}.", id);
             putMsg(result, Status.SUCCESS);
         } else {
@@ -311,7 +304,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     }
 
     private List<ProcessInstance> getProcessInstancesByTenant(Tenant tenant) {
-        return processInstanceMapper.queryByTenantIdAndStatus(tenant.getId(),
+        return processInstanceMapper.queryByTenantCodeAndStatus(tenant.getTenantCode(),
                 org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES);
     }
 
