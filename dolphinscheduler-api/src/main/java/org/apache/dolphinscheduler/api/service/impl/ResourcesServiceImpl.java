@@ -574,8 +574,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         String tenantCode = getTenantCode(user);
-
-        if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)) {
+        String baseDir = isAdmin(loginUser) ? storageOperate.getDir(ResourceType.ALL, tenantCode)
+                : storageOperate.getDir(type, tenantCode);
+        if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)
+                || (StringUtils.isNotBlank(fullName) && !StringUtils.startsWith(fullName, baseDir))) {
             log.error("current user does not have permission");
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
@@ -1676,6 +1678,40 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         log.info(jsonTreeStr);
         result.put(Constants.DATA_LIST, visitor.visit("").getChildren());
         putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    /**
+     * get resource base dir
+     *
+     * @param loginUser login user
+     * @param type      resource type
+     * @return
+     */
+    @Override
+    public Result<Object> queryResourceBaseDir(User loginUser, ResourceType type) {
+        Result<Object> result = new Result<>();
+        User user = userMapper.selectById(loginUser.getId());
+        if (user == null) {
+            log.error("user {} not exists", loginUser.getId());
+            putMsg(result, Status.USER_NOT_EXIST, loginUser.getId());
+            return result;
+        }
+
+        String tenantCode = getTenantCode(user);
+
+        if (!isUserTenantValid(isAdmin(loginUser), tenantCode, "")) {
+            log.error("current user does not have permission");
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
+        }
+
+        String baseDir = isAdmin(loginUser) ? storageOperate.getDir(ResourceType.ALL, tenantCode)
+                : storageOperate.getDir(type, tenantCode);
+
+        putMsg(result, Status.SUCCESS);
+        result.setData(baseDir);
+
         return result;
     }
 
