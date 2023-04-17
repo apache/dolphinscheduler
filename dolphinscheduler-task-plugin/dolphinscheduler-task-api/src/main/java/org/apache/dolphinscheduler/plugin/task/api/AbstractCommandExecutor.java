@@ -25,6 +25,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_COD
 import org.apache.dolphinscheduler.common.constants.TenantConstants;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.plugin.task.api.am.YarnApplicationManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.utils.AbstractCommandExecutorConstants;
@@ -74,6 +75,11 @@ public abstract class AbstractCommandExecutor {
      * process
      */
     private Process process;
+
+    /**
+     * yarn appId
+     */
+    private String appId;
 
     /**
      * log handler
@@ -306,6 +312,11 @@ public abstract class AbstractCommandExecutor {
             return;
         }
 
+        if (StringUtils.isNotBlank(appId)){
+            String commandFile = String.format("%s/%s.kill", taskRequest.getExecutePath(), appId);
+            YarnApplicationManager.execYarnKillCommand(taskRequest.getTenantCode(), appId, commandFile, "yarn application -kill " + appId);
+        }
+
         // soft kill
         logger.info("Begin to kill process process, pid is : {}", taskRequest.getProcessId());
         process.destroy();
@@ -376,6 +387,13 @@ public abstract class AbstractCommandExecutor {
                         logBuffer.add(line);
                         taskResultString = line;
                     }
+                    if (StringUtils.isBlank(appId)){
+                        String appId = LogUtils.getAppIdsFromLogLine(line);
+                        if (StringUtils.isNotBlank(appId)){
+                            this.appId = appId;
+                        }
+                    }
+
                 }
                 processLogOutputIsSuccess = true;
             } catch (Exception e) {
@@ -436,6 +454,10 @@ public abstract class AbstractCommandExecutor {
         }
 
         return remainTime;
+    }
+
+    public String getAppId() {
+        return appId;
     }
 
     /**

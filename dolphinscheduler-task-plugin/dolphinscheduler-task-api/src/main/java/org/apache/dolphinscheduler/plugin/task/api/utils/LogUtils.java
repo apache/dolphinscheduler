@@ -183,6 +183,16 @@ public class LogUtils {
         }
     }
 
+    public String getAppIdsFromLogLine(String logLine) {
+        if (StringUtils.isBlank(logLine)) return null;
+        Matcher matcher = APPLICATION_REGEX.matcher(logLine);
+        if (matcher.find()) {
+            String appId = matcher.group();
+            return appId;
+        }
+        return null;
+    }
+
     public static String getTaskInstanceLogFullPathMdc() {
         return MDC.get(TASK_INSTANCE_LOG_FULL_PATH_MDC_KEY);
     }
