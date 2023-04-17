@@ -113,6 +113,7 @@ export interface WorkflowInstance {
   failureStrategy: string
   processInstancePriority: string
   workerGroup: string
+  tenantCode: string
   warningType: string
   warningGroupId: number
 }
