@@ -15,8 +15,17 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.enums;
+package org.apache.dolphinscheduler.plugin.datasource.kyuubi;
 
-public enum NodeType {
-    MASTER, WORKER, DEAD_SERVER
+import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
+import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
+import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
+import org.apache.dolphinscheduler.spi.enums.DbType;
+
+public class KyuubiDataSourceChannel implements DataSourceChannel {
+
+    @Override
+    public DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+        return new KyuubiDataSourceClient(baseConnectionParam, dbType);
+    }
 }

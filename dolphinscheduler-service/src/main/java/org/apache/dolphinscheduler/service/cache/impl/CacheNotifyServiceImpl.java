@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.service.cache.impl;
 
-import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Message;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
@@ -114,7 +114,7 @@ public class CacheNotifyServiceImpl implements CacheNotifyService {
     public void notifyMaster(Message message) {
         log.info("send result, command:{}", message.toString());
         try {
-            List<Server> serverList = registryClient.getServerList(NodeType.MASTER);
+            List<Server> serverList = registryClient.getServerList(RegistryNodeType.MASTER);
             if (CollectionUtils.isEmpty(serverList)) {
                 return;
             }

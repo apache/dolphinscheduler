@@ -38,10 +38,12 @@ import {
 } from 'naive-ui'
 import { queryTenantList } from '@/service/modules/tenants'
 import { useRoute } from 'vue-router'
+import { useUserStore } from '@/store/user/user'
 import { verifyName } from '@/service/modules/process-definition'
 import './x6-style.scss'
 import { positiveIntegerRegex } from '@/utils/regex'
 import type { SaveForm, WorkflowDefinition, WorkflowInstance } from './types'
+import type { UserInfoRes } from '@/service/modules/users/types'
 
 const props = {
   visible: {
@@ -73,6 +75,7 @@ export default defineComponent({
     const { t } = useI18n()
 
     const projectCode = Number(route.params.projectCode)
+    const userInfo = useUserStore().getUserInfo as UserInfoRes
     const tenants = ref<Tenant[]>([])
     const tenantsDropdown = computed(() => {
       if (tenants.value) {
@@ -81,7 +84,6 @@ export default defineComponent({
             label: t.tenantCode,
             value: t.tenantCode
           }))
-          .concat({ label: 'default', value: 'default' })
       }
       return []
     })
@@ -94,7 +96,7 @@ export default defineComponent({
     const formValue = ref<SaveForm>({
       name: '',
       description: '',
-      tenantCode: 'default',
+      tenantCode: userInfo.tenantCode || 'default',
       executionType: 'PARALLEL',
       timeoutFlag: false,
       timeout: 0,
@@ -168,7 +170,7 @@ export default defineComponent({
       if (process) {
         formValue.value.name = process.name
         formValue.value.description = process.description
-        formValue.value.tenantCode = process.tenantCode || 'default'
+        formValue.value.tenantCode = process.tenantCode || userInfo.tenantCode || 'default'
         formValue.value.executionType = process.executionType || 'PARALLEL'
         if (process.timeout && process.timeout > 0) {
           formValue.value.timeoutFlag = true

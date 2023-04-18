@@ -122,6 +122,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
+import org.apache.dolphinscheduler.service.cron.CronUtils;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -1254,7 +1255,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         try {
             out = response.getOutputStream();
             buff = new BufferedOutputStream(out);
-            buff.write(JSONUtils.toJsonString(dagDataSchedules).getBytes(StandardCharsets.UTF_8));
+            buff.write(JSONUtils.toPrettyJsonString(dagDataSchedules).getBytes(StandardCharsets.UTF_8));
             buff.flush();
             buff.close();
         } catch (IOException e) {
@@ -1650,6 +1651,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         if (null != schedule) {
             ProcessDefinition newProcessDefinition = processDefinitionMapper.queryByCode(processDefinition.getCode());
             schedule.setProcessDefinitionCode(newProcessDefinition.getCode());
+            schedule.setId(null);
             schedule.setUserId(loginUser.getId());
             schedule.setCreateTime(now);
             schedule.setUpdateTime(now);
@@ -2607,7 +2609,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             putMsg(result, Status.SCHEDULE_START_TIME_END_TIME_SAME);
             return result;
         }
-        if (!org.quartz.CronExpression.isValidExpression(scheduleObj.getCrontab())) {
+        if (!CronUtils.isValidExpression(scheduleObj.getCrontab())) {
             log.error("CronExpression verify failure, cron:{}.", scheduleObj.getCrontab());
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, scheduleObj.getCrontab());
             return result;

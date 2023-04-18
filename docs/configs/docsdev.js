@@ -272,6 +272,10 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/datasource/hive.html',
                             },
                             {
+                                title: 'KYUUBI',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/kyuubi.html',
+                            },
+                            {
                                 title: 'Spark',
                                 link: '/en-us/docs/dev/user_doc/guide/datasource/spark.html',
                             },
@@ -521,15 +525,15 @@ export default {
                 children: [
                     {
                         title: 'Open API',
-                        link: '/en-us/docs/dev/user_doc/guide/open-api.html',
+                        link: '/en-us/docs/dev/user_doc/guide/api/open-api.html',
                     },
                     {
                         title: 'PyDolphinScheduler',
-                        link: '/python/main/index.html',
+                        link: '/en-us/docs/dev/user_doc/guide/api/pydolphinscheduler.html',
                     },
                     {
                         title: 'Health Check',
-                        link: '/en-us/docs/dev/user_doc/guide/healthcheck.html',
+                        link: '/en-us/docs/dev/user_doc/guide/api/healthcheck.html',
                     },
                 ],
             },
@@ -965,6 +969,10 @@ export default {
                                 link: '/zh-cn/docs/dev/user_doc/guide/datasource/hive.html',
                             },
                             {
+                                title: 'KYUUBI',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/kyuubi.html',
+                            },
+                            {
                                 title: 'Spark',
                                 link: '/zh-cn/docs/dev/user_doc/guide/datasource/spark.html',
                             },
@@ -1197,15 +1205,15 @@ export default {
                 children: [
                     {
                         title: 'API调用',
-                        link: '/zh-cn/docs/dev/user_doc/guide/open-api.html',
+                        link: '/zh-cn/docs/dev/user_doc/guide/api/open-api.html',
                     },
                     {
                         title: 'PyDolphinScheduler',
-                        link: '/python/main/index.html',
+                        link: '/zh-cn/docs/dev/user_doc/guide/api/pydolphinscheduler.html',
                     },
                     {
                         title: '健康检查',
-                        link: '/zh-cn/docs/dev/user_doc/guide/healthcheck.html',
+                        link: '/zh-cn/docs/dev/user_doc/guide/api/healthcheck.html',
                     },
                 ],
             },

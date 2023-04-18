@@ -15,37 +15,26 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.alert;
+package org.apache.dolphinscheduler.plugin.datasource.kyuubi;
 
-import static org.mockito.ArgumentMatchers.any;
-
-import org.apache.dolphinscheduler.dao.PluginDao;
+import org.apache.dolphinscheduler.plugin.datasource.kyuubi.param.KyuubiConnectionParam;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class AlertPluginManagerTest {
-
-    @Mock
-    private PluginDao pluginDao;
-
-    @InjectMocks
-    private AlertPluginManager alertPluginManager;
+public class KyuubiDataSourceChannelTest {
 
     @Test
-    public void testAlertPluginManager() {
-        Mockito.when(pluginDao.addOrUpdatePluginDefine(any())).thenReturn(0);
-
-        alertPluginManager.installPlugin(null);
-
-        Assertions.assertEquals(1, alertPluginManager.size());
-
-        Assertions.assertNotNull(alertPluginManager.getAlertChannel(0));
+    public void testCreateDataSourceClient() {
+        KyuubiDataSourceChannel sourceChannel = Mockito.mock(KyuubiDataSourceChannel.class);
+        KyuubiDataSourceClient dataSourceClient = Mockito.mock(KyuubiDataSourceClient.class);
+        Mockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
+        Assertions
+                .assertNotNull(sourceChannel.createDataSourceClient(new KyuubiConnectionParam(), DbType.KYUUBI));
     }
 }

@@ -48,13 +48,10 @@ worker:
   tenant-auto-create: true
   #Scenes to be used for distributed users.For example,users created by FreeIpa are stored in LDAP.This parameter only applies to Linux, When this parameter is true, worker.tenant.auto.create has no effect and will not automatically create tenants.
   tenant-distributed-user: false
-  # worker max cpuload avg, only higher than the system cpu load average, worker server can be dispatched tasks. default value -1: the number of cpu cores * 2
-  max-cpu-load-avg: -1
-  # worker reserved memory, only lower than system available memory, worker server can be dispatched tasks. default value 0.3, the unit is G
+  # worker max cpuload avg, only higher than the system cpu load average, worker server can be dispatched tasks. default value 1: will use 100% cpu.
+  max-cpu-load-avg: 1
+  # worker reserved memory, only lower than system available memory, worker server can be dispatched tasks. default value 0.3, only the available memory is higher than 30%, worker server can receive task.
   reserved-memory: 0.3
-  # alert server listen host
-  alert-listen-host: localhost
-  alert-listen-port: 50052
   registry-disconnect-strategy:
     # The disconnect strategy: stop, waiting
     strategy: waiting

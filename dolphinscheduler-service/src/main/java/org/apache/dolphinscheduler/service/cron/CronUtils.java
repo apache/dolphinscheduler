@@ -79,9 +79,27 @@ public class CronUtils {
     public static Cron parse2Cron(String cronExpression) throws CronParseException {
         try {
             return QUARTZ_CRON_PARSER.parse(cronExpression);
-        } catch (Exception ex) {
+        } catch (IllegalArgumentException ex) {
             throw new CronParseException(String.format("Parse corn expression: [%s] error", cronExpression), ex);
         }
+    }
+
+    /**
+     * Indicates whether the specified cron expression can be parsed into a
+     * valid cron expression
+     *
+     * @param cronExpression the expression to evaluate
+     * @return a boolean indicating whether the given expression is a valid cron
+     *         expression
+     */
+    public static boolean isValidExpression(String cronExpression) {
+        try {
+            parse2Cron(cronExpression);
+        } catch (CronParseException e) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

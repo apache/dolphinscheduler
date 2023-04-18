@@ -20,7 +20,13 @@ package org.apache.dolphinscheduler.plugin.task.seatunnel;
 public enum EngineEnum {
 
     FLINK("${SEATUNNEL_HOME}/bin/start-seatunnel-flink.sh"),
-    SPARK("${SEATUNNEL_HOME}/bin/start-seatunnel-spark.sh");
+    SPARK("${SEATUNNEL_HOME}/bin/start-seatunnel-spark.sh"),
+
+    FLINK_V2("${SEATUNNEL_HOME}/bin/start-seatunnel-flink-connector-v2.sh"),
+
+    SPARK_V2("${SEATUNNEL_HOME}/bin/start-seatunnel-spark-connector-v2.sh"),
+
+    SEATUNNEL_ENGINE("${SEATUNNEL_HOME}/bin/seatunnel.sh");
 
     private String command;
 
