@@ -1364,7 +1364,8 @@ public class ProcessServiceImpl implements ProcessService {
                 ResourceInfo mainJar = JSONUtils.parseObject(
                         JSONUtils.toJsonString(mainJarObj),
                         ResourceInfo.class);
-                ResourceInfo resourceInfo = updateResourceInfo(taskDefinition.getId(), mainJar);
+                ResourceInfo resourceInfo =
+                        updateResourceInfo(taskDefinitionMapper.queryByCode(taskDefinition.getCode()).getId(), mainJar);
                 if (resourceInfo != null) {
                     taskParameters.put("mainJar", resourceInfo);
                 }
@@ -1375,7 +1376,8 @@ public class ProcessServiceImpl implements ProcessService {
                 List<ResourceInfo> resourceInfos = JSONUtils.toList(resourceListStr, ResourceInfo.class);
                 List<ResourceInfo> updatedResourceInfos = resourceInfos
                         .stream()
-                        .map(resourceInfo -> updateResourceInfo(taskDefinition.getId(), resourceInfo))
+                        .map(resourceInfo -> updateResourceInfo(
+                                taskDefinitionMapper.queryByCode(taskDefinition.getCode()).getId(), resourceInfo))
                         .filter(Objects::nonNull)
                         .collect(Collectors.toList());
                 taskParameters.put("resourceList", updatedResourceInfos);
@@ -1402,7 +1404,6 @@ public class ProcessServiceImpl implements ProcessService {
             }
             resourceInfo = new ResourceInfo();
             resourceInfo.setId(-1);
-            resourceInfo.setRes(res.getRes());
             resourceInfo.setResourceName(resourceFullName);
             log.info("updated resource info {}",
                     JSONUtils.toJsonString(resourceInfo));

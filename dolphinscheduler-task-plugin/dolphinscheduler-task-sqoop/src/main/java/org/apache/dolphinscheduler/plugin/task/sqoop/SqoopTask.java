@@ -88,10 +88,6 @@ public class SqoopTask extends AbstractYarnTask {
     }
 
     @Override
-    protected void setMainJarName() {
-    }
-
-    @Override
     public AbstractParameters getParameters() {
         return sqoopParameters;
     }

@@ -714,13 +714,11 @@ public class ProcessServiceTest {
         // test normal situation
         ResourceInfo resourceInfoNormal = new ResourceInfo();
         resourceInfoNormal.setId(1);
-        resourceInfoNormal.setRes("test.txt");
         resourceInfoNormal.setResourceName("/test.txt");
 
         ResourceInfo updatedResourceInfo3 = processService.updateResourceInfo(0, resourceInfoNormal);
 
         Assertions.assertEquals(-1, updatedResourceInfo3.getId().intValue());
-        Assertions.assertEquals("test.txt", updatedResourceInfo3.getRes());
         Assertions.assertEquals("/test.txt", updatedResourceInfo3.getResourceName());
 
     }

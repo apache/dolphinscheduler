@@ -120,7 +120,7 @@ public class SparkArgsUtils {
 
         ResourceInfo mainJar = param.getMainJar();
         if (mainJar != null) {
-            args.add(mainJar.getRes());
+            args.add(mainJar.getResourceName());
         }
 
         String mainArgs = param.getMainArgs();

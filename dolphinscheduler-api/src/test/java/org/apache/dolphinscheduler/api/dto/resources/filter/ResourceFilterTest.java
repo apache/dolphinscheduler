@@ -16,7 +16,7 @@
  */
 package org.apache.dolphinscheduler.api.dto.resources.filter;
 
-import org.apache.dolphinscheduler.dao.entity.Resource;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,25 +34,23 @@ public class ResourceFilterTest {
     private static Logger logger = LoggerFactory.getLogger(ResourceFilterTest.class);
     @Test
     public void filterTest() {
-        List<Resource> allList = new ArrayList<>();
+        List<StorageEntity> allList = new ArrayList<>();
 
-        Resource resource1 = new Resource(3, -1, "b", "/b", true);
-        Resource resource2 = new Resource(4, 2, "a1.txt", "/a/a1.txt", false);
-        Resource resource3 = new Resource(5, 3, "b1.txt", "/b/b1.txt", false);
-        Resource resource4 = new Resource(6, 3, "b2.jar", "/b/b2.jar", false);
-        Resource resource5 = new Resource(7, -1, "b2", "/b2", true);
-        Resource resource6 = new Resource(8, -1, "b2", "/b/b2", true);
-        Resource resource7 = new Resource(9, 8, "c2.jar", "/b/b2/c2.jar", false);
+        StorageEntity resource1 = new StorageEntity();
+        resource1.setFullName("a1.txt");
+        StorageEntity resource2 = new StorageEntity();
+        resource2.setFullName("b1.txt");
+        StorageEntity resource3 = new StorageEntity();
+        resource3.setFullName("b2.jar");
+        StorageEntity resource4 = new StorageEntity();
+        resource4.setFullName("c2.jar");
         allList.add(resource1);
         allList.add(resource2);
         allList.add(resource3);
         allList.add(resource4);
-        allList.add(resource5);
-        allList.add(resource6);
-        allList.add(resource7);
 
         ResourceFilter resourceFilter = new ResourceFilter(".jar", allList);
-        List<Resource> resourceList = resourceFilter.filter();
+        List<StorageEntity> resourceList = resourceFilter.filter();
         Assertions.assertNotNull(resourceList);
         resourceList.forEach(t -> logger.info(t.toString()));
     }

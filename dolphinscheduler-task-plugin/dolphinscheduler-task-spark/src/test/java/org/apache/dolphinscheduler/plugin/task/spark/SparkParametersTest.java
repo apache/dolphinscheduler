@@ -33,12 +33,12 @@ public class SparkParametersTest {
         Assertions.assertTrue(sparkParameters.getResourceFilesList().isEmpty());
 
         ResourceInfo mainResource = new ResourceInfo();
-        mainResource.setRes("testSparkMain-1.0.0-SNAPSHOT.jar\"");
+        mainResource.setResourceName("testSparkMain-1.0.0-SNAPSHOT.jar\"");
         sparkParameters.setMainJar(mainResource);
 
         LinkedList<ResourceInfo> resourceInfos = new LinkedList<>();
         ResourceInfo resourceInfo1 = new ResourceInfo();
-        resourceInfo1.setRes("testSparkParameters1.jar");
+        resourceInfo1.setResourceName("testSparkParameters1.jar");
         resourceInfos.add(resourceInfo1);
 
         sparkParameters.setResourceList(resourceInfos);
@@ -47,7 +47,7 @@ public class SparkParametersTest {
         Assertions.assertEquals(2, resourceFilesList.size());
 
         ResourceInfo resourceInfo2 = new ResourceInfo();
-        resourceInfo2.setRes("testSparkParameters2.jar");
+        resourceInfo2.setResourceName("testSparkParameters2.jar");
         resourceInfos.add(resourceInfo2);
 
         sparkParameters.setResourceList(resourceInfos);
