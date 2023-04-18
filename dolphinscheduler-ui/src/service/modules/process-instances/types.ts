@@ -79,7 +79,6 @@ interface ProcessInstanceReq {
   scheduleTime?: string
   taskDefinitionJson?: string
   taskRelationJson?: string
-  tenantCode?: string
   timeout?: number
 }
 

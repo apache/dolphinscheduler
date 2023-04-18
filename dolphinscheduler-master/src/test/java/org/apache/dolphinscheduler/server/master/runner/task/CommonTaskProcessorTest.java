@@ -104,7 +104,7 @@ public class CommonTaskProcessorTest {
 
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(1);
-        processInstance.setTenantId(1);
+        processInstance.setTenantCode("default");
         processInstance.setCommandType(CommandType.START_PROCESS);
         taskInstance.setProcessInstance(processInstance);
         taskInstance.setState(TaskExecutionStatus.DELAY_EXECUTION);

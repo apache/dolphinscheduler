@@ -13,32 +13,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+*/
 
-export type { ProcessInstanceReq } from '@/service/modules/executors/types'
-
-export interface IEnvironmentOption {
-  label: string
-  value: string
-  workerGroups: Array<string>
-}
-
-export interface IOption {
-  label: string
-  value: number
-}
-
-export interface IParam {
-  prop: string
-  value: string
-}
-
-export interface ITimingState {
-  projectCode: number
-  workerGroups: Array<IOption>
-  tenantList: Array<IOption>
-  alertGroups: Array<IOption>
-  environmentList: Array<IEnvironmentOption>
-  startParamsList: Array<IParam>
-  schedulePreviewList: Array<string>
-}
+ALTER TABLE "t_ds_process_definition" DROP "tenant_id";
+ALTER TABLE "t_ds_process_definition_log" DROP "tenant_id";
+ALTER TABLE "t_ds_process_instance" DROP "tenant_id";
