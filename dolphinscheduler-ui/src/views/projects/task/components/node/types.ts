@@ -320,6 +320,10 @@ interface ITaskParams {
   zeppelinParagraphId?: string
   zeppelinRestEndpoint?: string
   restEndpoint?: string
+  zeppelinUsername?: string
+  username?: string
+  zeppelinPassword?: string
+  password?: string
   zeppelinProductionNoteDirectory?: string
   productionNoteDirectory?: string
   hiveCliOptions?: string

@@ -334,6 +334,8 @@ export function formatParams(data: INodeData): {
     taskParams.noteId = data.noteId
     taskParams.paragraphId = data.paragraphId
     taskParams.restEndpoint = data.restEndpoint
+    taskParams.username = data.username
+    taskParams.password = data.password
     taskParams.productionNoteDirectory = data.productionNoteDirectory
     taskParams.parameters = data.parameters
   }
