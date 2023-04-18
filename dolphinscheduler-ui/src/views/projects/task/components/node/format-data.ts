@@ -203,6 +203,10 @@ export function formatParams(data: INodeData): {
       if (data.udfs) taskParams.udfs = data.udfs.join(',')
       taskParams.connParams = data.connParams
     }
+
+    if (data.type === 'KYUUBI') {
+      if (data.udfs) taskParams.udfs = data.udfs.join(',')
+    }
   }
 
   if (data.taskType === 'PROCEDURE') {

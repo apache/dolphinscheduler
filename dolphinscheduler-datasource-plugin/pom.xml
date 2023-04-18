@@ -42,6 +42,7 @@
         <module>dolphinscheduler-datasource-all</module>
         <module>dolphinscheduler-datasource-redshift</module>
         <module>dolphinscheduler-datasource-athena</module>
+        <module>dolphinscheduler-datasource-kyuubi</module>
         <module>dolphinscheduler-datasource-trino</module>
         <module>dolphinscheduler-datasource-starrocks</module>
         <module>dolphinscheduler-datasource-azure-sql</module>
