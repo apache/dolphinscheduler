@@ -133,14 +133,12 @@ public class TaskExecutionCheckerUtils {
             for (Pair<String, String> fileDownload : downloadFiles) {
                 try {
                     String fullName = fileDownload.getLeft();
-                    // we do not actually get & need tenantCode with this implementation right now.
-                    String tenantCode = fileDownload.getRight();
-                    // TODO: Need a better way to get fileName because this implementation is tricky.
-                    String fileName = storageOperate.getResourceFileName(fullName);
+                    String fileName = fileDownload.getRight();
                     logger.info("get resource file from path:{}", fullName);
 
                     long resourceDownloadStartTime = System.currentTimeMillis();
-                    storageOperate.download(tenantCode, fullName, execLocalPath + File.separator + fileName, false,
+                    storageOperate.download(taskExecutionContext.getTenantCode(), fullName,
+                            execLocalPath + File.separator + fileName, false,
                             true);
                     WorkerServerMetrics
                             .recordWorkerResourceDownloadTime(System.currentTimeMillis() - resourceDownloadStartTime);

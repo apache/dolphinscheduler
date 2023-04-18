@@ -606,9 +606,8 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         if (baseParam != null) {
             List<ResourceInfo> projectResourceFiles = baseParam.getResourceFilesList();
             if (CollectionUtils.isNotEmpty(projectResourceFiles)) {
-                // TODO: Modify this part to accomodate(migrate) oldversionresources in the future.
                 projectResourceFiles.forEach(file -> resourcesMap.put(file.getResourceName(),
-                        processService.queryTenantCodeByResName(file.getResourceName(), ResourceType.FILE)));
+                        storageOperate.getResourceFileName(file.getResourceName())));
             }
         }
 

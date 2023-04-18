@@ -583,11 +583,36 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
+        List<StorageEntity> resourcesList = new ArrayList<>();
+        try {
+            resourcesList = queryStorageEntityList(loginUser, fullName, type, tenantCode, false);
+        } catch (ServiceException e) {
+            putMsg(result, Status.RESOURCE_NOT_EXIST);
+            return result;
+        }
+
+        // remove leading and trailing spaces in searchVal
+        String trimmedSearchVal = searchVal != null ? searchVal.trim() : "";
+        // filter based on trimmed searchVal
+        List<StorageEntity> filteredResourceList = resourcesList.stream()
+                .filter(x -> x.getFileName().contains(trimmedSearchVal)).collect(Collectors.toList());
+        // inefficient pagination
+        List<StorageEntity> slicedResourcesList = filteredResourceList.stream().skip((long) (pageNo - 1) * pageSize)
+                .limit(pageSize).collect(Collectors.toList());
+
+        pageInfo.setTotal(filteredResourceList.size());
+        pageInfo.setTotalList(slicedResourcesList);
+        result.setData(pageInfo);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    private List<StorageEntity> queryStorageEntityList(User loginUser, String fullName, ResourceType type,
+                                                       String tenantCode, boolean recursive) {
         String defaultPath = "";
         List<StorageEntity> resourcesList = new ArrayList<>();
         String resourceStorageType =
                 PropertyUtils.getString(Constants.RESOURCE_STORAGE_TYPE, ResUploadType.NONE.name());
-
         if (isAdmin(loginUser) && StringUtils.isBlank(fullName)) {
             // list all tenants' resources to admin users in the root directory
             List<User> userList = userMapper.selectList(null);
@@ -600,13 +625,15 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                         defaultPath = storageOperate.getUdfDir(tenantEntityCode);
                     }
                     try {
-                        resourcesList.addAll(storageOperate.listFilesStatus(defaultPath, defaultPath,
-                                tenantEntityCode, type));
+                        resourcesList.addAll(recursive
+                                ? storageOperate.listFilesStatusRecursively(defaultPath, defaultPath,
+                                        tenantEntityCode, type)
+                                : storageOperate.listFilesStatus(defaultPath, defaultPath,
+                                        tenantEntityCode, type));
 
                         visitedTenantEntityCode.add(tenantEntityCode);
                     } catch (Exception e) {
                         log.error(e.getMessage() + " Resource path: {}", defaultPath, e);
-                        putMsg(result, Status.RESOURCE_NOT_EXIST);
                         throw new ServiceException(String.format(e.getMessage() +
                                 " make sure resource path: %s exists in %s", defaultPath, resourceStorageType));
                     }
@@ -626,26 +653,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 }
             } catch (Exception e) {
                 log.error(e.getMessage() + " Resource path: {}", fullName, e);
-                putMsg(result, Status.RESOURCE_NOT_EXIST);
                 throw new ServiceException(String.format(e.getMessage() +
                         " make sure resource path: %s exists in %s", defaultPath, resourceStorageType));
             }
         }
 
-        // remove leading and trailing spaces in searchVal
-        String trimmedSearchVal = searchVal != null ? searchVal.trim() : "";
-        // filter based on trimmed searchVal
-        List<StorageEntity> filteredResourceList = resourcesList.stream()
-                .filter(x -> x.getFileName().contains(trimmedSearchVal)).collect(Collectors.toList());
-        // inefficient pagination
-        List<StorageEntity> slicedResourcesList = filteredResourceList.stream().skip((long) (pageNo - 1) * pageSize)
-                .limit(pageSize).collect(Collectors.toList());
-
-        pageInfo.setTotal(filteredResourceList.size());
-        pageInfo.setTotalList(slicedResourcesList);
-        result.setData(pageInfo);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return resourcesList;
     }
 
     /**
@@ -799,14 +812,23 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     public Result<Object> queryResourceByProgramType(User loginUser, ResourceType type, ProgramType programType) {
         Result<Object> result = new Result<>();
 
-        Set<Integer> resourceIds = resourcePermissionCheckService
-                .userOwnedResourceIdsAcquisition(checkResourceType(type), loginUser.getId(), log);
-        if (resourceIds.isEmpty()) {
-            result.setData(Collections.emptyList());
-            putMsg(result, Status.SUCCESS);
+        User user = userMapper.selectById(loginUser.getId());
+        if (user == null) {
+            log.error("user {} not exists", loginUser.getId());
+            putMsg(result, Status.USER_NOT_EXIST, loginUser.getId());
             return result;
         }
-        List<Resource> allResourceList = resourcesMapper.selectBatchIds(resourceIds);
+
+        Tenant tenant = tenantMapper.queryById(user.getTenantId());
+        if (tenant == null) {
+            log.error("tenant not exists");
+            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
+            return result;
+        }
+
+        String tenantCode = tenant.getTenantCode();
+
+        List<StorageEntity> allResourceList = queryStorageEntityList(loginUser, "", type, tenantCode, true);
 
         String suffix = ".jar";
         if (programType != null) {
@@ -820,12 +842,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 default:
             }
         }
-        List<Resource> resources = new ResourceFilter(suffix, new ArrayList<>(allResourceList)).filter();
-        // Transform into StorageEntity for compatibility
-        List<StorageEntity> transformedResourceList = resources.stream()
-                .map(this::createStorageEntityBasedOnResource)
-                .collect(Collectors.toList());
-        Visitor visitor = new ResourceTreeVisitor(transformedResourceList);
+        List<StorageEntity> resources = new ResourceFilter(suffix, new ArrayList<>(allResourceList)).filter();
+        Visitor visitor = new ResourceTreeVisitor(resources);
         result.setData(visitor.visit("").getChildren());
         putMsg(result, Status.SUCCESS);
         return result;
