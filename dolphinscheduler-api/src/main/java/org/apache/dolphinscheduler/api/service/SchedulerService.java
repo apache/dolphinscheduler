@@ -49,6 +49,7 @@ public interface SchedulerService {
      * @param failureStrategy failure strategy
      * @param processInstancePriority process instance priority
      * @param workerGroup worker group
+     * @param tenantCode tenant code
      * @param environmentCode environment code
      * @return create result code
      */
@@ -61,6 +62,7 @@ public interface SchedulerService {
                                        FailureStrategy failureStrategy,
                                        Priority processInstancePriority,
                                        String workerGroup,
+                                       String tenantCode,
                                        Long environmentCode);
 
     /**
@@ -84,6 +86,7 @@ public interface SchedulerService {
      * @param warningGroupId warning group id
      * @param failureStrategy failure strategy
      * @param workerGroup worker group
+     * @param tenantCode tenant code
      * @param environmentCode environment code
      * @param processInstancePriority process instance priority
      * @return update result code
@@ -97,6 +100,7 @@ public interface SchedulerService {
                                        FailureStrategy failureStrategy,
                                        Priority processInstancePriority,
                                        String workerGroup,
+                                       String tenantCode,
                                        Long environmentCode);
 
     /**
@@ -206,6 +210,7 @@ public interface SchedulerService {
      * @param warningGroupId warning group id
      * @param failureStrategy failure strategy
      * @param workerGroup worker group
+     * @param tenantCode tenant code
      * @param processInstancePriority process instance priority
      * @return update result code
      */
@@ -218,5 +223,6 @@ public interface SchedulerService {
                                                               FailureStrategy failureStrategy,
                                                               Priority processInstancePriority,
                                                               String workerGroup,
+                                                              String tenantCode,
                                                               long environmentCode);
 }

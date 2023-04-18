@@ -46,12 +46,14 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
+import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
@@ -117,6 +119,9 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     @Autowired
     private EnvironmentMapper environmentMapper;
 
+    @Autowired
+    private TenantMapper tenantMapper;
+
     /**
      * save schedule
      *
@@ -129,6 +134,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      * @param failureStrategy         failure strategy
      * @param processInstancePriority process instance priority
      * @param workerGroup             worker group
+     * @param tenantCode              tenant code
      * @param environmentCode         environment code
      * @return create result code
      */
@@ -143,6 +149,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                                               FailureStrategy failureStrategy,
                                               Priority processInstancePriority,
                                               String workerGroup,
+                                              String tenantCode,
                                               Long environmentCode) {
 
         Map<String, Object> result = new HashMap<>();
@@ -155,7 +162,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             return result;
         }
 
-        // check work flow define release state
+        // check workflow define release state
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefineCode);
         executorService.checkProcessDefinitionValid(projectCode, processDefinition, processDefineCode,
                 processDefinition.getVersion());
@@ -163,6 +170,9 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Schedule scheduleObj = new Schedule();
         Date now = new Date();
 
+        checkValidTenant(tenantCode);
+
+        scheduleObj.setTenantCode(tenantCode);
         scheduleObj.setProjectName(project.getName());
         scheduleObj.setProcessDefinitionCode(processDefineCode);
         scheduleObj.setProcessDefinitionName(processDefinition.getName());
@@ -269,11 +279,14 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                     scheduleExists.getId());
         }
 
+        checkValidTenant(scheduleCreateRequest.getTenantCode());
+
         Schedule schedule = scheduleCreateRequest.convert2Schedule();
         Environment environment = environmentMapper.queryByEnvironmentCode(schedule.getEnvironmentCode());
         if (environment == null) {
             throw new ServiceException(Status.QUERY_ENVIRONMENT_BY_CODE_ERROR, schedule.getEnvironmentCode());
         }
+
         schedule.setUserId(loginUser.getId());
         // give more detail when return schedule object
         schedule.setUserName(loginUser.getUserName());
@@ -301,6 +314,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      * @param warningGroupId          warning group id
      * @param failureStrategy         failure strategy
      * @param workerGroup             worker group
+     * @param tenantCode              tenant code
      * @param environmentCode         environment code
      * @param processInstancePriority process instance priority
      * @return update result code
@@ -316,6 +330,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                                               FailureStrategy failureStrategy,
                                               Priority processInstancePriority,
                                               String workerGroup,
+                                              String tenantCode,
                                               Long environmentCode) {
         Map<String, Object> result = new HashMap<>();
 
@@ -345,7 +360,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         }
 
         updateSchedule(result, schedule, processDefinition, scheduleExpression, warningType, warningGroupId,
-                failureStrategy, processInstancePriority, workerGroup, environmentCode);
+                failureStrategy, processInstancePriority, workerGroup, tenantCode, environmentCode);
         return result;
     }
 
@@ -561,16 +576,16 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         }
 
         Page<Schedule> page = new Page<>(pageNo, pageSize);
-        IPage<Schedule> scheduleIPage =
+        IPage<Schedule> schedulePage =
                 scheduleMapper.queryByProcessDefineCodePaging(page, processDefineCode, searchVal);
 
         List<ScheduleVo> scheduleList = new ArrayList<>();
-        for (Schedule schedule : scheduleIPage.getRecords()) {
+        for (Schedule schedule : schedulePage.getRecords()) {
             scheduleList.add(new ScheduleVo(schedule));
         }
 
         PageInfo<ScheduleVo> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotal((int) scheduleIPage.getTotal());
+        pageInfo.setTotal((int) schedulePage.getTotal());
         pageInfo.setTotalList(scheduleList);
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
@@ -752,6 +767,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      * @param warningGroupId          warning group id
      * @param failureStrategy         failure strategy
      * @param workerGroup             worker group
+     * @param tenantCode              tenant code
      * @param processInstancePriority process instance priority
      * @return update result code
      */
@@ -765,6 +781,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                                                                      FailureStrategy failureStrategy,
                                                                      Priority processInstancePriority,
                                                                      String workerGroup,
+                                                                     String tenantCode,
                                                                      long environmentCode) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
@@ -789,13 +806,14 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         }
 
         updateSchedule(result, schedule, processDefinition, scheduleExpression, warningType, warningGroupId,
-                failureStrategy, processInstancePriority, workerGroup, environmentCode);
+                failureStrategy, processInstancePriority, workerGroup, tenantCode, environmentCode);
         return result;
     }
 
     private void updateSchedule(Map<String, Object> result, Schedule schedule, ProcessDefinition processDefinition,
                                 String scheduleExpression, WarningType warningType, int warningGroupId,
                                 FailureStrategy failureStrategy, Priority processInstancePriority, String workerGroup,
+                                String tenantCode,
                                 long environmentCode) {
         if (checkValid(result, schedule.getReleaseState() == ReleaseState.ONLINE,
                 Status.SCHEDULE_CRON_ONLINE_FORBID_UPDATE)) {
@@ -805,6 +823,9 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         }
 
         Date now = new Date();
+
+        checkValidTenant(tenantCode);
+        schedule.setTenantCode(tenantCode);
 
         // updateProcessInstance param
         if (!StringUtils.isEmpty(scheduleExpression)) {
@@ -859,5 +880,19 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         log.info("Schedule update complete, projectCode:{}, processDefinitionCode:{}, scheduleId:{}.",
                 processDefinition.getProjectCode(), processDefinition.getCode(), schedule.getId());
         putMsg(result, Status.SUCCESS);
+    }
+
+    /**
+     * check valid tenant
+     *
+     * @param tenantCode
+     */
+    private void checkValidTenant(String tenantCode) {
+        if (!Constants.DEFAULT.equals(tenantCode)) {
+            Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
+            if (tenant == null) {
+                throw new ServiceException(Status.TENANT_NOT_EXIST, tenantCode);
+            }
+        }
     }
 }

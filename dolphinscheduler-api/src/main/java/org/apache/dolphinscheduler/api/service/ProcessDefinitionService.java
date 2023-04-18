@@ -52,7 +52,6 @@ public interface ProcessDefinitionService {
      * @param globalParams global params
      * @param locations locations for nodes
      * @param timeout timeout
-     * @param tenantCode tenantCode
      * @param taskRelationJson relation json for nodes
      * @param taskDefinitionJson taskDefinitionJson
      * @param otherParamsJson otherParamsJson handle other params
@@ -65,7 +64,6 @@ public interface ProcessDefinitionService {
                                                 String globalParams,
                                                 String locations,
                                                 int timeout,
-                                                String tenantCode,
                                                 String taskRelationJson,
                                                 String taskDefinitionJson,
                                                 String otherParamsJson,
@@ -207,7 +205,6 @@ public interface ProcessDefinitionService {
      * @param globalParams global params
      * @param locations locations for nodes
      * @param timeout timeout
-     * @param tenantCode tenantCode
      * @param taskRelationJson relation json for nodes
      * @param taskDefinitionJson taskDefinitionJson
      * @param otherParamsJson otherParamsJson handle other params
@@ -221,7 +218,6 @@ public interface ProcessDefinitionService {
                                                 String globalParams,
                                                 String locations,
                                                 int timeout,
-                                                String tenantCode,
                                                 String taskRelationJson,
                                                 String taskDefinitionJson,
                                                 String otherParamsJson,
@@ -427,7 +423,6 @@ public interface ProcessDefinitionService {
      * @param description description
      * @param globalParams globalParams
      * @param timeout timeout
-     * @param tenantCode tenantCode
      * @param scheduleJson scheduleJson
      * @return process definition code
      */
@@ -437,7 +432,6 @@ public interface ProcessDefinitionService {
                                                      String description,
                                                      String globalParams,
                                                      int timeout,
-                                                     String tenantCode,
                                                      String scheduleJson,
                                                      ProcessExecutionTypeEnum executionType);
 
@@ -451,7 +445,6 @@ public interface ProcessDefinitionService {
      * @param description description
      * @param globalParams globalParams
      * @param timeout timeout
-     * @param tenantCode tenantCode
      * @param scheduleJson scheduleJson
      * @param otherParamsJson otherParamsJson handle other params
      * @param executionType executionType
@@ -464,7 +457,6 @@ public interface ProcessDefinitionService {
                                                          String description,
                                                          String globalParams,
                                                          int timeout,
-                                                         String tenantCode,
                                                          String scheduleJson,
                                                          String otherParamsJson,
                                                          ProcessExecutionTypeEnum executionType);

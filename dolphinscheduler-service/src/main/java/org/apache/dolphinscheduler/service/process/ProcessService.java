@@ -45,7 +45,6 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -83,7 +82,7 @@ public interface ProcessService {
 
     void recurseFindSubProcess(long parentCode, List<Long> ids);
 
-    Tenant getTenantForProcess(int tenantId, int userId);
+    String getTenantForProcess(String tenantCode, int userId);
 
     Environment findEnvironmentByCode(Long environmentCode);
 

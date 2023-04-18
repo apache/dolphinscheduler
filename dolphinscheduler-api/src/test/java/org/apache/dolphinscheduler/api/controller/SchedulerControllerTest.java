@@ -67,11 +67,12 @@ public class SchedulerControllerTest extends AbstractControllerTest {
         paramsMap.add("receivers", "");
         paramsMap.add("receiversCc", "");
         paramsMap.add("workerGroupId", "1");
+        paramsMap.add("tenantCode", "root");
         paramsMap.add("processInstancePriority", String.valueOf(Priority.HIGH));
 
         Mockito.when(schedulerService.insertSchedule(isA(User.class), isA(Long.class), isA(Long.class),
                 isA(String.class), isA(WarningType.class), isA(int.class), isA(FailureStrategy.class),
-                isA(Priority.class), isA(String.class), isA(Long.class))).thenReturn(success());
+                isA(Priority.class), isA(String.class), isA(String.class), isA(Long.class))).thenReturn(success());
 
         MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedules/", 123)
                 .header(SESSION_ID, sessionId)
@@ -97,11 +98,12 @@ public class SchedulerControllerTest extends AbstractControllerTest {
         paramsMap.add("receivers", "");
         paramsMap.add("receiversCc", "");
         paramsMap.add("workerGroupId", "1");
+        paramsMap.add("tenantCode", "root");
         paramsMap.add("processInstancePriority", String.valueOf(Priority.HIGH));
 
         Mockito.when(schedulerService.updateSchedule(isA(User.class), isA(Long.class), isA(Integer.class),
                 isA(String.class), isA(WarningType.class), isA(Integer.class), isA(FailureStrategy.class),
-                isA(Priority.class), isA(String.class), isA(Long.class))).thenReturn(success());
+                isA(Priority.class), isA(String.class), isA(String.class), isA(Long.class))).thenReturn(success());
 
         MvcResult mvcResult = mockMvc.perform(put("/projects/{projectCode}/schedules/{id}", 123, 37)
                 .header(SESSION_ID, sessionId)

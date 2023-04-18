@@ -86,7 +86,6 @@ public class WorkflowV2ControllerTest {
         workflowCreateRequest.setDescription(description);
         workflowCreateRequest.setGlobalParams(EMPTY_STRING);
         workflowCreateRequest.setTimeout(timeout);
-        workflowCreateRequest.setTenantCode(tenantCode);
         workflowCreateRequest.setWarningGroupId(warningGroupId);
         workflowCreateRequest.setExecutionType(executionType);
 
@@ -139,7 +138,6 @@ public class WorkflowV2ControllerTest {
         processDefinition.setDescription(description);
         processDefinition.setReleaseState(ReleaseState.valueOf(releaseState));
         processDefinition.setProjectCode(projectCode);
-        processDefinition.setTenantId(1);
         processDefinition.setExecutionType(ProcessExecutionTypeEnum.valueOf(executionType));
         processDefinition.setWarningGroupId(warningGroupId);
         processDefinition.setGlobalParams(EMPTY_STRING);
@@ -153,7 +151,6 @@ public class WorkflowV2ControllerTest {
         processDefinition.setDescription(description);
         processDefinition.setReleaseState(ReleaseState.valueOf(releaseState));
         processDefinition.setProjectCode(projectCode);
-        processDefinition.setTenantId(1);
         processDefinition.setExecutionType(ProcessExecutionTypeEnum.valueOf(executionType));
         processDefinition.setWarningGroupId(warningGroupId);
         processDefinition.setGlobalParams(EMPTY_STRING);

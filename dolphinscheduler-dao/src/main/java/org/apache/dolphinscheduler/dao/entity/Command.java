@@ -87,6 +87,11 @@ public class Command {
     @TableField("worker_group")
     private String workerGroup;
 
+    /**
+     * tenant code
+     */
+    private String tenantCode;
+
     @TableField("environment_code")
     private Long environmentCode;
 

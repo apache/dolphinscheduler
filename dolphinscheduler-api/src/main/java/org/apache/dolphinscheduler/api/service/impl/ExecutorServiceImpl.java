@@ -70,6 +70,7 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
+import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
@@ -78,6 +79,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
+import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.remote.command.Message;
@@ -181,6 +183,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     @Autowired
     private ExecuteClient executeClient;
 
+    @Autowired
+    private TenantMapper tenantMapper;
+
     /**
      * execute process instance
      *
@@ -196,6 +201,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @param warningGroupId            notify group id
      * @param processInstancePriority   process instance priority
      * @param workerGroup               worker group name
+     * @param tenantCode                tenant code
      * @param environmentCode           environment code
      * @param runMode                   run mode
      * @param timeout                   timeout
@@ -212,6 +218,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                                    TaskDependType taskDependType, WarningType warningType,
                                                    Integer warningGroupId, RunMode runMode,
                                                    Priority processInstancePriority, String workerGroup,
+                                                   String tenantCode,
                                                    Long environmentCode, Integer timeout,
                                                    Map<String, String> startParams, Integer expectedParallelismNumber,
                                                    int dryRun, int testFlag,
@@ -229,6 +236,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             putMsg(result, Status.TASK_TIMEOUT_PARAMS_ERROR);
             return result;
         }
+        checkValidTenant(tenantCode);
         ProcessDefinition processDefinition;
         if (null != version) {
             processDefinition = processService.findProcessDefinition(processDefinitionCode, version);
@@ -254,7 +262,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                         failureStrategy,
                         startNodeList,
                         cronTime, warningType, loginUser.getId(), warningGroupId, runMode, processInstancePriority,
-                        workerGroup,
+                        workerGroup, tenantCode,
                         environmentCode, startParams, expectedParallelismNumber, dryRun, testFlag,
                         complementDependentMode);
 
@@ -359,6 +367,20 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 .filter(definition -> definition.getReleaseState().equals(ReleaseState.OFFLINE))
                 .collect(Collectors.toSet())
                 .isEmpty();
+    }
+
+    /**
+     * check valid tenant
+     *
+     * @param tenantCode
+     */
+    private void checkValidTenant(String tenantCode) {
+        if (!Constants.DEFAULT.equals(tenantCode)) {
+            Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
+            if (tenant == null) {
+                throw new ServiceException(Status.TENANT_NOT_EXIST, tenantCode);
+            }
+        }
     }
 
     /**
@@ -723,7 +745,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     private int createCommand(Long triggerCode, CommandType commandType, long processDefineCode, TaskDependType nodeDep,
                               FailureStrategy failureStrategy, String startNodeList, String schedule,
                               WarningType warningType, int executorId, Integer warningGroupId, RunMode runMode,
-                              Priority processInstancePriority, String workerGroup, Long environmentCode,
+                              Priority processInstancePriority, String workerGroup, String tenantCode,
+                              Long environmentCode,
                               Map<String, String> startParams, Integer expectedParallelismNumber, int dryRun,
                               int testFlag, ComplementDependentMode complementDependentMode) {
 
@@ -760,6 +783,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         command.setWarningGroupId(warningGroupId);
         command.setProcessInstancePriority(processInstancePriority);
         command.setWorkerGroup(workerGroup);
+        command.setTenantCode(tenantCode);
         command.setEnvironmentCode(environmentCode);
         command.setDryRun(dryRun);
         command.setTestFlag(testFlag);
@@ -1140,7 +1164,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     @Override
     public Map<String, Object> execStreamTaskInstance(User loginUser, long projectCode, long taskDefinitionCode,
                                                       int taskDefinitionVersion,
-                                                      int warningGroupId, String workerGroup, Long environmentCode,
+                                                      int warningGroupId, String workerGroup, String tenantCode,
+                                                      Long environmentCode,
                                                       Map<String, String> startParams, int dryRun) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
@@ -1149,7 +1174,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-
+        checkValidTenant(tenantCode);
         checkMasterExists();
         // todo dispatch improvement
         List<Server> masterServerList = monitorService.getServerListFromRegistry(true);
@@ -1162,6 +1187,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         taskExecuteStartMessage.setTaskDefinitionCode(taskDefinitionCode);
         taskExecuteStartMessage.setTaskDefinitionVersion(taskDefinitionVersion);
         taskExecuteStartMessage.setWorkerGroup(workerGroup);
+        taskExecuteStartMessage.setTenantCode(tenantCode);
         taskExecuteStartMessage.setWarningGroupId(warningGroupId);
         taskExecuteStartMessage.setEnvironmentCode(environmentCode);
         taskExecuteStartMessage.setStartParams(startParams);

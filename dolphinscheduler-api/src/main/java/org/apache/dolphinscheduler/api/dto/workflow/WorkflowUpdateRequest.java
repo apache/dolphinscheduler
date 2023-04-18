@@ -56,9 +56,6 @@ public class WorkflowUpdateRequest {
     @Schema(example = "60")
     private int timeout;
 
-    @Schema(example = "tenantCode1")
-    private String tenantCode;
-
     @Schema(allowableValues = "PARALLEL / SERIAL_WAIT / SERIAL_DISCARD / SERIAL_PRIORITY", example = "PARALLEL", description = "default PARALLEL if not provide.")
     private String executionType;
 
@@ -92,9 +89,6 @@ public class WorkflowUpdateRequest {
         }
         if (this.timeout != 0) {
             processDefinitionDeepCopy.setTimeout(this.timeout);
-        }
-        if (this.tenantCode != null) {
-            processDefinitionDeepCopy.setTenantCode(this.tenantCode);
         }
         if (this.executionType != null) {
             processDefinitionDeepCopy.setExecutionType(ProcessExecutionTypeEnum.valueOf(this.executionType));

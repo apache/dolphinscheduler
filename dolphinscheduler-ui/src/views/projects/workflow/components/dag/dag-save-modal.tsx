@@ -19,7 +19,6 @@ import {
   defineComponent,
   PropType,
   ref,
-  computed,
   onMounted,
   watch,
   getCurrentInstance
@@ -36,14 +35,11 @@ import {
   NDynamicInput,
   NCheckbox
 } from 'naive-ui'
-import { queryTenantList } from '@/service/modules/tenants'
 import { useRoute } from 'vue-router'
-import { useUserStore } from '@/store/user/user'
 import { verifyName } from '@/service/modules/process-definition'
 import './x6-style.scss'
 import { positiveIntegerRegex } from '@/utils/regex'
 import type { SaveForm, WorkflowDefinition, WorkflowInstance } from './types'
-import type { UserInfoRes } from '@/service/modules/users/types'
 
 const props = {
   visible: {
@@ -61,11 +57,6 @@ const props = {
   }
 }
 
-interface Tenant {
-  tenantCode: string
-  id: number
-}
-
 export default defineComponent({
   name: 'dag-save-modal',
   props,
@@ -75,28 +66,10 @@ export default defineComponent({
     const { t } = useI18n()
 
     const projectCode = Number(route.params.projectCode)
-    const userInfo = useUserStore().getUserInfo as UserInfoRes
-    const tenants = ref<Tenant[]>([])
-    const tenantsDropdown = computed(() => {
-      if (tenants.value) {
-        return tenants.value
-          .map((t) => ({
-            label: t.tenantCode,
-            value: t.tenantCode
-          }))
-      }
-      return []
-    })
-    onMounted(() => {
-      queryTenantList().then((res: any) => {
-        tenants.value = res
-      })
-    })
 
     const formValue = ref<SaveForm>({
       name: '',
       description: '',
-      tenantCode: userInfo.tenantCode || 'default',
       executionType: 'PARALLEL',
       timeoutFlag: false,
       timeout: 0,
@@ -170,7 +143,6 @@ export default defineComponent({
       if (process) {
         formValue.value.name = process.name
         formValue.value.description = process.description
-        formValue.value.tenantCode = process.tenantCode || userInfo.tenantCode || 'default'
         formValue.value.executionType = process.executionType || 'PARALLEL'
         if (process.timeout && process.timeout > 0) {
           formValue.value.timeoutFlag = true
@@ -214,13 +186,6 @@ export default defineComponent({
               type='textarea'
               v-model:value={formValue.value.description}
               class='input-description'
-            />
-          </NFormItem>
-          <NFormItem label={t('project.dag.tenant')} path='tenantCode'>
-            <NSelect
-              options={tenantsDropdown.value}
-              v-model:value={formValue.value.tenantCode}
-              class='btn-select-tenant-code'
             />
           </NFormItem>
           <NFormItem label={t('project.dag.timeout_alert')} path='timeoutFlag'>

@@ -631,15 +631,12 @@ public class ProcessServiceImpl implements ProcessService {
 
         // set process instance priority
         processInstance.setProcessInstancePriority(command.getProcessInstancePriority());
-        String workerGroup = Strings.isNullOrEmpty(command.getWorkerGroup()) ? Constants.DEFAULT_WORKER_GROUP
-                : command.getWorkerGroup();
+        String workerGroup = StringUtils.defaultIfEmpty(command.getWorkerGroup(), Constants.DEFAULT_WORKER_GROUP);
         processInstance.setWorkerGroup(workerGroup);
         processInstance
                 .setEnvironmentCode(Objects.isNull(command.getEnvironmentCode()) ? -1 : command.getEnvironmentCode());
         processInstance.setTimeout(processDefinition.getTimeout());
-        processInstance.setTenantId(processDefinition.getTenantId());
-        processInstance.setTenantCode(Optional.ofNullable(tenantMapper.queryById(processDefinition.getTenantId()))
-                .map(Tenant::getTenantCode).orElse(null));
+        processInstance.setTenantCode(command.getTenantCode());
         return processInstance;
     }
 
@@ -678,31 +675,29 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     /**
-     * get process tenant
-     * there is tenant id in definition, use the tenant of the definition.
-     * if there is not tenant id in the definiton or the tenant not exist
-     * use definition creator's tenant.
+     * Get workflow runtime tenant
      *
-     * @param tenantId tenantId
+     * the workflow provides a tenant and uses the provided tenant;
+     * when no tenant is provided or the provided tenant is the default tenant, \
+     * the user's tenant created by the workflow is used
+     *
+     * @param tenantCode tenantCode
      * @param userId   userId
-     * @return tenant
+     * @return tenant code
      */
     @Override
-    public Tenant getTenantForProcess(int tenantId, int userId) {
-        Tenant tenant = null;
-        if (tenantId >= 0) {
-            tenant = tenantMapper.queryById(tenantId);
+    public String getTenantForProcess(String tenantCode, int userId) {
+        if (StringUtils.isNoneBlank(tenantCode) && !Constants.DEFAULT.equals(tenantCode)) {
+            return tenantCode;
         }
 
         if (userId == 0) {
             return null;
         }
 
-        if (tenant == null) {
-            User user = userMapper.selectById(userId);
-            tenant = tenantMapper.queryById(user.getTenantId());
-        }
-        return tenant;
+        User user = userMapper.selectById(userId);
+        Tenant tenant = tenantMapper.queryById(user.getTenantId());
+        return tenant.getTenantCode();
     }
 
     /**

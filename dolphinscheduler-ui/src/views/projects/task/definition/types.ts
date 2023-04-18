@@ -31,6 +31,7 @@ interface IRecord {
 interface IStartState {
   projectCode: number
   workerGroups: Array<IOption>
+  tenantList: Array<IOption>
   alertGroups: Array<IOption>
   environmentList: Array<IEnvironmentNameOption>
   startParamsList: Array<IParam>

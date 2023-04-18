@@ -149,17 +149,6 @@ public class ProcessDefinition {
     private int timeout;
 
     /**
-     * tenant id
-     */
-    private int tenantId;
-
-    /**
-     * tenant code
-     */
-    @TableField(exist = false)
-    private String tenantCode;
-
-    /**
      * modify user name
      */
     @TableField(exist = false)
@@ -183,9 +172,8 @@ public class ProcessDefinition {
                              String globalParams,
                              String locations,
                              int timeout,
-                             int userId,
-                             int tenantId) {
-        set(projectCode, name, description, globalParams, locations, timeout, tenantId);
+                             int userId) {
+        set(projectCode, name, description, globalParams, locations, timeout);
         this.code = code;
         this.userId = userId;
         Date date = new Date();
@@ -198,15 +186,13 @@ public class ProcessDefinition {
                     String description,
                     String globalParams,
                     String locations,
-                    int timeout,
-                    int tenantId) {
+                    int timeout) {
         this.projectCode = projectCode;
         this.name = name;
         this.description = description;
         this.globalParams = globalParams;
         this.locations = locations;
         this.timeout = timeout;
-        this.tenantId = tenantId;
         this.flag = Flag.YES;
     }
 

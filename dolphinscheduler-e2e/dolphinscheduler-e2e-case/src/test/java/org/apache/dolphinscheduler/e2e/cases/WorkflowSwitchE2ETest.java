@@ -130,7 +130,6 @@ class WorkflowSwitchE2ETest {
 
         workflowForm.submit()
             .name(workflow)
-            .tenant(tenant)
             .addGlobalParam("key", "1")
             .submit();
 

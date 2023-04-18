@@ -72,6 +72,9 @@ public class ScheduleCreateRequest {
     @Schema(example = "worker-group-name")
     private String workerGroup;
 
+    @Schema(example = "tenant-code")
+    private String tenantCode;
+
     @Schema(example = "environment-code")
     private long environmentCode;
 
@@ -91,6 +94,7 @@ public class ScheduleCreateRequest {
         schedule.setTimezoneId(this.timezoneId);
         schedule.setWarningGroupId(this.warningGroupId);
         schedule.setWorkerGroup(this.workerGroup);
+        schedule.setTenantCode(this.tenantCode);
         schedule.setEnvironmentCode(this.environmentCode);
 
         FailureStrategy newFailureStrategy =

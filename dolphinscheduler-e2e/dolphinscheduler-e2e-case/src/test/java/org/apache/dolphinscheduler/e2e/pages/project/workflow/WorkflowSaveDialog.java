@@ -53,15 +53,6 @@ public final class WorkflowSaveDialog {
     })
     private WebElement buttonGlobalCustomParameters;
 
-    @FindBys({
-            @FindBy(className = "btn-select-tenant-code"),
-            @FindBy(className = "n-base-selection"),
-    })
-    private WebElement selectTenant;
-
-    @FindBy(className = "n-base-select-option__content")
-    private List<WebElement> selectTenantOption;
-
     @FindBy(className = "input-global-params")
     private WebElement globalParamsItems;
 
@@ -74,20 +65,6 @@ public final class WorkflowSaveDialog {
 
     public WorkflowSaveDialog name(String name) {
         inputName().sendKeys(name);
-
-        return this;
-    }
-
-    public WorkflowSaveDialog tenant(String tenant) {
-        selectTenant().click();
-
-        selectTenantOption()
-                .stream()
-                .filter(it -> it.getAttribute("innerText").contains(tenant))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException(String.format("No %s in workflow save dialog tenant dropdown " +
-                        "list", tenant)))
-                .click();
 
         return this;
     }

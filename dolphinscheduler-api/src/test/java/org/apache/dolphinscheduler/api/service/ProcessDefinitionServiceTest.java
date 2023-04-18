@@ -26,7 +26,6 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_ONLINE_OFFLINE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_TREE_VIEW;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_UPDATE;
-import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT;
 import static org.apache.dolphinscheduler.common.constants.Constants.EMPTY_STRING;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
@@ -58,7 +57,6 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskMainInfo;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.UserWithProcessDefinitionCode;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
@@ -68,7 +66,6 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
 import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
@@ -168,9 +165,6 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
     private ProcessInstanceService processInstanceService;
 
     @Mock
-    private TenantMapper tenantMapper;
-
-    @Mock
     private DataSourceMapper dataSourceMapper;
 
     @Mock
@@ -202,7 +196,6 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
     protected final static int warningGroupId = 1;
     protected final static int timeout = 60;
     protected final static String executionType = "PARALLEL";
-    protected final static String tenantCode = "tenant";
 
     @BeforeEach
     public void before() {
@@ -317,9 +310,6 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
 
         Project project = getProject(projectCode);
 
-        Tenant tenant = new Tenant();
-        tenant.setId(1);
-        tenant.setTenantCode("root");
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
 
@@ -345,7 +335,6 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         putMsg(result, Status.SUCCESS, projectCode);
         Mockito.when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_DEFINITION))
                 .thenReturn(result);
-        Mockito.when(tenantMapper.queryById(1)).thenReturn(tenant);
         Map<String, Object> successRes =
                 processDefinitionService.queryProcessDefinitionByCode(user, projectCode, 46L);
         Assertions.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
@@ -833,7 +822,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
 
         try {
             processDefinitionService.updateProcessDefinition(user, projectCode, "test", 1,
-                    "", "", "", 0, "root", null, "", null, ProcessExecutionTypeEnum.PARALLEL);
+                    "", "", "", 0, null, "", null, ProcessExecutionTypeEnum.PARALLEL);
             Assertions.fail();
         } catch (ServiceException ex) {
             Assertions.assertEquals(Status.DATA_IS_NOT_VALID.getCode(), ex.getCode());
@@ -958,14 +947,9 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         Assertions.assertEquals(Status.PROCESS_DEFINITION_NAME_EXIST.getCode(),
                 ((ServiceException) exception).getCode());
 
-        // tenant not exists
         Mockito.when(processDefinitionMapper.verifyByDefineName(project.getCode(), name)).thenReturn(null);
-        exception = Assertions.assertThrows(ServiceException.class,
-                () -> processDefinitionService.createSingleProcessDefinition(user, workflowCreateRequest));
-        Assertions.assertEquals(Status.TENANT_NOT_EXIST.getCode(), ((ServiceException) exception).getCode());
 
         // test success
-        workflowCreateRequest.setTenantCode(DEFAULT);
         workflowCreateRequest.setDescription(description);
         workflowCreateRequest.setTimeout(timeout);
         workflowCreateRequest.setReleaseState(releaseState);
@@ -1081,18 +1065,9 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         Assertions.assertEquals(Status.PROCESS_DEFINITION_NAME_EXIST.getCode(),
                 ((ServiceException) exception).getCode());
 
-        // error tenant code not exists
-        processDefinition = this.getProcessDefinition();
-        workflowUpdateRequest.setTenantCode(tenantCode);
         Mockito.when(processDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(processDefinition);
         Mockito.when(processDefinitionMapper.verifyByDefineName(projectCode, workflowUpdateRequest.getName()))
                 .thenReturn(null);
-        Mockito.when(tenantMapper.queryByTenantCode(workflowUpdateRequest.getTenantCode())).thenReturn(null);
-        exception = Assertions.assertThrows(ServiceException.class, () -> processDefinitionService
-                .updateSingleProcessDefinition(user, processDefinitionCode, workflowUpdateRequest));
-        Assertions.assertEquals(Status.TENANT_NOT_EXIST.getCode(), ((ServiceException) exception).getCode());
-        workflowUpdateRequest.setTenantCode(null);
-
         // error update process definition mapper
         workflowUpdateRequest.setName(name);
         Mockito.when(processDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(processDefinition);
@@ -1154,7 +1129,6 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         processDefinition.setId(46);
         processDefinition.setProjectCode(1L);
         processDefinition.setName("test_pdf");
-        processDefinition.setTenantId(1);
         processDefinition.setDescription("");
         processDefinition.setCode(processDefinitionCode);
         processDefinition.setProjectCode(projectCode);

@@ -52,6 +52,7 @@ public interface ExecutorService {
      * @param warningGroupId notify group id
      * @param processInstancePriority process instance priority
      * @param workerGroup worker group name
+     * @param tenantCode tenant code
      * @param environmentCode environment code
      * @param runMode run mode
      * @param timeout timeout
@@ -65,7 +66,8 @@ public interface ExecutorService {
                                             TaskDependType taskDependType, WarningType warningType,
                                             Integer warningGroupId,
                                             RunMode runMode,
-                                            Priority processInstancePriority, String workerGroup, Long environmentCode,
+                                            Priority processInstancePriority, String workerGroup, String tenantCode,
+                                            Long environmentCode,
                                             Integer timeout,
                                             Map<String, String> startParams, Integer expectedParallelismNumber,
                                             int dryRun, int testFlag,
@@ -154,6 +156,7 @@ public interface ExecutorService {
      * @param projectCode project code
      * @param warningGroupId notify group id
      * @param workerGroup worker group name
+     * @param tenantCode tenant code
      * @param environmentCode environment code
      * @param startParams the global param values which pass to new process instance
      * @return execute process instance code
@@ -161,7 +164,9 @@ public interface ExecutorService {
     Map<String, Object> execStreamTaskInstance(User loginUser, long projectCode,
                                                long taskDefinitionCode, int taskDefinitionVersion,
                                                int warningGroupId,
-                                               String workerGroup, Long environmentCode,
+                                               String workerGroup,
+                                               String tenantCode,
+                                               Long environmentCode,
                                                Map<String, String> startParams,
                                                int dryRun);
 }

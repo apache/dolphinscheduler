@@ -29,7 +29,6 @@ import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
@@ -332,10 +331,10 @@ public class StreamTaskExecuteRunnable implements Runnable {
      */
     protected TaskExecutionContext getTaskExecutionContext(TaskInstance taskInstance) {
         int userId = taskDefinition == null ? 0 : taskDefinition.getUserId();
-        Tenant tenant = processService.getTenantForProcess(processDefinition.getTenantId(), userId);
+        String tenantCode = processService.getTenantForProcess(taskExecuteStartMessage.getTenantCode(), userId);
 
         // verify tenant is null
-        if (tenant == null) {
+        if (StringUtils.isBlank(tenantCode)) {
             log.error("tenant not exists,task instance id : {}", taskInstance.getId());
             return null;
         }
@@ -357,7 +356,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
                 .buildParamInfo(propertyMap)
                 .create();
 
-        taskExecutionContext.setTenantCode(tenant.getTenantCode());
+        taskExecutionContext.setTenantCode(tenantCode);
         taskExecutionContext.setProjectCode(processDefinition.getProjectCode());
         taskExecutionContext.setProcessDefineCode(processDefinition.getCode());
         taskExecutionContext.setProcessDefineVersion(processDefinition.getVersion());

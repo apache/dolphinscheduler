@@ -118,7 +118,6 @@ class WorkflowE2ETest {
 
             .submit()
             .name(workflow)
-            .tenant(tenant)
             .addGlobalParam("global_param", "hello world")
             .submit()
         ;
@@ -151,7 +150,6 @@ class WorkflowE2ETest {
 
             .submit()
             .name(workflow)
-            .tenant(tenant)
             .addGlobalParam("global_param", "hello world")
             .submit()
         ;

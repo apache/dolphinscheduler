@@ -93,7 +93,6 @@ export default defineComponent({
           locations: JSON.stringify(locations),
           taskDefinitionJson: JSON.stringify(taskDefinitions),
           taskRelationJson: JSON.stringify(connects),
-          tenantCode: saveForm.tenantCode,
           timeout: saveForm.timeoutFlag ? saveForm.timeout : 0
         },
         id,

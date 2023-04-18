@@ -143,7 +143,6 @@ public class ProcessDefinitionMapperTest extends BaseDaoTest {
         processDefinition.setProjectCode(project.getCode());
         processDefinition.setUpdateTime(new Date());
         processDefinition.setCreateTime(new Date());
-        processDefinition.setTenantId(tenant.getId());
         processDefinition.setUserId(user.getId());
         processDefinitionMapper.insert(processDefinition);
         ProcessDefinition definition = processDefinitionMapper.verifyByDefineName(10L, "xxx");
@@ -187,30 +186,11 @@ public class ProcessDefinitionMapperTest extends BaseDaoTest {
         processDefinition.setProjectCode(project.getCode());
         processDefinition.setUpdateTime(new Date());
         processDefinition.setCreateTime(new Date());
-        processDefinition.setTenantId(tenant.getId());
         processDefinition.setUserId(user.getId());
         processDefinitionMapper.insert(processDefinition);
 
         ProcessDefinition processDefinition1 = processDefinitionMapper.queryByDefineName(project.getCode(), "def 1");
         Assertions.assertNotEquals(processDefinition1, null);
-    }
-
-    /**
-     * test queryDefinitionListByTenant
-     */
-    @Test
-    public void testQueryDefinitionListByTenant() {
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setCode(1L);
-        processDefinition.setName("def 1");
-        processDefinition.setProjectCode(888L);
-        processDefinition.setUpdateTime(new Date());
-        processDefinition.setCreateTime(new Date());
-        processDefinition.setTenantId(999);
-        processDefinition.setUserId(1234);
-        processDefinitionMapper.insert(processDefinition);
-        List<ProcessDefinition> definitions = processDefinitionMapper.queryDefinitionListByTenant(999);
-        Assertions.assertNotEquals(definitions.size(), 0);
     }
 
     /**
@@ -250,7 +230,6 @@ public class ProcessDefinitionMapperTest extends BaseDaoTest {
         processDefinition.setProjectCode(project.getCode());
         processDefinition.setUpdateTime(new Date());
         processDefinition.setCreateTime(new Date());
-        processDefinition.setTenantId(tenant.getId());
         processDefinition.setUserId(user.getId());
         processDefinitionMapper.insert(processDefinition);
         ProcessDefinition definition = processDefinitionMapper.queryByDefineId(333);

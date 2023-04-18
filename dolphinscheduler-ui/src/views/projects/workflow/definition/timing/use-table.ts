@@ -129,6 +129,11 @@ export function useTable() {
         width: 140
       },
       {
+        title: t('project.workflow.tenant_code'),
+        key: 'tenantCode',
+        width: 140
+      },
+      {
         title: t('project.workflow.environment_name'),
         key: 'environmentName',
         width: 160

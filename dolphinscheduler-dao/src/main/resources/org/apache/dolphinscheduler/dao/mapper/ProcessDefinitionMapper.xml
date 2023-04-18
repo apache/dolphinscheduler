@@ -20,12 +20,12 @@
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper">
     <sql id="baseSql">
         id, code, name, version, release_state, project_code, user_id, description,
-        global_params, flag, locations, warning_group_id, create_time, timeout, tenant_id, update_time,execution_type
+        global_params, flag, locations, warning_group_id, create_time, timeout, update_time,execution_type
     </sql>
 
     <select id="verifyByDefineName" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
         select pd.id, pd.code, pd.name, pd.version, pd.release_state, pd.project_code, pd.user_id, pd.description,
-        pd.global_params, pd.flag, pd.locations, pd.warning_group_id, pd.create_time, pd.timeout, pd.tenant_id, pd.update_time,pd.execution_type
+        pd.global_params, pd.flag, pd.locations, pd.warning_group_id, pd.create_time, pd.timeout, pd.update_time,pd.execution_type
         from t_ds_process_definition pd
         WHERE pd.project_code = #{projectCode}
         and pd.name = #{processDefinitionName}
@@ -57,13 +57,11 @@
 
     <select id="queryByDefineName" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
         select pd.id, pd.code, pd.name, pd.version, pd.release_state, pd.project_code, p.id as project_id, pd.user_id, pd.description,
-        pd.global_params, pd.flag, pd.locations, pd.warning_group_id, pd.create_time, pd.timeout, pd.tenant_id, pd.update_time,
-        u.user_name,p.name as project_name,t.tenant_code,q.queue,q.queue_name,pd.execution_type
+        pd.global_params, pd.flag, pd.locations, pd.warning_group_id, pd.create_time, pd.timeout, pd.update_time,
+        u.user_name,p.name as project_name,pd.execution_type
         from t_ds_process_definition pd
         JOIN t_ds_user u ON pd.user_id = u.id
         JOIN  t_ds_project p ON pd.project_code = p.code
-        LEFT JOIN  t_ds_tenant t ON t.id = u.tenant_id
-        LEFT JOIN t_ds_queue q ON t.queue_id = q.id
         WHERE p.code = #{projectCode}
         and pd.name = #{processDefinitionName}
     </select>
@@ -124,12 +122,6 @@
             </foreach>
         </if>
     </select>
-    <select id="queryDefinitionListByTenant" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
-        select
-        <include refid="baseSql"/>
-        from t_ds_process_definition
-        where tenant_id = #{tenantId}
-    </select>
     <select id="queryDefinitionListByIdList" resultType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition">
         select
         <include refid="baseSql"/>
@@ -175,7 +167,7 @@
         SELECT
             pd.id, pd.code, pd.name, pd.version, pd.release_state, pd.project_code, pd.user_id, pd.description,
             pd.global_params, pd.flag, pd.locations, pd.warning_group_id, pd.create_time, pd.timeout,
-            pd.tenant_id, pd.update_time, u.user_name,p.name AS project_name ,pd.execution_type
+            pd.update_time, u.user_name,p.name AS project_name ,pd.execution_type
         FROM
             t_ds_process_definition pd,
             t_ds_user u,
