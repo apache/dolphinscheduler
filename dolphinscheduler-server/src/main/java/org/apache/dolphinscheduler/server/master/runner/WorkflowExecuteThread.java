@@ -22,6 +22,8 @@ import static org.apache.dolphinscheduler.common.Constants.CMDPARAM_COMPLEMENT_D
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_RECOVERY_START_NODE_STRING;
 import static org.apache.dolphinscheduler.common.Constants.CMD_PARAM_START_NODES;
 import static org.apache.dolphinscheduler.common.Constants.DEFAULT_WORKER_GROUP;
+import static org.apache.dolphinscheduler.common.Constants.DRY_RUN_FLAG_NO;
+import static org.apache.dolphinscheduler.common.Constants.DRY_RUN_FLAG_YES;
 import static org.apache.dolphinscheduler.common.Constants.SEC_2_MINUTES_TIME_UNIT;
 import static org.apache.dolphinscheduler.common.Constants.START_UP_PARAMS_PREFIX;
 import static org.apache.dolphinscheduler.common.Constants.GLOBAL_PARAMS_PREFIX;
@@ -878,7 +880,7 @@ public class WorkflowExecuteThread implements Runnable {
             taskInstance.setFlag(Flag.YES);
 
             // task dry run flag
-            taskInstance.setDryRun(processInstance.getDryRun());
+            taskInstance.setDryRun(taskIsDryRun(processInstance, taskNode.getCode()));
 
             // task instance retry times
             taskInstance.setRetryTimes(0);
@@ -925,6 +927,19 @@ public class WorkflowExecuteThread implements Runnable {
         }
 
         return taskInstance;
+    }
+
+    private int taskIsDryRun(ProcessInstance processInstance, Long taskCode) {
+        if (processInstance.getDryRun() == DRY_RUN_FLAG_YES) {
+            if (!processInstance.getHistoryCmd().startsWith(CommandType.START_CURRENT_TASK_PROCESS.name())) {
+                return DRY_RUN_FLAG_YES;
+            }
+            List<String> startNodeList = parseStartNodeName(processInstance.getCommandParam());
+            if (startNodeList.contains(String.valueOf(taskCode))) {
+                return DRY_RUN_FLAG_YES;
+            }
+        }
+        return DRY_RUN_FLAG_NO;
     }
 
     public void getPreVarPool(TaskInstance taskInstance, Set<String> preTask) {

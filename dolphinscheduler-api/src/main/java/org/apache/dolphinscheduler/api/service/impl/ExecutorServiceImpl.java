@@ -502,7 +502,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         Map<String, String> cmdParam = new HashMap<>();
         if (commandType == null) {
-            command.setCommandType(CommandType.START_PROCESS);
+            command.setCommandType(StringUtils.isEmpty(startNodeList) ? CommandType.START_PROCESS : CommandType.START_CURRENT_TASK_PROCESS);
         } else {
             command.setCommandType(commandType);
         }
