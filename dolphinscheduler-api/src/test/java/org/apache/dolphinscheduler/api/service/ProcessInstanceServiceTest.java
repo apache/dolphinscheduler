@@ -591,7 +591,8 @@ public class ProcessInstanceServiceTest {
         Tenant tenant = getTenant();
         when(processDefineMapper.queryByCode(46L)).thenReturn(processDefinition);
         when(tenantMapper.queryByTenantCode("root")).thenReturn(tenant);
-        when(processService.getTenantForProcess(Mockito.anyInt(), Mockito.anyInt())).thenReturn(tenant);
+        when(processService.getTenantForProcess(Mockito.anyString(), Mockito.anyInt()))
+                .thenReturn(tenant.getTenantCode());
         when(processInstanceDao.updateProcessInstance(processInstance)).thenReturn(1);
         when(processService.saveProcessDefine(loginUser, processDefinition, Boolean.TRUE, Boolean.FALSE)).thenReturn(1);
 
@@ -815,7 +816,6 @@ public class ProcessInstanceServiceTest {
         processDefinition.setId(46);
         processDefinition.setName("test_pdf");
         processDefinition.setProjectCode(2L);
-        processDefinition.setTenantId(1);
         processDefinition.setDescription("");
         return processDefinition;
     }

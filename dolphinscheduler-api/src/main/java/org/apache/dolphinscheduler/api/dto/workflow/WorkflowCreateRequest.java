@@ -55,9 +55,6 @@ public class WorkflowCreateRequest {
     @Schema(example = "60")
     private int timeout;
 
-    @Schema(example = "tenant1", required = true)
-    private String tenantCode;
-
     @Schema(allowableValues = "PARALLEL / SERIAL_WAIT / SERIAL_DISCARD / SERIAL_PRIORITY", example = "PARALLEL", description = "default PARALLEL if not provide.")
     private String executionType;
 
@@ -70,7 +67,6 @@ public class WorkflowCreateRequest {
         processDefinition.setGlobalParams(this.globalParams);
         processDefinition.setWarningGroupId(this.warningGroupId);
         processDefinition.setTimeout(this.timeout);
-        processDefinition.setTenantCode(this.tenantCode);
 
         ReleaseState pdReleaseState =
                 this.releaseState == null ? ReleaseState.OFFLINE : ReleaseState.valueOf(this.releaseState);
