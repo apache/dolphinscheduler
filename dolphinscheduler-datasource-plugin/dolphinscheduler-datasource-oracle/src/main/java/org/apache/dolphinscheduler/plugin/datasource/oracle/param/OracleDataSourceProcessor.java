@@ -56,6 +56,7 @@ public class OracleDataSourceProcessor extends AbstractDataSourceProcessor {
         oracleDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
         oracleDatasourceParamDTO.setUserName(connectionParams.getUser());
         oracleDatasourceParamDTO.setOther(connectionParams.getOther());
+        oracleDatasourceParamDTO.setConnectType(connectionParams.getConnectType());
 
         String hostSeperator = Constants.DOUBLE_SLASH;
         if (DbConnectType.ORACLE_SID.equals(connectionParams.connectType)) {
