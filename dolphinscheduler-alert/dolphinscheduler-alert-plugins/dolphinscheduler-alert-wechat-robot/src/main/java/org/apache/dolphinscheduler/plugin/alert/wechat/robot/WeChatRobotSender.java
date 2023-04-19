@@ -39,7 +39,7 @@ public final class WeChatRobotSender {
         return alertResult;
     }
 
-    private AlertResult sendMsg(String title, String content) throws IOException {
+    private AlertResult sendMsg(String title, String content) {
         String msg = generateMsg(title, content);
         HttpPost httpPost = constructHttpPost(url, msg);
 
