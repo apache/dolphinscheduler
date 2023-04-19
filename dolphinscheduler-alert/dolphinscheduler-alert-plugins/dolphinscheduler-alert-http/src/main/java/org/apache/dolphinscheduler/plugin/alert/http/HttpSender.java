@@ -163,7 +163,10 @@ public final class HttpSender {
      */
     private void setMsgInRequestBody(String msg) {
         try {
-            ObjectNode objectNode = JSONUtils.parseObject(bodyParams);
+            ObjectNode objectNode = JSONUtils.createObjectNode();
+            if (StringUtils.isNotBlank(bodyParams)) {
+                objectNode = JSONUtils.parseObject(bodyParams);
+            }
             // set msg content field
             objectNode.put(contentField, msg);
             StringEntity entity = new StringEntity(JSONUtils.toJsonString(objectNode), DEFAULT_CHARSET);
