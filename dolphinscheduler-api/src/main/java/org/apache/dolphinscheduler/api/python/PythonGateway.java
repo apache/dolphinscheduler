@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.api.configuration.PythonGatewayConfiguration;
 import org.apache.dolphinscheduler.api.dto.EnvironmentDto;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.EnvironmentService;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
@@ -268,6 +269,10 @@ public class PythonGateway {
                     description, globalParams,
                     null, timeout, user.getTenantCode(), taskRelationJson, taskDefinitionJson, otherParamsJson,
                     executionTypeEnum);
+            if (result.get(Constants.STATUS) != Status.SUCCESS) {
+                log.error(result.get(Constants.MSG).toString());
+                throw new ServiceException(result.get(Constants.MSG).toString());
+            }
             processDefinition = (ProcessDefinition) result.get(Constants.DATA_LIST);
             processDefinitionCode = processDefinition.getCode();
         }
