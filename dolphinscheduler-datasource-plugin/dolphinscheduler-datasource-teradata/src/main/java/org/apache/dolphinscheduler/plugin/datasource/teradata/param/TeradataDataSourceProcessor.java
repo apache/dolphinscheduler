@@ -59,10 +59,8 @@ public class TeradataDataSourceProcessor extends AbstractDataSourceProcessor {
         String[] hostSeperator = address.split(Constants.DOUBLE_SLASH);
         String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.SLASH);
         teradataDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
-        teradataDatasourceParamDTO.setPort(1025); /*
-                                                   * Integer.parseInt(hostPortArray[0].split(Constants.EQUAL)[2]));
-                                                   * TODO: Fetch port number from address (above)
-                                                   */
+        teradataDatasourceParamDTO.setPort(
+                Integer.parseInt(connectionParams.getJdbcUrl().split("DBS_PORT=")[1].split(Constants.COMMA)[0]));
 
         return teradataDatasourceParamDTO;
     }
