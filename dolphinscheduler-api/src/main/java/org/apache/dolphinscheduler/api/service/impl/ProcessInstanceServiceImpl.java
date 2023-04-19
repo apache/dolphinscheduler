@@ -401,11 +401,12 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
                 }
                 String dependResultString = tmpStringArray[1];
                 String[] dependStringArray = dependResultString.split(",");
-                if (dependStringArray.length != 2) {
+                if (dependStringArray.length != 3) {
                     continue;
                 }
-                String key = dependStringArray[0].trim();
-                DependResult dependResult = DependResult.valueOf(dependStringArray[1].trim());
+                String key = dependStringArray[0].trim().split(":")[1].trim();
+                String result = dependStringArray[1].trim().split(":")[1].trim();
+                DependResult dependResult = DependResult.valueOf(result);
                 resultMap.put(key, dependResult);
             }
         }

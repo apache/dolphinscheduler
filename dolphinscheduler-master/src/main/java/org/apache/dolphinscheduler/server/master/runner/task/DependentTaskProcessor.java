@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
+import static org.apache.dolphinscheduler.common.constants.Constants.DEPENDENT_SPLIT;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DEPENDENT;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -249,8 +250,8 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
                 if (!dependResultMap.containsKey(entry.getKey())) {
                     dependResultMap.put(entry.getKey(), entry.getValue());
                     // save depend result to log
-                    logger.info("dependent item complete, dependentKey: {}, result: {}, dependentDate: {}",
-                            entry.getKey(), entry.getValue(), dependentDate);
+                    logger.info("dependent item complete, {} dependentKey: {}, result: {}, dependentDate: {}",
+                            DEPENDENT_SPLIT, entry.getKey(), entry.getValue(), dependentDate);
                 }
             }
             if (!dependentExecute.finish(dependentDate)) {
