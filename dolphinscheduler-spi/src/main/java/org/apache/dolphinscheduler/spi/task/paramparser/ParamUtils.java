@@ -69,7 +69,7 @@ public class ParamUtils {
 
         Map<String, Property> varParams = parameters.getVarPoolMap();
 
-        if (MapUtils.isEmpty(globalParams) && MapUtils.isEmpty(localParams)) {
+        if (MapUtils.isEmpty(globalParams) && MapUtils.isEmpty(localParams) && MapUtils.isEmpty(varParams)) {
             return null;
         }
         // if it is a complement,
@@ -98,7 +98,9 @@ public class ParamUtils {
             convertedParams = localParams;
         }
         if (varParams != null) {
-            varParams.putAll(globalParams);
+            if (globalParams != null) {
+                varParams.putAll(globalParams);
+            }
             globalParams = varParams;
             for (Map.Entry<String, Property> entry : varParams.entrySet()) {
                 convertedParams.put(entry.getKey(), entry.getValue());
