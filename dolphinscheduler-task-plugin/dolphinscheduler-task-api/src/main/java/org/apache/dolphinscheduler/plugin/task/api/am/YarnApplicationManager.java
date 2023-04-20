@@ -160,8 +160,8 @@ public class YarnApplicationManager implements ApplicationManager {
      * @param commandFile command file
      * @param cmd cmd
      */
-    private void execYarnKillCommand(String tenantCode, String appId, String commandFile,
-                                     String cmd) {
+    public static void execYarnKillCommand(String tenantCode, String appId, String commandFile,
+                                           String cmd) {
         try {
             StringBuilder sb = new StringBuilder();
             sb.append("#!/bin/sh\n");
