@@ -21,7 +21,6 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
 
 /**
  * resource type
- * @author zhanziheng
  */
 public enum ResourceType {
 
