@@ -183,9 +183,9 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
      * @return DefaultFS
      */
     public String getDefaultFS() {
-        String defaultFS = getConfiguration().get(Constants.FS_DEFAULT_FS);
+        String defaultFS = hdfsProperties.getDefaultFS();
         if (StringUtils.isBlank(defaultFS)) {
-            defaultFS = hdfsProperties.getDefaultFS();
+            defaultFS = getConfiguration().get(Constants.HDFS_DEFAULT_FS);
         }
         return defaultFS;
     }
