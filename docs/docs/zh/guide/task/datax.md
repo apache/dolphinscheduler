@@ -14,7 +14,7 @@ DataX 任务类型，用于执行 DataX 程序。对于 DataX 节点，worker �
 
   DATAX_HOME支持local/hdfs/s3
 
-| **类型** | **描述**                              |
+| **类型** |               **描述**                |
 |--------|-------------------------------------|
 | local  | /opt/datax/                         |
 | hdfs   | /tmp/hadoop/datax.tar.gz            |
@@ -22,7 +22,7 @@ DataX 任务类型，用于执行 DataX 程序。对于 DataX 节点，worker �
 
 - common.properties配置
 
-| **参数**                   | **示例**                                       | **描述**                                                        |
+|          **参数**          |                    **示例**                    |                            **描述**                             |
 |--------------------------|----------------------------------------------|---------------------------------------------------------------|
 | datax.yarn.jar           | /mnt/dss/datax-on-yarn-1.0.0.jar             | 从[url](https://github.com/duhanmin/datax-on-yarn)下载并编译获取jar即可 |
 | datax.yarn.bin           | HADOOP_OPTS="-Xms32m -Xmx128m" /usr/bin/yarn | datax yarn不需要太多内存，全局配置可能会影响hadoop/spark/flink进程               |

@@ -14,7 +14,7 @@ If yarn is required to run datax tasks, you also need to perform common.properti
 
 DATAX_HOME supports local, hdfs, and s3
 
-| **Type** | **Description**                     |
+| **Type** |           **Description**           |
 |----------|-------------------------------------|
 | local    | /opt/datax/                         |
 | hdfs     | /tmp/hadoop/datax.tar.gz            |
@@ -22,7 +22,7 @@ DATAX_HOME supports local, hdfs, and s3
 
 - common.properties configs
 
-| **Parameters**           | **Example**                                  | **Description**                                                                                       |
+|      **Parameters**      |                 **Example**                  |                                            **Description**                                            |
 |--------------------------|----------------------------------------------|-------------------------------------------------------------------------------------------------------|
 | datax.yarn.jar           | /mnt/dss/datax-on-yarn-1.0.0.jar             | Download and compile jar from [url](https://github.com/duhanmin/datax-on-yarn) can                    |
 | datax.yarn.bin           | HADOOP_OPTS="-Xms32m -Xmx128m" /usr/bin/yarn | datax yarn does not require much memory, global configuration may affect hadoop/spark/flink processes |
