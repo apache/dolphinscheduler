@@ -24,7 +24,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
@@ -40,6 +40,7 @@ import org.apache.dolphinscheduler.spi.enums.Flag;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
@@ -74,7 +75,7 @@ import com.alibaba.druid.sql.parser.SQLStatementParser;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class DataxTask extends AbstractTask {
+public class DataxTask extends AbstractYarnTask {
 
     /**
      * jvm parameters
@@ -126,7 +127,6 @@ public class DataxTask extends AbstractTask {
     public DataxTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
         this.taskExecutionContext = taskExecutionContext;
-
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
                 taskExecutionContext, log);
     }
@@ -160,7 +160,17 @@ public class DataxTask extends AbstractTask {
 
             // run datax processDataSourceService
             String jsonFilePath = buildDataxJsonFile(paramsMap);
-            String shellCommandFilePath = buildShellCommandFile(jsonFilePath, paramsMap);
+            String shellCommandFilePath;
+            if (dataXParameters.getYarn() == 1) {
+                if (StringUtils.isNotBlank(DataxConstants.DATAX_YARN_JAR)) {
+                    shellCommandFilePath = buildYarnShellCommandFile(jsonFilePath, paramsMap);
+                } else {
+                    throw new TaskException(
+                            "Configuration common.properties file does not exist datax.yarn.jar, download address: https://github.com/duhanmin/datax-on-yarn");
+                }
+            } else {
+                shellCommandFilePath = buildShellCommandFile(jsonFilePath, paramsMap);
+            }
             TaskResponse commandExecuteResult = shellCommandExecutor.run(shellCommandFilePath, taskCallBack);
 
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
@@ -175,6 +185,16 @@ public class DataxTask extends AbstractTask {
             setExitStatusCode(EXIT_CODE_FAILURE);
             throw new TaskException("Execute DataX task failed", e);
         }
+    }
+
+    @Override
+    protected String buildCommand() {
+        return null;
+    }
+
+    @Override
+    protected void setMainJarName() {
+
     }
 
     /**
@@ -541,6 +561,67 @@ public class DataxTask extends AbstractTask {
         }
 
         return columnNames;
+    }
+
+    private String buildYarnShellCommandFile(String jobConfigFilePath,
+                                             Map<String, Property> paramsMap) throws Exception {
+        // generate scripts
+        String fileName = String.format("%s/%s_node.%s",
+                taskExecutionContext.getExecutePath(),
+                taskExecutionContext.getTaskAppId(),
+                SystemUtils.IS_OS_WINDOWS ? "bat" : "sh");
+
+        Path path = new File(fileName).toPath();
+
+        if (Files.exists(path)) {
+            return fileName;
+        }
+
+        int xms = Math.max(dataXParameters.getXms(), 1);
+        int xmx = Math.max(dataXParameters.getXmx(), 1);
+        int jvm = Math.max(xms, xmx);
+
+        StringBuilder sbr = new StringBuilder(DataxConstants.DATAX_YARN_BIN + " jar " + DataxConstants.DATAX_YARN_JAR);
+        sbr.append(" com.on.yarn.Client");
+        sbr.append(" -jar_path " + DataxConstants.DATAX_YARN_JAR);
+        sbr.append(" -appname " + taskExecutionContext.getTaskName());
+        sbr.append(" -master_memory " + (jvm * 1024));
+        sbr.append(" -datax_job " + jobConfigFilePath);
+        sbr.append(" -datax_home_hdfs " + System.getenv("DATAX_HOME"));
+
+        if (StringUtils.isBlank(dataXParameters.getYarnQueue())) {
+            sbr.append(" -queue " + DataxConstants.DATAX_YARN_DEFAULT_QUEUE);
+        } else {
+            sbr.append(" -queue " + dataXParameters.getYarnQueue());
+        }
+
+        if (null != paramsMap && paramsMap.size() != 0) {
+            StringBuilder customParameters = new StringBuilder();
+            for (Map.Entry<String, Property> entry : paramsMap.entrySet()) {
+                customParameters.append(entry.getKey()).append("=").append(entry.getValue().getValue()).append(",");
+            }
+            sbr.append(" -p " + customParameters);
+        }
+
+        log.debug("datax yarn script : {}", sbr);
+        // replace placeholder
+        String dataxCommand =
+                ParameterUtils.convertParameterPlaceholders(sbr.toString(), ParamUtils.convert(paramsMap));
+        log.debug("raw script : {}", dataxCommand);
+
+        // create shell command file
+        Set<PosixFilePermission> perms = PosixFilePermissions.fromString(RWXR_XR_X);
+        FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
+
+        if (SystemUtils.IS_OS_WINDOWS) {
+            Files.createFile(path);
+        } else {
+            Files.createFile(path, attr);
+        }
+
+        Files.write(path, dataxCommand.getBytes(), StandardOpenOption.APPEND);
+
+        return fileName;
     }
 
     /**

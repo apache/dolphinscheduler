@@ -106,6 +106,29 @@ public class DataxParameters extends AbstractParameters {
     private int xmx;
 
     /**
+     * 0:default/1:yarn
+     */
+    private int yarn;
+
+    private String yarnQueue;
+
+    public String getYarnQueue() {
+        return yarnQueue;
+    }
+
+    public void setYarnQueue(String yarnQueue) {
+        this.yarnQueue = yarnQueue;
+    }
+
+    public int getYarn() {
+        return yarn;
+    }
+
+    public void setYarn(int yarn) {
+        this.yarn = yarn;
+    }
+
+    /**
      * resource list
      */
     private List<ResourceInfo> resourceList;

@@ -77,6 +77,15 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       value: 3000
     }
   ]
+  const yarnOptions = [
+    {
+      label: 'default',
+      value: 0
+    },    {
+      label: 'yarn',
+      value: 1
+    }
+  ]
   const memoryLimitOptions = [
     {
       label: '1G',
@@ -295,6 +304,20 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       span: 12,
       options: memoryLimitOptions,
       value: 1
+    },
+    {
+      type: 'select',
+      field: 'yarn',
+      name: t('project.node.datax_job_runtime_operation_mode'),
+      span: 12,
+      options: yarnOptions,
+      value: 0
+    },
+    {
+      type: 'input',
+      field: 'yarnQueue',
+      name: t('project.node.datax_job_runtime_queue'),
+      span: 12
     },
     ...useCustomParams({ model, field: 'localParams', isSimple: true })
   ]
