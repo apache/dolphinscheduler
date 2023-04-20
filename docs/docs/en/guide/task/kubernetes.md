@@ -16,13 +16,14 @@ K8S task type used to execute a batch task. In this task, the worker submits the
 
 - Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
 
-|  **Parameter**   |                                                 **Description**                                                  |
+|  **Parameter**   | **Description**                                                                                                  |
 |------------------|------------------------------------------------------------------------------------------------------------------|
 | Namespace        | The namespace for running k8s task.                                                                              |
 | Min CPU          | Minimum CPU requirement for running k8s task.                                                                    |
 | Min Memory       | Minimum memory requirement for running k8s task.                                                                 |
 | Image            | The registry url for image.                                                                                      |
-| Command          | The container execution command, for example: /bin/echo hello world                                              |
+| Command          | The container execution command (yaml-style array), for example: ["printenv"]                                    |
+| Args             | The args of execution command (yaml-style array), for example: ["HOSTNAME", "KUBERNETES_PORT"]                   |
 | Custom parameter | It is a local user-defined parameter for K8S task, these params will pass to container as environment variables. |
 
 ## Task Example

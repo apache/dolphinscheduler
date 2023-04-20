@@ -346,6 +346,7 @@ interface ITaskParams {
   minMemorySpace?: string
   image?: string
   command?: string
+  args?: string
   algorithm?: string
   params?: string
   searchParams?: string

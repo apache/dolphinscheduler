@@ -378,7 +378,9 @@ export default {
     image_tips: 'Please enter image',
     command: 'Command',
     command_tips:
-      'Please enter the container execution command, for example: /bin/echo hello world',
+      'Please enter the container execution command, for example: ["printenv"]',
+    args: 'Args',
+    args_tips: 'Please enter the container execution command args, for example: ["HOSTNAME", "KUBERNETES_PORT"]',
     min_memory_tips: 'Please enter min memory',
     state: 'State',
     branch_flow: 'Branch flow',
