@@ -21,6 +21,7 @@ import static org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUt
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
 
+import org.apache.dolphinscheduler.common.log.SensitiveDataConverter;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
@@ -92,6 +93,11 @@ public class DataxTask extends AbstractTask {
      * select all
      */
     private static final String SELECT_ALL_CHARACTER = "*";
+
+    /**
+     * post jdbc info regex
+     */
+    private static final String POST_JDBC_INFO_REGEX = "(?<=(post jdbc info:)).*(?=)";
     /**
      * datax path
      */
@@ -142,7 +148,7 @@ public class DataxTask extends AbstractTask {
         if (dataXParameters == null || !dataXParameters.checkParameters()) {
             throw new RuntimeException("datax task params is not valid");
         }
-
+        SensitiveDataConverter.addMaskPattern(POST_JDBC_INFO_REGEX);
         dataxTaskExecutionContext =
                 dataXParameters.generateExtendedContext(taskExecutionContext.getResourceParametersHelper());
     }
