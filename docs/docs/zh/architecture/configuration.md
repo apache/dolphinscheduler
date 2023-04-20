@@ -372,9 +372,17 @@ export FLINK_ENV_JAVA_OPTS="-javaagent:${DOLPHINSCHEDULER_HOME}/tools/libs/aspec
 
 ## 日志相关配置
 
-|服务名称| 配置文件 |
-|--|--|
-|Master Server | `master-server/conf/logback-spring.xml`|
-|Api Server| `api-server/conf/logback-spring.xml`|
-|Worker Server| `worker-server/conf/logback-spring.xml`|
-|Alert Server| `alert-server/conf/logback-spring.xml`|
+| **服务名称**      | **配置文件**                                |
+|---------------|-----------------------------------------|
+| Master Server | `master-server/conf/logback-spring.xml` |
+| Api Server    | `api-server/conf/logback-spring.xml`    |
+| Worker Server | `worker-server/conf/logback-spring.xml` |
+| Alert Server  | `alert-server/conf/logback-spring.xml`  |
+
+## common.properties [datax on yarn配置]
+
+| **参数**                   | **默认值** | **描述**                                                                                            |
+|--------------------------|---------|---------------------------------------------------------------------------------------------------|
+| datax.yarn.jar           | 无       | 从[url](https://github.com/duhanmin/datax-on-yarn)下载并编译获取jar即可                                     |
+| datax.yarn.bin           | yarn    | datax yarn不需要太多内存，全局配置可能会影响hadoop/spark/flink进程,意见配置:HADOOP_OPTS="-Xms32m -Xmx128m" /usr/bin/yarn |
+| datax.yarn.default.queue | default | 指定datax在yarn上运行队列，前端配置具有最高优先级                                                                     |

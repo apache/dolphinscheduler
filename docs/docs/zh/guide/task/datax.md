@@ -6,6 +6,28 @@ DataX 任务类型，用于执行 DataX 程序。对于 DataX 节点，worker �
 
 默认会使用python2.7去执行datax.py，如果需要使用其他版本的python去执行datax.py，需要在环境变量中配置`DATAX_PYTHON`。
 
+如果需要使用yarn运行datax任务，则还需要在common.properties相关依赖和配置,下面会详细介绍。
+
+## datax on yarn 配置
+
+- dolphinscheduler_env.sh配置
+
+  DATAX_HOME支持local/hdfs/s3
+
+| **类型** | **描述**                              |
+|--------|-------------------------------------|
+| local  | /opt/datax/                         |
+| hdfs   | /tmp/hadoop/datax.tar.gz            |
+| s3     | s3://bucket/tmp/hadoop/datax.tar.gz |
+
+- common.properties配置
+
+| **参数**                   | **示例**                                       | **描述**                                                        |
+|--------------------------|----------------------------------------------|---------------------------------------------------------------|
+| datax.yarn.jar           | /mnt/dss/datax-on-yarn-1.0.0.jar             | 从[url](https://github.com/duhanmin/datax-on-yarn)下载并编译获取jar即可 |
+| datax.yarn.bin           | HADOOP_OPTS="-Xms32m -Xmx128m" /usr/bin/yarn | datax yarn不需要太多内存，全局配置可能会影响hadoop/spark/flink进程               |
+| datax.yarn.default.queue | default                                      | 指定datax在yarn上运行队列，前端配置具有最高优先级                                 |
+
 ## 创建任务
 
 - 点击项目管理 -> 项目名称 -> 工作流定义，点击“创建工作流”按钮，进入 DAG 编辑页面；

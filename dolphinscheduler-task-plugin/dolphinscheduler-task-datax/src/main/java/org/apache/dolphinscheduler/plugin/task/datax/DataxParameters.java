@@ -108,7 +108,7 @@ public class DataxParameters extends AbstractParameters {
     /**
      * 0:default/1:yarn
      */
-    private int yarn;
+    private int dataxDeployMode;
 
     private String yarnQueue;
 
@@ -120,12 +120,12 @@ public class DataxParameters extends AbstractParameters {
         this.yarnQueue = yarnQueue;
     }
 
-    public int getYarn() {
-        return yarn;
+    public int getDataxDeployMode() {
+        return dataxDeployMode;
     }
 
-    public void setYarn(int yarn) {
-        this.yarn = yarn;
+    public void setDataxDeployMode(int dataxDeployMode) {
+        this.dataxDeployMode = dataxDeployMode;
     }
 
     /**

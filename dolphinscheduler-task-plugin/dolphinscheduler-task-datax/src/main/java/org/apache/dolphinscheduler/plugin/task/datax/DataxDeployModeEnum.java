@@ -19,12 +19,12 @@ package org.apache.dolphinscheduler.plugin.task.datax;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 
-public enum DataxYarnEnum {
+public enum DataxDeployModeEnum {
 
     DEFAULT(0, "default java process"),
     YARN(1, "execution on yarn");
 
-    DataxYarnEnum(int code, String descp) {
+    DataxDeployModeEnum(int code, String descp) {
         this.code = code;
         this.descp = descp;
     }
@@ -39,14 +39,5 @@ public enum DataxYarnEnum {
 
     public String getDescp() {
         return descp;
-    }
-
-    public static DataxYarnEnum of(int status) {
-        for (DataxYarnEnum dye : values()) {
-            if (dye.getCode() == status) {
-                return dye;
-            }
-        }
-        throw new IllegalArgumentException("invalid status : " + status);
     }
 }

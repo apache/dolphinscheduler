@@ -6,6 +6,28 @@ DataX task type for executing DataX programs. For DataX nodes, the worker will e
 
 By default, the datax.py will be executed by python2.7, if you want to use other python version, you can set the `DATAX_PYTHON` environment variable to specify a version.
 
+If yarn is required to run datax tasks, you also need to perform common.properties dependencies and configurations, as described below.
+
+## datax on yarn configuration
+
+- dolphinscheduler_env.sh configs
+
+DATAX_HOME supports local, hdfs, and s3
+
+| **Type** | **Description**                     |
+|----------|-------------------------------------|
+| local    | /opt/datax/                         |
+| hdfs     | /tmp/hadoop/datax.tar.gz            |
+| s3       | s3://bucket/tmp/hadoop/datax.tar.gz |
+
+- common.properties configs
+
+| **Parameters**           | **Example**                                  | **Description**                                                                                       |
+|--------------------------|----------------------------------------------|-------------------------------------------------------------------------------------------------------|
+| datax.yarn.jar           | /mnt/dss/datax-on-yarn-1.0.0.jar             | Download and compile jar from [url](https://github.com/duhanmin/datax-on-yarn) can                    |
+| datax.yarn.bin           | HADOOP_OPTS="-Xms32m -Xmx128m" /usr/bin/yarn | datax yarn does not require much memory, global configuration may affect hadoop/spark/flink processes |
+| datax.yarn.default.queue | default                                      | specifies datax run queue on yarn, front-end configuration has the highest priority                   |
+
 ## Create Task
 
 - Click `Project Management -> Project Name -> Workflow Definition`, and click the `Create Workflow` button to enter the DAG editing page.

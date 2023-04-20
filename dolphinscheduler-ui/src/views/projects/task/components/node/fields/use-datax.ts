@@ -77,7 +77,7 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       value: 3000
     }
   ]
-  const yarnOptions = [
+  const deployModeOptions = [
     {
       label: 'default',
       value: 0
@@ -307,10 +307,10 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
     },
     {
       type: 'select',
-      field: 'yarn',
+      field: 'dataxDeployMode',
       name: t('project.node.datax_job_runtime_operation_mode'),
       span: 12,
-      options: yarnOptions,
+      options: deployModeOptions,
       value: 0
     },
     {

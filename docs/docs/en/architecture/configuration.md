@@ -382,9 +382,17 @@ export FLINK_ENV_JAVA_OPTS="-javaagent:${DOLPHINSCHEDULER_HOME}/tools/libs/aspec
 
 ### Log related configuration
 
-|Service| Configuration file  |
-|--|--|
-|Master Server | `master-server/conf/logback-spring.xml`|
-|Api Server| `api-server/conf/logback-spring.xml`|
-|Worker Server| `worker-server/conf/logback-spring.xml`|
-|Alert Server| `alert-server/conf/logback-spring.xml`|
+| **Service**   | **Configuration file**                  |
+|---------------|-----------------------------------------|
+| Master Server | `master-server/conf/logback-spring.xml` |
+| Api Server    | `api-server/conf/logback-spring.xml`    |
+| Worker Server | `worker-server/conf/logback-spring.xml` |
+| Alert Server  | `alert-server/conf/logback-spring.xml`  |
+
+## common.properties [datax on yarn configs]
+
+| **Parameter**            | **Default Value** | **Description**                                                                                                                                                          |
+|--------------------------|-------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| datax.yarn.jar           | None              | Download and compile jar from [url](https://github.com/duhanmin/datax-on-yarn)                                                                                           |
+| datax.yarn.bin           | yarn              | datax yarn does not require much memory, global configuration may affect hadoop/spark/flink process, opinion configuration: HADOOP_OPTS="-Xms32m -Xmx128m" /usr/bin/yarn |
+| datax.yarn.default.queue | default           | specifies datax run queue on yarn, front-end configuration has the highest priority                                                                                      |

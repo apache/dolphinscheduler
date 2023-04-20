@@ -311,7 +311,7 @@ interface ITaskParams {
   jobSpeedRecord?: number
   xms?: number
   xmx?: number
-  yarn?: number
+  dataxDeployMode?: number
   yarnQueue?: string
   sparkParameters?: ISparkParameters
   ruleId?: number

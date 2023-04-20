@@ -154,7 +154,7 @@ public class DataxTask extends AbstractYarnTask {
         // run datax processDataSourceService
         String jsonFilePath = buildDataxJsonFile(paramsMap);
         String shellCommandFilePath;
-        if (DataxYarnEnum.YARN.getCode() == dataXParameters.getYarn()) {
+        if (DataxDeployModeEnum.YARN.getCode() == dataXParameters.getDataxDeployMode()) {
             if (StringUtils.isNotBlank(DataxConstants.DATAX_YARN_JAR)) {
                 shellCommandFilePath = buildYarnShellCommandFile(jsonFilePath, paramsMap);
             } else {
