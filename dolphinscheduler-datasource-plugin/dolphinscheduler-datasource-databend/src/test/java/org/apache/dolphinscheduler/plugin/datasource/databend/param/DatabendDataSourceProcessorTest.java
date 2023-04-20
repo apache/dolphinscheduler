@@ -1,3 +1,20 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.dolphinscheduler.plugin.datasource.databend.param;
 
 import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
@@ -20,7 +37,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 public class DatabendDataSourceProcessorTest {
+
     private DatabendDataSourceProcessor databendDataSourceProcessor = new DatabendDataSourceProcessor();
+
     @Test
     public void testCheckDatasourceParam() {
         DatabendDataSourceParamDTO databendDataSourceParamDTO = new DatabendDataSourceParamDTO();
@@ -32,7 +51,6 @@ public class DatabendDataSourceProcessorTest {
         DataSourceUtils.checkDatasourceParam(databendDataSourceParamDTO);
         Assertions.assertTrue(true);
     }
-
 
     @Test
     public void testBuildConnectionParams() {
@@ -51,7 +69,7 @@ public class DatabendDataSourceProcessorTest {
             mockedStaticCommonUtils.when(CommonUtils::getKerberosStartupState).thenReturn(false);
             ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(databendDataSourceParamDTO);
             Assertions.assertNotNull(connectionParam);
-            Assertions.assertEquals(connectionParam.getPassword(),"123456");
+            Assertions.assertEquals(connectionParam.getPassword(), "123456");
         }
     }
 
@@ -64,7 +82,8 @@ public class DatabendDataSourceProcessorTest {
         databendDataSourceParamDTO.setPort(8000);
         databendDataSourceParamDTO.setPassword("databend");
         ConnectionParam connectionParam =
-                DataSourceUtils.buildConnectionParams(DbType.DATABEND, JSONUtils.toJsonString(databendDataSourceParamDTO));
+                DataSourceUtils.buildConnectionParams(DbType.DATABEND,
+                        JSONUtils.toJsonString(databendDataSourceParamDTO));
         Assertions.assertNotNull(connectionParam);
     }
 
@@ -83,7 +102,7 @@ public class DatabendDataSourceProcessorTest {
                 MockedStatic<PasswordUtils> mockedStaticPasswordUtils = Mockito.mockStatic(PasswordUtils.class);
                 MockedStatic<CommonUtils> mockedStaticCommonUtils = Mockito.mockStatic(CommonUtils.class)) {
             mockedStaticPasswordUtils.when(() -> PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
-            DatabendConnectionParam connectionParams = (DatabendConnectionParam)databendDataSourceProcessor
+            DatabendConnectionParam connectionParams = (DatabendConnectionParam) databendDataSourceProcessor
                     .createConnectionParams(databendDataSourceParamDTO);
             Assertions.assertNotNull(connectionParams);
             Assertions.assertEquals("jdbc:databend://localhost:8000", connectionParams.getAddress());
@@ -98,14 +117,14 @@ public class DatabendDataSourceProcessorTest {
                 .createConnectionParams(connectionParam);
         Assertions.assertNotNull(connectionParam);
         Assertions.assertEquals("default", connectionParams.getUser());
-        Assertions.assertEquals("jdbc:databend://localhost:8000/default",connectionParams.getJdbcUrl());
+        Assertions.assertEquals("jdbc:databend://localhost:8000/default", connectionParams.getJdbcUrl());
     }
 
     @Test
     public void testCreateDatasourceParamDTO() {
         String connectionParam = "{\"user\":\"root\",\"address\":\"jdbc:databend://localhost:8000\""
                 + ",\"jdbcUrl\":\"jdbc:databend://localhost:8000/default\"}";
-        DatabendDataSourceParamDTO databendDataSourceParamDTO = (DatabendDataSourceParamDTO)databendDataSourceProcessor
+        DatabendDataSourceParamDTO databendDataSourceParamDTO = (DatabendDataSourceParamDTO) databendDataSourceProcessor
                 .createDatasourceParamDTO(connectionParam);
         Assertions.assertEquals("root", databendDataSourceParamDTO.getUserName());
         Assertions.assertEquals("localhost", databendDataSourceParamDTO.getHost());
@@ -128,6 +147,7 @@ public class DatabendDataSourceProcessorTest {
         Assertions.assertEquals("jdbc:databend://localhost:8000/default?ssl=true",
                 databendDataSourceProcessor.getJdbcUrl(connectionParam));
     }
+
     @Test
     public void testDbType() {
         Assertions.assertEquals(19, DbType.DATABEND.getCode());
@@ -145,6 +165,7 @@ public class DatabendDataSourceProcessorTest {
         Assertions.assertEquals(DataSourceConstants.DATABEND_VALIDATION_QUERY,
                 databendDataSourceProcessor.getValidationQuery());
     }
+
     @Test
     public void testBuildString() {
         DatabendDataSourceParamDTO databendDataSourceParamDTO = new DatabendDataSourceParamDTO();
@@ -155,6 +176,5 @@ public class DatabendDataSourceProcessorTest {
         databendDataSourceParamDTO.setPassword("root");
         Assertions.assertNotNull(databendDataSourceParamDTO.toString());
     }
-
 
 }
