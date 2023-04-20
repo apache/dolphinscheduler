@@ -313,6 +313,12 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       options: yarnOptions,
       value: 0
     },
+    {
+      type: 'input',
+      field: 'yarnQueue',
+      name: t('project.node.datax_job_runtime_queue'),
+      span: 12
+    },
     ...useCustomParams({ model, field: 'localParams', isSimple: true })
   ]
 }

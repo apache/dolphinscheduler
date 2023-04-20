@@ -24,7 +24,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
@@ -75,7 +75,7 @@ import com.alibaba.druid.sql.parser.SQLStatementParser;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class DataxTask extends AbstractTask {
+public class DataxTask extends AbstractYarnTask {
 
     /**
      * jvm parameters
@@ -88,16 +88,7 @@ public class DataxTask extends AbstractTask {
      * todo: Create a shell script to execute the datax task, and read the python version from the env, so we can support multiple versions of datax python
      */
     private static final String DATAX_PYTHON = Optional.ofNullable(System.getenv("DATAX_PYTHON")).orElse("python2.7");
-    /**
-     * datax on yarn jar path
-     * https://github.com/duhanmin/datax-on-yarn
-     */
-    private static final String dataxOnYarnJar = System.getenv("DATAX_ON_YARN_JAR");
-    /**
-     * example: HADOOP_OPTS="-Xms32m -Xmx128m" /usr/bin/yarn
-     */
-    private static final String YARN_BIN =
-            StringUtils.isEmpty(System.getenv("YARN_BIN")) ? "yarn" : System.getenv("YARN_BIN");
+
     /**
      * select all
      */
@@ -136,7 +127,6 @@ public class DataxTask extends AbstractTask {
     public DataxTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
         this.taskExecutionContext = taskExecutionContext;
-
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
                 taskExecutionContext, log);
     }
@@ -171,12 +161,12 @@ public class DataxTask extends AbstractTask {
             // run datax processDataSourceService
             String jsonFilePath = buildDataxJsonFile(paramsMap);
             String shellCommandFilePath;
-            if (dataXParameters.getYarn() == 1) {
-                if (StringUtils.isNotBlank(dataxOnYarnJar)) {
+            if (DataxYarnEnum.YARN.getCode() == dataXParameters.getYarn()) {
+                if (StringUtils.isNotBlank(DataxConstants.DATAX_YARN_JAR)) {
                     shellCommandFilePath = buildYarnShellCommandFile(jsonFilePath, paramsMap);
                 } else {
                     throw new TaskException(
-                            "The environment variable 'DATAX_ON_YARN_JAR' does not exist,download address: https://github.com/duhanmin/datax-on-yarn");
+                            "Configuration common.properties file does not exist datax.yarn.jar, download address: https://github.com/duhanmin/datax-on-yarn");
                 }
             } else {
                 shellCommandFilePath = buildShellCommandFile(jsonFilePath, paramsMap);
@@ -195,6 +185,16 @@ public class DataxTask extends AbstractTask {
             setExitStatusCode(EXIT_CODE_FAILURE);
             throw new TaskException("Execute DataX task failed", e);
         }
+    }
+
+    @Override
+    protected String buildCommand() {
+        return null;
+    }
+
+    @Override
+    protected void setMainJarName() {
+
     }
 
     /**
@@ -581,12 +581,19 @@ public class DataxTask extends AbstractTask {
         int xmx = Math.max(dataXParameters.getXmx(), 1);
         int jvm = Math.max(xms, xmx);
 
-        StringBuilder sbr = new StringBuilder(YARN_BIN + " jar " + dataxOnYarnJar);;
-        sbr.append(" -jar_path " + dataxOnYarnJar);
-        sbr.append(" -appname datax-job");
+        StringBuilder sbr = new StringBuilder(DataxConstants.DATAX_YARN_BIN + " jar " + DataxConstants.DATAX_YARN_JAR);
+        sbr.append(" com.on.yarn.Client");
+        sbr.append(" -jar_path " + DataxConstants.DATAX_YARN_JAR);
+        sbr.append(" -appname " + taskExecutionContext.getTaskName());
         sbr.append(" -master_memory " + (jvm * 1024));
         sbr.append(" -datax_job " + jobConfigFilePath);
         sbr.append(" -datax_home_hdfs " + System.getenv("DATAX_HOME"));
+
+        if (StringUtils.isBlank(dataXParameters.getYarnQueue())) {
+            sbr.append(" -queue " + DataxConstants.DATAX_YARN_DEFAULT_QUEUE);
+        } else {
+            sbr.append(" -queue " + dataXParameters.getYarnQueue());
+        }
 
         if (null != paramsMap && paramsMap.size() != 0) {
             StringBuilder customParameters = new StringBuilder();

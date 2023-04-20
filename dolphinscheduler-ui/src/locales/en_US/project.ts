@@ -579,6 +579,7 @@ export default {
     datax_job_runtime_memory_xms: 'Low Limit Value',
     datax_job_runtime_memory_xmx: 'High Limit Value',
     datax_job_runtime_operation_mode: 'operation mode(optional yarn)',
+    datax_job_runtime_queue: 'yarn queue',
     datax_job_runtime_memory_unit: 'G',
     chunjun_json_template: 'JSON script',
     current_hour: 'CurrentHour',

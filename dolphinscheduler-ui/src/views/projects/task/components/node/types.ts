@@ -312,6 +312,7 @@ interface ITaskParams {
   xms?: number
   xmx?: number
   yarn?: number
+  yarnQueue?: string
   sparkParameters?: ISparkParameters
   ruleId?: number
   ruleInputParameter?: IRuleParameters
