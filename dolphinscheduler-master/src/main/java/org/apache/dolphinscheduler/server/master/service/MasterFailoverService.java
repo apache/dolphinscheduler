@@ -91,7 +91,7 @@ public class MasterFailoverService {
     }
 
     public void failoverMaster(String masterHost) {
-        String failoverPath = RegistryNodeType.MASTER_FAILOVER_LOCK + "/" + masterHost;
+        String failoverPath = RegistryNodeType.MASTER_FAILOVER_LOCK.getRegistryPath() + "/" + masterHost;
         try {
             registryClient.getLock(failoverPath);
             doFailoverMaster(masterHost);
