@@ -18,19 +18,16 @@
 package org.apache.dolphinscheduler.plugin.task.datax;
 
 import static org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils.decodePassword;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
-import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
@@ -40,9 +37,11 @@ import org.apache.dolphinscheduler.spi.enums.Flag;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -74,7 +73,7 @@ import com.alibaba.druid.sql.parser.SQLStatementParser;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class DataxTask extends AbstractTask {
+public class DataxTask extends AbstractYarnTask {
 
     /**
      * jvm parameters
@@ -147,49 +146,25 @@ public class DataxTask extends AbstractTask {
                 dataXParameters.generateExtendedContext(taskExecutionContext.getResourceParametersHelper());
     }
 
-    /**
-     * run DataX process
-     *
-     * @throws TaskException if error throws Exception
-     */
     @Override
-    public void handle(TaskCallBack taskCallBack) throws TaskException {
-        try {
-            // replace placeholder,and combine local and global parameters
-            Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+    protected String buildCommand() {
+        // replace placeholder,and combine local and global parameters
+        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
 
-            // run datax processDataSourceService
-            String jsonFilePath = buildDataxJsonFile(paramsMap);
-            String shellCommandFilePath = buildShellCommandFile(jsonFilePath, paramsMap);
-            TaskResponse commandExecuteResult = shellCommandExecutor.run(shellCommandFilePath, taskCallBack);
-
-            setExitStatusCode(commandExecuteResult.getExitStatusCode());
-            setProcessId(commandExecuteResult.getProcessId());
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            log.error("The current DataX task has been interrupted", e);
-            setExitStatusCode(EXIT_CODE_FAILURE);
-            throw new TaskException("The current DataX task has been interrupted", e);
-        } catch (Exception e) {
-            log.error("datax task error", e);
-            setExitStatusCode(EXIT_CODE_FAILURE);
-            throw new TaskException("Execute DataX task failed", e);
+        // run datax processDataSourceService
+        String jsonFilePath = buildDataxJsonFile(paramsMap);
+        String shellCommandFilePath;
+        if (DataxYarnEnum.YARN.getCode() == dataXParameters.getYarn()) {
+            if (StringUtils.isNotBlank(DataxConstants.DATAX_YARN_JAR)) {
+                shellCommandFilePath = buildYarnShellCommandFile(jsonFilePath, paramsMap);
+            } else {
+                throw new TaskException(
+                        "Configuration common.properties file does not exist datax.yarn.jar, download address: https://github.com/duhanmin/datax-on-yarn");
+            }
+        } else {
+            shellCommandFilePath = buildShellCommandFile(jsonFilePath, paramsMap);
         }
-    }
-
-    /**
-     * cancel DataX process
-     *
-     * @throws TaskException if error throws Exception
-     */
-    @Override
-    public void cancel() throws TaskException {
-        // cancel process
-        try {
-            shellCommandExecutor.cancelApplication();
-        } catch (Exception e) {
-            throw new TaskException("cancel application error", e);
-        }
+        return shellCommandFilePath;
     }
 
     /**
@@ -198,7 +173,7 @@ public class DataxTask extends AbstractTask {
      * @return datax json file name
      * @throws Exception if error throws Exception
      */
-    private String buildDataxJsonFile(Map<String, Property> paramsMap) throws Exception {
+    private String buildDataxJsonFile(Map<String, Property> paramsMap) {
         // generate json
         String fileName = String.format("%s/%s_job.json",
                 taskExecutionContext.getExecutePath(),
@@ -229,7 +204,12 @@ public class DataxTask extends AbstractTask {
         log.debug("datax job json : {}", json);
 
         // create datax json file
-        FileUtils.writeStringToFile(new File(fileName), json, StandardCharsets.UTF_8);
+        try {
+            FileUtils.writeStringToFile(new File(fileName), json, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            throw new RuntimeException("generate datax script error", e);
+        }
+
         return fileName;
     }
 
@@ -382,7 +362,7 @@ public class DataxTask extends AbstractTask {
      * @return shell command file name
      * @throws Exception if error throws Exception
      */
-    private String buildShellCommandFile(String jobConfigFilePath, Map<String, Property> paramsMap) throws Exception {
+    private String buildShellCommandFile(String jobConfigFilePath, Map<String, Property> paramsMap) {
         // generate scripts
         String fileName = String.format("%s/%s_node.%s",
                 taskExecutionContext.getExecutePath(),
@@ -413,16 +393,28 @@ public class DataxTask extends AbstractTask {
         // create shell command file
         Set<PosixFilePermission> perms = PosixFilePermissions.fromString(RWXR_XR_X);
         FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
-
-        if (SystemUtils.IS_OS_WINDOWS) {
-            Files.createFile(path);
-        } else {
-            Files.createFile(path, attr);
-        }
-
-        Files.write(path, dataxCommand.getBytes(), StandardOpenOption.APPEND);
+        generateScript(path, dataxCommand, attr);
 
         return fileName;
+    }
+
+    /**
+     * generate datax Script
+     * @param path datax script path
+     * @param dataxCommand datax Command
+     * @param attr  an attribute encapsulating the given file permissions with name "posix:permissions"
+     */
+    private void generateScript(Path path, String dataxCommand, FileAttribute<Set<PosixFilePermission>> attr) {
+        try {
+            if (SystemUtils.IS_OS_WINDOWS) {
+                Files.createFile(path);
+            } else {
+                Files.createFile(path, attr);
+            }
+            Files.write(path, dataxCommand.getBytes(), StandardOpenOption.APPEND);
+        } catch (IOException e) {
+            throw new RuntimeException("generate datax script error", e);
+        }
     }
 
     private StringBuilder addCustomParameters(Map<String, Property> paramsMap) {
@@ -584,6 +576,59 @@ public class DataxTask extends AbstractTask {
         if (obj == null) {
             throw new RuntimeException(message);
         }
+    }
+
+    private String buildYarnShellCommandFile(String jobConfigFilePath, Map<String, Property> paramsMap) {
+        // generate scripts
+        String fileName = String.format("%s/%s_node.%s",
+                taskExecutionContext.getExecutePath(),
+                taskExecutionContext.getTaskAppId(),
+                SystemUtils.IS_OS_WINDOWS ? "bat" : "sh");
+
+        Path path = new File(fileName).toPath();
+
+        if (Files.exists(path)) {
+            return fileName;
+        }
+
+        int xms = Math.max(dataXParameters.getXms(), 1);
+        int xmx = Math.max(dataXParameters.getXmx(), 1);
+        int jvm = Math.max(xms, xmx);
+
+        StringBuilder sbr = new StringBuilder(DataxConstants.DATAX_YARN_BIN + " jar " + DataxConstants.DATAX_YARN_JAR);
+        sbr.append(" com.on.yarn.Client");
+        sbr.append(" -jar_path " + DataxConstants.DATAX_YARN_JAR);
+        sbr.append(" -appname " + taskExecutionContext.getTaskName());
+        sbr.append(" -master_memory " + (jvm * 1024));
+        sbr.append(" -datax_job " + jobConfigFilePath);
+        sbr.append(" -datax_home_hdfs " + System.getenv("DATAX_HOME"));
+
+        if (StringUtils.isBlank(dataXParameters.getYarnQueue())) {
+            sbr.append(" -queue " + DataxConstants.DATAX_YARN_DEFAULT_QUEUE);
+        } else {
+            sbr.append(" -queue " + dataXParameters.getYarnQueue());
+        }
+
+        if (null != paramsMap && paramsMap.size() != 0) {
+            StringBuilder customParameters = new StringBuilder();
+            for (Map.Entry<String, Property> entry : paramsMap.entrySet()) {
+                customParameters.append(entry.getKey()).append("=").append(entry.getValue().getValue()).append(",");
+            }
+            sbr.append(" -p " + customParameters);
+        }
+
+        log.debug("datax yarn script : {}", sbr);
+        // replace placeholder
+        String dataxCommand =
+                ParameterUtils.convertParameterPlaceholders(sbr.toString(), ParamUtils.convert(paramsMap));
+        log.debug("raw script : {}", dataxCommand);
+
+        // create shell command file
+        Set<PosixFilePermission> perms = PosixFilePermissions.fromString(RWXR_XR_X);
+        FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
+        generateScript(path, dataxCommand, attr);
+
+        return fileName;
     }
 
 }

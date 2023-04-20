@@ -276,6 +276,8 @@ export function formatParams(data: INodeData): {
     }
     taskParams.xms = data.xms
     taskParams.xmx = data.xmx
+    taskParams.yarn = data.yarn
+    taskParams.yarnQueue = data.yarnQueue
   }
   if (data.taskType === 'DEPENDENT') {
     taskParams.dependence = {
