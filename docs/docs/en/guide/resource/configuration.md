@@ -50,7 +50,6 @@ resource.aws.s3.endpoint=
 ......
 ```
 
-
 ## Use HDFS or Remote Object Storage
 
 After version 3.0.0-alpha, if you want to upload resources to `Resource Center` connected to `HDFS`, you need to configure `api-server/conf/common.properties` and `worker-server/conf/common.properties`.
