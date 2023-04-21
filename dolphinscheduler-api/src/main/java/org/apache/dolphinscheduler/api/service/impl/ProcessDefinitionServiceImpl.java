@@ -2371,7 +2371,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return result;
         }
         if (!CronUtils.isValidExpression(scheduleObj.getCrontab())) {
-            log.error("CronExpression verify failure, cron:{}.", scheduleObj.getCrontab());
+            logger.error("CronExpression verify failure, cron:{}.", scheduleObj.getCrontab());
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, scheduleObj.getCrontab());
             return result;
         }
