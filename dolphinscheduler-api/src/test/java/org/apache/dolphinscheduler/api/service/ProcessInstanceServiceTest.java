@@ -465,7 +465,7 @@ public class ProcessInstanceServiceTest {
     public void testParseLogForDependentResult() throws IOException {
         String logString =
                 "[INFO] 2019-03-19 17:11:08.475 org.apache.dolphinscheduler.server.worker.log.TaskLogger:[172]"
-                        + " - [taskAppId=TASK_223_10739_452334] dependent item complete :|| 223-ALL-day-last1Day,SUCCESS\n"
+                        + " - [taskAppId=TASK_223_10739_452334] dependent item complete, :|| dependentKey: 223-ALL-day-last1Day, result: SUCCESS, dependentDate: Wed Mar 19 17:10:36 CST 2019\n"
                         + "[INFO] 2019-03-19 17:11:08.476 org.apache.dolphinscheduler.server.worker.runner.TaskScheduleThread:[172]"
                         + " - task : 223_10739_452334 exit status code : 0\n"
                         + "[root@node2 current]# ";
@@ -591,7 +591,8 @@ public class ProcessInstanceServiceTest {
         Tenant tenant = getTenant();
         when(processDefineMapper.queryByCode(46L)).thenReturn(processDefinition);
         when(tenantMapper.queryByTenantCode("root")).thenReturn(tenant);
-        when(processService.getTenantForProcess(Mockito.anyInt(), Mockito.anyInt())).thenReturn(tenant);
+        when(processService.getTenantForProcess(Mockito.anyString(), Mockito.anyInt()))
+                .thenReturn(tenant.getTenantCode());
         when(processInstanceDao.updateProcessInstance(processInstance)).thenReturn(1);
         when(processService.saveProcessDefine(loginUser, processDefinition, Boolean.TRUE, Boolean.FALSE)).thenReturn(1);
 
@@ -815,7 +816,6 @@ public class ProcessInstanceServiceTest {
         processDefinition.setId(46);
         processDefinition.setName("test_pdf");
         processDefinition.setProjectCode(2L);
-        processDefinition.setTenantId(1);
         processDefinition.setDescription("");
         return processDefinition;
     }

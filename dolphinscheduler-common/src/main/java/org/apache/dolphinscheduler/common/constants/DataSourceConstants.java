@@ -37,6 +37,7 @@ public class DataSourceConstants {
     public static final String COM_ATHENA_JDBC_DRIVER = "com.simba.athena.jdbc.Driver";
     public static final String COM_TRINO_JDBC_DRIVER = "io.trino.jdbc.TrinoDriver";
     public static final String COM_DAMENG_JDBC_DRIVER = "dm.jdbc.driver.DmDriver";
+    public static final String ORG_APACHE_KYUUBI_JDBC_DRIVER = "org.apache.kyuubi.jdbc.KyuubiHiveDriver";
     public static final String COM_OCEANBASE_JDBC_DRIVER = "com.oceanbase.jdbc.Driver";
     public static final String COM_TERADATA_JDBC_DRIVER = "com.teradata.jdbc.TeraDriver";
 
@@ -57,12 +58,15 @@ public class DataSourceConstants {
     public static final String DAMENG_VALIDATION_QUERY = "select 1";
     public static final String TERADATA_VALIDATION_QUERY = "select 1";
 
+    public static final String KYUUBI_VALIDATION_QUERY = "select 1";
+
     /**
      * jdbc url
      */
     public static final String JDBC_MYSQL = "jdbc:mysql://";
     public static final String JDBC_POSTGRESQL = "jdbc:postgresql://";
     public static final String JDBC_HIVE_2 = "jdbc:hive2://";
+    public static final String JDBC_KYUUBI = "jdbc:kyuubi://";
     public static final String JDBC_CLICKHOUSE = "jdbc:clickhouse://";
     public static final String JDBC_ORACLE_SID = "jdbc:oracle:thin:@";
     public static final String JDBC_ORACLE_SERVICE_NAME = "jdbc:oracle:thin:@//";

@@ -234,7 +234,7 @@ delimiter ;
 CALL add_t_ds_task_instance_idx_cache_key;
 DROP PROCEDURE add_t_ds_task_instance_idx_cache_key;
 
--- ALTER TABLE `t_ds_process_instance` ADD column `project_code`, `process_definition_name`, `executor_name`, `tenant_code`;
+-- ALTER TABLE `t_ds_process_instance` ADD column `project_code`, `executor_name`, `tenant_code`;
 drop PROCEDURE if EXISTS add_t_ds_process_instance_add_project_code;
 delimiter d//
 CREATE PROCEDURE add_t_ds_process_instance_add_project_code()
@@ -266,7 +266,7 @@ delimiter ;
 CALL add_t_ds_process_instance_add_project_code;
 DROP PROCEDURE add_t_ds_process_instance_add_project_code;
 
--- ALTER TABLE `t_ds_task_instance` ADD column `project_code`, `process_definition_name`, `executor_name`, `tenant_code`;
+-- ALTER TABLE `t_ds_task_instance` ADD column `project_code`, `process_definition_name`, `executor_name`
 drop PROCEDURE if EXISTS add_t_ds_task_instance_add_project_code;
 delimiter d//
 CREATE PROCEDURE add_t_ds_task_instance_add_project_code()
@@ -381,4 +381,34 @@ ALTER TABLE `t_ds_k8s` MODIFY `k8s_name` varchar(255) DEFAULT NULL;
 ALTER TABLE `t_ds_k8s_namespace` MODIFY `namespace` varchar(255) DEFAULT NULL;
 ALTER TABLE `t_ds_cluster` MODIFY `name`        varchar(255) NOT NULL COMMENT 'cluster name';
 
-
+-- tenant improvement
+DROP PROCEDURE if EXISTS add_improvement_workflow_run_tenant;
+delimiter d//
+CREATE PROCEDURE add_improvement_workflow_run_tenant()
+BEGIN
+   IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_command'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='tenant_code')
+   THEN
+ALTER TABLE t_ds_command ADD `tenant_code` varchar(64) DEFAULT 'default' COMMENT 'tenant code';
+END IF;
+   IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_error_command'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='tenant_code')
+   THEN
+ALTER TABLE t_ds_error_command ADD `tenant_code` varchar(64) DEFAULT 'default' COMMENT 'tenant code';
+END IF;
+   IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_schedules'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='tenant_code')
+   THEN
+ALTER TABLE t_ds_schedules ADD `tenant_code` varchar(64) DEFAULT 'default' COMMENT 'tenant code';
+END IF;
+END;
+d//
+delimiter ;
+CALL add_improvement_workflow_run_tenant;
+DROP PROCEDURE add_improvement_workflow_run_tenant;

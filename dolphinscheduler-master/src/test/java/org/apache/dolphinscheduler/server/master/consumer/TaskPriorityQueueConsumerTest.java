@@ -68,18 +68,20 @@ public class TaskPriorityQueueConsumerTest {
     @Autowired
     private ExecutorDispatcher dispatcher;
 
+    private static final String TENANT_CODE = "root";
+
     @BeforeEach
     public void init() {
 
         Tenant tenant = new Tenant();
         tenant.setId(1);
-        tenant.setTenantCode("journey");
-        tenant.setDescription("journey");
+        tenant.setTenantCode(TENANT_CODE);
+        tenant.setDescription(TENANT_CODE);
         tenant.setQueueId(1);
         tenant.setCreateTime(new Date());
         tenant.setUpdateTime(new Date());
 
-        Mockito.doReturn(tenant).when(processService).getTenantForProcess(1, 2);
+        Mockito.doReturn(tenant).when(processService).getTenantForProcess(TENANT_CODE, 2);
     }
 
     @Test
@@ -95,7 +97,7 @@ public class TaskPriorityQueueConsumerTest {
 
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(1);
-        processInstance.setTenantId(1);
+        processInstance.setTenantCode(TENANT_CODE);
         processInstance.setCommandType(CommandType.START_PROCESS);
         taskInstance.setProcessInstance(processInstance);
 
@@ -123,7 +125,7 @@ public class TaskPriorityQueueConsumerTest {
         taskInstance.setExecutorId(2);
 
         ProcessInstance processInstance = new ProcessInstance();
-        processInstance.setTenantId(1);
+        processInstance.setTenantCode(TENANT_CODE);
         processInstance.setCommandType(CommandType.START_PROCESS);
         taskInstance.setProcessInstance(processInstance);
 
@@ -164,7 +166,7 @@ public class TaskPriorityQueueConsumerTest {
         taskInstance.setExecutorId(2);
 
         ProcessInstance processInstance = new ProcessInstance();
-        processInstance.setTenantId(1);
+        processInstance.setTenantCode(TENANT_CODE);
         processInstance.setCommandType(CommandType.START_PROCESS);
         taskInstance.setProcessInstance(processInstance);
 
@@ -203,7 +205,7 @@ public class TaskPriorityQueueConsumerTest {
         taskInstance.setExecutorId(2);
 
         ProcessInstance processInstance = new ProcessInstance();
-        processInstance.setTenantId(1);
+        processInstance.setTenantCode(TENANT_CODE);
         processInstance.setCommandType(CommandType.START_PROCESS);
         taskInstance.setProcessInstance(processInstance);
 
@@ -260,7 +262,7 @@ public class TaskPriorityQueueConsumerTest {
 
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(1);
-        processInstance.setTenantId(1);
+        processInstance.setTenantCode(TENANT_CODE);
         processInstance.setCommandType(CommandType.START_PROCESS);
         taskInstance.setProcessInstance(processInstance);
         taskInstance.setState(TaskExecutionStatus.DELAY_EXECUTION);
@@ -293,7 +295,7 @@ public class TaskPriorityQueueConsumerTest {
 
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(1);
-        processInstance.setTenantId(1);
+        processInstance.setTenantCode(TENANT_CODE);
         processInstance.setCommandType(CommandType.START_PROCESS);
         taskInstance.setProcessInstance(processInstance);
         taskInstance.setState(TaskExecutionStatus.DELAY_EXECUTION);
@@ -334,7 +336,7 @@ public class TaskPriorityQueueConsumerTest {
 
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(1);
-        processInstance.setTenantId(1);
+        processInstance.setTenantCode(TENANT_CODE);
         processInstance.setCommandType(CommandType.START_PROCESS);
         taskInstance.setProcessInstance(processInstance);
         taskInstance.setState(TaskExecutionStatus.DELAY_EXECUTION);

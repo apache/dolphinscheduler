@@ -45,7 +45,7 @@ public enum Status {
     LOGIN_SESSION_FAILED(10014, "create session failed!", "创建session失败"),
     DATASOURCE_EXIST(10015, "data source name already exists", "数据源名称已存在"),
     DATASOURCE_CONNECT_FAILED(10016, "data source connection failed", "建立数据源连接失败"),
-    TENANT_NOT_EXIST(10017, "tenant not exists", "租户不存在"),
+    TENANT_NOT_EXIST(10017, "tenant [{0}] not exists", "租户[{0}]不存在"),
     PROJECT_NOT_FOUND(10018, "project {0} not found ", "项目[{0}]不存在"),
     PROJECT_ALREADY_EXISTS(10019, "project {0} already exists", "项目名称[{0}]已存在"),
     TASK_INSTANCE_NOT_EXISTS(10020, "task instance {0} does not exist", "任务实例[{0}]不存在"),
