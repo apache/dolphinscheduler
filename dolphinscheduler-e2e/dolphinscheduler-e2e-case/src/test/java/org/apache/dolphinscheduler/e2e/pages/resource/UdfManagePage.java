@@ -34,6 +34,8 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 @Getter
 public class UdfManagePage extends NavBarPage implements ResourcePage.Tab {
@@ -79,6 +81,8 @@ public class UdfManagePage extends NavBarPage implements ResourcePage.Tab {
     }
 
     public UdfManagePage uploadFile(String filePath) {
+        new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(buttonUploadUdf));
+
         buttonUploadUdf().click();
 
         driver.setFileDetector(new LocalFileDetector());
