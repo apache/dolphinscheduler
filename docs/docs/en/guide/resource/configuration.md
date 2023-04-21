@@ -16,7 +16,7 @@ config three fields as follows:
 ```properties
 ......
 
-# resource storage type: HDFS, S3, OSS, NONE
+# resource storage type: HDFS, S3, NONE
 resource.storage.type=HDFS
 # resource store on HDFS/S3 path, resource file will store to this base path, self configuration, please make sure the directory exists on hdfs and have read write permissions. "/dolphinscheduler" is recommended
 resource.storage.upload.base.path=/tmp/dolphinscheduler
