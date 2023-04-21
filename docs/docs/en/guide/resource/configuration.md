@@ -30,6 +30,8 @@ The configuration you may need to change:
 
 if you want to upload resources to `Resource Center` connected to `S3`, you need to configure `api-server/conf/common.properties` and `worker-server/conf/common.properties`. You can refer to the following:
 
+config the following fields
+
 ```properties
 ......
 
@@ -43,7 +45,7 @@ resource.aws.secret.access.key=aws_secret_access_key
 # The AWS Region to use. if resource.storage.type=S3 or use EMR-Task, This configuration is required
 resource.aws.region=us-west-2
 # The name of the bucket. You need to create them by yourself. Otherwise, the system cannot start. All buckets in Amazon S3 share a single namespace; ensure the bucket is given a unique name.
-resource.aws.s3.bucket.name=dsresource
+resource.aws.s3.bucket.name=dolphinscheduler
 # You need to set this parameter when private cloud s4. If S3 uses public cloud, you only need to set resource.aws.region or set to the endpoint of a public cloud such as S3.cn-north-1.amazonaws.com.cn
 resource.aws.s3.endpoint=
 
