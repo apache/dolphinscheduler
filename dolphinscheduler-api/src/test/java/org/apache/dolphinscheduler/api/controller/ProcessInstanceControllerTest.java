@@ -108,7 +108,7 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
         Mockito.when(processInstanceService
                 .updateProcessInstance(Mockito.any(), Mockito.anyLong(), Mockito.anyInt(), Mockito.anyString(),
                         Mockito.anyString(), Mockito.anyString(), Mockito.anyBoolean(), Mockito.anyString(),
-                        Mockito.anyString(), Mockito.anyInt(), Mockito.anyString()))
+                        Mockito.anyString(), Mockito.anyInt()))
                 .thenReturn(mockResult);
 
         String json =

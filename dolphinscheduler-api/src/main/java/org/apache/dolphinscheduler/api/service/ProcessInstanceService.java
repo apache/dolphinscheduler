@@ -148,7 +148,6 @@ public interface ProcessInstanceService {
      * @param globalParams global params
      * @param locations locations for nodes
      * @param timeout timeout
-     * @param tenantCode tenantCode
      * @return update result code
      */
     Map<String, Object> updateProcessInstance(User loginUser,
@@ -160,8 +159,7 @@ public interface ProcessInstanceService {
                                               Boolean syncDefine,
                                               String globalParams,
                                               String locations,
-                                              int timeout,
-                                              String tenantCode);
+                                              int timeout);
 
     /**
      * query parent process instance detail info by sub process instance id
