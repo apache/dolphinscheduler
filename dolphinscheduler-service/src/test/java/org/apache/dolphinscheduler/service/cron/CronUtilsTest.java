@@ -240,7 +240,7 @@ public class CronUtilsTest {
 
     @Test
     public void testValid() {
-        Assertions.assertFalse(CronUtils.isValidExpression("0 0 13/0 * * ? *"));
-        Assertions.assertTrue(CronUtils.isValidExpression("0 0 13-0 * * ? *"));
+        Assert.assertFalse(CronUtils.isValidExpression("0 0 13/0 * * ? *"));
+        Assert.assertTrue(CronUtils.isValidExpression("0 0 13-0 * * ? *"));
     }
 }
