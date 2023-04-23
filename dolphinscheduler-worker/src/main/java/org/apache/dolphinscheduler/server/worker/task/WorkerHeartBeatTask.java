@@ -96,7 +96,7 @@ public class WorkerHeartBeatTask extends BaseHeartBeatTask<WorkerHeartBeat> {
                                int workerWaitingTaskCount) {
         if (cpuUsagePercentage > maxCpuUsePercentage || (1 - memoryUsagePercentage) < reservedMemory) {
             log.warn(
-                    "current cpu load average {} is higher than {} max.cpuload.avg or available memory is lower than {} reserved.memory={}",
+                    "current cpu load average {} is higher than {} or available memory {} is lower than {}",
                     cpuUsagePercentage, maxCpuUsePercentage, 1 - memoryUsagePercentage, reservedMemory);
             return Constants.ABNORMAL_NODE_STATUS;
         } else if (workerWaitingTaskCount > workerExecThreadCount) {
