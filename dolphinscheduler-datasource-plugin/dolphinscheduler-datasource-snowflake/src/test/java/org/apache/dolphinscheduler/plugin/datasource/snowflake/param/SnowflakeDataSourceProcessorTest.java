@@ -157,10 +157,12 @@ public class SnowflakeDataSourceProcessorTest {
 
     @Test
     public void testCreateDatasourceParamDTO() {
-        String connectionParam = "{\"user\":\"default\",\"address\":\"jdbc:snowflake://localhost1:5142,localhost2:5142\""
-                + ",\"jdbcUrl\":\"jdbc:snowflake://localhost1:5142,localhost2:5142/default\"}";
-        SnowflakeDatasourceParamDTO snowflakeDatasourceParamDTO = (SnowflakeDatasourceParamDTO) snowflakeDataSourceProcessor
-                .createDatasourceParamDTO(connectionParam);
+        String connectionParam =
+                "{\"user\":\"default\",\"address\":\"jdbc:snowflake://localhost1:5142,localhost2:5142\""
+                        + ",\"jdbcUrl\":\"jdbc:snowflake://localhost1:5142,localhost2:5142/default\"}";
+        SnowflakeDatasourceParamDTO snowflakeDatasourceParamDTO =
+                (SnowflakeDatasourceParamDTO) snowflakeDataSourceProcessor
+                        .createDatasourceParamDTO(connectionParam);
         Assertions.assertEquals("default", snowflakeDatasourceParamDTO.getUserName());
     }
 

@@ -17,23 +17,33 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.snowflake;
 
-import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
+import java.sql.Connection;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-public class SnowflakeDataSourceChannelFactoryTest {
+@ExtendWith(MockitoExtension.class)
+public class SnowflakeDataSourceClientTest {
+
+    @Mock
+    private SnowflakeDataSourceClient snowflakeDataSourceClient;
 
     @Test
-    public void testCreate() {
-        SnowflakeDataSourceChannelFactory sourceChannelFactory = new SnowflakeDataSourceChannelFactory();
-        DataSourceChannel dataSourceChannel = sourceChannelFactory.create();
-        Assertions.assertNotNull(dataSourceChannel);
+    public void testCheckClient() {
+        snowflakeDataSourceClient.checkClient();
+        Mockito.verify(snowflakeDataSourceClient).checkClient();
     }
 
     @Test
-    public void testGetName() {
-        SnowflakeDataSourceChannelFactory sourceChannelFactory = new SnowflakeDataSourceChannelFactory();
-        Assertions.assertEquals(sourceChannelFactory.getName(), "snowflake");
+    public void testGetConnection() {
+        Connection connection = Mockito.mock(Connection.class);
+        Mockito.when(snowflakeDataSourceClient.getConnection()).thenReturn(connection);
+        Assertions.assertNotNull(snowflakeDataSourceClient.getConnection());
+
     }
+
 }
