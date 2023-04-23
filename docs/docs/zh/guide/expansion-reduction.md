@@ -117,7 +117,7 @@ workers="现有worker01:default,现有worker02:default,ds3:default,ds4:default"
 
 ```
 
-- 如果扩容的是worker节点,需要设置worker分组.请参考安全中心[创建worker分组](./security.md)
+- 如果扩容的是worker节点,需要设置worker分组.请参考安全中心[创建worker分组](security/security.md)
 
 - 在所有的新增节点上，修改目录权限，使得部署用户对dolphinscheduler目录有操作权限
 

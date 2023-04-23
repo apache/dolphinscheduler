@@ -40,16 +40,11 @@ interface SaveReq extends ProcessDefinitionCodeReq, ProjectCodeReq {
   preTaskCode: string
 }
 
-interface MoveReq extends ProcessDefinitionCodeReq, TaskCodeReq {
-  targetProcessDefinitionCode: string
-}
-
 export {
   ProjectCodeReq,
   ProcessDefinitionCodeReq,
   PreTaskCodesReq,
   PostTaskCodesReq,
   TaskCodeReq,
-  SaveReq,
-  MoveReq
+  SaveReq
 }

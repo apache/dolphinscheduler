@@ -81,7 +81,7 @@ public class DinkyTask extends AbstractRemoteTask {
     public void init() {
         final String taskParams = taskExecutionContext.getTaskParams();
         this.dinkyParameters = JSONUtils.parseObject(taskParams, DinkyParameters.class);
-        logger.info("Initialize dinky task params: {}", JSONUtils.toPrettyJsonString(dinkyParameters));
+        log.info("Initialize dinky task params: {}", JSONUtils.toPrettyJsonString(dinkyParameters));
         if (this.dinkyParameters == null || !this.dinkyParameters.checkParameters()) {
             throw new DinkyTaskException("dinky task params is not valid");
         }
@@ -120,7 +120,7 @@ public class DinkyTask extends AbstractRemoteTask {
                             // Use address-taskId as app id
                             setAppIds(String.format("%s-%s", address, taskId));
                             setExitStatusCode(exitStatusCode);
-                            logger.info("dinky task finished with results: {}",
+                            log.info("dinky task finished with results: {}",
                                     result.get(DinkyTaskConstants.API_RESULT_DATAS));
                             finishFlag = true;
                             break;
@@ -138,7 +138,7 @@ public class DinkyTask extends AbstractRemoteTask {
             }
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
-            logger.error("Execute dinkyTask failed", ex);
+            log.error("Execute dinkyTask failed", ex);
             setExitStatusCode(EXIT_CODE_FAILURE);
             throw new TaskException("Execute dinkyTask failed", ex);
         }
@@ -181,7 +181,7 @@ public class DinkyTask extends AbstractRemoteTask {
 
     private void errorHandle(Object msg) {
         setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
-        logger.error("dinky task submit failed with error: {}", msg);
+        log.error("dinky task submit failed with error: {}", msg);
     }
 
     @Override
@@ -193,12 +193,12 @@ public class DinkyTask extends AbstractRemoteTask {
     public void cancelApplication() throws TaskException {
         String address = this.dinkyParameters.getAddress();
         String taskId = this.dinkyParameters.getTaskId();
-        logger.info("trying terminate dinky task, taskId: {}, address: {}, taskId: {}",
+        log.info("trying terminate dinky task, taskId: {}, address: {}, taskId: {}",
                 this.taskExecutionContext.getTaskInstanceId(),
                 address,
                 taskId);
         cancelTask(address, taskId);
-        logger.warn("dinky task terminated, taskId: {}, address: {}, taskId: {}",
+        log.warn("dinky task terminated, taskId: {}, address: {}, taskId: {}",
                 this.taskExecutionContext.getTaskInstanceId(),
                 address,
                 taskId);
@@ -235,7 +235,7 @@ public class DinkyTask extends AbstractRemoteTask {
         try {
             result = mapper.readTree(res);
         } catch (JsonProcessingException e) {
-            logger.error("dinky task submit failed with error", e);
+            log.error("dinky task submit failed with error", e);
         }
         return result;
     }
@@ -253,18 +253,18 @@ public class DinkyTask extends AbstractRemoteTask {
             }
             URI uri = uriBuilder.build();
             httpGet = new HttpGet(uri);
-            logger.info("access url: {}", uri);
+            log.info("access url: {}", uri);
             HttpResponse response = httpClient.execute(httpGet);
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 result = EntityUtils.toString(response.getEntity());
-                logger.info("dinky task succeed with results: {}", result);
+                log.info("dinky task succeed with results: {}", result);
             } else {
-                logger.error("dinky task terminated,response: {}", response);
+                log.error("dinky task terminated,response: {}", response);
             }
         } catch (IllegalArgumentException ie) {
-            logger.error("dinky task terminated: {}", ie.getMessage());
+            log.error("dinky task terminated: {}", ie.getMessage());
         } catch (Exception e) {
-            logger.error("dinky task terminated: ", e);
+            log.error("dinky task terminated: ", e);
         } finally {
             if (null != httpGet) {
                 httpGet.releaseConnection();
@@ -286,14 +286,14 @@ public class DinkyTask extends AbstractRemoteTask {
             HttpResponse response = httpClient.execute(httpPost);
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 result = EntityUtils.toString(response.getEntity());
-                logger.info("dinky task succeed with results: {}", result);
+                log.info("dinky task succeed with results: {}", result);
             } else {
-                logger.error("dinky task terminated,response: {}", response);
+                log.error("dinky task terminated,response: {}", response);
             }
         } catch (IllegalArgumentException ie) {
-            logger.error("dinky task terminated: {}", ie.getMessage());
+            log.error("dinky task terminated: {}", ie.getMessage());
         } catch (Exception he) {
-            logger.error("dinky task terminated: ", he);
+            log.error("dinky task terminated: ", he);
         }
         return result;
     }

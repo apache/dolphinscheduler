@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.master.utils;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependentRelation;
@@ -28,7 +29,6 @@ import org.apache.dolphinscheduler.plugin.task.api.model.DateInterval;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
 import org.apache.dolphinscheduler.plugin.task.api.utils.DependentUtils;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -36,18 +36,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * dependent item execute
  */
+@Slf4j
 public class DependentExecute {
 
-    /**
-     * process service
-     */
-    private final ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
+    private final ProcessInstanceDao processInstanceDao = SpringApplicationContext.getBean(ProcessInstanceDao.class);
 
     private final TaskInstanceDao taskInstanceDao = SpringApplicationContext.getBean(TaskInstanceDao.class);
 
@@ -61,6 +58,10 @@ public class DependentExecute {
      */
     private DependentRelation relation;
 
+    private ProcessInstance processInstance;
+
+    private TaskInstance taskInstance;
+
     /**
      * depend result
      */
@@ -72,19 +73,17 @@ public class DependentExecute {
     private Map<String, DependResult> dependResultMap = new HashMap<>();
 
     /**
-     * logger
-     */
-    private Logger logger = LoggerFactory.getLogger(DependentExecute.class);
-
-    /**
      * constructor
      *
      * @param itemList item list
      * @param relation relation
      */
-    public DependentExecute(List<DependentItem> itemList, DependentRelation relation) {
+    public DependentExecute(List<DependentItem> itemList, DependentRelation relation, ProcessInstance processInstance,
+                            TaskInstance taskInstance) {
         this.dependItemList = itemList;
         this.relation = relation;
+        this.processInstance = processInstance;
+        this.taskInstance = taskInstance;
     }
 
     /**
@@ -193,10 +192,10 @@ public class DependentExecute {
     private ProcessInstance findLastProcessInterval(Long definitionCode, DateInterval dateInterval, int testFlag) {
 
         ProcessInstance lastSchedulerProcess =
-                processService.findLastSchedulerProcessInterval(definitionCode, dateInterval, testFlag);
+                processInstanceDao.findLastSchedulerProcessInterval(definitionCode, dateInterval, testFlag);
 
         ProcessInstance lastManualProcess =
-                processService.findLastManualProcessInterval(definitionCode, dateInterval, testFlag);
+                processInstanceDao.findLastManualProcessInterval(definitionCode, dateInterval, testFlag);
 
         if (lastManualProcess == null) {
             return lastSchedulerProcess;
@@ -251,6 +250,15 @@ public class DependentExecute {
         List<DependResult> dependResultList = new ArrayList<>();
 
         for (DependentItem dependentItem : dependItemList) {
+            if (isSelfDependent(dependentItem) && isFirstProcessInstance(dependentItem)) {
+                // if self-dependent, default success at first time
+                dependResultMap.put(dependentItem.getKey(), DependResult.SUCCESS);
+                dependResultList.add(DependResult.SUCCESS);
+                log.info(
+                        "This dependent item is self-dependent and run at first time, default success, processDefinitionCode:{}, depTaskCode:{}",
+                        dependentItem.getDefinitionCode(), dependentItem.getDepTaskCode());
+                continue;
+            }
             DependResult dependResult = getDependResultForItem(dependentItem, currentTime, testFlag);
             if (dependResult != DependResult.WAITING) {
                 dependResultMap.put(dependentItem.getKey(), dependResult);
@@ -280,4 +288,42 @@ public class DependentExecute {
         return dependResultMap;
     }
 
+    /**
+     * check for self-dependent
+     * @param dependentItem
+     * @return
+     */
+    public boolean isSelfDependent(DependentItem dependentItem) {
+        if (processInstance.getProcessDefinitionCode().equals(dependentItem.getDefinitionCode())) {
+            if (dependentItem.getDepTaskCode() == Constants.DEPENDENT_ALL_TASK_CODE) {
+                return true;
+            }
+            if (dependentItem.getDepTaskCode() == taskInstance.getTaskCode()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * check for first-running
+     * query the first processInstance by scheduleTime(or startTime if scheduleTime is null)
+     * @param dependentItem
+     * @return
+     */
+    public boolean isFirstProcessInstance(DependentItem dependentItem) {
+        ProcessInstance firstProcessInstance =
+                processInstanceDao.queryFirstScheduleProcessInstance(dependentItem.getDefinitionCode());
+        if (firstProcessInstance == null) {
+            firstProcessInstance = processInstanceDao.queryFirstStartProcessInstance(dependentItem.getDefinitionCode());
+            if (firstProcessInstance == null) {
+                log.warn("First process instance is null, processDefinitionCode:{}", dependentItem.getDefinitionCode());
+                return false;
+            }
+        }
+        if (firstProcessInstance.getId() == processInstance.getId()) {
+            return true;
+        }
+        return false;
+    }
 }

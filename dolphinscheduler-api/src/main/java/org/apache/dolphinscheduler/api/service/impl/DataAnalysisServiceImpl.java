@@ -63,8 +63,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -72,9 +72,8 @@ import org.springframework.stereotype.Service;
  * data analysis service impl
  */
 @Service
+@Slf4j
 public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnalysisService {
-
-    private static final Logger logger = LoggerFactory.getLogger(DataAnalysisServiceImpl.class);
 
     @Autowired
     private ProjectMapper projectMapper;
@@ -176,7 +175,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
             start = DateUtils.stringToDate(startDate);
             end = DateUtils.stringToDate(endDate);
             if (Objects.isNull(start) || Objects.isNull(end)) {
-                logger.warn("Parameter startDate or endDate is invalid.");
+                log.warn("Parameter startDate or endDate is invalid.");
                 putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
                 return result;
             }
@@ -293,7 +292,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
 
     private Pair<Set<Integer>, Map<String, Object>> getProjectIds(User loginUser, Map<String, Object> result) {
         Set<Integer> projectIds = resourcePermissionCheckService
-                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), logger);
+                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), log);
         if (projectIds.isEmpty()) {
             List<ExecuteStatusCount> taskInstanceStateCounts = new ArrayList<>();
             result.put(Constants.DATA_LIST, new TaskCountDto(taskInstanceStateCounts));
@@ -370,7 +369,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         Map<String, Object> result = new HashMap<>();
         int count = 0;
         Set<Integer> projectIds = resourcePermissionCheckService
-                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), logger);
+                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), log);
         if (!projectIds.isEmpty()) {
             List<Project> projects = projectMapper.selectBatchIds(projectIds);
             List<Long> projectCodes = projects.stream().map(project -> project.getCode()).collect(Collectors.toList());
@@ -392,7 +391,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
                                                    StatisticsStateRequest statisticsStateRequest) {
         Map<String, Object> result = new HashMap<>();
         Set<Integer> projectIds = resourcePermissionCheckService
-                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), logger);
+                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), log);
         if (projectIds.isEmpty()) {
             putMsg(result, Status.SUCCESS);
             return result;
@@ -416,7 +415,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
                 workflowCode = processDefinitionMapper.queryByDefineName(projectCode, workflowName).getCode();
             }
         } catch (Exception e) {
-            logger.warn(e.getMessage());
+            log.warn(e.getMessage());
         }
 
         Date date = new Date();
@@ -466,7 +465,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
     public Map<String, Object> countTaskStates(User loginUser, StatisticsStateRequest statisticsStateRequest) {
         Map<String, Object> result = new HashMap<>();
         Set<Integer> projectIds = resourcePermissionCheckService
-                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), logger);
+                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), log);
         if (projectIds.isEmpty()) {
             putMsg(result, Status.SUCCESS);
             return result;
@@ -497,7 +496,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
                 // taskCode = relationMapper.queryTaskCodeByTaskName(workflowCode, taskName);
             }
         } catch (Exception e) {
-            logger.warn(e.getMessage());
+            log.warn(e.getMessage());
         }
 
         Date date = new Date();

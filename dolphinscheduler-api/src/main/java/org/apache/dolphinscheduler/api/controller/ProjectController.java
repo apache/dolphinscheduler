@@ -35,8 +35,8 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -62,9 +62,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "PROJECT_TAG")
 @RestController
 @RequestMapping("projects")
+@Slf4j
 public class ProjectController extends BaseController {
-
-    private static final Logger logger = LoggerFactory.getLogger(ProjectController.class);
 
     @Autowired
     private ProjectService projectService;
@@ -166,7 +165,7 @@ public class ProjectController extends BaseController {
 
         Result result = checkPageParams(pageNo, pageSize);
         if (!result.checkResult()) {
-            logger.warn("Pagination parameters check failed, pageNo:{}, pageSize:{}", pageNo, pageSize);
+            log.warn("Pagination parameters check failed, pageNo:{}, pageSize:{}", pageNo, pageSize);
             return result;
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);

@@ -158,9 +158,13 @@ const DetailModal = defineComponent({
       showHost,
       showPort,
       showAwsRegion,
+      showCompatibleMode,
       showConnectType,
       showPrincipal,
       showMode,
+      showDataBaseName,
+      showJDBCConnectParameters,
+      showPublicKey,
       modeOptions,
       redShitModeOptions,
       loading,
@@ -538,6 +542,7 @@ const DetailModal = defineComponent({
                   />
                 </NFormItem>
                 <NFormItem
+                  v-show={showDataBaseName}
                   label={t('datasource.database_name')}
                   path='database'
                   show-require-mark={requiredDataBase}
@@ -569,6 +574,22 @@ const DetailModal = defineComponent({
                   </NRadioGroup>
                 </NFormItem>
                 <NFormItem
+                  v-show={showCompatibleMode}
+                  label={t('datasource.compatible_mode')}
+                  path='compatibleMode'
+                  show-require-mark
+                >
+                  <NInput
+                    allowInput={this.trim}
+                    class='input-data-base'
+                    v-model={[detailForm.compatibleMode, 'value']}
+                    type='text'
+                    maxlength={60}
+                    placeholder={t('datasource.compatible_mode_tips')}
+                  />
+                </NFormItem>
+                <NFormItem
+                  v-show={showJDBCConnectParameters}
                   label={t('datasource.jdbc_connect_parameters')}
                   path='other'
                 >
@@ -616,6 +637,19 @@ const DetailModal = defineComponent({
                     class='select-bind-test-data-source-type-drop-down'
                     v-model={[detailForm.bindTestId, 'value']}
                     options={this.bindTestDataSourceExample}
+                  />
+                </NFormItem>
+                <NFormItem
+                    v-show={showPublicKey}
+                    label='PublicKey'
+                    path='publicKey'
+                >
+                  <NInput
+                      v-model={[detailForm.publicKey, 'value']}
+                      type='textarea'
+                      autosize={{
+                        minRows: 4
+                      }}
                   />
                 </NFormItem>
               </NForm>

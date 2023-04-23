@@ -23,7 +23,8 @@ import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.remote.command.WorkflowStateEventChangeCommand;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
+import org.apache.dolphinscheduler.remote.command.workflow.WorkflowStateEventChangeRequest;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
@@ -31,7 +32,6 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.server.master.event.TaskStateEvent;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,9 +39,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.PostConstruct;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
@@ -54,9 +53,8 @@ import com.google.common.base.Strings;
  * Used to execute {@link WorkflowExecuteRunnable}.
  */
 @Component
+@Slf4j
 public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
-
-    private static final Logger logger = LoggerFactory.getLogger(WorkflowExecuteThreadPool.class);
 
     @Autowired
     private MasterConfig masterConfig;
@@ -93,12 +91,12 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
         WorkflowExecuteRunnable workflowExecuteThread =
                 processInstanceExecCacheManager.getByProcessInstanceId(stateEvent.getProcessInstanceId());
         if (workflowExecuteThread == null) {
-            logger.warn("Submit state event error, cannot from workflowExecuteThread from cache manager, stateEvent:{}",
+            log.warn("Submit state event error, cannot from workflowExecuteThread from cache manager, stateEvent:{}",
                     stateEvent);
             return;
         }
         workflowExecuteThread.addStateEvent(stateEvent);
-        logger.info("Submit state event success, stateEvent: {}", stateEvent);
+        log.info("Submit state event success, stateEvent: {}", stateEvent);
     }
 
     /**
@@ -109,7 +107,7 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
             return;
         }
         if (multiThreadFilterMap.containsKey(workflowExecuteThread.getKey())) {
-            logger.warn("The workflow has been executed by another thread");
+            log.debug("The workflow has been executed by another thread");
             return;
         }
         multiThreadFilterMap.put(workflowExecuteThread.getKey(), workflowExecuteThread);
@@ -119,33 +117,33 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
 
             @Override
             public void onFailure(Throwable ex) {
-                LoggerUtils.setWorkflowInstanceIdMDC(processInstanceId);
+                LogUtils.setWorkflowInstanceIdMDC(processInstanceId);
                 try {
-                    logger.error("Workflow instance events handle failed", ex);
+                    log.error("Workflow instance events handle failed", ex);
                     notifyProcessChanged(workflowExecuteThread.getProcessInstance());
                     multiThreadFilterMap.remove(workflowExecuteThread.getKey());
                 } finally {
-                    LoggerUtils.removeWorkflowInstanceIdMDC();
+                    LogUtils.removeWorkflowInstanceIdMDC();
                 }
             }
 
             @Override
             public void onSuccess(Object result) {
                 try {
-                    LoggerUtils.setWorkflowInstanceIdMDC(workflowExecuteThread.getProcessInstance().getId());
+                    LogUtils.setWorkflowInstanceIdMDC(workflowExecuteThread.getProcessInstance().getId());
                     if (workflowExecuteThread.workFlowFinish() && workflowExecuteThread.eventSize() == 0) {
                         stateWheelExecuteThread
                                 .removeProcess4TimeoutCheck(workflowExecuteThread.getProcessInstance().getId());
                         processInstanceExecCacheManager.removeByProcessInstanceId(processInstanceId);
                         notifyProcessChanged(workflowExecuteThread.getProcessInstance());
-                        logger.info("Workflow instance is finished.");
+                        log.info("Workflow instance is finished.");
                     }
                 } catch (Exception e) {
-                    logger.error("Workflow instance is finished, but notify changed error", e);
+                    log.error("Workflow instance is finished, but notify changed error", e);
                 } finally {
                     // make sure the process has been removed from multiThreadFilterMap
                     multiThreadFilterMap.remove(workflowExecuteThread.getKey());
-                    LoggerUtils.removeWorkflowInstanceIdMDC();
+                    LogUtils.removeWorkflowInstanceIdMDC();
                 }
             }
         });
@@ -163,17 +161,16 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
             ProcessInstance processInstance = entry.getKey();
             TaskInstance taskInstance = entry.getValue();
             String address = NetUtils.getAddr(masterConfig.getListenPort());
-            try {
-                LoggerUtils.setWorkflowAndTaskInstanceIDMDC(processInstance.getId(), taskInstance.getId());
+            try (
+                    final LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
+                            LogUtils.setWorkflowAndTaskInstanceIDMDC(processInstance.getId(), taskInstance.getId())) {
                 if (processInstance.getHost().equalsIgnoreCase(address)) {
-                    logger.info("Process host is local master, will notify it");
+                    log.info("Process host is local master, will notify it");
                     this.notifyMyself(processInstance, taskInstance);
                 } else {
-                    logger.info("Process host is remote master, will notify it");
+                    log.info("Process host is remote master, will notify it");
                     this.notifyProcess(finishProcessInstance, processInstance, taskInstance);
                 }
-            } finally {
-                LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
         }
     }
@@ -183,7 +180,7 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
      */
     private void notifyMyself(@NonNull ProcessInstance processInstance, @NonNull TaskInstance taskInstance) {
         if (!processInstanceExecCacheManager.contains(processInstance.getId())) {
-            logger.warn("The execute cache manager doesn't contains this workflow instance");
+            log.warn("The execute cache manager doesn't contains this workflow instance");
             return;
         }
         TaskStateEvent stateEvent = TaskStateEvent.builder()
@@ -202,14 +199,14 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
                                TaskInstance taskInstance) {
         String processInstanceHost = processInstance.getHost();
         if (Strings.isNullOrEmpty(processInstanceHost)) {
-            logger.error("Process {} host is empty, cannot notify task {} now, taskId: {}", processInstance.getName(),
+            log.error("Process {} host is empty, cannot notify task {} now, taskId: {}", processInstance.getName(),
                     taskInstance.getName(), taskInstance.getId());
             return;
         }
-        WorkflowStateEventChangeCommand workflowStateEventChangeCommand = new WorkflowStateEventChangeCommand(
+        WorkflowStateEventChangeRequest workflowStateEventChangeRequest = new WorkflowStateEventChangeRequest(
                 finishProcessInstance.getId(), 0, finishProcessInstance.getState(), processInstance.getId(),
                 taskInstance.getId());
         Host host = new Host(processInstanceHost);
-        stateEventCallbackService.sendResult(host, workflowStateEventChangeCommand.convert2Command());
+        stateEventCallbackService.sendResult(host, workflowStateEventChangeRequest.convert2Command());
     }
 }

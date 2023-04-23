@@ -36,7 +36,7 @@ import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.master.dispatch.executor.NettyExecutorManager;
+import org.apache.dolphinscheduler.server.master.rpc.MasterRpcClient;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.command.CommandService;
@@ -116,11 +116,11 @@ public class WorkflowExecuteRunnableTest {
 
         stateWheelExecuteThread = Mockito.mock(StateWheelExecuteThread.class);
         curingGlobalParamsService = Mockito.mock(CuringParamsService.class);
-        NettyExecutorManager nettyExecutorManager = Mockito.mock(NettyExecutorManager.class);
+        MasterRpcClient masterRpcClient = Mockito.mock(MasterRpcClient.class);
         ProcessAlertManager processAlertManager = Mockito.mock(ProcessAlertManager.class);
         workflowExecuteThread = Mockito.spy(
                 new WorkflowExecuteRunnable(processInstance, commandService, processService, processInstanceDao,
-                        nettyExecutorManager,
+                        masterRpcClient,
                         processAlertManager, config, stateWheelExecuteThread, curingGlobalParamsService,
                         taskInstanceDao, taskDefinitionLogDao));
         Field dag = WorkflowExecuteRunnable.class.getDeclaredField("dag");

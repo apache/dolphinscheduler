@@ -149,6 +149,14 @@ export const TASK_TYPES_MAP = {
   LINKIS: {
     alias: 'LINKIS',
     helperLinkDisable: true
+  },
+  DATA_FACTORY: {
+    alias: 'DATA_FACTORY',
+    helperLinkDisable: true
+  },
+  REMOTESHELL: {
+    alias: 'REMOTESHELL',
+    helperLinkDisable: true
   }
 } as {
   [key in TaskType]: {

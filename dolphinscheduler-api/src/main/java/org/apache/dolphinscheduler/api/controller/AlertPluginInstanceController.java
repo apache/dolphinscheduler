@@ -35,8 +35,8 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -62,9 +62,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "ALERT_PLUGIN_INSTANCE_TAG")
 @RestController
 @RequestMapping("alert-plugin-instances")
+@Slf4j
 public class AlertPluginInstanceController extends BaseController {
-
-    private static final Logger logger = LoggerFactory.getLogger(AlertPluginInstanceController.class);
 
     @Autowired
     private AlertPluginInstanceService alertPluginInstanceService;
@@ -200,7 +199,7 @@ public class AlertPluginInstanceController extends BaseController {
 
         boolean exist = alertPluginInstanceService.checkExistPluginInstanceName(alertInstanceName);
         if (exist) {
-            logger.error("alert plugin instance {} has exist, can't create again.", alertInstanceName);
+            log.error("alert plugin instance {} has exist, can't create again.", alertInstanceName);
             return Result.error(Status.PLUGIN_INSTANCE_ALREADY_EXISTS);
         } else {
             return Result.success();

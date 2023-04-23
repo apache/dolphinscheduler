@@ -126,6 +126,11 @@ public class ScheduleVo {
     private String workerGroup;
 
     /**
+     * tenantCode
+     */
+    private String tenantCode;
+
+    /**
      * environment code
      */
     private Long environmentCode;
@@ -156,5 +161,6 @@ public class ScheduleVo {
         this.setStartTime(DateUtils.dateToString(schedule.getStartTime(), ZoneId.systemDefault().getId()));
         this.setEndTime(DateUtils.dateToString(schedule.getEndTime(), ZoneId.systemDefault().getId()));
         this.setEnvironmentName(schedule.getEnvironmentName());
+        this.setTenantCode(schedule.getTenantCode());
     }
 }

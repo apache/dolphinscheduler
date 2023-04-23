@@ -73,24 +73,24 @@ public abstract class BaseLoopTaskExecutor extends AbstractRemoteTask {
             }
             if (loopTaskInstanceStatus != null && loopTaskInstanceStatus.isSuccess()) {
                 setExitStatusCode(TaskConstants.EXIT_CODE_SUCCESS);
-                logger.info("The task instance: {} execute successfully.", appIds);
+                log.info("The task instance: {} execute successfully.", appIds);
             } else {
                 setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
-                logger.info("The task instance: {} is execute failure.", appIds);
+                log.info("The task instance: {} is execute failure.", appIds);
             }
         } catch (InterruptedException e) {
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
-            logger.error("The current loop thread has been interrupted", e);
+            log.error("The current loop thread has been interrupted", e);
             Thread.currentThread().interrupt();
             throw new TaskException("The current loop thread has been interrupted");
         } catch (TaskException ex) {
-            // print the error message with task logger.
-            logger.error("Loop task execute error", ex);
+            // print the error message with task log.
+            log.error("Loop task execute error", ex);
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
             throw ex;
         } catch (Exception ex) {
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
-            logger.error("Loop task execute error", ex);
+            log.error("Loop task execute error", ex);
             throw new TaskException("Loop task execute error", ex);
         }
     }

@@ -9,13 +9,46 @@
 
 ### 配置 `common.properties` 文件
 
-如果您以 `集群` 模式或者 `伪集群` 模式部署DolphinScheduler，您需要对以下路径的文件进行配置：`api-server/conf/common.properties` 和 `worker-server/conf/common.properties`；
-若您以 `单机` 模式部署DolphinScheduler，您只需要配置 `standalone-server/conf/common.properties`，具体配置如下：
+Dolphinscheduler 资源中心使用本地系统默认是开启的，不需要用户做任何额外的配置，但是当用户需要对默认配置做修改时，请确保同时完成下面的修改。
+
+- 如果您以 `集群` 模式或者 `伪集群` 模式部署DolphinScheduler，您需要对以下路径的文件进行配置：`api-server/conf/common.properties` 和 `worker-server/conf/common.properties`；
+- 若您以 `单机` 模式部署DolphinScheduler，您只需要配置 `standalone-server/conf/common.properties`，具体配置如下：
+
+您可能需要涉及如下的修改：
 
 - 将 `resource.storage.upload.base.path` 改为本地存储路径，请确保部署 DolphinScheduler 的用户拥有读写权限，例如：`resource.storage.upload.base.path=/tmp/dolphinscheduler`。当路径不存在时会自动创建文件夹
-- 修改 `resource.storage.type=HDFS` 和 `resource.hdfs.fs.defaultFS=file:///`。
 
-> **注意**：如果您不想用默认值作为资源中心的基础路径，请修改`resource.storage.upload.base.path`的值。
+> **注意**
+> 1. LOCAL模式不支持分布式模式读写，意味着上传的资源只能在一台机器上使用，除非使用共享文件挂载点
+> 2. 如果您不想用默认值作为资源中心的基础路径，请修改`resource.storage.upload.base.path`的值。
+> 3. 当配置 `resource.storage.type=LOCAL`，其实您配置了两个配置项，分别是 `resource.storage.type=HDFS` 和 `resource.hdfs.fs.defaultFS=file:///` ，我们单独配置 `resource.storage.type=LOCAL` 这个值是为了
+> 方便用户，并且能使得本地资源中心默认开启
+
+## 对接AWS S3
+
+如果需要使用到资源中心的 S3 上传资源，我们需要对以下路径的进行配置：`api-server/conf/common.properties` 和 `worker-server/conf/common.properties`。可参考如下：
+
+配置以下字段
+
+```properties
+......
+
+resource.storage.type=S3
+
+......
+
+resource.aws.access.key.id=aws_access_key_id
+# The AWS secret access key. if resource.storage.type=S3 or use EMR-Task, This configuration is required
+resource.aws.secret.access.key=aws_secret_access_key
+# The AWS Region to use. if resource.storage.type=S3 or use EMR-Task, This configuration is required
+resource.aws.region=us-west-2
+# The name of the bucket. You need to create them by yourself. Otherwise, the system cannot start. All buckets in Amazon S3 share a single namespace; ensure the bucket is given a unique name.
+resource.aws.s3.bucket.name=dolphinscheduler
+# You need to set this parameter when private cloud s4. If S3 uses public cloud, you only need to set resource.aws.region or set to the endpoint of a public cloud such as S3.cn-north-1.amazonaws.com.cn
+resource.aws.s3.endpoint=
+
+......
+```
 
 ## 对接分布式或远端对象存储
 
@@ -46,8 +79,8 @@
 # user data local directory path, please make sure the directory exists and have read write permissions
 data.basedir.path=/tmp/dolphinscheduler
 
-# resource storage type: HDFS, S3, OSS, NONE
-resource.storage.type=HDFS
+# resource storage type: LOCAL, HDFS, S3, OSS, GCS
+resource.storage.type=LOCAL
 
 # resource store on HDFS/S3/OSS path, resource file will store to this hadoop hdfs path, self configuration,
 # please make sure the directory exists on hdfs and have read write permissions. "/dolphinscheduler" is recommended

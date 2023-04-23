@@ -67,6 +67,7 @@
         <guava.version>31.1-jre</guava.version>
         <postgresql.version>42.4.1</postgresql.version>
         <hive-jdbc.version>2.3.9</hive-jdbc.version>
+        <kyuubi-jdbc.version>1.7.0</kyuubi-jdbc.version>
         <commons-io.version>2.11.0</commons-io.version>
         <oshi-core.version>6.1.1</oshi-core.version>
         <clickhouse-jdbc.version>0.3.2-patch11</clickhouse-jdbc.version>
@@ -103,6 +104,11 @@
         <azure-identity.version>1.7.1</azure-identity.version>
         <redshift-jdbc42.version>2.1.0.9</redshift-jdbc42.version>
         <aws-java-sdk-redshift.version>1.12.300</aws-java-sdk-redshift.version>
+        <azure-resourcemanager.version>2.21.0</azure-resourcemanager.version>
+        <azure-resourcemanager-datafactory.version>1.0.0-beta.19</azure-resourcemanager-datafactory.version>
+        <google-cloud-storage.version>2.18.0</google-cloud-storage.version>
+        <sshd.version>2.8.0</sshd.version>
+        <fabric8.client.version>6.0.0</fabric8.client.version>
     </properties>
 
     <dependencyManagement>
@@ -532,7 +538,11 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-
+            <dependency>
+                <groupId>org.apache.kyuubi</groupId>
+                <artifactId>kyuubi-hive-jdbc-shaded</artifactId>
+                <version>${kyuubi-jdbc.version}</version>
+            </dependency>
             <dependency>
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
@@ -669,6 +679,12 @@
             </dependency>
 
             <dependency>
+                <groupId>com.google.cloud</groupId>
+                <artifactId>google-cloud-storage</artifactId>
+                <version>${google-cloud-storage.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>joda-time</groupId>
                 <artifactId>joda-time</artifactId>
                 <version>${joda-time.version}</version>
@@ -727,6 +743,17 @@
                         <artifactId>jackson-module-scala_2.11</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.sshd</groupId>
+                <artifactId>sshd-sftp</artifactId>
+                <version>${sshd.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.sshd</groupId>
+                <artifactId>sshd-scp</artifactId>
+                <version>${sshd.version}</version>
             </dependency>
 
             <dependency>
@@ -799,6 +826,16 @@
                 <version>${azure-identity.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.azure.resourcemanager</groupId>
+                <artifactId>azure-resourcemanager</artifactId>
+                <version>${azure-resourcemanager.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.azure.resourcemanager</groupId>
+                <artifactId>azure-resourcemanager-datafactory</artifactId>
+                <version>${azure-resourcemanager-datafactory.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.amazon.redshift</groupId>
                 <artifactId>redshift-jdbc42</artifactId>
                 <version>${redshift-jdbc42.version}</version>
@@ -809,6 +846,11 @@
                 <artifactId>aws-java-sdk-redshift</artifactId>
                 <version>${aws-java-sdk-redshift.version}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.fabric8</groupId>
+                <artifactId>kubernetes-client</artifactId>
+                <version>${fabric8.client.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

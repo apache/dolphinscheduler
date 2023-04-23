@@ -21,7 +21,6 @@ import static org.apache.dolphinscheduler.common.constants.Constants.APPID_COLLE
 import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_COLLECT_WAY;
 
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 
@@ -52,7 +51,7 @@ public abstract class AbstractYarnTask extends AbstractRemoteTask {
         super(taskRequest);
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
                 taskRequest,
-                logger);
+                log);
     }
 
     // todo split handle to submit and track
@@ -60,18 +59,18 @@ public abstract class AbstractYarnTask extends AbstractRemoteTask {
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             // SHELL task exit code
-            TaskResponse response = shellCommandExecutor.run(buildCommand());
+            TaskResponse response = shellCommandExecutor.run(buildCommand(), taskCallBack);
             setExitStatusCode(response.getExitStatusCode());
             // set appIds
             setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
             setProcessId(response.getProcessId());
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
-            logger.info("The current yarn task has been interrupted", ex);
+            log.info("The current yarn task has been interrupted", ex);
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
             throw new TaskException("The current yarn task has been interrupted", ex);
         } catch (Exception e) {
-            logger.error("yarn process failure", e);
+            log.error("yarn process failure", e);
             exitStatusCode = -1;
             throw new TaskException("Execute task failed", e);
         }
@@ -122,25 +121,4 @@ public abstract class AbstractYarnTask extends AbstractRemoteTask {
      */
     protected abstract String buildCommand();
 
-    /**
-     * set main jar name
-     */
-    protected abstract void setMainJarName();
-
-    /**
-     * Get name of jar resource.
-     *
-     * @param mainJar
-     * @return
-     */
-    protected String getResourceNameOfMainJar(ResourceInfo mainJar) {
-        if (null == mainJar) {
-            throw new RuntimeException("The jar for the task is required.");
-        }
-
-        return mainJar.getId() == null
-                ? mainJar.getRes()
-                // when update resource maybe has error
-                : mainJar.getResourceName().replaceFirst("/", "");
-    }
 }

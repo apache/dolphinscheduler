@@ -20,28 +20,28 @@ package org.apache.dolphinscheduler.server.master.event;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.google.auto.service.AutoService;
 
 @AutoService(StateEventHandler.class)
+@Slf4j
 public class TaskWaitTaskGroupStateHandler implements StateEventHandler {
-
-    private static final Logger logger = LoggerFactory.getLogger(TaskWaitTaskGroupStateHandler.class);
 
     @Override
     public boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable,
-                                    StateEvent stateEvent) throws StateEventHandleFailure {
-        logger.info("Handle task instance wait task group event, taskInstanceId: {}", stateEvent.getTaskInstanceId());
-        if (!workflowExecuteRunnable.checkForceStartAndWakeUp(stateEvent)) {
-            throw new StateEventHandleFailure("Task state event handle failed due to robing taskGroup resource failed");
+                                    StateEvent stateEvent) {
+        log.info("Handle task instance wait task group event, taskInstanceId: {}", stateEvent.getTaskInstanceId());
+        if (workflowExecuteRunnable.checkForceStartAndWakeUp(stateEvent)) {
+            log.info("Success wake up task instance, taskInstanceId: {}", stateEvent.getTaskInstanceId());
+        } else {
+            log.info("Failed to wake up task instance, taskInstanceId: {}", stateEvent.getTaskInstanceId());
         }
         return true;
     }
 
     @Override
     public StateEventType getEventType() {
-        return StateEventType.WAIT_TASK_GROUP;
+        return StateEventType.WAKE_UP_TASK_GROUP;
     }
 }

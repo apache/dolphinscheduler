@@ -26,6 +26,8 @@ import org.apache.dolphinscheduler.api.service.LoggerService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.log.remote.RemoteLogUtils;
+import org.apache.dolphinscheduler.common.utils.LogUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ResponseTaskLog;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -37,13 +39,17 @@ import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.log.LogClient;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -53,9 +59,8 @@ import com.google.common.primitives.Bytes;
  * logger service impl
  */
 @Service
+@Slf4j
 public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService {
-
-    private static final Logger logger = LoggerFactory.getLogger(LoggerServiceImpl.class);
 
     private static final String LOG_HEAD_FORMAT = "[LOG-PATH]: %s, [HOST]:  %s%s";
 
@@ -90,11 +95,11 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
         TaskInstance taskInstance = taskInstanceDao.findTaskInstanceById(taskInstId);
 
         if (taskInstance == null) {
-            logger.error("Task instance does not exist, taskInstanceId:{}.", taskInstId);
+            log.error("Task instance does not exist, taskInstanceId:{}.", taskInstId);
             return Result.error(Status.TASK_INSTANCE_NOT_FOUND);
         }
         if (StringUtils.isBlank(taskInstance.getHost())) {
-            logger.error("Host of task instance is null, taskInstanceId:{}.", taskInstId);
+            log.error("Host of task instance is null, taskInstanceId:{}.", taskInstId);
             return Result.error(Status.TASK_INSTANCE_HOST_IS_NULL);
         }
         Project project = projectMapper.queryProjectByTaskInstanceId(taskInstId);
@@ -199,23 +204,39 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
      */
     private String queryLog(TaskInstance taskInstance, int skipLineNum, int limit) {
         Host host = Host.of(taskInstance.getHost());
+        String logPath = taskInstance.getLogPath();
 
-        logger.info("Query task instance log, taskInstanceId:{}, taskInstanceName:{}, host:{}, logPath:{}, port:{}",
-                taskInstance.getId(), taskInstance.getName(), host.getIp(), taskInstance.getLogPath(), host.getPort());
+        log.info("Query task instance log, taskInstanceId:{}, taskInstanceName:{}, host:{}, logPath:{}, port:{}",
+                taskInstance.getId(), taskInstance.getName(), host.getIp(), logPath, host.getPort());
 
-        StringBuilder log = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         if (skipLineNum == 0) {
             String head = String.format(LOG_HEAD_FORMAT,
-                    taskInstance.getLogPath(),
+                    logPath,
                     host,
                     Constants.SYSTEM_LINE_SEPARATOR);
-            log.append(head);
+            sb.append(head);
         }
 
-        log.append(logClient
-                .rollViewLog(host.getIp(), host.getPort(), taskInstance.getLogPath(), skipLineNum, limit));
+        String logContent = logClient
+                .rollViewLog(host.getIp(), host.getPort(), logPath, skipLineNum, limit);
 
-        return log.toString();
+        if (skipLineNum == 0 && StringUtils.isEmpty(logContent) && RemoteLogUtils.isRemoteLoggingEnable()) {
+            // When getting the log for the first time (skipLineNum=0) returns empty, get the log from remote target
+            try {
+                log.info("Get log {} from remote target", logPath);
+                RemoteLogUtils.getRemoteLog(logPath);
+                List<String> lines = LogUtils.readPartFileContentFromLocal(logPath, skipLineNum, limit);
+                logContent = LogUtils.rollViewLogLines(lines);
+                FileUtils.delete(new File(logPath));
+            } catch (IOException e) {
+                log.error("Error while getting log from remote target", e);
+            }
+        }
+
+        sb.append(logContent);
+
+        return sb.toString();
     }
 
     /**
@@ -226,11 +247,28 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
      */
     private byte[] getLogBytes(TaskInstance taskInstance) {
         Host host = Host.of(taskInstance.getHost());
+        String logPath = taskInstance.getLogPath();
+
         byte[] head = String.format(LOG_HEAD_FORMAT,
-                taskInstance.getLogPath(),
+                logPath,
                 host,
                 Constants.SYSTEM_LINE_SEPARATOR).getBytes(StandardCharsets.UTF_8);
-        return Bytes.concat(head,
-                logClient.getLogBytes(host.getIp(), host.getPort(), taskInstance.getLogPath()));
+
+        byte[] logBytes = logClient.getLogBytes(host.getIp(), host.getPort(), logPath);
+
+        if (logBytes.length == 0 && RemoteLogUtils.isRemoteLoggingEnable()) {
+            // get task log from remote target
+            try {
+                log.info("Get log {} from remote target", logPath);
+                RemoteLogUtils.getRemoteLog(logPath);
+                File logFile = new File(logPath);
+                logBytes = FileUtils.readFileToByteArray(logFile);
+                FileUtils.delete(logFile);
+            } catch (IOException e) {
+                log.error("Error while getting log from remote target", e);
+            }
+        }
+
+        return Bytes.concat(head, logBytes);
     }
 }

@@ -20,6 +20,9 @@ metadata:
   name: {{ include "dolphinscheduler.fullname" . }}-db-init-job
   labels:
     {{- include "dolphinscheduler.common.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade,post-rollback
+    "helm.sh/hook-weight": "1"
 spec:
   template:
     metadata:

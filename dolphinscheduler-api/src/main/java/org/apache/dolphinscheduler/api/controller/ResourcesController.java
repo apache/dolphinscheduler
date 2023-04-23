@@ -61,8 +61,8 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.IOException;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -93,9 +93,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "RESOURCES_TAG")
 @RestController
 @RequestMapping("resources")
+@Slf4j
 public class ResourcesController extends BaseController {
-
-    private static final Logger logger = LoggerFactory.getLogger(ResourcesController.class);
 
     @Autowired
     private ResourcesService resourceService;
@@ -414,7 +413,7 @@ public class ResourcesController extends BaseController {
                                        @RequestParam(value = "content") String content,
                                        @RequestParam(value = "currentDir") String currentDir) {
         if (StringUtils.isEmpty(content)) {
-            logger.error("resource file contents are not allowed to be empty");
+            log.error("resource file contents are not allowed to be empty");
             return error(RESOURCE_FILE_IS_EMPTY.getCode(), RESOURCE_FILE_IS_EMPTY.getMsg());
         }
         return resourceService.onlineCreateResource(loginUser, type, fileName, fileSuffix, description, content,
@@ -442,7 +441,7 @@ public class ResourcesController extends BaseController {
                                         @RequestParam(value = "tenantCode") String tenantCode,
                                         @RequestParam(value = "content") String content) {
         if (StringUtils.isEmpty(content)) {
-            logger.error("The resource file contents are not allowed to be empty");
+            log.error("The resource file contents are not allowed to be empty");
             return error(RESOURCE_FILE_IS_EMPTY.getCode(), RESOURCE_FILE_IS_EMPTY.getMsg());
         }
         return resourceService.updateResourceContent(loginUser, fullName, tenantCode, content);
@@ -772,5 +771,18 @@ public class ResourcesController extends BaseController {
                                           @RequestParam(value = "tenantCode") String tenantCode) throws IOException {
 
         return resourceService.queryResourceByFullName(loginUser, fullName, tenantCode, type);
+    }
+
+    @Operation(summary = "queryResourceBaseDir", description = "QUERY_RESOURCE_BASE_DIR")
+    @Parameters({
+            @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema = @Schema(implementation = ResourceType.class))
+    })
+    @GetMapping(value = "/base-dir")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(RESOURCE_NOT_EXIST)
+    @AccessLogAnnotation
+    public Result<Object> queryResourceBaseDir(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                               @RequestParam(value = "type") ResourceType type) {
+        return resourceService.queryResourceBaseDir(loginUser, type);
     }
 }

@@ -140,14 +140,14 @@ master:
   # master commit task interval
   task-commit-interval: 1s
   state-wheel-interval: 5s
-  # master max cpuload avg, only higher than the system cpu load average, master server can schedule. default value -1: the number of cpu cores * 2
-  max-cpu-load-avg: 50
-  # master reserved memory, only lower than system available memory, master server can schedule. default value 0.3, the unit is G
-  reserved-memory: 0.03
+  # master max cpuload avg percentage, only higher than the system cpu load average, master server can schedule. default value 1: will use 100% cpu
+  max-cpu-load-avg: 1
+  # master reserved memory, only lower than system available memory, master server can schedule. default value 0.3, only the available memory is higher than 30%, master server can schedule.
+  reserved-memory: 0.3
   # failover interval
   failover-interval: 10m
-  # kill yarn jon when failover taskInstance, default true
-  kill-yarn-job-when-task-failover: true
+  # kill yarn/k8s application when failover taskInstance, default true
+  kill-application-when-task-failover: true
   worker-group-refresh-interval: 10s
 
 worker:
@@ -163,16 +163,10 @@ worker:
   tenant-auto-create: true
   #Scenes to be used for distributed users.For example,users created by FreeIpa are stored in LDAP.This parameter only applies to Linux, When this parameter is true, worker.tenant.auto.create has no effect and will not automatically create tenants.
   tenant-distributed-user: false
-  # worker max cpuload avg, only higher than the system cpu load average, worker server can be dispatched tasks. default value -1: the number of cpu cores * 2
-  max-cpu-load-avg: -1
-  # worker reserved memory, only lower than system available memory, worker server can be dispatched tasks. default value 0.3, the unit is G
+  # worker max cpuload avg, only higher than the system cpu load average, worker server can be dispatched tasks. default value 1: will use 100% cpu.
+  max-cpu-load-avg: 1
+  # worker reserved memory, only lower than system available memory, worker server can be dispatched tasks. default value 0.3, only the available memory is higher than 30%, worker server can receive task.
   reserved-memory: 0.3
-  # default worker groups separated by comma, like 'worker.groups=default,test'
-  groups:
-    - default
-  # alert server listen host
-  alert-listen-host: localhost
-  alert-listen-port: 50052
   task-execute-threads-full-policy: REJECT
 
 alert:
@@ -180,6 +174,7 @@ alert:
   # Mark each alert of alert server if late after x milliseconds as failed.
   # Define value is (0 = infinite), and alert server would be waiting alert result.
   wait-timeout: 0
+  heartbeat-interval: 60s
 
 python-gateway:
   # Weather enable python gateway server or not. The default value is true.

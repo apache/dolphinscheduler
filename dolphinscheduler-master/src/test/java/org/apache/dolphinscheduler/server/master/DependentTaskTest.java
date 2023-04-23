@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
@@ -34,14 +35,17 @@ import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentTaskModel;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.utils.DependentExecute;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -72,6 +76,8 @@ public class DependentTaskTest {
 
     private ProcessService processService;
 
+    private ProcessInstanceDao processInstanceDao;
+
     private TaskInstanceDao taskInstanceDao;
 
     private TaskDefinitionDao taskDefinitionDao;
@@ -100,6 +106,9 @@ public class DependentTaskTest {
 
         processService = Mockito.mock(ProcessService.class);
         Mockito.when(applicationContext.getBean(ProcessService.class)).thenReturn(processService);
+
+        processInstanceDao = Mockito.mock(ProcessInstanceDao.class);
+        Mockito.when(applicationContext.getBean(ProcessInstanceDao.class)).thenReturn(processInstanceDao);
 
         taskInstanceDao = Mockito.mock(TaskInstanceDao.class);
         Mockito.when(applicationContext.getBean(TaskInstanceDao.class)).thenReturn(taskInstanceDao);
@@ -161,7 +170,7 @@ public class DependentTaskTest {
         ProcessInstance dependentProcessInstance =
                 getProcessInstanceForFindLastRunningProcess(200, WorkflowExecutionStatus.FAILURE);
         // for DependentExecute.findLastProcessInterval
-        Mockito.when(processService
+        Mockito.when(processInstanceDao
                 .findLastRunningProcess(Mockito.eq(2L), Mockito.any(), Mockito.any(), Mockito.anyInt()))
                 .thenReturn(dependentProcessInstance);
 
@@ -183,7 +192,7 @@ public class DependentTaskTest {
         ProcessInstance dependentProcessInstance =
                 getProcessInstanceForFindLastRunningProcess(200, WorkflowExecutionStatus.SUCCESS);
         // for DependentExecute.findLastProcessInterval
-        Mockito.when(processService
+        Mockito.when(processInstanceDao
                 .findLastRunningProcess(Mockito.eq(2L), Mockito.any(), Mockito.any(), Mockito.anyInt()))
                 .thenReturn(dependentProcessInstance);
 
@@ -231,10 +240,10 @@ public class DependentTaskTest {
                 getProcessInstanceForFindLastRunningProcess(300, WorkflowExecutionStatus.SUCCESS);
 
         // for DependentExecute.findLastProcessInterval
-        Mockito.when(processService
+        Mockito.when(processInstanceDao
                 .findLastRunningProcess(Mockito.eq(2L), Mockito.any(), Mockito.any(), Mockito.anyInt()))
                 .thenReturn(processInstance200);
-        Mockito.when(processService
+        Mockito.when(processInstanceDao
                 .findLastRunningProcess(Mockito.eq(3L), Mockito.any(), Mockito.any(), Mockito.anyInt()))
                 .thenReturn(processInstance300);
 
@@ -281,7 +290,7 @@ public class DependentTaskTest {
     public void testDependentOnAllSuccess() {
         testDependentOnAllInit();
         // for DependentExecute.findLastProcessInterval
-        Mockito.when(processService
+        Mockito.when(processInstanceDao
                 .findLastRunningProcess(Mockito.eq(2L), Mockito.any(), Mockito.any(), Mockito.anyInt()))
                 .thenReturn(getProcessInstanceForFindLastRunningProcess(200, WorkflowExecutionStatus.SUCCESS));
 
@@ -291,7 +300,7 @@ public class DependentTaskTest {
     public void testDependentOnAllFailure() {
         testDependentOnAllInit();
         // for DependentExecute.findLastProcessInterval
-        Mockito.when(processService
+        Mockito.when(processInstanceDao
                 .findLastRunningProcess(Mockito.eq(2L), Mockito.any(), Mockito.any(), Mockito.anyInt()))
                 .thenReturn(getProcessInstanceForFindLastRunningProcess(200, WorkflowExecutionStatus.FAILURE));
 
@@ -325,7 +334,7 @@ public class DependentTaskTest {
         ProcessInstance dependentProcessInstance =
                 getProcessInstanceForFindLastRunningProcess(200, WorkflowExecutionStatus.RUNNING_EXECUTION);
         // for DependentExecute.findLastProcessInterval
-        Mockito.when(processService
+        Mockito.when(processInstanceDao
                 .findLastRunningProcess(Mockito.eq(2L), Mockito.any(), Mockito.any(), Mockito.anyInt()))
                 .thenReturn(dependentProcessInstance);
 
@@ -345,9 +354,45 @@ public class DependentTaskTest {
 
     }
 
+    @Test
+    public void testIsSelfDependent() {
+        DependentExecute dependentExecute =
+                new DependentExecute(new ArrayList<>(), DependentRelation.AND, processInstance, taskInstance);
+        DependentItem dependentItem = new DependentItem();
+        dependentItem.setDefinitionCode(processInstance.getProcessDefinitionCode());
+        dependentItem.setDepTaskCode(Constants.DEPENDENT_ALL_TASK_CODE);
+        Assertions.assertTrue(dependentExecute.isSelfDependent(dependentItem));
+
+        dependentItem.setDepTaskCode(taskInstance.getTaskCode());
+        Assertions.assertTrue(dependentExecute.isSelfDependent(dependentItem));
+
+        // no self task
+        dependentItem.setDepTaskCode(12345678);
+        Assertions.assertFalse(dependentExecute.isSelfDependent(dependentItem));
+
+        // no self wf
+        dependentItem.setDefinitionCode(processInstance.getProcessDefinitionCode());
+        Assertions.assertFalse(dependentExecute.isSelfDependent(dependentItem));
+    }
+
+    @Test
+    public void testIsFirstProcessInstance() {
+        Mockito.when(processInstanceDao.queryFirstScheduleProcessInstance(processInstance.getProcessDefinitionCode()))
+                .thenReturn(processInstance);
+        DependentExecute dependentExecute =
+                new DependentExecute(new ArrayList<>(), DependentRelation.AND, processInstance, taskInstance);
+        DependentItem dependentItem = new DependentItem();
+        dependentItem.setDefinitionCode(processInstance.getProcessDefinitionCode());
+        Assertions.assertTrue(dependentExecute.isFirstProcessInstance(dependentItem));
+
+        dependentItem.setDefinitionCode(12345678L);
+        Assertions.assertFalse(dependentExecute.isFirstProcessInstance(dependentItem));
+    }
+
     private ProcessInstance getProcessInstance() {
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(100);
+        processInstance.setProcessDefinitionCode(10000L);
         processInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
         return processInstance;
     }
@@ -355,6 +400,7 @@ public class DependentTaskTest {
     private TaskInstance getTaskInstance() {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1000);
+        taskInstance.setTaskCode(10000L);
         return taskInstance;
     }
 

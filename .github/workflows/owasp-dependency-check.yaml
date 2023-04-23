@@ -19,6 +19,8 @@ name: OWASP Dependency Check
 
 on:
   push:
+    branches:
+      - dev
   pull_request:
     paths:
       - '**/pom.xml'

@@ -36,6 +36,7 @@ export interface IParam {
 export interface ITimingState {
   projectCode: number
   workerGroups: Array<IOption>
+  tenantList: Array<IOption>
   alertGroups: Array<IOption>
   environmentList: Array<IEnvironmentOption>
   startParamsList: Array<IParam>

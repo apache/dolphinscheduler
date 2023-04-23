@@ -29,15 +29,13 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * common script generator
  */
+@Slf4j
 public class CommonGenerator {
-
-    private static final Logger logger = LoggerFactory.getLogger(CommonGenerator.class);
 
     public String generate(SqoopParameters sqoopParameters) {
 
@@ -85,7 +83,7 @@ public class CommonGenerator {
                 }
             }
         } catch (Exception e) {
-            logger.error(String.format("Sqoop task general param build failed: [%s]", e.getMessage()));
+            log.error(String.format("Sqoop task general param build failed: [%s]", e.getMessage()));
         }
 
         return commonSb.toString();

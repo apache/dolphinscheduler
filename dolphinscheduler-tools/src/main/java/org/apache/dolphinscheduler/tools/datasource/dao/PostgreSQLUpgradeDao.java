@@ -26,14 +26,13 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class PostgreSQLUpgradeDao extends UpgradeDao {
-
-    public static final Logger logger = LoggerFactory.getLogger(PostgreSQLUpgradeDao.class);
 
     private PostgreSQLUpgradeDao(DataSource dataSource) {
         super(dataSource);
@@ -61,7 +60,7 @@ public class PostgreSQLUpgradeDao extends UpgradeDao {
             }
 
         } catch (SQLException e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
         return "";
     }
@@ -79,7 +78,7 @@ public class PostgreSQLUpgradeDao extends UpgradeDao {
                 ResultSet rs = conn.getMetaData().getTables(conn.getCatalog(), getSchema(), tableName, null)) {
             return rs.next();
         } catch (SQLException e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);
         }
     }
@@ -98,7 +97,7 @@ public class PostgreSQLUpgradeDao extends UpgradeDao {
                 ResultSet rs = conn.getMetaData().getColumns(conn.getCatalog(), getSchema(), tableName, columnName)) {
             return rs.next();
         } catch (SQLException e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);
         }
     }

@@ -28,11 +28,11 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-import org.apache.dolphinscheduler.remote.command.WorkflowStateEventChangeCommand;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
+import org.apache.dolphinscheduler.remote.command.workflow.WorkflowStateEventChangeRequest;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.utils.LogUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -71,7 +71,7 @@ public class SubTaskProcessor extends BaseTaskProcessor {
             return false;
         }
         this.setTaskExecutionLogger();
-        taskInstance.setLogPath(LogUtils.getTaskLogPath(taskInstance.getFirstSubmitTime(),
+        taskInstance.setLogPath(LogUtils.getTaskInstanceLogFullPath(taskInstance.getFirstSubmitTime(),
                 processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion(),
                 taskInstance.getProcessInstanceId(),
@@ -88,7 +88,7 @@ public class SubTaskProcessor extends BaseTaskProcessor {
                 updateTaskState();
             }
         } catch (Exception e) {
-            logger.error("work flow {} sub task {} exceptions",
+            log.error("work flow {} sub task {} exceptions",
                     this.processInstance.getId(),
                     this.taskInstance.getId(),
                     e);
@@ -115,7 +115,7 @@ public class SubTaskProcessor extends BaseTaskProcessor {
                 && TaskTimeoutStrategy.WARNFAILED != taskTimeoutStrategy) {
             return true;
         }
-        logger.info("sub process task {} timeout, strategy {} ",
+        log.info("sub process task {} timeout, strategy {} ",
                 taskInstance.getId(), taskTimeoutStrategy.getDescp());
         killTask();
         return true;
@@ -123,7 +123,7 @@ public class SubTaskProcessor extends BaseTaskProcessor {
 
     private void updateTaskState() {
         subProcessInstance = processService.findSubProcessInstance(processInstance.getId(), taskInstance.getId());
-        logger.info("work flow {} task {}, sub work flow: {} state: {}",
+        log.info("work flow {} task {}, sub work flow: {} state: {}",
                 this.processInstance.getId(),
                 this.taskInstance.getId(),
                 subProcessInstance.getId(),
@@ -188,7 +188,7 @@ public class SubTaskProcessor extends BaseTaskProcessor {
     }
 
     private boolean setSubWorkFlow() {
-        logger.info("set work flow {} task {} running",
+        log.info("set work flow {} task {} running",
                 this.processInstance.getId(),
                 this.taskInstance.getId());
         if (this.subProcessInstance != null) {
@@ -202,7 +202,7 @@ public class SubTaskProcessor extends BaseTaskProcessor {
         taskInstance.setState(TaskExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());
         taskInstanceDao.updateTaskInstance(taskInstance);
-        logger.info("set sub work flow {} task {} state: {}",
+        log.info("set sub work flow {} task {} state: {}",
                 processInstance.getId(),
                 taskInstance.getId(),
                 taskInstance.getState());
@@ -224,11 +224,11 @@ public class SubTaskProcessor extends BaseTaskProcessor {
     }
 
     private void sendToSubProcess() {
-        WorkflowStateEventChangeCommand workflowStateEventChangeCommand = new WorkflowStateEventChangeCommand(
+        WorkflowStateEventChangeRequest workflowStateEventChangeRequest = new WorkflowStateEventChangeRequest(
                 processInstance.getId(), taskInstance.getId(), subProcessInstance.getState(),
                 subProcessInstance.getId(), 0);
         Host host = new Host(subProcessInstance.getHost());
-        this.stateEventCallbackService.sendResult(host, workflowStateEventChangeCommand.convert2Command());
+        this.stateEventCallbackService.sendResult(host, workflowStateEventChangeRequest.convert2Command());
     }
 
     @Override

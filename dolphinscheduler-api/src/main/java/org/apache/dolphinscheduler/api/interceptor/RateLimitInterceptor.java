@@ -29,8 +29,8 @@ import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -44,9 +44,8 @@ import com.google.common.util.concurrent.RateLimiter;
  * If the current coming tenant reaches his tenant-level request quota, his request will be reject fast.
  * If the current system request number reaches the global request quota, all coming request will be reject fast.
  */
+@Slf4j
 public class RateLimitInterceptor implements HandlerInterceptor {
-
-    private static final Logger logger = LoggerFactory.getLogger(RateLimitInterceptor.class);
 
     private TrafficConfiguration trafficConfiguration;
 
@@ -81,7 +80,7 @@ public class RateLimitInterceptor implements HandlerInterceptor {
                 RateLimiter tenantRateLimiter = tenantRateLimiterCache.get(token);
                 if (!tenantRateLimiter.tryAcquire()) {
                     response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
-                    logger.warn("Too many request, reach tenant rate limit, current tenant:{} qps is {}", token,
+                    log.warn("Too many request, reach tenant rate limit, current tenant:{} qps is {}", token,
                             tenantRateLimiter.getRate());
                     return false;
                 }
@@ -91,7 +90,7 @@ public class RateLimitInterceptor implements HandlerInterceptor {
         if (trafficConfiguration.isGlobalSwitch()) {
             if (!globalRateLimiter.tryAcquire()) {
                 response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
-                logger.warn("Too many request, reach global rate limit, current qps is {}",
+                log.warn("Too many request, reach global rate limit, current qps is {}",
                         globalRateLimiter.getRate());
                 return false;
             }

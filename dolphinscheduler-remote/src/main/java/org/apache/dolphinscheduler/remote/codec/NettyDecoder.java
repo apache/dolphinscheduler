@@ -17,16 +17,14 @@
 
 package org.apache.dolphinscheduler.remote.codec;
 
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandContext;
-import org.apache.dolphinscheduler.remote.command.CommandHeader;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageContext;
+import org.apache.dolphinscheduler.remote.command.MessageHeader;
+import org.apache.dolphinscheduler.remote.command.MessageType;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import lombok.extern.slf4j.Slf4j;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ReplayingDecoder;
@@ -34,15 +32,14 @@ import io.netty.handler.codec.ReplayingDecoder;
 /**
  * netty decoder
  */
+@Slf4j
 public class NettyDecoder extends ReplayingDecoder<NettyDecoder.State> {
-
-    private static final Logger logger = LoggerFactory.getLogger(NettyDecoder.class);
 
     public NettyDecoder() {
         super(State.MAGIC);
     }
 
-    private final CommandHeader commandHeader = new CommandHeader();
+    private final MessageHeader messageHeader = new MessageHeader();
 
     /**
      * decode
@@ -63,42 +60,42 @@ public class NettyDecoder extends ReplayingDecoder<NettyDecoder.State> {
                 checkpoint(State.COMMAND);
                 // fallthru
             case COMMAND:
-                commandHeader.setType(in.readByte());
+                messageHeader.setType(in.readByte());
                 checkpoint(State.OPAQUE);
                 // fallthru
             case OPAQUE:
-                commandHeader.setOpaque(in.readLong());
+                messageHeader.setOpaque(in.readLong());
                 checkpoint(State.CONTEXT_LENGTH);
                 // fallthru
             case CONTEXT_LENGTH:
-                commandHeader.setContextLength(in.readInt());
+                messageHeader.setContextLength(in.readInt());
                 checkpoint(State.CONTEXT);
                 // fallthru
             case CONTEXT:
-                byte[] context = new byte[commandHeader.getContextLength()];
+                byte[] context = new byte[messageHeader.getContextLength()];
                 in.readBytes(context);
-                commandHeader.setContext(context);
+                messageHeader.setContext(context);
                 checkpoint(State.BODY_LENGTH);
                 // fallthru
             case BODY_LENGTH:
-                commandHeader.setBodyLength(in.readInt());
+                messageHeader.setBodyLength(in.readInt());
                 checkpoint(State.BODY);
                 // fallthru
             case BODY:
-                byte[] body = new byte[commandHeader.getBodyLength()];
+                byte[] body = new byte[messageHeader.getBodyLength()];
                 in.readBytes(body);
                 //
-                Command packet = new Command();
-                packet.setType(commandType(commandHeader.getType()));
-                packet.setOpaque(commandHeader.getOpaque());
-                packet.setContext(CommandContext.valueOf(commandHeader.getContext()));
+                Message packet = new Message();
+                packet.setType(commandType(messageHeader.getType()));
+                packet.setOpaque(messageHeader.getOpaque());
+                packet.setContext(MessageContext.valueOf(messageHeader.getContext()));
                 packet.setBody(body);
                 out.add(packet);
                 //
                 checkpoint(State.MAGIC);
                 break;
             default:
-                logger.warn("unknown decoder state {}", state());
+                log.warn("unknown decoder state {}", state());
         }
     }
 
@@ -107,8 +104,8 @@ public class NettyDecoder extends ReplayingDecoder<NettyDecoder.State> {
      *
      * @param type type
      */
-    private CommandType commandType(byte type) {
-        for (CommandType ct : CommandType.values()) {
+    private MessageType commandType(byte type) {
+        for (MessageType ct : MessageType.values()) {
             if (ct.ordinal() == type) {
                 return ct;
             }
@@ -122,7 +119,7 @@ public class NettyDecoder extends ReplayingDecoder<NettyDecoder.State> {
      * @param magic magic
      */
     private void checkMagic(byte magic) {
-        if (magic != Command.MAGIC) {
+        if (magic != Message.MAGIC) {
             throw new IllegalArgumentException("illegal packet [magic]" + magic);
         }
     }
@@ -131,7 +128,7 @@ public class NettyDecoder extends ReplayingDecoder<NettyDecoder.State> {
      * check version
      */
     private void checkVersion(byte version) {
-        if (version != Command.VERSION) {
+        if (version != Message.VERSION) {
             throw new IllegalArgumentException("illegal protocol [version]" + version);
         }
     }

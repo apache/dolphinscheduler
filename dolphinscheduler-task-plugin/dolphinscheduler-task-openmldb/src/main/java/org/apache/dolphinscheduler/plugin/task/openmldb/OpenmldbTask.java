@@ -64,16 +64,10 @@ public class OpenmldbTask extends PythonTask {
     public void init() {
         pythonParameters = JSONUtils.parseObject(taskRequest.getTaskParams(), OpenmldbParameters.class);
 
-        logger.info("Initialize openmldb task params {}", JSONUtils.toPrettyJsonString(pythonParameters));
+        log.info("Initialize openmldb task params {}", JSONUtils.toPrettyJsonString(pythonParameters));
         if (pythonParameters == null || !pythonParameters.checkParameters()) {
             throw new TaskException("openmldb task params is not valid");
         }
-    }
-
-    @Override
-    @Deprecated
-    public String getPreScript() {
-        return "";
     }
 
     /**
@@ -94,7 +88,7 @@ public class OpenmldbTask extends PythonTask {
     @Override
     protected String buildPythonScriptContent() {
         OpenmldbParameters openmldbParameters = (OpenmldbParameters) pythonParameters;
-        logger.info("raw sql script : {}", openmldbParameters.getSql());
+        log.info("raw sql script : {}", openmldbParameters.getSql());
 
         String rawSQLScript = openmldbParameters.getSql().replaceAll("[\\r]?\\n", "\n");
         Map<String, Property> paramsMap = mergeParamsWithContext(openmldbParameters);
@@ -102,7 +96,7 @@ public class OpenmldbTask extends PythonTask {
 
         // convert sql to python script
         String pythonScript = buildPythonScriptsFromSql(rawSQLScript);
-        logger.info("rendered python script : {}", pythonScript);
+        log.info("rendered python script : {}", pythonScript);
         return pythonScript;
     }
 

@@ -86,7 +86,7 @@ public class ChunJunTask extends AbstractTask {
         this.taskExecutionContext = taskExecutionContext;
 
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-                taskExecutionContext, logger);
+                taskExecutionContext, log);
     }
 
     /**
@@ -95,7 +95,7 @@ public class ChunJunTask extends AbstractTask {
     @Override
     public void init() {
         chunJunParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), ChunJunParameters.class);
-        logger.info("Initialize chunjun task params {}",
+        log.info("Initialize chunjun task params {}",
                 JSONUtils.toPrettyJsonString(taskExecutionContext.getTaskParams()));
 
         if (!chunJunParameters.checkParameters()) {
@@ -115,7 +115,7 @@ public class ChunJunTask extends AbstractTask {
 
             String jsonFilePath = buildChunJunJsonFile(paramsMap);
             String shellCommandFilePath = buildShellCommandFile(jsonFilePath, paramsMap);
-            TaskResponse commandExecuteResult = shellCommandExecutor.run(shellCommandFilePath);
+            TaskResponse commandExecuteResult = shellCommandExecutor.run(shellCommandFilePath, taskCallBack);
 
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
 
@@ -124,11 +124,11 @@ public class ChunJunTask extends AbstractTask {
             setProcessId(commandExecuteResult.getProcessId());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            logger.error("The current ChunJun Task has been interrupted", e);
+            log.error("The current ChunJun Task has been interrupted", e);
             setExitStatusCode(EXIT_CODE_FAILURE);
             throw new TaskException("The current ChunJun Task has been interrupted", e);
         } catch (Exception e) {
-            logger.error("chunjun task failed.", e);
+            log.error("chunjun task failed.", e);
             setExitStatusCode(EXIT_CODE_FAILURE);
             throw new TaskException("Execute chunjun task failed", e);
         }
@@ -161,7 +161,7 @@ public class ChunJunTask extends AbstractTask {
         // replace placeholder
         json = ParameterUtils.convertParameterPlaceholders(json, ParamUtils.convert(paramsMap));
 
-        logger.debug("chunjun job json : {}", json);
+        log.debug("chunjun job json : {}", json);
 
         // create chunjun json file
         FileUtils.writeStringToFile(new File(fileName), json, StandardCharsets.UTF_8);
@@ -219,7 +219,7 @@ public class ChunJunTask extends AbstractTask {
         // replace placeholder
         String chunjunCommand = ParameterUtils.convertParameterPlaceholders(command, ParamUtils.convert(paramsMap));
 
-        logger.info("raw script : {}", chunjunCommand);
+        log.info("raw script : {}", chunjunCommand);
 
         // create shell command file
         Set<PosixFilePermission> perms = PosixFilePermissions.fromString(RWXR_XR_X);

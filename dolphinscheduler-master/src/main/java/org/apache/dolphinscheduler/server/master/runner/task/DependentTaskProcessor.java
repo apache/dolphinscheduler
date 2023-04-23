@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task;
 
+import static org.apache.dolphinscheduler.common.constants.Constants.DEPENDENT_SPLIT;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DEPENDENT;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -34,9 +34,9 @@ import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentTaskModel;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.DependentUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.master.utils.DependentExecute;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.utils.LogUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -105,21 +105,21 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
                 return false;
             }
             this.setTaskExecutionLogger();
-            logger.info("Dependent task submit success");
-            taskInstance.setLogPath(LogUtils.getTaskLogPath(taskInstance.getFirstSubmitTime(),
+            log.info("Dependent task submit success");
+            taskInstance.setLogPath(LogUtils.getTaskInstanceLogFullPath(taskInstance.getFirstSubmitTime(),
                     processInstance.getProcessDefinitionCode(),
                     processInstance.getProcessDefinitionVersion(),
                     taskInstance.getProcessInstanceId(),
                     taskInstance.getId()));
-            taskInstance.setHost(NetUtils.getAddr(masterConfig.getListenPort()));
+            taskInstance.setHost(masterConfig.getMasterAddress());
             taskInstance.setState(TaskExecutionStatus.RUNNING_EXECUTION);
             taskInstance.setStartTime(new Date());
             taskInstanceDao.updateTaskInstance(taskInstance);
             initDependParameters();
-            logger.info("Success initialize dependent task parameters, the dependent data is: {}", dependentDate);
+            log.info("Success initialize dependent task parameters, the dependent data is: {}", dependentDate);
             return true;
         } catch (Exception ex) {
-            logger.error("Submit/Initialize dependent task error", ex);
+            log.error("Submit/Initialize dependent task error", ex);
             return false;
         }
     }
@@ -153,7 +153,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
                 && TaskTimeoutStrategy.WARNFAILED != taskTimeoutStrategy) {
             return true;
         }
-        logger.info("dependent taskInstanceId: {} timeout, taskName: {}, strategy: {} ",
+        log.info("dependent taskInstanceId: {} timeout, taskName: {}, strategy: {} ",
                 taskInstance.getId(), taskInstance.getName(), taskTimeoutStrategy.getDescp());
         result = DependResult.FAILED;
         endTask();
@@ -191,39 +191,40 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
                 .collect(Collectors.toMap(TaskDefinition::getCode, Function.identity()));
 
         for (DependentTaskModel taskModel : dependentParameters.getDependTaskList()) {
-            logger.info("Add sub dependent check tasks, dependent relation: {}", taskModel.getRelation());
+            log.info("Add sub dependent check tasks, dependent relation: {}", taskModel.getRelation());
             for (DependentItem dependentItem : taskModel.getDependItemList()) {
                 Project project = projectCodeMap.get(dependentItem.getProjectCode());
                 if (project == null) {
-                    logger.error("The dependent task's project is not exist, dependentItem: {}", dependentItem);
+                    log.error("The dependent task's project is not exist, dependentItem: {}", dependentItem);
                     throw new RuntimeException(
                             "The dependent task's project is not exist, dependentItem: " + dependentItem);
                 }
                 ProcessDefinition processDefinition = processDefinitionMap.get(dependentItem.getDefinitionCode());
                 if (processDefinition == null) {
-                    logger.error("The dependent task's workflow is not exist, dependentItem: {}", dependentItem);
+                    log.error("The dependent task's workflow is not exist, dependentItem: {}", dependentItem);
                     throw new RuntimeException(
                             "The dependent task's workflow is not exist, dependentItem: " + dependentItem);
                 }
                 if (dependentItem.getDepTaskCode() == Constants.DEPENDENT_ALL_TASK_CODE) {
-                    logger.info(
+                    log.info(
                             "Add dependent task: projectName: {}, workflowName: {}, taskName: ALL, dependentKey: {}",
                             project.getName(), processDefinition.getName(), dependentItem.getKey());
 
                 } else {
                     TaskDefinition taskDefinition = taskDefinitionMap.get(dependentItem.getDepTaskCode());
                     if (taskDefinition == null) {
-                        logger.error("The dependent task's taskDefinition is not exist, dependentItem: {}",
+                        log.error("The dependent task's taskDefinition is not exist, dependentItem: {}",
                                 dependentItem);
                         throw new RuntimeException(
                                 "The dependent task's taskDefinition is not exist, dependentItem: " + dependentItem);
                     }
-                    logger.info("Add dependent task: projectName: {}, workflowName: {}, taskName: {}, dependentKey: {}",
+                    log.info("Add dependent task: projectName: {}, workflowName: {}, taskName: {}, dependentKey: {}",
                             project.getName(), processDefinition.getName(), taskDefinition.getName(),
                             dependentItem.getKey());
                 }
             }
-            this.dependentTaskList.add(new DependentExecute(taskModel.getDependItemList(), taskModel.getRelation()));
+            this.dependentTaskList.add(new DependentExecute(taskModel.getDependItemList(), taskModel.getRelation(),
+                    processInstance, taskInstance));
         }
     }
 
@@ -255,8 +256,8 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
                 if (!dependResultMap.containsKey(entry.getKey())) {
                     dependResultMap.put(entry.getKey(), entry.getValue());
                     // save depend result to log
-                    logger.info("dependent item complete, dependentKey: {}, result: {}, dependentDate: {}",
-                            entry.getKey(), entry.getValue(), dependentDate);
+                    log.info("dependent item complete, {} dependentKey: {}, result: {}, dependentDate: {}",
+                            DEPENDENT_SPLIT, entry.getKey(), entry.getValue(), dependentDate);
                 }
             }
             if (!dependentExecute.finish(dependentDate, testFlag)) {
@@ -278,7 +279,7 @@ public class DependentTaskProcessor extends BaseTaskProcessor {
             dependResultList.add(dependResult);
         }
         result = DependentUtils.getDependResultForRelation(this.dependentParameters.getRelation(), dependResultList);
-        logger.info("Dependent task completed, dependent result: {}", result);
+        log.info("Dependent task completed, dependent result: {}", result);
         return result;
     }
 

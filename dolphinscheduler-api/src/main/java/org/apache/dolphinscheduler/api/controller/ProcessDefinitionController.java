@@ -53,8 +53,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -82,9 +82,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "PROCESS_DEFINITION_TAG")
 @RestController
 @RequestMapping("projects/{projectCode}/process-definition")
+@Slf4j
 public class ProcessDefinitionController extends BaseController {
-
-    private static final Logger logger = LoggerFactory.getLogger(ProcessDefinitionController.class);
 
     @Autowired
     private ProcessDefinitionService processDefinitionService;
@@ -99,7 +98,6 @@ public class ProcessDefinitionController extends BaseController {
      * @param globalParams globalParams
      * @param locations locations for nodes
      * @param timeout timeout
-     * @param tenantCode tenantCode
      * @param taskRelationJson relation json for nodes
      * @param taskDefinitionJson taskDefinitionJson
      * @param otherParamsJson otherParamsJson handle other params
@@ -123,14 +121,13 @@ public class ProcessDefinitionController extends BaseController {
                                           @RequestParam(value = "globalParams", required = false, defaultValue = "[]") String globalParams,
                                           @RequestParam(value = "locations", required = false) String locations,
                                           @RequestParam(value = "timeout", required = false, defaultValue = "0") int timeout,
-                                          @RequestParam(value = "tenantCode", required = true) String tenantCode,
                                           @RequestParam(value = "taskRelationJson", required = true) String taskRelationJson,
                                           @RequestParam(value = "taskDefinitionJson", required = true) String taskDefinitionJson,
                                           @RequestParam(value = "otherParamsJson", required = false) String otherParamsJson,
                                           @RequestParam(value = "executionType", defaultValue = "PARALLEL") ProcessExecutionTypeEnum executionType) {
         Map<String, Object> result = processDefinitionService.createProcessDefinition(loginUser, projectCode, name,
                 description, globalParams,
-                locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson, otherParamsJson, executionType);
+                locations, timeout, taskRelationJson, taskDefinitionJson, otherParamsJson, executionType);
         return returnDataList(result);
     }
 
@@ -223,7 +220,6 @@ public class ProcessDefinitionController extends BaseController {
      * @param globalParams globalParams
      * @param locations locations for nodes
      * @param timeout timeout
-     * @param tenantCode tenantCode
      * @param taskRelationJson relation json for nodes
      * @param taskDefinitionJson taskDefinitionJson
      * @param otherParamsJson otherParamsJson handle other params
@@ -250,7 +246,6 @@ public class ProcessDefinitionController extends BaseController {
                                           @RequestParam(value = "globalParams", required = false, defaultValue = "[]") String globalParams,
                                           @RequestParam(value = "locations", required = false) String locations,
                                           @RequestParam(value = "timeout", required = false, defaultValue = "0") int timeout,
-                                          @RequestParam(value = "tenantCode", required = true) String tenantCode,
                                           @RequestParam(value = "taskRelationJson", required = true) String taskRelationJson,
                                           @RequestParam(value = "taskDefinitionJson", required = true) String taskDefinitionJson,
                                           @RequestParam(value = "otherParamsJson", required = false) String otherParamsJson,
@@ -259,7 +254,7 @@ public class ProcessDefinitionController extends BaseController {
 
         Map<String, Object> result = processDefinitionService.updateProcessDefinition(loginUser, projectCode, name,
                 code, description, globalParams,
-                locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson, otherParamsJson, executionType);
+                locations, timeout, taskRelationJson, taskDefinitionJson, otherParamsJson, executionType);
         // If the update fails, the result will be returned directly
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return returnDataList(result);
@@ -696,7 +691,7 @@ public class ProcessDefinitionController extends BaseController {
         try {
             processDefinitionService.batchExportProcessDefinitionByCodes(loginUser, projectCode, codes, response);
         } catch (Exception e) {
-            logger.error(Status.BATCH_EXPORT_PROCESS_DEFINE_BY_IDS_ERROR.getMsg(), e);
+            log.error(Status.BATCH_EXPORT_PROCESS_DEFINE_BY_IDS_ERROR.getMsg(), e);
         }
     }
 
@@ -755,7 +750,6 @@ public class ProcessDefinitionController extends BaseController {
      * @param description description
      * @param globalParams globalParams
      * @param timeout timeout
-     * @param tenantCode tenantCode
      * @param scheduleJson scheduleJson
      * @return process definition code
      */
@@ -775,12 +769,11 @@ public class ProcessDefinitionController extends BaseController {
                                                @RequestParam(value = "description", required = false) String description,
                                                @RequestParam(value = "globalParams", required = false, defaultValue = "[]") String globalParams,
                                                @RequestParam(value = "timeout", required = false, defaultValue = "0") int timeout,
-                                               @RequestParam(value = "tenantCode", required = true) String tenantCode,
                                                @RequestParam(value = "scheduleJson", required = false) String scheduleJson,
                                                @RequestParam(value = "executionType", defaultValue = "PARALLEL") ProcessExecutionTypeEnum executionType) {
         return returnDataList(processDefinitionService.createEmptyProcessDefinition(loginUser, projectCode, name,
                 description, globalParams,
-                timeout, tenantCode, scheduleJson, executionType));
+                timeout, scheduleJson, executionType));
     }
 
     /**
@@ -793,7 +786,6 @@ public class ProcessDefinitionController extends BaseController {
      * @param description description
      * @param globalParams globalParams
      * @param timeout timeout
-     * @param tenantCode tenantCode
      * @param scheduleJson scheduleJson
      * @param executionType executionType
      * @param releaseState releaseState
@@ -819,14 +811,13 @@ public class ProcessDefinitionController extends BaseController {
                                                    @RequestParam(value = "description", required = false) String description,
                                                    @RequestParam(value = "globalParams", required = false, defaultValue = "[]") String globalParams,
                                                    @RequestParam(value = "timeout", required = false, defaultValue = "0") int timeout,
-                                                   @RequestParam(value = "tenantCode", required = true) String tenantCode,
                                                    @RequestParam(value = "scheduleJson", required = false) String scheduleJson,
                                                    @RequestParam(value = "otherParamsJson", required = false) String otherParamsJson,
                                                    @RequestParam(value = "executionType", defaultValue = "PARALLEL") ProcessExecutionTypeEnum executionType,
                                                    @RequestParam(value = "releaseState", required = false, defaultValue = "OFFLINE") ReleaseState releaseState) {
         Map<String, Object> result = processDefinitionService.updateProcessDefinitionBasicInfo(loginUser, projectCode,
                 name, code, description, globalParams,
-                timeout, tenantCode, scheduleJson, otherParamsJson, executionType);
+                timeout, scheduleJson, otherParamsJson, executionType);
         // If the update fails, the result will be returned directly
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return returnDataList(result);

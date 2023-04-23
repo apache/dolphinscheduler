@@ -56,6 +56,8 @@ export default {
   oracle_connect_type_tips: 'Please select serviceName or SID',
   oracle_service_name: 'ServiceName',
   oracle_sid: 'SID',
+  compatible_mode: 'Compatible Mode',
+  compatible_mode_tips: 'Please enter compatible mode',
   jdbc_connect_parameters: 'jdbc connect parameters',
   principal_tips: 'Please enter Principal',
   krb5_conf_tips:

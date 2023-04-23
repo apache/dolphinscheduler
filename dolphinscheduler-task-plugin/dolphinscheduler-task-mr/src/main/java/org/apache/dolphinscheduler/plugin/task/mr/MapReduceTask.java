@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
@@ -73,7 +72,6 @@ public class MapReduceTask extends AbstractYarnTask {
         }
 
         mapreduceParameters.setQueue(taskExecutionContext.getQueue());
-        setMainJarName();
 
         // replace placeholder,and combine local and global parameters
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
@@ -87,7 +85,7 @@ public class MapReduceTask extends AbstractYarnTask {
                     ParamUtils.convert(paramsMap));
             mapreduceParameters.setOthers(others);
         }
-        logger.info("Initialize mapreduce task params {}", JSONUtils.toPrettyJsonString(mapreduceParameters));
+        log.info("Initialize mapreduce task params {}", JSONUtils.toPrettyJsonString(mapreduceParameters));
     }
 
     /**
@@ -101,22 +99,13 @@ public class MapReduceTask extends AbstractYarnTask {
         args.add(MAPREDUCE_COMMAND);
 
         // other parameters
-        args.addAll(MapReduceArgsUtils.buildArgs(mapreduceParameters));
+        args.addAll(MapReduceArgsUtils.buildArgs(mapreduceParameters, taskExecutionContext));
 
         String command = ParameterUtils.convertParameterPlaceholders(String.join(" ", args),
                 taskExecutionContext.getDefinedParams());
-        logger.info("mapreduce task command: {}", command);
+        log.info("mapreduce task command: {}", command);
 
         return command;
-    }
-
-    @Override
-    protected void setMainJarName() {
-        // main jar
-        ResourceInfo mainJar = mapreduceParameters.getMainJar();
-        String resourceName = getResourceNameOfMainJar(mainJar);
-        mainJar.setRes(resourceName);
-        mapreduceParameters.setMainJar(mainJar);
     }
 
     @Override

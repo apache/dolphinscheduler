@@ -129,6 +129,8 @@ public class FlinkArgsUtils {
         if (FlinkDeployMode.LOCAL == deployMode) {
             // execution.target
             initOptions.add(String.format(FlinkConstants.FLINK_FORMAT_EXECUTION_TARGET, FlinkConstants.FLINK_LOCAL));
+        } else if (FlinkDeployMode.STANDALONE == deployMode) {
+            // standalone exec
         } else {
             // execution.target
             initOptions.add(
@@ -209,6 +211,9 @@ public class FlinkArgsUtils {
             case LOCAL:
                 args.add(FlinkConstants.FLINK_RUN); // run
                 break;
+            case STANDALONE:
+                args.add(FlinkConstants.FLINK_RUN); // run
+                break;
         }
 
         String others = flinkParameters.getOthers();
@@ -259,6 +264,8 @@ public class FlinkArgsUtils {
                 break;
             case LOCAL:
                 break;
+            case STANDALONE:
+                break;
         }
 
         int parallelism = flinkParameters.getParallelism();
@@ -290,7 +297,7 @@ public class FlinkArgsUtils {
             if (ProgramType.PYTHON == programType) {
                 args.add(FlinkConstants.FLINK_PYTHON);
             }
-            args.add(mainJar.getRes());
+            args.add(taskExecutionContext.getResources().get(mainJar.getResourceName()));
         }
 
         String mainArgs = flinkParameters.getMainArgs();

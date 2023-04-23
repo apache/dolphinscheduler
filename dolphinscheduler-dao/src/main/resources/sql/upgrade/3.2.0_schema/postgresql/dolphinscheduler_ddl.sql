@@ -222,3 +222,60 @@ d//
 delimiter ;
 select add_t_ds_task_instance_add_project_code();
 DROP FUNCTION add_t_ds_task_instance_add_project_code();
+
+ALTER TABLE `t_ds_alert`
+    MODIFY `title` varchar(512) DEFAULT NULL ;
+
+ALTER TABLE `t_ds_command` MODIFY `worker_group` varchar(255);
+ALTER TABLE `t_ds_project` MODIFY name varchar(255) DEFAULT NULL ;
+ALTER TABLE `t_ds_schedules` MODIFY worker_group varchar(255);
+ALTER TABLE `t_ds_task_instance` MODIFY worker_group varchar(255);
+ALTER TABLE `t_ds_udfs` MODIFY func_name varchar(255) NOT NULL ;
+ALTER TABLE `t_ds_version` MODIFY version varchar(63) NOT NULL;
+ALTER TABLE `t_ds_plugin_define` MODIFY plugin_name varchar(255) NOT NULL;
+ALTER TABLE `t_ds_plugin_define` MODIFY plugin_type varchar(63) NOT NULL;
+ALTER TABLE `t_ds_alert_plugin_instance` MODIFY instance_name varchar(255) NULL;
+ALTER TABLE `t_ds_dq_rule` MODIFY "name" varchar(255) DEFAULT NULL;
+ALTER TABLE `t_ds_environment` MODIFY name varchar(255) DEFAULT NULL;
+ALTER TABLE `t_ds_task_group_queue` MODIFY task_name    VARCHAR(255) DEFAULT NULL ;
+ALTER TABLE `t_ds_task_group` MODIFY name        varchar(255) DEFAULT NULL ;
+ALTER TABLE `t_ds_k8s` MODIFY k8s_name    VARCHAR(255) DEFAULT NULL ;
+ALTER TABLE `t_ds_k8s_namespace` MODIFY namespace          varchar(255) DEFAULT NULL ;
+ALTER TABLE `t_ds_cluster` MODIFY name        varchar(255) DEFAULT NULL;
+
+-- tenant improvement
+delimiter ;
+DROP FUNCTION IF EXISTS add_improvement_workflow_run_tenant();
+delimiter d//
+CREATE FUNCTION add_improvement_workflow_run_tenant() RETURNS void AS $$
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_CATALOG=current_database()
+          AND TABLE_SCHEMA=current_schema()
+          AND TABLE_NAME='t_ds_command'
+          AND COLUMN_NAME ='tenant_code')
+      THEN
+ALTER TABLE t_ds_command ADD `tenant_code` varchar(64) DEFAULT 'default' COMMENT 'tenant code';
+END IF;
+IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_CATALOG=current_database()
+          AND TABLE_SCHEMA=current_schema()
+          AND TABLE_NAME='t_ds_error_command'
+          AND COLUMN_NAME ='tenant_code')
+      THEN
+ALTER TABLE t_ds_error_command ADD `tenant_code` varchar(64) DEFAULT 'default' COMMENT 'tenant code';
+END IF;
+IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_CATALOG=current_database()
+          AND TABLE_SCHEMA=current_schema()
+          AND TABLE_NAME='t_ds_schedules'
+          AND COLUMN_NAME ='tenant_code')
+      THEN
+ALTER TABLE t_ds_schedules ADD `tenant_code` varchar(64) DEFAULT NULL COMMENT 'tenant code';
+END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+delimiter ;
+select add_improvement_workflow_run_tenant();
+DROP FUNCTION add_improvement_workflow_run_tenant();

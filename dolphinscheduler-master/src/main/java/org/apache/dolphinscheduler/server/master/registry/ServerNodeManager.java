@@ -17,11 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.registry;
 
-import static org.apache.dolphinscheduler.common.constants.Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
-import static org.apache.dolphinscheduler.common.constants.Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
-
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -32,8 +28,10 @@ import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.Event.Type;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.dispatch.exceptions.WorkerGroupNotFoundException;
 import org.apache.dolphinscheduler.service.queue.MasterPriorityQueue;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -61,16 +59,15 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PreDestroy;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class ServerNodeManager implements InitializingBean {
-
-    private final Logger logger = LoggerFactory.getLogger(ServerNodeManager.class);
 
     private final Lock masterLock = new ReentrantLock();
 
@@ -140,11 +137,8 @@ public class ServerNodeManager implements InitializingBean {
                 masterConfig.getWorkerGroupRefreshInterval().getSeconds(),
                 TimeUnit.SECONDS);
 
-        // init MasterNodeListener listener
-        registryClient.subscribe(REGISTRY_DOLPHINSCHEDULER_MASTERS, new MasterDataListener());
-
-        // init WorkerNodeListener listener
-        registryClient.subscribe(REGISTRY_DOLPHINSCHEDULER_WORKERS, new WorkerDataListener());
+        registryClient.subscribe(RegistryNodeType.MASTER.getRegistryPath(), new MasterDataListener());
+        registryClient.subscribe(RegistryNodeType.WORKER.getRegistryPath(), new WorkerDataListener());
     }
 
     class WorkerNodeInfoAndGroupDbSyncTask implements Runnable {
@@ -155,7 +149,7 @@ public class ServerNodeManager implements InitializingBean {
                 // sync worker node info
                 refreshWorkerNodesAndGroupMappings();
             } catch (Exception e) {
-                logger.error("WorkerNodeInfoAndGroupDbSyncTask error:", e);
+                log.error("WorkerNodeInfoAndGroupDbSyncTask error:", e);
             }
         }
     }
@@ -185,17 +179,17 @@ public class ServerNodeManager implements InitializingBean {
                     final String workerAddress = parts[parts.length - 1];
 
                     // todo: update workerNodeInfo
-                    logger.debug("received subscribe event : {}", event);
+                    log.debug("received subscribe event : {}", event);
                     if (type == Type.ADD) {
-                        logger.info("Worker: {} added, currentNode : {}", path, workerAddress);
+                        log.info("Worker: {} added, currentNode : {}", path, workerAddress);
                     } else if (type == Type.REMOVE) {
-                        logger.info("Worker node : {} down.", path);
+                        log.info("Worker node : {} down.", path);
                         alertDao.sendServerStoppedAlert(1, path, "WORKER");
                     } else if (type == Type.UPDATE) {
                         syncSingleWorkerNodeInfo(workerAddress, JSONUtils.parseObject(data, WorkerHeartBeat.class));
                     }
                 } catch (Exception ex) {
-                    logger.error("WorkerGroupListener capture data change and get data failed", ex);
+                    log.error("WorkerGroupListener capture data change and get data failed", ex);
                 }
             }
         }
@@ -219,16 +213,16 @@ public class ServerNodeManager implements InitializingBean {
             if (registryClient.isMasterPath(path)) {
                 try {
                     if (type.equals(Type.ADD)) {
-                        logger.info("master node : {} added.", path);
+                        log.info("master node : {} added.", path);
                         updateMasterNodes();
                     }
                     if (type.equals(Type.REMOVE)) {
-                        logger.info("master node : {} down.", path);
+                        log.info("master node : {} down.", path);
                         updateMasterNodes();
                         alertDao.sendServerStoppedAlert(1, path, "MASTER");
                     }
                 } catch (Exception ex) {
-                    logger.error("MasterNodeListener capture data change and get data failed.", ex);
+                    log.error("MasterNodeListener capture data change and get data failed.", ex);
                 }
             }
         }
@@ -238,14 +232,14 @@ public class ServerNodeManager implements InitializingBean {
         currentSlot = 0;
         totalSlot = 0;
         this.masterNodes.clear();
-        String nodeLock = Constants.REGISTRY_DOLPHINSCHEDULER_LOCK_MASTERS;
+        String nodeLock = RegistryNodeType.MASTER_NODE_LOCK.getRegistryPath();
         try {
             registryClient.getLock(nodeLock);
             Collection<String> currentNodes = registryClient.getMasterNodesDirectly();
-            List<Server> masterNodeList = registryClient.getServerList(NodeType.MASTER);
+            List<Server> masterNodeList = registryClient.getServerList(RegistryNodeType.MASTER);
             syncMasterNodes(currentNodes, masterNodeList);
         } catch (Exception e) {
-            logger.error("update master nodes error", e);
+            log.error("update master nodes error", e);
         } finally {
             registryClient.releaseLock(nodeLock);
         }
@@ -255,7 +249,7 @@ public class ServerNodeManager implements InitializingBean {
     private void updateWorkerNodes() {
         workerGroupWriteLock.lock();
         try {
-            Map<String, String> workerNodeMaps = registryClient.getServerMaps(NodeType.WORKER);
+            Map<String, String> workerNodeMaps = registryClient.getServerMaps(RegistryNodeType.WORKER);
             for (Map.Entry<String, String> entry : workerNodeMaps.entrySet()) {
                 workerNodeInfo.put(entry.getKey(), JSONUtils.parseObject(entry.getValue(), WorkerHeartBeat.class));
             }
@@ -311,9 +305,9 @@ public class ServerNodeManager implements InitializingBean {
                 totalSlot = nodes.size();
                 currentSlot = index;
             } else {
-                logger.warn("Current master is not in active master list");
+                log.warn("Current master is not in active master list");
             }
-            logger.info("Update master nodes, total master size: {}, current slot: {}", totalSlot, currentSlot);
+            log.info("Update master nodes, total master size: {}, current slot: {}", totalSlot, currentSlot);
         } finally {
             masterLock.unlock();
         }
@@ -334,13 +328,16 @@ public class ServerNodeManager implements InitializingBean {
      * @param workerGroup workerGroup
      * @return worker nodes
      */
-    public Set<String> getWorkerGroupNodes(String workerGroup) {
+    public Set<String> getWorkerGroupNodes(String workerGroup) throws WorkerGroupNotFoundException {
         workerGroupReadLock.lock();
         try {
             if (StringUtils.isEmpty(workerGroup)) {
                 workerGroup = Constants.DEFAULT_WORKER_GROUP;
             }
             Set<String> nodes = workerGroupNodes.get(workerGroup);
+            if (nodes == null) {
+                throw new WorkerGroupNotFoundException(String.format("WorkerGroup: %s is invalidated", workerGroup));
+            }
             if (CollectionUtils.isEmpty(nodes)) {
                 return Collections.emptySet();
             }

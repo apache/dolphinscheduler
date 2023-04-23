@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.kubeflow;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -38,8 +37,8 @@ import com.google.common.collect.Sets;
 
 public class KubeflowHelper {
 
-    protected final Logger logger =
-            LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
+    protected final Logger log =
+            LoggerFactory.getLogger(KubeflowHelper.class);
 
     private final String clusterConfigPath;
 
@@ -83,7 +82,7 @@ public class KubeflowHelper {
             for (int x = messageIndex; x < conditions.size(); x = x + 1) {
                 JsonNode condition = conditions.get(x);
                 String stepMessage = condition.toString();
-                logger.info(stepMessage);
+                log.info(stepMessage);
             }
             messageIndex = conditions.size();
             JsonNode lastCondition = conditions.get(conditions.size() - 1);

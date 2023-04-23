@@ -31,6 +31,6 @@ public class PropertyUtilsTest {
 
     @Test
     public void getResUploadStartupState() {
-        Assertions.assertFalse(PropertyUtils.getResUploadStartupState());
+        Assertions.assertTrue(PropertyUtils.getResUploadStartupState());
     }
 }

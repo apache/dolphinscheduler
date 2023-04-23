@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
---- rename t_ds_fav_task task_name to task_type
+-- rename t_ds_fav_task task_name to task_type
 drop procedure if exists modify_t_ds_fav_task_task_name;
 delimiter d//
 CREATE PROCEDURE modify_t_ds_fav_task_task_name()

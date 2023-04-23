@@ -115,7 +115,7 @@ workers="existing worker01:default,existing worker02:default,ds3:default,ds4:def
 
 ```
 
-- If the expansion is for worker nodes, you need to set the worker group, refer to the security of the [Worker grouping](./security.md)
+- If the expansion is for worker nodes, you need to set the worker group, refer to the security of the [Worker grouping](security/security.md)
 
 - On all new nodes, change the directory permissions so that the deployment user has access to the DolphinScheduler directory
 

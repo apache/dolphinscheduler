@@ -27,17 +27,15 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import java.sql.Connection;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+@Slf4j
 public class DataSourceUtils {
 
     public DataSourceUtils() {
     }
-
-    private static final Logger logger = LoggerFactory.getLogger(DataSourceUtils.class);
 
     /**
      * check datasource param
@@ -56,7 +54,7 @@ public class DataSourceUtils {
     public static ConnectionParam buildConnectionParams(BaseDataSourceParamDTO baseDataSourceParamDTO) {
         ConnectionParam connectionParams = getDatasourceProcessor(baseDataSourceParamDTO.getType())
                 .createConnectionParams(baseDataSourceParamDTO);
-        logger.info("Parameters map:{}", connectionParams);
+        log.info("Parameters map:{}", connectionParams);
         return connectionParams;
     }
 

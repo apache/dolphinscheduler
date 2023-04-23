@@ -64,7 +64,7 @@ export function useModal(
 
     try {
       await serviceHandle()
-      window.$message.success(t('resource.udf.success'))
+      window.$message.success(t('resource.function.success'))
       state.saving = false
       ctx.emit('updateList')
       ctx.emit('update:show')

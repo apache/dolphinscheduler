@@ -221,6 +221,10 @@ export default {
                                 title: 'Apache Linkis',
                                 link: '/en-us/docs/dev/user_doc/guide/task/linkis.html',
                             },
+                            {
+                                title: 'SSH',
+                                link: '/en-us/docs/dev/user_doc/guide/task/ssh.html',
+                            },
                         ],
                     },
                     {
@@ -268,6 +272,10 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/datasource/hive.html',
                             },
                             {
+                                title: 'KYUUBI',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/kyuubi.html',
+                            },
+                            {
                                 title: 'Spark',
                                 link: '/en-us/docs/dev/user_doc/guide/datasource/spark.html',
                             },
@@ -302,6 +310,26 @@ export default {
                             {
                                 title: 'Azure SQL Database',
                                 link: '/en-us/docs/dev/user_doc/guide/datasource/azure-sql.html',
+                            },
+                            {
+                                title: 'Trino',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/trino.html',
+                            },
+                            {
+                                title: 'StarRocks',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/starrocks.html',
+                            },
+                            {
+                                title: 'DAMENG',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/dameng.html',
+                            },
+                            {
+                                title: 'OceanBase',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/oceanbase.html',
+                            },
+                            {
+                                title: 'SSH',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/ssh.html',
                             },
                         ],
                     },
@@ -381,8 +409,18 @@ export default {
                     },
                     {
                         title: 'Security',
-                        link: '/en-us/docs/dev/user_doc/guide/security.html',
+                        children: [
+                            {
+                                title: 'Security (Authorization System)',
+                                link: '/en-us/docs/dev/user_doc/guide/security/security.html',
+                            },
+                            {
+                                title: 'Authentication Type',
+                                link: '/en-us/docs/dev/user_doc/guide/security/authentication-type.html',
+                            }
+                        ],
                     },
+
                     {
                         title: 'Metrics',
                         children: [
@@ -395,6 +433,10 @@ export default {
                     {
                         title: 'Data Quality',
                         link: '/en-us/docs/dev/user_doc/guide/data-quality.html',
+                    },
+                    {
+                        title: 'Remote Logging',
+                        link: '/en-us/docs/dev/user_doc/guide/remote-logging.html',
                     },
                     {
                         title: 'Upgrade',
@@ -483,15 +525,15 @@ export default {
                 children: [
                     {
                         title: 'Open API',
-                        link: '/en-us/docs/dev/user_doc/guide/open-api.html',
+                        link: '/en-us/docs/dev/user_doc/guide/api/open-api.html',
                     },
                     {
                         title: 'PyDolphinScheduler',
-                        link: '/python/main/index.html',
+                        link: '/en-us/docs/dev/user_doc/guide/api/pydolphinscheduler.html',
                     },
                     {
                         title: 'Health Check',
-                        link: '/en-us/docs/dev/user_doc/guide/healthcheck.html',
+                        link: '/en-us/docs/dev/user_doc/guide/api/healthcheck.html',
                     },
                 ],
             },
@@ -876,6 +918,10 @@ export default {
                                 title: 'Apache Linkis',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/linkis.html',
                             },
+                            {
+                                title: 'SSH',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/ssh.html',
+                            },
                         ],
                     },
                     {
@@ -923,6 +969,10 @@ export default {
                                 link: '/zh-cn/docs/dev/user_doc/guide/datasource/hive.html',
                             },
                             {
+                                title: 'KYUUBI',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/kyuubi.html',
+                            },
+                            {
                                 title: 'Spark',
                                 link: '/zh-cn/docs/dev/user_doc/guide/datasource/spark.html',
                             },
@@ -933,6 +983,34 @@ export default {
                             {
                                 title: 'Azure SQL Database',
                                 link: '/zh-cn/docs/dev/user_doc/guide/datasource/azure-sql.html',
+                            },
+                            {
+                                title: 'Redshift',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/redshift.html',
+                            },
+                            {
+                                title: 'Oracle',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/oracle.html',
+                            },
+                            {
+                                title: 'Trino',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/trino.html',
+                            },
+                            {
+                                title: 'StarRocks',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/starrocks.html',
+                            },
+                            {
+                                title: 'DAMENG',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/dameng.html',
+                            },
+                            {
+                                title: 'OceanBase',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/oceanbase.html',
+                            },
+                            {
+                                title: 'SSH',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/ssh.html',
                             },
                         ],
                     },
@@ -1012,7 +1090,16 @@ export default {
                     },
                     {
                         title: '安全中心',
-                        link: '/zh-cn/docs/dev/user_doc/guide/security.html',
+                        children: [
+                            {
+                                title: '安全中心（权限系统）',
+                                link: '/zh-cn/docs/dev/user_doc/guide/security/security.html',
+                            },
+                            {
+                                title: '认证方式',
+                                link: '/zh-cn/docs/dev/user_doc/guide/security/authentication-type.html',
+                            }
+                        ],
                     },
                     {
                         title: '指标相关',
@@ -1026,6 +1113,10 @@ export default {
                     {
                         title: '数据质量',
                         link: '/zh-cn/docs/dev/user_doc/guide/data-quality.html',
+                    },
+                    {
+                        title: '远程日志存储',
+                        link: '/zh-cn/docs/dev/user_doc/guide/remote-logging.html',
                     },
                     {
                         title: '升级',
@@ -1114,15 +1205,15 @@ export default {
                 children: [
                     {
                         title: 'API调用',
-                        link: '/zh-cn/docs/dev/user_doc/guide/open-api.html',
+                        link: '/zh-cn/docs/dev/user_doc/guide/api/open-api.html',
                     },
                     {
                         title: 'PyDolphinScheduler',
-                        link: '/python/main/index.html',
+                        link: '/zh-cn/docs/dev/user_doc/guide/api/pydolphinscheduler.html',
                     },
                     {
                         title: '健康检查',
-                        link: '/zh-cn/docs/dev/user_doc/guide/healthcheck.html',
+                        link: '/zh-cn/docs/dev/user_doc/guide/api/healthcheck.html',
                     },
                 ],
             },

@@ -27,7 +27,6 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -38,7 +37,6 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -106,7 +104,7 @@ public class CommonTaskProcessorTest {
 
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(1);
-        processInstance.setTenantId(1);
+        processInstance.setTenantCode("default");
         processInstance.setCommandType(CommandType.START_PROCESS);
         taskInstance.setProcessInstance(processInstance);
         taskInstance.setState(TaskExecutionStatus.DELAY_EXECUTION);
@@ -146,34 +144,6 @@ public class CommonTaskProcessorTest {
         Mockito.doReturn("tenantCode").when(processService).queryTenantCodeByResName(resource.getFullName(),
                 ResourceType.FILE);
         Assertions.assertNotNull(map);
-
-    }
-
-    @Test
-    public void testVerifyTenantIsNull() {
-        Tenant tenant = null;
-
-        TaskInstance taskInstance = new TaskInstance();
-        taskInstance.setId(1);
-        taskInstance.setTaskType("SHELL");
-        taskInstance.setProcessInstanceId(1);
-
-        ProcessInstance processInstance = new ProcessInstance();
-        processInstance.setId(1);
-        taskInstance.setProcessInstance(processInstance);
-
-        boolean res = commonTaskProcessor.verifyTenantIsNull(tenant, taskInstance);
-        Assertions.assertFalse(res);
-
-        tenant = new Tenant();
-        tenant.setId(1);
-        tenant.setTenantCode("journey");
-        tenant.setDescription("journey");
-        tenant.setQueueId(1);
-        tenant.setCreateTime(new Date());
-        tenant.setUpdateTime(new Date());
-        res = commonTaskProcessor.verifyTenantIsNull(tenant, taskInstance);
-        Assertions.assertFalse(res);
 
     }
 

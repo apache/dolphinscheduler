@@ -21,6 +21,11 @@
 
 timezone: "Asia/Shanghai"
 
+# Used to detect whether dolphinscheduler dependent services such as database are ready
+initImage:
+  pullPolicy: "IfNotPresent"
+  busybox: "busybox:1.30.1"
+
 image:
   registry: "dolphinscheduler.docker.scarf.sh/apache"
   tag: "dev-SNAPSHOT"
@@ -91,7 +96,6 @@ zookeeper:
 
 ## If exists external registry and set zookeeper.enable value to false, the external registry will be used.
 externalRegistry:
-  registryPluginDir: "lib/plugin/registry"
   registryPluginName: "zookeeper"
   registryServers: "127.0.0.1:2181"
 
@@ -100,7 +104,7 @@ conf:
     # user data local directory path, please make sure the directory exists and have read write permissions
     data.basedir.path: /tmp/dolphinscheduler
 
-    # resource storage type: HDFS, S3, NONE
+    # resource storage type: HDFS, S3, OSS, GCS, NONE
     resource.storage.type: S3
 
     # resource store on HDFS/S3 path, resource file will store to this base path, self configuration, please make sure the directory exists on hdfs and have read write permissions. "/dolphinscheduler" is recommended
@@ -306,10 +310,10 @@ master:
     MASTER_TASK_COMMIT_RETRYTIMES: "5"
     MASTER_TASK_COMMIT_INTERVAL: "1s"
     MASTER_STATE_WHEEL_INTERVAL: "5s"
-    MASTER_MAX_CPU_LOAD_AVG: "-1"
+    MASTER_MAX_CPU_LOAD_AVG: "1"
     MASTER_RESERVED_MEMORY: "0.3"
     MASTER_FAILOVER_INTERVAL: "10m"
-    MASTER_KILL_YARN_JOB_WHEN_HANDLE_FAILOVER: "true"
+    MASTER_KILL_APPLICATION_WHEN_HANDLE_FAILOVER: "true"
 
 worker:
   ## PodManagementPolicy controls how pods are created during initial scale up, when replacing pods on nodes, or when scaling down.
@@ -378,14 +382,12 @@ worker:
       storageClassName: "-"
       storage: "20Gi"
   env:
-    WORKER_GROUPS_0: default
-    WORKER_MAX_CPU_LOAD_AVG: "-1"
+    WORKER_MAX_CPU_LOAD_AVG: "1"
     WORKER_RESERVED_MEMORY: "0.3"
     WORKER_EXEC_THREADS: "100"
     WORKER_HEARTBEAT_INTERVAL: "10s"
     WORKER_HEART_ERROR_THRESHOLD: "5"
     WORKER_HOST_WEIGHT: "100"
-    WORKER_GROUPS: "default"
   keda:
     enabled: false
     namespaceLabels: { }

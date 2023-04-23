@@ -204,6 +204,12 @@ $bgLight: #ffffff;
     &.icon-kubeflow {
       background-image: url('/images/task-icons/kubeflow.png');
     }
+    &.icon-data_factory {
+      background-image: url('/images/task-icons/data_factory.png');
+    }
+    &.icon-remoteshell {
+      background-image: url('/images/task-icons/remoteshell.png');
+    }
   }
 
   &:hover {
@@ -310,6 +316,12 @@ $bgLight: #ffffff;
       }
       &.icon-kubeflow {
         background-image: url('/images/task-icons/kubeflow_hover.png');
+      }
+      &.icon-data_factory {
+        background-image: url('/images/task-icons/data_factory_hover.png');
+      }
+      &.icon-remoteshell {
+        background-image: url('/images/task-icons/remoteshell_hover.png');
       }
     }
   }

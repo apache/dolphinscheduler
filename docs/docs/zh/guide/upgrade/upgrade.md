@@ -37,6 +37,22 @@ jar 包 并添加到 `./tools/libs` 目录下，设置以下环境变量
 
 执行数据库升级脚本：`sh ./tools/bin/upgrade-schema.sh`
 
+### 资源迁移
+
+3.2.0 版本资源中心重构，原资源中心内的资源将不受管理，您可以指定迁移到的目标租户，然后运行一次性资源迁移脚本，所有资源会迁移到目标租户的 .migrate 目录下。
+
+#### 示例：
+
+指定已存在目标租户 `abc`，其资源根目录为 `/dolphinscheduler/abc/`。
+
+执行脚本：`sh ./tools/bin/migrate-resource.sh abc`。
+
+执行结果：
+
+- 原文件资源 `a/b.sh` 迁移至 `/dolphinscheduler/abc/resources/.migrate/a/b.sh`。
+- 原 UDF 资源 `x/y.jar` 迁移至 `/dolphinscheduler/abc/udf/.migrate/x/y.jar`。
+- 更新 UDF 函数绑定资源信息。
+
 ### 服务升级
 
 #### 修改 `bin/env/install_env.sh` 配置内容

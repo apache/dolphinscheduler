@@ -103,6 +103,7 @@ interface ResourceFile {
   fullName: string
   description: string
   size: number
+  createTime: string
   updateTime: string
 }
 

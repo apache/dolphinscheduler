@@ -19,22 +19,26 @@ package org.apache.dolphinscheduler.server.master.consumer;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.TaskEventType;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.TaskCacheUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.TaskDispatchCommand;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.task.TaskDispatchMessage;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
+import org.apache.dolphinscheduler.server.master.dispatch.exceptions.WorkerGroupNotFoundException;
 import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
@@ -47,6 +51,7 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -56,8 +61,8 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -65,12 +70,8 @@ import org.springframework.stereotype.Component;
  * TaskUpdateQueue consumer
  */
 @Component
+@Slf4j
 public class TaskPriorityQueueConsumer extends BaseDaemonThread {
-
-    /**
-     * logger of TaskUpdateQueueConsumer
-     */
-    private static final Logger logger = LoggerFactory.getLogger(TaskPriorityQueueConsumer.class);
 
     /**
      * taskUpdateQueue
@@ -124,9 +125,9 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
     public void init() {
         this.consumerThreadPoolExecutor = (ThreadPoolExecutor) ThreadUtils
                 .newDaemonFixedThreadExecutor("TaskUpdateQueueConsumerThread", masterConfig.getDispatchTaskNumber());
-        logger.info("Task priority queue consume thread staring");
+        log.info("Task priority queue consume thread staring");
         super.start();
-        logger.info("Task priority queue consume thread started");
+        log.info("Task priority queue consume thread started");
     }
 
     @Override
@@ -137,20 +138,20 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
                 List<TaskPriority> failedDispatchTasks = this.batchDispatch(fetchTaskNum);
 
                 if (CollectionUtils.isNotEmpty(failedDispatchTasks)) {
-                    logger.info("{} tasks dispatch failed, will retry to dispatch", failedDispatchTasks.size());
+                    log.info("{} tasks dispatch failed, will retry to dispatch", failedDispatchTasks.size());
                     TaskMetrics.incTaskDispatchFailed(failedDispatchTasks.size());
                     for (TaskPriority dispatchFailedTask : failedDispatchTasks) {
                         taskPriorityQueue.put(dispatchFailedTask);
                     }
                     // If the all task dispatch failed, will sleep for 1s to avoid the master cpu higher.
                     if (fetchTaskNum == failedDispatchTasks.size()) {
-                        logger.info("All tasks dispatch failed, will sleep a while to avoid the master cpu higher");
+                        log.info("All tasks dispatch failed, will sleep a while to avoid the master cpu higher");
                         TimeUnit.MILLISECONDS.sleep(Constants.SLEEP_TIME_MILLIS);
                     }
                 }
             } catch (Exception e) {
                 TaskMetrics.incTaskDispatchError();
-                logger.error("dispatcher task error", e);
+                log.error("dispatcher task error", e);
             }
         }
     }
@@ -171,8 +172,17 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
 
             consumerThreadPoolExecutor.submit(() -> {
                 try {
-                    boolean dispatchResult = this.dispatchTask(taskPriority);
-                    if (!dispatchResult) {
+                    try {
+                        this.dispatchTask(taskPriority);
+                    } catch (WorkerGroupNotFoundException e) {
+                        // If the worker group not found, will not try to dispatch again.
+                        // The task instance will be failed
+                        // todo:
+                        addDispatchFailedEvent(taskPriority);
+                    } catch (ExecuteException e) {
+                        failedDispatchTasks.add(taskPriority);
+                    } catch (Exception e) {
+                        log.error("Dispatch task error, meet an unknown exception", e);
                         failedDispatchTasks.add(taskPriority);
                     }
                 } finally {
@@ -193,60 +203,50 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
      * @param taskPriority taskPriority
      * @return dispatch result, return true if dispatch success, return false if dispatch failed.
      */
-    protected boolean dispatchTask(TaskPriority taskPriority) {
+    protected void dispatchTask(TaskPriority taskPriority) throws ExecuteException {
         TaskMetrics.incTaskDispatch();
-        boolean result = false;
-        try {
-            WorkflowExecuteRunnable workflowExecuteRunnable =
-                    processInstanceExecCacheManager.getByProcessInstanceId(taskPriority.getProcessInstanceId());
-            if (workflowExecuteRunnable == null) {
-                logger.error("Cannot find the related processInstance of the task, taskPriority: {}", taskPriority);
-                return true;
-            }
-            Optional<TaskInstance> taskInstanceOptional =
-                    workflowExecuteRunnable.getTaskInstance(taskPriority.getTaskId());
-            if (!taskInstanceOptional.isPresent()) {
-                logger.error("Cannot find the task instance from related processInstance, taskPriority: {}",
-                        taskPriority);
-                // we return true, so that we will drop this task.
-                return true;
-            }
-            TaskInstance taskInstance = taskInstanceOptional.get();
-            TaskExecutionContext context = taskPriority.getTaskExecutionContext();
-            ExecutionContext executionContext =
-                    new ExecutionContext(toCommand(context), ExecutorType.WORKER, context.getWorkerGroup(),
-                            taskInstance);
-
-            if (isTaskNeedToCheck(taskPriority)) {
-                if (taskInstanceIsFinalState(taskPriority.getTaskId())) {
-                    // when task finish, ignore this task, there is no need to dispatch anymore
-                    logger.info("Task {} is already finished, no need to dispatch, task instance id: {}",
-                            taskInstance.getName(), taskInstance.getId());
-                    return true;
-                }
-            }
-
-            // check task is cache execution, and decide whether to dispatch
-            if (checkIsCacheExecution(taskInstance, context)) {
-                return true;
-            }
-
-            result = dispatcher.dispatch(executionContext);
-
-            if (result) {
-                logger.info("Master success dispatch task to worker, taskInstanceId: {}, worker: {}",
-                        taskPriority.getTaskId(),
-                        executionContext.getHost());
-                addDispatchEvent(context, executionContext);
-            } else {
-                logger.info("Master failed to dispatch task to worker, taskInstanceId: {}, worker: {}",
-                        taskPriority.getTaskId(),
-                        executionContext.getHost());
-            }
-        } catch (RuntimeException | ExecuteException e) {
-            logger.error("Master dispatch task to worker error, taskPriority: {}", taskPriority, e);
+        WorkflowExecuteRunnable workflowExecuteRunnable =
+                processInstanceExecCacheManager.getByProcessInstanceId(taskPriority.getProcessInstanceId());
+        if (workflowExecuteRunnable == null) {
+            log.error("Cannot find the related processInstance of the task, taskPriority: {}", taskPriority);
+            return;
         }
-        return result;
+        Optional<TaskInstance> taskInstanceOptional =
+                workflowExecuteRunnable.getTaskInstance(taskPriority.getTaskId());
+        if (!taskInstanceOptional.isPresent()) {
+            log.error("Cannot find the task instance from related processInstance, taskPriority: {}",
+                    taskPriority);
+            // we return true, so that we will drop this task.
+            return;
+        }
+        TaskInstance taskInstance = taskInstanceOptional.get();
+        TaskExecutionContext context = taskPriority.getTaskExecutionContext();
+        ExecutionContext executionContext = ExecutionContext.builder()
+                .taskInstance(taskInstance)
+                .workerGroup(context.getWorkerGroup())
+                .executorType(ExecutorType.WORKER)
+                .message(toCommand(context))
+                .build();
+
+        if (isTaskNeedToCheck(taskPriority)) {
+            if (taskInstanceIsFinalState(taskPriority.getTaskId())) {
+                // when task finish, ignore this task, there is no need to dispatch anymore
+                log.info("Task {} is already finished, no need to dispatch, task instance id: {}",
+                        taskInstance.getName(), taskInstance.getId());
+                return;
+            }
+        }
+
+        // check task is cache execution, and decide whether to dispatch
+        if (checkIsCacheExecution(taskInstance, context)) {
+            return;
+        }
+
+        dispatcher.dispatch(executionContext);
+        log.info("Master success dispatch task to worker, taskInstanceId: {}, worker: {}",
+                taskPriority.getTaskId(),
+                executionContext.getHost());
+        addDispatchEvent(context, executionContext);
     }
 
     /**
@@ -258,9 +258,27 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
         taskEventService.addEvent(taskEvent);
     }
 
-    private Command toCommand(TaskExecutionContext taskExecutionContext) {
+    private void addDispatchFailedEvent(TaskPriority taskPriority) {
+        TaskExecutionContext taskExecutionContext = taskPriority.getTaskExecutionContext();
+        TaskEvent taskEvent = TaskEvent.builder()
+                .processInstanceId(taskPriority.getProcessInstanceId())
+                .taskInstanceId(taskPriority.getTaskId())
+                .state(TaskExecutionStatus.FAILURE)
+                .logPath(taskExecutionContext.getLogPath())
+                .executePath(taskExecutionContext.getExecutePath())
+                .appIds(taskExecutionContext.getAppIds())
+                .processId(taskExecutionContext.getProcessId())
+                .varPool(taskExecutionContext.getVarPool())
+                .startTime(DateUtils.timeStampToDate(taskExecutionContext.getStartTime()))
+                .endTime(new Date())
+                .event(TaskEventType.RESULT)
+                .build();
+        taskEventService.addEvent(taskEvent);
+    }
+
+    private Message toCommand(TaskExecutionContext taskExecutionContext) {
         // todo: we didn't set the host here, since right now we didn't need to retry this message.
-        TaskDispatchCommand requestCommand = new TaskDispatchCommand(taskExecutionContext,
+        TaskDispatchMessage requestCommand = new TaskDispatchMessage(taskExecutionContext,
                 masterConfig.getMasterAddress(),
                 taskExecutionContext.getHost(),
                 System.currentTimeMillis());
@@ -309,7 +327,7 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
             TaskInstance cacheTaskInstance = taskInstanceDao.findTaskInstanceByCacheKey(cacheKey);
             // if we can find the cache task instance, we will add cache event, and return true.
             if (cacheTaskInstance != null) {
-                logger.info("Task {} is cache, no need to dispatch, task instance id: {}",
+                log.info("Task {} is cache, no need to dispatch, task instance id: {}",
                         taskInstance.getName(), taskInstance.getId());
                 addCacheEvent(taskInstance, cacheTaskInstance);
                 taskInstance.setCacheKey(TaskCacheUtils.generateTagCacheKey(cacheTaskInstance.getId(), cacheKey));
@@ -319,7 +337,7 @@ public class TaskPriorityQueueConsumer extends BaseDaemonThread {
                 taskInstance.setCacheKey(TaskCacheUtils.generateTagCacheKey(taskInstance.getId(), cacheKey));
             }
         } catch (Exception e) {
-            logger.error("checkIsCacheExecution error", e);
+            log.error("checkIsCacheExecution error", e);
         }
         return false;
     }

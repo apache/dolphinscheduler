@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.api.aspect;
 
 import org.apache.dolphinscheduler.common.enums.CacheType;
-import org.apache.dolphinscheduler.remote.command.CacheExpireCommand;
+import org.apache.dolphinscheduler.remote.command.cache.CacheExpireRequest;
 import org.apache.dolphinscheduler.service.cache.CacheNotifyService;
 import org.apache.dolphinscheduler.service.cache.impl.CacheKeyGenerator;
 
@@ -28,13 +28,13 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -48,9 +48,8 @@ import org.springframework.stereotype.Component;
  */
 @Aspect
 @Component
+@Slf4j
 public class CacheEvictAspect {
-
-    private static final Logger logger = LoggerFactory.getLogger(CacheEvictAspect.class);
 
     /**
      * symbol of spring el
@@ -97,7 +96,7 @@ public class CacheEvictAspect {
                 }
             }
             if (StringUtils.isNotEmpty(cacheKey)) {
-                cacheNotifyService.notifyMaster(new CacheExpireCommand(cacheType, cacheKey).convert2Command());
+                cacheNotifyService.notifyMaster(new CacheExpireRequest(cacheType, cacheKey).convert2Command());
             }
         }
 

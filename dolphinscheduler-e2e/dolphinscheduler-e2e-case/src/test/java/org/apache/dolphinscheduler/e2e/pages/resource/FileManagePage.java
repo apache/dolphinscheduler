@@ -51,7 +51,7 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
     @FindBy(className = "btn-create-file")
     private WebElement buttonCreateFile;
 
-    @FindBy(className = "btn-upload-file")
+    @FindBy(className = "btn-upload-resource")
     private WebElement buttonUploadFile;
 
     private final CreateDirectoryBox createDirectoryBox;

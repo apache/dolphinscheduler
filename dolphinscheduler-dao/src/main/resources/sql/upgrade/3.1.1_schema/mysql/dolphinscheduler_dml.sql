@@ -15,4 +15,4 @@
  * limitations under the License.
 */
 
-UPDATE qrtz_job_details SET job_class_name = 'org.apache.dolphinscheduler.scheduler.quartz.ProcessScheduleTask' WHERE job_class_name = 'org.apache.dolphinscheduler.service.quartz.ProcessScheduleJob';
+UPDATE QRTZ_JOB_DETAILS SET job_class_name = 'org.apache.dolphinscheduler.scheduler.quartz.ProcessScheduleTask' WHERE job_class_name = 'org.apache.dolphinscheduler.service.quartz.ProcessScheduleJob';

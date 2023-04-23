@@ -36,16 +36,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * base service impl
  */
+@Slf4j
 public class BaseServiceImpl implements BaseService {
-
-    private static final Logger logger = LoggerFactory.getLogger(BaseServiceImpl.class);
 
     @Autowired
     protected ResourcePermissionCheckService resourcePermissionCheckService;
@@ -56,7 +56,7 @@ public class BaseServiceImpl implements BaseService {
         try {
             resourcePermissionCheckService.postHandle(authorizationType, userId, ids, logger);
         } catch (Exception e) {
-            logger.error("Post handle error, userId:{}.", userId, e);
+            log.error("Post handle error, userId:{}.", userId, e);
             throw new RuntimeException("Resource association user error", e);
         }
     }
@@ -176,8 +176,12 @@ public class BaseServiceImpl implements BaseService {
      * @return boolean
      */
     @Override
-    public boolean canOperatorPermissions(User user, Object[] ids,AuthorizationType type,String permissionKey) {
-        return resourcePermissionCheckService.operationPermissionCheck(type, type.equals(AuthorizationType.PROJECTS) ? ids : null, user.getId(), permissionKey, logger) && resourcePermissionCheckService.resourcePermissionCheck(type, ids, user.getUserType().equals(UserType.ADMIN_USER) ? 0 : user.getId(), logger);
+    public boolean canOperatorPermissions(User user, Object[] ids, AuthorizationType type, String permissionKey) {
+        boolean operationPermissionCheck =
+                resourcePermissionCheckService.operationPermissionCheck(type, user.getId(), permissionKey, log);
+        boolean resourcePermissionCheck = resourcePermissionCheckService.resourcePermissionCheck(type, ids,
+                user.getUserType().equals(UserType.ADMIN_USER) ? 0 : user.getId(), log);
+        return operationPermissionCheck && resourcePermissionCheck;
     }
 
     /**
@@ -189,7 +193,7 @@ public class BaseServiceImpl implements BaseService {
         if (!StringUtils.isEmpty(startDateStr)) {
             start = DateUtils.stringToDate(startDateStr);
             if (Objects.isNull(start)) {
-                logger.warn("Parameter startDateStr is invalid.");
+                log.warn("Parameter startDateStr is invalid.");
                 throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
             }
         }

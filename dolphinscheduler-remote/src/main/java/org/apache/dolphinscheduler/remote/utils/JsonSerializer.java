@@ -17,22 +17,44 @@
 
 package org.apache.dolphinscheduler.remote.utils;
 
+import static com.fasterxml.jackson.databind.DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT;
+import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
+import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
+import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
+import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYY_MM_DD_HH_MM_SS;
+
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.util.TimeZone;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 
 /**
  * json serialize or deserialize
  */
+@Slf4j
 public class JsonSerializer {
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
-    private static final Logger logger = LoggerFactory.getLogger(JsonSerializer.class);
+    private static final ObjectMapper objectMapper = JsonMapper.builder()
+            .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
+            .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
+            .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
+            .addModule(new SimpleModule()
+                    .addSerializer(LocalDateTime.class, new JSONUtils.LocalDateTimeSerializer())
+                    .addDeserializer(LocalDateTime.class, new JSONUtils.LocalDateTimeDeserializer()))
+            .defaultTimeZone(TimeZone.getDefault())
+            .defaultDateFormat(new SimpleDateFormat(YYYY_MM_DD_HH_MM_SS))
+            .build();
 
     private JsonSerializer() {
 
@@ -50,7 +72,7 @@ public class JsonSerializer {
         try {
             json = objectMapper.writeValueAsString(obj);
         } catch (JsonProcessingException e) {
-            logger.error("serializeToString exception!", e);
+            log.error("serializeToString exception!", e);
         }
 
         return json.getBytes(Constants.UTF8);
@@ -68,7 +90,7 @@ public class JsonSerializer {
         try {
             json = objectMapper.writeValueAsString(obj);
         } catch (JsonProcessingException e) {
-            logger.error("serializeToString exception!", e);
+            log.error("serializeToString exception!", e);
         }
 
         return json;
@@ -88,7 +110,7 @@ public class JsonSerializer {
         try {
             return objectMapper.readValue(json, clazz);
         } catch (IOException e) {
-            logger.error("deserialize exception!", e);
+            log.error("deserialize exception!", e);
             return null;
         }
 

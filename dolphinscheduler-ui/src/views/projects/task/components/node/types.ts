@@ -45,6 +45,10 @@ interface IOption {
   value: string | number
 }
 
+interface IRenderOption extends IOption {
+  filterLabel: string
+}
+
 interface ITaskPriorityOption extends SelectOption {
   icon: VNode
   color: string
@@ -316,6 +320,10 @@ interface ITaskParams {
   zeppelinParagraphId?: string
   zeppelinRestEndpoint?: string
   restEndpoint?: string
+  zeppelinUsername?: string
+  username?: string
+  zeppelinPassword?: string
+  password?: string
   zeppelinProductionNoteDirectory?: string
   productionNoteDirectory?: string
   hiveCliOptions?: string
@@ -405,6 +413,9 @@ interface ITaskParams {
   cloudWatchLogGroupArn?: string
   yamlContent?: string
   paramScript?: ILocalParam[]
+  factoryName?: string
+  resourceGroupName?: string
+  pipelineName?: string
 }
 
 interface INodeData
@@ -485,6 +496,7 @@ export {
   INodeData,
   ITaskParams,
   IOption,
+  IRenderOption,
   IDataBase,
   ModelType,
   SourceType,

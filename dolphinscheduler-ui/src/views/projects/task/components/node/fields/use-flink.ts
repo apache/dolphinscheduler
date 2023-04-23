@@ -53,6 +53,10 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
         {
           label: 'local',
           value: 'local'
+        },
+        {
+          label: 'standalone',
+          value: 'standalone'
         }
       ]
     }
@@ -98,7 +102,7 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
   )
 
   watchEffect(() => {
-    model.flinkVersion = model.programType === 'SQL' ? '>=1.13' : '<1.10'
+    model.flinkVersion = model.programType === 'SQL' ? '>=1.13' : model.flinkVersion
   })
 
   return [
@@ -161,6 +165,9 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
       field: 'rawScript',
       span: scriptSpan,
       name: t('project.node.script'),
+      props: {
+        language: 'sql'
+      },
       validate: {
         trigger: ['input', 'trigger'],
         required: true,

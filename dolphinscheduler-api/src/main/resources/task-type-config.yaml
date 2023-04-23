@@ -29,10 +29,12 @@ task:
     - 'DINKY'
     - 'FLINK_STREAM'
     - 'HIVECLI'
+    - 'REMOTESHELL'
   cloud:
     - 'EMR'
     - 'K8S'
     - 'DMS'
+    - 'DATA_FACTORY'
   logic:
     - 'SUB_PROCESS'
     - 'DEPENDENT'

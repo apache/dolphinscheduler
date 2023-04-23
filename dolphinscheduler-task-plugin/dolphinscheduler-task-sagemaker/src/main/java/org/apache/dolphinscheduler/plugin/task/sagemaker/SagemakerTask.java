@@ -85,7 +85,7 @@ public class SagemakerTask extends AbstractRemoteTask {
 
         parameters = JSONUtils.parseObject(taskRequest.getTaskParams(), SagemakerParameters.class);
 
-        logger.info("Initialize Sagemaker task params {}", JSONUtils.toPrettyJsonString(parameters));
+        log.info("Initialize Sagemaker task params {}", JSONUtils.toPrettyJsonString(parameters));
         if (parameters == null) {
             throw new SagemakerTaskException("Sagemaker task params is empty");
         }
@@ -152,11 +152,11 @@ public class SagemakerTask extends AbstractRemoteTask {
         try {
             startPipelineRequest = objectMapper.readValue(requestJson, StartPipelineExecutionRequest.class);
         } catch (Exception e) {
-            logger.error("can not parse SagemakerRequestJson from json: {}", requestJson);
+            log.error("can not parse SagemakerRequestJson from json: {}", requestJson);
             throw new SagemakerTaskException("can not parse SagemakerRequestJson ", e);
         }
 
-        logger.info("Sagemaker task create StartPipelineRequest: {}", startPipelineRequest);
+        log.info("Sagemaker task create StartPipelineRequest: {}", startPipelineRequest);
         return startPipelineRequest;
     }
 

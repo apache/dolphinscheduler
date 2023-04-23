@@ -104,4 +104,12 @@ public interface ScheduleMapper extends BaseMapper<Schedule> {
      * @return schedule
      */
     List<Schedule> querySchedulesByProcessDefinitionCodes(@Param("processDefinitionCodeList") List<Long> processDefinitionCodeList);
+
+    /**
+     * query schedule by tenant
+     *
+     * @param tenantCode tenantCode
+     * @return schedule list
+     */
+    List<Schedule> queryScheduleListByTenant(@Param("tenantCode") String tenantCode);
 }

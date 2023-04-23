@@ -148,7 +148,7 @@ public class DataxUtils {
             case ORACLE:
                 return String.format("\"%s\"", column);
             case SQLSERVER:
-                return String.format("`%s`", column);
+                return String.format("\"%s\"", column);
             case CLICKHOUSE:
                 return String.format("`%s`", column);
             default:
