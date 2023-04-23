@@ -46,6 +46,7 @@ public enum DbType {
     DAMENG(15, "dameng"),
     OCEANBASE(16, "oceanbase"),
     SSH(17, "ssh"),
+    KYUUBI(18, "kyuubi"),
     SNOWFLAKE(19, "snowflake");
 
     private static final Map<Integer, DbType> DB_TYPE_MAP =

@@ -45,7 +45,6 @@ import org.apache.dolphinscheduler.dao.entity.DqRuleExecuteSql;
 import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
@@ -607,9 +606,8 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
         if (baseParam != null) {
             List<ResourceInfo> projectResourceFiles = baseParam.getResourceFilesList();
             if (CollectionUtils.isNotEmpty(projectResourceFiles)) {
-                // TODO: Modify this part to accomodate(migrate) oldversionresources in the future.
                 projectResourceFiles.forEach(file -> resourcesMap.put(file.getResourceName(),
-                        processService.queryTenantCodeByResName(file.getResourceName(), ResourceType.FILE)));
+                        storageOperate.getResourceFileName(file.getResourceName())));
             }
         }
 
@@ -655,7 +653,6 @@ public abstract class BaseTaskProcessor implements ITaskProcessor {
 
     private String getTenantCode() {
         int userId = taskInstance.getProcessDefine() == null ? 0 : taskInstance.getProcessDefine().getUserId();
-        Tenant tenant = processService.getTenantForProcess(taskInstance.getProcessInstance().getTenantId(), userId);
-        return tenant == null ? null : tenant.getTenantCode();
+        return processService.getTenantForProcess(taskInstance.getProcessInstance().getTenantCode(), userId);
     }
 }

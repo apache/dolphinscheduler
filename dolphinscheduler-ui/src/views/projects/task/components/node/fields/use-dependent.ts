@@ -36,6 +36,7 @@ import type {
   ITaskState,
   IDateType
 } from '../types'
+import {IRenderOption} from "../types";
 
 export function useDependent(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
@@ -44,12 +45,12 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
 
   const dependentResult = nodeStore.getDependentResult
   const TasksStateConfig = tasksState(t)
-  const projectList = ref([] as { label: string; value: number }[])
+  const projectList = ref([] as IRenderOption[])
   const processCache = {} as {
-    [key: number]: { label: string; value: number }[]
+    [key: number]: IRenderOption[]
   }
   const taskCache = {} as {
-    [key: number]: { label: string; value: number }[]
+    [key: number]: IRenderOption[]
   }
   const selectOptions = ref([] as IDependTaskOptions[])
 
@@ -182,7 +183,8 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
     const result = await queryAllProjectListForDependent()
     projectList.value = result.map((item: { code: number; name: string }) => ({
       value: item.code,
-      label: () => h(NEllipsis, null, item.name)
+      label: () => h(NEllipsis, null, item.name),
+      filterLabel: item.name
     }))
     return projectList
   }
@@ -193,7 +195,8 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
     const result = await queryProcessDefinitionList(code)
     const processList = result.map((item: { code: number; name: string }) => ({
       value: item.code,
-      label: () => h(NEllipsis, null, item.name)
+      label: () => h(NEllipsis, null, item.name),
+      filterLabel: item.name
     }))
     processCache[code] = processList
 
@@ -207,7 +210,8 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
     const result = await getTasksByDefinitionList(code, processCode)
     const taskList = result.map((item: { code: number; name: string }) => ({
       value: item.code,
-      label: () => h(NEllipsis, null, item.name)
+      label: () => h(NEllipsis, null, item.name),
+      filterLabel: item.name
     }))
     taskList.unshift({
       value: 0,
@@ -283,6 +287,11 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
             span: 24,
             props: {
               filterable: true,
+              filter: (query: string, option: IRenderOption) => {
+                return option.filterLabel
+                  .toLowerCase()
+                  .includes(query.toLowerCase())
+              },
               onUpdateValue: async (projectCode: number) => {
                 const item = model.dependTaskList[i].dependItemList[j]
                 const options = selectOptions?.value[i] || {}
@@ -315,6 +324,11 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
             name: t('project.node.process_name'),
             props: {
               filterable: true,
+              filter: (query: string, option: IRenderOption) => {
+                return option.filterLabel
+                  .toLowerCase()
+                  .includes(query.toLowerCase())
+              },
               onUpdateValue: async (processCode: number) => {
                 const item = model.dependTaskList[i].dependItemList[j]
                 selectOptions.value[i].dependItemList[j].depTaskCodeOptions = await getTaskList(
@@ -343,7 +357,12 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
             span: 24,
             name: t('project.node.task_name'),
             props: {
-              filterable: true
+              filterable: true,
+              filter: (query: string, option: IRenderOption) => {
+                return option.filterLabel
+                  .toLowerCase()
+                  .includes(query.toLowerCase())
+              }
             },
             options:
               selectOptions.value[i]?.dependItemList[j]?.depTaskCodeOptions ||

@@ -113,6 +113,7 @@ export interface WorkflowInstance {
   failureStrategy: string
   processInstancePriority: string
   workerGroup: string
+  tenantCode: string
   warningType: string
   warningGroupId: number
 }
@@ -142,7 +143,6 @@ export interface GlobalParam {
 export interface SaveForm {
   name: string
   description: string
-  tenantCode: string
   executionType: string
   timeoutFlag: boolean
   timeout: number
@@ -163,6 +163,7 @@ export interface IStartupParam {
   failureStrategy: string
   processInstancePriority: string
   workerGroup: string
+  tenantCode: string
   warningType: string
   warningGroupId: number
 }

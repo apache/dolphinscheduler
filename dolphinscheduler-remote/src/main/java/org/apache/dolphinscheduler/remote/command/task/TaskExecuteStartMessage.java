@@ -54,7 +54,7 @@ public class TaskExecuteStartMessage extends BaseMessage {
 
     private Map<String, String> startParams;
 
-    private int tenantId;
+    private String tenantCode;
 
     private int dryRun;
 
