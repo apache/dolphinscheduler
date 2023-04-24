@@ -52,7 +52,7 @@ $ docker-compose --profile all up -d
 
 > 提醒：安装完成 docker-compose 后需要修改部分配置以便能更好体验 DolphinScheduler 服务，我们推荐配置不少于 4GB 的空闲内存，详见
 > [How to assign more memory to docker container](https://stackoverflow.com/a/44533437/7152658).
-> 
+>
 > 通过 docker-compose 启动服务时，除了会启动 DolphinScheduler 对应的服务外，还会启动必要依赖服务，如数据库 PostgreSQL 和 服务发现 ZooKeeper
 
 ### 沿用已有的 PostgreSQL 和 ZooKeeper 服务
