@@ -29,6 +29,7 @@ public class DataSourceConstants {
     public static final String COM_MYSQL_JDBC_DRIVER = "com.mysql.jdbc.Driver";
     public static final String ORG_APACHE_HIVE_JDBC_HIVE_DRIVER = "org.apache.hive.jdbc.HiveDriver";
     public static final String COM_CLICKHOUSE_JDBC_DRIVER = "com.clickhouse.jdbc.ClickHouseDriver";
+    public static final String COM_DATABEND_JDBC_DRIVER = "com.databend.jdbc.DatabendDriver";
     public static final String COM_ORACLE_JDBC_DRIVER = "oracle.jdbc.OracleDriver";
     public static final String COM_SQLSERVER_JDBC_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
     public static final String COM_DB2_JDBC_DRIVER = "com.ibm.db2.jcc.DB2Driver";
@@ -47,6 +48,7 @@ public class DataSourceConstants {
     public static final String MYSQL_VALIDATION_QUERY = "select 1";
     public static final String HIVE_VALIDATION_QUERY = "select 1";
     public static final String CLICKHOUSE_VALIDATION_QUERY = "select 1";
+    public static final String DATABEND_VALIDATION_QUERY = "select 1";
     public static final String ORACLE_VALIDATION_QUERY = "select 1 from dual";
     public static final String SQLSERVER_VALIDATION_QUERY = "select 1";
     public static final String DB2_VALIDATION_QUERY = "select 1 from sysibm.sysdummy1";
@@ -66,6 +68,7 @@ public class DataSourceConstants {
     public static final String JDBC_HIVE_2 = "jdbc:hive2://";
     public static final String JDBC_KYUUBI = "jdbc:kyuubi://";
     public static final String JDBC_CLICKHOUSE = "jdbc:clickhouse://";
+    public static final String JDBC_DATABEND = "jdbc:databend://";
     public static final String JDBC_ORACLE_SID = "jdbc:oracle:thin:@";
     public static final String JDBC_ORACLE_SERVICE_NAME = "jdbc:oracle:thin:@//";
     public static final String JDBC_SQLSERVER = "jdbc:sqlserver://";
