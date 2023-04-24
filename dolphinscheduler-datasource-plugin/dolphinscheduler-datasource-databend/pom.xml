@@ -43,7 +43,6 @@
         <dependency>
             <groupId>com.databend</groupId>
             <artifactId>databend-jdbc</artifactId>
-            <version>0.0.7</version>
             <exclusions>
                 <exclusion>
                     <groupId>javax.xml.bind</groupId>

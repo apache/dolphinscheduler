@@ -17,3 +17,6 @@
 | jdbc 连接参数 | DATABEND 连接的参数设置，以 JSON 格式表示。 |
 
 ``jdbc`` 连接参数可参考 [databend-jdbc](https://github.com/databendcloud/databend-jdbc)
+
+## 是否原生支持
+是，数据源不需要任务附加操作即可使用。
