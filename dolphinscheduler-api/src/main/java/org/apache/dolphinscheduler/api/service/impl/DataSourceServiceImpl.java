@@ -678,6 +678,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
                 schemaPattern = "dbo";
                 break;
             case CLICKHOUSE:
+            case DATABEND:
             case PRESTO:
                 if (!StringUtils.isEmpty(schema)) {
                     schemaPattern = schema;

@@ -331,6 +331,10 @@ export default {
                                 title: 'SSH',
                                 link: '/en-us/docs/dev/user_doc/guide/datasource/ssh.html',
                             },
+                            {
+                                title: 'Databend',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/databend.html',
+                            },
                         ],
                     },
                     {
@@ -1011,6 +1015,10 @@ export default {
                             {
                                 title: 'SSH',
                                 link: '/zh-cn/docs/dev/user_doc/guide/datasource/ssh.html',
+                            },
+                            {
+                                title: 'Databend',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/databend.html',
                             },
                         ],
                     },

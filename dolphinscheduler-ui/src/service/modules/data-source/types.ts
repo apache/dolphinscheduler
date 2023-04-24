@@ -33,6 +33,7 @@ type IDataBase =
   | 'DAMENG'
   | 'OCEANBASE'
   | 'SSH'
+  | 'DATABEND'
 
 type IDataBaseLabel =
 | 'MYSQL'
