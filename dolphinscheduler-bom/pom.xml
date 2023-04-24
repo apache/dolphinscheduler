@@ -109,6 +109,7 @@
         <google-cloud-storage.version>2.18.0</google-cloud-storage.version>
         <sshd.version>2.8.0</sshd.version>
         <fabric8.client.version>6.0.0</fabric8.client.version>
+        <scala.version>2.12</scala.version>
     </properties>
 
     <dependencyManagement>
@@ -735,12 +736,12 @@
 
             <dependency>
                 <groupId>org.apache.spark</groupId>
-                <artifactId>spark-core_2.12</artifactId>
+                <artifactId>spark-core_${scala.version}</artifactId>
                 <version>${spark.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>com.fasterxml.jackson.module</groupId>
-                        <artifactId>jackson-module-scala_2.11</artifactId>
+                        <artifactId>jackson-module-scala_${scala.version}</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -758,7 +759,7 @@
 
             <dependency>
                 <groupId>org.apache.spark</groupId>
-                <artifactId>spark-sql_2.12</artifactId>
+                <artifactId>spark-sql_${scala.version}</artifactId>
                 <version>${spark.version}</version>
                 <exclusions>
                     <exclusion>
@@ -770,7 +771,7 @@
 
             <dependency>
                 <groupId>org.apache.spark</groupId>
-                <artifactId>spark-hive_2.12</artifactId>
+                <artifactId>spark-hive_${scala.version}</artifactId>
                 <version>${spark.version}</version>
                 <exclusions>
                     <exclusion>
