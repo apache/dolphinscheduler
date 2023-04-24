@@ -55,6 +55,6 @@ eg：master.host.selector=random（不区分大小写）
 
 你可以在 worker.properties 修改下面的属性来自定义配置
 
-* worker.max.cpuload.avg=-1 (worker最大cpuload均值，只有高于系统cpuload均值时，worker服务才能被派发任务. 默认值为-1: cpu cores * 2)
-* worker.reserved.memory=0.3 (worker预留内存，只有低于系统可用内存时，worker服务才能被派发任务，单位为G)
+* worker.max.cpu.load.avg=-1 (worker最大cpu load均值，只有高于系统cpu load均值时，worker服务才能被派发任务. 默认值为-1: cpu cores * 2)
+* worker.reserved.memory=0.3 (worker预留内存，只有低于系统可用内存时，worker服务才能被派发任务，单位为百分比)
 
