@@ -436,6 +436,8 @@ public class SqlTask extends AbstractTaskExecutor {
         Map<Integer, Property> sqlParamsMap = new HashMap<>();
         StringBuilder sqlBuilder = new StringBuilder();
 
+        //replace variable TIME with $[YYYYmmddd...] in sql when history run job and batch complement job
+        sql = ParameterUtils.replaceScheduleTime(sql, taskExecutionContext.getScheduleTime());
         // combining local and global parameters
         Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext, getParameters());
 
@@ -452,9 +454,6 @@ public class SqlTask extends AbstractTaskExecutor {
             sqlParameters.setTitle(title);
         }
 
-        //new
-        //replace variable TIME with $[YYYYmmddd...] in sql when history run job and batch complement job
-        sql = ParameterUtils.replaceScheduleTime(sql, taskExecutionContext.getScheduleTime());
         // special characters need to be escaped, ${} needs to be escaped
         setSqlParamsMap(sql, rgex, sqlParamsMap, paramsMap,taskExecutionContext.getTaskInstanceId());
         //Replace the original value in sql ！{...} ，Does not participate in precompilation
