@@ -97,7 +97,7 @@ public class WorkerConfig implements Validator {
         logger.info("Worker config: alertListenHost -> {}", alertListenHost);
         logger.info("Worker config: alertListenPort -> {}", alertListenPort);
         logger.info("Worker config: registryDisconnectStrategy -> {}", registryDisconnectStrategy);
-        logger.info("Worker config: workerAddress -> {}", registryDisconnectStrategy);
+        logger.info("Worker config: workerAddress -> {}", workerAddress);
         logger.info("Worker config: workerRegistryPath: {}", workerRegistryPath);
         logger.info("Worker config: taskExecuteThreadsFullPolicy: {}", taskExecuteThreadsFullPolicy);
     }
