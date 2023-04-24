@@ -19,4 +19,5 @@
 ``jdbc`` 连接参数可参考 [databend-jdbc](https://github.com/databendcloud/databend-jdbc)
 
 ## 是否原生支持
+
 是，数据源不需要任务附加操作即可使用。
