@@ -91,7 +91,7 @@ public class WorkerConfig implements Validator {
         log.info("Worker config: maxCpuLoadAvg -> {}", maxCpuLoadAvg);
         log.info("Worker config: reservedMemory -> {}", reservedMemory);
         log.info("Worker config: registryDisconnectStrategy -> {}", registryDisconnectStrategy);
-        log.info("Worker config: workerAddress -> {}", registryDisconnectStrategy);
+        log.info("Worker config: workerAddress -> {}", workerAddress);
         log.info("Worker config: workerRegistryPath: {}", workerRegistryPath);
         log.info("Worker config: taskExecuteThreadsFullPolicy: {}", taskExecuteThreadsFullPolicy);
     }
