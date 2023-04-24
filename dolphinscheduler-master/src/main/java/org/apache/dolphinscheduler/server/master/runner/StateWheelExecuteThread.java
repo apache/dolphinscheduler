@@ -184,10 +184,6 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
             taskInstanceTimeoutCheckList.add(taskInstanceKey);
             log.info("Timeout flag is open, added task instance into timeout check list");
         }
-        if (taskInstance.isDependTask() || taskInstance.isSubProcess()) {
-            taskInstanceTimeoutCheckList.add(taskInstanceKey);
-            log.info("task instance is dependTask orSubProcess, added task instance into timeout check list");
-        }
     }
 
     public void removeTask4TimeoutCheck(@NonNull ProcessInstance processInstance, @NonNull TaskInstance taskInstance) {

@@ -50,6 +50,7 @@ public class ResourcePage extends NavBarPage implements NavBarPage.NavBarItem {
             new WebDriverWait(driver, 10).until(ExpectedConditions.urlContains("/resource"));
             new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(fileManageTab));
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", fileManageTab());
+            new WebDriverWait(driver, 10).until(ExpectedConditions.urlContains("/file-manage"));
             return tab.cast(new FileManagePage(driver));
         }
 
@@ -57,6 +58,7 @@ public class ResourcePage extends NavBarPage implements NavBarPage.NavBarItem {
             new WebDriverWait(driver, 10).until(ExpectedConditions.urlContains("/resource"));
             new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(udfManageTab));
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", udfManageTab());
+            new WebDriverWait(driver, 10).until(ExpectedConditions.urlContains("/resource-manage"));
             return tab.cast(new UdfManagePage(driver));
         }
 
@@ -64,6 +66,7 @@ public class ResourcePage extends NavBarPage implements NavBarPage.NavBarItem {
             new WebDriverWait(driver, 10).until(ExpectedConditions.urlContains("/resource"));
             new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(functionManageTab));
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", functionManageTab());
+            new WebDriverWait(driver, 10).until(ExpectedConditions.urlContains("/function-manage"));
             return tab.cast(new FunctionManagePage(driver));
         }
 

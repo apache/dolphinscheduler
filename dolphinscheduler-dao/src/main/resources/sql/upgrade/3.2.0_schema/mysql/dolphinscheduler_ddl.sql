@@ -398,14 +398,14 @@ END IF;
            AND TABLE_SCHEMA=(SELECT DATABASE())
            AND COLUMN_NAME ='tenant_code')
    THEN
-ALTER TABLE t_ds_task_instance ADD `tenant_code` varchar(64) DEFAULT 'default' COMMENT 'tenant code';
+ALTER TABLE t_ds_error_command ADD `tenant_code` varchar(64) DEFAULT 'default' COMMENT 'tenant code';
 END IF;
    IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
            WHERE TABLE_NAME='t_ds_schedules'
            AND TABLE_SCHEMA=(SELECT DATABASE())
            AND COLUMN_NAME ='tenant_code')
    THEN
-ALTER TABLE t_ds_task_instance ADD `tenant_code` varchar(64) DEFAULT 'default' COMMENT 'tenant code';
+ALTER TABLE t_ds_schedules ADD `tenant_code` varchar(64) DEFAULT 'default' COMMENT 'tenant code';
 END IF;
 END;
 d//
