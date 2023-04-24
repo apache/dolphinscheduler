@@ -175,7 +175,6 @@ public class ProcessInstanceController extends BaseController {
             @Parameter(name = "globalParams", description = "PROCESS_GLOBAL_PARAMS", schema = @Schema(implementation = String.class, example = "[]")),
             @Parameter(name = "locations", description = "PROCESS_INSTANCE_LOCATIONS", schema = @Schema(implementation = String.class)),
             @Parameter(name = "timeout", description = "PROCESS_TIMEOUT", schema = @Schema(implementation = int.class, example = "0")),
-            @Parameter(name = "tenantCode", description = "TENANT_CODE", schema = @Schema(implementation = String.class, example = "default"))
     })
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -190,11 +189,9 @@ public class ProcessInstanceController extends BaseController {
                                         @RequestParam(value = "syncDefine", required = true) Boolean syncDefine,
                                         @RequestParam(value = "globalParams", required = false, defaultValue = "[]") String globalParams,
                                         @RequestParam(value = "locations", required = false) String locations,
-                                        @RequestParam(value = "timeout", required = false, defaultValue = "0") int timeout,
-                                        @RequestParam(value = "tenantCode", required = true) String tenantCode) {
+                                        @RequestParam(value = "timeout", required = false, defaultValue = "0") int timeout) {
         Map<String, Object> result = processInstanceService.updateProcessInstance(loginUser, projectCode, id,
-                taskRelationJson, taskDefinitionJson, scheduleTime, syncDefine, globalParams, locations, timeout,
-                tenantCode);
+                taskRelationJson, taskDefinitionJson, scheduleTime, syncDefine, globalParams, locations, timeout);
         return returnDataList(result);
     }
 

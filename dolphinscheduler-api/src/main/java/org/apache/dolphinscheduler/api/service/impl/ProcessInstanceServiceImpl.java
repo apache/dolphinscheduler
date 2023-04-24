@@ -607,7 +607,6 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
      * @param globalParams       global params
      * @param locations          locations for nodes
      * @param timeout            timeout
-     * @param tenantCode         tenantCode
      * @return update result code
      */
     @Transactional
@@ -616,7 +615,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
                                                      String taskRelationJson,
                                                      String taskDefinitionJson, String scheduleTime, Boolean syncDefine,
                                                      String globalParams,
-                                                     String locations, int timeout, String tenantCode) {
+                                                     String locations, int timeout) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
         Map<String, Object> result =
@@ -655,7 +654,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             timezoneId = commandParamMap.get(Constants.SCHEDULE_TIMEZONE);
         }
 
-        setProcessInstance(processInstance, tenantCode, scheduleTime, globalParams, timeout, timezoneId);
+        setProcessInstance(processInstance, scheduleTime, globalParams, timeout, timezoneId);
         List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
         if (taskDefinitionLogs.isEmpty()) {
             log.warn("Parameter taskDefinitionJson is empty");
@@ -736,7 +735,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
     /**
      * update process instance attributes
      */
-    private void setProcessInstance(ProcessInstance processInstance, String tenantCode, String scheduleTime,
+    private void setProcessInstance(ProcessInstance processInstance, String scheduleTime,
                                     String globalParams, int timeout, String timezone) {
         Date schedule = processInstance.getScheduleTime();
         if (scheduleTime != null) {
@@ -749,7 +748,6 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         globalParams = curingGlobalParamsService.curingGlobalParams(processInstance.getId(), globalParamMap,
                 globalParamList, processInstance.getCmdTypeIfComplement(), schedule, timezone);
         processInstance.setTimeout(timeout);
-        processInstance.setTenantCode(tenantCode);
         processInstance.setGlobalParams(globalParams);
     }
 
