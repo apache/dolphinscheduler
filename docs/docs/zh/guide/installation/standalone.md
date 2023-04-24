@@ -30,7 +30,7 @@ bash ./bin/dolphinscheduler-daemon.sh start standalone-server
 
 浏览器访问地址 http://localhost:12345/dolphinscheduler/ui 即可登录系统 UI。默认的用户名和密码是 **admin/dolphinscheduler123**
 
-![登录页面](../assets/imgs/zh/guide/installation/standalone-login.png)
+![登录页面](../../../../img/new_ui/dev/quick-start/login.png)
 
 ## 启停服务
 
