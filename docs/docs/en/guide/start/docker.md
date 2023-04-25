@@ -1,15 +1,15 @@
 # Docker Quick Start
 
-There are three ways to start DolphinScheduler with Docker, [Standalone-server](#using-standalone-server-docker-image) is the way you
-find if you just want to start and try DolphinScheduler as a beginner. [docker-compose](#using-docker-compose-to-start-server) is for
-some who want to deploy DolphinScheduler in small or event middle scale workflows in their daily work.
-[Using exists postgresql and zookeeper server](#using-exists-postgresql-zookeeper) is for users who want to reuse the database
-or zookeeper server already exists.
+There are three ways to start DolphinScheduler with Docker
+
+- [Standalone-server](#using-standalone-server-docker-image) is the way you find if you just want to start and try DolphinScheduler as a beginner.
+- [docker-compose](#using-docker-compose-to-start-server) is for some who want to deploy DolphinScheduler in small or event middle scale workflows in their daily work.
+- [Using exists postgresql and zookeeper server](#using-exists-postgresql-zookeeper) is for users who want to reuse the database or zookeeper server already exists.
 
 ## Prepare
 
-- [Docker](https://docs.docker.com/engine/install/) 1.13.1+
-- [Docker Compose](https://docs.docker.com/compose/) 1.28.0+
+Need to install [Docker](https://docs.docker.com/engine/install/) 1.13.1+ and [Docker Compose](https://docs.docker.com/compose/) 1.28.0+
+before starting DolphinScheduler with Docker
 
 ## Start Server
 
@@ -37,15 +37,7 @@ be stored on disks after you change docker-compose configuration, and it is robu
 DolphinScheduler in a long term. You have to install [docker-compose](https://docs.docker.com/compose/install/) before you
 start servers.
 
-After installed docker-compose, it is recommended to modify some configurations for better experience. We highly recommended
-modify docker-compose's free memory up to 4 GB.
-
-- Mac：Click `Docker Desktop -> Preferences -> Resources -> Memory` modified it
-- Windows Docker Desktop：
-  - Hyper-V mode: Click `Docker Desktop -> Settings -> Resources -> Memory` modified it
-  - WSL 2 mode: see [WSL 2 utility VM](https://docs.microsoft.com/zh-cn/windows/wsl/wsl-config#configure-global-options-with-wslconfig) for more detail.
-
-After complete the configuration, we can get the `docker-compose.yaml` file from [download page](https://dolphinscheduler.apache.org/en-us/download)
+After complete the installation, get the `docker-compose.yaml` file from [download page](https://dolphinscheduler.apache.org/en-us/download/<version>)
 form its source package, and make sure you get the right version. After download the package, you can run the commands as below.
 
 ```shell
@@ -63,7 +55,11 @@ $ docker-compose --profile schema up -d
 $ docker-compose --profile all up -d
 ```
 
-> NOTES: It will not only start DolphinScheduler servers but also some others necessary services like PostgreSQL(with `root`
+> NOTES: After installed docker-compose, it is recommended to modify some configurations for better experience. We highly
+> recommended modify docker daemon memory up to 4 GB, see [How to assign more memory to docker container](https://stackoverflow.com/a/44533437/7152658)
+> for more detail.
+>
+> It will not only start DolphinScheduler servers but also some others necessary services like PostgreSQL(with `root`
 > as user, `root` as password and `dolphinscheduler` as database) and ZooKeeper when starting with docker-compose.
 
 ### Using Exists PostgreSQL ZooKeeper
