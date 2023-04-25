@@ -32,10 +32,12 @@ public class MasterConnectionStateListener implements ConnectionListener {
 
     private final String masterNodePath;
     private final RegistryClient registryClient;
+    private final MasterHeartBeatTask masterHeartBeatTask;
 
-    public MasterConnectionStateListener(String masterNodePath, RegistryClient registryClient) {
+    public MasterConnectionStateListener(String masterNodePath, RegistryClient registryClient, MasterHeartBeatTask masterHeartBeatTask) {
         this.masterNodePath = checkNotNull(masterNodePath);
         this.registryClient = checkNotNull(registryClient);
+        this.masterHeartBeatTask = checkNotNull(masterHeartBeatTask);
     }
 
     @Override
@@ -50,7 +52,7 @@ public class MasterConnectionStateListener implements ConnectionListener {
             case RECONNECTED:
                 logger.debug("registry connection state is {}, clean the node info", state);
                 registryClient.remove(masterNodePath);
-                registryClient.persistEphemeral(masterNodePath, "");
+                registryClient.persistEphemeral(masterNodePath, masterHeartBeatTask.getHeartBeatInfo());
                 break;
             case DISCONNECTED:
                 logger.warn("registry connection state is {}, ready to stop myself", state);

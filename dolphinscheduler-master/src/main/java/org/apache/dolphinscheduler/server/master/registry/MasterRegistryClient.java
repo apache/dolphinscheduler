@@ -80,6 +80,11 @@ public class MasterRegistryClient implements AutoCloseable {
     private ScheduledExecutorService heartBeatExecutor;
 
     /**
+     * master heartbeat task
+     */
+    private MasterHeartBeatTask masterHeartBeatTask;
+
+    /**
      * master startup time, ms
      */
     private long startupTime;
@@ -96,7 +101,7 @@ public class MasterRegistryClient implements AutoCloseable {
             // master registry
             registry();
             registryClient.addConnectionStateListener(new MasterConnectionStateListener(getCurrentNodePath(),
-                registryClient));
+                registryClient, masterHeartBeatTask));
             registryClient.subscribe(REGISTRY_DOLPHINSCHEDULER_NODE, new MasterRegistryDataListener());
         } catch (Exception e) {
             throw new RegistryException("Master registry client start up error", e);
@@ -189,7 +194,7 @@ public class MasterRegistryClient implements AutoCloseable {
         logger.info("Master node : {} registering to registry center", masterAddress);
         String localNodePath = getCurrentNodePath();
         Duration masterHeartbeatInterval = masterConfig.getHeartbeatInterval();
-        MasterHeartBeatTask heartBeatTask = new MasterHeartBeatTask(startupTime,
+        masterHeartBeatTask = new MasterHeartBeatTask(startupTime,
             masterConfig.getMaxCpuLoadAvg(),
             masterConfig.getReservedMemory(),
             Sets.newHashSet(localNodePath),
@@ -197,7 +202,7 @@ public class MasterRegistryClient implements AutoCloseable {
 
         // remove before persist
         registryClient.remove(localNodePath);
-        registryClient.persistEphemeral(localNodePath, heartBeatTask.getHeartBeatInfo());
+        registryClient.persistEphemeral(localNodePath, masterHeartBeatTask.getHeartBeatInfo());
 
         while (!registryClient.checkNodeExists(NetUtils.getHost(), NodeType.MASTER)) {
             logger.warn("The current master server node:{} cannot find in registry", NetUtils.getHost());
@@ -210,7 +215,7 @@ public class MasterRegistryClient implements AutoCloseable {
         // delete dead server
         registryClient.handleDeadServer(Collections.singleton(localNodePath), NodeType.MASTER, Constants.DELETE_OP);
 
-        this.heartBeatExecutor.scheduleAtFixedRate(heartBeatTask, 0L, masterHeartbeatInterval.getSeconds(), TimeUnit.SECONDS);
+        this.heartBeatExecutor.scheduleAtFixedRate(masterHeartBeatTask, 0L, masterHeartbeatInterval.getSeconds(), TimeUnit.SECONDS);
         logger.info("Master node : {} registered to registry center successfully with heartBeatInterval : {}s", masterAddress, masterHeartbeatInterval);
 
     }
