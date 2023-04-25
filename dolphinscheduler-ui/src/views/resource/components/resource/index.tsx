@@ -107,11 +107,11 @@ export default defineComponent({
     }
 
     onMounted(() => {
+      createColumns(variables)
       fileStore.setCurrentDir(variables.fullName)
       breadListRef.value = fileStore.getCurrentDir.replace(/\/+$/g, '')
         .split('/').slice(2) as Array<string>
       requestData()
-
     })
 
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
@@ -134,10 +134,6 @@ export default defineComponent({
       }
     }
 
-    onMounted(() => {
-      createColumns(variables)
-      requestData()
-    })
     watch(useI18n().locale, () => {
       createColumns(variables)
     })
