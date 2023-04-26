@@ -92,7 +92,6 @@ public class WorkerGroupAPITest {
     public void testQueryAllWorkerGroupsPaging() {
         HttpResponse queryAllWorkerGroupsPagingResponse = workerGroupPage.queryAllWorkerGroupsPaging(loginUser, 1, 2, null);
         Assertions.assertTrue(queryAllWorkerGroupsPagingResponse.getBody().getSuccess());
-        log.info("[debug111] " + queryAllWorkerGroupsPagingResponse);
         String workerGroupPageInfoData =  queryAllWorkerGroupsPagingResponse.getBody().getData().toString();
         Assertions.assertTrue(workerGroupPageInfoData.contains("test_worker_group"));
     }
@@ -120,7 +119,6 @@ public class WorkerGroupAPITest {
     public void testDeleteWorkerGroupById() {
         HttpResponse queryAllWorkerGroupsResponse = workerGroupPage.queryAllWorkerGroups(loginUser);
         String workerGroupsBeforeDelete = queryAllWorkerGroupsResponse.getBody().getData().toString();
-        log.info("[debug111] " + workerGroupsBeforeDelete);
         Assertions.assertTrue(queryAllWorkerGroupsResponse.getBody().getSuccess());
         Assertions.assertTrue(workerGroupsBeforeDelete.contains("test_worker_group"));
 
