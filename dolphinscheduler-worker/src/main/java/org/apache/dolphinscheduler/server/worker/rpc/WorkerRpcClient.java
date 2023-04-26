@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Message;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
-import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
+import org.apache.dolphinscheduler.remote.processor.WorkerRpcProcessor;
 import org.apache.dolphinscheduler.remote.utils.Host;
 
 import java.util.List;
@@ -41,7 +41,7 @@ public class WorkerRpcClient implements AutoCloseable {
 
     @Autowired
     @Lazy
-    private List<NettyRequestProcessor> nettyRequestProcessors;
+    private List<WorkerRpcProcessor> workerRpcProcessors;
 
     private NettyRemotingClient nettyRemotingClient;
 
@@ -50,8 +50,8 @@ public class WorkerRpcClient implements AutoCloseable {
         NettyClientConfig nettyClientConfig = new NettyClientConfig();
         this.nettyRemotingClient = new NettyRemotingClient(nettyClientConfig);
         // we only use the client to handle the ack message, we can optimize this, send ack to the nettyServer.
-        for (NettyRequestProcessor nettyRequestProcessor : nettyRequestProcessors) {
-            this.nettyRemotingClient.registerProcessor(nettyRequestProcessor);
+        for (WorkerRpcProcessor workerRpcProcessor : workerRpcProcessors) {
+            this.nettyRemotingClient.registerProcessor(workerRpcProcessor);
 
         }
         log.info("Worker rpc client started");

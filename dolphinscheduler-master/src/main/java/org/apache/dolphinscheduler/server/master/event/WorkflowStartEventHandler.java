@@ -47,9 +47,6 @@ public class WorkflowStartEventHandler implements WorkflowEventHandler {
     @Autowired
     private WorkflowExecuteThreadPool workflowExecuteThreadPool;
 
-    @Autowired
-    private WorkflowEventQueue workflowEventQueue;
-
     @Override
     public void handleWorkflowEvent(final WorkflowEvent workflowEvent) throws WorkflowEventHandleError {
         log.info("Handle workflow start event, begin to start a workflow, event: {}", workflowEvent);

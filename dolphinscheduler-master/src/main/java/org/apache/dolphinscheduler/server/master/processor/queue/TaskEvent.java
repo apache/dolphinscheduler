@@ -22,8 +22,7 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.remote.command.task.TaskExecuteResultMessage;
 import org.apache.dolphinscheduler.remote.command.task.TaskExecuteRunningMessage;
-import org.apache.dolphinscheduler.remote.command.task.TaskRejectMessage;
-import org.apache.dolphinscheduler.remote.command.task.TaskUpdatePidMessage;
+import org.apache.dolphinscheduler.remote.command.task.TaskUpdateRuntimeMessage;
 
 import java.util.Date;
 
@@ -145,15 +144,6 @@ public class TaskEvent {
         return event;
     }
 
-    public static TaskEvent newRecallEvent(TaskRejectMessage command, Channel channel) {
-        TaskEvent event = new TaskEvent();
-        event.setTaskInstanceId(command.getTaskInstanceId());
-        event.setProcessInstanceId(command.getProcessInstanceId());
-        event.setChannel(channel);
-        event.setEvent(TaskEventType.WORKER_REJECT);
-        return event;
-    }
-
     public static TaskEvent newCacheEvent(int processInstanceId, int taskInstanceId, int cacheTaskInstanceId) {
         TaskEvent event = new TaskEvent();
         event.setProcessInstanceId(processInstanceId);
@@ -163,7 +153,7 @@ public class TaskEvent {
         return event;
     }
 
-    public static TaskEvent newUpdatePidEvent(TaskUpdatePidMessage command, Channel channel, String workerAddress) {
+    public static TaskEvent newUpdatePidEvent(TaskUpdateRuntimeMessage command, Channel channel, String workerAddress) {
         TaskEvent event = new TaskEvent();
         event.setProcessInstanceId(command.getProcessInstanceId());
         event.setTaskInstanceId(command.getTaskInstanceId());

@@ -114,7 +114,7 @@ public class StateEventResponseService {
                 try {
                     stateEvent = eventQueue.take();
                 } catch (InterruptedException e) {
-                    log.warn("State event loop service interrupted, will stop this loop", e);
+                    log.warn("State event loop service interrupted, will stop loop");
                     Thread.currentThread().interrupt();
                     break;
                 }

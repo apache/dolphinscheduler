@@ -93,7 +93,6 @@ public class MasterServer implements IStoppable {
         this.masterRegistryClient.start();
         this.masterRegistryClient.setRegistryStoppable(this);
 
-        this.masterSchedulerBootstrap.init();
         this.masterSchedulerBootstrap.start();
 
         this.eventExecuteService.start();

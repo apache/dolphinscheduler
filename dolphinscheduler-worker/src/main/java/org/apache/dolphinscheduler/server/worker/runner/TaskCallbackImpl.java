@@ -64,7 +64,7 @@ public class TaskCallbackImpl implements TaskCallBack {
             return;
         }
 
-        workerMessageSender.sendMessageWithRetry(taskExecutionContext, MessageType.TASK_UPDATE_PID_MESSAGE);
+        workerMessageSender.sendMessageWithRetry(taskExecutionContext, MessageType.TASK_UPDATE_RUNTIME_MESSAGE);
     }
 
 }

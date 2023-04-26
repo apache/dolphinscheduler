@@ -74,7 +74,7 @@ public class NettyRemotingClient implements AutoCloseable {
 
     private final NettyClientConfig clientConfig;
 
-    private final Semaphore asyncSemaphore = new Semaphore(200, true);
+    private final Semaphore asyncSemaphore = new Semaphore(1024, true);
 
     private final ExecutorService callbackExecutor;
 
@@ -128,8 +128,7 @@ public class NettyRemotingClient implements AutoCloseable {
                                 .addLast(new NettyDecoder(), clientHandler, encoder);
                     }
                 });
-        this.responseFutureExecutor.scheduleAtFixedRate(ResponseFuture::scanFutureTable, 5000, 1000,
-                TimeUnit.MILLISECONDS);
+        this.responseFutureExecutor.scheduleWithFixedDelay(ResponseFuture::scanFutureTable, 0, 1, TimeUnit.SECONDS);
         isStarted.compareAndSet(false, true);
     }
 
@@ -199,8 +198,8 @@ public class NettyRemotingClient implements AutoCloseable {
     /**
      * sync send
      *
-     * @param host host
-     * @param message command
+     * @param host          host
+     * @param message       command
      * @param timeoutMillis timeoutMillis
      * @return command
      */
@@ -221,7 +220,7 @@ public class NettyRemotingClient implements AutoCloseable {
             }
             responseFuture.setCause(future.cause());
             responseFuture.putResponse(null);
-            log.error("send command {} to host {} failed", message, host);
+            log.error("send command {} to host {} failed: {}", message, host, responseFuture.getCause());
         });
         /*
          * sync wait for result

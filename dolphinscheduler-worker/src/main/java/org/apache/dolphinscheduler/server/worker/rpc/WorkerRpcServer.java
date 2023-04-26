@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.worker.rpc;
 
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
-import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
+import org.apache.dolphinscheduler.remote.processor.WorkerRpcProcessor;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 
 import java.io.Closeable;
@@ -35,7 +35,7 @@ import org.springframework.stereotype.Service;
 public class WorkerRpcServer implements Closeable {
 
     @Autowired
-    private List<NettyRequestProcessor> nettyRequestProcessors;
+    private List<WorkerRpcProcessor> workerRpcProcessors;
 
     @Autowired
     private WorkerConfig workerConfig;
@@ -43,16 +43,16 @@ public class WorkerRpcServer implements Closeable {
     private NettyRemotingServer nettyRemotingServer;
 
     public void start() {
-        log.info("Worker rpc server starting");
+        log.info("Worker rpc server starting...");
         NettyServerConfig serverConfig = new NettyServerConfig();
-        nettyRemotingServer = new NettyRemotingServer(serverConfig);
         serverConfig.setListenPort(workerConfig.getListenPort());
-        for (NettyRequestProcessor nettyRequestProcessor : nettyRequestProcessors) {
-            nettyRemotingServer.registerProcessor(nettyRequestProcessor);
-            log.info("Success register netty processor: {}", nettyRequestProcessor.getClass().getName());
+        nettyRemotingServer = new NettyRemotingServer(serverConfig);
+        for (WorkerRpcProcessor workerRpcProcessor : workerRpcProcessors) {
+            nettyRemotingServer.registerProcessor(workerRpcProcessor);
+            log.info("Success register WorkerRpcProcessor: {}", workerRpcProcessor.getClass().getName());
         }
         this.nettyRemotingServer.start();
-        log.info("Worker rpc server started");
+        log.info("Worker rpc server started...");
     }
 
     @Override

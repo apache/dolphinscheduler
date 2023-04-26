@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.remote.command.Message;
 import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.workflow.WorkflowStateEventChangeRequest;
-import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
+import org.apache.dolphinscheduler.remote.processor.MasterRpcProcessor;
 import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.server.master.event.TaskStateEvent;
 import org.apache.dolphinscheduler.server.master.event.WorkflowStateEvent;
@@ -42,7 +42,7 @@ import io.netty.channel.Channel;
  */
 @Component
 @Slf4j
-public class StateEventProcessor implements NettyRequestProcessor {
+public class StateEventProcessor implements MasterRpcProcessor {
 
     @Autowired
     private StateEventResponseService stateEventResponseService;

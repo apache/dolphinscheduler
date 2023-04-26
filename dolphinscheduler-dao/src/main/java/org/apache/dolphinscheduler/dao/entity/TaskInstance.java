@@ -321,6 +321,8 @@ public class TaskInstance implements Serializable {
     }
 
     public SwitchParameters getSwitchDependency() {
+        // todo: We need to directly use Jackson to deserialize the taskParam, rather than parse the map and get from
+        // field.
         if (this.switchDependency == null) {
             Map<String, Object> taskParamsMap =
                     JSONUtils.parseObject(this.getTaskParams(), new TypeReference<Map<String, Object>>() {
@@ -336,6 +338,7 @@ public class TaskInstance implements Serializable {
                 JSONUtils.parseObject(this.getTaskParams(), new TypeReference<Map<String, Object>>() {
                 });
         taskParamsMap.put(Constants.SWITCH_RESULT, JSONUtils.toJsonString(switchDependency));
+        this.switchDependency = switchDependency;
         this.setTaskParams(JSONUtils.toJsonString(taskParamsMap));
     }
 

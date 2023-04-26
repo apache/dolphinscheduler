@@ -155,19 +155,14 @@ public abstract class AbstractTask {
      * @return exit status
      */
     public TaskExecutionStatus getExitStatus() {
-        TaskExecutionStatus status;
         switch (getExitStatusCode()) {
             case TaskConstants.EXIT_CODE_SUCCESS:
-                status = TaskExecutionStatus.SUCCESS;
-                break;
+                return TaskExecutionStatus.SUCCESS;
             case TaskConstants.EXIT_CODE_KILL:
-                status = TaskExecutionStatus.KILL;
-                break;
+                return TaskExecutionStatus.KILL;
             default:
-                status = TaskExecutionStatus.FAILURE;
-                break;
+                return TaskExecutionStatus.FAILURE;
         }
-        return status;
     }
 
     /**

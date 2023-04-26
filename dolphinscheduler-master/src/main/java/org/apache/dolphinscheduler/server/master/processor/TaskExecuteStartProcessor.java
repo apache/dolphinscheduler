@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.remote.command.Message;
 import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.task.TaskExecuteStartMessage;
-import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
+import org.apache.dolphinscheduler.remote.processor.MasterRpcProcessor;
 import org.apache.dolphinscheduler.server.master.runner.StreamTaskExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.StreamTaskExecuteThreadPool;
 
@@ -39,7 +39,7 @@ import io.netty.channel.Channel;
  */
 @Component
 @Slf4j
-public class TaskExecuteStartProcessor implements NettyRequestProcessor {
+public class TaskExecuteStartProcessor implements MasterRpcProcessor {
 
     @Autowired
     private StreamTaskExecuteThreadPool streamTaskExecuteThreadPool;

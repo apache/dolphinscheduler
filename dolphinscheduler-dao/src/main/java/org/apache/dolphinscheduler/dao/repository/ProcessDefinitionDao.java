@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,4 +54,6 @@ public interface ProcessDefinitionDao {
     void deleteById(Integer workflowDefinitionId);
 
     void deleteByWorkflowDefinitionCode(long workflowDefinitionCode);
+
+    List<ProcessDefinition> queryByCodes(Collection<Long> processDefinitionCodes);
 }

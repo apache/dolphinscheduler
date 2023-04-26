@@ -30,6 +30,8 @@ import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -98,6 +100,14 @@ public class TaskDefinitionDaoImpl implements TaskDefinitionDao {
             return;
         }
         taskDefinitionMapper.deleteByBatchCodes(new ArrayList<>(needToDeleteTaskDefinitionCodes));
+    }
+
+    @Override
+    public List<TaskDefinition> queryByCodes(Collection<Long> taskDefinitionCodes) {
+        if (CollectionUtils.isEmpty(taskDefinitionCodes)) {
+            return Collections.emptyList();
+        }
+        return taskDefinitionMapper.queryByCodeList(taskDefinitionCodes);
     }
 
 }

@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.remote.command.Message;
 import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.task.TaskWakeupRequest;
-import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
+import org.apache.dolphinscheduler.remote.processor.MasterRpcProcessor;
 import org.apache.dolphinscheduler.server.master.event.TaskStateEvent;
 import org.apache.dolphinscheduler.server.master.processor.queue.StateEventResponseService;
 
@@ -39,7 +39,7 @@ import io.netty.channel.Channel;
  */
 @Component
 @Slf4j
-public class TaskWakeupProcessor implements NettyRequestProcessor {
+public class TaskWakeupProcessor implements MasterRpcProcessor {
 
     @Autowired
     private StateEventResponseService stateEventResponseService;

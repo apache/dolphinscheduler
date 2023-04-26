@@ -476,13 +476,6 @@ public final class Constants {
     public static final String BLOCKING_CONDITION = "blockingCondition";
     public static final String ALERT_WHEN_BLOCKING = "alertWhenBlocking";
 
-    /**
-     * master/worker server use for zk
-     */
-    public static final String MASTER_TYPE = "master";
-    public static final String WORKER_TYPE = "worker";
-    public static final String DELETE_OP = "delete";
-    public static final String ADD_OP = "add";
     public static final String ALIAS = "alias";
     public static final String CONTENT = "content";
     public static final String DEPENDENT_SPLIT = ":||";

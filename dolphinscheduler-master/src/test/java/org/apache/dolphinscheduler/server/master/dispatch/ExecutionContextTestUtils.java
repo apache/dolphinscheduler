@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.remote.command.Message;
-import org.apache.dolphinscheduler.remote.command.task.TaskDispatchMessage;
+import org.apache.dolphinscheduler.remote.command.task.TaskDispatchRequest;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
@@ -52,10 +52,7 @@ public class ExecutionContextTestUtils {
                 .buildProcessDefinitionRelatedInfo(processDefinition)
                 .create();
 
-        TaskDispatchMessage requestCommand = new TaskDispatchMessage(context,
-                "127.0.0.1:5678",
-                "127.0.0.1:5678",
-                System.currentTimeMillis());
+        TaskDispatchRequest requestCommand = new TaskDispatchRequest(context);
         Message message = requestCommand.convert2Command();
 
         ExecutionContext executionContext = new ExecutionContext(message, ExecutorType.WORKER, taskInstance);

@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.command.Message;
 import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.workflow.WorkflowMetricsCleanUpRequest;
-import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
+import org.apache.dolphinscheduler.remote.processor.MasterRpcProcessor;
 import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
 
 import org.springframework.stereotype.Component;
@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 import io.netty.channel.Channel;
 
 @Component
-public class WorkflowMetricsCleanUpProcessor implements NettyRequestProcessor {
+public class WorkflowMetricsCleanUpProcessor implements MasterRpcProcessor {
 
     @Override
     public void process(Channel channel, Message message) {

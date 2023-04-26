@@ -20,8 +20,6 @@ package org.apache.dolphinscheduler.remote.future;
 import org.apache.dolphinscheduler.remote.command.Message;
 
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
@@ -85,7 +83,9 @@ public class ResponseFuture {
      * @return command
      */
     public Message waitResponse() throws InterruptedException {
-        this.latch.await(timeoutMillis, TimeUnit.MILLISECONDS);
+        if (!latch.await(timeoutMillis, TimeUnit.MILLISECONDS)) {
+            log.warn("Wait response timeout, request id {}", opaque);
+        }
         return this.responseMessage;
     }
 
@@ -180,24 +180,22 @@ public class ResponseFuture {
      * scan future table
      */
     public static void scanFutureTable() {
-        final List<ResponseFuture> futureList = new LinkedList<>();
         Iterator<Map.Entry<Long, ResponseFuture>> it = FUTURE_TABLE.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<Long, ResponseFuture> next = it.next();
             ResponseFuture future = next.getValue();
-            if ((future.getBeginTimestamp() + future.getTimeoutMillis() + 1000) <= System.currentTimeMillis()) {
-                futureList.add(future);
-                it.remove();
-                log.warn("remove timeout request : {}", future);
+            if ((future.getBeginTimestamp() + future.getTimeoutMillis() + 1000) > System.currentTimeMillis()) {
+                continue;
             }
-        }
-        for (ResponseFuture future : futureList) {
             try {
+                // todo: use thread pool to execute the async callback, otherwise will block the scan thread
                 future.release();
                 future.executeInvokeCallback();
             } catch (Exception ex) {
-                log.warn("scanFutureTable, execute callback error", ex);
+                log.error("ScanFutureTable, execute callback error, requestId: {}", future.getOpaque(), ex);
             }
+            it.remove();
+            log.debug("Remove timeout request: {}", future);
         }
     }
 

@@ -142,8 +142,8 @@ master:
   state-wheel-interval: 5s
   # master max cpuload avg percentage, only higher than the system cpu load average, master server can schedule. default value 1: will use 100% cpu
   max-cpu-load-avg: 1
-  # master reserved memory, only lower than system available memory, master server can schedule. default value 0.3, only the available memory is higher than 30%, master server can schedule.
-  reserved-memory: 0.3
+  # master reserved memory, only lower than system available memory, master server can schedule. default value 0.1, only the available memory is higher than 10%, master server can schedule.
+  reserved-memory: 0.1
   # failover interval
   failover-interval: 10m
   # kill yarn/k8s application when failover taskInstance, default true
@@ -165,8 +165,8 @@ worker:
   tenant-distributed-user: false
   # worker max cpuload avg, only higher than the system cpu load average, worker server can be dispatched tasks. default value 1: will use 100% cpu.
   max-cpu-load-avg: 1
-  # worker reserved memory, only lower than system available memory, worker server can be dispatched tasks. default value 0.3, only the available memory is higher than 30%, worker server can receive task.
-  reserved-memory: 0.3
+  # worker reserved memory, only lower than system available memory, worker server can be dispatched tasks. default value 0.1, only the available memory is higher than 10%, worker server can receive task.
+  reserved-memory: 0.1
   task-execute-threads-full-policy: REJECT
 
 alert:

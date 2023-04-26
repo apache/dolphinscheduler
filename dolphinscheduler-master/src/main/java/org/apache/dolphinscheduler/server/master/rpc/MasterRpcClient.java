@@ -46,4 +46,7 @@ public class MasterRpcClient {
         return client.sendSync(host, rpcMessage, DEFAULT_TIME_OUT_MILLS);
     }
 
+    public void send(Host of, Message message) throws RemotingException {
+        client.send(of, message);
+    }
 }

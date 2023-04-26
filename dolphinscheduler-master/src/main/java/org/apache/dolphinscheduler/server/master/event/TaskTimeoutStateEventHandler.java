@@ -23,8 +23,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
-import org.apache.dolphinscheduler.server.master.runner.task.ITaskProcessor;
-import org.apache.dolphinscheduler.server.master.runner.task.TaskAction;
+import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnable;
 
 import java.util.Map;
 
@@ -57,13 +56,12 @@ public class TaskTimeoutStateEventHandler implements StateEventHandler {
         }
         TaskTimeoutStrategy taskTimeoutStrategy = taskInstance.getTaskDefine()
                 .getTimeoutNotifyStrategy();
-        Map<Long, ITaskProcessor> activeTaskProcessMap = workflowExecuteRunnable
-                .getActiveTaskProcessMap();
+        Map<Long, DefaultTaskExecuteRunnable> taskExecuteRunnableMap =
+                workflowExecuteRunnable.getTaskExecuteRunnableMap();
         if ((TaskTimeoutStrategy.FAILED == taskTimeoutStrategy
                 || TaskTimeoutStrategy.WARNFAILED == taskTimeoutStrategy)) {
-            if (activeTaskProcessMap.containsKey(taskInstance.getTaskCode())) {
-                ITaskProcessor taskProcessor = activeTaskProcessMap.get(taskInstance.getTaskCode());
-                taskProcessor.action(TaskAction.TIMEOUT);
+            if (taskExecuteRunnableMap.containsKey(taskInstance.getTaskCode())) {
+                taskExecuteRunnableMap.get(taskInstance.getTaskCode()).timeout();
             } else {
                 log.warn(
                         "cannot find the task processor for task {}, so skip task processor action.",

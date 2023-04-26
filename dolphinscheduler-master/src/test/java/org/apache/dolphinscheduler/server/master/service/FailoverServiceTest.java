@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
@@ -136,6 +137,7 @@ public class FailoverServiceTest {
         processInstance.setHistoryCmd("xxx");
         processInstance.setCommandType(CommandType.STOP);
         processInstance.setProcessDefinitionCode(123L);
+        processInstance.setProcessDefinition(new ProcessDefinition());
 
         masterTaskInstance = new TaskInstance();
         masterTaskInstance.setId(1);

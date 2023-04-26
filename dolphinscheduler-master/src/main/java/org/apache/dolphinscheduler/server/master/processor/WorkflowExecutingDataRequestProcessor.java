@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.workflow.WorkflowExecutingDataRequest;
 import org.apache.dolphinscheduler.remote.command.workflow.WorkflowExecutingDataResponse;
 import org.apache.dolphinscheduler.remote.dto.WorkflowExecuteDto;
-import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
+import org.apache.dolphinscheduler.remote.processor.MasterRpcProcessor;
 import org.apache.dolphinscheduler.server.master.service.ExecutingService;
 
 import java.util.Optional;
@@ -40,7 +40,7 @@ import io.netty.channel.Channel;
  */
 @Component
 @Slf4j
-public class WorkflowExecutingDataRequestProcessor implements NettyRequestProcessor {
+public class WorkflowExecutingDataRequestProcessor implements MasterRpcProcessor {
 
     @Autowired
     private ExecutingService executingService;
