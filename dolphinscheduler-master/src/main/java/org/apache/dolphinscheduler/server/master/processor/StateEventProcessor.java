@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.remote.command.Message;
 import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.workflow.WorkflowStateEventChangeRequest;
 import org.apache.dolphinscheduler.remote.processor.MasterRpcProcessor;
+import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.server.master.event.TaskStateEvent;
 import org.apache.dolphinscheduler.server.master.event.WorkflowStateEvent;
@@ -47,6 +48,9 @@ public class StateEventProcessor implements MasterRpcProcessor {
     @Autowired
     private StateEventResponseService stateEventResponseService;
 
+    @Autowired
+    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+
     @Override
     public void process(Channel channel, Message message) {
         WorkflowStateEventChangeRequest workflowStateEventChangeRequest =
@@ -54,6 +58,11 @@ public class StateEventProcessor implements MasterRpcProcessor {
         StateEvent stateEvent;
         if (workflowStateEventChangeRequest.getDestTaskInstanceId() == 0) {
             stateEvent = createWorkflowStateEvent(workflowStateEventChangeRequest);
+            if (((WorkflowStateEvent) stateEvent).getStatus() == WorkflowExecutionStatus.READY_STOP) {
+                processInstanceExecCacheManager
+                        .getByProcessInstanceId(workflowStateEventChangeRequest.getDestProcessInstanceId())
+                        .getProcessInstance().setState(WorkflowExecutionStatus.READY_STOP);
+            }
         } else {
             stateEvent = createTaskStateEvent(workflowStateEventChangeRequest);
         }

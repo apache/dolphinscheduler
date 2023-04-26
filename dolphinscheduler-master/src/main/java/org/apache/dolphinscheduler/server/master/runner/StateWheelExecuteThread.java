@@ -370,6 +370,11 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
                     taskInstanceStateCheckList.remove(taskInstanceKey);
                     continue;
                 }
+                ProcessInstance processInstance = workflowExecuteThread.getProcessInstance();
+                if (processInstance.getState().isReadyStop()) {
+                    taskInstanceStateCheckList.remove(taskInstanceKey);
+                    break;
+                }
                 Optional<TaskInstance> taskInstanceOptional =
                         workflowExecuteThread.getActiveTaskInstanceByTaskCode(taskCode);
                 if (!taskInstanceOptional.isPresent()) {
