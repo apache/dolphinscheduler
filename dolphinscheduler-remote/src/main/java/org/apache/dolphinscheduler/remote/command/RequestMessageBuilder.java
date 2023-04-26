@@ -31,5 +31,13 @@ public interface RequestMessageBuilder extends Serializable {
         return message;
     }
 
+    default Message convert2Command(int opaque) {
+        Message message = new Message(opaque);
+        message.setType(getCommandType());
+        byte[] body = JsonSerializer.serialize(this);
+        message.setBody(body);
+        return message;
+    }
+
     MessageType getCommandType();
 }

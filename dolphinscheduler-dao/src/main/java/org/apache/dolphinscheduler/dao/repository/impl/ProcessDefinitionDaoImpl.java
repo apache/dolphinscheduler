@@ -25,7 +25,11 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
 import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
 
+import org.apache.commons.collections4.CollectionUtils;
+
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -95,5 +99,13 @@ public class ProcessDefinitionDaoImpl implements ProcessDefinitionDao {
     @Override
     public void deleteByWorkflowDefinitionCode(long workflowDefinitionCode) {
         processDefinitionMapper.deleteByCode(workflowDefinitionCode);
+    }
+
+    @Override
+    public List<ProcessDefinition> queryByCodes(Collection<Long> processDefinitionCodes) {
+        if (CollectionUtils.isEmpty(processDefinitionCodes)) {
+            return Collections.emptyList();
+        }
+        return processDefinitionMapper.queryByCodes(processDefinitionCodes);
     }
 }

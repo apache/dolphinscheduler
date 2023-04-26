@@ -42,20 +42,18 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.remote.command.task.TaskDispatchMessage;
 import org.apache.dolphinscheduler.remote.command.task.TaskExecuteRunningMessageAck;
 import org.apache.dolphinscheduler.remote.command.task.TaskExecuteStartMessage;
 import org.apache.dolphinscheduler.server.master.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.cache.StreamTaskInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.master.dispatch.ExecutorDispatcher;
-import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
-import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
-import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
 import org.apache.dolphinscheduler.server.master.event.StateEventHandleError;
 import org.apache.dolphinscheduler.server.master.event.StateEventHandleException;
 import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
+import org.apache.dolphinscheduler.server.master.runner.dispatcher.WorkerTaskDispatcher;
+import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnableFactory;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
@@ -88,7 +86,9 @@ public class StreamTaskExecuteRunnable implements Runnable {
 
     protected TaskInstanceDao taskInstanceDao;
 
-    protected ExecutorDispatcher dispatcher;
+    protected DefaultTaskExecuteRunnableFactory defaultTaskExecuteRunnableFactory;
+
+    protected WorkerTaskDispatcher workerTaskDispatcher;
 
     protected ProcessTaskRelationMapper processTaskRelationMapper;
 
@@ -114,7 +114,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
     public StreamTaskExecuteRunnable(TaskDefinition taskDefinition, TaskExecuteStartMessage taskExecuteStartMessage) {
         this.processService = SpringApplicationContext.getBean(ProcessService.class);
         this.masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
-        this.dispatcher = SpringApplicationContext.getBean(ExecutorDispatcher.class);
+        this.workerTaskDispatcher = SpringApplicationContext.getBean(WorkerTaskDispatcher.class);
         this.taskPluginManager = SpringApplicationContext.getBean(TaskPluginManager.class);
         this.processTaskRelationMapper = SpringApplicationContext.getBean(ProcessTaskRelationMapper.class);
         this.taskInstanceDao = SpringApplicationContext.getBean(TaskInstanceDao.class);
@@ -144,48 +144,20 @@ public class StreamTaskExecuteRunnable implements Runnable {
         int processDefinitionVersion = processTaskRelationList.get(0).getProcessDefinitionVersion();
         processDefinition = processService.findProcessDefinition(processDefinitionCode, processDefinitionVersion);
 
-        // dispatch task
-        TaskExecutionContext taskExecutionContext = getTaskExecutionContext(taskInstance);
-        if (taskExecutionContext == null) {
-            taskInstance.setState(TaskExecutionStatus.FAILURE);
-            taskInstanceDao.upsertTaskInstance(taskInstance);
-            return;
-        }
-
-        TaskDispatchMessage dispatchCommand = new TaskDispatchMessage(taskExecutionContext,
-                masterConfig.getMasterAddress(),
-                taskExecutionContext.getHost(),
-                System.currentTimeMillis());
-
-        ExecutionContext executionContext = new ExecutionContext(dispatchCommand.convert2Command(), ExecutorType.WORKER,
-                taskExecutionContext.getWorkerGroup(), taskInstance);
-        Boolean dispatchSuccess = false;
         try {
-            dispatcher.dispatch(executionContext);
-            dispatchSuccess = true;
-        } catch (ExecuteException e) {
-            log.error("Master dispatch task to worker error, taskInstanceId: {}, worker: {}",
-                    taskInstance.getId(),
-                    executionContext.getHost(),
-                    e);
-        }
-        if (!dispatchSuccess) {
-            log.info("Master failed to dispatch task to worker, taskInstanceId: {}, worker: {}",
-                    taskInstance.getId(),
-                    executionContext.getHost());
-
-            // set task instance fail
+            DefaultTaskExecuteRunnable taskExecuteRunnable =
+                    defaultTaskExecuteRunnableFactory.createTaskExecuteRunnable(taskInstance);
+            workerTaskDispatcher.dispatchTask(taskExecuteRunnable);
+        } catch (Exception e) {
+            log.error("Master dispatch task to worker error, taskInstanceName: {}", taskInstance.getName(), e);
             taskInstance.setState(TaskExecutionStatus.FAILURE);
             taskInstanceDao.upsertTaskInstance(taskInstance);
             return;
         }
-
         // set started flag
         taskRunnableStatus = TaskRunnableStatus.STARTED;
-
-        log.info("Master success dispatch task to worker, taskInstanceId: {}, worker: {}",
-                taskInstance.getId(),
-                executionContext.getHost());
+        log.info("Master success dispatch task to worker, taskInstanceName: {}, worker: {}", taskInstance.getId(),
+                taskInstance.getHost());
     }
 
     public boolean isStart() {
@@ -344,8 +316,11 @@ public class StreamTaskExecuteRunnable implements Runnable {
         TaskChannel taskChannel = taskPluginManager.getTaskChannel(taskInstance.getTaskType());
         ResourceParametersHelper resources = taskChannel.getResources(taskInstance.getTaskParams());
 
-        AbstractParameters baseParam = taskPluginManager.getParameters(ParametersNode.builder()
-                .taskType(taskInstance.getTaskType()).taskParams(taskInstance.getTaskParams()).build());
+        AbstractParameters baseParam = taskPluginManager.getParameters(
+                ParametersNode.builder()
+                        .taskType(taskInstance.getTaskType())
+                        .taskParams(taskInstance.getTaskParams())
+                        .build());
         Map<String, Property> propertyMap = paramParsingPreparation(taskInstance, baseParam);
         TaskExecutionContext taskExecutionContext = TaskExecutionContextBuilder.get()
                 .buildWorkflowInstanceHost(masterConfig.getMasterAddress())

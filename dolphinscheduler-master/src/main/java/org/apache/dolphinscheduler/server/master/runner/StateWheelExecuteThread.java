@@ -136,8 +136,9 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
             return;
         }
         for (Integer processInstanceId : processInstanceTimeoutCheckList) {
-            try {
-                LogUtils.setWorkflowInstanceIdMDC(processInstanceId);
+            try (
+                    LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
+                            LogUtils.setWorkflowInstanceIdMDC(processInstanceId)) {
                 WorkflowExecuteRunnable workflowExecuteThread = processInstanceExecCacheManager.getByProcessInstanceId(
                         processInstanceId);
                 if (workflowExecuteThread == null) {
@@ -162,8 +163,6 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
                 }
             } catch (Exception ex) {
                 log.error("Check workflow instance timeout error");
-            } finally {
-                LogUtils.removeWorkflowInstanceIdMDC();
             }
         }
     }
@@ -246,9 +245,10 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
             return;
         }
         for (TaskInstanceKey taskInstanceKey : taskInstanceTimeoutCheckList) {
-            try {
+            try (
+                    LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
+                            LogUtils.setWorkflowInstanceIdMDC(taskInstanceKey.getProcessInstanceId())) {
                 int processInstanceId = taskInstanceKey.getProcessInstanceId();
-                LogUtils.setWorkflowInstanceIdMDC(processInstanceId);
                 long taskCode = taskInstanceKey.getTaskCode();
 
                 WorkflowExecuteRunnable workflowExecuteThread =
@@ -282,8 +282,6 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
                 }
             } catch (Exception ex) {
                 log.error("Check task timeout error, taskInstanceKey: {}", taskInstanceKey, ex);
-            } finally {
-                LogUtils.removeWorkflowInstanceIdMDC();
             }
         }
     }

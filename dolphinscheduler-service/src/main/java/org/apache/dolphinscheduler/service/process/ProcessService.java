@@ -88,11 +88,11 @@ public interface ProcessService {
 
     void setSubProcessParam(ProcessInstance subProcessInstance);
 
-    TaskInstance submitTaskWithRetry(ProcessInstance processInstance, TaskInstance taskInstance, int commitRetryTimes,
-                                     long commitInterval);
+    boolean submitTaskWithRetry(ProcessInstance processInstance, TaskInstance taskInstance, int commitRetryTimes,
+                                long commitInterval);
 
     @Transactional
-    TaskInstance submitTask(ProcessInstance processInstance, TaskInstance taskInstance);
+    boolean submitTask(ProcessInstance processInstance, TaskInstance taskInstance);
 
     void createSubWorkProcess(ProcessInstance parentProcessInstance, TaskInstance task);
 
