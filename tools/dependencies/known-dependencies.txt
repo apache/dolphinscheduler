@@ -474,5 +474,6 @@ sshd-sftp-2.8.0.jar
 sshd-common-2.8.0.jar
 sshd-core-2.8.0.jar
 jcl-over-slf4j-1.7.36.jar
+databend-jdbc-0.0.7.jar
 kyuubi-hive-jdbc-shaded-1.7.0.jar
 snowflake-jdbc-3.13.10.jar

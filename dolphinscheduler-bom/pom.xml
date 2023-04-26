@@ -71,6 +71,7 @@
         <commons-io.version>2.11.0</commons-io.version>
         <oshi-core.version>6.1.1</oshi-core.version>
         <clickhouse-jdbc.version>0.3.2-patch11</clickhouse-jdbc.version>
+        <databend-jdbc.version>0.0.7</databend-jdbc.version>
         <lz4-java.version>1.4.0</lz4-java.version>
         <mssql-jdbc.version>11.2.1.jre8</mssql-jdbc.version>
         <presto-jdbc.version>0.238.1</presto-jdbc.version>
@@ -574,6 +575,12 @@
                 <groupId>com.clickhouse</groupId>
                 <artifactId>clickhouse-jdbc</artifactId>
                 <version>${clickhouse-jdbc.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.databend</groupId>
+                <artifactId>databend-jdbc</artifactId>
+                <version>${databend-jdbc.version}</version>
             </dependency>
 
             <dependency>

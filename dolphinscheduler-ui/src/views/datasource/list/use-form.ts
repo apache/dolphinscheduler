@@ -441,6 +441,11 @@ export const datasourceType: IDataBaseOptionKeys = {
     value: 'SSH',
     label: 'SSH',
     defaultPort: 22
+  },
+  DATABEND: {
+    value: 'DATABEND',
+    label: 'DATABEND',
+    defaultPort: 8000
   }
 }
 

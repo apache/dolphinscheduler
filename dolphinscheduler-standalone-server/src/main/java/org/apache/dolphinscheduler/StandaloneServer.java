@@ -19,39 +19,26 @@ package org.apache.dolphinscheduler;
 
 import org.apache.curator.test.TestingServer;
 
-import java.io.IOException;
-
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.event.ApplicationFailedEvent;
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextClosedEvent;
 
 @SpringBootApplication
 @Slf4j
-public class StandaloneServer implements ApplicationListener<ApplicationEvent> {
-
-    private static TestingServer zookeeperServer;
+public class StandaloneServer {
 
     public static void main(String[] args) throws Exception {
-        zookeeperServer = new TestingServer(true);
-        System.setProperty("registry.zookeeper.connect-string", zookeeperServer.getConnectString());
-        SpringApplication.run(StandaloneServer.class, args);
-    }
-
-    @Override
-    public void onApplicationEvent(@NonNull ApplicationEvent event) {
-        if (event instanceof ApplicationFailedEvent || event instanceof ContextClosedEvent) {
-            try (TestingServer closedServer = zookeeperServer) {
-                // close the zookeeper server
-                log.info("Receive spring context close event: {}, will closed zookeeper server", event);
-            } catch (IOException e) {
-                log.error("Close zookeeper server error", e);
-            }
+        try {
+            // We cannot use try-with-resources to close "TestingServer", since SpringApplication.run() will not block
+            // the main thread.
+            TestingServer zookeeperServer = new TestingServer(true);
+            System.setProperty("registry.zookeeper.connect-string", zookeeperServer.getConnectString());
+            SpringApplication.run(StandaloneServer.class, args);
+        } catch (Exception ex) {
+            log.error("StandaloneServer start failed", ex);
+            System.exit(1);
         }
     }
+
 }
