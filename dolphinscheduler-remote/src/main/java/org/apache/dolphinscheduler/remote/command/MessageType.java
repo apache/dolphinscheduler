@@ -36,10 +36,8 @@ public enum MessageType {
      */
     TASK_EXECUTE_START,
 
-    /**
-     * dispatch task request
-     */
-    TASK_DISPATCH_MESSAGE,
+    TASK_DISPATCH_REQUEST,
+    TASK_DISPATCH_RESPONSE,
 
     /**
      * task execute running, from worker to master
@@ -62,10 +60,6 @@ public enum MessageType {
     TASK_EXECUTE_RESULT_MESSAGE_ACK,
 
     TASK_KILL_REQUEST,
-
-    TASK_REJECT,
-
-    TASK_REJECT_MESSAGE_ACK,
 
     /**
      * task savepoint, for stream task
@@ -107,12 +101,16 @@ public enum MessageType {
     /**
      * update taskInstance's PID request
      */
-    TASK_UPDATE_PID_MESSAGE,
+    TASK_UPDATE_RUNTIME_MESSAGE,
 
     /**
      * update taskInstance's PID response ack, from master to worker
      */
-    TASK_UPDATE_PID__MESSAGE_ACK,
+    TASK_UPDATE_RUNTIME_MESSAGE_ACK,
 
-    WORKFLOW_METRICS_CLEANUP;
+    WORKFLOW_METRICS_CLEANUP,
+
+    PAUSE_TASK_INSTANCE,
+    ;
+
 }
