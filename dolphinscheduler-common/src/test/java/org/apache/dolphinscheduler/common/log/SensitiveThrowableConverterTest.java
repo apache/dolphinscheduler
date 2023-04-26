@@ -39,7 +39,7 @@ public class SensitiveThrowableConverterTest {
     public void testPwdLogMsgConverter() {
         SensitiveThrowableConverter.addMaskPattern(ipPattern);
         RuntimeException runtimeException = new RuntimeException(ipLogMsg);
-        logger.error("error log",runtimeException);
+        logger.error("error log", runtimeException);
         String ipMaskedLog = SensitiveThrowableConverter.maskSensitiveData(runtimeException.getMessage());
         Assertions.assertEquals(ipMaskedLog, ipMaskLogMsg);
 

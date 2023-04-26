@@ -1,19 +1,21 @@
 package org.apache.dolphinscheduler.common.log;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
+
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import ch.qos.logback.classic.pattern.ThrowableProxyConverter;
 import ch.qos.logback.classic.spi.IThrowableProxy;
 import ch.qos.logback.classic.spi.StackTraceElementProxy;
 import ch.qos.logback.classic.spi.ThrowableProxy;
 import ch.qos.logback.classic.spi.ThrowableProxyUtil;
 import ch.qos.logback.core.CoreConstants;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class SensitiveThrowableConverter extends ThrowableProxyConverter {
 
@@ -28,7 +30,8 @@ public class SensitiveThrowableConverter extends ThrowableProxyConverter {
         throwableProxy.fullDump();
         StackTraceElementProxy[] stackTraceElementProxyArray = throwableProxy.getStackTraceElementProxyArray();
         sb.append("Exception:").append(maskSensitiveData(throwableProxy.getThrowable().getMessage()));
-        for(int stackTraceElementIndex = 0; stackTraceElementIndex < stackTraceElementProxyArray.length; ++stackTraceElementIndex) {
+        for (int stackTraceElementIndex =
+                0; stackTraceElementIndex < stackTraceElementProxyArray.length; ++stackTraceElementIndex) {
             StackTraceElementProxy step = stackTraceElementProxyArray[stackTraceElementIndex];
             String string = step.toString();
             sb.append('\t').append(string);
