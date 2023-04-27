@@ -168,9 +168,9 @@ public class SnowflakeDataSourceProcessorTest {
 
     @Test
     public void testDbType() {
-        Assertions.assertEquals(DbType.SNOWFLAKE.getCode(), 19);
+        Assertions.assertEquals(DbType.SNOWFLAKE.getCode(), 20);
         Assertions.assertEquals(DbType.SNOWFLAKE.getDescp(), "snowflake");
-        Assertions.assertEquals(DbType.of(19), DbType.SNOWFLAKE);
+        Assertions.assertEquals(DbType.of(20), DbType.SNOWFLAKE);
         Assertions.assertEquals(DbType.ofName("SNOWFLAKE"), DbType.SNOWFLAKE);
     }
 
