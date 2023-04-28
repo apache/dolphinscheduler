@@ -203,6 +203,10 @@ export function formatParams(data: INodeData): {
       if (data.udfs) taskParams.udfs = data.udfs.join(',')
       taskParams.connParams = data.connParams
     }
+
+    if (data.type === 'KYUUBI') {
+      if (data.udfs) taskParams.udfs = data.udfs.join(',')
+    }
   }
 
   if (data.taskType === 'PROCEDURE') {
@@ -330,6 +334,8 @@ export function formatParams(data: INodeData): {
     taskParams.noteId = data.noteId
     taskParams.paragraphId = data.paragraphId
     taskParams.restEndpoint = data.restEndpoint
+    taskParams.username = data.username
+    taskParams.password = data.password
     taskParams.productionNoteDirectory = data.productionNoteDirectory
     taskParams.parameters = data.parameters
   }
@@ -463,6 +469,11 @@ export function formatParams(data: INodeData): {
     taskParams.factoryName = data.factoryName
     taskParams.resourceGroupName = data.resourceGroupName
     taskParams.pipelineName = data.pipelineName
+  }
+
+  if (data.taskType === 'REMOTESHELL') {
+    taskParams.type = data.type
+    taskParams.datasource = data.datasource
   }
 
   let timeoutNotifyStrategy = ''

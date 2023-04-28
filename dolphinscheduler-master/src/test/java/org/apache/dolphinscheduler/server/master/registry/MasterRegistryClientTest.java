@@ -20,11 +20,11 @@ package org.apache.dolphinscheduler.server.master.registry;
 import static org.mockito.BDDMockito.given;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.task.MasterHeartBeatTask;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -94,9 +94,9 @@ public class MasterRegistryClientTest {
 
     @Test
     public void removeNodePathTest() {
-        masterRegistryClient.removeMasterNodePath("/path", NodeType.MASTER, false);
-        masterRegistryClient.removeMasterNodePath("/path", NodeType.MASTER, true);
+        masterRegistryClient.removeMasterNodePath("/path", RegistryNodeType.MASTER, false);
+        masterRegistryClient.removeMasterNodePath("/path", RegistryNodeType.MASTER, true);
         // Cannot mock static methods
-        masterRegistryClient.removeWorkerNodePath("/path", NodeType.WORKER, true);
+        masterRegistryClient.removeWorkerNodePath("/path", RegistryNodeType.WORKER, true);
     }
 }

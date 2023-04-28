@@ -97,7 +97,6 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskMainInfo;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.UserWithProcessDefinitionCode;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
@@ -110,7 +109,6 @@ import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
 import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
@@ -122,10 +120,12 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
+import org.apache.dolphinscheduler.service.cron.CronUtils;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedOutputStream;
@@ -242,9 +242,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     private SchedulerService schedulerService;
 
     @Autowired
-    private TenantMapper tenantMapper;
-
-    @Autowired
     private DataSourceMapper dataSourceMapper;
 
     @Autowired
@@ -266,7 +263,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @param globalParams global params
      * @param locations locations for nodes
      * @param timeout timeout
-     * @param tenantCode tenantCode
      * @param taskRelationJson relation json for nodes
      * @param taskDefinitionJson taskDefinitionJson
      * @return create result code
@@ -280,7 +276,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                        String globalParams,
                                                        String locations,
                                                        int timeout,
-                                                       String tenantCode,
                                                        String taskRelationJson,
                                                        String taskDefinitionJson,
                                                        String otherParamsJson,
@@ -307,19 +302,11 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
         List<TaskDefinitionLog> taskDefinitionLogs = generateTaskDefinitionList(taskDefinitionJson);
         List<ProcessTaskRelationLog> taskRelationList = generateTaskRelationList(taskRelationJson, taskDefinitionLogs);
-        int tenantId = -1;
-        if (!Constants.DEFAULT.equals(tenantCode)) {
-            Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
-            if (tenant == null) {
-                log.error("Tenant does not exist.");
-                throw new ServiceException(Status.TENANT_NOT_EXIST);
-            }
-            tenantId = tenant.getId();
-        }
+
         long processDefinitionCode = CodeGenerateUtils.getInstance().genCode();
         ProcessDefinition processDefinition =
                 new ProcessDefinition(projectCode, name, processDefinitionCode, description,
-                        globalParams, locations, timeout, loginUser.getId(), tenantId);
+                        globalParams, locations, timeout, loginUser.getId());
         processDefinition.setExecutionType(executionType);
 
         return createDagDefine(loginUser, taskRelationList, processDefinition, taskDefinitionLogs, otherParamsJson);
@@ -344,19 +331,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             throw new ServiceException(Status.PROCESS_DEFINITION_NAME_EXIST, processDefinition.getName());
         }
 
-        this.getTenantId(processDefinition);
-    }
-
-    private int getTenantId(ProcessDefinition processDefinition) {
-        int tenantId = -1;
-        if (!Constants.DEFAULT.equals(processDefinition.getTenantCode())) {
-            Tenant tenant = tenantMapper.queryByTenantCode(processDefinition.getTenantCode());
-            if (tenant == null) {
-                throw new ServiceException(Status.TENANT_NOT_EXIST);
-            }
-            tenantId = tenant.getId();
-        }
-        return tenantId;
     }
 
     private void syncObj2Log(User user, ProcessDefinition processDefinition) {
@@ -389,7 +363,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             throw new ServiceException(Status.INTERNAL_SERVER_ERROR_ARGS);
         }
 
-        processDefinition.setTenantId(this.getTenantId(processDefinition));
         processDefinition.setCode(processDefinitionCode);
         processDefinition.setUserId(loginUser.getId());
 
@@ -692,10 +665,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             log.error("Process definition does not exist, processCode:{}.", code);
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(code));
         } else {
-            Tenant tenant = tenantMapper.queryById(processDefinition.getTenantId());
-            if (tenant != null) {
-                processDefinition.setTenantCode(tenant.getTenantCode());
-            }
             DagData dagData = processService.genDagData(processDefinition);
             result.put(Constants.DATA_LIST, dagData);
             putMsg(result, Status.SUCCESS);
@@ -720,11 +689,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         Project project = projectMapper.queryByCode(processDefinition.getProjectCode());
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
-
-        Tenant tenant = tenantMapper.queryById(processDefinition.getTenantId());
-        if (tenant != null) {
-            processDefinition.setTenantCode(tenant.getTenantCode());
-        }
 
         return processDefinition;
     }
@@ -781,7 +745,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @param globalParams global params
      * @param locations locations for nodes
      * @param timeout timeout
-     * @param tenantCode tenantCode
      * @param taskRelationJson relation json for nodes
      * @param taskDefinitionJson taskDefinitionJson
      * @param otherParamsJson otherParamsJson handle other params
@@ -797,7 +760,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                        String globalParams,
                                                        String locations,
                                                        int timeout,
-                                                       String tenantCode,
                                                        String taskRelationJson,
                                                        String taskDefinitionJson,
                                                        String otherParamsJson,
@@ -818,17 +780,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
         List<TaskDefinitionLog> taskDefinitionLogs = generateTaskDefinitionList(taskDefinitionJson);
         List<ProcessTaskRelationLog> taskRelationList = generateTaskRelationList(taskRelationJson, taskDefinitionLogs);
-
-        int tenantId = -1;
-        if (!Constants.DEFAULT.equals(tenantCode)) {
-            Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
-            if (tenant == null) {
-                log.error("Tenant does not exist.");
-                putMsg(result, Status.TENANT_NOT_EXIST);
-                return result;
-            }
-            tenantId = tenant.getId();
-        }
 
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(code);
         // check process definition exists
@@ -856,7 +807,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
         ProcessDefinition processDefinitionDeepCopy =
                 JSONUtils.parseObject(JSONUtils.toJsonString(processDefinition), ProcessDefinition.class);
-        processDefinition.set(projectCode, name, description, globalParams, locations, timeout, tenantId);
+        processDefinition.set(projectCode, name, description, globalParams, locations, timeout);
         processDefinition.setExecutionType(executionType);
         return updateDagDefine(loginUser, taskRelationList, processDefinition, processDefinitionDeepCopy,
                 taskDefinitionLogs, otherParamsJson);
@@ -1254,7 +1205,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         try {
             out = response.getOutputStream();
             buff = new BufferedOutputStream(out);
-            buff.write(JSONUtils.toJsonString(dagDataSchedules).getBytes(StandardCharsets.UTF_8));
+            buff.write(JSONUtils.toPrettyJsonString(dagDataSchedules).getBytes(StandardCharsets.UTF_8));
             buff.flush();
             buff.close();
         } catch (IOException e) {
@@ -1365,7 +1316,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     CodeGenerateUtils.getInstance().genCode(),
                     "",
                     "[]", null,
-                    0, loginUser.getId(), loginUser.getTenantId());
+                    0, loginUser.getId());
 
             ZipEntry entry;
             while ((entry = zIn.getNextEntry()) != null) {
@@ -1650,6 +1601,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         if (null != schedule) {
             ProcessDefinition newProcessDefinition = processDefinitionMapper.queryByCode(processDefinition.getCode());
             schedule.setProcessDefinitionCode(newProcessDefinition.getCode());
+            schedule.setId(null);
             schedule.setUserId(loginUser.getId());
             schedule.setCreateTime(now);
             schedule.setUpdateTime(now);
@@ -2499,7 +2451,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @param description  description
      * @param globalParams globalParams
      * @param timeout      timeout
-     * @param tenantCode   tenantCode
      * @param scheduleJson scheduleJson
      * @return process definition code
      */
@@ -2511,7 +2462,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                             String description,
                                                             String globalParams,
                                                             int timeout,
-                                                            String tenantCode,
                                                             String scheduleJson,
                                                             ProcessExecutionTypeEnum executionType) {
         Project project = projectMapper.queryByCode(projectCode);
@@ -2536,16 +2486,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return result;
         }
 
-        int tenantId = -1;
-        if (!Constants.DEFAULT.equals(tenantCode)) {
-            Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
-            if (tenant == null) {
-                log.error("Tenant does not exist.");
-                putMsg(result, Status.TENANT_NOT_EXIST);
-                return result;
-            }
-            tenantId = tenant.getId();
-        }
         long processDefinitionCode;
         try {
             processDefinitionCode = CodeGenerateUtils.getInstance().genCode();
@@ -2556,7 +2496,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
         ProcessDefinition processDefinition =
                 new ProcessDefinition(projectCode, name, processDefinitionCode, description,
-                        globalParams, "", timeout, loginUser.getId(), tenantId);
+                        globalParams, "", timeout, loginUser.getId());
         processDefinition.setExecutionType(executionType);
         result = createEmptyDagDefine(loginUser, processDefinition);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
@@ -2607,7 +2547,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             putMsg(result, Status.SCHEDULE_START_TIME_END_TIME_SAME);
             return result;
         }
-        if (!org.quartz.CronExpression.isValidExpression(scheduleObj.getCrontab())) {
+        if (!CronUtils.isValidExpression(scheduleObj.getCrontab())) {
             log.error("CronExpression verify failure, cron:{}.", scheduleObj.getCrontab());
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, scheduleObj.getCrontab());
             return result;
@@ -2643,7 +2583,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
      * @param description   description
      * @param globalParams  globalParams
      * @param timeout       timeout
-     * @param tenantCode    tenantCode
      * @param scheduleJson  scheduleJson
      * @param otherParamsJson otherParamsJson handle other params
      * @param executionType executionType
@@ -2658,7 +2597,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                                 String description,
                                                                 String globalParams,
                                                                 int timeout,
-                                                                String tenantCode,
                                                                 String scheduleJson,
                                                                 String otherParamsJson,
                                                                 ProcessExecutionTypeEnum executionType) {
@@ -2674,16 +2612,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             log.warn("Parameter description is too long.");
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
-        }
-        int tenantId = -1;
-        if (!Constants.DEFAULT.equals(tenantCode)) {
-            Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
-            if (tenant == null) {
-                log.error("Tenant does not exist.");
-                putMsg(result, Status.TENANT_NOT_EXIST);
-                return result;
-            }
-            tenantId = tenant.getId();
         }
 
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(code);
@@ -2712,7 +2640,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
         ProcessDefinition processDefinitionDeepCopy =
                 JSONUtils.parseObject(JSONUtils.toJsonString(processDefinition), ProcessDefinition.class);
-        processDefinition.set(projectCode, name, description, globalParams, "", timeout, tenantId);
+        processDefinition.set(projectCode, name, description, globalParams, "", timeout);
         processDefinition.setExecutionType(executionType);
         List<ProcessTaskRelationLog> taskRelationList = processTaskRelationLogMapper
                 .queryByProcessCodeAndVersion(processDefinition.getCode(), processDefinition.getVersion());
@@ -2783,13 +2711,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         ProcessDefinition processDefinitionUpdate = workflowUpdateRequest.mergeIntoProcessDefinition(processDefinition);
         this.updateWorkflowValid(loginUser, processDefinition, processDefinitionUpdate);
 
-        if (processDefinitionUpdate.getTenantCode() != null) {
-            Tenant tenant = tenantMapper.queryByTenantCode(processDefinitionUpdate.getTenantCode());
-            if (tenant == null) {
-                throw new ServiceException(Status.TENANT_NOT_EXIST);
-            }
-            processDefinitionUpdate.setTenantId(tenant.getId());
-        }
         int insertVersion = this.saveProcessDefine(loginUser, processDefinitionUpdate);
         if (insertVersion == 0) {
             log.error("Update process definition error, projectCode:{}, processDefinitionName:{}.",
@@ -2908,12 +2829,13 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
         // set default value
         FailureStrategy failureStrategy =
-                schedule.getFailureStrategy() == null ? FailureStrategy.CONTINUE : schedule.getFailureStrategy();
-        WarningType warningType = schedule.getWarningType() == null ? WarningType.NONE : schedule.getWarningType();
+                ObjectUtils.defaultIfNull(schedule.getFailureStrategy(), FailureStrategy.CONTINUE);
+        WarningType warningType = ObjectUtils.defaultIfNull(schedule.getWarningType(), WarningType.NONE);
         Priority processInstancePriority =
-                schedule.getProcessInstancePriority() == null ? Priority.MEDIUM : schedule.getProcessInstancePriority();
+                ObjectUtils.defaultIfNull(schedule.getProcessInstancePriority(), Priority.MEDIUM);
         int warningGroupId = schedule.getWarningGroupId() == 0 ? 1 : schedule.getWarningGroupId();
-        String workerGroup = schedule.getWorkerGroup() == null ? "default" : schedule.getWorkerGroup();
+        String workerGroup = StringUtils.defaultIfBlank(schedule.getWorkerGroup(), DEFAULT_WORKER_GROUP);
+        String tenantCode = StringUtils.defaultIfBlank(schedule.getTenantCode(), Constants.DEFAULT);
         long environmentCode = schedule.getEnvironmentCode() == null ? -1 : schedule.getEnvironmentCode();
 
         ScheduleParam param = new ScheduleParam();
@@ -2932,6 +2854,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 failureStrategy,
                 processInstancePriority,
                 workerGroup,
+                tenantCode,
                 environmentCode);
     }
 

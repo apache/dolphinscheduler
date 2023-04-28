@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.storage.hdfs;
 
+import static org.apache.dolphinscheduler.common.constants.Constants.EMPTY_STRING;
 import static org.apache.dolphinscheduler.common.constants.Constants.FOLDER_SEPARATOR;
 import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_S_S;
 import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_TYPE_FILE;
@@ -182,9 +183,9 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
      * @return DefaultFS
      */
     public String getDefaultFS() {
-        String defaultFS = getConfiguration().get(Constants.FS_DEFAULT_FS);
+        String defaultFS = hdfsProperties.getDefaultFS();
         if (StringUtils.isBlank(defaultFS)) {
-            defaultFS = hdfsProperties.getDefaultFS();
+            defaultFS = getConfiguration().get(Constants.HDFS_DEFAULT_FS);
         }
         return defaultFS;
     }
@@ -615,13 +616,16 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
      * @return hdfs resource dir
      */
     public static String getHdfsDir(ResourceType resourceType, String tenantCode) {
-        String hdfsDir = "";
-        if (resourceType.equals(ResourceType.FILE)) {
-            hdfsDir = getHdfsResDir(tenantCode);
-        } else if (resourceType.equals(ResourceType.UDF)) {
-            hdfsDir = getHdfsUdfDir(tenantCode);
+        switch (resourceType) {
+            case UDF:
+                return getHdfsUdfDir(tenantCode);
+            case FILE:
+                return getHdfsResDir(tenantCode);
+            case ALL:
+                return getHdfsDataBasePath();
+            default:
+                return EMPTY_STRING;
         }
-        return hdfsDir;
     }
 
     @Override

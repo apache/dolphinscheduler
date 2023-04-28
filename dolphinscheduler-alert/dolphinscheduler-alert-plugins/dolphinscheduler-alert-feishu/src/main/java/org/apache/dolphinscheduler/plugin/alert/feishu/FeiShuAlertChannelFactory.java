@@ -26,10 +26,12 @@ import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertChannelFactory;
 import org.apache.dolphinscheduler.alert.api.AlertInputTips;
 import org.apache.dolphinscheduler.spi.params.PasswordParam;
+import org.apache.dolphinscheduler.spi.params.base.DataType;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
 import org.apache.dolphinscheduler.spi.params.input.InputParam;
+import org.apache.dolphinscheduler.spi.params.input.number.InputNumberParam;
 import org.apache.dolphinscheduler.spi.params.radio.RadioParam;
 
 import java.util.Arrays;
@@ -70,10 +72,12 @@ public final class FeiShuAlertChannelFactory implements AlertChannelFactory {
                                 .setRequired(false).build())
                         .build();
 
-        InputParam portParam =
-                InputParam.newBuilder(FeiShuParamsConstants.NAME_FEI_SHU_PORT, FeiShuParamsConstants.FEI_SHU_PORT)
+        InputNumberParam portParam =
+                InputNumberParam.newBuilder(FeiShuParamsConstants.NAME_FEI_SHU_PORT, FeiShuParamsConstants.FEI_SHU_PORT)
                         .addValidate(Validate.newBuilder()
-                                .setRequired(false).build())
+                                .setRequired(false)
+                                .setType(DataType.NUMBER.getDataType())
+                                .build())
                         .build();
 
         InputParam userParam =

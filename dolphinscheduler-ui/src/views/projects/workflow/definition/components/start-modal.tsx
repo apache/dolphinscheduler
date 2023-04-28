@@ -82,6 +82,7 @@ export default defineComponent({
       variables,
       handleStartDefinition,
       getWorkerGroups,
+      getTenantList,
       getAlertGroups,
       getEnvironmentList,
       getStartParamsList
@@ -92,7 +93,7 @@ export default defineComponent({
     }
 
     const handleStart = () => {
-      handleStartDefinition(props.row.code,props.row.version)
+      handleStartDefinition(props.row.code, props.row.version)
     }
 
     const generalWarningTypeListOptions = () => [
@@ -195,6 +196,7 @@ export default defineComponent({
 
     onMounted(() => {
       getWorkerGroups()
+      getTenantList()
       getAlertGroups()
       getEnvironmentList()
     })
@@ -312,6 +314,16 @@ export default defineComponent({
             />
           </NFormItem>
           <NFormItem
+            label={t('project.workflow.tenant_code')}
+            path='tenantCode'
+          >
+            <NSelect
+              options={this.tenantList}
+              v-model:value={this.startForm.tenantCode}
+            />
+          </NFormItem>
+
+          <NFormItem
             label={t('project.workflow.environment_name')}
             path='environmentCode'
           >
@@ -323,17 +335,19 @@ export default defineComponent({
               clearable
             />
           </NFormItem>
-          {this.startForm.warningType !== 'NONE' && (<NFormItem
-            label={t('project.workflow.alarm_group')}
-            path='warningGroupId'
-          >
-            <NSelect
-              options={this.alertGroups}
-              placeholder={t('project.workflow.please_choose')}
-              v-model:value={this.startForm.warningGroupId}
-              clearable
-            />
-          </NFormItem>)}
+          {this.startForm.warningType !== 'NONE' && (
+            <NFormItem
+              label={t('project.workflow.alarm_group')}
+              path='warningGroupId'
+            >
+              <NSelect
+                options={this.alertGroups}
+                placeholder={t('project.workflow.please_choose')}
+                v-model:value={this.startForm.warningGroupId}
+                clearable
+              />
+            </NFormItem>
+          )}
           <NFormItem
             label={t('project.workflow.complement_data')}
             path='complement_data'

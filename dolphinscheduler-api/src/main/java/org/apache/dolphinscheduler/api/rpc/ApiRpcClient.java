@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.api.rpc;
 
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
-import org.apache.dolphinscheduler.remote.command.Command;
+import org.apache.dolphinscheduler.remote.command.Message;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.utils.Host;
@@ -34,8 +34,8 @@ public class ApiRpcClient {
         this.nettyRemotingClient = new NettyRemotingClient(new NettyClientConfig());
     }
 
-    public void send(Host host, Command command) throws RemotingException {
-        nettyRemotingClient.send(host, command);
+    public void send(Host host, Message message) throws RemotingException {
+        nettyRemotingClient.send(host, message);
     }
 
 }

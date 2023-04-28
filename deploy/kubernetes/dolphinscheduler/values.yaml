@@ -104,7 +104,7 @@ conf:
     # user data local directory path, please make sure the directory exists and have read write permissions
     data.basedir.path: /tmp/dolphinscheduler
 
-    # resource storage type: HDFS, S3, NONE
+    # resource storage type: HDFS, S3, OSS, GCS, NONE
     resource.storage.type: S3
 
     # resource store on HDFS/S3 path, resource file will store to this base path, self configuration, please make sure the directory exists on hdfs and have read write permissions. "/dolphinscheduler" is recommended
@@ -310,7 +310,7 @@ master:
     MASTER_TASK_COMMIT_RETRYTIMES: "5"
     MASTER_TASK_COMMIT_INTERVAL: "1s"
     MASTER_STATE_WHEEL_INTERVAL: "5s"
-    MASTER_MAX_CPU_LOAD_AVG: "-1"
+    MASTER_MAX_CPU_LOAD_AVG: "1"
     MASTER_RESERVED_MEMORY: "0.3"
     MASTER_FAILOVER_INTERVAL: "10m"
     MASTER_KILL_APPLICATION_WHEN_HANDLE_FAILOVER: "true"
@@ -382,7 +382,7 @@ worker:
       storageClassName: "-"
       storage: "20Gi"
   env:
-    WORKER_MAX_CPU_LOAD_AVG: "-1"
+    WORKER_MAX_CPU_LOAD_AVG: "1"
     WORKER_RESERVED_MEMORY: "0.3"
     WORKER_EXEC_THREADS: "100"
     WORKER_HEARTBEAT_INTERVAL: "10s"

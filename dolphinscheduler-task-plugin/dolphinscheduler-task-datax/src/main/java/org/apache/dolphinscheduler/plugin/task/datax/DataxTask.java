@@ -21,6 +21,7 @@ import static org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUt
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
 
+import org.apache.dolphinscheduler.common.log.SensitiveDataConverter;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
@@ -40,14 +41,12 @@ import org.apache.dolphinscheduler.spi.enums.Flag;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
@@ -60,10 +59,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.alibaba.druid.sql.ast.SQLStatement;
 import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
@@ -87,14 +85,19 @@ public class DataxTask extends AbstractTask {
     public static final String CUSTOM_PARAM = " -D%s='%s'";
     /**
      * python process(datax only supports version 2.7 by default)
+     * todo: Create a shell script to execute the datax task, and read the python version from the env, so we can support multiple versions of datax python
      */
-    private static final String DATAX_PYTHON = "python2.7";
-    private static final Pattern PYTHON_PATH_PATTERN = Pattern.compile("/bin/python[\\d.]*$");
+    private static final String DATAX_PYTHON = Optional.ofNullable(System.getenv("DATAX_PYTHON")).orElse("python2.7");
 
     /**
      * select all
      */
     private static final String SELECT_ALL_CHARACTER = "*";
+
+    /**
+     * post jdbc info regex
+     */
+    private static final String POST_JDBC_INFO_REGEX = "(?<=(post jdbc info:)).*(?=)";
     /**
      * datax path
      */
@@ -145,7 +148,7 @@ public class DataxTask extends AbstractTask {
         if (dataXParameters == null || !dataXParameters.checkParameters()) {
             throw new RuntimeException("datax task params is not valid");
         }
-
+        SensitiveDataConverter.addMaskPattern(POST_JDBC_INFO_REGEX);
         dataxTaskExecutionContext =
                 dataXParameters.generateExtendedContext(taskExecutionContext.getResourceParametersHelper());
     }
@@ -399,7 +402,7 @@ public class DataxTask extends AbstractTask {
         }
 
         // datax python command
-        String sbr = getPythonCommand() +
+        String sbr = DATAX_PYTHON +
                 " " +
                 DATAX_PATH +
                 " " +
@@ -439,23 +442,6 @@ public class DataxTask extends AbstractTask {
         customParameters.replace(4, 5, "");
         customParameters.append("\"");
         return customParameters;
-    }
-
-    public String getPythonCommand() {
-        String pythonHome = System.getenv("PYTHON_HOME");
-        return getPythonCommand(pythonHome);
-    }
-
-    public String getPythonCommand(String pythonHome) {
-        if (StringUtils.isEmpty(pythonHome)) {
-            return DATAX_PYTHON;
-        }
-        String pythonBinPath = "/bin/" + DATAX_PYTHON;
-        Matcher matcher = PYTHON_PATH_PATTERN.matcher(pythonHome);
-        if (matcher.find()) {
-            return matcher.replaceAll(pythonBinPath);
-        }
-        return Paths.get(pythonHome, pythonBinPath).toString();
     }
 
     public String loadJvmEnv(DataxParameters dataXParameters) {

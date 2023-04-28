@@ -47,6 +47,11 @@
             <artifactId>dolphinscheduler-storage-oss</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-storage-gcs</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

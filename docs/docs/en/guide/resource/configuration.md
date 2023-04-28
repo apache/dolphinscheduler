@@ -26,9 +26,35 @@ The configuration you may need to change:
 > and `resource.hdfs.fs.defaultFS=file:///`, The configuration of `resource.storage.type=LOCAL` is for user-friendly, and enables
 > the local resource center to be enabled by default
 
+## connect AWS S3
+
+if you want to upload resources to `Resource Center` connected to `S3`, you need to configure `api-server/conf/common.properties` and `worker-server/conf/common.properties`. You can refer to the following:
+
+config the following fields
+
+```properties
+......
+
+resource.storage.type=S3
+
+......
+
+resource.aws.access.key.id=aws_access_key_id
+# The AWS secret access key. if resource.storage.type=S3 or use EMR-Task, This configuration is required
+resource.aws.secret.access.key=aws_secret_access_key
+# The AWS Region to use. if resource.storage.type=S3 or use EMR-Task, This configuration is required
+resource.aws.region=us-west-2
+# The name of the bucket. You need to create them by yourself. Otherwise, the system cannot start. All buckets in Amazon S3 share a single namespace; ensure the bucket is given a unique name.
+resource.aws.s3.bucket.name=dolphinscheduler
+# You need to set this parameter when private cloud s4. If S3 uses public cloud, you only need to set resource.aws.region or set to the endpoint of a public cloud such as S3.cn-north-1.amazonaws.com.cn
+resource.aws.s3.endpoint=
+
+......
+```
+
 ## Use HDFS or Remote Object Storage
 
-After version 3.0.0-alpha, if you want to upload resources to `Resource Center` connected to `HDFS` or `S3`, you need to configure `api-server/conf/common.properties` and `worker-server/conf/common.properties`.
+After version 3.0.0-alpha, if you want to upload resources to `Resource Center` connected to `HDFS`, you need to configure `api-server/conf/common.properties` and `worker-server/conf/common.properties`.
 
 ```properties
 #
@@ -54,7 +80,7 @@ data.basedir.path=/tmp/dolphinscheduler
 # resource view suffixs
 #resource.view.suffixs=txt,log,sh,bat,conf,cfg,py,java,sql,xml,hql,properties,json,yml,yaml,ini,js
 
-# resource storage type: HDFS, S3, OSS, NONE
+# resource storage type: HDFS, S3, OSS, GCS, NONE
 resource.storage.type=NONE
 # resource store on HDFS/S3/OSS path, resource file will store to this base path, self configuration, please make sure the directory exists on hdfs and have read write permissions. "/dolphinscheduler" is recommended
 resource.storage.upload.base.path=/tmp/dolphinscheduler

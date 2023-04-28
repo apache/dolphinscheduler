@@ -56,7 +56,7 @@ public class RequestClient {
             headersBuilder = Headers.of(headers);
         }
 
-        LOGGER.info("GET request to {}, Headers: {}", requestUrl, headersBuilder);
+        log.info("GET request to {}, Headers: {}", requestUrl, headersBuilder);
         Request request = new Request.Builder()
             .url(requestUrl)
             .headers(headersBuilder)
@@ -74,7 +74,7 @@ public class RequestClient {
 
         HttpResponse httpResponse = new HttpResponse(responseCode, responseData);
 
-        LOGGER.info("GET response: {}", httpResponse);
+        log.info("GET response: {}", httpResponse);
 
         return httpResponse;
     }
@@ -111,7 +111,7 @@ public class RequestClient {
 
         RequestBody requestBody = FormBody.create(MediaType.parse(Constants.REQUEST_CONTENT_TYPE), getParams(params));
 
-        LOGGER.info("POST request to {}, Headers: {}, Params: {}", requestUrl, headersBuilder, params);
+        log.info("POST request to {}, Headers: {}, Params: {}", requestUrl, headersBuilder, params);
         Request request = new Request.Builder()
             .headers(headersBuilder)
             .url(requestUrl)
@@ -129,7 +129,7 @@ public class RequestClient {
 
         HttpResponse httpResponse = new HttpResponse(responseCode, responseData);
 
-        LOGGER.info("POST response: {}", httpResponse);
+        log.info("POST response: {}", httpResponse);
 
         return httpResponse;
     }
@@ -146,7 +146,7 @@ public class RequestClient {
 
         Headers headersBuilder = Headers.of(headers);
 
-        LOGGER.info("DELETE request to {}, Headers: {}, Params: {}", requestUrl, headersBuilder, params);
+        log.info("DELETE request to {}, Headers: {}, Params: {}", requestUrl, headersBuilder, params);
         Request request = new Request.Builder()
             .headers(headersBuilder)
             .url(requestUrl)
@@ -164,7 +164,7 @@ public class RequestClient {
 
         HttpResponse httpResponse = new HttpResponse(responseCode, responseData);
 
-        LOGGER.info("DELETE response: {}", httpResponse);
+        log.info("DELETE response: {}", httpResponse);
 
         return httpResponse;
     }
