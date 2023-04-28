@@ -26,7 +26,7 @@
 
   <artifactId>dolphinscheduler-ui</artifactId>
 
-  <name>${project.artifactId}</name>
+  <name>dolphinscheduler-ui</name>
 
   <properties>
     <node.version>v16.13.1</node.version>

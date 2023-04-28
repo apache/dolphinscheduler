@@ -25,7 +25,7 @@
 
     <artifactId>dolphinscheduler-microbench</artifactId>
     <packaging>jar</packaging>
-    <name>${project.artifactId}</name>
+    <name>dolphinscheduler-microbench</name>
 
     <properties>
         <jmh.version>1.21</jmh.version>

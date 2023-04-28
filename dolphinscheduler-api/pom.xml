@@ -24,7 +24,7 @@
         <version>3.0.1-SNAPSHOT</version>
     </parent>
     <artifactId>dolphinscheduler-api</artifactId>
-    <name>${project.artifactId}</name>
+    <name>dolphinscheduler-api</name>
     <packaging>jar</packaging>
 
     <dependencies>

@@ -24,7 +24,7 @@
         <version>3.0.1-SNAPSHOT</version>
     </parent>
     <artifactId>dolphinscheduler-python</artifactId>
-    <name>${project.artifactId}</name>
+    <name>dolphinscheduler-python</name>
     <packaging>jar</packaging>
 
     <profiles>

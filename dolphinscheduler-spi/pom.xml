@@ -23,7 +23,7 @@
         <version>3.0.1-SNAPSHOT</version>
     </parent>
     <artifactId>dolphinscheduler-spi</artifactId>
-    <name>${project.artifactId}</name>
+    <name>dolphinscheduler-spi</name>
 
     <dependencies>
         <!-- the SPI should have only minimal dependencies -->

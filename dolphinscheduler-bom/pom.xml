@@ -25,7 +25,7 @@
         <version>dev-SNAPSHOT</version>
     </parent>
     <artifactId>dolphinscheduler-bom</artifactId>
-    <name>${project.artifactId}</name>
+    <name>dolphinscheduler-bom</name>
     <packaging>pom</packaging>
 
     <properties>
