@@ -119,10 +119,15 @@ export function useDatasource(
       disabled: true
     },
     {
-      id: 15,
+      id: 16,
+      code: 'DATABEND',
+      disabled: false
+    },
+    {
+      id: 17,
       code: 'TERADATA',
       disabled: false
-    },    
+    },
   ]
 
   const getDatasourceTypes = async () => {

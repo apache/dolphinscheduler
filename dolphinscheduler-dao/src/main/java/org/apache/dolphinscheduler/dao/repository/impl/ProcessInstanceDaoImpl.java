@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.dao.repository.impl;
 
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
+import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.model.DateInterval;
@@ -40,6 +42,9 @@ public class ProcessInstanceDaoImpl implements ProcessInstanceDao {
 
     @Autowired
     private ProcessInstanceMapper processInstanceMapper;
+
+    @Autowired
+    private ProcessInstanceMapMapper processInstanceMapMapper;
 
     @Override
     public int insertProcessInstance(ProcessInstance processInstance) {
@@ -146,5 +151,17 @@ public class ProcessInstanceDaoImpl implements ProcessInstanceDao {
     @Override
     public ProcessInstance queryFirstStartProcessInstance(Long definitionCode) {
         return processInstanceMapper.queryFirstStartProcessInstance(definitionCode);
+    }
+
+    @Override
+    public ProcessInstance findSubProcessInstanceByParentId(Integer processInstanceId, Integer taskInstanceId) {
+        ProcessInstance processInstance = null;
+        ProcessInstanceMap processInstanceMap =
+                processInstanceMapMapper.queryByParentId(processInstanceId, taskInstanceId);
+        if (processInstanceMap == null || processInstanceMap.getProcessInstanceId() == 0) {
+            return processInstance;
+        }
+        processInstance = queryByWorkflowInstanceId(processInstanceMap.getProcessInstanceId());
+        return processInstance;
     }
 }

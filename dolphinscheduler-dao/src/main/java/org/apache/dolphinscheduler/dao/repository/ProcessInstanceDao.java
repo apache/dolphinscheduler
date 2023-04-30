@@ -87,4 +87,6 @@ public interface ProcessInstanceDao {
      * @return process instance
      */
     ProcessInstance queryFirstStartProcessInstance(@Param("processDefinitionCode") Long definitionCode);
+
+    ProcessInstance findSubProcessInstanceByParentId(Integer processInstanceId, Integer taskInstanceId);
 }

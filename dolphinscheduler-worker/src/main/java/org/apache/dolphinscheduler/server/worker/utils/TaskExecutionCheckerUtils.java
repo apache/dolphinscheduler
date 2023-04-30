@@ -47,8 +47,6 @@ import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.slf4j.Logger;
-
 @Slf4j
 public class TaskExecutionCheckerUtils {
 
@@ -109,7 +107,7 @@ public class TaskExecutionCheckerUtils {
     }
 
     public static void downloadResourcesIfNeeded(StorageOperate storageOperate,
-                                                 TaskExecutionContext taskExecutionContext, Logger logger) {
+                                                 TaskExecutionContext taskExecutionContext) {
         String execLocalPath = taskExecutionContext.getExecutePath();
         Map<String, String> projectRes = taskExecutionContext.getResources();
         if (MapUtils.isEmpty(projectRes)) {
@@ -122,7 +120,7 @@ public class TaskExecutionCheckerUtils {
             if (notExist) {
                 downloadFiles.add(Pair.of(key, value));
             } else {
-                logger.info("file : {} exists ", resFile.getName());
+                log.info("file : {} exists ", resFile.getName());
             }
         });
         if (!downloadFiles.isEmpty() && !PropertyUtils.getResUploadStartupState()) {
@@ -133,8 +131,11 @@ public class TaskExecutionCheckerUtils {
             for (Pair<String, String> fileDownload : downloadFiles) {
                 try {
                     String fullName = fileDownload.getLeft();
-                    String fileName = fileDownload.getRight();
-                    logger.info("get resource file from path:{}", fullName);
+                    // we do not actually get & need tenantCode with this implementation right now.
+                    String tenantCode = fileDownload.getRight();
+                    // TODO: Need a better way to get fileName because this implementation is tricky.
+                    String fileName = storageOperate.getResourceFileName(fullName);
+                    log.info("get resource file from path:{}", fullName);
 
                     long resourceDownloadStartTime = System.currentTimeMillis();
                     storageOperate.download(taskExecutionContext.getTenantCode(), fullName,

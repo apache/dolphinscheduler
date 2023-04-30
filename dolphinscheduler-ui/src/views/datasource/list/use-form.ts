@@ -428,6 +428,11 @@ export const datasourceType: IDataBaseOptionKeys = {
     label: 'SSH',
     defaultPort: 22
   },
+  DATABEND: {
+    value: 'DATABEND',
+    label: 'DATABEND',
+    defaultPort: 8000
+  },
   TERADATA: {
     value: 'TERADATA',
     label: 'TERADATA',

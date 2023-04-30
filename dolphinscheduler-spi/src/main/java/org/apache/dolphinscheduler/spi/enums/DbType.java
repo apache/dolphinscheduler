@@ -47,7 +47,8 @@ public enum DbType {
     OCEANBASE(16, "oceanbase"),
     SSH(17, "ssh"),
     KYUUBI(18, "kyuubi"),
-    TERADATA(19, "teradata");
+    DATABEND(19, "databend"),
+    TERADATA(20, "teradata");
 
     private static final Map<Integer, DbType> DB_TYPE_MAP =
             Arrays.stream(DbType.values()).collect(toMap(DbType::getCode, Functions.identity()));
