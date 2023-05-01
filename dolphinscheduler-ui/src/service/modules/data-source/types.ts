@@ -54,6 +54,7 @@ type IDataBaseLabel =
 | 'DAMENG'
 | 'OCEANBASE'
 | 'SSH'
+| 'DATABEND'
 | 'TERADATA'
 
 interface IDataSource {

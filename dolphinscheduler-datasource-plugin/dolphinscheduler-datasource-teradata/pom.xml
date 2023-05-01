@@ -44,6 +44,7 @@
         <dependency>
             <groupId>com.teradata.jdbc</groupId>
             <artifactId>terajdbc</artifactId>
+            <version>20.00.00.06</version>
         </dependency>
     </dependencies>
 </project>
