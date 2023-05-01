@@ -29,6 +29,7 @@ public class K8sTaskMainParameters {
 
     private String image;
     private String command;
+    private String args;
     private String namespaceName;
     private String clusterName;
     private double minCpuCores;
