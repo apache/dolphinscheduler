@@ -21,14 +21,14 @@ DROP TABLE IF EXISTS `t_ds_jdbc_registry_data`;
 CREATE TABLE `t_ds_jdbc_registry_data`
 (
     `id`               bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'primary key',
-    `key`              varchar(256) NOT NULL COMMENT 'key, like zookeeper node path',
-    `data`             text         NOT NULL COMMENT 'data, like zookeeper node value',
-    `type`             tinyint(4) NOT NULL COMMENT '1: ephemeral node, 2: persistent node',
+    `data_key`         varchar(256) NOT NULL COMMENT 'key, like zookeeper node path',
+    `data_value`       text         NOT NULL COMMENT 'data, like zookeeper node value',
+    `data_type`        tinyint(4) NOT NULL COMMENT '1: ephemeral node, 2: persistent node',
     `last_term`        bigint       NOT NULL COMMENT 'last term time',
     `last_update_time` timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'last update time',
     `create_time`      timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
     PRIMARY KEY (`id`),
-    unique (`key`)
+    unique (`data_key`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
 
@@ -37,12 +37,12 @@ DROP TABLE IF EXISTS `t_ds_jdbc_registry_lock`;
 CREATE TABLE `t_ds_jdbc_registry_lock`
 (
     `id`               bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'primary key',
-    `key`              varchar(256) NOT NULL COMMENT 'lock path',
+    `lock_key`         varchar(256) NOT NULL COMMENT 'lock path',
     `lock_owner`       varchar(256) NOT NULL COMMENT 'the lock owner, ip_processId',
     `last_term`        bigint       NOT NULL COMMENT 'last term time',
     `last_update_time` timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'last update time',
     `create_time`      timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
     PRIMARY KEY (`id`),
-    unique (`key`)
+    unique (`lock_key`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;

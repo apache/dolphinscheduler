@@ -80,7 +80,7 @@ public class SubscribeDataManager implements AutoCloseable {
         if (jdbcRegistryData == null) {
             return null;
         }
-        return jdbcRegistryData.getData();
+        return jdbcRegistryData.getDataValue();
     }
 
     @Override
@@ -102,7 +102,7 @@ public class SubscribeDataManager implements AutoCloseable {
             try {
                 Map<String, JdbcRegistryData> currentJdbcDataMap = jdbcOperator.queryAllJdbcRegistryData()
                         .stream()
-                        .collect(Collectors.toMap(JdbcRegistryData::getKey, Function.identity()));
+                        .collect(Collectors.toMap(JdbcRegistryData::getDataKey, Function.identity()));
                 // find the different
                 List<JdbcRegistryData> addedData = new ArrayList<>();
                 List<JdbcRegistryData> deletedData = new ArrayList<>();
@@ -143,9 +143,9 @@ public class SubscribeDataManager implements AutoCloseable {
                                      List<SubscribeListener> subscribeListeners,
                                      Event.Type type) {
             for (JdbcRegistryData data : dataList) {
-                if (data.getKey().startsWith(subscribeKey)) {
+                if (data.getDataKey().startsWith(subscribeKey)) {
                     subscribeListeners.forEach(subscribeListener -> subscribeListener
-                            .notify(new Event(data.getKey(), data.getKey(), data.getData(), type)));
+                            .notify(new Event(data.getDataKey(), data.getDataKey(), data.getDataValue(), type)));
                 }
             }
         }
