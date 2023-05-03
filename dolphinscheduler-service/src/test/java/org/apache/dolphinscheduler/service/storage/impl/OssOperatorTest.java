@@ -265,7 +265,7 @@ public class OssOperatorTest {
     }
 
     @Test
-    public void testCopyHdfsToLocal() {
+    public void testDownload() {
         try {
             while (true) {
                 ossOperator.download(
