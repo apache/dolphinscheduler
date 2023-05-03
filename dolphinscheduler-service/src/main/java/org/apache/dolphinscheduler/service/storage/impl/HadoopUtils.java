@@ -22,6 +22,7 @@ import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_S_S;
 import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_TYPE_FILE;
 import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_TYPE_UDF;
 
+import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.exception.BaseException;
@@ -82,6 +83,9 @@ public class HadoopUtils implements Closeable, StorageOperate {
     public static final int HADOOP_RESOURCE_MANAGER_HTTP_ADDRESS_PORT_VALUE =
             PropertyUtils.getInt(Constants.HADOOP_RESOURCE_MANAGER_HTTPADDRESS_PORT, 8088);
     private static final String HADOOP_UTILS_KEY = "HADOOP_UTILS_KEY";
+
+
+    private static final int LOCK_TIME_OUT = PropertyUtils.getInt(Constants.RESOURCE_LOCK_TIMEOUT, 10000);
 
     private static final LoadingCache<String, HadoopUtils> cache = CacheBuilder
             .newBuilder()
@@ -222,16 +226,36 @@ public class HadoopUtils implements Closeable, StorageOperate {
      * @return byte[] byte array
      * @throws IOException errors
      */
-    public byte[] catFile(String hdfsFilePath) throws IOException {
+    public byte[] catFile(String hdfsFilePath, InterProcessMutex lock) throws IOException {
 
         if (StringUtils.isBlank(hdfsFilePath)) {
             logger.error("hdfs file path:{} is blank", hdfsFilePath);
             return new byte[0];
         }
 
-        try (FSDataInputStream fsDataInputStream = fs.open(new Path(hdfsFilePath))) {
+        FSDataInputStream fsDataInputStream = null;
+        try {
+            if (null != lock) {
+                lock.acquire(LOCK_TIME_OUT, TimeUnit.MILLISECONDS);
+            }
+            fsDataInputStream = fs.open(new Path(hdfsFilePath));
+
             return IOUtils.toByteArray(fsDataInputStream);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                if (null != lock) {
+                    lock.release();
+                }
+            } catch (Exception e) {
+                logger.error("release distributed lock key:{} failed.", hdfsFilePath);
+            }
+            if (null != fsDataInputStream) {
+                fsDataInputStream.close();
+            }
         }
+
     }
 
     /**
@@ -240,27 +264,47 @@ public class HadoopUtils implements Closeable, StorageOperate {
      * @param hdfsFilePath hdfs file path
      * @param skipLineNums skip line numbers
      * @param limit        read how many lines
+     * @param lock
      * @return content of file
      * @throws IOException errors
      */
-    public List<String> catFile(String hdfsFilePath, int skipLineNums, int limit) throws IOException {
+    public List<String> catFile(String hdfsFilePath, int skipLineNums, int limit,
+        InterProcessMutex lock) throws IOException {
 
         if (StringUtils.isBlank(hdfsFilePath)) {
             logger.error("hdfs file path:{} is blank", hdfsFilePath);
             return Collections.emptyList();
         }
-
-        try (FSDataInputStream in = fs.open(new Path(hdfsFilePath))) {
-            BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+        FSDataInputStream in = null;
+        try {
+            if (null != lock) {
+                lock.acquire(LOCK_TIME_OUT, TimeUnit.MILLISECONDS);
+            }
+            in = fs.open(new Path(hdfsFilePath));
+            BufferedReader br = new BufferedReader(
+                new InputStreamReader(in, StandardCharsets.UTF_8));
             Stream<String> stream = br.lines().skip(skipLineNums).limit(limit);
             return stream.collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                if (null != lock) {
+                    lock.release();
+                }
+            } catch (Exception e) {
+                logger.error("release distributed lock key:{} failed.", hdfsFilePath);
+            }
+            if (null != in) {
+                in.close();
+            }
         }
     }
 
     @Override
     public List<String> vimFile(String bucketName, String hdfsFilePath, int skipLineNums,
-                                int limit) throws IOException {
-        return catFile(hdfsFilePath, skipLineNums, limit);
+                                int limit, InterProcessMutex lock) throws IOException {
+        return catFile(hdfsFilePath, skipLineNums, limit, lock);
     }
 
     @Override
@@ -305,8 +349,8 @@ public class HadoopUtils implements Closeable, StorageOperate {
 
     @Override
     public void download(String bucketName, String srcHdfsFilePath, String dstFile, boolean deleteSource,
-                         boolean overwrite) throws IOException {
-        copyHdfsToLocal(srcHdfsFilePath, dstFile, deleteSource, overwrite);
+                         boolean overwrite, InterProcessMutex lock) throws IOException {
+        copyHdfsToLocal(srcHdfsFilePath, dstFile, deleteSource, overwrite, lock);
     }
 
     /**
@@ -316,12 +360,33 @@ public class HadoopUtils implements Closeable, StorageOperate {
      * @param dstPath      destination hdfs path
      * @param deleteSource whether to delete the src
      * @param overwrite    whether to overwrite an existing file
+     * @param lock
      * @return if success or not
      * @throws IOException errors
      */
     @Override
-    public boolean copy(String srcPath, String dstPath, boolean deleteSource, boolean overwrite) throws IOException {
-        return FileUtil.copy(fs, new Path(srcPath), fs, new Path(dstPath), deleteSource, overwrite, fs.getConf());
+    public boolean copy(String srcPath, String dstPath, boolean deleteSource, boolean overwrite,
+        InterProcessMutex lock) throws IOException {
+
+        try {
+            if (null != lock) {
+                lock.acquire(LOCK_TIME_OUT, TimeUnit.MILLISECONDS);
+            }
+
+            return FileUtil.copy(fs, new Path(srcPath), fs, new Path(dstPath), deleteSource,
+                overwrite, fs.getConf());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+        try {
+            if (null != lock) {
+                lock.release();
+            }
+        } catch (Exception e) {
+            logger.error("release distributed lock key:{} failed.", dstPath);
+        }
+    }
+
     }
 
     /**
@@ -336,19 +401,36 @@ public class HadoopUtils implements Closeable, StorageOperate {
      * @throws IOException errors
      */
     public boolean copyLocalToHdfs(String srcFile, String dstHdfsPath, boolean deleteSource,
-                                   boolean overwrite) throws IOException {
+        boolean overwrite,InterProcessMutex lock) throws IOException {
         Path srcPath = new Path(srcFile);
         Path dstPath = new Path(dstHdfsPath);
+        try {
+            if (null != lock) {
+                lock.acquire(LOCK_TIME_OUT, TimeUnit.MILLISECONDS);
+            }
 
-        fs.copyFromLocalFile(deleteSource, overwrite, srcPath, dstPath);
+            fs.copyFromLocalFile(deleteSource, overwrite, srcPath, dstPath);
 
-        return true;
+            return true;
+        } catch (IOException e) {
+            throw new IOException(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                if (null != lock) {
+                    lock.release();
+                }
+            } catch (Exception e) {
+                logger.error("release distributed lock key:{} failed.", dstHdfsPath);
+            }
+        }
     }
 
     @Override
     public boolean upload(String buckName, String srcFile, String dstPath, boolean deleteSource,
-                          boolean overwrite) throws IOException {
-        return copyLocalToHdfs(srcFile, dstPath, deleteSource, overwrite);
+        boolean overwrite, InterProcessMutex lock) throws IOException {
+        return copyLocalToHdfs(srcFile, dstPath, deleteSource, overwrite, lock);
     }
 
     /*
@@ -367,25 +449,42 @@ public class HadoopUtils implements Closeable, StorageOperate {
      * @throws IOException errors
      */
     public boolean copyHdfsToLocal(String srcHdfsFilePath, String dstFile, boolean deleteSource,
-                                   boolean overwrite) throws IOException {
+        boolean overwrite, InterProcessMutex lock) throws IOException {
         Path srcPath = new Path(srcHdfsFilePath);
         File dstPath = new File(dstFile);
 
-        if (dstPath.exists()) {
-            if (dstPath.isFile()) {
-                if (overwrite) {
-                    Files.delete(dstPath.toPath());
+        try {
+            if (null != lock) {
+                lock.acquire(LOCK_TIME_OUT, TimeUnit.MILLISECONDS);
+            }
+            if (dstPath.exists()) {
+                if (dstPath.isFile()) {
+                    if (overwrite) {
+                        Files.delete(dstPath.toPath());
+                    }
+                } else {
+                    logger.error("destination file must be a file");
                 }
-            } else {
-                logger.error("destination file must be a file");
+            }
+
+            if (!dstPath.getParentFile().exists() && !dstPath.getParentFile().mkdirs()) {
+                return false;
+            }
+
+            return FileUtil.copy(fs, srcPath, dstPath, deleteSource, fs.getConf());
+        } catch (IOException e) {
+            throw new IOException(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (null != lock) {
+                try {
+                    lock.release();
+                } catch (Exception e) {
+                    logger.error("release distributed lock key:{} failed.", srcHdfsFilePath);
+                }
             }
         }
-
-        if (!dstPath.getParentFile().exists() && !dstPath.getParentFile().mkdirs()) {
-            return false;
-        }
-
-        return FileUtil.copy(fs, srcPath, dstPath, deleteSource, fs.getConf());
     }
 
     /**
@@ -422,12 +521,25 @@ public class HadoopUtils implements Closeable, StorageOperate {
      * @return {@link FileStatus} file status
      * @throws IOException errors
      */
-    public FileStatus[] listFileStatus(String filePath) throws IOException {
+    public FileStatus[] listFileStatus(String filePath, InterProcessMutex lock) throws IOException {
         try {
+            if (null != lock) {
+                lock.acquire(LOCK_TIME_OUT, TimeUnit.MILLISECONDS);
+            }
             return fs.listStatus(new Path(filePath));
         } catch (IOException e) {
             logger.error("Get file list exception", e);
             throw new IOException("Get file list exception", e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (null != lock) {
+                try {
+                    lock.release();
+                } catch (Exception e) {
+                    logger.error("release distributed lock key:{} failed.", filePath);
+                }
+            }
         }
     }
 

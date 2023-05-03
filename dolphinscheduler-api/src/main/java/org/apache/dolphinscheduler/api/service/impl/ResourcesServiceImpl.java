@@ -26,6 +26,7 @@ import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_S_S;
 import static org.apache.dolphinscheduler.common.constants.Constants.JAR;
 import static org.apache.dolphinscheduler.common.constants.Constants.PERIOD;
 
+import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.dto.resources.filter.ResourceFilter;
@@ -56,6 +57,7 @@ import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
+import org.apache.dolphinscheduler.plugin.registry.zookeeper.ZookeeperRegistry;
 import org.apache.dolphinscheduler.service.storage.StorageOperate;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
@@ -122,6 +124,14 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
     @Autowired(required = false)
     private StorageOperate storageOperate;
+
+    /**
+     * distributed read write locks
+     */
+    @Autowired
+    private ZookeeperRegistry zookeeperRegistry;
+
+    private Boolean useLock = PropertyUtils.getBoolean(Constants.RESOURCE_LOCK_SWITCH, false);
 
     /**
      * create directory
@@ -578,7 +588,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         try {
             logger.info("start  copy {} -> {}", originFileName, destHdfsFileName);
-            storageOperate.copy(originFileName, destHdfsFileName, true, true);
+            // Distributed write lock
+            InterProcessMutex lock =
+                useLock ? zookeeperRegistry.getReadWriteLock(destHdfsFileName)
+                    .writeLock() : null;
+            storageOperate.copy(originFileName, destHdfsFileName, true, true, lock);
         } catch (Exception e) {
             logger.error(MessageFormat.format(" copy {0} -> {1} fail", originFileName, destHdfsFileName), e);
             putMsg(result, Status.HDFS_COPY_FAIL);
@@ -739,7 +753,13 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 storageOperate.createTenantDirIfNotExists(tenantCode);
             }
             org.apache.dolphinscheduler.api.utils.FileUtils.copyInputStreamToFile(file, localFilename);
-            storageOperate.upload(tenantCode, localFilename, fileName, true, true);
+
+            // Distributed write lock
+            InterProcessMutex lock =
+                useLock ? zookeeperRegistry.getReadWriteLock(fileName)
+                    .writeLock() : null;
+
+            storageOperate.upload(tenantCode, localFilename, fileName, true, true, lock);
         } catch (Exception e) {
             FileUtils.deleteFile(localFilename);
             logger.error(e.getMessage(), e);
@@ -1079,7 +1099,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         logger.info("resource  path is {}", resourceFileName);
         try {
             if (storageOperate.exists(tenantCode, resourceFileName)) {
-                List<String> content = storageOperate.vimFile(tenantCode, resourceFileName, skipLineNum, limit);
+                // Distributed read lock
+                InterProcessMutex lock =
+                    useLock ? zookeeperRegistry.getReadWriteLock(resourceFileName).readLock() : null;
+                List<String> content = storageOperate.vimFile(tenantCode, resourceFileName, skipLineNum, limit, lock);
 
                 putMsg(result, Status.SUCCESS);
                 Map<String, Object> map = new HashMap<>();
@@ -1411,7 +1434,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 storageOperate.delete(tenantCode, storageFileName, false);
             }
 
-            storageOperate.upload(tenantCode, localFilename, storageFileName, true, true);
+            // Distributed write lock
+            InterProcessMutex lock =
+                useLock ? zookeeperRegistry.getReadWriteLock(storageFileName).writeLock() : null;
+
+            storageOperate.upload(tenantCode, localFilename, storageFileName, true, true, lock);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             result.setCode(Status.HDFS_OPERATION_ERROR.getCode());
@@ -1480,7 +1507,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         logger.info("resource  path is {}, download local filename is {}", fileName, localFileName);
 
         try {
-            storageOperate.download(tenantCode, fileName, localFileName, false, true);
+            // Distributed read lock
+            InterProcessMutex lock =
+                useLock ? zookeeperRegistry.getReadWriteLock(fileName).readLock() : null;
+            storageOperate.download(tenantCode, fileName, localFileName, false, true, lock);
             return org.apache.dolphinscheduler.api.utils.FileUtils.file2Resource(localFileName);
         } catch (IOException e) {
             logger.error("download resource error, the path is {}, and local filename is {}, the error message is {}",

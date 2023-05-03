@@ -22,6 +22,7 @@ import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_S_S;
 import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_TYPE_FILE;
 import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_TYPE_UDF;
 
+import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.factory.OssClientFactory;
@@ -185,7 +186,7 @@ public class OssOperator implements Closeable, StorageOperate {
 
     @Override
     public void download(String tenantCode, String srcFilePath, String dstFilePath, boolean deleteSource,
-                         boolean overwrite) throws IOException {
+                         boolean overwrite, InterProcessMutex lock) throws IOException {
         File dstFile = new File(dstFilePath);
         if (dstFile.isDirectory()) {
             Files.delete(dstFile.toPath());
@@ -226,7 +227,8 @@ public class OssOperator implements Closeable, StorageOperate {
     }
 
     @Override
-    public boolean copy(String srcPath, String dstPath, boolean deleteSource, boolean overwrite) throws IOException {
+    public boolean copy(String srcPath, String dstPath, boolean deleteSource, boolean overwrite,
+        InterProcessMutex lock) throws IOException {
         ossClient.copyObject(bucketName, srcPath, bucketName, dstPath);
         ossClient.deleteObject(bucketName, srcPath);
         return true;
@@ -246,7 +248,7 @@ public class OssOperator implements Closeable, StorageOperate {
 
     @Override
     public boolean upload(String tenantCode, String srcFile, String dstPath, boolean deleteSource,
-                          boolean overwrite) throws IOException {
+                          boolean overwrite, InterProcessMutex lock) throws IOException {
         try {
             ossClient.putObject(bucketName, dstPath, new File(srcFile));
             return true;
@@ -257,7 +259,7 @@ public class OssOperator implements Closeable, StorageOperate {
     }
 
     @Override
-    public List<String> vimFile(String tenantCode, String filePath, int skipLineNums, int limit) throws IOException {
+    public List<String> vimFile(String tenantCode, String filePath, int skipLineNums, int limit, InterProcessMutex lock) throws IOException {
         if (StringUtils.isBlank(filePath)) {
             logger.error("file path:{} is empty", filePath);
             return Collections.emptyList();

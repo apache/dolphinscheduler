@@ -200,7 +200,7 @@ public class OssOperatorTest {
         doReturn(null).when(ossClientMock).copyObject(anyString(), anyString(), anyString(), anyString());
         doReturn(null).when(ossClientMock).deleteObject(anyString(), anyString());
         try {
-            isSuccess = ossOperator.copy(FILE_PATH_MOCK, FILE_PATH_MOCK, false, false);
+            isSuccess = ossOperator.copy(FILE_PATH_MOCK, FILE_PATH_MOCK, false, false, null);
         } catch (IOException e) {
             fail("unexpected IO exception in unit test");
         }
@@ -249,5 +249,31 @@ public class OssOperatorTest {
         doReturn(true).when(ossClientMock).doesObjectExist(anyString(), anyString());
         ossOperator.deleteDir(DIR_MOCK);
         verify(ossClientMock, times(1)).deleteObject(anyString(), anyString());
+    }
+
+    @Test
+    public void testUpload() {
+        try {
+            while (true) {
+                ossOperator.upload("root",
+                    "D:/tmp/113/apache-dolphinscheduler.rpm", "/tmp/test", false,
+                    true, null);
+            }
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void testCopyHdfsToLocal() {
+        try {
+            while (true) {
+                ossOperator.download(
+                    "root", "/tmp/test/apache-dolphinscheduler.rpm",
+                    "D:\\tmp\\113\\a.zip", false, true, null);
+            }
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
     }
 }

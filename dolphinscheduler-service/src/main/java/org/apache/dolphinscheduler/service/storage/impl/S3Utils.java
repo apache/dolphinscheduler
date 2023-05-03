@@ -25,6 +25,7 @@ import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_TY
 import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_TYPE_UDF;
 import static org.apache.dolphinscheduler.common.constants.Constants.STORAGE_S3;
 
+import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
@@ -181,7 +182,7 @@ public class S3Utils implements Closeable, StorageOperate {
 
     @Override
     public void download(String tenantCode, String srcFilePath, String dstFilePath, boolean deleteSource,
-                         boolean overwrite) throws IOException {
+                         boolean overwrite, InterProcessMutex lock) throws IOException {
         File dstFile = new File(dstFilePath);
         if (dstFile.isDirectory()) {
             Files.delete(dstFile.toPath());
@@ -222,7 +223,8 @@ public class S3Utils implements Closeable, StorageOperate {
     }
 
     @Override
-    public boolean copy(String srcPath, String dstPath, boolean deleteSource, boolean overwrite) throws IOException {
+    public boolean copy(String srcPath, String dstPath, boolean deleteSource, boolean overwrite,
+        InterProcessMutex lock) throws IOException {
         s3Client.copyObject(BUCKET_NAME, srcPath, BUCKET_NAME, dstPath);
         s3Client.deleteObject(BUCKET_NAME, srcPath);
         return true;
@@ -243,7 +245,7 @@ public class S3Utils implements Closeable, StorageOperate {
 
     @Override
     public boolean upload(String tenantCode, String srcFile, String dstPath, boolean deleteSource,
-                          boolean overwrite) throws IOException {
+                          boolean overwrite, InterProcessMutex lock) throws IOException {
         try {
             s3Client.putObject(BUCKET_NAME, dstPath, new File(srcFile));
             return true;
@@ -254,7 +256,7 @@ public class S3Utils implements Closeable, StorageOperate {
     }
 
     @Override
-    public List<String> vimFile(String tenantCode, String filePath, int skipLineNums, int limit) throws IOException {
+    public List<String> vimFile(String tenantCode, String filePath, int skipLineNums, int limit, InterProcessMutex lock) throws IOException {
         if (StringUtils.isBlank(filePath)) {
             logger.error("file path:{} is blank", filePath);
             return Collections.emptyList();

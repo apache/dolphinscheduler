@@ -1125,7 +1125,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
                     if (!component.isDirctory()) {
                         // copy it to dst
                         storageOperate.copy(String.format(Constants.FORMAT_S_S, srcBasePath, component.getFullName()),
-                                String.format(Constants.FORMAT_S_S, dstBasePath, component.getFullName()), false, true);
+                                String.format(Constants.FORMAT_S_S, dstBasePath, component.getFullName()), false, true,
+                            null);
                         continue;
                     }
 

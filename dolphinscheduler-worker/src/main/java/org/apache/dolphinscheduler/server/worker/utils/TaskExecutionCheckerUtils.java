@@ -17,14 +17,19 @@
 
 package org.apache.dolphinscheduler.server.worker.utils;
 
+import org.apache.curator.framework.recipes.locks.InterProcessMutex;
+import org.apache.curator.framework.recipes.locks.InterProcessReadWriteLock;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.exception.StorageOperateNoConfiguredException;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.plugin.registry.zookeeper.ZookeeperRegistry;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.metrics.WorkerServerMetrics;
+import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.storage.StorageOperate;
 import org.apache.dolphinscheduler.service.utils.CommonUtils;
 import org.apache.commons.collections.CollectionUtils;
@@ -116,6 +121,13 @@ public class TaskExecutionCheckerUtils {
         }
 
         if (CollectionUtils.isNotEmpty(downloadFiles)) {
+
+            Boolean useLock = PropertyUtils.getBoolean(Constants.RESOURCE_LOCK_SWITCH, true);
+            // Distributed read write locks
+            ZookeeperRegistry zookeeperOperator =
+                useLock ? SpringApplicationContext.getBean(ZookeeperRegistry.class) : null;
+            InterProcessMutex readLock = null;
+
             for (Pair<String, String> fileDownload : downloadFiles) {
                 try {
                     // query the tenant code of the resource according to the name of the resource
@@ -124,8 +136,16 @@ public class TaskExecutionCheckerUtils {
                     String resPath = storageOperate.getResourceFileName(tenantCode, fullName);
                     logger.info("get resource file from path:{}", resPath);
                     long resourceDownloadStartTime = System.currentTimeMillis();
+
+                    if (null != zookeeperOperator) {
+                        InterProcessReadWriteLock lock = zookeeperOperator.getReadWriteLock(
+                            resPath);
+                        // Distributed read lock
+                        readLock = lock.readLock();
+                    }
+
                     storageOperate.download(tenantCode, resPath, execLocalPath + File.separator + fullName, false,
-                            true);
+                            true, readLock);
                     WorkerServerMetrics
                             .recordWorkerResourceDownloadTime(System.currentTimeMillis() - resourceDownloadStartTime);
                     WorkerServerMetrics.recordWorkerResourceDownloadSize(

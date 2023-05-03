@@ -600,7 +600,7 @@ public class ResourcesServiceTest {
         //SUCCESS
         try {
             Mockito.when(storageOperate.exists(Mockito.any(), Mockito.any())).thenReturn(true);
-            Mockito.when(storageOperate.vimFile(Mockito.any(), Mockito.any(), eq(1), eq(10))).thenReturn(getContent());
+            Mockito.when(storageOperate.vimFile(Mockito.any(), Mockito.any(), eq(1), eq(10),null)).thenReturn(getContent());
         } catch (IOException e) {
             logger.error("storage error", e);
         }
@@ -975,8 +975,8 @@ public class ResourcesServiceTest {
         //SUCCESS
         try {
             Mockito.when(storageOperate.exists(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
-            Mockito.when(storageOperate.vimFile(Mockito.anyString(), Mockito.anyString(), eq(1), eq(10))).thenReturn(getContent());
-            List<String> list = storageOperate.vimFile(Mockito.any(), Mockito.anyString(), eq(1), eq(10));
+            Mockito.when(storageOperate.vimFile(Mockito.anyString(), Mockito.anyString(), eq(1), eq(10),null)).thenReturn(getContent());
+            List<String> list = storageOperate.vimFile(Mockito.any(), Mockito.anyString(), eq(1), eq(10),null);
             Assert.assertNotNull(list);
 
         } catch (IOException e) {

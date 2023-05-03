@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.service.storage;
 
+import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
@@ -99,14 +100,17 @@ public interface StorageOperate {
 
     /**
      * copy the file from srcPath to dstPath
+     *
      * @param srcPath
      * @param dstPath
      * @param deleteSource if need to delete the file of srcPath
      * @param overwrite
+     * @param lock
      * @return
      * @throws IOException
      */
-    boolean copy(String srcPath, String dstPath, boolean deleteSource, boolean overwrite) throws IOException;
+    boolean copy(String srcPath, String dstPath, boolean deleteSource, boolean overwrite,
+        InterProcessMutex lock) throws IOException;
 
     /**
      * get the root path of the tenant with resourceType
@@ -127,7 +131,7 @@ public interface StorageOperate {
      * @throws IOException
      */
     boolean upload(String tenantCode, String srcFile, String dstPath, boolean deleteSource,
-                   boolean overwrite) throws IOException;
+                   boolean overwrite, InterProcessMutex lock) throws IOException;
 
     /**
      * download the srcPath to local
@@ -139,7 +143,7 @@ public interface StorageOperate {
      * @throws IOException
      */
     void download(String tenantCode, String srcFilePath, String dstFile, boolean deleteSource,
-                  boolean overwrite) throws IOException;
+                  boolean overwrite, InterProcessMutex lock) throws IOException;
 
     /**
      * vim the context of filePath
@@ -150,7 +154,7 @@ public interface StorageOperate {
      * @return
      * @throws IOException
      */
-    List<String> vimFile(String tenantCode, String filePath, int skipLineNums, int limit) throws IOException;
+    List<String> vimFile(String tenantCode, String filePath, int skipLineNums, int limit, InterProcessMutex lock) throws IOException;
 
     /**
      * delete the files and directory of the tenant

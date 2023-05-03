@@ -26,6 +26,7 @@ import org.apache.curator.framework.recipes.cache.ChildData;
 import org.apache.curator.framework.recipes.cache.TreeCache;
 import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
+import org.apache.curator.framework.recipes.locks.InterProcessReadWriteLock;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.utils.CloseableUtils;
 import org.apache.dolphinscheduler.registry.api.ConnectionListener;
@@ -48,6 +49,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.util.StringUtils;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
@@ -246,6 +248,25 @@ public final class ZookeeperRegistry implements Registry {
             throw new RegistryException("zookeeper release lock error", e);
         }
         return true;
+    }
+
+    public InterProcessReadWriteLock getReadWriteLock(String lockKey) {
+        if (lockKey.startsWith("/")) {
+            lockKey = lockKey.substring(1);
+        }
+        lockKey = lockKey.replaceAll("-", "_");
+
+        String lockRoot = properties.getNamespace();
+        if (StringUtils.isEmpty(lockRoot)) {
+            lockRoot = "/dolphinscheduler";
+        } else if (!lockRoot.startsWith("/")) {
+            lockRoot = "/" + lockRoot;
+        }
+
+        InterProcessReadWriteLock lock = new InterProcessReadWriteLock(client,
+            lockRoot + "/resourceLock/" + lockKey,
+            lockKey.getBytes(StandardCharsets.UTF_8));
+        return lock;
     }
 
     @Override

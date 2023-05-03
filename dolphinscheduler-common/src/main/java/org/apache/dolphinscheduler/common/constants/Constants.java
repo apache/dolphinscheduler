@@ -795,4 +795,14 @@ public final class Constants {
     public static final String KERBEROS_KRB5_CONF_PATH = "javaSecurityKrb5Conf";
     public static final String KERBEROS_KEY_TAB_USERNAME = "loginUserKeytabUsername";
     public static final String KERBEROS_KEY_TAB_PATH = "loginUserKeytabPath";
+
+    /**
+     * whether to use distributed locks to ensure atomicity when using resources
+     */
+    public static final String RESOURCE_LOCK_SWITCH = "resource.lock.switch";
+
+    /**
+     * zk lock timeout
+     */
+    public static final String RESOURCE_LOCK_TIMEOUT = "resource.lock.timeout";
 }
