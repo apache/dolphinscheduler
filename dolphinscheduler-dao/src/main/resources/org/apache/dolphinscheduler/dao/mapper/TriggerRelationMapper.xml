@@ -47,7 +47,7 @@
         delete from t_ds_trigger_relation where triggerCode = #{triggerCode}
     </delete>
 
-    <insert id="upsert" databaseId="mysql">
+    <insert id="upsert">
         INSERT INTO t_ds_trigger_relation (trigger_code, trigger_type, job_id, create_time, update_time) VALUES(
             #{triggerRelation.triggerCode},#{triggerRelation.triggerType},#{triggerRelation.jobId},#{triggerRelation.createTime},#{triggerRelation.updateTime})
         ON DUPLICATE KEY UPDATE update_time = #{triggerRelation.updateTime};
