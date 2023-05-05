@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, getCurrentInstance, toRefs, withKeys } from 'vue'
+import {defineComponent, getCurrentInstance, onMounted, toRefs, withKeys} from 'vue'
 import styles from './index.module.scss'
 import {
   NInput,
@@ -31,6 +31,7 @@ import { useLogin } from './use-login'
 import { useLocalesStore } from '@/store/locales/locales'
 import { useThemeStore } from '@/store/theme/theme'
 import cookies from 'js-cookie'
+import {ssoLoginUrl} from "@/service/modules/login";
 
 const login = defineComponent({
   name: 'login',
@@ -50,6 +51,23 @@ const login = defineComponent({
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
     cookies.set('language', localesStore.getLocales, { path: '/' })
+
+    onMounted(async () => {
+      const ssoLoginUrlRes = await ssoLoginUrl()
+      state.loginForm.ssoLoginUrl = ssoLoginUrlRes
+      if (state.loginForm.ssoLoginUrl) {
+        const url = new URL(window.location.href)
+        let ssoState = url.searchParams.get('state')
+        let ssoCode = url.searchParams.get('code')
+        if (ssoState && ssoCode) {
+          state.loginForm.userName = ssoState
+          state.loginForm.userPassword = ssoCode
+          handleLogin()
+        }
+      } else {
+        state.loginForm.ssoLoginUrl = ''
+      }
+    })
 
     return {
       t,
@@ -80,7 +98,7 @@ const login = defineComponent({
           <div class={styles.logo}>
             <div class={styles['logo-img']} />
           </div>
-          <div class={styles['form-model']}>
+          <div class={styles['form-model']} v-show={this.loginForm.ssoLoginUrl.length === 0}>
             <NForm rules={this.rules} ref='loginFormRef'>
               <NFormItem
                 label={this.t('login.userName')}
@@ -126,6 +144,19 @@ const login = defineComponent({
             >
               {this.t('login.login')}
             </NButton>
+          </div>
+          <div class={styles['form-model']} v-show={this.loginForm.ssoLoginUrl.length !== 0}>
+            <a href={this.loginForm.ssoLoginUrl} style="text-decoration:none">
+              <NButton
+                  class='btn-login-sso'
+                  round
+                  type='info'
+                  style={{width: '100%', marginTop: '30px'}}
+                  onClick={this.handleLogin}
+              >
+                {this.t('login.ssoLogin')}
+              </NButton>
+            </a>
           </div>
         </div>
       </div>
