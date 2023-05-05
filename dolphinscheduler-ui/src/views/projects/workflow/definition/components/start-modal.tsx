@@ -380,6 +380,25 @@ export default defineComponent({
                     </NSpace>
                   </NRadioGroup>
                 </NFormItem>
+                {this.startForm.complementDependentMode === 'ALL_DEPENDENT' && (
+                  <NFormItem
+                    label={t('project.workflow.all_level_dependent')}
+                    path='allLevelDependent'
+                  >
+                    <NRadioGroup
+                      v-model:value={this.startForm.allLevelDependent}
+                    >
+                      <NSpace>
+                        <NRadio value={'false'}>
+                          {t('project.workflow.close')}
+                        </NRadio>
+                        <NRadio value={'true'}>
+                          {t('project.workflow.open')}
+                        </NRadio>
+                      </NSpace>
+                    </NRadioGroup>
+                  </NFormItem>
+                )}
                 <NFormItem
                   label={t('project.workflow.mode_of_execution')}
                   path='runMode'

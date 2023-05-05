@@ -224,7 +224,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     }
 
     /***
-     * create User for ldap login
+     * create User for ldap and sso login
      */
     @Override
     @Transactional

@@ -282,7 +282,8 @@ public class ExecuteFunctionServiceTest {
                 RunMode.RUN_MODE_SERIAL,
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 10, null, 0, Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
-                ComplementDependentMode.OFF_MODE, null);
+                ComplementDependentMode.OFF_MODE, null,
+                false);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(commandService, times(1)).createCommand(any(Command.class));
 
@@ -306,7 +307,8 @@ public class ExecuteFunctionServiceTest {
                 RunMode.RUN_MODE_SERIAL,
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
-                ComplementDependentMode.OFF_MODE, null);
+                ComplementDependentMode.OFF_MODE, null,
+                false);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(commandService, times(1)).createCommand(any(Command.class));
 
@@ -329,7 +331,8 @@ public class ExecuteFunctionServiceTest {
                     Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 0,
                     Constants.DRY_RUN_FLAG_NO,
                     Constants.TEST_FLAG_NO,
-                    ComplementDependentMode.OFF_MODE, null);
+                    ComplementDependentMode.OFF_MODE, null,
+                    false);
         } catch (ServiceException e) {
             Assertions.assertEquals(Status.START_NODE_NOT_EXIST_IN_LAST_PROCESS.getCode(), e.getCode());
         }
@@ -375,8 +378,23 @@ public class ExecuteFunctionServiceTest {
         command.setProcessDefinitionCode(processDefinitionCode);
         command.setExecutorId(1);
 
-        int count = executorService.createComplementDependentCommand(schedules, command);
+        // not enable allLevelDependent
+        int count = executorService.createComplementDependentCommand(schedules, command, false);
         Assertions.assertEquals(1, count);
+
+        // enable allLevelDependent
+        DependentProcessDefinition childDependent = new DependentProcessDefinition();
+        childDependent.setProcessDefinitionCode(3);
+        childDependent.setProcessDefinitionVersion(1);
+        childDependent.setTaskDefinitionCode(4);
+        childDependent.setWorkerGroup(Constants.DEFAULT_WORKER_GROUP);
+        childDependent.setTaskParams(
+                "{\"localParams\":[],\"resourceList\":[],\"dependence\":{\"relation\":\"AND\",\"dependTaskList\":[{\"relation\":\"AND\",\"dependItemList\":[{\"depTaskCode\":3,\"status\":\"SUCCESS\"}]}]},\"conditionResult\":{\"successNode\":[1],\"failedNode\":[1]}}");
+        Mockito.when(processService.queryDependentProcessDefinitionByProcessDefinitionCode(
+                dependentProcessDefinition.getProcessDefinitionCode())).thenReturn(Lists.newArrayList(childDependent))
+                .thenReturn(Lists.newArrayList());
+        int allLevelDependentCount = executorService.createComplementDependentCommand(schedules, command, true);
+        Assertions.assertEquals(2, allLevelDependentCount);
     }
 
     /**
@@ -397,7 +415,8 @@ public class ExecuteFunctionServiceTest {
                 RunMode.RUN_MODE_SERIAL,
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
-                ComplementDependentMode.OFF_MODE, null);
+                ComplementDependentMode.OFF_MODE, null,
+                false);
         Assertions.assertEquals(Status.START_PROCESS_INSTANCE_ERROR, result.get(Constants.STATUS));
         verify(commandService, times(0)).createCommand(any(Command.class));
     }
@@ -420,7 +439,8 @@ public class ExecuteFunctionServiceTest {
                 RunMode.RUN_MODE_SERIAL,
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
-                ComplementDependentMode.OFF_MODE, null);
+                ComplementDependentMode.OFF_MODE, null,
+                false);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(commandService, times(1)).createCommand(any(Command.class));
     }
@@ -443,7 +463,8 @@ public class ExecuteFunctionServiceTest {
                 RunMode.RUN_MODE_PARALLEL,
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
-                ComplementDependentMode.OFF_MODE, null);
+                ComplementDependentMode.OFF_MODE, null,
+                false);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(commandService, times(31)).createCommand(any(Command.class));
 
@@ -468,7 +489,8 @@ public class ExecuteFunctionServiceTest {
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 15,
                 Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
-                ComplementDependentMode.OFF_MODE, null);
+                ComplementDependentMode.OFF_MODE, null,
+                false);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(commandService, times(15)).createCommand(any(Command.class));
 
@@ -499,9 +521,8 @@ public class ExecuteFunctionServiceTest {
                 0,
                 Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
-                ComplementDependentMode.OFF_MODE,
-                null));
-
+                ComplementDependentMode.OFF_MODE, null,
+                false));
     }
 
     @Test
@@ -533,7 +554,8 @@ public class ExecuteFunctionServiceTest {
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 15,
                 Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_YES,
-                ComplementDependentMode.OFF_MODE, null);
+                ComplementDependentMode.OFF_MODE, null,
+                false);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
