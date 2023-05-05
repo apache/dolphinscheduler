@@ -195,6 +195,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.casbin</groupId>
+            <artifactId>casdoor-spring-boot-starter</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-ui</artifactId>
         </dependency>

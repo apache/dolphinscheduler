@@ -532,6 +532,11 @@ public final class Constants {
      */
     public static final String LOGIN_USER_KEY_TAB_PATH = "login.user.keytab.path";
 
+    /**
+     * sso.login.user.state
+     */
+    public static final String SSO_LOGIN_USER_STATE = "sso.login.user.state";
+
     public static final String WORKFLOW_INSTANCE_ID_MDC_KEY = "workflowInstanceId";
     public static final String TASK_INSTANCE_ID_MDC_KEY = "taskInstanceId";
 

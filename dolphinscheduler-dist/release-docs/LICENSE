@@ -551,6 +551,10 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     proto-google-iam-v1 1.9.0: https://mvnrepository.com/artifact/com.google.api.grpc/proto-google-iam-v1/1.9.0, Apache 2.0
     sshd-sftp https://mvnrepository.com/artifact/org.apache.sshd/sshd-sftp/2.8.0 Apache 2.0
     sshd-scp https://mvnrepository.com/artifact/org.apache.sshd/sshd-scp/2.8.0 Aapache 2.0
+    casdoor-java-sdk 1.11.0  https://mvnrepository.com/artifact/org.casbin/casdoor-java-sdk/1.11.0  Apache 2.0
+    casdoor-spring-boot-starter 1.6.0  https://mvnrepository.com/artifact/org.casbin/casdoor-spring-boot-starter/1.6.0  Apache 2.0
+    org.apache.oltu.oauth2.client 1.0.2  https://mvnrepository.com/artifact/org.apache.oltu.oauth2/org.apache.oltu.oauth2.client/1.0.2  Apache 2.0
+    org.apache.oltu.oauth2.common 1.0.2  https://mvnrepository.com/artifact/org.apache.oltu.oauth2/org.apache.oltu.oauth2.common/1.0.2  Apache 2.0
 
 
 

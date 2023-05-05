@@ -146,7 +146,7 @@ python-gateway:
 
 security:
   authentication:
-    # Authentication types (supported types: PASSWORD,LDAP)
+    # Authentication types (supported types: PASSWORD,LDAP,CASDOOR_SSO)
     type: PASSWORD
     # IF you set type `LDAP`, below config will be effective
     ldap:
