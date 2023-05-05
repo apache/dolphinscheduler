@@ -67,6 +67,14 @@ export function useK8s(model: { [field: string]: any }): IJsonItem[] {
         placeholder: t('project.node.command_tips')
       }
     },
+    {
+      type: 'input',
+      field: 'args',
+      name: t('project.node.args'),
+      props: {
+        placeholder: t('project.node.args_tips')
+      }
+    },
     ...useCustomParams({ model, field: 'localParams', isSimple: true })
   ]
 }

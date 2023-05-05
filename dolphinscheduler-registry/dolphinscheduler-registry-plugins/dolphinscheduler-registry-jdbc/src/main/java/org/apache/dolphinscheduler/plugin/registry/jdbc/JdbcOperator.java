@@ -70,9 +70,9 @@ public class JdbcOperator {
             return id;
         }
         jdbcRegistryData = JdbcRegistryData.builder()
-                .key(key)
-                .data(value)
-                .type(DataType.EPHEMERAL.getTypeValue())
+                .dataKey(key)
+                .dataValue(value)
+                .dataType(DataType.EPHEMERAL.getTypeValue())
                 .lastTerm(System.currentTimeMillis())
                 .build();
         jdbcRegistryDataMapper.insert(jdbcRegistryData);
@@ -89,9 +89,9 @@ public class JdbcOperator {
             return id;
         }
         jdbcRegistryData = JdbcRegistryData.builder()
-                .key(key)
-                .data(value)
-                .type(DataType.PERSISTENT.getTypeValue())
+                .dataKey(key)
+                .dataValue(value)
+                .dataType(DataType.PERSISTENT.getTypeValue())
                 .lastTerm(System.currentTimeMillis())
                 .build();
         jdbcRegistryDataMapper.insert(jdbcRegistryData);
@@ -122,7 +122,7 @@ public class JdbcOperator {
     public List<String> getChildren(String key) throws SQLException {
         return jdbcRegistryDataMapper.fuzzyQueryByKey(key)
                 .stream()
-                .map(JdbcRegistryData::getKey)
+                .map(JdbcRegistryData::getDataKey)
                 .filter(fullPath -> fullPath.length() > key.length())
                 .map(fullPath -> StringUtils.substringBefore(fullPath.substring(key.length() + 1), "/"))
                 .collect(Collectors.toList());
@@ -139,7 +139,7 @@ public class JdbcOperator {
     @SuppressWarnings("checkstyle:IllegalCatch")
     public JdbcRegistryLock tryToAcquireLock(String key) throws SQLException {
         JdbcRegistryLock jdbcRegistryLock = JdbcRegistryLock.builder()
-                .key(key)
+                .lockKey(key)
                 .lockOwner(JdbcRegistryConstant.LOCK_OWNER)
                 .lastTerm(System.currentTimeMillis())
                 .build();
