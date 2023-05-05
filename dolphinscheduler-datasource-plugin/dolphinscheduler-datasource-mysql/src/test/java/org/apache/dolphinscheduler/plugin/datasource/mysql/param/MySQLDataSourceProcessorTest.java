@@ -43,7 +43,7 @@ public class MySQLDataSourceProcessorTest {
         MySQLDataSourceParamDTO mysqlDatasourceParamDTO = new MySQLDataSourceParamDTO();
         mysqlDatasourceParamDTO.setUserName("root");
         mysqlDatasourceParamDTO.setPassword("123456");
-        mysqlDatasourceParamDTO.setHost("localhost");
+        mysqlDatasourceParamDTO.setHost("0.0.0.0");
         mysqlDatasourceParamDTO.setPort(3306);
         mysqlDatasourceParamDTO.setDatabase("default");
         mysqlDatasourceParamDTO.setOther(props);
