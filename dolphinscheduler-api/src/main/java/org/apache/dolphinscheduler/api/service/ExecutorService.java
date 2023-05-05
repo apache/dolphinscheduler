@@ -71,7 +71,8 @@ public interface ExecutorService {
                                             Integer timeout,
                                             Map<String, String> startParams, Integer expectedParallelismNumber,
                                             int dryRun, int testFlag,
-                                            ComplementDependentMode complementDependentMode, Integer version);
+                                            ComplementDependentMode complementDependentMode, Integer version,
+                                            boolean allLevelDependent);
 
     /**
      * check whether the process definition can be executed
