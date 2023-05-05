@@ -379,10 +379,15 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
      * copy hdfs file to local
      *
      * @param srcHdfsFilePath source hdfs file path
-     * @param dstFile         destination file
-     * @param deleteSource    delete source
-     * @param overwrite       overwrite
+     *
+     * @param dstFile destination file
+     *
+     * @param deleteSource delete source
+     *
+     * @param overwrite overwrite
+     *
      * @return result of copy hdfs file to local
+     *
      * @throws IOException errors
      */
     public boolean copyHdfsToLocal(String srcHdfsFilePath, String dstFile, boolean deleteSource,
@@ -426,10 +431,10 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
     /**
      * delete a list of files
      *
-     * @param filePath  the path to delete, usually it is a directory.
-     * @param recursive if path is a directory and set to
-     *                  true, the directory is deleted else throws an exception. In
-     *                  case of a file the recursive can be set to either true or false.
+     * @param filePath the path to delete, usually it is a directory.
+     * @param recursive    if path is a directory and set to
+     *                     true, the directory is deleted else throws an exception. In
+     *                     case of a file the recursive can be set to either true or false.
      * @return true if delete is successful else false.
      * @throws IOException errors
      */
