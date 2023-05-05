@@ -43,7 +43,7 @@ public class DatabendDataSourceProcessorTest {
     @Test
     public void testCheckDatasourceParam() {
         DatabendDataSourceParamDTO databendDataSourceParamDTO = new DatabendDataSourceParamDTO();
-        databendDataSourceParamDTO.setHost("localhost");
+        databendDataSourceParamDTO.setHost("0.0.0.0");
         databendDataSourceParamDTO.setDatabase("default");
         Map<String, String> other = new HashMap<>();
         other.put("ssl", "true");
