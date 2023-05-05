@@ -47,7 +47,7 @@ public class YarnApplicationManager implements ApplicationManager {
             String cmd = getKerberosInitCommand() + "yarn application -kill " + String.join(Constants.SPACE, appIds);
             execYarnKillCommand(tenantCode, commandFile, cmd);
         } catch (Exception e) {
-            log.error("Kill yarn application [{}}] failed", appIds, e);
+            log.error("Kill yarn application [{}] failed", appIds, e);
             throw new TaskException(e.getMessage());
         }
 
