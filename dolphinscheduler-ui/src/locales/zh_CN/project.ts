@@ -207,6 +207,7 @@ export default {
     cancel_full_screen: '取消全屏',
     task_state: '任务状态',
     mode_of_dependent: '依赖模式',
+    all_level_dependent: '所有层级依赖',
     open: '打开',
     project_name_required: '项目名称必填',
     related_items: '关联项目',
