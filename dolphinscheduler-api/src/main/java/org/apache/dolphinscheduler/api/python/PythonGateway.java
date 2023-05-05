@@ -405,7 +405,7 @@ public class PythonGateway {
                 DEFAULT_TEST_FLAG,
                 COMPLEMENT_DEPENDENT_MODE,
                 processDefinition.getVersion(),
-            false);
+                false);
     }
 
     // side object

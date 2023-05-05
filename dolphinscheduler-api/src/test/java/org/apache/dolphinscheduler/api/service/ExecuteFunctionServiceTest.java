@@ -240,21 +240,21 @@ public class ExecuteFunctionServiceTest {
         // mock
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_START))
-            .thenReturn(checkProjectAndAuth());
+                .thenReturn(checkProjectAndAuth());
         Mockito.when(processDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(this.processDefinition);
         Mockito.when(processService.getTenantForProcess(tenantCode, userId)).thenReturn(tenantCode);
         doReturn(1).when(commandService).createCommand(argThat(c -> c.getId() == null));
         doReturn(0).when(commandService).createCommand(argThat(c -> c.getId() != null));
         Mockito.when(monitorService.getServerListFromRegistry(true)).thenReturn(getMasterServersList());
         Mockito.when(processService.findProcessInstanceDetailById(processInstanceId))
-            .thenReturn(Optional.ofNullable(processInstance));
+                .thenReturn(Optional.ofNullable(processInstance));
         Mockito.when(processService.findProcessDefinition(1L, 1)).thenReturn(this.processDefinition);
         Mockito.when(taskGroupQueueMapper.selectById(1)).thenReturn(taskGroupQueue);
         Mockito.when(processInstanceMapper.selectById(1)).thenReturn(processInstance);
         Mockito.when(triggerRelationService.saveProcessInstanceTrigger(Mockito.any(), Mockito.any()))
-            .thenReturn(1);
+                .thenReturn(1);
         Mockito.when(processService.findRelationByCode(processDefinitionCode, processDefinitionVersion))
-            .thenReturn(processTaskRelations);
+                .thenReturn(processTaskRelations);
     }
 
     @Test
@@ -271,19 +271,19 @@ public class ExecuteFunctionServiceTest {
     public void testNoComplement() {
 
         Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
-            .thenReturn(zeroSchedulerList());
+                .thenReturn(zeroSchedulerList());
         Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(new Tenant());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
-            processDefinitionCode,
-            "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
-            CommandType.START_PROCESS,
-            null, null,
-            null, null, null,
-            RunMode.RUN_MODE_SERIAL,
-            Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 10, null, 0, Constants.DRY_RUN_FLAG_NO,
-            Constants.TEST_FLAG_NO,
-            ComplementDependentMode.OFF_MODE, null,
-            false);
+                processDefinitionCode,
+                "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
+                CommandType.START_PROCESS,
+                null, null,
+                null, null, null,
+                RunMode.RUN_MODE_SERIAL,
+                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 10, null, 0, Constants.DRY_RUN_FLAG_NO,
+                Constants.TEST_FLAG_NO,
+                ComplementDependentMode.OFF_MODE, null,
+                false);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(commandService, times(1)).createCommand(any(Command.class));
 
@@ -296,19 +296,19 @@ public class ExecuteFunctionServiceTest {
     public void testComplementWithStartNodeList() {
 
         Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
-            .thenReturn(zeroSchedulerList());
+                .thenReturn(zeroSchedulerList());
         Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(new Tenant());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
-            processDefinitionCode,
-            "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
-            CommandType.START_PROCESS,
-            null, "123456789,987654321",
-            null, null, null,
-            RunMode.RUN_MODE_SERIAL,
-            Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
-            Constants.TEST_FLAG_NO,
-            ComplementDependentMode.OFF_MODE, null,
-            false);
+                processDefinitionCode,
+                "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
+                CommandType.START_PROCESS,
+                null, "123456789,987654321",
+                null, null, null,
+                RunMode.RUN_MODE_SERIAL,
+                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
+                Constants.TEST_FLAG_NO,
+                ComplementDependentMode.OFF_MODE, null,
+                false);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(commandService, times(1)).createCommand(any(Command.class));
 
@@ -317,22 +317,22 @@ public class ExecuteFunctionServiceTest {
     @Test
     public void testComplementWithOldStartNodeList() {
         Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
-            .thenReturn(zeroSchedulerList());
+                .thenReturn(zeroSchedulerList());
         Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(new Tenant());
         Map<String, Object> result = new HashMap<>();
         try {
             result = executorService.execProcessInstance(loginUser, projectCode,
-                processDefinitionCode,
-                "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
-                CommandType.START_PROCESS,
-                null, "1123456789,987654321",
-                null, null, null,
-                RunMode.RUN_MODE_SERIAL,
-                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 0,
-                Constants.DRY_RUN_FLAG_NO,
-                Constants.TEST_FLAG_NO,
-                ComplementDependentMode.OFF_MODE, null,
-                false);
+                    processDefinitionCode,
+                    "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
+                    CommandType.START_PROCESS,
+                    null, "1123456789,987654321",
+                    null, null, null,
+                    RunMode.RUN_MODE_SERIAL,
+                    Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 0,
+                    Constants.DRY_RUN_FLAG_NO,
+                    Constants.TEST_FLAG_NO,
+                    ComplementDependentMode.OFF_MODE, null,
+                    false);
         } catch (ServiceException e) {
             Assertions.assertEquals(Status.START_NODE_NOT_EXIST_IN_LAST_PROCESS.getCode(), e.getCode());
         }
@@ -352,7 +352,7 @@ public class ExecuteFunctionServiceTest {
         List<Schedule> schedules = Lists.newArrayList(schedule);
         Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(
                 processDefinitionCode))
-            .thenReturn(schedules);
+                .thenReturn(schedules);
 
         DependentProcessDefinition dependentProcessDefinition = new DependentProcessDefinition();
         dependentProcessDefinition.setProcessDefinitionCode(2);
@@ -360,20 +360,20 @@ public class ExecuteFunctionServiceTest {
         dependentProcessDefinition.setTaskDefinitionCode(1);
         dependentProcessDefinition.setWorkerGroup(Constants.DEFAULT_WORKER_GROUP);
         dependentProcessDefinition.setTaskParams(
-            "{\"localParams\":[],\"resourceList\":[],\"dependence\":{\"relation\":\"AND\",\"dependTaskList\":[{\"relation\":\"AND\",\"dependItemList\":[{\"depTaskCode\":2,\"status\":\"SUCCESS\"}]}]},\"conditionResult\":{\"successNode\":[1],\"failedNode\":[1]}}");
+                "{\"localParams\":[],\"resourceList\":[],\"dependence\":{\"relation\":\"AND\",\"dependTaskList\":[{\"relation\":\"AND\",\"dependItemList\":[{\"depTaskCode\":2,\"status\":\"SUCCESS\"}]}]},\"conditionResult\":{\"successNode\":[1],\"failedNode\":[1]}}");
         Mockito.when(processService.queryDependentProcessDefinitionByProcessDefinitionCode(processDefinitionCode))
-            .thenReturn(Lists.newArrayList(dependentProcessDefinition));
+                .thenReturn(Lists.newArrayList(dependentProcessDefinition));
 
         Map<Long, String> processDefinitionWorkerGroupMap = new HashMap<>();
         processDefinitionWorkerGroupMap.put(1L, Constants.DEFAULT_WORKER_GROUP);
         Mockito.when(workerGroupService.queryWorkerGroupByProcessDefinitionCodes(Lists.newArrayList(1L)))
-            .thenReturn(processDefinitionWorkerGroupMap);
+                .thenReturn(processDefinitionWorkerGroupMap);
 
         Command command = new Command();
         command.setId(1);
         command.setCommandType(CommandType.COMPLEMENT_DATA);
         command.setCommandParam(
-            "{\"StartNodeList\":\"1\",\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}");
+                "{\"StartNodeList\":\"1\",\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}");
         command.setWorkerGroup(Constants.DEFAULT_WORKER_GROUP);
         command.setProcessDefinitionCode(processDefinitionCode);
         command.setExecutorId(1);
@@ -404,19 +404,19 @@ public class ExecuteFunctionServiceTest {
     public void testDateError() {
 
         Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
-            .thenReturn(zeroSchedulerList());
+                .thenReturn(zeroSchedulerList());
         Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(new Tenant());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
-            processDefinitionCode,
-            "{\"complementStartDate\":\"2022-01-07 12:12:12\",\"complementEndDate\":\"2022-01-06 12:12:12\"}",
-            CommandType.COMPLEMENT_DATA,
-            null, null,
-            null, null, null,
-            RunMode.RUN_MODE_SERIAL,
-            Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
-            Constants.TEST_FLAG_NO,
-            ComplementDependentMode.OFF_MODE, null,
-            false);
+                processDefinitionCode,
+                "{\"complementStartDate\":\"2022-01-07 12:12:12\",\"complementEndDate\":\"2022-01-06 12:12:12\"}",
+                CommandType.COMPLEMENT_DATA,
+                null, null,
+                null, null, null,
+                RunMode.RUN_MODE_SERIAL,
+                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
+                Constants.TEST_FLAG_NO,
+                ComplementDependentMode.OFF_MODE, null,
+                false);
         Assertions.assertEquals(Status.START_PROCESS_INSTANCE_ERROR, result.get(Constants.STATUS));
         verify(commandService, times(0)).createCommand(any(Command.class));
     }
@@ -428,19 +428,19 @@ public class ExecuteFunctionServiceTest {
     public void testSerial() {
 
         Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
-            .thenReturn(zeroSchedulerList());
+                .thenReturn(zeroSchedulerList());
         Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(new Tenant());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
-            processDefinitionCode,
-            "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
-            CommandType.COMPLEMENT_DATA,
-            null, null,
-            null, null, null,
-            RunMode.RUN_MODE_SERIAL,
-            Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
-            Constants.TEST_FLAG_NO,
-            ComplementDependentMode.OFF_MODE, null,
-            false);
+                processDefinitionCode,
+                "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
+                CommandType.COMPLEMENT_DATA,
+                null, null,
+                null, null, null,
+                RunMode.RUN_MODE_SERIAL,
+                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
+                Constants.TEST_FLAG_NO,
+                ComplementDependentMode.OFF_MODE, null,
+                false);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(commandService, times(1)).createCommand(any(Command.class));
     }
@@ -452,19 +452,19 @@ public class ExecuteFunctionServiceTest {
     public void testParallelWithOutSchedule() {
 
         Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
-            .thenReturn(zeroSchedulerList());
+                .thenReturn(zeroSchedulerList());
         Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(new Tenant());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
-            processDefinitionCode,
-            "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
-            CommandType.COMPLEMENT_DATA,
-            null, null,
-            null, null, null,
-            RunMode.RUN_MODE_PARALLEL,
-            Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
-            Constants.TEST_FLAG_NO,
-            ComplementDependentMode.OFF_MODE, null,
-            false);
+                processDefinitionCode,
+                "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
+                CommandType.COMPLEMENT_DATA,
+                null, null,
+                null, null, null,
+                RunMode.RUN_MODE_PARALLEL,
+                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
+                Constants.TEST_FLAG_NO,
+                ComplementDependentMode.OFF_MODE, null,
+                false);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(commandService, times(31)).createCommand(any(Command.class));
 
@@ -477,20 +477,20 @@ public class ExecuteFunctionServiceTest {
     public void testParallelWithSchedule() {
 
         Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
-            .thenReturn(oneSchedulerList());
+                .thenReturn(oneSchedulerList());
         Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(new Tenant());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
-            processDefinitionCode,
-            "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
-            CommandType.COMPLEMENT_DATA,
-            null, null,
-            null, null, null,
-            RunMode.RUN_MODE_PARALLEL,
-            Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 15,
-            Constants.DRY_RUN_FLAG_NO,
-            Constants.TEST_FLAG_NO,
-            ComplementDependentMode.OFF_MODE, null,
-            false);
+                processDefinitionCode,
+                "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
+                CommandType.COMPLEMENT_DATA,
+                null, null,
+                null, null, null,
+                RunMode.RUN_MODE_PARALLEL,
+                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 15,
+                Constants.DRY_RUN_FLAG_NO,
+                Constants.TEST_FLAG_NO,
+                ComplementDependentMode.OFF_MODE, null,
+                false);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(commandService, times(15)).createCommand(any(Command.class));
 
@@ -501,40 +501,40 @@ public class ExecuteFunctionServiceTest {
         Mockito.when(monitorService.getServerListFromRegistry(true)).thenReturn(new ArrayList<>());
 
         Assertions.assertThrows(ServiceException.class, () -> executorService.execProcessInstance(
-            loginUser,
-            projectCode,
-            processDefinitionCode,
-            "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
-            CommandType.COMPLEMENT_DATA,
-            null,
-            null,
-            null,
-            null,
-            null,
-            RunMode.RUN_MODE_PARALLEL,
-            Priority.LOW,
-            Constants.DEFAULT_WORKER_GROUP,
-            tenantCode,
-            100L,
-            110,
-            null,
-            0,
-            Constants.DRY_RUN_FLAG_NO,
-            Constants.TEST_FLAG_NO,
-            ComplementDependentMode.OFF_MODE, null,
-            false));
+                loginUser,
+                projectCode,
+                processDefinitionCode,
+                "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
+                CommandType.COMPLEMENT_DATA,
+                null,
+                null,
+                null,
+                null,
+                null,
+                RunMode.RUN_MODE_PARALLEL,
+                Priority.LOW,
+                Constants.DEFAULT_WORKER_GROUP,
+                tenantCode,
+                100L,
+                110,
+                null,
+                0,
+                Constants.DRY_RUN_FLAG_NO,
+                Constants.TEST_FLAG_NO,
+                ComplementDependentMode.OFF_MODE, null,
+                false));
     }
 
     @Test
     public void testExecuteRepeatRunning() {
         when(commandService.verifyIsNeedCreateCommand(any(Command.class))).thenReturn(true);
         when(projectService.checkProjectAndAuth(loginUser, project, projectCode, RERUN))
-            .thenReturn(checkProjectAndAuth());
+                .thenReturn(checkProjectAndAuth());
         when(processInstanceDao.queryByWorkflowInstanceId(processInstanceId)).thenReturn(processInstance);
         when(processDefinitionService.queryWorkflowDefinitionThrowExceptionIfNotFound(processDefinitionCode,
-            processDefinitionVersion)).thenReturn(processDefinition);
+                processDefinitionVersion)).thenReturn(processDefinition);
         Map<String, Object> result =
-            executorService.execute(loginUser, projectCode, processInstanceId, ExecuteType.REPEAT_RUNNING);
+                executorService.execute(loginUser, projectCode, processInstanceId, ExecuteType.REPEAT_RUNNING);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
@@ -542,20 +542,20 @@ public class ExecuteFunctionServiceTest {
     public void testOfTestRun() {
         Mockito.when(commandService.verifyIsNeedCreateCommand(any(Command.class))).thenReturn(true);
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, RERUN))
-            .thenReturn(checkProjectAndAuth());
+                .thenReturn(checkProjectAndAuth());
         Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(new Tenant());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
-            processDefinitionCode,
-            "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
-            CommandType.COMPLEMENT_DATA,
-            null, null,
-            null, null, 0,
-            RunMode.RUN_MODE_PARALLEL,
-            Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 15,
-            Constants.DRY_RUN_FLAG_NO,
-            Constants.TEST_FLAG_YES,
-            ComplementDependentMode.OFF_MODE, null,
-            false);
+                processDefinitionCode,
+                "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
+                CommandType.COMPLEMENT_DATA,
+                null, null,
+                null, null, 0,
+                RunMode.RUN_MODE_PARALLEL,
+                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 15,
+                Constants.DRY_RUN_FLAG_NO,
+                Constants.TEST_FLAG_YES,
+                ComplementDependentMode.OFF_MODE, null,
+                false);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
@@ -571,7 +571,7 @@ public class ExecuteFunctionServiceTest {
         processDefinition.setReleaseState(ReleaseState.ONLINE);
         processDefinitionList.add(processDefinition);
         Mockito.when(processDefinitionMapper.queryDefinitionListByIdList(new Integer[ids.size()]))
-            .thenReturn(processDefinitionList);
+                .thenReturn(processDefinitionList);
 
         Map<String, Object> result = executorService.startCheckByProcessDefinedCode(1L);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
@@ -659,35 +659,35 @@ public class ExecuteFunctionServiceTest {
 
         ProcessInstance processInstanceMock = Mockito.mock(ProcessInstance.class, RETURNS_DEEP_STUBS);
         Mockito.when(processService.findProcessInstanceDetailById(processInstanceId))
-            .thenReturn(Optional.ofNullable(processInstanceMock));
+                .thenReturn(Optional.ofNullable(processInstanceMock));
 
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setProjectCode(projectCode);
         Mockito.when(processService.findProcessDefinition(Mockito.anyLong(), Mockito.anyInt()))
-            .thenReturn(processDefinition);
+                .thenReturn(processDefinition);
 
         Mockito.when(processService.getTenantForProcess(Mockito.anyString(), Mockito.anyInt())).thenReturn(tenantCode);
 
         when(processInstanceMock.getState().isFinished()).thenReturn(false);
         WorkflowExecuteResponse responseInstanceIsNotFinished =
-            executorService.executeTask(loginUser, projectCode, processInstanceId, startNodeList, taskDependType);
+                executorService.executeTask(loginUser, projectCode, processInstanceId, startNodeList, taskDependType);
         Assertions.assertEquals(Status.WORKFLOW_INSTANCE_IS_NOT_FINISHED.getCode(),
-            responseInstanceIsNotFinished.getCode());
+                responseInstanceIsNotFinished.getCode());
 
         when(processInstanceMock.getState().isFinished()).thenReturn(true);
         WorkflowExecuteResponse responseStartNodeListError =
-            executorService.executeTask(loginUser, projectCode, processInstanceId, "1234567870,", taskDependType);
+                executorService.executeTask(loginUser, projectCode, processInstanceId, "1234567870,", taskDependType);
         Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), responseStartNodeListError.getCode());
 
         Mockito.when(taskDefinitionLogMapper.queryMaxVersionForDefinition(Mockito.anyLong())).thenReturn(null);
         WorkflowExecuteResponse responseNotDefineTask =
-            executorService.executeTask(loginUser, projectCode, processInstanceId, startNodeList, taskDependType);
+                executorService.executeTask(loginUser, projectCode, processInstanceId, startNodeList, taskDependType);
         Assertions.assertEquals(Status.EXECUTE_NOT_DEFINE_TASK.getCode(), responseNotDefineTask.getCode());
 
         Mockito.when(taskDefinitionLogMapper.queryMaxVersionForDefinition(Mockito.anyLong())).thenReturn(1);
         Mockito.when(commandService.verifyIsNeedCreateCommand(any())).thenReturn(true);
         WorkflowExecuteResponse responseSuccess =
-            executorService.executeTask(loginUser, projectCode, processInstanceId, startNodeList, taskDependType);
+                executorService.executeTask(loginUser, projectCode, processInstanceId, startNodeList, taskDependType);
         Assertions.assertEquals(Status.SUCCESS.getCode(), responseSuccess.getCode());
 
     }
