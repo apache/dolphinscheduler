@@ -46,7 +46,7 @@ public class DataSourceUtilsTest {
     @Test
     public void testCheckDatasourceParam() {
         MySQLDataSourceParamDTO mysqlDatasourceParamDTO = new MySQLDataSourceParamDTO();
-        mysqlDatasourceParamDTO.setHost("localhost");
+        mysqlDatasourceParamDTO.setHost("0.0.0.0");
         mysqlDatasourceParamDTO.setDatabase("default");
         Map<String, String> other = new HashMap<>();
         other.put("serverTimezone", "Asia/Shanghai");
