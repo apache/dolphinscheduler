@@ -346,6 +346,7 @@ export function formatParams(data: INodeData): {
     taskParams.minMemorySpace = data.minMemorySpace
     taskParams.image = data.image
     taskParams.command = data.command
+    taskParams.args = data.args
   }
 
   if (data.taskType === 'JUPYTER') {
