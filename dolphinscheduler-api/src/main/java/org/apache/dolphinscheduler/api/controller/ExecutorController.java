@@ -122,7 +122,8 @@ public class ExecutorController extends BaseController {
             @Parameter(name = "expectedParallelismNumber", description = "EXPECTED_PARALLELISM_NUMBER", schema = @Schema(implementation = int.class, example = "8")),
             @Parameter(name = "dryRun", description = "DRY_RUN", schema = @Schema(implementation = int.class, example = "0")),
             @Parameter(name = "testFlag", description = "TEST_FLAG", schema = @Schema(implementation = int.class, example = "0")),
-            @Parameter(name = "complementDependentMode", description = "COMPLEMENT_DEPENDENT_MODE", schema = @Schema(implementation = ComplementDependentMode.class))
+            @Parameter(name = "complementDependentMode", description = "COMPLEMENT_DEPENDENT_MODE", schema = @Schema(implementation = ComplementDependentMode.class)),
+            @Parameter(name = "allLevelDependent", description = "ALL_LEVEL_DEPENDENT", schema = @Schema(implementation = boolean.class, example = "false"))
     })
     @PostMapping(value = "start-process-instance")
     @ResponseStatus(HttpStatus.OK)
@@ -149,7 +150,8 @@ public class ExecutorController extends BaseController {
                                        @RequestParam(value = "dryRun", defaultValue = "0", required = false) int dryRun,
                                        @RequestParam(value = "testFlag", defaultValue = "0") int testFlag,
                                        @RequestParam(value = "complementDependentMode", required = false) ComplementDependentMode complementDependentMode,
-                                       @RequestParam(value = "version", required = false) Integer version) {
+                                       @RequestParam(value = "version", required = false) Integer version,
+                                       @RequestParam(value = "allLevelDependent", required = false, defaultValue = "false") boolean allLevelDependent) {
 
         if (timeout == null) {
             timeout = Constants.MAX_TASK_TIMEOUT;
@@ -168,7 +170,7 @@ public class ExecutorController extends BaseController {
                 startNodeList, taskDependType, warningType, warningGroupId, runMode, processInstancePriority,
                 workerGroup, tenantCode, environmentCode, timeout, startParamMap, expectedParallelismNumber, dryRun,
                 testFlag,
-                complementDependentMode, version);
+                complementDependentMode, version, allLevelDependent);
         return returnDataList(result);
     }
 
@@ -215,7 +217,8 @@ public class ExecutorController extends BaseController {
             @Parameter(name = "expectedParallelismNumber", description = "EXPECTED_PARALLELISM_NUMBER", schema = @Schema(implementation = int.class, example = "8")),
             @Parameter(name = "dryRun", description = "DRY_RUN", schema = @Schema(implementation = int.class, example = "0")),
             @Parameter(name = "testFlag", description = "TEST_FLAG", schema = @Schema(implementation = int.class, example = "0")),
-            @Parameter(name = "complementDependentMode", description = "COMPLEMENT_DEPENDENT_MODE", schema = @Schema(implementation = ComplementDependentMode.class))
+            @Parameter(name = "complementDependentMode", description = "COMPLEMENT_DEPENDENT_MODE", schema = @Schema(implementation = ComplementDependentMode.class)),
+            @Parameter(name = "allLevelDependent", description = "ALL_LEVEL_DEPENDENT", schema = @Schema(implementation = boolean.class, example = "false"))
     })
     @PostMapping(value = "batch-start-process-instance")
     @ResponseStatus(HttpStatus.OK)
@@ -241,7 +244,8 @@ public class ExecutorController extends BaseController {
                                             @RequestParam(value = "expectedParallelismNumber", required = false) Integer expectedParallelismNumber,
                                             @RequestParam(value = "dryRun", defaultValue = "0", required = false) int dryRun,
                                             @RequestParam(value = "testFlag", defaultValue = "0") int testFlag,
-                                            @RequestParam(value = "complementDependentMode", required = false) ComplementDependentMode complementDependentMode) {
+                                            @RequestParam(value = "complementDependentMode", required = false) ComplementDependentMode complementDependentMode,
+                                            @RequestParam(value = "allLevelDependent", required = false, defaultValue = "false") boolean allLevelDependent) {
 
         if (timeout == null) {
             log.debug("Parameter timeout set to {} due to null.", Constants.MAX_TASK_TIMEOUT);
@@ -271,7 +275,7 @@ public class ExecutorController extends BaseController {
                     startNodeList, taskDependType, warningType, warningGroupId, runMode, processInstancePriority,
                     workerGroup, tenantCode, environmentCode, timeout, startParamMap, expectedParallelismNumber, dryRun,
                     testFlag,
-                    complementDependentMode, null);
+                    complementDependentMode, null, allLevelDependent);
 
             if (!Status.SUCCESS.equals(result.get(Constants.STATUS))) {
                 log.error("Process definition start failed, projectCode:{}, processDefinitionCode:{}.", projectCode,

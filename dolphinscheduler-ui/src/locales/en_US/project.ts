@@ -206,6 +206,7 @@ export default {
     cancel_full_screen: 'Cancel full screen',
     task_state: 'Task status',
     mode_of_dependent: 'Mode of dependent',
+    all_level_dependent: 'all level dependent',
     open: 'Open',
     project_name_required: 'Project name is required',
     related_items: 'Related items',
