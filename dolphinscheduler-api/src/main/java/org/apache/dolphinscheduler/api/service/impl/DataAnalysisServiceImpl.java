@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.api.dto.project.StatisticsStateRequest;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.DataAnalysisService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -111,8 +112,8 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
      * @return task state count data
      */
     @Override
-    public Map<String, Object> countTaskStateByProject(User loginUser, long projectCode, String startDate,
-                                                       String endDate) {
+    public Result countTaskStateByProject(User loginUser, long projectCode, String startDate,
+                                          String endDate) {
 
         return countStateByProject(
                 loginUser,
@@ -132,9 +133,9 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
      * @return process instance state count data
      */
     @Override
-    public Map<String, Object> countProcessInstanceStateByProject(User loginUser, long projectCode, String startDate,
-                                                                  String endDate) {
-        Map<String, Object> result = this.countStateByProject(
+    public Result countProcessInstanceStateByProject(User loginUser, long projectCode, String startDate,
+                                                     String endDate) {
+        Result result = this.countStateByProject(
                 loginUser,
                 projectCode,
                 startDate,
@@ -143,8 +144,8 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
                         projectCodes));
 
         // process state count needs to remove state of forced success
-        if (result.containsKey(Constants.STATUS) && result.get(Constants.STATUS).equals(Status.SUCCESS)) {
-            ((TaskCountDto) result.get(Constants.DATA_LIST))
+        if (result.getCode().equals(Status.SUCCESS.getCode())) {
+            ((TaskCountDto) result.getData())
                     .removeStateFromCountList(TaskExecutionStatus.FORCED_SUCCESS);
         }
         return result;
@@ -158,15 +159,12 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
      * @param startDate   start date
      * @param endDate     end date
      */
-    private Map<String, Object> countStateByProject(User loginUser, long projectCode, String startDate, String endDate,
-                                                    TriFunction<Date, Date, Long[], List<ExecuteStatusCount>> instanceStateCounter) {
-        Map<String, Object> result = new HashMap<>();
+    private Result countStateByProject(User loginUser, long projectCode, String startDate, String endDate,
+                                       TriFunction<Date, Date, Long[], List<ExecuteStatusCount>> instanceStateCounter) {
+        Result result = new Result();
         if (projectCode != 0) {
-            Project project = projectMapper.queryByCode(projectCode);
-            result = projectService.checkProjectAndAuth(loginUser, project, projectCode, PROJECT_OVERVIEW);
-            if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            if (checkResult(loginUser, projectCode, result))
                 return result;
-            }
         }
 
         Date start = null;
@@ -180,7 +178,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
                 return result;
             }
         }
-        Pair<Set<Integer>, Map<String, Object>> projectIds = getProjectIds(loginUser, result);
+        Pair<Set<Integer>, Result> projectIds = getProjectIds(loginUser, result);
         if (projectIds.getRight() != null) {
             return projectIds.getRight();
         }
@@ -194,7 +192,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
 
         if (processInstanceStateCounts != null) {
             TaskCountDto taskCountResult = new TaskCountDto(processInstanceStateCounts);
-            result.put(Constants.DATA_LIST, taskCountResult);
+            result.setData(taskCountResult);
             putMsg(result, Status.SUCCESS);
         }
         return result;
@@ -210,22 +208,19 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
      * @return definition count data
      */
     @Override
-    public Map<String, Object> countDefinitionByUser(User loginUser, long projectCode) {
-        Map<String, Object> result = new HashMap<>();
-        if (projectCode != 0) {
-            Project project = projectMapper.queryByCode(projectCode);
-            result = projectService.checkProjectAndAuth(loginUser, project, projectCode, PROJECT_OVERVIEW);
-            if (result.get(Constants.STATUS) != Status.SUCCESS) {
+    public Result countDefinitionByUser(User loginUser, long projectCode) {
+        Result result = new Result();
+        if (projectCode != 0L) {
+            if (checkResult(loginUser, projectCode, result))
                 return result;
-            }
         }
 
         List<DefinitionGroupByUser> defineGroupByUsers = new ArrayList<>();
-        Pair<Set<Integer>, Map<String, Object>> projectIds = getProjectIds(loginUser, result);
+        Pair<Set<Integer>, Result> projectIds = getProjectIds(loginUser, result);
         if (projectIds.getRight() != null) {
             List<DefinitionGroupByUser> emptyList = new ArrayList<>();
             DefineUserDto dto = new DefineUserDto(emptyList);
-            result.put(Constants.DATA_LIST, dto);
+            result.setData(dto);
             putMsg(result, Status.SUCCESS);
             return result;
         }
@@ -236,9 +231,21 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         }
 
         DefineUserDto dto = new DefineUserDto(defineGroupByUsers);
-        result.put(Constants.DATA_LIST, dto);
+        result.setData(dto);
         putMsg(result, Status.SUCCESS);
         return result;
+    }
+
+    private boolean checkResult(User loginUser, long projectCode, Result result) {
+        Project project = projectMapper.queryByCode(projectCode);
+        Map<String, Object> checkResult =
+                projectService.checkProjectAndAuth(loginUser, project, projectCode, PROJECT_OVERVIEW);
+        Status resultStatus = (Status) checkResult.get(Constants.STATUS);
+        if (resultStatus != Status.SUCCESS) {
+            putMsg(result, resultStatus);
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -248,8 +255,8 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
      * @return command state count data
      */
     @Override
-    public Map<String, Object> countCommandState(User loginUser) {
-        Map<String, Object> result = new HashMap<>();
+    public Result countCommandState(User loginUser) {
+        Result result = new Result();
 
         /**
          * find all the task lists in the project under the user
@@ -257,11 +264,11 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
          */
         Date start = null;
         Date end = null;
-        Pair<Set<Integer>, Map<String, Object>> projectIds = getProjectIds(loginUser, result);
+        Pair<Set<Integer>, Result> projectIds = getProjectIds(loginUser, result);
         if (projectIds.getRight() != null) {
             List<CommandStateCount> noData = Arrays.stream(CommandType.values())
                     .map(commandType -> new CommandStateCount(0, 0, commandType)).collect(Collectors.toList());
-            result.put(Constants.DATA_LIST, noData);
+            result.setData(noData);
             putMsg(result, Status.SUCCESS);
             return result;
         }
@@ -285,17 +292,17 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
                         commandType))
                 .collect(Collectors.toList());
 
-        result.put(Constants.DATA_LIST, list);
+        result.setData(list);
         putMsg(result, Status.SUCCESS);
         return result;
     }
 
-    private Pair<Set<Integer>, Map<String, Object>> getProjectIds(User loginUser, Map<String, Object> result) {
+    private Pair<Set<Integer>, Result> getProjectIds(User loginUser, Result result) {
         Set<Integer> projectIds = resourcePermissionCheckService
                 .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), log);
         if (projectIds.isEmpty()) {
             List<ExecuteStatusCount> taskInstanceStateCounts = new ArrayList<>();
-            result.put(Constants.DATA_LIST, new TaskCountDto(taskInstanceStateCounts));
+            result.setData(new TaskCountDto(taskInstanceStateCounts));
             putMsg(result, Status.SUCCESS);
             return Pair.of(null, result);
         }
@@ -316,14 +323,14 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
      * @return queue state count data
      */
     @Override
-    public Map<String, Object> countQueueState(User loginUser) {
-        Map<String, Object> result = new HashMap<>();
+    public Result countQueueState(User loginUser) {
+        Result result = new Result();
 
         // TODO need to add detail data info
         Map<String, Integer> dataMap = new HashMap<>();
         dataMap.put("taskQueue", 0);
         dataMap.put("taskKill", 0);
-        result.put(Constants.DATA_LIST, dataMap);
+        result.setData(dataMap);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -573,23 +580,23 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
      * @return definition count data
      */
     @Override
-    public Map<String, Object> countDefinitionByUserV2(User loginUser, Long projectCode, Integer userId,
-                                                       Integer releaseState) {
-        Map<String, Object> result = new HashMap<>();
+    public Result countDefinitionByUserV2(User loginUser, Long projectCode, Integer userId,
+                                          Integer releaseState) {
+        Result<DefineUserDto> result = new Result<>();
         if (null != projectCode) {
             Project project = projectMapper.queryByCode(projectCode);
-            result = projectService.checkProjectAndAuth(loginUser, project, projectCode, PROJECT_OVERVIEW);
-            if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            projectService.checkProjectAndAuth(result, loginUser, project, projectCode, PROJECT_OVERVIEW);
+            if (result.getCode() != Status.SUCCESS.getCode()) {
                 return result;
             }
         }
 
         List<DefinitionGroupByUser> defineGroupByUsers = new ArrayList<>();
-        Pair<Set<Integer>, Map<String, Object>> projectIds = getProjectIds(loginUser, result);
+        Pair<Set<Integer>, Result> projectIds = getProjectIds(loginUser, result);
         if (projectIds.getRight() != null) {
             List<DefinitionGroupByUser> emptyList = new ArrayList<>();
             DefineUserDto dto = new DefineUserDto(emptyList);
-            result.put(Constants.DATA_LIST, dto);
+            result.setData(dto);
             putMsg(result, Status.SUCCESS);
             return result;
         }
@@ -601,7 +608,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         }
 
         DefineUserDto dto = new DefineUserDto(defineGroupByUsers);
-        result.put(Constants.DATA_LIST, dto);
+        result.setData(dto);
         putMsg(result, Status.SUCCESS);
         return result;
     }
