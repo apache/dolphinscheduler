@@ -42,7 +42,7 @@ public class KyuubiDataSourceProcessorTest {
     @Test
     public void testCheckDatasourceParam() {
         KyuubiDataSourceParamDTO kyuubiDatasourceParamDTO = new KyuubiDataSourceParamDTO();
-        kyuubiDatasourceParamDTO.setHost("localhost");
+        kyuubiDatasourceParamDTO.setHost("0.0.0.0");
         kyuubiDatasourceParamDTO.setDatabase("default");
         Map<String, String> other = new HashMap<>();
         other.put("serverTimezone", "Asia/Shanghai");
