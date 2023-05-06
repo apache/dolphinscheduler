@@ -473,7 +473,11 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
         // TODO: add hdfs prefix getFile
         List<StorageEntity> storageEntityList = new ArrayList<>();
         try {
-            FileStatus[] fileStatuses = fs.listStatus(new Path(path));
+            Path filePath = new Path(path);
+            if (!fs.exists(filePath)) {
+                return storageEntityList;
+            }
+            FileStatus[] fileStatuses = fs.listStatus(filePath);
 
             // transform FileStatusArray into the StorageEntity List
             for (FileStatus fileStatus : fileStatuses) {
@@ -756,9 +760,10 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
     private static final class YarnHAAdminUtils {
 
         /**
-         *  get active resourcemanager node
+         * get active resourcemanager node
+         *
          * @param protocol http protocol
-         * @param rmIds yarn ha ids
+         * @param rmIds    yarn ha ids
          * @return yarn active node
          */
         public static String getActiveRMName(String protocol, String rmIds) {
