@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.utils;
 
+import org.apache.dolphinscheduler.common.constants.TenantConstants;
 import org.apache.dolphinscheduler.common.exception.StorageOperateNoConfiguredException;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
@@ -44,13 +45,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class TaskExecutionCheckerUtils {
 
     public static void checkTenantExist(WorkerConfig workerConfig, TaskExecutionContext taskExecutionContext) {
         try {
             String tenantCode = taskExecutionContext.getTenantCode();
+            if (TenantConstants.DEFAULT_TENANT_CODE.equals(tenantCode)) {
+                log.warn("Current tenant is default tenant, will use {} to execute the task",
+                        TenantConstants.BOOTSTRAPT_SYSTEM_USER);
+                return;
+            }
             boolean osUserExistFlag;
             // if Using distributed is true and Currently supported systems are linux,Should not let it
             // automatically
@@ -89,15 +96,18 @@ public class TaskExecutionCheckerUtils {
                     taskExecutionContext.getTaskInstanceId());
             taskExecutionContext.setExecutePath(execLocalPath);
             taskExecutionContext.setAppInfoPath(FileUtils.getAppInfoPath(execLocalPath));
-            createDirectoryWithOwner(Paths.get(taskExecutionContext.getExecutePath()),
-                    taskExecutionContext.getTenantCode());
+            Path executePath = Paths.get(taskExecutionContext.getExecutePath());
+            createDirectory(executePath);
+            if (!TenantConstants.DEFAULT_TENANT_CODE.equals(taskExecutionContext.getTenantCode())) {
+                setOwner(executePath, taskExecutionContext.getTenantCode());
+            }
         } catch (Throwable ex) {
             throw new TaskException("Cannot create process execute dir", ex);
         }
     }
 
     public static void downloadResourcesIfNeeded(StorageOperate storageOperate,
-                                                 TaskExecutionContext taskExecutionContext, Logger logger) {
+                                                 TaskExecutionContext taskExecutionContext) {
         String execLocalPath = taskExecutionContext.getExecutePath();
         Map<String, String> projectRes = taskExecutionContext.getResources();
         if (MapUtils.isEmpty(projectRes)) {
@@ -110,7 +120,7 @@ public class TaskExecutionCheckerUtils {
             if (notExist) {
                 downloadFiles.add(Pair.of(key, value));
             } else {
-                logger.info("file : {} exists ", resFile.getName());
+                log.info("file : {} exists ", resFile.getName());
             }
         });
         if (!downloadFiles.isEmpty() && !PropertyUtils.getResUploadStartupState()) {
@@ -125,10 +135,11 @@ public class TaskExecutionCheckerUtils {
                     String tenantCode = fileDownload.getRight();
                     // TODO: Need a better way to get fileName because this implementation is tricky.
                     String fileName = storageOperate.getResourceFileName(fullName);
-                    logger.info("get resource file from path:{}", fullName);
+                    log.info("get resource file from path:{}", fullName);
 
                     long resourceDownloadStartTime = System.currentTimeMillis();
-                    storageOperate.download(tenantCode, fullName, execLocalPath + File.separator + fileName, false,
+                    storageOperate.download(taskExecutionContext.getTenantCode(), fullName,
+                            execLocalPath + File.separator + fileName, false,
                             true);
                     WorkerServerMetrics
                             .recordWorkerResourceDownloadTime(System.currentTimeMillis() - resourceDownloadStartTime);
@@ -143,12 +154,19 @@ public class TaskExecutionCheckerUtils {
         }
     }
 
-    private static void createDirectoryWithOwner(Path filePath, String tenant) {
+    private static void createDirectory(Path filePath) {
         if (Files.exists(filePath)) {
             return;
         }
         try {
             Files.createDirectories(filePath);
+        } catch (IOException e) {
+            throw new TaskException("Create directory " + filePath + " failed ", e);
+        }
+    }
+
+    private static void setOwner(Path filePath, String tenant) {
+        try {
             if (!OSUtils.isSudoEnable()) {
                 // we need to open sudo, then we can change the owner.
                 return;
@@ -158,7 +176,7 @@ public class TaskExecutionCheckerUtils {
             UserPrincipal tenantPrincipal = userPrincipalLookupService.lookupPrincipalByName(tenant);
             Files.setOwner(filePath, tenantPrincipal);
         } catch (IOException e) {
-            throw new TaskException("Set tenant directory permission failed, tenant: " + tenant, e);
+            throw new TaskException("Set tenant directory " + filePath + " permission failed, tenant: " + tenant, e);
         }
     }
 }

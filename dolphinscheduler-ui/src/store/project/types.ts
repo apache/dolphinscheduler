@@ -57,6 +57,7 @@ type TaskType =
   | 'KUBEFLOW'
   | 'LINKIS'
   | 'DATA_FACTORY'
+  | 'REMOTESHELL'
 
 type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON'
 

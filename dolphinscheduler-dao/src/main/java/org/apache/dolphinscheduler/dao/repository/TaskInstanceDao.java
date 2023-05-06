@@ -56,7 +56,7 @@ public interface TaskInstanceDao {
      * @param processInstance process instance
      * @return task instance
      */
-    TaskInstance submitTaskInstanceToDB(TaskInstance taskInstance, ProcessInstance processInstance);
+    boolean submitTaskInstanceToDB(TaskInstance taskInstance, ProcessInstance processInstance);
 
     /**
      * Query list of valid task instance by process instance id

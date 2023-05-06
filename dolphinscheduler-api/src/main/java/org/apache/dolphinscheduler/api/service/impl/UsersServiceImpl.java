@@ -224,7 +224,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     }
 
     /***
-     * create User for ldap login
+     * create User for ldap and sso login
      */
     @Override
     @Transactional
@@ -1069,6 +1069,11 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
                 sb.append(alertGroups.get(alertGroups.size() - 1));
                 user.setAlertGroup(sb.toString());
             }
+        }
+
+        Tenant tenant = tenantMapper.selectById(user.getTenantId());
+        if (tenant != null) {
+            user.setTenantCode(tenant.getTenantCode());
         }
 
         // add system default timezone if not user timezone

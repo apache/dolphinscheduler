@@ -45,16 +45,13 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.plugin.task.api.model.DateInterval;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -85,17 +82,17 @@ public interface ProcessService {
 
     void recurseFindSubProcess(long parentCode, List<Long> ids);
 
-    Tenant getTenantForProcess(int tenantId, int userId);
+    String getTenantForProcess(String tenantCode, int userId);
 
     Environment findEnvironmentByCode(Long environmentCode);
 
     void setSubProcessParam(ProcessInstance subProcessInstance);
 
-    TaskInstance submitTaskWithRetry(ProcessInstance processInstance, TaskInstance taskInstance, int commitRetryTimes,
-                                     long commitInterval);
+    boolean submitTaskWithRetry(ProcessInstance processInstance, TaskInstance taskInstance, int commitRetryTimes,
+                                long commitInterval);
 
     @Transactional
-    TaskInstance submitTask(ProcessInstance processInstance, TaskInstance taskInstance);
+    boolean submitTask(ProcessInstance processInstance, TaskInstance taskInstance);
 
     void createSubWorkProcess(ProcessInstance parentProcessInstance, TaskInstance task);
 
@@ -135,12 +132,6 @@ public interface ProcessService {
     String queryTenantCodeByResName(String resName, ResourceType resourceType);
 
     List<Schedule> selectAllByProcessDefineCode(long[] codes);
-
-    ProcessInstance findLastSchedulerProcessInterval(Long definitionCode, DateInterval dateInterval, int testFlag);
-
-    ProcessInstance findLastManualProcessInterval(Long definitionCode, DateInterval dateInterval, int testFlag);
-
-    ProcessInstance findLastRunningProcess(Long definitionCode, Date startTime, Date endTime, int testFlag);
 
     String queryUserQueueByProcessInstance(ProcessInstance processInstance);
 
@@ -230,9 +221,6 @@ public interface ProcessService {
     int updateTaskGroupQueue(TaskGroupQueue taskGroupQueue);
 
     TaskGroupQueue loadTaskGroupQueue(int taskId);
-
-    void sendStartTask2Master(ProcessInstance processInstance, int taskId,
-                              org.apache.dolphinscheduler.remote.command.CommandType taskType);
 
     ProcessInstance loadNextProcess4Serial(long code, int state, int id);
 

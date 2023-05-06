@@ -53,6 +53,7 @@
         <if test="instanceName != null and instanceName != ''">
             and instance_name like concat('%', #{instanceName}, '%')
         </if>
+        order by update_time desc
     </select>
 
     <select id="existInstanceName" resultType="java.lang.Boolean">

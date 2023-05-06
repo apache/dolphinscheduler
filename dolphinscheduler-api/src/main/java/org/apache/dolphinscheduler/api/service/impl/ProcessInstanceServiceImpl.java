@@ -61,7 +61,6 @@ import org.apache.dolphinscheduler.dao.entity.ResponseTaskLog;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
@@ -265,10 +264,6 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             log.error("Process definition does not exist, projectCode:{}.", projectCode);
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, processId);
         } else {
-            Tenant tenant = tenantMapper.queryById(processDefinition.getTenantId());
-            if (tenant != null) {
-                processDefinition.setTenantCode(tenant.getTenantCode());
-            }
             processInstance.setLocations(processDefinition.getLocations());
             processInstance.setDagData(processService.genDagData(processDefinition));
             result.put(DATA_LIST, processInstance);
@@ -531,11 +526,12 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
                 }
                 String dependResultString = tmpStringArray[1];
                 String[] dependStringArray = dependResultString.split(",");
-                if (dependStringArray.length != 2) {
+                if (dependStringArray.length != 3) {
                     continue;
                 }
-                String key = dependStringArray[0].trim();
-                DependResult dependResult = DependResult.valueOf(dependStringArray[1].trim());
+                String key = dependStringArray[0].trim().split(":")[1].trim();
+                String result = dependStringArray[1].trim().split(":")[1].trim();
+                DependResult dependResult = DependResult.valueOf(result);
                 resultMap.put(key, dependResult);
             }
         }
@@ -611,7 +607,6 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
      * @param globalParams       global params
      * @param locations          locations for nodes
      * @param timeout            timeout
-     * @param tenantCode         tenantCode
      * @return update result code
      */
     @Transactional
@@ -620,7 +615,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
                                                      String taskRelationJson,
                                                      String taskDefinitionJson, String scheduleTime, Boolean syncDefine,
                                                      String globalParams,
-                                                     String locations, int timeout, String tenantCode) {
+                                                     String locations, int timeout) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
         Map<String, Object> result =
@@ -659,7 +654,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             timezoneId = commandParamMap.get(Constants.SCHEDULE_TIMEZONE);
         }
 
-        setProcessInstance(processInstance, tenantCode, scheduleTime, globalParams, timeout, timezoneId);
+        setProcessInstance(processInstance, scheduleTime, globalParams, timeout, timezoneId);
         List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
         if (taskDefinitionLogs.isEmpty()) {
             log.warn("Parameter taskDefinitionJson is empty");
@@ -693,18 +688,9 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-        int tenantId = -1;
-        if (!Constants.DEFAULT.equals(tenantCode)) {
-            Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
-            if (tenant == null) {
-                log.error("Tenant does not exist.");
-                putMsg(result, Status.TENANT_NOT_EXIST);
-                return result;
-            }
-            tenantId = tenant.getId();
-        }
+
         processDefinition.set(projectCode, processDefinition.getName(), processDefinition.getDescription(),
-                globalParams, locations, timeout, tenantId);
+                globalParams, locations, timeout);
         processDefinition.setUpdateTime(new Date());
         int insertVersion = processService.saveProcessDefine(loginUser, processDefinition, syncDefine, Boolean.FALSE);
         if (insertVersion == 0) {
@@ -749,7 +735,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
     /**
      * update process instance attributes
      */
-    private void setProcessInstance(ProcessInstance processInstance, String tenantCode, String scheduleTime,
+    private void setProcessInstance(ProcessInstance processInstance, String scheduleTime,
                                     String globalParams, int timeout, String timezone) {
         Date schedule = processInstance.getScheduleTime();
         if (scheduleTime != null) {
@@ -762,7 +748,6 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         globalParams = curingGlobalParamsService.curingGlobalParams(processInstance.getId(), globalParamMap,
                 globalParamList, processInstance.getCmdTypeIfComplement(), schedule, timezone);
         processInstance.setTimeout(timeout);
-        processInstance.setTenantCode(tenantCode);
         processInstance.setGlobalParams(globalParams);
     }
 
@@ -993,7 +978,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
                 task.getEndDate().add(endTime.getTime());
                 task.setIsoStart(startTime);
                 task.setIsoEnd(endTime);
-                task.setStatus(taskInstance.getState().getDesc().toUpperCase());
+                task.setStatus(taskInstance.getState().name());
                 task.setExecutionDate(taskInstance.getStartTime());
                 task.setDuration(DateUtils.format2Readable(endTime.getTime() - startTime.getTime()));
                 taskList.add(task);

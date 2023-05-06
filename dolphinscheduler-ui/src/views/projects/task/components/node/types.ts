@@ -45,6 +45,10 @@ interface IOption {
   value: string | number
 }
 
+interface IRenderOption extends IOption {
+  filterLabel: string
+}
+
 interface ITaskPriorityOption extends SelectOption {
   icon: VNode
   color: string
@@ -316,6 +320,10 @@ interface ITaskParams {
   zeppelinParagraphId?: string
   zeppelinRestEndpoint?: string
   restEndpoint?: string
+  zeppelinUsername?: string
+  username?: string
+  zeppelinPassword?: string
+  password?: string
   zeppelinProductionNoteDirectory?: string
   productionNoteDirectory?: string
   hiveCliOptions?: string
@@ -346,6 +354,7 @@ interface ITaskParams {
   minMemorySpace?: string
   image?: string
   command?: string
+  args?: string
   algorithm?: string
   params?: string
   searchParams?: string
@@ -488,6 +497,7 @@ export {
   INodeData,
   ITaskParams,
   IOption,
+  IRenderOption,
   IDataBase,
   ModelType,
   SourceType,

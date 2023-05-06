@@ -18,21 +18,11 @@
 package org.apache.dolphinscheduler.server.master.rpc;
 
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
-import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
-import org.apache.dolphinscheduler.remote.processor.LoggerRequestProcessor;
+import org.apache.dolphinscheduler.remote.processor.MasterRpcProcessor;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.master.processor.CacheProcessor;
-import org.apache.dolphinscheduler.server.master.processor.StateEventProcessor;
-import org.apache.dolphinscheduler.server.master.processor.TaskEventProcessor;
-import org.apache.dolphinscheduler.server.master.processor.TaskExecuteResponseProcessor;
-import org.apache.dolphinscheduler.server.master.processor.TaskExecuteRunningProcessor;
-import org.apache.dolphinscheduler.server.master.processor.TaskExecuteStartProcessor;
-import org.apache.dolphinscheduler.server.master.processor.TaskKillResponseProcessor;
-import org.apache.dolphinscheduler.server.master.processor.TaskRecallProcessor;
-import org.apache.dolphinscheduler.server.master.processor.TaskUpdatePidProcessor;
-import org.apache.dolphinscheduler.server.master.processor.WorkflowExecutingDataRequestProcessor;
-import org.apache.dolphinscheduler.server.master.processor.WorkflowMetricsCleanUpProcessor;
+
+import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -52,40 +42,7 @@ public class MasterRPCServer implements AutoCloseable {
     private MasterConfig masterConfig;
 
     @Autowired
-    private TaskExecuteRunningProcessor taskExecuteRunningProcessor;
-
-    @Autowired
-    private TaskExecuteResponseProcessor taskExecuteResponseProcessor;
-
-    @Autowired
-    private TaskEventProcessor taskEventProcessor;
-
-    @Autowired
-    private StateEventProcessor stateEventProcessor;
-
-    @Autowired
-    private CacheProcessor cacheProcessor;
-
-    @Autowired
-    private TaskKillResponseProcessor taskKillResponseProcessor;
-
-    @Autowired
-    private TaskUpdatePidProcessor updatePidProcessor;
-
-    @Autowired
-    private TaskRecallProcessor taskRecallProcessor;
-
-    @Autowired
-    private LoggerRequestProcessor loggerRequestProcessor;
-
-    @Autowired
-    private WorkflowExecutingDataRequestProcessor workflowExecutingDataRequestProcessor;
-
-    @Autowired
-    private TaskExecuteStartProcessor taskExecuteStartProcessor;
-
-    @Autowired
-    private WorkflowMetricsCleanUpProcessor workflowMetricsCleanUpProcessor;
+    private List<MasterRpcProcessor> masterRpcProcessors;
 
     public void start() {
         log.info("Starting Master RPC Server...");
@@ -93,27 +50,10 @@ public class MasterRPCServer implements AutoCloseable {
         NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(masterConfig.getListenPort());
         this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RUNNING, taskExecuteRunningProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_UPDATE_PID, updatePidProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_RESULT, taskExecuteResponseProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_KILL_RESPONSE, taskKillResponseProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.STATE_EVENT_REQUEST, stateEventProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_FORCE_STATE_EVENT_REQUEST, taskEventProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_WAKEUP_EVENT_REQUEST, taskEventProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.CACHE_EXPIRE, cacheProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_REJECT, taskRecallProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.WORKFLOW_EXECUTING_DATA_REQUEST,
-                workflowExecutingDataRequestProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.TASK_EXECUTE_START, taskExecuteStartProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.WORKFLOW_METRICS_CLEANUP,
-                workflowMetricsCleanUpProcessor);
-
-        // log server
-        this.nettyRemotingServer.registerProcessor(CommandType.GET_LOG_BYTES_REQUEST, loggerRequestProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.ROLL_VIEW_LOG_REQUEST, loggerRequestProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.VIEW_WHOLE_LOG_REQUEST, loggerRequestProcessor);
-        this.nettyRemotingServer.registerProcessor(CommandType.REMOVE_TAK_LOG_REQUEST, loggerRequestProcessor);
-
+        for (MasterRpcProcessor masterRpcProcessor : masterRpcProcessors) {
+            this.nettyRemotingServer.registerProcessor(masterRpcProcessor);
+            log.info("Success register netty processor: {}", masterRpcProcessor.getClass().getName());
+        }
         this.nettyRemotingServer.start();
         log.info("Started Master RPC Server...");
     }

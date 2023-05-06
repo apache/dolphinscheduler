@@ -165,6 +165,9 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
       field: 'rawScript',
       span: scriptSpan,
       name: t('project.node.script'),
+      props: {
+        language: 'sql'
+      },
       validate: {
         trigger: ['input', 'trigger'],
         required: true,

@@ -20,22 +20,17 @@ package org.apache.dolphinscheduler.plugin.task.api.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class SwitchResultVo {
 
     private String condition;
     private List<String> nextNode;
-
-    public String getCondition() {
-        return condition;
-    }
-
-    public void setCondition(String condition) {
-        this.condition = condition;
-    }
-
-    public List<String> getNextNode() {
-        return nextNode;
-    }
 
     public void setNextNode(Object nextNode) {
         if (nextNode instanceof String) {

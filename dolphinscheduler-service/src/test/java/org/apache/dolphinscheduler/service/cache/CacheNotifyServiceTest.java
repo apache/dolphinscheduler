@@ -18,15 +18,16 @@
 package org.apache.dolphinscheduler.service.cache;
 
 import org.apache.dolphinscheduler.common.enums.CacheType;
-import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
-import org.apache.dolphinscheduler.remote.command.CacheExpireCommand;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
+import org.apache.dolphinscheduler.remote.command.cache.CacheExpireRequest;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
+import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.service.cache.impl.CacheNotifyServiceImpl;
 
 import java.util.ArrayList;
@@ -39,6 +40,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import io.netty.channel.Channel;
 
 /**
  * tenant cache proxy test
@@ -56,13 +59,22 @@ public class CacheNotifyServiceTest {
     public void testNotifyMaster() {
         User user1 = new User();
         user1.setId(100);
-        Command cacheExpireCommand = new CacheExpireCommand(CacheType.USER, "100").convert2Command();
+        Message cacheExpireMessage = new CacheExpireRequest(CacheType.USER, "100").convert2Command();
 
         NettyServerConfig serverConfig = new NettyServerConfig();
 
         NettyRemotingServer nettyRemotingServer = new NettyRemotingServer(serverConfig);
-        nettyRemotingServer.registerProcessor(CommandType.CACHE_EXPIRE, (channel, command) -> {
-            Assertions.assertEquals(cacheExpireCommand, command);
+        nettyRemotingServer.registerProcessor(new NettyRequestProcessor() {
+
+            @Override
+            public void process(Channel channel, Message message) {
+                Assertions.assertEquals(cacheExpireMessage, message);
+            }
+
+            @Override
+            public MessageType getCommandType() {
+                return MessageType.CACHE_EXPIRE;
+            }
         });
         nettyRemotingServer.start();
 
@@ -72,9 +84,9 @@ public class CacheNotifyServiceTest {
         server.setPort(serverConfig.getListenPort());
         serverList.add(server);
 
-        Mockito.when(registryClient.getServerList(NodeType.MASTER)).thenReturn(serverList);
+        Mockito.when(registryClient.getServerList(RegistryNodeType.MASTER)).thenReturn(serverList);
 
-        cacheNotifyService.notifyMaster(cacheExpireCommand);
+        cacheNotifyService.notifyMaster(cacheExpireMessage);
 
         nettyRemotingServer.close();
     }

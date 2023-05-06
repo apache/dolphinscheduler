@@ -112,7 +112,17 @@ export function useDatasource(
       id: 15,
       code: 'DAMENG',
       disabled: false
-    }
+    },
+    {
+      id: 15,
+      code: 'SSH',
+      disabled: true
+    },
+    {
+      id: 16,
+      code: 'DATABEND',
+      disabled: false
+    },
   ]
 
   const getDatasourceTypes = async () => {

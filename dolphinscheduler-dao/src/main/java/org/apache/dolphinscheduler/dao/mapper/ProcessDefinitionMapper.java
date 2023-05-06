@@ -151,14 +151,6 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
     List<ProcessDefinition> queryDefinitionListByIdList(@Param("ids") Integer[] ids);
 
     /**
-     * query process definition by tenant
-     *
-     * @param tenantId tenantId
-     * @return process definition list
-     */
-    List<ProcessDefinition> queryDefinitionListByTenant(@Param("tenantId") int tenantId);
-
-    /**
      * Statistics process definition group by project codes list
      * <p>
      * We only need project codes to determine whether the definition belongs to the user or not.

@@ -21,10 +21,10 @@ import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.WorkflowStateEventChangeCommand;
-import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
+import org.apache.dolphinscheduler.remote.command.workflow.WorkflowStateEventChangeRequest;
+import org.apache.dolphinscheduler.remote.processor.MasterRpcProcessor;
 import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.server.master.event.TaskStateEvent;
 import org.apache.dolphinscheduler.server.master.event.WorkflowStateEvent;
@@ -35,7 +35,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Preconditions;
 import io.netty.channel.Channel;
 
 /**
@@ -43,23 +42,20 @@ import io.netty.channel.Channel;
  */
 @Component
 @Slf4j
-public class StateEventProcessor implements NettyRequestProcessor {
+public class StateEventProcessor implements MasterRpcProcessor {
 
     @Autowired
     private StateEventResponseService stateEventResponseService;
 
     @Override
-    public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.STATE_EVENT_REQUEST == command.getType(),
-                String.format("invalid command type: %s", command.getType()));
-
-        WorkflowStateEventChangeCommand workflowStateEventChangeCommand =
-                JSONUtils.parseObject(command.getBody(), WorkflowStateEventChangeCommand.class);
+    public void process(Channel channel, Message message) {
+        WorkflowStateEventChangeRequest workflowStateEventChangeRequest =
+                JSONUtils.parseObject(message.getBody(), WorkflowStateEventChangeRequest.class);
         StateEvent stateEvent;
-        if (workflowStateEventChangeCommand.getDestTaskInstanceId() == 0) {
-            stateEvent = createWorkflowStateEvent(workflowStateEventChangeCommand);
+        if (workflowStateEventChangeRequest.getDestTaskInstanceId() == 0) {
+            stateEvent = createWorkflowStateEvent(workflowStateEventChangeRequest);
         } else {
-            stateEvent = createTaskStateEvent(workflowStateEventChangeCommand);
+            stateEvent = createTaskStateEvent(workflowStateEventChangeRequest);
         }
 
         try (
@@ -71,26 +67,31 @@ public class StateEventProcessor implements NettyRequestProcessor {
 
     }
 
-    private TaskStateEvent createTaskStateEvent(WorkflowStateEventChangeCommand workflowStateEventChangeCommand) {
+    @Override
+    public MessageType getCommandType() {
+        return MessageType.STATE_EVENT_REQUEST;
+    }
+
+    private TaskStateEvent createTaskStateEvent(WorkflowStateEventChangeRequest workflowStateEventChangeRequest) {
         return TaskStateEvent.builder()
-                .processInstanceId(workflowStateEventChangeCommand.getDestProcessInstanceId())
-                .taskInstanceId(workflowStateEventChangeCommand.getDestTaskInstanceId())
+                .processInstanceId(workflowStateEventChangeRequest.getDestProcessInstanceId())
+                .taskInstanceId(workflowStateEventChangeRequest.getDestTaskInstanceId())
                 .type(StateEventType.TASK_STATE_CHANGE)
-                .key(workflowStateEventChangeCommand.getKey())
+                .key(workflowStateEventChangeRequest.getKey())
                 .build();
     }
 
-    private WorkflowStateEvent createWorkflowStateEvent(WorkflowStateEventChangeCommand workflowStateEventChangeCommand) {
-        WorkflowExecutionStatus workflowExecutionStatus = workflowStateEventChangeCommand.getSourceStatus();
-        if (workflowStateEventChangeCommand.getSourceProcessInstanceId() != workflowStateEventChangeCommand
+    private WorkflowStateEvent createWorkflowStateEvent(WorkflowStateEventChangeRequest workflowStateEventChangeRequest) {
+        WorkflowExecutionStatus workflowExecutionStatus = workflowStateEventChangeRequest.getSourceStatus();
+        if (workflowStateEventChangeRequest.getSourceProcessInstanceId() != workflowStateEventChangeRequest
                 .getDestProcessInstanceId()) {
             workflowExecutionStatus = WorkflowExecutionStatus.RUNNING_EXECUTION;
         }
         return WorkflowStateEvent.builder()
-                .processInstanceId(workflowStateEventChangeCommand.getDestProcessInstanceId())
+                .processInstanceId(workflowStateEventChangeRequest.getDestProcessInstanceId())
                 .type(StateEventType.PROCESS_STATE_CHANGE)
                 .status(workflowExecutionStatus)
-                .key(workflowStateEventChangeCommand.getKey())
+                .key(workflowStateEventChangeRequest.getKey())
                 .build();
     }
 

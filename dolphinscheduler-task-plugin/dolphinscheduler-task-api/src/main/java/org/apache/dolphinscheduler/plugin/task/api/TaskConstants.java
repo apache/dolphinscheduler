@@ -33,7 +33,7 @@ public class TaskConstants {
 
     public static final String FLINK_APPLICATION_REGEX = "JobID \\w+";
 
-    public static final String SETVALUE_REGEX = "[\\$#]\\{setValue\\(([^)]*)\\)}";
+    public static final String SETVALUE_REGEX = "[\\$#]\\{setValue\\((.*?)\\)}";
 
     /**
      * string false
@@ -238,7 +238,6 @@ public class TaskConstants {
 
     /**
      * year_week
-     *
      */
     public static final String YEAR_WEEK = "year_week";
     /**
@@ -301,6 +300,7 @@ public class TaskConstants {
     public static final String JDBC_POSTGRESQL = "jdbc:postgresql://";
     public static final String JDBC_HIVE_2 = "jdbc:hive2://";
     public static final String JDBC_CLICKHOUSE = "jdbc:clickhouse://";
+    public static final String JDBC_DATABEND = "jdbc:databend://";
     public static final String JDBC_ORACLE_SID = "jdbc:oracle:thin:@";
     public static final String JDBC_ORACLE_SERVICE_NAME = "jdbc:oracle:thin:@//";
     public static final String JDBC_SQLSERVER = "jdbc:sqlserver://";
@@ -314,6 +314,7 @@ public class TaskConstants {
     public static final String COM_MYSQL_CJ_JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
     public static final String ORG_APACHE_HIVE_JDBC_HIVE_DRIVER = "org.apache.hive.jdbc.HiveDriver";
     public static final String COM_CLICKHOUSE_JDBC_DRIVER = "com.clickhouse.jdbc.ClickHouseDriver";
+    public static final String COM_DATABEND_JDBC_DRIVER = "com.databend.jdbc.DatabendDriver";
     public static final String COM_ORACLE_JDBC_DRIVER = "oracle.jdbc.driver.OracleDriver";
     public static final String COM_SQLSERVER_JDBC_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
     public static final String COM_DB2_JDBC_DRIVER = "com.ibm.db2.jcc.DB2Driver";
