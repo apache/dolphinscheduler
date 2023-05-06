@@ -556,6 +556,21 @@ const DetailModal = defineComponent({
                     placeholder={t('datasource.database_name_tips')}
                   />
                 </NFormItem>
+                {detailForm.type === 'SNOWFLAKE' && (
+                      <NFormItem
+                          label={t('datasource.datawarehouse')}
+                          path='datawarehouse'
+                          show-require-mark
+                      >
+                          <NInput
+                              allowInput={this.trim}
+                              class='input-datawarehouse'
+                              v-model={[detailForm.datawarehouse, 'value']}
+                              maxlength={60}
+                              placeholder={t('datasource.datawarehouse_tips')}
+                          />
+                      </NFormItem>
+                )}
                 <NFormItem
                   v-show={showConnectType}
                   label={t('datasource.oracle_connect_type')}

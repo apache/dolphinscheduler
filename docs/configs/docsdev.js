@@ -272,6 +272,10 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/datasource/hive.html',
                             },
                             {
+                                title: 'SNOWFLAKE',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/snowflake.html',
+                            },
+                            {
                                 title: 'KYUUBI',
                                 link: '/en-us/docs/dev/user_doc/guide/datasource/kyuubi.html',
                             },
@@ -971,6 +975,10 @@ export default {
                             {
                                 title: 'HIVE',
                                 link: '/zh-cn/docs/dev/user_doc/guide/datasource/hive.html',
+                            },
+                            {
+                                title: 'SNOWFLAKE',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/snowflake.html',
                             },
                             {
                                 title: 'KYUUBI',
