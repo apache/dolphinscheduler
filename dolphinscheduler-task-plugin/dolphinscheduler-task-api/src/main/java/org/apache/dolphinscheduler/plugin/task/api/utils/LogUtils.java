@@ -164,10 +164,7 @@ public class LogUtils {
         }
         Set<String> appIds = new HashSet<>();
         try (Stream<String> stream = Files.lines(Paths.get(logPath))) {
-            stream.filter(line -> {
-                Matcher matcher = APPLICATION_REGEX.matcher(line);
-                return matcher.find();
-            }).forEach(line -> {
+            stream.forEach(line -> {
                 Matcher matcher = APPLICATION_REGEX.matcher(line);
                 if (matcher.find()) {
                     String appId = matcher.group();
