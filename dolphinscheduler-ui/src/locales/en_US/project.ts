@@ -206,6 +206,7 @@ export default {
     cancel_full_screen: 'Cancel full screen',
     task_state: 'Task status',
     mode_of_dependent: 'Mode of dependent',
+    all_level_dependent: 'all level dependent',
     open: 'Open',
     project_name_required: 'Project name is required',
     related_items: 'Related items',
@@ -379,7 +380,9 @@ export default {
     image_tips: 'Please enter image',
     command: 'Command',
     command_tips:
-      'Please enter the container execution command, for example: /bin/echo hello world',
+      'Please enter the container execution command, for example: ["printenv"]',
+    args: 'Args',
+    args_tips: 'Please enter the container execution command args, for example: ["HOSTNAME", "KUBERNETES_PORT"]',
     min_memory_tips: 'Please enter min memory',
     state: 'State',
     branch_flow: 'Branch flow',

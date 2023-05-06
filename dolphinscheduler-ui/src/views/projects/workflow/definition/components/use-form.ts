@@ -69,7 +69,8 @@ export const useForm = () => {
       expectedParallelismNumber: '',
       dryRun: 0,
       testFlag: 0,
-      version: null
+      version: null,
+      allLevelDependent: 'false'
     },
     saving: false,
     rules: {

@@ -15,24 +15,9 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.k8s;
+package org.apache.dolphinscheduler.api.security.impl;
 
-import java.util.Map;
+public abstract class AbstractSsoAuthenticator extends AbstractAuthenticator {
 
-import lombok.Data;
-
-/**
- * k8s task parameters
- */
-@Data
-public class K8sTaskMainParameters {
-
-    private String image;
-    private String command;
-    private String args;
-    private String namespaceName;
-    private String clusterName;
-    private double minCpuCores;
-    private double minMemorySpace;
-    private Map<String, String> paramsMap;
+    public abstract String getSignInUrl(String state);
 }

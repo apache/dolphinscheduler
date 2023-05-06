@@ -48,7 +48,8 @@ public class K8sTaskTest {
 
     private final String DAY = "day";
     private final String date = "20220507";
-    private final String command = "echo 'hello world'";
+    private final String command = "[\"/bin/bash\", \"-c\"]";
+    private final String args = "[\"echo hello world\"]";
     @BeforeEach
     public void before() {
         k8sTaskParameters = new K8sTaskParameters();
@@ -57,6 +58,7 @@ public class K8sTaskTest {
         k8sTaskParameters.setMinCpuCores(minCpuCores);
         k8sTaskParameters.setMinMemorySpace(minMemorySpace);
         k8sTaskParameters.setCommand(command);
+        k8sTaskParameters.setArgs(args);
         TaskExecutionContext taskRequest = new TaskExecutionContext();
         taskRequest.setTaskInstanceId(taskInstanceId);
         taskRequest.setTaskName(taskName);
@@ -82,7 +84,7 @@ public class K8sTaskTest {
     @Test
     public void testBuildCommandNormal() {
         String expectedStr =
-                "{\"image\":\"ds-dev\",\"command\":\"echo 'hello world'\",\"namespaceName\":\"default\",\"clusterName\":\"lab\",\"minCpuCores\":2.0,\"minMemorySpace\":10.0,\"paramsMap\":{\"day\":\"20220507\"}}";
+                "{\"image\":\"ds-dev\",\"command\":\"[\\\"/bin/bash\\\", \\\"-c\\\"]\",\"args\":\"[\\\"echo hello world\\\"]\",\"namespaceName\":\"default\",\"clusterName\":\"lab\",\"minCpuCores\":2.0,\"minMemorySpace\":10.0,\"paramsMap\":{\"day\":\"20220507\"}}";
         String commandStr = k8sTask.buildCommand();
         Assertions.assertEquals(expectedStr, commandStr);
     }
@@ -90,7 +92,7 @@ public class K8sTaskTest {
     @Test
     public void testGetParametersNormal() {
         String expectedStr =
-                "K8sTaskParameters(image=ds-dev, namespace={\"name\":\"default\",\"cluster\":\"lab\"}, command=echo 'hello world', minCpuCores=2.0, minMemorySpace=10.0)";
+                "K8sTaskParameters(image=ds-dev, namespace={\"name\":\"default\",\"cluster\":\"lab\"}, command=[\"/bin/bash\", \"-c\"], args=[\"echo hello world\"], minCpuCores=2.0, minMemorySpace=10.0)";
         String result = k8sTask.getParameters().toString();
         Assertions.assertEquals(expectedStr, result);
     }

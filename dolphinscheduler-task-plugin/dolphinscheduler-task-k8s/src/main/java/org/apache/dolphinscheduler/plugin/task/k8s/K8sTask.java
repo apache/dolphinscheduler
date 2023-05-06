@@ -83,6 +83,7 @@ public class K8sTask extends AbstractK8sTask {
         k8sTaskMainParameters.setMinMemorySpace(k8sTaskParameters.getMinMemorySpace());
         k8sTaskMainParameters.setParamsMap(ParamUtils.convert(paramsMap));
         k8sTaskMainParameters.setCommand(k8sTaskParameters.getCommand());
+        k8sTaskMainParameters.setArgs(k8sTaskParameters.getArgs());
         return JSONUtils.toJsonString(k8sTaskMainParameters);
     }
 

@@ -34,19 +34,19 @@ public interface JdbcRegistryDataMapper extends BaseMapper<JdbcRegistryData> {
     @Select("select * from t_ds_jdbc_registry_data")
     List<JdbcRegistryData> selectAll();
 
-    @Select("select * from t_ds_jdbc_registry_data where key = #{key}")
+    @Select("select * from t_ds_jdbc_registry_data where data_key = #{key}")
     JdbcRegistryData selectByKey(@Param("key") String key);
 
-    @Select("select * from t_ds_jdbc_registry_data where key like CONCAT (#{key}, '%')")
+    @Select("select * from t_ds_jdbc_registry_data where data_key like CONCAT (#{key}, '%')")
     List<JdbcRegistryData> fuzzyQueryByKey(@Param("key") String key);
 
-    @Update("update t_ds_jdbc_registry_data set data = #{data}, last_term = #{term} where id = #{id}")
+    @Update("update t_ds_jdbc_registry_data set data_value = #{data}, last_term = #{term} where id = #{id}")
     int updateDataAndTermById(@Param("id") long id, @Param("data") String data, @Param("term") long term);
 
-    @Delete("delete from t_ds_jdbc_registry_data where key = #{key}")
+    @Delete("delete from t_ds_jdbc_registry_data where data_key = #{key}")
     void deleteByKey(@Param("key") String key);
 
-    @Delete("delete from t_ds_jdbc_registry_data where last_term < #{term} and type = #{type}")
+    @Delete("delete from t_ds_jdbc_registry_data where last_term < #{term} and data_type = #{type}")
     void clearExpireEphemeralDate(@Param("term") long term, @Param("type") int type);
 
     @Update({"<script>",
