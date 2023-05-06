@@ -52,4 +52,10 @@
             #{triggerRelation.triggerCode},#{triggerRelation.triggerType},#{triggerRelation.jobId},#{triggerRelation.createTime},#{triggerRelation.updateTime})
         ON DUPLICATE KEY UPDATE update_time = #{triggerRelation.updateTime};
     </insert>
+
+    <insert id="upsert" databaseId="pg">
+        INSERT INTO t_ds_trigger_relation (trigger_code, trigger_type, job_id, create_time, update_time) VALUES(
+            #{triggerRelation.triggerCode},#{triggerRelation.triggerType},#{triggerRelation.jobId},#{triggerRelation.createTime},#{triggerRelation.updateTime})
+        ON CONFLICT(trigger_type,job_id,trigger_code) DO UPDATE SET update_time = #{triggerRelation.updateTime};
+    </insert>
 </mapper>

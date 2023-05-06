@@ -321,6 +321,7 @@ CREATE TABLE t_ds_error_command (
   message                   text ,
   process_instance_id       int DEFAULT 0,
   process_definition_version int DEFAULT 0,
+  test_flag                 int DEFAULT NULL ,
   PRIMARY KEY (id)
 );
 
@@ -981,7 +982,7 @@ VALUES ('admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '-1'
 
 -- Records of t_ds_tenant
 INSERT INTO t_ds_tenant(id, tenant_code, description, queue_id, create_time, update_time)
-VALUES (-1, 'default', 'default tenant', '0', '2018-03-27 15:48:50', '2018-10-24 17:40:22');
+VALUES (-1, 'default', 'default tenant', '1', '2018-03-27 15:48:50', '2018-10-24 17:40:22');
 
 -- Records of t_ds_alertgroup, default admin warning group
 INSERT INTO t_ds_alertgroup(alert_instance_ids, create_user_id, group_name, description, create_time, update_time)
