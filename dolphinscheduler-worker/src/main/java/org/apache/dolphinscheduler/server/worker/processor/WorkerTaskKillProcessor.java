@@ -85,9 +85,10 @@ public class WorkerTaskKillProcessor implements WorkerRpcProcessor {
                 return;
             }
 
+            this.cancelApplication(taskInstanceId);
+
             int processId = taskExecutionContext.getProcessId();
             if (processId == 0) {
-                this.cancelApplication(taskInstanceId);
                 workerManager.killTaskBeforeExecuteByInstanceId(taskInstanceId);
                 taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.KILL);
                 TaskExecutionContextCacheManager.removeByTaskInstanceId(taskInstanceId);
@@ -96,8 +97,6 @@ public class WorkerTaskKillProcessor implements WorkerRpcProcessor {
                 return;
             }
 
-            // if processId > 0, it should call cancelApplication to cancel remote application too.
-            this.cancelApplication(taskInstanceId);
             boolean result = doKill(taskExecutionContext);
 
             taskExecutionContext.setCurrentExecutionStatus(
