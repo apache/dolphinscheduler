@@ -49,6 +49,7 @@
         <module>dolphinscheduler-datasource-dameng</module>
         <module>dolphinscheduler-datasource-ssh</module>
         <module>dolphinscheduler-datasource-databend</module>
+        <module>dolphinscheduler-datasource-snowflake</module>
     </modules>
 
     <dependencyManagement>
