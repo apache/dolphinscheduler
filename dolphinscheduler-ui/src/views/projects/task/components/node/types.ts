@@ -355,6 +355,7 @@ interface ITaskParams {
   image?: string
   command?: string
   args?: string
+  customizedLabels?: string
   algorithm?: string
   params?: string
   searchParams?: string

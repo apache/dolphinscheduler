@@ -22,6 +22,7 @@ type IType =
   | 'radio'
   | 'editor'
   | 'custom-parameters'
+  | 'custom-labels'
   | 'switch'
   | 'input-number'
   | 'select'

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { useCustomParams, useNamespace } from '.'
+import { useCustomParams, useNamespace, useCustomLabels } from '.'
 import type { IJsonItem } from '../types'
 import { useI18n } from 'vue-i18n'
 
@@ -75,6 +75,7 @@ export function useK8s(model: { [field: string]: any }): IJsonItem[] {
         placeholder: t('project.node.args_tips')
       }
     },
+    ...useCustomLabels({ model, field: 'customizedLabels' }),
     ...useCustomParams({ model, field: 'localParams', isSimple: true })
   ]
 }

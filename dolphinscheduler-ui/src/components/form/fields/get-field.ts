@@ -23,6 +23,7 @@ const TYPES = [
   'radio',
   'editor',
   'custom-parameters',
+  'custom-labels',
   'switch',
   'input-number',
   'select',
@@ -45,7 +46,7 @@ const getField = (
     return widget || null
   }
   // TODO Support other widgets later
-  if (type === 'custom-parameters') {
+  if (type === 'custom-parameters' || type === 'custom-labels') {
     let fieldRules: { [key: string]: IFormItemRule }[] = []
     if (rules && !rules[field]) fieldRules = rules[field] = []
     // @ts-ignore
