@@ -476,4 +476,4 @@ sshd-core-2.8.0.jar
 jcl-over-slf4j-1.7.36.jar
 databend-jdbc-0.0.7.jar
 kyuubi-hive-jdbc-shaded-1.7.0.jar
-
+terajdbc-20.00.00.06.jar

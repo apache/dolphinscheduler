@@ -784,3 +784,11 @@ SIL licenses
 JDOM licenses
 ========================================
     jdom2 2.0.6.1: https://github.com/hunterhacker/jdom/blob/master/LICENSE.txt JDOM
+
+========================================
+Vendor Specific License licenses
+========================================
+The following components are provided vendor specific license. See project link for details.
+The text of each license is also included at licenses/LICENSE-[project].txt.
+
+    terajdbc  20.00.00.06: https://mvnrepository.com/artifact/com.teradata.jdbc/terajdbc/20.00.00.06 VSL
