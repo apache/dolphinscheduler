@@ -30,9 +30,9 @@ Attention: DolphinScheduler itself does not depend on Hadoop, Hive, Spark, but w
 mkdir -p /opt
 cd /opt
 # decompress
-tar -zxvf apache-dolphinscheduler-3.1.5-bin.tar.gz -C /opt 
+tar -zxvf apache-dolphinscheduler-3.1.6-bin.tar.gz -C /opt 
 cd /opt
-mv apache-dolphinscheduler-3.1.5-bin  dolphinscheduler
+mv apache-dolphinscheduler-3.1.6-bin  dolphinscheduler
 ```
 
 ```markdown
