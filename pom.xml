@@ -24,7 +24,7 @@
     </parent>
     <groupId>org.apache.dolphinscheduler</groupId>
     <artifactId>dolphinscheduler</artifactId>
-    <version>3.1.6-SNAPSHOT</version>
+    <version>3.1.6</version>
     <packaging>pom</packaging>
     <name>${project.artifactId}</name>
     <description>Dolphin Scheduler is a distributed and easy-to-expand visual DAG workflow scheduling system, dedicated
@@ -761,7 +761,7 @@
         <connection>scm:git:https://github.com/apache/dolphinscheduler.git</connection>
         <developerConnection>scm:git:https://github.com/apache/dolphinscheduler.git</developerConnection>
         <url>https://github.com/apache/dolphinscheduler</url>
-        <tag>HEAD</tag>
+        <tag>3.1.6</tag>
     </scm>
 
     <profiles>
