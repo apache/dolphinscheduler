@@ -477,6 +477,31 @@ public class ProcessServiceTest {
         Mockito.when(commandMapper.deleteById(9)).thenReturn(1);
         ProcessInstance processInstance10 = processService.handleCommand(host, command9);
         Assert.assertTrue(processInstance10 != null);
+
+        // build command same as processService.processNeedFailoverProcessInstances(processInstance);
+        Command command12 = new Command();
+        command12.setId(12);
+        command12.setProcessDefinitionCode(definitionCode);
+        command12.setProcessDefinitionVersion(definitionVersion);
+        command12.setProcessInstanceId(processInstanceId);
+        command12.setCommandType(CommandType.RECOVER_TOLERANCE_FAULT_PROCESS);
+        HashMap<String, String> startParams12 = new HashMap<>();
+        startParams12.put("startParam11", "testStartParam11");
+        HashMap<String, String> commandParams12 = new HashMap<>();
+        commandParams12.put(CMD_PARAM_START_PARAMS, JSONUtils.toJsonString(startParams12));
+        commandParams12.put("ProcessInstanceId", "222");
+        command12.setCommandParam(JSONUtils.toJsonString(commandParams12));
+        Mockito.when(processInstanceMapper.queryDetailById(222)).thenReturn(processInstance);
+        Mockito.when(commandMapper.deleteById(12)).thenReturn(1);
+        Mockito.when(curingGlobalParamsService.curingGlobalParams(222,
+                processDefinition.getGlobalParamMap(),
+                processDefinition.getGlobalParamList(),
+                CommandType.RECOVER_TOLERANCE_FAULT_PROCESS,
+                processInstance.getScheduleTime(), null)).thenReturn("\"testStartParam11\"");
+        ProcessInstance processInstance13 = processService.handleCommand(host, command12);
+        Assert.assertNotNull(processInstance13);
+        Assert.assertNotNull(processInstance13.getGlobalParams());
+        Assert.assertTrue(processInstance13.getGlobalParams().contains("\"testStartParam11\""));
     }
 
     @Test(expected = ServiceException.class)
