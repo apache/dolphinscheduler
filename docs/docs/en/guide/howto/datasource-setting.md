@@ -25,7 +25,7 @@ export SPRING_DATASOURCE_PASSWORD={password}
 
 DolphinScheduler stores metadata in `relational database`. Currently, we support `PostgreSQL` and `MySQL`. Let's walk through how to initialize the database in `MySQL` and `PostgreSQL` :
 
-> If you use MySQL, you need to manually download [mysql-connector-java driver][mysql] (8.0.16) and move it to the libs directory of DolphinScheduler which is `api-server/libs` and `alert-server/libs` and `master-server/libs` and `worker-server/libs`.
+> If you use MySQL, you need to manually download [mysql-connector-java driver][mysql] (8.0.16) and move it to the libs directory of DolphinScheduler which is `api-server/libs` and `alert-server/libs` and `master-server/libs` and `worker-server/libs` and `tools/libs`.
 
 For mysql 5.6 / 5.7
 
