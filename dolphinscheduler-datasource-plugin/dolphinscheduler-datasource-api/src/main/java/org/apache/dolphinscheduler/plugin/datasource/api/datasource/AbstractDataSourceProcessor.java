@@ -37,6 +37,10 @@ import com.google.common.collect.Sets;
 
 public abstract class AbstractDataSourceProcessor implements DataSourceProcessor {
 
+    private static final Pattern IPV4_PATTERN = Pattern.compile("^[a-zA-Z0-9\\_\\-\\.\\,]+$");
+
+    private static final Pattern IPV6_PATTERN = Pattern.compile("^[a-zA-Z0-9\\_\\-\\.\\:\\[\\]\\,]+$");
+    
     private static final Pattern DATABASE_PATTER = Pattern.compile("^[a-zA-Z0-9\\_\\-\\.]+$");
 
     private static final Pattern PARAMS_PATTER = Pattern.compile("^[a-zA-Z0-9\\-\\_\\/\\@\\.\\:]+$");
@@ -59,7 +63,8 @@ public abstract class AbstractDataSourceProcessor implements DataSourceProcessor
      * @param host datasource host
      */
     protected void checkHost(String host) {
-        if (!com.google.common.net.InetAddresses.isInetAddress(host)) {
+        if (com.google.common.net.InetAddresses.isInetAddress(host)) {
+        } else if (!IPV4_PATTERN.matcher(host).matches() || !IPV6_PATTERN.matcher(host).matches()) {
             throw new IllegalArgumentException("datasource host illegal");
         }
     }
