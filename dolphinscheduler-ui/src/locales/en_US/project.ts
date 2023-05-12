@@ -217,7 +217,9 @@ export default {
     workflow_relation_no_data_result_desc:
       'There is not any workflows. Please create a workflow, and then visit this page again.',
     ready_to_block: 'Ready to block',
-    block: 'Block'
+    block: 'Block',
+    batch_online: 'Batch Online',
+    batch_offline: 'Batch Offline'
   },
   task: {
     on_line: 'Online',

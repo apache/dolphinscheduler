@@ -59,7 +59,9 @@ export default defineComponent({
       getTableData,
       batchDeleteWorkflow,
       batchExportWorkflow,
-      batchCopyWorkflow
+      batchCopyWorkflow,
+      batchOnlineWorkflow,
+      batchOfflineWorkflow
     } = useTable()
 
     const requestData = () => {
@@ -135,6 +137,8 @@ export default defineComponent({
       batchDeleteWorkflow,
       batchExportWorkflow,
       batchCopyWorkflow,
+      batchOnlineWorkflow,
+      batchOfflineWorkflow,
       handleCopyUpdateList,
       ...toRefs(variables),
       uiSettingStore,
@@ -259,6 +263,42 @@ export default defineComponent({
                       >
                         {t('project.workflow.batch_copy')}
                       </NButton>
+                    )
+                  }}
+                </NTooltip>
+
+                <NTooltip>
+                  {{
+                    default: () => t('project.workflow.batch_online'),
+                    trigger: () => (
+                        <NButton
+                            tag='div'
+                            size='small'
+                            type='primary'
+                            disabled={this.checkedRowKeys.length <= 0}
+                            onClick={this.batchOnlineWorkflow}
+                            class='btn-delete-all'
+                        >
+                          {t('project.workflow.batch_online')}
+                        </NButton>
+                    )
+                  }}
+                </NTooltip>
+
+                <NTooltip>
+                  {{
+                    default: () => t('project.workflow.batch_offline'),
+                    trigger: () => (
+                        <NButton
+                            tag='div'
+                            size='small'
+                            type='primary'
+                            disabled={this.checkedRowKeys.length <= 0}
+                            onClick={this.batchOfflineWorkflow}
+                            class='btn-delete-all'
+                        >
+                          {t('project.workflow.batch_offline')}
+                        </NButton>
                     )
                   }}
                 </NTooltip>

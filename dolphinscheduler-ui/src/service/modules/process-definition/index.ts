@@ -17,15 +17,16 @@
 
 import { axios } from '@/service/service'
 import {
-  CodeReq,
-  CodesReq,
-  NameReq,
-  ReleaseStateReq,
-  LimitReq,
-  PageReq,
-  ListReq,
-  ProcessDefinitionReq,
-  TargetCodeReq
+    CodeReq,
+    CodesReq,
+    NameReq,
+    ReleaseStateReq,
+    LimitReq,
+    PageReq,
+    ListReq,
+    ProcessDefinitionReq,
+    TargetCodeReq,
+    CodeStateListReq
 } from './types'
 
 export function queryListPaging(params: PageReq & ListReq, code: number): any {
@@ -255,3 +256,10 @@ export function viewProcessDefinitionVariables(code: number, processCode: number
   })
 }
 
+export function batchOnlineByCodeStates(data: CodeStateListReq, code: number): any {
+    return axios({
+        url: `/projects/${code}/process-definition/batch-release`,
+        method: 'post',
+        data
+    })
+}

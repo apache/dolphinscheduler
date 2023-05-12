@@ -442,7 +442,7 @@ public enum Status {
             "failed to delete the alert instance, there is an alarm group associated with this alert instance",
             "删除告警实例失败，存在与此告警实例关联的警报组"),
     PROCESS_DEFINITION_VERSION_IS_USED(110013, "this process definition version is used", "此工作流定义版本被使用"),
-
+    INVALID_CODE_STATES_JSON(110014,  "invalid code states JSON", "无效的codeStates状态JSON"),
     CREATE_ENVIRONMENT_ERROR(120001, "create environment error", "创建环境失败"),
     ENVIRONMENT_NAME_EXISTS(120002, "this environment name [{0}] already exists", "环境名称[{0}]已经存在"),
     ENVIRONMENT_NAME_IS_NULL(120003, "this environment name shouldn't be empty.", "环境名称不能为空"),
@@ -529,8 +529,9 @@ public enum Status {
     USER_PASSWORD_LENGTH_ERROR(1300017, "user's password length error", "用户密码长度错误"),
     QUERY_CAN_USE_K8S_NAMESPACE_ERROR(1300018, "login user query can used namespace list error", "查询可用命名空间错误"),
 
-    QUERY_PROCESS_DEFINITION_ALL_VARIABLES_ERROR(1300100, "query process definition all variables error",
-            "查询工作流自定义变量信息错误"),
+    QUERY_PROCESS_DEFINITION_ALL_VARIABLES_ERROR(1300100, "query process definition all variables error", "查询工作流自定义变量信息错误"),
+
+    BATCH_RELEASE_PROCESS_DEFINE_BY_CODE_STATES_ERROR(1300101, "batch release process definition by code states error", "批量释放工作流定义失败"),
 
     NO_CURRENT_OPERATING_PERMISSION(1400001, "The current user does not have this permission.", "当前用户无此权限"),
     FUNCTION_DISABLED(1400002, "The current feature is disabled.", "当前功能已被禁用"),

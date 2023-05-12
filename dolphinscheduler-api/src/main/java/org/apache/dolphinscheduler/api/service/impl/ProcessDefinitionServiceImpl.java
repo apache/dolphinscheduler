@@ -45,6 +45,9 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LOCAL_PA
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SQL;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 import org.apache.dolphinscheduler.api.dto.DagDataSchedule;
 import org.apache.dolphinscheduler.api.dto.ScheduleParam;
 import org.apache.dolphinscheduler.api.dto.treeview.Instance;
@@ -3054,4 +3057,46 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
     }
 
+    /**
+     * Batch release process definitions by code states.
+     *
+     * @param loginUser    Login user.
+     * @param projectCode  Project code.
+     * @param codeStates   Code states in JSON format.
+     * @return Result of the batch release process definitions.
+     */
+    @Override
+    @Transactional
+    public Map<String, Object> batchReleaseProcessDefinitions(User loginUser, long projectCode, String codeStates) {
+        Map<String, Object> result = new HashMap<>();
+        if (StringUtils.isEmpty(codeStates)) {
+            log.error("Parameter codeStates is empty, projectCode is {}.", projectCode);
+            putMsg(new HashMap<>(), Status.PROCESS_DEFINITION_CODES_IS_EMPTY);
+            return result;
+        }
+
+        try {
+            Map<String, String> codeStateMap = new Gson().fromJson(codeStates, new TypeToken<Map<String, String>>() {}.getType());
+
+            for (Map.Entry<String, String> entry : codeStateMap.entrySet()) {
+                String code = entry.getKey();
+                String releaseState = entry.getValue();
+
+                try {
+                    ReleaseState releaseStateEnum = ReleaseState.valueOf(releaseState);
+                    result = releaseProcessDefinition(loginUser, projectCode, Long.parseLong(code), releaseStateEnum);
+                } catch (IllegalArgumentException e) {
+                    log.error("Invalid releaseState '{}' in codeStates JSON, projectCode is {}.", releaseState, projectCode);
+                    putMsg(result, Status.INVALID_CODE_STATES_JSON);
+                    return result;
+                }
+            }
+        } catch (JsonSyntaxException e) {
+            log.error("Failed to parse codeStates JSON, projectCode is {}.", projectCode);
+            putMsg(result, Status.INVALID_CODE_STATES_JSON);
+            return result;
+        }
+
+        return result;
+    }
 }

@@ -27,7 +27,8 @@ import {
   batchExportByCodes,
   deleteByCode,
   queryListPaging,
-  release
+  release,
+  batchOnlineByCodeStates
 } from '@/service/modules/process-definition'
 import TableAction from './components/table-action'
 import styles from './index.module.scss'
@@ -409,12 +410,48 @@ export function useTable() {
     return state
   }
 
+    const processWorkflow = (releaseState: any) => {
+        const checkedRowKeys = variables.checkedRowKeys;
+        const projectCode = variables.projectCode;
+        let resultData: { [code: string]: string } = {};
+
+        if (checkedRowKeys.length > 0) {
+            checkedRowKeys.forEach((key) => {
+                const code = String(key);
+                resultData[code] = releaseState;
+            });
+        }
+
+        const codeStatesList = JSON.stringify(resultData);
+        const data = {
+            codeStates: codeStatesList,
+        };
+        batchOnlineByCodeStates(data, projectCode).then(() => {
+            window.$message.success(t('project.workflow.success'));
+            getTableData({
+                pageSize: variables.pageSize,
+                pageNo: variables.page,
+                searchVal: variables.searchVal,
+            });
+        });
+    };
+
+    const batchOnlineWorkflow = () => {
+        processWorkflow('ONLINE');
+    };
+
+    const batchOfflineWorkflow = () => {
+        processWorkflow('OFFLINE');
+    };
+
   return {
     variables,
     createColumns,
     getTableData,
     batchDeleteWorkflow,
     batchExportWorkflow,
-    batchCopyWorkflow
+    batchCopyWorkflow,
+    batchOnlineWorkflow,
+    batchOfflineWorkflow
   }
 }

@@ -521,4 +521,15 @@ public interface ProcessDefinitionService {
      * @return variables data
      */
     Map<String, Object> viewVariables(User loginUser, long projectCode, long code);
+
+    /**
+     * Batch release process definitions by code states.
+     *
+     * @param loginUser    Login user.
+     * @param projectCode  Project code.
+     * @param codeStates   Code states in JSON format.
+     * @return Result of the batch release process definitions.
+     */
+    Map<String, Object> batchReleaseProcessDefinitions(User loginUser, long projectCode, String codeStates);
+
 }

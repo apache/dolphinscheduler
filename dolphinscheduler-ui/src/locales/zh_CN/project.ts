@@ -218,6 +218,8 @@ export default {
       '目前没有任何工作流，请先创建工作流，再访问该页面',
     ready_to_block: '准备锁定',
     block: '锁定',
+    batch_online: '批量上线',
+    batch_offline: '批量下线'
   },
   task: {
     on_line: '线上',
