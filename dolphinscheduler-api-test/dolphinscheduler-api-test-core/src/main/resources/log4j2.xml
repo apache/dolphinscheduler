@@ -28,8 +28,4 @@
             <AppenderRef ref="Console"/>
         </Root>
     </Loggers>
-
-    <logger name="org.testcontainers" level="DEBUG"/>
-    <logger name="com.github.dockerjava" level="WARN"/>
-    <logger name="com.github.dockerjava.zerodep.shaded.org.apache.hc.client5.http.wire" level="OFF"/>
 </Configuration>
