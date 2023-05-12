@@ -41,8 +41,6 @@ import org.junit.jupiter.api.Test;
 
 import lombok.extern.slf4j.Slf4j;
 
-;
-
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 @Slf4j
 public class WorkerGroupAPITest {
