@@ -47,9 +47,6 @@
     <logger name="org.apache.zookeeper" level="WARN"/>
     <logger name="org.apache.hbase" level="WARN"/>
     <logger name="org.apache.hadoop" level="WARN"/>
-    <logger name="org.testcontainers" level="DEBUG"/>
-    <logger name="com.github.dockerjava" level="WARN"/>
-    <logger name="com.github.dockerjava.zerodep.shaded.org.apache.hc.client5.http.wire" level="OFF"/>
 
     <conversionRule conversionWord="message"
                     converterClass="org.apache.dolphinscheduler.common.log.SensitiveDataConverter"/>
