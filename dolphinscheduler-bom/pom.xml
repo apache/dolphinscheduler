@@ -70,7 +70,7 @@
         <kyuubi-jdbc.version>1.7.0</kyuubi-jdbc.version>
         <commons-io.version>2.11.0</commons-io.version>
         <oshi-core.version>6.1.1</oshi-core.version>
-        <clickhouse-jdbc.version>0.3.2-patch11</clickhouse-jdbc.version>
+        <clickhouse-jdbc.version>0.4.6</clickhouse-jdbc.version>
         <databend-jdbc.version>0.0.7</databend-jdbc.version>
         <lz4-java.version>1.4.0</lz4-java.version>
         <mssql-jdbc.version>11.2.1.jre8</mssql-jdbc.version>
