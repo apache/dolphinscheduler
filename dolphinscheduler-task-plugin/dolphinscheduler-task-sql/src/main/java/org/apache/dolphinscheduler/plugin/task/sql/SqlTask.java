@@ -482,7 +482,7 @@ public class SqlTask extends AbstractTask {
         sql = ParameterUtils.replaceScheduleTime(sql,
                 DateUtils.timeStampToDate(taskExecutionContext.getScheduleTime()));
         // combining local and global parameters
-        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+        Map<String, Property> paramsMap = ParamUtils.convert(taskExecutionContext, getParameters());
 
         // spell SQL according to the final user-defined variable
         if (paramsMap == null) {
