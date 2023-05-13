@@ -45,9 +45,6 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LOCAL_PA
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SQL;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.reflect.TypeToken;
 import org.apache.dolphinscheduler.api.dto.DagDataSchedule;
 import org.apache.dolphinscheduler.api.dto.ScheduleParam;
 import org.apache.dolphinscheduler.api.dto.treeview.Instance;
@@ -175,6 +172,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 
 /**
  * process definition service impl
@@ -1033,6 +1033,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
     }
 
+    @Override
     public void deleteProcessDefinitionByCode(User loginUser, long code) {
         ProcessDefinition processDefinition = processDefinitionDao.queryByCode(code)
                 .orElseThrow(() -> new ServiceException(PROCESS_DEFINE_NOT_EXIST, String.valueOf(code)));
@@ -3071,12 +3072,13 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         Map<String, Object> result = new HashMap<>();
         if (StringUtils.isEmpty(codeStates)) {
             log.error("Parameter codeStates is empty, projectCode is {}.", projectCode);
-            putMsg(new HashMap<>(), Status.PROCESS_DEFINITION_CODES_IS_EMPTY);
-            return result;
+            putMsg(result, Status.PROCESS_DEFINITION_CODES_IS_EMPTY);
+            throw new ServiceException(Status.PROCESS_DEFINITION_CODES_IS_EMPTY);
         }
 
         try {
-            Map<String, String> codeStateMap = new Gson().fromJson(codeStates, new TypeToken<Map<String, String>>() {}.getType());
+            Map<String, String> codeStateMap = new Gson().fromJson(codeStates, new TypeToken<Map<String, String>>() {
+            }.getType());
 
             for (Map.Entry<String, String> entry : codeStateMap.entrySet()) {
                 String code = entry.getKey();
@@ -3086,15 +3088,16 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     ReleaseState releaseStateEnum = ReleaseState.valueOf(releaseState);
                     result = releaseProcessDefinition(loginUser, projectCode, Long.parseLong(code), releaseStateEnum);
                 } catch (IllegalArgumentException e) {
-                    log.error("Invalid releaseState '{}' in codeStates JSON, projectCode is {}.", releaseState, projectCode);
+                    log.error("Invalid releaseState '{}' in codeStates JSON, projectCode is {}.", releaseState,
+                            projectCode);
                     putMsg(result, Status.INVALID_CODE_STATES_JSON);
-                    return result;
+                    throw new ServiceException(Status.INVALID_CODE_STATES_JSON);
                 }
             }
         } catch (JsonSyntaxException e) {
             log.error("Failed to parse codeStates JSON, projectCode is {}.", projectCode);
             putMsg(result, Status.INVALID_CODE_STATES_JSON);
-            return result;
+            throw new ServiceException(Status.INVALID_CODE_STATES_JSON);
         }
 
         return result;
