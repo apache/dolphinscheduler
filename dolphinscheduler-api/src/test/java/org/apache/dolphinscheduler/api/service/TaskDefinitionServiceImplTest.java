@@ -37,7 +37,6 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
-import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -351,48 +350,6 @@ public class TaskDefinitionServiceImplTest {
         Result result = taskDefinitionService.queryTaskDefinitionListPaging(user, PROJECT_CODE,
                 null, null, null, pageNo, pageSize);
         Assertions.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
-    }
-
-    @Test
-    public void testReleaseTaskDefinition() {
-        Mockito.when(projectMapper.queryByCode(PROJECT_CODE)).thenReturn(getProject());
-        Project project = getProject();
-
-        // check task dose not exist
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.TASK_DEFINE_NOT_EXIST, TASK_CODE);
-        Mockito.when(projectService.checkProjectAndAuth(user, project, PROJECT_CODE, null)).thenReturn(result);
-        Map<String, Object> map =
-                taskDefinitionService.releaseTaskDefinition(user, PROJECT_CODE, TASK_CODE, ReleaseState.OFFLINE);
-        Assertions.assertEquals(Status.TASK_DEFINE_NOT_EXIST, map.get(Constants.STATUS));
-
-        // process definition offline
-        putMsg(result, Status.SUCCESS);
-        TaskDefinition taskDefinition = new TaskDefinition();
-        taskDefinition.setProjectCode(PROJECT_CODE);
-        taskDefinition.setVersion(1);
-        taskDefinition.setCode(TASK_CODE);
-        String params =
-                "{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"echo 1\",\"conditionResult\":{\"successNode\":[\"\"],\"failedNode\":[\"\"]},\"dependence\":{}}";
-        taskDefinition.setTaskParams(params);
-        taskDefinition.setTaskType("SHELL");
-        Mockito.when(taskDefinitionMapper.queryByCode(TASK_CODE)).thenReturn(taskDefinition);
-        TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog(taskDefinition);
-        Mockito.when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(TASK_CODE, taskDefinition.getVersion()))
-                .thenReturn(taskDefinitionLog);
-        Map<String, Object> offlineTaskResult =
-                taskDefinitionService.releaseTaskDefinition(user, PROJECT_CODE, TASK_CODE, ReleaseState.OFFLINE);
-        Assertions.assertEquals(Status.SUCCESS, offlineTaskResult.get(Constants.STATUS));
-
-        // process definition online, resource exist
-        Map<String, Object> onlineTaskResult =
-                taskDefinitionService.releaseTaskDefinition(user, PROJECT_CODE, TASK_CODE, ReleaseState.ONLINE);
-        Assertions.assertEquals(Status.SUCCESS, onlineTaskResult.get(Constants.STATUS));
-
-        // release error code
-        Map<String, Object> failResult =
-                taskDefinitionService.releaseTaskDefinition(user, PROJECT_CODE, TASK_CODE, ReleaseState.getEnum(2));
-        Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, failResult.get(Constants.STATUS));
     }
 
     @Test

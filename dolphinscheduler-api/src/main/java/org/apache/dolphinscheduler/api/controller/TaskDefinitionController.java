@@ -24,7 +24,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.LOGIN_USER_QUERY_PROJ
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_DETAIL_OF_TASK_DEFINITION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_DEFINITION_LIST_PAGING_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_DEFINITION_VERSIONS_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.RELEASE_TASK_DEFINITION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.SWITCH_TASK_DEFINITION_VERSION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_TASK_DEFINITION_ERROR;
 
@@ -34,7 +33,6 @@ import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
@@ -384,31 +382,4 @@ public class TaskDefinitionController extends BaseController {
         return returnDataList(result);
     }
 
-    /**
-     * release task definition
-     *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param code task definition code
-     * @param releaseState releaseState
-     * @return update result code
-     */
-    @Operation(summary = "releaseTaskDefinition", description = "RELEASE_TASK_DEFINITION_NOTES")
-    @Parameters({
-            @Parameter(name = "projectCode", description = "PROCESS_DEFINITION_NAME", required = true, schema = @Schema(implementation = long.class)),
-            @Parameter(name = "code", description = "TASK_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "123456789")),
-            @Parameter(name = "releaseState", description = "RELEASE_PROCESS_DEFINITION_NOTES", required = true, schema = @Schema(implementation = ReleaseState.class))
-    })
-    @PostMapping(value = "/{code}/release")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiException(RELEASE_TASK_DEFINITION_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result releaseTaskDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                        @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                        @PathVariable(value = "code", required = true) long code,
-                                        @RequestParam(value = "releaseState", required = true, defaultValue = "OFFLINE") ReleaseState releaseState) {
-        Map<String, Object> result =
-                taskDefinitionService.releaseTaskDefinition(loginUser, projectCode, code, releaseState);
-        return returnDataList(result);
-    }
 }

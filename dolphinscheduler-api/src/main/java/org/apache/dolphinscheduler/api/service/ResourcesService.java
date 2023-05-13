@@ -201,15 +201,6 @@ public interface ResourcesService {
     org.springframework.core.io.Resource downloadResource(User loginUser, String fullName) throws IOException;
 
     /**
-     * list all file
-     *
-     * @param loginUser login user
-     * @param userId user id
-     * @return unauthorized result code
-     */
-    Map<String, Object> authorizeResourceTree(User loginUser, Integer userId);
-
-    /**
      * Get resource by given resource type and full name.
      * Useful in Python API create task which need processDefinition information.
      *
@@ -225,42 +216,6 @@ public interface ResourcesService {
      * @param days number of days
      */
     DeleteDataTransferResponse deleteDataTransferData(User loginUser, Integer days);
-
-    /**
-     * unauthorized file
-     *
-     * @param loginUser login user
-     * @param userId user id
-     * @return unauthorized result code
-     */
-    Map<String, Object> unauthorizedFile(User loginUser, Integer userId);
-
-    /**
-     * unauthorized udf function
-     *
-     * @param loginUser login user
-     * @param userId user id
-     * @return unauthorized result code
-     */
-    Map<String, Object> unauthorizedUDFFunction(User loginUser, Integer userId);
-
-    /**
-     * authorized udf function
-     *
-     * @param loginUser login user
-     * @param userId user id
-     * @return authorized result code
-     */
-    Map<String, Object> authorizedUDFFunction(User loginUser, Integer userId);
-
-    /**
-     * authorized file
-     *
-     * @param loginUser login user
-     * @param userId user id
-     * @return authorized result
-     */
-    Map<String, Object> authorizedFile(User loginUser, Integer userId);
 
     /**
      * get resource by id

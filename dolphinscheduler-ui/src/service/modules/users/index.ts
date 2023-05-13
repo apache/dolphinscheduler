@@ -24,10 +24,8 @@ import {
   IdReq,
   UserIdReq,
   GrantDataSourceReq,
-  GrantResourceReq,
   GrantProject,
   ProjectCodeReq,
-  GrantUDFReq,
   GrantNamespaceReq,
   ListAllReq,
   ListReq,
@@ -89,14 +87,6 @@ export function grantDataSource(data: GrantDataSourceReq) {
   })
 }
 
-export function grantResource(data: GrantResourceReq) {
-  return axios({
-    url: '/users/grant-file',
-    method: 'post',
-    data
-  })
-}
-
 export function revokeProjectById(data: GrantProject) {
   return axios({
     url: '/users/revoke-project-by-id',
@@ -124,14 +114,6 @@ export function grantProjectWithReadPerm(data: GrantProject) {
 export function grantProjectByCode(data: ProjectCodeReq & UserIdReq): any {
   return axios({
     url: '/users/grant-project-by-code',
-    method: 'post',
-    data
-  })
-}
-
-export function grantUDFFunc(data: GrantUDFReq & UserIdReq) {
-  return axios({
-    url: '/users/grant-udf-func',
     method: 'post',
     data
   })

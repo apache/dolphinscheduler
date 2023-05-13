@@ -32,7 +32,6 @@ import org.apache.dolphinscheduler.api.dto.taskRelation.TaskRelationUpdateUpstre
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowUpdateRequest;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
-import org.apache.dolphinscheduler.api.permission.PermissionCheck;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.ProcessTaskRelationService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -41,7 +40,6 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.api.vo.TaskDefinitionVo;
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.ConditionType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
@@ -102,8 +100,6 @@ import com.google.common.collect.Lists;
 @Service
 @Slf4j
 public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDefinitionService {
-
-    private static final String RELEASESTATE = "releaseState";
 
     @Autowired
     private ProjectMapper projectMapper;
@@ -1232,83 +1228,6 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         putMsg(result, Status.SUCCESS);
         // return processDefinitionCode
         result.put(Constants.DATA_LIST, taskCodes);
-        return result;
-    }
-
-    /**
-     * release task definition
-     *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param code task definition code
-     * @param releaseState releaseState
-     * @return update result code
-     */
-    @Transactional
-    @Override
-    public Map<String, Object> releaseTaskDefinition(User loginUser, long projectCode, long code,
-                                                     ReleaseState releaseState) {
-        Project project = projectMapper.queryByCode(projectCode);
-        // check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, null);
-        Status resultStatus = (Status) result.get(Constants.STATUS);
-        if (resultStatus != Status.SUCCESS) {
-            return result;
-        }
-        if (null == releaseState) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, RELEASESTATE);
-            return result;
-        }
-        TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(code);
-        if (taskDefinition == null || projectCode != taskDefinition.getProjectCode()) {
-            putMsg(result, Status.TASK_DEFINE_NOT_EXIST, String.valueOf(code));
-            return result;
-        }
-        TaskDefinitionLog taskDefinitionLog =
-                taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(code, taskDefinition.getVersion());
-        if (taskDefinitionLog == null) {
-            log.error("Task definition does not exist, taskDefinitionCode:{}.", code);
-            putMsg(result, Status.TASK_DEFINE_NOT_EXIST, String.valueOf(code));
-            return result;
-        }
-        switch (releaseState) {
-            case OFFLINE:
-                taskDefinition.setFlag(Flag.NO);
-                taskDefinitionLog.setFlag(Flag.NO);
-                break;
-            case ONLINE:
-                String resourceIds = taskDefinition.getResourceIds();
-                if (StringUtils.isNotBlank(resourceIds)) {
-                    Integer[] resourceIdArray =
-                            Arrays.stream(resourceIds.split(",")).map(Integer::parseInt).toArray(Integer[]::new);
-                    PermissionCheck<Integer> permissionCheck = new PermissionCheck(AuthorizationType.RESOURCE_FILE_ID,
-                            processService, resourceIdArray, loginUser.getId(), log);
-                    try {
-                        permissionCheck.checkPermission();
-                    } catch (Exception e) {
-                        log.error("Resources permission check error, resourceIds:{}.", resourceIds, e);
-                        putMsg(result, Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION);
-                        return result;
-                    }
-                }
-                taskDefinition.setFlag(Flag.YES);
-                taskDefinitionLog.setFlag(Flag.YES);
-                break;
-            default:
-                log.warn("Parameter releaseState is invalid.");
-                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, RELEASESTATE);
-                return result;
-        }
-        int update = taskDefinitionMapper.updateById(taskDefinition);
-        int updateLog = taskDefinitionLogMapper.updateById(taskDefinitionLog);
-        if ((update == 0 && updateLog == 1) || (update == 1 && updateLog == 0)) {
-            log.error("Update taskDefinition state or taskDefinitionLog state error, taskDefinitionCode:{}.", code);
-            putMsg(result, Status.UPDATE_TASK_DEFINITION_ERROR);
-            throw new ServiceException(Status.UPDATE_TASK_DEFINITION_ERROR);
-        }
-        log.error("Update taskDefinition state or taskDefinitionLog state to complete, taskDefinitionCode:{}.",
-                code);
-        putMsg(result, Status.SUCCESS);
         return result;
     }
 

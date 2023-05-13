@@ -27,7 +27,6 @@ import {
   ContentReq,
   DescriptionReq,
   CreateReq,
-  UserIdReq,
   OnlineCreateReq,
   ProgramTypeReq,
   ListReq,
@@ -82,30 +81,6 @@ export function createResource(
     url: '/resources',
     method: 'post',
     data
-  })
-}
-
-export function authorizedFile(params: UserIdReq): any {
-  return axios({
-    url: '/resources/authed-file',
-    method: 'get',
-    params
-  })
-}
-
-export function authorizeResourceTree(params: UserIdReq): any {
-  return axios({
-    url: '/resources/authed-resource-tree',
-    method: 'get',
-    params
-  })
-}
-
-export function authUDFFunc(params: UserIdReq): any {
-  return axios({
-    url: '/resources/authed-udf-func',
-    method: 'get',
-    params
   })
 }
 
@@ -175,14 +150,6 @@ export function deleteUdfFunc(id: number, params: FullNameReq): any {
   return axios({
     url: `/resources/udf-func/${id}`,
     method: 'delete',
-    params
-  })
-}
-
-export function unAuthUDFFunc(params: UserIdReq): any {
-  return axios({
-    url: '/resources/unauth-udf-func',
-    method: 'get',
     params
   })
 }

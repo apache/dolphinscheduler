@@ -33,7 +33,6 @@ import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConst
 
 import org.apache.dolphinscheduler.common.constants.CommandKeyConstants;
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
@@ -68,7 +67,6 @@ import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
-import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
@@ -96,8 +94,6 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
@@ -136,17 +132,14 @@ import org.apache.dolphinscheduler.service.log.LogClient;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.utils.ClusterConfUtils;
 import org.apache.dolphinscheduler.service.utils.DagHelper;
-import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -223,12 +216,6 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Autowired
     private UdfFuncMapper udfFuncMapper;
-
-    @Autowired
-    private ResourceMapper resourceMapper;
-
-    @Autowired
-    private ResourceUserMapper resourceUserMapper;
 
     @Autowired
     private ErrorCommandMapper errorCommandMapper;
@@ -1637,34 +1624,6 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     /**
-     * find tenant code by resource name
-     *
-     * @param resName      resource name
-     * @param resourceType resource type
-     * @return tenant code
-     */
-    @Override
-    public String queryTenantCodeByResName(String resName, ResourceType resourceType) {
-        // in order to query tenant code successful although the version is older
-        String fullName = resName.startsWith("/") ? resName : String.format("/%s", resName);
-
-        List<Resource> resourceList = resourceMapper.queryResource(fullName, resourceType.ordinal());
-        if (CollectionUtils.isEmpty(resourceList)) {
-            return "";
-        }
-        int userId = resourceList.get(0).getUserId();
-        User user = userMapper.selectById(userId);
-        if (Objects.isNull(user)) {
-            return "";
-        }
-        Tenant tenant = tenantMapper.queryById(user.getTenantId());
-        if (Objects.isNull(tenant)) {
-            return "";
-        }
-        return tenant.getTenantCode();
-    }
-
-    /**
      * find schedule list by process define codes.
      *
      * @param codes codes
@@ -1728,55 +1687,6 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     /**
-     * list unauthorized udf function
-     *
-     * @param userId     user id
-     * @param needChecks data source id array
-     * @return unauthorized udf function list
-     */
-    @Override
-    public <T> List<T> listUnauthorized(int userId, T[] needChecks, AuthorizationType authorizationType) {
-        List<T> resultList = new ArrayList<>();
-
-        if (Objects.nonNull(needChecks) && needChecks.length > 0) {
-            Set<T> originResSet = new HashSet<>(Arrays.asList(needChecks));
-
-            switch (authorizationType) {
-                case RESOURCE_FILE_ID:
-                case UDF_FILE:
-                    List<Resource> ownUdfResources = resourceMapper.listAuthorizedResourceById(userId, needChecks);
-                    addAuthorizedResources(ownUdfResources, userId);
-                    Set<Integer> authorizedResourceFiles =
-                            ownUdfResources.stream().map(Resource::getId).collect(toSet());
-                    originResSet.removeAll(authorizedResourceFiles);
-                    break;
-                case RESOURCE_FILE_NAME:
-                    List<Resource> ownResources = resourceMapper.listAuthorizedResource(userId, needChecks);
-                    addAuthorizedResources(ownResources, userId);
-                    Set<String> authorizedResources = ownResources.stream().map(Resource::getFullName).collect(toSet());
-                    originResSet.removeAll(authorizedResources);
-                    break;
-                case DATASOURCE:
-                    Set<Integer> authorizedDatasources = dataSourceMapper.listAuthorizedDataSource(userId, needChecks)
-                            .stream().map(DataSource::getId).collect(toSet());
-                    originResSet.removeAll(authorizedDatasources);
-                    break;
-                case UDF:
-                    Set<Integer> authorizedUdfs = udfFuncMapper.listAuthorizedUdfFunc(userId, needChecks).stream()
-                            .map(UdfFunc::getId).collect(toSet());
-                    originResSet.removeAll(authorizedUdfs);
-                    break;
-                default:
-                    break;
-            }
-
-            resultList.addAll(originResSet);
-        }
-
-        return resultList;
-    }
-
-    /**
      * get user by user id
      *
      * @param userId user id
@@ -1785,28 +1695,6 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public User getUserById(int userId) {
         return userMapper.selectById(userId);
-    }
-
-    /**
-     * get resource by resource id
-     *
-     * @param resourceId resource id
-     * @return Resource
-     */
-    @Override
-    public Resource getResourceById(int resourceId) {
-        return resourceMapper.selectById(resourceId);
-    }
-
-    /**
-     * list resources by ids
-     *
-     * @param resIds resIds
-     * @return resource list
-     */
-    @Override
-    public List<Resource> listResourceByIds(Integer[] resIds) {
-        return resourceMapper.listResourceByIds(resIds);
     }
 
     /**
@@ -2152,20 +2040,6 @@ public class ProcessServiceImpl implements ProcessService {
         List<ProcessTaskRelationLog> processTaskRelationLogList = processTaskRelationLogMapper
                 .queryByProcessCodeAndVersion(processDefinitionCode, processDefinitionVersion);
         return processTaskRelationLogList.stream().map(r -> (ProcessTaskRelation) r).collect(Collectors.toList());
-    }
-
-    /**
-     * add authorized resources
-     *
-     * @param ownResources own resources
-     * @param userId       userId
-     */
-    private void addAuthorizedResources(List<Resource> ownResources, int userId) {
-        List<Integer> relationResourceIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, 7);
-        List<Resource> relationResources = CollectionUtils.isNotEmpty(relationResourceIds)
-                ? resourceMapper.queryResourceListById(relationResourceIds)
-                : new ArrayList<>();
-        ownResources.addAll(relationResources);
     }
 
     /**

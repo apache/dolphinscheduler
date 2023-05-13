@@ -37,10 +37,7 @@ import org.apache.dolphinscheduler.dao.entity.DatasourceUser;
 import org.apache.dolphinscheduler.dao.entity.K8sNamespaceUser;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
-import org.apache.dolphinscheduler.dao.entity.Resource;
-import org.apache.dolphinscheduler.dao.entity.ResourcesUser;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.dao.entity.UDFUser;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
@@ -49,12 +46,8 @@ import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
-import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
-import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
-import org.apache.dolphinscheduler.dao.utils.ResourceProcessDefinitionUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -103,16 +96,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     private ProjectUserMapper projectUserMapper;
 
     @Autowired
-    private ResourceUserMapper resourceUserMapper;
-
-    @Autowired
-    private ResourceMapper resourceMapper;
-
-    @Autowired
     private DataSourceUserMapper datasourceUserMapper;
-
-    @Autowired
-    private UDFUserMapper udfUserMapper;
 
     @Autowired
     private AlertGroupMapper alertGroupMapper;
@@ -774,164 +758,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         this.projectUserMapper.deleteProjectRelation(project.getId(), user.getId());
         log.info("User is revoked permission for projects, userId:{}, projectCode:{}.", userId, projectCode);
         this.putMsg(result, Status.SUCCESS);
-        return result;
-    }
-
-    /**
-     * grant resource
-     *
-     * @param loginUser   login user
-     * @param userId      user id
-     * @param resourceIds resource id array
-     * @return grant result code
-     */
-    @Override
-    @Transactional
-    public Map<String, Object> grantResources(User loginUser, int userId, String resourceIds) {
-        Map<String, Object> result = new HashMap<>();
-
-        if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
-            return result;
-        }
-        User user = userMapper.selectById(userId);
-        if (user == null) {
-            log.error("User does not exist, userId:{}.", userId);
-            putMsg(result, Status.USER_NOT_EXIST, userId);
-            return result;
-        }
-
-        Set<Integer> needAuthorizeResIds = new HashSet<>();
-        if (StringUtils.isNotBlank(resourceIds)) {
-            String[] resourceFullIdArr = resourceIds.split(",");
-            // need authorize resource id set
-            for (String resourceFullId : resourceFullIdArr) {
-                String[] resourceIdArr = resourceFullId.split("-");
-                for (int i = 0; i <= resourceIdArr.length - 1; i++) {
-                    int resourceIdValue = Integer.parseInt(resourceIdArr[i]);
-                    needAuthorizeResIds.add(resourceIdValue);
-                }
-            }
-        }
-
-        // get the authorized resource id list by user id
-        List<Integer> resIds =
-                resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, Constants.AUTHORIZE_WRITABLE_PERM);
-        List<Resource> oldAuthorizedRes =
-                CollectionUtils.isEmpty(resIds) ? new ArrayList<>() : resourceMapper.queryResourceListById(resIds);
-        // if resource type is UDF,need check whether it is bound by UDF function
-        Set<Integer> oldAuthorizedResIds = oldAuthorizedRes.stream().map(Resource::getId).collect(Collectors.toSet());
-
-        // get the unauthorized resource id list
-        oldAuthorizedResIds.removeAll(needAuthorizeResIds);
-
-        if (CollectionUtils.isNotEmpty(oldAuthorizedResIds)) {
-
-            // get all resource id of process definitions those are released
-            List<Map<String, Object>> list = processDefinitionMapper.listResourcesByUser(userId);
-            Map<Integer, Set<Long>> resourceProcessMap =
-                    ResourceProcessDefinitionUtils.getResourceProcessDefinitionMap(list);
-            Set<Integer> resourceIdSet = resourceProcessMap.keySet();
-
-            resourceIdSet.retainAll(oldAuthorizedResIds);
-            if (CollectionUtils.isNotEmpty(resourceIdSet)) {
-                for (Integer resId : resourceIdSet) {
-                    log.error("Resource id:{} is used by process definition {}", resId,
-                            resourceProcessMap.get(resId));
-                }
-                putMsg(result, Status.RESOURCE_IS_USED);
-                return result;
-            }
-
-        }
-
-        resourceUserMapper.deleteResourceUser(userId, 0);
-
-        if (check(result, StringUtils.isEmpty(resourceIds), Status.SUCCESS)) {
-            log.warn("Parameter resourceIds is empty.");
-            return result;
-        }
-
-        for (int resourceIdValue : needAuthorizeResIds) {
-            Resource resource = resourceMapper.selectById(resourceIdValue);
-            if (resource == null) {
-                log.error("Resource does not exist, resourceId:{}.", resourceIdValue);
-                putMsg(result, Status.RESOURCE_NOT_EXIST);
-                return result;
-            }
-
-            Date now = new Date();
-            ResourcesUser resourcesUser = new ResourcesUser();
-            resourcesUser.setUserId(userId);
-            resourcesUser.setResourcesId(resourceIdValue);
-            if (resource.isDirectory()) {
-                resourcesUser.setPerm(Constants.AUTHORIZE_READABLE_PERM);
-            } else {
-                resourcesUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
-            }
-
-            resourcesUser.setCreateTime(now);
-            resourcesUser.setUpdateTime(now);
-            resourceUserMapper.insert(resourcesUser);
-
-        }
-
-        log.info("User is granted permission for resources, userId:{}, resourceIds:{}.", user.getId(),
-                needAuthorizeResIds);
-
-        putMsg(result, Status.SUCCESS);
-
-        return result;
-    }
-
-    /**
-     * grant udf function
-     *
-     * @param loginUser login user
-     * @param userId    user id
-     * @param udfIds    udf id array
-     * @return grant result code
-     */
-    @Override
-    @Transactional
-    public Map<String, Object> grantUDFFunction(User loginUser, int userId, String udfIds) {
-        Map<String, Object> result = new HashMap<>();
-
-        if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
-            return result;
-        }
-        User user = userMapper.selectById(userId);
-        if (user == null) {
-            log.error("User does not exist, userId:{}.", userId);
-            putMsg(result, Status.USER_NOT_EXIST, userId);
-            return result;
-        }
-
-        udfUserMapper.deleteByUserId(userId);
-
-        if (check(result, StringUtils.isEmpty(udfIds), Status.SUCCESS)) {
-            log.warn("Parameter udfIds is empty.");
-            return result;
-        }
-
-        String[] resourcesIdArr = udfIds.split(",");
-
-        for (String udfId : resourcesIdArr) {
-            Date now = new Date();
-            UDFUser udfUser = new UDFUser();
-            udfUser.setUserId(userId);
-            udfUser.setUdfId(Integer.parseInt(udfId));
-            udfUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
-            udfUser.setCreateTime(now);
-            udfUser.setUpdateTime(now);
-            udfUserMapper.insert(udfUser);
-        }
-
-        log.info("User is granted permission for UDF, userName:{}.", user.getUserName());
-
-        putMsg(result, Status.SUCCESS);
-
         return result;
     }
 

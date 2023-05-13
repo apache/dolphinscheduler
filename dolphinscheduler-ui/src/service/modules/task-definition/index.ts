@@ -23,7 +23,6 @@ import {
   TaskDefinitionJsonReq,
   CodeReq,
   TaskDefinitionJsonObjReq,
-  ReleaseStateReq,
   VersionReq,
   ISingleSaveReq,
   TaskDefinitionReq
@@ -90,18 +89,6 @@ export function deleteTaskDefinition(
   return axios({
     url: `/projects/${projectCode.projectCode}/task-definition/${code.code}`,
     method: 'delete'
-  })
-}
-
-export function releaseTaskDefinition(
-  data: ReleaseStateReq,
-  code: number,
-  projectCode: number
-): any {
-  return axios({
-    url: `/projects/${projectCode}/task-definition/${code}/release`,
-    method: 'post',
-    data
   })
 }
 

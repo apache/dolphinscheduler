@@ -24,9 +24,7 @@ export type { UserInfoRes } from '@/service/modules/users/types'
 type TUserType = 'GENERAL_USER' | ''
 type TAuthType =
   | 'authorize_project'
-  | 'authorize_resource'
   | 'authorize_datasource'
-  | 'authorize_udf'
   | 'authorize_namespace'
 
 interface IRecord {
@@ -42,13 +40,6 @@ interface IRecord {
   createTime: string
   updateTime: string
 }
-
-interface IResourceOption {
-  id: number
-  fullName: string
-  type: string
-}
-
 interface IOption {
   value: number
   label: string
@@ -56,7 +47,6 @@ interface IOption {
 
 export {
   IRecord,
-  IResourceOption,
   IOption,
   TAuthType,
   UserReq,

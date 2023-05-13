@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.service.process;
 
-import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
@@ -39,7 +38,6 @@ import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
-import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
@@ -50,7 +48,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.service.model.TaskNode;
-import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import java.util.List;
 import java.util.Map;
@@ -129,8 +126,6 @@ public interface ProcessService {
 
     List<UdfFunc> queryUdfFunListByIds(Integer[] ids);
 
-    String queryTenantCodeByResName(String resName, ResourceType resourceType);
-
     List<Schedule> selectAllByProcessDefineCode(long[] codes);
 
     String queryUserQueueByProcessInstance(ProcessInstance processInstance);
@@ -139,13 +134,7 @@ public interface ProcessService {
 
     List<Project> getProjectListHavePerm(int userId);
 
-    <T> List<T> listUnauthorized(int userId, T[] needChecks, AuthorizationType authorizationType);
-
     User getUserById(int userId);
-
-    Resource getResourceById(int resourceId);
-
-    List<Resource> listResourceByIds(Integer[] resIds);
 
     String formatTaskAppId(TaskInstance taskInstance);
 

@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.plugin.task.sql;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
-import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.SQLTaskExecutionContext;
@@ -566,9 +565,6 @@ public class SqlTask extends AbstractTask {
      */
     private List<String> buildJarSql(List<UdfFuncParameters> udfFuncParameters) {
         return udfFuncParameters.stream().map(value -> {
-            String defaultFS = value.getDefaultFS();
-            String prefixPath = defaultFS.startsWith("file://") ? "file://" : defaultFS;
-            String uploadPath = CommonUtils.getHdfsUdfDir(value.getTenantCode());
             String resourceFullName = value.getResourceName();
             return String.format("add jar %s", resourceFullName);
         }).collect(Collectors.toList());

@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.api.dto.task.TaskFilterRequest;
 import org.apache.dolphinscheduler.api.dto.task.TaskUpdateRequest;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -239,20 +238,6 @@ public interface TaskDefinitionService {
      * @return task code list
      */
     Map<String, Object> genTaskCodeList(Integer genNum);
-
-    /**
-     * release task definition
-     *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param code task definition code
-     * @param releaseState releaseState
-     * @return update result code
-     */
-    Map<String, Object> releaseTaskDefinition(User loginUser,
-                                              long projectCode,
-                                              long code,
-                                              ReleaseState releaseState);
 
     void deleteTaskByWorkflowDefinitionCode(long workflowDefinitionCode, int workflowDefinitionVersion);
 }

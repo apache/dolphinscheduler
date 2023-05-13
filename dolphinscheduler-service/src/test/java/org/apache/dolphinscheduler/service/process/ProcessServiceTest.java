@@ -58,7 +58,6 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
-import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
@@ -149,8 +148,6 @@ public class ProcessServiceTest {
     private ProcessTaskRelationMapper processTaskRelationMapper;
     @Mock
     private ProcessDefinitionLogMapper processDefineLogMapper;
-    @Mock
-    private ResourceMapper resourceMapper;
     @Mock
     private TaskGroupMapper taskGroupMapper;
     @Mock

@@ -31,7 +31,6 @@ import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
@@ -77,9 +76,6 @@ public class UdfFuncServiceTest {
 
     @InjectMocks
     private UdfFuncServiceImpl udfFuncService;
-
-    @Mock
-    private ResourceMapper resourceMapper;
 
     @Mock
     private UdfFuncMapper udfFuncMapper;
