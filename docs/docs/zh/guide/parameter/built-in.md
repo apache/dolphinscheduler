@@ -19,6 +19,36 @@
         <td>${system.datetime}</td>
         <td>日常调度实例定时的定时时间，格式为 yyyyMMddHHmmss</td>
     </tr>
+    <tr>
+        <td>system.task.execute.path</td>
+        <td>${system.task.execute.path}</td>
+        <td>当前任务执行的绝对路径</td>
+    </tr>
+    <tr>
+        <td>system.task.instance.id</td>
+        <td>${system.task.instance.id}</td>
+        <td>当前任务实例的ID</td>
+    </tr>
+    <tr>
+        <td>system.task.definition.name</td>
+        <td>${system.task.definition.name}</td>
+        <td>当前任务所属任务定义的名称</td>
+    </tr>
+    <tr>
+        <td>system.workflow.instance.id</td>
+        <td>${system.workflow.instance.id}</td>
+        <td>当前任务所属工作流实例ID</td>
+    </tr>
+    <tr>
+        <td>system.workflow.definition.name</td>
+        <td>${system.workflow.definition.name}</td>
+        <td>当前任务所属工作流定义的名称</td>
+    </tr>
+    <tr>
+        <td>system.project.name</td>
+        <td>${system.project.name}</td>
+        <td>当前任务所在项目的名称</td>
+    </tr>
 </table>
 
 ## 衍生内置参数
