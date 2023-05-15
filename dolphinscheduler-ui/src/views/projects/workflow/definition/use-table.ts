@@ -28,7 +28,7 @@ import {
   deleteByCode,
   queryListPaging,
   release,
-  batchOnlineByCodeStates
+  batchReleaseByCodeStates
 } from '@/service/modules/process-definition'
 import TableAction from './components/table-action'
 import styles from './index.module.scss'
@@ -422,11 +422,11 @@ export function useTable() {
             });
         }
 
-        const codeStatesList = JSON.stringify(resultData);
+        const codeStatesJsonString = JSON.stringify(resultData);
         const data = {
-            codeStates: codeStatesList,
+            codeStates: codeStatesJsonString
         };
-        batchOnlineByCodeStates(data, projectCode).then(() => {
+      batchReleaseByCodeStates(data, projectCode).then(() => {
             window.$message.success(t('project.workflow.success'));
             getTableData({
                 pageSize: variables.pageSize,

@@ -75,7 +75,7 @@ interface SimpleListRes {
   projectCode: any
 }
 
-interface CodeStateListReq {
+interface CodeStatesReq {
     codeStates: string
 }
 
@@ -92,5 +92,5 @@ export {
   ProcessDefinitionReq,
   TargetCodeReq,
   SimpleListRes,
-  CodeStateListReq
+  CodeStatesReq
 }

@@ -172,9 +172,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
-import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import com.google.gson.reflect.TypeToken;
 
 /**
  * process definition service impl
@@ -3077,8 +3075,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
 
         try {
-            Map<String, String> codeStateMap = new Gson().fromJson(codeStates, new TypeToken<Map<String, String>>() {
-            }.getType());
+            Map<String, String> codeStateMap = JSONUtils.toMap(codeStates);
 
             for (Map.Entry<String, String> entry : codeStateMap.entrySet()) {
                 String code = entry.getKey();

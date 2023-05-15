@@ -26,7 +26,7 @@ import {
     ListReq,
     ProcessDefinitionReq,
     TargetCodeReq,
-    CodeStateListReq
+    CodeStatesReq
 } from './types'
 
 export function queryListPaging(params: PageReq & ListReq, code: number): any {
@@ -256,7 +256,7 @@ export function viewProcessDefinitionVariables(code: number, processCode: number
   })
 }
 
-export function batchOnlineByCodeStates(data: CodeStateListReq, code: number): any {
+export function batchReleaseByCodeStates(data: CodeStatesReq, code: number): any {
     return axios({
         url: `/projects/${code}/process-definition/batch-release`,
         method: 'post',
