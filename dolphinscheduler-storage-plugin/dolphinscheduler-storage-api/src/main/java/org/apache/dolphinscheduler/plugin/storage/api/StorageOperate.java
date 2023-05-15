@@ -60,19 +60,19 @@ public interface StorageOperate {
     boolean mkdir(String tenantCode, String path) throws IOException;
 
     /**
-     * get the path of the resource file
+     * get the path of the resource file (fullName)
      * @param tenantCode
+     * @param fileName
+     * @return
+     */
+    String getResourceFullName(String tenantCode, String fileName);
+
+    /**
+     * get the path of the resource file excluding the base path (fileName)
      * @param fullName
      * @return
      */
     String getResourceFileName(String tenantCode, String fullName);
-
-    /**
-     * get the path of the resource file excluding the base path.
-     * @param fullName
-     * @return
-     */
-    String getResourceFileName(String fullName);
 
     /**
      * get the path of the file

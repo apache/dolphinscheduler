@@ -56,7 +56,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
@@ -69,7 +68,6 @@ import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.base.Joiner;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -298,28 +296,14 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
     }
 
     @Override
-    public String getResourceFileName(String tenantCode, String fullName) {
+    public String getResourceFullName(String tenantCode, String fullName) {
         return getHdfsResourceFileName(tenantCode, fullName);
     }
 
     @Override
-    public String getResourceFileName(String fullName) {
-        // here is a quick fix here to get fileName. We get the resource upload path and
-        // get the index of the first appearance of resource upload path. The index is put
-        // in the start index of the substring function and get the result substring containing
-        // tenantcode and "resource" directory and the fileName.
-        // Then we split the result substring
-        // with "/" and join all elements except the first two elements because they are
-        // tenantCode and "resource" directory.
-        String resourceUploadPath =
-                RESOURCE_UPLOAD_PATH.endsWith(FOLDER_SEPARATOR) ? StringUtils.chop(RESOURCE_UPLOAD_PATH)
-                        : RESOURCE_UPLOAD_PATH;
-        // +1 because we want to skip the "/" after resource upload path as well.
-        String pathContainingTenantNResource = fullName.substring(
-                fullName.indexOf(resourceUploadPath)
-                        + resourceUploadPath.length() + 1);
-        String[] fileNameArr = pathContainingTenantNResource.split(FOLDER_SEPARATOR);
-        return Joiner.on(FOLDER_SEPARATOR).join(Arrays.stream(fileNameArr).skip(2).collect(Collectors.toList()));
+    public String getResourceFileName(String tenantCode, String fullName) {
+        String resDir = getResDir(tenantCode);
+        return fullName.replaceFirst(resDir, "");
     }
 
     @Override

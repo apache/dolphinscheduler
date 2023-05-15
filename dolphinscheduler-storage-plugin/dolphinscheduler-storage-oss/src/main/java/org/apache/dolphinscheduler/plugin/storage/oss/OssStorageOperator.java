@@ -175,7 +175,7 @@ public class OssStorageOperator implements Closeable, StorageOperate {
     }
 
     @Override
-    public String getResourceFileName(String tenantCode, String fileName) {
+    public String getResourceFullName(String tenantCode, String fileName) {
         if (fileName.startsWith(FOLDER_SEPARATOR)) {
             fileName = fileName.replaceFirst(FOLDER_SEPARATOR, "");
         }
@@ -183,8 +183,9 @@ public class OssStorageOperator implements Closeable, StorageOperate {
     }
 
     @Override
-    public String getResourceFileName(String fullName) {
-        return null;
+    public String getResourceFileName(String tenantCode, String fullName) {
+        String resDir = getResDir(tenantCode);
+        return fullName.replaceFirst(resDir, "");
     }
 
     @Override

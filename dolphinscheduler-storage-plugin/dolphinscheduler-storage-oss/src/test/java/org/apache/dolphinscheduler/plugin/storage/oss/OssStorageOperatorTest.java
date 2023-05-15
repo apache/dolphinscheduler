@@ -159,10 +159,19 @@ public class OssStorageOperatorTest {
     }
 
     @Test
-    public void getResourceFileName() {
-        final String expectedResourceFileName =
+    public void getResourceFullName() {
+        final String expectedResourceFullName =
                 String.format("dolphinscheduler/%s/resources/%s", TENANT_CODE_MOCK, FILE_NAME_MOCK);
-        final String resourceFileName = ossOperator.getResourceFileName(TENANT_CODE_MOCK, FILE_NAME_MOCK);
+        final String resourceFullName = ossOperator.getResourceFullName(TENANT_CODE_MOCK, FILE_NAME_MOCK);
+        Assertions.assertEquals(expectedResourceFullName, resourceFullName);
+    }
+
+    @Test
+    public void getResourceFileName() {
+        final String expectedResourceFileName = FILE_NAME_MOCK;
+        final String resourceFullName =
+                String.format("dolphinscheduler/%s/resources/%s", TENANT_CODE_MOCK, FILE_NAME_MOCK);
+        final String resourceFileName = ossOperator.getResourceFileName(TENANT_CODE_MOCK, resourceFullName);
         Assertions.assertEquals(expectedResourceFileName, resourceFileName);
     }
 

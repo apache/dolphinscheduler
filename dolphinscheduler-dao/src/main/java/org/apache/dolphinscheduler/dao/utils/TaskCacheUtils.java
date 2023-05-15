@@ -178,7 +178,7 @@ public class TaskCacheUtils {
     public static String getValCheckSum(Property fileProperty, TaskExecutionContext context,
                                         StorageOperate storageOperate) {
         String resourceCRCPath = fileProperty.getValue() + CRC_SUFFIX;
-        String resourceCRCWholePath = storageOperate.getResourceFileName(context.getTenantCode(), resourceCRCPath);
+        String resourceCRCWholePath = storageOperate.getResourceFullName(context.getTenantCode(), resourceCRCPath);
         String targetPath = String.format("%s/%s", context.getExecutePath(), resourceCRCPath);
         log.info("{} --- Remote:{} to Local:{}", "CRC file", resourceCRCWholePath, targetPath);
         String crcString = "";
