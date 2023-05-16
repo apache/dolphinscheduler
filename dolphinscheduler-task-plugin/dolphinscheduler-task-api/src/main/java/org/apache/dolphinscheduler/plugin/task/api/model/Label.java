@@ -15,25 +15,26 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.k8s;
+package org.apache.dolphinscheduler.plugin.task.api.model;
 
-import java.util.Map;
+import java.io.Serializable;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-/**
- * k8s task parameters
- */
 @Data
-public class K8sTaskMainParameters {
+@NoArgsConstructor
+@AllArgsConstructor
+public class Label implements Serializable {
 
-    private String image;
-    private String command;
-    private String args;
-    private String namespaceName;
-    private String clusterName;
-    private double minCpuCores;
-    private double minMemorySpace;
-    private Map<String, String> paramsMap;
-    private Map<String, String> labelMap;
+    /**
+     * label name
+     */
+    private String label;
+
+    /**
+     * label value
+     */
+    private String value;
 }

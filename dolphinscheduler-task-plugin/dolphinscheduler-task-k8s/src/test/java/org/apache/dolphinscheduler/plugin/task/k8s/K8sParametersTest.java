@@ -17,7 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.task.k8s;
 
+import org.apache.dolphinscheduler.plugin.task.api.model.Label;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.K8sTaskParameters;
+
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,6 +36,7 @@ public class K8sParametersTest {
     private final double minMemorySpace = 10;
     private final String command = "[\"/bin/bash\", \"-c\"]";
     private final String args = "[\"echo hello world\"]";
+    private final List<Label> labels = Arrays.asList(new Label("test", "1234"));
 
     @BeforeEach
     public void before() {
@@ -42,6 +47,7 @@ public class K8sParametersTest {
         k8sTaskParameters.setMinMemorySpace(minMemorySpace);
         k8sTaskParameters.setCommand(command);
         k8sTaskParameters.setArgs(args);
+        k8sTaskParameters.setCustomizedLabels(labels);
     }
 
     @Test
@@ -63,6 +69,7 @@ public class K8sParametersTest {
         Assertions.assertEquals(0, Double.compare(minMemorySpace, k8sTaskParameters.getMinMemorySpace()));
         Assertions.assertEquals(command, k8sTaskParameters.getCommand());
         Assertions.assertEquals(args, k8sTaskParameters.getArgs());
+        Assertions.assertEquals(labels, k8sTaskParameters.getCustomizedLabels());
     }
 
 }
