@@ -94,7 +94,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         Map<String, Quantity> limitRes = new HashMap<>();
         limitRes.put(MEMORY, new Quantity(String.format("%s%s", limitPodMem, MI)));
         limitRes.put(CPU, new Quantity(String.valueOf(limitPodCpu)));
-        Map<String, String> labelMap = new HashMap<>();
+        Map<String, String> labelMap = k8STaskMainParameters.getLabelMap();
         labelMap.put(LAYER_LABEL, LAYER_LABEL_VALUE);
         labelMap.put(NAME_LABEL, k8sJobName);
         EnvVar taskInstanceIdVar = new EnvVar(TASK_INSTANCE_ID, taskInstanceId, null);

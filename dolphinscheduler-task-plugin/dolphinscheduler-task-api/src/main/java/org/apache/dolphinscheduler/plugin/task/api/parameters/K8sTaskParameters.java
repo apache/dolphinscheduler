@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
+import org.apache.dolphinscheduler.plugin.task.api.model.Label;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 
 import org.apache.commons.lang3.StringUtils;
@@ -35,6 +36,7 @@ public class K8sTaskParameters extends AbstractParameters {
     private String image;
     private String namespace;
     private String command;
+    private List<Label> customizedLabels;
     private String args;
     private double minCpuCores;
     private double minMemorySpace;
