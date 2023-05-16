@@ -31,7 +31,7 @@ import {
 } from '@/service/modules/process-definition'
 import TableAction from './components/table-action'
 import styles from './index.module.scss'
-import {NTag, NSpace, NIcon, NButton, NEllipsis, NTooltip} from 'naive-ui'
+import { NTag, NSpace, NIcon, NButton, NEllipsis, NTooltip } from 'naive-ui'
 import { CopyOutlined } from '@vicons/antd'
 import ButtonLink from '@/components/button-link'
 import {
@@ -129,22 +129,21 @@ export function useTable() {
         key: 'copy',
         ...COLUMN_WIDTH_CONFIG['copy'],
         render: (row) =>
-          h(NTooltip, null,
-            {
-              trigger: () => h(
-                  NButton,
-                  {
-                    quaternary: true,
-                    circle: true,
-                    type: 'info',
-                    size: 'tiny',
-                    onClick: () => void copy(row.name)
-                  },
-                    { icon: () => h(NIcon, { size: 16 }, () => h(CopyOutlined)) }
+          h(NTooltip, null, {
+            trigger: () =>
+              h(
+                NButton,
+                {
+                  quaternary: true,
+                  circle: true,
+                  type: 'info',
+                  size: 'tiny',
+                  onClick: () => void copy(row.name)
+                },
+                { icon: () => h(NIcon, { size: 16 }, () => h(CopyOutlined)) }
               ),
-              default: () => t('project.workflow.copy_workflow_name')
-            }
-          )
+            default: () => t('project.workflow.copy_workflow_name')
+          })
       },
       {
         title: t('project.workflow.status'),
@@ -153,19 +152,19 @@ export function useTable() {
         render: (row) =>
           row.releaseState === 'ONLINE'
             ? h(
-              NTag,
-              { type: 'success', size: 'small' },
-              {
-                default: () => t('project.workflow.up_line')
-              }
-            )
+                NTag,
+                { type: 'success', size: 'small' },
+                {
+                  default: () => t('project.workflow.up_line')
+                }
+              )
             : h(
-              NTag,
-              { type: 'warning', size: 'small' },
-              {
-                default: () => t('project.workflow.down_line')
-              }
-            )
+                NTag,
+                { type: 'warning', size: 'small' },
+                {
+                  default: () => t('project.workflow.down_line')
+                }
+              )
       },
       {
         title: t('project.workflow.schedule_publish_status'),
@@ -314,7 +313,7 @@ export function useTable() {
     })
   }
 
-  const batchCopyWorkflow = () => { }
+  const batchCopyWorkflow = () => {}
 
   const releaseWorkflow = (row: any) => {
     const data = {
