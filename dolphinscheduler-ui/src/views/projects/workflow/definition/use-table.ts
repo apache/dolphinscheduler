@@ -31,7 +31,7 @@ import {
 } from '@/service/modules/process-definition'
 import TableAction from './components/table-action'
 import styles from './index.module.scss'
-import { NTag, NSpace, NIcon, NButton, NEllipsis } from 'naive-ui'
+import {NTag, NSpace, NIcon, NButton, NEllipsis, NTooltip} from 'naive-ui'
 import { CopyOutlined } from '@vicons/antd'
 import ButtonLink from '@/components/button-link'
 import {
@@ -129,16 +129,21 @@ export function useTable() {
         key: 'copy',
         ...COLUMN_WIDTH_CONFIG['copy'],
         render: (row) =>
-          h(
-            NButton,
+          h(NTooltip, null,
             {
-              quaternary: true,
-              circle: true,
-              type: 'info',
-              size: 'tiny',
-              onClick: () => void copy(row.name)
-            },
-            { icon: () => h(NIcon, { size: 16 }, () => h(CopyOutlined)) }
+              trigger: () => h(
+                  NButton,
+                  {
+                    quaternary: true,
+                    circle: true,
+                    type: 'info',
+                    size: 'tiny',
+                    onClick: () => void copy(row.name)
+                  },
+                    { icon: () => h(NIcon, { size: 16 }, () => h(CopyOutlined)) }
+              ),
+              default: () => t('project.workflow.copy_workflow_name')
+            }
           )
       },
       {

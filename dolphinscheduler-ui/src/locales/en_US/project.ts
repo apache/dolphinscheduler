@@ -80,6 +80,7 @@ export default {
     up_line: 'Online',
     down_line: 'Offline',
     copy_workflow: 'Copy Workflow',
+    copy_workflow_name: 'Copy workflow name',
     cron_manage: 'Cron manage',
     delete: 'Delete',
     tree_view: 'Tree View',
