@@ -82,6 +82,7 @@ export default {
     up_line: '上线',
     down_line: '下线',
     copy_workflow: '复制工作流',
+    copy_workflow_name: '复制工作流名称',
     cron_manage: '定时管理',
     delete: '删除',
     tree_view: '工作流树形图',
