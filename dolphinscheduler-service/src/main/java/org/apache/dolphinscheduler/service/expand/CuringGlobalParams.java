@@ -17,6 +17,13 @@
 
 package org.apache.dolphinscheduler.service.expand;
 
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_PROJECT_NAME;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_TASK_DEFINITION_NAME;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_TASK_EXECUTE_PATH;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_TASK_INSTANCE_ID;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_WORKFLOW_DEFINITION_NAME;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_WORKFLOW_INSTANCE_ID;
+
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.constants.DateConstants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -45,14 +52,6 @@ import lombok.NonNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_TASK_EXECUTE_PATH;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_TASK_INSTANCE_ID;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_TASK_DEFINITION_NAME;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_WORKFLOW_INSTANCE_ID;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_WORKFLOW_DEFINITION_NAME;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_PROJECT_NAME;
-
 
 @Component
 public class CuringGlobalParams implements CuringParamsService {
@@ -160,7 +159,7 @@ public class CuringGlobalParams implements CuringParamsService {
         String timeZone = cmdParam.get(Constants.SCHEDULE_TIMEZONE);
 
         // build-in params
-        Map<String, String> params = setBuildInParamsMap(taskInstance, timeZone);
+        Map<String, String> params = setBuiltInParamsMap(taskInstance, timeZone);
 
         if (MapUtils.isNotEmpty(params)) {
             globalParams.putAll(ParamUtils.getUserDefParamsMap(params));
@@ -211,7 +210,7 @@ public class CuringGlobalParams implements CuringParamsService {
      * @param taskInstance
      * @param timeZone
      */
-    private Map<String, String> setBuildInParamsMap(@NonNull TaskInstance taskInstance,
+    private Map<String, String> setBuiltInParamsMap(@NonNull TaskInstance taskInstance,
                                                     @NonNull String timeZone) {
         CommandType commandType = taskInstance.getProcessInstance().getCmdTypeIfComplement();
         Date scheduleTime = taskInstance.getProcessInstance().getScheduleTime();
@@ -224,7 +223,8 @@ public class CuringGlobalParams implements CuringParamsService {
         params.put(PARAMETER_TASK_INSTANCE_ID, Integer.toString(taskInstance.getId()));
         params.put(PARAMETER_TASK_DEFINITION_NAME, taskInstance.getTaskDefine().getName());
         params.put(PARAMETER_WORKFLOW_INSTANCE_ID, Integer.toString(taskInstance.getProcessInstance().getId()));
-        params.put(PARAMETER_WORKFLOW_DEFINITION_NAME, taskInstance.getProcessInstance().getProcessDefinition().getName());
+        params.put(PARAMETER_WORKFLOW_DEFINITION_NAME,
+                taskInstance.getProcessInstance().getProcessDefinition().getName());
         params.put(PARAMETER_PROJECT_NAME, taskInstance.getProcessInstance().getProcessDefinition().getProjectName());
         return params;
     }

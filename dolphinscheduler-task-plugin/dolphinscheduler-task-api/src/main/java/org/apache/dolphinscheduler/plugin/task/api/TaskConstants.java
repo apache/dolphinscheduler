@@ -17,12 +17,13 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
+import org.apache.dolphinscheduler.common.constants.DateConstants;
+
 import java.time.Duration;
 import java.util.Set;
 import java.util.regex.Pattern;
 
 import com.google.common.collect.Sets;
-import org.apache.dolphinscheduler.common.constants.DateConstants;
 
 public class TaskConstants {
 
