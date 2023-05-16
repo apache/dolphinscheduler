@@ -37,8 +37,6 @@ If your etcd server has configured with ssl, about certification files you can s
 > Because after version 8u252 has native support for ALPN. Detail you can see:
 > 
 > https://github.com/grpc/grpc-java/issues/5369#issuecomment-751885384
-> 
-> https://webtide.com/jetty-alpn-java-8u252/
 
 After do this config, you can start your DolphinScheduler cluster, your cluster will use etcd as registry center to
 store server metadata.
