@@ -229,11 +229,11 @@ Create a registry environment variables.
 - name: REGISTRY_AUTHORITY
   value: {{ .Values.etcd.authority }}
 - name: REGISTRY_CERT_FILE
-  value: {{ .Values.etcd.certFile }}
+  value: {{ .Values.etcd.ssl.certFile }}
 - name: REGISTRY_KEY_CERT_CHAIN_FILE
-  value: {{ .Values.etcd.keyCertChainFile }}
+  value: {{ .Values.etcd.ssl.keyCertChainFile }}
 - name: REGISTRY_KEY_FILE
-  value: {{ .Values.etcd.keyFile }}
+  value: {{ .Values.etcd.ssl.keyFile }}
 {{- else }}
 - name: REGISTRY_ZOOKEEPER_CONNECT_STRING
   {{- if .Values.zookeeper.enabled }}
@@ -302,13 +302,13 @@ Create a etcd ssl volumeMount.
 */}}
 {{- define "dolphinscheduler.etcd.ssl.volumeMount" -}}
 {{- if .Values.etcd.enabled -}}
-- mountPath: /opt/dolphinscheduler/{{ .Values.etcd.certFile }}
+- mountPath: /opt/dolphinscheduler/{{ .Values.etcd.ssl.certFile }}
   name: etcd-ssl
   subPath: cert-file
-- mountPath: /opt/dolphinscheduler/{{ .Values.etcd.keyCertChainFile  }}
+- mountPath: /opt/dolphinscheduler/{{ .Values.etcd.ssl.keyCertChainFile  }}
   name: etcd-ssl
   subPath: key-cert-chain-file
-- mountPath: /opt/dolphinscheduler/{{ .Values.etcd.keyFile }}
+- mountPath: /opt/dolphinscheduler/{{ .Values.etcd.ssl.keyFile }}
   name: etcd-ssl
   subPath: key-file
 {{- end -}}

@@ -102,9 +102,11 @@ etcd:
   passWord: ""
   authority: ""
   # Please create a new folder: deploy/kubernetes/dolphinscheduler/etcd-certs
-  certFile: "etcd-certs/ca.crt"
-  keyCertChainFile: "etcd-certs/client.crt"
-  keyFile: "etcd-certs/client.pem"
+  ssl:
+    enabled: false
+    certFile: "etcd-certs/ca.crt"
+    keyCertChainFile: "etcd-certs/client.crt"
+    keyFile: "etcd-certs/client.pem"
 
 ## If exists external registry and set zookeeper.enable value to false, the external registry will be used.
 externalRegistry:
