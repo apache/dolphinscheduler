@@ -312,7 +312,7 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
     }
 
     @Override
-    public void download(String bucketName, String srcHdfsFilePath, String dstFile, boolean deleteSource,
+    public void download(String tenantCode, String srcHdfsFilePath, String dstFile, boolean deleteSource,
                          boolean overwrite) throws IOException {
         copyHdfsToLocal(srcHdfsFilePath, dstFile, deleteSource, overwrite);
     }
