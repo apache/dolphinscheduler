@@ -1534,7 +1534,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         String tenantCode = getTenantCode(user);
 
-        String baseFolder = storageOperate.getResourceFileName(tenantCode, "DATA_TRANSFER");
+        String baseFolder = storageOperate.getResourceFullName(tenantCode, "DATA_TRANSFER");
 
         LocalDateTime now = LocalDateTime.now();
         now = now.minus(days, ChronoUnit.DAYS);

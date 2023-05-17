@@ -70,7 +70,7 @@ export const useForm = () => {
       dryRun: 0,
       testFlag: 0,
       version: null,
-      allLevelDependent: false
+      allLevelDependent: 'false'
     },
     saving: false,
     rules: {

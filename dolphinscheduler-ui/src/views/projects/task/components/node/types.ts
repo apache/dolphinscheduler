@@ -66,6 +66,11 @@ interface ILocalParam {
   value?: string
 }
 
+interface ICustomLabel {
+  label: string
+  value: string
+}
+
 interface IResponseJsonItem extends Omit<IJsonItemParams, 'type'> {
   type: 'input' | 'select' | 'radio' | 'group'
   emit: 'change'[]
@@ -355,6 +360,7 @@ interface ITaskParams {
   image?: string
   command?: string
   args?: string
+  customizedLabels?: ICustomLabel[]
   algorithm?: string
   params?: string
   searchParams?: string

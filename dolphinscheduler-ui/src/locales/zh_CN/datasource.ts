@@ -23,6 +23,8 @@ export default {
   search_input_tips: '请输入关键字',
   datasource_name: '源名称',
   datasource_name_tips: '请输入数据源名称',
+  datawarehouse: '数据仓库',
+  datawarehouse_tips: '请输入数据仓库',
   datasource_user_name: '所属用户',
   datasource_type: '源类型',
   datasource_parameter: '参数',

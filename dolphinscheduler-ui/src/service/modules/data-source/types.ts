@@ -34,6 +34,7 @@ type IDataBase =
   | 'OCEANBASE'
   | 'SSH'
   | 'DATABEND'
+  | 'SNOWFLAKE'
 
 type IDataBaseLabel =
 | 'MYSQL'
@@ -80,6 +81,7 @@ interface IDataSource {
   dbUser?: string
   compatibleMode?: string
   publicKey?: string
+  datawarehouse?: string
 }
 
 interface ListReq {

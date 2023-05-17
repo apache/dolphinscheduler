@@ -23,6 +23,8 @@ export default {
   search_input_tips: 'Please input the keywords',
   datasource_name: 'Datasource Name',
   datasource_name_tips: 'Please enter datasource name',
+  datawarehouse: 'Datawarehouse',
+  datawarehouse_tips: 'Please enter datawarehouse',
   datasource_user_name: 'Owner',
   datasource_type: 'Datasource Type',
   datasource_parameter: 'Datasource Parameter',

@@ -107,6 +107,7 @@
         <aws-java-sdk-redshift.version>1.12.300</aws-java-sdk-redshift.version>
         <azure-resourcemanager.version>2.21.0</azure-resourcemanager.version>
         <azure-resourcemanager-datafactory.version>1.0.0-beta.19</azure-resourcemanager-datafactory.version>
+        <snowflake-jdbc.version>3.13.10</snowflake-jdbc.version>
         <google-cloud-storage.version>2.18.0</google-cloud-storage.version>
         <sshd.version>2.8.0</sshd.version>
         <fabric8.client.version>6.0.0</fabric8.client.version>
@@ -864,6 +865,12 @@
                 <groupId>org.casbin</groupId>
                 <artifactId>casdoor-spring-boot-starter</artifactId>
                 <version>${casdoor.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.snowflake</groupId>
+                <artifactId>snowflake-jdbc</artifactId>
+                <version>${snowflake-jdbc.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

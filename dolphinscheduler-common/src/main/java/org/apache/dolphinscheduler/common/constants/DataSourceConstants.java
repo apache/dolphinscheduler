@@ -40,7 +40,7 @@ public class DataSourceConstants {
     public static final String COM_DAMENG_JDBC_DRIVER = "dm.jdbc.driver.DmDriver";
     public static final String ORG_APACHE_KYUUBI_JDBC_DRIVER = "org.apache.kyuubi.jdbc.KyuubiHiveDriver";
     public static final String COM_OCEANBASE_JDBC_DRIVER = "com.oceanbase.jdbc.Driver";
-
+    public static final String NET_SNOWFLAKE_JDBC_DRIVER = "net.snowflake.client.jdbc.SnowflakeDriver";
     /**
      * validation Query
      */
@@ -57,6 +57,7 @@ public class DataSourceConstants {
     public static final String ATHENA_VALIDATION_QUERY = "select 1";
     public static final String TRINO_VALIDATION_QUERY = "select 1";
     public static final String DAMENG_VALIDATION_QUERY = "select 1";
+    public static final String SNOWFLAKE_VALIDATION_QUERY = "select 1";
 
     public static final String KYUUBI_VALIDATION_QUERY = "select 1";
 
@@ -80,6 +81,7 @@ public class DataSourceConstants {
     public static final String JDBC_TRINO = "jdbc:trino://";
     public static final String JDBC_DAMENG = "jdbc:dm://";
     public static final String JDBC_OCEANBASE = "jdbc:oceanbase://";
+    public static final String JDBC_SNOWFLAKE = "jdbc:snowflake://";
 
     /**
      * database type
