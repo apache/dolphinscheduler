@@ -19,6 +19,8 @@ version: "3.8"
 services:
   dolphinscheduler-postgresql:
     image: bitnami/postgresql:11.11.0
+    ports:
+      - "5432:5432"
     profiles: ["all", "schema"]
     environment:
       POSTGRESQL_USERNAME: root
@@ -67,6 +69,9 @@ services:
 
   dolphinscheduler-api:
     image: ${HUB}/dolphinscheduler-api:${TAG}
+    ports:
+      - "12345:12345"
+      - "25333:25333"
     profiles: ["all"]
     env_file: .env
     healthcheck:
