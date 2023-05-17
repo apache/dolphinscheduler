@@ -149,9 +149,6 @@ public class CuringGlobalParams implements CuringParamsService {
         parameters.setVarPool(taskInstance.getVarPool());
         Map<String, Property> varParams = parameters.getVarPoolMap();
 
-        if (MapUtils.isEmpty(globalParams) && MapUtils.isEmpty(localParams) && MapUtils.isEmpty(varParams)) {
-            return null;
-        }
         // if it is a complement,
         // you need to pass in the task instance id to locate the time
         // of the process instance complement
