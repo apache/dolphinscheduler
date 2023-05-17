@@ -17,13 +17,13 @@
 
 package org.apache.dolphinscheduler.plugin.task.seatunnel.self;
 
+import org.apache.dolphinscheduler.plugin.task.seatunnel.DeployModeEnum;
+import org.apache.dolphinscheduler.plugin.task.seatunnel.SeatunnelParameters;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import org.apache.dolphinscheduler.plugin.task.seatunnel.DeployModeEnum;
-import org.apache.dolphinscheduler.plugin.task.seatunnel.SeatunnelParameters;
 
 @Getter
 @Setter

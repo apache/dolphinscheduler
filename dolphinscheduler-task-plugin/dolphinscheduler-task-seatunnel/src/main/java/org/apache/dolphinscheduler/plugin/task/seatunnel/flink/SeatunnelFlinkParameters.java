@@ -17,12 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.task.seatunnel.flink;
 
-import lombok.Data;
+import org.apache.dolphinscheduler.plugin.task.seatunnel.SeatunnelParameters;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import org.apache.dolphinscheduler.plugin.task.seatunnel.SeatunnelParameters;
 
 @Getter
 @Setter

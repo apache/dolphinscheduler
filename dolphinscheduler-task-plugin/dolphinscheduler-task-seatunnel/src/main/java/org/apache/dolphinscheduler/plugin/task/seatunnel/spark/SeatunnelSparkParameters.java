@@ -17,17 +17,16 @@
 
 package org.apache.dolphinscheduler.plugin.task.seatunnel.spark;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import org.apache.dolphinscheduler.plugin.task.seatunnel.DeployModeEnum;
 import org.apache.dolphinscheduler.plugin.task.seatunnel.SeatunnelParameters;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Objects;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
