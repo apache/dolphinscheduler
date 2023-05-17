@@ -46,7 +46,7 @@ const getField = (
     return widget || null
   }
   // TODO Support other widgets later
-  if (type === 'custom-parameters' || type === '') {
+  if (type === 'custom-parameters') {
     let fieldRules: { [key: string]: IFormItemRule }[] = []
     if (rules && !rules[field]) fieldRules = rules[field] = []
     // @ts-ignore

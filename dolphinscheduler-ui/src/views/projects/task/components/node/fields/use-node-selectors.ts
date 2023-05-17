@@ -72,9 +72,6 @@ export function useNodeSelectors({
                     span: 4,
                     options: OPERATOR_LIST,
                     value: 'In',
-                    props: {
-                        disabled: false
-                    }
                 },
                 {
                     type: 'input',
