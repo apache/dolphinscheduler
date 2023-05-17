@@ -17,6 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.task.seatunnel.spark;
 
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import org.apache.dolphinscheduler.plugin.task.seatunnel.DeployModeEnum;
 import org.apache.dolphinscheduler.plugin.task.seatunnel.SeatunnelParameters;
 
@@ -24,6 +29,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Objects;
 
+@Getter
+@Setter
+@NoArgsConstructor
 public class SeatunnelSparkParameters extends SeatunnelParameters {
 
     private DeployModeEnum deployMode;
@@ -42,45 +50,18 @@ public class SeatunnelSparkParameters extends SeatunnelParameters {
         return result;
     }
 
-    public static enum MasterTypeEnum {
+    @Getter
+    public enum MasterTypeEnum {
 
         YARN("yarn"),
         LOCAL("local"),
         SPARK("spark://"),
         MESOS("mesos://");
 
-        private String command;
+        private final String command;
 
         MasterTypeEnum(String command) {
             this.command = command;
         }
-
-        public String getCommand() {
-            return command;
-        }
-    }
-
-    public DeployModeEnum getDeployMode() {
-        return deployMode;
-    }
-
-    public void setDeployMode(DeployModeEnum deployMode) {
-        this.deployMode = deployMode;
-    }
-
-    public MasterTypeEnum getMaster() {
-        return master;
-    }
-
-    public void setMaster(MasterTypeEnum master) {
-        this.master = master;
-    }
-
-    public String getMasterUrl() {
-        return masterUrl;
-    }
-
-    public void setMasterUrl(String masterUrl) {
-        this.masterUrl = masterUrl;
     }
 }

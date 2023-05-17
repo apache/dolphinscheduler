@@ -17,6 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.task.seatunnel;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.seatunnel.flink.SeatunnelFlinkParameters;
@@ -32,14 +37,12 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, visible = true, property = "engine")
-@JsonSubTypes({
-        @JsonSubTypes.Type(value = SeatunnelFlinkParameters.class, name = "FLINK"),
-        @JsonSubTypes.Type(value = SeatunnelSparkParameters.class, name = "SPARK")
-})
+@Getter
+@Setter
+@NoArgsConstructor
 public class SeatunnelParameters extends AbstractParameters {
 
-    private EngineEnum engine;
+    private String startupScript;
 
     private Boolean useCustom;
 
@@ -50,41 +53,9 @@ public class SeatunnelParameters extends AbstractParameters {
      */
     private List<ResourceInfo> resourceList;
 
-    public EngineEnum getEngine() {
-        return engine;
-    }
-
-    public void setEngine(EngineEnum engine) {
-        this.engine = engine;
-    }
-
-    public Boolean getUseCustom() {
-        return useCustom;
-    }
-
-    public void setUseCustom(Boolean useCustom) {
-        this.useCustom = useCustom;
-    }
-
-    public String getRawScript() {
-        return rawScript;
-    }
-
-    public void setRawScript(String rawScript) {
-        this.rawScript = rawScript;
-    }
-
-    public List<ResourceInfo> getResourceList() {
-        return resourceList;
-    }
-
-    public void setResourceList(List<ResourceInfo> resourceList) {
-        this.resourceList = resourceList;
-    }
-
     @Override
     public boolean checkParameters() {
-        return Objects.nonNull(engine)
+        return Objects.nonNull(startupScript)
                 && ((BooleanUtils.isTrue(useCustom) && StringUtils.isNotBlank(rawScript))
                         || (BooleanUtils.isFalse(useCustom) && CollectionUtils.isNotEmpty(resourceList)
                                 && resourceList.size() == 1));
