@@ -163,7 +163,7 @@ public class SubTaskProcessor extends BaseTaskProcessor {
 
     private boolean pauseSubWorkFlow() {
         ProcessInstance subProcessInstance = processService.findSubProcessInstance(processInstance.getId(), taskInstance.getId());
-        if (subProcessInstance == null || taskInstance.getState().typeIsFinished()) {
+        if (subProcessInstance == null || taskInstance.getState().typeIsFinished() || subProcessInstance.getState().typeIsFinished()) {
             return false;
         }
         subProcessInstance.setState(ExecutionStatus.READY_PAUSE);
@@ -198,7 +198,7 @@ public class SubTaskProcessor extends BaseTaskProcessor {
     @Override
     protected boolean killTask() {
         ProcessInstance subProcessInstance = processService.findSubProcessInstance(processInstance.getId(), taskInstance.getId());
-        if (subProcessInstance == null || taskInstance.getState().typeIsFinished()) {
+        if (subProcessInstance == null || taskInstance.getState().typeIsFinished() || subProcessInstance.getState().typeIsFinished()) {
             return false;
         }
         subProcessInstance.setState(ExecutionStatus.READY_STOP);
