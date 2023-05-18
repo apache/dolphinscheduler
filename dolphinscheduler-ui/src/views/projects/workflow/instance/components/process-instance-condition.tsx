@@ -133,10 +133,10 @@ export default defineComponent({
     return (
       <NSpace justify='end'>
         <NSelect
-          options={this.processDefinitionOptions}
-          size='small'
           clearable
           filterable
+          options={this.processDefinitionOptions}
+          size='small'
           style={{ width: '210px' }}
           v-model:value={this.processDefineCodeRef}
         />
