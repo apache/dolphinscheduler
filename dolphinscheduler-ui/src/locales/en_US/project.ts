@@ -88,6 +88,8 @@ export default {
     tree_limit: 'Limit Size',
     export: 'Export',
     batch_copy: 'Batch Copy',
+    batch_delete: 'Batch Delete',
+    batch_export: 'Batch Export',
     version_info: 'Version Info',
     version: 'Version',
     file_upload: 'File Upload',
