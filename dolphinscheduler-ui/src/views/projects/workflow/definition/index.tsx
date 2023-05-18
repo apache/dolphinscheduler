@@ -207,7 +207,7 @@ export default defineComponent({
               <NSpace>
                 <NTooltip>
                   {{
-                    default: () => t('project.workflow.delete'),
+                    default: () => t('project.workflow.batch_delete'),
                     trigger: () => (
                       <NPopconfirm onPositiveClick={this.batchDeleteWorkflow}>
                         {{
@@ -220,7 +220,7 @@ export default defineComponent({
                               disabled={this.checkedRowKeys.length <= 0}
                               class='btn-delete-all'
                             >
-                              {t('project.workflow.delete')}
+                              {t('project.workflow.batch_delete')}
                             </NButton>
                           )
                         }}
@@ -230,7 +230,7 @@ export default defineComponent({
                 </NTooltip>
                 <NTooltip>
                   {{
-                    default: () => t('project.workflow.export'),
+                    default: () => t('project.workflow.batch_export'),
                     trigger: () => (
                       <NButton
                         tag='div'
@@ -240,7 +240,7 @@ export default defineComponent({
                         onClick={this.batchExportWorkflow}
                         class='btn-delete-all'
                       >
-                        {t('project.workflow.export')}
+                        {t('project.workflow.batch_export')}
                       </NButton>
                     )
                   }}
