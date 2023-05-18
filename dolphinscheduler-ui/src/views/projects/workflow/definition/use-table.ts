@@ -150,26 +150,29 @@ export function useTable() {
         key: 'instances',
         ...COLUMN_WIDTH_CONFIG['instances'],
         render: (row) =>
-            h(NTooltip, null, {
-              trigger: () =>
-                  h(
-                      NButton,
-                      {
-                        quaternary: true,
-                        circle: true,
-                        type: 'info',
-                        size: 'tiny',
-                        onClick: () => {
-                          void router.push({
-                            name: 'workflow-instance-list',
-                            query: { processDefineCode: row.code }
-                          })
-                        }
-                      },
-                      { icon: () => h(NIcon, { size: 18 }, () => h(UnorderedListOutlined)) }
-                  ),
-              default: () => t('project.workflow.visit_workflow_instances')
-            })
+          h(NTooltip, null, {
+            trigger: () =>
+              h(
+                NButton,
+                {
+                  quaternary: true,
+                  circle: true,
+                  type: 'info',
+                  size: 'tiny',
+                  onClick: () => {
+                    void router.push({
+                      name: 'workflow-instance-list',
+                      query: { processDefineCode: row.code }
+                    })
+                  }
+                },
+                {
+                  icon: () =>
+                    h(NIcon, { size: 18 }, () => h(UnorderedListOutlined))
+                }
+              ),
+            default: () => t('project.workflow.visit_workflow_instances')
+          })
       },
       {
         title: t('project.workflow.status'),
