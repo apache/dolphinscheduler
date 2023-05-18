@@ -1913,8 +1913,6 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
             if (DependResult.SUCCESS == dependResult) {
                 log.info("The dependResult of task {} is success, so ready to submit to execute", task.getName());
                 if (!executeTask(task)) {
-                    // todo: don't ste 0 here
-                    task.setId(0);
                     this.taskFailedSubmit = true;
                     // Remove and add to complete map and error map
                     if (!removeTaskFromStandbyList(task)) {
