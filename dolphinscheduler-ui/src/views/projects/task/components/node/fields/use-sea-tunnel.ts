@@ -42,7 +42,7 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
     {
       type: 'select',
       field: 'startupScript',
-      span: 12,
+      span: 15,
       name: t('project.node.startup_script'),
       options: STARTUP_SCRIPT,
       validate: {
