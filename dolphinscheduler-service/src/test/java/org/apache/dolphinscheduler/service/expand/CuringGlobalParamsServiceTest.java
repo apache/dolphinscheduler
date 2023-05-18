@@ -206,5 +206,4 @@ public class CuringGlobalParamsServiceTest {
         Assertions.assertEquals(propertyMap.get(TaskConstants.PARAMETER_PROJECT_NAME).getValue(),
                 processDefinition.getProjectName());
     }
-
 }

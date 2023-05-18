@@ -127,7 +127,7 @@ public class CuringGlobalParams implements CuringParamsService {
     }
 
     /**
-     * the global parameters and local parameters used in the worker will be prepared here, and build-in parameters.
+     * the global parameters and local parameters used in the worker will be prepared here, and built-in parameters.
      *
      * @param taskInstance
      * @param parameters
@@ -155,7 +155,7 @@ public class CuringGlobalParams implements CuringParamsService {
         Map<String, String> cmdParam = JSONUtils.toMap(processInstance.getCommandParam());
         String timeZone = cmdParam.get(Constants.SCHEDULE_TIMEZONE);
 
-        // build-in params
+        // built-in params
         Map<String, String> params = setBuiltInParamsMap(taskInstance, timeZone);
 
         if (MapUtils.isNotEmpty(params)) {
