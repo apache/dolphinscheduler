@@ -56,7 +56,8 @@ public class AsyncTaskExecutionContext implements Delayed {
         } else {
             this.timeout = TimeUnit.SECONDS.toMillis(Integer.MAX_VALUE);
         }
-        this.executeInterval = Math.max(asyncTaskExecuteFunction.getAsyncTaskStateCheckInterval().toMillis(), 1000L);
+        this.executeInterval = asyncTaskExecuteFunction.getAsyncTaskStateCheckInterval() == null ? 1000L
+                : Math.max(asyncTaskExecuteFunction.getAsyncTaskStateCheckInterval().toMillis(), 1000L);
     }
 
     public void refreshStartTime() {

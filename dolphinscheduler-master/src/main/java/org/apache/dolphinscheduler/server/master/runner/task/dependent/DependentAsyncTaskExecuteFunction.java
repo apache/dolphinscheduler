@@ -54,8 +54,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DependentAsyncTaskExecuteFunction implements AsyncTaskExecuteFunction {
 
-    private static final Duration DEPENDENT_TASK_STATE_CHECK_INTERVAL = Duration.ofSeconds(10);
-
     private final TaskExecutionContext taskExecutionContext;
     private final DependentParameters dependentParameters;
     private final ProjectDao projectDao;
@@ -201,7 +199,8 @@ public class DependentAsyncTaskExecuteFunction implements AsyncTaskExecuteFuncti
                             dependResult, dependentDate);
                 }
             });
-            if (!dependentExecute.finish(dependentDate, processInstance.getTestFlag())) {
+            if (!dependentExecute.finish(dependentDate, processInstance.getTestFlag(),
+                    dependentParameters.getFailurePolicy(), dependentParameters.getFailureWaitingTime())) {
                 isAllDependentTaskFinished = false;
             }
         }
@@ -210,6 +209,6 @@ public class DependentAsyncTaskExecuteFunction implements AsyncTaskExecuteFuncti
 
     @Override
     public @NonNull Duration getAsyncTaskStateCheckInterval() {
-        return DEPENDENT_TASK_STATE_CHECK_INTERVAL;
+        return Duration.ofSeconds(dependentParameters.getCheckInterval());
     }
 }

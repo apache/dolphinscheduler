@@ -23,8 +23,7 @@ import type {
   ISqoopTargetParams,
   ISqoopSourceParams,
   ILocalParam,
-  IDependTask,
-  RelationType
+  IDependentParameters
 } from './types'
 
 export function formatParams(data: INodeData): {
@@ -279,6 +278,9 @@ export function formatParams(data: INodeData): {
   }
   if (data.taskType === 'DEPENDENT') {
     taskParams.dependence = {
+      checkInterval: data.checkInterval,
+      failurePolicy: data.failurePolicy,
+      failureWaitingTime: data.failureWaitingTime,
       relation: data.relation,
       dependTaskList: data.dependTaskList
     }
@@ -650,7 +652,12 @@ export function formatModel(data: ITaskData) {
   }
 
   if (data.taskParams?.dependence) {
-    const dependence: { relation?: RelationType, dependTaskList?: IDependTask[] } = JSON.parse(JSON.stringify(data.taskParams.dependence))
+    const dependence: IDependentParameters = JSON.parse(
+      JSON.stringify(data.taskParams.dependence)
+    )
+    params.checkInterval = dependence.checkInterval
+    params.failurePolicy = dependence.failurePolicy
+    params.failureWaitingTime = dependence.failureWaitingTime
     params.dependTaskList = dependence.dependTaskList || []
     params.relation = dependence.relation
   }
