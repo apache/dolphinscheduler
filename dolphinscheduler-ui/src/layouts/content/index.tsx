@@ -96,7 +96,8 @@ const Content = defineComponent({
     return {
       ...toRefs(state),
       changeMenuOption,
-      sideKeyRef
+      sideKeyRef,
+      currentRoute: route
     }
   },
   render() {
@@ -123,7 +124,7 @@ const Content = defineComponent({
             style='padding: 16px 22px'
             contentStyle={'height: 100%'}
           >
-            <router-view key={this.$route.fullPath} />
+            <router-view key={this.currentRoute.fullPath} />
           </NLayoutContent>
         </NLayout>
       </NLayout>
