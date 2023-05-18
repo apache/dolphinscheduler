@@ -16,21 +16,46 @@
  */
 
 import { SearchOutlined } from '@vicons/antd'
-import { NInput, NButton, NDatePicker, NSelect, NIcon, NSpace } from 'naive-ui'
-import { defineComponent, getCurrentInstance, ref } from 'vue'
+import {NInput, NButton, NDatePicker, NSelect, NIcon, NSpace, NEllipsis} from 'naive-ui'
+import {defineComponent, getCurrentInstance, h, ref} from 'vue'
 import { useI18n } from 'vue-i18n'
 import { format } from 'date-fns'
 import { workflowExecutionStateType } from '@/common/common'
+import { queryProcessDefinitionList } from "@/service/modules/process-definition"
+import { SelectMixedOption } from 'naive-ui/lib/select/src/interface'
+import {Router, useRouter} from "vue-router";
 
 export default defineComponent({
   name: 'ProcessInstanceCondition',
   emits: ['handleSearch'],
   setup(props, ctx) {
+
+    const router: Router = useRouter()
+
     const searchValRef = ref('')
     const executorNameRef = ref('')
     const hostRef = ref('')
     const stateTypeRef = ref('')
     const startEndTimeRef = ref()
+    const projectCode = ref(Number(router.currentRoute.value.params.projectCode))
+    const processDefineCodeRef = router.currentRoute.value.query.processDefineCode? ref(Number(router.currentRoute.value.query.processDefineCode)):ref()
+
+    const processDefinitionOptions = ref<Array<SelectMixedOption>>([])
+
+    const initProcessList = (code: number) => {
+     queryProcessDefinitionList(code).then((result:any) => {
+       result.map((item: { code: number; name: string }) => {
+         const option: SelectMixedOption = {
+           value: item.code,
+           label: () => h(NEllipsis, null, item.name),
+           filterLabel: item.name
+         }
+         processDefinitionOptions.value.push(option)
+       })
+     })
+    }
+
+    initProcessList(projectCode.value)
 
     const handleSearch = () => {
       let startDate = ''
@@ -52,7 +77,8 @@ export default defineComponent({
         host: hostRef.value,
         stateType: stateTypeRef.value,
         startDate,
-        endDate
+        endDate,
+        processDefineCode: processDefineCodeRef.value
       })
     }
 
@@ -83,7 +109,9 @@ export default defineComponent({
       onClearSearchVal,
       onClearSearchExecutor,
       onClearSearchHost,
-      trim
+      trim,
+      processDefinitionOptions,
+      processDefineCodeRef
     }
   },
   render() {
@@ -92,6 +120,14 @@ export default defineComponent({
 
     return (
       <NSpace justify='end'>
+        <NSelect
+            options={this.processDefinitionOptions}
+            size='small'
+            clearable
+            filterable
+            style={{ width: '210px' }}
+            v-model:value={this.processDefineCodeRef}
+        />
         <NInput
           allowInput={this.trim}
           size='small'

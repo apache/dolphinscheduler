@@ -64,6 +64,7 @@ export function useTable() {
     startDate: ref(),
     endDate: ref(),
     projectCode: ref(Number(router.currentRoute.value.params.projectCode)),
+    processDefineCode: router.currentRoute.value.query.processDefineCode? ref(Number(router.currentRoute.value.query.processDefineCode)):ref(),
     loadingRef: ref(false)
   })
 
@@ -262,7 +263,8 @@ export function useTable() {
       host: variables.host,
       stateType: variables.stateType,
       startDate: variables.startDate,
-      endDate: variables.endDate
+      endDate: variables.endDate,
+      processDefineCode: variables.processDefineCode
     }
     queryProcessInstanceListPaging({ ...params }, variables.projectCode).then(
       (res: any) => {
