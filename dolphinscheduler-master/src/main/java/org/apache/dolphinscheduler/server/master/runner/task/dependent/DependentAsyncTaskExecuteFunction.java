@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task.dependent;
 
+import static org.apache.dolphinscheduler.common.constants.Constants.DEPENDENT_SPLIT;
+
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -194,7 +196,10 @@ public class DependentAsyncTaskExecuteFunction implements AsyncTaskExecuteFuncti
             dependentExecute.getDependResultMap().forEach((dependentKey, dependResult) -> {
                 if (!dependResultMap.containsKey(dependentKey)) {
                     dependResultMap.put(dependentKey, dependResult);
-                    log.info("Dependent item check finished: dependentKey: {}, result: {}, dependentDate: {}",
+                    // The log is applied in: api-server obtains the result of the item dependent in the dependent task
+                    // node.{@link ProcessInstanceServiceImpl#parseLogForDependentResult}
+                    log.info("Dependent item check finished, {} dependentKey: {}, result: {}, dependentDate: {}",
+                            DEPENDENT_SPLIT,
                             dependentKey,
                             dependResult, dependentDate);
                 }

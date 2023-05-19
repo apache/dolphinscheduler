@@ -21,10 +21,13 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
+import org.apache.dolphinscheduler.plugin.task.api.model.Label;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.K8sTaskParameters;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
@@ -50,6 +53,8 @@ public class K8sTaskTest {
     private final String date = "20220507";
     private final String command = "[\"/bin/bash\", \"-c\"]";
     private final String args = "[\"echo hello world\"]";
+    private final List<Label> labels = Arrays.asList(new Label("test", "1234"));
+
     @BeforeEach
     public void before() {
         k8sTaskParameters = new K8sTaskParameters();
@@ -59,6 +64,7 @@ public class K8sTaskTest {
         k8sTaskParameters.setMinMemorySpace(minMemorySpace);
         k8sTaskParameters.setCommand(command);
         k8sTaskParameters.setArgs(args);
+        k8sTaskParameters.setCustomizedLabels(labels);
         TaskExecutionContext taskRequest = new TaskExecutionContext();
         taskRequest.setTaskInstanceId(taskInstanceId);
         taskRequest.setTaskName(taskName);
@@ -84,7 +90,7 @@ public class K8sTaskTest {
     @Test
     public void testBuildCommandNormal() {
         String expectedStr =
-                "{\"image\":\"ds-dev\",\"command\":\"[\\\"/bin/bash\\\", \\\"-c\\\"]\",\"args\":\"[\\\"echo hello world\\\"]\",\"namespaceName\":\"default\",\"clusterName\":\"lab\",\"minCpuCores\":2.0,\"minMemorySpace\":10.0,\"paramsMap\":{\"day\":\"20220507\"}}";
+                "{\"image\":\"ds-dev\",\"command\":\"[\\\"/bin/bash\\\", \\\"-c\\\"]\",\"args\":\"[\\\"echo hello world\\\"]\",\"namespaceName\":\"default\",\"clusterName\":\"lab\",\"minCpuCores\":2.0,\"minMemorySpace\":10.0,\"paramsMap\":{\"day\":\"20220507\"},\"labelMap\":{\"test\":\"1234\"}}";
         String commandStr = k8sTask.buildCommand();
         Assertions.assertEquals(expectedStr, commandStr);
     }
@@ -92,7 +98,7 @@ public class K8sTaskTest {
     @Test
     public void testGetParametersNormal() {
         String expectedStr =
-                "K8sTaskParameters(image=ds-dev, namespace={\"name\":\"default\",\"cluster\":\"lab\"}, command=[\"/bin/bash\", \"-c\"], args=[\"echo hello world\"], minCpuCores=2.0, minMemorySpace=10.0)";
+                "K8sTaskParameters(image=ds-dev, namespace={\"name\":\"default\",\"cluster\":\"lab\"}, command=[\"/bin/bash\", \"-c\"], customizedLabels=[Label(label=test, value=1234)], args=[\"echo hello world\"], minCpuCores=2.0, minMemorySpace=10.0)";
         String result = k8sTask.getParameters().toString();
         Assertions.assertEquals(expectedStr, result);
     }

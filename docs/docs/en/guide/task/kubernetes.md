@@ -24,6 +24,7 @@ K8S task type used to execute a batch task. In this task, the worker submits the
 | Image            | The registry url for image.                                                                                      |
 | Command          | The container execution command (yaml-style array), for example: ["printenv"]                                    |
 | Args             | The args of execution command (yaml-style array), for example: ["HOSTNAME", "KUBERNETES_PORT"]                   |
+| Custom label     | The customized labels for k8s Job.                                                                               |
 | Custom parameter | It is a local user-defined parameter for K8S task, these params will pass to container as environment variables. |
 
 ## Task Example
