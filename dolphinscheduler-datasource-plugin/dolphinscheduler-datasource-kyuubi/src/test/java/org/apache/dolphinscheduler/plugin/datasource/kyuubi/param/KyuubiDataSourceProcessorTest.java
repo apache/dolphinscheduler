@@ -114,6 +114,18 @@ public class KyuubiDataSourceProcessorTest {
         Assertions.assertNotNull(connectionParam);
         Assertions.assertEquals("default", connectionParams.getUser());
     }
+
+    @Test
+    public void testCreateConnectionParams3() {
+        String connectionParam = "{\"user\":\"default\",\"address\":\"jdbc:hive2://localhost1:5142,localhost2:5142\""
+                + ",\"jdbcUrl\":\"jdbc:hive2://localhost1:5142,localhost2:5142/default\",\"other\":\"connectTimeout=300000;\" }";
+        KyuubiConnectionParam connectionParams = (KyuubiConnectionParam) kyuubiDatasourceProcessor
+                .createConnectionParams(connectionParam);
+        String jdbcUrl = DataSourceUtils.getJdbcUrl(DbType.KYUUBI, connectionParams);
+        Assertions.assertNotNull(jdbcUrl);
+        Assertions.assertEquals("jdbc:hive2://localhost1:5142,localhost2:5142/default;connectTimeout=300000;", jdbcUrl);
+    }
+
     @Test
     public void testCreateDatasourceParamDTO() {
         String connectionParam = "{\"user\":\"default\",\"address\":\"jdbc:kyuubi://localhost1:5142,localhost2:5142\""
