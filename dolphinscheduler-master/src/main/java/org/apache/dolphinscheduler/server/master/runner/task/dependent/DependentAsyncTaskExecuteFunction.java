@@ -56,7 +56,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DependentAsyncTaskExecuteFunction implements AsyncTaskExecuteFunction {
 
-    private static final Duration DEPENDENT_TASK_STATE_CHECK_INTERVAL = Duration.ofSeconds(10);
+    private static final Duration DEFAULT_STATE_CHECK_INTERVAL = Duration.ofSeconds(10);
 
     private final TaskExecutionContext taskExecutionContext;
     private final DependentParameters dependentParameters;
@@ -195,6 +195,10 @@ public class DependentAsyncTaskExecuteFunction implements AsyncTaskExecuteFuncti
     private boolean isAllDependentTaskFinished() {
         boolean isAllDependentTaskFinished = true;
         for (DependentExecute dependentExecute : dependentTaskList) {
+            if (!dependentExecute.finish(dependentDate, processInstance.getTestFlag(),
+                    dependentParameters.getFailurePolicy(), dependentParameters.getFailureWaitingTime())) {
+                isAllDependentTaskFinished = false;
+            }
             dependentExecute.getDependResultMap().forEach((dependentKey, dependResult) -> {
                 if (!dependResultMap.containsKey(dependentKey)) {
                     dependResultMap.put(dependentKey, dependResult);
@@ -206,15 +210,13 @@ public class DependentAsyncTaskExecuteFunction implements AsyncTaskExecuteFuncti
                             dependResult, dependentDate);
                 }
             });
-            if (!dependentExecute.finish(dependentDate, processInstance.getTestFlag())) {
-                isAllDependentTaskFinished = false;
-            }
         }
         return isAllDependentTaskFinished;
     }
 
     @Override
     public @NonNull Duration getAsyncTaskStateCheckInterval() {
-        return DEPENDENT_TASK_STATE_CHECK_INTERVAL;
+        return dependentParameters.getCheckInterval() == null ? DEFAULT_STATE_CHECK_INTERVAL
+                : Duration.ofSeconds(dependentParameters.getCheckInterval());
     }
 }

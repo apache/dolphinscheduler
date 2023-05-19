@@ -107,6 +107,14 @@ interface ISwitchResult {
   nextNode?: number
 }
 
+interface IDependentParameters {
+  checkInterval?: number
+  failurePolicy?: 'DEPENDENT_FAILURE_FAILURE' | 'DEPENDENT_FAILURE_WAITING'
+  failureWaitingTime?: number
+  relation?: RelationType
+  dependTaskList?: IDependTask[]
+}
+
 /*
  * resourceName: resource full name
  * res: resource file name
@@ -301,10 +309,7 @@ interface ITaskParams {
   switchResult?: ISwitchResult
   dependTaskList?: IDependTask[]
   nextNode?: number
-  dependence?: {
-    relation?: RelationType
-    dependTaskList?: IDependTask[]
-  }
+  dependence?: IDependentParameters
   customConfig?: number
   json?: string
   dsType?: string
@@ -441,6 +446,7 @@ interface INodeData
     >,
     ISqoopTargetData,
     ISqoopSourceData,
+    IDependentParameters,
     Omit<IRuleParameters, 'mapping_columns'> {
   id?: string
   taskType?: ITaskType
@@ -519,5 +525,6 @@ export {
   FormRules,
   IJsonItemParams,
   IResponseJsonItem,
-  IDateType
+  IDateType,
+  IDependentParameters
 }
