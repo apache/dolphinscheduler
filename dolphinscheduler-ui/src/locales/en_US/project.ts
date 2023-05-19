@@ -759,6 +759,8 @@ export default {
     custom_config: 'Custom Config',
     engine: 'engine',
     engine_tips: 'Please select engine',
+    startup_script: 'Startup script',
+    startup_script_tips: 'Please select startup script',
     run_mode: 'Run Mode',
     dinky_address: 'Dinky address',
     dinky_address_tips: 'Please enter the url of your dinky',
