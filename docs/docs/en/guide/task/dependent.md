@@ -16,7 +16,7 @@ Dependent nodes are **dependency check nodes**. For example, process A depends o
 
 - Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
 
-| **Parameter**                   | **Description**                                                                                                                                                       |
+|          **Parameter**          |                                                                            **Description**                                                                            |
 |---------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Add Dependencies                | Configure dependent upstream tasks.                                                                                                                                   |
 | Check interval                  | Check the dependent upstream task status interval, the default is 10s.                                                                                                |
