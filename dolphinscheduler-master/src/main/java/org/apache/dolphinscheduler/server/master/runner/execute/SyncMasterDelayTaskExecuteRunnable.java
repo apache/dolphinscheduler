@@ -55,6 +55,8 @@ public class SyncMasterDelayTaskExecuteRunnable extends MasterDelayTaskExecuteRu
                 "Execute task finished, will send the task execute result to master, the current task execute result is {}",
                 taskExecutionContext.getCurrentExecutionStatus().name());
         closeLogAppender();
+        MasterTaskExecutionContextHolder.removeTaskExecutionContext(taskExecutionContext.getTaskInstanceId());
+        MasterTaskExecuteRunnableHolder.removeMasterTaskExecuteRunnable(taskExecutionContext.getTaskInstanceId());
     }
 
 }
