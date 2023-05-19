@@ -342,6 +342,7 @@ interface ITaskParams {
   parameters?: string
   kernel?: string
   engine?: string
+  startupScript?: string
   executionTimeout?: string
   startTimeout?: string
   processDefinitionCode?: number
