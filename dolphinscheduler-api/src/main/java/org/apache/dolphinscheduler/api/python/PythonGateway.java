@@ -270,7 +270,7 @@ public class PythonGateway {
                     null, timeout, user.getTenantCode(), taskRelationJson, taskDefinitionJson, otherParamsJson,
                     executionTypeEnum);
             if (result.get(Constants.STATUS) != Status.SUCCESS) {
-                log.error(result.get(Constants.MSG).toString());
+                logger.error(result.get(Constants.MSG).toString());
                 throw new ServiceException(result.get(Constants.MSG).toString());
             }
             processDefinition = (ProcessDefinition) result.get(Constants.DATA_LIST);

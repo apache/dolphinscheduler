@@ -50,6 +50,8 @@ import java.util.Map;
  */
 public class SeatunnelTask extends AbstractRemoteTask {
 
+    private static final String SEATUNNEL_BIN_DIR = "${SEATUNNEL_HOME}/bin/";
+
     /**
      * seatunnel parameters
      */
@@ -138,7 +140,7 @@ public class SeatunnelTask extends AbstractRemoteTask {
     private String buildCommand() throws Exception {
 
         List<String> args = new ArrayList<>();
-        args.add(seatunnelParameters.getEngine().getCommand());
+        args.add(SEATUNNEL_BIN_DIR + seatunnelParameters.getStartupScript());
         args.addAll(buildOptions());
 
         String command = String.join(" ", args);
