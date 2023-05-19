@@ -17,6 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.seatunnel;
 
+import static org.apache.dolphinscheduler.plugin.task.seatunnel.Constants.STARTUP_SCRIPT_FLINK;
+import static org.apache.dolphinscheduler.plugin.task.seatunnel.Constants.STARTUP_SCRIPT_SEATUNNEL;
+import static org.apache.dolphinscheduler.plugin.task.seatunnel.Constants.STARTUP_SCRIPT_SPARK;
+
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -38,17 +42,18 @@ public class SeatunnelTaskChannel implements TaskChannel {
     public SeatunnelTask createTask(TaskExecutionContext taskRequest) {
         SeatunnelParameters seatunnelParameters =
                 JSONUtils.parseObject(taskRequest.getTaskParams(), SeatunnelParameters.class);
-        switch (seatunnelParameters.getEngine()) {
-            case FLINK:
-            case FLINK_V2:
-                return new SeatunnelFlinkTask(taskRequest);
-            case SPARK:
-            case SPARK_V2:
-                return new SeatunnelSparkTask(taskRequest);
-            case SEATUNNEL_ENGINE:
-                return new SeatunnelEngineTask(taskRequest);
+        assert seatunnelParameters != null;
+        String startupScript = seatunnelParameters.getStartupScript();
+        if (startupScript.contains(STARTUP_SCRIPT_SPARK)) {
+            return new SeatunnelSparkTask(taskRequest);
         }
-        throw new IllegalArgumentException("Unsupported engine type:" + seatunnelParameters.getEngine());
+        if (startupScript.contains(STARTUP_SCRIPT_FLINK)) {
+            return new SeatunnelFlinkTask(taskRequest);
+        }
+        if (startupScript.contains(STARTUP_SCRIPT_SEATUNNEL)) {
+            return new SeatunnelEngineTask(taskRequest);
+        }
+        throw new IllegalArgumentException("Unsupported startup script name:" + seatunnelParameters.getStartupScript());
     }
 
     @Override
