@@ -19,15 +19,12 @@ package org.apache.dolphinscheduler.plugin.task.seatunnel.spark;
 
 import static org.apache.dolphinscheduler.plugin.task.seatunnel.Constants.DEPLOY_MODE_OPTIONS;
 import static org.apache.dolphinscheduler.plugin.task.seatunnel.Constants.MASTER_OPTIONS;
-import static org.apache.dolphinscheduler.plugin.task.seatunnel.Constants.QUEUE_OPTIONS;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.seatunnel.DeployModeEnum;
 import org.apache.dolphinscheduler.plugin.task.seatunnel.SeatunnelTask;
 import org.apache.dolphinscheduler.plugin.task.seatunnel.spark.SeatunnelSparkParameters.MasterTypeEnum;
-
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
