@@ -376,6 +376,7 @@ export default {
     times: 'Times',
     failed_retry_interval: 'Failed retry interval',
     minute: 'Minute',
+    second: 'Second',
     delay_execution_time: 'Delay execution time',
     namespace_cluster: 'Namespace(Cluster)',
     min_cpu: 'Min cpu',
@@ -388,7 +389,8 @@ export default {
     command_tips:
       'Please enter the container execution command, for example: ["printenv"]',
     args: 'Args',
-    args_tips: 'Please enter the container execution command args, for example: ["HOSTNAME", "KUBERNETES_PORT"]',
+    args_tips:
+      'Please enter the container execution command args, for example: ["HOSTNAME", "KUBERNETES_PORT"]',
     min_memory_tips: 'Please enter min memory',
     state: 'State',
     branch_flow: 'Branch flow',
@@ -625,6 +627,7 @@ export default {
     add_dependency: 'Add dependency',
     waiting_dependent_start: 'Waiting Dependent start',
     check_interval: 'Check interval',
+    check_interval_tips: 'Check interval must be a positive integer',
     waiting_dependent_complete: 'Waiting Dependent complete',
     project_name: 'Project Name',
     project_name_tips: 'Please select a project(required)',
@@ -697,7 +700,7 @@ export default {
     zeppelin_username: 'zeppelinUsername',
     zeppelin_username_tips: 'Please enter the zeppelin server username',
     zeppelin_password: 'zeppelinPassword',
-    zeppelin_password_tips: 'Please enter the zeppelin server password',  
+    zeppelin_password_tips: 'Please enter the zeppelin server password',
     hive_cli_task_execution_type: 'Hive Cli Task Execution Type',
     hive_sql_script: 'Hive SQL Script',
     hive_cli_options: 'Hive Cli Options',
@@ -800,6 +803,8 @@ export default {
     custom_config: 'Custom Config',
     engine: 'engine',
     engine_tips: 'Please select engine',
+    startup_script: 'Startup script',
+    startup_script_tips: 'Please select startup script',
     run_mode: 'Run Mode',
     dinky_address: 'Dinky address',
     dinky_address_tips: 'Please enter the url of your dinky',
@@ -823,7 +828,13 @@ export default {
     pipeline_name: 'Pipeline Name',
     factory_tips: 'Please select factory',
     resource_group_tips: 'Please select resource group',
-    pipeline_tips: 'Please select pipeline'
+    pipeline_tips: 'Please select pipeline',
+    dependent_failure_policy: 'Dependent failure policy',
+    dependent_failure_policy_failure: 'failure',
+    dependent_failure_policy_waiting: 'waiting',
+    dependent_failure_waiting_time: 'Dependent failure waiting time',
+    dependent_failure_waiting_time_tips:
+      'Failure waiting time must be a positive integer'
   },
   menu: {
     fav: 'Favorites',
