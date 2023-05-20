@@ -172,7 +172,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
-import com.google.gson.JsonSyntaxException;
 
 /**
  * process definition service impl
@@ -3057,46 +3056,30 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     }
 
     /**
-     * Batch release process definitions by code states.
+     * batch release process definitions based on codes and releaseState.
      *
-     * @param loginUser    Login user.
-     * @param projectCode  Project code.
-     * @param codeStates   Code states in JSON format.
+     * @param loginUser    login user
+     * @param projectCode  project code
+     * @param codes        process definition code list
+     * @param releaseState releaseState
      * @return Result of the batch release process definitions.
      */
     @Override
     @Transactional
-    public Map<String, Object> batchReleaseProcessDefinitions(User loginUser, long projectCode, String codeStates) {
+    public Map<String, Object> batchReleaseProcessDefinitionsByCodes(User loginUser, long projectCode, String codes,
+                                                                     ReleaseState releaseState) {
         Map<String, Object> result = new HashMap<>();
-        if (StringUtils.isEmpty(codeStates)) {
-            log.error("Parameter codeStates is empty, projectCode is {}.", projectCode);
+        if (StringUtils.isEmpty(codes)) {
+            log.error("Parameter processDefinitionCodes is empty, projectCode is {}.", projectCode);
             putMsg(result, Status.PROCESS_DEFINITION_CODES_IS_EMPTY);
-            throw new ServiceException(Status.PROCESS_DEFINITION_CODES_IS_EMPTY);
+            return result;
         }
 
-        try {
-            Map<String, String> codeStateMap = JSONUtils.toMap(codeStates);
-
-            for (Map.Entry<String, String> entry : codeStateMap.entrySet()) {
-                String code = entry.getKey();
-                String releaseState = entry.getValue();
-
-                try {
-                    ReleaseState releaseStateEnum = ReleaseState.valueOf(releaseState);
-                    result = releaseProcessDefinition(loginUser, projectCode, Long.parseLong(code), releaseStateEnum);
-                } catch (IllegalArgumentException e) {
-                    log.error("Invalid releaseState '{}' in codeStates JSON, projectCode is {}.", releaseState,
-                            projectCode);
-                    putMsg(result, Status.INVALID_CODE_STATES_JSON);
-                    throw new ServiceException(Status.INVALID_CODE_STATES_JSON);
-                }
-            }
-        } catch (JsonSyntaxException e) {
-            log.error("Failed to parse codeStates JSON, projectCode is {}.", projectCode);
-            putMsg(result, Status.INVALID_CODE_STATES_JSON);
-            throw new ServiceException(Status.INVALID_CODE_STATES_JSON);
+        Set<Long> definitionCodes = Lists.newArrayList(codes.split(Constants.COMMA)).stream().map(Long::parseLong)
+                .collect(Collectors.toSet());
+        for (Long definitionCode : definitionCodes) {
+            result = releaseProcessDefinition(loginUser, projectCode, definitionCode, releaseState);
         }
-
         return result;
     }
 }

@@ -28,7 +28,7 @@ import {
   deleteByCode,
   queryListPaging,
   release,
-  batchReleaseByCodeStates
+  batchReleaseByCodes
 } from '@/service/modules/process-definition'
 import TableAction from './components/table-action'
 import styles from './index.module.scss'
@@ -444,22 +444,12 @@ export function useTable() {
   }
 
     const processWorkflow = (releaseState: any) => {
-        const checkedRowKeys = variables.checkedRowKeys;
-        const projectCode = variables.projectCode;
-        let resultData: { [code: string]: string } = {};
-
-        if (checkedRowKeys.length > 0) {
-            checkedRowKeys.forEach((key) => {
-                const code = String(key);
-                resultData[code] = releaseState;
-            });
-        }
-
-        const codeStatesJsonString = JSON.stringify(resultData);
-        const data = {
-            codeStates: codeStatesJsonString
-        };
-      batchReleaseByCodeStates(data, projectCode).then(() => {
+      const data = {
+        codes: _.join(variables.checkedRowKeys, ','),
+        releaseState,
+      };
+      const projectCode = variables.projectCode;
+      batchReleaseByCodes(data, projectCode).then(() => {
             window.$message.success(t('project.workflow.success'));
             getTableData({
                 pageSize: variables.pageSize,

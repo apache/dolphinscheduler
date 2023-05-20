@@ -523,13 +523,15 @@ public interface ProcessDefinitionService {
     Map<String, Object> viewVariables(User loginUser, long projectCode, long code);
 
     /**
-     * Batch release process definitions by code states.
+     * batch release process definitions based on codes and releaseState.
      *
-     * @param loginUser    Login user.
-     * @param projectCode  Project code.
-     * @param codeStates   Code states in JSON format.
+     * @param loginUser    login user
+     * @param projectCode  project code
+     * @param codes        process definition code list
+     * @param releaseState releaseState
      * @return Result of the batch release process definitions.
      */
-    Map<String, Object> batchReleaseProcessDefinitions(User loginUser, long projectCode, String codeStates);
+    Map<String, Object> batchReleaseProcessDefinitionsByCodes(User loginUser, long projectCode, String codes,
+                                                              ReleaseState releaseState);
 
 }

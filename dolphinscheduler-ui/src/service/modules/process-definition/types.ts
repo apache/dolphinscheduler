@@ -75,8 +75,9 @@ interface SimpleListRes {
   projectCode: any
 }
 
-interface CodeStatesReq {
-    codeStates: string
+interface CodesReleaseStateReq {
+  codes: string
+  releaseState: 'OFFLINE' | 'ONLINE'
 }
 
 export {
@@ -92,5 +93,5 @@ export {
   ProcessDefinitionReq,
   TargetCodeReq,
   SimpleListRes,
-  CodeStatesReq
+  CodesReleaseStateReq
 }
