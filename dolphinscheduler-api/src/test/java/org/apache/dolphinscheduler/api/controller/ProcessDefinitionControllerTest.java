@@ -443,4 +443,29 @@ public class ProcessDefinitionControllerTest {
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
     }
 
+    @Test
+    public void testBatchReleaseProcessDefinitionsByCodes() {
+        long projectCode = 1L;
+        String codes = "1,2";
+        Map<String, Object> result = new HashMap<>();
+        putMsg(result, Status.SUCCESS);
+
+        // processes definition online
+        Mockito.when(processDefinitionService.batchReleaseProcessDefinitionsByCodes(user, projectCode, codes,
+                ReleaseState.ONLINE))
+                .thenReturn(result);
+        Result onlineResponse =
+                processDefinitionController.batchReleaseProcessDefinitionsByCodes(user, projectCode, codes,
+                        ReleaseState.ONLINE);
+        Assertions.assertTrue(onlineResponse != null && onlineResponse.isSuccess());
+
+        // processes definition offline
+        Mockito.when(processDefinitionService.batchReleaseProcessDefinitionsByCodes(user, projectCode, codes,
+                ReleaseState.OFFLINE))
+                .thenReturn(result);
+        Result offlineResponses =
+                processDefinitionController.batchReleaseProcessDefinitionsByCodes(user, projectCode, codes,
+                        ReleaseState.OFFLINE);
+        Assertions.assertTrue(offlineResponses != null && offlineResponses.isSuccess());
+    }
 }

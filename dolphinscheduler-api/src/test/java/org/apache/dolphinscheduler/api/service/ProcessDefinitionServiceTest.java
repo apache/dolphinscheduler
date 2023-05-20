@@ -1119,6 +1119,72 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         Assertions.assertEquals(Status.PROJECT_NOT_FOUND, map.get(Constants.STATUS));
     }
 
+    @Test
+    public void testBatchReleaseProcessDefinitionsByCodes() {
+        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
+
+        Project project = getProject(projectCode);
+
+        // project check auth fail
+        Map<String, Object> result = new HashMap<>();
+        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
+        Mockito.when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_ONLINE_OFFLINE))
+                .thenReturn(result);
+        String codes = "1,2";
+        Map<String, Object> map = processDefinitionService.batchReleaseProcessDefinitionsByCodes(user, projectCode,
+                codes, ReleaseState.OFFLINE);
+        Assertions.assertEquals(Status.PROJECT_NOT_FOUND, map.get(Constants.STATUS));
+
+        // project check auth success, processes definition online
+        putMsg(result, Status.SUCCESS, projectCode);
+        Mockito.when(processDefinitionMapper.queryByCode(1L)).thenReturn(getProcessDefinition());
+        Mockito.when(processDefinitionMapper.queryByCode(2L)).thenReturn(getProcessDefinition());
+        List<ProcessTaskRelation> processTaskRelationListOne = new ArrayList<>();
+        ProcessTaskRelation processTaskRelationOne = new ProcessTaskRelation();
+        processTaskRelationOne.setProjectCode(projectCode);
+        processTaskRelationOne.setProcessDefinitionCode(1L);
+        processTaskRelationOne.setPostTaskCode(123L);
+        processTaskRelationListOne.add(processTaskRelationOne);
+
+        List<ProcessTaskRelation> processTaskRelationListTow = new ArrayList<>();
+        ProcessTaskRelation processTaskRelationTow = new ProcessTaskRelation();
+        processTaskRelationTow.setProjectCode(projectCode);
+        processTaskRelationTow.setProcessDefinitionCode(2L);
+        processTaskRelationTow.setPostTaskCode(567L);
+        processTaskRelationListTow.add(processTaskRelationTow);
+
+        Mockito.when(processService.findRelationByCode(1L, 1)).thenReturn(processTaskRelationListOne);
+        Mockito.when(processService.findRelationByCode(2L, 1)).thenReturn(processTaskRelationListTow);
+        Map<String, Object> onlineRes =
+                processDefinitionService.batchReleaseProcessDefinitionsByCodes(user, projectCode, codes,
+                        ReleaseState.ONLINE);
+        Assertions.assertEquals(Status.SUCCESS, onlineRes.get(Constants.STATUS));
+
+        // project check auth success, processes definition online
+        Map<String, Object> onlineWithResourceRes =
+                processDefinitionService.batchReleaseProcessDefinitionsByCodes(user, projectCode, codes,
+                        ReleaseState.ONLINE);
+        Assertions.assertEquals(Status.SUCCESS, onlineWithResourceRes.get(Constants.STATUS));
+
+        // project check auth success, processes definition offline
+        Map<String, Object> offlineWithResourceRes =
+                processDefinitionService.batchReleaseProcessDefinitionsByCodes(user, projectCode, codes,
+                        ReleaseState.OFFLINE);
+        Assertions.assertEquals(Status.SUCCESS, offlineWithResourceRes.get(Constants.STATUS));
+
+        // release error releaseState
+        Map<String, Object> failReleaseStateRes =
+                processDefinitionService.batchReleaseProcessDefinitionsByCodes(user, projectCode, codes,
+                        ReleaseState.getEnum(2));
+        Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, failReleaseStateRes.get(Constants.STATUS));
+
+        // release error codes
+        Map<String, Object> failCodesRes =
+                processDefinitionService.batchReleaseProcessDefinitionsByCodes(user, projectCode, null,
+                        ReleaseState.getEnum(0));
+        Assertions.assertEquals(Status.PROCESS_DEFINITION_CODES_IS_EMPTY, failCodesRes.get(Constants.STATUS));
+    }
+
     /**
      * get mock processDefinition
      *

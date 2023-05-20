@@ -91,16 +91,16 @@ public class ProcessDefinitionController extends BaseController {
     /**
      * create process definition
      *
-     * @param loginUser          login user
-     * @param projectCode        project code
-     * @param name               process definition name
-     * @param description        description
-     * @param globalParams       globalParams
-     * @param locations          locations for nodes
-     * @param timeout            timeout
-     * @param taskRelationJson   relation json for nodes
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param name process definition name
+     * @param description description
+     * @param globalParams globalParams
+     * @param locations locations for nodes
+     * @param timeout timeout
+     * @param taskRelationJson relation json for nodes
      * @param taskDefinitionJson taskDefinitionJson
-     * @param otherParamsJson    otherParamsJson handle other params
+     * @param otherParamsJson otherParamsJson handle other params
      * @return create result code
      */
     @Operation(summary = "createProcessDefinition", description = "CREATE_PROCESS_DEFINITION_NOTES")
@@ -134,9 +134,9 @@ public class ProcessDefinitionController extends BaseController {
     /**
      * copy process definition
      *
-     * @param loginUser         login user
-     * @param projectCode       project code
-     * @param codes             process definition codes
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param codes process definition codes
      * @param targetProjectCode target project code
      * @return copy result code
      */
@@ -160,9 +160,9 @@ public class ProcessDefinitionController extends BaseController {
     /**
      * move process definition
      *
-     * @param loginUser         login user
-     * @param projectCode       project code
-     * @param codes             process definition codes
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param codes process definition codes
      * @param targetProjectCode target project code
      * @return move result code
      */
@@ -186,9 +186,9 @@ public class ProcessDefinitionController extends BaseController {
     /**
      * verify process definition name unique
      *
-     * @param loginUser   login user
+     * @param loginUser login user
      * @param projectCode project code
-     * @param name        name
+     * @param name name
      * @return true if process definition name not exists, otherwise false
      */
     @Operation(summary = "verify-name", description = "VERIFY_PROCESS_DEFINITION_NAME_NOTES")
@@ -212,17 +212,17 @@ public class ProcessDefinitionController extends BaseController {
     /**
      * update process definition, with whole process definition object including task definition, task relation and location.
      *
-     * @param loginUser          login user
-     * @param projectCode        project code
-     * @param name               process definition name
-     * @param code               process definition code
-     * @param description        description
-     * @param globalParams       globalParams
-     * @param locations          locations for nodes
-     * @param timeout            timeout
-     * @param taskRelationJson   relation json for nodes
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param name process definition name
+     * @param code process definition code
+     * @param description description
+     * @param globalParams globalParams
+     * @param locations locations for nodes
+     * @param timeout timeout
+     * @param taskRelationJson relation json for nodes
      * @param taskDefinitionJson taskDefinitionJson
-     * @param otherParamsJson    otherParamsJson handle other params
+     * @param otherParamsJson otherParamsJson handle other params
      * @return update result code
      */
     @Operation(summary = "update", description = "UPDATE_PROCESS_DEFINITION_NOTES")
@@ -270,11 +270,11 @@ public class ProcessDefinitionController extends BaseController {
     /**
      * query process definition version paging list info
      *
-     * @param loginUser   login user info
+     * @param loginUser login user info
      * @param projectCode project code
-     * @param pageNo      the process definition version list current page number
-     * @param pageSize    the process definition version list page size
-     * @param code        the process definition code
+     * @param pageNo the process definition version list current page number
+     * @param pageSize the process definition version list page size
+     * @param code the process definition code
      * @return the process definition version list
      */
     @Operation(summary = "queryVersions", description = "QUERY_PROCESS_DEFINITION_VERSIONS_NOTES")
@@ -306,10 +306,10 @@ public class ProcessDefinitionController extends BaseController {
     /**
      * switch certain process definition version
      *
-     * @param loginUser   login user info
+     * @param loginUser login user info
      * @param projectCode project code
-     * @param code        the process definition code
-     * @param version     the version user want to switch
+     * @param code the process definition code
+     * @param version the version user want to switch
      * @return switch version result code
      */
     @Operation(summary = "switchVersion", description = "SWITCH_PROCESS_DEFINITION_VERSION_NOTES")
@@ -333,10 +333,10 @@ public class ProcessDefinitionController extends BaseController {
     /**
      * delete the certain process definition version by version and process definition code
      *
-     * @param loginUser   login user info
+     * @param loginUser login user info
      * @param projectCode project code
-     * @param code        the process definition code
-     * @param version     the process definition version user want to delete
+     * @param code the process definition code
+     * @param version the process definition version user want to delete
      * @return delete version result code
      */
     @Operation(summary = "deleteVersion", description = "DELETE_PROCESS_DEFINITION_VERSION_NOTES")
@@ -360,9 +360,9 @@ public class ProcessDefinitionController extends BaseController {
     /**
      * release process definition
      *
-     * @param loginUser    login user
-     * @param projectCode  project code
-     * @param code         process definition code
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param code process definition code
      * @param releaseState release state
      * @return release result code
      */
@@ -388,9 +388,9 @@ public class ProcessDefinitionController extends BaseController {
     /**
      * query detail of process definition by code
      *
-     * @param loginUser   login user
+     * @param loginUser login user
      * @param projectCode project code
-     * @param code        process definition code
+     * @param code process definition code
      * @return process definition detail
      */
     @Operation(summary = "queryProcessDefinitionByCode", description = "QUERY_PROCESS_DEFINITION_BY_CODE_NOTES")
@@ -412,9 +412,9 @@ public class ProcessDefinitionController extends BaseController {
     /**
      * query detail of process definition by name
      *
-     * @param loginUser   login user
+     * @param loginUser login user
      * @param projectCode project code
-     * @param name        process definition name
+     * @param name process definition name
      * @return process definition detail
      */
     @Operation(summary = "queryProcessDefinitionByName", description = "QUERY_PROCESS_DEFINITION_BY_NAME_NOTES")
@@ -436,7 +436,7 @@ public class ProcessDefinitionController extends BaseController {
     /**
      * query Process definition list
      *
-     * @param loginUser   login user
+     * @param loginUser login user
      * @param projectCode project code
      * @return process definition list
      */
@@ -454,7 +454,7 @@ public class ProcessDefinitionController extends BaseController {
     /**
      * query Process definition simple list
      *
-     * @param loginUser   login user
+     * @param loginUser login user
      * @param projectCode project code
      * @return process definition list
      */
@@ -472,13 +472,13 @@ public class ProcessDefinitionController extends BaseController {
     /**
      * query process definition list paging
      *
-     * @param loginUser       login user
-     * @param projectCode     project code
-     * @param searchVal       search value
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param searchVal search value
      * @param otherParamsJson otherParamsJson handle other params
-     * @param pageNo          page number
-     * @param pageSize        page size
-     * @param userId          user id
+     * @param pageNo page number
+     * @param pageSize page size
+     * @param userId user id
      * @return process definition page
      */
     @Operation(summary = "queryListPaging", description = "QUERY_PROCESS_DEFINITION_LIST_PAGING_NOTES")
@@ -517,10 +517,10 @@ public class ProcessDefinitionController extends BaseController {
     /**
      * encapsulation tree view structure
      *
-     * @param loginUser   login user
+     * @param loginUser login user
      * @param projectCode project code
-     * @param code        process definition code
-     * @param limit       limit
+     * @param code process definition code
+     * @param limit limit
      * @return tree view json data
      */
     @Operation(summary = "viewTree", description = "VIEW_TREE_NOTES")
@@ -543,9 +543,9 @@ public class ProcessDefinitionController extends BaseController {
     /**
      * get tasks list by process definition code
      *
-     * @param loginUser   login user
+     * @param loginUser login user
      * @param projectCode project code
-     * @param code        process definition code
+     * @param code process definition code
      * @return task list
      */
     @Operation(summary = "getTasksByDefinitionCode", description = "GET_TASK_LIST_BY_DEFINITION_CODE_NOTES")
@@ -566,9 +566,9 @@ public class ProcessDefinitionController extends BaseController {
     /**
      * get tasks list map by process definition multiple code
      *
-     * @param loginUser   login user
+     * @param loginUser login user
      * @param projectCode project code
-     * @param codes       process definition codes
+     * @param codes process definition codes
      * @return node list data
      */
     @Operation(summary = "getTaskListByDefinitionCodes", description = "GET_TASK_LIST_BY_DEFINITION_CODE_NOTES")
@@ -589,7 +589,7 @@ public class ProcessDefinitionController extends BaseController {
     /**
      * get process definition list map by project code
      *
-     * @param loginUser   login user
+     * @param loginUser login user
      * @param projectCode project code
      * @return process definition list data
      */
@@ -609,7 +609,7 @@ public class ProcessDefinitionController extends BaseController {
     /**
      * get task definition list by process definition code
      *
-     * @param loginUser   login user
+     * @param loginUser login user
      * @param projectCode project code
      * @return process definition list data
      */
@@ -647,9 +647,9 @@ public class ProcessDefinitionController extends BaseController {
     /**
      * batch delete process definition by codes
      *
-     * @param loginUser   login user
+     * @param loginUser login user
      * @param projectCode project code
-     * @param codes       process definition code list
+     * @param codes process definition code list
      * @return delete result code
      */
     @Operation(summary = "batchDeleteByCodes", description = "BATCH_DELETE_PROCESS_DEFINITION_BY_IDS_NOTES")
@@ -672,10 +672,10 @@ public class ProcessDefinitionController extends BaseController {
     /**
      * batch export process definition by codes
      *
-     * @param loginUser   login user
+     * @param loginUser login user
      * @param projectCode project code
-     * @param codes       process definition codes
-     * @param response    response
+     * @param codes process definition codes
+     * @param response response
      */
     @Operation(summary = "batchExportByCodes", description = "BATCH_EXPORT_PROCESS_DEFINITION_BY_CODES_NOTES")
     @Parameters({
@@ -698,7 +698,7 @@ public class ProcessDefinitionController extends BaseController {
     /**
      * query all process definition by project code
      *
-     * @param loginUser   login user
+     * @param loginUser login user
      * @param projectCode project code
      * @return process definition list
      */
@@ -717,9 +717,9 @@ public class ProcessDefinitionController extends BaseController {
     /**
      * import process definition
      *
-     * @param loginUser   login user
+     * @param loginUser login user
      * @param projectCode project code
-     * @param file        resource file
+     * @param file resource file
      * @return import result code
      */
     @Operation(summary = "importProcessDefinition", description = "IMPORT_PROCESS_DEFINITION_NOTES")
@@ -744,12 +744,12 @@ public class ProcessDefinitionController extends BaseController {
     /**
      * create empty process definition
      *
-     * @param loginUser    login user
-     * @param projectCode  project code
-     * @param name         process definition name
-     * @param description  description
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param name process definition name
+     * @param description description
      * @param globalParams globalParams
-     * @param timeout      timeout
+     * @param timeout timeout
      * @param scheduleJson scheduleJson
      * @return process definition code
      */
@@ -779,16 +779,16 @@ public class ProcessDefinitionController extends BaseController {
     /**
      * update process definition basic info, not including task definition, task relation and location.
      *
-     * @param loginUser       login user
-     * @param projectCode     project code
-     * @param name            process definition name
-     * @param code            process definition code
-     * @param description     description
-     * @param globalParams    globalParams
-     * @param timeout         timeout
-     * @param scheduleJson    scheduleJson
-     * @param executionType   executionType
-     * @param releaseState    releaseState
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param name process definition name
+     * @param code process definition code
+     * @param description description
+     * @param globalParams globalParams
+     * @param timeout timeout
+     * @param scheduleJson scheduleJson
+     * @param executionType executionType
+     * @param releaseState releaseState
      * @param otherParamsJson otherParamsJson handle other params
      * @return update result code
      */
@@ -833,9 +833,9 @@ public class ProcessDefinitionController extends BaseController {
     /**
      * release process definition and schedule
      *
-     * @param loginUser    login user
-     * @param projectCode  project code
-     * @param code         process definition code
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param code process definition code
      * @param releaseState releaseState
      * @return update result code
      */
@@ -861,7 +861,7 @@ public class ProcessDefinitionController extends BaseController {
      * query process definition global variables and local variables
      *
      * @param loginUser login user
-     * @param code      process definition code
+     * @param code process definition code
      * @return variables data
      */
     @Operation(summary = "viewVariables", description = "QUERY_PROCESS_DEFINITION_GLOBAL_VARIABLES_AND_LOCAL_VARIABLES_NOTES")
@@ -882,9 +882,9 @@ public class ProcessDefinitionController extends BaseController {
     /**
      * batch release process definitions based on codes and releaseState.
      *
-     * @param loginUser    login user
-     * @param projectCode  project code
-     * @param codes        process definition code list
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param codes process definition code list
      * @param releaseState releaseState
      * @return Result of the batch release process definitions.
      */
