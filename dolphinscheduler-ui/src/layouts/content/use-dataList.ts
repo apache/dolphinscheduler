@@ -126,6 +126,11 @@ export function useDataList() {
                 label: t('menu.workflow_instance'),
                 key: `/projects/${projectCode}/workflow/instances`,
                 payload: {projectName:projectName}
+              },
+              {
+                label: t('menu.workflow_timing'),
+                key: `/projects/${projectCode}/workflow/timings`,
+                payload: {projectName:projectName}
               }
             ]
           },

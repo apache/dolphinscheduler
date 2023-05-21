@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT;
 
+import java.util.Objects;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.dolphinscheduler.api.dto.ScheduleParam;
 import org.apache.dolphinscheduler.api.dto.schedule.ScheduleCreateRequest;
 import org.apache.dolphinscheduler.api.dto.schedule.ScheduleFilterRequest;
@@ -568,16 +570,20 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             return result;
         }
 
-        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefineCode);
-        if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
-            log.error("Process definition does not exist, processDefinitionCode:{}.", processDefineCode);
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(processDefineCode));
-            return result;
+        if (processDefineCode != 0) {
+            ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefineCode);
+            if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
+                log.error("Process definition does not exist, processDefinitionCode:{}.", processDefineCode);
+                putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(processDefineCode));
+                return result;
+            }
         }
 
         Page<Schedule> page = new Page<>(pageNo, pageSize);
+        // IPage<Schedule> schedulePage =
+        //         scheduleMapper.queryByProcessDefineCodePaging(page, processDefineCode, searchVal);
         IPage<Schedule> schedulePage =
-                scheduleMapper.queryByProcessDefineCodePaging(page, processDefineCode, searchVal);
+            scheduleMapper.queryByProjectAndProcessDefineCodePaging(page, projectCode, processDefineCode, searchVal);
 
         List<ScheduleVo> scheduleList = new ArrayList<>();
         for (Schedule schedule : schedulePage.getRecords()) {

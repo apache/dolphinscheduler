@@ -258,9 +258,8 @@ export function useTable() {
   const getTableData = (params: ISearchParam) => {
     if (variables.loadingRef) return
     variables.loadingRef = true
-    const definitionCode = Number(
-      router.currentRoute.value.params.definitionCode
-    )
+    const definitionCode = router.currentRoute.value.params.definitionCode? Number(router.currentRoute.value.params.definitionCode):undefined
+
     queryScheduleListPaging(
       { ...params, processDefinitionCode: definitionCode },
       variables.projectCode

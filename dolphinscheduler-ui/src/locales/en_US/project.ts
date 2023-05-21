@@ -65,6 +65,7 @@ export default {
     workflow_publish_status: 'Workflow Publish Status',
     schedule_publish_status: 'Schedule Publish Status',
     workflow_definition: 'Workflow Definition',
+    workflow_timing: 'Workflow Timing',
     workflow_instance: 'Workflow Instance',
     status: 'Status',
     create_time: 'Create Time',
