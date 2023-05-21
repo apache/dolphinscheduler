@@ -92,14 +92,15 @@ public class AsyncMasterTaskDelayQueueLooper extends BaseDaemonThread implements
                             asyncTaskExecutionContext.getAsyncTaskExecuteFunction();
                     final AsyncTaskCallbackFunction asyncTaskCallbackFunction =
                             asyncTaskExecutionContext.getAsyncTaskCallbackFunction();
-                    try (
-                            LogUtils.MDCAutoClosableContext mdcAutoClosableContext2 =
-                                    LogUtils.setTaskInstanceLogFullPathMDC(taskExecutionContext.getLogPath())) {
+                    try {
+                        LogUtils.setTaskInstanceLogFullPathMDC(taskExecutionContext.getLogPath());
+                        LogUtils.setTaskInstanceIdMDC(taskExecutionContext.getTaskInstanceId());
                         AsyncTaskExecuteFunction.AsyncTaskExecutionStatus asyncTaskExecutionStatus =
                                 asyncTaskExecuteFunction.getAsyncTaskExecutionStatus();
                         switch (asyncTaskExecutionStatus) {
                             case RUNNING:
-                                // If the task status is running, means the task real status is not finished. We will
+                                // If the task status is running, means the task real status is not finished. We
+                                // will
                                 // put it back to the queue to get the status again.
                                 asyncMasterTaskDelayQueue.addAsyncTask(asyncTaskExecutionContext);
                                 break;
@@ -112,6 +113,9 @@ public class AsyncMasterTaskDelayQueueLooper extends BaseDaemonThread implements
                         }
                     } catch (Exception ex) {
                         asyncTaskCallbackFunction.executeThrowing(ex);
+                    } finally {
+                        LogUtils.removeTaskInstanceLogFullPathMDC();
+                        LogUtils.removeTaskInstanceIdMDC();
                     }
                 });
             }

@@ -142,11 +142,11 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
 
     @Override
     public void run() {
-        try (
-                final LogUtils.MDCAutoClosableContext mdcAutoClosableContext = LogUtils.setWorkflowAndTaskInstanceIDMDC(
-                        taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId());
-                final LogUtils.MDCAutoClosableContext mdcAutoClosableContext1 =
-                        LogUtils.setTaskInstanceLogFullPathMDC(taskExecutionContext.getLogPath())) {
+        try {
+            LogUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(),
+                    taskExecutionContext.getTaskInstanceId());
+            LogUtils.setTaskInstanceLogFullPathMDC(taskExecutionContext.getLogPath());
+
             TaskInstanceLogHeader.printInitializeTaskContextHeader();
             initializeTask();
 
@@ -154,7 +154,8 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
                 taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.SUCCESS);
                 taskExecutionContext.setEndTime(System.currentTimeMillis());
                 TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-                workerMessageSender.sendMessageWithRetry(taskExecutionContext, MessageType.TASK_EXECUTE_RESULT_MESSAGE);
+                workerMessageSender.sendMessageWithRetry(taskExecutionContext,
+                        MessageType.TASK_EXECUTE_RESULT_MESSAGE);
                 log.info(
                         "The current execute mode is dry run, will stop the subsequent process and set the taskInstance status to success");
                 return;
@@ -177,6 +178,9 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
             log.error("Task execute failed, due to meet an exception", ex);
             afterThrowing(ex);
             closeLogAppender();
+        } finally {
+            LogUtils.removeWorkflowAndTaskInstanceIdMDC();
+            LogUtils.removeTaskInstanceLogFullPathMDC();
         }
     }
 

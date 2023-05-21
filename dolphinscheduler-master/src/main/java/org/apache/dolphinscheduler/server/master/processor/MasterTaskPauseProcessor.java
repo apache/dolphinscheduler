@@ -52,9 +52,9 @@ public class MasterTaskPauseProcessor implements MasterRpcProcessor {
             return;
         }
         TaskExecutionContext taskExecutionContext = masterTaskExecuteRunnable.getTaskExecutionContext();
-        try (
-                LogUtils.MDCAutoClosableContext mdcAutoClosableContext = LogUtils.setWorkflowAndTaskInstanceIDMDC(
-                        taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId())) {
+        try {
+            LogUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(),
+                    taskExecutionContext.getTaskInstanceId());
             masterTaskExecuteRunnable.pauseTask();
         } catch (MasterTaskExecuteException e) {
             log.error("Pause MasterTaskExecuteRunnable failed", e);
