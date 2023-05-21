@@ -58,7 +58,7 @@ public abstract class MasterTaskExecuteRunnable implements Runnable {
     protected void afterThrowing(Throwable throwable) {
         try {
             cancelTask();
-            log.info("Get a exception when execute the task, canceled the task", throwable);
+            log.error("Get a exception when execute the task, canceled the task", throwable);
         } catch (Exception e) {
             log.error("Cancel task failed,", e);
         }
