@@ -142,8 +142,7 @@ public class TaskExecutionCheckerUtils {
 
                     long resourceDownloadStartTime = System.currentTimeMillis();
                     storageOperate.download(actualTenant, fullName,
-                            execLocalPath + File.separator + fileName, false,
-                            true);
+                            execLocalPath + File.separator + fileName, true);
                     WorkerServerMetrics
                             .recordWorkerResourceDownloadTime(System.currentTimeMillis() - resourceDownloadStartTime);
                     WorkerServerMetrics.recordWorkerResourceDownloadSize(

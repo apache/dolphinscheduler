@@ -1462,7 +1462,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         log.info("Resource path is {}, download local filename is {}", alias, localFileName);
 
         try {
-            storageOperate.download(tenantCode, fullName, localFileName, false, true);
+            storageOperate.download(tenantCode, fullName, localFileName, true);
             return org.apache.dolphinscheduler.api.utils.FileUtils.file2Resource(localFileName);
         } catch (IOException e) {
             log.error("Download resource error, the path is {}, and local filename is {}, the error message is {}",

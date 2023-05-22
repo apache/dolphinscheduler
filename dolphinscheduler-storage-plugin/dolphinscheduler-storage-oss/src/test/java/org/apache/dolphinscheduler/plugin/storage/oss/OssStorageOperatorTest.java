@@ -215,7 +215,6 @@ public class OssStorageOperatorTest {
     public void copy() {
         boolean isSuccess = false;
         doReturn(null).when(ossClientMock).copyObject(anyString(), anyString(), anyString(), anyString());
-        doReturn(null).when(ossClientMock).deleteObject(anyString(), anyString());
         try {
             isSuccess = ossOperator.copy(FILE_PATH_MOCK, FILE_PATH_MOCK, false, false);
         } catch (IOException e) {
@@ -224,7 +223,6 @@ public class OssStorageOperatorTest {
 
         Assertions.assertTrue(isSuccess);
         verify(ossClientMock, times(1)).copyObject(anyString(), anyString(), anyString(), anyString());
-        verify(ossClientMock, times(1)).deleteObject(anyString(), anyString());
     }
 
     @Test

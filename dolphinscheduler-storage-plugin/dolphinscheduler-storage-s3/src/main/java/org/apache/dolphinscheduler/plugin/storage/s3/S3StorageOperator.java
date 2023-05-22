@@ -202,7 +202,7 @@ public class S3StorageOperator implements Closeable, StorageOperate {
     }
 
     @Override
-    public void download(String tenantCode, String srcFilePath, String dstFilePath, boolean deleteSource,
+    public void download(String tenantCode, String srcFilePath, String dstFilePath,
                          boolean overwrite) throws IOException {
         File dstFile = new File(dstFilePath);
         if (dstFile.isDirectory()) {
@@ -263,7 +263,9 @@ public class S3StorageOperator implements Closeable, StorageOperate {
     @Override
     public boolean copy(String srcPath, String dstPath, boolean deleteSource, boolean overwrite) throws IOException {
         s3Client.copyObject(bucketName, srcPath, bucketName, dstPath);
-        s3Client.deleteObject(bucketName, srcPath);
+        if (deleteSource) {
+            s3Client.deleteObject(bucketName, srcPath);
+        }
         return true;
     }
 
@@ -287,6 +289,10 @@ public class S3StorageOperator implements Closeable, StorageOperate {
                           boolean overwrite) throws IOException {
         try {
             s3Client.putObject(bucketName, dstPath, new File(srcFile));
+
+            if (deleteSource) {
+                Files.delete(Paths.get(srcFile));
+            }
             return true;
         } catch (AmazonServiceException e) {
             log.error("upload failed,the bucketName is {},the filePath is {}", bucketName, dstPath);
