@@ -15,26 +15,26 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.seatunnel;
+package org.apache.dolphinscheduler.plugin.task.api.model;
 
-public enum EngineEnum {
+import java.io.Serializable;
 
-    FLINK("${SEATUNNEL_HOME}/bin/start-seatunnel-flink.sh"),
-    SPARK("${SEATUNNEL_HOME}/bin/start-seatunnel-spark.sh"),
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-    FLINK_V2("${SEATUNNEL_HOME}/bin/start-seatunnel-flink-connector-v2.sh"),
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Label implements Serializable {
 
-    SPARK_V2("${SEATUNNEL_HOME}/bin/start-seatunnel-spark-connector-v2.sh"),
+    /**
+     * label name
+     */
+    private String label;
 
-    SEATUNNEL_ENGINE("${SEATUNNEL_HOME}/bin/seatunnel.sh");
-
-    private String command;
-
-    EngineEnum(String command) {
-        this.command = command;
-    }
-
-    public String getCommand() {
-        return command;
-    }
+    /**
+     * label value
+     */
+    private String value;
 }

@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.impl.K8sTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
@@ -55,6 +56,8 @@ public class K8sTaskExecutorTest {
         Map<String, String> namespace = JSONUtils.toMap(this.namespace);
         String namespaceName = namespace.get(NAMESPACE_NAME);
         String clusterName = namespace.get(CLUSTER);
+        Map<String, String> labelMap = new HashMap<>();
+        labelMap.put("test", "1234");
         k8sTaskExecutor = new K8sTaskExecutor(null, taskRequest);
         k8sTaskMainParameters = new K8sTaskMainParameters();
         k8sTaskMainParameters.setImage(image);
@@ -63,6 +66,7 @@ public class K8sTaskExecutorTest {
         k8sTaskMainParameters.setMinCpuCores(minCpuCores);
         k8sTaskMainParameters.setMinMemorySpace(minMemorySpace);
         k8sTaskMainParameters.setCommand("[\"perl\" ,\"-Mbignum=bpi\", \"-wle\", \"print bpi(2000)\"]");
+        k8sTaskMainParameters.setLabelMap(labelMap);
         job = k8sTaskExecutor.buildK8sJob(k8sTaskMainParameters);
     }
     @Test

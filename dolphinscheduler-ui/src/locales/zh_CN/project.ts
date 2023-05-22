@@ -37,10 +37,10 @@ export default {
     confirm: '确定',
     cancel: '取消',
     delete_confirm: '确定删除吗?',
-    authorize_level:'权限等级',
+    authorize_level: '权限等级',
     no_permission: '无权限',
     read_permission: '读权限',
-    all_permission: '所有权限',
+    all_permission: '所有权限'
   },
   workflow: {
     on_line: '线上',
@@ -82,12 +82,16 @@ export default {
     up_line: '上线',
     down_line: '下线',
     copy_workflow: '复制工作流',
+    copy_workflow_name: '复制工作流名称',
+    visit_workflow_instances: '查看工作流实例',
     cron_manage: '定时管理',
     delete: '删除',
     tree_view: '工作流树形图',
     tree_limit: '限制大小',
     export: '导出',
     batch_copy: '批量复制',
+    batch_delete: '批量删除',
+    batch_export: '批量导出',
     version_info: '版本信息',
     version: '版本',
     file_upload: '文件上传',
@@ -217,7 +221,7 @@ export default {
     workflow_relation_no_data_result_desc:
       '目前没有任何工作流，请先创建工作流，再访问该页面',
     ready_to_block: '准备锁定',
-    block: '锁定',
+    block: '锁定'
   },
   task: {
     on_line: '线上',
@@ -331,7 +335,7 @@ export default {
     online: '已上线'
   },
   node: {
-    is_cache: "缓存执行",
+    is_cache: '缓存执行',
     is_module_path: '使用模块路径',
     run_type: '运行类型',
     jvm_args: '虚拟机参数',
@@ -369,6 +373,7 @@ export default {
     times: '次',
     failed_retry_interval: '失败重试间隔',
     minute: '分',
+    second: '秒',
     delay_execution_time: '延时执行时间',
     namespace_cluster: '命名空间(集群)',
     min_cpu: '最小cpu',
@@ -413,6 +418,10 @@ export default {
     prop_repeat: 'prop中有重复',
     value_tips: 'value(选填)',
     value_required_tips: 'value(必填)',
+    custom_labels: '自定义标签',
+    label_repeat: 'label中有重复',
+    label_name_tips: 'label name(必填)',
+    label_value_tips: 'label value(必填)',
     pre_tasks: '前置任务',
     program_type: '程序类型',
     main_class: '主函数的Class',
@@ -607,6 +616,7 @@ export default {
     add_dependency: '添加依赖',
     waiting_dependent_start: '等待依赖启动',
     check_interval: '检查间隔',
+    check_interval_tips: '检查间隔必须为正整数',
     waiting_dependent_complete: '等待依赖完成',
     project_name: '项目名称',
     project_name_tips: '项目名称（必填）',
@@ -769,6 +779,8 @@ export default {
     custom_config: '自定义配置',
     engine: '引擎',
     engine_tips: '请选择引擎',
+    startup_script: '启动脚本',
+    startup_script_tips: '请选择启动脚本',
     run_mode: '运行模式',
     dinky_address: 'dinky 地址',
     dinky_address_tips: '请输入 Dinky 地址',
@@ -791,7 +803,12 @@ export default {
     pipeline_name: 'pipeline名称',
     factory_tips: '请选择工厂',
     resource_group_tips: '请选择资源组',
-    pipeline_tips: '请选择pipeline'
+    pipeline_tips: '请选择pipeline',
+    dependent_failure_policy: '依赖失败策略',
+    dependent_failure_policy_failure: '失败',
+    dependent_failure_policy_waiting: '等待',
+    dependent_failure_waiting_time: '依赖失败等待时间',
+    dependent_failure_waiting_time_tips: '失败等待时间必须为正整数'
   },
   menu: {
     fav: '收藏组件',
@@ -801,6 +818,6 @@ export default {
     di: '数据集成',
     dq: '数据质量',
     ml: '机器学习',
-    other: '其他',
+    other: '其他'
   }
 }

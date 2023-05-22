@@ -23,8 +23,7 @@ import type {
   ISqoopTargetParams,
   ISqoopSourceParams,
   ILocalParam,
-  IDependTask,
-  RelationType
+  IDependentParameters
 } from './types'
 
 export function formatParams(data: INodeData): {
@@ -216,21 +215,21 @@ export function formatParams(data: INodeData): {
   }
 
   if (data.taskType === 'SEATUNNEL') {
-    taskParams.engine = data.engine
+    taskParams.startupScript = data.startupScript
     taskParams.useCustom = data.useCustom
     taskParams.rawScript = data.rawScript
-    switch (data.engine) {
-      case 'FLINK':
-        taskParams.runMode = data.runMode
-        taskParams.others = data.others
-        break
-      case 'SPARK':
-        taskParams.deployMode = data.deployMode
-        taskParams.master = data.master
-        taskParams.masterUrl = data.masterUrl
-        break
-      default:
-        break
+    if (data.startupScript?.includes("flink")) {
+      taskParams.runMode = data.runMode
+      taskParams.others = data.others
+    }
+    if (data.startupScript?.includes("spark")) {
+      taskParams.deployMode = data.deployMode
+      taskParams.master = data.master
+      taskParams.masterUrl = data.masterUrl
+    }
+    if (data.startupScript === "seatunnel.sh") {
+      taskParams.deployMode = data.deployMode
+      taskParams.others = data.others
     }
   }
 
@@ -279,6 +278,9 @@ export function formatParams(data: INodeData): {
   }
   if (data.taskType === 'DEPENDENT') {
     taskParams.dependence = {
+      checkInterval: data.checkInterval,
+      failurePolicy: data.failurePolicy,
+      failureWaitingTime: data.failureWaitingTime,
       relation: data.relation,
       dependTaskList: data.dependTaskList
     }
@@ -347,6 +349,7 @@ export function formatParams(data: INodeData): {
     taskParams.image = data.image
     taskParams.command = data.command
     taskParams.args = data.args
+    taskParams.customizedLabels = data.customizedLabels
   }
 
   if (data.taskType === 'JUPYTER') {
@@ -650,7 +653,12 @@ export function formatModel(data: ITaskData) {
   }
 
   if (data.taskParams?.dependence) {
-    const dependence: { relation?: RelationType, dependTaskList?: IDependTask[] } = JSON.parse(JSON.stringify(data.taskParams.dependence))
+    const dependence: IDependentParameters = JSON.parse(
+      JSON.stringify(data.taskParams.dependence)
+    )
+    params.checkInterval = dependence.checkInterval
+    params.failurePolicy = dependence.failurePolicy
+    params.failureWaitingTime = dependence.failureWaitingTime
     params.dependTaskList = dependence.dependTaskList || []
     params.relation = dependence.relation
   }

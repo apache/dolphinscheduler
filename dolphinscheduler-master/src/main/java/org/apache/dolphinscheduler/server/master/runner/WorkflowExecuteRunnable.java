@@ -119,7 +119,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -312,10 +311,9 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
             if (stateEvent == null) {
                 return;
             }
-            try (
-                    final LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
-                            LogUtils.setWorkflowAndTaskInstanceIDMDC(stateEvent.getProcessInstanceId(),
-                                    stateEvent.getTaskInstanceId())) {
+            try {
+                LogUtils.setWorkflowAndTaskInstanceIDMDC(stateEvent.getProcessInstanceId(),
+                        stateEvent.getTaskInstanceId());
                 // if state handle success then will remove this state, otherwise will retry this state next time.
                 // The state should always handle success except database error.
                 checkProcessInstance(stateEvent);
@@ -329,7 +327,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
                     this.stateEvents.remove(stateEvent);
                 }
             } catch (StateEventHandleError stateEventHandleError) {
-                log.error("State event handle error, will remove this event: {}", stateEvent, stateEventHandleError);
+                log.error("State event handle error, will remove this event: {}", stateEvent,
+                        stateEventHandleError);
                 this.stateEvents.remove(stateEvent);
                 ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
             } catch (StateEventHandleException stateEventHandleException) {
@@ -345,12 +344,15 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
                 this.stateEvents.offer(stateEvent);
                 ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
             } catch (Exception e) {
-                // we catch the exception here, since if the state event handle failed, the state event will still keep
+                // we catch the exception here, since if the state event handle failed, the state event will still
+                // keep
                 // in the stateEvents queue.
                 log.error("State event handle error, get a unknown exception, will retry this event: {}",
                         stateEvent,
                         e);
                 ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
+            } finally {
+                LogUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
         }
     }
@@ -737,9 +739,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
     @Override
     public WorkflowSubmitStatus call() {
 
-        try (
-                LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
-                        LogUtils.setWorkflowInstanceIdMDC(processInstance.getId())) {
+        try {
+            LogUtils.setWorkflowInstanceIdMDC(processInstance.getId());
             if (isStart()) {
                 // This case should not been happened
                 log.warn("The workflow has already been started, current state: {}", workflowRunnableStatus);
@@ -764,6 +765,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
         } catch (Exception e) {
             log.error("Start workflow error", e);
             return WorkflowSubmitStatus.FAILED;
+        } finally {
+            LogUtils.removeWorkflowInstanceIdMDC();
         }
     }
 
@@ -1860,18 +1863,16 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
                     continue;
                 }
                 DefaultTaskExecuteRunnable defaultTaskExecuteRunnable = taskExecuteRunnableMap.get(taskCode);
-                CompletableFuture.runAsync(defaultTaskExecuteRunnable::kill)
-                        .thenRun(() -> {
-                            if (defaultTaskExecuteRunnable.getTaskInstance().getState().isFinished()) {
-                                TaskStateEvent taskStateEvent = TaskStateEvent.builder()
-                                        .processInstanceId(processInstance.getId())
-                                        .taskInstanceId(taskInstance.getId())
-                                        .status(defaultTaskExecuteRunnable.getTaskInstance().getState())
-                                        .type(StateEventType.TASK_STATE_CHANGE)
-                                        .build();
-                                this.addStateEvent(taskStateEvent);
-                            }
-                        });
+                defaultTaskExecuteRunnable.kill();
+                if (defaultTaskExecuteRunnable.getTaskInstance().getState().isFinished()) {
+                    TaskStateEvent taskStateEvent = TaskStateEvent.builder()
+                            .processInstanceId(processInstance.getId())
+                            .taskInstanceId(taskInstance.getId())
+                            .status(defaultTaskExecuteRunnable.getTaskInstance().getState())
+                            .type(StateEventType.TASK_STATE_CHANGE)
+                            .build();
+                    this.addStateEvent(taskStateEvent);
+                }
             }
         }
     }
@@ -1913,8 +1914,6 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
             if (DependResult.SUCCESS == dependResult) {
                 log.info("The dependResult of task {} is success, so ready to submit to execute", task.getName());
                 if (!executeTask(task)) {
-                    // todo: don't ste 0 here
-                    task.setId(0);
                     this.taskFailedSubmit = true;
                     // Remove and add to complete map and error map
                     if (!removeTaskFromStandbyList(task)) {

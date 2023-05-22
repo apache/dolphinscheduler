@@ -123,26 +123,28 @@ public class WorkerFailoverService {
                     final LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
                             LogUtils.setWorkflowAndTaskInstanceIDMDC(taskInstance.getProcessInstanceId(),
                                     taskInstance.getId())) {
-                ProcessInstance processInstance = processInstanceCacheMap.computeIfAbsent(
-                        taskInstance.getProcessInstanceId(), k -> {
-                            WorkflowExecuteRunnable workflowExecuteRunnable = cacheManager.getByProcessInstanceId(
-                                    taskInstance.getProcessInstanceId());
-                            if (workflowExecuteRunnable == null) {
-                                return null;
-                            }
-                            return workflowExecuteRunnable.getProcessInstance();
-                        });
-                if (!checkTaskInstanceNeedFailover(needFailoverWorkerStartTime, processInstance, taskInstance)) {
-                    log.info("Worker[{}] the current taskInstance doesn't need to failover", workerHost);
-                    continue;
+                try {
+                    ProcessInstance processInstance = processInstanceCacheMap.computeIfAbsent(
+                            taskInstance.getProcessInstanceId(), k -> {
+                                WorkflowExecuteRunnable workflowExecuteRunnable = cacheManager.getByProcessInstanceId(
+                                        taskInstance.getProcessInstanceId());
+                                if (workflowExecuteRunnable == null) {
+                                    return null;
+                                }
+                                return workflowExecuteRunnable.getProcessInstance();
+                            });
+                    if (!checkTaskInstanceNeedFailover(needFailoverWorkerStartTime, processInstance, taskInstance)) {
+                        log.info("Worker[{}] the current taskInstance doesn't need to failover", workerHost);
+                        continue;
+                    }
+                    log.info(
+                            "Worker[{}] failover: begin to failover taskInstance, will set the status to NEED_FAULT_TOLERANCE",
+                            workerHost);
+                    failoverTaskInstance(processInstance, taskInstance);
+                    log.info("Worker[{}] failover: Finish failover taskInstance", workerHost);
+                } catch (Exception ex) {
+                    log.info("Worker[{}] failover taskInstance occur exception", workerHost, ex);
                 }
-                log.info(
-                        "Worker[{}] failover: begin to failover taskInstance, will set the status to NEED_FAULT_TOLERANCE",
-                        workerHost);
-                failoverTaskInstance(processInstance, taskInstance);
-                log.info("Worker[{}] failover: Finish failover taskInstance", workerHost);
-            } catch (Exception ex) {
-                log.info("Worker[{}] failover taskInstance occur exception", workerHost, ex);
             }
         }
         failoverTimeCost.stop();

@@ -35,4 +35,5 @@ public class K8sTaskMainParameters {
     private double minCpuCores;
     private double minMemorySpace;
     private Map<String, String> paramsMap;
+    private Map<String, String> labelMap;
 }
