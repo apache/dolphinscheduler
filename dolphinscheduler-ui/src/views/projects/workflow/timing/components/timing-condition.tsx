@@ -66,11 +66,8 @@ export default defineComponent({
       })
     }
 
-    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
-
     return {
       handleSearch,
-      trim,
       processDefinitionOptions,
       processDefineCodeRef
     }
