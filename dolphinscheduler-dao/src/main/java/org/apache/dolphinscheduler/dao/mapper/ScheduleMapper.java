@@ -73,10 +73,9 @@ public interface ScheduleMapper extends BaseMapper<Schedule> {
      * @return scheduler IPage
      */
     IPage<Schedule> queryByProjectAndProcessDefineCodePaging(IPage<Schedule> page,
-        @Param("projectCode") long projectCode,
-        @Param("processDefinitionCode") long processDefinitionCode,
-        @Param("searchVal") String searchVal);
-
+                                                             @Param("projectCode") long projectCode,
+                                                             @Param("processDefinitionCode") long processDefinitionCode,
+                                                             @Param("searchVal") String searchVal);
 
     /**
      * Filter schedule

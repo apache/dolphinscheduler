@@ -19,8 +19,6 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT;
 
-import java.util.Objects;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.dolphinscheduler.api.dto.ScheduleParam;
 import org.apache.dolphinscheduler.api.dto.schedule.ScheduleCreateRequest;
 import org.apache.dolphinscheduler.api.dto.schedule.ScheduleFilterRequest;
@@ -582,7 +580,8 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Page<Schedule> page = new Page<>(pageNo, pageSize);
 
         IPage<Schedule> schedulePage =
-            scheduleMapper.queryByProjectAndProcessDefineCodePaging(page, projectCode, processDefineCode, searchVal);
+                scheduleMapper.queryByProjectAndProcessDefineCodePaging(page, projectCode, processDefineCode,
+                        searchVal);
 
         List<ScheduleVo> scheduleList = new ArrayList<>();
         for (Schedule schedule : schedulePage.getRecords()) {

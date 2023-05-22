@@ -174,8 +174,8 @@ public class ScheduleMapperTest extends BaseDaoTest {
         scheduleMapper.updateById(schedule);
 
         Page<Schedule> page = new Page(1, 3);
-        IPage<Schedule> scheduleIPage = scheduleMapper.queryByProjectAndProcessDefineCodePaging(page,project.getCode(),
-            processDefinition.getCode(), "");
+        IPage<Schedule> scheduleIPage = scheduleMapper.queryByProjectAndProcessDefineCodePaging(page, project.getCode(),
+                processDefinition.getCode(), "");
         Assertions.assertNotEquals(scheduleIPage.getSize(), 0);
     }
 
