@@ -580,8 +580,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         }
 
         Page<Schedule> page = new Page<>(pageNo, pageSize);
-        // IPage<Schedule> schedulePage =
-        //         scheduleMapper.queryByProcessDefineCodePaging(page, processDefineCode, searchVal);
+
         IPage<Schedule> schedulePage =
             scheduleMapper.queryByProjectAndProcessDefineCodePaging(page, projectCode, processDefineCode, searchVal);
 
