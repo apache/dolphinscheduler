@@ -15,10 +15,8 @@
  * limitations under the License.
  */
 
-export interface ISearchParam {
-  pageSize: number
-  pageNo: number
-  projectCode: number
+interface ITimingSearch {
   processDefinitionCode: number
-  searchVal: string | undefined
 }
+
+export { ITimingSearch }

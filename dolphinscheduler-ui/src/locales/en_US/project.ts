@@ -83,7 +83,7 @@ export default {
     copy_workflow: 'Copy Workflow',
     copy_workflow_name: 'Copy workflow name',
     visit_workflow_instances: 'Visit workflow instances',
-    cron_manage: 'Cron manage',
+    cron_manage: 'Timing Management',
     delete: 'Delete',
     tree_view: 'Tree View',
     tree_limit: 'Limit Size',

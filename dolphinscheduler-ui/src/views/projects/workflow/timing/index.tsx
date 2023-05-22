@@ -15,15 +15,15 @@
  * limitations under the License.
  */
 
-import { ArrowLeftOutlined } from '@vicons/antd'
-import { NButton, NDataTable, NIcon, NPagination, NSpace } from 'naive-ui'
+import {  NDataTable, NPagination, NSpace } from 'naive-ui'
 import { defineComponent, onMounted, toRefs, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
 import { useTable } from '../definition/timing/use-table'
 import Card from '@/components/card'
 import TimingModal from '../definition/components/timing-modal'
-import type { Router } from 'vue-router'
+import TimingCondition
+  from "@/views/projects/workflow/timing/components/timing-condition";
+import { ITimingSearch } from "@/views/projects/workflow/timing/types";
 
 export default defineComponent({
   name: 'WorkflowTimingList',
@@ -34,7 +34,9 @@ export default defineComponent({
       getTableData({
         pageSize: variables.pageSize,
         pageNo: variables.page,
-        searchVal: variables.searchVal
+        searchVal: variables.searchVal,
+        projectCode: variables.projectCode,
+        processDefinitionCode: variables.processDefinitionCode
       })
     }
 
@@ -42,7 +44,8 @@ export default defineComponent({
       requestData()
     }
 
-    const handleSearch = () => {
+    const handleSearch = (params: ITimingSearch) => {
+      variables.processDefinitionCode = params.processDefinitionCode
       variables.page = 1
       requestData()
     }
@@ -71,17 +74,12 @@ export default defineComponent({
   },
   render() {
     const { t } = useI18n()
-    const router: Router = useRouter()
     const { loadingRef } = this
 
     return (
       <NSpace vertical>
         <Card>
-          <NButton type='primary' size='small' onClick={() => router.go(-1)}>
-            <NIcon>
-              <ArrowLeftOutlined />
-            </NIcon>
-          </NButton>
+          <TimingCondition onHandleSearch={this.handleSearch} />
         </Card>
         <Card title={t('project.workflow.cron_manage')}>
           <NSpace vertical>
