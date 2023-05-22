@@ -45,7 +45,7 @@ export function useChunjun({
     workerGroup: 'default',
     delayTime: 0,
     timeout: 30,
-    customConfig: false,
+    customConfig: true,
     preStatements: [],
     postStatements: [],
     timeoutNotifyStrategy: ['WARN']
