@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.LoggerUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ExecutionStatus;
@@ -131,7 +132,7 @@ public class TaskDispatchProcessor implements NettyRequestProcessor {
                 }
 
                 // check if the OS user exists
-                if (!OSUtils.getUserList().contains(taskExecutionContext.getTenantCode())) {
+                if (PropertyUtils.getBoolean(Constants.SUDO_ENABLE, true) && !OSUtils.getUserList().contains(taskExecutionContext.getTenantCode())) {
                     logger.error("tenantCode: {} does not exist, taskInstanceId: {}",
                                  taskExecutionContext.getTenantCode(),
                                  taskExecutionContext.getTaskInstanceId());
