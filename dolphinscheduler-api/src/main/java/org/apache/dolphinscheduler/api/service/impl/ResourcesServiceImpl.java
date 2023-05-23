@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.api.dto.resources.visitor.ResourceTreeVisitor
 import org.apache.dolphinscheduler.api.dto.resources.visitor.Visitor;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.metrics.ApiServerMetrics;
 import org.apache.dolphinscheduler.api.service.ResourcesService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.RegexUtils;
@@ -64,6 +65,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -277,8 +279,9 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             throw new ServiceException(
                     String.format("upload resource: %s file: %s failed.", name, file.getOriginalFilename()));
         } else
-            log.info("Upload resource file complete, resourceName:{}, fileName:{}.",
-                    RegexUtils.escapeNRT(name), RegexUtils.escapeNRT(file.getOriginalFilename()));
+            ApiServerMetrics.recordApiResourceUploadSize(file.getSize());
+        log.info("Upload resource file complete, resourceName:{}, fileName:{}.",
+                RegexUtils.escapeNRT(name), RegexUtils.escapeNRT(file.getOriginalFilename()));
         return result;
     }
 
@@ -467,6 +470,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 }
             }
 
+            ApiServerMetrics.recordApiResourceUploadSize(file.getSize());
             return result;
         }
 
@@ -1143,6 +1147,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         try {
             if (storageOperate.exists(fullName)) {
                 content = storageOperate.vimFile(tenantCode, fullName, skipLineNum, limit);
+                long size = content.stream().mapToLong(String::length).sum();
+                ApiServerMetrics.recordApiResourceDownloadSize(size);
             } else {
                 log.error("read file {} not exist in storage", fullName);
                 putMsg(result, Status.RESOURCE_FILE_NOT_EXIST, fullName);
@@ -1463,6 +1469,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         try {
             storageOperate.download(tenantCode, fullName, localFileName, true);
+            ApiServerMetrics.recordApiResourceDownloadSize(java.nio.file.Files.size(Paths.get(localFileName)));
             return org.apache.dolphinscheduler.api.utils.FileUtils.file2Resource(localFileName);
         } catch (IOException e) {
             log.error("Download resource error, the path is {}, and local filename is {}, the error message is {}",

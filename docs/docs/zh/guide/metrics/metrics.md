@@ -17,7 +17,7 @@ cd dolphinscheduler-meter/src/main/resources/grafana-demo
 docker compose up
 ```
 
-然后，您即可通过http://localhost/3001`链接访问`Grafana`面板。
+然后，您即可通过`http://localhost:3001`链接访问`Grafana`面板。
 
 ![image.png](../../../../img/metrics/metrics-master.png)
 ![image.png](../../../../img/metrics/metrics-worker.png)
@@ -111,7 +111,11 @@ metrics exporter端口`server.port`是在application.yaml里定义的: master: `
 
 ### Api Server指标
 
-- 目前我们尚未提供任何Api Server指标
+- ds.api.request.count: (counter) api请求次数
+- ds.api.response.count: (counter) api响应次数，可由标签`code`切分
+- ds.api.response.time: (histogram) api响应时间分布
+- ds.api.resource.upload.size: (histogram) api上传资源文件大小的分布（bytes）
+- ds.api.resource.download.size: (histogram) api下载资源文件大小的分布（bytes）
 
 ### Alert Server指标
 
