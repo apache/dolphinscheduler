@@ -43,7 +43,7 @@ import TimingModal from './components/timing-modal'
 import VersionModal from './components/version-modal'
 import CopyModal from './components/copy-modal'
 import type { Router } from 'vue-router'
-import Search from "@/components/input-search";
+import Search from '@/components/input-search'
 
 export default defineComponent({
   name: 'WorkflowDefinitionList',
@@ -158,15 +158,15 @@ export default defineComponent({
               >
                 {t('project.workflow.create_workflow')}
               </NButton>
-              {
-                this.uiSettingStore.getDynamicTask && <NButton
+              {this.uiSettingStore.getDynamicTask && (
+                <NButton
                   type='warning'
                   size='small'
                   onClick={this.createDefinitionDynamic}
                 >
                   {t('project.workflow.create_workflow_dynamic')}
                 </NButton>
-              }
+              )}
               <NButton
                 strong
                 secondary
@@ -178,7 +178,7 @@ export default defineComponent({
             </NSpace>
             <NSpace>
               <Search
-                placeholder = {t('resource.function.enter_keyword_tips')}
+                placeholder={t('resource.function.enter_keyword_tips')}
                 v-model:value={this.searchVal}
                 onSearch={this.handleSearch}
                 onClear={this.onClearSearch}

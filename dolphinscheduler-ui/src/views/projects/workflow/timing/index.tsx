@@ -15,15 +15,14 @@
  * limitations under the License.
  */
 
-import {  NDataTable, NPagination, NSpace } from 'naive-ui'
+import { NDataTable, NPagination, NSpace } from 'naive-ui'
 import { defineComponent, onMounted, toRefs, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useTable } from '../definition/timing/use-table'
 import Card from '@/components/card'
 import TimingModal from '../definition/components/timing-modal'
-import TimingCondition
-  from "@/views/projects/workflow/timing/components/timing-condition";
-import { ITimingSearch } from "@/views/projects/workflow/timing/types";
+import TimingCondition from '@/views/projects/workflow/timing/components/timing-condition'
+import { ITimingSearch } from '@/views/projects/workflow/timing/types'
 
 export default defineComponent({
   name: 'WorkflowTimingList',

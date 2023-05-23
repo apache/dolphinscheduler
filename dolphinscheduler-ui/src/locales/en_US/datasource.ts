@@ -90,10 +90,10 @@ export default {
   clientSecret: 'ClientSecret',
   OAuth_token_endpoint: 'OAuth 2.0 token endpoint',
   endpoint_tips: 'Please enter OAuth Token',
-  AccessKeyID:'AccessKeyID',
-  AccessKeyID_tips:'Please input AccessKeyID',
-  SecretAccessKey:'SecretAccessKey',
-  SecretAccessKey_tips:'Please input SecretAccessKey',
-  dbUser:'DbUser',
-  dbUser_tips:'Please input DbUser',
+  AccessKeyID: 'AccessKeyID',
+  AccessKeyID_tips: 'Please input AccessKeyID',
+  SecretAccessKey: 'SecretAccessKey',
+  SecretAccessKey_tips: 'Please input SecretAccessKey',
+  dbUser: 'DbUser',
+  dbUser_tips: 'Please input DbUser'
 }

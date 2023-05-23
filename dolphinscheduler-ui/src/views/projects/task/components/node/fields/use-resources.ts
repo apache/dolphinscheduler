@@ -41,7 +41,7 @@ export function useResources(
     }
     if (resourcesLoading.value) return
     resourcesLoading.value = true
-    const res = await queryResourceList({ type: 'FILE', fullName:"" })
+    const res = await queryResourceList({ type: 'FILE', fullName: '' })
     utils.removeUselessChildren(res)
     resourcesOptions.value = res || []
     resourcesLoading.value = false

@@ -85,7 +85,7 @@ export function useZeppelin(model: { [field: string]: any }): IJsonItem[] {
       field: 'password',
       name: t('project.node.zeppelin_password'),
       props: {
-        placeholder:  t('project.node.zeppelin_password_tips')
+        placeholder: t('project.node.zeppelin_password_tips')
       }
     },
     {

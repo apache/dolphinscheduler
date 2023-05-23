@@ -218,16 +218,16 @@ export function formatParams(data: INodeData): {
     taskParams.startupScript = data.startupScript
     taskParams.useCustom = data.useCustom
     taskParams.rawScript = data.rawScript
-    if (data.startupScript?.includes("flink")) {
+    if (data.startupScript?.includes('flink')) {
       taskParams.runMode = data.runMode
       taskParams.others = data.others
     }
-    if (data.startupScript?.includes("spark")) {
+    if (data.startupScript?.includes('spark')) {
       taskParams.deployMode = data.deployMode
       taskParams.master = data.master
       taskParams.masterUrl = data.masterUrl
     }
-    if (data.startupScript === "seatunnel.sh") {
+    if (data.startupScript === 'seatunnel.sh') {
       taskParams.deployMode = data.deployMode
       taskParams.others = data.others
     }
@@ -502,7 +502,7 @@ export function formatParams(data: INodeData): {
         : '0',
       failRetryTimes: data.failRetryTimes ? String(data.failRetryTimes) : '0',
       flag: data.flag,
-      isCache: data.isCache ? "YES" : "NO",
+      isCache: data.isCache ? 'YES' : 'NO',
       name: data.name,
       taskGroupId: data.taskGroupId,
       taskGroupPriority: data.taskGroupPriority,
@@ -514,7 +514,9 @@ export function formatParams(data: INodeData): {
         initScript: data.initScript,
         rawScript: data.rawScript,
         resourceList: data.resourceList?.length
-          ? data.resourceList.map((fullName: string) => ({ resourceName: `${fullName}` }))
+          ? data.resourceList.map((fullName: string) => ({
+              resourceName: `${fullName}`
+            }))
           : [],
         ...taskParams
       },
@@ -563,7 +565,7 @@ export function formatModel(data: ITaskData) {
   }
   if (data.taskParams?.resourceList) {
     params.resourceList = data.taskParams.resourceList.map(
-      (item: { resourceName: string }) => (`${item.resourceName}`)
+      (item: { resourceName: string }) => `${item.resourceName}`
     )
   }
   if (data.taskParams?.mainJar) {

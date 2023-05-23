@@ -98,7 +98,7 @@ export function useTable() {
             ButtonLink,
             {
               onClick: () => {
-                let routeUrl = router.resolve({
+                const routeUrl = router.resolve({
                   name: 'workflow-instance-detail',
                   params: { id: row.id },
                   query: { code: row.processDefinitionCode }

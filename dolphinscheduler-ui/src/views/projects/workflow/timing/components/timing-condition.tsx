@@ -16,15 +16,8 @@
  */
 
 import { SearchOutlined } from '@vicons/antd'
-import {
-  NButton,
-  NSelect,
-  NIcon,
-  NSpace,
-  NEllipsis
-} from 'naive-ui'
-import { defineComponent, getCurrentInstance, h, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { NButton, NSelect, NIcon, NSpace, NEllipsis } from 'naive-ui'
+import { defineComponent, h, ref } from 'vue'
 import { queryProcessDefinitionList } from '@/service/modules/process-definition'
 import { SelectMixedOption } from 'naive-ui/lib/select/src/interface'
 import { Router, useRouter } from 'vue-router'
@@ -73,8 +66,6 @@ export default defineComponent({
     }
   },
   render() {
-    const { t } = useI18n()
-
     return (
       <NSpace justify='end'>
         <NSelect

@@ -122,7 +122,7 @@ export function useDatasource(
       id: 16,
       code: 'DATABEND',
       disabled: false
-    },
+    }
   ]
 
   const getDatasourceTypes = async () => {

@@ -18,7 +18,7 @@
 import { h, ref, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import {NSpace, NTooltip, NButton, NPopconfirm, NTag} from 'naive-ui'
+import { NSpace, NTooltip, NButton, NPopconfirm, NTag } from 'naive-ui'
 import {
   deleteScheduleById,
   offline,
@@ -56,7 +56,9 @@ export function useTable() {
     totalPage: ref(1),
     showRef: ref(false),
     loadingRef: ref(false),
-    processDefinitionCode: router.currentRoute.value.params.definitionCode? ref(Number(router.currentRoute.value.params.definitionCode)):ref()
+    processDefinitionCode: router.currentRoute.value.params.definitionCode
+      ? ref(Number(router.currentRoute.value.params.definitionCode))
+      : ref()
   })
 
   const renderTime = (time: string, timeZone: string) => {
@@ -122,19 +124,19 @@ export function useTable() {
         render: (row: any) => {
           if (row.releaseState === 'ONLINE') {
             return h(
-                NTag,
-                {type: 'success', size: 'small'},
-                {
-                  default: () => t('project.workflow.up_line')
-                }
+              NTag,
+              { type: 'success', size: 'small' },
+              {
+                default: () => t('project.workflow.up_line')
+              }
             )
           } else {
             return h(
-                NTag,
-                {type: 'warning', size: 'small'},
-                {
-                  default: () => t('project.workflow.down_line')
-                }
+              NTag,
+              { type: 'warning', size: 'small' },
+              {
+                default: () => t('project.workflow.down_line')
+              }
             )
           }
         }
@@ -275,16 +277,15 @@ export function useTable() {
     if (variables.loadingRef) return
     variables.loadingRef = true
 
-    queryScheduleListPaging(
-      { ...params },
-      variables.projectCode
-    ).then((res: any) => {
-      variables.totalPage = res.totalPage
-      variables.tableData = res.totalList.map((item: any) => {
-        return { ...item }
-      })
-      variables.loadingRef = false
-    })
+    queryScheduleListPaging({ ...params }, variables.projectCode).then(
+      (res: any) => {
+        variables.totalPage = res.totalPage
+        variables.tableData = res.totalList.map((item: any) => {
+          return { ...item }
+        })
+        variables.loadingRef = false
+      }
+    )
   }
 
   const handleReleaseState = (row: any) => {
