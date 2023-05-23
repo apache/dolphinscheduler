@@ -814,7 +814,7 @@ export default {
     dependent_failure_policy_waiting: '等待',
     dependent_failure_waiting_time: '依赖失败等待时间',
     dependent_failure_waiting_time_tips: '失败等待时间必须为正整数',
-    max_num_of_sub_workflow_instances: '动态生成实例上线',
+    max_num_of_sub_workflow_instances: '动态生成实例上限',
     filter_condition: '过滤条件',
     params_value: '取值参数',
     separator: '分隔符',

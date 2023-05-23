@@ -838,7 +838,7 @@ export default {
     dependent_failure_waiting_time: 'Dependent failure waiting time',
     dependent_failure_waiting_time_tips:
       'Failure waiting time must be a positive integer',
-    max_num_of_sub_workflow_instances: '动态生成实例上线',
+    max_num_of_sub_workflow_instances: 'max num of sub workflow instances',
     filter_condition: 'Filter Condition',
     params_value: 'Params Value',
     separator: 'Separator',
