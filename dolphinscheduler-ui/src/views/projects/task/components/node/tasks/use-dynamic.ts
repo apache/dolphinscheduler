@@ -53,19 +53,6 @@ export function useDynamic({
     listParameters: [{ name: null, value: null, separator: ',' }]
   } as INodeData)
 
-  let extra: IJsonItem[] = []
-  if (from === 1) {
-    extra = [
-      Fields.useTaskType(model, readonly),
-      Fields.useProcessName({
-        model,
-        projectCode,
-        isCreate: !data?.id,
-        from,
-        processName: data?.processName
-      })
-    ]
-  }
   if (model.listParameters?.length) {
     model.listParameters[0].disabled = true
   }

@@ -52,7 +52,6 @@ import { useKubeflow } from './use-kubeflow'
 import { useLinkis } from './use-linkis'
 import { useDataFactory } from './use-data-factory'
 import { useRemoteShell } from './use-remote-shell'
-// @ts-ignore
 import { useDynamic } from './use-dynamic'
 
 export default {
