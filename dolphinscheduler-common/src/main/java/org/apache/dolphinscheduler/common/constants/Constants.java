@@ -798,6 +798,8 @@ public final class Constants {
     public static final String KERBEROS_KEY_TAB_USERNAME = "loginUserKeytabUsername";
     public static final String KERBEROS_KEY_TAB_PATH = "loginUserKeytabPath";
 
+    public static final String ORG_APACHE_HIVE_JDBC_HIVE_DRIVER = "org.apache.hive.jdbc.HiveDriver";
+
     public static final Integer QUERY_ALL_ON_SYSTEM = 0;
     public static final Integer QUERY_ALL_ON_PROJECT = 1;
     public static final Integer QUERY_ALL_ON_WORKFLOW = 2;

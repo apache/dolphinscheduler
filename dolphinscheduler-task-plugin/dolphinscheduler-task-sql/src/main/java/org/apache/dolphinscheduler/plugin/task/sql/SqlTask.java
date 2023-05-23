@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.sql;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
@@ -45,6 +46,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -71,12 +73,12 @@ public class SqlTask extends AbstractTask {
     /**
      * taskExecutionContext
      */
-    private TaskExecutionContext taskExecutionContext;
+    private final TaskExecutionContext taskExecutionContext;
 
     /**
      * sql parameters
      */
-    private SqlParameters sqlParameters;
+    private final SqlParameters sqlParameters;
 
     /**
      * base datasource
@@ -95,7 +97,7 @@ public class SqlTask extends AbstractTask {
      */
     private static final int QUERY_LIMIT = 10000;
 
-    private SQLTaskExecutionContext sqlTaskExecutionContext;
+    private final SQLTaskExecutionContext sqlTaskExecutionContext;
 
     public static final int TEST_FLAG_YES = 1;
 
@@ -148,6 +150,7 @@ public class SqlTask extends AbstractTask {
             baseConnectionParam = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
                     DbType.valueOf(sqlParameters.getType()),
                     sqlTaskExecutionContext.getConnectionParams());
+
             if (DbType.valueOf(sqlParameters.getType()).isSupportMultipleStatement()) {
                 separator = "";
             }
@@ -226,10 +229,15 @@ public class SqlTask extends AbstractTask {
                                   List<String> createFuncs) throws Exception {
         Connection connection = null;
         try {
-
             // create connection
-            connection = DataSourceClientProvider.getInstance().getConnection(DbType.valueOf(sqlParameters.getType()),
-                    baseConnectionParam);
+            if (DbType.valueOf(sqlParameters.getType()).isHive()) {
+                connection = createConnection();
+            } else {
+                connection =
+                        DataSourceClientProvider.getInstance().getConnection(DbType.valueOf(sqlParameters.getType()),
+                                baseConnectionParam);
+            }
+
             // create temp function
             if (CollectionUtils.isNotEmpty(createFuncs)) {
                 createTempFunction(connection, createFuncs);
@@ -572,6 +580,41 @@ public class SqlTask extends AbstractTask {
             String resourceFullName = value.getResourceName();
             return String.format("add jar %s", resourceFullName);
         }).collect(Collectors.toList());
+    }
+
+    /**
+     * create connection
+     *
+     * @return connection
+     * @throws Exception Exception
+     */
+    private Connection createConnection() throws Exception {
+        String url = buildUrl(baseConnectionParam.getJdbcUrl(), baseConnectionParam.getOther());
+        Class.forName(Constants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER);
+        Connection connection = DriverManager.getConnection(url,
+                baseConnectionParam.getUser(),
+                baseConnectionParam.getPassword());
+        DriverManager.setLoginTimeout(1800000);
+        return connection;
+    }
+
+    private static String buildUrl(String baseUrl, Map<String, String> properties) {
+        StringBuilder urlBuilder = new StringBuilder(baseUrl);
+
+        if (!properties.isEmpty()) {
+            urlBuilder.append("?");
+
+            for (Map.Entry<String, String> entry : properties.entrySet()) {
+                urlBuilder.append(entry.getKey())
+                        .append("=")
+                        .append(entry.getValue())
+                        .append(";");
+            }
+
+            urlBuilder.deleteCharAt(urlBuilder.length() - 1);
+        }
+
+        return urlBuilder.toString();
     }
 
 }
