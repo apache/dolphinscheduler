@@ -229,7 +229,6 @@ public class SqlTask extends AbstractTask {
                                   List<String> createFuncs) throws Exception {
         Connection connection = null;
         try {
-            // create connection
             if (DbType.valueOf(sqlParameters.getType()).isHive()) {
                 connection = createConnection();
             } else {
