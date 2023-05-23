@@ -1,4 +1,4 @@
-<!--Thanks very much for contributing to Apache DolphinScheduler. Please review https://dolphinscheduler.apache.org/en-us/community/development/pull-request.html before opening a pull request.-->
+<!--Thanks very much for contributing to Apache DolphinScheduler, we are happy that you want to help us improve DolphinScheduler! -->
 
 ## Purpose of the pull request
 
