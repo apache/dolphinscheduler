@@ -22,7 +22,6 @@ import static ch.qos.logback.classic.ClassicConstants.FINALIZE_SESSION_MARKER;
 import org.apache.dolphinscheduler.common.log.remote.RemoteLogUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.log.TaskInstanceLogHeader;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
@@ -59,7 +58,7 @@ public abstract class MasterTaskExecuteRunnable implements Runnable {
     protected void afterThrowing(Throwable throwable) {
         try {
             cancelTask();
-            log.info("Get a exception when execute the task, canceled the task");
+            log.error("Get a exception when execute the task, canceled the task", throwable);
         } catch (Exception e) {
             log.error("Cancel task failed,", e);
         }
@@ -68,7 +67,8 @@ public abstract class MasterTaskExecuteRunnable implements Runnable {
         log.info(
                 "Get a exception when execute the task, sent the task execute result to master, the current task execute result is {}",
                 taskExecutionContext.getCurrentExecutionStatus());
-        TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+        MasterTaskExecutionContextHolder.removeTaskExecutionContext(taskExecutionContext.getTaskInstanceId());
+        MasterTaskExecuteRunnableHolder.removeMasterTaskExecuteRunnable(taskExecutionContext.getTaskInstanceId());
         log.info("Get a exception when execute the task, removed the TaskExecutionContext");
     }
 

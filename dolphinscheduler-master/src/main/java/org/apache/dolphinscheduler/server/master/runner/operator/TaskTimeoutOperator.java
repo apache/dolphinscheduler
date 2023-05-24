@@ -19,11 +19,8 @@ package org.apache.dolphinscheduler.server.master.runner.operator;
 
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnable;
-
-import java.util.Date;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -51,9 +48,8 @@ public class TaskTimeoutOperator implements TaskOperator {
                     taskInstance.getName(), taskTimeoutStrategy.name());
             return;
         }
-        log.info("TaskInstance: {} timeout, will kill the task instance", taskInstance.getName());
-        taskInstance.setState(TaskExecutionStatus.FAILURE);
-        taskInstance.setEndTime(new Date());
-        taskInstanceDao.upsertTaskInstance(taskInstance);
+        taskExecuteRunnable.kill();
+        log.info("TaskInstance: {} timeout, killed the task instance", taskInstance.getName());
+
     }
 }

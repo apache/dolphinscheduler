@@ -26,8 +26,8 @@ import org.apache.dolphinscheduler.remote.command.task.TaskKillRequest;
 import org.apache.dolphinscheduler.remote.processor.MasterRpcProcessor;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
 import org.apache.dolphinscheduler.server.master.runner.MasterDelayTaskExecuteRunnableDelayQueue;
-import org.apache.dolphinscheduler.server.master.runner.MasterTaskExecuteRunnableThreadPool;
 import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecuteRunnableHolder;
 import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecutionContextHolder;
 
 import lombok.extern.slf4j.Slf4j;
@@ -40,9 +40,6 @@ import io.netty.channel.Channel;
 @Slf4j
 @Component
 public class MasterTaskKillProcessor implements MasterRpcProcessor {
-
-    @Autowired
-    private MasterTaskExecuteRunnableThreadPool masterTaskExecuteRunnableThreadPool;
 
     @Autowired
     private MasterDelayTaskExecuteRunnableDelayQueue masterDelayTaskExecuteRunnableDelayQueue;
@@ -60,7 +57,7 @@ public class MasterTaskKillProcessor implements MasterRpcProcessor {
                 return;
             }
             MasterTaskExecuteRunnable masterTaskExecuteRunnable =
-                    masterTaskExecuteRunnableThreadPool.getMasterTaskExecuteRunnable(taskInstanceId);
+                    MasterTaskExecuteRunnableHolder.getMasterTaskExecuteRunnable(taskInstanceId);
             if (masterTaskExecuteRunnable == null) {
                 log.error("Cannot find the MasterTaskExecuteRunnable, this task may already been killed");
                 return;
@@ -71,6 +68,9 @@ public class MasterTaskKillProcessor implements MasterRpcProcessor {
                         .removeMasterDelayTaskExecuteRunnable(masterTaskExecuteRunnable);
             } catch (MasterTaskExecuteException e) {
                 log.error("Cancel MasterTaskExecuteRunnable failed ", e);
+            } finally {
+                MasterTaskExecutionContextHolder.removeTaskExecutionContext(taskInstanceId);
+                MasterTaskExecuteRunnableHolder.removeMasterTaskExecuteRunnable(taskInstanceId);
             }
         }
     }
