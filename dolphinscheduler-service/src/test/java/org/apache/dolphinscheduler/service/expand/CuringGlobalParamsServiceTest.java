@@ -47,6 +47,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.google.common.collect.Lists;
+
 @ExtendWith(MockitoExtension.class)
 public class CuringGlobalParamsServiceTest {
 
@@ -175,15 +177,25 @@ public class CuringGlobalParamsServiceTest {
 
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setName("TaskName-1");
+        taskDefinition.setCode(1000001l);
 
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(2);
         processInstance.setCommandParam("{\"" + Constants.SCHEDULE_TIMEZONE + "\":\"Asia/Shanghai\"}");
         processInstance.setHistoryCmd(CommandType.COMPLEMENT_DATA.toString());
+        Property property = new Property();
+        property.setDirect(Direct.IN);
+        property.setProp("global_params");
+        property.setValue("hello world");
+        property.setType(DataType.VARCHAR);
+        List<Property> properties = Lists.newArrayList(property);
+        processInstance.setGlobalParams(JSONUtils.toJsonString(properties));
 
         ProcessDefinition processDefinition = new ProcessDefinition();
         processDefinition.setName("ProcessName-1");
         processDefinition.setProjectName("ProjectName-1");
+        processDefinition.setProjectCode(3000001l);
+        processDefinition.setCode(200001l);
 
         processInstance.setProcessDefinition(processDefinition);
         taskInstance.setProcessDefine(processDefinition);
@@ -205,5 +217,11 @@ public class CuringGlobalParamsServiceTest {
                 processDefinition.getName());
         Assertions.assertEquals(propertyMap.get(TaskConstants.PARAMETER_PROJECT_NAME).getValue(),
                 processDefinition.getProjectName());
+        Assertions.assertEquals(propertyMap.get(TaskConstants.PARAMETER_PROJECT_CODE).getValue(),
+                String.valueOf(processDefinition.getProjectCode()));
+        Assertions.assertEquals(propertyMap.get(TaskConstants.PARAMETER_TASK_DEFINITION_CODE).getValue(),
+                String.valueOf(taskDefinition.getCode()));
+        Assertions.assertEquals(propertyMap.get(TaskConstants.PARAMETER_WORKFLOW_DEFINITION_CODE).getValue(),
+                String.valueOf(processDefinition.getCode()));
     }
 }

@@ -190,6 +190,11 @@ public class TaskConstants {
     public static final String PARAMETER_TASK_INSTANCE_ID = "system.task.instance.id";
 
     /**
+     * the definition code of current task
+     */
+    public static final String PARAMETER_TASK_DEFINITION_CODE = "system.task.definition.code";
+
+    /**
      * the definition name of current task
      */
     public static final String PARAMETER_TASK_DEFINITION_NAME = "system.task.definition.name";
@@ -200,9 +205,19 @@ public class TaskConstants {
     public static final String PARAMETER_WORKFLOW_INSTANCE_ID = "system.workflow.instance.id";
 
     /**
+     * the definition code of the workflow to which current task belongs
+     */
+    public static final String PARAMETER_WORKFLOW_DEFINITION_CODE = "system.workflow.definition.code";
+
+    /**
      * the definition name of the workflow to which current task belongs
      */
     public static final String PARAMETER_WORKFLOW_DEFINITION_NAME = "system.workflow.definition.name";
+
+    /**
+     * the code of the project to which current task belongs
+     */
+    public static final String PARAMETER_PROJECT_CODE = "system.project.code";
 
     /**
      * the name of the project to which current task belongs

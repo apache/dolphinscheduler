@@ -17,10 +17,13 @@
 
 package org.apache.dolphinscheduler.service.expand;
 
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_PROJECT_CODE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_PROJECT_NAME;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_TASK_DEFINITION_CODE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_TASK_DEFINITION_NAME;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_TASK_EXECUTE_PATH;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_TASK_INSTANCE_ID;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_WORKFLOW_DEFINITION_CODE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_WORKFLOW_DEFINITION_NAME;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_WORKFLOW_INSTANCE_ID;
 
@@ -155,6 +158,10 @@ public class CuringGlobalParams implements CuringParamsService {
         Map<String, String> cmdParam = JSONUtils.toMap(processInstance.getCommandParam());
         String timeZone = cmdParam.get(Constants.SCHEDULE_TIMEZONE);
 
+        if (MapUtils.isEmpty(globalParams) && MapUtils.isEmpty(localParams) && MapUtils.isEmpty(varParams)) {
+            return null;
+        }
+
         // built-in params
         Map<String, String> params = setBuiltInParamsMap(taskInstance, timeZone);
 
@@ -219,10 +226,15 @@ public class CuringGlobalParams implements CuringParamsService {
         }
         params.put(PARAMETER_TASK_INSTANCE_ID, Integer.toString(taskInstance.getId()));
         params.put(PARAMETER_TASK_DEFINITION_NAME, taskInstance.getTaskDefine().getName());
+        params.put(PARAMETER_TASK_DEFINITION_CODE, Long.toString(taskInstance.getTaskDefine().getCode()));
         params.put(PARAMETER_WORKFLOW_INSTANCE_ID, Integer.toString(taskInstance.getProcessInstance().getId()));
         params.put(PARAMETER_WORKFLOW_DEFINITION_NAME,
                 taskInstance.getProcessInstance().getProcessDefinition().getName());
+        params.put(PARAMETER_WORKFLOW_DEFINITION_CODE,
+                Long.toString(taskInstance.getProcessInstance().getProcessDefinition().getCode()));
         params.put(PARAMETER_PROJECT_NAME, taskInstance.getProcessInstance().getProcessDefinition().getProjectName());
+        params.put(PARAMETER_PROJECT_CODE,
+                Long.toString(taskInstance.getProcessInstance().getProcessDefinition().getProjectCode()));
         return params;
     }
     private Map<String, String> setGlobalParamsMap(ProcessInstance processInstance) {
