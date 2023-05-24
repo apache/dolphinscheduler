@@ -49,33 +49,33 @@ public class AzureSQLDataSourceClient extends CommonDataSourceClient {
         return AzureSQLDataSourceProcessor.tokenGetConnection(connectionParam);
     }
 
-    @Override
-    public void checkClient() {
-
-        AzureSQLConnectionParam connectionParam = (AzureSQLConnectionParam) this.baseConnectionParam;
-        Stopwatch stopwatch = Stopwatch.createStarted();
-        String validationQuery = this.baseConnectionParam.getValidationQuery();
-        if (!connectionParam.getMode().equals(AzureSQLAuthMode.ACCESSTOKEN)) {
-            // Checking data source client
-            try {
-                this.jdbcTemplate.execute(validationQuery);
-            } catch (Exception e) {
-                throw new RuntimeException("JDBC connect failed", e);
-            } finally {
-                log.info("Time to execute check jdbc client with sql {} for {} ms ",
-                        this.baseConnectionParam.getValidationQuery(), stopwatch.elapsed(TimeUnit.MILLISECONDS));
-            }
-        } else {
-            try (Statement statement = getConnection().createStatement()) {
-                if (!statement.execute(validationQuery)) {
-                    throw new SQLException("execute check azure sql token client failed : " + validationQuery);
-                }
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            } finally {
-                log.info("Time to execute check azure sql token client with sql {} for {} ms ",
-                        this.baseConnectionParam.getValidationQuery(), stopwatch.elapsed(TimeUnit.MILLISECONDS));
-            }
-        }
-    }
+//    @Override
+//    public void checkClient() {
+//
+//        AzureSQLConnectionParam connectionParam = (AzureSQLConnectionParam) this.baseConnectionParam;
+//        Stopwatch stopwatch = Stopwatch.createStarted();
+//        String validationQuery = this.baseConnectionParam.getValidationQuery();
+//        if (!connectionParam.getMode().equals(AzureSQLAuthMode.ACCESSTOKEN)) {
+//            // Checking data source client
+//            try {
+//                this.jdbcTemplate.execute(validationQuery);
+//            } catch (Exception e) {
+//                throw new RuntimeException("JDBC connect failed", e);
+//            } finally {
+//                log.info("Time to execute check jdbc client with sql {} for {} ms ",
+//                        this.baseConnectionParam.getValidationQuery(), stopwatch.elapsed(TimeUnit.MILLISECONDS));
+//            }
+//        } else {
+//            try (Statement statement = getConnection().createStatement()) {
+//                if (!statement.execute(validationQuery)) {
+//                    throw new SQLException("execute check azure sql token client failed : " + validationQuery);
+//                }
+//            } catch (SQLException e) {
+//                throw new RuntimeException(e);
+//            } finally {
+//                log.info("Time to execute check azure sql token client with sql {} for {} ms ",
+//                        this.baseConnectionParam.getValidationQuery(), stopwatch.elapsed(TimeUnit.MILLISECONDS));
+//            }
+//        }
+//    }
 }

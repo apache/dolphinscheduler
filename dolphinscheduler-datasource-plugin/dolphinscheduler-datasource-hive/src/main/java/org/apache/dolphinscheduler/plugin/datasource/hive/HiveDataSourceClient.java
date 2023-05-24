@@ -23,22 +23,16 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.JAVA_SEC
 
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
-import org.apache.dolphinscheduler.plugin.datasource.api.provider.JDBCDataSourceProvider;
 import org.apache.dolphinscheduler.plugin.datasource.hive.security.UserGroupInformationFactory;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import sun.security.krb5.Config;
-
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
-import java.sql.Connection;
-import java.sql.SQLException;
 
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.jdbc.core.JdbcTemplate;
 
 @Slf4j
 public class HiveDataSourceClient extends CommonDataSourceClient {
@@ -50,17 +44,6 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
     @Override
     protected void preInit() {
         log.info("PreInit in {}", getClass().getName());
-    }
-
-    @Override
-    protected void initClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        log.info("Create UserGroupInformation.");
-        UserGroupInformationFactory.login(baseConnectionParam.getUser());
-        log.info("Create ugi success.");
-
-        this.dataSource = JDBCDataSourceProvider.createOneSessionJdbcDataSource(baseConnectionParam, dbType);
-        this.jdbcTemplate = new JdbcTemplate(dataSource);
-        log.info("Init {} success.", getClass().getName());
     }
 
     @Override
@@ -86,19 +69,6 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
         }
     }
 
-    @Override
-    public Connection getConnection() {
-        Connection connection = null;
-        while (connection == null) {
-            try {
-                connection = dataSource.getConnection();
-            } catch (SQLException e) {
-                UserGroupInformationFactory.logout(baseConnectionParam.getUser());
-                UserGroupInformationFactory.login(baseConnectionParam.getUser());
-            }
-        }
-        return connection;
-    }
 
     @Override
     public void close() {
