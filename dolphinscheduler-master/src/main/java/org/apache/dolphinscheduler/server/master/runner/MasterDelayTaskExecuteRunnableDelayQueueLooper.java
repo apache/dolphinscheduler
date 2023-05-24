@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.server.master.runner.execute.MasterDelayTaskExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecuteRunnableHolder;
+import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecuteRunnableThreadPool;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -62,6 +64,7 @@ public class MasterDelayTaskExecuteRunnableDelayQueueLooper extends BaseDaemonTh
                 final MasterDelayTaskExecuteRunnable masterDelayTaskExecuteRunnable =
                         masterDelayTaskExecuteRunnableDelayQueue.takeMasterDelayTaskExecuteRunnable();
                 masterTaskExecuteRunnableThreadPool.submitMasterTaskExecuteRunnable(masterDelayTaskExecuteRunnable);
+                MasterTaskExecuteRunnableHolder.putMasterTaskExecuteRunnable(masterDelayTaskExecuteRunnable);
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
                 log.warn("MasterDelayTaskExecuteRunnableDelayQueueLooper has been interrupted, will stop loop");

@@ -99,6 +99,7 @@ public class MasterTaskDispatchProcessor implements MasterRpcProcessor {
             }
         } catch (Exception ex) {
             log.error("Handle task dispatch request error, command: {}", taskDispatchRequest, ex);
+            MasterTaskExecutionContextHolder.removeTaskExecutionContext(taskExecutionContext.getTaskInstanceId());
             sendDispatchFailedResult(channel, message, taskExecutionContext, ex);
         } finally {
             LogUtils.removeWorkflowAndTaskInstanceIdMDC();
