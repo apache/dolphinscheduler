@@ -253,7 +253,6 @@ public class MlflowTask extends AbstractTask {
     }
 
     private Map<String, Property> getParamsMap() {
-        // replace placeholder, and combining local and global parameters
         return taskExecutionContext.getPrepareParamsMap();
 
     }

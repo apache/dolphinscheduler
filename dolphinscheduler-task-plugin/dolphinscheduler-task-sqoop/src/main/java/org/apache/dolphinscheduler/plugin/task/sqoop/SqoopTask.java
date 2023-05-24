@@ -78,7 +78,6 @@ public class SqoopTask extends AbstractYarnTask {
         SqoopJobGenerator generator = new SqoopJobGenerator();
         String script = generator.generateSqoopJob(sqoopParameters, sqoopTaskExecutionContext);
 
-        // combining local and global parameters
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
 
         String resultScripts = ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
