@@ -15,40 +15,37 @@
  * limitations under the License.
  */
 
-import {
-  defineComponent,
-  Ref,
-  toRefs,
-  onMounted,
-  toRef,
-  watch,
-  getCurrentInstance
-} from 'vue'
-import { NIcon, NSpace, NDataTable, NButton, NPagination } from 'naive-ui'
+import { NDataTable, NPagination, NSpace } from 'naive-ui'
+import { defineComponent, onMounted, toRefs, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { SearchOutlined } from '@vicons/antd'
-import { useTable } from './use-table'
+import { useTable } from '../definition/timing/use-table'
 import Card from '@/components/card'
-import FolderModal from './components/function-modal'
-import Search from '@/components/input-search'
-import styles from './index.module.scss'
+import TimingModal from '../definition/components/timing-modal'
+import TimingCondition from '@/views/projects/workflow/timing/components/timing-condition'
+import { ITimingSearch } from '@/views/projects/workflow/timing/types'
 
 export default defineComponent({
-  name: 'function-manage',
+  name: 'WorkflowTimingList',
   setup() {
     const { variables, createColumns, getTableData } = useTable()
 
     const requestData = () => {
       getTableData({
-        id: variables.id,
-        fullName: variables.fullName,
         pageSize: variables.pageSize,
         pageNo: variables.page,
-        searchVal: variables.searchVal
+        searchVal: variables.searchVal,
+        projectCode: variables.projectCode,
+        processDefinitionCode: variables.processDefinitionCode
       })
     }
 
     const handleUpdateList = () => {
+      requestData()
+    }
+
+    const handleSearch = (params: ITimingSearch) => {
+      variables.processDefinitionCode = params.processDefinitionCode
+      variables.page = 1
       requestData()
     }
 
@@ -57,39 +54,21 @@ export default defineComponent({
       requestData()
     }
 
-    const handleSearch = () => {
-      variables.page = 1
-      requestData()
-    }
-
-    const handleShowModal = (showRef: Ref<Boolean>) => {
-      showRef.value = true
-    }
-
-    const handleCreateFolder = () => {
-      variables.row = {}
-      handleShowModal(toRef(variables, 'showRef'))
-    }
-
-    const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
-
-    watch(useI18n().locale, () => {
-      createColumns(variables)
-    })
-
     onMounted(() => {
       createColumns(variables)
       requestData()
+    })
+
+    watch(useI18n().locale, () => {
+      createColumns(variables)
     })
 
     return {
       requestData,
       handleSearch,
       handleUpdateList,
-      handleCreateFolder,
       handleChangePageSize,
-      ...toRefs(variables),
-      trim
+      ...toRefs(variables)
     }
   },
   render() {
@@ -99,30 +78,9 @@ export default defineComponent({
     return (
       <NSpace vertical>
         <Card>
-          <NSpace justify='space-between'>
-            <NButton
-              type='primary'
-              size='small'
-              onClick={this.handleCreateFolder}
-              class='btn-create-udf-function'
-            >
-              {t('resource.function.create_udf_function')}
-            </NButton>
-            <NSpace>
-              <Search
-                placeholder={t('resource.function.enter_keyword_tips')}
-                v-model:value={this.searchVal}
-                onSearch={this.handleSearch}
-              />
-              <NButton type='primary' size='small' onClick={this.handleSearch}>
-                <NIcon>
-                  <SearchOutlined />
-                </NIcon>
-              </NButton>
-            </NSpace>
-          </NSpace>
+          <TimingCondition onHandleSearch={this.handleSearch} />
         </Card>
-        <Card title={t('resource.function.udf_function')}>
+        <Card title={t('project.workflow.cron_manage')}>
           <NSpace vertical>
             <NDataTable
               loading={loadingRef}
@@ -130,8 +88,6 @@ export default defineComponent({
               data={this.tableData}
               striped
               size={'small'}
-              class={styles.table}
-              row-class-name='items'
               scrollX={this.tableWidth}
             />
             <NSpace justify='center'>
@@ -148,7 +104,8 @@ export default defineComponent({
             </NSpace>
           </NSpace>
         </Card>
-        <FolderModal
+        <TimingModal
+          type={'update'}
           v-model:row={this.row}
           v-model:show={this.showRef}
           onUpdateList={this.handleUpdateList}

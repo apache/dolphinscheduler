@@ -18,7 +18,14 @@
 import { defineComponent, onMounted, toRefs, watch, VNode, h } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
-import { NSelect, NButton, NIcon, NSpace, NTooltip, SelectOption } from 'naive-ui'
+import {
+  NSelect,
+  NButton,
+  NIcon,
+  NSpace,
+  NTooltip,
+  SelectOption
+} from 'naive-ui'
 import { ReloadOutlined, EyeOutlined } from '@vicons/antd'
 import { useRelation } from './use-relation'
 import Card from '@/components/card'
@@ -48,7 +55,13 @@ const workflowRelation = defineComponent({
         : getWorkflowList(Number(route.params.projectCode))
     }
 
-    const renderOption = ({ node, option }: { node: VNode; option: SelectOption }) =>
+    const renderOption = ({
+      node,
+      option
+    }: {
+      node: VNode
+      option: SelectOption
+    }) =>
       h(NTooltip, null, {
         trigger: () => node,
         default: () => option.label

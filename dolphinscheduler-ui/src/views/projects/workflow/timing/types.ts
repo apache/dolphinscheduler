@@ -15,13 +15,8 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
-import ResourceListModal from '../../components/resource'
+interface ITimingSearch {
+  processDefinitionCode: number
+}
 
-export default defineComponent({
-  name: 'resource-manage',
-  setup() {},
-  render() {
-    return <ResourceListModal resourceType={'UDF'} />
-  }
-})
+export { ITimingSearch }

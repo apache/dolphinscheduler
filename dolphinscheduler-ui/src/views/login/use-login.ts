@@ -25,7 +25,7 @@ import type { UserInfoRes } from '@/service/modules/users/types'
 import { useRouteStore } from '@/store/route/route'
 import { useTimezoneStore } from '@/store/timezone/timezone'
 import cookies from 'js-cookie'
-import {queryBaseDir} from "@/service/modules/resources";
+import { queryBaseDir } from '@/service/modules/resources'
 
 export function useLogin(state: any) {
   const router: Router = useRouter()

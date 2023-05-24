@@ -24,19 +24,35 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
 
   const configEditorSpan = computed(() => (model.useCustom ? 24 : 0))
   const resourceEditorSpan = computed(() => (model.useCustom ? 0 : 24))
-  const flinkSpan = computed(() => (model.startupScript.includes("flink") ? 24 : 0))
-  const deployModeSpan = computed(() => (model.startupScript.includes("spark") || model.startupScript === "seatunnel.sh" ? 24 : 0))
-  const masterSpan = computed(() => (model.startupScript.includes("spark")) && model.deployMode !== 'local' ? 12 : 0)
+  const flinkSpan = computed(() =>
+    model.startupScript.includes('flink') ? 24 : 0
+  )
+  const deployModeSpan = computed(() =>
+    model.startupScript.includes('spark') ||
+    model.startupScript === 'seatunnel.sh'
+      ? 24
+      : 0
+  )
+  const masterSpan = computed(() =>
+    model.startupScript.includes('spark') && model.deployMode !== 'local'
+      ? 12
+      : 0
+  )
   const masterUrlSpan = computed(() =>
-    (model.startupScript.includes("spark")) &&
+    model.startupScript.includes('spark') &&
     model.deployMode !== 'local' &&
     (model.master === 'SPARK' || model.master === 'MESOS')
       ? 12
       : 0
   )
-  const showClient = computed(() => model.startupScript.includes("spark"))
+  const showClient = computed(() => model.startupScript.includes('spark'))
   const showLocal = computed(() => model.startupScript === 'seatunnel.sh')
-  const othersSpan = computed(() => (model.startupScript.includes("flink") || model.startupScript === 'seatunnel.sh' ? 24 : 0))
+  const othersSpan = computed(() =>
+    model.startupScript.includes('flink') ||
+    model.startupScript === 'seatunnel.sh'
+      ? 24
+      : 0
+  )
 
   return [
     {
@@ -56,12 +72,12 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
             if (model.startupScript === 'seatunnel.sh') {
               model.deployMode = 'local'
             }
-            if (model.startupScript.includes("spark")) {
+            if (model.startupScript.includes('spark')) {
               model.deployMode = 'client'
             }
           }
         }
-      },
+      }
     },
 
     // SeaTunnel flink parameter

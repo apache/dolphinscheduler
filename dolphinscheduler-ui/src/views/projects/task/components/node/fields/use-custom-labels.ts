@@ -19,64 +19,64 @@ import { useI18n } from 'vue-i18n'
 import type { IJsonItem } from '../types'
 
 export function useCustomLabels({
-                                    model,
-                                    field,
-                                    name = 'custom_labels',
-                                    span = 24
-                                }: {
-    model: { [field: string]: any }
-    field: string
-    name?: string
-    span?: Ref | number
+  model,
+  field,
+  name = 'custom_labels',
+  span = 24
+}: {
+  model: { [field: string]: any }
+  field: string
+  name?: string
+  span?: Ref | number
 }): IJsonItem[] {
-    const { t } = useI18n()
+  const { t } = useI18n()
 
-    return [
+  return [
+    {
+      type: 'custom-parameters',
+      field: field,
+      name: t(`project.node.${name}`),
+      class: 'btn-custom-parameters',
+      span,
+      children: [
         {
-            type: 'custom-parameters',
-            field: field,
-            name: t(`project.node.${name}`),
-            class: 'btn-custom-parameters',
-            span,
-            children: [
-                {
-                    type: 'input',
-                    field: 'label',
-                    span: 8,
-                    class: 'customized-label-name',
-                    props: {
-                        placeholder: t('project.node.label_name_tips'),
-                        maxLength: 256
-                    },
-                    validate: {
-                        trigger: ['input', 'blur'],
-                        required: true,
-                        validator(validate: any, value: string) {
-                            if (!value) {
-                                return new Error(t('project.node.label_name_tips'))
-                            }
+          type: 'input',
+          field: 'label',
+          span: 8,
+          class: 'customized-label-name',
+          props: {
+            placeholder: t('project.node.label_name_tips'),
+            maxLength: 256
+          },
+          validate: {
+            trigger: ['input', 'blur'],
+            required: true,
+            validator(validate: any, value: string) {
+              if (!value) {
+                return new Error(t('project.node.label_name_tips'))
+              }
 
-                            const sameItems = model[field].filter(
-                                (item: { label: string }) => item.label === value
-                            )
+              const sameItems = model[field].filter(
+                (item: { label: string }) => item.label === value
+              )
 
-                            if (sameItems.length > 1) {
-                                return new Error(t('project.node.label_repeat'))
-                            }
-                        }
-                    }
-                },
-                {
-                    type: 'input',
-                    field: 'value',
-                    span: 14,
-                    class: 'customized-label-value',
-                    props: {
-                        placeholder: t('project.node.label_value_tips'),
-                        maxLength: 256
-                    }
-                }
-            ]
+              if (sameItems.length > 1) {
+                return new Error(t('project.node.label_repeat'))
+              }
+            }
+          }
+        },
+        {
+          type: 'input',
+          field: 'value',
+          span: 14,
+          class: 'customized-label-value',
+          props: {
+            placeholder: t('project.node.label_value_tips'),
+            maxLength: 256
+          }
         }
-    ]
+      ]
+    }
+  ]
 }

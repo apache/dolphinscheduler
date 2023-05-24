@@ -23,14 +23,7 @@ import {
   forceSuccess,
   downloadLog
 } from '@/service/modules/task-instances'
-import {
-  NButton,
-  NIcon,
-  NSpace,
-  NTooltip,
-  NSpin,
-  NEllipsis
-} from 'naive-ui'
+import { NButton, NIcon, NSpace, NTooltip, NSpin, NEllipsis } from 'naive-ui'
 import ButtonLink from '@/components/button-link'
 import {
   AlignLeftOutlined,
@@ -39,19 +32,14 @@ import {
 } from '@vicons/antd'
 import { format } from 'date-fns'
 import { useRoute, useRouter } from 'vue-router'
-import {
-  parseTime,
-  renderTableTime,
-  tasksState
-} from '@/common/common'
+import { parseTime, renderTableTime, tasksState } from '@/common/common'
 import {
   COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
   DefaultTableWidth
 } from '@/common/column-width-config'
 import type { Router, TaskInstancesRes, IRecord, ITaskState } from './types'
-import {renderEnvironmentalDistinctionCell} from "@/utils/environmental-distinction";
-
+import { renderEnvironmentalDistinctionCell } from '@/utils/environmental-distinction'
 
 export function useTable() {
   const { t } = useI18n()
@@ -98,7 +86,7 @@ export function useTable() {
         ...COLUMN_WIDTH_CONFIG['name'],
         resizable: true,
         minWidth: 200,
-        maxWidth: 600,
+        maxWidth: 600
       },
       {
         title: t('project.task.workflow_instance'),
@@ -115,7 +103,7 @@ export function useTable() {
             ButtonLink,
             {
               onClick: () => {
-                let routeUrl = router.resolve({
+                const routeUrl = router.resolve({
                   name: 'workflow-instance-detail',
                   params: { id: row.processInstanceId },
                   query: { code: projectCode }
@@ -127,9 +115,9 @@ export function useTable() {
               default: () =>
                 h(
                   NEllipsis,
-                    {
-                      style: 'max-width: 580px;line-height: 1.5'
-                    },
+                  {
+                    style: 'max-width: 580px;line-height: 1.5'
+                  },
                   () => row.processInstanceName
                 )
             }

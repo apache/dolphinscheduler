@@ -16,7 +16,13 @@
  */
 
 import { axios } from '@/service/service'
-import { ListReq, ListIdReq, ProjectsReq, UserIdReq, UpdateProjectsReq } from './types'
+import {
+  ListReq,
+  ListIdReq,
+  ProjectsReq,
+  UserIdReq,
+  UpdateProjectsReq
+} from './types'
 
 export function queryProjectListPaging(params: ListReq): any {
   return axios({
@@ -26,7 +32,9 @@ export function queryProjectListPaging(params: ListReq): any {
   })
 }
 
-export function queryProjectWithAuthorizedLevelListPaging(params: ListIdReq): any {
+export function queryProjectWithAuthorizedLevelListPaging(
+  params: ListIdReq
+): any {
   return axios({
     url: '/projects/project-with-authorized-level-list-paging',
     method: 'get',

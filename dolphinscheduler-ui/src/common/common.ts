@@ -154,7 +154,6 @@ export const workflowExecutionStateType = (t: any) => [
   }))
 ]
 
-
 /**
  * Stream task state
  */
@@ -271,7 +270,7 @@ export const tasksState = (t: any): ITaskStateConfig => ({
     icon: SendOutlined,
     isSpin: false,
     classNames: 'dispatch'
-  },
+  }
 })
 
 /**
@@ -282,7 +281,9 @@ export const tasksState = (t: any): ITaskStateConfig => ({
  * @icon icon
  * @isSpin is loading (Need to execute the code block to write if judgment)
  */
-export const workflowExecutionState = (t: any): IWorkflowExecutionStateConfig => ({
+export const workflowExecutionState = (
+  t: any
+): IWorkflowExecutionStateConfig => ({
   SUBMITTED_SUCCESS: {
     id: 0,
     desc: `${t('project.workflow.submit_success')}`,
