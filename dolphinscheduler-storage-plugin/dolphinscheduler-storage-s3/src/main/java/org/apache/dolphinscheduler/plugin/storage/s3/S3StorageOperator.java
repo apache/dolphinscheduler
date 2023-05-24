@@ -63,7 +63,6 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
-import com.amazonaws.services.s3.model.Bucket;
 import com.amazonaws.services.s3.model.DeleteObjectsRequest;
 import com.amazonaws.services.s3.model.ListObjectsV2Request;
 import com.amazonaws.services.s3.model.ListObjectsV2Result;
@@ -404,17 +403,13 @@ public class S3StorageOperator implements Closeable, StorageOperate {
             throw new IllegalArgumentException("resource.aws.s3.bucket.name is blank");
         }
 
-        Bucket existsBucket = s3Client.listBuckets()
-                .stream()
-                .filter(
-                        bucket -> bucket.getName().equals(bucketName))
-                .findFirst()
-                .orElseThrow(() -> {
-                    return new IllegalArgumentException(
-                            "bucketName: " + bucketName + " is not exists, you need to create them by yourself");
-                });
+        boolean existsBucket = s3Client.doesBucketExistV2(bucketName);
+        if (!existsBucket) {
+            throw new IllegalArgumentException(
+                    "bucketName: " + bucketName + " is not exists, you need to create them by yourself");
+        }
 
-        log.info("bucketName: {} has been found, the current regionName is {}", existsBucket.getName(),
+        log.info("bucketName: {} has been found, the current regionName is {}", bucketName,
                 s3Client.getRegionName());
     }
 
