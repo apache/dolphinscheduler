@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.datasource.kyuubi;
 
 import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
-import org.apache.dolphinscheduler.plugin.datasource.api.provider.JDBCDataSourceProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
@@ -34,6 +33,7 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 @Slf4j
 public class KyuubiDataSourceClient extends CommonDataSourceClient {
+
     private DriverManagerDataSource driverManagerDataSource;
 
     public KyuubiDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
@@ -48,11 +48,13 @@ public class KyuubiDataSourceClient extends CommonDataSourceClient {
     @Override
     protected void initClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
 
-        this.driverManagerDataSource = new DriverManagerDataSource(DataSourceUtils.getJdbcUrl(DbType.KYUUBI, baseConnectionParam)
-                , baseConnectionParam.getUser(), PasswordUtils.decodePassword(baseConnectionParam.getPassword()));
+        this.driverManagerDataSource =
+                new DriverManagerDataSource(DataSourceUtils.getJdbcUrl(DbType.KYUUBI, baseConnectionParam),
+                        baseConnectionParam.getUser(), PasswordUtils.decodePassword(baseConnectionParam.getPassword()));
         driverManagerDataSource.setDriverClassName(baseConnectionParam.getDriverClassName());
         this.jdbcTemplate = new JdbcTemplate(driverManagerDataSource);
-        log.info("Init {} {} success.", getClass().getName(),DataSourceUtils.getJdbcUrl(DbType.KYUUBI, baseConnectionParam)) ;
+        log.info("Init {} {} success.", getClass().getName(),
+                DataSourceUtils.getJdbcUrl(DbType.KYUUBI, baseConnectionParam));
     }
 
     @Override
@@ -77,7 +79,7 @@ public class KyuubiDataSourceClient extends CommonDataSourceClient {
     public void close() {
         try {
             driverManagerDataSource.getConnection().close();
-        } catch (SQLException e){
+        } catch (SQLException e) {
             log.error("failed to close the kyuubi connection: {}", e.getMessage(), e);
         }
         log.info("Closed Kyuubi datasource client.");
