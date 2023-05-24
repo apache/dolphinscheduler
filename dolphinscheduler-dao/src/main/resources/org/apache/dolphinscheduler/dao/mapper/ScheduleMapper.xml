@@ -44,6 +44,25 @@
         </if>
         order by s.update_time desc
     </select>
+    <select id="queryByProjectAndProcessDefineCodePaging" resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
+        select p_f.name as process_definition_name, p.name as project_name,u.user_name,e.name as environment_name,
+        <include refid="baseSqlV2">
+            <property name="alias" value="s"/>
+        </include>
+        from t_ds_schedules s
+        join t_ds_process_definition p_f on s.process_definition_code = p_f.code
+        join t_ds_project as p on p_f.project_code = p.code
+        join t_ds_user as u on s.user_id = u.id
+        left join t_ds_environment as e on s.environment_code = e.code
+        where 1=1
+        <if test="projectCode != 0">
+            and p.code = #{projectCode}
+        </if>
+        <if test="processDefinitionCode != 0">
+            and s.process_definition_code = #{processDefinitionCode}
+        </if>
+        order by s.update_time desc
+    </select>
     <select id="querySchedulerListByProjectName" resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
         select p_f.name as process_definition_name, p_f.description as definition_description, p.name as project_name,u.user_name, s.*
         from t_ds_schedules s

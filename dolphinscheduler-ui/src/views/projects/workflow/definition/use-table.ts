@@ -103,7 +103,7 @@ export function useTable() {
                   ButtonLink,
                   {
                     onClick: () => {
-                      let routeUrl = router.resolve({
+                      const routeUrl = router.resolve({
                         name: 'workflow-definition-detail',
                         params: { code: row.code }
                       })

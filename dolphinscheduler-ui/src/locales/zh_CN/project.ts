@@ -66,6 +66,7 @@ export default {
     schedule_publish_status: '定时状态',
     workflow_definition: '工作流定义',
     workflow_instance: '工作流实例',
+    workflow_timing: '工作流定时',
     status: '状态',
     create_time: '创建时间',
     update_time: '更新时间',

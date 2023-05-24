@@ -34,7 +34,7 @@ import {
   calculateTableWidth,
   DefaultTableWidth
 } from '@/common/column-width-config'
-import {renderEnvironmentalDistinctionCell} from "@/utils/environmental-distinction";
+import { renderEnvironmentalDistinctionCell } from '@/utils/environmental-distinction'
 
 export function useColumns(onCallback: Function) {
   const { t } = useI18n()
@@ -118,7 +118,8 @@ export function useColumns(onCallback: Function) {
                       circle: true,
                       type: 'info',
                       size: 'small',
-                      onClick: () => void onCallback(rowData.id, 'edit', rowData)
+                      onClick: () =>
+                        void onCallback(rowData.id, 'edit', rowData)
                     },
                     {
                       default: () =>

@@ -77,13 +77,13 @@ export function useTable(onEdit: Function) {
             },
             {
               default: () =>
-                  h(
-                      NEllipsis,
-                      {
-                        style: 'max-width: 580px;line-height: 1.5'
-                      },
-                      () => row.taskName
-                  )
+                h(
+                  NEllipsis,
+                  {
+                    style: 'max-width: 580px;line-height: 1.5'
+                  },
+                  () => row.taskName
+                )
             }
           )
       },

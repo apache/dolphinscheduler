@@ -91,9 +91,9 @@ const TaskResult = defineComponent({
         <Card>
           <NSpace justify='end'>
             <Search
-                v-model:value={this.searchVal}
-                placeholder={t('data_quality.task_result.task_name')}
-                onSearch={onSearch}
+              v-model:value={this.searchVal}
+              placeholder={t('data_quality.task_result.task_name')}
+              onSearch={onSearch}
             />
             <NSelect
               v-model={[this.ruleType, 'value']}

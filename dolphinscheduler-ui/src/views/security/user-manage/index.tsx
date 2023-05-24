@@ -15,18 +15,8 @@
  * limitations under the License.
  */
 
-import {
-  defineComponent,
-  getCurrentInstance,
-  toRefs
-} from 'vue'
-import {
-  NButton,
-  NIcon,
-  NSpace,
-  NDataTable,
-  NPagination
-} from 'naive-ui'
+import { defineComponent, getCurrentInstance, toRefs } from 'vue'
+import { NButton, NIcon, NSpace, NDataTable, NPagination } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { SearchOutlined } from '@vicons/antd'
 import { useColumns } from './use-columns'
@@ -34,7 +24,7 @@ import { useTable } from './use-table'
 import UserDetailModal from './components/user-detail-modal'
 import AuthorizeModal from './components/authorize-modal'
 import Card from '@/components/card'
-import Search from "@/components/input-search";
+import Search from '@/components/input-search'
 
 const UsersManage = defineComponent({
   name: 'user-manage',

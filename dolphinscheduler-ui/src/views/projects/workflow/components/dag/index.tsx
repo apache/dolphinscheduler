@@ -139,9 +139,7 @@ export default defineComponent({
 
     // execute task buttons in the dag node menu
     const executeTaskDisplay = computed(() => {
-        return (
-            route.name === 'workflow-instance-detail'
-        )
+      return route.name === 'workflow-instance-detail'
     })
 
     // other button in the dag node menu
@@ -250,7 +248,7 @@ export default defineComponent({
       getLogs(logTimer)
     }
 
-    var getLogsID: number
+    let getLogsID: number
 
     const getLogs = (logTimer: number) => {
       const { state } = useAsyncState(
@@ -259,7 +257,6 @@ export default defineComponent({
           limit: nodeVariables.limit,
           skipLineNum: nodeVariables.skipLineNum
         }).then((res: any) => {
-
           nodeVariables.logRef += res.message || ''
           if (res && res.message !== '') {
             nodeVariables.limit += 1000
@@ -292,18 +289,23 @@ export default defineComponent({
       getLogs(logTimer)
     }
 
-    const handleExecuteTask = (startNodeList: number, taskDependType: string) => {
-      executeTask({
-        processInstanceId: Number(route.params.id),
-        startNodeList: startNodeList,
-        taskDependType: taskDependType,
-      },
-        props.projectCode).then(() => {
-          window.$message.success(t('project.workflow.success'))
-          setTimeout(() => {
-            window.location.reload();
-          }, 1000);
-        })
+    const handleExecuteTask = (
+      startNodeList: number,
+      taskDependType: string
+    ) => {
+      executeTask(
+        {
+          processInstanceId: Number(route.params.id),
+          startNodeList: startNodeList,
+          taskDependType: taskDependType
+        },
+        props.projectCode
+      ).then(() => {
+        window.$message.success(t('project.workflow.success'))
+        setTimeout(() => {
+          window.location.reload()
+        }, 1000)
+      })
     }
 
     const handleRemoveTaskInstanceCache = (taskId: number) => {
@@ -450,4 +452,3 @@ export default defineComponent({
     )
   }
 })
-

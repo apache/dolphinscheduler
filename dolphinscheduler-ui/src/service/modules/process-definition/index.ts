@@ -248,10 +248,12 @@ export function viewTree(
   })
 }
 
-export function viewProcessDefinitionVariables(code: number, processCode: number): any {
+export function viewProcessDefinitionVariables(
+  code: number,
+  processCode: number
+): any {
   return axios({
     url: `/projects/${code}/process-definition/${processCode}/view-variables`,
     method: 'get'
   })
 }
-

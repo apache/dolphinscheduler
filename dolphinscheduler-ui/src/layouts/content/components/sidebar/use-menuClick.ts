@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import {LocationQueryRaw, useRouter} from 'vue-router'
+import { LocationQueryRaw, useRouter } from 'vue-router'
 import type { Router } from 'vue-router'
 import { MenuOption } from 'naive-ui'
 
@@ -25,7 +25,7 @@ export function useMenuClick() {
   const handleMenuClick = (key: string, menuOption: MenuOption) => {
     router.push({
       path: `${key}`,
-      query: menuOption.payload? menuOption.payload as LocationQueryRaw: {}
+      query: menuOption.payload ? (menuOption.payload as LocationQueryRaw) : {}
     })
   }
 

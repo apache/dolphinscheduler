@@ -20,9 +20,8 @@ import ResourceEditModal from '../../components/resource/edit'
 
 export default defineComponent({
   name: 'ResourceFileEdit',
-  setup() {
-  },
+  setup() {},
   render() {
-    return <ResourceEditModal/>
+    return <ResourceEditModal />
   }
 })

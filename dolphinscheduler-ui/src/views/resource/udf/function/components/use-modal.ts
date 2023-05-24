@@ -36,11 +36,9 @@ export function useModal(
   const handleCreateFunc = async () => {
     submitRequest(
       async () =>
-        await createUdfFunc(
-          {
-            ...state.functionForm
-          }
-        )
+        await createUdfFunc({
+          ...state.functionForm
+        })
     )
   }
 
@@ -117,7 +115,7 @@ export function useModal(
 
   const getUdfList = () => {
     const { state } = useAsyncState(
-      queryResourceList({ type: 'UDF', fullName: "" }).then((res: any) => {
+      queryResourceList({ type: 'UDF', fullName: '' }).then((res: any) => {
         let item = res
         let item1 = _.cloneDeep(res)
 

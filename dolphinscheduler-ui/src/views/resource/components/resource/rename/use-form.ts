@@ -18,9 +18,18 @@
 import { reactive, ref, unref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { FormRules } from 'naive-ui'
-import { IRenameDefaultValue, ResourceType } from "@/views/resource/components/resource/types";
+import {
+  IRenameDefaultValue,
+  ResourceType
+} from '@/views/resource/components/resource/types'
 
-const defaultValue:IRenameDefaultValue = (type: ResourceType, fullName = '', name = '', description = '', user_name = '') => ({
+const defaultValue: IRenameDefaultValue = (
+  type: ResourceType,
+  fullName = '',
+  name = '',
+  description = '',
+  user_name = ''
+) => ({
   fullName,
   name,
   type: type,
@@ -28,15 +37,30 @@ const defaultValue:IRenameDefaultValue = (type: ResourceType, fullName = '', nam
   user_name
 })
 
-export function useForm(resourceType: ResourceType, fullName: string, name: string, description: string, user_name: string) {
+export function useForm(
+  resourceType: ResourceType,
+  fullName: string,
+  name: string,
+  description: string,
+  user_name: string
+) {
   const { t } = useI18n()
   const resetForm = () => {
-    state.renameForm = Object.assign(unref(state.renameForm), defaultValue(resourceType))
+    state.renameForm = Object.assign(
+      unref(state.renameForm),
+      defaultValue(resourceType)
+    )
   }
 
   const state = reactive({
     renameFormRef: ref(),
-    renameForm: defaultValue(resourceType,fullName, name, description, user_name),
+    renameForm: defaultValue(
+      resourceType,
+      fullName,
+      name,
+      description,
+      user_name
+    ),
     saving: false,
     rules: {
       name: {

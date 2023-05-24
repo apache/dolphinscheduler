@@ -56,29 +56,29 @@ export function useSeaTunnel({
     timeoutNotifyStrategy: ['WARN'],
     rawScript:
       'env {\n' +
-        '  execution.parallelism = 2\n' +
-        '  job.mode = "BATCH"\n' +
-        '  checkpoint.interval = 10000\n' +
-        '}\n' +
-        '\n' +
-        'source {\n' +
-        '  FakeSource {\n' +
-        '    parallelism = 2\n' +
-        '    result_table_name = "fake"\n' +
-        '    row.num = 16\n' +
-        '    schema = {\n' +
-        '      fields {\n' +
-        '        name = "string"\n' +
-        '        age = "int"\n' +
-        '      }\n' +
-        '    }\n' +
-        '  }\n' +
-        '}\n' +
-        '\n' +
-        'sink {\n' +
-        '  Console {\n' +
-        '  }\n' +
-        '}'
+      '  execution.parallelism = 2\n' +
+      '  job.mode = "BATCH"\n' +
+      '  checkpoint.interval = 10000\n' +
+      '}\n' +
+      '\n' +
+      'source {\n' +
+      '  FakeSource {\n' +
+      '    parallelism = 2\n' +
+      '    result_table_name = "fake"\n' +
+      '    row.num = 16\n' +
+      '    schema = {\n' +
+      '      fields {\n' +
+      '        name = "string"\n' +
+      '        age = "int"\n' +
+      '      }\n' +
+      '    }\n' +
+      '  }\n' +
+      '}\n' +
+      '\n' +
+      'sink {\n' +
+      '  Console {\n' +
+      '  }\n' +
+      '}'
   } as INodeData)
 
   return {

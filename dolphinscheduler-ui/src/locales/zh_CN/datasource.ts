@@ -87,10 +87,10 @@ export default {
   clientSecret: 'ClientSecret',
   OAuth_token_endpoint: 'OAuth 2.0 token endpoint',
   endpoint_tips: '请输入OAuth',
-  AccessKeyID:'AccessKeyID',
-  AccessKeyID_tips:'请输入AccessKeyID',
-  SecretAccessKey:'SecretAccessKey',
-  SecretAccessKey_tips:'请输入SecretAccessKey',
-  dbUser:'DbUser',
-  dbUser_tips:'请输入DbUser',
+  AccessKeyID: 'AccessKeyID',
+  AccessKeyID_tips: '请输入AccessKeyID',
+  SecretAccessKey: 'SecretAccessKey',
+  SecretAccessKey_tips: '请输入SecretAccessKey',
+  dbUser: 'DbUser',
+  dbUser_tips: '请输入DbUser'
 }

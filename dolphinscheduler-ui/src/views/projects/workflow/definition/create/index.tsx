@@ -88,9 +88,11 @@ export default defineComponent({
           theme.darkTheme ? Styles['dark'] : Styles['light']
         ]}
       >
-        {
-          route.query.dynamic === 'true' ? <DynamicDag /> : <Dag projectCode={projectCode} onSave={onSave} />
-        }
+        {route.query.dynamic === 'true' ? (
+          <DynamicDag />
+        ) : (
+          <Dag projectCode={projectCode} onSave={onSave} />
+        )}
       </div>
     )
   }

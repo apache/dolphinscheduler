@@ -58,7 +58,7 @@ export function useNamespace(): IJsonItem {
     props: {
       loading,
       'render-label': renderLabel,
-      'clearable': true
+      clearable: true
     },
     options: [
       {

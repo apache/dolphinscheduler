@@ -34,7 +34,7 @@ interface ListReq {
 }
 
 interface ProcessDefinitionCodeReq {
-  processDefinitionCode: number
+  processDefinitionCode?: number
 }
 
 interface ScheduleReq {

@@ -25,7 +25,7 @@ const reqFunction = (url: string, method: string) => {
 }
 
 export function useFormRequest(apis: any, forms: Array<any>): Array<any> {
-  forms.map(f => {
+  forms.map((f) => {
     if (f.api) {
       reqFunction(apis[f.api].url, apis[f.api].method).then((res: any) => {
         f.options = res.map((r: any) => {

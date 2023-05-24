@@ -26,7 +26,7 @@ import { useI18n } from 'vue-i18n'
 import Modal from '@/components/modal'
 import { useForm } from './use-form'
 import { useRename } from './use-rename'
-import type { ResourceType } from "@/views/resource/components/resource/types";
+import type { ResourceType } from '@/views/resource/components/resource/types'
 
 const props = {
   show: {
@@ -60,7 +60,13 @@ export default defineComponent({
   props,
   emits: ['updateList', 'update:show'],
   setup(props, ctx) {
-    const { state, resetForm } = useForm(props.resourceType!,props.fullName, props.name, props.description, props.userName)
+    const { state, resetForm } = useForm(
+      props.resourceType!,
+      props.fullName,
+      props.name,
+      props.description,
+      props.userName
+    )
     const { handleRenameFile } = useRename(state)
     const hideModal = () => {
       ctx.emit('update:show', false)

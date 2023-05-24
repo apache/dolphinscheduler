@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, toRefs, watch} from 'vue'
+import { defineComponent, PropType, toRefs, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
   NInput,
@@ -56,7 +56,17 @@ export const AuthorizeModal = defineComponent({
   emits: ['cancel'],
   setup(props, ctx) {
     const { t } = useI18n()
-    const { state, onInit, onSave, getProjects, revokeProjectByIdRequest, grantProjectRequest, grantProjectWithReadPermRequest, requestData, handleChangePageSize } = useAuthorize()
+    const {
+      state,
+      onInit,
+      onSave,
+      getProjects,
+      revokeProjectByIdRequest,
+      grantProjectRequest,
+      grantProjectWithReadPermRequest,
+      requestData,
+      handleChangePageSize
+    } = useAuthorize()
     const onCancel = () => {
       ctx.emit('cancel')
     }
@@ -97,14 +107,14 @@ export const AuthorizeModal = defineComponent({
       onConfirm,
       getProjects,
       handleCheck,
-      requestData, 
+      requestData,
       handleChangePageSize,
       onRevokeProject,
       onGrantReadPerm,
       onGrantAllPerm
     }
   },
-  render(props: { type: TAuthType, userId: number }) {
+  render(props: { type: TAuthType; userId: number }) {
     const { t } = this
     const { type, userId } = props
     return (
@@ -118,17 +128,28 @@ export const AuthorizeModal = defineComponent({
         cancelClassName='btn-cancel'
       >
         {type === 'authorize_project' && (
-
           <NSpace vertical>
             <NSpace>
-              <NButton size='small' type='primary' onClick={this.onRevokeProject}>
+              <NButton
+                size='small'
+                type='primary'
+                onClick={this.onRevokeProject}
+              >
                 {t('security.user.revoke_auth')}
               </NButton>
-              <NButton size='small' type='primary' onClick={this.onGrantReadPerm}>
-              {t('security.user.grant_read')}
+              <NButton
+                size='small'
+                type='primary'
+                onClick={this.onGrantReadPerm}
+              >
+                {t('security.user.grant_read')}
               </NButton>
-              <NButton size='small' type='primary' onClick={this.onGrantAllPerm}>
-              {t('security.user.grant_all')}
+              <NButton
+                size='small'
+                type='primary'
+                onClick={this.onGrantAllPerm}
+              >
+                {t('security.user.grant_all')}
               </NButton>
               <NInput
                 size='small'
@@ -137,34 +158,38 @@ export const AuthorizeModal = defineComponent({
                 v-model:value={this.searchVal}
               />
               {/* <NButton size='small' type='primary' onClick={this.handleSearch}> */}
-              <NButton size='small' type='primary' onClick={() => this.getProjects(userId)}>
+              <NButton
+                size='small'
+                type='primary'
+                onClick={() => this.getProjects(userId)}
+              >
                 <NIcon>
                   <SearchOutlined />
                 </NIcon>
               </NButton>
             </NSpace>
-          <NDataTable
-            virtualScroll
-            row-class-name='items'
-            columns={this.columnsRef.columns}
-            data={this.projectWithAuthorizedLevel}
-            loading={this.loading}
-            max-height="250"
-            row-key={this.rowKey}
-            on-update:checked-row-keys={this.handleCheck}
-          />
-          <div class={styles.pagination}>
-            <NPagination
-              v-model:page={this.pagination.page}
-              v-model:page-size={this.pagination.pageSize}
-              page-count={this.pagination.totalPage}
-              show-size-picker
-              page-sizes={[5, 10]}
-              show-quick-jumper
-              onUpdatePage={this.requestData}
-              onUpdatePageSize={this.handleChangePageSize}
+            <NDataTable
+              virtualScroll
+              row-class-name='items'
+              columns={this.columnsRef.columns}
+              data={this.projectWithAuthorizedLevel}
+              loading={this.loading}
+              max-height='250'
+              row-key={this.rowKey}
+              on-update:checked-row-keys={this.handleCheck}
             />
-          </div>
+            <div class={styles.pagination}>
+              <NPagination
+                v-model:page={this.pagination.page}
+                v-model:page-size={this.pagination.pageSize}
+                page-count={this.pagination.totalPage}
+                show-size-picker
+                page-sizes={[5, 10]}
+                show-quick-jumper
+                onUpdatePage={this.requestData}
+                onUpdatePageSize={this.handleChangePageSize}
+              />
+            </div>
           </NSpace>
         )}
         {type === 'authorize_datasource' && (

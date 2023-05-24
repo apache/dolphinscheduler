@@ -112,6 +112,17 @@ export default {
       }
     },
     {
+      path: '/projects/:projectCode/workflow/timings',
+      name: 'workflow-timing-list',
+      component: components['projects-workflow-timing'],
+      meta: {
+        title: '工作流定时管理',
+        activeMenu: 'projects',
+        showSide: true,
+        auth: []
+      }
+    },
+    {
       path: '/projects/:projectCode/workflow/instances',
       name: 'workflow-instance-list',
       component: components['projects-workflow-instance'],

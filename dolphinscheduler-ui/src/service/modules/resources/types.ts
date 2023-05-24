@@ -36,7 +36,7 @@ interface FileNameReq {
   fileName: string
 }
 
-interface TenantCodeReq{
+interface TenantCodeReq {
   tenantCode: string
 }
 

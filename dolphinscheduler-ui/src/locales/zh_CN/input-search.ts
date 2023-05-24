@@ -16,5 +16,5 @@
  */
 
 export default {
-    placeholder: '请输入关键词'
+  placeholder: '请输入关键词'
 }

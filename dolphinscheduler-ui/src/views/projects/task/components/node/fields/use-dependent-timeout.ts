@@ -24,7 +24,9 @@ export function useDependentTimeout(model: {
 }): IJsonItem[] {
   const { t } = useI18n()
   const timeCompleteSpan = computed(() => (model.timeoutShowFlag ? 24 : 0))
-  const timeCompleteEnableSpan = computed(() => (model.timeoutFlag && model.timeoutShowFlag ? 12 : 0))
+  const timeCompleteEnableSpan = computed(() =>
+    model.timeoutFlag && model.timeoutShowFlag ? 12 : 0
+  )
 
   const strategyOptions = [
     {

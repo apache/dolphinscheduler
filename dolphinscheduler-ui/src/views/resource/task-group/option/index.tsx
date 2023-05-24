@@ -23,19 +23,13 @@ import {
   onMounted,
   getCurrentInstance
 } from 'vue'
-import {
-  NButton,
-  NIcon,
-  NDataTable,
-  NPagination,
-  NSpace
-} from 'naive-ui'
+import { NButton, NIcon, NDataTable, NPagination, NSpace } from 'naive-ui'
 import Card from '@/components/card'
 import { SearchOutlined } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
 import FormModal from './components/form-modal'
-import Search from "@/components/input-search";
+import Search from '@/components/input-search'
 
 const taskGroupOption = defineComponent({
   name: 'taskGroupOption',
@@ -164,11 +158,11 @@ const taskGroupOption = defineComponent({
             </NButton>
             <NSpace>
               <Search
-                  placeholder={t(
-                      'resource.task_group_option.please_enter_keywords'
-                  )}
-                  v-model:value={this.name}
-                  onSearch={this.onSearch}
+                placeholder={t(
+                  'resource.task_group_option.please_enter_keywords'
+                )}
+                v-model:value={this.name}
+                onSearch={this.onSearch}
               ></Search>
               <NButton size='small' type='primary' onClick={onSearch}>
                 <NIcon>

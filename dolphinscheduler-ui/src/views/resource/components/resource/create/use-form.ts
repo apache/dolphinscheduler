@@ -18,7 +18,7 @@
 import { useI18n } from 'vue-i18n'
 import { reactive, ref, unref } from 'vue'
 import type { FormRules } from 'naive-ui'
-import { ICreateFileDefaultValue } from "@/views/resource/components/resource/types";
+import { ICreateFileDefaultValue } from '@/views/resource/components/resource/types'
 
 const defaultValue: ICreateFileDefaultValue = () => ({
   pid: -1,

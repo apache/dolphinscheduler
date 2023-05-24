@@ -14,14 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { defineComponent, toRefs, PropType, getCurrentInstance, watch } from 'vue'
+import {
+  defineComponent,
+  toRefs,
+  PropType,
+  getCurrentInstance,
+  watch
+} from 'vue'
 import { NButton, NForm, NFormItem, NInput, NUpload } from 'naive-ui'
 
 import { useI18n } from 'vue-i18n'
 import Modal from '@/components/modal'
 import { useForm } from './use-form'
 import { useUpload } from './use-upload'
-import { ResourceType } from "@/views/resource/components/resource/types";
+import { ResourceType } from '@/views/resource/components/resource/types'
 
 const props = {
   show: {
@@ -83,7 +89,6 @@ export default defineComponent({
     }
 
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
-
 
     watch(
       () => props.show,

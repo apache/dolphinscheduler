@@ -33,7 +33,9 @@ export function useTaskForm(data: any) {
   useDynamicLocales(data.locales)
   variables.model = useFormField(data.forms)
   variables.rules = useFormValidate(data.forms, variables.model)
-  variables.formStructure = useFormStructure(useFormRequest(data.apis, data.forms))
+  variables.formStructure = useFormStructure(
+    useFormRequest(data.apis, data.forms)
+  )
 
   const handleValidate = () => {
     variables.taskForm.validate((err: any) => {

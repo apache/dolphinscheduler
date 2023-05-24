@@ -22,19 +22,13 @@ import {
   toRefs,
   watch
 } from 'vue'
-import {
-  NButton,
-  NDataTable,
-  NIcon,
-  NPagination,
-  NSpace
-} from 'naive-ui'
+import { NButton, NDataTable, NIcon, NPagination, NSpace } from 'naive-ui'
 import { SearchOutlined } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
 import EnvironmentModal from './components/environment-modal'
 import Card from '@/components/card'
-import Search from "@/components/input-search";
+import Search from '@/components/input-search'
 
 const environmentManage = defineComponent({
   name: 'environment-manage',

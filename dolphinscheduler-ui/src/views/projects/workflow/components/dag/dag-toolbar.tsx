@@ -217,37 +217,33 @@ export default defineComponent({
         )}
         {props.definition?.processDefinition?.name && (
           <NTooltip
-              v-slots={{
-                trigger: () => (
-                    <NPopover
-                        placement='bottom'
-                        trigger='click'
-                        scrollable
-                        style={{ maxWidth: '50vw', maxHeight: '70vh' }}
-                    >
-                      {{
-                        trigger: () => (
-                            <NButton
-                                quaternary
-                                circle
-                                class={Styles['toolbar-btn']}
-                            >
-                              <NIcon>
-                                <FundViewOutlined />
-                              </NIcon>
-                            </NButton>
-                        ),
-                        header: () => (
-                            <NText strong depth={1}>
-                              {t('project.workflow.parameters_variables')}
-                            </NText>
-                        ),
-                        default: () => <VariablesView onCopy={copy} />
-                      }}
-                    </NPopover>
-                ),
-                default: () => t('project.dag.view_variables')
-              }}
+            v-slots={{
+              trigger: () => (
+                <NPopover
+                  placement='bottom'
+                  trigger='click'
+                  scrollable
+                  style={{ maxWidth: '50vw', maxHeight: '70vh' }}
+                >
+                  {{
+                    trigger: () => (
+                      <NButton quaternary circle class={Styles['toolbar-btn']}>
+                        <NIcon>
+                          <FundViewOutlined />
+                        </NIcon>
+                      </NButton>
+                    ),
+                    header: () => (
+                      <NText strong depth={1}>
+                        {t('project.workflow.parameters_variables')}
+                      </NText>
+                    ),
+                    default: () => <VariablesView onCopy={copy} />
+                  }}
+                </NPopover>
+              ),
+              default: () => t('project.dag.view_variables')
+            }}
           ></NTooltip>
         )}
         <div class={Styles['toolbar-left-part']}>
