@@ -496,24 +496,33 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
      *
      */
     public void releaseTaskGroup(TaskInstance taskInstance) throws RemotingException, InterruptedException {
-        if (taskInstance.getTaskGroupId() > 0) {
-            TaskInstance nextTaskInstance = this.processService.releaseTaskGroup(taskInstance);
-            if (nextTaskInstance != null) {
-                if (nextTaskInstance.getProcessInstanceId() == taskInstance.getProcessInstanceId()) {
-                    TaskStateEvent nextEvent = TaskStateEvent.builder()
-                            .processInstanceId(processInstance.getId())
-                            .taskInstanceId(nextTaskInstance.getId())
-                            .type(StateEventType.WAKE_UP_TASK_GROUP)
-                            .build();
-                    this.stateEvents.add(nextEvent);
-                } else {
-                    ProcessInstance processInstance =
-                            this.processService.findProcessInstanceById(nextTaskInstance.getProcessInstanceId());
-                    this.masterRpcClient.sendSyncCommand(Host.of(processInstance.getHost()),
-                            new TaskWakeupRequest(processInstance.getId(), nextTaskInstance.getId()).convert2Command());
-                }
-            }
+        // todo: use Integer
+        if (taskInstance.getTaskGroupId() <= 0) {
+            log.info("The current TaskInstance: {} doesn't use taskGroup, no need to release taskGroup",
+                    taskInstance.getName());
         }
+        TaskInstance nextTaskInstance = processService.releaseTaskGroup(taskInstance);
+        if (nextTaskInstance == null) {
+            log.info(
+                    "The current TaskInstance: {} is the last taskInstance in the taskGroup, no need to wakeup next taskInstance",
+                    taskInstance.getName());
+            return;
+        }
+        if (nextTaskInstance.getProcessInstanceId() == taskInstance.getProcessInstanceId()) {
+            TaskStateEvent nextEvent = TaskStateEvent.builder()
+                    .processInstanceId(processInstance.getId())
+                    .taskInstanceId(nextTaskInstance.getId())
+                    .type(StateEventType.WAKE_UP_TASK_GROUP)
+                    .build();
+            stateEvents.add(nextEvent);
+        } else {
+            ProcessInstance processInstance =
+                    processService.findProcessInstanceById(nextTaskInstance.getProcessInstanceId());
+            masterRpcClient.sendSyncCommand(
+                    Host.of(processInstance.getHost()),
+                    new TaskWakeupRequest(processInstance.getId(), nextTaskInstance.getId()).convert2Command());
+        }
+        log.info("Success send wakeup message to next taskInstance: {}", nextTaskInstance.getId());
     }
 
     /**

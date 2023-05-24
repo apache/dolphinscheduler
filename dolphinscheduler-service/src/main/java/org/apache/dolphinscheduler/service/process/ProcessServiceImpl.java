@@ -2334,14 +2334,17 @@ public class ProcessServiceImpl implements ProcessService {
         TaskGroup taskGroup = taskGroupMapper.selectById(taskGroupId);
         if (taskGroup == null) {
             // we don't throw exception here, to avoid the task group has been deleted during workflow running
+            log.warn("The taskGroup is not exist no need to acquire taskGroup, taskGroupId: {}", taskGroupId);
             return true;
         }
         // if task group is not applicable
         if (taskGroup.getStatus() == Flag.NO.getCode()) {
+            log.warn("The taskGroup status is {}, no need to acquire taskGroup, taskGroupId: {}", taskGroup.getStatus(),
+                    taskGroupId);
             return true;
         }
         // Create a waiting taskGroupQueue, after acquire resource, we can update the status to ACQUIRE_SUCCESS
-        TaskGroupQueue taskGroupQueue = this.taskGroupQueueMapper.queryByTaskId(taskInstanceId);
+        TaskGroupQueue taskGroupQueue = taskGroupQueueMapper.queryByTaskId(taskInstanceId);
         if (taskGroupQueue == null) {
             taskGroupQueue = insertIntoTaskGroupQueue(
                     taskInstanceId,
@@ -2350,14 +2353,12 @@ public class ProcessServiceImpl implements ProcessService {
                     workflowInstanceId,
                     taskGroupPriority,
                     TaskGroupQueueStatus.WAIT_QUEUE);
+            log.info("Insert TaskGroupQueue: {} successfully", taskGroupQueue.getId());
         } else {
             log.info("The task queue is already exist, taskId: {}", taskInstanceId);
             if (taskGroupQueue.getStatus() == TaskGroupQueueStatus.ACQUIRE_SUCCESS) {
                 return true;
             }
-            taskGroupQueue.setInQueue(Flag.NO.getCode());
-            taskGroupQueue.setStatus(TaskGroupQueueStatus.WAIT_QUEUE);
-            this.taskGroupQueueMapper.updateById(taskGroupQueue);
         }
         // check if there already exist higher priority tasks
         List<TaskGroupQueue> highPriorityTasks = taskGroupQueueMapper.queryHighPriorityTasks(
@@ -2374,7 +2375,6 @@ public class ProcessServiceImpl implements ProcessService {
             return true;
         }
         log.info("Failed to acquire taskGroup, taskInstanceId: {}, taskGroupId: {}", taskInstanceId, taskGroupId);
-        this.taskGroupQueueMapper.updateInQueue(Flag.NO.getCode(), taskGroupQueue.getId());
         return false;
     }
 
@@ -2387,10 +2387,13 @@ public class ProcessServiceImpl implements ProcessService {
         for (int i = 0; i < 10; i++) {
             TaskGroup taskGroup = taskGroupMapper.selectById(taskGroupQueue.getGroupId());
             if (taskGroup.getGroupSize() <= taskGroup.getUseSize()) {
+                // remove
+                taskGroupQueueMapper.updateInQueue(Flag.NO.getCode(), taskGroupQueue.getId());
                 log.info("The current task Group is full, taskGroup: {}", taskGroup);
                 return false;
             }
-            int affectedCount = taskGroupMapper.robTaskGroupResource(taskGroup.getId(),
+            int affectedCount = taskGroupMapper.robTaskGroupResource(
+                    taskGroup.getId(),
                     taskGroup.getUseSize(),
                     taskGroupQueue.getId(),
                     TaskGroupQueueStatus.WAIT_QUEUE.getCode());
@@ -2404,6 +2407,7 @@ public class ProcessServiceImpl implements ProcessService {
             }
         }
         log.info("Failed to rob taskGroup, taskGroupQueue: {}", taskGroupQueue);
+        taskGroupQueueMapper.updateInQueue(Flag.NO.getCode(), taskGroupQueue.getId());
         return false;
     }
 
@@ -2431,10 +2435,11 @@ public class ProcessServiceImpl implements ProcessService {
             do {
                 taskGroup = taskGroupMapper.selectById(taskInstance.getTaskGroupId());
                 if (taskGroup == null) {
-                    log.error("The taskGroup is null, taskGroupId: {}", taskInstance.getTaskGroupId());
+                    log.error("The taskGroup is not exist no need to release taskGroup, taskGroupId: {}",
+                            taskInstance.getTaskGroupId());
                     return null;
                 }
-                thisTaskGroupQueue = this.taskGroupQueueMapper.queryByTaskId(taskInstance.getId());
+                thisTaskGroupQueue = taskGroupQueueMapper.queryByTaskId(taskInstance.getId());
                 if (thisTaskGroupQueue.getStatus() == TaskGroupQueueStatus.RELEASE) {
                     log.info("The taskGroupQueue's status is release, taskInstanceId: {}", taskInstance.getId());
                     return null;
@@ -2458,20 +2463,22 @@ public class ProcessServiceImpl implements ProcessService {
         changeTaskGroupQueueStatus(taskInstance.getId(), TaskGroupQueueStatus.RELEASE);
         TaskGroupQueue taskGroupQueue;
         do {
-            taskGroupQueue = this.taskGroupQueueMapper.queryTheHighestPriorityTasks(taskGroup.getId(),
+            taskGroupQueue = taskGroupQueueMapper.queryTheHighestPriorityTasks(
+                    taskGroup.getId(),
                     TaskGroupQueueStatus.WAIT_QUEUE.getCode(),
                     Flag.NO.getCode(),
                     Flag.NO.getCode());
             if (taskGroupQueue == null) {
-                log.info("The taskGroupQueue is null, taskGroup: {}", taskGroup.getId());
+                log.info("There is no taskGroupQueue need to be wakeup taskGroup: {}", taskGroup.getId());
                 return null;
             }
-        } while (this.taskGroupQueueMapper.updateInQueueCAS(Flag.NO.getCode(),
+        } while (this.taskGroupQueueMapper.updateInQueueCAS(
+                Flag.NO.getCode(),
                 Flag.YES.getCode(),
                 taskGroupQueue.getId()) != 1);
         log.info("Finished to release task group queue: taskGroupId: {}, taskGroupQueueId: {}",
                 taskInstance.getTaskGroupId(), taskGroupQueue.getId());
-        return this.taskInstanceMapper.selectById(taskGroupQueue.getTaskId());
+        return taskInstanceMapper.selectById(taskGroupQueue.getTaskId());
     }
 
     /**
@@ -2505,6 +2512,7 @@ public class ProcessServiceImpl implements ProcessService {
                 .processId(workflowInstanceId)
                 .priority(taskGroupPriority)
                 .status(status)
+                .forceStart(Flag.NO.getCode())
                 .inQueue(Flag.NO.getCode())
                 .createTime(now)
                 .updateTime(now)
