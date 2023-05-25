@@ -82,10 +82,10 @@ public final class WeChatAlertChannelFactory implements AlertChannelFactory {
         RadioParam sendType = RadioParam
                 .newBuilder(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_SEND_TYPE,
                         WeChatAlertParamsConstants.ENTERPRISE_WE_CHAT_SEND_TYPE)
-                .addParamsOptions(new ParamsOptions(WeChatType.APP.getDescp(), WeChatType.APP.getDescp(), false))
+                .addParamsOptions(new ParamsOptions(WeChatType.APP.getDescr(), WeChatType.APP.getDescr(), false))
                 .addParamsOptions(
-                        new ParamsOptions(WeChatType.APPCHAT.getDescp(), WeChatType.APPCHAT.getDescp(), false))
-                .setValue(WeChatType.APP.getDescp())
+                        new ParamsOptions(WeChatType.APPCHAT.getDescr(), WeChatType.APPCHAT.getDescr(), false))
+                .setValue(WeChatType.APP.getDescr())
                 .addValidate(Validate.newBuilder().setRequired(true).build())
                 .build();
 
