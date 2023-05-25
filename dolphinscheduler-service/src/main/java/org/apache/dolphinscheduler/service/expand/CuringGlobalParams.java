@@ -17,8 +17,15 @@
 
 package org.apache.dolphinscheduler.service.expand;
 
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_PROJECT_CODE;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_PROJECT_NAME;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_TASK_DEFINITION_CODE;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_TASK_DEFINITION_NAME;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_TASK_EXECUTE_PATH;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_TASK_INSTANCE_ID;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_WORKFLOW_DEFINITION_CODE;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_WORKFLOW_DEFINITION_NAME;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_WORKFLOW_INSTANCE_ID;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.constants.DateConstants;
@@ -123,7 +130,7 @@ public class CuringGlobalParams implements CuringParamsService {
     }
 
     /**
-     * the global parameters and local parameters used in the worker will be prepared here.
+     * the global parameters and local parameters used in the worker will be prepared here, and built-in parameters.
      *
      * @param taskInstance
      * @param parameters
@@ -137,8 +144,6 @@ public class CuringGlobalParams implements CuringParamsService {
         // assign value to definedParams here
         Map<String, String> globalParamsMap = setGlobalParamsMap(processInstance);
         Map<String, Property> globalParams = ParamUtils.getUserDefParamsMap(globalParamsMap);
-        CommandType commandType = processInstance.getCmdTypeIfComplement();
-        Date scheduleTime = processInstance.getScheduleTime();
 
         // combining local and global parameters
         Map<String, Property> localParams = parameters.getInputLocalParametersMap();
@@ -147,24 +152,18 @@ public class CuringGlobalParams implements CuringParamsService {
         parameters.setVarPool(taskInstance.getVarPool());
         Map<String, Property> varParams = parameters.getVarPoolMap();
 
-        if (MapUtils.isEmpty(globalParams) && MapUtils.isEmpty(localParams) && MapUtils.isEmpty(varParams)) {
-            return null;
-        }
         // if it is a complement,
         // you need to pass in the task instance id to locate the time
         // of the process instance complement
         Map<String, String> cmdParam = JSONUtils.toMap(processInstance.getCommandParam());
         String timeZone = cmdParam.get(Constants.SCHEDULE_TIMEZONE);
-        Map<String, String> params = BusinessTimeUtils.getBusinessTime(commandType, scheduleTime, timeZone);
 
-        if (MapUtils.isNotEmpty(globalParamsMap)) {
-            params.putAll(globalParamsMap);
-        }
+        // built-in params
+        Map<String, String> params = setBuiltInParamsMap(taskInstance, timeZone);
 
-        if (StringUtils.isNotBlank(taskInstance.getExecutePath())) {
-            params.put(PARAMETER_TASK_EXECUTE_PATH, taskInstance.getExecutePath());
+        if (MapUtils.isNotEmpty(params)) {
+            globalParams.putAll(ParamUtils.getUserDefParamsMap(params));
         }
-        params.put(PARAMETER_TASK_INSTANCE_ID, Integer.toString(taskInstance.getId()));
 
         if (MapUtils.isNotEmpty(varParams)) {
             globalParams.putAll(varParams);
@@ -206,6 +205,33 @@ public class CuringGlobalParams implements CuringParamsService {
         return globalParams;
     }
 
+    /**
+     * build all built-in parameters
+     * @param taskInstance
+     * @param timeZone
+     */
+    private Map<String, String> setBuiltInParamsMap(@NonNull TaskInstance taskInstance, String timeZone) {
+        CommandType commandType = taskInstance.getProcessInstance().getCmdTypeIfComplement();
+        Date scheduleTime = taskInstance.getProcessInstance().getScheduleTime();
+
+        Map<String, String> params = BusinessTimeUtils.getBusinessTime(commandType, scheduleTime, timeZone);
+
+        if (StringUtils.isNotBlank(taskInstance.getExecutePath())) {
+            params.put(PARAMETER_TASK_EXECUTE_PATH, taskInstance.getExecutePath());
+        }
+        params.put(PARAMETER_TASK_INSTANCE_ID, Integer.toString(taskInstance.getId()));
+        params.put(PARAMETER_TASK_DEFINITION_NAME, taskInstance.getTaskDefine().getName());
+        params.put(PARAMETER_TASK_DEFINITION_CODE, Long.toString(taskInstance.getTaskDefine().getCode()));
+        params.put(PARAMETER_WORKFLOW_INSTANCE_ID, Integer.toString(taskInstance.getProcessInstance().getId()));
+        params.put(PARAMETER_WORKFLOW_DEFINITION_NAME,
+                taskInstance.getProcessInstance().getProcessDefinition().getName());
+        params.put(PARAMETER_WORKFLOW_DEFINITION_CODE,
+                Long.toString(taskInstance.getProcessInstance().getProcessDefinition().getCode()));
+        params.put(PARAMETER_PROJECT_NAME, taskInstance.getProcessInstance().getProcessDefinition().getProjectName());
+        params.put(PARAMETER_PROJECT_CODE,
+                Long.toString(taskInstance.getProcessInstance().getProcessDefinition().getProjectCode()));
+        return params;
+    }
     private Map<String, String> setGlobalParamsMap(ProcessInstance processInstance) {
         Map<String, String> globalParamsMap = new HashMap<>(16);
 

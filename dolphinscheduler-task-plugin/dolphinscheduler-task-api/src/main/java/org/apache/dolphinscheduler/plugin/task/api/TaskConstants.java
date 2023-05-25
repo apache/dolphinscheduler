@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
+import org.apache.dolphinscheduler.common.constants.DateConstants;
+
 import java.time.Duration;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -165,17 +167,17 @@ public class TaskConstants {
     /**
      * system date(yyyyMMddHHmmss)
      */
-    public static final String PARAMETER_DATETIME = "system.datetime";
+    public static final String PARAMETER_DATETIME = DateConstants.PARAMETER_DATETIME;
 
     /**
      * system date(yyyymmdd) today
      */
-    public static final String PARAMETER_CURRENT_DATE = "system.biz.curdate";
+    public static final String PARAMETER_CURRENT_DATE = DateConstants.PARAMETER_CURRENT_DATE;
 
     /**
      * system date(yyyymmdd) yesterday
      */
-    public static final String PARAMETER_BUSINESS_DATE = "system.biz.date";
+    public static final String PARAMETER_BUSINESS_DATE = DateConstants.PARAMETER_BUSINESS_DATE;
 
     /**
      * the absolute path of current executing task
@@ -187,6 +189,40 @@ public class TaskConstants {
      */
     public static final String PARAMETER_TASK_INSTANCE_ID = "system.task.instance.id";
 
+    /**
+     * the definition code of current task
+     */
+    public static final String PARAMETER_TASK_DEFINITION_CODE = "system.task.definition.code";
+
+    /**
+     * the definition name of current task
+     */
+    public static final String PARAMETER_TASK_DEFINITION_NAME = "system.task.definition.name";
+
+    /**
+     * the instance id of the workflow to which current task belongs
+     */
+    public static final String PARAMETER_WORKFLOW_INSTANCE_ID = "system.workflow.instance.id";
+
+    /**
+     * the definition code of the workflow to which current task belongs
+     */
+    public static final String PARAMETER_WORKFLOW_DEFINITION_CODE = "system.workflow.definition.code";
+
+    /**
+     * the definition name of the workflow to which current task belongs
+     */
+    public static final String PARAMETER_WORKFLOW_DEFINITION_NAME = "system.workflow.definition.name";
+
+    /**
+     * the code of the project to which current task belongs
+     */
+    public static final String PARAMETER_PROJECT_CODE = "system.project.code";
+
+    /**
+     * the name of the project to which current task belongs
+     */
+    public static final String PARAMETER_PROJECT_NAME = "system.project.name";
     /**
      * month_begin
      */
