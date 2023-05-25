@@ -24,18 +24,18 @@ public enum WeChatType {
     ;
 
     private final int code;
-    private final String descp;
+    private final String descr;
 
-    WeChatType(int code, String descp) {
+    WeChatType(int code, String descr) {
         this.code = code;
-        this.descp = descp;
+        this.descr = descr;
     }
 
     public int getCode() {
         return code;
     }
 
-    public String getDescp() {
-        return descp;
+    public String getDescr() {
+        return descr;
     }
 }

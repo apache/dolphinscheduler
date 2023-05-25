@@ -211,13 +211,13 @@ public final class WeChatSender {
         Map<String, String> contentMap = new HashMap<>();
         contentMap.put(WeChatAlertConstants.WE_CHAT_CONTENT_KEY, data);
         String msgJson = "";
-        if (sendType.equals(WeChatType.APP.getDescp())) {
+        if (sendType.equals(WeChatType.APP.getDescr())) {
             enterpriseWeChatPushUrlReplace = WeChatAlertConstants.WE_CHAT_PUSH_URL.replace(TOKEN_REGEX, weChatToken);
             WechatAppMessage wechatAppMessage = new WechatAppMessage(weChatUsers, showType,
                     Integer.valueOf(weChatAgentIdChatId), contentMap, WE_CHAT_MESSAGE_SAFE_PUBLICITY,
                     WE_CHAT_ENABLE_ID_TRANS, WE_CHAT_DUPLICATE_CHECK_INTERVAL_ZERO);
             msgJson = JSONUtils.toJsonString(wechatAppMessage);
-        } else if (sendType.equals(WeChatType.APPCHAT.getDescp())) {
+        } else if (sendType.equals(WeChatType.APPCHAT.getDescr())) {
             enterpriseWeChatPushUrlReplace =
                     WeChatAlertConstants.WE_CHAT_APP_CHAT_PUSH_URL.replace(TOKEN_REGEX, weChatToken);
             WechatAppChatMessage wechatAppChatMessage =
