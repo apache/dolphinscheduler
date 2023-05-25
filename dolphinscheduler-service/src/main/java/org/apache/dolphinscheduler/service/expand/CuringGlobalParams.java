@@ -158,10 +158,6 @@ public class CuringGlobalParams implements CuringParamsService {
         Map<String, String> cmdParam = JSONUtils.toMap(processInstance.getCommandParam());
         String timeZone = cmdParam.get(Constants.SCHEDULE_TIMEZONE);
 
-        if (MapUtils.isEmpty(globalParams) && MapUtils.isEmpty(localParams) && MapUtils.isEmpty(varParams)) {
-            return null;
-        }
-
         // built-in params
         Map<String, String> params = setBuiltInParamsMap(taskInstance, timeZone);
 
@@ -214,8 +210,7 @@ public class CuringGlobalParams implements CuringParamsService {
      * @param taskInstance
      * @param timeZone
      */
-    private Map<String, String> setBuiltInParamsMap(@NonNull TaskInstance taskInstance,
-                                                    @NonNull String timeZone) {
+    private Map<String, String> setBuiltInParamsMap(@NonNull TaskInstance taskInstance, String timeZone) {
         CommandType commandType = taskInstance.getProcessInstance().getCmdTypeIfComplement();
         Date scheduleTime = taskInstance.getProcessInstance().getScheduleTime();
 
