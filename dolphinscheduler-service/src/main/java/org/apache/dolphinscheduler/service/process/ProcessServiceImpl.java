@@ -2369,13 +2369,15 @@ public class ProcessServiceImpl implements ProcessService {
             return false;
         }
         // try to get taskGroup
-        int count = taskGroupMapper.selectAvailableCountById(taskGroupId);
-        if (count == 1 && robTaskGroupResource(taskGroupQueue)) {
-            log.info("Success acquire taskGroup, taskInstanceId: {}, taskGroupId: {}", taskInstanceId, taskGroupId);
-            return true;
+        int availableTaskGroupCount = taskGroupMapper.selectAvailableCountById(taskGroupId);
+        if (availableTaskGroupCount < 1) {
+            log.info(
+                    "Failed to acquire taskGroup, there is no avaliable taskGroup, taskInstanceId: {}, taskGroupId: {}",
+                    taskInstanceId, taskGroupId);
+            taskGroupQueueMapper.updateInQueue(Flag.NO.getCode(), taskGroupQueue.getId());
+            return false;
         }
-        log.info("Failed to acquire taskGroup, taskInstanceId: {}, taskGroupId: {}", taskInstanceId, taskGroupId);
-        return false;
+        return robTaskGroupResource(taskGroupQueue);
     }
 
     /**
