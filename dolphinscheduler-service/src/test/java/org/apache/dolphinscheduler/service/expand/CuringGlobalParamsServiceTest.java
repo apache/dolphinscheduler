@@ -17,12 +17,20 @@
 
 package org.apache.dolphinscheduler.service.expand;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.SubProcessParameters;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -38,6 +46,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.google.common.collect.Lists;
 
 @ExtendWith(MockitoExtension.class)
 public class CuringGlobalParamsServiceTest {
@@ -157,5 +167,61 @@ public class CuringGlobalParamsServiceTest {
         String result6 = dolphinSchedulerCuringGlobalParams.curingGlobalParams(1, globalParamMap, globalParamList,
                 CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null);
         Assertions.assertEquals(result6, JSONUtils.toJsonString(globalParamList));
+    }
+
+    @Test
+    public void testParamParsingPreparation() {
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setId(1);
+        taskInstance.setExecutePath("home/path/execute");
+
+        TaskDefinition taskDefinition = new TaskDefinition();
+        taskDefinition.setName("TaskName-1");
+        taskDefinition.setCode(1000001l);
+
+        ProcessInstance processInstance = new ProcessInstance();
+        processInstance.setId(2);
+        processInstance.setCommandParam("{\"" + Constants.SCHEDULE_TIMEZONE + "\":\"Asia/Shanghai\"}");
+        processInstance.setHistoryCmd(CommandType.COMPLEMENT_DATA.toString());
+        Property property = new Property();
+        property.setDirect(Direct.IN);
+        property.setProp("global_params");
+        property.setValue("hello world");
+        property.setType(DataType.VARCHAR);
+        List<Property> properties = Lists.newArrayList(property);
+        processInstance.setGlobalParams(JSONUtils.toJsonString(properties));
+
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setName("ProcessName-1");
+        processDefinition.setProjectName("ProjectName-1");
+        processDefinition.setProjectCode(3000001l);
+        processDefinition.setCode(200001l);
+
+        processInstance.setProcessDefinition(processDefinition);
+        taskInstance.setProcessDefine(processDefinition);
+        taskInstance.setProcessInstance(processInstance);
+        taskInstance.setTaskDefine(taskDefinition);
+
+        AbstractParameters parameters = new SubProcessParameters();
+
+        Map<String, Property> propertyMap =
+                dolphinSchedulerCuringGlobalParams.paramParsingPreparation(taskInstance, parameters, processInstance);
+        Assertions.assertNotNull(propertyMap);
+        Assertions.assertEquals(propertyMap.get(TaskConstants.PARAMETER_TASK_INSTANCE_ID).getValue(),
+                String.valueOf(taskInstance.getId()));
+        Assertions.assertEquals(propertyMap.get(TaskConstants.PARAMETER_TASK_EXECUTE_PATH).getValue(),
+                taskInstance.getExecutePath());
+        Assertions.assertEquals(propertyMap.get(TaskConstants.PARAMETER_WORKFLOW_INSTANCE_ID).getValue(),
+                String.valueOf(processInstance.getId()));
+        Assertions.assertEquals(propertyMap.get(TaskConstants.PARAMETER_WORKFLOW_DEFINITION_NAME).getValue(),
+                processDefinition.getName());
+        Assertions.assertEquals(propertyMap.get(TaskConstants.PARAMETER_PROJECT_NAME).getValue(),
+                processDefinition.getProjectName());
+        Assertions.assertEquals(propertyMap.get(TaskConstants.PARAMETER_PROJECT_CODE).getValue(),
+                String.valueOf(processDefinition.getProjectCode()));
+        Assertions.assertEquals(propertyMap.get(TaskConstants.PARAMETER_TASK_DEFINITION_CODE).getValue(),
+                String.valueOf(taskDefinition.getCode()));
+        Assertions.assertEquals(propertyMap.get(TaskConstants.PARAMETER_WORKFLOW_DEFINITION_CODE).getValue(),
+                String.valueOf(processDefinition.getCode()));
     }
 }
