@@ -32,7 +32,7 @@ import { workflowExecutionStateType } from '@/common/common'
 import { queryProcessDefinitionList } from '@/service/modules/process-definition'
 import { SelectMixedOption } from 'naive-ui/lib/select/src/interface'
 import { Router, useRouter } from 'vue-router'
-import { SelectOption } from "naive-ui/es/select/src/interface"
+import { SelectOption } from 'naive-ui/es/select/src/interface'
 
 export default defineComponent({
   name: 'ProcessInstanceCondition',
@@ -113,9 +113,12 @@ export default defineComponent({
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
     const selectFilter = (query: string, option: SelectOption) => {
-      return option.filterLabel? option.filterLabel.toString()
-      .toLowerCase()
-      .includes(query.toLowerCase()):false
+      return option.filterLabel
+        ? option.filterLabel
+            .toString()
+            .toLowerCase()
+            .includes(query.toLowerCase())
+        : false
     }
 
     const updateValue = (value: number) => {
@@ -142,28 +145,29 @@ export default defineComponent({
   render() {
     const { t } = useI18n()
     const options = workflowExecutionStateType(t)
-    const { processDefinitionOptions, processDefineCodeRef, selectFilter, updateValue } = this
+    const {
+      processDefinitionOptions,
+      processDefineCodeRef,
+      selectFilter,
+      updateValue
+    } = this
 
     return (
       <NSpace justify='end'>
-        {
-          h(
-            NSelect, {
-              style: {
-                width: '210px'
-              },
-              size: 'small',
-              clearable: true,
-              filterable: true,
-              options: unref(processDefinitionOptions),
-              value: processDefineCodeRef,
-              filter: selectFilter,
-              onUpdateValue: (value: any) => {
-                updateValue(value)
-              },
-            }
-          )
-        }
+        {h(NSelect, {
+          style: {
+            width: '210px'
+          },
+          size: 'small',
+          clearable: true,
+          filterable: true,
+          options: unref(processDefinitionOptions),
+          value: processDefineCodeRef,
+          filter: selectFilter,
+          onUpdateValue: (value: any) => {
+            updateValue(value)
+          }
+        })}
         <NInput
           allowInput={this.trim}
           size='small'

@@ -21,7 +21,7 @@ import { defineComponent, h, ref, unref } from 'vue'
 import { queryProcessDefinitionList } from '@/service/modules/process-definition'
 import { SelectMixedOption } from 'naive-ui/lib/select/src/interface'
 import { Router, useRouter } from 'vue-router'
-import {SelectOption} from "naive-ui/es/select/src/interface";
+import { SelectOption } from 'naive-ui/es/select/src/interface'
 
 export default defineComponent({
   name: 'TimingCondition',
@@ -61,9 +61,12 @@ export default defineComponent({
     }
 
     const selectFilter = (query: string, option: SelectOption) => {
-          return option.filterLabel? option.filterLabel.toString()
-          .toLowerCase()
-          .includes(query.toLowerCase()):false
+      return option.filterLabel
+        ? option.filterLabel
+            .toString()
+            .toLowerCase()
+            .includes(query.toLowerCase())
+        : false
     }
 
     const updateValue = (value: number) => {
@@ -79,27 +82,28 @@ export default defineComponent({
     }
   },
   render() {
-    const { processDefineCodeRef, processDefinitionOptions, selectFilter, updateValue } = this
+    const {
+      processDefineCodeRef,
+      processDefinitionOptions,
+      selectFilter,
+      updateValue
+    } = this
     return (
       <NSpace justify='end'>
-        {
-          h(
-              NSelect, {
-                style: {
-                  width: '310px'
-                },
-                size: 'small',
-                clearable:true,
-                filterable: true,
-                value: processDefineCodeRef,
-                options: unref(processDefinitionOptions),
-                filter: selectFilter,
-                onUpdateValue: (value: any) => {
-                  updateValue(value)
-                },
-              },
-          )
-        }
+        {h(NSelect, {
+          style: {
+            width: '310px'
+          },
+          size: 'small',
+          clearable: true,
+          filterable: true,
+          value: processDefineCodeRef,
+          options: unref(processDefinitionOptions),
+          filter: selectFilter,
+          onUpdateValue: (value: any) => {
+            updateValue(value)
+          }
+        })}
         <NButton type='primary' size='small' onClick={this.handleSearch}>
           <NIcon>
             <SearchOutlined />
