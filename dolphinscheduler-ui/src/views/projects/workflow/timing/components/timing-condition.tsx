@@ -17,10 +17,11 @@
 
 import { SearchOutlined } from '@vicons/antd'
 import { NButton, NSelect, NIcon, NSpace, NEllipsis } from 'naive-ui'
-import { defineComponent, h, ref } from 'vue'
+import { defineComponent, h, ref, unref } from 'vue'
 import { queryProcessDefinitionList } from '@/service/modules/process-definition'
 import { SelectMixedOption } from 'naive-ui/lib/select/src/interface'
 import { Router, useRouter } from 'vue-router'
+import {SelectOption} from "naive-ui/es/select/src/interface";
 
 export default defineComponent({
   name: 'TimingCondition',
@@ -59,23 +60,46 @@ export default defineComponent({
       })
     }
 
+    const selectFilter = (query: string, option: SelectOption) => {
+          return option.filterLabel? option.filterLabel.toString()
+          .toLowerCase()
+          .includes(query.toLowerCase()):false
+    }
+
+    const updateValue = (value: number) => {
+      processDefineCodeRef.value = value
+    }
+
     return {
       handleSearch,
       processDefinitionOptions,
-      processDefineCodeRef
+      processDefineCodeRef,
+      selectFilter,
+      updateValue
     }
   },
   render() {
+    const { processDefineCodeRef, processDefinitionOptions, selectFilter, updateValue } = this
     return (
       <NSpace justify='end'>
-        <NSelect
-          clearable
-          filterable
-          options={this.processDefinitionOptions}
-          size='small'
-          style={{ width: '310px' }}
-          v-model:value={this.processDefineCodeRef}
-        />
+        {
+          h(
+              NSelect, {
+                style: {
+                  width: '310px'
+                },
+                size: 'small',
+                clearable:true,
+                filterable: true,
+                value: processDefineCodeRef,
+                options: unref(processDefinitionOptions),
+                filter: selectFilter,
+                onUpdateValue: (value: any) => {
+                  updateValue(value)
+                },
+              },
+          )
+        }
         <NButton type='primary' size='small' onClick={this.handleSearch}>
           <NIcon>
             <SearchOutlined />
