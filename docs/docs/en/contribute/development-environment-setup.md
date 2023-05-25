@@ -92,7 +92,7 @@ There are two ways to configure the DolphinScheduler development environment, st
 > 
 > Standalone is only supported in DolphinScheduler 1.3.9 and later versions.
 >
-> Standalone server is able to connect to external databases like mysql and postgresql, see [Standalone Deployment](https://dolphinscheduler.apache.org/en-us/docs/3.0.5/guide/installation/standalone) for instructions.
+> Standalone server is able to connect to external databases like mysql and postgresql, see [Standalone Deployment](https://dolphinscheduler.apache.org/en-us/docs/3.0.6/guide/installation/standalone) for instructions.
 
 ### Git Branch Choose
 

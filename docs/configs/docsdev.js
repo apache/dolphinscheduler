@@ -25,19 +25,19 @@ export default {
                 children: [
                     {
                         title: 'Introduction',
-                        link: '/en-us/docs/3.0.5/user_doc/about/introduction.html',
+                        link: '/en-us/docs/3.0.6/user_doc/about/introduction.html',
                     },
                     {
                         title: 'Features',
-                        link: '/en-us/docs/3.0.5/user_doc/about/features.html',
+                        link: '/en-us/docs/3.0.6/user_doc/about/features.html',
                     },
                     {
                         title: 'Hardware Environment',
-                        link: '/en-us/docs/3.0.5/user_doc/about/hardware.html',
+                        link: '/en-us/docs/3.0.6/user_doc/about/hardware.html',
                     },
                     {
                         title: 'Glossary',
-                        link: '/en-us/docs/3.0.5/user_doc/about/glossary.html',
+                        link: '/en-us/docs/3.0.6/user_doc/about/glossary.html',
                     }
                 ],
             },
@@ -46,11 +46,11 @@ export default {
                 children: [
                     {
                         title: 'Quick Start',
-                        link: '/en-us/docs/3.0.5/user_doc/guide/start/quick-start.html',
+                        link: '/en-us/docs/3.0.6/user_doc/guide/start/quick-start.html',
                     },
                     {
                         title: 'Docker Deployment',
-                        link: '/en-us/docs/3.0.5/user_doc/guide/start/docker.html',
+                        link: '/en-us/docs/3.0.6/user_doc/guide/start/docker.html',
                     },
                 ],
             },
@@ -59,30 +59,30 @@ export default {
                 children: [
                     {
                         title: 'Workflow Overview',
-                        link: '/en-us/docs/3.0.5/user_doc/guide/homepage.html',
+                        link: '/en-us/docs/3.0.6/user_doc/guide/homepage.html',
                     },
                     {
                         title: 'Project',
                         children: [
                             {
                                 title: 'Project List',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/project/project-list.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/project/project-list.html',
                             },
                             {
                                 title: 'Workflow Definition',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/project/workflow-definition.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/project/workflow-definition.html',
                             },
                             {
                                 title: 'Workflow Instance',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/project/workflow-instance.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/project/workflow-instance.html',
                             },
                             {
                                 title: 'Task Instance',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/project/task-instance.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/project/task-instance.html',
                             },
                             {
                                 title: 'Task Definition',
-                                link: '/zh-cn/docs/3.0.5/user_doc/guide/project/task-definition.html',
+                                link: '/zh-cn/docs/3.0.6/user_doc/guide/project/task-definition.html',
                             },
                         ]
                     },
@@ -91,67 +91,67 @@ export default {
                         children: [
                             {
                                 title: 'Shell',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/task/shell.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/task/shell.html',
                             },
                             {
                                 title: 'SubProcess',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/task/sub-process.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/task/sub-process.html',
                             },
                             {
                                 title: 'Dependent',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/task/dependent.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/task/dependent.html',
                             },
                             {
                                 title: 'Stored Procedure',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/task/stored-procedure.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/task/stored-procedure.html',
                             },
                             {
                                 title: 'SQL',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/task/sql.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/task/sql.html',
                             },
                             {
                                 title: 'Spark',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/task/spark.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/task/spark.html',
                             },
                             {
                                 title: 'MapReduce',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/task/map-reduce.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/task/map-reduce.html',
                             },
                             {
                                 title: 'Python',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/task/python.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/task/python.html',
                             },
                             {
                                 title: 'Flink',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/task/flink.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/task/flink.html',
                             },
                             {
                                 title: 'HTTP',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/task/http.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/task/http.html',
                             },
                             {
                                 title: 'DataX',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/task/datax.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/task/datax.html',
                             },
                             {
                                 title: 'Pigeon',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/task/pigeon.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/task/pigeon.html',
                             },
                             {
                                 title: 'Conditions',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/task/conditions.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/task/conditions.html',
                             },
                             {
                                 title: 'Switch',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/task/switch.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/task/switch.html',
                             },
                             {
                                 title: 'Amazon EMR',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/task/emr.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/task/emr.html',
                             },
                             {
                                 title: 'Apache Zeppelin',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/task/zeppelin.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/task/zeppelin.html',
                             },
                         ],
                     },
@@ -160,23 +160,23 @@ export default {
                         children: [
                             {
                                 title: 'Built-in Parameter',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/parameter/built-in.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/parameter/built-in.html',
                             },
                             {
                                 title: 'Global Parameter',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/parameter/global.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/parameter/global.html',
                             },
                             {
                                 title: 'Local Parameter',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/parameter/local.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/parameter/local.html',
                             },
                             {
                                 title: 'Parameter Context',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/parameter/context.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/parameter/context.html',
                             },
                             {
                                 title: 'Parameter Priority',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/parameter/priority.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/parameter/priority.html',
                             },
                         ],
                     },
@@ -185,43 +185,43 @@ export default {
                         children: [
                             {
                                 title: 'MySQL',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/datasource/mysql.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/datasource/mysql.html',
                             },
                             {
                                 title: 'PostgreSQL',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/datasource/postgresql.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/datasource/postgresql.html',
                             },
                             {
                                 title: 'HIVE',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/datasource/hive.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/datasource/hive.html',
                             },
                             {
                                 title: 'Spark',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/datasource/spark.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/datasource/spark.html',
                             },
                             {
                                 title: 'Presto',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/datasource/presto.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/datasource/presto.html',
                             },
                             {
                                 title: 'SQL SERVER',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/datasource/sqlserver.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/datasource/sqlserver.html',
                             },
                             {
                                 title: 'Amazon Redshift',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/datasource/redshift.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/datasource/redshift.html',
                             },
                             {
                                 title: 'ClickHouse',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/datasource/clickhouse.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/datasource/clickhouse.html',
                             },
                             {
                                 title: 'IBM DB2',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/datasource/db2.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/datasource/db2.html',
                             },
                             {
                                 title: 'Oracle',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/datasource/oracle.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/datasource/oracle.html',
                             },
                         ],
                     },
@@ -230,39 +230,39 @@ export default {
                         children: [
                             {
                                 title: 'Alert Component User Guide ',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/alert/alert_plugin_user_guide.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/alert/alert_plugin_user_guide.html',
                             },
                             {
                                 title: 'Email',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/alert/email.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/alert/email.html',
                             },
                             {
                                 title: 'Telegram',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/alert/telegram.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/alert/telegram.html',
                             },
                             {
                                 title: 'Ding Talk',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/alert/dingtalk.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/alert/dingtalk.html',
                             },
                             {
                                 title: 'Enterprise Wechat',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/alert/enterprise-wechat.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/alert/enterprise-wechat.html',
                             },
                             {
                                 title: 'Enterprise Webexteams',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/alert/enterprise-webexteams.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/alert/enterprise-webexteams.html',
                             },
                             {
                                 title: 'Script',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/alert/script.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/alert/script.html',
                             },
                             {
                                 title: 'Http',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/alert/http.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/alert/http.html',
                             },
                             {
                                 title: 'Feishu',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/alert/feishu.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/alert/feishu.html',
                             },
                             {
                                 title: 'Slack',
@@ -279,54 +279,54 @@ export default {
                         children: [
                             {
                                 title: 'Introduction',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/resource/intro.html'
+                                link: '/en-us/docs/3.0.6/user_doc/guide/resource/intro.html'
                             },
                             {
                                 title: 'Configuration',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/resource/configuration.html'
+                                link: '/en-us/docs/3.0.6/user_doc/guide/resource/configuration.html'
                             },
                             {
                                 title: 'File Manage',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/resource/file-manage.html'
+                                link: '/en-us/docs/3.0.6/user_doc/guide/resource/file-manage.html'
                             },
                             {
                                 title: 'UDF Manage',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/resource/udf-manage.html'
+                                link: '/en-us/docs/3.0.6/user_doc/guide/resource/udf-manage.html'
                             },
                             {
                                 title: 'Task Group Manage',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/resource/task-group.html'
+                                link: '/en-us/docs/3.0.6/user_doc/guide/resource/task-group.html'
                             },
                         ],
                     },
                     {
                         title: 'Monitor',
-                        link: '/en-us/docs/3.0.5/user_doc/guide/monitor.html',
+                        link: '/en-us/docs/3.0.6/user_doc/guide/monitor.html',
                     },
                     {
                         title: 'Security',
-                        link: '/en-us/docs/3.0.5/user_doc/guide/security.html',
+                        link: '/en-us/docs/3.0.6/user_doc/guide/security.html',
                     },
                     {
                         title: 'Metrics',
                         children: [
                             {
                                 title: 'Metrics',
-                                link: '/en-us/docs/3.0.5/user_doc/guide/metrics/metrics.html',
+                                link: '/en-us/docs/3.0.6/user_doc/guide/metrics/metrics.html',
                             }
                         ],
                     },
                     {
                         title: 'Data Quality',
-                        link: '/en-us/docs/3.0.5/user_doc/guide/data-quality.html',
+                        link: '/en-us/docs/3.0.6/user_doc/guide/data-quality.html',
                     },
                     {
                         title: 'Upgrade',
-                        link: '/en-us/docs/3.0.5/user_doc/guide/upgrade.html',
+                        link: '/en-us/docs/3.0.6/user_doc/guide/upgrade.html',
                     },
                     {
                         title: 'Expansion and Reduction',
-                        link: '/en-us/docs/3.0.5/user_doc/guide/expansion-reduction.html',
+                        link: '/en-us/docs/3.0.6/user_doc/guide/expansion-reduction.html',
                     },
                 ],
             },

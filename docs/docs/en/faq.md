@@ -302,9 +302,9 @@ change into
 
 ## Q : how to add a worker server
 
-A: 1, Create deployment user and hosts mapping, please refer 1.3 part of [cluster deployment](https://dolphinscheduler.apache.org/en-us/docs/3.0.5/user_doc/installation/cluster)
+A: 1, Create deployment user and hosts mapping, please refer 1.3 part of [cluster deployment](https://dolphinscheduler.apache.org/en-us/docs/3.0.6/user_doc/installation/cluster)
 
-​ 2, Configure hosts mapping and ssh access and modify directory permissions. please refer 1.4 part of [cluster deployment](https://dolphinscheduler.apache.org/en-us/docs/3.0.5/user_doc/installation/cluster)
+​ 2, Configure hosts mapping and ssh access and modify directory permissions. please refer 1.4 part of [cluster deployment](https://dolphinscheduler.apache.org/en-us/docs/3.0.6/user_doc/installation/cluster)
 
 ​		3, Copy the deployment directory from worker server that has already deployed
 

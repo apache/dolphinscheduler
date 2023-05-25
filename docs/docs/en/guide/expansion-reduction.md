@@ -31,9 +31,9 @@ Attention: There cannot be more than one master service process or worker servic
 mkdir -p /opt
 cd /opt
 # decompress
-tar -zxvf apache-dolphinscheduler-3.0.5-bin.tar.gz -C /opt
+tar -zxvf apache-dolphinscheduler-3.0.6-bin.tar.gz -C /opt
 cd /opt
-mv apache-dolphinscheduler-3.0.5-bin  dolphinscheduler
+mv apache-dolphinscheduler-3.0.6-bin  dolphinscheduler
 ```
 
 ```markdown

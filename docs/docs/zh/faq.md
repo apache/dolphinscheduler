@@ -285,9 +285,9 @@ A： 将 hive pom
 
 ## Q：如何增加一台工作服务器
 
-A： 1，参考官网[部署文档](https://dolphinscheduler.apache.org/zh-cn/docs/3.0.5/installation/cluster) 1.3 小节，创建部署用户和 hosts 映射
+A： 1，参考官网[部署文档](https://dolphinscheduler.apache.org/zh-cn/docs/3.0.6/installation/cluster) 1.3 小节，创建部署用户和 hosts 映射
 
-​ 2，参考官网[部署文档](https://dolphinscheduler.apache.org/zh-cn/docs/3.0.5/installation/cluster) 1.4 小节，配置 hosts 映射和 ssh 打通及修改目录权限.
+​ 2，参考官网[部署文档](https://dolphinscheduler.apache.org/zh-cn/docs/3.0.6/installation/cluster) 1.4 小节，配置 hosts 映射和 ssh 打通及修改目录权限.
 ​ 1.4 小节的最后一步是在当前新增机器上执行的，即需要给部署目录部署用户的权限
 
 ​	3，复制正在运行的服务器上的部署目录到新机器的同样的部署目录下
