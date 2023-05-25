@@ -19,8 +19,17 @@ package org.apache.dolphinscheduler.server.master.runner.operator;
 
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.remote.command.task.TaskKillRequest;
+import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
+import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.server.master.rpc.MasterRpcClient;
 import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnable;
+
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.Date;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,6 +42,9 @@ public class TaskTimeoutOperator implements TaskOperator {
 
     @Autowired
     private TaskInstanceDao taskInstanceDao;
+
+    @Autowired
+    private MasterRpcClient masterRpcClient;
 
     @Override
     public void handle(DefaultTaskExecuteRunnable taskExecuteRunnable) {
@@ -48,8 +60,27 @@ public class TaskTimeoutOperator implements TaskOperator {
                     taskInstance.getName(), taskTimeoutStrategy.name());
             return;
         }
-        taskExecuteRunnable.kill();
-        log.info("TaskInstance: {} timeout, killed the task instance", taskInstance.getName());
+        try {
+            timeoutTaskInstanceInDB(taskInstance);
+            killRemoteTaskInstanceInThreadPool(taskInstance);
+            log.info("TaskInstance: {} timeout, killed the task instance", taskInstance.getName());
+        } catch (Exception ex) {
+            log.error("TaskInstance timeout {} failed", taskInstance.getName(), ex);
+        }
 
+    }
+
+    private void timeoutTaskInstanceInDB(TaskInstance taskInstance) {
+        taskInstance.setState(TaskExecutionStatus.FAILURE);
+        taskInstance.setEndTime(new Date());
+        taskInstanceDao.updateTaskInstance(taskInstance);
+    }
+
+    private void killRemoteTaskInstanceInThreadPool(TaskInstance taskInstance) throws RemotingException {
+        if (StringUtils.isEmpty(taskInstance.getHost())) {
+            return;
+        }
+        TaskKillRequest killCommand = new TaskKillRequest(taskInstance.getId());
+        masterRpcClient.send(Host.of(taskInstance.getHost()), killCommand.convert2Command());
     }
 }
