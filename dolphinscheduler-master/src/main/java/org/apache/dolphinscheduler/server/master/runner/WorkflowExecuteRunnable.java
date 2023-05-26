@@ -1690,8 +1690,9 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
         if (state == WorkflowExecutionStatus.READY_STOP) {
             List<TaskInstance> killList = getCompleteTaskByState(TaskExecutionStatus.KILL);
             List<TaskInstance> failList = getCompleteTaskByState(TaskExecutionStatus.FAILURE);
+            List<TaskInstance> stopList = getCompleteTaskByState(TaskExecutionStatus.STOP);
             WorkflowExecutionStatus executionStatus;
-            if (CollectionUtils.isNotEmpty(killList) || CollectionUtils.isNotEmpty(failList) || !isComplementEnd()) {
+            if (CollectionUtils.isNotEmpty(stopList) || CollectionUtils.isNotEmpty(killList) || CollectionUtils.isNotEmpty(failList) || !isComplementEnd()) {
                 executionStatus = WorkflowExecutionStatus.STOP;
             } else {
                 executionStatus = WorkflowExecutionStatus.SUCCESS;
