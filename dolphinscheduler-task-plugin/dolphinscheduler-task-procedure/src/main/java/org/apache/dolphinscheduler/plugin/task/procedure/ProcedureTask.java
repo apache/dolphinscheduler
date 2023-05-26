@@ -137,7 +137,6 @@ public class ProcedureTask extends AbstractTask {
     }
 
     private String formatSql(Map<Integer, Property> sqlParamsMap, Map<String, Property> paramsMap) {
-        // combining local and global parameters
         setSqlParamsMap(procedureParameters.getMethod(), rgex, sqlParamsMap, paramsMap,
                 taskExecutionContext.getTaskInstanceId());
         return procedureParameters.getMethod().replaceAll(rgex, "?");

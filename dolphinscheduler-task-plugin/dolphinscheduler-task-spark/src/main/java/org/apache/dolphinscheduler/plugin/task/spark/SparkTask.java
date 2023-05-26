@@ -114,7 +114,7 @@ public class SparkTask extends AbstractYarnTask {
         // populate spark options
         args.addAll(populateSparkOptions());
 
-        // replace placeholder, and combining local and global parameters
+        // replace placeholder
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
 
         String command =
@@ -267,7 +267,7 @@ public class SparkTask extends AbstractYarnTask {
 
     private String replaceParam(String script) {
         script = script.replaceAll("\\r\\n", System.lineSeparator());
-        // replace placeholder, and combining local and global parameters
+        // replace placeholder
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
         script = ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
         return script;

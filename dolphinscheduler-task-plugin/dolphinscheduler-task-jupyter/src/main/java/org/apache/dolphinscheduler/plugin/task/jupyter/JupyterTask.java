@@ -148,7 +148,7 @@ public class JupyterTask extends AbstractRemoteTask {
             args.add(String.format(JupyterConstants.REMOVE_ENV, timestamp));
         }
 
-        // replace placeholder, and combining local and global parameters
+        // replace placeholder
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
         String command = ParameterUtils
                 .convertParameterPlaceholders(String.join(" ", args), ParamUtils.convert(paramsMap));
