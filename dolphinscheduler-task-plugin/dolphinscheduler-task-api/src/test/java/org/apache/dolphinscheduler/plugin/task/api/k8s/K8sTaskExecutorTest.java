@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.impl.K8sTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,6 +35,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import io.fabric8.kubernetes.api.model.NodeSelectorRequirement;
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
 import io.fabric8.kubernetes.api.model.batch.v1.JobStatus;
 
@@ -58,6 +60,11 @@ public class K8sTaskExecutorTest {
         String clusterName = namespace.get(CLUSTER);
         Map<String, String> labelMap = new HashMap<>();
         labelMap.put("test", "1234");
+
+        NodeSelectorRequirement requirement = new NodeSelectorRequirement();
+        requirement.setKey("node-label");
+        requirement.setOperator("In");
+        requirement.setValues(Arrays.asList("1234", "123456"));
         k8sTaskExecutor = new K8sTaskExecutor(null, taskRequest);
         k8sTaskMainParameters = new K8sTaskMainParameters();
         k8sTaskMainParameters.setImage(image);
@@ -67,6 +74,7 @@ public class K8sTaskExecutorTest {
         k8sTaskMainParameters.setMinMemorySpace(minMemorySpace);
         k8sTaskMainParameters.setCommand("[\"perl\" ,\"-Mbignum=bpi\", \"-wle\", \"print bpi(2000)\"]");
         k8sTaskMainParameters.setLabelMap(labelMap);
+        k8sTaskMainParameters.setNodeSelectorRequirements(Arrays.asList(requirement));
         job = k8sTaskExecutor.buildK8sJob(k8sTaskMainParameters);
     }
     @Test
