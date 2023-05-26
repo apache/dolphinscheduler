@@ -30,10 +30,7 @@ import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.jdbc.core.JdbcTemplate;
-
 import com.google.common.base.Stopwatch;
-import com.zaxxer.hikari.HikariDataSource;
 
 @Slf4j
 public class CommonDataSourceClient implements DataSourceClient {
@@ -75,7 +72,8 @@ public class CommonDataSourceClient implements DataSourceClient {
         Connection conn = null;
         try {
             Class.forName(baseConnectionParam.getDriverClassName());
-            conn = DriverManager.getConnection(baseConnectionParam.getJdbcUrl(), baseConnectionParam.getUser(), baseConnectionParam.getPassword());
+            conn = DriverManager.getConnection(baseConnectionParam.getJdbcUrl(), baseConnectionParam.getUser(),
+                    baseConnectionParam.getPassword());
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("Driver load fail", e);
         } catch (SQLException e) {

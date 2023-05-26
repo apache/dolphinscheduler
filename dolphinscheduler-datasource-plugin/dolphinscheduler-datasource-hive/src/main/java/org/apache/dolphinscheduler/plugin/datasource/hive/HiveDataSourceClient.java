@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import sun.security.krb5.Config;
+
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
@@ -68,7 +69,6 @@ public class HiveDataSourceClient extends CommonDataSourceClient {
             }
         }
     }
-
 
     @Override
     public void close() {
