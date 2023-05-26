@@ -350,6 +350,7 @@ export function formatParams(data: INodeData): {
     taskParams.command = data.command
     taskParams.args = data.args
     taskParams.customizedLabels = data.customizedLabels
+    taskParams.nodeSelectors = data.nodeSelectors
   }
 
   if (data.taskType === 'JUPYTER') {

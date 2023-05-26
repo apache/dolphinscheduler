@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.k8s;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.CLUSTER;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.COMMA;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.NAMESPACE_NAME;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -26,17 +27,23 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.AbstractK8sTask;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.K8sTaskMainParameters;
 import org.apache.dolphinscheduler.plugin.task.api.model.Label;
+import org.apache.dolphinscheduler.plugin.task.api.model.NodeSelectorExpression;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.K8sTaskParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import io.fabric8.kubernetes.api.model.NodeSelectorRequirement;
 
 public class K8sTask extends AbstractK8sTask {
 
@@ -87,18 +94,33 @@ public class K8sTask extends AbstractK8sTask {
         k8sTaskMainParameters.setMinMemorySpace(k8sTaskParameters.getMinMemorySpace());
         k8sTaskMainParameters.setParamsMap(ParamUtils.convert(paramsMap));
         k8sTaskMainParameters.setLabelMap(convertToLabelMap(k8sTaskParameters.getCustomizedLabels()));
+        k8sTaskMainParameters
+                .setNodeSelectorRequirements(convertToNodeSelectorRequirements(k8sTaskParameters.getNodeSelectors()));
         k8sTaskMainParameters.setCommand(k8sTaskParameters.getCommand());
         k8sTaskMainParameters.setArgs(k8sTaskParameters.getArgs());
         return JSONUtils.toJsonString(k8sTaskMainParameters);
     }
 
-    public Map<String, String> convertToLabelMap(List<Label> customizedLabels) {
-        if (CollectionUtils.isEmpty(customizedLabels)) {
+    public List<NodeSelectorRequirement> convertToNodeSelectorRequirements(List<NodeSelectorExpression> expressions) {
+        if (CollectionUtils.isEmpty(expressions)) {
+            return Collections.emptyList();
+        }
+
+        return expressions.stream().map(expression -> new NodeSelectorRequirement(
+                expression.getKey(),
+                expression.getOperator(),
+                StringUtils.isEmpty(expression.getValues()) ? Collections.emptyList()
+                        : Arrays.asList(expression.getValues().trim().split(COMMA))))
+                .collect(Collectors.toList());
+    }
+
+    public Map<String, String> convertToLabelMap(List<Label> labels) {
+        if (CollectionUtils.isEmpty(labels)) {
             return Collections.emptyMap();
         }
 
         HashMap<String, String> labelMap = new HashMap<>();
-        customizedLabels.forEach(label -> {
+        labels.forEach(label -> {
             labelMap.put(label.getLabel(), label.getValue());
         });
         return labelMap;

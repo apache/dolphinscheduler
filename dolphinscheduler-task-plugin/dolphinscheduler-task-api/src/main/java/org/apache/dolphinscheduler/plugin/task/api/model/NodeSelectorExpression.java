@@ -15,28 +15,31 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.k8s;
+package org.apache.dolphinscheduler.plugin.task.api.model;
 
-import java.util.List;
-import java.util.Map;
+import java.io.Serializable;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import io.fabric8.kubernetes.api.model.NodeSelectorRequirement;
+import lombok.NoArgsConstructor;
 
-/**
- * k8s task parameters
- */
 @Data
-public class K8sTaskMainParameters {
+@NoArgsConstructor
+@AllArgsConstructor
+public class NodeSelectorExpression implements Serializable {
 
-    private String image;
-    private String command;
-    private String args;
-    private String namespaceName;
-    private String clusterName;
-    private double minCpuCores;
-    private double minMemorySpace;
-    private Map<String, String> paramsMap;
-    private Map<String, String> labelMap;
-    private List<NodeSelectorRequirement> nodeSelectorRequirements;
+    /**
+     * selector key
+     */
+    private String key;
+
+    /**
+     * selector operator
+     */
+    private String operator;
+
+    /**
+     * selector value
+     */
+    private String values;
 }

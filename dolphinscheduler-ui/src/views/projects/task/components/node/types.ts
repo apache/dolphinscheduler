@@ -66,9 +66,15 @@ interface ILocalParam {
   value?: string
 }
 
-interface ICustomLabel {
+interface ILabel {
   label: string
   value: string
+}
+
+interface IMatchExpression {
+  key: string
+  operator: string
+  values: string
 }
 
 interface IResponseJsonItem extends Omit<IJsonItemParams, 'type'> {
@@ -366,7 +372,8 @@ interface ITaskParams {
   image?: string
   command?: string
   args?: string
-  customizedLabels?: ICustomLabel[]
+  customizedLabels?: ILabel[]
+  nodeSelectors?: IMatchExpression[]
   algorithm?: string
   params?: string
   searchParams?: string
