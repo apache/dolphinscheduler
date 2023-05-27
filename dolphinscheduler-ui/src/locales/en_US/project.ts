@@ -847,5 +847,13 @@ export default {
     dq: 'Data Quality',
     ml: 'Machine Learning',
     other: 'Other'
-  }
+  },
+  parameter: {
+    create_parameter: 'Create Parameter',
+    parameter_manage: 'Parameter Management',
+    code: 'Parameter Code',
+    name: 'Parameter Name',
+    value: 'Parameter Value',
+    create_time: 'Create Time',
+  },
 }

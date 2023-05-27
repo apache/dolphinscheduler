@@ -823,5 +823,13 @@ export default {
     dq: '数据质量',
     ml: '机器学习',
     other: '其他'
-  }
+  },
+  parameter: {
+    create_parameter: '创建项目级变量',
+    parameter_manage: '变量管理',
+    code: '变量编码',
+    name: '变量名称',
+    value: '变量值',
+    create_time: '创建时间',
+  },
 }
