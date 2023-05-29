@@ -483,3 +483,4 @@ casdoor-spring-boot-starter-1.6.0.jar
 org.apache.oltu.oauth2.client-1.0.2.jar
 org.apache.oltu.oauth2.common-1.0.2.jar
 snowflake-jdbc-3.13.10.jar
+vertica-jdbc-12.0.4-0.jar

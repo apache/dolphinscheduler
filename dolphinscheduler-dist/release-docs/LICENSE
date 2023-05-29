@@ -788,3 +788,8 @@ SIL licenses
 JDOM licenses
 ========================================
     jdom2 2.0.6.1: https://github.com/hunterhacker/jdom/blob/master/LICENSE.txt JDOM
+
+========================================
+Vertica Client Driver License
+========================================
+    vertica-jdbc 12.0.4-0: https://mvnrepository.com/artifact/com.vertica.jdbc/vertica-jdbc/12.0.4-0, Vertica Client Driver License

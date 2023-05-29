@@ -122,6 +122,11 @@ export function useDatasource(
       id: 16,
       code: 'DATABEND',
       disabled: false
+    },
+    {
+      id: 21,
+      code: 'VERTICA',
+      disabled: false
     }
   ]
 
