@@ -1755,7 +1755,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             parentTreeViewDto.getInstances()
                     .add(new Instance(processInstance.getId(), processInstance.getName(),
                             processInstance.getProcessDefinitionCode(),
-                            "", processInstance.getState().toString(), processInstance.getStartTime(), endTime,
+                            "", processInstance.getState().name(), processInstance.getStartTime(), endTime,
                             processInstance.getHost(),
                             DateUtils.format2Readable(endTime.getTime() - processInstance.getStartTime().getTime())));
         }
@@ -1814,7 +1814,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                         }
                         treeViewDto.getInstances().add(new Instance(taskInstance.getId(), taskInstance.getName(),
                                 taskInstance.getTaskCode(),
-                                taskInstance.getTaskType(), taskInstance.getState().toString(),
+                                taskInstance.getTaskType(), taskInstance.getState().name(),
                                 taskInstance.getStartTime(), taskInstance.getEndTime(),
                                 taskInstance.getHost(),
                                 DateUtils.format2Readable(endTime.getTime() - startTime.getTime()), subProcessCode));
