@@ -165,7 +165,7 @@ public class FlinkArgsUtils {
 
             // yarn.application.queue
             String others = flinkParameters.getOthers();
-            if (StringUtils.isEmpty(others) || !others.contains(FlinkConstants.FLINK_QUEUE)) {
+            if (StringUtils.isEmpty(others) || !others.contains(FlinkConstants.FLINK_QUEUE_FOR_MODE)) {
                 String queue = flinkParameters.getQueue();
                 if (StringUtils.isNotEmpty(queue)) {
                     initOptions.add(String.format(FlinkConstants.FLINK_FORMAT_YARN_APPLICATION_QUEUE, queue));
@@ -186,6 +186,8 @@ public class FlinkArgsUtils {
                                                              FlinkParameters flinkParameters) {
         List<String> args = new ArrayList<>();
 
+        String others = flinkParameters.getOthers();
+
         args.add(FlinkConstants.FLINK_COMMAND);
         FlinkDeployMode deployMode = Optional.ofNullable(flinkParameters.getDeployMode()).orElse(DEFAULT_DEPLOY_MODE);
         String flinkVersion = flinkParameters.getFlinkVersion();
@@ -197,16 +199,41 @@ public class FlinkArgsUtils {
                     args.add(FlinkConstants.FLINK_RUN); // run
                     args.add(FlinkConstants.FLINK_EXECUTION_TARGET); // -t
                     args.add(FlinkConstants.FLINK_YARN_PER_JOB); // yarn-per-job
+
+                    if (StringUtils.isEmpty(others) || !others.contains(FlinkConstants.FLINK_QUEUE_FOR_TARGETS)) {
+                        String queue = flinkParameters.getQueue();
+                        if (StringUtils.isNotEmpty(queue)) { // -Dyarn.application.queue=%s
+                            args.add(String.format(FlinkConstants.FLINK_QUEUE_FOR_TARGETS, queue));
+                        }
+                    }
+
                 } else {
                     args.add(FlinkConstants.FLINK_RUN); // run
                     args.add(FlinkConstants.FLINK_RUN_MODE); // -m
                     args.add(FlinkConstants.FLINK_YARN_CLUSTER); // yarn-cluster
+
+                    if (StringUtils.isEmpty(others) || !others.contains(FlinkConstants.FLINK_QUEUE_FOR_MODE)) {
+                        String queue = flinkParameters.getQueue();
+                        if (StringUtils.isNotEmpty(queue)) { // -yqu
+                            args.add(FlinkConstants.FLINK_QUEUE_FOR_MODE);
+                            args.add(queue);
+                        }
+                    }
+
                 }
                 break;
             case APPLICATION:
                 args.add(FlinkConstants.FLINK_RUN_APPLICATION); // run-application
                 args.add(FlinkConstants.FLINK_EXECUTION_TARGET); // -t
                 args.add(FlinkConstants.FLINK_YARN_APPLICATION); // yarn-application
+
+                if (StringUtils.isEmpty(others) || !others.contains(FlinkConstants.FLINK_QUEUE_FOR_TARGETS)) {
+                    String queue = flinkParameters.getQueue();
+                    if (StringUtils.isNotEmpty(queue)) { // -Dyarn.application.queue=%s
+                        args.add(String.format(FlinkConstants.FLINK_QUEUE_FOR_TARGETS, queue));
+                    }
+                }
+
                 break;
             case LOCAL:
                 args.add(FlinkConstants.FLINK_RUN); // run
@@ -215,8 +242,6 @@ public class FlinkArgsUtils {
                 args.add(FlinkConstants.FLINK_RUN); // run
                 break;
         }
-
-        String others = flinkParameters.getOthers();
 
         // build args
         switch (deployMode) {
@@ -254,13 +279,6 @@ public class FlinkArgsUtils {
                     args.add(taskManagerMemory);
                 }
 
-                if (StringUtils.isEmpty(others) || !others.contains(FlinkConstants.FLINK_QUEUE)) {
-                    String queue = flinkParameters.getQueue();
-                    if (StringUtils.isNotEmpty(queue)) { // -yqu
-                        args.add(FlinkConstants.FLINK_QUEUE);
-                        args.add(queue);
-                    }
-                }
                 break;
             case LOCAL:
                 break;
