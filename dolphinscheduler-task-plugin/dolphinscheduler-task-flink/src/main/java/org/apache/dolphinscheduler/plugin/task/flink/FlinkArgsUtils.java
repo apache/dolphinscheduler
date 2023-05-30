@@ -321,7 +321,7 @@ public class FlinkArgsUtils {
         String others = flinkParameters.getOthers();
         if (StringUtils.isEmpty(others) || !others.contains(option)) {
             String queue = flinkParameters.getQueue();
-            if (StringUtils.isNotEmpty(queue)) { // -Dyarn.application.queue=%s
+            if (StringUtils.isNotEmpty(queue)) {
                 switch (option) {
                     case FlinkConstants.FLINK_QUEUE_FOR_TARGETS:
                         args.add(String.format(FlinkConstants.FLINK_QUEUE_FOR_TARGETS, queue));
