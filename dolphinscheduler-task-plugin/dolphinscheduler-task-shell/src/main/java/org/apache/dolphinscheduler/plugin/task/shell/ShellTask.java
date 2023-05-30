@@ -156,7 +156,6 @@ public class ShellTask extends AbstractTask {
     }
 
     private String parseScript(String script) {
-        // combining local and global parameters
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
         return ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
     }
