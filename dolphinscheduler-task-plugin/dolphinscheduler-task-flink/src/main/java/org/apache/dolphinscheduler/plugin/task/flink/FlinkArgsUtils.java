@@ -324,7 +324,7 @@ public class FlinkArgsUtils {
             if (StringUtils.isNotEmpty(queue)) {
                 switch (option) {
                     case FlinkConstants.FLINK_QUEUE_FOR_TARGETS:
-                        args.add(String.format(FlinkConstants.FLINK_QUEUE_FOR_TARGETS, queue));
+                        args.add(String.format(FlinkConstants.FLINK_QUEUE_FOR_TARGETS + "=%s", queue));
                     case FlinkConstants.FLINK_QUEUE_FOR_MODE:
                         args.add(FlinkConstants.FLINK_QUEUE_FOR_MODE);
                         args.add(queue);
