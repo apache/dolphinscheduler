@@ -183,8 +183,6 @@ public class FlinkArgsUtils {
                                                              FlinkParameters flinkParameters) {
         List<String> args = new ArrayList<>();
 
-        String others = flinkParameters.getOthers();
-
         args.add(FlinkConstants.FLINK_COMMAND);
         FlinkDeployMode deployMode = Optional.ofNullable(flinkParameters.getDeployMode()).orElse(DEFAULT_DEPLOY_MODE);
         String flinkVersion = flinkParameters.getFlinkVersion();
@@ -196,19 +194,16 @@ public class FlinkArgsUtils {
                     args.add(FlinkConstants.FLINK_RUN); // run
                     args.add(FlinkConstants.FLINK_EXECUTION_TARGET); // -t
                     args.add(FlinkConstants.FLINK_YARN_PER_JOB); // yarn-per-job
-
                 } else {
                     args.add(FlinkConstants.FLINK_RUN); // run
                     args.add(FlinkConstants.FLINK_RUN_MODE); // -m
                     args.add(FlinkConstants.FLINK_YARN_CLUSTER); // yarn-cluster
-
                 }
                 break;
             case APPLICATION:
                 args.add(FlinkConstants.FLINK_RUN_APPLICATION); // run-application
                 args.add(FlinkConstants.FLINK_EXECUTION_TARGET); // -t
                 args.add(FlinkConstants.FLINK_YARN_APPLICATION); // yarn-application
-
                 break;
             case LOCAL:
                 args.add(FlinkConstants.FLINK_RUN); // run
@@ -217,6 +212,8 @@ public class FlinkArgsUtils {
                 args.add(FlinkConstants.FLINK_RUN); // run
                 break;
         }
+
+        String others = flinkParameters.getOthers();
 
         // build args
         switch (deployMode) {
@@ -311,28 +308,28 @@ public class FlinkArgsUtils {
             case CLUSTER:
                 if (FLINK_VERSION_AFTER_OR_EQUALS_1_12.equals(flinkVersion)
                         || FLINK_VERSION_AFTER_OR_EQUALS_1_13.equals(flinkVersion)) {
-                    if (StringUtils.isEmpty(others) || !others.contains(FlinkConstants.FLINK_QUEUE_FOR_TARGETS)) {
-                        String queue = flinkParameters.getQueue();
-                        if (StringUtils.isNotEmpty(queue)) { // -Dyarn.application.queue=%s
-                            args.add(String.format(FlinkConstants.FLINK_QUEUE_FOR_TARGETS, queue));
-                        }
-                    }
+                    doAddQueue(args, flinkParameters, FlinkConstants.FLINK_QUEUE_FOR_TARGETS);
                 } else {
-                    if (StringUtils.isEmpty(others) || !others.contains(FlinkConstants.FLINK_QUEUE_FOR_MODE)) {
-                        String queue = flinkParameters.getQueue();
-                        if (StringUtils.isNotEmpty(queue)) { // -yqu
-                            args.add(FlinkConstants.FLINK_QUEUE_FOR_MODE);
-                            args.add(queue);
-                        }
-                    }
+                    doAddQueue(args, flinkParameters, FlinkConstants.FLINK_QUEUE_FOR_MODE);
                 }
             case APPLICATION:
-                if (StringUtils.isEmpty(others) || !others.contains(FlinkConstants.FLINK_QUEUE_FOR_TARGETS)) {
-                    String queue = flinkParameters.getQueue();
-                    if (StringUtils.isNotEmpty(queue)) { // -Dyarn.application.queue=%s
+                doAddQueue(args, flinkParameters, FlinkConstants.FLINK_QUEUE_FOR_TARGETS);
+        }
+    }
+
+    private static void doAddQueue(List<String> args, FlinkParameters flinkParameters, String option) {
+        String others = flinkParameters.getOthers();
+        if (StringUtils.isEmpty(others) || !others.contains(option)) {
+            String queue = flinkParameters.getQueue();
+            if (StringUtils.isNotEmpty(queue)) { // -Dyarn.application.queue=%s
+                switch (option) {
+                    case FlinkConstants.FLINK_QUEUE_FOR_TARGETS:
                         args.add(String.format(FlinkConstants.FLINK_QUEUE_FOR_TARGETS, queue));
-                    }
+                    case FlinkConstants.FLINK_QUEUE_FOR_MODE:
+                        args.add(FlinkConstants.FLINK_QUEUE_FOR_MODE);
+                        args.add(queue);
                 }
+            }
         }
     }
 
