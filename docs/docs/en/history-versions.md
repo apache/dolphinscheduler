@@ -36,6 +36,10 @@
 
 #### Links： [3.1.0 Document](../3.1.0/user_doc/about/introduction.md)
 
+### Versions: 3.0.6
+
+#### Links： [3.0.6 Document](../3.0.6/user_doc/about/introduction.md)
+
 ### Versions: 3.0.5
 
 #### Links： [3.0.5 Document](../3.0.5/user_doc/about/introduction.md)
