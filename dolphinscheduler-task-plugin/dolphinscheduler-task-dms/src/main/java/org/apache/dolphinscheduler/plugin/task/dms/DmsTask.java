@@ -235,7 +235,6 @@ public class DmsTask extends AbstractRemoteTask {
     public void convertJsonParameters() throws TaskException {
         // create a new parameter object using the json data if the json data is not empty
         if (parameters.getIsJsonFormat() && parameters.getJsonData() != null) {
-            // combining local and global parameters
             String jsonData = ParameterUtils.convertParameterPlaceholders(parameters.getJsonData(),
                     ParamUtils.convert(taskExecutionContext.getPrepareParamsMap()));
 
