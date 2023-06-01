@@ -495,11 +495,10 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      * @param projectCode project code
      * @param projectName project name
      * @param desc        description
-     * @param userName    project owner
      * @return update result code
      */
     @Override
-    public Result update(User loginUser, Long projectCode, String projectName, String desc, String userName) {
+    public Result update(User loginUser, Long projectCode, String projectName, String desc) {
         Result result = new Result();
 
         checkDesc(result, desc);
@@ -517,10 +516,10 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             putMsg(result, Status.PROJECT_ALREADY_EXISTS, projectName);
             return result;
         }
-        User user = userMapper.queryByUserNameAccurately(userName);
+        User user = userMapper.selectById(loginUser.getId());
         if (user == null) {
-            log.error("User does not exist.");
-            putMsg(result, Status.USER_NOT_EXIST, userName);
+            log.error("user {} not exists", loginUser.getId());
+            putMsg(result, Status.USER_NOT_EXIST, loginUser.getId());
             return result;
         }
         project.setName(projectName);
