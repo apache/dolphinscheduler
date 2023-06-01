@@ -91,9 +91,39 @@ public class WorkerServerMetrics {
         workerResourceDownloadSizeDistribution.record(size);
     }
 
-    public void registerWorkerRunningTaskGauge(final Supplier<Number> supplier) {
-        Gauge.builder("ds.task.running", supplier)
-                .description("number of running tasks on workers")
+    public void registerWorkerTaskTotalGauge(final Supplier<Number> supplier) {
+        Gauge.builder("ds.worker.task", supplier)
+                .description("total number of tasks on worker")
+                .register(Metrics.globalRegistry);
+    }
+
+    public void registerWorkerExecuteQueueSizeGauge(Supplier<Number> supplier) {
+        Gauge.builder("ds.worker.execute.queue.size", supplier)
+                .description("worker execute queue size")
+                .register(Metrics.globalRegistry);
+    }
+
+    public void registerWorkerActiveExecuteThreadGauge(Supplier<Number> supplier) {
+        Gauge.builder("ds.worker.active.execute.thread", supplier)
+                .description("number of active task execute threads on worker")
+                .register(Metrics.globalRegistry);
+    }
+
+    public void registerWorkerMemoryAvailableGauge(Supplier<Number> supplier) {
+        Gauge.builder("ds.worker.memory.available", supplier)
+                .description("worker memory available")
+                .register(Metrics.globalRegistry);
+    }
+
+    public void registerWorkerCpuUsageGauge(Supplier<Number> supplier) {
+        Gauge.builder("ds.worker.cpu.usage", supplier)
+                .description("worker cpu usage")
+                .register(Metrics.globalRegistry);
+    }
+
+    public void registerWorkerMemoryUsageGauge(Supplier<Number> supplier) {
+        Gauge.builder("ds.worker.memory.usage", supplier)
+                .description("worker memory usage")
                 .register(Metrics.globalRegistry);
     }
 
