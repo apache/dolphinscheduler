@@ -196,7 +196,7 @@ const GraphChart = defineComponent({
       ]
     }
 
-    initChart(graphChartRef, option)
+    initChart(graphChartRef, option, 'graph')
 
     return { graphChartRef }
   },

@@ -81,7 +81,7 @@ const BarChart = defineComponent({
       ]
     }
 
-    initChart(barChartRef, option)
+    initChart(barChartRef, option, 'bra')
 
     return { barChartRef }
   },
