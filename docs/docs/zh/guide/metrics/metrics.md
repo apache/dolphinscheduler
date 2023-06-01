@@ -113,7 +113,7 @@ metrics exporter端口`server.port`是在application.yaml里定义的: master: `
 
 - ds.api.request.count: (counter) api请求次数
 - ds.api.response.count: (counter) api响应次数，可由标签`code`切分
-- ds.api.response.time: (histogram) api响应时间分布
+- ds.api.response.time: (timer) api响应时间分布，可由标签`user_id`切分
 - ds.api.resource.upload.size: (histogram) api上传资源文件大小的分布（bytes）
 - ds.api.resource.download.size: (histogram) api下载资源文件大小的分布（bytes）
 
