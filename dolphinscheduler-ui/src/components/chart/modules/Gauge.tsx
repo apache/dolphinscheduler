@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, ref } from 'vue'
+import { defineComponent, onMounted, PropType, ref } from 'vue'
 import initChart from '@/components/chart'
 import type { Ref } from 'vue'
 
@@ -38,6 +38,11 @@ const GaugeChart = defineComponent({
   props,
   setup(props) {
     const gaugeChartRef: Ref<HTMLDivElement | null> = ref(null)
+    const windowWidth = window.innerWidth
+    // The original size was based on the screen width of 2560
+    const defaultFontSize = windowWidth > 2560 ? 20 : (windowWidth / 2560) * 20
+
+    console.log('defaultFontSize', defaultFontSize)
 
     const option = {
       series: [
@@ -72,12 +77,13 @@ const GaugeChart = defineComponent({
           axisLabel: {
             color: 'auto',
             distance: 40,
-            fontSize: 20
+            fontSize: defaultFontSize
           },
           detail: {
             valueAnimation: true,
             formatter: '{value} %',
-            color: 'auto'
+            color: 'auto',
+            fontSize: defaultFontSize * 1.5
           },
           data: [
             {
@@ -88,8 +94,7 @@ const GaugeChart = defineComponent({
       ]
     }
 
-    initChart(gaugeChartRef, option)
-
+    initChart(gaugeChartRef, option, 'gauge')
     return { gaugeChartRef }
   },
   render() {
