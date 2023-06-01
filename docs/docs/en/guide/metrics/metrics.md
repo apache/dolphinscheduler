@@ -106,7 +106,7 @@ For example, you can get the master metrics by `curl http://localhost:5679/actua
 - ds.worker.task: (gauge) the number of tasks on the worker, including pending and running ones
 - ds.worker.execute.queue.size: (gauge) the number of pending tasks on the worker
 - ds.worker.active.execute.thread: (gauge) the number of running tasks on the worker
-- ds.worker.memory.available: (gauge) the available physical memory of the worker
+- ds.worker.memory.available: (gauge) the available physical memory of the worker (GB)
 - ds.worker.cpu.usage: (gauge) the cpu usage percentage of the worker
 - ds.worker.memory.usage: (gauge) the memory usage percentage of the worker
 - ds.worker.full.submit.queue.count: (counter) the number of times the worker's submit queue being full

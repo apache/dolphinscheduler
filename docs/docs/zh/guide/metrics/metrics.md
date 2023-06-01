@@ -106,7 +106,7 @@ metrics exporter端口`server.port`是在application.yaml里定义的: master: `
 - ds.worker.task: (gauge) worker上任务总数，包含等待提交和正在执行的任务
 - ds.worker.execute.queue.size: (gauge) worker上等待提交的任务总数
 - ds.worker.active.execute.thread: (gauge) worker上正在执行的任务总数
-- ds.worker.memory.available: (gauge) worker机器可用物理内存
+- ds.worker.memory.available: (gauge) worker机器可用物理内存 (GB)
 - ds.worker.cpu.usage: (gauge) worker机器cpu使用百分比
 - ds.worker.memory.usage: (gauge) worker机器内存使用百分比
 - ds.worker.full.submit.queue.count: (counter) worker提交队列全满次数
