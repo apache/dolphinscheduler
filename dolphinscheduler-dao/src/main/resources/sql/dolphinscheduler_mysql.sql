@@ -606,6 +606,7 @@ CREATE TABLE `t_ds_process_instance` (
   `end_time` datetime DEFAULT NULL COMMENT 'process instance end time',
   `run_times` int(11) DEFAULT NULL COMMENT 'process instance run times',
   `host` varchar(135) DEFAULT NULL COMMENT 'process instance host',
+  `workflow_instance_log_path` varchar(255) DEFAULT NULL,
   `command_type` tinyint(4) DEFAULT NULL COMMENT 'command type',
   `command_param` text COMMENT 'json command parameters',
   `task_depend_type` tinyint(4) DEFAULT NULL COMMENT 'task depend type. 0: only current node,1:before the node,2:later nodes',

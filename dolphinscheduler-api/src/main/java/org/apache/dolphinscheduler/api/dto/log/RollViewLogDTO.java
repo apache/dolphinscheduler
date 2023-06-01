@@ -15,24 +15,32 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.remote.command.log;
-
-import org.apache.dolphinscheduler.remote.command.MessageType;
-import org.apache.dolphinscheduler.remote.command.RequestMessageBuilder;
+package org.apache.dolphinscheduler.api.dto.log;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
+@Builder
 @NoArgsConstructor
-public class GetLogBytesRequest implements RequestMessageBuilder {
+@AllArgsConstructor
+public class RollViewLogDTO {
 
-    private String path;
+    /**
+     * Current log message
+     */
+    private String log;
 
-    @Override
-    public MessageType getCommandType() {
-        return MessageType.GET_LOG_BYTES_REQUEST;
-    }
+    /**
+     * Current log line number
+     */
+    private long currentLogLineNumber;
+
+    /**
+     * False means there are no extra log.
+     */
+    private boolean hasNext;
+
 }

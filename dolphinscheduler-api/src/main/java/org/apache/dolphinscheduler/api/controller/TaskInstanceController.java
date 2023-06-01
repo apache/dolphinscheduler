@@ -17,15 +17,19 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.apache.dolphinscheduler.api.enums.Status.DOWNLOAD_TASK_INSTANCE_LOG_FILE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.FORCE_TASK_SUCCESS_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_INSTANCE_LOG_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_LIST_PAGING_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.REMOVE_TASK_INSTANCE_CACHE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.TASK_SAVEPOINT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.TASK_STOP_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
+import org.apache.dolphinscheduler.api.dto.log.RollViewLogDTO;
 import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceRemoveCacheResponse;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
+import org.apache.dolphinscheduler.api.service.TaskInstanceLogService;
 import org.apache.dolphinscheduler.api.service.TaskInstanceService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -35,7 +39,9 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,6 +49,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -62,6 +69,9 @@ public class TaskInstanceController extends BaseController {
 
     @Autowired
     private TaskInstanceService taskInstanceService;
+
+    @Autowired
+    private TaskInstanceLogService taskInstanceLogService;
 
     /**
      * query task list paging
@@ -224,5 +234,44 @@ public class TaskInstanceController extends BaseController {
                                                                    @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                                    @PathVariable(value = "id") Integer id) {
         return taskInstanceService.removeTaskInstanceCache(loginUser, projectCode, id);
+    }
+
+    @Operation(summary = "queryTaskInstanceLog", description = "QUERY_TASK_INSTANCE_LOG")
+    @Parameters({
+            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "taskInstanceId", description = "TASK_INSTANCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "skipLineNum", description = "SKIP_LINE_NUM", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "limit", description = "LIMIT", required = true, schema = @Schema(implementation = int.class, example = "100"))
+    })
+    @GetMapping(value = "/log/view")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_TASK_INSTANCE_LOG_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result<RollViewLogDTO> queryLog(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                           @RequestParam(value = "taskInstanceId") int taskInstanceId,
+                                           @RequestParam(value = "skipLineNum") int skipNum,
+                                           @RequestParam(value = "limit") int limit) {
+        RollViewLogDTO rollViewLogResponse =
+                taskInstanceLogService.queryTaskInstanceLog(loginUser, taskInstanceId, skipNum, limit);
+        return Result.success(rollViewLogResponse);
+    }
+
+    @Operation(summary = "downloadTaskInstanceLog", description = "DOWNLOAD_TASK_INSTANCE_LOG")
+    @Parameters({
+            @Parameter(name = "taskInstanceId", description = "TASK_INSTANCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
+    })
+    @GetMapping(value = "/log/download")
+    @ResponseBody
+    @ApiException(DOWNLOAD_TASK_INSTANCE_LOG_FILE_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public ResponseEntity downloadTaskLog(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                          @RequestParam(value = "taskInstanceId") int taskInstanceId) {
+        // todo: return log file name
+        byte[] logBytes = taskInstanceLogService.downloadTaskInstanceLog(loginUser, taskInstanceId);
+        return ResponseEntity
+                .ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + System.currentTimeMillis() + ".log" + "\"")
+                .body(logBytes);
     }
 }

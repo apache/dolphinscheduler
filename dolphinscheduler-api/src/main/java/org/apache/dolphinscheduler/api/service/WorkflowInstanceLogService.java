@@ -15,22 +15,14 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.remote.command.log;
+package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.api.dto.log.RollViewLogDTO;
+import org.apache.dolphinscheduler.dao.entity.User;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+public interface WorkflowInstanceLogService {
 
-public class RollViewLogRequestTest {
+    RollViewLogDTO queryWorkflowInstanceLog(User loginUser, int workflowInstanceId, int skipNum, int limit);
 
-    @Test
-    public void testConvert2Command() {
-        RollViewLogRequest rollViewLogRequest = new RollViewLogRequest();
-        rollViewLogRequest.setPath("/opt/test");
-        rollViewLogRequest.setSkipLineNum(1);
-        rollViewLogRequest.setLimit(1);
-        Message message = rollViewLogRequest.convert2Command();
-        Assertions.assertNotNull(message);
-    }
+    byte[] downloadWorkflowInstanceLog(User loginUser, int workflowInstanceId);
 }

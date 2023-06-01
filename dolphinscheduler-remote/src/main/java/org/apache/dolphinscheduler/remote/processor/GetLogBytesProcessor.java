@@ -18,11 +18,16 @@
 package org.apache.dolphinscheduler.remote.processor;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.LogUtils;
 import org.apache.dolphinscheduler.remote.command.Message;
 import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.log.GetLogBytesRequest;
 import org.apache.dolphinscheduler.remote.command.log.GetLogBytesResponse;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,12 +41,29 @@ public class GetLogBytesProcessor extends BaseLogProcessor implements NettyReque
 
     @Override
     public void process(Channel channel, Message message) {
-        GetLogBytesRequest getLogRequest = JSONUtils.parseObject(
-                message.getBody(), GetLogBytesRequest.class);
-        String path = getLogRequest.getPath();
-        byte[] bytes = LogUtils.getFileContentBytes(path);
-        GetLogBytesResponse getLogResponse = new GetLogBytesResponse(bytes);
+        GetLogBytesRequest getLogRequest = JSONUtils.parseObject(message.getBody(), GetLogBytesRequest.class);
+        GetLogBytesResponse getLogResponse = getFileContentBytes(getLogRequest);
         channel.writeAndFlush(getLogResponse.convert2Command(message.getOpaque()));
+    }
+
+    private GetLogBytesResponse getFileContentBytes(GetLogBytesRequest logBytesRequestCommand) {
+        if (logBytesRequestCommand == null) {
+            return GetLogBytesResponse.error(GetLogBytesResponse.Status.COMMAND_IS_NULL);
+        }
+        String path = logBytesRequestCommand.getPath();
+        try (
+                InputStream in = Files.newInputStream(Paths.get(path));
+                ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = in.read(buf)) != -1) {
+                bos.write(buf, 0, len);
+            }
+            return GetLogBytesResponse.success(bos.toByteArray());
+        } catch (IOException e) {
+            log.error("Get file bytes error, meet an unknown exception", e);
+            return GetLogBytesResponse.error(GetLogBytesResponse.Status.UNKNOWN_ERROR);
+        }
     }
 
     @Override

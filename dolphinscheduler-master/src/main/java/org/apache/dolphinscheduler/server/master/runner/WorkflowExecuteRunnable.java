@@ -84,11 +84,13 @@ import org.apache.dolphinscheduler.server.master.event.StateEventHandlerManager;
 import org.apache.dolphinscheduler.server.master.event.TaskStateEvent;
 import org.apache.dolphinscheduler.server.master.event.WorkflowStateEvent;
 import org.apache.dolphinscheduler.server.master.exception.TaskExecuteRunnableCreateException;
+import org.apache.dolphinscheduler.server.master.log.WorkflowInstanceLogHeader;
 import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
 import org.apache.dolphinscheduler.server.master.rpc.MasterRpcClient;
 import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnableFactory;
 import org.apache.dolphinscheduler.server.master.utils.TaskUtils;
+import org.apache.dolphinscheduler.server.master.utils.WorkflowInstanceLogUtils;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
@@ -778,23 +780,26 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
         }
     }
 
-    /**
-     * process end handle
-     */
     public void endProcess() {
-        this.stateEvents.clear();
-        if (processDefinition.getExecutionType().typeIsSerialWait() || processDefinition.getExecutionType()
-                .typeIsSerialPriority()) {
-            checkSerialProcess(processDefinition);
-        }
-        ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
-        processAlertManager.sendAlertProcessInstance(processInstance, getValidTaskList(), projectUser);
-        if (processInstance.getState().isSuccess()) {
-            processAlertManager.closeAlert(processInstance);
-        }
-        if (checkTaskQueue()) {
-            // release task group
-            processService.releaseAllTaskGroup(processInstance.getId());
+        try {
+            WorkflowInstanceLogUtils.setWorkflowInstanceLogFullPathMdcKey(processInstance.getWorkflowInstanceLogPath());
+            WorkflowInstanceLogHeader.printFinalizeWorkflowInstanceHeader();
+            stateEvents.clear();
+            if (processDefinition.getExecutionType().typeIsSerialWait() || processDefinition.getExecutionType()
+                    .typeIsSerialPriority()) {
+                checkSerialProcess(processDefinition);
+            }
+            ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
+            processAlertManager.sendAlertProcessInstance(processInstance, getValidTaskList(), projectUser);
+            if (processInstance.getState().isSuccess()) {
+                processAlertManager.closeAlert(processInstance);
+            }
+            if (checkTaskQueue()) {
+                // release task group
+                processService.releaseAllTaskGroup(processInstance.getId());
+            }
+        } finally {
+            WorkflowInstanceLogUtils.removeWorkflowInstanceLogFullPathMdcKey();
         }
     }
 

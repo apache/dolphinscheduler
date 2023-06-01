@@ -21,29 +21,28 @@ import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.RequestMessageBuilder;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- *  roll view log request command
- */
 @Data
-@NoArgsConstructor
+@Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class RollViewLogRequest implements RequestMessageBuilder {
 
     /**
-     *  log path
+     * log path
      */
     private String path;
 
     /**
-     *  skip line number
+     * skip line number
      */
     private int skipLineNum;
 
     /**
-     *  query line number
+     * query line number
      */
     private int limit;
 

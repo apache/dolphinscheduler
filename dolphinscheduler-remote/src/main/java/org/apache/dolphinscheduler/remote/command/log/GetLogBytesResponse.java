@@ -21,25 +21,57 @@ import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.ResponseMessageBuilder;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
-/**
- * get log bytes response command
- */
 @Data
-@NoArgsConstructor
+@Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class GetLogBytesResponse implements ResponseMessageBuilder {
 
-    /**
-     * log byte data
-     */
     private byte[] data;
+
+    private Status responseStatus;
+
+    public static GetLogBytesResponse error(@NonNull Status status) {
+        return GetLogBytesResponse.builder()
+                .responseStatus(status)
+                .build();
+    }
+
+    public static GetLogBytesResponse success(byte[] logBytes) {
+        return GetLogBytesResponse.builder()
+                .responseStatus(Status.SUCCESS)
+                .data(logBytes)
+                .build();
+    }
 
     @Override
     public MessageType getCommandType() {
         return MessageType.RESPONSE;
+    }
+
+    public enum Status {
+
+        SUCCESS("success"),
+        COMMAND_IS_NULL("RPC command is null"),
+        LOG_PATH_IS_NOT_SECURITY("Log file path is not at a security directory"),
+        LOG_FILE_NOT_FOUND("Log file doesn't exist"),
+        UNKNOWN_ERROR("Meet an unknown exception"),
+        ;
+
+        private final String desc;
+
+        Status(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return desc;
+        }
     }
 
 }

@@ -18,6 +18,8 @@
 
 <configuration scan="true" scanPeriod="120 seconds">
     <property name="log.base" value="logs"/>
+    <property name="task.log.base" value="logs/task-logs"/>
+    <property name="workflow.log.base" value="logs/workflow-logs"/>
     <property scope="context" name="log.base.ctx" value="${log.base}" />
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
@@ -54,7 +56,7 @@
         <filter class="org.apache.dolphinscheduler.plugin.task.api.log.TaskLogFilter"/>
         <Discriminator class="org.apache.dolphinscheduler.plugin.task.api.log.TaskLogDiscriminator">
             <key>taskInstanceLogFullPath</key>
-            <logBase>${log.base}</logBase>
+            <logBase>${task.log.base}</logBase>
         </Discriminator>
         <sift>
             <appender name="FILE-${taskInstanceLogFullPath}" class="ch.qos.logback.core.FileAppender">
@@ -62,6 +64,26 @@
                 <encoder>
                     <pattern>
                         [%level] %date{yyyy-MM-dd HH:mm:ss.SSS Z} - %message%n
+                    </pattern>
+                    <charset>UTF-8</charset>
+                </encoder>
+                <append>true</append>
+            </appender>
+        </sift>
+    </appender>
+
+    <appender name="WORKFLOW_INSTANCE_LOG_FILE" class="ch.qos.logback.classic.sift.SiftingAppender">
+        <filter class="org.apache.dolphinscheduler.server.master.log.WorkflowInstanceLogFilter"/>
+        <Discriminator class="org.apache.dolphinscheduler.server.master.log.WorkflowInstanceLogDiscriminator">
+            <key>workflowInstanceLogFullPath</key>
+            <logBase>${workflow.log.base}</logBase>
+        </Discriminator>
+        <sift>
+            <appender name="FILE-${workflowInstanceLogFullPath}" class="ch.qos.logback.core.FileAppender">
+                <file>${workflowInstanceLogFullPath}</file>
+                <encoder>
+                    <pattern>
+                        [%level] %date{yyyy-MM-dd HH:mm:ss.SSS} - %messsage%n
                     </pattern>
                     <charset>UTF-8</charset>
                 </encoder>

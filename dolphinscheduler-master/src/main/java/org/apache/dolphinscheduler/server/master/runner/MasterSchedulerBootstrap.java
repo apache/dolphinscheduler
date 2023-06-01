@@ -31,9 +31,11 @@ import org.apache.dolphinscheduler.server.master.event.WorkflowEventQueue;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEventType;
 import org.apache.dolphinscheduler.server.master.exception.MasterException;
 import org.apache.dolphinscheduler.server.master.exception.WorkflowCreateException;
+import org.apache.dolphinscheduler.server.master.log.WorkflowInstanceLogHeader;
 import org.apache.dolphinscheduler.server.master.metrics.MasterServerMetrics;
 import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
+import org.apache.dolphinscheduler.server.master.utils.WorkflowInstanceLogUtils;
 import org.apache.dolphinscheduler.service.command.CommandService;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -135,6 +137,9 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
                                 WorkflowExecuteRunnable workflowExecuteRunnable =
                                         workflowExecuteRunnableFactory.createWorkflowExecuteRunnable(command);
                                 ProcessInstance processInstance = workflowExecuteRunnable.getProcessInstance();
+                                WorkflowInstanceLogUtils.setWorkflowInstanceLogFullPathMdcKey(
+                                        processInstance.getWorkflowInstanceLogPath());
+                                WorkflowInstanceLogHeader.printInitializeWorkflowInstanceHeader();
                                 if (processInstanceExecCacheManager.contains(processInstance.getId())) {
                                     log.error(
                                             "The workflow instance is already been cached, this case shouldn't be happened");

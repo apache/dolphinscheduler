@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.service.log;
 
 import static org.apache.dolphinscheduler.common.constants.Constants.APPID_COLLECT;
 import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_COLLECT_WAY;
-import static org.apache.dolphinscheduler.common.utils.LogUtils.readWholeFileContentFromLocal;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
@@ -35,12 +34,11 @@ import org.apache.dolphinscheduler.remote.command.log.RemoveTaskLogRequest;
 import org.apache.dolphinscheduler.remote.command.log.RemoveTaskLogResponse;
 import org.apache.dolphinscheduler.remote.command.log.RollViewLogRequest;
 import org.apache.dolphinscheduler.remote.command.log.RollViewLogResponse;
-import org.apache.dolphinscheduler.remote.command.log.ViewLogRequest;
-import org.apache.dolphinscheduler.remote.command.log.ViewLogResponseResponse;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.factory.NettyRemotingClientFactory;
 import org.apache.dolphinscheduler.remote.utils.Host;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -64,118 +62,28 @@ public class LogClient implements AutoCloseable {
         client = NettyRemotingClientFactory.buildNettyRemotingClient();
     }
 
-    /**
-     * roll view log
-     *
-     * @param host host
-     * @param port port
-     * @param path path
-     * @param skipLineNum skip line number
-     * @param limit limit
-     * @return log content
-     */
-    public String rollViewLog(String host, int port, String path, int skipLineNum, int limit) {
-        log.info("Roll view log from host : {}, port : {}, path {}, skipLineNum {} ,limit {}", host, port, path,
-                skipLineNum, limit);
-        RollViewLogRequest request = new RollViewLogRequest(path, skipLineNum, limit);
-        final Host address = new Host(host, port);
-        try {
-            Message message = request.convert2Command();
-            Message response = client.sendSync(address, message, LOG_REQUEST_TIMEOUT);
-            if (response != null) {
-                RollViewLogResponse rollReviewLog =
-                        JSONUtils.parseObject(response.getBody(), RollViewLogResponse.class);
-                return rollReviewLog.getMsg();
-            }
-            return "Roll view log response is null";
-        } catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
-            log.error(
-                    "Roll view log from host : {}, port : {}, path {}, skipLineNum {} ,limit {} error, the current thread has been interrupted",
-                    host, port, path, skipLineNum, limit, ex);
-            return "Roll view log error: " + ex.getMessage();
-        } catch (Exception e) {
-            log.error("Roll view log from host : {}, port : {}, path {}, skipLineNum {} ,limit {} error", host, port,
-                    path, skipLineNum, limit, e);
-            return "Roll view log error: " + e.getMessage();
-        }
+    public RollViewLogResponse queryTaskInstanceLog(Host taskExecuteHost,
+                                                    String taskInstanceLogPath,
+                                                    int skipLineNum,
+                                                    int limit) {
+        return doRollingViewLog(taskExecuteHost, taskInstanceLogPath, skipLineNum, limit);
     }
 
-    /**
-     * view log
-     *
-     * @param host host
-     * @param port port
-     * @param path path
-     * @return log content
-     */
-    public String viewLog(String host, int port, String path) {
-        log.info("View log from host: {}, port: {}, logPath: {}", host, port, path);
-        ViewLogRequest request = new ViewLogRequest(path);
-        final Host address = new Host(host, port);
-        try {
-            if (NetUtils.getHost().equals(host)) {
-                return readWholeFileContentFromLocal(request.getPath());
-            } else {
-                Message message = request.convert2Command();
-                Message response = this.client.sendSync(address, message, LOG_REQUEST_TIMEOUT);
-                if (response != null) {
-                    ViewLogResponseResponse viewLog =
-                            JSONUtils.parseObject(response.getBody(), ViewLogResponseResponse.class);
-                    return viewLog.getMsg();
-                }
-                return "View log response is null";
-            }
-        } catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
-            log.error("View log from host: {}, port: {}, logPath: {} error, the current thread has been interrupted",
-                    host, port, path, ex);
-            return "View log error: " + ex.getMessage();
-        } catch (Exception e) {
-            log.error("View log from host: {}, port: {}, logPath: {} error", host, port, path, e);
-            return "View log error: " + e.getMessage();
-        }
+    public byte[] queryWholeTaskInstanceLogBytes(Host taskExecuteHost, String workflowInstanceLogPath) {
+        return doDownloadLog(taskExecuteHost, workflowInstanceLogPath);
     }
 
-    /**
-     * get log size
-     *
-     * @param host host
-     * @param port port
-     * @param path log path
-     * @return log content bytes
-     */
-    public byte[] getLogBytes(String host, int port, String path) {
-        log.info("Get log bytes from host: {}, port: {}, logPath {}", host, port, path);
-        GetLogBytesRequest request = new GetLogBytesRequest(path);
-        final Host address = new Host(host, port);
-        try {
-            Message message = request.convert2Command();
-            Message response = this.client.sendSync(address, message, LOG_REQUEST_TIMEOUT);
-            if (response != null) {
-                GetLogBytesResponse getLog =
-                        JSONUtils.parseObject(response.getBody(), GetLogBytesResponse.class);
-                return getLog.getData() == null ? EMPTY_BYTE_ARRAY : getLog.getData();
-            }
-            return EMPTY_BYTE_ARRAY;
-        } catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
-            log.error(
-                    "Get logSize from host: {}, port: {}, logPath: {} error, the current thread has been interrupted",
-                    host, port, path, ex);
-            return EMPTY_BYTE_ARRAY;
-        } catch (Exception e) {
-            log.error("Get logSize from host: {}, port: {}, logPath: {} error", host, port, path, e);
-            return EMPTY_BYTE_ARRAY;
-        }
+    public RollViewLogResponse queryWorkflowInstanceLog(Host workflowInstanceExecuteHost,
+                                                        String workflowInstanceLogPath,
+                                                        int skipLineNum,
+                                                        int limit) {
+        return doRollingViewLog(workflowInstanceExecuteHost, workflowInstanceLogPath, skipLineNum, limit);
     }
 
-    /**
-     * remove task log
-     *
-     * @param host host
-     * @param path path
-     */
+    public byte[] queryWholeWorkflowInstanceLogBytes(Host host, String workflowInstanceLogPath) {
+        return doDownloadLog(host, workflowInstanceLogPath);
+    }
+
     public void removeTaskLog(@NonNull Host host, String path) {
         log.info("Begin remove task log from host: {} logPath {}", host, path);
         RemoveTaskLogRequest request = new RemoveTaskLogRequest(path);
@@ -231,6 +139,46 @@ public class LogClient implements AutoCloseable {
         log.info("Get appIds: {} from worker: {}:{} taskLogPath: {}, taskAppInfoPath: {}", appIds, host, port,
                 taskLogFilePath, taskAppInfoPath);
         return appIds;
+    }
+
+    private RollViewLogResponse doRollingViewLog(Host executeHost,
+                                                 String logPath,
+                                                 int skipLineNum,
+                                                 int limit) {
+        RollViewLogRequest request = new RollViewLogRequest(logPath, skipLineNum, limit);
+        try {
+            Message response = client.sendSync(executeHost, request.convert2Command(), LOG_REQUEST_TIMEOUT);
+            if (response != null) {
+                return JSONUtils.parseObject(response.getBody(), RollViewLogResponse.class);
+            }
+            log.error("Roll view log response is null, request: {}", request);
+            return RollViewLogResponse.error(RollViewLogResponse.Status.UNKNOWN_ERROR);
+        } catch (Exception e) {
+            log.error("Roll view log failed, meet an unknown exception: {}", request, e);
+            return RollViewLogResponse.error(RollViewLogResponse.Status.UNKNOWN_ERROR);
+        }
+    }
+
+    private byte[] doDownloadLog(Host executeHost, String logPath) {
+        log.info("Get log bytes from host: {}, logPath {}", executeHost, logPath);
+        GetLogBytesRequest request = new GetLogBytesRequest(logPath);
+        try {
+            Message response = client.sendSync(executeHost, request.convert2Command(), LOG_REQUEST_TIMEOUT);
+            if (response != null) {
+                GetLogBytesResponse getLogBytesResponse =
+                        JSONUtils.parseObject(response.getBody(), GetLogBytesResponse.class);
+                GetLogBytesResponse.Status responseStatus = getLogBytesResponse.getResponseStatus();
+                if (responseStatus == GetLogBytesResponse.Status.SUCCESS) {
+                    return getLogBytesResponse.getData();
+                }
+                return getLogBytesResponse.getResponseStatus().getDesc().getBytes(StandardCharsets.UTF_8);
+            }
+            log.error("Get logByte from host: {}, logPath: {} error, the response is null", executeHost, logPath);
+            return EMPTY_BYTE_ARRAY;
+        } catch (Exception e) {
+            log.error("Get logByte from host: {}, logPath: {} error", executeHost, logPath, e);
+            return GetLogBytesResponse.Status.UNKNOWN_ERROR.getDesc().getBytes(StandardCharsets.UTF_8);
+        }
     }
 
     @Override

@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 import org.apache.dolphinscheduler.server.master.rpc.MasterRpcClient;
 import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnableFactory;
+import org.apache.dolphinscheduler.server.master.utils.WorkflowInstanceLogUtils;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
@@ -111,6 +112,8 @@ public class WorkflowExecuteRunnableFactory {
             throw new RuntimeException("Slot check failed the current state: " + slotCheckState);
         }
         ProcessInstance processInstance = processService.handleCommand(masterConfig.getMasterAddress(), command);
+        processInstance.setWorkflowInstanceLogPath(
+                WorkflowInstanceLogUtils.generateWorkflowInstanceLogFullPath(processInstance));
         log.info("Master handle command {} end, create process instance {}", command.getId(), processInstance.getId());
         ProcessInstanceMetrics
                 .recordProcessInstanceGenerateTime(System.currentTimeMillis() - commandTransformStartTime);

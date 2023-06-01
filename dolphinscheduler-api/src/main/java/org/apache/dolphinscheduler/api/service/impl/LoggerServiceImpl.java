@@ -36,6 +36,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.remote.command.log.RollViewLogResponse;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.log.LogClient;
 
@@ -218,23 +219,25 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
             sb.append(head);
         }
 
-        String logContent = logClient
-                .rollViewLog(host.getIp(), host.getPort(), logPath, skipLineNum, limit);
+        RollViewLogResponse rollViewLogResponse = logClient.queryTaskInstanceLog(host, logPath, skipLineNum, limit);
 
-        if (skipLineNum == 0 && StringUtils.isEmpty(logContent) && RemoteLogUtils.isRemoteLoggingEnable()) {
+        if (skipLineNum == 0
+                && rollViewLogResponse.getResponseStatus() == RollViewLogResponse.Status.LOG_FILE_NOT_FOUND
+                && RemoteLogUtils.isRemoteLoggingEnable()) {
             // When getting the log for the first time (skipLineNum=0) returns empty, get the log from remote target
             try {
                 log.info("Get log {} from remote target", logPath);
                 RemoteLogUtils.getRemoteLog(logPath);
                 List<String> lines = LogUtils.readPartFileContentFromLocal(logPath, skipLineNum, limit);
-                logContent = LogUtils.rollViewLogLines(lines);
+                String logContent = LogUtils.rollViewLogLines(lines);
+                sb.append(logContent);
                 FileUtils.delete(new File(logPath));
             } catch (IOException e) {
                 log.error("Error while getting log from remote target", e);
             }
+        } else {
+            sb.append(rollViewLogResponse.getLog());
         }
-
-        sb.append(logContent);
 
         return sb.toString();
     }
@@ -254,7 +257,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
                 host,
                 Constants.SYSTEM_LINE_SEPARATOR).getBytes(StandardCharsets.UTF_8);
 
-        byte[] logBytes = logClient.getLogBytes(host.getIp(), host.getPort(), logPath);
+        byte[] logBytes = logClient.queryWholeTaskInstanceLogBytes(host, logPath);
 
         if (logBytes.length == 0 && RemoteLogUtils.isRemoteLoggingEnable()) {
             // get task log from remote target

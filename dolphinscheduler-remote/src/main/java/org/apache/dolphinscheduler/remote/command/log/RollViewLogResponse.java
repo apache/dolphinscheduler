@@ -21,24 +21,52 @@ import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.ResponseMessageBuilder;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- *  roll view log response command
- */
 @Data
-@NoArgsConstructor
+@Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class RollViewLogResponse implements ResponseMessageBuilder {
 
-    /**
-     *  response data
-     */
-    private String msg;
+    private String log;
+
+    @Builder.Default
+    private Status responseStatus = Status.SUCCESS;
+
+    private long currentLineNumber;
+
+    private long currentTotalLineNumber;
+
+    public static RollViewLogResponse error(Status status) {
+        RollViewLogResponse rollViewLogResponse = new RollViewLogResponse();
+        rollViewLogResponse.setResponseStatus(status);
+        return rollViewLogResponse;
+    }
 
     @Override
     public MessageType getCommandType() {
         return MessageType.RESPONSE;
+    }
+
+    public enum Status {
+
+        SUCCESS("success"),
+        LOG_PATH_IS_NOT_SECURITY("Log file path is not at a security directory"),
+        LOG_FILE_NOT_FOUND("Log file doesn't exist"),
+        UNKNOWN_ERROR("Meet an unknown exception"),
+        ;
+
+        private final String desc;
+
+        Status(String desc) {
+            this.desc = desc;
+        }
+
+        public String getDesc() {
+            return desc;
+        }
     }
 }

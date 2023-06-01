@@ -1,3 +1,4 @@
+package org.apache.dolphinscheduler.server.master.log;
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -15,24 +16,19 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.remote.command.log;
+import org.apache.dolphinscheduler.server.master.utils.WorkflowInstanceLogUtils;
 
-import org.apache.dolphinscheduler.remote.command.MessageType;
-import org.apache.dolphinscheduler.remote.command.RequestMessageBuilder;
+import org.slf4j.MDC;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.filter.Filter;
+import ch.qos.logback.core.spi.FilterReply;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class GetLogBytesRequest implements RequestMessageBuilder {
-
-    private String path;
+public class WorkflowInstanceLogFilter extends Filter<ILoggingEvent> {
 
     @Override
-    public MessageType getCommandType() {
-        return MessageType.GET_LOG_BYTES_REQUEST;
+    public FilterReply decide(ILoggingEvent event) {
+        return MDC.get(WorkflowInstanceLogUtils.WORKFLOW_INSTANCE_LOG_FULL_PATH_MDC_KEY) == null ? FilterReply.DENY
+                : FilterReply.ACCEPT;
     }
 }

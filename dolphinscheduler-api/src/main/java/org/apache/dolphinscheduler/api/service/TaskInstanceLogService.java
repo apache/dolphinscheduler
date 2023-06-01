@@ -15,24 +15,15 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.remote.command.log;
+package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.remote.command.MessageType;
-import org.apache.dolphinscheduler.remote.command.RequestMessageBuilder;
+import org.apache.dolphinscheduler.api.dto.log.RollViewLogDTO;
+import org.apache.dolphinscheduler.dao.entity.User;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+public interface TaskInstanceLogService {
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class GetLogBytesRequest implements RequestMessageBuilder {
+    RollViewLogDTO queryTaskInstanceLog(User loginUser, int taskInstanceId, int skipNum, int limit);
 
-    private String path;
+    byte[] downloadTaskInstanceLog(User loginUser, int taskInstanceId);
 
-    @Override
-    public MessageType getCommandType() {
-        return MessageType.GET_LOG_BYTES_REQUEST;
-    }
 }

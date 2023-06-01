@@ -28,7 +28,7 @@ public class GetLogBytesResponseTest {
 
     @Test
     public void testConvert2Command() {
-        GetLogBytesResponse getLogBytesResponse = new GetLogBytesResponse(data);
+        GetLogBytesResponse getLogBytesResponse = new GetLogBytesResponse(data, GetLogBytesResponse.Status.SUCCESS);
         Message message = getLogBytesResponse.convert2Command(122);
         Assertions.assertNotNull(message);
     }

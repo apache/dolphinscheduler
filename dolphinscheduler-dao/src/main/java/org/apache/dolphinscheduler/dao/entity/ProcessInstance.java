@@ -89,6 +89,8 @@ public class ProcessInstance {
 
     private String host;
 
+    private String workflowInstanceLogPath;
+
     @TableField(exist = false)
     private ProcessDefinition processDefinition;
     private CommandType commandType;

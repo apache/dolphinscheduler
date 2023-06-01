@@ -17,22 +17,20 @@
 
 package org.apache.dolphinscheduler.remote.command.log;
 
-import org.apache.dolphinscheduler.remote.command.MessageType;
-import org.apache.dolphinscheduler.remote.command.RequestMessageBuilder;
+import org.apache.dolphinscheduler.remote.command.Message;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class GetLogBytesRequest implements RequestMessageBuilder {
+public class RollViewLogRequestProcessorTest {
 
-    private String path;
-
-    @Override
-    public MessageType getCommandType() {
-        return MessageType.GET_LOG_BYTES_REQUEST;
+    @Test
+    public void testConvert2Command() {
+        RollViewLogRequest rollViewLogRequest = new RollViewLogRequest();
+        rollViewLogRequest.setPath("/opt/test");
+        rollViewLogRequest.setSkipLineNum(1);
+        rollViewLogRequest.setLimit(1);
+        Message message = rollViewLogRequest.convert2Command();
+        Assertions.assertNotNull(message);
     }
 }

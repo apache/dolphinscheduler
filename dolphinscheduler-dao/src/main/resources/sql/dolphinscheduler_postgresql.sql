@@ -533,6 +533,7 @@ CREATE TABLE t_ds_process_instance (
   end_time timestamp DEFAULT NULL ,
   run_times int DEFAULT NULL ,
   host varchar(135) DEFAULT NULL ,
+  workflow_instance_log_path varchar(255) DEFAULT NULL,
   command_type int DEFAULT NULL ,
   command_param text ,
   task_depend_type int DEFAULT NULL ,

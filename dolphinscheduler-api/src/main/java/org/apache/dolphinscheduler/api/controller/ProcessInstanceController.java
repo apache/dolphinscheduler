@@ -17,12 +17,16 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.apache.dolphinscheduler.api.enums.Status.DOWNLOAD_TASK_INSTANCE_LOG_FILE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_INSTANCE_LOG_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
+import org.apache.dolphinscheduler.api.dto.log.RollViewLogDTO;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
+import org.apache.dolphinscheduler.api.service.WorkflowInstanceLogService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
@@ -42,7 +46,9 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -51,6 +57,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -71,6 +78,9 @@ public class ProcessInstanceController extends BaseController {
 
     @Autowired
     private ProcessInstanceService processInstanceService;
+
+    @Autowired
+    private WorkflowInstanceLogService workflowInstanceLogService;
 
     /**
      * query process instance list paging
@@ -162,7 +172,6 @@ public class ProcessInstanceController extends BaseController {
      * @param scheduleTime schedule time
      * @param syncDefine sync define
      * @param locations locations
-     * @param tenantCode tenantCode
      * @return update result code
      */
     @Operation(summary = "updateProcessInstance", description = "UPDATE_PROCESS_INSTANCE_NOTES")
@@ -424,5 +433,44 @@ public class ProcessInstanceController extends BaseController {
                                                      @RequestParam(value = "triggerCode") Long triggerCode) {
         Map<String, Object> result = processInstanceService.queryByTriggerCode(loginUser, projectCode, triggerCode);
         return returnDataList(result);
+    }
+
+    @Operation(summary = "queryWorkflowInstanceLog", description = "QUERY_WORKFLOW_INSTANCE_LOG")
+    @Parameters({
+            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "workflowInstanceId", description = "WORKFLOW_INSTANCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "skipLineNum", description = "SKIP_LINE_NUM", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "limit", description = "LIMIT", required = true, schema = @Schema(implementation = int.class, example = "100"))
+    })
+    @GetMapping(value = "/log/view")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_TASK_INSTANCE_LOG_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result<RollViewLogDTO> queryLog(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                           @RequestParam(value = "workflowInstanceId") int workflowInstanceId,
+                                           @RequestParam(value = "skipLineNum") int skipNum,
+                                           @RequestParam(value = "limit") int limit) {
+        RollViewLogDTO rollViewLogResponse =
+                workflowInstanceLogService.queryWorkflowInstanceLog(loginUser, workflowInstanceId, skipNum, limit);
+        return Result.success(rollViewLogResponse);
+    }
+
+    @Operation(summary = "downloadWorkflowInstanceLog", description = "DOWNLOAD_WORKFLOW_INSTANCE_LOG")
+    @Parameters({
+            @Parameter(name = "workflowInstanceId", description = "WORKFLOW_INSTANCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
+    })
+    @GetMapping(value = "/log/download")
+    @ResponseBody
+    @ApiException(DOWNLOAD_TASK_INSTANCE_LOG_FILE_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public ResponseEntity downloadTaskLog(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                          @RequestParam(value = "workflowInstanceId") int workflowInstanceId) {
+        // todo: return log file name
+        byte[] logBytes = workflowInstanceLogService.downloadWorkflowInstanceLog(loginUser, workflowInstanceId);
+        return ResponseEntity
+                .ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + System.currentTimeMillis() + ".log" + "\"")
+                .body(logBytes);
     }
 }
