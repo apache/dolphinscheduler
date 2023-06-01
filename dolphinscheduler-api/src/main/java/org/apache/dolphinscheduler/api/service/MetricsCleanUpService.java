@@ -21,4 +21,6 @@ public interface MetricsCleanUpService {
 
     void cleanUpWorkflowMetricsByDefinitionCode(String workflowDefinitionCode);
 
+    void cleanUpApiResponseTimeMetricsByUserId(int userId);
+
 }

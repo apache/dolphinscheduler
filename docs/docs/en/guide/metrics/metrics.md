@@ -113,7 +113,7 @@ For example, you can get the master metrics by `curl http://localhost:5679/actua
 
 - ds.api.request.count: (counter) the number of requests received by the api server
 - ds.api.response.count: (counter) the number of responses received by the api server, sliced by tag `code`
-- ds.api.response.time: (histogram) the response time distribution of the api server
+- ds.api.response.time: (timer) the response time distribution of the api server, sliced by tag `user_id`
 - ds.api.resource.upload.size: (histogram) size distribution of resource files uploaded by the api server (bytes)
 - ds.api.resource.download.size: (histogram) size distribution of resource files download by the api server (bytes)
 

@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import org.apache.dolphinscheduler.api.metrics.ApiServerMetrics;
 import org.apache.dolphinscheduler.api.rpc.ApiRpcClient;
 import org.apache.dolphinscheduler.api.service.MetricsCleanUpService;
 import org.apache.dolphinscheduler.common.model.Server;
@@ -59,4 +60,8 @@ public class MetricsCleanUpServiceImpl implements MetricsCleanUpService {
         }
     }
 
+    @Override
+    public void cleanUpApiResponseTimeMetricsByUserId(int userId) {
+        ApiServerMetrics.cleanUpApiResponseTimeMetricsByUserId(userId);
+    }
 }
