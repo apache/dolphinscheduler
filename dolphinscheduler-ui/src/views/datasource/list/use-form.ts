@@ -390,6 +390,11 @@ export const datasourceType: IDataBaseOptionKeys = {
     label: 'DB2',
     defaultPort: 50000
   },
+  VERTICA: {
+    value: 'VERTICA',
+    label: 'VERTICA',
+    defaultPort: 5433
+  },
   PRESTO: {
     value: 'PRESTO',
     label: 'PRESTO',
