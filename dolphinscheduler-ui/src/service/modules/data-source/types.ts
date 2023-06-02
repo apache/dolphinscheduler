@@ -24,6 +24,7 @@ type IDataBase =
   | 'ORACLE'
   | 'SQLSERVER'
   | 'DB2'
+  | 'VERTICA'
   | 'PRESTO'
   | 'REDSHIFT'
   | 'ATHENA'

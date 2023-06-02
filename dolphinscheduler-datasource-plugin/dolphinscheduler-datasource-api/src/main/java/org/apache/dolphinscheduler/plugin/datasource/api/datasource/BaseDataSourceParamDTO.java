@@ -17,9 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.datasource;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Map;
 
 /**
@@ -87,6 +89,39 @@ public abstract class BaseDataSourceParamDTO implements Serializable {
 
     public void setPort(Integer port) {
         this.port = port;
+    }
+
+    /**
+     * extract the host and port from the address,
+     * then set it
+     * @param address address like 'jdbc:mysql://host:port' or 'jdbc:hive2://zk1:port,zk2:port,zk3:port'
+     */
+    public void setHostAndPortByAddress(String address) {
+        if (address == null) {
+            throw new IllegalArgumentException("address is null.");
+        }
+        address = address.trim();
+
+        int doubleSlashIndex = address.indexOf(Constants.DOUBLE_SLASH);
+        // trim address like 'jdbc:mysql://host:port/xxx' ends with '/xxx'
+        int slashIndex = address.indexOf(Constants.SLASH, doubleSlashIndex + 2);
+        String hostPortString = slashIndex == -1 ? address.substring(doubleSlashIndex + 2)
+                : address.substring(doubleSlashIndex + 2, slashIndex);
+
+        ArrayList<String> hosts = new ArrayList<>();
+        String portString = null;
+        for (String hostPort : hostPortString.split(Constants.COMMA)) {
+            String[] parts = hostPort.split(Constants.COLON);
+            hosts.add(parts[0]);
+            if (portString == null && parts.length > 1)
+                portString = parts[1];
+        }
+        if (hosts.size() == 0 || portString == null) {
+            throw new IllegalArgumentException(String.format("host:port '%s' illegal.", hostPortString));
+        }
+
+        this.host = String.join(Constants.COMMA, hosts);
+        this.port = Integer.parseInt(portString);
     }
 
     public String getDatabase() {
