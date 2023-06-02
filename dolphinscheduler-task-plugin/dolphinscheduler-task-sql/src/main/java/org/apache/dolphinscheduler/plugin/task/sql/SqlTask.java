@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.sql;
 
+import static org.apache.dolphinscheduler.spi.enums.DbType.KYUUBI;
+
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
@@ -43,7 +45,6 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.sql.*;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,8 +60,6 @@ import org.slf4j.Logger;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import static org.apache.dolphinscheduler.spi.enums.DbType.KYUUBI;
 
 public class SqlTask extends AbstractTask {
 
@@ -224,13 +223,16 @@ public class SqlTask extends AbstractTask {
         try {
 
             // create connection
-            if(DbType.valueOf(sqlParameters.getType()) == KYUUBI){
-                log.info("full jdbc url : {}, user : {} begin to build a connection", DataSourceUtils.getJdbcUrl(DbType.KYUUBI, baseConnectionParam), baseConnectionParam.getUser());
+            if (DbType.valueOf(sqlParameters.getType()) == KYUUBI) {
+                log.info("full jdbc url : {}, user : {} begin to build a connection",
+                        DataSourceUtils.getJdbcUrl(DbType.KYUUBI, baseConnectionParam), baseConnectionParam.getUser());
                 Class.forName(baseConnectionParam.getDriverClassName());
-                connection = DriverManager.getConnection(baseConnectionParam.getJdbcUrl(), baseConnectionParam.getUser(), baseConnectionParam.getPassword());
+                connection = DriverManager.getConnection(baseConnectionParam.getJdbcUrl(),
+                        baseConnectionParam.getUser(), baseConnectionParam.getPassword());
             } else {
-                connection = DataSourceClientProvider.getInstance().getConnection(DbType.valueOf(sqlParameters.getType()),
-                        baseConnectionParam);
+                connection =
+                        DataSourceClientProvider.getInstance().getConnection(DbType.valueOf(sqlParameters.getType()),
+                                baseConnectionParam);
             }
             // create temp function
             if (CollectionUtils.isNotEmpty(createFuncs)) {
