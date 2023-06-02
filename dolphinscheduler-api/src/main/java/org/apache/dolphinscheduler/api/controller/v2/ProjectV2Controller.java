@@ -113,7 +113,7 @@ public class ProjectV2Controller extends BaseController {
                                                @PathVariable("code") Long code,
                                                @RequestBody ProjectUpdateRequest projectUpdateReq) {
         Result result = projectService.update(loginUser, code, projectUpdateReq.getProjectName(),
-                projectUpdateReq.getDescription(), projectUpdateReq.getUserName());
+                projectUpdateReq.getDescription());
         return new ProjectUpdateResponse(result);
     }
 

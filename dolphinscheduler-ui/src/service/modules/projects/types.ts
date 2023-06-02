@@ -37,10 +37,6 @@ interface UserIdReq {
   userId?: number
 }
 
-interface UpdateProjectsReq extends ProjectsReq {
-  userName?: string
-}
-
 interface ProjectList {
   id: number
   userId: number
@@ -69,7 +65,6 @@ export {
   ListIdReq,
   ProjectsReq,
   UserIdReq,
-  UpdateProjectsReq,
   ProjectRes,
   ProjectList
 }

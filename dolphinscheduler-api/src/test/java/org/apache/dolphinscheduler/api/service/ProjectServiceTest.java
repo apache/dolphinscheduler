@@ -292,7 +292,7 @@ public class ProjectServiceTest {
         Mockito.when(projectMapper.queryByName(projectName)).thenReturn(project);
         Mockito.when(projectMapper.queryByCode(2L)).thenReturn(getProject());
         // PROJECT_NOT_FOUND
-        Result result = projectService.update(loginUser, 1L, projectName, "desc", "testUser");
+        Result result = projectService.update(loginUser, 1L, projectName, "desc");
         logger.info(result.toString());
         Assertions.assertTrue(Status.PROJECT_NOT_FOUND.getCode() == result.getCode());
 
@@ -304,20 +304,20 @@ public class ProjectServiceTest {
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS, new Object[]{1},
                 loginUser.getId(),
                 baseServiceLogger)).thenReturn(true);
-        result = projectService.update(loginUser, 2L, projectName, "desc", userName);
+        result = projectService.update(loginUser, 2L, projectName, "desc");
         logger.info(result.toString());
         Assertions.assertTrue(Status.PROJECT_ALREADY_EXISTS.getCode() == result.getCode());
 
         // USER_NOT_EXIST
-        Mockito.when(userMapper.queryByUserNameAccurately(Mockito.any())).thenReturn(null);
-        result = projectService.update(loginUser, 2L, "test", "desc", "testuser");
+        Mockito.when(userMapper.selectById(Mockito.any())).thenReturn(null);
+        result = projectService.update(loginUser, 2L, "test", "desc");
         Assertions.assertTrue(Status.USER_NOT_EXIST.getCode() == result.getCode());
 
         // success
-        Mockito.when(userMapper.queryByUserNameAccurately(Mockito.any())).thenReturn(new User());
+        Mockito.when(userMapper.selectById(Mockito.any())).thenReturn(new User());
         project.setUserId(1);
         Mockito.when(projectMapper.updateById(Mockito.any(Project.class))).thenReturn(1);
-        result = projectService.update(loginUser, 2L, "test", "desc", "testUser");
+        result = projectService.update(loginUser, 2L, "test", "desc");
         logger.info(result.toString());
         Assertions.assertTrue(Status.SUCCESS.getCode() == result.getCode());
 

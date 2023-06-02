@@ -104,8 +104,7 @@ public class ProjectController extends BaseController {
     @Parameters({
             @Parameter(name = "code", description = "PROJECT_CODE", schema = @Schema(implementation = long.class, example = "123456")),
             @Parameter(name = "projectName", description = "PROJECT_NAME", schema = @Schema(implementation = String.class)),
-            @Parameter(name = "description", description = "PROJECT_DESC", schema = @Schema(implementation = String.class)),
-            @Parameter(name = "userName", description = "USER_NAME", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "description", description = "PROJECT_DESC", schema = @Schema(implementation = String.class))
     })
     @PutMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
@@ -114,9 +113,8 @@ public class ProjectController extends BaseController {
     public Result updateProject(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @PathVariable("code") Long code,
                                 @RequestParam("projectName") String projectName,
-                                @RequestParam(value = "description", required = false) String description,
-                                @RequestParam(value = "userName") String userName) {
-        return projectService.update(loginUser, code, projectName, description, userName);
+                                @RequestParam(value = "description", required = false) String description) {
+        return projectService.update(loginUser, code, projectName, description);
     }
 
     /**
