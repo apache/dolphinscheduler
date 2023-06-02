@@ -57,6 +57,7 @@
         <cron-utils.version>9.1.6</cron-utils.version>
         <h2.version>2.1.210</h2.version>
         <mysql-connector.version>8.0.16</mysql-connector.version>
+        <vertica-jdbc.version>12.0.4-0</vertica-jdbc.version>
         <oracle-jdbc.version>21.5.0.0</oracle-jdbc.version>
         <dameng-jdbc.version>8.1.2.79</dameng-jdbc.version>
         <slf4j.version>1.7.36</slf4j.version>
@@ -396,6 +397,12 @@
                 <groupId>com.dameng</groupId>
                 <artifactId>DmJdbcDriver18</artifactId>
                 <version>${dameng-jdbc.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.vertica.jdbc</groupId>
+                <artifactId>vertica-jdbc</artifactId>
+                <version>${vertica-jdbc.version}</version>
             </dependency>
 
             <dependency>
