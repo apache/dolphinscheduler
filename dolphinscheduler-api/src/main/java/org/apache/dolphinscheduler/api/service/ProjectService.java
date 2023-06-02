@@ -128,10 +128,9 @@ public interface ProjectService {
      * @param projectCode project code
      * @param projectName project name
      * @param desc description
-     * @param userName project owner
      * @return update result code
      */
-    Result update(User loginUser, Long projectCode, String projectName, String desc, String userName);
+    Result update(User loginUser, Long projectCode, String projectName, String desc);
 
     /**
      * query unauthorized project
