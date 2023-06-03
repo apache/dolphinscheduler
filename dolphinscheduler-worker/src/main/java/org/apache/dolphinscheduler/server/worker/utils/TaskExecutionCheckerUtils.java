@@ -110,13 +110,16 @@ public class TaskExecutionCheckerUtils {
                                                  TaskExecutionContext taskExecutionContext) {
         String execLocalPath = taskExecutionContext.getExecutePath();
         String tenant = taskExecutionContext.getTenantCode();
+        String actualTenant =
+                TenantConstants.DEFAULT_TENANT_CODE.equals(tenant) ? TenantConstants.BOOTSTRAPT_SYSTEM_USER : tenant;
+
         Map<String, String> projectRes = taskExecutionContext.getResources();
         if (MapUtils.isEmpty(projectRes)) {
             return;
         }
         List<Pair<String, String>> downloadFiles = new ArrayList<>();
         projectRes.keySet().forEach(fullName -> {
-            String fileName = storageOperate.getResourceFileName(tenant, fullName);
+            String fileName = storageOperate.getResourceFileName(actualTenant, fullName);
             projectRes.put(fullName, fileName);
             File resFile = new File(execLocalPath, fileName);
             boolean notExist = !resFile.exists();
@@ -138,9 +141,8 @@ public class TaskExecutionCheckerUtils {
                     log.info("get resource file from path:{}", fullName);
 
                     long resourceDownloadStartTime = System.currentTimeMillis();
-                    storageOperate.download(taskExecutionContext.getTenantCode(), fullName,
-                            execLocalPath + File.separator + fileName, false,
-                            true);
+                    storageOperate.download(actualTenant, fullName,
+                            execLocalPath + File.separator + fileName, true);
                     WorkerServerMetrics
                             .recordWorkerResourceDownloadTime(System.currentTimeMillis() - resourceDownloadStartTime);
                     WorkerServerMetrics.recordWorkerResourceDownloadSize(

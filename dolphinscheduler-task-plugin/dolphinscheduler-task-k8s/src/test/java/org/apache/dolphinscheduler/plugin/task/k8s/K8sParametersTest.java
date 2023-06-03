@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.k8s;
 
 import org.apache.dolphinscheduler.plugin.task.api.model.Label;
+import org.apache.dolphinscheduler.plugin.task.api.model.NodeSelectorExpression;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.K8sTaskParameters;
 
 import java.util.Arrays;
@@ -37,6 +38,8 @@ public class K8sParametersTest {
     private final String command = "[\"/bin/bash\", \"-c\"]";
     private final String args = "[\"echo hello world\"]";
     private final List<Label> labels = Arrays.asList(new Label("test", "1234"));
+    private final List<NodeSelectorExpression> nodeSelectorExpressions =
+            Arrays.asList(new NodeSelectorExpression("node-label", "In", "1234,12345"));
 
     @BeforeEach
     public void before() {
@@ -48,6 +51,7 @@ public class K8sParametersTest {
         k8sTaskParameters.setCommand(command);
         k8sTaskParameters.setArgs(args);
         k8sTaskParameters.setCustomizedLabels(labels);
+        k8sTaskParameters.setNodeSelectors(nodeSelectorExpressions);
     }
 
     @Test
@@ -70,6 +74,7 @@ public class K8sParametersTest {
         Assertions.assertEquals(command, k8sTaskParameters.getCommand());
         Assertions.assertEquals(args, k8sTaskParameters.getArgs());
         Assertions.assertEquals(labels, k8sTaskParameters.getCustomizedLabels());
+        Assertions.assertEquals(nodeSelectorExpressions, k8sTaskParameters.getNodeSelectors());
     }
 
 }

@@ -22,19 +22,13 @@ import {
   watch,
   getCurrentInstance
 } from 'vue'
-import {
-  NButton,
-  NIcon,
-  NDataTable,
-  NPagination,
-  NSpace
-} from 'naive-ui'
+import { NButton, NIcon, NDataTable, NPagination, NSpace } from 'naive-ui'
 import { useTable } from './use-table'
 import { SearchOutlined } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
 import TenantModal from './components/tenant-modal'
 import Card from '@/components/card'
-import Search from "@/components/input-search";
+import Search from '@/components/input-search'
 
 const tenementManage = defineComponent({
   name: 'tenement-manage',

@@ -18,7 +18,7 @@
 import { reactive, ref, unref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { FormRules } from 'naive-ui'
-import { IFolderDefaultValue } from "@/views/resource/components/resource/types";
+import { IFolderDefaultValue } from '@/views/resource/components/resource/types'
 
 const defaultValue: IFolderDefaultValue = () => ({
   pid: -1,

@@ -57,6 +57,7 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 
 import io.fabric8.kubernetes.api.model.EnvVar;
+import io.fabric8.kubernetes.api.model.NodeSelectorTerm;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.api.model.ResourceRequirements;
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
@@ -125,6 +126,9 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
             throw new TaskException("Parse yaml-like commands and args failed", e);
         }
 
+        NodeSelectorTerm nodeSelectorTerm = new NodeSelectorTerm();
+        nodeSelectorTerm.setMatchExpressions(k8STaskMainParameters.getNodeSelectorRequirements());
+
         return new JobBuilder()
                 .withApiVersion(API_VERSION)
                 .withNewMetadata()
@@ -146,6 +150,14 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 .withEnv(envVars)
                 .endContainer()
                 .withRestartPolicy(RESTART_POLICY)
+                .withNewAffinity()
+                .withNewNodeAffinity()
+                .withNewRequiredDuringSchedulingIgnoredDuringExecution()
+                .addNewNodeSelectorTermLike(nodeSelectorTerm)
+                .endNodeSelectorTerm()
+                .endRequiredDuringSchedulingIgnoredDuringExecution()
+                .endNodeAffinity()
+                .endAffinity()
                 .endSpec()
                 .endTemplate()
                 .withBackoffLimit(retryNum)

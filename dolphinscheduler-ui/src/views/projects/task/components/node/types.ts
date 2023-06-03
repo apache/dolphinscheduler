@@ -66,9 +66,15 @@ interface ILocalParam {
   value?: string
 }
 
-interface ICustomLabel {
+interface ILabel {
   label: string
   value: string
+}
+
+interface IMatchExpression {
+  key: string
+  operator: string
+  values: string
 }
 
 interface IResponseJsonItem extends Omit<IJsonItemParams, 'type'> {
@@ -107,13 +113,21 @@ interface ISwitchResult {
   nextNode?: number
 }
 
+interface IDependentParameters {
+  checkInterval?: number
+  failurePolicy?: 'DEPENDENT_FAILURE_FAILURE' | 'DEPENDENT_FAILURE_WAITING'
+  failureWaitingTime?: number
+  relation?: RelationType
+  dependTaskList?: IDependTask[]
+}
+
 /*
  * resourceName: resource full name
  * res: resource file name
  */
 interface ISourceItem {
-  id?: number,
-  resourceName: string,
+  id?: number
+  resourceName: string
   res?: string
 }
 
@@ -301,10 +315,7 @@ interface ITaskParams {
   switchResult?: ISwitchResult
   dependTaskList?: IDependTask[]
   nextNode?: number
-  dependence?: {
-    relation?: RelationType
-    dependTaskList?: IDependTask[]
-  }
+  dependence?: IDependentParameters
   customConfig?: number
   json?: string
   dsType?: string
@@ -342,6 +353,7 @@ interface ITaskParams {
   parameters?: string
   kernel?: string
   engine?: string
+  startupScript?: string
   executionTimeout?: string
   startTimeout?: string
   processDefinitionCode?: number
@@ -360,7 +372,8 @@ interface ITaskParams {
   image?: string
   command?: string
   args?: string
-  customizedLabels?: ICustomLabel[]
+  customizedLabels?: ILabel[]
+  nodeSelectors?: IMatchExpression[]
   algorithm?: string
   params?: string
   searchParams?: string
@@ -440,6 +453,7 @@ interface INodeData
     >,
     ISqoopTargetData,
     ISqoopSourceData,
+    IDependentParameters,
     Omit<IRuleParameters, 'mapping_columns'> {
   id?: string
   taskType?: ITaskType
@@ -488,7 +502,7 @@ interface ITaskData
   > {
   name?: string
   taskPriority?: string
-  isCache?: "YES" | "NO"
+  isCache?: 'YES' | 'NO'
   timeoutFlag?: 'OPEN' | 'CLOSE'
   timeoutNotifyStrategy?: string | []
   taskParams?: ITaskParams
@@ -518,5 +532,6 @@ export {
   FormRules,
   IJsonItemParams,
   IResponseJsonItem,
-  IDateType
+  IDateType,
+  IDependentParameters
 }

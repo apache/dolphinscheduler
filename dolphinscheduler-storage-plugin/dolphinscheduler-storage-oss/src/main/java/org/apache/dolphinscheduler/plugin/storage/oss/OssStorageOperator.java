@@ -214,7 +214,7 @@ public class OssStorageOperator implements Closeable, StorageOperate {
     }
 
     @Override
-    public void download(String tenantCode, String srcFilePath, String dstFilePath, boolean deleteSource,
+    public void download(String tenantCode, String srcFilePath, String dstFilePath,
                          boolean overwrite) throws IOException {
         File dstFile = new File(dstFilePath);
         if (dstFile.isDirectory()) {
@@ -234,7 +234,7 @@ public class OssStorageOperator implements Closeable, StorageOperate {
         } catch (OSSException e) {
             throw new IOException(e);
         } catch (FileNotFoundException e) {
-            log.error("cannot fin the destination file {}", dstFilePath);
+            log.error("cannot find the destination file {}", dstFilePath);
             throw e;
         }
     }
@@ -258,7 +258,9 @@ public class OssStorageOperator implements Closeable, StorageOperate {
     @Override
     public boolean copy(String srcPath, String dstPath, boolean deleteSource, boolean overwrite) throws IOException {
         ossClient.copyObject(bucketName, srcPath, bucketName, dstPath);
-        ossClient.deleteObject(bucketName, srcPath);
+        if (deleteSource) {
+            ossClient.deleteObject(bucketName, srcPath);
+        }
         return true;
     }
 
@@ -281,6 +283,9 @@ public class OssStorageOperator implements Closeable, StorageOperate {
                           boolean overwrite) throws IOException {
         try {
             ossClient.putObject(bucketName, dstPath, new File(srcFile));
+            if (deleteSource) {
+                Files.delete(Paths.get(srcFile));
+            }
             return true;
         } catch (OSSException e) {
             log.error("upload failed, the bucketName is {}, the filePath is {}", bucketName, dstPath, e);

@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task.dependent;
 
+import static org.apache.dolphinscheduler.common.constants.Constants.DEPENDENT_SPLIT;
+
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -54,7 +56,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DependentAsyncTaskExecuteFunction implements AsyncTaskExecuteFunction {
 
-    private static final Duration DEPENDENT_TASK_STATE_CHECK_INTERVAL = Duration.ofSeconds(10);
+    private static final Duration DEFAULT_STATE_CHECK_INTERVAL = Duration.ofSeconds(10);
 
     private final TaskExecutionContext taskExecutionContext;
     private final DependentParameters dependentParameters;
@@ -193,23 +195,28 @@ public class DependentAsyncTaskExecuteFunction implements AsyncTaskExecuteFuncti
     private boolean isAllDependentTaskFinished() {
         boolean isAllDependentTaskFinished = true;
         for (DependentExecute dependentExecute : dependentTaskList) {
+            if (!dependentExecute.finish(dependentDate, processInstance.getTestFlag(),
+                    dependentParameters.getFailurePolicy(), dependentParameters.getFailureWaitingTime())) {
+                isAllDependentTaskFinished = false;
+            }
             dependentExecute.getDependResultMap().forEach((dependentKey, dependResult) -> {
                 if (!dependResultMap.containsKey(dependentKey)) {
                     dependResultMap.put(dependentKey, dependResult);
-                    log.info("Dependent item check finished: dependentKey: {}, result: {}, dependentDate: {}",
+                    // The log is applied in: api-server obtains the result of the item dependent in the dependent task
+                    // node.{@link ProcessInstanceServiceImpl#parseLogForDependentResult}
+                    log.info("Dependent item check finished, {} dependentKey: {}, result: {}, dependentDate: {}",
+                            DEPENDENT_SPLIT,
                             dependentKey,
                             dependResult, dependentDate);
                 }
             });
-            if (!dependentExecute.finish(dependentDate, processInstance.getTestFlag())) {
-                isAllDependentTaskFinished = false;
-            }
         }
         return isAllDependentTaskFinished;
     }
 
     @Override
     public @NonNull Duration getAsyncTaskStateCheckInterval() {
-        return DEPENDENT_TASK_STATE_CHECK_INTERVAL;
+        return dependentParameters.getCheckInterval() == null ? DEFAULT_STATE_CHECK_INTERVAL
+                : Duration.ofSeconds(dependentParameters.getCheckInterval());
     }
 }

@@ -102,10 +102,12 @@ export function useDataList() {
         icon: renderIcon(ProfileOutlined),
         children: [
           {
-            label: t('menu.project_overview') + (projectName? `[${projectName}]` : ''),
+            label:
+              t('menu.project_overview') +
+              (projectName ? `[${projectName}]` : ''),
             key: `/projects/${projectCode}`,
             icon: renderIcon(FundProjectionScreenOutlined),
-            payload: {projectName:projectName}
+            payload: { projectName: projectName }
           },
           {
             label: t('menu.workflow'),
@@ -115,17 +117,22 @@ export function useDataList() {
               {
                 label: t('menu.workflow_relation'),
                 key: `/projects/${projectCode}/workflow/relation`,
-                payload: {projectName:projectName}
+                payload: { projectName: projectName }
               },
               {
                 label: t('menu.workflow_definition'),
                 key: `/projects/${projectCode}/workflow-definition`,
-                payload: {projectName:projectName}
+                payload: { projectName: projectName }
               },
               {
                 label: t('menu.workflow_instance'),
                 key: `/projects/${projectCode}/workflow/instances`,
-                payload: {projectName:projectName}
+                payload: { projectName: projectName }
+              },
+              {
+                label: t('menu.workflow_timing'),
+                key: `/projects/${projectCode}/workflow/timings`,
+                payload: { projectName: projectName }
               }
             ]
           },
@@ -137,12 +144,12 @@ export function useDataList() {
               {
                 label: t('menu.task_definition'),
                 key: `/projects/${projectCode}/task/definitions`,
-                payload: {projectName:projectName}
+                payload: { projectName: projectName }
               },
               {
                 label: t('menu.task_instance'),
                 key: `/projects/${projectCode}/task/instances`,
-                payload: {projectName:projectName}
+                payload: { projectName: projectName }
               }
             ]
           }

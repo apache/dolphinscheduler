@@ -76,7 +76,7 @@ export const useForm = () => {
         required: true,
         trigger: ['input', 'blur'],
         validator() {
-          if (state.functionForm.fullName == "") {
+          if (state.functionForm.fullName == '') {
             return new Error(t('resource.function.enter_name_tips'))
           }
         }

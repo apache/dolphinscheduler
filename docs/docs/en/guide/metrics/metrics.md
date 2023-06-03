@@ -17,7 +17,7 @@ cd dolphinscheduler-meter/src/main/resources/grafana-demo
 docker compose up
 ```
 
-then access the `Grafana` by the url: `http://localhost/3001` for dashboards.
+then access the `Grafana` by the url: `http://localhost:3001` for dashboards.
 
 ![image.png](../../../../img/metrics/metrics-master.png)
 ![image.png](../../../../img/metrics/metrics-worker.png)
@@ -111,7 +111,11 @@ For example, you can get the master metrics by `curl http://localhost:5679/actua
 
 ### Api Server Metrics
 
-- Currently, we have not embedded any metrics in Api Server.
+- ds.api.request.count: (counter) the number of requests received by the api server
+- ds.api.response.count: (counter) the number of responses received by the api server, sliced by tag `code`
+- ds.api.response.time: (histogram) the response time distribution of the api server
+- ds.api.resource.upload.size: (histogram) size distribution of resource files uploaded by the api server (bytes)
+- ds.api.resource.download.size: (histogram) size distribution of resource files download by the api server (bytes)
 
 ### Alert Server Related
 

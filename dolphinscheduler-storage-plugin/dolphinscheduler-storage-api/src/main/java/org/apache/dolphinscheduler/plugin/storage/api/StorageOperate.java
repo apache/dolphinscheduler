@@ -140,11 +140,10 @@ public interface StorageOperate {
      * @param tenantCode
      * @param srcFilePath the full path of the srcPath
      * @param dstFile
-     * @param deleteSource
      * @param overwrite
      * @throws IOException
      */
-    void download(String tenantCode, String srcFilePath, String dstFile, boolean deleteSource,
+    void download(String tenantCode, String srcFilePath, String dstFile,
                   boolean overwrite) throws IOException;
 
     /**
