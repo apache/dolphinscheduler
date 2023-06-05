@@ -200,7 +200,7 @@ const GanttChart = defineComponent({
       series: series
     }
 
-    initChart(graphChartRef, option, 'graph')
+    initChart(graphChartRef, option)
 
     return { graphChartRef }
   },
