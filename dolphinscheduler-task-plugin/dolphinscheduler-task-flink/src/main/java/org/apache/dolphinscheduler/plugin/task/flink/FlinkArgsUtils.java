@@ -302,7 +302,7 @@ public class FlinkArgsUtils {
     }
 
     private static void determinedYarnQueue(List<String> args, FlinkParameters flinkParameters,
-                                     FlinkDeployMode deployMode, String flinkVersion) {
+                                            FlinkDeployMode deployMode, String flinkVersion) {
         switch (deployMode) {
             case CLUSTER:
                 if (FLINK_VERSION_AFTER_OR_EQUALS_1_12.equals(flinkVersion)
