@@ -412,3 +412,27 @@ d//
 delimiter ;
 CALL add_improvement_workflow_run_tenant;
 DROP PROCEDURE add_improvement_workflow_run_tenant;
+
+-- uc_dolphin_T_t_ds_relation_sub_workflow
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_relation_sub_workflow;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_relation_sub_workflow()
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_relation_sub_workflow'
+           AND TABLE_SCHEMA=(SELECT DATABASE()))
+   THEN
+CREATE TABLE `t_ds_relation_sub_workflow` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `parent_workflow_instance_id` bigint  NOT NULL,
+    `parent_task_code` bigint  NOT NULL COMMENT,
+    `sub_workflow_instance_id` bigint  NOT NULL,
+    PRIMARY KEY (`id`),
+    KEY `idx_parent_workflow_instance_id` (`parent_workflow_instance_id`),
+    KEY `idx_parent_task_code` (`parent_task_code`),
+    KEY `idx_sub_workflow_instance_id` (`sub_workflow_instance_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE utf8_bin;
+END IF;
+END;
+
+d//
