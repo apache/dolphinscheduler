@@ -18,7 +18,7 @@
 import { defineComponent, onMounted, toRefs } from 'vue'
 import { useSidebar } from './use-sidebar'
 import styles from './dag-sidebar.module.scss'
-import { NEllipsis, NIcon, NImage } from 'naive-ui'
+import { NEllipsis, NIcon } from 'naive-ui'
 import { StarFilled, StarOutlined } from '@vicons/antd'
 
 const DagSidebar = defineComponent({
@@ -37,7 +37,6 @@ const DagSidebar = defineComponent({
 
     onMounted(() => {
       getTaskList()
-      console.log('variables.taskList', variables.taskList)
     })
 
     return {
