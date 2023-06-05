@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.runner.task.dynamic;
 
 import org.apache.dolphinscheduler.common.constants.CommandKeyConstants;
+import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
@@ -31,7 +32,10 @@ import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.DynamicInputParameter;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DynamicParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
+import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.remote.command.workflow.WorkflowStateEventChangeRequest;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.utils.Host;
@@ -186,6 +190,8 @@ public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
         ProcessInstance subProcessInstance;
         try {
             subProcessInstance = processService.constructProcessInstance(command, processInstance.getHost());
+            subProcessInstance.setIsSubProcess(Flag.YES);
+            subProcessInstance.setVarPool(taskExecutionContext.getVarPool());
         } catch (Exception e) {
             log.error("create sub process instance error", e);
             throw new MasterTaskExecuteException(e.getMessage());
@@ -194,7 +200,7 @@ public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
     }
 
     public List<Map<String, String>> generateParameterGroup() {
-        List<DynamicInputParameter> dynamicInputParameters = taskParameters.getListParameters();
+        List<DynamicInputParameter> dynamicInputParameters = getDynamicInputParameters();
         Set<String> filterStrings =
                 Arrays.stream(StringUtils.split(taskParameters.getFilterCondition(), ",")).map(String::trim)
                         .collect(Collectors.toSet());
@@ -235,6 +241,19 @@ public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
             }
         }
         return parameterGroup;
+    }
+
+    private List<DynamicInputParameter> getDynamicInputParameters() {
+        List<DynamicInputParameter> dynamicInputParameters = taskParameters.getListParameters();
+        if (CollectionUtils.isNotEmpty(dynamicInputParameters)) {
+            for (DynamicInputParameter dynamicInputParameter : dynamicInputParameters) {
+                String value = dynamicInputParameter.getValue();
+                Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+                value = ParameterUtils.convertParameterPlaceholders(value, ParamUtils.convert(paramsMap));
+                dynamicInputParameter.setValue(value);
+            }
+        }
+        return dynamicInputParameters;
     }
 
     @Override
