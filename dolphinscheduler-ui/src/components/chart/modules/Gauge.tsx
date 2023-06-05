@@ -48,7 +48,6 @@ const GaugeChart = defineComponent({
     const windowWidth = window.innerWidth
     // The original size was based on the screen width of 2560
     const defaultFontSize = windowWidth > 2560 ? 20 : (windowWidth / 2560) * 20
-    const axisLabelFontSize = ref(defaultFontSize)
 
     const option = {
       series: [
@@ -102,7 +101,7 @@ const GaugeChart = defineComponent({
 
     const resize = (chart: any) => {
       const clientWidth = gaugeChartRef.value?.clientWidth || 400
-      axisLabelFontSize.value =
+      const axisLabelFontSize =
         clientWidth > 400
           ? defaultFontSize
           : (clientWidth / 400) * defaultFontSize
@@ -111,10 +110,10 @@ const GaugeChart = defineComponent({
           series: [
             {
               axisLabel: {
-                fontSize: axisLabelFontSize.value
+                fontSize: axisLabelFontSize
               },
               detail: {
-                fontSize: axisLabelFontSize.value * 1.5
+                fontSize: axisLabelFontSize * 1.5
               }
             }
           ]
@@ -122,7 +121,7 @@ const GaugeChart = defineComponent({
       chart && chart.resize()
     }
 
-    const chart =initChart(gaugeChartRef, option, resize)
+    initChart(gaugeChartRef, option, resize)
 
     onMounted(() => {
       addEventListener('resize', resize)
