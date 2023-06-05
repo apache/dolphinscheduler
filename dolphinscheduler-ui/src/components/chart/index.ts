@@ -25,9 +25,7 @@ import type { ECBasicOption } from 'echarts/types/dist/shared'
 
 function initChart<Opt extends ECBasicOption>(
   domRef: Ref<HTMLDivElement | null>,
-  option: Opt,
-  type: string,
-  fontSize = 20
+  option: Opt
 ): ECharts | null {
   let chart: ECharts | null = null
   const themeStore = useThemeStore()
@@ -36,14 +34,6 @@ function initChart<Opt extends ECBasicOption>(
     getCurrentInstance()?.appContext.config.globalProperties
 
   option['backgroundColor'] = ''
-
-  const axisLabelFontSize = ref(fontSize)
-
-  const changeFontSize = () => {
-    const clientWidth = domRef.value?.clientWidth || 400
-    axisLabelFontSize.value =
-      clientWidth > 400 ? fontSize : (clientWidth / 400) * fontSize
-  }
 
   const init = () => {
     chart = globalProperties?.echarts.init(
@@ -54,24 +44,6 @@ function initChart<Opt extends ECBasicOption>(
   }
 
   const resize = throttle(() => {
-    if (type === 'gauge') {
-    //Now only the gauge needs to be resized the fontSize
-      changeFontSize()
-      chart &&
-        chart.setOption({
-          series: [
-            {
-              axisLabel: {
-                fontSize: axisLabelFontSize.value
-              },
-              detail: {
-                fontSize: axisLabelFontSize.value * 1.5
-              }
-            }
-          ]
-        })
-    }
-
     chart && chart.resize()
   }, 20)
 

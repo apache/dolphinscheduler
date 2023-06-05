@@ -66,7 +66,7 @@ const PieChart = defineComponent({
       ]
     }
 
-    initChart(pieChartRef, option, 'pie')
+    initChart(pieChartRef, option)
 
     return { pieChartRef }
   },

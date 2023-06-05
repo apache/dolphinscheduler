@@ -89,7 +89,7 @@ const TreeChart = defineComponent({
       ]
     })
 
-    initChart(treeChartRef, option, 'tree')
+    initChart(treeChartRef, option)
 
     watch(
       () => props.data,

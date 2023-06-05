@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, PropType, ref } from 'vue'
+import { defineComponent, onMounted, onBeforeUnmount, PropType, ref } from 'vue'
 import initChart from '@/components/chart'
 import type { Ref } from 'vue'
 
@@ -41,8 +41,15 @@ const GaugeChart = defineComponent({
     const windowWidth = window.innerWidth
     // The original size was based on the screen width of 2560
     const defaultFontSize = windowWidth > 2560 ? 20 : (windowWidth / 2560) * 20
+    const axisLabelFontSize = ref(defaultFontSize)
 
-    console.log('defaultFontSize', defaultFontSize)
+    const changeFontSize = () => {
+      const clientWidth = gaugeChartRef.value?.clientWidth || 400
+      axisLabelFontSize.value =
+        clientWidth > 400
+          ? defaultFontSize
+          : (clientWidth / 400) * defaultFontSize
+    }
 
     const option = {
       series: [
@@ -94,7 +101,32 @@ const GaugeChart = defineComponent({
       ]
     }
 
-    initChart(gaugeChartRef, option, 'gauge')
+    const resize = () => {
+      changeFontSize()
+      chart &&
+        chart.setOption({
+          series: [
+            {
+              axisLabel: {
+                fontSize: axisLabelFontSize.value
+              },
+              detail: {
+                fontSize: axisLabelFontSize.value * 1.5
+              }
+            }
+          ]
+        })
+    }
+
+    onMounted(() => {
+      addEventListener('resize', resize)
+    })
+
+    onBeforeUnmount(() => {
+      removeEventListener('resize', resize)
+    })
+
+    const chart = initChart(gaugeChartRef, option)
     return { gaugeChartRef }
   },
   render() {
