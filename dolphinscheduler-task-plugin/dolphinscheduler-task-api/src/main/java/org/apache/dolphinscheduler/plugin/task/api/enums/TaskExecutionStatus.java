@@ -88,8 +88,12 @@ public enum TaskExecutionStatus {
         return this == TaskExecutionStatus.PAUSE;
     }
 
+    public boolean isStop() {
+        return this == TaskExecutionStatus.STOP;
+    }
+
     public boolean isFinished() {
-        return isSuccess() || isKill() || isFailure() || isPause();
+        return isSuccess() || isKill() || isFailure() || isPause() || isStop();
     }
 
     public boolean isNeedFaultTolerance() {
