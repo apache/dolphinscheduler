@@ -30,32 +30,32 @@ git clone git@github.com:apache/dolphinscheduler.git
 
 ### 代码风格
 
-DolphinScheduler使用`Spotless`检查并修复代码风格和格式问题。
-您可以执行如下的命令，`Spotless`将会为您自动检查并修复代码风格和格式问题。
+DolphinScheduler 使用 `Spotless` 检查并修复代码风格和格式问题。
+您可以执行如下的命令，`Spotless` 将会为您自动检查并修复代码风格和格式问题。
 
 ```shell
 ./mvnw spotless:apply
 ```
 
-我们也提供了一个`pre-commit`配置文件，方便您配置。要使用它，您需要先安装python，然后通过运行以下命令安装`pre-commit`：
+我们也提供了一个 `pre-commit` 配置文件，方便您配置。要使用它，您需要先安装 python，然后通过运行以下命令安装 `pre-commit`：
 
 ```shell
 python -m pip install pre-commit
 ```
 
-之后，您可以运行以下命令安装`pre-commit`钩子：
+之后，您可以运行以下命令安装 `pre-commit` 钩子：
 
 ```shell
 pre-commit install
 ```
 
-现在，每次您提交代码时，`pre-commit`都会自动运行`Spotless`来检查代码风格和格式。
+现在，每次您提交代码时，`pre-commit` 都会自动运行 `Spotless` 来检查代码风格和格式。
 
 ## Docker镜像构建
 
 DolphinScheduler 每次发版都会同时发布 Docker 镜像，你可以在 [Docker Hub](https://hub.docker.com/search?q=DolphinScheduler) 中找到这些镜像
 
-* 如果你想基于源码进行改造，然后在本地构建Docker镜像，可以在代码改造完成后运行
+* 如果你想基于源码进行改造，然后在本地构建 Docker 镜像，可以在代码改造完成后运行
 
 ```shell
 cd dolphinscheduler
@@ -69,7 +69,7 @@ cd dolphinscheduler
 
 当命令运行完了后你可以通过 `docker images` 命令查看刚刚创建的镜像
 
-* 如果你想基于源码进行改造，然后构建Docker镜像并推送到 <HUB_URL>，可以在代码改造完成后运行
+* 如果你想基于源码进行改造，然后构建 Docker 镜像并推送到 <HUB_URL>，可以在代码改造完成后运行
 
 ```shell
 cd dolphinscheduler
@@ -100,18 +100,18 @@ RUN apt update ; \
     apt install -y <YOUR-CUSTOM-DEPENDENCE> ; \
 ```
 
-> **_注意：_** Docker默认会构建并推送 linux/amd64,linux/arm64 多架构镜像
+> **_注意：_** Docker 默认会构建并推送 linux/amd64,linux/arm64 多架构镜像
 >
-> 必须使用Docker 19.03及以后的版本，因为19.03及以后的版本包含 buildx
+> 必须使用 Docker 19.03 及以后的版本，因为 19.03 及以后的版本包含 buildx
 
 ## 开发者须知
 
-DolphinScheduler 开发环境配置有两个方式，分别是standalone模式，以及普通模式
+DolphinScheduler 开发环境配置有两个方式，分别是 standalone 模式，以及普通模式
 
-* [standalone模式](#dolphinscheduler-standalone快速开发模式)：**推荐使用，但仅支持 1.3.9 及以后的版本**，方便快速的开发环境搭建，能解决大部分场景的开发
+* [standalone 模式](#dolphinscheduler-standalone 快速开发模式)：**推荐使用，但仅支持 1.3.9 及以后的版本**，方便快速的开发环境搭建，能解决大部分场景的开发
 * [普通模式](#dolphinscheduler-普通开发模式)：master、worker、api等单独启动，能更好的的模拟真实生产环境，可以覆盖的测试环境更多
 
-## DolphinScheduler Standalone快速开发模式
+## DolphinScheduler Standalone 快速开发模式
 
 > **_注意：_** 仅供单机开发调试使用，默认使用 H2 Database,Zookeeper Testing Server
 >
@@ -132,7 +132,7 @@ DolphinScheduler 开发环境配置有两个方式，分别是standalone模式�
 
 安装前端依赖并运行前端组件
 
-> 注意：你可以在[frontend development](./frontend-development.md)里查看更多前端的相关配置
+> 注意：你可以在 [frontend development](./frontend-development.md) 里查看更多前端的相关配置
 
 ```shell
 cd dolphinscheduler-ui
@@ -140,7 +140,7 @@ pnpm install
 pnpm run dev
 ```
 
-截止目前，前后端已成功运行起来，浏览器访问[http://localhost:5173](http://localhost:5173)，并使用默认账户密码 **admin/dolphinscheduler123** 即可完成登录
+截止目前，前后端已成功运行起来，浏览器访问 [http://localhost:5173](http://localhost:5173)，并使用默认账户密码 **admin/dolphinscheduler123** 即可完成登录
 
 ## DolphinScheduler 普通开发模式
 
@@ -150,7 +150,7 @@ pnpm run dev
 
 下载 [ZooKeeper](https://www.apache.org/dyn/closer.lua/zookeeper/zookeeper-3.6.3)，解压
 
-* 在 ZooKeeper 的目录下新建 zkData、zkLog文件夹
+* 在 ZooKeeper 的目录下新建 zkData、zkLog 文件夹
 * 将 conf 目录下的 `zoo_sample.cfg` 文件，复制一份，重命名为 `zoo.cfg`，修改其中数据和日志的配置，如：
 
   ```shell
@@ -161,7 +161,7 @@ pnpm run dev
 
 #### 数据库
 
-DolphinScheduler 的元数据存储在关系型数据库中，目前支持的关系型数据库包括 MySQL 以及 PostgreSQL。下面以MySQL为例，启动数据库并创建新 database 作为 DolphinScheduler 元数据库，这里以数据库名 dolphinscheduler 为例
+DolphinScheduler 的元数据存储在关系型数据库中，目前支持的关系型数据库包括 MySQL 以及 PostgreSQL。下面以 MySQL 为例，启动数据库并创建新 database 作为 DolphinScheduler 元数据库，这里以数据库名 dolphinscheduler 为例
 
 创建完新数据库后，将 `dolphinscheduler/dolphinscheduler-dao/src/main/resources/sql/dolphinscheduler_mysql.sql` 下的 sql 文件直接在 MySQL 中运行，完成数据库初始化
 
@@ -175,7 +175,14 @@ DolphinScheduler 的元数据存储在关系型数据库中，目前支持的关
 
 * 必要的修改
 
-  * 如果使用 MySQL 作为元数据库，需要先修改 `dolphinscheduler/pom.xml`，将 `mysql-connector-java` 依赖的 `scope` 改为 `compile`，使用 PostgreSQL 则不需要
+  * 如果使用 MySQL 作为元数据库，则需要在 `dolphinscheduler-api` 和 `dolphinscheduler-master` 模块下的 `pom.xml` 中添加 `mysql-connector-java` 的依赖，使用 PostgreSQL 则不需要，详细配置如下：
+    ```xml
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    ```
   * 修改 Master 数据库配置，修改 `dolphinscheduler-master/src/main/resources/application.yaml` 文件中的数据库配置
   * 修改 Worker 数据库配置，修改 `dolphinscheduler-worker/src/main/resources/application.yaml` 文件中的数据库配置
   * 修改 Api 数据库配置，修改 `dolphinscheduler-api/src/main/resources/application.yaml` 文件中的数据库配置
@@ -206,6 +213,8 @@ DolphinScheduler 的元数据存储在关系型数据库中，目前支持的关
   </root>
   ```
 
+> **注意**：只有 DolphinScheduler 2.0 及以后的版本在启动服务器前需要安装所有插件。在 2.0 之前的版本则不需要。
+
 ##### 启动服务
 
 我们需要启动三个服务，包括 MasterServer，WorkerServer，ApiApplicationServer
@@ -226,4 +235,4 @@ pnpm install
 pnpm run dev
 ```
 
-截止目前，前后端已成功运行起来，浏览器访问[http://localhost:5173](http://localhost:5173)，并使用默认账户密码 **admin/dolphinscheduler123** 即可完成登录
+截止目前，前后端已成功运行起来，浏览器访问 [http://localhost:5173](http://localhost:5173)，并使用默认账户密码 **admin/dolphinscheduler123** 即可完成登录

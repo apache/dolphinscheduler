@@ -25,7 +25,7 @@ git clone git@github.com:apache/dolphinscheduler.git
 Supporting system:
 
 - MacOS
-- Liunx
+- Linux
 
 Run `mvn clean install -Prelease -Dmaven.test.skip=true`
 
@@ -181,7 +181,14 @@ Following steps will guide how to start the DolphinScheduler backend service
 
 - File change
 
-  - If you use MySQL as your metadata database, you need to modify `dolphinscheduler/pom.xml` and change the `scope` of the `mysql-connector-java` dependency to `compile`. This step is not necessary to use PostgreSQL
+  - If you use MySQL as meta-database, you need to add `mysql-connector-java` dependency in `pom.xml` file which is under `dolphinscheduler-api` and `dolphinscheduler-master` modules, it is not needed if you use PostgreSQL, the detailed configuration is as follows:
+  ```xml
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    ```
   - Modify database configuration, modify the database configuration in the `dolphinscheduler-master/src/main/resources/application.yaml`
   - Modify database configuration, modify the database configuration in the `dolphinscheduler-worker/src/main/resources/application.yaml`
   - Modify database configuration, modify the database configuration in the `dolphinscheduler-api/src/main/resources/application.yaml`
