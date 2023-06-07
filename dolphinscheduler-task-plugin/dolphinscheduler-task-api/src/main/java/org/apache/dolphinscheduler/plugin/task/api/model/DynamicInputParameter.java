@@ -15,15 +15,19 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.alert.script;
+package org.apache.dolphinscheduler.plugin.task.api.model;
 
-public final class OSUtils {
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
-    private OSUtils() {
-        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
-    }
+@Data
+@NoArgsConstructor
+public class DynamicInputParameter {
 
-    static Boolean isWindows() {
-        return System.getProperty("os.name").startsWith("Windows");
-    }
+    @NonNull
+    private String name;
+    @NonNull
+    private String value;
+    private String separator = ",";
 }

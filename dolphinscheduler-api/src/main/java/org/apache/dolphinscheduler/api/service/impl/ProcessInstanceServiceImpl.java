@@ -30,6 +30,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYP
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SUB_PROCESS;
 
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
+import org.apache.dolphinscheduler.api.dto.DynamicSubWorkflowDto;
 import org.apache.dolphinscheduler.api.dto.gantt.GanttDto;
 import org.apache.dolphinscheduler.api.dto.gantt.Task;
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceQueryRequest;
@@ -44,6 +45,7 @@ import org.apache.dolphinscheduler.api.service.TaskInstanceService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.constants.CommandKeyConstants;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
@@ -57,6 +59,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.RelationSubWorkflow;
 import org.apache.dolphinscheduler.dao.entity.ResponseTaskLog;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
@@ -66,6 +69,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.mapper.RelationSubWorkflowMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
@@ -93,6 +97,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -183,6 +188,9 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
 
     @Autowired
     private ScheduleMapper scheduleMapper;
+
+    @Autowired
+    private RelationSubWorkflowMapper relationSubWorkflowMapper;
 
     @Autowired
     private AlertDao alertDao;
@@ -486,6 +494,66 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
 
         putMsg(result, Status.SUCCESS);
         return result;
+    }
+
+    @Override
+    public List<DynamicSubWorkflowDto> queryDynamicSubWorkflowInstances(User loginUser, Integer taskId) {
+        TaskInstance taskInstance = taskInstanceDao.findTaskInstanceById(taskId);
+        Map<String, Object> result = new HashMap<>();
+        if (taskInstance == null) {
+            putMsg(result, Status.TASK_INSTANCE_NOT_EXISTS, taskId);
+            throw new ServiceException(Status.TASK_INSTANCE_NOT_EXISTS, taskId);
+        }
+
+        TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskInstance.getTaskCode());
+        if (taskDefinition == null) {
+            putMsg(result, Status.TASK_INSTANCE_NOT_EXISTS, taskId);
+            throw new ServiceException(Status.TASK_INSTANCE_NOT_EXISTS, taskId);
+        }
+
+        if (!taskInstance.isDynamic()) {
+            putMsg(result, Status.TASK_INSTANCE_NOT_DYNAMIC_TASK, taskInstance.getName());
+            throw new ServiceException(Status.TASK_INSTANCE_NOT_EXISTS, taskId);
+        }
+        List<RelationSubWorkflow> relationSubWorkflows = relationSubWorkflowMapper
+                .queryAllSubProcessInstance(Long.valueOf(taskInstance.getProcessInstanceId()),
+                        taskInstance.getTaskCode());
+        List<Long> allSubProcessInstanceId = relationSubWorkflows.stream()
+                .map(RelationSubWorkflow::getSubWorkflowInstanceId).collect(java.util.stream.Collectors.toList());
+        List<ProcessInstance> allSubWorkflows = processInstanceDao.queryBatchIds(allSubProcessInstanceId);
+
+        if (allSubWorkflows == null || allSubWorkflows.isEmpty()) {
+            putMsg(result, Status.SUB_PROCESS_INSTANCE_NOT_EXIST, taskId);
+            throw new ServiceException(Status.SUB_PROCESS_INSTANCE_NOT_EXIST, taskId);
+        }
+        Long subWorkflowCode = allSubWorkflows.get(0).getProcessDefinitionCode();
+        int subWorkflowVersion = allSubWorkflows.get(0).getProcessDefinitionVersion();
+        ProcessDefinition subProcessDefinition =
+                processService.findProcessDefinition(subWorkflowCode, subWorkflowVersion);
+        if (subProcessDefinition == null) {
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, subWorkflowCode);
+            throw new ServiceException(Status.PROCESS_DEFINE_NOT_EXIST, subWorkflowCode);
+        }
+
+        allSubWorkflows.sort(Comparator.comparing(ProcessInstance::getId));
+
+        List<DynamicSubWorkflowDto> allDynamicSubWorkflowDtos = new ArrayList<>();
+        int index = 1;
+        for (ProcessInstance processInstance : allSubWorkflows) {
+            DynamicSubWorkflowDto dynamicSubWorkflowDto = new DynamicSubWorkflowDto();
+            dynamicSubWorkflowDto.setProcessInstanceId(processInstance.getId());
+            dynamicSubWorkflowDto.setIndex(index);
+            dynamicSubWorkflowDto.setState(processInstance.getState());
+            dynamicSubWorkflowDto.setName(subProcessDefinition.getName());
+            Map<String, String> commandParamMap = JSONUtils.toMap(processInstance.getCommandParam());
+            String parameter = commandParamMap.get(CommandKeyConstants.CMD_DYNAMIC_START_PARAMS);
+            dynamicSubWorkflowDto.setParameters(JSONUtils.toMap(parameter));
+            allDynamicSubWorkflowDtos.add(dynamicSubWorkflowDto);
+            index++;
+
+        }
+
+        return allDynamicSubWorkflowDtos;
     }
 
     /**
