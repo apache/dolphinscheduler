@@ -104,11 +104,14 @@ public class RequestClient {
 
         String requestUrl = String.format("%s%s", Constants.DOLPHINSCHEDULER_API_URL, url);
 
-        headers.put("Content-Type", Constants.REQUEST_CONTENT_TYPE);
+//        headers.put("Content-Type", Constants.REQUEST_CONTENT_TYPE);
+        headers.put("enctype", "multipart/form-data");
+        headers.put("Content-Type", "multipart/form-data");
 
         Headers headersBuilder = Headers.of(headers);
 
-        RequestBody requestBody = FormBody.create(MediaType.parse(Constants.REQUEST_CONTENT_TYPE), getParams(params));
+//        RequestBody requestBody = FormBody.create(MediaType.parse(Constants.REQUEST_CONTENT_TYPE), getParams(params));
+        RequestBody requestBody = FormBody.create(MediaType.parse(Constants.MULTIPART_FORM_DATA), getParams(params));
 
         log.info("POST request to {}, Headers: {}, Params: {}", requestUrl, headersBuilder, params);
         Request request = new Request.Builder()
