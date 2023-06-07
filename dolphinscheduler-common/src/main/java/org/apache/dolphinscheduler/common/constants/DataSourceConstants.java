@@ -112,6 +112,8 @@ public class DataSourceConstants {
 
     public static final String SPRING_DATASOURCE_MAX_ACTIVE = "spring.datasource.maxActive";
 
+    public static final String SPRING_DATASOURCE_IDLE_TIMEOUT = "spring.datasource.idleTimeoutMs";
+
     public static final String SPRING_DATASOURCE_TEST_ON_BORROW = "spring.datasource.testOnBorrow";
 
     /**
