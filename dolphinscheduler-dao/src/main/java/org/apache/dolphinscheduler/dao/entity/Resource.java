@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.dao.entity;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import java.util.Date;
+import java.util.Objects;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -149,7 +150,7 @@ public class Resource {
 
         Resource resource = (Resource) o;
 
-        if (id != resource.id) {
+        if (!Objects.equals(id, resource.id)) {
             return false;
         }
         return alias.equals(resource.alias);
