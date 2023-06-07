@@ -260,6 +260,7 @@ export default {
     retry_count: 'Retry Count',
     dry_run_flag: 'Dry Run Flag',
     host: 'Host',
+    app_link: 'External Application Link',
     operation: 'Operation',
     edit: 'Edit',
     delete: 'Delete',
