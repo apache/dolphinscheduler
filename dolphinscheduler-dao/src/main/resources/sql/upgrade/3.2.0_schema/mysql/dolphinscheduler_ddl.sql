@@ -431,7 +431,7 @@ CREATE TABLE `t_ds_relation_sub_workflow` (
     KEY `idx_parent_workflow_instance_id` (`parent_workflow_instance_id`),
     KEY `idx_parent_task_code` (`parent_task_code`),
     KEY `idx_sub_workflow_instance_id` (`sub_workflow_instance_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE utf8_bin;
+);
 END IF;
 END;
 
