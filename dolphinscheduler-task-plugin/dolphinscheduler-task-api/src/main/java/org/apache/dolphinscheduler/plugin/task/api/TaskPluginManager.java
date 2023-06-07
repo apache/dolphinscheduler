@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import org.apache.dolphinscheduler.plugin.task.api.parameters.BlockingParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ConditionsParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.DynamicParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SubProcessParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
@@ -102,6 +103,8 @@ public class TaskPluginManager {
                 return JSONUtils.parseObject(parametersNode.getTaskParams(), DependentParameters.class);
             case TaskConstants.TASK_TYPE_BLOCKING:
                 return JSONUtils.parseObject(parametersNode.getTaskParams(), BlockingParameters.class);
+            case TaskConstants.TASK_TYPE_DYNAMIC:
+                return JSONUtils.parseObject(parametersNode.getTaskParams(), DynamicParameters.class);
             default:
                 TaskChannel taskChannel = this.getTaskChannelMap().get(taskType);
                 if (Objects.isNull(taskChannel)) {

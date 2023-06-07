@@ -32,7 +32,7 @@ export function formatParams(data: INodeData): {
   taskDefinitionJsonObj: object
 } {
   const taskParams: ITaskParams = {}
-  if (data.taskType === 'SUB_PROCESS') {
+  if (data.taskType === 'SUB_PROCESS' || data.taskType === 'DYNAMIC') {
     taskParams.processDefinitionCode = data.processDefinitionCode
   }
 
@@ -479,6 +479,14 @@ export function formatParams(data: INodeData): {
   if (data.taskType === 'REMOTESHELL') {
     taskParams.type = data.type
     taskParams.datasource = data.datasource
+  }
+
+  if (data.taskType === 'DYNAMIC') {
+    taskParams.processDefinitionCode = data.processDefinitionCode
+    taskParams.maxNumOfSubWorkflowInstances = data.maxNumOfSubWorkflowInstances
+    taskParams.degreeOfParallelism = data.degreeOfParallelism
+    taskParams.filterCondition = data.filterCondition
+    taskParams.listParameters = data.listParameters
   }
 
   let timeoutNotifyStrategy = ''

@@ -2042,3 +2042,16 @@ CREATE TABLE t_ds_trigger_relation
     PRIMARY KEY (id),
     UNIQUE KEY t_ds_trigger_relation_UN(trigger_type,job_id,trigger_code)
 );
+
+
+DROP TABLE IF EXISTS t_ds_relation_sub_workflow;
+CREATE TABLE t_ds_relation_sub_workflow (
+    id BIGINT AUTO_INCREMENT NOT NULL,
+    parent_workflow_instance_id BIGINT NOT NULL,
+    parent_task_code BIGINT NOT NULL,
+    sub_workflow_instance_id BIGINT NOT NULL,
+    PRIMARY KEY (id),
+    INDEX idx_parent_workflow_instance_id (parent_workflow_instance_id),
+    INDEX idx_parent_task_code (parent_task_code),
+    INDEX idx_sub_workflow_instance_id (sub_workflow_instance_id)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;

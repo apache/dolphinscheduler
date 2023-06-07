@@ -744,8 +744,8 @@ public class ProcessServiceImpl implements ProcessService {
      * @param host    host
      * @return process instance
      */
-    protected @Nullable ProcessInstance constructProcessInstance(Command command,
-                                                                 String host) throws CronParseException, CodeGenerateException {
+    public @Nullable ProcessInstance constructProcessInstance(Command command,
+                                                              String host) throws CronParseException, CodeGenerateException {
         ProcessInstance processInstance;
         ProcessDefinition processDefinition;
         CommandType commandType = command.getCommandType();
@@ -765,6 +765,7 @@ public class ProcessServiceImpl implements ProcessService {
             processInstance = generateNewProcessInstance(processDefinition, command, cmdParam);
         } else {
             processInstance = this.findProcessInstanceDetailById(processInstanceId).orElse(null);
+            setGlobalParamIfCommanded(processDefinition, cmdParam);
             if (processInstance == null) {
                 return null;
             }
@@ -816,6 +817,7 @@ public class ProcessServiceImpl implements ProcessService {
         int runTime = processInstance.getRunTimes();
         switch (commandType) {
             case START_PROCESS:
+            case DYNAMIC_GENERATION:
                 break;
             case START_FAILURE_TASK_PROCESS:
                 // find failed tasks and init these tasks

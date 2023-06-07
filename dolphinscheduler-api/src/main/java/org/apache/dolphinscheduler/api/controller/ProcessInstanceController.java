@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.controller;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
+import org.apache.dolphinscheduler.api.dto.DynamicSubWorkflowDto;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
@@ -317,6 +318,28 @@ public class ProcessInstanceController extends BaseController {
                                              @RequestParam("subId") Integer subId) {
         Map<String, Object> result = processInstanceService.queryParentInstanceBySubId(loginUser, projectCode, subId);
         return returnDataList(result);
+    }
+
+    /**
+     * query dynamic sub process instance detail info by task id
+     *
+     * @param loginUser login user
+     * @param taskId task id
+     * @return sub process instance detail
+     */
+    @Operation(summary = "queryDynamicSubWorkflowInstances", description = "QUERY_DYNAMIC_SUBPROCESS_INSTANCE_BY_TASK_CODE_NOTES")
+    @Parameters({
+            @Parameter(name = "taskId", description = "taskInstanceId", required = true, schema = @Schema(implementation = int.class, example = "100"))
+    })
+    @GetMapping(value = "/query-dynamic-sub-workflows")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(Status.QUERY_SUB_PROCESS_INSTANCE_DETAIL_INFO_BY_TASK_ID_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result<List<DynamicSubWorkflowDto>> queryDynamicSubWorkflowInstances(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                                @RequestParam("taskId") Integer taskId) {
+        List<DynamicSubWorkflowDto> dynamicSubWorkflowDtos =
+                processInstanceService.queryDynamicSubWorkflowInstances(loginUser, taskId);
+        return new Result(Status.SUCCESS.getCode(), Status.SUCCESS.getMsg(), dynamicSubWorkflowDtos);
     }
 
     /**

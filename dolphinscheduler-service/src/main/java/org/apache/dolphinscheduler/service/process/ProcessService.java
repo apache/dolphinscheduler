@@ -64,6 +64,9 @@ public interface ProcessService {
     ProcessInstance handleCommand(String host,
                                   Command command) throws CronParseException, CodeGenerateUtils.CodeGenerateException;
 
+    ProcessInstance constructProcessInstance(Command command,
+                                             String host) throws CronParseException, CodeGenerateUtils.CodeGenerateException;
+
     Optional<ProcessInstance> findProcessInstanceDetailById(int processId);
 
     ProcessInstance findProcessInstanceById(int processId);

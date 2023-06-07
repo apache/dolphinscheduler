@@ -2001,3 +2001,16 @@ CREATE TABLE t_ds_trigger_relation (
     PRIMARY KEY (id),
     CONSTRAINT t_ds_trigger_relation_unique UNIQUE (trigger_type,job_id,trigger_code)
 );
+
+DROP TABLE IF EXISTS t_ds_relation_sub_workflow;
+CREATE TABLE t_ds_relation_sub_workflow (
+    id        serial      NOT NULL,
+    parent_workflow_instance_id BIGINT NOT NULL,
+    parent_task_code BIGINT NOT NULL,
+    sub_workflow_instance_id BIGINT NOT NULL,
+    PRIMARY KEY (id)
+);
+CREATE INDEX idx_parent_workflow_instance_id ON t_ds_relation_sub_workflow (parent_workflow_instance_id);
+CREATE INDEX idx_parent_task_code ON t_ds_relation_sub_workflow (parent_task_code);
+CREATE INDEX idx_sub_workflow_instance_id ON t_ds_relation_sub_workflow (sub_workflow_instance_id);
+

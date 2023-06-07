@@ -38,6 +38,8 @@ public interface ProcessInstanceDao {
      */
     public int upsertProcessInstance(ProcessInstance processInstance);
 
+    List<ProcessInstance> queryBatchIds(List<Long> processInstanceIds);
+
     void deleteByIds(List<Integer> needToDeleteWorkflowInstanceIds);
 
     void deleteById(Integer workflowInstanceId);

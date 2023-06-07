@@ -445,8 +445,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
 
             if (taskInstance.getState().isSuccess()) {
                 completeTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
-                // todo: merge the last taskInstance
-                processInstance.setVarPool(taskInstance.getVarPool());
+                mergeTaskInstanceVarPool(taskInstance);
                 processInstanceDao.upsertProcessInstance(processInstance);
                 // save the cacheKey only if the task is defined as cache task and the task is success
                 if (taskInstance.getIsCache().equals(Flag.YES)) {
@@ -2211,5 +2210,26 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
 
     private boolean isExecutedOnMaster(String host) {
         return host.endsWith(masterAddress.split(Constants.COLON)[1]);
+    }
+
+    private void mergeTaskInstanceVarPool(TaskInstance taskInstance) {
+        String taskVarPoolJson = taskInstance.getVarPool();
+        if (StringUtils.isEmpty(taskVarPoolJson)) {
+            return;
+        }
+        String processVarPoolJson = processInstance.getVarPool();
+        if (StringUtils.isEmpty(processVarPoolJson)) {
+            processInstance.setVarPool(taskVarPoolJson);
+            return;
+        }
+        List<Property> processVarPool = new ArrayList<>(JSONUtils.toList(processVarPoolJson, Property.class));
+        List<Property> taskVarPool = JSONUtils.toList(taskVarPoolJson, Property.class);
+        Set<String> newProcessVarPoolKeys = taskVarPool.stream().map(Property::getProp).collect(Collectors.toSet());
+        processVarPool = processVarPool.stream().filter(property -> !newProcessVarPoolKeys.contains(property.getProp()))
+                .collect(Collectors.toList());
+
+        processVarPool.addAll(taskVarPool);
+
+        processInstance.setVarPool(JSONUtils.toJsonString(processVarPool));
     }
 }

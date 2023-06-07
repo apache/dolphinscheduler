@@ -315,3 +315,27 @@ d//
 delimiter ;
 select add_improvement_workflow_run_tenant();
 DROP FUNCTION add_improvement_workflow_run_tenant();
+
+-- uc_dolphin_T_t_ds_relation_sub_workflow
+CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_relation_sub_workflow()
+RETURNS VOID AS $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_name='t_ds_relation_sub_workflow'
+        AND table_schema=current_schema()
+    ) THEN
+CREATE TABLE t_ds_relation_sub_workflow (
+                                            id        serial      NOT NULL,
+                                            parent_workflow_instance_id BIGINT NOT NULL,
+                                            parent_task_code BIGINT NOT NULL,
+                                            sub_workflow_instance_id BIGINT NOT NULL,
+                                            PRIMARY KEY (id)
+);
+CREATE INDEX idx_parent_workflow_instance_id ON t_ds_relation_sub_workflow (parent_workflow_instance_id);
+CREATE INDEX idx_parent_task_code ON t_ds_relation_sub_workflow (parent_task_code);
+CREATE INDEX idx_sub_workflow_instance_id ON t_ds_relation_sub_workflow (sub_workflow_instance_id);
+END IF;
+END;
+$$ LANGUAGE plpgsql;

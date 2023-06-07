@@ -37,7 +37,7 @@ public class TaskTimeoutStateEventHandler implements StateEventHandler {
 
     @Override
     public boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable,
-                                    StateEvent stateEvent) throws StateEventHandleError {
+                                    StateEvent stateEvent) throws StateEventHandleError, StateEventHandleException {
         TaskStateEvent taskStateEvent = (TaskStateEvent) stateEvent;
 
         TaskMetrics.incTaskInstanceByState("timeout");
@@ -62,6 +62,7 @@ public class TaskTimeoutStateEventHandler implements StateEventHandler {
                 || TaskTimeoutStrategy.WARNFAILED == taskTimeoutStrategy)) {
             if (taskExecuteRunnableMap.containsKey(taskInstance.getTaskCode())) {
                 taskExecuteRunnableMap.get(taskInstance.getTaskCode()).timeout();
+                workflowExecuteRunnable.taskFinished(taskInstance);
             } else {
                 log.warn(
                         "cannot find the task processor for task {}, so skip task processor action.",

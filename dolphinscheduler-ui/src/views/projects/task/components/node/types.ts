@@ -436,6 +436,10 @@ interface ITaskParams {
   factoryName?: string
   resourceGroupName?: string
   pipelineName?: string
+  maxNumOfSubWorkflowInstances?: number
+  degreeOfParallelism?: number
+  filterCondition?: string
+  listParameters?: Array<any>
 }
 
 interface INodeData
