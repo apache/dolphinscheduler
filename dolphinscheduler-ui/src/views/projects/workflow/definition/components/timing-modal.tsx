@@ -298,18 +298,19 @@ export default defineComponent({
           </NFormItem>
           <NFormItem label=' ' showFeedback={false}>
             <NList>
-              <NListItem>
-                <NThing
-                  description={t('project.workflow.next_five_execution_times')}
-                >
-                  {this.schedulePreviewList.map((item: string) => (
-                    <NSpace>
-                      {item}
-                      <br />
-                    </NSpace>
-                  ))}
-                </NThing>
-              </NListItem>
+                {this.schedulePreviewList.length > 0 ?
+                    <NListItem>
+                        <NThing
+                            description={t('project.workflow.next_five_execution_times')}
+                        >
+                            {this.schedulePreviewList.map((item: string) => (
+                                <NSpace>
+                                    {item}
+                                    <br/>
+                                </NSpace>
+                            ))}
+                        </NThing>
+                    </NListItem> : null}
             </NList>
           </NFormItem>
           <NFormItem
