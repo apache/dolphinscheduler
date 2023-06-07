@@ -23,6 +23,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.COMMA;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SET_K8S;
 
 import org.apache.dolphinscheduler.common.enums.ResourceManagerType;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
