@@ -2022,7 +2022,7 @@ DROP TABLE IF EXISTS `t_ds_relation_sub_workflow`;
 CREATE TABLE `t_ds_relation_sub_workflow` (
     `id` bigint NOT NULL AUTO_INCREMENT,
     `parent_workflow_instance_id` bigint  NOT NULL,
-    `parent_task_code` bigint  NOT NULL COMMENT,
+    `parent_task_code` bigint  NOT NULL,
     `sub_workflow_instance_id` bigint  NOT NULL,
     PRIMARY KEY (`id`),
     KEY `idx_parent_workflow_instance_id` (`parent_workflow_instance_id`),

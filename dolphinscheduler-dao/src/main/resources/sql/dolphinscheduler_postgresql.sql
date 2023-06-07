@@ -2004,10 +2004,11 @@ CREATE TABLE t_ds_trigger_relation (
 
 DROP TABLE IF EXISTS t_ds_relation_sub_workflow;
 CREATE TABLE t_ds_relation_sub_workflow (
-    id BIGSERIAL PRIMARY KEY COMMENT 'key',
+    id        serial      NOT NULL,
     parent_workflow_instance_id BIGINT NOT NULL,
     parent_task_code BIGINT NOT NULL,
-    sub_workflow_instance_id BIGINT NOT NULL
+    sub_workflow_instance_id BIGINT NOT NULL,
+    PRIMARY KEY (id)
 );
 CREATE INDEX idx_parent_workflow_instance_id ON t_ds_relation_sub_workflow (parent_workflow_instance_id);
 CREATE INDEX idx_parent_task_code ON t_ds_relation_sub_workflow (parent_task_code);
