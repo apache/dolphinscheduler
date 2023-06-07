@@ -51,11 +51,11 @@ public class SubWorkflowServiceImpl implements SubWorkflowService {
     @Override
     public List<ProcessInstance> getAllDynamicSubWorkflow(long processInstanceId, long taskCode) {
         List<RelationSubWorkflow> relationSubWorkflows =
-                relationSubWorkflowMapper.selectAllSubProcessInstance(processInstanceId, taskCode);
+                relationSubWorkflowMapper.queryAllSubProcessInstance(processInstanceId, taskCode);
         List<Long> allSubProcessInstanceId = relationSubWorkflows.stream()
                 .map(RelationSubWorkflow::getSubWorkflowInstanceId).collect(Collectors.toList());
 
-        List<ProcessInstance> allSubProcessInstance = processInstanceDao.selectBatchIds(allSubProcessInstanceId);
+        List<ProcessInstance> allSubProcessInstance = processInstanceDao.queryBatchIds(allSubProcessInstanceId);
         allSubProcessInstance.sort(Comparator.comparing(ProcessInstance::getId));
         return allSubProcessInstance;
     }

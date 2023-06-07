@@ -516,11 +516,11 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             throw new ServiceException(Status.TASK_INSTANCE_NOT_EXISTS, taskId);
         }
         List<RelationSubWorkflow> relationSubWorkflows = relationSubWorkflowMapper
-                .selectAllSubProcessInstance(Long.valueOf(taskInstance.getProcessInstanceId()),
+                .queryAllSubProcessInstance(Long.valueOf(taskInstance.getProcessInstanceId()),
                         taskInstance.getTaskCode());
         List<Long> allSubProcessInstanceId = relationSubWorkflows.stream()
                 .map(RelationSubWorkflow::getSubWorkflowInstanceId).collect(java.util.stream.Collectors.toList());
-        List<ProcessInstance> allSubWorkflows = processInstanceDao.selectBatchIds(allSubProcessInstanceId);
+        List<ProcessInstance> allSubWorkflows = processInstanceDao.queryBatchIds(allSubProcessInstanceId);
 
         if (allSubWorkflows == null || allSubWorkflows.isEmpty()) {
             putMsg(result, Status.SUB_PROCESS_INSTANCE_NOT_EXIST, taskId);

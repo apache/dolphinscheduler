@@ -261,7 +261,7 @@ public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
         try {
             changeRunningSubprocessInstancesToStop(WorkflowExecutionStatus.READY_STOP);
         } catch (MasterTaskExecuteException e) {
-            log.error("kill " + taskInstance.getName() + " error", e);
+            log.error("kill {} error", taskInstance.getName(), e);
         }
     }
 

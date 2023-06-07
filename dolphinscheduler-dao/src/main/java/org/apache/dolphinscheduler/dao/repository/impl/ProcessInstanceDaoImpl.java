@@ -67,7 +67,7 @@ public class ProcessInstanceDaoImpl implements ProcessInstanceDao {
     }
 
     @Override
-    public List<ProcessInstance> selectBatchIds(List<Long> processInstanceIds) {
+    public List<ProcessInstance> queryBatchIds(List<Long> processInstanceIds) {
         if (CollectionUtils.isEmpty(processInstanceIds)) {
             return new ArrayList<>();
         }
