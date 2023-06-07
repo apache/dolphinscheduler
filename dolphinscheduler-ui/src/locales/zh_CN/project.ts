@@ -259,6 +259,7 @@ export default {
     duration: '运行时间',
     retry_count: '重试次数',
     dry_run_flag: '空跑标识',
+    app_link: '外部应用链接',
     host: '主机',
     operation: '操作',
     edit: '编辑',
