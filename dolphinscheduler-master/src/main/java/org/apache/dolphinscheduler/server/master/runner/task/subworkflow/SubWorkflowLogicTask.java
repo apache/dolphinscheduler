@@ -123,8 +123,8 @@ public class SubWorkflowLogicTask extends BaseAsyncLogicTask<SubProcessParameter
             log.info("TaskInstance is null");
             return;
         }
-        if (taskInstance.getState().isFinished()) {
-            log.info("The task instance is finished, no need to pause");
+        if (subProcessInstance.getState().isFinished()) {
+            log.info("The subProcessInstance is finished, no need to pause");
             return;
         }
         subProcessInstance.setStateWithDesc(WorkflowExecutionStatus.READY_STOP, "ready stop by kill task");

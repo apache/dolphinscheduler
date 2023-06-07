@@ -102,6 +102,10 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/task/sub-process.html',
                             },
                             {
+                                title: 'Dynamic',
+                                link: '/en-us/docs/dev/user_doc/guide/task/dynamic.html',
+                            },
+                            {
                                 title: 'Dependent',
                                 link: '/en-us/docs/dev/user_doc/guide/task/dependent.html',
                             },
@@ -809,6 +813,10 @@ export default {
                             {
                                 title: 'SubProcess',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/sub-process.html',
+                            },
+                            {
+                                title: 'Dynamic',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/dynamic.html',
                             },
                             {
                                 title: 'Dependent',

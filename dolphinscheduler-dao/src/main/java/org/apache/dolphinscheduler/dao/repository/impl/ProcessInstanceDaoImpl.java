@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.DateInterval;
 
 import org.apache.commons.collections4.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -63,6 +64,14 @@ public class ProcessInstanceDaoImpl implements ProcessInstanceDao {
         } else {
             return insertProcessInstance(processInstance);
         }
+    }
+
+    @Override
+    public List<ProcessInstance> queryBatchIds(List<Long> processInstanceIds) {
+        if (CollectionUtils.isEmpty(processInstanceIds)) {
+            return new ArrayList<>();
+        }
+        return processInstanceMapper.selectBatchIds(processInstanceIds);
     }
 
     @Override
