@@ -188,6 +188,12 @@ export function useTable() {
         render: (row: IRecord) => row.host || '-'
       },
       {
+        title: t('project.task.app_link'),
+        key: 'appLink',
+        ...COLUMN_WIDTH_CONFIG['name'],
+        render: (row: IRecord) => row.appLink || '-'
+      },
+      {
         title: t('project.task.operation'),
         key: 'operation',
         ...COLUMN_WIDTH_CONFIG['operation'](3),
