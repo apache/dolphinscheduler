@@ -55,7 +55,7 @@ public class SubWorkflowServiceImpl implements SubWorkflowService {
         List<Long> allSubProcessInstanceId = relationSubWorkflows.stream()
                 .map(RelationSubWorkflow::getSubWorkflowInstanceId).collect(Collectors.toList());
 
-        List<ProcessInstance> allSubProcessInstance = processInstanceDao.queryBatchIds(allSubProcessInstanceId);
+        List<ProcessInstance> allSubProcessInstance = processInstanceDao.queryByIds(allSubProcessInstanceId);
         allSubProcessInstance.sort(Comparator.comparing(ProcessInstance::getId));
         return allSubProcessInstance;
     }
