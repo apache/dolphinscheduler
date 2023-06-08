@@ -812,12 +812,9 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
     @Test
     public void testUpdateProcessDefinition() {
         Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS);
 
         Project project = getProject(projectCode);
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
-        Mockito.when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_UPDATE))
-                .thenReturn(result);
         Mockito.when(projectService.hasProjectAndWritePerm(user, project, result)).thenReturn(true);
 
         try {
