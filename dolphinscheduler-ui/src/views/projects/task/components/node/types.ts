@@ -440,6 +440,7 @@ interface ITaskParams {
   degreeOfParallelism?: number
   filterCondition?: string
   listParameters?: Array<any>
+  yarnQueue?: string
 }
 
 interface INodeData

@@ -62,6 +62,7 @@ export function formatParams(data: INodeData): {
     if (data.namespace) {
       taskParams.namespace = data.namespace
     }
+    taskParams.yarnQueue = data.yarnQueue
   }
 
   if (data.taskType === 'SPARK') {
@@ -321,7 +322,8 @@ export function formatParams(data: INodeData): {
       executorCores: data.executorCores,
       executorMemory: data.executorMemory,
       numExecutors: data.numExecutors,
-      others: data.others
+      others: data.others,
+      yarnQueue: data.yarnQueue
     }
   }
 

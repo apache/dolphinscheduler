@@ -848,6 +848,8 @@ export default {
     dynamic_separator_tips: 'separator(required)',
     child_node_definition: 'child node definition',
     child_node_instance: 'child node instance',
+    yarn_queue: 'Yarn Queue',
+    yarn_queue_tips: 'Please input yarn queue',
   },
   menu: {
     fav: 'Favorites',
