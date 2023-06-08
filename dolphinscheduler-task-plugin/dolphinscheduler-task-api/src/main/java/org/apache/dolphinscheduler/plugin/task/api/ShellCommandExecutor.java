@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
-import org.apache.dolphinscheduler.plugin.task.api.utils.FileUtils;
+import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ShellUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
