@@ -199,10 +199,10 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
     private final Map<Long, Integer> errorTaskMap = new ConcurrentHashMap<>();
 
     /**
-     * complete task map, taskCode as key, taskInstanceId as value
+     * complete task set
      * in a DAG, only one taskInstance per taskCode is valid
      */
-    private final Map<Long, Integer> completeTaskMap = new ConcurrentHashMap<>();
+    private final Set<Long> completeTaskSet = Sets.newConcurrentHashSet();
 
     /**
      * depend failed task set
@@ -444,7 +444,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
             stateWheelExecuteThread.removeTask4RetryCheck(processInstance, taskInstance);
 
             if (taskInstance.getState().isSuccess()) {
-                completeTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
+                completeTaskSet.add(taskInstance.getTaskCode());
                 mergeTaskInstanceVarPool(taskInstance);
                 processInstanceDao.upsertProcessInstance(processInstance);
                 // save the cacheKey only if the task is defined as cache task and the task is success
@@ -459,7 +459,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
                 log.info("Retry taskInstance taskInstance state: {}", taskInstance.getState());
                 retryTaskInstance(taskInstance);
             } else if (taskInstance.getState().isFailure()) {
-                completeTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
+                completeTaskSet.add(taskInstance.getTaskCode());
                 // There are child nodes and the failure policy is: CONTINUE
                 if (processInstance.getFailureStrategy() == FailureStrategy.CONTINUE && DagHelper.haveAllNodeAfterNode(
                         Long.toString(taskInstance.getTaskCode()),
@@ -473,7 +473,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
                 }
             } else if (taskInstance.getState().isFinished()) {
                 // todo: when the task instance type is pause, then it should not in completeTaskMap
-                completeTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
+                completeTaskSet.add(taskInstance.getTaskCode());
             }
             log.info("TaskInstance finished will try to update the workflow instance state, task code:{} state:{}",
                     taskInstance.getTaskCode(),
@@ -484,7 +484,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
         } catch (Exception ex) {
             log.error("Task finish failed, get a exception, will remove this taskInstance from completeTaskMap", ex);
             // remove the task from complete map, so that we can finish in the next time.
-            completeTaskMap.remove(taskInstance.getTaskCode());
+            completeTaskSet.remove(taskInstance.getTaskCode());
             throw ex;
         }
     }
@@ -872,7 +872,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
         // do we need to clear?
         taskExecuteRunnableMap.clear();
         dependFailedTaskSet.clear();
-        completeTaskMap.clear();
+        completeTaskSet.clear();
         errorTaskMap.clear();
 
         if (!isNewProcessInstance()) {
@@ -908,7 +908,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
 
                     if (task.isTaskComplete()) {
                         log.info("TaskInstance is already complete.");
-                        completeTaskMap.put(task.getTaskCode(), task.getId());
+                        completeTaskSet.add(task.getTaskCode());
                         continue;
                     }
                     if (task.isConditionsTask() || DagHelper.haveConditionsAfterNode(Long.toString(task.getTaskCode()),
@@ -979,9 +979,9 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
                 }
             }
         }
-        log.info("Initialize task queue, dependFailedTaskSet: {}, completeTaskMap: {}, errorTaskMap: {}",
+        log.info("Initialize task queue, dependFailedTaskSet: {}, completeTaskSet: {}, errorTaskMap: {}",
                 dependFailedTaskSet,
-                completeTaskMap,
+                completeTaskSet,
                 errorTaskMap);
     }
 
@@ -1235,7 +1235,12 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
         Map<String, TaskInstance> allTaskInstance = new HashMap<>();
         if (CollectionUtils.isNotEmpty(preTask)) {
             for (String preTaskCode : preTask) {
-                Integer taskId = completeTaskMap.get(Long.parseLong(preTaskCode));
+                Optional<TaskInstance> existTaskInstanceOptional = getTaskInstance(Long.parseLong(preTaskCode));
+                if (!existTaskInstanceOptional.isPresent()) {
+                    continue;
+                }
+
+                Integer taskId = existTaskInstanceOptional.get().getId();
                 if (taskId == null) {
                     continue;
                 }
@@ -1302,20 +1307,21 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
      */
     private Map<String, TaskInstance> getCompleteTaskInstanceMap() {
         Map<String, TaskInstance> completeTaskInstanceMap = new HashMap<>();
-        for (Map.Entry<Long, Integer> entry : completeTaskMap.entrySet()) {
-            Long taskConde = entry.getKey();
-            Integer taskInstanceId = entry.getValue();
-            TaskInstance taskInstance = taskInstanceMap.get(taskInstanceId);
-            if (taskInstance == null) {
-                log.warn("Cannot find the taskInstance from taskInstanceMap, taskInstanceId: {}, taskConde: {}",
-                        taskInstanceId,
-                        taskConde);
-                // This case will happen when we submit to db failed, then the taskInstanceId is 0
-                continue;
-            }
-            completeTaskInstanceMap.put(Long.toString(taskInstance.getTaskCode()), taskInstance);
 
-        }
+        completeTaskSet.forEach(taskCode -> {
+            Optional<TaskInstance> existTaskInstanceOptional = getTaskInstance(taskCode);
+            if (existTaskInstanceOptional.isPresent()) {
+                TaskInstance taskInstance = taskInstanceMap.get(existTaskInstanceOptional.get().getId());
+                if (taskInstance == null) {
+                    // This case will happen when we submit to db failed, then the taskInstanceId is 0
+                    log.warn("Cannot find the taskInstance from taskInstanceMap, taskConde: {}",
+                            taskCode);
+                } else {
+                    completeTaskInstanceMap.put(Long.toString(taskCode), taskInstance);
+                }
+            }
+        });
+
         return completeTaskInstanceMap;
     }
 
@@ -1363,17 +1369,21 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
         }
         // the end node of the branch of the dag
         if (StringUtils.isNotEmpty(parentNodeCode) && dag.getEndNode().contains(parentNodeCode)) {
-            TaskInstance endTaskInstance = taskInstanceMap.get(completeTaskMap.get(NumberUtils.toLong(parentNodeCode)));
-            String taskInstanceVarPool = endTaskInstance.getVarPool();
-            if (StringUtils.isNotEmpty(taskInstanceVarPool)) {
-                Set<Property> taskProperties = new HashSet<>(JSONUtils.toList(taskInstanceVarPool, Property.class));
-                String processInstanceVarPool = processInstance.getVarPool();
-                if (StringUtils.isNotEmpty(processInstanceVarPool)) {
-                    Set<Property> properties = new HashSet<>(JSONUtils.toList(processInstanceVarPool, Property.class));
-                    properties.addAll(taskProperties);
-                    processInstance.setVarPool(JSONUtils.toJsonString(properties));
-                } else {
-                    processInstance.setVarPool(JSONUtils.toJsonString(taskProperties));
+            Optional<TaskInstance> existTaskInstanceOptional = getTaskInstance(NumberUtils.toLong(parentNodeCode));
+            if (existTaskInstanceOptional.isPresent()) {
+                TaskInstance endTaskInstance = taskInstanceMap.get(existTaskInstanceOptional.get().getId());
+                String taskInstanceVarPool = endTaskInstance.getVarPool();
+                if (StringUtils.isNotEmpty(taskInstanceVarPool)) {
+                    Set<Property> taskProperties = new HashSet<>(JSONUtils.toList(taskInstanceVarPool, Property.class));
+                    String processInstanceVarPool = processInstance.getVarPool();
+                    if (StringUtils.isNotEmpty(processInstanceVarPool)) {
+                        Set<Property> properties =
+                                new HashSet<>(JSONUtils.toList(processInstanceVarPool, Property.class));
+                        properties.addAll(taskProperties);
+                        processInstance.setVarPool(JSONUtils.toJsonString(properties));
+                    } else {
+                        processInstance.setVarPool(JSONUtils.toJsonString(taskProperties));
+                    }
                 }
             }
         }
@@ -1386,7 +1396,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
                 continue;
             }
 
-            if (task.getId() != null && completeTaskMap.containsKey(task.getTaskCode())) {
+            if (task.getId() != null && completeTaskSet.contains(task.getTaskCode())) {
                 log.info("Task has already run success, taskName: {}", task.getName());
                 continue;
             }
@@ -1458,12 +1468,18 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
         for (String depsNode : indirectDepCodeList) {
             if (dag.containsNode(depsNode) && !skipTaskNodeMap.containsKey(depsNode)) {
                 // dependencies must be fully completed
-                Long despNodeTaskCode = Long.parseLong(depsNode);
-                if (!completeTaskMap.containsKey(despNodeTaskCode)) {
+                long despNodeTaskCode = Long.parseLong(depsNode);
+                if (!completeTaskSet.contains(despNodeTaskCode)) {
                     return DependResult.WAITING;
                 }
-                Integer depsTaskId = completeTaskMap.get(despNodeTaskCode);
-                TaskExecutionStatus depTaskState = taskInstanceMap.get(depsTaskId).getState();
+
+                Optional<TaskInstance> existTaskInstanceOptional = getTaskInstance(despNodeTaskCode);
+                if (!existTaskInstanceOptional.isPresent()) {
+                    return DependResult.NON_EXEC;
+                }
+
+                TaskExecutionStatus depTaskState =
+                        taskInstanceMap.get(existTaskInstanceOptional.get().getId()).getState();
                 if (depTaskState.isKill()) {
                     return DependResult.NON_EXEC;
                 }
@@ -1483,7 +1499,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
             }
         }
         log.info("The dependTasks of task all success, currentTaskCode: {}, dependTaskCodes: {}",
-                taskCode, Arrays.toString(completeTaskMap.keySet().toArray()));
+                taskCode, Arrays.toString(completeTaskSet.toArray()));
         return DependResult.SUCCESS;
     }
 
@@ -1534,8 +1550,12 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
                     .contains(nextNodeCode);
         }
         long taskCode = Long.parseLong(dependNodeCode);
-        Integer taskInstanceId = completeTaskMap.get(taskCode);
-        TaskExecutionStatus depTaskState = taskInstanceMap.get(taskInstanceId).getState();
+        Optional<TaskInstance> existTaskInstanceOptional = getTaskInstance(taskCode);
+        if (!existTaskInstanceOptional.isPresent()) {
+            return false;
+        }
+
+        TaskExecutionStatus depTaskState = taskInstanceMap.get(existTaskInstanceOptional.get().getId()).getState();
         return !depTaskState.isFailure();
     }
 
@@ -1547,12 +1567,17 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
      */
     private List<TaskInstance> getCompleteTaskByState(TaskExecutionStatus state) {
         List<TaskInstance> resultList = new ArrayList<>();
-        for (Integer taskInstanceId : completeTaskMap.values()) {
-            TaskInstance taskInstance = taskInstanceMap.get(taskInstanceId);
-            if (taskInstance != null && taskInstance.getState() == state) {
-                resultList.add(taskInstance);
+
+        completeTaskSet.forEach(taskCode -> {
+            Optional<TaskInstance> existTaskInstanceOptional = getTaskInstance(taskCode);
+            if (existTaskInstanceOptional.isPresent()) {
+                TaskInstance taskInstance = taskInstanceMap.get(existTaskInstanceOptional.get().getId());
+                if (taskInstance != null && taskInstance.getState() == state) {
+                    resultList.add(taskInstance);
+                }
             }
-        }
+        });
+
         return resultList;
     }
 
@@ -1904,7 +1929,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
                             "Task {} has been forced success, put it into complete task list and stop retrying, taskInstanceId: {}",
                             task.getName(), task.getId());
                     removeTaskFromStandbyList(task);
-                    completeTaskMap.put(task.getTaskCode(), task.getId());
+                    completeTaskSet.add(task.getTaskCode());
                     taskInstanceMap.put(task.getId(), task);
                     submitPostNode(Long.toString(task.getTaskCode()));
                     continue;
@@ -1930,7 +1955,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
                                 processInstance.getId(),
                                 task.getTaskCode());
                     }
-                    completeTaskMap.put(task.getTaskCode(), task.getId());
+                    completeTaskSet.add(task.getTaskCode());
                     taskInstanceMap.put(task.getId(), task);
                     errorTaskMap.put(task.getTaskCode(), task.getId());
 
@@ -2065,8 +2090,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
         return false;
     }
 
-    public Map<Long, Integer> getCompleteTaskMap() {
-        return completeTaskMap;
+    public Set<Long> getCompleteTaskSet() {
+        return completeTaskSet;
     }
 
     public Map<Long, DefaultTaskExecuteRunnable> getTaskExecuteRunnableMap() {
@@ -2177,7 +2202,11 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
 
         // remove task instance from taskInstanceMap, completeTaskMap, validTaskMap, errorTaskMap
         taskInstanceMap.entrySet().removeIf(map -> dag.containsNode(Long.toString(map.getValue().getTaskCode())));
-        completeTaskMap.entrySet().removeIf(map -> dag.containsNode(Long.toString(map.getKey())));
+        completeTaskSet.removeIf(set -> {
+            Optional<TaskInstance> existTaskInstanceOptional = getTaskInstance(set);
+            return existTaskInstanceOptional
+                    .filter(taskInstance -> dag.containsNode(Integer.toString(taskInstance.getId()))).isPresent();
+        });
         validTaskMap.entrySet().removeIf(map -> dag.containsNode(Long.toString(map.getKey())));
         errorTaskMap.entrySet().removeIf(map -> dag.containsNode(Long.toString(map.getKey())));
     }
