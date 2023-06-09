@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.NodeSelectorExpression;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.K8sTaskParameters;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +35,8 @@ import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import io.fabric8.kubernetes.api.model.NodeSelectorRequirement;
 
 public class K8sTaskTest {
 
@@ -105,6 +108,21 @@ public class K8sTaskTest {
                 "K8sTaskParameters(image=ds-dev, namespace={\"name\":\"default\",\"cluster\":\"lab\"}, command=[\"/bin/bash\", \"-c\"], customizedLabels=[Label(label=test, value=1234)], nodeSelectors=[NodeSelectorExpression(key=node-label, operator=In, values=1234,12345)], args=[\"echo hello world\"], minCpuCores=2.0, minMemorySpace=10.0)";
         String result = k8sTask.getParameters().toString();
         Assertions.assertEquals(expectedStr, result);
+    }
+
+    @Test
+    public void testConvertToNodeSelectorRequirements() {
+        NodeSelectorExpression expression = new NodeSelectorExpression();
+        expression.setKey("key");
+        expression.setOperator("In");
+        expression.setValues("123, 1234");
+        List<NodeSelectorRequirement> nodeSelectorRequirements =
+                k8sTask.convertToNodeSelectorRequirements(Arrays.asList(expression));
+        Assertions.assertEquals(1, nodeSelectorRequirements.size());
+        List<String> expectedList = new ArrayList<>();
+        expectedList.add("123");
+        expectedList.add("1234");
+        Assertions.assertEquals(expectedList, nodeSelectorRequirements.get(0).getValues());
     }
 
 }
