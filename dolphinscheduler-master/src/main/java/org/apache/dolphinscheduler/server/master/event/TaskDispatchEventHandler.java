@@ -67,7 +67,7 @@ public class TaskDispatchEventHandler implements TaskEventHandler {
         taskInstance.setState(TaskExecutionStatus.DISPATCH);
         taskInstance.setHost(taskEvent.getWorkerAddress());
         try {
-            if (!taskInstanceDao.updateTaskInstance(taskInstance)) {
+            if (!taskInstanceDao.updateById(taskInstance)) {
                 throw new TaskEventHandleError("Handle task dispatch event error, update taskInstance to db failed");
             }
         } catch (Exception ex) {

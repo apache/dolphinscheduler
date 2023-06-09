@@ -108,7 +108,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -406,9 +405,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 ApiFuncIdentificationConstant.map.get(executeType));
         checkMasterExists();
 
-        ProcessInstance workflowInstance =
-                Optional.ofNullable(processInstanceDao.queryByWorkflowInstanceId(processInstanceId))
-                        .orElseThrow(() -> new ServiceException(Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceId));
+        ProcessInstance workflowInstance = processInstanceDao.queryOptionalById(processInstanceId)
+                .orElseThrow(() -> new ServiceException(Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceId));
 
         checkState(workflowInstance.getProjectCode() == projectCode,
                 "The workflow instance's project code doesn't equals to the given project");
@@ -637,10 +635,10 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         processInstance.setCommandType(commandType);
         processInstance.addHistoryCmd(commandType);
         processInstance.setStateWithDesc(executionStatus, commandType.getDescp() + "by ui");
-        int update = processInstanceDao.updateProcessInstance(processInstance);
+        boolean update = processInstanceDao.updateById(processInstance);
 
         // determine whether the process is normal
-        if (update > 0) {
+        if (update) {
             log.info("Process instance state is updated to {} in database, processInstanceName:{}.",
                     executionStatus.getDesc(), processInstance.getName());
             // directly send the process instance state change event to target master, not guarantee the event send

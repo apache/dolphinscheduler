@@ -73,7 +73,7 @@ public class TaskTimeoutOperator implements TaskOperator {
     private void timeoutTaskInstanceInDB(TaskInstance taskInstance) {
         taskInstance.setState(TaskExecutionStatus.FAILURE);
         taskInstance.setEndTime(new Date());
-        taskInstanceDao.updateTaskInstance(taskInstance);
+        taskInstanceDao.updateById(taskInstance);
     }
 
     private void killRemoteTaskInstanceInThreadPool(TaskInstance taskInstance) throws RemotingException {

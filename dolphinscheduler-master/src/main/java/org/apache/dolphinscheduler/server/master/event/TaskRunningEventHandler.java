@@ -84,7 +84,7 @@ public class TaskRunningEventHandler implements TaskEventHandler {
             taskInstance.setExecutePath(taskEvent.getExecutePath());
             taskInstance.setPid(taskEvent.getProcessId());
             taskInstance.setAppLink(taskEvent.getAppIds());
-            if (!taskInstanceDao.updateTaskInstance(taskInstance)) {
+            if (!taskInstanceDao.updateById(taskInstance)) {
                 throw new TaskEventHandleError("Handle task running event error, update taskInstance to db failed");
             }
             sendAckToWorker(taskEvent);
