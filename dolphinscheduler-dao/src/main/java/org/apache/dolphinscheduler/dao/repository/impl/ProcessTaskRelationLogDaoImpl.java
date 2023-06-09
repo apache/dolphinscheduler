@@ -19,31 +19,41 @@ package org.apache.dolphinscheduler.dao.repository.impl;
 
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
+import org.apache.dolphinscheduler.dao.repository.BaseDao;
 import org.apache.dolphinscheduler.dao.repository.ProcessTaskRelationLogDao;
+
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.NonNull;
+
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ProcessTaskRelationLogDaoImpl implements ProcessTaskRelationLogDao {
+public class ProcessTaskRelationLogDaoImpl extends BaseDao<ProcessTaskRelationLog, ProcessTaskRelationLogMapper>
+        implements
+            ProcessTaskRelationLogDao {
 
-    @Autowired
-    private ProcessTaskRelationLogMapper processTaskRelationLogMapper;
+    public ProcessTaskRelationLogDaoImpl(@NonNull ProcessTaskRelationLogMapper processTaskRelationLogMapper) {
+        super(processTaskRelationLogMapper);
+    }
 
     @Override
-    public List<ProcessTaskRelationLog> findByWorkflowDefinitionCode(long workflowDefinitionCode) {
-        return processTaskRelationLogMapper.queryByProcessCode(workflowDefinitionCode);
+    public List<ProcessTaskRelationLog> queryByWorkflowDefinitionCode(long workflowDefinitionCode) {
+        return mybatisMapper.queryByProcessCode(workflowDefinitionCode);
     }
 
     @Override
     public void deleteByWorkflowDefinitionCode(long workflowDefinitionCode) {
-        processTaskRelationLogMapper.deleteByWorkflowDefinitionCode(workflowDefinitionCode);
+        mybatisMapper.deleteByWorkflowDefinitionCode(workflowDefinitionCode);
     }
 
     @Override
     public int batchInsert(List<ProcessTaskRelationLog> taskRelationList) {
-        return processTaskRelationLogMapper.batchInsert(taskRelationList);
+        if (CollectionUtils.isEmpty(taskRelationList)) {
+            return 0;
+        }
+        return mybatisMapper.batchInsert(taskRelationList);
     }
 }

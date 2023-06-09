@@ -84,7 +84,7 @@ public class DependentAsyncTaskExecuteFunction implements AsyncTaskExecuteFuncti
         this.taskDefinitionDao = taskDefinitionDao;
         this.taskInstanceDao = taskInstanceDao;
         this.processInstance =
-                processInstanceDao.queryByWorkflowInstanceId(taskExecutionContext.getProcessInstanceId());
+                processInstanceDao.queryById(taskExecutionContext.getProcessInstanceId());
         this.dependentDate = calculateDependentDate();
         this.dependentTaskList = initializeDependentTaskList();
         log.info("Initialized dependent task list successfully");
@@ -132,7 +132,7 @@ public class DependentAsyncTaskExecuteFunction implements AsyncTaskExecuteFuncti
         final Map<Long, TaskDefinition> taskDefinitionMap = taskDefinitionDao.queryByCodes(taskDefinitionCodes).stream()
                 .collect(Collectors.toMap(TaskDefinition::getCode, Function.identity()));
         final TaskInstance taskInstance =
-                taskInstanceDao.findTaskInstanceById(taskExecutionContext.getTaskInstanceId());
+                taskInstanceDao.queryById(taskExecutionContext.getTaskInstanceId());
         List<DependentExecute> dependentExecutes = dependentParameters.getDependTaskList()
                 .stream()
                 .map(dependentTaskModel -> {

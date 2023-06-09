@@ -26,10 +26,11 @@ import java.util.Set;
 /**
  * Task Instance DAO
  */
-public interface TaskDefinitionDao {
+public interface TaskDefinitionDao extends IDao<TaskDefinition> {
 
     /**
      * Get list of task definition by process definition code
+     *
      * @param processDefinitionCode process definition code
      * @return list of task definition
      */

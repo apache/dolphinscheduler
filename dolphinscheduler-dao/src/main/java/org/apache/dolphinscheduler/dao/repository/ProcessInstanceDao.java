@@ -22,29 +22,14 @@ import org.apache.dolphinscheduler.plugin.task.api.model.DateInterval;
 
 import org.apache.ibatis.annotations.Param;
 
-import java.util.Date;
-import java.util.List;
-
-public interface ProcessInstanceDao {
-
-    public int insertProcessInstance(ProcessInstance processInstance);
-
-    public int updateProcessInstance(ProcessInstance processInstance);
+public interface ProcessInstanceDao extends IDao<ProcessInstance> {
 
     /**
      * insert or update work process instance to database
      *
      * @param processInstance processInstance
      */
-    public int upsertProcessInstance(ProcessInstance processInstance);
-
-    List<ProcessInstance> queryBatchIds(List<Long> processInstanceIds);
-
-    void deleteByIds(List<Integer> needToDeleteWorkflowInstanceIds);
-
-    void deleteById(Integer workflowInstanceId);
-
-    ProcessInstance queryByWorkflowInstanceId(Integer workflowInstanceId);
+    void upsertProcessInstance(ProcessInstance processInstance);
 
     /**
      * find last scheduler process instance in the date interval
@@ -53,7 +38,7 @@ public interface ProcessInstanceDao {
      * @param dateInterval   dateInterval
      * @return process instance
      */
-    ProcessInstance findLastSchedulerProcessInterval(Long definitionCode, DateInterval dateInterval, int testFlag);
+    ProcessInstance queryLastSchedulerProcessInterval(Long definitionCode, DateInterval dateInterval, int testFlag);
 
     /**
      * find last manual process instance interval
@@ -62,17 +47,7 @@ public interface ProcessInstanceDao {
      * @param dateInterval   dateInterval
      * @return process instance
      */
-    ProcessInstance findLastManualProcessInterval(Long definitionCode, DateInterval dateInterval, int testFlag);
-
-    /**
-     * find last running process instance
-     *
-     * @param definitionCode process definition code
-     * @param startTime      start time
-     * @param endTime        end time
-     * @return process instance
-     */
-    ProcessInstance findLastRunningProcess(Long definitionCode, Date startTime, Date endTime, int testFlag);
+    ProcessInstance queryLastManualProcessInterval(Long definitionCode, DateInterval dateInterval, int testFlag);
 
     /**
      * query first schedule process instance
@@ -90,5 +65,5 @@ public interface ProcessInstanceDao {
      */
     ProcessInstance queryFirstStartProcessInstance(@Param("processDefinitionCode") Long definitionCode);
 
-    ProcessInstance findSubProcessInstanceByParentId(Integer processInstanceId, Integer taskInstanceId);
+    ProcessInstance querySubProcessInstanceByParentId(Integer processInstanceId, Integer taskInstanceId);
 }

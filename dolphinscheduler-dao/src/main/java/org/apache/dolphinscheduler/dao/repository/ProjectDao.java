@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import java.util.Collection;
 import java.util.List;
 
-public interface ProjectDao {
+public interface ProjectDao extends IDao<Project> {
 
     List<Project> queryByCodes(Collection<Long> projectCodes);
 

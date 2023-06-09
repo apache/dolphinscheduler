@@ -17,20 +17,26 @@
 
 package org.apache.dolphinscheduler.dao.repository.impl;
 
+import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
 import org.apache.dolphinscheduler.dao.mapper.DqExecuteResultMapper;
+import org.apache.dolphinscheduler.dao.repository.BaseDao;
 import org.apache.dolphinscheduler.dao.repository.DqExecuteResultDao;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.NonNull;
+
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class DqExecuteResultDaoImpl implements DqExecuteResultDao {
+public class DqExecuteResultDaoImpl extends BaseDao<DqExecuteResult, DqExecuteResultMapper>
+        implements
+            DqExecuteResultDao {
 
-    @Autowired
-    private DqExecuteResultMapper dqExecuteResultMapper;
+    public DqExecuteResultDaoImpl(@NonNull DqExecuteResultMapper dqExecuteResultMapper) {
+        super(dqExecuteResultMapper);
+    }
 
     @Override
     public void deleteByWorkflowInstanceId(Integer workflowInstanceId) {
-        dqExecuteResultMapper.deleteByWorkflowInstanceId(workflowInstanceId);
+        mybatisMapper.deleteByWorkflowInstanceId(workflowInstanceId);
     }
 }

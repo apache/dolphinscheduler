@@ -87,7 +87,7 @@ class DynamicLogicTaskTest {
         taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         objectMapper = new ObjectMapper();
         processInstance = new ProcessInstance();
-        Mockito.when(processInstanceDao.queryByWorkflowInstanceId(Mockito.any())).thenReturn(processInstance);
+        Mockito.when(processInstanceDao.queryById(Mockito.any())).thenReturn(processInstance);
         dynamicLogicTask = new DynamicLogicTask(
                 taskExecutionContext,
                 processInstanceDao,
@@ -163,7 +163,7 @@ class DynamicLogicTaskTest {
 
         dynamicLogicTask.resetProcessInstanceStatus(subProcessInstances);
 
-        Mockito.verify(processInstanceDao).updateProcessInstance(subProcessInstance);
+        Mockito.verify(processInstanceDao).updateById(subProcessInstance);
         Assertions.assertEquals(WorkflowExecutionStatus.WAIT_TO_RUN, subProcessInstance.getState());
     }
 
@@ -178,7 +178,7 @@ class DynamicLogicTaskTest {
 
         dynamicLogicTask.resetProcessInstanceStatus(subProcessInstances);
 
-        Mockito.verify(processInstanceDao).updateProcessInstance(failedSubProcessInstance);
+        Mockito.verify(processInstanceDao).updateById(failedSubProcessInstance);
         Assertions.assertEquals(WorkflowExecutionStatus.WAIT_TO_RUN, failedSubProcessInstance.getState());
     }
 

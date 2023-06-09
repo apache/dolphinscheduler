@@ -17,7 +17,9 @@
 
 package org.apache.dolphinscheduler.dao.repository;
 
-public interface DqExecuteResultDao {
+import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
+
+public interface DqExecuteResultDao extends IDao<DqExecuteResult> {
 
     void deleteByWorkflowInstanceId(Integer workflowInstanceId);
 }

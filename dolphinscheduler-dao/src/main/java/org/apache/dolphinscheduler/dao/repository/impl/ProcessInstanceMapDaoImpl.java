@@ -19,46 +19,39 @@ package org.apache.dolphinscheduler.dao.repository.impl;
 
 import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapMapper;
+import org.apache.dolphinscheduler.dao.repository.BaseDao;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceMapDao;
 
 import java.util.List;
 
 import lombok.NonNull;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 /**
  * Process Instance Map Dao implementation
  */
 @Repository
-public class ProcessInstanceMapDaoImpl implements ProcessInstanceMapDao {
+public class ProcessInstanceMapDaoImpl extends BaseDao<ProcessInstanceMap, ProcessInstanceMapMapper>
+        implements
+            ProcessInstanceMapDao {
 
-    @Autowired
-    private ProcessInstanceMapMapper processInstanceMapMapper;
-
-    @Override
-    public int updateWorkProcessInstanceMap(ProcessInstanceMap processInstanceMap) {
-        return processInstanceMapMapper.updateById(processInstanceMap);
+    public ProcessInstanceMapDaoImpl(@NonNull ProcessInstanceMapMapper processInstanceMapMapper) {
+        super(processInstanceMapMapper);
     }
 
     @Override
-    public int createWorkProcessInstanceMap(@NonNull ProcessInstanceMap processInstanceMap) {
-        return processInstanceMapMapper.insert(processInstanceMap);
-    }
-
-    @Override
-    public ProcessInstanceMap findWorkProcessMapByParent(Integer parentWorkProcessId, Integer parentTaskId) {
-        return processInstanceMapMapper.queryByParentId(parentWorkProcessId, parentTaskId);
+    public ProcessInstanceMap queryWorkProcessMapByParent(Integer parentWorkProcessId, Integer parentTaskId) {
+        return mybatisMapper.queryByParentId(parentWorkProcessId, parentTaskId);
     }
 
     @Override
     public List<Integer> querySubWorkflowInstanceIds(int workflowInstanceId) {
-        return processInstanceMapMapper.querySubIdListByParentId(workflowInstanceId);
+        return mybatisMapper.querySubIdListByParentId(workflowInstanceId);
     }
 
     @Override
     public void deleteByParentId(int workflowInstanceId) {
-        processInstanceMapMapper.deleteByParentId(workflowInstanceId);
+        mybatisMapper.deleteByParentId(workflowInstanceId);
     }
 }

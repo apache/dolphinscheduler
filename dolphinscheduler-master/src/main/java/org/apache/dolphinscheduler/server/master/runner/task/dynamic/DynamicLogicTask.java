@@ -101,9 +101,8 @@ public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
         this.processDefineMapper = processDefineMapper;
         this.commandMapper = commandMapper;
 
-        this.processInstance =
-                processInstanceDao.queryByWorkflowInstanceId(taskExecutionContext.getProcessInstanceId());
-        this.taskInstance = taskInstanceDao.findTaskInstanceById(taskExecutionContext.getTaskInstanceId());
+        this.processInstance = processInstanceDao.queryById(taskExecutionContext.getProcessInstanceId());
+        this.taskInstance = taskInstanceDao.queryById(taskExecutionContext.getTaskInstanceId());
     }
 
     @Override
@@ -134,7 +133,7 @@ public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
             case REPEAT_RUNNING:
                 existsSubProcessInstanceList.forEach(processInstance -> {
                     processInstance.setState(WorkflowExecutionStatus.WAIT_TO_RUN);
-                    processInstanceDao.updateProcessInstance(processInstance);
+                    processInstanceDao.updateById(processInstance);
                 });
                 break;
             case START_FAILURE_TASK_PROCESS:
@@ -143,7 +142,7 @@ public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
                         subWorkflowService.filterFailedProcessInstances(existsSubProcessInstanceList);
                 failedProcessInstances.forEach(processInstance -> {
                     processInstance.setState(WorkflowExecutionStatus.WAIT_TO_RUN);
-                    processInstanceDao.updateProcessInstance(processInstance);
+                    processInstanceDao.updateById(processInstance);
                 });
                 break;
         }
@@ -165,7 +164,7 @@ public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
                     dynamicStartParams);
             ProcessInstance subProcessInstance = createSubProcessInstance(command);
             subProcessInstance.setState(WorkflowExecutionStatus.WAIT_TO_RUN);
-            processInstanceDao.insertProcessInstance(subProcessInstance);
+            processInstanceDao.insert(subProcessInstance);
             command.setProcessInstanceId(subProcessInstance.getId());
             processInstanceList.add(subProcessInstance);
         }
@@ -273,7 +272,7 @@ public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
                 subWorkflowService.filterRunningProcessInstances(existsSubProcessInstanceList);
         for (ProcessInstance subProcessInstance : runningSubProcessInstanceList) {
             subProcessInstance.setState(stopStatus);
-            processInstanceDao.updateProcessInstance(subProcessInstance);
+            processInstanceDao.updateById(subProcessInstance);
             if (subProcessInstance.getState().isFinished()) {
                 log.info("The process instance [{}] is finished, no need to stop", subProcessInstance.getId());
                 return;

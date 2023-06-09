@@ -73,7 +73,7 @@ public class TaskCacheEventHandler implements TaskEventHandler {
         TaskInstance taskInstance = taskInstanceOptional.get();
         dataQualityResultOperator.operateDqExecuteResult(taskEvent, taskInstance);
 
-        TaskInstance cacheTaskInstance = taskInstanceDao.findTaskInstanceById(taskEvent.getCacheTaskInstanceId());
+        TaskInstance cacheTaskInstance = taskInstanceDao.queryById(taskEvent.getCacheTaskInstanceId());
 
         // keep the task instance fields
         cacheTaskInstance.setId(taskInstance.getId());
@@ -90,7 +90,7 @@ public class TaskCacheEventHandler implements TaskEventHandler {
 
         processService.changeOutParam(taskInstance);
 
-        taskInstanceDao.updateTaskInstance(taskInstance);
+        taskInstanceDao.updateById(taskInstance);
         TaskStateEvent stateEvent = TaskStateEvent.builder()
                 .processInstanceId(taskEvent.getProcessInstanceId())
                 .taskInstanceId(taskEvent.getTaskInstanceId())

@@ -24,21 +24,7 @@ import java.util.List;
 /**
  * Process Instance Map DAO
  */
-public interface ProcessInstanceMapDao {
-
-    /**
-     * Update process instance map
-     * @param processInstanceMap process instance map
-     * @return result
-     */
-    int updateWorkProcessInstanceMap(ProcessInstanceMap processInstanceMap);
-
-    /**
-     * Create process instance map to DB.
-     * @param processInstanceMap process instance map
-     * @return result
-     */
-    int createWorkProcessInstanceMap(ProcessInstanceMap processInstanceMap);
+public interface ProcessInstanceMapDao extends IDao<ProcessInstanceMap> {
 
     /**
      * find work process map by parent process id and parent task id.
@@ -46,7 +32,7 @@ public interface ProcessInstanceMapDao {
      * @param parentTaskId        parentTaskId
      * @return process instance map
      */
-    ProcessInstanceMap findWorkProcessMapByParent(Integer parentWorkProcessId, Integer parentTaskId);
+    ProcessInstanceMap queryWorkProcessMapByParent(Integer parentWorkProcessId, Integer parentTaskId);
 
     List<Integer> querySubWorkflowInstanceIds(int workflowInstanceId);
 

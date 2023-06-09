@@ -530,7 +530,7 @@ public class ExecuteFunctionServiceTest {
         when(commandService.verifyIsNeedCreateCommand(any(Command.class))).thenReturn(true);
         when(projectService.checkProjectAndAuth(loginUser, project, projectCode, RERUN))
                 .thenReturn(checkProjectAndAuth());
-        when(processInstanceDao.queryByWorkflowInstanceId(processInstanceId)).thenReturn(processInstance);
+        when(processInstanceDao.queryOptionalById(processInstanceId)).thenReturn(Optional.of(processInstance));
         when(processDefinitionService.queryWorkflowDefinitionThrowExceptionIfNotFound(processDefinitionCode,
                 processDefinitionVersion)).thenReturn(processDefinition);
         Map<String, Object> result =

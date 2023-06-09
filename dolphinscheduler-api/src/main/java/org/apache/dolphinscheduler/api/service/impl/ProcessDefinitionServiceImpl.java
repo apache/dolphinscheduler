@@ -697,7 +697,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                                int workflowDefinitionVersion) {
         ProcessDefinition workflowDefinition = processDefinitionDao.queryByCode(workflowDefinitionCode).orElse(null);
         if (workflowDefinition == null || workflowDefinition.getVersion() != workflowDefinitionVersion) {
-            workflowDefinition = processDefinitionLogDao.queryProcessDefinitionLog(workflowDefinitionCode,
+            workflowDefinition = processDefinitionLogDao.queryByDefinitionCodeAndVersion(workflowDefinitionCode,
                     workflowDefinitionVersion);
         }
         return Optional.ofNullable(workflowDefinition);
@@ -1856,15 +1856,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         List<DependentSimplifyDefinition> processDefinitions = processDefinitionMapper
                 .queryDefinitionListByProjectCodeAndProcessDefinitionCodes(projectCode, definitionCodesSet);
 
-        // query process task relation
-        List<ProcessTaskRelation> processTaskRelations =
-                processTaskRelationMapper.queryProcessTaskRelationsByProcessDefinitionCode(
-                        processDefinitions.get(0).getCode(),
-                        processDefinitions.get(0).getVersion());
-
         // query task definition log
-        List<TaskDefinitionLog> taskDefinitionLogsList =
-                taskDefinitionLogDao.getTaskDefineLogList(processTaskRelations);
+        List<TaskDefinitionLog> taskDefinitionLogsList = taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(
+                processDefinitions.get(0).getCode(), processDefinitions.get(0).getVersion());
 
         List<DependentSimplifyDefinition> taskDefinitionList = new ArrayList<>();
         for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogsList) {
@@ -1914,8 +1908,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         List<ProcessInstance> processInstanceList = processInstanceService.queryByProcessDefineCode(code, limit);
         processInstanceList.forEach(processInstance -> processInstance
                 .setDuration(DateUtils.format2Duration(processInstance.getStartTime(), processInstance.getEndTime())));
-        List<TaskDefinitionLog> taskDefinitionList = taskDefinitionLogDao.getTaskDefineLogList(processTaskRelationMapper
-                .queryByProcessCode(processDefinition.getProjectCode(), processDefinition.getCode()));
+        List<TaskDefinitionLog> taskDefinitionList = taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(
+                processDefinition.getCode(), processDefinition.getVersion());
         Map<Long, TaskDefinitionLog> taskDefinitionMap = taskDefinitionList.stream()
                 .collect(Collectors.toMap(TaskDefinitionLog::getCode, taskDefinitionLog -> taskDefinitionLog));
 
@@ -2153,7 +2147,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             if (isCopy) {
                 log.info("Copy process definition...");
                 List<TaskDefinitionLog> taskDefinitionLogs =
-                        taskDefinitionLogDao.getTaskDefineLogList(processTaskRelations);
+                        taskDefinitionLogDao.queryTaskDefineLogList(processTaskRelations);
                 Map<Long, Long> taskCodeMap = new HashMap<>();
                 for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
                     try {

@@ -23,9 +23,9 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-public interface ProcessTaskRelationLogDao {
+public interface ProcessTaskRelationLogDao extends IDao<ProcessTaskRelationLog> {
 
-    List<ProcessTaskRelationLog> findByWorkflowDefinitionCode(long workflowDefinitionCode);
+    List<ProcessTaskRelationLog> queryByWorkflowDefinitionCode(long workflowDefinitionCode);
 
     void deleteByWorkflowDefinitionCode(long workflowDefinitionCode);
 

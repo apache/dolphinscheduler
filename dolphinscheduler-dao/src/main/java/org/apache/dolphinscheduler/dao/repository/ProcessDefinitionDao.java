@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.dao.repository;
 
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
 
 import java.util.Collection;
@@ -27,7 +26,7 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-public interface ProcessDefinitionDao {
+public interface ProcessDefinitionDao extends IDao<ProcessDefinition> {
 
     /**
      * Listing the process definition belongs to the given userId and projectCode.
@@ -42,16 +41,7 @@ public interface ProcessDefinitionDao {
                                                                   int userId,
                                                                   long projectCode);
 
-    /**
-     * query process definitions by definition codes and versions
-     * @param processInstances process instances where codes and version come from
-     * @return
-     */
-    List<ProcessDefinition> queryProcessDefinitionsByCodesAndVersions(List<ProcessInstance> processInstances);
-
     Optional<ProcessDefinition> queryByCode(long code);
-
-    void deleteById(Integer workflowDefinitionId);
 
     void deleteByWorkflowDefinitionCode(long workflowDefinitionCode);
 

@@ -395,8 +395,8 @@ public class TaskInstanceServiceTest {
 
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         when(taskInstanceMapper.selectById(1)).thenReturn(task);
-        when(taskInstanceDao.findTaskInstanceByCacheKey(cacheKey)).thenReturn(task, null);
-        when(taskInstanceDao.updateTaskInstance(task)).thenReturn(true);
+        when(taskInstanceDao.queryByCacheKey(cacheKey)).thenReturn(task, null);
+        when(taskInstanceDao.updateById(task)).thenReturn(true);
 
         TaskInstanceRemoveCacheResponse response =
                 taskInstanceService.removeTaskInstanceCache(user, projectCode, taskId);

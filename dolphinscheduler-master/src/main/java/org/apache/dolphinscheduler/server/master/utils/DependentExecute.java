@@ -156,7 +156,7 @@ public class DependentExecute {
         DependResult result;
         TaskInstance taskInstance = null;
         List<TaskInstance> taskInstanceList =
-                taskInstanceDao.findValidTaskListByProcessId(processInstance.getId(), testFlag);
+                taskInstanceDao.queryValidTaskListByWorkflowInstanceId(processInstance.getId(), testFlag);
 
         for (TaskInstance task : taskInstanceList) {
             if (task.getTaskCode() == taskCode) {
@@ -192,10 +192,10 @@ public class DependentExecute {
     private ProcessInstance findLastProcessInterval(Long definitionCode, DateInterval dateInterval, int testFlag) {
 
         ProcessInstance lastSchedulerProcess =
-                processInstanceDao.findLastSchedulerProcessInterval(definitionCode, dateInterval, testFlag);
+                processInstanceDao.queryLastSchedulerProcessInterval(definitionCode, dateInterval, testFlag);
 
         ProcessInstance lastManualProcess =
-                processInstanceDao.findLastManualProcessInterval(definitionCode, dateInterval, testFlag);
+                processInstanceDao.queryLastManualProcessInterval(definitionCode, dateInterval, testFlag);
 
         if (lastManualProcess == null) {
             return lastSchedulerProcess;

@@ -80,7 +80,7 @@ class TaskCacheEventHandlerTest {
         cacheTaskInstance.setProcessInstanceId(cacheProcessInstanceId);
         cacheTaskInstance.setTaskParams(JSONUtils.toJsonString(new HashMap<>()));
 
-        Mockito.when(taskInstanceDao.findTaskInstanceById(cacheTaskInstanceId)).thenReturn(cacheTaskInstance);
+        Mockito.when(taskInstanceDao.queryById(cacheTaskInstanceId)).thenReturn(cacheTaskInstance);
 
         WorkflowExecuteRunnable workflowExecuteRunnable = Mockito.mock(WorkflowExecuteRunnable.class);
         Mockito.when(processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId))

@@ -73,7 +73,7 @@ public class SubWorkflowLogicTask extends BaseAsyncLogicTask<SubProcessParameter
             return;
         }
         ProcessInstance subProcessInstance =
-                processInstanceDao.findSubProcessInstanceByParentId(taskExecutionContext.getProcessInstanceId(),
+                processInstanceDao.querySubProcessInstanceByParentId(taskExecutionContext.getProcessInstanceId(),
                         taskExecutionContext.getTaskInstanceId());
         if (subProcessInstance == null) {
             log.info("SubWorkflow instance is null");
@@ -91,7 +91,7 @@ public class SubWorkflowLogicTask extends BaseAsyncLogicTask<SubProcessParameter
             return;
         }
         subProcessInstance.setStateWithDesc(WorkflowExecutionStatus.READY_PAUSE, "ready pause sub workflow");
-        processInstanceDao.updateProcessInstance(subProcessInstance);
+        processInstanceDao.updateById(subProcessInstance);
         try {
             sendToSubProcess(taskExecutionContext, subProcessInstance);
             log.info("Success send pause request to SubWorkflow's master: {}", subProcessInstance.getHost());
@@ -110,7 +110,7 @@ public class SubWorkflowLogicTask extends BaseAsyncLogicTask<SubProcessParameter
             return;
         }
         ProcessInstance subProcessInstance =
-                processInstanceDao.findSubProcessInstanceByParentId(taskExecutionContext.getProcessInstanceId(),
+                processInstanceDao.querySubProcessInstanceByParentId(taskExecutionContext.getProcessInstanceId(),
                         taskExecutionContext.getTaskInstanceId());
         if (subProcessInstance == null) {
             log.info("SubWorkflow instance is null");
@@ -128,7 +128,7 @@ public class SubWorkflowLogicTask extends BaseAsyncLogicTask<SubProcessParameter
             return;
         }
         subProcessInstance.setStateWithDesc(WorkflowExecutionStatus.READY_STOP, "ready stop by kill task");
-        processInstanceDao.updateProcessInstance(subProcessInstance);
+        processInstanceDao.updateById(subProcessInstance);
         try {
             sendToSubProcess(taskExecutionContext, subProcessInstance);
             log.info("Success send kill request to SubWorkflow's master: {}", subProcessInstance.getHost());

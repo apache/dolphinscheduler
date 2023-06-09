@@ -371,7 +371,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
     @Override
     public void deleteByWorkflowInstanceId(Integer workflowInstanceId) {
         List<TaskInstance> needToDeleteTaskInstances =
-                taskInstanceDao.findTaskInstanceByWorkflowInstanceId(workflowInstanceId);
+                taskInstanceDao.queryByWorkflowInstanceId(workflowInstanceId);
         if (org.apache.commons.collections4.CollectionUtils.isEmpty(needToDeleteTaskInstances)) {
             return;
         }

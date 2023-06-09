@@ -26,21 +26,12 @@ import java.util.Set;
 /**
  * Task Definition Log DAO
  */
-public interface TaskDefinitionLogDao {
+public interface TaskDefinitionLogDao extends IDao<TaskDefinitionLog> {
 
-    /**
-     * Get task definition log list
-     * @param processTaskRelations list of process task relation
-     * @return list of task definition
-     */
-    List<TaskDefinitionLog> getTaskDefineLogList(List<ProcessTaskRelation> processTaskRelations);
+    List<TaskDefinitionLog> queryByWorkflowDefinitionCodeAndVersion(Long workflowDefinitionCode,
+                                                                    Integer workflowDefinitionVersion);
 
-    /**
-     * Query task definition log list by process task relation list
-     * @param processTaskRelations list of task relation
-     * @return list of task definition log
-     */
-    List<TaskDefinitionLog> getTaskDefineLogListByRelation(List<ProcessTaskRelation> processTaskRelations);
+    List<TaskDefinitionLog> queryTaskDefineLogList(List<ProcessTaskRelation> processTaskRelations);
 
     void deleteByTaskDefinitionCodes(Set<Long> taskDefinitionCodes);
 }
