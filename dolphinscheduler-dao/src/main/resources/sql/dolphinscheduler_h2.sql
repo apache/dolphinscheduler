@@ -661,6 +661,29 @@ CREATE TABLE t_ds_project
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for t_ds_project_parameter
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_project_parameter CASCADE;
+CREATE TABLE t_ds_project_parameter
+(
+    id              int(11) NOT NULL AUTO_INCREMENT,
+    param_name      varchar(255) NOT NULL,
+    param_value     varchar(255) NOT NULL,
+    code            bigint(20) NOT NULL,
+    project_code    bigint(20) NOT NULL,
+    user_id         int(11) DEFAULT NULL,
+    create_time     datetime NOT NULL,
+    update_time     datetime     DEFAULT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY unique_project_parameter_name (project_code, param_name),
+    UNIQUE KEY unique_project_parameter_code (code)
+);
+
+-- ----------------------------
+-- Records of t_ds_project_parameter
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for t_ds_queue
 -- ----------------------------
 DROP TABLE IF EXISTS t_ds_queue CASCADE;
