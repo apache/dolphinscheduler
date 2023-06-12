@@ -388,7 +388,6 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             activeTaskProcessorMaps.remove(taskInstance.getTaskCode());
             stateWheelExecuteThread.removeTask4TimeoutCheck(processInstance, taskInstance);
             stateWheelExecuteThread.removeTask4RetryCheck(processInstance, taskInstance);
-            stateWheelExecuteThread.removeTask4StateCheck(processInstance, taskInstance);
 
             if (taskInstance.getState().isSuccess()) {
                 completeTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
@@ -990,7 +989,6 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             taskProcessor.action(TaskAction.RUN);
 
             stateWheelExecuteThread.addTask4TimeoutCheck(processInstance, taskInstance);
-            stateWheelExecuteThread.addTask4StateCheck(processInstance, taskInstance);
 
             if (taskProcessor.taskInstance().getState().isFinished()) {
                 if (processInstance.isBlocked()) {
