@@ -91,7 +91,7 @@ public class BlockingLogicTask extends BaseSyncLogicTask<BlockingParameters> {
     private DependResult calculateConditionResult() throws MasterTaskExecuteException {
         // todo: Directly get the task instance from the cache
         Map<Long, TaskInstance> completeTaskList = taskInstanceDao
-                .findValidTaskListByProcessId(taskExecutionContext.getProcessInstanceId(),
+                .queryValidTaskListByWorkflowInstanceId(taskExecutionContext.getProcessInstanceId(),
                         taskExecutionContext.getTestFlag())
                 .stream()
                 .collect(Collectors.toMap(TaskInstance::getTaskCode, Function.identity()));

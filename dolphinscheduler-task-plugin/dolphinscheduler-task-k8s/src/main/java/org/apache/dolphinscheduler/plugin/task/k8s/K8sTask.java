@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.task.k8s;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.CLUSTER;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.COMMA;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.NAMESPACE_NAME;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -110,7 +109,7 @@ public class K8sTask extends AbstractK8sTask {
                 expression.getKey(),
                 expression.getOperator(),
                 StringUtils.isEmpty(expression.getValues()) ? Collections.emptyList()
-                        : Arrays.asList(expression.getValues().trim().split(COMMA))))
+                        : Arrays.asList(expression.getValues().trim().split("\\s*,\\s*"))))
                 .collect(Collectors.toList());
     }
 

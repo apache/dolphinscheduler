@@ -161,7 +161,7 @@ public class WorkflowExecuteRunnableTest {
             taskInstance4.setId(4);
             Map<String, String> cmdParam = new HashMap<>();
             cmdParam.put(CMD_PARAM_RECOVERY_START_NODE_STRING, "1,2,3,4");
-            Mockito.when(taskInstanceDao.findTaskInstanceByIdList(
+            Mockito.when(taskInstanceDao.queryByIds(
                     Arrays.asList(taskInstance1.getId(), taskInstance2.getId(), taskInstance3.getId(),
                             taskInstance4.getId())))
                     .thenReturn(Arrays.asList(taskInstance1, taskInstance2, taskInstance3, taskInstance4));
@@ -308,9 +308,11 @@ public class WorkflowExecuteRunnableTest {
         dagField.setAccessible(true);
         dagField.set(workflowExecuteThread, dag);
 
-        Mockito.when(taskInstanceDao.findTaskByInstanceIdAndCode(processInstance.getId(), taskInstance1.getTaskCode()))
+        Mockito.when(taskInstanceDao.queryByWorkflowInstanceIdAndTaskCode(processInstance.getId(),
+                taskInstance1.getTaskCode()))
                 .thenReturn(taskInstance1);
-        Mockito.when(taskInstanceDao.findTaskByInstanceIdAndCode(processInstance.getId(), taskInstance2.getTaskCode()))
+        Mockito.when(taskInstanceDao.queryByWorkflowInstanceIdAndTaskCode(processInstance.getId(),
+                taskInstance2.getTaskCode()))
                 .thenReturn(null);
 
         workflowExecuteThread.clearDataIfExecuteTask();
