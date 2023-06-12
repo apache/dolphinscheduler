@@ -589,6 +589,26 @@ CREATE UNIQUE INDEX unique_name on t_ds_project (name);
 CREATE UNIQUE INDEX unique_code on t_ds_project (code);
 
 --
+-- Table structure for table t_ds_project_parameter
+--
+
+DROP TABLE IF EXISTS t_ds_project_parameter;
+CREATE TABLE t_ds_project_parameter (
+  id int NOT NULL  ,
+  param_name varchar(255) NOT NULL ,
+  param_value varchar(255) NOT NULL ,
+  code bigint NOT NULL,
+  project_code bigint NOT NULL,
+  user_id int DEFAULT NULL ,
+  create_time timestamp DEFAULT CURRENT_TIMESTAMP ,
+  update_time timestamp DEFAULT CURRENT_TIMESTAMP ,
+  PRIMARY KEY (id)
+) ;
+
+CREATE UNIQUE INDEX unique_project_parameter_name on t_ds_project_parameter (project_code, param_name);
+CREATE UNIQUE INDEX unique_project_parameter_code on t_ds_project_parameter (code);
+
+--
 -- Table structure for table t_ds_queue
 --
 
