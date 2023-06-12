@@ -75,7 +75,7 @@ public class TaskUpdatePidEventHandler implements TaskEventHandler {
             taskInstance.setStartTime(taskEvent.getStartTime());
             taskInstance.setHost(taskEvent.getWorkerAddress());
             taskInstance.setPid(taskEvent.getProcessId());
-            if (!taskInstanceDao.updateTaskInstance(taskInstance)) {
+            if (!taskInstanceDao.updateById(taskInstance)) {
                 throw new TaskEventHandleError("Handle task running event error, update taskInstance to db failed");
             }
             sendAckToWorker(taskEvent);

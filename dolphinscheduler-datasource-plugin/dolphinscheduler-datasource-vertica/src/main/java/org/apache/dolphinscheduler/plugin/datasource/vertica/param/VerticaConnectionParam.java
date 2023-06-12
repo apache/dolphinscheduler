@@ -15,15 +15,24 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.alert.script;
+package org.apache.dolphinscheduler.plugin.datasource.vertica.param;
 
-public final class OSUtils {
+import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 
-    private OSUtils() {
-        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
-    }
+public class VerticaConnectionParam extends BaseConnectionParam {
 
-    static Boolean isWindows() {
-        return System.getProperty("os.name").startsWith("Windows");
+    @Override
+    public String toString() {
+        return "VerticaConnectionParam{"
+                + "user='" + user + '\''
+                + ", password='" + password + '\''
+                + ", address='" + address + '\''
+                + ", database='" + database + '\''
+                + ", jdbcUrl='" + jdbcUrl + '\''
+                + ", driverLocation='" + driverLocation + '\''
+                + ", driverClassName='" + driverClassName + '\''
+                + ", validationQuery='" + validationQuery + '\''
+                + ", other='" + other + '\''
+                + '}';
     }
 }

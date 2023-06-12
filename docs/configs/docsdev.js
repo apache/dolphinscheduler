@@ -102,6 +102,10 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/task/sub-process.html',
                             },
                             {
+                                title: 'Dynamic',
+                                link: '/en-us/docs/dev/user_doc/guide/task/dynamic.html',
+                            },
+                            {
                                 title: 'Dependent',
                                 link: '/en-us/docs/dev/user_doc/guide/task/dependent.html',
                             },
@@ -253,6 +257,10 @@ export default {
                             {
                                 title: 'File Parameter',
                                 link: '/en-us/docs/dev/user_doc/guide/parameter/file-parameter.html',
+                            },
+                            {
+                                title: 'Vertica',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/vertica.html',
                             },
                         ],
                     },
@@ -807,6 +815,10 @@ export default {
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/sub-process.html',
                             },
                             {
+                                title: 'Dynamic',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/dynamic.html',
+                            },
+                            {
                                 title: 'Dependent',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/dependent.html',
                             },
@@ -929,6 +941,10 @@ export default {
                             {
                                 title: 'SSH',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/ssh.html',
+                            },
+                            {
+                                title: 'Vertica',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/vertica.html',
                             },
                         ],
                     },

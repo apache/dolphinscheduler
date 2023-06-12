@@ -169,6 +169,7 @@ export default {
     recovery_waiting_thread: 'Recovery waiting thread',
     recover_serial_wait: 'Recover serial wait',
     execute_task: 'Execute the specified task',
+    dynamic_generation: 'Dynamic Generation',
     recovery_suspend: 'Recovery Suspend',
     recovery_failed: 'Recovery Failed',
     gantt: 'Gantt',
@@ -260,6 +261,7 @@ export default {
     retry_count: 'Retry Count',
     dry_run_flag: 'Dry Run Flag',
     host: 'Host',
+    app_link: 'External Application Link',
     operation: 'Operation',
     edit: 'Edit',
     delete: 'Delete',
@@ -836,7 +838,16 @@ export default {
     dependent_failure_policy_waiting: 'waiting',
     dependent_failure_waiting_time: 'Dependent failure waiting time',
     dependent_failure_waiting_time_tips:
-      'Failure waiting time must be a positive integer'
+      'Failure waiting time must be a positive integer',
+    max_num_of_sub_workflow_instances: 'max num of sub workflow instances',
+    filter_condition: 'Filter Condition',
+    params_value: 'Params Value',
+    separator: 'Separator',
+    dynamic_name_tips: 'name(required)',
+    dynamic_value_tips: 'params or value(required)',
+    dynamic_separator_tips: 'separator(required)',
+    child_node_definition: 'child node definition',
+    child_node_instance: 'child node instance',
   },
   menu: {
     fav: 'Favorites',

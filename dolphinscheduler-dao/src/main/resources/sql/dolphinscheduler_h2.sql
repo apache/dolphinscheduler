@@ -661,6 +661,29 @@ CREATE TABLE t_ds_project
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for t_ds_project_parameter
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_project_parameter CASCADE;
+CREATE TABLE t_ds_project_parameter
+(
+    id              int(11) NOT NULL AUTO_INCREMENT,
+    param_name      varchar(255) NOT NULL,
+    param_value     varchar(255) NOT NULL,
+    code            bigint(20) NOT NULL,
+    project_code    bigint(20) NOT NULL,
+    user_id         int(11) DEFAULT NULL,
+    create_time     datetime NOT NULL,
+    update_time     datetime     DEFAULT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY unique_project_parameter_name (project_code, param_name),
+    UNIQUE KEY unique_project_parameter_code (code)
+);
+
+-- ----------------------------
+-- Records of t_ds_project_parameter
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for t_ds_queue
 -- ----------------------------
 DROP TABLE IF EXISTS t_ds_queue CASCADE;
@@ -2042,3 +2065,16 @@ CREATE TABLE t_ds_trigger_relation
     PRIMARY KEY (id),
     UNIQUE KEY t_ds_trigger_relation_UN(trigger_type,job_id,trigger_code)
 );
+
+
+DROP TABLE IF EXISTS t_ds_relation_sub_workflow;
+CREATE TABLE t_ds_relation_sub_workflow (
+    id BIGINT AUTO_INCREMENT NOT NULL,
+    parent_workflow_instance_id BIGINT NOT NULL,
+    parent_task_code BIGINT NOT NULL,
+    sub_workflow_instance_id BIGINT NOT NULL,
+    PRIMARY KEY (id),
+    INDEX idx_parent_workflow_instance_id (parent_workflow_instance_id),
+    INDEX idx_parent_task_code (parent_task_code),
+    INDEX idx_sub_workflow_instance_id (sub_workflow_instance_id)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;

@@ -589,6 +589,26 @@ CREATE UNIQUE INDEX unique_name on t_ds_project (name);
 CREATE UNIQUE INDEX unique_code on t_ds_project (code);
 
 --
+-- Table structure for table t_ds_project_parameter
+--
+
+DROP TABLE IF EXISTS t_ds_project_parameter;
+CREATE TABLE t_ds_project_parameter (
+  id int NOT NULL  ,
+  param_name varchar(255) NOT NULL ,
+  param_value varchar(255) NOT NULL ,
+  code bigint NOT NULL,
+  project_code bigint NOT NULL,
+  user_id int DEFAULT NULL ,
+  create_time timestamp DEFAULT CURRENT_TIMESTAMP ,
+  update_time timestamp DEFAULT CURRENT_TIMESTAMP ,
+  PRIMARY KEY (id)
+) ;
+
+CREATE UNIQUE INDEX unique_project_parameter_name on t_ds_project_parameter (project_code, param_name);
+CREATE UNIQUE INDEX unique_project_parameter_code on t_ds_project_parameter (code);
+
+--
 -- Table structure for table t_ds_queue
 --
 
@@ -2001,3 +2021,16 @@ CREATE TABLE t_ds_trigger_relation (
     PRIMARY KEY (id),
     CONSTRAINT t_ds_trigger_relation_unique UNIQUE (trigger_type,job_id,trigger_code)
 );
+
+DROP TABLE IF EXISTS t_ds_relation_sub_workflow;
+CREATE TABLE t_ds_relation_sub_workflow (
+    id        serial      NOT NULL,
+    parent_workflow_instance_id BIGINT NOT NULL,
+    parent_task_code BIGINT NOT NULL,
+    sub_workflow_instance_id BIGINT NOT NULL,
+    PRIMARY KEY (id)
+);
+CREATE INDEX idx_parent_workflow_instance_id ON t_ds_relation_sub_workflow (parent_workflow_instance_id);
+CREATE INDEX idx_parent_task_code ON t_ds_relation_sub_workflow (parent_task_code);
+CREATE INDEX idx_sub_workflow_instance_id ON t_ds_relation_sub_workflow (sub_workflow_instance_id);
+
