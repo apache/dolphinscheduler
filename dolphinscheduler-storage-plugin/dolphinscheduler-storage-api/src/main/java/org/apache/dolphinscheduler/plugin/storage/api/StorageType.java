@@ -25,7 +25,9 @@ public enum StorageType {
     HDFS(1, "HDFS"),
     OSS(2, "OSS"),
     S3(3, "S3"),
-    GCS(4, "GCS");
+    GCS(4, "GCS"),
+
+    ABS(5, "ABS");
 
     private final int code;
     private final String name;

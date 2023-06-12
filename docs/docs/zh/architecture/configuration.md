@@ -194,7 +194,7 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn/applicationId�
 | 参数 | 默认值 | 描述 |
 |--|--|--|
 |data.basedir.path | /tmp/dolphinscheduler | 本地工作目录,用于存放临时文件|
-|resource.storage.type | NONE | 资源文件存储类型: HDFS,S3,OSS,GCS,NONE|
+|resource.storage.type | NONE | 资源文件存储类型: HDFS,S3,OSS,GCS,ABS,NONE|
 |resource.upload.path | /dolphinscheduler | 资源文件存储路径|
 |aws.access.key.id | minioadmin | S3 access key|
 |aws.secret.access.key | minioadmin | S3 secret access key|

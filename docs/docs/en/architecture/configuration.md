@@ -197,7 +197,7 @@ The default configuration is as follows:
 | Parameters | Default value | Description |
 |--|--|--|
 |data.basedir.path | /tmp/dolphinscheduler | local directory used to store temp files|
-|resource.storage.type | NONE | type of resource files: HDFS, S3, OSS, GCS, NONE|
+|resource.storage.type | NONE | type of resource files: HDFS, S3, OSS, GCS, ABS, NONE|
 |resource.upload.path | /dolphinscheduler | storage path of resource files|
 |aws.access.key.id | minioadmin | access key id of S3|
 |aws.secret.access.key | minioadmin | secret access key of S3|
