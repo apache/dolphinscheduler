@@ -141,23 +141,4 @@ public class EtcdRegistryTest {
     public static void after() throws IOException {
         registry.close();
     }
-
-    @Disabled
-    @Test
-    public void test() throws Exception {
-        EtcdRegistryProperties properties = new EtcdRegistryProperties();
-        properties.setEndpoints("");
-        /*
-         * Please store your certs file in
-         * dolphinscheduler-registry/dolphinscheduler-registry-plugins/dolphinscheduler-registry-etcd/etcd-certs/ for
-         * running this test
-         * 
-         * If you pass this method and want to run api service, please store your certs file in
-         * deploy/kubernetes/dolphinscheduler/etcd-certs/
-         */
-        properties.setCertFile("etcd-certs/ca.crt");
-        properties.setKeyCertChainFile("etcd-certs/client.crt");
-        properties.setKeyFile("etcd-certs/client.pem");
-        registry = new EtcdRegistry(properties);
-    }
 }
