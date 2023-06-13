@@ -341,6 +341,7 @@ CREATE TABLE `t_ds_command` (
   `update_time`               datetime DEFAULT NULL COMMENT 'update time',
   `process_instance_priority` int(11) DEFAULT '2' COMMENT 'process instance priority: 0 Highest,1 High,2 Medium,3 Low,4 Lowest',
   `worker_group`              varchar(255)  COMMENT 'worker group',
+  `tenant_code`               varchar(64) DEFAULT 'default' COMMENT 'tenant code',
   `environment_code`          bigint(20) DEFAULT '-1' COMMENT 'environment code',
   `dry_run`                   tinyint(4) DEFAULT '0' COMMENT 'dry run flag：0 normal, 1 dry run',
   `test_flag`                 tinyint(4) DEFAULT null COMMENT 'test flag：0 normal, 1 test run',
@@ -396,6 +397,7 @@ CREATE TABLE `t_ds_error_command` (
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   `process_instance_priority` int(11) DEFAULT '2' COMMENT 'process instance priority, 0 Highest,1 High,2 Medium,3 Low,4 Lowest',
   `worker_group` varchar(255)  COMMENT 'worker group',
+  `tenant_code`  varchar(64) DEFAULT 'default' COMMENT 'tenant code',
   `environment_code` bigint(20) DEFAULT '-1' COMMENT 'environment code',
   `message` text COMMENT 'message',
   `dry_run` tinyint(4) DEFAULT '0' COMMENT 'dry run flag: 0 normal, 1 dry run',
@@ -425,7 +427,6 @@ CREATE TABLE `t_ds_process_definition` (
   `locations` text COMMENT 'Node location information',
   `warning_group_id` int(11) DEFAULT NULL COMMENT 'alert group id',
   `timeout` int(11) DEFAULT '0' COMMENT 'time out, unit: minute',
-  `tenant_id` int(11) NOT NULL DEFAULT '-1' COMMENT 'tenant id',
   `execution_type` tinyint(4) DEFAULT '0' COMMENT 'execution_type 0:parallel,1:serial wait,2:serial discard,3:serial priority',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime NOT NULL COMMENT 'update time',
@@ -455,7 +456,6 @@ CREATE TABLE `t_ds_process_definition_log` (
   `locations` text COMMENT 'Node location information',
   `warning_group_id` int(11) DEFAULT NULL COMMENT 'alert group id',
   `timeout` int(11) DEFAULT '0' COMMENT 'time out,unit: minute',
-  `tenant_id` int(11) NOT NULL DEFAULT '-1' COMMENT 'tenant id',
   `execution_type` tinyint(4) DEFAULT '0' COMMENT 'execution_type 0:parallel,1:serial wait,2:serial discard,3:serial priority',
   `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
   `operate_time` datetime DEFAULT NULL COMMENT 'operate time',
@@ -626,8 +626,7 @@ CREATE TABLE `t_ds_process_instance` (
   `worker_group` varchar(255) DEFAULT NULL COMMENT 'worker group id',
   `environment_code` bigint(20) DEFAULT '-1' COMMENT 'environment code',
   `timeout` int(11) DEFAULT '0' COMMENT 'time out',
-  `tenant_id` int(11) NOT NULL DEFAULT '-1' COMMENT 'tenant id',
-  `tenant_code` varchar(64) DEFAULT NULL COMMENT 'tenant code',
+  `tenant_code` varchar(64) DEFAULT 'default' COMMENT 'tenant code',
   `var_pool` longtext COMMENT 'var_pool',
   `dry_run` tinyint(4) DEFAULT '0' COMMENT 'dry run flag：0 normal, 1 dry run',
   `next_process_instance_id` int(11) DEFAULT '0' COMMENT 'serial queue next processInstanceId',
@@ -663,6 +662,28 @@ CREATE TABLE `t_ds_project` (
 
 -- ----------------------------
 -- Records of t_ds_project
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for t_ds_project_parameter
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_project_parameter`;
+CREATE TABLE `t_ds_project_parameter` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
+  `param_name` varchar(255) NOT NULL COMMENT 'project parameter name',
+  `param_value` varchar(255) NOT NULL COMMENT 'project parameter value',
+  `code` bigint(20) NOT NULL COMMENT 'encoding',
+  `project_code` bigint(20) NOT NULL COMMENT 'project code',
+  `user_id` int(11) DEFAULT NULL COMMENT 'creator id',
+  `create_time` datetime NOT NULL COMMENT 'create time',
+  `update_time` datetime DEFAULT NULL COMMENT 'update time',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_project_parameter_name`(`project_code`, `param_name`),
+  UNIQUE KEY `unique_project_parameter_code`(`code`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
+
+-- ----------------------------
+-- Records of t_ds_project_parameter
 -- ----------------------------
 
 -- ----------------------------
@@ -814,6 +835,7 @@ CREATE TABLE `t_ds_schedules` (
   `warning_group_id` int(11) DEFAULT NULL COMMENT 'alert group id',
   `process_instance_priority` int(11) DEFAULT '2' COMMENT 'process instance priority：0 Highest,1 High,2 Medium,3 Low,4 Lowest',
   `worker_group` varchar(255) DEFAULT '' COMMENT 'worker group id',
+  `tenant_code`  varchar(64) DEFAULT 'default' COMMENT 'tenant code',
   `environment_code` bigint(20) DEFAULT '-1' COMMENT 'environment code',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime NOT NULL COMMENT 'update time',
@@ -2016,3 +2038,16 @@ CREATE TABLE `t_ds_trigger_relation` (
     KEY `t_ds_trigger_relation_trigger_code_IDX` (`trigger_code`),
     UNIQUE KEY `t_ds_trigger_relation_UN` (`trigger_type`,`job_id`,`trigger_code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
+
+
+DROP TABLE IF EXISTS `t_ds_relation_sub_workflow`;
+CREATE TABLE `t_ds_relation_sub_workflow` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `parent_workflow_instance_id` bigint  NOT NULL,
+    `parent_task_code` bigint  NOT NULL,
+    `sub_workflow_instance_id` bigint  NOT NULL,
+    PRIMARY KEY (`id`),
+    KEY `idx_parent_workflow_instance_id` (`parent_workflow_instance_id`),
+    KEY `idx_parent_task_code` (`parent_task_code`),
+    KEY `idx_sub_workflow_instance_id` (`sub_workflow_instance_id`)
+);

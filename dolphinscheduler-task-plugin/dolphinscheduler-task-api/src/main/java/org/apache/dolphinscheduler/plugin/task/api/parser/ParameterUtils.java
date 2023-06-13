@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serializable;
 import java.sql.PreparedStatement;
 import java.util.Date;
 import java.util.HashMap;
@@ -147,6 +148,40 @@ public class ParameterUtils {
         } else if (dataType.equals(DataType.BOOLEAN)) {
             stmt.setBoolean(index, Boolean.parseBoolean(value));
         }
+    }
+
+    public static Serializable getParameterValue(Property property) {
+        if (property == null) {
+            return null;
+        }
+        String value = property.getValue();
+        switch (property.getType()) {
+            case LONG:
+                return Long.valueOf(value);
+            case FLOAT:
+                return Float.valueOf(value);
+            case INTEGER:
+                return Integer.valueOf(value);
+            case DOUBLE:
+                return Double.valueOf(value);
+            case BOOLEAN:
+                return Boolean.valueOf(value);
+            // todo: add date type, list type....
+            default:
+                return value;
+        }
+    }
+
+    public static boolean isNumber(Property property) {
+        return property != null &&
+                (DataType.INTEGER.equals(property.getType())
+                        || DataType.LONG.equals(property.getType())
+                        || DataType.FLOAT.equals(property.getType())
+                        || DataType.DOUBLE.equals(property.getType()));
+    }
+
+    public static boolean isBoolean(Property property) {
+        return property != null && DataType.BOOLEAN.equals(property.getType());
     }
 
     public static String expandListParameter(Map<Integer, Property> params, String sql) {

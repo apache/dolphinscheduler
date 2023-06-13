@@ -49,7 +49,9 @@ export function useEnvironmentName(
     if (options.value.length === 0) {
       model.environmentCode = null
     } else {
-      (isCreate && !model.environmentCode)  && (model.environmentCode = options.value[0].value)
+      isCreate &&
+        !model.environmentCode &&
+        (model.environmentCode = options.value[0].value)
     }
   }
 
@@ -83,7 +85,7 @@ export function useEnvironmentName(
     name: t('project.node.environment_name'),
     props: {
       loading: loading,
-      clearable: true,
+      clearable: true
     },
     options: options
   }

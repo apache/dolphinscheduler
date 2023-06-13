@@ -54,12 +54,12 @@ public class TenantAPITest {
         LoginPage loginPage = new LoginPage();
         HttpResponse loginHttpResponse = loginPage.login(user, password);
 
-        sessionId = JSONUtils.convertValue(loginHttpResponse.body().data(), LoginResponseData.class).sessionId();
+        sessionId = JSONUtils.convertValue(loginHttpResponse.getBody().getData(), LoginResponseData.class).getSessionId();
     }
 
     @AfterAll
     public static void cleanup() {
-        LOGGER.info("success cleanup");
+        log.info("success cleanup");
     }
 
     @Test
@@ -69,7 +69,7 @@ public class TenantAPITest {
 
         HttpResponse createTenantHttpResponse = tenantPage.createTenant(sessionId, tenant, 1, "");
 
-        Assertions.assertTrue(createTenantHttpResponse.body().success());
+        Assertions.assertTrue(createTenantHttpResponse.getBody().getSuccess());
     }
 
     @Test
@@ -79,7 +79,7 @@ public class TenantAPITest {
 
         HttpResponse createTenantHttpResponse = tenantPage.createTenant(sessionId, tenant, 1, "");
 
-        Assertions.assertFalse(createTenantHttpResponse.body().success());
+        Assertions.assertFalse(createTenantHttpResponse.getBody().getSuccess());
     }
 
     @Test
@@ -90,15 +90,15 @@ public class TenantAPITest {
         HttpResponse createTenantHttpResponse = tenantPage.getTenantListPaging(sessionId, 1, 10, "");
         boolean result = false;
 
-        for (TenantListPagingResponseTotalList tenantListPagingResponseTotalList : JSONUtils.convertValue(createTenantHttpResponse.body().data(), TenantListPagingResponseData.class).totalList()) {
-            if (tenantListPagingResponseTotalList.tenantCode().equals(tenant)) {
+        for (TenantListPagingResponseTotalList tenantListPagingResponseTotalList : JSONUtils.convertValue(createTenantHttpResponse.getBody().getData(), TenantListPagingResponseData.class).getTotalList()) {
+            if (tenantListPagingResponseTotalList.getTenantCode().equals(tenant)) {
                 result = true;
-                existTenantId = tenantListPagingResponseTotalList.id();
+                existTenantId = tenantListPagingResponseTotalList.getId();
                 break;
             }
         }
 
-        Assertions.assertTrue(createTenantHttpResponse.body().success());
+        Assertions.assertTrue(createTenantHttpResponse.getBody().getSuccess());
         Assertions.assertTrue(result);
     }
 
@@ -109,6 +109,6 @@ public class TenantAPITest {
 
         HttpResponse deleteTenantHttpResponse = tenantPage.deleteTenant(sessionId, existTenantId);
 
-        Assertions.assertTrue(deleteTenantHttpResponse.body().success());
+        Assertions.assertTrue(deleteTenantHttpResponse.getBody().getSuccess());
     }
 }

@@ -25,14 +25,14 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.Message;
-import org.apache.dolphinscheduler.remote.command.task.TaskDispatchMessage;
+import org.apache.dolphinscheduler.remote.command.task.TaskDispatchRequest;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.ExecuteException;
-import org.apache.dolphinscheduler.server.worker.processor.TaskDispatchProcessor;
+import org.apache.dolphinscheduler.server.worker.processor.WorkerTaskDispatchProcessor;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
@@ -56,7 +56,7 @@ public class NettyExecutorManagerTest {
         final NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(30000);
         NettyRemotingServer nettyRemotingServer = new NettyRemotingServer(serverConfig);
-        nettyRemotingServer.registerProcessor(new TaskDispatchProcessor());
+        nettyRemotingServer.registerProcessor(new WorkerTaskDispatchProcessor());
         nettyRemotingServer.start();
         TaskInstance taskInstance = Mockito.mock(TaskInstance.class);
         ProcessDefinition processDefinition = Mockito.mock(ProcessDefinition.class);
@@ -94,10 +94,7 @@ public class NettyExecutorManagerTest {
 
     }
     private Message toCommand(TaskExecutionContext taskExecutionContext) {
-        TaskDispatchMessage requestCommand = new TaskDispatchMessage(taskExecutionContext,
-                "127.0.0.1:5678",
-                "127.0.0.1:1234",
-                System.currentTimeMillis());
+        TaskDispatchRequest requestCommand = new TaskDispatchRequest(taskExecutionContext);
         return requestCommand.convert2Command();
     }
 }

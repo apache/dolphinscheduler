@@ -45,7 +45,6 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -65,6 +64,9 @@ public interface ProcessService {
     ProcessInstance handleCommand(String host,
                                   Command command) throws CronParseException, CodeGenerateUtils.CodeGenerateException;
 
+    ProcessInstance constructProcessInstance(Command command,
+                                             String host) throws CronParseException, CodeGenerateUtils.CodeGenerateException;
+
     Optional<ProcessInstance> findProcessInstanceDetailById(int processId);
 
     ProcessInstance findProcessInstanceById(int processId);
@@ -83,17 +85,17 @@ public interface ProcessService {
 
     void recurseFindSubProcess(long parentCode, List<Long> ids);
 
-    Tenant getTenantForProcess(int tenantId, int userId);
+    String getTenantForProcess(String tenantCode, int userId);
 
     Environment findEnvironmentByCode(Long environmentCode);
 
     void setSubProcessParam(ProcessInstance subProcessInstance);
 
-    TaskInstance submitTaskWithRetry(ProcessInstance processInstance, TaskInstance taskInstance, int commitRetryTimes,
-                                     long commitInterval);
+    boolean submitTaskWithRetry(ProcessInstance processInstance, TaskInstance taskInstance, int commitRetryTimes,
+                                long commitInterval);
 
     @Transactional
-    TaskInstance submitTask(ProcessInstance processInstance, TaskInstance taskInstance);
+    boolean submitTask(ProcessInstance processInstance, TaskInstance taskInstance);
 
     void createSubWorkProcess(ProcessInstance parentProcessInstance, TaskInstance task);
 

@@ -39,6 +39,6 @@ public class RollViewLogResponse implements ResponseMessageBuilder {
 
     @Override
     public MessageType getCommandType() {
-        return MessageType.ROLL_VIEW_LOG_RESPONSE;
+        return MessageType.RESPONSE;
     }
 }

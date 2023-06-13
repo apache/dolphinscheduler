@@ -17,19 +17,19 @@
 
 package org.apache.dolphinscheduler.plugin.task.seatunnel;
 
+import lombok.Getter;
+
+@Getter
 public enum DeployModeEnum {
 
+    // TODO: use upper case, have to change both frontend and backend code, currently frontend use lower case
     cluster("cluster"),
     client("client"),
-    local("client");
+    local("local");
 
-    private String command;
+    private final String command;
 
     DeployModeEnum(String command) {
         this.command = command;
-    }
-
-    public String getCommand() {
-        return command;
     }
 }

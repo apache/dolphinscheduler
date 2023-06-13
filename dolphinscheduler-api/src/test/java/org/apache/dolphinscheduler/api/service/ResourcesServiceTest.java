@@ -48,6 +48,8 @@ import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -127,6 +129,10 @@ public class ResourcesServiceTest {
 
     private MockedStatic<PropertyUtils> mockedStaticPropertyUtils;
 
+    private MockedStatic<Paths> mockedStaticPaths;
+
+    private MockedStatic<java.nio.file.Files> filesMockedStatic;
+
     private Throwable exception;
 
     @BeforeEach
@@ -137,6 +143,8 @@ public class ResourcesServiceTest {
                 Mockito.mockStatic(org.apache.dolphinscheduler.api.utils.FileUtils.class);
 
         mockedStaticPropertyUtils = Mockito.mockStatic(PropertyUtils.class);
+        mockedStaticPaths = Mockito.mockStatic(Paths.class);
+        filesMockedStatic = Mockito.mockStatic(java.nio.file.Files.class);
     }
 
     @AfterEach
@@ -145,6 +153,8 @@ public class ResourcesServiceTest {
         mockedStaticFiles.close();
         mockedStaticDolphinschedulerFileUtils.close();
         mockedStaticPropertyUtils.close();
+        mockedStaticPaths.close();
+        filesMockedStatic.close();
     }
 
     @Test
@@ -668,7 +678,10 @@ public class ResourcesServiceTest {
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
         Mockito.when(userMapper.selectById(1)).thenReturn(getUser());
         org.springframework.core.io.Resource resourceMock = Mockito.mock(org.springframework.core.io.Resource.class);
+        Path path = Mockito.mock(Path.class);
+        Mockito.when(Paths.get(Mockito.any())).thenReturn(path);
         try {
+            Mockito.when(java.nio.file.Files.size(Mockito.any())).thenReturn(1L);
             // resource null
             org.springframework.core.io.Resource resource = resourcesService.downloadResource(getUser(), "");
             Assertions.assertNull(resource);
@@ -892,6 +905,24 @@ public class ResourcesServiceTest {
             logger.error("hadoop error", e);
         }
     }
+
+    @Test
+    void testQueryBaseDir() {
+        User user = getUser();
+        Mockito.when(userMapper.selectById(user.getId())).thenReturn(getUser());
+        Mockito.when(tenantMapper.queryById(user.getTenantId())).thenReturn(getTenant());
+        Mockito.when(storageOperate.getDir(ResourceType.FILE, "123")).thenReturn("/dolphinscheduler/123/resources/");
+        try {
+            Mockito.when(storageOperate.getFileStatus(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
+                    Mockito.any())).thenReturn(getStorageEntityResource());
+        } catch (Exception e) {
+            logger.error(e.getMessage() + " Resource path: {}", "/dolphinscheduler/123/resources/ResourcesServiceTest",
+                    e);
+        }
+        Result<Object> result = resourcesService.queryResourceBaseDir(user, ResourceType.FILE);
+        Assertions.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
+    }
+
     private List<Resource> getResourceList() {
 
         List<Resource> resources = new ArrayList<>();

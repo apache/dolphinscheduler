@@ -25,7 +25,7 @@ import org.apache.dolphinscheduler.remote.command.Message;
 import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.task.WorkflowHostChangeRequest;
 import org.apache.dolphinscheduler.remote.command.task.WorkflowHostChangeResponse;
-import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
+import org.apache.dolphinscheduler.remote.processor.WorkerRpcProcessor;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 
 import org.slf4j.Logger;
@@ -41,7 +41,7 @@ import io.netty.channel.ChannelFutureListener;
  * this used when master failover
  */
 @Component
-public class WorkflowHostChangeProcessor implements NettyRequestProcessor {
+public class WorkflowHostChangeProcessor implements WorkerRpcProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(WorkflowHostChangeProcessor.class);
 

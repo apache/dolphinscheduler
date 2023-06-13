@@ -166,7 +166,6 @@ public class SagemakerTask extends AbstractRemoteTask {
     }
 
     private String parseRequstJson(String requestJson) {
-        // combining local and global parameters
         Map<String, Property> paramsMap = taskRequest.getPrepareParamsMap();
         return ParameterUtils.convertParameterPlaceholders(requestJson, ParamUtils.convert(paramsMap));
     }

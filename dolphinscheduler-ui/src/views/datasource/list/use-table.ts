@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import {reactive, ref} from 'vue'
+import { reactive, ref } from 'vue'
 import {
   queryDataSourceListPaging,
   deleteDataSource

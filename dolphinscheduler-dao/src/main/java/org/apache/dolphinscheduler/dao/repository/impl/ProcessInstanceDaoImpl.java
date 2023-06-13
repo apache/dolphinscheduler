@@ -17,16 +17,13 @@
 
 package org.apache.dolphinscheduler.dao.repository.impl;
 
-import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
+import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
+import org.apache.dolphinscheduler.dao.repository.BaseDao;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.model.DateInterval;
-
-import org.apache.commons.collections4.CollectionUtils;
-
-import java.util.Date;
-import java.util.List;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -36,46 +33,24 @@ import org.springframework.stereotype.Repository;
 
 @Slf4j
 @Repository
-public class ProcessInstanceDaoImpl implements ProcessInstanceDao {
+public class ProcessInstanceDaoImpl extends BaseDao<ProcessInstance, ProcessInstanceMapper>
+        implements
+            ProcessInstanceDao {
 
     @Autowired
-    private ProcessInstanceMapper processInstanceMapper;
+    private ProcessInstanceMapMapper processInstanceMapMapper;
 
-    @Override
-    public int insertProcessInstance(ProcessInstance processInstance) {
-        return processInstanceMapper.insert(processInstance);
+    public ProcessInstanceDaoImpl(@NonNull ProcessInstanceMapper processInstanceMapper) {
+        super(processInstanceMapper);
     }
 
     @Override
-    public int updateProcessInstance(ProcessInstance processInstance) {
-        return processInstanceMapper.updateById(processInstance);
-    }
-
-    @Override
-    public int upsertProcessInstance(@NonNull ProcessInstance processInstance) {
+    public void upsertProcessInstance(@NonNull ProcessInstance processInstance) {
         if (processInstance.getId() != null) {
-            return updateProcessInstance(processInstance);
+            updateById(processInstance);
         } else {
-            return insertProcessInstance(processInstance);
+            insert(processInstance);
         }
-    }
-
-    @Override
-    public void deleteByIds(List<Integer> needToDeleteWorkflowInstanceIds) {
-        if (CollectionUtils.isEmpty(needToDeleteWorkflowInstanceIds)) {
-            return;
-        }
-        processInstanceMapper.deleteBatchIds(needToDeleteWorkflowInstanceIds);
-    }
-
-    @Override
-    public void deleteById(Integer workflowInstanceId) {
-        processInstanceMapper.deleteById(workflowInstanceId);
-    }
-
-    @Override
-    public ProcessInstance queryByWorkflowInstanceId(Integer workflowInstanceId) {
-        return processInstanceMapper.selectById(workflowInstanceId);
     }
 
     /**
@@ -86,9 +61,9 @@ public class ProcessInstanceDaoImpl implements ProcessInstanceDao {
      * @return process instance
      */
     @Override
-    public ProcessInstance findLastSchedulerProcessInterval(Long definitionCode, DateInterval dateInterval,
-                                                            int testFlag) {
-        return processInstanceMapper.queryLastSchedulerProcess(definitionCode,
+    public ProcessInstance queryLastSchedulerProcessInterval(Long definitionCode, DateInterval dateInterval,
+                                                             int testFlag) {
+        return mybatisMapper.queryLastSchedulerProcess(definitionCode,
                 dateInterval.getStartTime(),
                 dateInterval.getEndTime(),
                 testFlag);
@@ -102,28 +77,12 @@ public class ProcessInstanceDaoImpl implements ProcessInstanceDao {
      * @return process instance
      */
     @Override
-    public ProcessInstance findLastManualProcessInterval(Long definitionCode, DateInterval dateInterval, int testFlag) {
-        return processInstanceMapper.queryLastManualProcess(definitionCode,
+    public ProcessInstance queryLastManualProcessInterval(Long definitionCode, DateInterval dateInterval,
+                                                          int testFlag) {
+        return mybatisMapper.queryLastManualProcess(definitionCode,
                 dateInterval.getStartTime(),
                 dateInterval.getEndTime(),
                 testFlag);
-    }
-
-    /**
-     * find last running process instance
-     *
-     * @param definitionCode process definition code
-     * @param startTime      start time
-     * @param endTime        end time
-     * @return process instance
-     */
-    @Override
-    public ProcessInstance findLastRunningProcess(Long definitionCode, Date startTime, Date endTime, int testFlag) {
-        return processInstanceMapper.queryLastRunningProcess(definitionCode,
-                startTime,
-                endTime,
-                testFlag,
-                WorkflowExecutionStatus.getNeedFailoverWorkflowInstanceState());
     }
 
     /**
@@ -134,7 +93,7 @@ public class ProcessInstanceDaoImpl implements ProcessInstanceDao {
      */
     @Override
     public ProcessInstance queryFirstScheduleProcessInstance(Long definitionCode) {
-        return processInstanceMapper.queryFirstScheduleProcessInstance(definitionCode);
+        return mybatisMapper.queryFirstScheduleProcessInstance(definitionCode);
     }
 
     /**
@@ -145,6 +104,18 @@ public class ProcessInstanceDaoImpl implements ProcessInstanceDao {
      */
     @Override
     public ProcessInstance queryFirstStartProcessInstance(Long definitionCode) {
-        return processInstanceMapper.queryFirstStartProcessInstance(definitionCode);
+        return mybatisMapper.queryFirstStartProcessInstance(definitionCode);
+    }
+
+    @Override
+    public ProcessInstance querySubProcessInstanceByParentId(Integer processInstanceId, Integer taskInstanceId) {
+        ProcessInstance processInstance = null;
+        ProcessInstanceMap processInstanceMap =
+                processInstanceMapMapper.queryByParentId(processInstanceId, taskInstanceId);
+        if (processInstanceMap == null || processInstanceMap.getProcessInstanceId() == 0) {
+            return processInstance;
+        }
+        processInstance = queryById(processInstanceMap.getProcessInstanceId());
+        return processInstance;
     }
 }

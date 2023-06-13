@@ -22,7 +22,7 @@ import Modal from '@/components/modal'
 import { noSpace } from '@/utils/trim'
 import { useForm } from './use-form'
 import { useFolder } from './use-folder'
-import { ResourceType } from "@/views/resource/components/resource/types";
+import { ResourceType } from '@/views/resource/components/resource/types'
 
 const props = {
   show: {

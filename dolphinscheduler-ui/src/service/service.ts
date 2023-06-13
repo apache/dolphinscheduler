@@ -65,6 +65,8 @@ const err = (err: AxiosError): Promise<AxiosError> => {
     userStore.setSessionId('')
     userStore.setSecurityConfigType('')
     userStore.setUserInfo({})
+    userStore.setBaseResDir('')
+    userStore.setBaseUdfDir('')
     router.push({ path: '/login' })
   }
 

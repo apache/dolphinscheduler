@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.master.rpc;
 
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
-import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
+import org.apache.dolphinscheduler.remote.processor.MasterRpcProcessor;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 
 import java.util.List;
@@ -42,7 +42,7 @@ public class MasterRPCServer implements AutoCloseable {
     private MasterConfig masterConfig;
 
     @Autowired
-    private List<NettyRequestProcessor> nettyRequestProcessors;
+    private List<MasterRpcProcessor> masterRpcProcessors;
 
     public void start() {
         log.info("Starting Master RPC Server...");
@@ -50,9 +50,9 @@ public class MasterRPCServer implements AutoCloseable {
         NettyServerConfig serverConfig = new NettyServerConfig();
         serverConfig.setListenPort(masterConfig.getListenPort());
         this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
-        for (NettyRequestProcessor nettyRequestProcessor : nettyRequestProcessors) {
-            this.nettyRemotingServer.registerProcessor(nettyRequestProcessor);
-            log.info("Success register netty processor: {}", nettyRequestProcessor.getClass().getName());
+        for (MasterRpcProcessor masterRpcProcessor : masterRpcProcessors) {
+            this.nettyRemotingServer.registerProcessor(masterRpcProcessor);
+            log.info("Success register netty processor: {}", masterRpcProcessor.getClass().getName());
         }
         this.nettyRemotingServer.start();
         log.info("Started Master RPC Server...");

@@ -28,13 +28,14 @@ import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
-import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.log.TaskInstanceLogHeader;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
@@ -43,7 +44,7 @@ import org.apache.dolphinscheduler.remote.command.alert.AlertSendRequest;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
-import org.apache.dolphinscheduler.server.worker.log.TaskInstanceLogHeader;
+import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcClient;
 import org.apache.dolphinscheduler.server.worker.utils.TaskExecutionCheckerUtils;
@@ -52,6 +53,7 @@ import org.apache.dolphinscheduler.server.worker.utils.TaskFilesTransferUtils;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 
@@ -72,6 +74,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
     protected final TaskPluginManager taskPluginManager;
     protected final @Nullable StorageOperate storageOperate;
     protected final WorkerRpcClient workerRpcClient;
+    protected final WorkerRegistryClient workerRegistryClient;
 
     protected @Nullable AbstractTask task;
 
@@ -81,13 +84,15 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
                                         @NonNull WorkerMessageSender workerMessageSender,
                                         @NonNull WorkerRpcClient workerRpcClient,
                                         @NonNull TaskPluginManager taskPluginManager,
-                                        @Nullable StorageOperate storageOperate) {
+                                        @Nullable StorageOperate storageOperate,
+                                        @NonNull WorkerRegistryClient workerRegistryClient) {
         this.taskExecutionContext = taskExecutionContext;
         this.workerConfig = workerConfig;
         this.workerMessageSender = workerMessageSender;
         this.workerRpcClient = workerRpcClient;
         this.taskPluginManager = taskPluginManager;
         this.storageOperate = storageOperate;
+        this.workerRegistryClient = workerRegistryClient;
     }
 
     protected abstract void executeTask(TaskCallBack taskCallBack);
@@ -107,38 +112,41 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
     }
 
     protected void afterThrowing(Throwable throwable) throws TaskException {
-        cancelTask();
+        if (cancelTask()) {
+            log.info("Cancel the task successfully");
+        }
         TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
         taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.FAILURE);
         taskExecutionContext.setEndTime(System.currentTimeMillis());
         workerMessageSender.sendMessageWithRetry(taskExecutionContext, MessageType.TASK_EXECUTE_RESULT_MESSAGE);
-        log.info(
-                "Get a exception when execute the task, will send the task execute result to master, the current task execute result is {}",
-                TaskExecutionStatus.FAILURE);
+        log.info("Get a exception when execute the task, will send the task status: {} to master: {}",
+                TaskExecutionStatus.FAILURE.name(), taskExecutionContext.getHost());
 
     }
 
-    public void cancelTask() {
+    public boolean cancelTask() {
         // cancel the task
-        if (task != null) {
-            try {
-                task.cancel();
-                ProcessUtils.cancelApplication(taskExecutionContext);
-            } catch (Exception e) {
-                log.error(
-                        "Task execute failed and cancel the application failed, this will not affect the taskInstance status, but you need to check manual",
-                        e);
-            }
+        if (task == null) {
+            return true;
+        }
+        try {
+            task.cancel();
+            ProcessUtils.cancelApplication(taskExecutionContext);
+            return true;
+        } catch (Exception e) {
+            log.error("Cancel task failed, this will not affect the taskInstance status, but you need to check manual",
+                    e);
+            return false;
         }
     }
 
     @Override
     public void run() {
-        try (
-                final LogUtils.MDCAutoClosableContext mdcAutoClosableContext = LogUtils.setWorkflowAndTaskInstanceIDMDC(
-                        taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId());
-                final LogUtils.MDCAutoClosableContext mdcAutoClosableContext1 =
-                        LogUtils.setTaskInstanceLogFullPathMDC(taskExecutionContext.getLogPath())) {
+        try {
+            LogUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(),
+                    taskExecutionContext.getTaskInstanceId());
+            LogUtils.setTaskInstanceLogFullPathMDC(taskExecutionContext.getLogPath());
+
             TaskInstanceLogHeader.printInitializeTaskContextHeader();
             initializeTask();
 
@@ -146,7 +154,8 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
                 taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.SUCCESS);
                 taskExecutionContext.setEndTime(System.currentTimeMillis());
                 TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-                workerMessageSender.sendMessageWithRetry(taskExecutionContext, MessageType.TASK_EXECUTE_RESULT_MESSAGE);
+                workerMessageSender.sendMessageWithRetry(taskExecutionContext,
+                        MessageType.TASK_EXECUTE_RESULT_MESSAGE);
                 log.info(
                         "The current execute mode is dry run, will stop the subsequent process and set the taskInstance status to success");
                 return;
@@ -169,6 +178,9 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
             log.error("Task execute failed, due to meet an exception", ex);
             afterThrowing(ex);
             closeLogAppender();
+        } finally {
+            LogUtils.removeWorkflowAndTaskInstanceIdMDC();
+            LogUtils.removeTaskInstanceLogFullPathMDC();
         }
     }
 
@@ -190,36 +202,34 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
     protected void beforeExecute() {
         taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.RUNNING_EXECUTION);
         workerMessageSender.sendMessageWithRetry(taskExecutionContext, MessageType.TASK_EXECUTE_RUNNING_MESSAGE);
-        log.info("Set task status to {}", TaskExecutionStatus.RUNNING_EXECUTION);
+        log.info("Send task status {} master: {}", TaskExecutionStatus.RUNNING_EXECUTION.name(),
+                taskExecutionContext.getHost());
 
         TaskExecutionCheckerUtils.checkTenantExist(workerConfig, taskExecutionContext);
-        log.info("TenantCode: {} check success", taskExecutionContext.getTenantCode());
+        log.info("TenantCode: {} check successfully", taskExecutionContext.getTenantCode());
 
         TaskExecutionCheckerUtils.createProcessLocalPathIfAbsent(taskExecutionContext);
-        log.info("ProcessExecDir:{} check success", taskExecutionContext.getExecutePath());
+        log.info("WorkflowInstanceExecDir: {} check successfully", taskExecutionContext.getExecutePath());
 
-        TaskExecutionCheckerUtils.downloadResourcesIfNeeded(storageOperate, taskExecutionContext, log);
-        log.info("Resources:{} check success", taskExecutionContext.getResources());
+        TaskExecutionCheckerUtils.downloadResourcesIfNeeded(storageOperate, taskExecutionContext);
+        log.info("Download resources: {} successfully", taskExecutionContext.getResources());
 
         TaskFilesTransferUtils.downloadUpstreamFiles(taskExecutionContext, storageOperate);
+        log.info("Download upstream files: {} successfully",
+                TaskFilesTransferUtils.getFileLocalParams(taskExecutionContext, Direct.IN));
 
-        TaskChannel taskChannel = taskPluginManager.getTaskChannelMap().get(taskExecutionContext.getTaskType());
-        if (null == taskChannel) {
-            throw new TaskPluginException(String.format("%s task plugin not found, please check config file.",
-                    taskExecutionContext.getTaskType()));
-        }
-        task = taskChannel.createTask(taskExecutionContext);
-        if (task == null) {
-            throw new TaskPluginException(String.format("%s task is null, please check the task plugin is correct",
-                    taskExecutionContext.getTaskType()));
-        }
-        log.info("Task plugin: {} create success", taskExecutionContext.getTaskType());
+        task = Optional.ofNullable(taskPluginManager.getTaskChannelMap().get(taskExecutionContext.getTaskType()))
+                .map(taskChannel -> taskChannel.createTask(taskExecutionContext))
+                .orElseThrow(() -> new TaskPluginException(taskExecutionContext.getTaskType()
+                        + " task plugin not found, please check the task type is correct."));
+        log.info("Task plugin instance: {} create successfully", taskExecutionContext.getTaskType());
 
+        // todo: remove the init method, this should initialize in constructor method
         task.init();
-        log.info("Success initialized task plugin instance success");
+        log.info("Success initialized task plugin instance successfully");
 
         task.getParameters().setVarPool(taskExecutionContext.getVarPool());
-        log.info("Success set taskVarPool: {}", taskExecutionContext.getVarPool());
+        log.info("Set taskVarPool: {} successfully", taskExecutionContext.getVarPool());
 
     }
 
@@ -227,7 +237,15 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         if (!task.getNeedAlert()) {
             return;
         }
-        log.info("The current task need to send alert, begin to send alert");
+
+        // todo: We need to send the alert to the master rather than directly send to the alert server
+        Optional<Host> alertServerAddressOptional = workerRegistryClient.getAlertServerAddress();
+        if (!alertServerAddressOptional.isPresent()) {
+            log.error("Cannot get alert server address, please check the alert server is running");
+            return;
+        }
+        Host alertServerAddress = alertServerAddressOptional.get();
+
         TaskExecutionStatus status = task.getExitStatus();
         TaskAlertInfo taskAlertInfo = task.getTaskAlertInfo();
         int strategy =
@@ -238,25 +256,28 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
                 taskAlertInfo.getContent(),
                 strategy);
         try {
-            workerRpcClient.send(Host.of(workerConfig.getAlertListenHost()), alertCommand.convert2Command());
-            log.info("Success send alert");
+            workerRpcClient.send(alertServerAddress, alertCommand.convert2Command());
+            log.info("Send alert to: {} successfully", alertServerAddress);
         } catch (RemotingException e) {
-            log.error("Send alert failed, alertCommand: {}", alertCommand, e);
+            log.error("Send alert to: {} failed, alertCommand: {}", alertServerAddress, alertCommand, e);
         }
     }
 
     protected void sendTaskResult() {
         taskExecutionContext.setCurrentExecutionStatus(task.getExitStatus());
-        taskExecutionContext.setEndTime(System.currentTimeMillis());
         taskExecutionContext.setProcessId(task.getProcessId());
         taskExecutionContext.setAppIds(task.getAppIds());
         taskExecutionContext.setVarPool(JSONUtils.toJsonString(task.getParameters().getVarPool()));
+        taskExecutionContext.setEndTime(System.currentTimeMillis());
+
         // upload out files and modify the "OUT FILE" property in VarPool
         TaskFilesTransferUtils.uploadOutputFiles(taskExecutionContext, storageOperate);
-        workerMessageSender.sendMessageWithRetry(taskExecutionContext, MessageType.TASK_EXECUTE_RESULT_MESSAGE);
+        log.info("Upload output files: {} successfully",
+                TaskFilesTransferUtils.getFileLocalParams(taskExecutionContext, Direct.OUT));
 
-        log.info("Send task execute result to master, the current task status: {}",
-                taskExecutionContext.getCurrentExecutionStatus());
+        workerMessageSender.sendMessageWithRetry(taskExecutionContext, MessageType.TASK_EXECUTE_RESULT_MESSAGE);
+        log.info("Send task execute status: {} to master : {}", taskExecutionContext.getCurrentExecutionStatus().name(),
+                taskExecutionContext.getHost());
     }
 
     protected void clearTaskExecPathIfNeeded() {
@@ -293,27 +314,17 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         }
     }
 
-    protected void writePodLodIfNeeded() {
-        if (null == taskExecutionContext.getK8sTaskExecutionContext()) {
-            return;
-        }
-        log.info("The current task is k8s task, begin to write pod log");
-        ProcessUtils.getPodLog(taskExecutionContext.getK8sTaskExecutionContext(), taskExecutionContext.getTaskAppId());
-    }
-
     protected void closeLogAppender() {
         try {
-            writePodLodIfNeeded();
             if (RemoteLogUtils.isRemoteLoggingEnable()) {
                 RemoteLogUtils.sendRemoteLog(taskExecutionContext.getLogPath());
                 log.info("Log handler sends task log {} to remote storage asynchronously.",
                         taskExecutionContext.getLogPath());
             }
         } catch (Exception ex) {
-            log.error("Write k8s pod log failed", ex);
+            log.error("Send remote log failed", ex);
         } finally {
             log.info(FINALIZE_SESSION_MARKER, FINALIZE_SESSION_MARKER.toString());
-
         }
     }
 

@@ -144,8 +144,6 @@ public class V200DolphinSchedulerUpgrader implements DolphinSchedulerUpgrader {
             ObjectNode jsonObject = JSONUtils.parseObject(entry.getValue());
             ProcessDefinition processDefinition = processDefinitionMap.get(entry.getKey());
             if (processDefinition != null) {
-                processDefinition
-                        .setTenantId(jsonObject.get("tenantId") == null ? -1 : jsonObject.get("tenantId").asInt());
                 processDefinition.setTimeout(jsonObject.get("timeout").asInt());
                 processDefinition.setGlobalParams(jsonObject.get("globalParams").toString());
             } else {

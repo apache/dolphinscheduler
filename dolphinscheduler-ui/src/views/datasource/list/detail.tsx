@@ -108,7 +108,8 @@ const DetailModal = defineComponent({
       () => props.show,
       async () => {
         state.detailForm.type = props.selectType
-        state.detailForm.label = props.selectType === 'HIVE' ? 'HIVE/IMPALA' :  props.selectType
+        state.detailForm.label =
+          props.selectType === 'HIVE' ? 'HIVE/IMPALA' : props.selectType
         props.show &&
           state.detailForm.type &&
           (await changeType(
@@ -116,7 +117,9 @@ const DetailModal = defineComponent({
             datasourceType[state.detailForm.type]
           ))
         props.show && props.id && setFieldsValue(await queryById(props.id))
-        props.show && state.detailForm.testFlag == 0 && await getSameTypeTestDataSource()
+        props.show &&
+          state.detailForm.testFlag == 0 &&
+          (await getSameTypeTestDataSource())
       }
     )
 
@@ -124,12 +127,13 @@ const DetailModal = defineComponent({
       () => props.selectType,
       async () => {
         state.detailForm.type = props.selectType
-        state.detailForm.label = props.selectType === 'HIVE' ? 'HIVE/IMPALA' :  props.selectType
+        state.detailForm.label =
+          props.selectType === 'HIVE' ? 'HIVE/IMPALA' : props.selectType
         state.detailForm.type &&
-        (await changeType(
-          state.detailForm.type,
-          datasourceType[state.detailForm.type]
-        ))
+          (await changeType(
+            state.detailForm.type,
+            datasourceType[state.detailForm.type]
+          ))
       }
     )
 
@@ -205,8 +209,18 @@ const DetailModal = defineComponent({
                   show-require-mark
                 >
                   <div class={[styles.typeBox, !!id && styles.disabledBox]}>
-                    <div v-model={[detailForm.type, 'value']}>{detailForm.label}</div>
-                    <div class={[styles['text-color'], 'btn-data-source-type-drop-down']} onClick={handleSourceModalOpen}>{t('datasource.select')}</div>
+                    <div v-model={[detailForm.type, 'value']}>
+                      {detailForm.label}
+                    </div>
+                    <div
+                      class={[
+                        styles['text-color'],
+                        'btn-data-source-type-drop-down'
+                      ]}
+                      onClick={handleSourceModalOpen}
+                    >
+                      {t('datasource.select')}
+                    </div>
                   </div>
                 </NFormItem>
                 <NFormItem
@@ -290,14 +304,18 @@ const DetailModal = defineComponent({
                 </NFormItem>
                 {/* 验证条件选择 */}
                 <NFormItem
-                    v-show={showMode}
-                    label={t('datasource.validation')}
-                    path='mode'
-                    show-require-mark
+                  v-show={showMode}
+                  label={t('datasource.validation')}
+                  path='mode'
+                  show-require-mark
                 >
                   <NSelect
-                   v-model={[detailForm.mode, 'value']}
-                   options={detailForm.type === 'REDSHIFT' ? redShitModeOptions : modeOptions}
+                    v-model={[detailForm.mode, 'value']}
+                    options={
+                      detailForm.type === 'REDSHIFT'
+                        ? redShitModeOptions
+                        : modeOptions
+                    }
                   ></NSelect>
                 </NFormItem>
                 {/* SqlPassword */}
@@ -329,7 +347,9 @@ const DetailModal = defineComponent({
                 </NFormItem>
                 {/* ActiveDirectoryPassword */}
                 <NFormItem
-                  v-show={showMode && detailForm.mode === 'ActiveDirectoryPassword'}
+                  v-show={
+                    showMode && detailForm.mode === 'ActiveDirectoryPassword'
+                  }
                   label={t('datasource.Azure_AD_username')}
                   path='userName'
                   show-require-mark
@@ -342,7 +362,9 @@ const DetailModal = defineComponent({
                   />
                 </NFormItem>
                 <NFormItem
-                  v-show={showMode && detailForm.mode === 'ActiveDirectoryPassword'}
+                  v-show={
+                    showMode && detailForm.mode === 'ActiveDirectoryPassword'
+                  }
                   label={t('datasource.Azure_AD_password')}
                   path='password'
                   show-require-mark
@@ -369,7 +391,10 @@ const DetailModal = defineComponent({
                 </NFormItem>
                 {/* ActiveDirectoryServicePrincipal */}
                 <NFormItem
-                  v-show={showMode && detailForm.mode === 'ActiveDirectoryServicePrincipal'}
+                  v-show={
+                    showMode &&
+                    detailForm.mode === 'ActiveDirectoryServicePrincipal'
+                  }
                   label={t('datasource.clientId')}
                   path='userName'
                   show-require-mark
@@ -382,7 +407,10 @@ const DetailModal = defineComponent({
                   />
                 </NFormItem>
                 <NFormItem
-                  v-show={showMode && detailForm.mode === 'ActiveDirectoryServicePrincipal'}
+                  v-show={
+                    showMode &&
+                    detailForm.mode === 'ActiveDirectoryServicePrincipal'
+                  }
                   label={t('datasource.clientSecret')}
                   path='password'
                   show-require-mark
@@ -528,17 +556,17 @@ const DetailModal = defineComponent({
                   />
                 </NFormItem>
                 <NFormItem
-                    v-show={showAwsRegion}
-                    label={t('datasource.aws_region')}
-                    path='awsRegion'
-                    show-require-mark
+                  v-show={showAwsRegion}
+                  label={t('datasource.aws_region')}
+                  path='awsRegion'
+                  show-require-mark
                 >
                   <NInput
-                      allowInput={this.trim}
-                      v-model={[detailForm.awsRegion, 'value']}
-                      type='text'
-                      maxlength={60}
-                      placeholder={t('datasource.aws_region_tips')}
+                    allowInput={this.trim}
+                    v-model={[detailForm.awsRegion, 'value']}
+                    type='text'
+                    maxlength={60}
+                    placeholder={t('datasource.aws_region_tips')}
                   />
                 </NFormItem>
                 <NFormItem
@@ -556,6 +584,21 @@ const DetailModal = defineComponent({
                     placeholder={t('datasource.database_name_tips')}
                   />
                 </NFormItem>
+                {detailForm.type === 'SNOWFLAKE' && (
+                  <NFormItem
+                    label={t('datasource.datawarehouse')}
+                    path='datawarehouse'
+                    show-require-mark
+                  >
+                    <NInput
+                      allowInput={this.trim}
+                      class='input-datawarehouse'
+                      v-model={[detailForm.datawarehouse, 'value']}
+                      maxlength={60}
+                      placeholder={t('datasource.datawarehouse_tips')}
+                    />
+                  </NFormItem>
+                )}
                 <NFormItem
                   v-show={showConnectType}
                   label={t('datasource.oracle_connect_type')}
@@ -640,16 +683,16 @@ const DetailModal = defineComponent({
                   />
                 </NFormItem>
                 <NFormItem
-                    v-show={showPublicKey}
-                    label='PublicKey'
-                    path='publicKey'
+                  v-show={showPublicKey}
+                  label='PublicKey'
+                  path='publicKey'
                 >
                   <NInput
-                      v-model={[detailForm.publicKey, 'value']}
-                      type='textarea'
-                      autosize={{
-                        minRows: 4
-                      }}
+                    v-model={[detailForm.publicKey, 'value']}
+                    type='textarea'
+                    autosize={{
+                      minRows: 4
+                    }}
                   />
                 </NFormItem>
               </NForm>

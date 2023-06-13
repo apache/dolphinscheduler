@@ -333,6 +333,7 @@ CREATE TABLE t_ds_command
     update_time                datetime DEFAULT NULL,
     process_instance_priority  int(11) DEFAULT '2',
     worker_group               varchar(255),
+    tenant_code                varchar(64) DEFAULT 'default',
     environment_code           bigint(20) DEFAULT '-1',
     dry_run                    int NULL DEFAULT 0,
     process_instance_id        int(11) DEFAULT 0,
@@ -390,6 +391,7 @@ CREATE TABLE t_ds_error_command
     update_time                datetime DEFAULT NULL,
     process_instance_priority  int(11) DEFAULT '2',
     worker_group               varchar(255),
+    tenant_code                varchar(64) DEFAULT 'default',
     environment_code           bigint(20) DEFAULT '-1',
     message                    text,
     dry_run                    int NULL DEFAULT 0,
@@ -422,7 +424,6 @@ CREATE TABLE t_ds_process_definition
     locations        text,
     warning_group_id int(11) DEFAULT NULL,
     timeout          int(11) DEFAULT '0',
-    tenant_id        int(11) NOT NULL DEFAULT '-1',
     execution_type   tinyint(4) DEFAULT '0',
     create_time      datetime NOT NULL,
     update_time      datetime     DEFAULT NULL,
@@ -454,7 +455,6 @@ CREATE TABLE t_ds_process_definition_log
     locations        text,
     warning_group_id int(11) DEFAULT NULL,
     timeout          int(11) DEFAULT '0',
-    tenant_id        int(11) NOT NULL DEFAULT '-1',
     execution_type   tinyint(4) DEFAULT '0',
     operator         int(11) DEFAULT NULL,
     operate_time     datetime     DEFAULT NULL,
@@ -625,8 +625,7 @@ CREATE TABLE t_ds_process_instance
     environment_code           bigint(20) DEFAULT '-1',
     timeout                    int(11) DEFAULT '0',
     next_process_instance_id   int(11) DEFAULT '0',
-    tenant_id                  int(11) NOT NULL DEFAULT '-1',
-    tenant_code                varchar(64) DEFAULT NULL,
+    tenant_code                varchar(64) DEFAULT 'default',
     var_pool                   longtext,
     dry_run                    int NULL DEFAULT 0,
     restart_time               datetime     DEFAULT NULL,
@@ -659,6 +658,29 @@ CREATE TABLE t_ds_project
 
 -- ----------------------------
 -- Records of t_ds_project
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for t_ds_project_parameter
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_project_parameter CASCADE;
+CREATE TABLE t_ds_project_parameter
+(
+    id              int(11) NOT NULL AUTO_INCREMENT,
+    param_name      varchar(255) NOT NULL,
+    param_value     varchar(255) NOT NULL,
+    code            bigint(20) NOT NULL,
+    project_code    bigint(20) NOT NULL,
+    user_id         int(11) DEFAULT NULL,
+    create_time     datetime NOT NULL,
+    update_time     datetime     DEFAULT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY unique_project_parameter_name (project_code, param_name),
+    UNIQUE KEY unique_project_parameter_code (code)
+);
+
+-- ----------------------------
+-- Records of t_ds_project_parameter
 -- ----------------------------
 
 -- ----------------------------
@@ -817,6 +839,7 @@ CREATE TABLE t_ds_schedules
     warning_group_id          int(11) DEFAULT NULL,
     process_instance_priority int(11) DEFAULT '2',
     worker_group              varchar(255) DEFAULT '',
+    tenant_code                varchar(64) DEFAULT 'default',
     environment_code          bigint(20) DEFAULT '-1',
     create_time               datetime     NOT NULL,
     update_time               datetime     NOT NULL,
@@ -2042,3 +2065,16 @@ CREATE TABLE t_ds_trigger_relation
     PRIMARY KEY (id),
     UNIQUE KEY t_ds_trigger_relation_UN(trigger_type,job_id,trigger_code)
 );
+
+
+DROP TABLE IF EXISTS t_ds_relation_sub_workflow;
+CREATE TABLE t_ds_relation_sub_workflow (
+    id BIGINT AUTO_INCREMENT NOT NULL,
+    parent_workflow_instance_id BIGINT NOT NULL,
+    parent_task_code BIGINT NOT NULL,
+    sub_workflow_instance_id BIGINT NOT NULL,
+    PRIMARY KEY (id),
+    INDEX idx_parent_workflow_instance_id (parent_workflow_instance_id),
+    INDEX idx_parent_task_code (parent_task_code),
+    INDEX idx_sub_workflow_instance_id (sub_workflow_instance_id)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;

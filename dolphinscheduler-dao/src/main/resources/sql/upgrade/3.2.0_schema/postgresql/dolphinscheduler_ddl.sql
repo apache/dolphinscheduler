@@ -26,7 +26,8 @@ BEGIN
           AND TABLE_NAME='t_ds_command'
           AND COLUMN_NAME ='test_flag')
       THEN
-ALTER TABLE t_ds_command alter column test_flag type int DEFAULT NULL;
+ALTER TABLE t_ds_command alter column test_flag type int;
+ALTER TABLE t_ds_command alter column test_flag set DEFAULT NULL;
 END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -47,7 +48,8 @@ BEGIN
           AND TABLE_NAME='t_ds_error_command'
           AND COLUMN_NAME ='test_flag')
       THEN
-ALTER TABLE t_ds_error_command alter column test_flag type int DEFAULT NULL;
+ALTER TABLE t_ds_error_command alter column test_flag type int;
+ALTER TABLE t_ds_error_command alter column test_flag set DEFAULT NULL;
 END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -68,8 +70,10 @@ BEGIN
           AND TABLE_NAME='t_ds_datasource'
           AND COLUMN_NAME ='test_flag')
       THEN
-ALTER TABLE t_ds_datasource alter column test_flag type int DEFAULT NULL;
-ALTER TABLE t_ds_datasource alter column bind_test_id type int DEFAULT NULL;
+ALTER TABLE t_ds_datasource alter column test_flag type int;
+ALTER TABLE t_ds_datasource alter column test_flag set DEFAULT NULL;
+ALTER TABLE t_ds_datasource alter column bind_test_id type int;
+ALTER TABLE t_ds_datasource alter column bind_test_id set DEFAULT NULL;
 END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -90,7 +94,8 @@ BEGIN
           AND TABLE_NAME='t_ds_process_instance'
           AND COLUMN_NAME ='test_flag')
       THEN
-ALTER TABLE t_ds_process_instance alter column test_flag type int DEFAULT NULL;
+ALTER TABLE t_ds_process_instance alter column test_flag type int;
+ALTER TABLE t_ds_process_instance alter column test_flag set DEFAULT NULL;
 END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -111,7 +116,8 @@ BEGIN
           AND TABLE_NAME='t_ds_task_instance'
           AND COLUMN_NAME ='test_flag')
       THEN
-ALTER TABLE t_ds_task_instance alter column test_flag type int DEFAULT NULL;
+ALTER TABLE t_ds_task_instance alter column test_flag type int;
+ALTER TABLE t_ds_task_instance alter column test_flag set DEFAULT NULL;
 END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -161,7 +167,9 @@ BEGIN
           AND TABLE_NAME='t_ds_process_instance'
           AND COLUMN_NAME ='project_code')
       THEN
-ALTER TABLE t_ds_process_instance ADD `project_code` bigint DEFAULT NULL COMMENT 'project code';
+ALTER TABLE t_ds_process_instance ADD project_code bigint;
+ALTER TABLE t_ds_process_instance alter column project_code set DEFAULT NULL;
+comment on column t_ds_process_instance.project_code is 'project code';
 END IF;
 IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
           WHERE TABLE_CATALOG=current_database()
@@ -169,7 +177,9 @@ IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
           AND TABLE_NAME='t_ds_process_instance'
           AND COLUMN_NAME ='executor_name')
       THEN
-ALTER TABLE t_ds_process_instance ADD `executor_name` varchar(64) DEFAULT NULL COMMENT 'execute user name';
+ALTER TABLE t_ds_process_instance ADD executor_name varchar(64);
+ALTER TABLE t_ds_process_instance alter column executor_name set DEFAULT NULL;
+comment on column t_ds_process_instance.executor_name is 'execute user name';
 END IF;
 IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
           WHERE TABLE_CATALOG=current_database()
@@ -177,7 +187,9 @@ IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
           AND TABLE_NAME='t_ds_process_instance'
           AND COLUMN_NAME ='tenant_code')
       THEN
-ALTER TABLE t_ds_process_instance ADD `tenant_code` varchar(64) DEFAULT NULL COMMENT 'tenant code';
+ALTER TABLE t_ds_process_instance ADD tenant_code varchar(64);
+ALTER TABLE t_ds_process_instance alter column tenant_code set DEFAULT NULL;
+comment on column t_ds_process_instance.tenant_code is 'tenant code';
 END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -198,7 +210,9 @@ BEGIN
           AND TABLE_NAME='t_ds_task_instance'
           AND COLUMN_NAME ='process_instance_name')
       THEN
-ALTER TABLE t_ds_task_instance ADD `process_instance_name` varchar(255) DEFAULT NULL COMMENT 'process instance name';
+ALTER TABLE t_ds_task_instance ADD process_instance_name varchar(255);
+ALTER TABLE t_ds_task_instance alter column process_instance_name set DEFAULT NULL;
+comment on column t_ds_task_instance.process_instance_name is 'process instance name';
 END IF;
 IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
           WHERE TABLE_CATALOG=current_database()
@@ -206,7 +220,9 @@ IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
           AND TABLE_NAME='t_ds_task_instance'
           AND COLUMN_NAME ='project_code')
       THEN
-ALTER TABLE t_ds_process_instance ADD `project_code` bigint DEFAULT NULL COMMENT 'project code';
+ALTER TABLE t_ds_process_instance ADD project_code bigint;
+ALTER TABLE t_ds_process_instance alter column project_code set DEFAULT NULL;
+comment on column t_ds_process_instance.project_code is 'project code';
 END IF;
 IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
           WHERE TABLE_CATALOG=current_database()
@@ -214,7 +230,9 @@ IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
           AND TABLE_NAME='t_ds_task_instance'
           AND COLUMN_NAME ='executor_name')
       THEN
-ALTER TABLE t_ds_task_instance ADD `executor_name` varchar(64) DEFAULT NULL COMMENT 'execute user name';
+ALTER TABLE t_ds_task_instance ADD executor_name varchar(64);
+ALTER TABLE t_ds_task_instance alter column executor_name set DEFAULT NULL;
+comment on column t_ds_task_instance.executor_name is 'execute user name';
 END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -223,22 +241,101 @@ delimiter ;
 select add_t_ds_task_instance_add_project_code();
 DROP FUNCTION add_t_ds_task_instance_add_project_code();
 
-ALTER TABLE `t_ds_alert`
-    MODIFY `title` varchar(512) DEFAULT NULL ;
+ALTER TABLE t_ds_alert alter column title type varchar(512);
+ALTER TABLE t_ds_alert alter column title set DEFAULT NULL;
+ALTER TABLE t_ds_command alter column worker_group type varchar(255);
+ALTER TABLE t_ds_project alter column name type varchar(255);
+ALTER TABLE t_ds_project alter column name set DEFAULT NULL;
+ALTER TABLE t_ds_schedules alter column worker_group type varchar(255);
+ALTER TABLE t_ds_task_instance alter column worker_group type varchar(255);
+ALTER TABLE t_ds_udfs alter column func_name type varchar(255);
+ALTER TABLE t_ds_udfs alter column func_name set NOT NULL ;
+ALTER TABLE t_ds_version alter column version type varchar(63);
+ALTER TABLE t_ds_version alter column version set NOT NULL;
+ALTER TABLE t_ds_plugin_define alter column plugin_name type varchar(255);
+ALTER TABLE t_ds_plugin_define alter column plugin_name set NOT NULL;
+ALTER TABLE t_ds_plugin_define alter column plugin_type type varchar(63);
+ALTER TABLE t_ds_plugin_define alter column plugin_type set NOT NULL;
+ALTER TABLE t_ds_alert_plugin_instance alter column instance_name type varchar(255);
+ALTER TABLE t_ds_alert_plugin_instance alter column instance_name set DEFAULT NULL;
+ALTER TABLE t_ds_dq_rule alter column name type varchar(255);
+ALTER TABLE t_ds_dq_rule alter column name set DEFAULT NULL;
+ALTER TABLE t_ds_environment alter column name type varchar(255);
+ALTER TABLE t_ds_environment alter column name set DEFAULT NULL;
+ALTER TABLE t_ds_task_group_queue alter column task_name type VARCHAR(255);
+ALTER TABLE t_ds_task_group_queue alter column task_name set DEFAULT NULL ;
+ALTER TABLE t_ds_task_group alter column name type varchar(255);
+ALTER TABLE t_ds_task_group alter column name set DEFAULT NULL ;
+ALTER TABLE t_ds_k8s alter column k8s_name type VARCHAR(255);
+ALTER TABLE t_ds_k8s alter column k8s_name set DEFAULT NULL ;
+ALTER TABLE t_ds_k8s_namespace alter column namespace type varchar(255);
+ALTER TABLE t_ds_k8s_namespace alter column namespace set DEFAULT NULL;
+ALTER TABLE t_ds_cluster alter column name type varchar(255);
+ALTER TABLE t_ds_cluster alter column name set DEFAULT NULL;
 
-ALTER TABLE `t_ds_command` MODIFY `worker_group` varchar(255);
-ALTER TABLE `t_ds_project` MODIFY name varchar(255) DEFAULT NULL ;
-ALTER TABLE `t_ds_schedules` MODIFY worker_group varchar(255);
-ALTER TABLE `t_ds_task_instance` MODIFY worker_group varchar(255);
-ALTER TABLE `t_ds_udfs` MODIFY func_name varchar(255) NOT NULL ;
-ALTER TABLE `t_ds_version` MODIFY version varchar(63) NOT NULL;
-ALTER TABLE `t_ds_plugin_define` MODIFY plugin_name varchar(255) NOT NULL;
-ALTER TABLE `t_ds_plugin_define` MODIFY plugin_type varchar(63) NOT NULL;
-ALTER TABLE `t_ds_alert_plugin_instance` MODIFY instance_name varchar(255) NULL;
-ALTER TABLE `t_ds_dq_rule` MODIFY "name" varchar(255) DEFAULT NULL;
-ALTER TABLE `t_ds_environment` MODIFY name varchar(255) DEFAULT NULL;
-ALTER TABLE `t_ds_task_group_queue` MODIFY task_name    VARCHAR(255) DEFAULT NULL ;
-ALTER TABLE `t_ds_task_group` MODIFY name        varchar(255) DEFAULT NULL ;
-ALTER TABLE `t_ds_k8s` MODIFY k8s_name    VARCHAR(255) DEFAULT NULL ;
-ALTER TABLE `t_ds_k8s_namespace` MODIFY namespace          varchar(255) DEFAULT NULL ;
-ALTER TABLE `t_ds_cluster` MODIFY name        varchar(255) DEFAULT NULL;
+-- tenant improvement
+delimiter ;
+DROP FUNCTION IF EXISTS add_improvement_workflow_run_tenant();
+delimiter d//
+CREATE FUNCTION add_improvement_workflow_run_tenant() RETURNS void AS $$
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_CATALOG=current_database()
+          AND TABLE_SCHEMA=current_schema()
+          AND TABLE_NAME='t_ds_command'
+          AND COLUMN_NAME ='tenant_code')
+      THEN
+ALTER TABLE t_ds_command ADD tenant_code varchar(64);
+ALTER TABLE t_ds_command alter column tenant_code set DEFAULT 'default';
+comment on column t_ds_command.tenant_code is 'tenant code';
+END IF;
+IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_CATALOG=current_database()
+          AND TABLE_SCHEMA=current_schema()
+          AND TABLE_NAME='t_ds_error_command'
+          AND COLUMN_NAME ='tenant_code')
+      THEN
+ALTER TABLE t_ds_error_command ADD tenant_code varchar(64);
+ALTER TABLE t_ds_error_command alter column tenant_code set DEFAULT 'default';
+comment on column t_ds_error_command.tenant_code is 'tenant code';
+END IF;
+IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+          WHERE TABLE_CATALOG=current_database()
+          AND TABLE_SCHEMA=current_schema()
+          AND TABLE_NAME='t_ds_schedules'
+          AND COLUMN_NAME ='tenant_code')
+      THEN
+ALTER TABLE t_ds_schedules ADD tenant_code varchar(64);
+ALTER TABLE t_ds_schedules alter column tenant_code  set DEFAULT NULL;
+comment on column t_ds_schedules.tenant_code is 'tenant code';
+END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+delimiter ;
+select add_improvement_workflow_run_tenant();
+DROP FUNCTION add_improvement_workflow_run_tenant();
+
+-- uc_dolphin_T_t_ds_relation_sub_workflow
+CREATE OR REPLACE FUNCTION uc_dolphin_T_t_ds_relation_sub_workflow()
+RETURNS VOID AS $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_name='t_ds_relation_sub_workflow'
+        AND table_schema=current_schema()
+    ) THEN
+CREATE TABLE t_ds_relation_sub_workflow (
+                                            id        serial      NOT NULL,
+                                            parent_workflow_instance_id BIGINT NOT NULL,
+                                            parent_task_code BIGINT NOT NULL,
+                                            sub_workflow_instance_id BIGINT NOT NULL,
+                                            PRIMARY KEY (id)
+);
+CREATE INDEX idx_parent_workflow_instance_id ON t_ds_relation_sub_workflow (parent_workflow_instance_id);
+CREATE INDEX idx_parent_task_code ON t_ds_relation_sub_workflow (parent_task_code);
+CREATE INDEX idx_sub_workflow_instance_id ON t_ds_relation_sub_workflow (sub_workflow_instance_id);
+END IF;
+END;
+$$ LANGUAGE plpgsql;

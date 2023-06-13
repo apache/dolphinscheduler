@@ -51,6 +51,8 @@ import java.util.Map;
  */
 public class SeatunnelTask extends AbstractRemoteTask {
 
+    private static final String SEATUNNEL_BIN_DIR = "${SEATUNNEL_HOME}/bin/";
+
     /**
      * seatunnel parameters
      */
@@ -139,7 +141,7 @@ public class SeatunnelTask extends AbstractRemoteTask {
     private String buildCommand() throws Exception {
 
         List<String> args = new ArrayList<>();
-        args.add(seatunnelParameters.getEngine().getCommand());
+        args.add(SEATUNNEL_BIN_DIR + seatunnelParameters.getStartupScript());
         args.addAll(buildOptions());
 
         String command = String.join(" ", args);
@@ -156,6 +158,7 @@ public class SeatunnelTask extends AbstractRemoteTask {
         } else {
             seatunnelParameters.getResourceList().forEach(resourceInfo -> {
                 args.add(CONFIG_OPTIONS);
+                // TODO: Need further check for refactored resource center
                 // TODO Currently resourceName is `/xxx.sh`, it has more `/` and needs to be optimized
                 args.add(resourceInfo.getResourceName().substring(1));
             });
@@ -201,7 +204,6 @@ public class SeatunnelTask extends AbstractRemoteTask {
     }
 
     private String parseScript(String script) {
-        // combining local and global parameters
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
         return ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
     }

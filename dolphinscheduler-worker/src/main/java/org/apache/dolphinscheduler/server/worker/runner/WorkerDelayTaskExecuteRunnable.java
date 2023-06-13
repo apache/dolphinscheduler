@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
+import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcClient;
 
@@ -39,13 +40,15 @@ public abstract class WorkerDelayTaskExecuteRunnable extends WorkerTaskExecuteRu
                                              @NonNull WorkerMessageSender workerMessageSender,
                                              @NonNull WorkerRpcClient workerRpcClient,
                                              @NonNull TaskPluginManager taskPluginManager,
-                                             @Nullable StorageOperate storageOperate) {
+                                             @Nullable StorageOperate storageOperate,
+                                             @NonNull WorkerRegistryClient workerRegistryClient) {
         super(taskExecutionContext,
                 workerConfig,
                 workerMessageSender,
                 workerRpcClient,
                 taskPluginManager,
-                storageOperate);
+                storageOperate,
+                workerRegistryClient);
     }
 
     @Override

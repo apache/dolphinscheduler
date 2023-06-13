@@ -25,7 +25,7 @@ import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
 import org.apache.dolphinscheduler.server.master.runner.StateWheelExecuteThread;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowSubmitStatue;
+import org.apache.dolphinscheduler.server.master.runner.WorkflowSubmitStatus;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -47,9 +47,6 @@ public class WorkflowStartEventHandler implements WorkflowEventHandler {
     @Autowired
     private WorkflowExecuteThreadPool workflowExecuteThreadPool;
 
-    @Autowired
-    private WorkflowEventQueue workflowEventQueue;
-
     @Override
     public void handleWorkflowEvent(final WorkflowEvent workflowEvent) throws WorkflowEventHandleError {
         log.info("Handle workflow start event, begin to start a workflow, event: {}", workflowEvent);
@@ -63,13 +60,13 @@ public class WorkflowStartEventHandler implements WorkflowEventHandler {
         ProcessInstanceMetrics.incProcessInstanceByStateAndProcessDefinitionCode("submit",
                 processInstance.getProcessDefinitionCode().toString());
         CompletableFuture.supplyAsync(workflowExecuteRunnable::call, workflowExecuteThreadPool)
-                .thenAccept(workflowSubmitStatue -> {
-                    if (WorkflowSubmitStatue.SUCCESS == workflowSubmitStatue) {
+                .thenAccept(workflowSubmitStatus -> {
+                    if (WorkflowSubmitStatus.SUCCESS == workflowSubmitStatus) {
                         log.info("Success submit the workflow instance");
                         if (processInstance.getTimeout() > 0) {
                             stateWheelExecuteThread.addProcess4TimeoutCheck(processInstance);
                         }
-                    } else if (WorkflowSubmitStatue.FAILED == workflowSubmitStatue) {
+                    } else if (WorkflowSubmitStatus.FAILED == workflowSubmitStatus) {
                         log.error(
                                 "Failed to submit the workflow instance, will resend the workflow start event: {}",
                                 workflowEvent);

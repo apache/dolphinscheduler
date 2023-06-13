@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.zeppelin.client.ClientConfig;
 import org.apache.zeppelin.client.NoteResult;
 import org.apache.zeppelin.client.ParagraphResult;
@@ -79,10 +80,21 @@ public class ZeppelinTask extends AbstractRemoteTask {
         this.zClient = getZeppelinClient();
     }
 
+    public boolean login() throws Exception {
+        String username = this.zeppelinParameters.getUsername();
+        String password = this.zeppelinParameters.getPassword();
+        if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
+            this.zClient.login(username, password);
+            log.info("username : {}  login  success ", username);
+        }
+        return true;
+    }
+
     // todo split handle to submit and track
     @Override
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
+            login();
             final String paragraphId = this.zeppelinParameters.getParagraphId();
             final String productionNoteDirectory = this.zeppelinParameters.getProductionNoteDirectory();
             final String parameters = this.zeppelinParameters.getParameters();

@@ -18,11 +18,11 @@
 package org.apache.dolphinscheduler.server.master.service;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
@@ -76,7 +76,8 @@ public class MasterFailoverService {
         List<String> needFailoverMasterHosts = processService.queryNeedFailoverProcessInstanceHost()
                 .stream()
                 // failover myself || dead server
-                .filter(host -> localAddress.equals(host) || !registryClient.checkNodeExists(host, NodeType.MASTER))
+                .filter(host -> localAddress.equals(host)
+                        || !registryClient.checkNodeExists(host, RegistryNodeType.MASTER))
                 .distinct()
                 .collect(Collectors.toList());
         if (CollectionUtils.isEmpty(needFailoverMasterHosts)) {
@@ -90,7 +91,7 @@ public class MasterFailoverService {
     }
 
     public void failoverMaster(String masterHost) {
-        String failoverPath = Constants.REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_MASTERS + "/" + masterHost;
+        String failoverPath = RegistryNodeType.MASTER_FAILOVER_LOCK.getRegistryPath() + "/" + masterHost;
         try {
             registryClient.getLock(failoverPath);
             doFailoverMaster(masterHost);
@@ -111,8 +112,9 @@ public class MasterFailoverService {
     private void doFailoverMaster(@NonNull String masterHost) {
         StopWatch failoverTimeCost = StopWatch.createStarted();
 
-        Optional<Date> masterStartupTimeOptional = getServerStartupTime(registryClient.getServerList(NodeType.MASTER),
-                masterHost);
+        Optional<Date> masterStartupTimeOptional =
+                getServerStartupTime(registryClient.getServerList(RegistryNodeType.MASTER),
+                        masterHost);
         List<ProcessInstance> needFailoverProcessInstanceList = processService.queryNeedFailoverProcessInstances(
                 masterHost);
         if (CollectionUtils.isEmpty(needFailoverProcessInstanceList)) {

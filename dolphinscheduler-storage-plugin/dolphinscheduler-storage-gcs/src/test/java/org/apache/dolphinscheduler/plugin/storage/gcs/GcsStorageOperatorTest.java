@@ -147,10 +147,19 @@ public class GcsStorageOperatorTest {
     }
 
     @Test
-    public void getResourceFileName() {
-        final String expectedResourceFileName =
+    public void getResourceFullName() {
+        final String expectedResourceFullName =
                 String.format("dolphinscheduler/%s/resources/%s", TENANT_CODE_MOCK, FILE_NAME_MOCK);
-        final String resourceFileName = gcsStorageOperator.getResourceFileName(TENANT_CODE_MOCK, FILE_NAME_MOCK);
+        final String resourceFullName = gcsStorageOperator.getResourceFullName(TENANT_CODE_MOCK, FILE_NAME_MOCK);
+        Assertions.assertEquals(expectedResourceFullName, resourceFullName);
+    }
+
+    @Test
+    public void getResourceFileName() {
+        final String expectedResourceFileName = FILE_NAME_MOCK;
+        final String resourceFullName =
+                String.format("dolphinscheduler/%s/resources/%s", TENANT_CODE_MOCK, FILE_NAME_MOCK);
+        final String resourceFileName = gcsStorageOperator.getResourceFileName(TENANT_CODE_MOCK, resourceFullName);
         Assertions.assertEquals(expectedResourceFileName, resourceFileName);
     }
 
@@ -194,7 +203,6 @@ public class GcsStorageOperatorTest {
     public void copy() {
         boolean isSuccess = false;
         doReturn(null).when(gcsStorage).copy(Mockito.any());
-        doReturn(true).when(gcsStorage).delete(Mockito.any(BlobId.class));
         try {
             isSuccess = gcsStorageOperator.copy(FILE_PATH_MOCK, FILE_PATH_MOCK, false, false);
         } catch (IOException e) {
@@ -203,7 +211,6 @@ public class GcsStorageOperatorTest {
 
         Assertions.assertTrue(isSuccess);
         verify(gcsStorage, times(1)).copy(Mockito.any());
-        verify(gcsStorage, times(1)).delete(Mockito.any(BlobId.class));
     }
 
     @Test

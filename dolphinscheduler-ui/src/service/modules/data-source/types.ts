@@ -24,6 +24,7 @@ type IDataBase =
   | 'ORACLE'
   | 'SQLSERVER'
   | 'DB2'
+  | 'VERTICA'
   | 'PRESTO'
   | 'REDSHIFT'
   | 'ATHENA'
@@ -33,25 +34,27 @@ type IDataBase =
   | 'DAMENG'
   | 'OCEANBASE'
   | 'SSH'
+  | 'DATABEND'
+  | 'SNOWFLAKE'
 
 type IDataBaseLabel =
-| 'MYSQL'
-| 'POSTGRESQL'
-| 'HIVE'
-| 'SPARK'
-| 'CLICKHOUSE'
-| 'ORACLE'
-| 'SQLSERVER'
-| 'DB2'
-| 'PRESTO'
-| 'REDSHIFT'
-| 'ATHENA'
-| 'TRINO'
-| 'AZURESQL'
-| 'STARROCKS'
-| 'DAMENG'
-| 'OCEANBASE'
-| 'SSH'
+  | 'MYSQL'
+  | 'POSTGRESQL'
+  | 'HIVE'
+  | 'SPARK'
+  | 'CLICKHOUSE'
+  | 'ORACLE'
+  | 'SQLSERVER'
+  | 'DB2'
+  | 'PRESTO'
+  | 'REDSHIFT'
+  | 'ATHENA'
+  | 'TRINO'
+  | 'AZURESQL'
+  | 'STARROCKS'
+  | 'DAMENG'
+  | 'OCEANBASE'
+  | 'SSH'
 
 interface IDataSource {
   id?: number
@@ -79,6 +82,7 @@ interface IDataSource {
   dbUser?: string
   compatibleMode?: string
   publicKey?: string
+  datawarehouse?: string
 }
 
 interface ListReq {

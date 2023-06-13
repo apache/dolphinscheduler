@@ -21,7 +21,6 @@ import static org.apache.dolphinscheduler.common.constants.Constants.APPID_COLLE
 import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_COLLECT_WAY;
 
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 
@@ -122,25 +121,4 @@ public abstract class AbstractYarnTask extends AbstractRemoteTask {
      */
     protected abstract String buildCommand();
 
-    /**
-     * set main jar name
-     */
-    protected abstract void setMainJarName();
-
-    /**
-     * Get name of jar resource.
-     *
-     * @param mainJar
-     * @return
-     */
-    protected String getResourceNameOfMainJar(ResourceInfo mainJar) {
-        if (null == mainJar) {
-            throw new RuntimeException("The jar for the task is required.");
-        }
-
-        return mainJar.getId() == null
-                ? mainJar.getRes()
-                // when update resource maybe has error
-                : mainJar.getResourceName().replaceFirst("/", "");
-    }
 }

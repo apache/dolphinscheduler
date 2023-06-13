@@ -84,9 +84,6 @@ public class SparkTask extends AbstractYarnTask {
         }
         sparkParameters.setQueue(taskExecutionContext.getQueue());
 
-        if (sparkParameters.getProgramType() != ProgramType.SQL) {
-            setMainJarName();
-        }
         log.info("Initialize spark task params {}", JSONUtils.toPrettyJsonString(sparkParameters));
     }
 
@@ -117,7 +114,7 @@ public class SparkTask extends AbstractYarnTask {
         // populate spark options
         args.addAll(populateSparkOptions());
 
-        // replace placeholder, and combining local and global parameters
+        // replace placeholder
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
 
         String command =
@@ -191,7 +188,7 @@ public class SparkTask extends AbstractYarnTask {
 
         ResourceInfo mainJar = sparkParameters.getMainJar();
         if (programType != ProgramType.SQL) {
-            args.add(mainJar.getRes());
+            args.add(taskExecutionContext.getResources().get(mainJar.getResourceName()));
         }
 
         String mainArgs = sparkParameters.getMainArgs();
@@ -270,19 +267,10 @@ public class SparkTask extends AbstractYarnTask {
 
     private String replaceParam(String script) {
         script = script.replaceAll("\\r\\n", System.lineSeparator());
-        // replace placeholder, and combining local and global parameters
+        // replace placeholder
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
         script = ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
         return script;
-    }
-
-    @Override
-    protected void setMainJarName() {
-        // main jar
-        ResourceInfo mainJar = sparkParameters.getMainJar();
-        String resourceName = getResourceNameOfMainJar(mainJar);
-        mainJar.setRes(resourceName);
-        sparkParameters.setMainJar(mainJar);
     }
 
     @Override
