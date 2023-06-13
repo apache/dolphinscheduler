@@ -55,7 +55,7 @@ public class TaskStateEventHandler implements StateEventHandler {
                 "Handle task instance state event, the current task instance state {} will be changed to {}",
                 task.getState().name(), taskStateEvent.getStatus().name());
 
-        Set<Long> completeTaskSet = workflowExecuteRunnable.getCompleteTaskSet();
+        Set<Long> completeTaskSet = workflowExecuteRunnable.getCompleteTaskCodes();
         if (task.getState().isFinished()
                 && (taskStateEvent.getStatus() != null && taskStateEvent.getStatus().isRunning())) {
             String errorMessage = String.format(
