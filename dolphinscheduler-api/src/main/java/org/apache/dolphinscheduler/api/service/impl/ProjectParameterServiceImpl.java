@@ -142,7 +142,7 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
                 .eq(ProjectParameter::getParamName, projectParameterName)
                 .ne(ProjectParameter::getCode, code));
 
-        if (tempProjectParameter != null && tempProjectParameter.getCode() != code) {
+        if (tempProjectParameter != null) {
             log.error("Project parameter name {} already exists", projectParameterName);
             putMsg(result, Status.PROJECT_PARAMETER_ALREADY_EXISTS, projectParameterName);
             return result;
