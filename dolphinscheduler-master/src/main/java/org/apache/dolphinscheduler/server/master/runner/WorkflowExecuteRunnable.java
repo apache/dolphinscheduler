@@ -732,8 +732,9 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
         command.setProcessInstanceId(0);
         command.setProcessDefinitionVersion(processInstance.getProcessDefinitionVersion());
         command.setTestFlag(processInstance.getTestFlag());
+        int create = commandService.createCommand(command);
         processService.saveCommandTrigger(command.getId(), processInstance.getId());
-        return commandService.createCommand(command);
+        return create;
     }
 
     private boolean needComplementProcess() {
