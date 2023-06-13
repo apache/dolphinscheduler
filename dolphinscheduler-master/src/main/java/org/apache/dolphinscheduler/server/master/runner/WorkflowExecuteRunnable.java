@@ -2090,7 +2090,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
         return false;
     }
 
-    public Set<Long> getCompleteTaskSet() {
+    public Set<Long> getCompleteTaskCodes() {
         return completeTaskSet;
     }
 
