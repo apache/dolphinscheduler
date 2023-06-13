@@ -223,6 +223,7 @@ interface ISparkParameters {
   executorMemory?: string
   numExecutors?: number
   others?: string
+  yarnQueue?: string
 }
 
 interface IRuleParameters {

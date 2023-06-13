@@ -825,7 +825,7 @@ export default {
     child_node_definition: '子节点定义',
     child_node_instance: '子节点实例',
     yarn_queue: 'Yarn队列',
-    yarn_queue_tips: '请输入Yarn队列',
+    yarn_queue_tips: '请输入Yarn队列(选填)',
   },
   menu: {
     fav: '收藏组件',
