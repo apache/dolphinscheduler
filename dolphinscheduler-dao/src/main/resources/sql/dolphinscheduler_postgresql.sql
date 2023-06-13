@@ -996,7 +996,7 @@ DROP SEQUENCE IF EXISTS t_ds_worker_group_id_sequence;
 CREATE SEQUENCE  t_ds_worker_group_id_sequence;
 ALTER TABLE t_ds_worker_group ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_worker_group_id_sequence');
 
-DROP SEQUENCE IF EXISTS t_ds_project_parameter;
+DROP SEQUENCE IF EXISTS t_ds_project_parameter_id_sequence;
 CREATE SEQUENCE  t_ds_project_parameter_id_sequence;
 ALTER TABLE t_ds_project_parameter ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_project_parameter_id_sequence');
 
