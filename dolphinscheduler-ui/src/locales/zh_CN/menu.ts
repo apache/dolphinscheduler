@@ -24,6 +24,7 @@ export default {
   security: '安全中心',
   ui_setting: '界面设置',
   project_overview: '项目概览',
+  project_parameter: '项目变量',
   workflow_relation: '工作流关系',
   workflow: '工作流',
   workflow_definition: '工作流定义',
