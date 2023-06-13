@@ -20,8 +20,7 @@ import {
   onMounted,
   onBeforeUnmount,
   PropType,
-  ref,
-  watch
+  ref
 } from 'vue'
 import initChart from '@/components/chart'
 import type { Ref } from 'vue'

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { getCurrentInstance, onMounted, onBeforeUnmount, ref, watch } from 'vue'
+import { getCurrentInstance, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useThemeStore } from '@/store/theme/theme'
 import { throttle } from 'echarts'
 import { useI18n } from 'vue-i18n'
