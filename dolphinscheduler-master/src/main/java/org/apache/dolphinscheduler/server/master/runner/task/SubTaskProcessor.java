@@ -129,11 +129,26 @@ public class SubTaskProcessor extends BaseTaskProcessor {
                 subProcessInstance.getId(),
                 subProcessInstance.getState());
         if (subProcessInstance != null && subProcessInstance.getState().isFinished()) {
-            // todo: check the status and transform
-            taskInstance.setState(TaskExecutionStatus.of(subProcessInstance.getState().getCode()));
+            taskInstance.setState(subProcessFinishedStateTransform(subProcessInstance.getState()));
             taskInstance.setEndTime(new Date());
             dealFinish();
             processService.saveTaskInstance(taskInstance);
+        }
+    }
+
+    private TaskExecutionStatus subProcessFinishedStateTransform(WorkflowExecutionStatus state) {
+        if (state.isSuccess()) {
+            return TaskExecutionStatus.SUCCESS;
+        } else if (state.isFailure()) {
+            return TaskExecutionStatus.FAILURE;
+        } else if (state.isStop()) {
+            return TaskExecutionStatus.KILL;
+        } else if (state.isPause()) {
+            return TaskExecutionStatus.PAUSE;
+        } else {
+            // todo: should handle 'BLOCK' state?
+            logger.error("Can't transform workflow state: {}", state);
+            throw new IllegalArgumentException(String.format("Can't transform workflow state: %s", state.name()));
         }
     }
 
