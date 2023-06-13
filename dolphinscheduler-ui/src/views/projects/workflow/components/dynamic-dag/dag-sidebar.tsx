@@ -32,7 +32,6 @@ const DagSidebar = defineComponent({
     }
 
     const handleCollection = (task: any) => {
-      console.log('taskFav', task)
     }
 
     onMounted(() => {
