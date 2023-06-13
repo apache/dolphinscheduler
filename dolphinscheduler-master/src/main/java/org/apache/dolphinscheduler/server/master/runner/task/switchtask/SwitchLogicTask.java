@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.SwitchResultVo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.exception.LogicTaskInitializeException;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
@@ -151,9 +152,11 @@ public class SwitchLogicTask extends BaseSyncLogicTask<SwitchParameters> {
             if (property == null) {
                 return "";
             }
-            String value = property.getValue();
-            if (!org.apache.commons.lang3.math.NumberUtils.isCreatable(value)) {
-                value = "\"" + value + "\"";
+            String value;
+            if (ParameterUtils.isNumber(property) || ParameterUtils.isBoolean(property)) {
+                value = "" + ParameterUtils.getParameterValue(property);
+            } else {
+                value = "\"" + ParameterUtils.getParameterValue(property) + "\"";
             }
             log.info("paramName:{}，paramValue:{}", paramName, value);
             content = content.replace("${" + paramName + "}", value);
