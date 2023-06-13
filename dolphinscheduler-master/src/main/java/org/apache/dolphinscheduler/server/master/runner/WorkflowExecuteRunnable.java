@@ -472,7 +472,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
                     }
                 }
             } else if (taskInstance.getState().isFinished()) {
-                // todo: when the task instance type is pause, then it should not in completeTaskMap
+                // todo: when the task instance type is pause, then it should not in completeTaskSet
                 completeTaskSet.add(taskInstance.getTaskCode());
             }
             log.info("TaskInstance finished will try to update the workflow instance state, task code:{} state:{}",
@@ -482,7 +482,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
 
             sendTaskLogOnMasterToRemoteIfNeeded(taskInstance.getLogPath(), taskInstance.getHost());
         } catch (Exception ex) {
-            log.error("Task finish failed, get a exception, will remove this taskInstance from completeTaskMap", ex);
+            log.error("Task finish failed, get a exception, will remove this taskInstance from completeTaskSet", ex);
             // remove the task from complete map, so that we can finish in the next time.
             completeTaskSet.remove(taskInstance.getTaskCode());
             throw ex;
@@ -2141,7 +2141,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
      * 1. find all task code from sub dag (only contains related task)
      * 2. set the flag of tasks to Flag.NO
      * 3. clear varPool data from re-execute task instance in process instance
-     * 4. remove related task instance from taskInstanceMap, completeTaskMap, validTaskMap, errorTaskMap
+     * 4. remove related task instance from taskInstanceMap, completeTaskSet, validTaskMap, errorTaskMap
      *
      * @return task instance
      */
@@ -2200,13 +2200,14 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
         processInstance.setVarPool(JSONUtils.toJsonString(processProperties));
         processInstanceDao.updateProcessInstance(processInstance);
 
-        // remove task instance from taskInstanceMap, completeTaskMap, validTaskMap, errorTaskMap
-        taskInstanceMap.entrySet().removeIf(map -> dag.containsNode(Long.toString(map.getValue().getTaskCode())));
+        // remove task instance from taskInstanceMap, completeTaskSet, validTaskMap, errorTaskMap
+        // completeTaskSet remove dependency taskInstanceMap, so the sort can't change
         completeTaskSet.removeIf(set -> {
             Optional<TaskInstance> existTaskInstanceOptional = getTaskInstance(set);
             return existTaskInstanceOptional
                     .filter(taskInstance -> dag.containsNode(Integer.toString(taskInstance.getId()))).isPresent();
         });
+        taskInstanceMap.entrySet().removeIf(map -> dag.containsNode(Long.toString(map.getValue().getTaskCode())));
         validTaskMap.entrySet().removeIf(map -> dag.containsNode(Long.toString(map.getKey())));
         errorTaskMap.entrySet().removeIf(map -> dag.containsNode(Long.toString(map.getKey())));
     }
