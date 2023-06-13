@@ -383,8 +383,9 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS, projectCode);
-        Mockito.when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_BATCH_COPY))
-                .thenReturn(result);
+        Mockito.doReturn(result)
+                .when(projectService)
+                .checkProjectAndAuth(user, project, projectCode, WORKFLOW_BATCH_COPY);
 
         // copy project definition ids empty test
         Map<String, Object> map =
@@ -402,8 +403,9 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         // project check auth success, target project name not equal project name, check auth target project fail
         Project project1 = getProject(projectCodeOther);
         Mockito.when(projectMapper.queryByCode(projectCodeOther)).thenReturn(project1);
-        Mockito.when(projectService.checkProjectAndAuth(user, project, projectCodeOther, WORKFLOW_BATCH_COPY))
-                .thenReturn(result);
+        Mockito.doReturn(result)
+                .when(projectService)
+                .checkProjectAndAuth(user, project1, projectCodeOther, WORKFLOW_BATCH_COPY);
 
         putMsg(result, Status.SUCCESS, projectCodeOther);
         ProcessDefinition definition = getProcessDefinition();
