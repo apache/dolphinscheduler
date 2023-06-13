@@ -17,8 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.parser;
 
+import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.spi.enums.CommandType;
+import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
 
 import java.util.Date;
 import java.util.Map;
@@ -30,7 +31,7 @@ public class TimePlaceholderUtilsTest {
 
     Date date = DateUtils.parse("2022-08-26 00:00:00", "yyyy-MM-dd HH:mm:ss");
 
-    Map<String, String> timeParams = BusinessTimeUtils.getBusinessTime(CommandType.COMPLEMENT_DATA, date);
+    Map<String, String> timeParams = BusinessTimeUtils.getBusinessTime(CommandType.COMPLEMENT_DATA, date, null);
 
     @Test
     public void timePlaceHolderForThisDay() {
