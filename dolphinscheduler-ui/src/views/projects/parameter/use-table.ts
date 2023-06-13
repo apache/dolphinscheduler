@@ -18,21 +18,18 @@
 import { h, ref, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import { NSpace, NTooltip, NButton, NPopconfirm, NTag } from 'naive-ui'
+import { NSpace, NTooltip, NButton, NPopconfirm } from 'naive-ui'
 import {
-  deleteScheduleById,
-  queryScheduleListPaging
-} from '@/service/modules/schedules'
-import {
-  DeleteOutlined,
-  EditOutlined
-} from '@vicons/antd'
+  deleteProjectParameterByCode,
+  queryProjectParameterListPaging
+} from '@/service/modules/projects-parameter'
+import { ProjectParameterCodeReq } from '@/service/modules/projects-parameter/types'
+import { DeleteOutlined, EditOutlined } from '@vicons/antd'
 import {
   COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
   DefaultTableWidth
 } from '@/common/column-width-config'
-import { format } from 'date-fns-tz'
 import type { Router } from 'vue-router'
 
 export function useTable() {
@@ -50,25 +47,9 @@ export function useTable() {
     searchVal: ref(),
     totalPage: ref(1),
     showRef: ref(false),
-    loadingRef: ref(false),
-    processDefinitionCode: router.currentRoute.value.params.definitionCode
-      ? ref(Number(router.currentRoute.value.params.definitionCode))
-      : ref()
+    statusRef: ref(0),
+    loadingRef: ref(false)
   })
-
-  const renderTime = (time: string, timeZone: string) => {
-    if (!timeZone) {
-      return time
-    }
-
-    const utc = format(new Date(time), 'zzz', {
-      timeZone
-    }).replace('GMT', 'UTC')
-    return h('span', [
-      h('span', null, time),
-      h('span', { style: 'color: #1890ff; margin-left: 5px' }, `(${utc})`)
-    ])
-  }
 
   const createColumns = (variables: any) => {
     variables.columns = [
@@ -79,39 +60,27 @@ export function useTable() {
         render: (row: any, index: number) => index + 1
       },
       {
-        title: t('project.workflow.workflow_name'),
-        key: 'processDefinitionName',
+        title: t('project.parameter.name'),
+        key: 'paramName',
         ...COLUMN_WIDTH_CONFIG['name']
       },
       {
-        title: t('project.workflow.start_time'),
-        key: 'startTime',
-        ...COLUMN_WIDTH_CONFIG['timeZone'],
-        render: (row: any) => renderTime(row.startTime, row.timezoneId)
+        title: t('project.parameter.value'),
+        key: 'paramValue',
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
-        title: t('project.workflow.end_time'),
-        key: 'endTime',
-        ...COLUMN_WIDTH_CONFIG['timeZone'],
-        render: (row: any) => renderTime(row.endTime, row.timezoneId)
-      },
-      {
-        title: t('project.workflow.crontab'),
-        key: 'crontab',
-        width: 140
-      },
-      {
-        title: t('project.workflow.create_time'),
+        title: t('project.parameter.create_time'),
         key: 'createTime',
         ...COLUMN_WIDTH_CONFIG['time']
       },
       {
-        title: t('project.workflow.update_time'),
+        title: t('project.parameter.update_time'),
         key: 'updateTime',
         ...COLUMN_WIDTH_CONFIG['time']
       },
       {
-        title: t('project.workflow.operation'),
+        title: t('project.parameter.operation'),
         key: 'operation',
         ...COLUMN_WIDTH_CONFIG['operation'](3),
         render: (row: any) => {
@@ -128,7 +97,6 @@ export function useTable() {
                         circle: true,
                         type: 'info',
                         size: 'small',
-                        disabled: row.releaseState === 'ONLINE',
                         onClick: () => {
                           handleEdit(row)
                         }
@@ -137,14 +105,14 @@ export function useTable() {
                         icon: () => h(EditOutlined)
                       }
                     ),
-                  default: () => t('project.workflow.edit')
+                  default: () => t('project.parameter.edit')
                 }
               ),
               h(
                 NPopconfirm,
                 {
                   onPositiveClick: () => {
-                    handleDelete(row.id)
+                    handleDelete(row.code)
                   }
                 },
                 {
@@ -165,10 +133,10 @@ export function useTable() {
                               icon: () => h(DeleteOutlined)
                             }
                           ),
-                        default: () => t('project.workflow.delete')
+                        default: () => t('project.parameter.delete')
                       }
                     ),
-                  default: () => t('project.workflow.delete_confirm')
+                  default: () => t('project.parameter.delete_confirm')
                 }
               )
             ]
@@ -183,6 +151,7 @@ export function useTable() {
 
   const handleEdit = (row: any) => {
     variables.showRef = true
+    variables.statusRef = 1
     variables.row = row
   }
 
@@ -190,7 +159,7 @@ export function useTable() {
     if (variables.loadingRef) return
     variables.loadingRef = true
 
-    queryScheduleListPaging({ ...params }, variables.projectCode).then(
+    queryProjectParameterListPaging({ ...params }, variables.projectCode).then(
       (res: any) => {
         variables.totalPage = res.totalPage
         variables.tableData = res.totalList.map((item: any) => {
@@ -201,18 +170,19 @@ export function useTable() {
     )
   }
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (code: number) => {
     if (variables.tableData.length === 1 && variables.page > 1) {
       variables.page -= 1
     }
-    deleteScheduleById(id, variables.projectCode).then(() => {
-      window.$message.success(t('project.workflow.success'))
+    const data: ProjectParameterCodeReq = {
+      code: code
+    }
+    deleteProjectParameterByCode(data, variables.projectCode).then(() => {
+      window.$message.success(t('project.parameter.success'))
       getTableData({
         pageSize: variables.pageSize,
         pageNo: variables.page,
-        searchVal: variables.searchVal,
-        projectCode: variables.projectCode,
-        processDefinitionCode: variables.processDefinitionCode
+        searchVal: variables.searchVal
       })
     })
   }

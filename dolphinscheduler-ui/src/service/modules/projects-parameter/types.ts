@@ -21,8 +21,7 @@ interface ListReq {
   searchVal?: string
 }
 
-
-interface projectParameterCodeReq {
+interface ProjectParameterCodeReq {
   code: number
 }
 
@@ -34,7 +33,6 @@ interface ProjectParameterReq {
 interface UpdateProjectParameterReq extends ProjectParameterReq {
   code: number
 }
-
 
 interface ProjectParameterList {
   id: number
@@ -56,7 +54,7 @@ interface ProjectParameterRes {
 
 export {
   ListReq,
-  projectParameterCodeReq,
+  ProjectParameterCodeReq,
   ProjectParameterReq,
   UpdateProjectParameterReq,
   ProjectParameterRes,

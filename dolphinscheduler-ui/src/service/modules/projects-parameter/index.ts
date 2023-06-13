@@ -18,12 +18,15 @@
 import { axios } from '@/service/service'
 import {
   ListReq,
-  projectParameterCodeReq,
+  ProjectParameterCodeReq,
   ProjectParameterReq,
-  UpdateProjectParameterReq,
+  UpdateProjectParameterReq
 } from './types'
 
-export function queryProjectParameterListPaging(params: ListReq, projectCode: number): any {
+export function queryProjectParameterListPaging(
+  params: ListReq,
+  projectCode: number
+): any {
   return axios({
     url: `/projects/${projectCode}/project-parameter`,
     method: 'get',
@@ -31,14 +34,20 @@ export function queryProjectParameterListPaging(params: ListReq, projectCode: nu
   })
 }
 
-export function queryProjectParameterByCode(projectCode: number, code: number): any {
+export function queryProjectParameterByCode(
+  projectCode: number,
+  code: number
+): any {
   return axios({
     url: `/projects/${projectCode}/project-parameter/${code}`,
     method: 'get'
   })
 }
 
-export function createProjectParameter(data: ProjectParameterReq, projectCode: number): any {
+export function createProjectParameter(
+  data: ProjectParameterReq,
+  projectCode: number
+): any {
   return axios({
     url: `/projects/${projectCode}/project-parameter`,
     method: 'post',
@@ -46,7 +55,10 @@ export function createProjectParameter(data: ProjectParameterReq, projectCode: n
   })
 }
 
-export function updateProjectParameter(data: UpdateProjectParameterReq, projectCode: number): any {
+export function updateProjectParameter(
+  data: UpdateProjectParameterReq,
+  projectCode: number
+): any {
   return axios({
     url: `/projects/${projectCode}/project-parameter/${data.code}`,
     method: 'put',
@@ -54,7 +66,10 @@ export function updateProjectParameter(data: UpdateProjectParameterReq, projectC
   })
 }
 
-export function deleteProjectParameterByCode(data: projectParameterCodeReq, projectCode: number): any {
+export function deleteProjectParameterByCode(
+  data: ProjectParameterCodeReq,
+  projectCode: number
+): any {
   return axios({
     url: `/projects/${projectCode}/project-parameter/delete`,
     method: 'post',
@@ -62,8 +77,10 @@ export function deleteProjectParameterByCode(data: projectParameterCodeReq, proj
   })
 }
 
-
-export function deleteProjectParameterByCodes(data: projectParameterCodeReq[], projectCode: number): any {
+export function deleteProjectParameterByCodes(
+  data: ProjectParameterCodeReq[],
+  projectCode: number
+): any {
   return axios({
     url: `/projects/${projectCode}/project-parameter/batch-delete`,
     method: 'post',

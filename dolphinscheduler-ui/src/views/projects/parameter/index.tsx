@@ -15,16 +15,23 @@
  * limitations under the License.
  */
 
-import { NDataTable, NIcon, NInput, NPagination, NSpace, NButton } from 'naive-ui'
+import {
+  NDataTable,
+  NIcon,
+  NInput,
+  NPagination,
+  NSpace,
+  NButton
+} from 'naive-ui'
 import { defineComponent, onMounted, toRefs, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useTable } from '@/views/projects/workflow/definition/timing/use-table'
+import { useTable } from '@/views/projects/parameter/use-table'
 import Card from '@/components/card'
-import TimingModal from '@/views/projects/workflow/definition/components/timing-modal'
-import { SearchOutlined } from "@vicons/antd";
+import ParameterModal from '@/views/projects/parameter/components/parameter-modal'
+import { SearchOutlined } from '@vicons/antd'
 
 export default defineComponent({
-  name: 'WorkflowTimingList',
+  name: 'ProjectParameterList',
   setup() {
     const { variables, createColumns, getTableData } = useTable()
 
@@ -33,8 +40,7 @@ export default defineComponent({
         pageSize: variables.pageSize,
         pageNo: variables.page,
         searchVal: variables.searchVal,
-        projectCode: variables.projectCode,
-        processDefinitionCode: variables.processDefinitionCode
+        projectCode: variables.projectCode
       })
     }
 
@@ -52,8 +58,18 @@ export default defineComponent({
       requestData()
     }
 
-    const onCreateParameter = () => {
+    const onCancelModal = () => {
+      variables.showRef = false
+    }
 
+    const onConfirmModal = () => {
+      variables.showRef = false
+      requestData()
+    }
+
+    const onCreateParameter = () => {
+      variables.showRef = true
+      variables.statusRef = 0
     }
 
     onMounted(() => {
@@ -71,12 +87,20 @@ export default defineComponent({
       handleUpdateList,
       handleChangePageSize,
       onCreateParameter,
+      onCancelModal,
+      onConfirmModal,
       ...toRefs(variables)
     }
   },
   render() {
     const { t } = useI18n()
-    const { loadingRef, handleSearch, onCreateParameter } = this
+    const {
+      loadingRef,
+      handleSearch,
+      onCreateParameter,
+      onConfirmModal,
+      onCancelModal
+    } = this
 
     return (
       <NSpace vertical>
@@ -87,10 +111,10 @@ export default defineComponent({
             </NButton>
             <NSpace>
               <NInput
-                  size='small'
-                  clearable
-                  v-model={[this.searchVal, 'value']}
-                  placeholder={t('project.parameter.name')}
+                size='small'
+                clearable
+                v-model={[this.searchVal, 'value']}
+                placeholder={t('project.parameter.name')}
               />
               <NButton size='small' type='primary' onClick={handleSearch}>
                 <NIcon>
@@ -124,11 +148,12 @@ export default defineComponent({
             </NSpace>
           </NSpace>
         </Card>
-        <TimingModal
-          type={'update'}
-          v-model:row={this.row}
-          v-model:show={this.showRef}
-          onUpdateList={this.handleUpdateList}
+        <ParameterModal
+          showModalRef={this.showRef}
+          statusRef={this.statusRef}
+          row={this.row}
+          onCancelModal={onCancelModal}
+          onConfirmModal={onConfirmModal}
         />
       </NSpace>
     )

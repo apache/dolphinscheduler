@@ -47,6 +47,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
@@ -135,8 +136,13 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
         }
 
         // check if project parameter name exists
-        ProjectParameter tempProjectParameter = projectParameterMapper.queryByName(projectParameterName);
-        if (tempProjectParameter != null) {
+        ProjectParameter tempProjectParameter = projectParameterMapper.selectOne(new QueryWrapper<ProjectParameter>()
+                .lambda()
+                .eq(ProjectParameter::getProjectCode, projectCode)
+                .eq(ProjectParameter::getParamName, projectParameterName)
+                .ne(ProjectParameter::getCode, code));
+
+        if (tempProjectParameter != null && tempProjectParameter.getCode() != code) {
             log.error("Project parameter name {} already exists", projectParameterName);
             putMsg(result, Status.PROJECT_PARAMETER_ALREADY_EXISTS, projectParameterName);
             return result;
