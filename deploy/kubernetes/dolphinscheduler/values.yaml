@@ -113,6 +113,25 @@ externalRegistry:
   registryPluginName: "zookeeper"
   registryServers: "127.0.0.1:2181"
 
+security:
+  authentication:
+    type: PASSWORD
+    ldap:
+      urls: ldap://ldap.forumsys.com:389/
+      basedn: dc=example,dc=com
+      username: cn=read-only-admin,dc=example,dc=com
+      password: password
+      user:
+        admin: read-only-admin
+        identityattribute: uid
+        emailattribute: mail
+        notexistaction: CREATE
+      ssl:
+        enable: false
+        # store jks in deploy/kubernetes/dolphinscheduler/ldap-certs/ldapkeystore.jks
+        truststore: "ldap-certs/ldapkeystore.jks"
+        truststorepassword: ""
+
 conf:
   common:
     # user data local directory path, please make sure the directory exists and have read write permissions

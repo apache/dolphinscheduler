@@ -25,6 +25,13 @@ security:
         email-attribute: mail
         # action when ldap user is not exist (supported types: CREATE,DENY)
         not-exist-action: CREATE
+      ssl:
+        enable: false
+        # please store the jks file in dolphinscheduler-api/src/main/resources/ldapkeystore.jks
+        # if you run local, please change value to src/main/resources/ldapkeystore.jks
+        # if you run in service, please change value to ldapkeystore.jks
+        trust-store: "ldapkeystore.jks"
+        trust-store-password: "password"
 ```
 
 具体字段解释详见：[Api-server相关配置](../../architecture/configuration.md)
@@ -40,6 +47,16 @@ security:
 - 修改`ldapLogin`方法中的userId和userPwd为你的账号密码;
 - 修改`ldapLogin`方法中的expected email为正常登陆的返回值;
 - 执行`ldapLogin`方法，判断LDAP登陆结果是否为预期;
+
+如果你要启用ssl，请将jks文件放在`dolphinscheduler-api/src/main/resources/ldapkeystore.jks`，并且修改`TestPropertySource`配置中ssl相关参数为：
+
+```
+security.authentication.ldap.ssl.enable=false
+security.authentication.ldap.ssl.trust-store=src/main/resources/ldapkeystore.jks
+security.authentication.ldap.ssl.trust-store-password=yourpassword
+```
+
+运行`ldapLoginSSL`方法，判断email是否为预期的返回值。
 
 ## 通过 Casdoor 实现 SSO 登录
 

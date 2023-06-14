@@ -178,6 +178,38 @@ Create a database environment variables.
 {{- end -}}
 
 {{/*
+Create a security environment variables.
+*/}}
+{{- define "dolphinscheduler.security.env_vars" -}}
+- name: SECURITY_AUTHENTICATION_TYPE
+  value: {{ .Values.security.authentication.type | quote }}
+{{- if eq .Values.security.authentication.type "LDAP" }}
+- name: SECURITY_AUTHENTICATION_LDAP_URLS
+  value: {{ .Values.security.authentication.ldap.urls | quote }}
+- name: SECURITY_AUTHENTICATION_LDAP_BASE_DN
+  value: {{ .Values.security.authentication.ldap.basedn | quote }}
+- name: SECURITY_AUTHENTICATION_LDAP_USERNAME
+  value: {{ .Values.security.authentication.ldap.username | quote }}
+- name: SECURITY_AUTHENTICATION_LDAP_PASSWORD
+  value: {{ .Values.security.authentication.ldap.password | quote }}
+- name: SECURITY_AUTHENTICATION_LDAP_USER_ADMIN
+  value: {{ .Values.security.authentication.ldap.user.admin | quote }}
+- name: SECURITY_AUTHENTICATION_LDAP_USER_IDENTITY_ATTRIBUTE
+  value: {{ .Values.security.authentication.ldap.user.identityattribute | quote }}
+- name: SECURITY_AUTHENTICATION_LDAP_USER_EMAIL_ATTRIBUTE
+  value: {{ .Values.security.authentication.ldap.user.emailattribute | quote }}
+- name: SECURITY_AUTHENTICATION_LDAP_USER_NOT_EXIST_ACTION
+  value: {{ .Values.security.authentication.ldap.user.notexistaction | quote }}
+- name: SECURITY_AUTHENTICATION_LDAP_SSL_ENABLE
+  value: {{ .Values.security.authentication.ldap.ssl.enable | quote }}
+- name: SECURITY_AUTHENTICATION_LDAP_SSL_TRUST_STORE
+  value: {{ .Values.security.authentication.ldap.ssl.truststore | quote }}
+- name: SECURITY_AUTHENTICATION_LDAP_SSL_TRUST_STORE_PASSWORD
+  value: {{ .Values.security.authentication.ldap.ssl.truststorepassword | quote }}
+{{- end }}
+{{- end -}}
+
+{{/*
 Wait for database to be ready.
 */}}
 {{- define "dolphinscheduler.database.wait-for-ready" -}}
@@ -311,5 +343,27 @@ Create a etcd ssl volumeMount.
 - mountPath: /opt/dolphinscheduler/{{ .Values.etcd.ssl.keyFile }}
   name: etcd-ssl
   subPath: key-file
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create a ldap ssl volume.
+*/}}
+{{- define "dolphinscheduler.ldap.ssl.volume" -}}
+{{- if .Values.security.authentication.ldap.ssl.enable -}}
+- name: jks-file
+  secret:
+    secretName: {{ include "dolphinscheduler.fullname" . }}-ldap-ssl
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create a ldap ssl volumeMount.
+*/}}
+{{- define "dolphinscheduler.ldap.ssl.volumeMount" -}}
+{{- if .Values.security.authentication.ldap.ssl.enable -}}
+- mountPath: /opt/dolphinscheduler/{{ .Values.security.authentication.ldap.ssl.truststore }}
+  name: jks-file
+  subPath: jks-file
 {{- end -}}
 {{- end -}}
