@@ -40,8 +40,8 @@ import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.remote.command.task.TaskExecuteRunningMessageAck;
 import org.apache.dolphinscheduler.remote.command.task.TaskExecuteStartMessage;
 import org.apache.dolphinscheduler.server.master.builder.TaskExecutionContextBuilder;
@@ -436,7 +436,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
                                                          @NonNull AbstractParameters parameters) {
         // assign value to definedParams here
         Map<String, String> globalParamsMap = taskExecuteStartMessage.getStartParams();
-        Map<String, Property> globalParams = ParamUtils.getUserDefParamsMap(globalParamsMap);
+        Map<String, Property> globalParams = ParameterUtils.getUserDefParamsMap(globalParamsMap);
 
         // combining local and global parameters
         Map<String, Property> localParams = parameters.getInputLocalParametersMap();

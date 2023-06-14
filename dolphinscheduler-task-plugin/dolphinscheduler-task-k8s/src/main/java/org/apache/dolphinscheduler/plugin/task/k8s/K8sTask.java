@@ -30,7 +30,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.NodeSelectorExpression;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.K8sTaskParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -91,7 +91,7 @@ public class K8sTask extends AbstractK8sTask {
         k8sTaskMainParameters.setClusterName(clusterName);
         k8sTaskMainParameters.setMinCpuCores(k8sTaskParameters.getMinCpuCores());
         k8sTaskMainParameters.setMinMemorySpace(k8sTaskParameters.getMinMemorySpace());
-        k8sTaskMainParameters.setParamsMap(ParamUtils.convert(paramsMap));
+        k8sTaskMainParameters.setParamsMap(ParameterUtils.convert(paramsMap));
         k8sTaskMainParameters.setLabelMap(convertToLabelMap(k8sTaskParameters.getCustomizedLabels()));
         k8sTaskMainParameters
                 .setNodeSelectorRequirements(convertToNodeSelectorRequirements(k8sTaskParameters.getNodeSelectors()));
