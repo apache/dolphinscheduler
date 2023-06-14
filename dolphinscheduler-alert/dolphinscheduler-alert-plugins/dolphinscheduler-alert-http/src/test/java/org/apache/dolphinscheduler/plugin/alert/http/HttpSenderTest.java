@@ -35,15 +35,19 @@ public class HttpSenderTest {
     @Test
     public void sendTest() throws IOException {
         Map<String, String> paramsMap = new HashMap<>();
-        paramsMap.put(HttpAlertConstants.NAME_URL, "http://www.dolphinscheduler-not-exists-web.com");
-        paramsMap.put(HttpAlertConstants.NAME_REQUEST_TYPE, "POST");
+        String url = "https://www.dolphinscheduler-not-exists-web.com:12345";
+        String contentField = "content";
+        paramsMap.put(HttpAlertConstants.NAME_URL, url);
+        paramsMap.put(HttpAlertConstants.NAME_REQUEST_TYPE, "GET");
         paramsMap.put(HttpAlertConstants.NAME_HEADER_PARAMS, "{\"Content-Type\":\"application/json\"}");
         paramsMap.put(HttpAlertConstants.NAME_BODY_PARAMS, "{\"number\":\"123456\"}");
-        paramsMap.put(HttpAlertConstants.NAME_CONTENT_FIELD, "content");
+        paramsMap.put(HttpAlertConstants.NAME_CONTENT_FIELD, contentField);
 
         HttpSender httpSender = spy(new HttpSender(paramsMap));
         doReturn("success").when(httpSender).getResponseString(any());
         AlertResult alertResult = httpSender.send("Fault tolerance warning");
         Assertions.assertEquals("true", alertResult.getStatus());
+        Assertions.assertTrue(httpSender.getRequestUrl().contains(url));
+        Assertions.assertTrue(httpSender.getRequestUrl().contains(contentField));
     }
 }
