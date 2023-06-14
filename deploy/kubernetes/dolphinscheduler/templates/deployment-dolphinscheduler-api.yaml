@@ -111,6 +111,7 @@ spec:
               subPath: common_properties
             {{- include "dolphinscheduler.sharedStorage.volumeMount" . | nindent 12 }}
             {{- include "dolphinscheduler.fsFileResource.volumeMount" . | nindent 12 }}
+            {{- include "dolphinscheduler.etcd.ssl.volumeMount" . | nindent 12 }}
       volumes:
         - name: {{ include "dolphinscheduler.fullname" . }}-api
           {{- if .Values.api.persistentVolumeClaim.enabled }}
@@ -124,3 +125,4 @@ spec:
             name: {{ include "dolphinscheduler.fullname" . }}-configs
         {{- include "dolphinscheduler.sharedStorage.volume" . | nindent 8 }}
         {{- include "dolphinscheduler.fsFileResource.volume" . | nindent 8 }}
+        {{- include "dolphinscheduler.etcd.ssl.volume" . | nindent 8 }}
