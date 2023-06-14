@@ -37,7 +37,6 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
@@ -143,7 +142,7 @@ public class CuringGlobalParams implements CuringParamsService {
                                                          @NonNull ProcessInstance processInstance) {
         // assign value to definedParams here
         Map<String, String> globalParamsMap = setGlobalParamsMap(processInstance);
-        Map<String, Property> globalParams = ParamUtils.getUserDefParamsMap(globalParamsMap);
+        Map<String, Property> globalParams = ParameterUtils.getUserDefParamsMap(globalParamsMap);
 
         // combining local and global parameters
         Map<String, Property> localParams = parameters.getInputLocalParametersMap();
@@ -162,7 +161,7 @@ public class CuringGlobalParams implements CuringParamsService {
         Map<String, String> params = setBuiltInParamsMap(taskInstance, timeZone);
 
         if (MapUtils.isNotEmpty(params)) {
-            globalParams.putAll(ParamUtils.getUserDefParamsMap(params));
+            globalParams.putAll(ParameterUtils.getUserDefParamsMap(params));
         }
 
         if (MapUtils.isNotEmpty(varParams)) {
@@ -172,7 +171,7 @@ public class CuringGlobalParams implements CuringParamsService {
             globalParams.putAll(localParams);
         }
         if (MapUtils.isNotEmpty(cmdParam)) {
-            globalParams.putAll(ParamUtils.getUserDefParamsMap(cmdParam));
+            globalParams.putAll(ParameterUtils.getUserDefParamsMap(cmdParam));
         }
         Iterator<Map.Entry<String, Property>> iter = globalParams.entrySet().iterator();
         while (iter.hasNext()) {
