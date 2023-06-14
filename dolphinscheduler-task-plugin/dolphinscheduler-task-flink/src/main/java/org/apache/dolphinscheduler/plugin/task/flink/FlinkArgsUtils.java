@@ -20,9 +20,8 @@ package org.apache.dolphinscheduler.plugin.task.flink;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ArgsUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -293,7 +292,7 @@ public class FlinkArgsUtils {
         String mainArgs = flinkParameters.getMainArgs();
         if (StringUtils.isNotEmpty(mainArgs)) {
             Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
-            args.add(ParameterUtils.convertParameterPlaceholders(mainArgs, ParamUtils.convert(paramsMap)));
+            args.add(ParameterUtils.convertParameterPlaceholders(mainArgs, ParameterUtils.convert(paramsMap)));
         }
 
         // determine yarn queue

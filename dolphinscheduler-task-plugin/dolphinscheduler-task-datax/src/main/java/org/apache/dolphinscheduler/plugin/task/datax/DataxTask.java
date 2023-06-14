@@ -33,8 +33,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.enums.Flag;
@@ -230,7 +229,7 @@ public class DataxTask extends AbstractTask {
         }
 
         // replace placeholder
-        json = ParameterUtils.convertParameterPlaceholders(json, ParamUtils.convert(paramsMap));
+        json = ParameterUtils.convertParameterPlaceholders(json, ParameterUtils.convert(paramsMap));
 
         log.debug("datax job json : {}", json);
 
@@ -412,7 +411,7 @@ public class DataxTask extends AbstractTask {
                 jobConfigFilePath;
 
         // replace placeholder
-        String dataxCommand = ParameterUtils.convertParameterPlaceholders(sbr, ParamUtils.convert(paramsMap));
+        String dataxCommand = ParameterUtils.convertParameterPlaceholders(sbr, ParameterUtils.convert(paramsMap));
 
         log.debug("raw script : {}", dataxCommand);
 

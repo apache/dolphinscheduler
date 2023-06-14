@@ -30,8 +30,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.spi.enums.Flag;
 
 import org.apache.commons.io.FileUtils;
@@ -159,7 +158,7 @@ public class ChunJunTask extends AbstractTask {
         }
 
         // replace placeholder
-        json = ParameterUtils.convertParameterPlaceholders(json, ParamUtils.convert(paramsMap));
+        json = ParameterUtils.convertParameterPlaceholders(json, ParameterUtils.convert(paramsMap));
 
         log.debug("chunjun job json : {}", json);
 
@@ -217,7 +216,7 @@ public class ChunJunTask extends AbstractTask {
         String command = String.join(" ", args);
 
         // replace placeholder
-        String chunjunCommand = ParameterUtils.convertParameterPlaceholders(command, ParamUtils.convert(paramsMap));
+        String chunjunCommand = ParameterUtils.convertParameterPlaceholders(command, ParameterUtils.convert(paramsMap));
 
         log.info("raw script : {}", chunjunCommand);
 
