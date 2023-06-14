@@ -175,4 +175,8 @@ public final class HttpSender {
             log.error("send http alert msg  exception : {}", e.getMessage());
         }
     }
+
+    public String getRequestUrl() {
+        return httpRequest.getURI().toString();
+    }
 }
