@@ -26,7 +26,7 @@ import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
@@ -155,7 +155,7 @@ public class ShellTask extends AbstractTask {
     }
 
     private String parseScript(String script) {
-        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+        Map<String, Parameter> paramsMap = taskExecutionContext.getPrepareParamsMap();
         return ParameterUtils.convertParameterPlaceholders(script, ParameterUtils.convert(paramsMap));
     }
 }

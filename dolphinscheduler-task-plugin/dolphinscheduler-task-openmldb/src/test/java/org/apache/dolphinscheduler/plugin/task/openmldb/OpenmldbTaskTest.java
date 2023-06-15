@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.openmldb;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
 import java.util.HashMap;
@@ -43,7 +43,7 @@ public class OpenmldbTaskTest {
         }
 
         @Override
-        protected Map<String, Property> mergeParamsWithContext(AbstractParameters parameters) {
+        protected Map<String, Parameter> mergeParamsWithContext(AbstractParameters parameters) {
             return new HashMap<>();
         }
     }

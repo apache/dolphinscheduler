@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.api;
 
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
@@ -187,8 +187,8 @@ public abstract class AbstractTask {
      * @param sqlParamsMap sql params map
      * @param paramsPropsMap params props map
      */
-    public void setSqlParamsMap(String content, String rgex, Map<Integer, Property> sqlParamsMap,
-                                Map<String, Property> paramsPropsMap, int taskInstanceId) {
+    public void setSqlParamsMap(String content, String rgex, Map<Integer, Parameter> sqlParamsMap,
+                                Map<String, Parameter> paramsPropsMap, int taskInstanceId) {
         if (paramsPropsMap == null) {
             return;
         }
@@ -199,7 +199,7 @@ public abstract class AbstractTask {
         while (m.find()) {
 
             String paramName = m.group(1);
-            Property prop = paramsPropsMap.get(paramName);
+            Parameter prop = paramsPropsMap.get(paramName);
 
             if (prop == null) {
                 log.error(

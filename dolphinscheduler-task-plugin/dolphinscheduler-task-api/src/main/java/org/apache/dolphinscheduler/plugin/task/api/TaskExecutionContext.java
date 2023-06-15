@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.api;
 
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 
 import java.io.Serializable;
@@ -184,7 +184,7 @@ public class TaskExecutionContext implements Serializable {
     /**
      * prepare params map
      */
-    private Map<String, Property> prepareParamsMap;
+    private Map<String, Parameter> prepareParamsMap;
 
     /**
      * task AppId
@@ -246,7 +246,7 @@ public class TaskExecutionContext implements Serializable {
      */
     private int dryRun;
 
-    private Map<String, Property> paramsMap;
+    private Map<String, Parameter> paramsMap;
 
     private DataQualityTaskExecutionContext dataQualityTaskExecutionContext;
 

@@ -28,7 +28,7 @@ import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
@@ -165,7 +165,7 @@ public class MlflowTask extends AbstractTask {
      */
     private String buildCommandForMlflowProjects() {
 
-        Map<String, Property> paramsMap = getParamsMap();
+        Map<String, Parameter> paramsMap = getParamsMap();
         List<String> args = new ArrayList<>();
         args.add(
                 String.format(MlflowConstants.EXPORT_MLFLOW_TRACKING_URI_ENV, mlflowParameters.getMlflowTrackingUri()));
@@ -228,7 +228,7 @@ public class MlflowTask extends AbstractTask {
      */
     protected String buildCommandForMlflowModels() {
 
-        Map<String, Property> paramsMap = getParamsMap();
+        Map<String, Parameter> paramsMap = getParamsMap();
         List<String> args = new ArrayList<>();
         args.add(
                 String.format(MlflowConstants.EXPORT_MLFLOW_TRACKING_URI_ENV, mlflowParameters.getMlflowTrackingUri()));
@@ -251,7 +251,7 @@ public class MlflowTask extends AbstractTask {
         return ParameterUtils.convertParameterPlaceholders(String.join("\n", args), ParameterUtils.convert(paramsMap));
     }
 
-    private Map<String, Property> getParamsMap() {
+    private Map<String, Parameter> getParamsMap() {
         return taskExecutionContext.getPrepareParamsMap();
 
     }

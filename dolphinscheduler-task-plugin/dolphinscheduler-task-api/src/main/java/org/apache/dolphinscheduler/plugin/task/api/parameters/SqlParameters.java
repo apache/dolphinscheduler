@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.plugin.task.api.SQLTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.UdfType;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
@@ -241,7 +241,7 @@ public class SqlParameters extends AbstractParameters {
         if (CollectionUtils.isEmpty(localParams)) {
             return;
         }
-        List<Property> outProperty = getOutProperty(localParams);
+        List<Parameter> outProperty = getOutProperty(localParams);
         if (CollectionUtils.isEmpty(outProperty)) {
             return;
         }
@@ -266,17 +266,17 @@ public class SqlParameters extends AbstractParameters {
                     sqlResultFormat.get(key).add(String.valueOf(info.get(key)));
                 }
             }
-            for (Property info : outProperty) {
+            for (Parameter info : outProperty) {
                 if (info.getType() == DataType.LIST) {
-                    info.setValue(JSONUtils.toJsonString(sqlResultFormat.get(info.getProp())));
+                    info.setValue(JSONUtils.toJsonString(sqlResultFormat.get(info.getKey())));
                     varPool.add(info);
                 }
             }
         } else {
             // result only one line
             Map<String, String> firstRow = sqlResult.get(0);
-            for (Property info : outProperty) {
-                info.setValue(String.valueOf(firstRow.get(info.getProp())));
+            for (Parameter info : outProperty) {
+                info.setValue(String.valueOf(firstRow.get(info.getKey())));
                 varPool.add(info);
             }
         }

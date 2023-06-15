@@ -57,7 +57,7 @@ export function useChunjun(model: { [field: string]: any }): IJsonItem[] {
           field: 'prop',
           span: 10,
           props: {
-            placeholder: t('project.node.prop_tips'),
+            placeholder: t('project.node.key_tips'),
             maxLength: 256
           },
           validate: {
@@ -65,7 +65,7 @@ export function useChunjun(model: { [field: string]: any }): IJsonItem[] {
             required: true,
             validator(validate: any, value: string) {
               if (!value) {
-                return new Error(t('project.node.prop_tips'))
+                return new Error(t('project.node.key_tips'))
               }
 
               const sameItems = model.localParams.filter(
@@ -73,7 +73,7 @@ export function useChunjun(model: { [field: string]: any }): IJsonItem[] {
               )
 
               if (sameItems.length > 1) {
-                return new Error(t('project.node.prop_repeat'))
+                return new Error(t('project.node.key_repeat'))
               }
             }
           }

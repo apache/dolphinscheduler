@@ -43,13 +43,13 @@ public class JSONUtilsTest {
 
     @Test
     public void createArrayNodeTest() {
-        Property property = new Property();
-        property.setProp("ds");
+        Parameter property = new Parameter();
+        property.setKey("ds");
         property.setDirect(Direct.IN);
         property.setType(DataType.VARCHAR);
         property.setValue("sssssss");
         String str =
-                "[{\"prop\":\"ds\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"sssssss\"},{\"prop\":\"ds\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"sssssss\"}]";
+                "[{\"key\":\"ds\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"sssssss\"},{\"key\":\"ds\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"sssssss\"}]";
         JsonNode jsonNode = JSONUtils.toJsonNode(property);
 
         ArrayNode arrayNode = JSONUtils.createArrayNode();
@@ -65,12 +65,12 @@ public class JSONUtilsTest {
 
     @Test
     public void toJsonNodeTest() {
-        Property property = new Property();
-        property.setProp("ds");
+        Parameter property = new Parameter();
+        property.setKey("ds");
         property.setDirect(Direct.IN);
         property.setType(DataType.VARCHAR);
         property.setValue("sssssss");
-        String str = "{\"prop\":\"ds\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"sssssss\"}";
+        String str = "{\"key\":\"ds\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"sssssss\"}";
 
         JsonNode jsonNodes = JSONUtils.toJsonNode(property);
         String s = JSONUtils.toJsonString(jsonNodes);
@@ -102,13 +102,13 @@ public class JSONUtilsTest {
 
     @Test
     public void convert2Property() {
-        Property property = new Property();
-        property.setProp("ds");
+        Parameter property = new Parameter();
+        property.setKey("ds");
         property.setDirect(Direct.IN);
         property.setType(DataType.VARCHAR);
         property.setValue("sssssss");
-        String str = "{\"direct\":\"IN\",\"prop\":\"ds\",\"type\":\"VARCHAR\",\"value\":\"sssssss\"}";
-        Property property1 = JSONUtils.parseObject(str, Property.class);
+        String str = "{\"direct\":\"IN\",\"key\":\"ds\",\"type\":\"VARCHAR\",\"value\":\"sssssss\"}";
+        Parameter property1 = JSONUtils.parseObject(str, Parameter.class);
         Direct direct = property1.getDirect();
         Assertions.assertEquals(Direct.IN, direct);
     }

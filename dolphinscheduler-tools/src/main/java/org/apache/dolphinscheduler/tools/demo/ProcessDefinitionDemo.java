@@ -392,7 +392,7 @@ public class ProcessDefinitionDemo {
         taskDefinitionLogFirst.setName("Upstream task node");
         taskDefinitionLogFirst.setDescription("Create a local parameter and pass the assignment to the downstream");
         taskDefinitionLogFirst.setTaskParams(
-                "{\"localParams\":[{\"prop\":\"value\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"0\"},{\"prop\":\"output\",\"direct\":\"OUT\",\"type\":\"VARCHAR\",\"value\":\"\"}],\"rawScript\":\"echo \\\"====Node start====\\\"\\r\\necho '${setValue(output=1)}'\\r\\n\\r\\necho ${output}\\r\\necho ${value}\\r\\n\\r\\necho \\\"====Node end====\\\"\",\"resourceList\":[]}");
+                "{\"localParams\":[{\"key\":\"value\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"0\"},{\"key\":\"output\",\"direct\":\"OUT\",\"type\":\"VARCHAR\",\"value\":\"\"}],\"rawScript\":\"echo \\\"====Node start====\\\"\\r\\necho '${setValue(output=1)}'\\r\\n\\r\\necho ${output}\\r\\necho ${value}\\r\\n\\r\\necho \\\"====Node end====\\\"\",\"resourceList\":[]}");
 
         TaskDefinitionLog taskDefinitionLogSecond = taskDefinitionLogs.get(1);
         taskDefinitionLogSecond.setCode(taskCodes.get(1));

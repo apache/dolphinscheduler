@@ -28,7 +28,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
@@ -315,7 +315,7 @@ public class JavaTask extends AbstractTask {
         String rawJavaScript = javaParameters.getRawScript().replaceAll("\\r\\n", "\n");
         // replace placeholder
 
-        Map<String, Property> paramsMap = taskRequest.getPrepareParamsMap();
+        Map<String, Parameter> paramsMap = taskRequest.getPrepareParamsMap();
         if (MapUtils.isEmpty(paramsMap)) {
             paramsMap = new HashMap<>();
         }

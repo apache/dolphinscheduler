@@ -23,7 +23,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_COD
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
 import org.apache.commons.io.IOUtils;
@@ -184,10 +184,10 @@ public class HttpTaskTest {
         String response = "{\"status\": \"success\"}";
         httpTask.addDefaultOutput(response);
 
-        List<Property> varPool = httpParameters.getVarPool();
+        List<Parameter> varPool = httpParameters.getVarPool();
         Assertions.assertEquals(1, varPool.size());
-        Property property = varPool.get(0);
-        Assertions.assertEquals("null.response", property.getProp());
+        Parameter property = varPool.get(0);
+        Assertions.assertEquals("null.response", property.getKey());
         Assertions.assertEquals(Direct.OUT, property.getDirect());
         Assertions.assertEquals(DataType.VARCHAR, property.getType());
         Assertions.assertEquals(response, property.getValue());
@@ -226,10 +226,10 @@ public class HttpTaskTest {
         TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(paramData);
         if (prepareParamsMap != null) {
-            Map<String, Property> propertyParamsMap = new HashMap<>();
+            Map<String, Parameter> propertyParamsMap = new HashMap<>();
             prepareParamsMap.forEach((k, v) -> {
-                Property property = new Property();
-                property.setProp(k);
+                Parameter property = new Parameter();
+                property.setKey(k);
                 property.setValue(v);
                 propertyParamsMap.put(k, property);
             });

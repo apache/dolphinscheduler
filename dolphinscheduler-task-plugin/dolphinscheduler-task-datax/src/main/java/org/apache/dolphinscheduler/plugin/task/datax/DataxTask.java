@@ -30,7 +30,7 @@ import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
@@ -161,7 +161,7 @@ public class DataxTask extends AbstractTask {
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             // replace placeholder,and combine local and global parameters
-            Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+            Map<String, Parameter> paramsMap = taskExecutionContext.getPrepareParamsMap();
 
             // run datax processDataSourceService
             String jsonFilePath = buildDataxJsonFile(paramsMap);
@@ -203,7 +203,7 @@ public class DataxTask extends AbstractTask {
      * @return datax json file name
      * @throws Exception if error throws Exception
      */
-    private String buildDataxJsonFile(Map<String, Property> paramsMap) throws Exception {
+    private String buildDataxJsonFile(Map<String, Parameter> paramsMap) throws Exception {
         // generate json
         String fileName = String.format("%s/%s_job.json",
                 taskExecutionContext.getExecutePath(),
@@ -387,7 +387,7 @@ public class DataxTask extends AbstractTask {
      * @return shell command file name
      * @throws Exception if error throws Exception
      */
-    private String buildShellCommandFile(String jobConfigFilePath, Map<String, Property> paramsMap) throws Exception {
+    private String buildShellCommandFile(String jobConfigFilePath, Map<String, Parameter> paramsMap) throws Exception {
         // generate scripts
         String fileName = String.format("%s/%s_node.%s",
                 taskExecutionContext.getExecutePath(),
@@ -430,12 +430,12 @@ public class DataxTask extends AbstractTask {
         return fileName;
     }
 
-    private StringBuilder addCustomParameters(Map<String, Property> paramsMap) {
+    private StringBuilder addCustomParameters(Map<String, Parameter> paramsMap) {
         if (paramsMap == null || paramsMap.size() == 0) {
             return new StringBuilder();
         }
         StringBuilder customParameters = new StringBuilder("-p \"");
-        for (Map.Entry<String, Property> entry : paramsMap.entrySet()) {
+        for (Map.Entry<String, Parameter> entry : paramsMap.entrySet()) {
             customParameters.append(String.format(CUSTOM_PARAM, entry.getKey(), entry.getValue().getValue()));
         }
         customParameters.replace(4, 5, "");

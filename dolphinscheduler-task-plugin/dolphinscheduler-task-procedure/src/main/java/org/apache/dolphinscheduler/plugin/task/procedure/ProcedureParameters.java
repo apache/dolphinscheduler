@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.procedure;
 
 import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
@@ -48,7 +48,7 @@ public class ProcedureParameters extends AbstractParameters {
      */
     private int datasource;
 
-    private Map<String, Property> outProperty;
+    private Map<String, Parameter> outProperty;
 
     /**
      * procedure name
@@ -99,7 +99,7 @@ public class ProcedureParameters extends AbstractParameters {
     }
 
     public void dealOutParam4Procedure(Object result, String pop) {
-        Map<String, Property> properties = getOutProperty();
+        Map<String, Parameter> properties = getOutProperty();
         if (this.outProperty == null) {
             return;
         }
@@ -107,23 +107,23 @@ public class ProcedureParameters extends AbstractParameters {
         varPool.add(properties.get(pop));
     }
 
-    public Map<String, Property> getOutProperty() {
+    public Map<String, Parameter> getOutProperty() {
         if (this.outProperty != null) {
             return this.outProperty;
         }
         if (CollectionUtils.isEmpty(localParams)) {
             return null;
         }
-        List<Property> outPropertyList = getOutProperty(localParams);
-        Map<String, Property> outProperty = new HashMap<>();
-        for (Property info : outPropertyList) {
-            outProperty.put(info.getProp(), info);
+        List<Parameter> outPropertyList = getOutProperty(localParams);
+        Map<String, Parameter> outProperty = new HashMap<>();
+        for (Parameter info : outPropertyList) {
+            outProperty.put(info.getKey(), info);
         }
         this.outProperty = outProperty;
         return this.outProperty;
     }
 
-    public void setOutProperty(Map<String, Property> outProperty) {
+    public void setOutProperty(Map<String, Parameter> outProperty) {
         this.outProperty = outProperty;
     }
 

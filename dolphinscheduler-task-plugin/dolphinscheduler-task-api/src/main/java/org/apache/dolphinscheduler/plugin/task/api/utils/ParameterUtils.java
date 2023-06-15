@@ -25,7 +25,7 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.api.parser.PlaceholderUtils;
 import org.apache.dolphinscheduler.plugin.task.api.parser.TimePlaceholderUtils;
 
@@ -153,7 +153,7 @@ public class ParameterUtils {
         }
     }
 
-    public static Serializable getParameterValue(Property property) {
+    public static Serializable getParameterValue(Parameter property) {
         if (property == null) {
             return null;
         }
@@ -175,7 +175,7 @@ public class ParameterUtils {
         }
     }
 
-    public static boolean isNumber(Property property) {
+    public static boolean isNumber(Parameter property) {
         return property != null &&
                 (DataType.INTEGER.equals(property.getType())
                         || DataType.LONG.equals(property.getType())
@@ -183,12 +183,12 @@ public class ParameterUtils {
                         || DataType.DOUBLE.equals(property.getType()));
     }
 
-    public static boolean isBoolean(Property property) {
+    public static boolean isBoolean(Parameter property) {
         return property != null && DataType.BOOLEAN.equals(property.getType());
     }
 
-    public static String expandListParameter(Map<Integer, Property> params, String sql) {
-        Map<Integer, Property> expandMap = new HashMap<>();
+    public static String expandListParameter(Map<Integer, Parameter> params, String sql) {
+        Map<Integer, Parameter> expandMap = new HashMap<>();
         if (params == null || params.isEmpty()) {
             return sql;
         }
@@ -199,7 +199,7 @@ public class ParameterUtils {
         StringBuilder ret = new StringBuilder(split[0]);
         int index = 1;
         for (int i = 1; i < split.length; i++) {
-            Property property = params.get(i);
+            Parameter property = params.get(i);
             String value = property.getValue();
             if (DataType.LIST.equals(property.getType())) {
                 List<Object> valueList = JSONUtils.toList(value, Object.class);
@@ -213,7 +213,7 @@ public class ParameterUtils {
                     }
                 }
                 for (Object v : valueList) {
-                    Property newProperty = new Property();
+                    Parameter newProperty = new Parameter();
                     if (v instanceof Integer) {
                         newProperty.setType(DataType.INTEGER);
                     } else if (v instanceof Long) {
@@ -226,7 +226,7 @@ public class ParameterUtils {
                         newProperty.setType(DataType.VARCHAR);
                     }
                     newProperty.setValue(v.toString());
-                    newProperty.setProp(property.getProp());
+                    newProperty.setKey(property.getKey());
                     newProperty.setDirect(property.getDirect());
                     expandMap.put(index++, newProperty);
                 }
@@ -249,16 +249,16 @@ public class ParameterUtils {
      * $[yyyyMMdd] replace schedule time
      */
     public static String replaceScheduleTime(String text, Date scheduleTime) {
-        Map<String, Property> paramsMap = new HashMap<>();
+        Map<String, Parameter> paramsMap = new HashMap<>();
         // if getScheduleTime null ,is current date
         if (null == scheduleTime) {
             scheduleTime = new Date();
         }
 
         String dateTime = DateUtils.format(scheduleTime, PARAMETER_FORMAT_TIME);
-        Property p = new Property();
+        Parameter p = new Parameter();
         p.setValue(dateTime);
-        p.setProp(PARAMETER_SHECDULE_TIME);
+        p.setKey(PARAMETER_SHECDULE_TIME);
         paramsMap.put(PARAMETER_SHECDULE_TIME, p);
         text = ParameterUtils.convertParameterPlaceholders2(text, convert(paramsMap));
 
@@ -272,15 +272,15 @@ public class ParameterUtils {
      * @return Map of converted
      * see org.apache.dolphinscheduler.server.utils.ParameterUtils.convert
      */
-    public static Map<String, String> convert(Map<String, Property> paramsMap) {
+    public static Map<String, String> convert(Map<String, Parameter> paramsMap) {
         if (paramsMap == null) {
             return null;
         }
 
         Map<String, String> map = new HashMap<>();
-        Iterator<Map.Entry<String, Property>> iter = paramsMap.entrySet().iterator();
+        Iterator<Map.Entry<String, Parameter>> iter = paramsMap.entrySet().iterator();
         while (iter.hasNext()) {
-            Map.Entry<String, Property> en = iter.next();
+            Map.Entry<String, Parameter> en = iter.next();
             map.put(en.getKey(), en.getValue().getValue());
         }
         return map;
@@ -330,14 +330,14 @@ public class ParameterUtils {
      * @param definedParams definedParams
      * @return parameters map
      */
-    public static Map<String, Property> getUserDefParamsMap(Map<String, String> definedParams) {
-        Map<String, Property> userDefParamsMaps = new HashMap<>();
+    public static Map<String, Parameter> getUserDefParamsMap(Map<String, String> definedParams) {
+        Map<String, Parameter> userDefParamsMaps = new HashMap<>();
         if (definedParams != null) {
             Iterator<Map.Entry<String, String>> iter = definedParams.entrySet().iterator();
             while (iter.hasNext()) {
                 Map.Entry<String, String> en = iter.next();
-                Property property = new Property(en.getKey(), Direct.IN, DataType.VARCHAR, en.getValue());
-                userDefParamsMaps.put(property.getProp(), property);
+                Parameter property = new Parameter(en.getKey(), Direct.IN, DataType.VARCHAR, en.getValue());
+                userDefParamsMaps.put(property.getKey(), property);
             }
         }
         return userDefParamsMaps;

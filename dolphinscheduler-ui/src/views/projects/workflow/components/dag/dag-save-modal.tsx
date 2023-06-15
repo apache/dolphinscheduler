@@ -101,13 +101,13 @@ export default defineComponent({
           const keys = formValue.value.globalParams.map((item) => item.key)
           const keysSet = new Set(keys)
           if (keysSet.size !== keys.length) {
-            return new Error(t('project.dag.prop_repeat'))
+            return new Error(t('project.dag.key_repeat'))
           }
 
           for (const param of formValue.value.globalParams) {
             const prop = param.value
             if (!prop) {
-              return new Error(t('project.dag.prop_empty'))
+              return new Error(t('project.dag.key_empty'))
             }
 
             props.add(prop)

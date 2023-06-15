@@ -27,7 +27,7 @@ import org.apache.dolphinscheduler.plugin.task.api.k8s.AbstractK8sTask;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.K8sTaskMainParameters;
 import org.apache.dolphinscheduler.plugin.task.api.model.Label;
 import org.apache.dolphinscheduler.plugin.task.api.model.NodeSelectorExpression;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.K8sTaskParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
@@ -82,7 +82,7 @@ public class K8sTask extends AbstractK8sTask {
     @Override
     protected String buildCommand() {
         K8sTaskMainParameters k8sTaskMainParameters = new K8sTaskMainParameters();
-        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+        Map<String, Parameter> paramsMap = taskExecutionContext.getPrepareParamsMap();
         Map<String, String> namespace = JSONUtils.toMap(k8sTaskParameters.getNamespace());
         String namespaceName = namespace.get(NAMESPACE_NAME);
         String clusterName = namespace.get(CLUSTER);

@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.sqoop.parameter;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
@@ -87,12 +87,12 @@ public class SqoopParameters extends AbstractParameters {
     /**
      * hadoop custom param for sqoop job
      */
-    private List<Property> hadoopCustomParams;
+    private List<Parameter> hadoopCustomParams;
 
     /**
      * sqoop advanced param
      */
-    private List<Property> sqoopAdvancedParams;
+    private List<Parameter> sqoopAdvancedParams;
 
     public String getModelType() {
         return modelType;
@@ -174,19 +174,19 @@ public class SqoopParameters extends AbstractParameters {
         this.customShell = customShell;
     }
 
-    public List<Property> getHadoopCustomParams() {
+    public List<Parameter> getHadoopCustomParams() {
         return hadoopCustomParams;
     }
 
-    public void setHadoopCustomParams(List<Property> hadoopCustomParams) {
+    public void setHadoopCustomParams(List<Parameter> hadoopCustomParams) {
         this.hadoopCustomParams = hadoopCustomParams;
     }
 
-    public List<Property> getSqoopAdvancedParams() {
+    public List<Parameter> getSqoopAdvancedParams() {
         return sqoopAdvancedParams;
     }
 
-    public void setSqoopAdvancedParams(List<Property> sqoopAdvancedParams) {
+    public void setSqoopAdvancedParams(List<Parameter> sqoopAdvancedParams) {
         this.sqoopAdvancedParams = sqoopAdvancedParams;
     }
 

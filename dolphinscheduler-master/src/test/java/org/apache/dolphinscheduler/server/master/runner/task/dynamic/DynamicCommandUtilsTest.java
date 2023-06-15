@@ -49,7 +49,7 @@ class DynamicCommandUtilsTest {
         processInstance.setCommandType(CommandType.START_PROCESS);
         processInstance.setFailureStrategy(null); // update this
         processInstance.setWarningType(null); // update this
-        processInstance.setGlobalParams("{\"prop\":\"value\"}");
+        processInstance.setGlobalParams("{\"key\":\"value\"}");
         processInstance.setExecutorId(1);
         processInstance.setWarningGroupId(1);
         processInstance.setProcessInstancePriority(null); // update this
@@ -117,7 +117,7 @@ class DynamicCommandUtilsTest {
     void testCreateCommandGlobalParams() {
         // Scenario: processInstance has globalParams
         parameters.put("testKey", "testValue");
-        processInstance.setGlobalParams("[{\"prop\":\"globalKey\",\"value\":\"globalValue\"}]");
+        processInstance.setGlobalParams("[{\"key\":\"globalKey\",\"value\":\"globalValue\"}]");
 
         Command command = DynamicCommandUtils.createCommand(processInstance, subProcessDefinitionCode,
                 subProcessDefinitionVersion, parameters);

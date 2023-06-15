@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -102,7 +102,7 @@ public class TaskDefinition {
      * user defined parameter list
      */
     @TableField(exist = false)
-    private List<Property> taskParamList;
+    private List<Parameter> taskParamList;
 
     /**
      * user defined parameter map
@@ -231,10 +231,10 @@ public class TaskDefinition {
         this.version = version;
     }
 
-    public List<Property> getTaskParamList() {
+    public List<Parameter> getTaskParamList() {
         JsonNode localParams = JSONUtils.parseObject(taskParams).findValue("localParams");
         if (localParams != null) {
-            taskParamList = JSONUtils.toList(localParams.toString(), Property.class);
+            taskParamList = JSONUtils.toList(localParams.toString(), Parameter.class);
         }
 
         return taskParamList;
@@ -246,12 +246,12 @@ public class TaskDefinition {
 
             // If a jsonNode is null, not only use !=null, but also it should use the isNull method to be estimated.
             if (localParams != null && !localParams.isNull()) {
-                List<Property> propList = JSONUtils.toList(localParams.toString(), Property.class);
+                List<Parameter> propList = JSONUtils.toList(localParams.toString(), Parameter.class);
 
                 if (CollectionUtils.isNotEmpty(propList)) {
                     taskParamMap = new HashMap<>();
-                    for (Property property : propList) {
-                        taskParamMap.put(property.getProp(), property.getValue());
+                    for (Parameter property : propList) {
+                        taskParamMap.put(property.getKey(), property.getValue());
                     }
                 }
             }

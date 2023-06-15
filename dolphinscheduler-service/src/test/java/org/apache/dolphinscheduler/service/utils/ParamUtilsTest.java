@@ -26,7 +26,7 @@ public class ParamUtilsTest {
 
     @Test
     public void testGetGlobalParamMap() {
-        String globalParam = "[{\"prop\":\"startParam1\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"\"}]";
+        String globalParam = "[{\"key\":\"startParam1\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"\"}]";
         Map<String, String> globalParamMap = ParamUtils.getGlobalParamMap(globalParam);
         Assertions.assertEquals(globalParamMap.size(), 1);
         Assertions.assertEquals(globalParamMap.get("startParam1"), "");

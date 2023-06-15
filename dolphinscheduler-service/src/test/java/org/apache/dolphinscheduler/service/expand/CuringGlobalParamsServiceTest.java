@@ -28,7 +28,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SubProcessParameters;
 
@@ -100,7 +100,7 @@ public class CuringGlobalParamsServiceTest {
         globalParamMap.put("globalParams1", "Params1");
 
         // define globalParamList
-        List<Property> globalParamList = new ArrayList<>();
+        List<Parameter> globalParamList = new ArrayList<>();
 
         // define scheduleTime
         Date scheduleTime = DateUtils.stringToDate("2019-12-20 00:00:00");
@@ -115,7 +115,7 @@ public class CuringGlobalParamsServiceTest {
                 CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null));
 
         // test globalParamList is not null
-        Property property = new Property("testGlobalParam", Direct.IN, DataType.VARCHAR, "testGlobalParam");
+        Parameter property = new Parameter("testGlobalParam", Direct.IN, DataType.VARCHAR, "testGlobalParam");
         globalParamList.add(property);
 
         String result2 = dolphinSchedulerCuringGlobalParams.curingGlobalParams(1, null, globalParamList,
@@ -134,9 +134,9 @@ public class CuringGlobalParamsServiceTest {
         globalParamMap.put("bizDate", "${system.biz.date}");
         globalParamMap.put("b1zCurdate", "${system.biz.curdate}");
 
-        Property property2 = new Property("testParamList1", Direct.IN, DataType.VARCHAR, "testParamList");
-        Property property3 = new Property("testParamList2", Direct.IN, DataType.VARCHAR, "{testParamList1}");
-        Property property4 = new Property("testParamList3", Direct.IN, DataType.VARCHAR, "${b1zCurdate}");
+        Parameter property2 = new Parameter("testParamList1", Direct.IN, DataType.VARCHAR, "testParamList");
+        Parameter property3 = new Parameter("testParamList2", Direct.IN, DataType.VARCHAR, "{testParamList1}");
+        Parameter property4 = new Parameter("testParamList3", Direct.IN, DataType.VARCHAR, "${b1zCurdate}");
 
         globalParamList.add(property2);
         globalParamList.add(property3);
@@ -146,10 +146,10 @@ public class CuringGlobalParamsServiceTest {
                 CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null);
         Assertions.assertEquals(result5, JSONUtils.toJsonString(globalParamList));
 
-        Property testStartParamProperty = new Property("testStartParam", Direct.IN, DataType.VARCHAR, "");
+        Parameter testStartParamProperty = new Parameter("testStartParam", Direct.IN, DataType.VARCHAR, "");
         globalParamList.add(testStartParamProperty);
-        Property testStartParam2Property =
-                new Property("testStartParam2", Direct.IN, DataType.VARCHAR, "$[yyyy-MM-dd+1]");
+        Parameter testStartParam2Property =
+                new Parameter("testStartParam2", Direct.IN, DataType.VARCHAR, "$[yyyy-MM-dd+1]");
         globalParamList.add(testStartParam2Property);
         globalParamMap.put("testStartParam", "");
         globalParamMap.put("testStartParam2", "$[yyyy-MM-dd+1]");
@@ -183,12 +183,12 @@ public class CuringGlobalParamsServiceTest {
         processInstance.setId(2);
         processInstance.setCommandParam("{\"" + Constants.SCHEDULE_TIMEZONE + "\":\"Asia/Shanghai\"}");
         processInstance.setHistoryCmd(CommandType.COMPLEMENT_DATA.toString());
-        Property property = new Property();
+        Parameter property = new Parameter();
         property.setDirect(Direct.IN);
-        property.setProp("global_params");
+        property.setKey("global_params");
         property.setValue("hello world");
         property.setType(DataType.VARCHAR);
-        List<Property> properties = Lists.newArrayList(property);
+        List<Parameter> properties = Lists.newArrayList(property);
         processInstance.setGlobalParams(JSONUtils.toJsonString(properties));
 
         ProcessDefinition processDefinition = new ProcessDefinition();
@@ -204,7 +204,7 @@ public class CuringGlobalParamsServiceTest {
 
         AbstractParameters parameters = new SubProcessParameters();
 
-        Map<String, Property> propertyMap =
+        Map<String, Parameter> propertyMap =
                 dolphinSchedulerCuringGlobalParams.paramParsingPreparation(taskInstance, parameters, processInstance);
         Assertions.assertNotNull(propertyMap);
         Assertions.assertEquals(propertyMap.get(TaskConstants.PARAMETER_TASK_INSTANCE_ID).getValue(),

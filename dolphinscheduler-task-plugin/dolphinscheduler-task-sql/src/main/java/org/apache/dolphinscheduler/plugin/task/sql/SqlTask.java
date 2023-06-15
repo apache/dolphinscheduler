@@ -31,7 +31,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.SqlType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
@@ -261,13 +261,13 @@ public class SqlTask extends AbstractTask {
         }
     }
 
-    private String setNonQuerySqlReturn(String updateResult, List<Property> properties) {
+    private String setNonQuerySqlReturn(String updateResult, List<Parameter> properties) {
         String result = null;
-        for (Property info : properties) {
+        for (Parameter info : properties) {
             if (Direct.OUT == info.getDirect()) {
                 List<Map<String, String>> updateRL = new ArrayList<>();
                 Map<String, String> updateRM = new HashMap<>();
-                updateRM.put(info.getProp(), updateResult);
+                updateRM.put(info.getKey(), updateResult);
                 updateRL.add(updateRM);
                 result = JSONUtils.toJsonString(updateRL);
                 break;
@@ -430,10 +430,10 @@ public class SqlTask extends AbstractTask {
             if (timeoutFlag) {
                 stmt.setQueryTimeout(taskExecutionContext.getTaskTimeout());
             }
-            Map<Integer, Property> params = sqlBinds.getParamsMap();
+            Map<Integer, Parameter> params = sqlBinds.getParamsMap();
             if (params != null) {
-                for (Map.Entry<Integer, Property> entry : params.entrySet()) {
-                    Property prop = entry.getValue();
+                for (Map.Entry<Integer, Parameter> entry : params.entrySet()) {
+                    Parameter prop = entry.getValue();
                     ParameterUtils.setInParameter(entry.getKey(), stmt, prop.getType(), prop.getValue());
                 }
             }
@@ -453,7 +453,7 @@ public class SqlTask extends AbstractTask {
      * @param rgex rgex
      * @param sqlParamsMap sql params map
      */
-    private void printReplacedSql(String content, String formatSql, String rgex, Map<Integer, Property> sqlParamsMap) {
+    private void printReplacedSql(String content, String formatSql, String rgex, Map<Integer, Parameter> sqlParamsMap) {
         // parameter print style
         log.info("after replace sql , preparing : {}", formatSql);
         StringBuilder logPrint = new StringBuilder("replaced sql , parameters:");
@@ -474,14 +474,14 @@ public class SqlTask extends AbstractTask {
      * @return SqlBinds
      */
     private SqlBinds getSqlAndSqlParamsMap(String sql) {
-        Map<Integer, Property> sqlParamsMap = new HashMap<>();
+        Map<Integer, Parameter> sqlParamsMap = new HashMap<>();
         StringBuilder sqlBuilder = new StringBuilder();
         // new
         // replace variable TIME with $[YYYYmmddd...] in sql when history run job and batch complement job
         sql = ParameterUtils.replaceScheduleTime(sql,
                 DateUtils.timeStampToDate(taskExecutionContext.getScheduleTime()));
 
-        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+        Map<String, Parameter> paramsMap = taskExecutionContext.getPrepareParamsMap();
 
         // spell SQL according to the final user-defined variable
         if (paramsMap == null) {
@@ -511,7 +511,7 @@ public class SqlTask extends AbstractTask {
         return new SqlBinds(sqlBuilder.toString(), sqlParamsMap);
     }
 
-    private String replaceOriginalValue(String content, String rgex, Map<String, Property> sqlParamsMap) {
+    private String replaceOriginalValue(String content, String rgex, Map<String, Parameter> sqlParamsMap) {
         Pattern pattern = Pattern.compile(rgex);
         while (true) {
             Matcher m = pattern.matcher(content);

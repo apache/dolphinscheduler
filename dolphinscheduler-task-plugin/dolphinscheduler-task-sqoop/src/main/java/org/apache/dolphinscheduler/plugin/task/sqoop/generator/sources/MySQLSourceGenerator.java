@@ -36,7 +36,7 @@ import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.TABLE
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopQueryType;
 import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.ISourceGenerator;
@@ -108,12 +108,12 @@ public class MySQLSourceGenerator implements ISourceGenerator {
                     }
 
                     // sqoop hive map column
-                    List<Property> mapColumnHive = sourceMysqlParameter.getMapColumnHive();
+                    List<Parameter> mapColumnHive = sourceMysqlParameter.getMapColumnHive();
 
                     if (null != mapColumnHive && !mapColumnHive.isEmpty()) {
                         StringBuilder columnMap = new StringBuilder();
-                        for (Property item : mapColumnHive) {
-                            columnMap.append(item.getProp()).append(EQUAL_SIGN).append(item.getValue()).append(COMMA);
+                        for (Parameter item : mapColumnHive) {
+                            columnMap.append(item.getKey()).append(EQUAL_SIGN).append(item.getValue()).append(COMMA);
                         }
 
                         if (StringUtils.isNotEmpty(columnMap.toString())) {
@@ -123,12 +123,12 @@ public class MySQLSourceGenerator implements ISourceGenerator {
                     }
 
                     // sqoop map column java
-                    List<Property> mapColumnJava = sourceMysqlParameter.getMapColumnJava();
+                    List<Parameter> mapColumnJava = sourceMysqlParameter.getMapColumnJava();
 
                     if (null != mapColumnJava && !mapColumnJava.isEmpty()) {
                         StringBuilder columnMap = new StringBuilder();
-                        for (Property item : mapColumnJava) {
-                            columnMap.append(item.getProp()).append(EQUAL_SIGN).append(item.getValue()).append(COMMA);
+                        for (Parameter item : mapColumnJava) {
+                            columnMap.append(item.getKey()).append(EQUAL_SIGN).append(item.getValue()).append(COMMA);
                         }
 
                         if (StringUtils.isNotEmpty(columnMap.toString())) {

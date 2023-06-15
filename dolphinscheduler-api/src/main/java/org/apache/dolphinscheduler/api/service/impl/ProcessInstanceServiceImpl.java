@@ -81,7 +81,7 @@ import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.WorkflowUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
@@ -811,9 +811,9 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             schedule = DateUtils.stringToDate(scheduleTime);
         }
         processInstance.setScheduleTime(schedule);
-        List<Property> globalParamList = JSONUtils.toList(globalParams, Property.class);
+        List<Parameter> globalParamList = JSONUtils.toList(globalParams, Parameter.class);
         Map<String, String> globalParamMap =
-                globalParamList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
+                globalParamList.stream().collect(Collectors.toMap(Parameter::getKey, Parameter::getValue));
         globalParams = curingGlobalParamsService.curingGlobalParams(processInstance.getId(), globalParamMap,
                 globalParamList, processInstance.getCmdTypeIfComplement(), schedule, timezone);
         processInstance.setTimeout(timeout);
@@ -931,18 +931,18 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
                         processInstance.getScheduleTime(), timezone);
         String userDefinedParams = processInstance.getGlobalParams();
         // global params
-        List<Property> globalParams = new ArrayList<>();
+        List<Parameter> globalParams = new ArrayList<>();
 
         // global param string
         String globalParamStr =
                 ParameterUtils.convertParameterPlaceholders(JSONUtils.toJsonString(globalParams), timeParams);
-        globalParams = JSONUtils.toList(globalParamStr, Property.class);
-        for (Property property : globalParams) {
-            timeParams.put(property.getProp(), property.getValue());
+        globalParams = JSONUtils.toList(globalParamStr, Parameter.class);
+        for (Parameter property : globalParams) {
+            timeParams.put(property.getKey(), property.getValue());
         }
 
         if (userDefinedParams != null && userDefinedParams.length() > 0) {
-            globalParams = JSONUtils.toList(userDefinedParams, Property.class);
+            globalParams = JSONUtils.toList(userDefinedParams, Parameter.class);
         }
 
         Map<String, Map<String, Object>> localUserDefParams = getLocalParams(processInstance, timeParams);
@@ -973,7 +973,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             String localParams = JSONUtils.getNodeString(taskDefinitionLog.getTaskParams(), LOCAL_PARAMS);
             if (!StringUtils.isEmpty(localParams)) {
                 localParams = ParameterUtils.convertParameterPlaceholders(localParams, timeParams);
-                List<Property> localParamsList = JSONUtils.toList(localParams, Property.class);
+                List<Parameter> localParamsList = JSONUtils.toList(localParams, Parameter.class);
 
                 Map<String, Object> localParamsMap = new HashMap<>();
                 localParamsMap.put(TASK_TYPE, taskDefinitionLog.getTaskType());

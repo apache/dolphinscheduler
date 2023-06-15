@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 
 import org.apache.curator.shaded.com.google.common.io.Files;
 
@@ -74,14 +74,14 @@ public class TaskFilesTransferUtilsTest {
             return;
         }
         String varPool = "[" +
-                String.format("{\"prop\":\"folder\",\"direct\":\"OUT\",\"type\":\"FILE\",\"value\":\"%s\"},",
+                String.format("{\"key\":\"folder\",\"direct\":\"OUT\",\"type\":\"FILE\",\"value\":\"%s\"},",
                         folderPath.getName())
                 +
-                String.format(" {\"prop\":\"file\",\"direct\":\"OUT\",\"type\":\"FILE\",\"value\":\"%s/%s\"},",
+                String.format(" {\"key\":\"file\",\"direct\":\"OUT\",\"type\":\"FILE\",\"value\":\"%s/%s\"},",
                         folderPath.getName(), file.getName())
                 +
-                "{\"prop\":\"a\",\"direct\":\"OUT\",\"type\":\"VARCHAR\",\"value\":\"a\"}," +
-                "{\"prop\":\"b\",\"direct\":\"OUT\",\"type\":\"VARCHAR\",\"value\":\"b\"}" +
+                "{\"key\":\"a\",\"direct\":\"OUT\",\"type\":\"VARCHAR\",\"value\":\"a\"}," +
+                "{\"key\":\"b\",\"direct\":\"OUT\",\"type\":\"VARCHAR\",\"value\":\"b\"}" +
                 "]";
         String taskParams = String.format("{\"localParams\": %s}", varPool);
         TaskExecutionContext taskExecutionContext = TaskExecutionContext.builder()
@@ -97,7 +97,7 @@ public class TaskFilesTransferUtilsTest {
                 .endTime(endTime)
                 .build();
 
-        List<Property> oriProperties = TaskFilesTransferUtils.getVarPools(taskExecutionContext);
+        List<Parameter> oriProperties = TaskFilesTransferUtils.getVarPools(taskExecutionContext);
 
         StorageOperate storageOperate = Mockito.mock(StorageOperate.class);
         TaskFilesTransferUtils.uploadOutputFiles(taskExecutionContext, storageOperate);
@@ -107,16 +107,16 @@ public class TaskFilesTransferUtilsTest {
                 String.format("%s_%s", exceptTemplate, folderPath.getName() + TaskFilesTransferUtils.PACK_SUFFIX);
         String exceptFile = String.format("%s_%s", exceptTemplate, file.getName());
 
-        List<Property> properties = TaskFilesTransferUtils.getVarPools(taskExecutionContext);
+        List<Parameter> properties = TaskFilesTransferUtils.getVarPools(taskExecutionContext);
         Assertions.assertEquals(4, properties.size());
 
-        Assertions.assertEquals(String.format("%s.%s", taskName, "folder"), properties.get(0).getProp());
+        Assertions.assertEquals(String.format("%s.%s", taskName, "folder"), properties.get(0).getKey());
         Assertions.assertEquals(exceptFolder, properties.get(0).getValue());
 
-        Assertions.assertEquals(String.format("%s.%s", taskName, "file"), properties.get(1).getProp());
+        Assertions.assertEquals(String.format("%s.%s", taskName, "file"), properties.get(1).getKey());
         Assertions.assertEquals(exceptFile, properties.get(1).getValue());
 
-        Assertions.assertEquals(oriProperties.get(2).getProp(), properties.get(2).getProp());
+        Assertions.assertEquals(oriProperties.get(2).getKey(), properties.get(2).getKey());
         Assertions.assertEquals(oriProperties.get(3).getValue(), properties.get(3).getValue());
 
     }
@@ -128,17 +128,17 @@ public class TaskFilesTransferUtilsTest {
         String filePath = exceptTemplate + "_file";
         String varPool = "[" +
                 String.format(
-                        "{\"prop\":\"task1.folder\",\"direct\":\"IN\",\"type\":\"FILE\",\"value\":\"%s\"},", folderPath)
+                        "{\"key\":\"task1.folder\",\"direct\":\"IN\",\"type\":\"FILE\",\"value\":\"%s\"},", folderPath)
                 +
-                String.format(" {\"prop\":\"task2.file\",\"direct\":\"IN\",\"type\":\"FILE\",\"value\":\"%s\"},",
+                String.format(" {\"key\":\"task2.file\",\"direct\":\"IN\",\"type\":\"FILE\",\"value\":\"%s\"},",
                         filePath)
                 +
-                "{\"prop\":\"a\",\"direct\":\"OUT\",\"type\":\"VARCHAR\",\"value\":\"a\"}," +
-                "{\"prop\":\"b\",\"direct\":\"OUT\",\"type\":\"VARCHAR\",\"value\":\"b\"}" +
+                "{\"key\":\"a\",\"direct\":\"OUT\",\"type\":\"VARCHAR\",\"value\":\"a\"}," +
+                "{\"key\":\"b\",\"direct\":\"OUT\",\"type\":\"VARCHAR\",\"value\":\"b\"}" +
                 "]";
         String varPoolParams = "[" +
-                "{\"prop\":\"folder\",\"direct\":\"IN\",\"type\":\"FILE\",\"value\":\"task1.folder\"}," +
-                " {\"prop\":\"file\",\"direct\":\"IN\",\"type\":\"FILE\",\"value\":\"task2.file\"}" +
+                "{\"key\":\"folder\",\"direct\":\"IN\",\"type\":\"FILE\",\"value\":\"task1.folder\"}," +
+                " {\"key\":\"file\",\"direct\":\"IN\",\"type\":\"FILE\",\"value\":\"task2.file\"}" +
                 "]";
         String taskParams = String.format("{\"localParams\": %s}", varPoolParams);
         TaskExecutionContext taskExecutionContext = TaskExecutionContext.builder()
@@ -163,22 +163,23 @@ public class TaskFilesTransferUtilsTest {
     @Test
     void testGetFileLocalParams() {
         String taskParams = "{\"localParams\":[" +
-                "{\"prop\":\"inputFile\",\"direct\":\"IN\",\"type\":\"FILE\",\"value\":\"task1.data\"}," +
-                "{\"prop\":\"outputFile\",\"direct\":\"OUT\",\"type\":\"FILE\",\"value\":\"data\"}," +
-                "{\"prop\":\"a\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"a\"}," +
-                "{\"prop\":\"b\",\"direct\":\"OUT\",\"type\":\"VARCHAR\",\"value\":\"b\"}" +
+                "{\"key\":\"inputFile\",\"direct\":\"IN\",\"type\":\"FILE\",\"value\":\"task1.data\"}," +
+                "{\"key\":\"outputFile\",\"direct\":\"OUT\",\"type\":\"FILE\",\"value\":\"data\"}," +
+                "{\"key\":\"a\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"a\"}," +
+                "{\"key\":\"b\",\"direct\":\"OUT\",\"type\":\"VARCHAR\",\"value\":\"b\"}" +
                 "]}";
         TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(taskParams);
 
-        List<Property> fileLocalParamsIn = TaskFilesTransferUtils.getFileLocalParams(taskExecutionContext, Direct.IN);
+        List<Parameter> fileLocalParamsIn = TaskFilesTransferUtils.getFileLocalParams(taskExecutionContext, Direct.IN);
         Assertions.assertEquals(1, fileLocalParamsIn.size());
-        Assertions.assertEquals("inputFile", fileLocalParamsIn.get(0).getProp());
+        Assertions.assertEquals("inputFile", fileLocalParamsIn.get(0).getKey());
         Assertions.assertEquals("task1.data", fileLocalParamsIn.get(0).getValue());
 
-        List<Property> fileLocalParamsOut = TaskFilesTransferUtils.getFileLocalParams(taskExecutionContext, Direct.OUT);
+        List<Parameter> fileLocalParamsOut =
+                TaskFilesTransferUtils.getFileLocalParams(taskExecutionContext, Direct.OUT);
         Assertions.assertEquals(1, fileLocalParamsOut.size());
-        Assertions.assertEquals("outputFile", fileLocalParamsOut.get(0).getProp());
+        Assertions.assertEquals("outputFile", fileLocalParamsOut.get(0).getKey());
         Assertions.assertEquals("data", fileLocalParamsOut.get(0).getValue());
 
     }
@@ -204,33 +205,33 @@ public class TaskFilesTransferUtilsTest {
     @Test
     void testGetVarPools() {
         String varPoolsString = "[" +
-                "{\"prop\":\"input\",\"direct\":\"IN\",\"type\":\"FILE\",\"value\":\"task1.output\"}" +
-                ",{\"prop\":\"a\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"${a}\"}" +
+                "{\"key\":\"input\",\"direct\":\"IN\",\"type\":\"FILE\",\"value\":\"task1.output\"}" +
+                ",{\"key\":\"a\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"${a}\"}" +
                 "]";
         TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         Mockito.when(taskExecutionContext.getVarPool()).thenReturn(varPoolsString);
 
-        List<Property> varPools = TaskFilesTransferUtils.getVarPools(taskExecutionContext);
+        List<Parameter> varPools = TaskFilesTransferUtils.getVarPools(taskExecutionContext);
         Assertions.assertEquals(2, varPools.size());
 
-        Property varPool0 = varPools.get(0);
-        Assertions.assertEquals("input", varPool0.getProp());
+        Parameter varPool0 = varPools.get(0);
+        Assertions.assertEquals("input", varPool0.getKey());
         Assertions.assertEquals(Direct.IN, varPool0.getDirect());
         Assertions.assertEquals(DataType.FILE, varPool0.getType());
         Assertions.assertEquals("task1.output", varPool0.getValue());
 
-        Property varPool1 = varPools.get(1);
-        Assertions.assertEquals("a", varPool1.getProp());
+        Parameter varPool1 = varPools.get(1);
+        Assertions.assertEquals("a", varPool1.getKey());
         Assertions.assertEquals(Direct.IN, varPool1.getDirect());
         Assertions.assertEquals(DataType.VARCHAR, varPool1.getType());
         Assertions.assertEquals("${a}", varPool1.getValue());
 
         Mockito.when(taskExecutionContext.getVarPool()).thenReturn("[]");
-        List<Property> varPoolsEmpty = TaskFilesTransferUtils.getVarPools(taskExecutionContext);
+        List<Parameter> varPoolsEmpty = TaskFilesTransferUtils.getVarPools(taskExecutionContext);
         Assertions.assertEquals(0, varPoolsEmpty.size());
 
         Mockito.when(taskExecutionContext.getVarPool()).thenReturn(null);
-        List<Property> varPoolsNull = TaskFilesTransferUtils.getVarPools(taskExecutionContext);
+        List<Parameter> varPoolsNull = TaskFilesTransferUtils.getVarPools(taskExecutionContext);
         Assertions.assertEquals(0, varPoolsNull.size());
 
     }

@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import java.io.IOException;
@@ -130,7 +130,7 @@ public class KubeflowTask extends AbstractRemoteTask {
         String yamlContent = kubeflowParameters.getYamlContent();
         String clusterYAML = kubeflowParameters.getClusterYAML();
 
-        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+        Map<String, Parameter> paramsMap = taskExecutionContext.getPrepareParamsMap();
         yamlContent = ParameterUtils.convertParameterPlaceholders(yamlContent, ParameterUtils.convert(paramsMap));
 
         yamlPath = Paths.get(taskExecutionContext.getExecutePath(), KubeflowHelper.CONSTANTS.YAML_FILE_PATH);

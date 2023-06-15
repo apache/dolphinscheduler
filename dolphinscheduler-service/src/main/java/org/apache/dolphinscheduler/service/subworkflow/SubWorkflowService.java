@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.service.subworkflow;
 
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.RelationSubWorkflow;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 
 import java.util.List;
 
@@ -42,5 +42,5 @@ public interface SubWorkflowService {
 
     List<ProcessInstance> filterFailedProcessInstances(List<ProcessInstance> processInstanceList);
 
-    List<Property> getWorkflowOutputParameters(ProcessInstance processInstance);
+    List<Parameter> getWorkflowOutputParameters(ProcessInstance processInstance);
 }

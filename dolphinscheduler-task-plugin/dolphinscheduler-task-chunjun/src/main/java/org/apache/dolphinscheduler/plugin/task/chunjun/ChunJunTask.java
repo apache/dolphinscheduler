@@ -27,7 +27,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
@@ -110,7 +110,7 @@ public class ChunJunTask extends AbstractTask {
     @Override
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
-            Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+            Map<String, Parameter> paramsMap = taskExecutionContext.getPrepareParamsMap();
 
             String jsonFilePath = buildChunJunJsonFile(paramsMap);
             String shellCommandFilePath = buildShellCommandFile(jsonFilePath, paramsMap);
@@ -140,7 +140,7 @@ public class ChunJunTask extends AbstractTask {
      * @return
      * @throws Exception
      */
-    private String buildChunJunJsonFile(Map<String, Property> paramsMap) throws Exception {
+    private String buildChunJunJsonFile(Map<String, Parameter> paramsMap) throws Exception {
         // generate json
         String fileName = String.format("%s/%s_job.json",
                 taskExecutionContext.getExecutePath(),
@@ -173,7 +173,7 @@ public class ChunJunTask extends AbstractTask {
      * @return shell command file name
      * @throws Exception if error throws Exception
      */
-    private String buildShellCommandFile(String jobConfigFilePath, Map<String, Property> paramsMap) throws Exception {
+    private String buildShellCommandFile(String jobConfigFilePath, Map<String, Parameter> paramsMap) throws Exception {
         // generate scripts
         String fileName = String.format("%s/%s_node.%s",
                 taskExecutionContext.getExecutePath(),

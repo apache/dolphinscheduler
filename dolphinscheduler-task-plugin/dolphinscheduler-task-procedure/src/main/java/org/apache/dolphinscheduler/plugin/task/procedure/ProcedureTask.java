@@ -30,7 +30,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
@@ -101,8 +101,8 @@ public class ProcedureTask extends AbstractTask {
         ConnectionParam connectionParams =
                 dataSourceProcessor.createConnectionParams(procedureTaskExecutionContext.getConnectionParams());
         try (Connection connection = dataSourceProcessor.getConnection(connectionParams)) {
-            Map<Integer, Property> sqlParamsMap = new HashMap<>();
-            Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap() == null ? Maps.newHashMap()
+            Map<Integer, Parameter> sqlParamsMap = new HashMap<>();
+            Map<String, Parameter> paramsMap = taskExecutionContext.getPrepareParamsMap() == null ? Maps.newHashMap()
                     : taskExecutionContext.getPrepareParamsMap();
             if (procedureParameters.getOutProperty() != null) {
                 // set out params before format sql
@@ -115,7 +115,7 @@ public class ProcedureTask extends AbstractTask {
                 setTimeout(stmt);
 
                 // outParameterMap
-                Map<Integer, Property> outParameterMap = getOutParameterMap(stmt, sqlParamsMap, paramsMap);
+                Map<Integer, Parameter> outParameterMap = getOutParameterMap(stmt, sqlParamsMap, paramsMap);
 
                 stmt.executeUpdate();
 
@@ -136,7 +136,7 @@ public class ProcedureTask extends AbstractTask {
 
     }
 
-    private String formatSql(Map<Integer, Property> sqlParamsMap, Map<String, Property> paramsMap) {
+    private String formatSql(Map<Integer, Parameter> sqlParamsMap, Map<String, Parameter> paramsMap) {
         setSqlParamsMap(procedureParameters.getMethod(), rgex, sqlParamsMap, paramsMap,
                 taskExecutionContext.getTaskInstanceId());
         return procedureParameters.getMethod().replaceAll(rgex, "?");
@@ -150,11 +150,11 @@ public class ProcedureTask extends AbstractTask {
      * @throws SQLException SQLException
      */
     private void printOutParameter(CallableStatement stmt,
-                                   Map<Integer, Property> outParameterMap) throws SQLException {
-        for (Map.Entry<Integer, Property> en : outParameterMap.entrySet()) {
+                                   Map<Integer, Parameter> outParameterMap) throws SQLException {
+        for (Map.Entry<Integer, Parameter> en : outParameterMap.entrySet()) {
             int index = en.getKey();
-            Property property = en.getValue();
-            String prop = property.getProp();
+            Parameter property = en.getValue();
+            String prop = property.getKey();
             DataType dataType = property.getType();
             // get output parameter
             procedureParameters.dealOutParam4Procedure(getOutputParameter(stmt, index, prop, dataType), prop);
@@ -169,22 +169,22 @@ public class ProcedureTask extends AbstractTask {
      * @return outParameterMap
      * @throws Exception Exception
      */
-    private Map<Integer, Property> getOutParameterMap(CallableStatement stmt, Map<Integer, Property> paramsMap,
-                                                      Map<String, Property> totalParamsMap) throws Exception {
-        Map<Integer, Property> outParameterMap = new HashMap<>();
+    private Map<Integer, Parameter> getOutParameterMap(CallableStatement stmt, Map<Integer, Parameter> paramsMap,
+                                                       Map<String, Parameter> totalParamsMap) throws Exception {
+        Map<Integer, Parameter> outParameterMap = new HashMap<>();
         if (procedureParameters.getLocalParametersMap() == null) {
             return outParameterMap;
         }
 
         int index = 1;
         if (paramsMap != null) {
-            for (Map.Entry<Integer, Property> entry : paramsMap.entrySet()) {
-                Property property = entry.getValue();
+            for (Map.Entry<Integer, Parameter> entry : paramsMap.entrySet()) {
+                Parameter property = entry.getValue();
                 if (property.getDirect().equals(Direct.IN)) {
                     ParameterUtils.setInParameter(index, stmt, property.getType(),
-                            totalParamsMap.get(property.getProp()).getValue());
+                            totalParamsMap.get(property.getKey()).getValue());
                 } else if (property.getDirect().equals(Direct.OUT)) {
-                    setOutParameter(index, stmt, property.getType(), totalParamsMap.get(property.getProp()).getValue());
+                    setOutParameter(index, stmt, property.getType(), totalParamsMap.get(property.getKey()).getValue());
                     outParameterMap.put(index, property);
                 }
                 index++;

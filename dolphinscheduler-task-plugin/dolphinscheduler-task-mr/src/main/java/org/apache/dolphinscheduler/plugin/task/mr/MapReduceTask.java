@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
@@ -73,7 +73,7 @@ public class MapReduceTask extends AbstractYarnTask {
         mapreduceParameters.setQueue(taskExecutionContext.getQueue());
 
         // replace placeholder,and combine local and global parameters
-        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+        Map<String, Parameter> paramsMap = taskExecutionContext.getPrepareParamsMap();
 
         String args = ParameterUtils.convertParameterPlaceholders(mapreduceParameters.getMainArgs(),
                 ParameterUtils.convert(paramsMap));

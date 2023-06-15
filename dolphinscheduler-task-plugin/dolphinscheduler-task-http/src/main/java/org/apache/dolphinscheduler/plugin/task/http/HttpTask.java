@@ -27,7 +27,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
@@ -133,7 +133,7 @@ public class HttpTask extends AbstractTask {
         RequestBuilder builder = createRequestBuilder();
 
         // replace placeholder,and combine local and global parameters
-        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+        Map<String, Parameter> paramsMap = taskExecutionContext.getPrepareParamsMap();
 
         List<HttpProperty> httpPropertyList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(httpParameters.getHttpParams())) {
@@ -333,8 +333,8 @@ public class HttpTask extends AbstractTask {
 
     public void addDefaultOutput(String response) {
         // put response in output
-        Property outputProperty = new Property();
-        outputProperty.setProp(String.format("%s.%s", taskExecutionContext.getTaskName(), "response"));
+        Parameter outputProperty = new Parameter();
+        outputProperty.setKey(String.format("%s.%s", taskExecutionContext.getTaskName(), "response"));
         outputProperty.setDirect(Direct.OUT);
         outputProperty.setType(DataType.VARCHAR);
         outputProperty.setValue(response);

@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.sqoop.parameter.sources;
 
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 
 import java.util.List;
 
@@ -53,15 +53,15 @@ public class SourceMysqlParameter {
     /**
      * src condition list
      */
-    private List<Property> srcConditionList;
+    private List<Parameter> srcConditionList;
     /**
      * map column hive
      */
-    private List<Property> mapColumnHive;
+    private List<Parameter> mapColumnHive;
     /**
      * map column java
      */
-    private List<Property> mapColumnJava;
+    private List<Parameter> mapColumnJava;
 
     public int getSrcDatasource() {
         return srcDatasource;
@@ -111,27 +111,27 @@ public class SourceMysqlParameter {
         this.srcColumns = srcColumns;
     }
 
-    public List<Property> getSrcConditionList() {
+    public List<Parameter> getSrcConditionList() {
         return srcConditionList;
     }
 
-    public void setSrcConditionList(List<Property> srcConditionList) {
+    public void setSrcConditionList(List<Parameter> srcConditionList) {
         this.srcConditionList = srcConditionList;
     }
 
-    public List<Property> getMapColumnHive() {
+    public List<Parameter> getMapColumnHive() {
         return mapColumnHive;
     }
 
-    public void setMapColumnHive(List<Property> mapColumnHive) {
+    public void setMapColumnHive(List<Parameter> mapColumnHive) {
         this.mapColumnHive = mapColumnHive;
     }
 
-    public List<Property> getMapColumnJava() {
+    public List<Parameter> getMapColumnJava() {
         return mapColumnJava;
     }
 
-    public void setMapColumnJava(List<Property> mapColumnJava) {
+    public void setMapColumnJava(List<Parameter> mapColumnJava) {
         this.mapColumnJava = mapColumnJava;
     }
 }

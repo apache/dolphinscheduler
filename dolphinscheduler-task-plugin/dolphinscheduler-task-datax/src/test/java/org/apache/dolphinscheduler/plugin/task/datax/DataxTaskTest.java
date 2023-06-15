@@ -34,7 +34,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskRunStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
@@ -265,15 +265,15 @@ public class DataxTaskTest {
         return dataxParameters;
     }
 
-    private Map<String, Property> createPrepareParamsMap() {
-        Map<String, Property> paramsMap = new HashMap<>();
-        Property dtProperty = new Property();
-        dtProperty.setProp("DT");
+    private Map<String, Parameter> createPrepareParamsMap() {
+        Map<String, Parameter> paramsMap = new HashMap<>();
+        Parameter dtProperty = new Parameter();
+        dtProperty.setKey("DT");
         dtProperty.setDirect(Direct.IN);
         dtProperty.setType(DataType.VARCHAR);
         dtProperty.setValue("DT");
-        Property dsProperty = new Property();
-        dsProperty.setProp("DS");
+        Parameter dsProperty = new Parameter();
+        dsProperty.setKey("DS");
         dsProperty.setDirect(Direct.IN);
         dsProperty.setType(DataType.VARCHAR);
         dsProperty.setValue("DS");

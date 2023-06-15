@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 
@@ -52,23 +52,23 @@ public abstract class AbstractParameters implements IParameters {
     /**
      * local parameters
      */
-    public List<Property> localParams;
+    public List<Parameter> localParams;
 
     /**
      * var pool
      */
-    public List<Property> varPool;
+    public List<Parameter> varPool;
 
     /**
      * get local parameters list
      *
      * @return Property list
      */
-    public List<Property> getLocalParams() {
+    public List<Parameter> getLocalParams() {
         return localParams;
     }
 
-    public void setLocalParams(List<Property> localParams) {
+    public void setLocalParams(List<Parameter> localParams) {
         this.localParams = localParams;
     }
 
@@ -76,11 +76,11 @@ public abstract class AbstractParameters implements IParameters {
      * get local parameters map
      * @return parameters map
      */
-    public Map<String, Property> getLocalParametersMap() {
-        Map<String, Property> localParametersMaps = new LinkedHashMap<>();
+    public Map<String, Parameter> getLocalParametersMap() {
+        Map<String, Parameter> localParametersMaps = new LinkedHashMap<>();
         if (localParams != null) {
-            for (Property property : localParams) {
-                localParametersMaps.put(property.getProp(), property);
+            for (Parameter property : localParams) {
+                localParametersMaps.put(property.getKey(), property);
             }
         }
         return localParametersMaps;
@@ -90,13 +90,13 @@ public abstract class AbstractParameters implements IParameters {
      * get input local parameters map if the param direct is IN
      * @return parameters map
      */
-    public Map<String, Property> getInputLocalParametersMap() {
-        Map<String, Property> localParametersMaps = new LinkedHashMap<>();
+    public Map<String, Parameter> getInputLocalParametersMap() {
+        Map<String, Parameter> localParametersMaps = new LinkedHashMap<>();
         if (localParams != null) {
-            for (Property property : localParams) {
+            for (Parameter property : localParams) {
                 // The direct of some tasks is empty, default IN
                 if (property.getDirect() == null || Objects.equals(Direct.IN, property.getDirect())) {
-                    localParametersMaps.put(property.getProp(), property);
+                    localParametersMaps.put(property.getKey(), property);
                 }
             }
         }
@@ -108,17 +108,17 @@ public abstract class AbstractParameters implements IParameters {
      *
      * @return parameters map
      */
-    public Map<String, Property> getVarPoolMap() {
-        Map<String, Property> varPoolMap = new LinkedHashMap<>();
+    public Map<String, Parameter> getVarPoolMap() {
+        Map<String, Parameter> varPoolMap = new LinkedHashMap<>();
         if (varPool != null) {
-            for (Property property : varPool) {
-                varPoolMap.put(property.getProp(), property);
+            for (Parameter property : varPool) {
+                varPoolMap.put(property.getKey(), property);
             }
         }
         return varPoolMap;
     }
 
-    public List<Property> getVarPool() {
+    public List<Parameter> getVarPool() {
         return varPool;
     }
 
@@ -126,7 +126,7 @@ public abstract class AbstractParameters implements IParameters {
         if (StringUtils.isEmpty(varPool)) {
             this.varPool = new ArrayList<>();
         } else {
-            this.varPool = JSONUtils.toList(varPool, Property.class);
+            this.varPool = JSONUtils.toList(varPool, Parameter.class);
         }
     }
 
@@ -134,7 +134,7 @@ public abstract class AbstractParameters implements IParameters {
         if (CollectionUtils.isEmpty(localParams)) {
             return;
         }
-        List<Property> outProperty = getOutProperty(localParams);
+        List<Parameter> outProperty = getOutProperty(localParams);
         if (CollectionUtils.isEmpty(outProperty)) {
             return;
         }
@@ -146,8 +146,8 @@ public abstract class AbstractParameters implements IParameters {
         if (taskResult.size() == 0) {
             return;
         }
-        for (Property info : outProperty) {
-            String propValue = taskResult.get(info.getProp());
+        for (Parameter info : outProperty) {
+            String propValue = taskResult.get(info.getKey());
             if (StringUtils.isNotEmpty(propValue)) {
                 info.setValue(propValue);
                 addPropertyToValPool(info);
@@ -155,12 +155,12 @@ public abstract class AbstractParameters implements IParameters {
         }
     }
 
-    public List<Property> getOutProperty(List<Property> params) {
+    public List<Parameter> getOutProperty(List<Parameter> params) {
         if (CollectionUtils.isEmpty(params)) {
             return new ArrayList<>();
         }
-        List<Property> result = new ArrayList<>();
-        for (Property info : params) {
+        List<Parameter> result = new ArrayList<>();
+        for (Parameter info : params) {
             if (info.getDirect() == Direct.OUT) {
                 result.add(info);
             }
@@ -199,8 +199,8 @@ public abstract class AbstractParameters implements IParameters {
         return new ResourceParametersHelper();
     }
 
-    public void addPropertyToValPool(Property property) {
-        varPool.removeIf(p -> p.getProp().equals(property.getProp()));
+    public void addPropertyToValPool(Parameter property) {
+        varPool.removeIf(p -> p.getKey().equals(property.getKey()));
         varPool.add(property);
     }
 }

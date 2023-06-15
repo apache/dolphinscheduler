@@ -47,7 +47,7 @@ export function useCustomParams({
           span: 6,
           class: 'input-param-key',
           props: {
-            placeholder: t('project.node.prop_tips'),
+            placeholder: t('project.node.key_tips'),
             maxLength: 256
           },
           validate: {
@@ -55,7 +55,7 @@ export function useCustomParams({
             required: true,
             validator(validate: any, value: string) {
               if (!value) {
-                return new Error(t('project.node.prop_tips'))
+                return new Error(t('project.node.key_tips'))
               }
 
               const sameItems = model[field].filter(
@@ -63,7 +63,7 @@ export function useCustomParams({
               )
 
               if (sameItems.length > 1) {
-                return new Error(t('project.node.prop_repeat'))
+                return new Error(t('project.node.key_repeat'))
               }
             }
           }

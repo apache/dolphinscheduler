@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.sql;
 
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 
 import java.util.Map;
 
@@ -27,9 +27,9 @@ import java.util.Map;
 public class SqlBinds {
 
     private final String sql;
-    private final Map<Integer, Property> paramsMap;
+    private final Map<Integer, Parameter> paramsMap;
 
-    public SqlBinds(String sql, Map<Integer, Property> paramsMap) {
+    public SqlBinds(String sql, Map<Integer, Parameter> paramsMap) {
         this.sql = sql;
         this.paramsMap = paramsMap;
     }
@@ -38,7 +38,7 @@ public class SqlBinds {
         return sql;
     }
 
-    public Map<Integer, Property> getParamsMap() {
+    public Map<Integer, Parameter> getParamsMap() {
         return paramsMap;
     }
 }

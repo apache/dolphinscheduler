@@ -31,7 +31,7 @@ import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 
 import java.util.Map;
@@ -151,7 +151,7 @@ public class TaskExecutionContextBuilder {
      * @param propertyMap
      * @return
      */
-    public TaskExecutionContextBuilder buildParamInfo(Map<String, Property> propertyMap) {
+    public TaskExecutionContextBuilder buildParamInfo(Map<String, Parameter> propertyMap) {
         taskExecutionContext.setPrepareParamsMap(propertyMap);
         return this;
     }
@@ -162,7 +162,7 @@ public class TaskExecutionContextBuilder {
      * @param businessParamsMap
      * @return
      */
-    public TaskExecutionContextBuilder buildBusinessParamsMap(Map<String, Property> businessParamsMap) {
+    public TaskExecutionContextBuilder buildBusinessParamsMap(Map<String, Parameter> businessParamsMap) {
         taskExecutionContext.setParamsMap(businessParamsMap);
         return this;
     }

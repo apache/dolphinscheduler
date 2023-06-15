@@ -35,7 +35,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
@@ -321,7 +321,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
                         .taskType(taskInstance.getTaskType())
                         .taskParams(taskInstance.getTaskParams())
                         .build());
-        Map<String, Property> propertyMap = paramParsingPreparation(taskInstance, baseParam);
+        Map<String, Parameter> propertyMap = paramParsingPreparation(taskInstance, baseParam);
         TaskExecutionContext taskExecutionContext = TaskExecutionContextBuilder.get()
                 .buildWorkflowInstanceHost(masterConfig.getMasterAddress())
                 .buildTaskInstanceRelatedInfo(taskInstance)
@@ -432,18 +432,18 @@ public class StreamTaskExecuteRunnable implements Runnable {
         }
     }
 
-    public Map<String, Property> paramParsingPreparation(@NonNull TaskInstance taskInstance,
-                                                         @NonNull AbstractParameters parameters) {
+    public Map<String, Parameter> paramParsingPreparation(@NonNull TaskInstance taskInstance,
+                                                          @NonNull AbstractParameters parameters) {
         // assign value to definedParams here
         Map<String, String> globalParamsMap = taskExecuteStartMessage.getStartParams();
-        Map<String, Property> globalParams = ParameterUtils.getUserDefParamsMap(globalParamsMap);
+        Map<String, Parameter> globalParams = ParameterUtils.getUserDefParamsMap(globalParamsMap);
 
         // combining local and global parameters
-        Map<String, Property> localParams = parameters.getInputLocalParametersMap();
+        Map<String, Parameter> localParams = parameters.getInputLocalParametersMap();
 
         // stream pass params
         parameters.setVarPool(taskInstance.getVarPool());
-        Map<String, Property> varParams = parameters.getVarPoolMap();
+        Map<String, Parameter> varParams = parameters.getVarPoolMap();
 
         if (globalParams.isEmpty() && localParams.isEmpty() && varParams.isEmpty()) {
             return null;

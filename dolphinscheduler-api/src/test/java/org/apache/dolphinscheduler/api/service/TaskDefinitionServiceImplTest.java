@@ -162,7 +162,7 @@ public class TaskDefinitionServiceImplTest {
 
         String createTaskDefinitionJson =
                 "[{\"name\":\"detail_up\",\"description\":\"\",\"taskType\":\"SHELL\",\"taskParams\":"
-                        + "\"{\\\"resourceList\\\":[],\\\"localParams\\\":[{\\\"prop\\\":\\\"datetime\\\",\\\"direct\\\":\\\"IN\\\","
+                        + "\"{\\\"resourceList\\\":[],\\\"localParams\\\":[{\\\"key\\\":\\\"datetime\\\",\\\"direct\\\":\\\"IN\\\","
                         + "\\\"type\\\":\\\"VARCHAR\\\",\\\"value\\\":\\\"${system.datetime}\\\"}],\\\"rawScript\\\":"
                         + "\\\"echo ${datetime}\\\",\\\"conditionResult\\\":\\\"{\\\\\\\"successNode\\\\\\\":[\\\\\\\"\\\\\\\"],"
                         + "\\\\\\\"failedNode\\\\\\\":[\\\\\\\"\\\\\\\"]}\\\",\\\"dependence\\\":{}}\",\"flag\":0,\"taskPriority\":0,"
@@ -290,7 +290,7 @@ public class TaskDefinitionServiceImplTest {
     public void checkJson() {
         String taskDefinitionJson =
                 "[{\"name\":\"detail_up\",\"description\":\"\",\"taskType\":\"SHELL\",\"taskParams\":"
-                        + "\"{\\\"resourceList\\\":[],\\\"localParams\\\":[{\\\"prop\\\":\\\"datetime\\\",\\\"direct\\\":\\\"IN\\\","
+                        + "\"{\\\"resourceList\\\":[],\\\"localParams\\\":[{\\\"key\\\":\\\"datetime\\\",\\\"direct\\\":\\\"IN\\\","
                         + "\\\"type\\\":\\\"VARCHAR\\\",\\\"value\\\":\\\"${system.datetime}\\\"}],\\\"rawScript\\\":"
                         + "\\\"echo ${datetime}\\\",\\\"conditionResult\\\":\\\"{\\\\\\\"successNode\\\\\\\":[\\\\\\\"\\\\\\\"],"
                         + "\\\\\\\"failedNode\\\\\\\":[\\\\\\\"\\\\\\\"]}\\\",\\\"dependence\\\":{}}\",\"flag\":0,\"taskPriority\":0,"
@@ -309,7 +309,7 @@ public class TaskDefinitionServiceImplTest {
         taskDefinitionLogs = JSONUtils.toList(taskJson, TaskDefinitionLog.class);
         Assertions.assertFalse(taskDefinitionLogs.isEmpty());
         String taskParams =
-                "{\"resourceList\":[],\"localParams\":[{\"prop\":\"datetime\",\"direct\":\"IN\",\"type\":\"VARCHAR\","
+                "{\"resourceList\":[],\"localParams\":[{\"key\":\"datetime\",\"direct\":\"IN\",\"type\":\"VARCHAR\","
                         + "\"value\":\"${system.datetime}\"}],\"rawScript\":\"echo ${datetime}\",\"conditionResult\":\"{\\\"successNode\\\":[\\\"\\\"],"
                         + "\\\"failedNode\\\":[\\\"\\\"]}\",\"dependence\":{}}";
         Map parameters = JSONUtils.parseObject(taskParams, Map.class);
@@ -626,7 +626,7 @@ public class TaskDefinitionServiceImplTest {
 
     private String getTaskDefinitionJson() {
         return "{\"name\":\"detail_up\",\"description\":\"\",\"taskType\":\"SHELL\",\"taskParams\":"
-                + "\"{\\\"resourceList\\\":[],\\\"localParams\\\":[{\\\"prop\\\":\\\"datetime\\\","
+                + "\"{\\\"resourceList\\\":[],\\\"localParams\\\":[{\\\"key\\\":\\\"datetime\\\","
                 + "\\\"direct\\\":\\\"IN\\\",\\\"type\\\":\\\"VARCHAR\\\","
                 + "\\\"value\\\":\\\"${system.datetime}\\\"}],\\\"rawScript\\\":\\\"echo ${datetime}\\\","
                 + "\\\"conditionResult\\\":\\\"{\\\\\\\"successNode\\\\\\\":[\\\\\\\"\\\\\\\"],"

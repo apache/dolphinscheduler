@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.api.model.SwitchResultVo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
@@ -134,21 +134,21 @@ public class SwitchLogicTask extends BaseSyncLogicTask<SwitchParameters> {
     public String setTaskParams(String content, String rgex) {
         Pattern pattern = Pattern.compile(rgex);
         Matcher m = pattern.matcher(content);
-        Map<String, Property> globalParams = JSONUtils
-                .toList(processInstance.getGlobalParams(), Property.class)
+        Map<String, Parameter> globalParams = JSONUtils
+                .toList(processInstance.getGlobalParams(), Parameter.class)
                 .stream()
-                .collect(Collectors.toMap(Property::getProp, Property -> Property));
-        Map<String, Property> varParams = JSONUtils
-                .toList(taskInstance.getVarPool(), Property.class)
+                .collect(Collectors.toMap(Parameter::getKey, Property -> Property));
+        Map<String, Parameter> varParams = JSONUtils
+                .toList(taskInstance.getVarPool(), Parameter.class)
                 .stream()
-                .collect(Collectors.toMap(Property::getProp, Property -> Property));
+                .collect(Collectors.toMap(Parameter::getKey, Property -> Property));
         if (varParams.size() > 0) {
             varParams.putAll(globalParams);
             globalParams = varParams;
         }
         while (m.find()) {
             String paramName = m.group(1);
-            Property property = globalParams.get(paramName);
+            Parameter property = globalParams.get(paramName);
             if (property == null) {
                 return "";
             }

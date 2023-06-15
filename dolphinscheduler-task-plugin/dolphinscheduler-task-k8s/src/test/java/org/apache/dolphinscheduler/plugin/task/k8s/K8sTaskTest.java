@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Label;
 import org.apache.dolphinscheduler.plugin.task.api.model.NodeSelectorExpression;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.K8sTaskParameters;
 
 import java.util.ArrayList;
@@ -76,18 +76,18 @@ public class K8sTaskTest {
         taskRequest.setTaskInstanceId(taskInstanceId);
         taskRequest.setTaskName(taskName);
         taskRequest.setTaskParams(JSONUtils.toJsonString(k8sTaskParameters));
-        Property property = new Property();
-        property.setProp(DAY);
+        Parameter property = new Parameter();
+        property.setKey(DAY);
         property.setDirect(Direct.IN);
         property.setType(DataType.VARCHAR);
         property.setValue(date);
-        Map<String, Property> paramsMap = new HashMap<>();
+        Map<String, Parameter> paramsMap = new HashMap<>();
         paramsMap.put(DAY, property);
         taskRequest.setParamsMap(paramsMap);
 
-        Map<String, Property> prepareParamsMap = new HashMap<>();
-        Property property1 = new Property();
-        property1.setProp("day");
+        Map<String, Parameter> prepareParamsMap = new HashMap<>();
+        Parameter property1 = new Parameter();
+        property1.setKey("day");
         property1.setValue("20220507");
         prepareParamsMap.put("day", property1);
         taskRequest.setPrepareParamsMap(prepareParamsMap);

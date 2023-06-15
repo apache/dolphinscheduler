@@ -53,7 +53,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ConnectorType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ExecuteSqlType;
 import org.apache.dolphinscheduler.plugin.task.api.model.JdbcInfo;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.K8sTaskParameters;
@@ -130,11 +130,11 @@ public class TaskExecutionContextFactory {
 
         K8sTaskExecutionContext k8sTaskExecutionContext = setK8sTaskRelation(taskInstance);
 
-        Map<String, Property> businessParamsMap = curingParamsService.preBuildBusinessParams(workflowInstance);
+        Map<String, Parameter> businessParamsMap = curingParamsService.preBuildBusinessParams(workflowInstance);
 
         AbstractParameters baseParam = taskPluginManager.getParameters(ParametersNode.builder()
                 .taskType(taskInstance.getTaskType()).taskParams(taskInstance.getTaskParams()).build());
-        Map<String, Property> propertyMap =
+        Map<String, Parameter> propertyMap =
                 curingParamsService.paramParsingPreparation(taskInstance, baseParam, workflowInstance);
         return TaskExecutionContextBuilder.get()
                 .buildWorkflowInstanceHost(masterConfig.getMasterAddress())

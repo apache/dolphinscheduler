@@ -38,7 +38,7 @@ import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
 import org.apache.dolphinscheduler.plugin.task.api.DataQualityTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.dataquality.DataQualityParameters;
@@ -171,7 +171,7 @@ public class DataQualityTask extends AbstractYarnTask {
         args.addAll(SparkArgsUtils.buildArgs(dataQualityParameters.getSparkParameters()));
 
         // replace placeholder
-        Map<String, Property> paramsMap = dqTaskExecutionContext.getPrepareParamsMap();
+        Map<String, Parameter> paramsMap = dqTaskExecutionContext.getPrepareParamsMap();
         String command =
                 ParameterUtils.convertParameterPlaceholders(String.join(" ", args), ParameterUtils.convert(paramsMap));
         log.info("data quality task command: {}", command);

@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.service.expand;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
 import java.util.Date;
@@ -66,7 +66,7 @@ public interface CuringParamsService {
      * @return
      */
     String curingGlobalParams(Integer processInstanceId, Map<String, String> globalParamMap,
-                              List<Property> globalParamList, CommandType commandType, Date scheduleTime,
+                              List<Parameter> globalParamList, CommandType commandType, Date scheduleTime,
                               String timezone);
 
     /**
@@ -76,14 +76,14 @@ public interface CuringParamsService {
      * @param processInstance
      * @return
      */
-    Map<String, Property> paramParsingPreparation(@NonNull TaskInstance taskInstance,
-                                                  @NonNull AbstractParameters parameters,
-                                                  @NonNull ProcessInstance processInstance);
+    Map<String, Parameter> paramParsingPreparation(@NonNull TaskInstance taskInstance,
+                                                   @NonNull AbstractParameters parameters,
+                                                   @NonNull ProcessInstance processInstance);
 
     /**
      * preBuildBusinessParams
      * @param processInstance
      * @return
      */
-    Map<String, Property> preBuildBusinessParams(ProcessInstance processInstance);
+    Map<String, Parameter> preBuildBusinessParams(ProcessInstance processInstance);
 }

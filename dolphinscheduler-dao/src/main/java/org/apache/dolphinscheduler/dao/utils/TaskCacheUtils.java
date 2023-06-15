@@ -26,7 +26,7 @@ import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -127,26 +127,26 @@ public class TaskCacheUtils {
         JsonNode taskParams = JSONUtils.parseObject(taskInstance.getTaskParams());
 
         // The set of input values considered from localParams in the taskParams
-        Set<String> propertyInSet = JSONUtils.toList(taskParams.get("localParams").toString(), Property.class).stream()
+        Set<String> propertyInSet = JSONUtils.toList(taskParams.get("localParams").toString(), Parameter.class).stream()
                 .filter(property -> property.getDirect().equals(Direct.IN))
-                .map(Property::getProp).collect(Collectors.toSet());
+                .map(Parameter::getKey).collect(Collectors.toSet());
 
         // The set of input values considered from `${var}` form task definition
         propertyInSet.addAll(getScriptVarInSet(taskInstance));
 
         // var pool value from upstream task
-        List<Property> varPool = JSONUtils.toList(taskInstance.getVarPool(), Property.class);
+        List<Parameter> varPool = JSONUtils.toList(taskInstance.getVarPool(), Parameter.class);
 
         Map<String, String> fileCheckSumMap = new HashMap<>();
-        List<Property> fileInput = varPool.stream().filter(property -> property.getType().equals(DataType.FILE))
+        List<Parameter> fileInput = varPool.stream().filter(property -> property.getType().equals(DataType.FILE))
                 .collect(Collectors.toList());
         fileInput.forEach(
-                property -> fileCheckSumMap.put(property.getProp(), getValCheckSum(property, context, storageOperate)));
+                property -> fileCheckSumMap.put(property.getKey(), getValCheckSum(property, context, storageOperate)));
 
         // var pool value from workflow global parameters
         if (context.getPrepareParamsMap() != null) {
-            Set<String> taskVarPoolSet = varPool.stream().map(Property::getProp).collect(Collectors.toSet());
-            List<Property> globalContextVarPool = context.getPrepareParamsMap().entrySet().stream()
+            Set<String> taskVarPoolSet = varPool.stream().map(Parameter::getKey).collect(Collectors.toSet());
+            List<Parameter> globalContextVarPool = context.getPrepareParamsMap().entrySet().stream()
                     .filter(entry -> !taskVarPoolSet.contains(entry.getKey()))
                     .map(Map.Entry::getValue)
                     .collect(Collectors.toList());
@@ -156,8 +156,8 @@ public class TaskCacheUtils {
         // only consider var pool value which is in propertyInSet
         varPool = varPool.stream()
                 .filter(property -> property.getDirect().equals(Direct.IN))
-                .filter(property -> propertyInSet.contains(property.getProp()))
-                .sorted(Comparator.comparing(Property::getProp))
+                .filter(property -> propertyInSet.contains(property.getKey()))
+                .sorted(Comparator.comparing(Parameter::getKey))
                 .collect(Collectors.toList());
 
         varPool.forEach(property -> {
@@ -175,7 +175,7 @@ public class TaskCacheUtils {
      * @param context
      * @param storageOperate
      */
-    public static String getValCheckSum(Property fileProperty, TaskExecutionContext context,
+    public static String getValCheckSum(Parameter fileProperty, TaskExecutionContext context,
                                         StorageOperate storageOperate) {
         String resourceCRCPath = fileProperty.getValue() + CRC_SUFFIX;
         String resourceCRCWholePath = storageOperate.getResourceFullName(context.getTenantCode(), resourceCRCPath);
@@ -187,7 +187,7 @@ public class TaskCacheUtils {
             crcString = FileUtils.readFile2Str(new FileInputStream(targetPath));
             fileProperty.setValue(crcString);
         } catch (IOException e) {
-            log.error("Replace checksum failed for file property {}.", fileProperty.getProp());
+            log.error("Replace checksum failed for file property {}.", fileProperty.getKey());
         }
         return crcString;
     }

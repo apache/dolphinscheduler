@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -44,9 +44,9 @@ public class SqlParametersTest {
 
     @Test
     public void testSqlParameters() {
-        List<Property> properties = new ArrayList<>();
-        Property property = new Property();
-        property.setProp("test1");
+        List<Parameter> properties = new ArrayList<>();
+        Parameter property = new Parameter();
+        property.setKey("test1");
         property.setDirect(Direct.OUT);
         property.setType(DataType.VARCHAR);
         property.setValue("test1");

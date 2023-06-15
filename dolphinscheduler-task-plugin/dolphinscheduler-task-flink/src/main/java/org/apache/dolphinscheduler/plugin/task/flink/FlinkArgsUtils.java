@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.flink;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ArgsUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
@@ -291,7 +291,7 @@ public class FlinkArgsUtils {
 
         String mainArgs = flinkParameters.getMainArgs();
         if (StringUtils.isNotEmpty(mainArgs)) {
-            Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+            Map<String, Parameter> paramsMap = taskExecutionContext.getPrepareParamsMap();
             args.add(ParameterUtils.convertParameterPlaceholders(mainArgs, ParameterUtils.convert(paramsMap)));
         }
 

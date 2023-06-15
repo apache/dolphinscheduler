@@ -119,7 +119,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqTaskState;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
@@ -656,7 +656,7 @@ public class ProcessServiceImpl implements ProcessService {
         startParamMap.putAll(fatherParamMap);
         // set start param into global params
         Map<String, String> globalMap = processDefinition.getGlobalParamMap();
-        List<Property> globalParamList = processDefinition.getGlobalParamList();
+        List<Parameter> globalParamList = processDefinition.getGlobalParamList();
         if (MapUtils.isNotEmpty(startParamMap) && globalMap != null) {
             // start param to overwrite global param
             for (Map.Entry<String, String> param : globalMap.entrySet()) {
@@ -669,7 +669,7 @@ public class ProcessServiceImpl implements ProcessService {
             for (Entry<String, String> startParam : startParamMap.entrySet()) {
                 if (!globalMap.containsKey(startParam.getKey())) {
                     globalMap.put(startParam.getKey(), startParam.getValue());
-                    globalParamList.add(new Property(startParam.getKey(), IN, VARCHAR, startParam.getValue()));
+                    globalParamList.add(new Parameter(startParam.getKey(), IN, VARCHAR, startParam.getValue()));
                 }
             }
         }
@@ -1064,18 +1064,18 @@ public class ProcessServiceImpl implements ProcessService {
     private String joinGlobalParams(String parentGlobalParams, String subGlobalParams) {
 
         // Since JSONUtils.toList return unmodified list, we need to creat a new List here.
-        List<Property> parentParams = Lists.newArrayList(JSONUtils.toList(parentGlobalParams, Property.class));
-        List<Property> subParams = JSONUtils.toList(subGlobalParams, Property.class);
+        List<Parameter> parentParams = Lists.newArrayList(JSONUtils.toList(parentGlobalParams, Parameter.class));
+        List<Parameter> subParams = JSONUtils.toList(subGlobalParams, Parameter.class);
 
-        Set<String> parentParamKeys = parentParams.stream().map(Property::getProp).collect(toSet());
+        Set<String> parentParamKeys = parentParams.stream().map(Parameter::getKey).collect(toSet());
 
         // We will combine the params of parent workflow and sub workflow
         // If the params are defined in both, we will use parent's params to override the sub workflow(ISSUE-7962)
         // todo: Do we need to consider the other attribute of Property?
         // e.g. the subProp's type is not equals with parent, or subProp's direct is not equals with parent
         // It's suggested to add node name in property, this kind of problem can be solved.
-        List<Property> extraSubParams = subParams.stream()
-                .filter(subProp -> !parentParamKeys.contains(subProp.getProp())).collect(Collectors.toList());
+        List<Parameter> extraSubParams = subParams.stream()
+                .filter(subProp -> !parentParamKeys.contains(subProp.getKey())).collect(Collectors.toList());
         parentParams.addAll(extraSubParams);
         return JSONUtils.toJsonString(parentParams);
     }
@@ -1089,14 +1089,14 @@ public class ProcessServiceImpl implements ProcessService {
      * @return
      */
     private String joinVarPool(String parentValPool, String subValPool) {
-        List<Property> parentValPools = Lists.newArrayList(JSONUtils.toList(parentValPool, Property.class));
+        List<Parameter> parentValPools = Lists.newArrayList(JSONUtils.toList(parentValPool, Parameter.class));
         parentValPools = parentValPools.stream().filter(valPool -> valPool.getDirect() == Direct.OUT)
                 .collect(Collectors.toList());
 
-        List<Property> subValPools = Lists.newArrayList(JSONUtils.toList(subValPool, Property.class));
+        List<Parameter> subValPools = Lists.newArrayList(JSONUtils.toList(subValPool, Parameter.class));
 
-        Set<String> parentValPoolKeys = parentValPools.stream().map(Property::getProp).collect(toSet());
-        List<Property> extraSubValPools = subValPools.stream().filter(sub -> !parentValPoolKeys.contains(sub.getProp()))
+        Set<String> parentValPoolKeys = parentValPools.stream().map(Parameter::getKey).collect(toSet());
+        List<Parameter> extraSubValPools = subValPools.stream().filter(sub -> !parentValPoolKeys.contains(sub.getKey()))
                 .collect(Collectors.toList());
         parentValPools.addAll(extraSubValPools);
         return JSONUtils.toJsonString(parentValPools);
@@ -1479,7 +1479,7 @@ public class ProcessServiceImpl implements ProcessService {
         if (Strings.isNullOrEmpty(taskInstance.getVarPool())) {
             return;
         }
-        List<Property> properties = JSONUtils.toList(taskInstance.getVarPool(), Property.class);
+        List<Parameter> properties = JSONUtils.toList(taskInstance.getVarPool(), Parameter.class);
         if (CollectionUtils.isEmpty(properties)) {
             return;
         }
@@ -1491,16 +1491,16 @@ public class ProcessServiceImpl implements ProcessService {
         if (localParams == null) {
             return;
         }
-        List<Property> allParam = JSONUtils.toList(JSONUtils.toJsonString(localParams), Property.class);
+        List<Parameter> allParam = JSONUtils.toList(JSONUtils.toJsonString(localParams), Parameter.class);
         Map<String, String> outProperty = new HashMap<>();
-        for (Property info : properties) {
+        for (Parameter info : properties) {
             if (info.getDirect() == Direct.OUT) {
-                outProperty.put(info.getProp(), info.getValue());
+                outProperty.put(info.getKey(), info.getValue());
             }
         }
-        for (Property info : allParam) {
+        for (Parameter info : allParam) {
             if (info.getDirect() == Direct.OUT) {
-                String paramName = info.getProp();
+                String paramName = info.getKey();
                 info.setValue(outProperty.get(paramName));
             }
         }

@@ -116,7 +116,7 @@ import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.SqlType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
@@ -2982,7 +2982,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
 
         // global params
-        List<Property> globalParams = processDefinition.getGlobalParamList();
+        List<Parameter> globalParams = processDefinition.getGlobalParamList();
 
         Map<String, Map<String, Object>> localUserDefParams = getLocalParams(processDefinition);
 
@@ -3024,7 +3024,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     Map<String, Object> localParamsMap = new HashMap<>();
                     String localParams = JSONUtils.getNodeString(taskDefinition.getTaskParams(), LOCAL_PARAMS);
                     if (!StringUtils.isEmpty(localParams)) {
-                        List<Property> localParamsList = JSONUtils.toList(localParams, Property.class);
+                        List<Parameter> localParamsList = JSONUtils.toList(localParams, Parameter.class);
                         localParamsMap.put(TASK_TYPE, taskDefinition.getTaskType());
                         localParamsMap.put(LOCAL_PARAMS_LIST, localParamsList);
                         if (CollectionUtils.isNotEmpty(localParamsList)) {

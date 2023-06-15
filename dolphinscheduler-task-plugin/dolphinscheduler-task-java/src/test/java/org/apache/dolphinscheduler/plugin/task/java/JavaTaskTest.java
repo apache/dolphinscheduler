@@ -26,7 +26,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.java.exception.JavaSourceFileExistException;
 import org.apache.dolphinscheduler.plugin.task.java.exception.PublicClassNotFoundException;
@@ -228,9 +228,9 @@ public class JavaTaskTest {
                         "        }\n" + "        System.out.println(builder);\n" +
                         "    }\n" +
                         "}\n");
-        ArrayList<Property> localParams = new ArrayList<>();
-        Property property = new Property();
-        property.setProp("name");
+        ArrayList<Parameter> localParams = new ArrayList<>();
+        Parameter property = new Parameter();
+        property.setKey("name");
         property.setValue("zhangsan");
         property.setDirect(IN);
         property.setType(VARCHAR);

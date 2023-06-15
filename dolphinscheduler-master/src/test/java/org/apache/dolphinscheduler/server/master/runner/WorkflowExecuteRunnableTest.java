@@ -196,13 +196,13 @@ public class WorkflowExecuteRunnableTest {
             TaskInstance taskInstance1 = new TaskInstance();
             taskInstance1.setId(1);
             taskInstance1.setTaskCode(1);
-            taskInstance1.setVarPool("[{\"direct\":\"OUT\",\"prop\":\"test1\",\"type\":\"VARCHAR\",\"value\":\"1\"}]");
+            taskInstance1.setVarPool("[{\"direct\":\"OUT\",\"key\":\"test1\",\"type\":\"VARCHAR\",\"value\":\"1\"}]");
             taskInstance1.setEndTime(new Date());
 
             TaskInstance taskInstance2 = new TaskInstance();
             taskInstance2.setId(2);
             taskInstance2.setTaskCode(2);
-            taskInstance2.setVarPool("[{\"direct\":\"OUT\",\"prop\":\"test2\",\"type\":\"VARCHAR\",\"value\":\"2\"}]");
+            taskInstance2.setVarPool("[{\"direct\":\"OUT\",\"key\":\"test2\",\"type\":\"VARCHAR\",\"value\":\"2\"}]");
             taskInstance2.setEndTime(new Date());
 
             Map<Integer, TaskInstance> taskInstanceMap = new ConcurrentHashMap<>();
@@ -226,7 +226,7 @@ public class WorkflowExecuteRunnableTest {
             workflowExecuteThread.getPreVarPool(taskInstance, preTaskName);
             Assertions.assertNotNull(taskInstance.getVarPool());
 
-            taskInstance2.setVarPool("[{\"direct\":\"OUT\",\"prop\":\"test1\",\"type\":\"VARCHAR\",\"value\":\"2\"}]");
+            taskInstance2.setVarPool("[{\"direct\":\"OUT\",\"key\":\"test1\",\"type\":\"VARCHAR\",\"value\":\"2\"}]");
             completeTaskSet.add(taskInstance2.getTaskCode());
 
             completeTaskSetField.setAccessible(true);

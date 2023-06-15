@@ -16,7 +16,7 @@
  */
 package org.apache.dolphinscheduler.service.utils;
 
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 
 import java.util.List;
@@ -33,13 +33,13 @@ public class ProcessData {
     private List<TaskNode> tasks;
 
     @EqualsAndHashCode.Include
-    private List<Property> globalParams;
+    private List<Parameter> globalParams;
 
     private int timeout;
 
     private int tenantId;
 
-    public ProcessData(List<TaskNode> tasks, List<Property> globalParams) {
+    public ProcessData(List<TaskNode> tasks, List<Parameter> globalParams) {
         this.tasks = tasks;
         this.globalParams = globalParams;
     }

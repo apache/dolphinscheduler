@@ -65,7 +65,7 @@ import org.apache.dolphinscheduler.dao.utils.TaskCacheUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.remote.command.Message;
@@ -1232,7 +1232,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
     }
 
     public void getPreVarPool(TaskInstance taskInstance, Set<String> preTask) {
-        Map<String, Property> allProperty = new HashMap<>();
+        Map<String, Parameter> allProperty = new HashMap<>();
         Map<String, TaskInstance> allTaskInstance = new HashMap<>();
         if (CollectionUtils.isNotEmpty(preTask)) {
             for (String preTaskCode : preTask) {
@@ -1251,8 +1251,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
                 }
                 String preVarPool = preTaskInstance.getVarPool();
                 if (StringUtils.isNotEmpty(preVarPool)) {
-                    List<Property> properties = JSONUtils.toList(preVarPool, Property.class);
-                    for (Property info : properties) {
+                    List<Parameter> properties = JSONUtils.toList(preVarPool, Parameter.class);
+                    for (Parameter info : properties) {
                         setVarPoolValue(allProperty, allTaskInstance, preTaskInstance, info);
                     }
                 }
@@ -1271,16 +1271,16 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
         return taskInstanceMap.values();
     }
 
-    private void setVarPoolValue(Map<String, Property> allProperty, Map<String, TaskInstance> allTaskInstance,
-                                 TaskInstance preTaskInstance, Property thisProperty) {
+    private void setVarPoolValue(Map<String, Parameter> allProperty, Map<String, TaskInstance> allTaskInstance,
+                                 TaskInstance preTaskInstance, Parameter thisProperty) {
         // for this taskInstance all the param in this part is IN.
         thisProperty.setDirect(Direct.IN);
         // get the pre taskInstance Property's name
-        String proName = thisProperty.getProp();
+        String proName = thisProperty.getKey();
         // if the Previous nodes have the Property of same name
         if (allProperty.containsKey(proName)) {
             // comparison the value of two Property
-            Property otherPro = allProperty.get(proName);
+            Parameter otherPro = allProperty.get(proName);
             // if this property'value of loop is empty,use the other,whether the other's value is empty or not
             if (StringUtils.isEmpty(thisProperty.getValue())) {
                 allProperty.put(proName, otherPro);
@@ -1375,11 +1375,12 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
                 TaskInstance endTaskInstance = taskInstanceMap.get(existTaskInstanceOptional.get().getId());
                 String taskInstanceVarPool = endTaskInstance.getVarPool();
                 if (StringUtils.isNotEmpty(taskInstanceVarPool)) {
-                    Set<Property> taskProperties = new HashSet<>(JSONUtils.toList(taskInstanceVarPool, Property.class));
+                    Set<Parameter> taskProperties =
+                            new HashSet<>(JSONUtils.toList(taskInstanceVarPool, Parameter.class));
                     String processInstanceVarPool = processInstance.getVarPool();
                     if (StringUtils.isNotEmpty(processInstanceVarPool)) {
-                        Set<Property> properties =
-                                new HashSet<>(JSONUtils.toList(processInstanceVarPool, Property.class));
+                        Set<Parameter> properties =
+                                new HashSet<>(JSONUtils.toList(processInstanceVarPool, Parameter.class));
                         properties.addAll(taskProperties);
                         processInstance.setVarPool(JSONUtils.toJsonString(properties));
                     } else {
@@ -2118,7 +2119,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
         startParamMap.putAll(fatherParamMap);
         // set start param into global params
         Map<String, String> globalMap = processDefinition.getGlobalParamMap();
-        List<Property> globalParamList = processDefinition.getGlobalParamList();
+        List<Parameter> globalParamList = processDefinition.getGlobalParamList();
         if (startParamMap.size() > 0 && globalMap != null) {
             // start param to overwrite global param
             for (Map.Entry<String, String> param : globalMap.entrySet()) {
@@ -2131,7 +2132,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
             for (Map.Entry<String, String> startParam : startParamMap.entrySet()) {
                 if (!globalMap.containsKey(startParam.getKey())) {
                     globalMap.put(startParam.getKey(), startParam.getValue());
-                    globalParamList.add(new Property(startParam.getKey(), IN, VARCHAR, startParam.getValue()));
+                    globalParamList.add(new Parameter(startParam.getKey(), IN, VARCHAR, startParam.getValue()));
                 }
             }
         }
@@ -2180,10 +2181,10 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
         for (TaskInstance taskInstance : removeTaskInstances) {
             String taskVarPool = taskInstance.getVarPool();
             if (StringUtils.isNotEmpty(taskVarPool)) {
-                List<Property> properties = JSONUtils.toList(taskVarPool, Property.class);
+                List<Parameter> properties = JSONUtils.toList(taskVarPool, Parameter.class);
                 List<String> keys = properties.stream()
                         .filter(property -> property.getDirect().equals(Direct.OUT))
-                        .map(property -> String.format("%s_%s", property.getProp(), property.getType()))
+                        .map(property -> String.format("%s_%s", property.getKey(), property.getType()))
                         .collect(Collectors.toList());
                 removeSet.addAll(keys);
             }
@@ -2192,10 +2193,10 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
         // remove varPool data and update process instance
         // TODO: we can remove this snippet if : we get varPool from pre taskInstance instead of process instance when
         // task can not get pre task from incomplete dag
-        List<Property> processProperties = JSONUtils.toList(processInstance.getVarPool(), Property.class);
+        List<Parameter> processProperties = JSONUtils.toList(processInstance.getVarPool(), Parameter.class);
         processProperties = processProperties.stream()
                 .filter(property -> !(property.getDirect().equals(Direct.IN)
-                        && removeSet.contains(String.format("%s_%s", property.getProp(), property.getType()))))
+                        && removeSet.contains(String.format("%s_%s", property.getKey(), property.getType()))))
                 .collect(Collectors.toList());
 
         processInstance.setVarPool(JSONUtils.toJsonString(processProperties));
@@ -2253,10 +2254,10 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
             processInstance.setVarPool(taskVarPoolJson);
             return;
         }
-        List<Property> processVarPool = new ArrayList<>(JSONUtils.toList(processVarPoolJson, Property.class));
-        List<Property> taskVarPool = JSONUtils.toList(taskVarPoolJson, Property.class);
-        Set<String> newProcessVarPoolKeys = taskVarPool.stream().map(Property::getProp).collect(Collectors.toSet());
-        processVarPool = processVarPool.stream().filter(property -> !newProcessVarPoolKeys.contains(property.getProp()))
+        List<Parameter> processVarPool = new ArrayList<>(JSONUtils.toList(processVarPoolJson, Parameter.class));
+        List<Parameter> taskVarPool = JSONUtils.toList(taskVarPoolJson, Parameter.class);
+        Set<String> newProcessVarPoolKeys = taskVarPool.stream().map(Parameter::getKey).collect(Collectors.toSet());
+        processVarPool = processVarPool.stream().filter(property -> !newProcessVarPoolKeys.contains(property.getKey()))
                 .collect(Collectors.toList());
 
         processVarPool.addAll(taskVarPool);

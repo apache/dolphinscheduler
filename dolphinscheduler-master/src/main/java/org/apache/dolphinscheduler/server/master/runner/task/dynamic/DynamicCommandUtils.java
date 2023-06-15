@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -53,9 +53,9 @@ public class DynamicCommandUtils {
 
         String globalParams = processInstance.getGlobalParams();
         if (StringUtils.isNotEmpty(globalParams)) {
-            List<Property> parentParams = Lists.newArrayList(JSONUtils.toList(globalParams, Property.class));
-            for (Property parentParam : parentParams) {
-                parameters.put(parentParam.getProp(), parentParam.getValue());
+            List<Parameter> parentParams = Lists.newArrayList(JSONUtils.toList(globalParams, Parameter.class));
+            for (Parameter parentParam : parentParams) {
+                parameters.put(parentParam.getKey(), parentParam.getValue());
             }
         }
 

@@ -46,7 +46,7 @@ public class WorkflowCreateRequest {
     @Schema(allowableValues = "ONLINE / OFFLINE", example = "OFFLINE", description = "default OFFLINE if not provide.")
     private String releaseState;
 
-    @Schema(example = "[{\"prop\":\"key\",\"value\":\"value\",\"direct\":\"IN\",\"type\":\"VARCHAR\"}]")
+    @Schema(example = "[{\"key\":\"key\",\"value\":\"value\",\"direct\":\"IN\",\"type\":\"VARCHAR\"}]")
     private String globalParams;
 
     @Schema(example = "2")

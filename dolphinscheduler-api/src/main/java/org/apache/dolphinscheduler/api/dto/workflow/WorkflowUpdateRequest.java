@@ -47,7 +47,7 @@ public class WorkflowUpdateRequest {
     @Schema(allowableValues = "ONLINE / OFFLINE", example = "OFFLINE")
     private String releaseState;
 
-    @Schema(example = "[{\"prop\":\"key\",\"value\":\"value\",\"direct\":\"IN\",\"type\":\"VARCHAR\"}]")
+    @Schema(example = "[{\"key\":\"key\",\"value\":\"value\",\"direct\":\"IN\",\"type\":\"VARCHAR\"}]")
     private String globalParams;
 
     @Schema(example = "2")

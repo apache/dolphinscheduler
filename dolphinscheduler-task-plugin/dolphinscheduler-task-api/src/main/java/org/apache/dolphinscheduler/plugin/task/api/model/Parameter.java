@@ -23,13 +23,13 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import java.io.Serializable;
 import java.util.Objects;
 
-public class Property implements Serializable {
+public class Parameter implements Serializable {
 
     private static final long serialVersionUID = -4045513703397452451L;
     /**
      * key
      */
-    private String prop;
+    private String key;
 
     /**
      * input/output
@@ -46,11 +46,11 @@ public class Property implements Serializable {
      */
     private String value;
 
-    public Property() {
+    public Parameter() {
     }
 
-    public Property(String prop, Direct direct, DataType type, String value) {
-        this.prop = prop;
+    public Parameter(String key, Direct direct, DataType type, String value) {
+        this.key = key;
         this.direct = direct;
         this.type = type;
         this.value = value;
@@ -59,28 +59,28 @@ public class Property implements Serializable {
     /**
      * getter method
      *
-     * @return the prop
-     * @see Property#prop
+     * @return the key
+     * @see Parameter#key
      */
-    public String getProp() {
-        return prop;
+    public String getKey() {
+        return key;
     }
 
     /**
      * setter method
      *
-     * @param prop the prop to set
-     * @see Property#prop
+     * @param key the key to set
+     * @see Parameter#key
      */
-    public void setProp(String prop) {
-        this.prop = prop;
+    public void setKey(String key) {
+        this.key = key;
     }
 
     /**
      * getter method
      *
      * @return the value
-     * @see Property#value
+     * @see Parameter#value
      */
     public String getValue() {
         return value;
@@ -90,7 +90,7 @@ public class Property implements Serializable {
      * setter method
      *
      * @param value the value to set
-     * @see Property#value
+     * @see Parameter#value
      */
     public void setValue(String value) {
         this.value = value;
@@ -120,20 +120,20 @@ public class Property implements Serializable {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Property property = (Property) o;
-        return Objects.equals(prop, property.prop)
-                && Objects.equals(value, property.value);
+        Parameter parameter = (Parameter) o;
+        return Objects.equals(key, parameter.key)
+                && Objects.equals(value, parameter.value);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(prop, value);
+        return Objects.hash(key, value);
     }
 
     @Override
     public String toString() {
-        return "Property{"
-                + "prop='" + prop + '\''
+        return "Parameter{"
+                + "key='" + key + '\''
                 + ", direct=" + direct
                 + ", type=" + type
                 + ", value='" + value + '\''

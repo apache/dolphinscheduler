@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -92,7 +92,7 @@ public class ProcessDefinition {
      * user defined parameter list
      */
     @TableField(exist = false)
-    private List<Property> globalParamList;
+    private List<Parameter> globalParamList;
 
     /**
      * user define parameter map
@@ -197,7 +197,7 @@ public class ProcessDefinition {
     }
 
     public void setGlobalParams(String globalParams) {
-        this.globalParamList = JSONUtils.toList(globalParams, Property.class);
+        this.globalParamList = JSONUtils.toList(globalParams, Parameter.class);
         if (this.globalParamList == null) {
             this.globalParamList = new ArrayList<>();
         }
@@ -206,8 +206,8 @@ public class ProcessDefinition {
 
     public Map<String, String> getGlobalParamMap() {
         if (globalParamMap == null && !Strings.isNullOrEmpty(globalParams)) {
-            List<Property> propList = JSONUtils.toList(globalParams, Property.class);
-            globalParamMap = propList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
+            List<Parameter> propList = JSONUtils.toList(globalParams, Parameter.class);
+            globalParamMap = propList.stream().collect(Collectors.toMap(Parameter::getKey, Parameter::getValue));
         }
 
         return globalParamMap;

@@ -90,9 +90,9 @@ package org.apache.dolphinscheduler.server.master;
 // TaskInstance taskInstance = testBasicInit(WorkflowExecutionStatus.SUCCESS);
 // taskInstance.setVarPool(getProperty());
 // taskInstance.setTaskParams("{\"processDefinitionCode\":110," +
-// "\"dependence\":{},\"localParams\":[{\"prop\":\"key\"," +
+// "\"dependence\":{},\"localParams\":[{\"key\":\"key\"," +
 // "\"direct\":\"out\",\"type\":\"VARCHAR\",\"value\":\"\"}," +
-// "{\"prop\":\"database_name\",\"direct\":\"OUT\"," +
+// "{\"key\":\"database_name\",\"direct\":\"OUT\"," +
 // "\"type\":\"VARCHAR\",\"value\":\"\"}]," +
 // "\"conditionResult\":{\"successNode\":[],\"failedNode\":[]}," +
 // "\"waitStartTimeout\":{},\"switchResult\":{}}");

@@ -63,7 +63,7 @@ public class PigeonTaskTest {
         Mockito.when(taskExecutionContext.getTaskTimeout()).thenReturn(10000);
         Mockito.when(taskExecutionContext.getLogPath()).thenReturn("/tmp/dx");
         // Mockito.when(taskExecutionContext.getVarPool())
-        // .thenReturn("[{\"direct\":\"IN\",\"prop\":\"" + TISTask.KEY_POOL_VAR_TIS_HOST +
+        // .thenReturn("[{\"direct\":\"IN\",\"key\":\"" + TISTask.KEY_POOL_VAR_TIS_HOST +
         // "\",\"type\":\"VARCHAR\",\"value\":\"127.0.0.1:8080\"}]");
         Map<String, String> gloabParams =
                 Collections.singletonMap(PigeonTask.KEY_POOL_VAR_PIGEON_HOST, "127.0.0.1:8080");

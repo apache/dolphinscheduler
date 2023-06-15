@@ -25,7 +25,7 @@ import org.apache.dolphinscheduler.dao.entity.RelationSubWorkflow;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.RelationSubWorkflowMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -98,19 +98,19 @@ public class SubWorkflowServiceImpl implements SubWorkflowService {
     }
 
     @Override
-    public List<Property> getWorkflowOutputParameters(ProcessInstance processInstance) {
-        List<Property> outputParamList =
-                new ArrayList<>(JSONUtils.toList(processInstance.getVarPool(), Property.class));
+    public List<Parameter> getWorkflowOutputParameters(ProcessInstance processInstance) {
+        List<Parameter> outputParamList =
+                new ArrayList<>(JSONUtils.toList(processInstance.getVarPool(), Parameter.class));
 
         ProcessDefinitionLog processDefinition = processDefinitionLogMapper
                 .queryByDefinitionCodeAndVersion(processInstance.getProcessDefinitionCode(),
                         processInstance.getProcessDefinitionVersion());
-        List<Property> globalParamList = JSONUtils.toList(processDefinition.getGlobalParams(), Property.class);
+        List<Parameter> globalParamList = JSONUtils.toList(processDefinition.getGlobalParams(), Parameter.class);
 
-        Set<String> ouputParamSet = outputParamList.stream().map(Property::getProp).collect(Collectors.toSet());
+        Set<String> ouputParamSet = outputParamList.stream().map(Parameter::getKey).collect(Collectors.toSet());
 
         // add output global parameters which are not in output parameters list
-        globalParamList.stream().filter(globalParam -> !ouputParamSet.contains(globalParam.getProp()))
+        globalParamList.stream().filter(globalParam -> !ouputParamSet.contains(globalParam.getKey()))
                 .forEach(outputParamList::add);
 
         return outputParamList;

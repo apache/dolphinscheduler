@@ -26,7 +26,7 @@ import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -54,13 +54,13 @@ class TaskCacheUtilsTest {
         String taskParams = "{\n" +
                 "  \"localParams\": [\n" +
                 "    {\n" +
-                "      \"prop\": \"a\",\n" +
+                "      \"key\": \"a\",\n" +
                 "      \"direct\": \"IN\",\n" +
                 "      \"type\": \"VARCHAR\",\n" +
                 "      \"value\": \"\"\n" +
                 "    },\n" +
                 "    {\n" +
-                "      \"prop\": \"b\",\n" +
+                "      \"key\": \"b\",\n" +
                 "      \"direct\": \"IN\",\n" +
                 "      \"type\": \"VARCHAR\",\n" +
                 "      \"value\": \"bb\"\n" +
@@ -72,13 +72,13 @@ class TaskCacheUtilsTest {
 
         String varPool = "[\n" +
                 "  {\n" +
-                "    \"prop\": \"c\",\n" +
+                "    \"key\": \"c\",\n" +
                 "    \"direct\": \"IN\",\n" +
                 "    \"type\": \"VARCHAR\",\n" +
                 "    \"value\": \"cc\"\n" +
                 "  },\n" +
                 "  {\n" +
-                "    \"prop\": \"k\",\n" +
+                "    \"key\": \"k\",\n" +
                 "    \"direct\": \"IN\",\n" +
                 "    \"type\": \"VARCHAR\",\n" +
                 "    \"value\": \"kk\"\n" +
@@ -93,12 +93,12 @@ class TaskCacheUtilsTest {
         taskInstance.setIsCache(Flag.YES);
 
         taskExecutionContext = new TaskExecutionContext();
-        Property property = new Property();
-        property.setProp("a");
+        Parameter property = new Parameter();
+        property.setKey("a");
         property.setDirect(Direct.IN);
         property.setType(DataType.VARCHAR);
         property.setValue("aa");
-        Map<String, Property> prepareParamsMap = new HashMap<>();
+        Map<String, Parameter> prepareParamsMap = new HashMap<>();
         prepareParamsMap.put("a", property);
         taskExecutionContext.setPrepareParamsMap(prepareParamsMap);
 
@@ -134,7 +134,7 @@ class TaskCacheUtilsTest {
         // b=bb is a fixed value, will be considered in task version
         // k=kk is not in task params, will be ignored
         String except =
-                "[{\"prop\":\"a\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"aa\"},{\"prop\":\"c\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"cc\"}]";
+                "[{\"key\":\"a\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"aa\"},{\"key\":\"c\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"cc\"}]";
         Assertions.assertEquals(except,
                 TaskCacheUtils.getTaskInputVarPoolData(taskInstance, taskExecutionContext, storageOperate));
     }
@@ -142,8 +142,8 @@ class TaskCacheUtilsTest {
     @Test
     void TestGenerateCacheKey() {
         String cacheKeyBase = TaskCacheUtils.generateCacheKey(taskInstance, taskExecutionContext, storageOperate);
-        Property propertyI = new Property();
-        propertyI.setProp("i");
+        Parameter propertyI = new Parameter();
+        propertyI.setKey("i");
         propertyI.setDirect(Direct.IN);
         propertyI.setType(DataType.VARCHAR);
         propertyI.setValue("ii");
@@ -152,8 +152,8 @@ class TaskCacheUtilsTest {
         // i will not influence the result, because task instance not use it
         Assertions.assertEquals(cacheKeyBase, cacheKeyNew);
 
-        Property propertyD = new Property();
-        propertyD.setProp("d");
+        Parameter propertyD = new Parameter();
+        propertyD.setKey("d");
         propertyD.setDirect(Direct.IN);
         propertyD.setType(DataType.VARCHAR);
         propertyD.setValue("dd");
@@ -185,8 +185,8 @@ class TaskCacheUtilsTest {
         String filePath = "test/testFile.txt";
         FileUtils.writeContent2File(content, filePath + CRC_SUFFIX);
 
-        Property property = new Property();
-        property.setProp("f1");
+        Parameter property = new Parameter();
+        property.setKey("f1");
         property.setValue("testFile.txt");
         property.setType(DataType.FILE);
         property.setDirect(Direct.IN);

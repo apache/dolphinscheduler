@@ -38,7 +38,7 @@ import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.service.utils.ParamUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -224,15 +224,15 @@ public class CommandServiceImpl implements CommandService {
         ProcessDefinition subProcessDefinition = processDefineMapper.queryByCode(childDefineCode);
 
         Object localParams = subProcessParam.get(Constants.LOCAL_PARAMS);
-        List<Property> allParam = JSONUtils.toList(JSONUtils.toJsonString(localParams), Property.class);
+        List<Parameter> allParam = JSONUtils.toList(JSONUtils.toJsonString(localParams), Parameter.class);
         Map<String, String> globalMap = ParamUtils.getGlobalParamMap(task.getVarPool());
         Map<String, String> fatherParams = new HashMap<>();
         if (CollectionUtils.isNotEmpty(allParam)) {
-            for (Property info : allParam) {
+            for (Parameter info : allParam) {
                 if (Direct.OUT == info.getDirect()) {
                     continue;
                 }
-                fatherParams.put(info.getProp(), globalMap.get(info.getProp()));
+                fatherParams.put(info.getKey(), globalMap.get(info.getKey()));
             }
         }
         String processParam = ParamUtils.getSubWorkFlowParam(instanceMap, parentProcessInstance, fatherParams);

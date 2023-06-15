@@ -27,7 +27,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -70,19 +70,19 @@ public class TaskFilesTransferUtils {
      */
     public static void uploadOutputFiles(TaskExecutionContext taskExecutionContext,
                                          StorageOperate storageOperate) throws TaskException {
-        List<Property> varPools = getVarPools(taskExecutionContext);
+        List<Parameter> varPools = getVarPools(taskExecutionContext);
         // get map of varPools for quick search
-        Map<String, Property> varPoolsMap = varPools.stream().collect(Collectors.toMap(Property::getProp, x -> x));
+        Map<String, Parameter> varPoolsMap = varPools.stream().collect(Collectors.toMap(Parameter::getKey, x -> x));
 
         // get OUTPUT FILE parameters
-        List<Property> localParamsProperty = getFileLocalParams(taskExecutionContext, Direct.OUT);
+        List<Parameter> localParamsProperty = getFileLocalParams(taskExecutionContext, Direct.OUT);
 
         if (localParamsProperty.isEmpty()) {
             return;
         }
 
         log.info("Upload output files ...");
-        for (Property property : localParamsProperty) {
+        for (Parameter property : localParamsProperty) {
             // get local file path
             String path = String.format("%s/%s", taskExecutionContext.getExecutePath(), property.getValue());
             String srcPath = packIfDir(path);
@@ -114,15 +114,15 @@ public class TaskFilesTransferUtils {
             }
 
             // update varPool
-            Property oriProperty;
+            Parameter oriProperty;
             // if the property is not in varPool, add it
-            if (varPoolsMap.containsKey(property.getProp())) {
-                oriProperty = varPoolsMap.get(property.getProp());
+            if (varPoolsMap.containsKey(property.getKey())) {
+                oriProperty = varPoolsMap.get(property.getKey());
             } else {
-                oriProperty = new Property(property.getProp(), Direct.OUT, DataType.FILE, property.getValue());
+                oriProperty = new Parameter(property.getKey(), Direct.OUT, DataType.FILE, property.getValue());
                 varPools.add(oriProperty);
             }
-            oriProperty.setProp(String.format("%s.%s", taskExecutionContext.getTaskName(), oriProperty.getProp()));
+            oriProperty.setKey(String.format("%s.%s", taskExecutionContext.getTaskName(), oriProperty.getKey()));
             oriProperty.setValue(resourcePath);
         }
         taskExecutionContext.setVarPool(JSONUtils.toJsonString(varPools));
@@ -137,12 +137,12 @@ public class TaskFilesTransferUtils {
      * @throws TaskException task exception
      */
     public static void downloadUpstreamFiles(TaskExecutionContext taskExecutionContext, StorageOperate storageOperate) {
-        List<Property> varPools = getVarPools(taskExecutionContext);
+        List<Parameter> varPools = getVarPools(taskExecutionContext);
         // get map of varPools for quick search
-        Map<String, Property> varPoolsMap = varPools.stream().collect(Collectors.toMap(Property::getProp, x -> x));
+        Map<String, Parameter> varPoolsMap = varPools.stream().collect(Collectors.toMap(Parameter::getKey, x -> x));
 
         // get "IN FILE" parameters
-        List<Property> localParamsProperty = getFileLocalParams(taskExecutionContext, Direct.IN);
+        List<Parameter> localParamsProperty = getFileLocalParams(taskExecutionContext, Direct.IN);
 
         if (localParamsProperty.isEmpty()) {
             return;
@@ -153,8 +153,8 @@ public class TaskFilesTransferUtils {
         String downloadTmpPath = String.format("%s/%s", executePath, DOWNLOAD_TMP);
 
         log.info("Download upstream files...");
-        for (Property property : localParamsProperty) {
-            Property inVarPool = varPoolsMap.get(property.getValue());
+        for (Parameter property : localParamsProperty) {
+            Parameter inVarPool = varPoolsMap.get(property.getValue());
             if (inVarPool == null) {
                 log.error("{} not in  {}", property.getValue(), varPoolsMap.keySet());
                 throw new TaskException(String.format("Can not find upstream file using %s, please check the key",
@@ -162,7 +162,7 @@ public class TaskFilesTransferUtils {
             }
 
             String resourcePath = inVarPool.getValue();
-            String targetPath = String.format("%s/%s", executePath, property.getProp());
+            String targetPath = String.format("%s/%s", executePath, property.getKey());
 
             String downloadPath;
             // If the data is packaged, download it to a special directory (DOWNLOAD_TMP) and unpack it to the
@@ -206,11 +206,11 @@ public class TaskFilesTransferUtils {
      * @param direct               may be Direct.IN or Direct.OUT.
      * @return List<Property>
      */
-    public static List<Property> getFileLocalParams(TaskExecutionContext taskExecutionContext, Direct direct) {
-        List<Property> localParamsProperty = new ArrayList<>();
+    public static List<Parameter> getFileLocalParams(TaskExecutionContext taskExecutionContext, Direct direct) {
+        List<Parameter> localParamsProperty = new ArrayList<>();
         JsonNode taskParams = JSONUtils.parseObject(taskExecutionContext.getTaskParams());
         for (JsonNode localParam : taskParams.get("localParams")) {
-            Property property = JSONUtils.parseObject(localParam.toString(), Property.class);
+            Parameter property = JSONUtils.parseObject(localParam.toString(), Parameter.class);
 
             if (property.getDirect().equals(direct) && property.getType().equals(DataType.FILE)) {
                 localParamsProperty.add(property);
@@ -244,8 +244,8 @@ public class TaskFilesTransferUtils {
      * @param taskExecutionContext is the context of task
      * @return List<Property>
      */
-    public static List<Property> getVarPools(TaskExecutionContext taskExecutionContext) {
-        List<Property> varPools = new ArrayList<>();
+    public static List<Parameter> getVarPools(TaskExecutionContext taskExecutionContext) {
+        List<Parameter> varPools = new ArrayList<>();
 
         // get varPool
         String varPoolString = taskExecutionContext.getVarPool();
@@ -254,7 +254,7 @@ public class TaskFilesTransferUtils {
         }
         // parse varPool
         for (JsonNode varPoolData : JSONUtils.parseArray(varPoolString)) {
-            Property property = JSONUtils.parseObject(varPoolData.toString(), Property.class);
+            Parameter property = JSONUtils.parseObject(varPoolData.toString(), Parameter.class);
             varPools.add(property);
         }
         return varPools;

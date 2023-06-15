@@ -39,7 +39,7 @@ public class EntityTestUtils {
     static {
         OBJECT_MAP.put("java.lang.Long", 1L);
         OBJECT_MAP.put("java.lang.String",
-                "[{\"direct\":\"OUT\",\"prop\":\"percentage5\",\"type\":\"VARCHAR\",\"value\":\"qwe\"}]");
+                "[{\"direct\":\"OUT\",\"key\":\"percentage5\",\"type\":\"VARCHAR\",\"value\":\"qwe\"}]");
         OBJECT_MAP.put("java.lang.Integer", 1);
         OBJECT_MAP.put("int", 1);
         OBJECT_MAP.put("long", 1L);

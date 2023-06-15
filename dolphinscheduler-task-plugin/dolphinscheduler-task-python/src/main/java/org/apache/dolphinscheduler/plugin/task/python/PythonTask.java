@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
@@ -170,11 +170,11 @@ public class PythonTask extends AbstractTask {
     protected String buildPythonScriptContent() throws Exception {
         log.info("raw python script : {}", pythonParameters.getRawScript());
         String rawPythonScript = pythonParameters.getRawScript().replaceAll("\\r\\n", System.lineSeparator());
-        Map<String, Property> paramsMap = mergeParamsWithContext(pythonParameters);
+        Map<String, Parameter> paramsMap = mergeParamsWithContext(pythonParameters);
         return ParameterUtils.convertParameterPlaceholders(rawPythonScript, ParameterUtils.convert(paramsMap));
     }
 
-    protected Map<String, Property> mergeParamsWithContext(AbstractParameters parameters) {
+    protected Map<String, Parameter> mergeParamsWithContext(AbstractParameters parameters) {
         // replace placeholder
         return taskRequest.getPrepareParamsMap();
     }

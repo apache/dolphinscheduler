@@ -27,7 +27,7 @@ import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.server.master.runner.execute.AsyncTaskExecuteFunction;
 import org.apache.dolphinscheduler.service.subworkflow.SubWorkflowService;
 
@@ -125,9 +125,9 @@ public class DynamicAsyncTaskExecuteFunction implements AsyncTaskExecuteFunction
             dynamicOutput.setDynParams(dynamicParams);
 
             Map<String, String> outputValueMap = new HashMap<>();
-            List<Property> propertyList = subWorkflowService.getWorkflowOutputParameters(processInstance);
-            for (Property property : propertyList) {
-                outputValueMap.put(property.getProp(), property.getValue());
+            List<Parameter> propertyList = subWorkflowService.getWorkflowOutputParameters(processInstance);
+            for (Parameter property : propertyList) {
+                outputValueMap.put(property.getKey(), property.getValue());
             }
 
             dynamicOutput.setOutputValue(outputValueMap);
@@ -135,13 +135,14 @@ public class DynamicAsyncTaskExecuteFunction implements AsyncTaskExecuteFunction
             dynamicOutputs.add(dynamicOutput);
         }
 
-        Property property = new Property();
-        property.setProp(String.format("%s(%s)", OUTPUT_KEY, taskInstance.getName()));
+        Parameter property = new Parameter();
+        property.setKey(String.format("%s(%s)", OUTPUT_KEY, taskInstance.getName()));
         property.setDirect(Direct.OUT);
         property.setType(DataType.VARCHAR);
         property.setValue(JSONUtils.toJsonString(dynamicOutputs));
 
-        List<Property> taskPropertyList = new ArrayList<>(JSONUtils.toList(taskInstance.getVarPool(), Property.class));
+        List<Parameter> taskPropertyList =
+                new ArrayList<>(JSONUtils.toList(taskInstance.getVarPool(), Parameter.class));
         taskPropertyList.add(property);
         logicTask.getTaskParameters().setVarPool(JSONUtils.toJsonString(taskPropertyList));
 

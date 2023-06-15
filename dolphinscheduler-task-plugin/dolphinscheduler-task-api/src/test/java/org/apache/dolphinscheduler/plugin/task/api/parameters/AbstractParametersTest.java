@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,14 +39,14 @@ public class AbstractParametersTest {
                 return false;
             }
         };
-        List<Property> localParams = new ArrayList<>();
-        localParams.add(new Property("key1", null, null, "value1"));
-        localParams.add(new Property("key2", Direct.IN, DataType.VARCHAR, "value2"));
-        localParams.add(new Property("key3", Direct.OUT, DataType.VARCHAR, null));
+        List<Parameter> localParams = new ArrayList<>();
+        localParams.add(new Parameter("key1", null, null, "value1"));
+        localParams.add(new Parameter("key2", Direct.IN, DataType.VARCHAR, "value2"));
+        localParams.add(new Parameter("key3", Direct.OUT, DataType.VARCHAR, null));
         parameters.setLocalParams(localParams);
 
         // should return property key1 and key2 (direct null and IN)
-        Map<String, Property> inputLocalParametersMap = parameters.getInputLocalParametersMap();
+        Map<String, Parameter> inputLocalParametersMap = parameters.getInputLocalParametersMap();
 
         Assertions.assertEquals(2, inputLocalParametersMap.size());
         Assertions.assertTrue(inputLocalParametersMap.containsKey("key1"));

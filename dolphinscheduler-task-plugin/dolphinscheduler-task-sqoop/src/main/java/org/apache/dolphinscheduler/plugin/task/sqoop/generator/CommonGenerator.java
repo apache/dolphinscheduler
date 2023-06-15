@@ -21,7 +21,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.D;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EQUAL_SIGN;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SPACE;
 
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SqoopParameters;
 
@@ -53,10 +53,10 @@ public class CommonGenerator {
                             EQUAL_SIGN, sqoopParameters.getJobName()));
 
             // hadoop custom param
-            List<Property> hadoopCustomParams = sqoopParameters.getHadoopCustomParams();
+            List<Parameter> hadoopCustomParams = sqoopParameters.getHadoopCustomParams();
             if (CollectionUtils.isNotEmpty(hadoopCustomParams)) {
-                for (Property hadoopCustomParam : hadoopCustomParams) {
-                    String hadoopCustomParamStr = String.format("%s%s%s", hadoopCustomParam.getProp(),
+                for (Parameter hadoopCustomParam : hadoopCustomParams) {
+                    String hadoopCustomParamStr = String.format("%s%s%s", hadoopCustomParam.getKey(),
                             EQUAL_SIGN, hadoopCustomParam.getValue());
 
                     commonSb.append(SPACE).append(D)
@@ -65,10 +65,10 @@ public class CommonGenerator {
             }
 
             // sqoop custom params
-            List<Property> sqoopAdvancedParams = sqoopParameters.getSqoopAdvancedParams();
+            List<Parameter> sqoopAdvancedParams = sqoopParameters.getSqoopAdvancedParams();
             if (CollectionUtils.isNotEmpty(sqoopAdvancedParams)) {
-                for (Property sqoopAdvancedParam : sqoopAdvancedParams) {
-                    commonSb.append(SPACE).append(sqoopAdvancedParam.getProp())
+                for (Parameter sqoopAdvancedParam : sqoopAdvancedParams) {
+                    commonSb.append(SPACE).append(sqoopAdvancedParam.getKey())
                             .append(SPACE).append(sqoopAdvancedParam.getValue());
                 }
             }

@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.openmldb;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.python.PythonTask;
 
@@ -90,7 +90,7 @@ public class OpenmldbTask extends PythonTask {
         log.info("raw sql script : {}", openmldbParameters.getSql());
 
         String rawSQLScript = openmldbParameters.getSql().replaceAll("[\\r]?\\n", "\n");
-        Map<String, Property> paramsMap = mergeParamsWithContext(openmldbParameters);
+        Map<String, Parameter> paramsMap = mergeParamsWithContext(openmldbParameters);
         rawSQLScript = ParameterUtils.convertParameterPlaceholders(rawSQLScript, ParameterUtils.convert(paramsMap));
 
         // convert sql to python script

@@ -67,7 +67,7 @@ export function useDynamic(model: { [field: string]: any }): IJsonItem[] {
               )
 
               if (sameItems.length > 1) {
-                return new Error(t('project.node.prop_repeat'))
+                return new Error(t('project.node.key_repeat'))
               }
             }
           }

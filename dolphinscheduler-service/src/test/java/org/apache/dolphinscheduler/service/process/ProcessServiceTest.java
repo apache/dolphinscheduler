@@ -218,7 +218,7 @@ public class ProcessServiceTest {
         processDefinition.setVersion(definitionVersion);
         processDefinition.setCode(definitionCode);
         processDefinition
-                .setGlobalParams("[{\"prop\":\"startParam1\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"\"}]");
+                .setGlobalParams("[{\"key\":\"startParam1\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"\"}]");
         processDefinition.setExecutionType(ProcessExecutionTypeEnum.PARALLEL);
 
         ProcessInstance processInstance = new ProcessInstance();
@@ -417,7 +417,7 @@ public class ProcessServiceTest {
         processDefinition.setVersion(definitionVersion);
         processDefinition.setCode(definitionCode);
         processDefinition
-                .setGlobalParams("[{\"prop\":\"startParam1\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"\"}]");
+                .setGlobalParams("[{\"key\":\"startParam1\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"\"}]");
         processDefinition.setExecutionType(ProcessExecutionTypeEnum.PARALLEL);
 
         ProcessInstance processInstance = new ProcessInstance();
@@ -715,10 +715,10 @@ public class ProcessServiceTest {
         taskInstance.setProcessInstanceId(62);
         ProcessInstance processInstance = new ProcessInstance();
         processInstance.setId(62);
-        taskInstance.setVarPool("[{\"direct\":\"OUT\",\"prop\":\"test1\",\"type\":\"VARCHAR\",\"value\":\"\"}]");
+        taskInstance.setVarPool("[{\"direct\":\"OUT\",\"key\":\"test1\",\"type\":\"VARCHAR\",\"value\":\"\"}]");
         taskInstance.setTaskParams("{\"type\":\"MYSQL\",\"datasource\":1,\"sql\":\"select id from tb_test limit 1\","
                 + "\"udfs\":\"\",\"sqlType\":\"0\",\"sendEmail\":false,\"displayRows\":10,\"title\":\"\","
-                + "\"groupId\":null,\"localParams\":[{\"prop\":\"test1\",\"direct\":\"OUT\",\"type\":\"VARCHAR\",\"value\":\"12\"}],"
+                + "\"groupId\":null,\"localParams\":[{\"key\":\"test1\",\"direct\":\"OUT\",\"type\":\"VARCHAR\",\"value\":\"12\"}],"
                 + "\"connParams\":\"\",\"preStatements\":[],\"postStatements\":[],\"conditionResult\":\"{\\\"successNode\\\":[\\\"\\\"],"
                 + "\\\"failedNode\\\":[\\\"\\\"]}\",\"dependence\":\"{}\"}");
         processService.changeOutParam(taskInstance);

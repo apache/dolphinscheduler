@@ -25,7 +25,7 @@ import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.C
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -48,11 +48,11 @@ public class ParamUtils {
      * @return parameter map
      */
     public static Map<String, String> getGlobalParamMap(String globalParams) {
-        List<Property> propList;
+        List<Parameter> propList;
         Map<String, String> globalParamMap = new HashMap<>();
         if (!Strings.isNullOrEmpty(globalParams)) {
-            propList = JSONUtils.toList(globalParams, Property.class);
-            globalParamMap = propList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
+            propList = JSONUtils.toList(globalParams, Parameter.class);
+            globalParamMap = propList.stream().collect(Collectors.toMap(Parameter::getKey, Parameter::getValue));
         }
         return globalParamMap;
     }

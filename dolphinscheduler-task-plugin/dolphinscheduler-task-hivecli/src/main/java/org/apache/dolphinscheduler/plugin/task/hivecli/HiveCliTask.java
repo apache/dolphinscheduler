@@ -25,7 +25,7 @@ import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.Parameter;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
@@ -127,7 +127,7 @@ public class HiveCliTask extends AbstractRemoteTask {
             args.add(hiveCliOptions);
         }
 
-        final Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+        final Map<String, Parameter> paramsMap = taskExecutionContext.getPrepareParamsMap();
         final String command =
                 ParameterUtils.convertParameterPlaceholders(String.join(" ", args), ParameterUtils.convert(paramsMap));
 
