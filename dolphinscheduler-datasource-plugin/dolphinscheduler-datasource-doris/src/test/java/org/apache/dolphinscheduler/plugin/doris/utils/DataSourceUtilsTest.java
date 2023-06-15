@@ -45,7 +45,7 @@ public class DataSourceUtilsTest {
     @Test
     public void testCheckDatasourceParamOne() {
         DorisDataSourceParamDTO dorisDatasourceParamDTO = new DorisDataSourceParamDTO();
-        dorisDatasourceParamDTO.setHost("localhost");
+        dorisDatasourceParamDTO.setHost("localhost,localhost1");
         dorisDatasourceParamDTO.setDatabase("default");
         Map<String, String> other = new HashMap<>();
         other.put("serverTimezone", "Asia/Shanghai");
@@ -54,6 +54,7 @@ public class DataSourceUtilsTest {
         dorisDatasourceParamDTO.setOther(other);
         DataSourceUtils.checkDatasourceParam(dorisDatasourceParamDTO);
         Assertions.assertTrue(true);
+        Assertions.assertEquals("localhost,localhost1",dorisDatasourceParamDTO.getHost());
     }
 
     @Test
@@ -114,10 +115,10 @@ public class DataSourceUtilsTest {
     @Test
     public void testGetJdbcUrl() {
         DorisConnectionParam dorisConnectionParam = new DorisConnectionParam();
-        dorisConnectionParam.setJdbcUrl("jdbc:mysql://localhost:3308");
+        dorisConnectionParam.setJdbcUrl("jdbc:mysql://localhost,localhost2:3308?allowLoadLocalInfile=false");
         String jdbcUrl = DataSourceUtils.getJdbcUrl(DbType.DORIS, dorisConnectionParam);
         Assertions.assertEquals(
-                "jdbc:mysql://localhost:3308?allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false",
+                "jdbc:mysql://localhost,localhost2:3308?allowLoadLocalInfile=false",
                 jdbcUrl);
     }
 
@@ -125,8 +126,8 @@ public class DataSourceUtilsTest {
     public void testBuildDatasourceParamDTO() {
         DorisConnectionParam connectionParam = new DorisConnectionParam();
         connectionParam.setJdbcUrl(
-                "jdbc:mysql://localhost:3308?allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false");
-        connectionParam.setAddress("jdbc:mysql://localhost:3308");
+                "jdbc:mysql://localhost,localhost2:3308?allowLoadLocalInfile=false");
+        connectionParam.setAddress("jdbc:mysql://localhost:3308,localhost2:3308");
         connectionParam.setUser("root");
         connectionParam.setPassword("123456");
 

@@ -40,6 +40,7 @@ public class DorisDataSourceProcessorTest {
         Map<String, String> props = new HashMap<>();
         props.put("serverTimezone", "utc");
         DorisDataSourceParamDTO dorisDatasourceParamDTO = new DorisDataSourceParamDTO();
+
         dorisDatasourceParamDTO.setUserName("root");
         dorisDatasourceParamDTO.setPassword("123456");
         dorisDatasourceParamDTO.setHost("localhost");
@@ -50,8 +51,24 @@ public class DorisDataSourceProcessorTest {
             Mockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
             DorisConnectionParam connectionParams = (DorisConnectionParam) dorisDatasourceProcessor
                     .createConnectionParams(dorisDatasourceParamDTO);
-            Assertions.assertEquals("jdbc:mysql://localhost:3306", connectionParams.getAddress());
-            Assertions.assertEquals("jdbc:mysql://localhost:3306/default", connectionParams.getJdbcUrl());
+            Assertions.assertEquals("jdbc:mysql:loadbalance://localhost:3306", connectionParams.getAddress());
+            Assertions.assertEquals("jdbc:mysql:loadbalance://localhost:3306/default", connectionParams.getJdbcUrl());
+        }
+
+
+
+        dorisDatasourceParamDTO.setUserName("root");
+        dorisDatasourceParamDTO.setPassword("123456");
+        dorisDatasourceParamDTO.setHost("localhost,localhost1");
+        dorisDatasourceParamDTO.setPort(3306);
+        dorisDatasourceParamDTO.setDatabase("default");
+        dorisDatasourceParamDTO.setOther(props);
+        try (MockedStatic<PasswordUtils> mockedPasswordUtils = Mockito.mockStatic(PasswordUtils.class)) {
+            Mockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
+            DorisConnectionParam connectionParams = (DorisConnectionParam) dorisDatasourceProcessor
+                    .createConnectionParams(dorisDatasourceParamDTO);
+            Assertions.assertEquals("jdbc:mysql:loadbalance://localhost:3306,localhost1:3306", connectionParams.getAddress());
+            Assertions.assertEquals("jdbc:mysql:loadbalance://localhost:3306,localhost1:3306/default", connectionParams.getJdbcUrl());
         }
     }
 
@@ -74,7 +91,7 @@ public class DorisDataSourceProcessorTest {
     @Test
     public void testGetJdbcUrl() {
         DorisConnectionParam dorisConnectionParam = new DorisConnectionParam();
-        dorisConnectionParam.setJdbcUrl("jdbc:mysql://localhost:3306/default");
+        dorisConnectionParam.setJdbcUrl("jdbc:mysql://localhost:3306/default?allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false");
         Assertions.assertEquals(
                 "jdbc:mysql://localhost:3306/default?allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false",
                 dorisDatasourceProcessor.getJdbcUrl(dorisConnectionParam));
@@ -99,7 +116,7 @@ public class DorisDataSourceProcessorTest {
         dorisConnectionParam.setPassword("123456");
         try (MockedStatic<PasswordUtils> mockedPasswordUtils = Mockito.mockStatic(PasswordUtils.class)) {
             Mockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("123456");
-            Assertions.assertEquals("mysql@root@123456@jdbc:mysql://localhost:3306/default",
+            Assertions.assertEquals("doris@root@123456@jdbc:mysql://localhost:3306/default",
                     dorisDatasourceProcessor.getDatasourceUniqueId(dorisConnectionParam, DbType.DORIS));
         }
     }

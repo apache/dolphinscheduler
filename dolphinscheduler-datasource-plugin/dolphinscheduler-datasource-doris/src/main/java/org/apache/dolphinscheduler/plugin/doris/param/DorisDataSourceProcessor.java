@@ -73,8 +73,8 @@ public class DorisDataSourceProcessor extends AbstractDataSourceProcessor {
             hosts[i] = String.format(Constants.FORMAT_S_S_COLON, hosts[i], mysqlDatasourceParam.getPort());
         }
 
-        String address = String.format("%s", DataSourceConstants.JDBC_MYSQL_LOADBALANCE, String.join(",", hosts));
-        String jdbcUrl = String.format(Constants.FORMAT_S_S_COLON, address, mysqlDatasourceParam.getDatabase());
+        String address = String.format("%s%s", DataSourceConstants.JDBC_MYSQL_LOADBALANCE, String.join(",", hosts));
+        String jdbcUrl = String.format(Constants.FORMAT_S_S, address, mysqlDatasourceParam.getDatabase());
 
         DorisConnectionParam mysqlConnectionParam = new DorisConnectionParam();
         mysqlConnectionParam.setJdbcUrl(jdbcUrl);
@@ -96,7 +96,7 @@ public class DorisDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return DataSourceConstants.COM_MYSQL_JDBC_DRIVER;
+        return DataSourceConstants.COM_MYSQL_CJ_JDBC_DRIVER;
     }
 
     @Override
