@@ -31,8 +31,7 @@ const DagSidebar = defineComponent({
       context.emit('Dragstart', task)
     }
 
-    const handleCollection = (task: any) => {
-    }
+    const handleCollection = () => {}
 
     onMounted(() => {
       getTaskList()
