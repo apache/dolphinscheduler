@@ -25,7 +25,8 @@ import type { ECBasicOption } from 'echarts/types/dist/shared'
 
 function initChart<Opt extends ECBasicOption>(
   domRef: Ref<HTMLDivElement | null>,
-  option: Opt
+  option: Opt,
+  resizeFun?: any
 ): ECharts | null {
   let chart: ECharts | null = null
   const themeStore = useThemeStore()
@@ -44,6 +45,10 @@ function initChart<Opt extends ECBasicOption>(
   }
 
   const resize = throttle(() => {
+    if (resizeFun) {
+      resizeFun(chart)
+      return
+    }
     chart && chart.resize()
   }, 20)
 
