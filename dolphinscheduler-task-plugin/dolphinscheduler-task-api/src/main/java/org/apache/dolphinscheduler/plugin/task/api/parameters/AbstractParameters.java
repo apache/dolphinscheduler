@@ -79,8 +79,8 @@ public abstract class AbstractParameters implements IParameters {
     public Map<String, Parameter> getLocalParametersMap() {
         Map<String, Parameter> localParametersMaps = new LinkedHashMap<>();
         if (localParams != null) {
-            for (Parameter property : localParams) {
-                localParametersMaps.put(property.getKey(), property);
+            for (Parameter parameter : localParams) {
+                localParametersMaps.put(parameter.getKey(), parameter);
             }
         }
         return localParametersMaps;
@@ -93,10 +93,10 @@ public abstract class AbstractParameters implements IParameters {
     public Map<String, Parameter> getInputLocalParametersMap() {
         Map<String, Parameter> localParametersMaps = new LinkedHashMap<>();
         if (localParams != null) {
-            for (Parameter property : localParams) {
+            for (Parameter parameter : localParams) {
                 // The direct of some tasks is empty, default IN
-                if (property.getDirect() == null || Objects.equals(Direct.IN, property.getDirect())) {
-                    localParametersMaps.put(property.getKey(), property);
+                if (parameter.getDirect() == null || Objects.equals(Direct.IN, parameter.getDirect())) {
+                    localParametersMaps.put(parameter.getKey(), parameter);
                 }
             }
         }
@@ -111,8 +111,8 @@ public abstract class AbstractParameters implements IParameters {
     public Map<String, Parameter> getVarPoolMap() {
         Map<String, Parameter> varPoolMap = new LinkedHashMap<>();
         if (varPool != null) {
-            for (Parameter property : varPool) {
-                varPoolMap.put(property.getKey(), property);
+            for (Parameter parameter : varPool) {
+                varPoolMap.put(parameter.getKey(), parameter);
             }
         }
         return varPoolMap;
@@ -199,8 +199,8 @@ public abstract class AbstractParameters implements IParameters {
         return new ResourceParametersHelper();
     }
 
-    public void addPropertyToValPool(Parameter property) {
-        varPool.removeIf(p -> p.getKey().equals(property.getKey()));
-        varPool.add(property);
+    public void addPropertyToValPool(Parameter parameter) {
+        varPool.removeIf(p -> p.getKey().equals(parameter.getKey()));
+        varPool.add(parameter);
     }
 }

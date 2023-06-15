@@ -937,8 +937,8 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         String globalParamStr =
                 ParameterUtils.convertParameterPlaceholders(JSONUtils.toJsonString(globalParams), timeParams);
         globalParams = JSONUtils.toList(globalParamStr, Parameter.class);
-        for (Parameter property : globalParams) {
-            timeParams.put(property.getKey(), property.getValue());
+        for (Parameter parameter : globalParams) {
+            timeParams.put(parameter.getKey(), parameter.getValue());
         }
 
         if (userDefinedParams != null && userDefinedParams.length() > 0) {

@@ -82,9 +82,9 @@ public class TaskFilesTransferUtils {
         }
 
         log.info("Upload output files ...");
-        for (Parameter property : localParamsProperty) {
+        for (Parameter parameter : localParamsProperty) {
             // get local file path
-            String path = String.format("%s/%s", taskExecutionContext.getExecutePath(), property.getValue());
+            String path = String.format("%s/%s", taskExecutionContext.getExecutePath(), parameter.getValue());
             String srcPath = packIfDir(path);
 
             // get crc file path
@@ -104,7 +104,7 @@ public class TaskFilesTransferUtils {
                         storageOperate.getResourceFullName(taskExecutionContext.getTenantCode(), resourcePath);
                 String resourceCRCWholePath =
                         storageOperate.getResourceFullName(taskExecutionContext.getTenantCode(), resourceCRCPath);
-                log.info("{} --- Local:{} to Remote:{}", property, srcPath, resourceWholePath);
+                log.info("{} --- Local:{} to Remote:{}", parameter, srcPath, resourceWholePath);
                 storageOperate.upload(taskExecutionContext.getTenantCode(), srcPath, resourceWholePath, false, true);
                 log.info("{} --- Local:{} to Remote:{}", "CRC file", srcCRCPath, resourceCRCWholePath);
                 storageOperate.upload(taskExecutionContext.getTenantCode(), srcCRCPath, resourceCRCWholePath, false,
@@ -116,10 +116,10 @@ public class TaskFilesTransferUtils {
             // update varPool
             Parameter oriProperty;
             // if the property is not in varPool, add it
-            if (varPoolsMap.containsKey(property.getKey())) {
-                oriProperty = varPoolsMap.get(property.getKey());
+            if (varPoolsMap.containsKey(parameter.getKey())) {
+                oriProperty = varPoolsMap.get(parameter.getKey());
             } else {
-                oriProperty = new Parameter(property.getKey(), Direct.OUT, DataType.FILE, property.getValue());
+                oriProperty = new Parameter(parameter.getKey(), Direct.OUT, DataType.FILE, parameter.getValue());
                 varPools.add(oriProperty);
             }
             oriProperty.setKey(String.format("%s.%s", taskExecutionContext.getTaskName(), oriProperty.getKey()));
@@ -153,16 +153,16 @@ public class TaskFilesTransferUtils {
         String downloadTmpPath = String.format("%s/%s", executePath, DOWNLOAD_TMP);
 
         log.info("Download upstream files...");
-        for (Parameter property : localParamsProperty) {
-            Parameter inVarPool = varPoolsMap.get(property.getValue());
+        for (Parameter parameter : localParamsProperty) {
+            Parameter inVarPool = varPoolsMap.get(parameter.getValue());
             if (inVarPool == null) {
-                log.error("{} not in  {}", property.getValue(), varPoolsMap.keySet());
+                log.error("{} not in  {}", parameter.getValue(), varPoolsMap.keySet());
                 throw new TaskException(String.format("Can not find upstream file using %s, please check the key",
-                        property.getValue()));
+                        parameter.getValue()));
             }
 
             String resourcePath = inVarPool.getValue();
-            String targetPath = String.format("%s/%s", executePath, property.getKey());
+            String targetPath = String.format("%s/%s", executePath, parameter.getKey());
 
             String downloadPath;
             // If the data is packaged, download it to a special directory (DOWNLOAD_TMP) and unpack it to the
@@ -177,7 +177,7 @@ public class TaskFilesTransferUtils {
             try {
                 String resourceWholePath =
                         storageOperate.getResourceFullName(taskExecutionContext.getTenantCode(), resourcePath);
-                log.info("{} --- Remote:{} to Local:{}", property, resourceWholePath, downloadPath);
+                log.info("{} --- Remote:{} to Local:{}", parameter, resourceWholePath, downloadPath);
                 storageOperate.download(taskExecutionContext.getTenantCode(), resourceWholePath, downloadPath, true);
             } catch (IOException ex) {
                 throw new TaskException("Download file from storage error", ex);
@@ -210,10 +210,10 @@ public class TaskFilesTransferUtils {
         List<Parameter> localParamsProperty = new ArrayList<>();
         JsonNode taskParams = JSONUtils.parseObject(taskExecutionContext.getTaskParams());
         for (JsonNode localParam : taskParams.get("localParams")) {
-            Parameter property = JSONUtils.parseObject(localParam.toString(), Parameter.class);
+            Parameter parameter = JSONUtils.parseObject(localParam.toString(), Parameter.class);
 
-            if (property.getDirect().equals(direct) && property.getType().equals(DataType.FILE)) {
-                localParamsProperty.add(property);
+            if (parameter.getDirect().equals(direct) && parameter.getType().equals(DataType.FILE)) {
+                localParamsProperty.add(parameter);
             }
         }
         return localParamsProperty;
@@ -254,8 +254,8 @@ public class TaskFilesTransferUtils {
         }
         // parse varPool
         for (JsonNode varPoolData : JSONUtils.parseArray(varPoolString)) {
-            Parameter property = JSONUtils.parseObject(varPoolData.toString(), Parameter.class);
-            varPools.add(property);
+            Parameter parameter = JSONUtils.parseObject(varPoolData.toString(), Parameter.class);
+            varPools.add(parameter);
         }
         return varPools;
     }

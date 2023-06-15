@@ -199,15 +199,15 @@ public abstract class AbstractTask {
         while (m.find()) {
 
             String paramName = m.group(1);
-            Parameter prop = paramsPropsMap.get(paramName);
+            Parameter param = paramsPropsMap.get(paramName);
 
-            if (prop == null) {
+            if (param == null) {
                 log.error(
                         "setSqlParamsMap: No Property with paramName: {} is found in paramsPropsMap of task instance"
                                 + " with id: {}. So couldn't put Property in sqlParamsMap.",
                         paramName, taskInstanceId);
             } else {
-                sqlParamsMap.put(index, prop);
+                sqlParamsMap.put(index, param);
                 index++;
                 log.info(
                         "setSqlParamsMap: Property with paramName: {} put in sqlParamsMap of content {} successfully.",

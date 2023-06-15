@@ -148,15 +148,15 @@ public class SwitchLogicTask extends BaseSyncLogicTask<SwitchParameters> {
         }
         while (m.find()) {
             String paramName = m.group(1);
-            Parameter property = globalParams.get(paramName);
-            if (property == null) {
+            Parameter parameter = globalParams.get(paramName);
+            if (parameter == null) {
                 return "";
             }
             String value;
-            if (ParameterUtils.isNumber(property) || ParameterUtils.isBoolean(property)) {
-                value = "" + ParameterUtils.getParameterValue(property);
+            if (ParameterUtils.isNumber(parameter) || ParameterUtils.isBoolean(parameter)) {
+                value = "" + ParameterUtils.getParameterValue(parameter);
             } else {
-                value = "\"" + ParameterUtils.getParameterValue(property) + "\"";
+                value = "\"" + ParameterUtils.getParameterValue(parameter) + "\"";
             }
             log.info("paramName:{}，paramValue:{}", paramName, value);
             content = content.replace("${" + paramName + "}", value);

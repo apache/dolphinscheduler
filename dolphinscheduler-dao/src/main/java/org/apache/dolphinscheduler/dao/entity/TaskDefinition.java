@@ -250,8 +250,8 @@ public class TaskDefinition {
 
                 if (CollectionUtils.isNotEmpty(propList)) {
                     taskParamMap = new HashMap<>();
-                    for (Parameter property : propList) {
-                        taskParamMap.put(property.getKey(), property.getValue());
+                    for (Parameter parameter : propList) {
+                        taskParamMap.put(parameter.getKey(), parameter.getValue());
                     }
                 }
             }

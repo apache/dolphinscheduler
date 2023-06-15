@@ -93,13 +93,13 @@ class TaskCacheUtilsTest {
         taskInstance.setIsCache(Flag.YES);
 
         taskExecutionContext = new TaskExecutionContext();
-        Parameter property = new Parameter();
-        property.setKey("a");
-        property.setDirect(Direct.IN);
-        property.setType(DataType.VARCHAR);
-        property.setValue("aa");
+        Parameter parameter = new Parameter();
+        parameter.setKey("a");
+        parameter.setDirect(Direct.IN);
+        parameter.setType(DataType.VARCHAR);
+        parameter.setValue("aa");
         Map<String, Parameter> prepareParamsMap = new HashMap<>();
-        prepareParamsMap.put("a", property);
+        prepareParamsMap.put("a", parameter);
         taskExecutionContext.setPrepareParamsMap(prepareParamsMap);
 
         storageOperate = Mockito.mock(StorageOperate.class);
@@ -142,22 +142,22 @@ class TaskCacheUtilsTest {
     @Test
     void TestGenerateCacheKey() {
         String cacheKeyBase = TaskCacheUtils.generateCacheKey(taskInstance, taskExecutionContext, storageOperate);
-        Parameter propertyI = new Parameter();
-        propertyI.setKey("i");
-        propertyI.setDirect(Direct.IN);
-        propertyI.setType(DataType.VARCHAR);
-        propertyI.setValue("ii");
-        taskExecutionContext.getPrepareParamsMap().put("i", propertyI);
+        Parameter parameterI = new Parameter();
+        parameterI.setKey("i");
+        parameterI.setDirect(Direct.IN);
+        parameterI.setType(DataType.VARCHAR);
+        parameterI.setValue("ii");
+        taskExecutionContext.getPrepareParamsMap().put("i", parameterI);
         String cacheKeyNew = TaskCacheUtils.generateCacheKey(taskInstance, taskExecutionContext, storageOperate);
         // i will not influence the result, because task instance not use it
         Assertions.assertEquals(cacheKeyBase, cacheKeyNew);
 
-        Parameter propertyD = new Parameter();
-        propertyD.setKey("d");
-        propertyD.setDirect(Direct.IN);
-        propertyD.setType(DataType.VARCHAR);
-        propertyD.setValue("dd");
-        taskExecutionContext.getPrepareParamsMap().put("i", propertyD);
+        Parameter parameterD = new Parameter();
+        parameterD.setKey("d");
+        parameterD.setDirect(Direct.IN);
+        parameterD.setType(DataType.VARCHAR);
+        parameterD.setValue("dd");
+        taskExecutionContext.getPrepareParamsMap().put("i", parameterD);
         String cacheKeyD = TaskCacheUtils.generateCacheKey(taskInstance, taskExecutionContext, storageOperate);
         // d will influence the result, because task instance use it
         Assertions.assertNotEquals(cacheKeyBase, cacheKeyD);
@@ -185,16 +185,16 @@ class TaskCacheUtilsTest {
         String filePath = "test/testFile.txt";
         FileUtils.writeContent2File(content, filePath + CRC_SUFFIX);
 
-        Parameter property = new Parameter();
-        property.setKey("f1");
-        property.setValue("testFile.txt");
-        property.setType(DataType.FILE);
-        property.setDirect(Direct.IN);
+        Parameter parameter = new Parameter();
+        parameter.setKey("f1");
+        parameter.setValue("testFile.txt");
+        parameter.setType(DataType.FILE);
+        parameter.setDirect(Direct.IN);
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
         taskExecutionContext.setExecutePath("test");
         taskExecutionContext.setTenantCode("aaa");
 
-        String crc = TaskCacheUtils.getValCheckSum(property, taskExecutionContext, storageOperate);
+        String crc = TaskCacheUtils.getValCheckSum(parameter, taskExecutionContext, storageOperate);
         Assertions.assertEquals(crc, content);
     }
 }

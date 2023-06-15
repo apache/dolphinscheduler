@@ -229,11 +229,11 @@ public class JavaTaskTest {
                         "    }\n" +
                         "}\n");
         ArrayList<Parameter> localParams = new ArrayList<>();
-        Parameter property = new Parameter();
-        property.setKey("name");
-        property.setValue("zhangsan");
-        property.setDirect(IN);
-        property.setType(VARCHAR);
+        Parameter parameter = new Parameter();
+        parameter.setKey("name");
+        parameter.setValue("zhangsan");
+        parameter.setDirect(IN);
+        parameter.setType(VARCHAR);
         javaParameters.setLocalParams(localParams);
         ResourceInfo mainJar = new ResourceInfo();
         mainJar.setId(1);

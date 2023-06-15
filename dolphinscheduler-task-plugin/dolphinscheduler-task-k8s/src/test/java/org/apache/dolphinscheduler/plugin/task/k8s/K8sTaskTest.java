@@ -76,20 +76,20 @@ public class K8sTaskTest {
         taskRequest.setTaskInstanceId(taskInstanceId);
         taskRequest.setTaskName(taskName);
         taskRequest.setTaskParams(JSONUtils.toJsonString(k8sTaskParameters));
-        Parameter property = new Parameter();
-        property.setKey(DAY);
-        property.setDirect(Direct.IN);
-        property.setType(DataType.VARCHAR);
-        property.setValue(date);
+        Parameter parameter = new Parameter();
+        parameter.setKey(DAY);
+        parameter.setDirect(Direct.IN);
+        parameter.setType(DataType.VARCHAR);
+        parameter.setValue(date);
         Map<String, Parameter> paramsMap = new HashMap<>();
-        paramsMap.put(DAY, property);
+        paramsMap.put(DAY, parameter);
         taskRequest.setParamsMap(paramsMap);
 
         Map<String, Parameter> prepareParamsMap = new HashMap<>();
-        Parameter property1 = new Parameter();
-        property1.setKey("day");
-        property1.setValue("20220507");
-        prepareParamsMap.put("day", property1);
+        Parameter parameter1 = new Parameter();
+        parameter1.setKey("day");
+        parameter1.setValue("20220507");
+        prepareParamsMap.put("day", parameter1);
         taskRequest.setPrepareParamsMap(prepareParamsMap);
         k8sTask = new K8sTask(taskRequest);
     }

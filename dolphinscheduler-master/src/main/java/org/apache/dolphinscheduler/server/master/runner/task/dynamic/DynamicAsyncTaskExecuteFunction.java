@@ -125,9 +125,9 @@ public class DynamicAsyncTaskExecuteFunction implements AsyncTaskExecuteFunction
             dynamicOutput.setDynParams(dynamicParams);
 
             Map<String, String> outputValueMap = new HashMap<>();
-            List<Parameter> propertyList = subWorkflowService.getWorkflowOutputParameters(processInstance);
-            for (Parameter property : propertyList) {
-                outputValueMap.put(property.getKey(), property.getValue());
+            List<Parameter> parameterList = subWorkflowService.getWorkflowOutputParameters(processInstance);
+            for (Parameter parameter : parameterList) {
+                outputValueMap.put(parameter.getKey(), parameter.getValue());
             }
 
             dynamicOutput.setOutputValue(outputValueMap);
@@ -135,18 +135,18 @@ public class DynamicAsyncTaskExecuteFunction implements AsyncTaskExecuteFunction
             dynamicOutputs.add(dynamicOutput);
         }
 
-        Parameter property = new Parameter();
-        property.setKey(String.format("%s(%s)", OUTPUT_KEY, taskInstance.getName()));
-        property.setDirect(Direct.OUT);
-        property.setType(DataType.VARCHAR);
-        property.setValue(JSONUtils.toJsonString(dynamicOutputs));
+        Parameter parameter = new Parameter();
+        parameter.setKey(String.format("%s(%s)", OUTPUT_KEY, taskInstance.getName()));
+        parameter.setDirect(Direct.OUT);
+        parameter.setType(DataType.VARCHAR);
+        parameter.setValue(JSONUtils.toJsonString(dynamicOutputs));
 
         List<Parameter> taskPropertyList =
                 new ArrayList<>(JSONUtils.toList(taskInstance.getVarPool(), Parameter.class));
-        taskPropertyList.add(property);
+        taskPropertyList.add(parameter);
         logicTask.getTaskParameters().setVarPool(JSONUtils.toJsonString(taskPropertyList));
 
-        log.info("set property: {}", property);
+        log.info("set property: {}", parameter);
     }
 
     private void startSubProcessInstances(List<ProcessInstance> allSubProcessInstance, int startCount) {

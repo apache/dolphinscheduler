@@ -433,8 +433,8 @@ public class SqlTask extends AbstractTask {
             Map<Integer, Parameter> params = sqlBinds.getParamsMap();
             if (params != null) {
                 for (Map.Entry<Integer, Parameter> entry : params.entrySet()) {
-                    Parameter prop = entry.getValue();
-                    ParameterUtils.setInParameter(entry.getKey(), stmt, prop.getType(), prop.getValue());
+                    Parameter param = entry.getValue();
+                    ParameterUtils.setInParameter(entry.getKey(), stmt, param.getType(), param.getValue());
                 }
             }
             log.info("prepare statement replace sql : {}, sql parameters : {}", sqlBinds.getSql(),

@@ -43,14 +43,14 @@ public class JSONUtilsTest {
 
     @Test
     public void createArrayNodeTest() {
-        Parameter property = new Parameter();
-        property.setKey("ds");
-        property.setDirect(Direct.IN);
-        property.setType(DataType.VARCHAR);
-        property.setValue("sssssss");
+        Parameter parameter = new Parameter();
+        parameter.setKey("ds");
+        parameter.setDirect(Direct.IN);
+        parameter.setType(DataType.VARCHAR);
+        parameter.setValue("sssssss");
         String str =
                 "[{\"key\":\"ds\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"sssssss\"},{\"key\":\"ds\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"sssssss\"}]";
-        JsonNode jsonNode = JSONUtils.toJsonNode(property);
+        JsonNode jsonNode = JSONUtils.toJsonNode(parameter);
 
         ArrayNode arrayNode = JSONUtils.createArrayNode();
         ArrayList<JsonNode> objects = new ArrayList<>();
@@ -65,14 +65,14 @@ public class JSONUtilsTest {
 
     @Test
     public void toJsonNodeTest() {
-        Parameter property = new Parameter();
-        property.setKey("ds");
-        property.setDirect(Direct.IN);
-        property.setType(DataType.VARCHAR);
-        property.setValue("sssssss");
+        Parameter parameter = new Parameter();
+        parameter.setKey("ds");
+        parameter.setDirect(Direct.IN);
+        parameter.setType(DataType.VARCHAR);
+        parameter.setValue("sssssss");
         String str = "{\"key\":\"ds\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"sssssss\"}";
 
-        JsonNode jsonNodes = JSONUtils.toJsonNode(property);
+        JsonNode jsonNodes = JSONUtils.toJsonNode(parameter);
         String s = JSONUtils.toJsonString(jsonNodes);
         Assertions.assertEquals(s, str);
 
@@ -102,14 +102,14 @@ public class JSONUtilsTest {
 
     @Test
     public void convert2Property() {
-        Parameter property = new Parameter();
-        property.setKey("ds");
-        property.setDirect(Direct.IN);
-        property.setType(DataType.VARCHAR);
-        property.setValue("sssssss");
+        Parameter parameter = new Parameter();
+        parameter.setKey("ds");
+        parameter.setDirect(Direct.IN);
+        parameter.setType(DataType.VARCHAR);
+        parameter.setValue("sssssss");
         String str = "{\"direct\":\"IN\",\"key\":\"ds\",\"type\":\"VARCHAR\",\"value\":\"sssssss\"}";
-        Parameter property1 = JSONUtils.parseObject(str, Parameter.class);
-        Direct direct = property1.getDirect();
+        Parameter parameter1 = JSONUtils.parseObject(str, Parameter.class);
+        Direct direct = parameter1.getDirect();
         Assertions.assertEquals(Direct.IN, direct);
     }
 

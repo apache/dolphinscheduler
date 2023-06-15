@@ -153,9 +153,9 @@ public class ProcedureTask extends AbstractTask {
                                    Map<Integer, Parameter> outParameterMap) throws SQLException {
         for (Map.Entry<Integer, Parameter> en : outParameterMap.entrySet()) {
             int index = en.getKey();
-            Parameter property = en.getValue();
-            String prop = property.getKey();
-            DataType dataType = property.getType();
+            Parameter parameter = en.getValue();
+            String prop = parameter.getKey();
+            DataType dataType = parameter.getType();
             // get output parameter
             procedureParameters.dealOutParam4Procedure(getOutputParameter(stmt, index, prop, dataType), prop);
         }
@@ -179,13 +179,14 @@ public class ProcedureTask extends AbstractTask {
         int index = 1;
         if (paramsMap != null) {
             for (Map.Entry<Integer, Parameter> entry : paramsMap.entrySet()) {
-                Parameter property = entry.getValue();
-                if (property.getDirect().equals(Direct.IN)) {
-                    ParameterUtils.setInParameter(index, stmt, property.getType(),
-                            totalParamsMap.get(property.getKey()).getValue());
-                } else if (property.getDirect().equals(Direct.OUT)) {
-                    setOutParameter(index, stmt, property.getType(), totalParamsMap.get(property.getKey()).getValue());
-                    outParameterMap.put(index, property);
+                Parameter parameter = entry.getValue();
+                if (parameter.getDirect().equals(Direct.IN)) {
+                    ParameterUtils.setInParameter(index, stmt, parameter.getType(),
+                            totalParamsMap.get(parameter.getKey()).getValue());
+                } else if (parameter.getDirect().equals(Direct.OUT)) {
+                    setOutParameter(index, stmt, parameter.getType(),
+                            totalParamsMap.get(parameter.getKey()).getValue());
+                    outParameterMap.put(index, parameter);
                 }
                 index++;
             }

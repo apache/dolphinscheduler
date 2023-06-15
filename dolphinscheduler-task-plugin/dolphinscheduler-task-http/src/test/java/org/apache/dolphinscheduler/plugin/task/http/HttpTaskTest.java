@@ -186,11 +186,11 @@ public class HttpTaskTest {
 
         List<Parameter> varPool = httpParameters.getVarPool();
         Assertions.assertEquals(1, varPool.size());
-        Parameter property = varPool.get(0);
-        Assertions.assertEquals("null.response", property.getKey());
-        Assertions.assertEquals(Direct.OUT, property.getDirect());
-        Assertions.assertEquals(DataType.VARCHAR, property.getType());
-        Assertions.assertEquals(response, property.getValue());
+        Parameter parameter = varPool.get(0);
+        Assertions.assertEquals("null.response", parameter.getKey());
+        Assertions.assertEquals(Direct.OUT, parameter.getDirect());
+        Assertions.assertEquals(DataType.VARCHAR, parameter.getType());
+        Assertions.assertEquals(response, parameter.getValue());
     }
 
     private String withMockWebServer(String path, int actualResponseCode,
@@ -228,10 +228,10 @@ public class HttpTaskTest {
         if (prepareParamsMap != null) {
             Map<String, Parameter> propertyParamsMap = new HashMap<>();
             prepareParamsMap.forEach((k, v) -> {
-                Parameter property = new Parameter();
-                property.setKey(k);
-                property.setValue(v);
-                propertyParamsMap.put(k, property);
+                Parameter parameter = new Parameter();
+                parameter.setKey(k);
+                parameter.setValue(v);
+                propertyParamsMap.put(k, parameter);
             });
             Mockito.when(taskExecutionContext.getPrepareParamsMap()).thenReturn(propertyParamsMap);
         }

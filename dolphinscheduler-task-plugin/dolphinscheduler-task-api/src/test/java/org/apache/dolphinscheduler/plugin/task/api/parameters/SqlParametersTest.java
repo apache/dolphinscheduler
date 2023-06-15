@@ -45,12 +45,12 @@ public class SqlParametersTest {
     @Test
     public void testSqlParameters() {
         List<Parameter> properties = new ArrayList<>();
-        Parameter property = new Parameter();
-        property.setKey("test1");
-        property.setDirect(Direct.OUT);
-        property.setType(DataType.VARCHAR);
-        property.setValue("test1");
-        properties.add(property);
+        Parameter parameter = new Parameter();
+        parameter.setKey("test1");
+        parameter.setDirect(Direct.OUT);
+        parameter.setType(DataType.VARCHAR);
+        parameter.setValue("test1");
+        properties.add(parameter);
 
         SqlParameters sqlParameters = new SqlParameters();
         Assertions.assertTrue(CollectionUtils.isEmpty(sqlParameters.getResourceFilesList()));
@@ -84,9 +84,9 @@ public class SqlParametersTest {
         sqlParameters.dealOutParam(sqlResult1);
         Assertions.assertNotNull(sqlParameters.getVarPool().get(0));
 
-        property.setType(DataType.LIST);
+        parameter.setType(DataType.LIST);
         properties.clear();
-        properties.add(property);
+        properties.add(parameter);
         sqlParameters.setLocalParams(properties);
         sqlParameters.dealOutParam(sqlResult);
         Assertions.assertNotNull(sqlParameters.getVarPool().get(0));

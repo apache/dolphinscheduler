@@ -115,8 +115,8 @@ public class CuringGlobalParamsServiceTest {
                 CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null));
 
         // test globalParamList is not null
-        Parameter property = new Parameter("testGlobalParam", Direct.IN, DataType.VARCHAR, "testGlobalParam");
-        globalParamList.add(property);
+        Parameter parameter = new Parameter("testGlobalParam", Direct.IN, DataType.VARCHAR, "testGlobalParam");
+        globalParamList.add(parameter);
 
         String result2 = dolphinSchedulerCuringGlobalParams.curingGlobalParams(1, null, globalParamList,
                 CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null);
@@ -134,13 +134,13 @@ public class CuringGlobalParamsServiceTest {
         globalParamMap.put("bizDate", "${system.biz.date}");
         globalParamMap.put("b1zCurdate", "${system.biz.curdate}");
 
-        Parameter property2 = new Parameter("testParamList1", Direct.IN, DataType.VARCHAR, "testParamList");
-        Parameter property3 = new Parameter("testParamList2", Direct.IN, DataType.VARCHAR, "{testParamList1}");
-        Parameter property4 = new Parameter("testParamList3", Direct.IN, DataType.VARCHAR, "${b1zCurdate}");
+        Parameter parameter2 = new Parameter("testParamList1", Direct.IN, DataType.VARCHAR, "testParamList");
+        Parameter parameter3 = new Parameter("testParamList2", Direct.IN, DataType.VARCHAR, "{testParamList1}");
+        Parameter parameter4 = new Parameter("testParamList3", Direct.IN, DataType.VARCHAR, "${b1zCurdate}");
 
-        globalParamList.add(property2);
-        globalParamList.add(property3);
-        globalParamList.add(property4);
+        globalParamList.add(parameter2);
+        globalParamList.add(parameter3);
+        globalParamList.add(parameter4);
 
         String result5 = dolphinSchedulerCuringGlobalParams.curingGlobalParams(1, globalParamMap, globalParamList,
                 CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null);
@@ -183,12 +183,12 @@ public class CuringGlobalParamsServiceTest {
         processInstance.setId(2);
         processInstance.setCommandParam("{\"" + Constants.SCHEDULE_TIMEZONE + "\":\"Asia/Shanghai\"}");
         processInstance.setHistoryCmd(CommandType.COMPLEMENT_DATA.toString());
-        Parameter property = new Parameter();
-        property.setDirect(Direct.IN);
-        property.setKey("global_params");
-        property.setValue("hello world");
-        property.setType(DataType.VARCHAR);
-        List<Parameter> properties = Lists.newArrayList(property);
+        Parameter parameter = new Parameter();
+        parameter.setDirect(Direct.IN);
+        parameter.setKey("global_params");
+        parameter.setValue("hello world");
+        parameter.setType(DataType.VARCHAR);
+        List<Parameter> properties = Lists.newArrayList(parameter);
         processInstance.setGlobalParams(JSONUtils.toJsonString(properties));
 
         ProcessDefinition processDefinition = new ProcessDefinition();

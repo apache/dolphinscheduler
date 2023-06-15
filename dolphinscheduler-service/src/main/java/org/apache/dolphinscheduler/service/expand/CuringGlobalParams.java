@@ -119,10 +119,10 @@ public class CuringGlobalParams implements CuringParamsService {
             }
         }
         globalMap.putAll(resolveMap);
-        for (Parameter property : globalParamList) {
-            String val = globalMap.get(property.getKey());
+        for (Parameter parameter : globalParamList) {
+            String val = globalMap.get(parameter.getKey());
             if (val != null) {
-                property.setValue(val);
+                parameter.setValue(val);
             }
         }
         return JSONUtils.toJsonString(globalParamList);
@@ -176,21 +176,21 @@ public class CuringGlobalParams implements CuringParamsService {
         Iterator<Map.Entry<String, Parameter>> iter = globalParams.entrySet().iterator();
         while (iter.hasNext()) {
             Map.Entry<String, Parameter> en = iter.next();
-            Parameter property = en.getValue();
+            Parameter parameter = en.getValue();
 
-            if (StringUtils.isNotEmpty(property.getValue())
-                    && property.getValue().contains(Constants.FUNCTION_START_WITH)) {
+            if (StringUtils.isNotEmpty(parameter.getValue())
+                    && parameter.getValue().contains(Constants.FUNCTION_START_WITH)) {
                 /**
                  *  local parameter refers to global parameter with the same name
                  *  note: the global parameters of the process instance here are solidified parameters,
                  *  and there are no variables in them.
                  */
-                String val = property.getValue();
+                String val = parameter.getValue();
                 // whether external scaling calculation is required
                 if (timeFunctionNeedExpand(val)) {
                     val = timeFunctionExtension(taskInstance.getProcessInstanceId(), timeZone, val);
                 }
-                property.setValue(val);
+                parameter.setValue(val);
             }
         }
         if (MapUtils.isEmpty(globalParams)) {

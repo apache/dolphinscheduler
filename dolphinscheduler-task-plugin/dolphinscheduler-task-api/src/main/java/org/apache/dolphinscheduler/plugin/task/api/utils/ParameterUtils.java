@@ -153,12 +153,12 @@ public class ParameterUtils {
         }
     }
 
-    public static Serializable getParameterValue(Parameter property) {
-        if (property == null) {
+    public static Serializable getParameterValue(Parameter parameter) {
+        if (parameter == null) {
             return null;
         }
-        String value = property.getValue();
-        switch (property.getType()) {
+        String value = parameter.getValue();
+        switch (parameter.getType()) {
             case LONG:
                 return Long.valueOf(value);
             case FLOAT:
@@ -175,16 +175,16 @@ public class ParameterUtils {
         }
     }
 
-    public static boolean isNumber(Parameter property) {
-        return property != null &&
-                (DataType.INTEGER.equals(property.getType())
-                        || DataType.LONG.equals(property.getType())
-                        || DataType.FLOAT.equals(property.getType())
-                        || DataType.DOUBLE.equals(property.getType()));
+    public static boolean isNumber(Parameter parameter) {
+        return parameter != null &&
+                (DataType.INTEGER.equals(parameter.getType())
+                        || DataType.LONG.equals(parameter.getType())
+                        || DataType.FLOAT.equals(parameter.getType())
+                        || DataType.DOUBLE.equals(parameter.getType()));
     }
 
-    public static boolean isBoolean(Parameter property) {
-        return property != null && DataType.BOOLEAN.equals(property.getType());
+    public static boolean isBoolean(Parameter parameter) {
+        return parameter != null && DataType.BOOLEAN.equals(parameter.getType());
     }
 
     public static String expandListParameter(Map<Integer, Parameter> params, String sql) {
@@ -199,9 +199,9 @@ public class ParameterUtils {
         StringBuilder ret = new StringBuilder(split[0]);
         int index = 1;
         for (int i = 1; i < split.length; i++) {
-            Parameter property = params.get(i);
-            String value = property.getValue();
-            if (DataType.LIST.equals(property.getType())) {
+            Parameter parameter = params.get(i);
+            String value = parameter.getValue();
+            if (DataType.LIST.equals(parameter.getType())) {
                 List<Object> valueList = JSONUtils.toList(value, Object.class);
                 if (valueList.isEmpty() && StringUtils.isNotBlank(value)) {
                     valueList.add(value);
@@ -226,13 +226,13 @@ public class ParameterUtils {
                         newProperty.setType(DataType.VARCHAR);
                     }
                     newProperty.setValue(v.toString());
-                    newProperty.setKey(property.getKey());
-                    newProperty.setDirect(property.getDirect());
+                    newProperty.setKey(parameter.getKey());
+                    newProperty.setDirect(parameter.getDirect());
                     expandMap.put(index++, newProperty);
                 }
             } else {
                 ret.append(PARAM_REPLACE_CHAR);
-                expandMap.put(index++, property);
+                expandMap.put(index++, parameter);
             }
             ret.append(split[i]);
         }
@@ -336,8 +336,8 @@ public class ParameterUtils {
             Iterator<Map.Entry<String, String>> iter = definedParams.entrySet().iterator();
             while (iter.hasNext()) {
                 Map.Entry<String, String> en = iter.next();
-                Parameter property = new Parameter(en.getKey(), Direct.IN, DataType.VARCHAR, en.getValue());
-                userDefParamsMaps.put(property.getKey(), property);
+                Parameter parameter = new Parameter(en.getKey(), Direct.IN, DataType.VARCHAR, en.getValue());
+                userDefParamsMaps.put(parameter.getKey(), parameter);
             }
         }
         return userDefParamsMaps;
