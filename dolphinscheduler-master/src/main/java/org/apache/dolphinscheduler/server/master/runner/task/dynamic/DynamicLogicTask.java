@@ -34,8 +34,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.DynamicInputParameter;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DynamicParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.remote.command.workflow.WorkflowStateEventChangeRequest;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.utils.Host;
@@ -248,7 +247,7 @@ public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
             for (DynamicInputParameter dynamicInputParameter : dynamicInputParameters) {
                 String value = dynamicInputParameter.getValue();
                 Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
-                value = ParameterUtils.convertParameterPlaceholders(value, ParamUtils.convert(paramsMap));
+                value = ParameterUtils.convertParameterPlaceholders(value, ParameterUtils.convert(paramsMap));
                 dynamicInputParameter.setValue(value);
             }
         }
