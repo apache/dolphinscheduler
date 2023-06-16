@@ -66,7 +66,7 @@ const DagSidebar = defineComponent({
                 onMouseleave={() => {
                   task.starHover = false
                 }}
-                onClick={() => this.handleCollection(task)}
+                onClick={() => this.handleCollection()}
               >
                 <div class={styles.fav}>
                   <NIcon
