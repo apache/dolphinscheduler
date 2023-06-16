@@ -9,3 +9,7 @@ Install Terraform according to [the documentation](https://developer.hashicorp.c
 ## AWS
 
 Refer to [the doc](aws/README.md).
+
+## TODO
+
+* 如何使用应用市场的 AMI
