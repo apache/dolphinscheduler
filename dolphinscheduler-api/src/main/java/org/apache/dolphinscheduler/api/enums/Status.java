@@ -412,6 +412,7 @@ public enum Status {
 
     WORKFLOW_INSTANCE_IS_NOT_FINISHED(50071, "the workflow instance is not finished, can not do this operation",
             "工作流实例未结束，不能执行此操作"),
+    UPDATE_TASK_PROCESS_RELATION_ERROR(50072, "update process task relation {0} error", "更新工作流任务关系 {0} 错误"),
 
     HDFS_NOT_STARTUP(60001, "hdfs not startup", "hdfs未启用"),
     STORAGE_NOT_STARTUP(60002, "storage not startup", "存储未启用"),

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.remote.utils;
+package org.apache.dolphinscheduler.common.utils;
 
 /**
  * key value pair

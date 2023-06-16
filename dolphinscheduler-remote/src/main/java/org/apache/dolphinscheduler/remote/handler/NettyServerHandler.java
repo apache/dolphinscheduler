@@ -17,12 +17,12 @@
 
 package org.apache.dolphinscheduler.remote.handler;
 
+import org.apache.dolphinscheduler.common.utils.Pair;
 import org.apache.dolphinscheduler.remote.NettyRemotingServer;
 import org.apache.dolphinscheduler.remote.command.Message;
 import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
 import org.apache.dolphinscheduler.remote.utils.ChannelUtils;
-import org.apache.dolphinscheduler.remote.utils.Pair;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
