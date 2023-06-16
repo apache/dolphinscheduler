@@ -672,7 +672,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
 
         Date scheduleDate = processInstance.getScheduleTime();
         if (scheduleDate == null) {
-            if (complementListDate.size() == 0) {
+            if (CollectionUtils.isEmpty(complementListDate)) {
                 logger.info("complementListDate size is zero, process complement end. process id:{}", processInstance.getId());
                 return true;
             }
