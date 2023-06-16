@@ -35,6 +35,7 @@ import com.zaxxer.hikari.HikariDataSource;
 public class JdbcRegistryConfiguration {
 
     @Bean
+    @ConditionalOnProperty(prefix = "registry", name = "separate-datasource", havingValue = "true")
     public SqlSessionFactory jdbcRegistrySqlSessionFactory(JdbcRegistryProperties jdbcRegistryProperties) throws Exception {
         MybatisSqlSessionFactoryBean sqlSessionFactoryBean = new MybatisSqlSessionFactoryBean();
         sqlSessionFactoryBean.setDataSource(new HikariDataSource(jdbcRegistryProperties.getHikariConfig()));
