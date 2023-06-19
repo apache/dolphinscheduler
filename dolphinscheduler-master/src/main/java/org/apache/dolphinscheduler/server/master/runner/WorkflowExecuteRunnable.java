@@ -672,6 +672,11 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
 
         Date scheduleDate = processInstance.getScheduleTime();
         if (scheduleDate == null) {
+            if (CollectionUtils.isEmpty(complementListDate)) {
+                log.info("complementListDate is empty, process complement end. process id:{}", processInstance.getId());
+
+                return true;
+            }
             scheduleDate = complementListDate.get(0);
         } else if (processInstance.getState().isFinished()) {
             endProcess();
