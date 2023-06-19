@@ -362,7 +362,7 @@ Create a ldap ssl volumeMount.
 */}}
 {{- define "dolphinscheduler.ldap.ssl.volumeMount" -}}
 {{- if .Values.security.authentication.ldap.ssl.enable -}}
-- mountPath: /opt/dolphinscheduler/{{ .Values.security.authentication.ldap.ssl.truststore }}
+- mountPath: {{ .Values.security.authentication.ldap.ssl.truststore }}
   name: jks-file
   subPath: jks-file
 {{- end -}}
