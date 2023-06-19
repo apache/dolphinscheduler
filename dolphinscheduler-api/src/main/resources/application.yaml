@@ -165,9 +165,6 @@ security:
       ssl:
         enable: false
         # jks file path && password
-        # please store the jks file in dolphinscheduler-api/src/main/resources/ldapkeystore.jks
-        # if you run local, please change value to src/main/resources/ldapkeystore.jks
-        # if you run in service, please change value to ldapkeystore.jks
         trust-store: "ldapkeystore.jks"
         trust-store-password: "password"
 

@@ -109,10 +109,7 @@ security:
       ssl:
         enable: false
         # jks file path && password
-        # please store the jks file in dolphinscheduler-standalone-server/src/main/resources/ldapkeystore.jks
-        # if you run local, please change value to dolphinscheduler-standalone-server/src/main/resources/ldapkeystore.jks
-        # if you run in service, please change value to ldapkeystore.jks
-        trust-store: "ldapkeystore.jks"
+        trust-store: "dolphinscheduler-standalone-server/src/main/resources/ldapkeystore.jks"
         trust-store-password: ""
 
 # Traffic control, if you turn on this config, the maximum number of request/s will be limited.
