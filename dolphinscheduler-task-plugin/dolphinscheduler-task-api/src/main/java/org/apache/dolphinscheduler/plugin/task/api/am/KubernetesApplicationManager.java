@@ -67,7 +67,7 @@ public class KubernetesApplicationManager implements ApplicationManager {
         boolean isKill;
         String labelValue = kubernetesApplicationManagerContext.getLabelValue();
         FilterWatchListDeletable<Pod, PodList, PodResource> watchList =
-                getDriverPod(kubernetesApplicationManagerContext);
+                getListenPod(kubernetesApplicationManagerContext);
         try {
             if (getApplicationStatus(kubernetesApplicationManagerContext, watchList).isFailure()) {
                 log.error("Driver pod is in FAILED or UNKNOWN status.");
@@ -97,7 +97,7 @@ public class KubernetesApplicationManager implements ApplicationManager {
      * @param kubernetesApplicationManagerContext
      * @return
      */
-    private FilterWatchListDeletable<Pod, PodList, PodResource> getDriverPod(KubernetesApplicationManagerContext kubernetesApplicationManagerContext) {
+    private FilterWatchListDeletable<Pod, PodList, PodResource> getListenPod(KubernetesApplicationManagerContext kubernetesApplicationManagerContext) {
         KubernetesClient client = getClient(kubernetesApplicationManagerContext);
         String labelValue = kubernetesApplicationManagerContext.getLabelValue();
         FilterWatchListDeletable<Pod, PodList, PodResource> watchList = client.pods()
@@ -153,7 +153,7 @@ public class KubernetesApplicationManager implements ApplicationManager {
         String phase;
         try {
             if (Objects.isNull(watchList)) {
-                watchList = getDriverPod(kubernetesApplicationManagerContext);
+                watchList = getListenPod(kubernetesApplicationManagerContext);
             }
             List<Pod> driverPod = watchList.list().getItems();
             if (!driverPod.isEmpty()) {
@@ -181,15 +181,15 @@ public class KubernetesApplicationManager implements ApplicationManager {
     public LogWatch getPodLogWatcher(KubernetesApplicationManagerContext kubernetesApplicationManagerContext) {
         KubernetesClient client = getClient(kubernetesApplicationManagerContext);
         FilterWatchListDeletable<Pod, PodList, PodResource> watchList =
-                getDriverPod(kubernetesApplicationManagerContext);
-        List<Pod> driverPod = watchList.list().getItems();
-        if (CollectionUtils.isEmpty(driverPod)) {
+                getListenPod(kubernetesApplicationManagerContext);
+        List<Pod> podList = watchList.list().getItems();
+        if (CollectionUtils.isEmpty(podList)) {
             return null;
         }
-        Pod driver = driverPod.get(0);
+        Pod pod = podList.get(0);
 
-        return client.pods().inNamespace(driver.getMetadata().getNamespace())
-                .withName(driver.getMetadata().getName())
+        return client.pods().inNamespace(pod.getMetadata().getNamespace())
+                .withName(pod.getMetadata().getName())
                 .watchLog();
     }
 

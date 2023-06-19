@@ -142,12 +142,13 @@ public final class ProcessUtils {
      */
     public static void cancelApplication(TaskExecutionContext taskExecutionContext) {
         try {
-            if (Objects.nonNull(taskExecutionContext.getK8sTaskExecutionContext()) &&
-                    !TASK_TYPE_SET_K8S.contains(taskExecutionContext.getTaskType())) {
-                applicationManagerMap.get(ResourceManagerType.KUBERNETES)
-                        .killApplication(new KubernetesApplicationManagerContext(
-                                taskExecutionContext.getK8sTaskExecutionContext(),
-                                taskExecutionContext.getTaskAppId()));
+            if (Objects.nonNull(taskExecutionContext.getK8sTaskExecutionContext())) {
+                if (!TASK_TYPE_SET_K8S.contains(taskExecutionContext.getTaskType())) {
+                    applicationManagerMap.get(ResourceManagerType.KUBERNETES)
+                            .killApplication(new KubernetesApplicationManagerContext(
+                                    taskExecutionContext.getK8sTaskExecutionContext(),
+                                    taskExecutionContext.getTaskAppId()));
+                }
             } else {
                 String host = taskExecutionContext.getHost();
                 String executePath = taskExecutionContext.getExecutePath();

@@ -31,7 +31,9 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.MI;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.NAME_LABEL;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RESTART_POLICY;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_INSTANCE_ID;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.UNIQUE_LABEL_NAME;
 
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
@@ -42,16 +44,23 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.AbstractK8sTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.K8sTaskMainParameters;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -66,6 +75,7 @@ import io.fabric8.kubernetes.api.model.batch.v1.JobStatus;
 import io.fabric8.kubernetes.client.Watch;
 import io.fabric8.kubernetes.client.Watcher;
 import io.fabric8.kubernetes.client.WatcherException;
+import io.fabric8.kubernetes.client.dsl.LogWatch;
 
 /**
  * K8sTaskExecutor used to submit k8s task to K8S
@@ -73,6 +83,9 @@ import io.fabric8.kubernetes.client.WatcherException;
 public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
 
     private Job job;
+    protected boolean podLogOutputIsFinished = false;
+    protected Future<?> podLogOutputFuture;
+
     public K8sTaskExecutor(Logger logger, TaskExecutionContext taskRequest) {
         super(logger, taskRequest);
     }
@@ -98,6 +111,8 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         Map<String, String> labelMap = k8STaskMainParameters.getLabelMap();
         labelMap.put(LAYER_LABEL, LAYER_LABEL_VALUE);
         labelMap.put(NAME_LABEL, k8sJobName);
+        Map<String, String> podLabelMap = new HashMap<>();
+        podLabelMap.put(UNIQUE_LABEL_NAME, taskRequest.getTaskAppId());
         EnvVar taskInstanceIdVar = new EnvVar(TASK_INSTANCE_ID, taskInstanceId, null);
         List<EnvVar> envVars = new ArrayList<>();
         envVars.add(taskInstanceIdVar);
@@ -139,6 +154,9 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 .withNewSpec()
                 .withTtlSecondsAfterFinished(JOB_TTL_SECONDS)
                 .withNewTemplate()
+                .withNewMetadata()
+                .withLabels(podLabelMap)
+                .endMetadata()
                 .withNewSpec()
                 .addNewContainer()
                 .withName(k8sJobName)
@@ -172,22 +190,25 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
 
             @Override
             public void eventReceived(Action action, Job job) {
-                log.info("event received : job:{} action:{}", job.getMetadata().getName(), action);
-                if (action != Action.ADDED) {
-                    int jobStatus = getK8sJobStatus(job);
-                    log.info("job {} status {}", job.getMetadata().getName(), jobStatus);
-                    if (jobStatus == TaskConstants.RUNNING_CODE) {
-                        return;
+                try (
+                        final LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
+                                LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath())) {
+                    log.info("event received : job:{} action:{}", job.getMetadata().getName(), action);
+                    if (action != Action.ADDED) {
+                        int jobStatus = getK8sJobStatus(job);
+                        log.info("job {} status {}", job.getMetadata().getName(), jobStatus);
+                        if (jobStatus == TaskConstants.RUNNING_CODE) {
+                            return;
+                        }
+                        setTaskStatus(jobStatus, taskInstanceId, taskResponse, k8STaskMainParameters);
+                        countDownLatch.countDown();
                     }
-                    setTaskStatus(jobStatus, taskInstanceId, taskResponse, k8STaskMainParameters);
-                    countDownLatch.countDown();
                 }
             }
 
             @Override
             public void onClose(WatcherException e) {
-                logStringBuffer.append(String.format("[K8sJobExecutor-%s] fail in k8s: %s", job.getMetadata().getName(),
-                        e.getMessage()));
+                log.error("[K8sJobExecutor-{}] fail in k8s: {}", job.getMetadata().getName(), e.getMessage());
                 taskResponse.setExitStatusCode(EXIT_CODE_FAILURE);
                 countDownLatch.countDown();
             }
@@ -203,7 +224,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
             } else {
                 countDownLatch.await();
             }
-            flushLog(taskResponse);
+            // flushLog(taskResponse);
         } catch (InterruptedException e) {
             log.error("job failed in k8s: {}", e.getMessage(), e);
             Thread.currentThread().interrupt();
@@ -216,6 +237,32 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 watch.close();
             }
         }
+    }
+
+    private void parsePodLogOutput() {
+        ExecutorService collectPodLogExecutorService = ThreadUtils
+                .newSingleDaemonScheduledExecutorService("CollectPodLogOutput-thread-" + taskRequest.getTaskName());
+
+        podLogOutputFuture = collectPodLogExecutorService.submit(() -> {
+            try (
+                    final LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
+                            LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());
+                    LogWatch watcher = ProcessUtils.getPodLogWatcher(taskRequest.getK8sTaskExecutionContext(),
+                            taskRequest.getTaskAppId())) {
+                String line;
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(watcher.getOutput()))) {
+                    while ((line = reader.readLine()) != null) {
+                        log.info("[K8S-pod-log] {}", line);
+                    }
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            } finally {
+                podLogOutputIsFinished = true;
+            }
+        });
+
+        collectPodLogExecutorService.shutdown();
     }
 
     @Override
@@ -237,7 +284,17 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
             String configYaml = k8sTaskExecutionContext.getConfigYaml();
             k8sUtils.buildClient(configYaml);
             submitJob2k8s(k8sParameterStr);
+            parsePodLogOutput();
             registerBatchJobWatcher(job, Integer.toString(taskInstanceId), result, k8STaskMainParameters);
+
+            if (podLogOutputFuture != null) {
+                try {
+                    // Wait kubernetes pod log collection finished
+                    podLogOutputFuture.get();
+                } catch (ExecutionException e) {
+                    log.error("Handle pod log error", e);
+                }
+            }
         } catch (Exception e) {
             cancelApplication(k8sParameterStr);
             result.setExitStatusCode(EXIT_CODE_FAILURE);
@@ -265,9 +322,9 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
             stopJobOnK8s(k8sParameterStr);
             String namespaceName = k8STaskMainParameters.getNamespaceName();
             k8sUtils.createJob(namespaceName, job);
-            log.info("[K8sJobExecutor-{}-{}]  submitted job successfully", taskName, taskInstanceId);
+            log.info("[K8sJobExecutor-{}-{}] submitted job successfully", taskName, taskInstanceId);
         } catch (Exception e) {
-            log.error("[K8sJobExecutor-{}-{}]  fail to submit job", taskName, taskInstanceId);
+            log.error("[K8sJobExecutor-{}-{}] fail to submit job", taskName, taskInstanceId);
             throw new TaskException("K8sJobExecutor fail to submit job", e);
         }
     }
@@ -283,7 +340,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 k8sUtils.deleteJob(jobName, namespaceName);
             }
         } catch (Exception e) {
-            log.error("[K8sJobExecutor-{}]  fail to stop job", jobName);
+            log.error("[K8sJobExecutor-{}] fail to stop job", jobName);
             throw new TaskException("K8sJobExecutor fail to stop job", e);
         }
     }
@@ -303,17 +360,15 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                               K8sTaskMainParameters k8STaskMainParameters) {
         if (jobStatus == EXIT_CODE_SUCCESS || jobStatus == EXIT_CODE_FAILURE) {
             if (null == TaskExecutionContextCacheManager.getByTaskInstanceId(Integer.valueOf(taskInstanceId))) {
-                logStringBuffer.append(String.format("[K8sJobExecutor-%s] killed", job.getMetadata().getName()));
+                log.info("[K8sJobExecutor-{}] killed", job.getMetadata().getName());
                 taskResponse.setExitStatusCode(EXIT_CODE_KILL);
             } else if (jobStatus == EXIT_CODE_SUCCESS) {
-                logStringBuffer
-                        .append(String.format("[K8sJobExecutor-%s] succeed in k8s", job.getMetadata().getName()));
+                log.info("[K8sJobExecutor-{}] succeed in k8s", job.getMetadata().getName());
                 taskResponse.setExitStatusCode(EXIT_CODE_SUCCESS);
             } else {
                 String errorMessage =
                         k8sUtils.getPodLog(job.getMetadata().getName(), k8STaskMainParameters.getNamespaceName());
-                logStringBuffer.append(String.format("[K8sJobExecutor-%s] fail in k8s: %s", job.getMetadata().getName(),
-                        errorMessage));
+                log.error("[K8sJobExecutor-{}] fail in k8s: {}", job.getMetadata().getName(), errorMessage);
                 taskResponse.setExitStatusCode(EXIT_CODE_FAILURE);
             }
         }
