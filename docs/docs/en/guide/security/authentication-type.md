@@ -27,10 +27,8 @@ security:
         not-exist-action: CREATE
       ssl:
         enable: false
-        # jks file path && password
-        # if you run local, please change value to src/main/resources/ldapkeystore.jks
-        # if you run in service, please change value to ldapkeystore.jks
-        trust-store: "ldapkeystore.jks"
+        # jks file absolute path && password
+        trust-store: "/ldapkeystore.jks"
         trust-store-password: "password"
 ```
 
@@ -48,11 +46,12 @@ You can follow guide below：
 - Change the expected email to the return value you expect in the `ldapLogin` method.
 - Run`ldapLogin`method and determine whether the LDAP login result is expected.
 
-If you want to enable ssl, please store jks file in `dolphinscheduler-api/src/main/resources/ldapkeystore.jks`, and change configuration in `TestPropertySource` like below:
+If you want to enable ssl, please change configuration in `TestPropertySource` like below:
 
 ```
 security.authentication.ldap.ssl.enable=false
-security.authentication.ldap.ssl.trust-store=src/main/resources/ldapkeystore.jks
+// absolute path
+security.authentication.ldap.ssl.trust-store=/ldapkeystore.jks
 security.authentication.ldap.ssl.trust-store-password=yourpassword
 ```
 

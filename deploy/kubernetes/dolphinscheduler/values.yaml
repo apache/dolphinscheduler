@@ -128,8 +128,8 @@ security:
         notexistaction: CREATE
       ssl:
         enable: false
-        # store jks in deploy/kubernetes/dolphinscheduler/ldap-certs/ldapkeystore.jks
-        truststore: "ldap-certs/ldapkeystore.jks"
+        # jks file absolute path && password
+        truststore: "/ldapkeystore.jks"
         truststorepassword: ""
 
 conf:

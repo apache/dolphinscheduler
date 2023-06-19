@@ -27,16 +27,14 @@ security:
         not-exist-action: CREATE
       ssl:
         enable: false
-        # please store the jks file in dolphinscheduler-api/src/main/resources/ldapkeystore.jks
-        # if you run local, please change value to src/main/resources/ldapkeystore.jks
-        # if you run in service, please change value to ldapkeystore.jks
-        trust-store: "ldapkeystore.jks"
+        # jks file absolute path && password
+        trust-store: "/ldapkeystore.jks"
         trust-store-password: "password"
 ```
 
 具体字段解释详见：[Api-server相关配置](../../architecture/configuration.md)
 
-## LDAP测试
+## 开发者LDAP测试
 
 我们提供了一个单元测试类，可以在不启动项目的情况下测试DolphinScheduler与LDAP的集成。
 
@@ -48,11 +46,12 @@ security:
 - 修改`ldapLogin`方法中的expected email为正常登陆的返回值;
 - 执行`ldapLogin`方法，判断LDAP登陆结果是否为预期;
 
-如果你要启用ssl，请将jks文件放在`dolphinscheduler-api/src/main/resources/ldapkeystore.jks`，并且修改`TestPropertySource`配置中ssl相关参数为：
+如果你要启用ssl，请修改`TestPropertySource`配置中ssl相关参数为：
 
 ```
 security.authentication.ldap.ssl.enable=false
-security.authentication.ldap.ssl.trust-store=src/main/resources/ldapkeystore.jks
+// absolute path
+security.authentication.ldap.ssl.trust-store=/ldapkeystore.jks 
 security.authentication.ldap.ssl.trust-store-password=yourpassword
 ```
 

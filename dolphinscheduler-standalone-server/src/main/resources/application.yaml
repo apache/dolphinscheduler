@@ -108,8 +108,8 @@ security:
         not-exist-action: CREATE
       ssl:
         enable: false
-        # jks file path && password
-        trust-store: "dolphinscheduler-standalone-server/src/main/resources/ldapkeystore.jks"
+        # jks file absolute path && password
+        trust-store: "/ldapkeystore.jks"
         trust-store-password: ""
 
 # Traffic control, if you turn on this config, the maximum number of request/s will be limited.

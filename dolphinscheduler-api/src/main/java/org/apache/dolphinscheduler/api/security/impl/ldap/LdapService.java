@@ -156,8 +156,7 @@ public class LdapService {
 
         if (sslEnable) {
             env.put(Context.SECURITY_PROTOCOL, "ssl");
-            System.setProperty("javax.net.ssl.trustStore",
-                    String.format("%s/%s", System.getProperty("user.dir"), trustStore));
+            System.setProperty("javax.net.ssl.trustStore", trustStore);
             if (StringUtils.isNotEmpty(trustStorePassword)) {
                 System.setProperty("javax.net.ssl.trustStorePassword", trustStorePassword);
             }
