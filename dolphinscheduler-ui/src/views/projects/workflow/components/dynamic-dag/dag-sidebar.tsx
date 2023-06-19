@@ -18,6 +18,8 @@
 import { defineComponent, onMounted, toRefs } from 'vue'
 import { useSidebar } from './use-sidebar'
 import styles from './dag-sidebar.module.scss'
+import { NEllipsis, NIcon } from 'naive-ui'
+import { StarFilled, StarOutlined } from '@vicons/antd'
 
 const DagSidebar = defineComponent({
   name: 'DagSidebar',
@@ -29,26 +31,54 @@ const DagSidebar = defineComponent({
       context.emit('Dragstart', task)
     }
 
+    const handleCollection = () => {}
+
     onMounted(() => {
       getTaskList()
     })
 
     return {
       ...toRefs(variables),
-      handleDragstart
+      handleDragstart,
+      handleCollection
     }
   },
   render() {
     return (
-      <div>
+      <div class={styles.sidebar}>
         {this.taskList.map((task: any) => {
           return (
             <div
-              class={styles['task-item']}
+              class={styles['draggable']}
               draggable='true'
               onDragstart={() => this.handleDragstart(task)}
             >
-              {task.name}
+              <em
+                class={styles['sidebar-icon']}
+                style={{ backgroundImage: task.icon }}
+              ></em>
+              <NEllipsis style={{ width: '60px' }}>{task.name}</NEllipsis>
+              <div
+                class={styles.stars}
+                onMouseenter={() => {
+                  task.starHover = true
+                }}
+                onMouseleave={() => {
+                  task.starHover = false
+                }}
+                onClick={() => this.handleCollection()}
+              >
+                <div class={styles.fav}>
+                  <NIcon
+                    size='18'
+                    color={
+                      task.collection || task.starHover ? '#288FFF' : '#ccc'
+                    }
+                  >
+                    {task.collection ? <StarFilled /> : <StarOutlined />}
+                  </NIcon>
+                </div>
+              </div>
             </div>
           )
         })}

@@ -19,99 +19,99 @@ import { useI18n } from 'vue-i18n'
 import type { IJsonItem } from '../types'
 
 export function useNodeSelectors({
-                                    model,
-                                    field,
-                                    name,
-                                    span = 24
-                                }: {
-    model: { [field: string]: any }
-    field: string
-    name?: string
-    span?: Ref | number
+  model,
+  field,
+  name,
+  span = 24
+}: {
+  model: { [field: string]: any }
+  field: string
+  name?: string
+  span?: Ref | number
 }): IJsonItem[] {
-    const { t } = useI18n()
+  const { t } = useI18n()
 
-    return [
+  return [
+    {
+      type: 'custom-parameters',
+      field: field,
+      name: t(`project.node.${name}`),
+      class: 'btn-custom-parameters',
+      span,
+      children: [
         {
-            type: 'custom-parameters',
-            field: field,
-            name: t(`project.node.${name}`),
-            class: 'btn-custom-parameters',
-            span,
-            children: [
-                {
-                    type: 'input',
-                    field: 'key',
-                    span: 8,
-                    class: 'node-selector-label-name',
-                    props: {
-                        placeholder: t('project.node.expression_name_tips'),
-                        maxLength: 256
-                    },
-                    validate: {
-                        trigger: ['input', 'blur'],
-                        required: true,
-                        validator(validate: any, value: string) {
-                            if (!value) {
-                                return new Error(t('project.node.expression_name_tips'))
-                            }
+          type: 'input',
+          field: 'key',
+          span: 8,
+          class: 'node-selector-label-name',
+          props: {
+            placeholder: t('project.node.expression_name_tips'),
+            maxLength: 256
+          },
+          validate: {
+            trigger: ['input', 'blur'],
+            required: true,
+            validator(validate: any, value: string) {
+              if (!value) {
+                return new Error(t('project.node.expression_name_tips'))
+              }
 
-                            const sameItems = model[field].filter(
-                                (item: { label: string }) => item.label === value
-                            )
+              const sameItems = model[field].filter(
+                (item: { label: string }) => item.label === value
+              )
 
-                            if (sameItems.length > 1) {
-                                return new Error(t('project.node.label_repeat'))
-                            }
-                        }
-                    }
-                },
-                {
-                    type: 'select',
-                    field: 'operator',
-                    span: 4,
-                    options: OPERATOR_LIST,
-                    value: 'In',
-                },
-                {
-                    type: 'input',
-                    field: 'values',
-                    span: 10,
-                    class: 'node-selector-label-value',
-                    props: {
-                        placeholder: t('project.node.expression_value_tips'),
-                        maxLength: 256,
-                        disabled: false
-                    }
-                }
-            ]
+              if (sameItems.length > 1) {
+                return new Error(t('project.node.label_repeat'))
+              }
+            }
+          }
+        },
+        {
+          type: 'select',
+          field: 'operator',
+          span: 4,
+          options: OPERATOR_LIST,
+          value: 'In'
+        },
+        {
+          type: 'input',
+          field: 'values',
+          span: 10,
+          class: 'node-selector-label-value',
+          props: {
+            placeholder: t('project.node.expression_value_tips'),
+            maxLength: 256,
+            disabled: false
+          }
         }
-    ]
+      ]
+    }
+  ]
 }
 
 export const OPERATOR_LIST = [
-    {
-        value: 'In',
-        label: 'In'
-    },
-    {
-        value: 'NotIn',
-        label: 'NotIn'
-    },
-    {
-        value: 'Exists',
-        label: 'Exists'
-    },
-    {
-        value: 'DoesNotExist',
-        label: 'DoesNotExist'
-    },
-    {
-        value: 'Gt',
-        label: 'Gt'
-    },
-    {
-        value: 'Lt',
-        label: 'Lt'
-    }
+  {
+    value: 'In',
+    label: 'In'
+  },
+  {
+    value: 'NotIn',
+    label: 'NotIn'
+  },
+  {
+    value: 'Exists',
+    label: 'Exists'
+  },
+  {
+    value: 'DoesNotExist',
+    label: 'DoesNotExist'
+  },
+  {
+    value: 'Gt',
+    label: 'Gt'
+  },
+  {
+    value: 'Lt',
+    label: 'Lt'
+  }
 ]
