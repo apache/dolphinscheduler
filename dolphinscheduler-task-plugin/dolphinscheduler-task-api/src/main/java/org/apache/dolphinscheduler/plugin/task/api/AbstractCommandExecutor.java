@@ -261,7 +261,7 @@ public abstract class AbstractCommandExecutor {
                 // Wait the task log process finished.
                 taskOutputFuture.get();
             } catch (ExecutionException e) {
-                logger.info("Handle task log error", e);
+                logger.error("Handle task log error", e);
             }
         }
 

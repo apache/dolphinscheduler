@@ -213,9 +213,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 countDownLatch.countDown();
             }
         };
-        Watch watch = null;
-        try {
-            watch = k8sUtils.createBatchJobWatcher(job.getMetadata().getName(), watcher);
+        try (Watch watch = k8sUtils.createBatchJobWatcher(job.getMetadata().getName(), watcher)) {
             boolean timeoutFlag = taskRequest.getTaskTimeoutStrategy() == TaskTimeoutStrategy.FAILED
                     || taskRequest.getTaskTimeoutStrategy() == TaskTimeoutStrategy.WARNFAILED;
             if (timeoutFlag) {
@@ -224,7 +222,6 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
             } else {
                 countDownLatch.await();
             }
-            // flushLog(taskResponse);
         } catch (InterruptedException e) {
             log.error("job failed in k8s: {}", e.getMessage(), e);
             Thread.currentThread().interrupt();
@@ -232,10 +229,6 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         } catch (Exception e) {
             log.error("job failed in k8s: {}", e.getMessage(), e);
             taskResponse.setExitStatusCode(EXIT_CODE_FAILURE);
-        } finally {
-            if (watch != null) {
-                watch.close();
-            }
         }
     }
 
@@ -297,6 +290,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
             }
         } catch (Exception e) {
             cancelApplication(k8sParameterStr);
+            Thread.currentThread().interrupt();
             result.setExitStatusCode(EXIT_CODE_FAILURE);
             throw e;
         }
