@@ -1,6 +1,6 @@
 # Introduction
 
-This module is the mysql registry plugin module, this plugin will use mysql as the registry center.
+This module is the jdbc registry plugin module, this plugin will use jdbc as the registry center. Will use the database configuration same as DolphinScheduler in api'yaml default.
 
 # How to use
 
@@ -17,14 +17,12 @@ You need to set the registry properties in master/worker/api's appplication.yml
 ```yaml
 registry:
   type: jdbc
-  # Will use the database configuration same as DolphinScheduler in api'yaml default
-  separate-datasource: false
 ```
 
 After do this two steps, you can start your DolphinScheduler cluster, your cluster will use mysql as registry center to
 store server metadata.
 
-NOTE: You need to add `mysql-connector-java.jar` into DS classpath, since this plugin will not bundle this driver in distribution.
+NOTE: You need to add `mysql-connector-java.jar` into DS classpath if you use mysql database, since this plugin will not bundle this driver in distribution.
 You can get the detail about <a href="https://dolphinscheduler.apache.org/en-us/docs/3.1.2/guide/installation/pseudo-cluster">Initialize the Database</a>.
 
 ## Optional configuration
@@ -32,8 +30,6 @@ You can get the detail about <a href="https://dolphinscheduler.apache.org/en-us/
 ```yaml
 registry:
   type: jdbc
-  # Will use the database configuration same as DolphinScheduler in api'yaml default
-  separate-datasource: false
   # Used to schedule refresh the ephemeral data/ lock.
   term-refresh-interval: 2s
   # Used to calculate the expire time,
@@ -50,8 +46,6 @@ You need to set the registry properties in master/worker/api's appplication.yml
 ```yaml
 registry:
   type: jdbc
-  # Change separate-datasource field to true
-  separate-datasource: true
   term-refresh-interval: 2s
   term-expire-times: 3
   hikari-config:
@@ -68,8 +62,6 @@ registry:
 ```yaml
 registry:
   type: jdbc
-  # Change separate-datasource field to true
-  separate-datasource: true
   term-refresh-interval: 2s
   term-expire-times: 3
   hikari-config:
