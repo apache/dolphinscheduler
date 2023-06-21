@@ -41,12 +41,6 @@
         </include>
         from t_ds_task_group
         <where>
-<!--            <if test="ids != null and ids.size() > 0">-->
-<!--                and id in-->
-<!--                <foreach collection="ids" item="i" open="(" close=")" separator=",">-->
-<!--                    #{i}-->
-<!--                </foreach>-->
-<!--            </if>-->
             <if test="status != null">
                 and status = #{status}
             </if>

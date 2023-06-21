@@ -86,12 +86,8 @@ public class TaskGroupMapperTest extends BaseDaoTest {
     public void testQueryTaskGroupPaging() {
         TaskGroup taskGroup = insertOne();
         Page<TaskGroup> page = new Page(1, 3);
-        // List<Integer> ids = new ArrayList<>();
-        // ids.add(1);
-        // ids.add(2);
         IPage<TaskGroup> taskGroupIPage = taskGroupMapper.queryTaskGroupPaging(
                 page,
-                // ids,
                 taskGroup.getName(), taskGroup.getStatus());
 
         Assertions.assertEquals(taskGroupIPage.getTotal(), 1);
