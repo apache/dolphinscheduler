@@ -39,7 +39,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
@@ -253,16 +252,8 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
     public Map<String, Object> queryTaskGroupByProjectCode(User loginUser, int pageNo, int pageSize, Long projectCode) {
         Map<String, Object> result = new HashMap<>();
         Page<TaskGroup> page = new Page<>(pageNo, pageSize);
-        PageInfo<TaskGroup> emptyPageInfo = new PageInfo<>(pageNo, pageSize);
-        Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.TASK_GROUP,
-                loginUser.getId(), log);
-        if (ids.isEmpty()) {
-            result.put(Constants.DATA_LIST, emptyPageInfo);
-            putMsg(result, Status.SUCCESS);
-            return result;
-        }
         IPage<TaskGroup> taskGroupPaging =
-                taskGroupMapper.queryTaskGroupPagingByProjectCode(page, new ArrayList<>(ids), projectCode);
+                taskGroupMapper.queryTaskGroupPagingByProjectCode(page, projectCode);
 
         return getStringObjectMap(pageNo, pageSize, result, taskGroupPaging);
     }
@@ -311,16 +302,8 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
                                        Integer status) {
         Map<String, Object> result = new HashMap<>();
         Page<TaskGroup> page = new Page<>(pageNo, pageSize);
-        PageInfo<TaskGroup> pageInfo = new PageInfo<>(pageNo, pageSize);
-        Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.TASK_GROUP,
-                userId, log);
-        if (ids.isEmpty()) {
-            result.put(Constants.DATA_LIST, pageInfo);
-            putMsg(result, Status.SUCCESS);
-            return result;
-        }
         IPage<TaskGroup> taskGroupPaging =
-                taskGroupMapper.queryTaskGroupPaging(page, new ArrayList<>(ids), name, status);
+                taskGroupMapper.queryTaskGroupPaging(page, name, status);
 
         return getStringObjectMap(pageNo, pageSize, result, taskGroupPaging);
     }

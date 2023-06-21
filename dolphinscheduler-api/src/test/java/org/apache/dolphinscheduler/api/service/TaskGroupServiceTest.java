@@ -173,8 +173,8 @@ public class TaskGroupServiceTest {
                 loginUser.getId(), ApiFuncIdentificationConstant.TASK_GROUP_VIEW, serviceLogger)).thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TASK_GROUP, null,
                 0, serviceLogger)).thenReturn(true);
-        Mockito.when(taskGroupMapper.queryTaskGroupPaging(Mockito.any(Page.class), Mockito.anyList(),
-                Mockito.eq(null), Mockito.eq(0))).thenReturn(page);
+        Mockito.when(taskGroupMapper.queryTaskGroupPaging(Mockito.any(Page.class), Mockito.eq(null), Mockito.eq(0)))
+                .thenReturn(page);
 
         // query all
         Map<String, Object> result = taskGroupService.queryAllTaskGroup(loginUser, null, null, 1, 10);
