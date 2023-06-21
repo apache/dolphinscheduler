@@ -1,0 +1,13 @@
+shell:
+  projectId: "项目id"
+  projectName: "项目名称"
+  owner: "所属用户"
+  processId: "工作流编号"
+  processName: "工作流名称"
+  processState: "工作流状态"
+  taskCode: "task编码"
+  taskName: "task名称"
+  taskType: "task类型"
+  taskState: "task状态"
+  taskStartTime: "task开始时间"
+  taskEndTime: "task结束时间"
