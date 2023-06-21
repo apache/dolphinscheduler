@@ -67,6 +67,7 @@ public class DataSourceConstants {
      * jdbc url
      */
     public static final String JDBC_MYSQL = "jdbc:mysql://";
+    public static final String JDBC_MYSQL_LOADBALANCE = "jdbc:mysql:loadbalance://";
     public static final String JDBC_POSTGRESQL = "jdbc:postgresql://";
     public static final String JDBC_HIVE_2 = "jdbc:hive2://";
     public static final String JDBC_KYUUBI = "jdbc:kyuubi://";
