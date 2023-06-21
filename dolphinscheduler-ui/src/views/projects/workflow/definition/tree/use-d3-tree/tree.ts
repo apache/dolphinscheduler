@@ -77,7 +77,6 @@ Tree.prototype.init = function ({
     this.tasks = tasks
     this.links = links
 
-    // this.diagonal = d3.svg.diagonal().projection((d) => [d.y, d.x])
     this.diagonal = d3
       .linkHorizontal()
       .x((d) => d.y)
@@ -106,7 +105,6 @@ Tree.prototype.init = function ({
 
     this.treeUpdate((this.root = data)).then(() => {
       this.treeTooltip()
-      // selfTree.isLoading = false
       resolve()
     })
   })
@@ -154,7 +152,6 @@ Tree.prototype.treeToggles = function (e,clicked_d) { // eslint-disable-line
     clicked_d.children = null
   }
   self.treeUpdate(clicked_d)
-  // self.treeTooltip(clicked_d.data.type, e)s
 }
 
 /**
@@ -180,20 +177,11 @@ Tree.prototype.treeUpdate = function (source) {
         this.config.margin.top +
         this.config.margin.bottom
     )
-    // const width =
-    //   this.config.nodesMax * 70 +
-    //   this.squareNum * (this.config.squareSize + this.config.squarePading) +
-    //   this.config.margin.left +
-    //   this.config.margin.right +
-    //   50
-
-    // console.log('width', width)
 
     d3.select('.tree-svg')
       .transition()
       .duration(this.duration)
       .attr('height', height)
-    // .attr('width', 1071)
 
     tasks.forEach((n, i) => {
       n.x = i * this.config.barHeight
@@ -215,7 +203,6 @@ Tree.prototype.treeUpdate = function (source) {
       .append('circle')
       .attr('r', this.config.barHeight / 3)
       .attr('class', 'task')
-      // .attr('data-toggle', 'tooltip')
       .attr('title', (d) => {
         return d.data.type ? d.data.type : ''
       })
@@ -261,22 +248,17 @@ Tree.prototype.treeUpdate = function (source) {
       .data((d) => d.data.instances)
       .enter()
       .append('rect')
-      .on('click', (e, d) => {
+      .on('click', () => {
         this.removeTooltip()
-        if (d.type === 'SUB_PROCESS') {
-          // this.selfTree.proxy._subProcessHandle(d.subflowId)
-        }
       })
       .attr('class', 'state')
       .style(
         'fill',
         (d) => (d.state && tasksStateObj[d.state].color) || '#ffffff'
       )
-      // .attr('data-toggle', 'tooltip')
       .attr('rx', (d) => (d.type ? 0 : 12))
       .attr('ry', (d) => (d.type ? 0 : 12))
       .style('shape-rendering', (d) => (d.type ? 'crispEdges' : 'auto'))
-      // .attr('title', (data) => rtInstancesTooltip(data, tasksStateObj))
       .attr(
         'x',
         (d, i) => i * (this.config.squareSize + this.config.squarePading)
@@ -285,11 +267,9 @@ Tree.prototype.treeUpdate = function (source) {
       .attr('width', 10)
       .attr('height', 10)
       .on('mouseover', (e, d) => {
-        // d3.select(this).transition()
         self.treeTooltip(rtInstancesTooltip(d, tasksStateObj), e)
       })
       .on('mouseout', () => {
-        // d3.select(this).transition()
         self.removeTooltip()
       })
 
