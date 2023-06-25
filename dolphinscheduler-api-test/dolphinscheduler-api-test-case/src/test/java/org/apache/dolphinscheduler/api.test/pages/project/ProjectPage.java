@@ -17,43 +17,40 @@
  * under the License.
  */
 
-package org.apache.dolphinscheduler.api.test.pages.workflow;
+package org.apache.dolphinscheduler.api.test.pages.project;
+
+import lombok.AllArgsConstructor;
 
 import org.apache.dolphinscheduler.api.test.core.Constants;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.utils.RequestClient;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
-
-@Slf4j
 @AllArgsConstructor
-public class ProcessDefinitionPage {
-
+public final class ProjectPage {
     private String sessionId;
 
-    public HttpResponse importProcessDefinition(User loginUser, long projectCode, File file) {
+    public HttpResponse createProject(User loginUser, String projectName) {
         Map<String, Object> params = new HashMap<>();
         params.put("loginUser", loginUser);
-//        params.put("projectCode", projectCode);
-//        params.put("file", file);
-
-
+        params.put("projectName", projectName);
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.SESSION_ID_KEY, sessionId);
 
         RequestClient requestClient = new RequestClient();
-
-        String url = String.format("/projects/%s/process-definition/import", projectCode);
-        log.info("[debug111] url: " + url);
-
-        return requestClient.postWithFile(url, headers, params, file);
+        return requestClient.post("/projects", headers, params);
     }
 
+    public HttpResponse queryAllProjectList(User loginUser) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("loginUser", loginUser);
+        Map<String, String> headers = new HashMap<>();
+        headers.put(Constants.SESSION_ID_KEY, sessionId);
+
+        RequestClient requestClient = new RequestClient();
+        return requestClient.post("/projects/list", headers, params);
+    }
 }

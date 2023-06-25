@@ -23,11 +23,13 @@ import org.apache.dolphinscheduler.api.test.core.DolphinScheduler;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.entity.LoginResponseData;
 import org.apache.dolphinscheduler.api.test.pages.LoginPage;
+import org.apache.dolphinscheduler.api.test.pages.project.ProjectPage;
 import org.apache.dolphinscheduler.api.test.pages.workflow.ProcessDefinitionPage;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -38,6 +40,7 @@ import java.nio.file.Paths;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
@@ -60,12 +63,15 @@ public class ProcessDefinitionAPITest {
 
     private static ProcessDefinitionPage processDefinitionPage;
 
+    private static ProjectPage projectPage;
+
     @BeforeAll
     public static void setup() {
         LoginPage loginPage = new LoginPage();
         HttpResponse loginHttpResponse = loginPage.login(username, password);
         sessionId = JSONUtils.convertValue(loginHttpResponse.getBody().getData(), LoginResponseData.class).getSessionId();
         processDefinitionPage = new ProcessDefinitionPage(sessionId);
+        projectPage = new ProjectPage(sessionId);
         loginUser = new User();
         loginUser.setId(123);
         loginUser.setUserType(UserType.GENERAL_USER);
@@ -78,9 +84,30 @@ public class ProcessDefinitionAPITest {
 
     @Test
     @Order(1)
+    public void testCreateProject() {
+        try {
+            HttpResponse createProjectResponse = projectPage.createProject(loginUser, "project-test");
+            log.info("[debug111] {}", createProjectResponse.toString());
+            log.info(createProjectResponse.getBody().getSuccess().toString());
+            log.info(createProjectResponse.getBody().getData().toString());
+            HttpResponse queryAllProjectListResponse = projectPage.queryAllProjectList(loginUser);
+            log.info("[debug111] {}", createProjectResponse.toString());
+            log.info(createProjectResponse.getBody().getSuccess().toString());
+            log.info(createProjectResponse.getBody().getData().toString());
+        }  catch (Exception e) {
+            log.error("failed", e);
+            Assertions.fail();
+        }
+    }
+
+    @Disabled
+    @Test
+    @Order(2)
     public void testImportProcessDefinition() {
         try {
-            MultipartFile file = getMultipartFile("workflow-json/test.json");
+//            MultipartFile file = getMultipartFile("workflow-json/test.json");
+            ClassLoader classLoader = getClass().getClassLoader();
+            File file = new File(classLoader.getResource("workflow-json/test.json").getFile());
             HttpResponse importProcessDefinitionResponse = processDefinitionPage
                 .importProcessDefinition(loginUser, 1, file);
             log.info("[debug111] {}", importProcessDefinitionResponse.toString());

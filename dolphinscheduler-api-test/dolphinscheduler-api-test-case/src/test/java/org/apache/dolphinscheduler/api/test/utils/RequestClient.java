@@ -23,6 +23,8 @@ import org.apache.dolphinscheduler.api.test.core.Constants;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponseBody;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -36,6 +38,15 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicHeader;
 
 @Slf4j
 public class RequestClient {
@@ -156,6 +167,59 @@ public class RequestClient {
         log.info("PUT response: {}", httpResponse);
 
         return httpResponse;
+    }
+
+    public HttpResponse postWithFile(String url, Map<String, String> headers, Map<String, Object> params, File file) {
+//        headers.put("enctype", "multipart/form-data");
+//        headers.put("Content-Type", "multipart/form-data");
+
+        Headers headersBuilder = Headers.of(headers);
+
+//        RequestBody requestBody = FormBody.create(MediaType.parse(Constants.REQUEST_CONTENT_TYPE), getParams(params));
+
+        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+        builder.addTextBody("json", getParams(params), ContentType.MULTIPART_FORM_DATA);
+        builder.addBinaryBody(
+            "file",
+            new FileInputStream(file),
+            ContentType.APPLICATION_OCTET_STREAM,
+            file.getName()
+        );
+
+        HttpEntity multipart = builder.build();
+
+//        RequestBody requestBody = FormBody.create(MediaType.parse(Constants.MULTIPART_FORM_DATA), getParams(params));
+
+        log.info("POST request to {}, Headers: {}, Params: {}", requestUrl, headersBuilder, params);
+//        Request request = new Request.Builder()
+//            .headers(headersBuilder)
+//            .url(requestUrl)
+//            .post(requestBody)
+//            .build();
+        HttpPost httpPost = new HttpPost(requestUrl);
+        for (Map.Entry<String, String> header : headers.entrySet()) {
+            httpPost.setHeader(new BasicHeader(header.getKey(), header.getValue()));
+        }
+        httpPost.setEntity(multipart);
+        CloseableHttpClient client = HttpClients.createDefault();
+
+//        Response response = this.httpClient.newCall(request).execute();
+        CloseableHttpResponse response = client.execute(httpPost);
+        log.info("[debug111] response - {}", response);
+
+//        int responseCode = response.code();
+//        HttpResponseBody responseData = null;
+//        if (response.body() != null) {
+//            responseData = JSONUtils.parseObject(response.body().string(), HttpResponseBody.class);
+//        }
+//        response.close();
+//
+//        HttpResponse httpResponse = new HttpResponse(responseCode, responseData);
+//
+//        log.info("POST response: {}", httpResponse);
+
+//        return httpResponse;
+        return null;
     }
 
 
