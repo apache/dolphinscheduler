@@ -68,11 +68,9 @@ public class DataxUtils {
             case CLICKHOUSE:
                 return DATAX_READER_PLUGIN_CLICKHOUSE;
             case HIVE:
-                return DATAX_READER_PLUGIN_RDBMS;
             case PRESTO:
-                return DATAX_READER_PLUGIN_RDBMS;
             default:
-                return null;
+                return DATAX_READER_PLUGIN_RDBMS;
         }
     }
 
@@ -91,11 +89,9 @@ public class DataxUtils {
             case DATABEND:
                 return DATAX_WRITER_PLUGIN_DATABEND;
             case HIVE:
-                return DATAX_WRITER_PLUGIN_RDBMS;
             case PRESTO:
-                return DATAX_WRITER_PLUGIN_RDBMS;
             default:
-                return null;
+                return DATAX_WRITER_PLUGIN_RDBMS;
         }
     }
 
