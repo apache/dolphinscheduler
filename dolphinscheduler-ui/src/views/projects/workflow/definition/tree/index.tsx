@@ -45,10 +45,9 @@ import { IChartDataItem } from '@/components/chart/modules/types'
 import { Router, useRouter } from 'vue-router'
 import { viewTree } from '@/service/modules/process-definition'
 import { SelectMixedOption } from 'naive-ui/lib/select/src/interface'
-import { tasksState } from '@/common/common'
+import { tasksState, uuid } from '@/common/common'
 import type { ITaskTypeNodeOption } from './types'
 import { cloneDeep, map } from 'lodash'
-import { uuid } from '@/common/common'
 
 export default defineComponent({
   name: 'WorkflowDefinitionTree',

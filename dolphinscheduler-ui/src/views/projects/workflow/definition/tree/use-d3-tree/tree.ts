@@ -169,7 +169,6 @@ Tree.prototype.treeUpdate = function (source) {
   })
 
   return new Promise((resolve) => {
-    // const tasks = this.tree.nodes(this.root)
     const tasks = this.tasks
     const height = Math.max(
       500,
