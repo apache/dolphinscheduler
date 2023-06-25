@@ -128,8 +128,13 @@ security:
         notexistaction: CREATE
       ssl:
         enable: false
-        # jks file absolute path && password
-        truststore: "/ldapkeystore.jks"
+        # do not change this value
+        truststore: "/opt/ldapkeystore.jks"
+        # if you use macOS, please run `base64 -b 0 -i /path/to/your.jks`
+        # if you use Linux, please run `base64 -w 0 /path/to/your.jks`
+        # if you use Windows, please run `certutil -f -encode /path/to/your.jks`
+        # Then copy the base64 content to below field in one line
+        jksbase64content: ""
         truststorepassword: ""
 
 conf:
