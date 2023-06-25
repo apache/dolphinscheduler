@@ -139,63 +139,34 @@ public class RequestClient {
     }
 
     @SneakyThrows
-    public HttpResponse postWithFile(String url, Map<String, String> headers, Map<String, Object> params, File file) {
+    public HttpResponse put(String url, Map<String, String> headers, Map<String, Object> params) {
         if (headers == null) {
             headers = new HashMap<>();
         }
 
         String requestUrl = String.format("%s%s", Constants.DOLPHINSCHEDULER_API_URL, url);
-
-//        headers.put("enctype", "multipart/form-data");
-//        headers.put("Content-Type", "multipart/form-data");
-
+        headers.put("Content-Type", Constants.REQUEST_CONTENT_TYPE);
         Headers headersBuilder = Headers.of(headers);
-
-//        RequestBody requestBody = FormBody.create(MediaType.parse(Constants.REQUEST_CONTENT_TYPE), getParams(params));
-
-        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-        builder.addTextBody("json", getParams(params), ContentType.MULTIPART_FORM_DATA);
-        builder.addBinaryBody(
-            "file",
-            new FileInputStream(file),
-            ContentType.APPLICATION_OCTET_STREAM,
-            file.getName()
-        );
-
-        HttpEntity multipart = builder.build();
-
-//        RequestBody requestBody = FormBody.create(MediaType.parse(Constants.MULTIPART_FORM_DATA), getParams(params));
-
-        log.info("POST request to {}, Headers: {}, Params: {}", requestUrl, headersBuilder, params);
-//        Request request = new Request.Builder()
-//            .headers(headersBuilder)
-//            .url(requestUrl)
-//            .post(requestBody)
-//            .build();
-        HttpPost httpPost = new HttpPost(requestUrl);
-        for (Map.Entry<String, String> header : headers.entrySet()) {
-            httpPost.setHeader(new BasicHeader(header.getKey(), header.getValue()));
+        RequestBody requestBody = FormBody.create(MediaType.parse(Constants.REQUEST_CONTENT_TYPE), getParams(params));
+        log.info("PUT request to {}, Headers: {}, Params: {}", requestUrl, headersBuilder, params);
+        Request request = new Request.Builder()
+            .headers(headersBuilder)
+            .url(requestUrl)
+            .put(requestBody)
+            .build();
+        Response response = this.httpClient.newCall(request).execute();
+        int responseCode = response.code();
+        HttpResponseBody responseData = null;
+        if (response.body() != null) {
+            responseData = JSONUtils.parseObject(response.body().string(), HttpResponseBody.class);
         }
-        httpPost.setEntity(multipart);
-        CloseableHttpClient client = HttpClients.createDefault();
+        response.close();
 
-//        Response response = this.httpClient.newCall(request).execute();
-        CloseableHttpResponse response = client.execute(httpPost);
-        log.info("[debug111] response - {}", response);
+        HttpResponse httpResponse = new HttpResponse(responseCode, responseData);
 
-//        int responseCode = response.code();
-//        HttpResponseBody responseData = null;
-//        if (response.body() != null) {
-//            responseData = JSONUtils.parseObject(response.body().string(), HttpResponseBody.class);
-//        }
-//        response.close();
-//
-//        HttpResponse httpResponse = new HttpResponse(responseCode, responseData);
-//
-//        log.info("POST response: {}", httpResponse);
+        log.info("PUT response: {}", httpResponse);
 
-//        return httpResponse;
-        return null;
+        return httpResponse;
     }
 
 
