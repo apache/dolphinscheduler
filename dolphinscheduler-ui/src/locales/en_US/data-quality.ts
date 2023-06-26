@@ -69,6 +69,7 @@ export default {
     failure_strategy: 'FailureStrategy',
     target_connector_type: 'TargetConnType',
     target_datasource_id: 'TargetSourceId',
+    target_database: 'TargetDatabase',
     target_table: 'TargetTable',
     target_filter: 'TargetFilter',
     mapping_columns: 'OnClause',

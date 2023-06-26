@@ -31,7 +31,6 @@ import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConst
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.DATA_TIME;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.DRIVER;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.ERROR_OUTPUT_PATH;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.SRC_DATABASE;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.FAILURE_STRATEGY;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.HDFS_FILE;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.INDEX;
@@ -44,14 +43,15 @@ import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConst
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.PROCESS_INSTANCE_ID;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.RULE_NAME;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.RULE_TYPE;
-import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TARGET_DATABASE;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.SQL;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.SRC_DATABASE;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.SRC_FIELD;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.SRC_FILTER;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.SRC_TABLE;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.STATISTICS_EXECUTE_SQL;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.STATISTICS_TABLE;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TABLE;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TARGET_DATABASE;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TARGET_FIELD;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TARGET_FILTER;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TARGET_TABLE;
@@ -153,7 +153,8 @@ public class RuleParserUtils {
                 config.put(PASSWORD, ParserUtils.encode(targetDataSource.getPassword()));
                 config.put(DRIVER, DataSourceUtils
                         .getDatasourceDriver(DbType.of(dataQualityTaskExecutionContext.getTargetType())));
-                String outputTable = inputParameterValue.get(TARGET_DATABASE) + "_" + inputParameterValue.get(TARGET_TABLE);
+                String outputTable =
+                        inputParameterValue.get(TARGET_DATABASE) + "_" + inputParameterValue.get(TARGET_TABLE);
                 config.put(OUTPUT_TABLE, outputTable);
                 inputParameterValue.put(TARGET_TABLE, outputTable);
             }

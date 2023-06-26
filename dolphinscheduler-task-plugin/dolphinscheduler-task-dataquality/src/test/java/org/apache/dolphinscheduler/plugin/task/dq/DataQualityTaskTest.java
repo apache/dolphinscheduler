@@ -695,7 +695,8 @@ public class DataQualityTaskTest {
         targetDatabase.setInputType(InputType.DEFAULT.getCode());
         targetDatabase.setValueType(ValueType.NUMBER.getCode());
         targetDatabase.setCreateTime(new Date());
-        targetDatabase.setUpdateTime(new Date());        targetDatasourceId.setInputType(InputType.DEFAULT.getCode());
+        targetDatabase.setUpdateTime(new Date());
+        targetDatasourceId.setInputType(InputType.DEFAULT.getCode());
 
         DqRuleInputEntry targetTable = new DqRuleInputEntry();
         targetTable.setTitle("目标数据表");
