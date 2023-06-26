@@ -59,6 +59,7 @@ export default {
     input_item_type: 'Input item type',
     src_connector_type: 'SrcConnType',
     src_datasource_id: 'SrcSource',
+    src_database: 'SrcDatabase',
     src_table: 'SrcTable',
     src_filter: 'SrcFilter',
     src_field: 'SrcField',
