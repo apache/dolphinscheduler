@@ -429,7 +429,6 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     zjsonpatch 0.3.0 https://mvnrepository.com/artifact/io.fabric8/zjsonpatch/0.3.0, Apache 2.0
     jackson-dataformat-yaml 2.13.0 https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml/2.13.0, Apache 2.0
     logging-interceptor 4.9.3 https://mvnrepository.com/artifact/com.squareup.okhttp3/logging-interceptor/4.9.3, Apache 2.0
-    okhttp 3.14.3 https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp/3.14.3, Apache 2.0
     okio 1.17.2 https://mvnrepository.com/artifact/com.squareup.okio/okio/1.17.2, Apache 2.0
     hibernate-validator  6.2.2.Final https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator/6.2.2.Final, Apache 2.0
     jakarta.validation-api 2.0.2 https://mvnrepository.com/artifact/jakarta.validation/jakarta.validation-api/2.0.2, Apache 2.0

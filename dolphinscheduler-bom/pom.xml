@@ -490,6 +490,12 @@
                 <groupId>org.apache.hadoop</groupId>
                 <artifactId>hadoop-client</artifactId>
                 <version>${hadoop.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>okhttp</artifactId>
+                        <groupId>com.squareup.okhttp</groupId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.hadoop</groupId>
@@ -505,6 +511,12 @@
                 <groupId>org.apache.hadoop</groupId>
                 <artifactId>hadoop-yarn-client</artifactId>
                 <version>${hadoop.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>okhttp</artifactId>
+                        <groupId>com.squareup.okhttp</groupId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.htrace</groupId>

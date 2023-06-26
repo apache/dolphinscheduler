@@ -134,6 +134,10 @@
                     <groupId>log4j</groupId>
                     <artifactId>log4j</artifactId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>okhttp</artifactId>
+                    <groupId>com.squareup.okhttp</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
 

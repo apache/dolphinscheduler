@@ -158,6 +158,10 @@
                     <groupId>com.google.protobuf</groupId>
                     <artifactId>protobuf-java</artifactId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>okhttp</artifactId>
+                    <groupId>com.squareup.okhttp</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
 
