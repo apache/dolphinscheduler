@@ -246,7 +246,7 @@ nimbus-jose-jwt-9.8.1.jar
 nimbus-jose-jwt-9.10.jar
 okhttp-2.7.5.jar
 okhttp-4.9.3.jar
-okio-1.17.2.jar
+okio-2.8.0.jar
 opencsv-2.3.jar
 oshi-core-6.1.1.jar
 paranamer-2.3.jar
