@@ -492,8 +492,8 @@
                 <version>${hadoop.version}</version>
                 <exclusions>
                     <exclusion>
-                        <artifactId>okhttp</artifactId>
                         <groupId>com.squareup.okhttp</groupId>
+                        <artifactId>okhttp</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -513,8 +513,8 @@
                 <version>${hadoop.version}</version>
                 <exclusions>
                     <exclusion>
-                        <artifactId>okhttp</artifactId>
                         <groupId>com.squareup.okhttp</groupId>
+                        <artifactId>okhttp</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>

@@ -159,8 +159,8 @@
                     <artifactId>protobuf-java</artifactId>
                 </exclusion>
                 <exclusion>
-                    <artifactId>okhttp</artifactId>
                     <groupId>com.squareup.okhttp</groupId>
+                    <artifactId>okhttp</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
