@@ -331,33 +331,36 @@ public class DataSourceController extends BaseController {
 
     @Operation(summary = "tables", description = "GET_DATASOURCE_TABLES_NOTES")
     @Parameters({
-            @Parameter(name = "datasourceId", description = "DATA_SOURCE_ID", required = true, schema = @Schema(implementation = int.class, example = "1"))
+            @Parameter(name = "datasourceId", description = "DATA_SOURCE_ID", required = true, schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "database", description = "DATABASE", required = true, schema = @Schema(implementation = String.class, example = "test"))
     })
     @GetMapping(value = "/tables")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(GET_DATASOURCE_TABLES_ERROR)
-    public Result getTables(@RequestParam("datasourceId") Integer datasourceId) {
-        Map<String, Object> result = dataSourceService.getTables(datasourceId);
+    public Result getTables(@RequestParam("datasourceId") Integer datasourceId, @RequestParam(value = "database") String database) {
+        Map<String, Object> result = dataSourceService.getTables(datasourceId, database);
         return returnDataList(result);
     }
 
     @Operation(summary = "tableColumns", description = "GET_DATASOURCE_TABLE_COLUMNS_NOTES")
     @Parameters({
             @Parameter(name = "datasourceId", description = "DATA_SOURCE_ID", required = true, schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "database", description = "DATABASE", required = true, schema = @Schema(implementation = String.class, example = "test")),
             @Parameter(name = "tableName", description = "TABLE_NAME", required = true, schema = @Schema(implementation = String.class, example = "test"))
     })
     @GetMapping(value = "/tableColumns")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(GET_DATASOURCE_TABLE_COLUMNS_ERROR)
     public Result getTableColumns(@RequestParam("datasourceId") Integer datasourceId,
-                                  @RequestParam("tableName") String tableName) {
-        Map<String, Object> result = dataSourceService.getTableColumns(datasourceId, tableName);
+                                  @RequestParam("tableName") String tableName,
+                                  @RequestParam(value = "database") String database) {
+        Map<String, Object> result = dataSourceService.getTableColumns(datasourceId, database, tableName);
         return returnDataList(result);
     }
 
     @Operation(summary = "databases", description = "GET_DATASOURCE_DATABASE_NOTES")
     @Parameters({
-            @Parameter(name = "datasourceId", description = "DATA_SOURCE_ID", required = true, schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "datasourceId", description = "DATA_SOURCE_ID", required = true, schema = @Schema(implementation = int.class, example = "1"))
     })
     @GetMapping(value = "/databases")
     @ResponseStatus(HttpStatus.OK)

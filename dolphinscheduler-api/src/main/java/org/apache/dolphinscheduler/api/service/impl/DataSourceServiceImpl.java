@@ -525,7 +525,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     }
 
     @Override
-    public Map<String, Object> getTables(Integer datasourceId) {
+    public Map<String, Object> getTables(Integer datasourceId, String database) {
         Map<String, Object> result = new HashMap<>();
 
         DataSource dataSource = dataSourceMapper.selectById(datasourceId);
@@ -561,7 +561,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             }
 
             tables = metaData.getTables(
-                    connectionParam.getDatabase(),
+                    database,
                     getDbSchemaPattern(dataSource.getType(), schema, connectionParam),
                     "%", TABLE_TYPES);
             if (null == tables) {
@@ -593,7 +593,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     }
 
     @Override
-    public Map<String, Object> getTableColumns(Integer datasourceId, String tableName) {
+    public Map<String, Object> getTableColumns(Integer datasourceId, String database, String tableName) {
         Map<String, Object> result = new HashMap<>();
 
         DataSource dataSource = dataSourceMapper.selectById(datasourceId);
@@ -613,8 +613,6 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         ResultSet rs = null;
 
         try {
-
-            String database = connectionParam.getDatabase();
             if (null == connection) {
                 return result;
             }
