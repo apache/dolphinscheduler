@@ -231,8 +231,8 @@ netty-transport-native-epoll-4.1.53.Final.jar
 netty-transport-native-unix-common-4.1.53.Final.jar
 nimbus-jose-jwt-9.8.1.jar
 okhttp-2.7.5.jar
-okhttp-3.14.9.jar
-okio-1.17.2.jar
+okhttp-4.9.3.jar
+okio-2.8.0.jar
 opencsv-2.3.jar
 oshi-core-6.1.1.jar
 paranamer-2.3.jar
