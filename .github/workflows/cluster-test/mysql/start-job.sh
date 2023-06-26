@@ -21,7 +21,7 @@ set -euox pipefail
 docker-compose -f .github/workflows/cluster-test/mysql/docker-compose-base.yaml up -d
 
 #Build ds mysql cluster image
-docker build -t jdk8:ds_mysql_cluster -f .github/workflows/cluster-test/mysql/Dockerfile .
+docker build -t jdk8:ds_mysql_cluster --no-cache -f .github/workflows/cluster-test/mysql/Dockerfile .
 
 #Start ds mysql cluster container
 docker-compose -f .github/workflows/cluster-test/mysql/docker-compose-cluster.yaml up -d
