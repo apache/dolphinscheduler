@@ -36,6 +36,7 @@ type IDataBase =
   | 'SSH'
   | 'DATABEND'
   | 'SNOWFLAKE'
+  | 'HANA'
 
 type IDataBaseLabel =
   | 'MYSQL'
