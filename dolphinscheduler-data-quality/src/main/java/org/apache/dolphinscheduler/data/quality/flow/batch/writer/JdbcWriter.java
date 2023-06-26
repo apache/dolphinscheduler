@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.data.quality.flow.batch.writer;
 
 import static org.apache.dolphinscheduler.data.quality.Constants.APPEND;
+import static org.apache.dolphinscheduler.data.quality.Constants.DATABASE;
 import static org.apache.dolphinscheduler.data.quality.Constants.DB_TABLE;
 import static org.apache.dolphinscheduler.data.quality.Constants.DRIVER;
 import static org.apache.dolphinscheduler.data.quality.Constants.JDBC;
@@ -79,7 +80,7 @@ public class JdbcWriter implements BatchWriter {
                 .format(JDBC)
                 .option(DRIVER, config.getString(DRIVER))
                 .option(URL, config.getString(URL))
-                .option(DB_TABLE, config.getString(TABLE))
+                .option(DB_TABLE, config.getString(DATABASE) + "." + config.getString(TABLE))
                 .option(USER, config.getString(USER))
                 .option(PASSWORD, ParserUtils.decode(config.getString(PASSWORD)))
                 .mode(config.getString(SAVE_MODE))

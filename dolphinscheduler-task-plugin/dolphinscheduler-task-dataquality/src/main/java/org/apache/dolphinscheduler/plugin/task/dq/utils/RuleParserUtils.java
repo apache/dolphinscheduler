@@ -31,6 +31,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConst
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.DATA_TIME;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.DRIVER;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.ERROR_OUTPUT_PATH;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.SRC_DATABASE;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.FAILURE_STRATEGY;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.HDFS_FILE;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.INDEX;
@@ -43,6 +44,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConst
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.PROCESS_INSTANCE_ID;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.RULE_NAME;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.RULE_TYPE;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TARGET_DATABASE;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.SQL;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.SRC_FIELD;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.SRC_FILTER;
@@ -116,7 +118,7 @@ public class RuleParserUtils {
             sourceBaseConfig.setType(dataQualityTaskExecutionContext.getSourceConnectorType());
             Map<String, Object> config = new HashMap<>();
             if (sourceDataSource != null) {
-                config.put(DATABASE, sourceDataSource.getDatabase());
+                config.put(DATABASE, inputParameterValue.get(SRC_DATABASE));
                 config.put(TABLE, inputParameterValue.get(SRC_TABLE));
                 config.put(URL, DataSourceUtils.getJdbcUrl(DbType.of(dataQualityTaskExecutionContext.getSourceType()),
                         sourceDataSource));
@@ -124,7 +126,7 @@ public class RuleParserUtils {
                 config.put(PASSWORD, ParserUtils.encode(sourceDataSource.getPassword()));
                 config.put(DRIVER, DataSourceUtils
                         .getDatasourceDriver(DbType.of(dataQualityTaskExecutionContext.getSourceType())));
-                String outputTable = sourceDataSource.getDatabase() + "_" + inputParameterValue.get(SRC_TABLE);
+                String outputTable = inputParameterValue.get(SRC_DATABASE) + "_" + inputParameterValue.get(SRC_TABLE);
                 config.put(OUTPUT_TABLE, outputTable);
                 inputParameterValue.put(SRC_TABLE, outputTable);
             }
@@ -143,7 +145,7 @@ public class RuleParserUtils {
             targetBaseConfig.setType(dataQualityTaskExecutionContext.getTargetConnectorType());
             Map<String, Object> config = new HashMap<>();
             if (targetDataSource != null) {
-                config.put(DATABASE, targetDataSource.getDatabase());
+                config.put(DATABASE, inputParameterValue.get(TARGET_DATABASE));
                 config.put(TABLE, inputParameterValue.get(TARGET_TABLE));
                 config.put(URL, DataSourceUtils.getJdbcUrl(DbType.of(dataQualityTaskExecutionContext.getTargetType()),
                         targetDataSource));
@@ -151,7 +153,7 @@ public class RuleParserUtils {
                 config.put(PASSWORD, ParserUtils.encode(targetDataSource.getPassword()));
                 config.put(DRIVER, DataSourceUtils
                         .getDatasourceDriver(DbType.of(dataQualityTaskExecutionContext.getTargetType())));
-                String outputTable = targetDataSource.getDatabase() + "_" + inputParameterValue.get(TARGET_TABLE);
+                String outputTable = inputParameterValue.get(TARGET_DATABASE) + "_" + inputParameterValue.get(TARGET_TABLE);
                 config.put(OUTPUT_TABLE, outputTable);
                 inputParameterValue.put(TARGET_TABLE, outputTable);
             }

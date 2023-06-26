@@ -645,6 +645,55 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         return result;
     }
 
+    @Override
+    public Map<String, Object> getDatabases(Integer datasourceId) {
+        Map<String, Object> result = new HashMap<>();
+
+        DataSource dataSource = dataSourceMapper.selectById(datasourceId);
+
+        List<String> tableList;
+        BaseConnectionParam connectionParam =
+                (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
+                        dataSource.getType(),
+                        dataSource.getConnectionParams());
+
+        if (null == connectionParam) {
+            putMsg(result, Status.DATASOURCE_CONNECT_FAILED);
+            return result;
+        }
+
+        Connection connection =
+                DataSourceUtils.getConnection(dataSource.getType(), connectionParam);
+        ResultSet rs = null;
+
+        try {
+            if (null == connection) {
+                putMsg(result, Status.DATASOURCE_CONNECT_FAILED);
+                return result;
+            }
+
+            rs = connection.createStatement().executeQuery(Constants.DATABASES_QUERY);
+            tableList = new ArrayList<>();
+            while (rs.next()) {
+                String name = rs.getString(1);
+                tableList.add(name);
+            }
+        } catch (Exception e) {
+            log.error("Get databases error, datasourceId:{}.", datasourceId, e);
+            putMsg(result, Status.GET_DATASOURCE_TABLES_ERROR);
+            return result;
+        } finally {
+            closeResult(rs);
+            releaseConnection(connection);
+        }
+
+        List<ParamsOptions> options = getParamsOptions(tableList);
+
+        result.put(Constants.DATA_LIST, options);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
     private List<ParamsOptions> getParamsOptions(List<String> columnList) {
         List<ParamsOptions> options = null;
         if (CollectionUtils.isNotEmpty(columnList)) {
