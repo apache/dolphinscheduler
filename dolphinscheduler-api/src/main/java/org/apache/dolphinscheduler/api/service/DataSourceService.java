@@ -146,7 +146,6 @@ public interface DataSourceService {
      */
     Map<String, Object> getTableColumns(Integer datasourceId, String database, String tableName);
 
-
     /**
      * get databases
      * @param datasourceId
