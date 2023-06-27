@@ -1,4 +1,4 @@
-# MySQL
+# HANA
 
 ![hana](../../../../img/new_ui/dev/datasource/hana.png)
 
