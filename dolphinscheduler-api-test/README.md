@@ -9,7 +9,7 @@ Every page of DolphinScheduler's api is abstracted into a class for better maint
 ### Example
 
 The login page's api is abstracted
-as [`LoginPage`](dolphinscheduler-api-test-case/src/test/java/org/apache/dolphinscheduler/api.test/pages/LoginPage.java)
+as [`LoginPage`](dolphinscheduler-api-test-case/src/test/java/org/apache/dolphinscheduler/api/test/pages/LoginPage.java)
 , with the following fields,
 
 ```java

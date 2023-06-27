@@ -92,6 +92,8 @@ jobs:
             class: org.apache.dolphinscheduler.api.test.cases.TenantAPITest
           - name: WorkerGroup
             class: org.apache.dolphinscheduler.api.test.cases.WorkerGroupAPITest
+          - name: Project
+            class: org.apache.dolphinscheduler.api.test.cases.ProjectAPITest
     env:
       RECORDING_PATH: /tmp/recording-${{ matrix.case.name }}
     steps:
