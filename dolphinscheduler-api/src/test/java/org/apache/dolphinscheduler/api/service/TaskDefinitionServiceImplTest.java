@@ -156,9 +156,9 @@ public class TaskDefinitionServiceImplTest {
         Mockito.when(projectMapper.queryByCode(PROJECT_CODE)).thenReturn(project);
 
         Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, PROJECT_CODE);
-        Mockito.when(projectService.checkProjectAndAuth(user, project, PROJECT_CODE, TASK_DEFINITION_CREATE))
-                .thenReturn(result);
+        Mockito.when(projectService.hasProjectAndWritePerm(user, project, result))
+                .thenReturn(true);
+        Mockito.when(taskPluginManager.checkTaskParameters(Mockito.any())).thenReturn(true);
 
         String createTaskDefinitionJson =
                 "[{\"name\":\"detail_up\",\"description\":\"\",\"taskType\":\"SHELL\",\"taskParams\":"
