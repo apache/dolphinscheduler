@@ -231,7 +231,5 @@ public interface ProcessService {
 
     void forceProcessInstanceSuccessByTaskInstanceId(Integer taskInstanceId);
 
-    Integer queryTestDataSourceId(Integer onlineDataSourceId);
-
     void saveCommandTrigger(Integer commandId, Integer processInstanceId);
 }

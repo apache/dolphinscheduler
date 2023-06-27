@@ -366,8 +366,6 @@ CREATE TABLE `t_ds_datasource` (
   `connection_params` text NOT NULL COMMENT 'json connection params',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
-  `test_flag`   tinyint(4) DEFAULT NULL COMMENT 'test flag：0 normal, 1 testDataSource',
-  `bind_test_id` int(11)  DEFAULT NULL COMMENT 'bind testDataSource id',
   PRIMARY KEY (`id`),
   UNIQUE KEY `t_ds_datasource_name_un` (`name`, `type`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
