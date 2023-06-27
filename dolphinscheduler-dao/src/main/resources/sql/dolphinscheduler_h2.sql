@@ -361,8 +361,6 @@ CREATE TABLE t_ds_datasource
     connection_params text        NOT NULL,
     create_time       datetime    NOT NULL,
     update_time       datetime     DEFAULT NULL,
-    test_flag           int DEFAULT NULL,
-    bind_test_id        int DEFAULT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY t_ds_datasource_name_un (name, type)
 );

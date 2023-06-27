@@ -69,13 +69,13 @@ public interface DataSourceService {
     Result queryDataSourceListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
 
     /**
-     * query online/test data resource list
+     * query data resource list
      *
      * @param loginUser login user
      * @param type      data source type
      * @return data source list page
      */
-    Map<String, Object> queryDataSourceList(User loginUser, Integer type, int testFlag);
+    Map<String, Object> queryDataSourceList(User loginUser, Integer type);
 
     /**
      * verify datasource exists

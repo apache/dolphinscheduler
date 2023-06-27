@@ -32,8 +32,6 @@ public class StarRocksDataSourceParamDTO extends BaseDataSourceParamDTO {
                 ", port=" + port +
                 ", database='" + database + '\'' +
                 ", userName='" + userName + '\'' +
-                ", testFlag=" + testFlag +
-                ", bindTestId=" + bindTestId +
                 ", other=" + other +
                 '}';
     }

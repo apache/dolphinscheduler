@@ -24,7 +24,6 @@ import java.util.Objects;
 
 import lombok.Data;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -80,17 +79,6 @@ public class DataSource {
      * update time
      */
     private Date updateTime;
-
-    /**
-     * test flag
-     */
-    protected int testFlag;
-
-    /**
-     * bind test data source id
-     */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    protected Integer bindTestId;
 
     @Override
     public boolean equals(Object o) {

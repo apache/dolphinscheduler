@@ -45,10 +45,6 @@ public abstract class BaseDataSourceParamDTO implements Serializable {
 
     protected String password;
 
-    protected int testFlag;
-
-    protected Integer bindTestId;
-
     protected Map<String, String> other;
 
     public Integer getId() {
@@ -154,22 +150,6 @@ public abstract class BaseDataSourceParamDTO implements Serializable {
 
     public void setOther(Map<String, String> other) {
         this.other = other;
-    }
-
-    public int getTestFlag() {
-        return testFlag;
-    }
-
-    public void setTestFlag(int testFlag) {
-        this.testFlag = testFlag;
-    }
-
-    public Integer getBindTestId() {
-        return bindTestId;
-    }
-
-    public void setBindTestId(Integer bindTestId) {
-        this.bindTestId = bindTestId;
     }
 
     /**

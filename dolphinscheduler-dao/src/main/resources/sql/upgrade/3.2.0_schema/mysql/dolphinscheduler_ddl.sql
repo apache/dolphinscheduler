@@ -56,30 +56,6 @@ delimiter ;
 CALL uc_dolphin_T_t_ds_error_command_R_test_flag;
 DROP PROCEDURE uc_dolphin_T_t_ds_error_command_R_test_flag;
 
--- uc_dolphin_T_t_ds_datasource_R_test_flag_bind_test_id
-drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_datasource_R_test_flag_bind_test_id;
-delimiter d//
-CREATE PROCEDURE uc_dolphin_T_t_ds_datasource_R_test_flag_bind_test_id()
-BEGIN
-       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
-           WHERE TABLE_NAME='t_ds_datasource'
-           AND TABLE_SCHEMA=(SELECT DATABASE())
-           AND COLUMN_NAME ='test_flag')
-           and NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
-           WHERE TABLE_NAME='t_ds_datasource'
-           AND TABLE_SCHEMA=(SELECT DATABASE())
-           AND COLUMN_NAME ='bind_test_id')
-   THEN
-ALTER TABLE t_ds_datasource ADD `test_flag` tinyint(4) DEFAULT null COMMENT 'test flag：0 normal, 1 testDataSource';
-ALTER TABLE t_ds_datasource ADD `bind_test_id` int DEFAULT null COMMENT 'bind testDataSource id';
-END IF;
-END;
-
-d//
-
-delimiter ;
-CALL uc_dolphin_T_t_ds_datasource_R_test_flag_bind_test_id;
-DROP PROCEDURE uc_dolphin_T_t_ds_datasource_R_test_flag_bind_test_id;
 
 -- uc_dolphin_T_t_ds_process_instance_R_test_flag
 drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_process_instance_R_test_flag;
