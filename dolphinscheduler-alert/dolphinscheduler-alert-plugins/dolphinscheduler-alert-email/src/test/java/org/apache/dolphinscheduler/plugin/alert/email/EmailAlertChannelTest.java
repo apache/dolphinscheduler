@@ -108,7 +108,6 @@ public class EmailAlertChannelTest {
 
         InputParam mailPassword = InputParam.newBuilder(MailParamsConstants.NAME_MAIL_PASSWD, "passwd")
                 .setPlaceholder("if enable use authentication, you need input password")
-                .setValue("escheduler123")
                 .build();
 
         RadioParam enableTls =
