@@ -252,7 +252,6 @@ export default defineComponent({
                 style={{ marginBottom: '5px' }}
               >
                 <NInput
-                  allowInput={this.trim}
                   type='textarea'
                   v-model={[this.uploadForm.description, 'value']}
                   placeholder={t('resource.function.enter_description_tips')}
@@ -272,7 +271,6 @@ export default defineComponent({
             path='description'
           >
             <NInput
-              allowInput={this.trim}
               type='textarea'
               v-model={[this.functionForm.description, 'value']}
               placeholder={t('resource.function.enter_instructions_tips')}
