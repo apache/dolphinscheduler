@@ -396,6 +396,11 @@ export const datasourceType: IDataBaseOptionKeys = {
     value: 'DATABEND',
     label: 'DATABEND',
     defaultPort: 8000
+  },
+  HANA: {
+    value: 'HANA',
+    label: 'HANA',
+    defaultPort: 30015
   }
 }
 
