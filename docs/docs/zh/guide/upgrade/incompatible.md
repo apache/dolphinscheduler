@@ -15,4 +15,6 @@
 * Use semicolon as default sql segment separator [#10869](https://github.com/apache/dolphinscheduler/pull/10869)
 
 ## 3.2.0
-*  在 /datasources/tables && /datasources/tableColumns 接口中添加了必选字段`database` [#14406](https://github.com/apache/dolphinscheduler/pull/14406)
+
+* 在 /datasources/tables && /datasources/tableColumns 接口中添加了必选字段`database` [#14406](https://github.com/apache/dolphinscheduler/pull/14406)
+
