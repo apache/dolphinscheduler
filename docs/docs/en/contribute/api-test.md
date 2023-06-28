@@ -80,7 +80,7 @@ When the preparation is complete, it is time for the formal test case writing. W
 
 The rest are similar cases and can be understood by referring to the specific source code.
 
-https://github.com/apache/dolphinscheduler/tree/dev/dolphinscheduler-api-test/dolphinscheduler-api-test-case/src/test/java/org/apache/dolphinscheduler/api.test/cases
+https://github.com/apache/dolphinscheduler/tree/dev/dolphinscheduler-api-test/dolphinscheduler-api-test-case/src/test/java/org/apache/dolphinscheduler/api/test/cases
 
 ## Supplements
 
