@@ -98,7 +98,6 @@ export default defineComponent({
         if (props.isReupload && props.show) {
           state.uploadForm.fullName = props.fullName
           state.uploadForm.name = props.name
-          state.uploadForm.description = props.description
           state.uploadForm.user_name = props.userName
         }
       }
@@ -136,15 +135,6 @@ export default defineComponent({
               v-model={[this.uploadForm.name, 'value']}
               placeholder={t('resource.file.enter_name_tips')}
               class='input-file-name'
-            />
-          </NFormItem>
-          <NFormItem label={t('resource.file.description')} path='description'>
-            <NInput
-              allowInput={this.trim}
-              type='textarea'
-              v-model={[this.uploadForm.description, 'value']}
-              placeholder={t('resource.file.enter_description_tips')}
-              class='input-description'
             />
           </NFormItem>
           <NFormItem label={t('resource.file.upload_files')} path='file'>
