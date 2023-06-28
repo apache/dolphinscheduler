@@ -31,7 +31,6 @@ import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 
 import com.aliyun.oss.OSS;
-import com.aliyun.oss.model.Bucket;
 import com.aliyun.oss.model.GetObjectRequest;
 import com.aliyun.oss.model.PutObjectRequest;
 
@@ -104,17 +103,13 @@ public class OssRemoteLogHandler implements RemoteLogHandler, Closeable {
             throw new IllegalArgumentException(Constants.REMOTE_LOGGING_OSS_BUCKET_NAME + " is empty");
         }
 
-        Bucket existsBucket = ossClient.listBuckets()
-                .stream()
-                .filter(
-                        bucket -> bucket.getName().equals(bucketName))
-                .findFirst()
-                .orElseThrow(() -> {
-                    return new IllegalArgumentException(
-                            "bucketName: " + bucketName + " does not exist, you need to create them by yourself");
-                });
+        boolean existsBucket = ossClient.doesBucketExist(bucketName);
+        if (!existsBucket) {
+            throw new IllegalArgumentException(
+                    "bucketName: " + bucketName + " is not exists, you need to create them by yourself");
+        }
 
-        log.info("bucketName: {} has been found", existsBucket.getName());
+        log.info("bucketName: {} has been found", bucketName);
     }
 
     private String readOssAccessKeyId() {
