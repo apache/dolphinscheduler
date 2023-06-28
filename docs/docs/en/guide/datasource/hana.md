@@ -4,11 +4,11 @@
 
 ## Datasource Parameters
 
-|       **Datasource**       |                     **Description**                      |
-|----------------------------|----------------------------------------------------------|
+|       **Datasource**       |                     **Description**                     |
+|----------------------------|---------------------------------------------------------|
 | Datasource                 | Select HANA.                                            |
-| Datasource name            | Enter the name of the DataSource.                        |
-| Description                | Enter a description of the DataSource.                   |
+| Datasource name            | Enter the name of the DataSource.                       |
+| Description                | Enter a description of the DataSource.                  |
 | IP/Host Name               | Enter the HANA service IP.                              |
 | Port                       | Enter the HANA service port.                            |
 | Username                   | Set the username for HANA connection.                   |
