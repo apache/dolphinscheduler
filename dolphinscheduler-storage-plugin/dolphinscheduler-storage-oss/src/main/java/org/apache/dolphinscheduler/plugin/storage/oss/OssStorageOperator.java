@@ -59,7 +59,6 @@ import lombok.extern.slf4j.Slf4j;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSException;
 import com.aliyun.oss.ServiceException;
-import com.aliyun.oss.model.Bucket;
 import com.aliyun.oss.model.DeleteObjectsRequest;
 import com.aliyun.oss.model.ListObjectsV2Request;
 import com.aliyun.oss.model.ListObjectsV2Result;
@@ -516,7 +515,7 @@ public class OssStorageOperator implements Closeable, StorageOperate {
         boolean existsBucket = ossClient.doesBucketExist(bucketName);
         if (!existsBucket) {
             throw new IllegalArgumentException(
-                "bucketName: " + bucketName + " is not exists, you need to create them by yourself");
+                    "bucketName: " + bucketName + " is not exists, you need to create them by yourself");
         }
 
         log.info("bucketName: {} has been found, the current regionName is {}", bucketName, region);

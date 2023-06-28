@@ -31,7 +31,6 @@ import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 
 import com.aliyun.oss.OSS;
-import com.aliyun.oss.model.Bucket;
 import com.aliyun.oss.model.GetObjectRequest;
 import com.aliyun.oss.model.PutObjectRequest;
 
@@ -107,7 +106,7 @@ public class OssRemoteLogHandler implements RemoteLogHandler, Closeable {
         boolean existsBucket = ossClient.doesBucketExist(bucketName);
         if (!existsBucket) {
             throw new IllegalArgumentException(
-                "bucketName: " + bucketName + " is not exists, you need to create them by yourself");
+                    "bucketName: " + bucketName + " is not exists, you need to create them by yourself");
         }
 
         log.info("bucketName: {} has been found", bucketName);
