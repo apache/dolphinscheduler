@@ -669,7 +669,9 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
                 putMsg(result, Status.DATASOURCE_CONNECT_FAILED);
                 return result;
             }
-
+            if (dataSource.getType() == DbType.POSTGRESQL) {
+                rs = connection.createStatement().executeQuery(Constants.DATABASES_QUERY_PG);
+            }
             rs = connection.createStatement().executeQuery(Constants.DATABASES_QUERY);
             tableList = new ArrayList<>();
             while (rs.next()) {

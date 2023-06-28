@@ -14,3 +14,5 @@ This document records the incompatible updates between each version. You need to
 * Copy and import workflow without 'copy' suffix [#10607](https://github.com/apache/dolphinscheduler/pull/10607)
 * Use semicolon as default sql segment separator [#10869](https://github.com/apache/dolphinscheduler/pull/10869)
 
+## 3.2.0
+* Add required field `database` in /datasources/tables && /datasources/tableColumns Api [#14406](https://github.com/apache/dolphinscheduler/pull/14406)
