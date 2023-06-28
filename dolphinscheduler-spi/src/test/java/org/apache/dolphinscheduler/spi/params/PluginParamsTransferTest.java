@@ -86,8 +86,9 @@ public class PluginParamsTransferTest {
                 .setPlaceholder("if enable use authentication, you need input user")
                 .build();
 
-        PasswordParam mailPassword = new PasswordParam.Builder("field8", "field8")
+        InputParam mailPassword = new InputParam.Builder("field8", "field8")
                 .setPlaceholder("if enable use authentication, you need input password")
+                .setType("password")
                 .build();
 
         RadioParam enableTls = new RadioParam.Builder("field9", "field9")
@@ -160,9 +161,13 @@ public class PluginParamsTransferTest {
                 + "\"validateEvent\":null,\"showPassword\":null,\"placeholder\":\"if enable use authentication, "
                 + "you need input user\",\"size\":\"small\"},\"field\":\"field7\",\"name\":\"field7\","
                 + "\"type\":\"input\",\"title\":\"field7\",\"value\":null,\"validate\":null,\"emit\":null},"
-                + "{\"field\":\"field8\",\"name\":\"field8\",\"props\":{\"disabled\":null,\"placeholder\":"
-                + "\"if enable use authentication, you need input password\",\"size\":\"small\"},\"type\":"
-                + "\"input\",\"title\":\"field8\",\"value\":null,\"validate\":null,\"emit\":null},{\"props\":"
+                + "{\"props\":{\"disabled\":null,\"type\":\"password\",\"maxlength\":null,\"minlength\":null,\""
+                + "clearable\":null,\"prefixIcon\":null,\"suffixIcon\":null,\"rows\":null,\"autosize\":null,"
+                + "\"autocomplete\":null,\"name\":null,\"readonly\":null,\"max\":null,\"min\":null,\"step\":null,"
+                + "\"resize\":null,\"autofocus\":null,\"form\":null,\"label\":null,\"tabindex\":null,\"validateEvent\":null,"
+                + "\"showPassword\":null,\"placeholder\":\"if enable use authentication, you need input password\","
+                + "\"size\":\"small\"},\"field\":\"field8\",\"name\":\"field8\",\"type\":\"input\",\"title\":\"field8\","
+                + "\"value\":null,\"validate\":null,\"emit\":null},{\"props\":"
                 + "null,\"field\":\"field9\",\"name\":\"field9\",\"type\":\"radio\",\"title\":\"field9\","
                 + "\"value\":false,\"validate\":[{\"required\":true,\"message\":null,\"type\":\"string\","
                 + "\"trigger\":\"blur\",\"min\":null,\"max\":null}],\"emit\":null,\"options\":[{\"label\":"

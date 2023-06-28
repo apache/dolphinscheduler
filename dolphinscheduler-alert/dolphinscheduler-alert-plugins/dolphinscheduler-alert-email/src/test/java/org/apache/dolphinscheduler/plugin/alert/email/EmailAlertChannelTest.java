@@ -23,7 +23,6 @@ import org.apache.dolphinscheduler.alert.api.AlertInfo;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.alert.api.ShowType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.spi.params.PasswordParam;
 import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
@@ -107,9 +106,8 @@ public class EmailAlertChannelTest {
                 .setValue("dolphinscheduler@126.com")
                 .build();
 
-        PasswordParam mailPassword = PasswordParam.newBuilder(MailParamsConstants.NAME_MAIL_PASSWD, "passwd")
+        InputParam mailPassword = InputParam.newBuilder(MailParamsConstants.NAME_MAIL_PASSWD, "passwd")
                 .setPlaceholder("if enable use authentication, you need input password")
-                .setValue("escheduler123")
                 .build();
 
         RadioParam enableTls =
