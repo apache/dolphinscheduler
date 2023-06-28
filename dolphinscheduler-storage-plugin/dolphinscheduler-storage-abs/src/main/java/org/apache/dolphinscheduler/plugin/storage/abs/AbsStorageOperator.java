@@ -376,7 +376,6 @@ public class AbsStorageOperator implements Closeable, StorageOperate {
                 entity.setFileName(fileName);
                 entity.setFullName(blobItem.getName());
                 entity.setDirectory(true);
-                entity.setDescription(EMPTY_STRING);
                 entity.setUserName(tenantCode);
                 entity.setType(type);
                 entity.setSize(0);
@@ -395,7 +394,6 @@ public class AbsStorageOperator implements Closeable, StorageOperate {
                 entity.setFileName(fileName);
                 entity.setFullName(blobItem.getName());
                 entity.setDirectory(false);
-                entity.setDescription(EMPTY_STRING);
                 entity.setUserName(tenantCode);
                 entity.setType(type);
                 entity.setSize(blobItem.getProperties().getContentLength());
@@ -423,7 +421,6 @@ public class AbsStorageOperator implements Closeable, StorageOperate {
             entity.setFileName(fileName);
             entity.setFullName(path);
             entity.setDirectory(true);
-            entity.setDescription(EMPTY_STRING);
             entity.setUserName(tenantCode);
             entity.setType(type);
             entity.setSize(0);
@@ -442,7 +439,6 @@ public class AbsStorageOperator implements Closeable, StorageOperate {
                 entity.setFileName(fileName);
                 entity.setFullName(blobClient.getBlobName());
                 entity.setDirectory(false);
-                entity.setDescription(EMPTY_STRING);
                 entity.setUserName(tenantCode);
                 entity.setType(type);
                 entity.setSize(blobClient.getProperties().getBlobSize());

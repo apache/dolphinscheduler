@@ -56,7 +56,6 @@ public class StorageEntity {
      */
     private String pfullName;
     private boolean isDirectory;
-    private String description;
     private int userId;
     private String userName;
     private ResourceType type;

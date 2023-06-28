@@ -122,7 +122,7 @@ public class FileManageE2ETest {
     void testCreateDirectory() {
         final FileManagePage page = new FileManagePage(browser);
 
-        page.createDirectory(testDirectoryName, "test_desc");
+        page.createDirectory(testDirectoryName);
 
         await().untilAsserted(() -> assertThat(page.fileList())
                 .as("File list should contain newly-created file")
@@ -135,7 +135,7 @@ public class FileManageE2ETest {
     void testCancelCreateDirectory() {
         final FileManagePage page = new FileManagePage(browser);
 
-        page.cancelCreateDirectory(testDirectoryName, "test_desc");
+        page.cancelCreateDirectory(testDirectoryName);
 
         await().untilAsserted(() -> assertThat(page.fileList())
             .as("File list should contain newly-created file")

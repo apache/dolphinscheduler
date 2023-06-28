@@ -101,7 +101,6 @@ interface ResourceFile {
   directory: boolean
   fileName: string
   fullName: string
-  description: string
   size: number
   createTime: string
   updateTime: string

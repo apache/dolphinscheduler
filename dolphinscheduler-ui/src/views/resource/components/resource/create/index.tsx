@@ -89,16 +89,6 @@ export default defineComponent({
               class='select-file-format'
             />
           </NFormItem>
-          <NFormItem label={t('resource.file.description')} path='description'>
-            <NInput
-              allowInput={this.trim}
-              type='textarea'
-              v-model={[this.fileForm.description, 'value']}
-              placeholder={t('resource.file.enter_description_tips')}
-              style={{ width: '430px' }}
-              class='input-description'
-            />
-          </NFormItem>
           <NFormItem label={t('resource.file.file_content')} path='content'>
             <div
               style={{

@@ -387,7 +387,6 @@ public class GcsStorageOperator implements Closeable, StorageOperate {
                 entity.setFileName(fileName);
                 entity.setFullName(blob.getName());
                 entity.setDirectory(true);
-                entity.setDescription(EMPTY_STRING);
                 entity.setUserName(tenantCode);
                 entity.setType(type);
                 entity.setSize(0);
@@ -406,7 +405,6 @@ public class GcsStorageOperator implements Closeable, StorageOperate {
                 entity.setFileName(fileName);
                 entity.setFullName(blob.getName());
                 entity.setDirectory(false);
-                entity.setDescription(EMPTY_STRING);
                 entity.setUserName(tenantCode);
                 entity.setType(type);
                 entity.setSize(blob.getSize());
@@ -434,7 +432,6 @@ public class GcsStorageOperator implements Closeable, StorageOperate {
             entity.setFileName(fileName);
             entity.setFullName(path);
             entity.setDirectory(true);
-            entity.setDescription(EMPTY_STRING);
             entity.setUserName(tenantCode);
             entity.setType(type);
             entity.setSize(0);
@@ -453,7 +450,6 @@ public class GcsStorageOperator implements Closeable, StorageOperate {
                 entity.setFileName(fileName);
                 entity.setFullName(blob.getName());
                 entity.setDirectory(false);
-                entity.setDescription(EMPTY_STRING);
                 entity.setUserName(tenantCode);
                 entity.setType(type);
                 entity.setSize(blob.getSize());

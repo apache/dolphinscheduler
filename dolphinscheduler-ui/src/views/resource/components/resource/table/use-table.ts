@@ -132,11 +132,6 @@ export function useTable() {
         key: 'file_name'
       },
       {
-        title: t('resource.file.description'),
-        ...COLUMN_WIDTH_CONFIG['note'],
-        key: 'description'
-      },
-      {
         title: t('resource.file.size'),
         key: 'size',
         ...COLUMN_WIDTH_CONFIG['size'],
