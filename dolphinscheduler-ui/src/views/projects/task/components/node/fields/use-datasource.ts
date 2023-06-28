@@ -127,6 +127,11 @@ export function useDatasource(
       id: 21,
       code: 'VERTICA',
       disabled: false
+    },
+    {
+      id: 22,
+      code: 'HANA',
+      disabled: false
     }
   ]
 

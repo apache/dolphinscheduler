@@ -347,6 +347,10 @@ export default {
                                 title: 'Databend',
                                 link: '/en-us/docs/dev/user_doc/guide/datasource/databend.html',
                             },
+                            {
+                                title: 'HANA',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/hana.html',
+                            }
                         ],
                     },
                     {
@@ -1044,6 +1048,10 @@ export default {
                                 title: 'Databend',
                                 link: '/zh-cn/docs/dev/user_doc/guide/datasource/databend.html',
                             },
+                            {
+                                title: 'HANA',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/hana.html',
+                            }
                         ],
                     },
                     {
