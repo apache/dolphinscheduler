@@ -247,6 +247,9 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn/applicationId�
 |security.authentication.ldap.user.identity-attribute|uid|LDAP用户身份标识字段名|
 |security.authentication.ldap.user.email-attribute|mail|LDAP邮箱字段名|
 |security.authentication.ldap.user.not-exist-action|CREATE|当通过LDAP登陆时用户不存在的操作，默认值是: CREATE，可选值:CREATE、DENY|
+|security.authentication.ldap.ssl.enable|false|LDAP ssl开关|
+|security.authentication.ldap.ssl.trust-store|ldapkeystore.jks|LDAP jks文件绝对路径|
+|security.authentication.ldap.ssl.trust-store-password|password|LDAP jks密码|
 |traffic.control.global.switch|false|流量控制全局开关|
 |traffic.control.max-global-qps-rate|300|全局最大请求数/秒|
 |traffic.control.tenant-switch|false|流量控制租户开关|
