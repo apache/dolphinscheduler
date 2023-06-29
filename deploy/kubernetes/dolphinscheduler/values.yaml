@@ -113,6 +113,30 @@ externalRegistry:
   registryPluginName: "zookeeper"
   registryServers: "127.0.0.1:2181"
 
+security:
+  authentication:
+    type: PASSWORD
+    ldap:
+      urls: ldap://ldap.forumsys.com:389/
+      basedn: dc=example,dc=com
+      username: cn=read-only-admin,dc=example,dc=com
+      password: password
+      user:
+        admin: read-only-admin
+        identityattribute: uid
+        emailattribute: mail
+        notexistaction: CREATE
+      ssl:
+        enable: false
+        # do not change this value
+        truststore: "/opt/ldapkeystore.jks"
+        # if you use macOS, please run `base64 -b 0 -i /path/to/your.jks`
+        # if you use Linux, please run `base64 -w 0 /path/to/your.jks`
+        # if you use Windows, please run `certutil -f -encode /path/to/your.jks`
+        # Then copy the base64 content to below field in one line
+        jksbase64content: ""
+        truststorepassword: ""
+
 conf:
   common:
     # user data local directory path, please make sure the directory exists and have read write permissions
