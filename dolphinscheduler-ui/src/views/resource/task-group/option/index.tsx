@@ -97,6 +97,7 @@ const taskGroupOption = defineComponent({
     }
 
     const onSearch = () => {
+      variables.page = 1
       resetTableData()
     }
 

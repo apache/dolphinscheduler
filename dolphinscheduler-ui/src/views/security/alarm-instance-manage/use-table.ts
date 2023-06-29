@@ -59,9 +59,7 @@ export function useTable() {
   }
 
   const updateList = () => {
-    if (data.list.length === 1 && data.page > 1) {
-      --data.page
-    }
+    data.page = 1
     getList()
   }
 

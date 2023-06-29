@@ -52,6 +52,7 @@ const TaskResult = defineComponent({
     }
 
     const onSearch = () => {
+      variables.page = 1
       requestTableData()
     }
 

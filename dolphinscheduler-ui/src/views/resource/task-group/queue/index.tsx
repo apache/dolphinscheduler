@@ -103,6 +103,7 @@ const taskGroupQueue = defineComponent({
     }
 
     const onSearch = () => {
+      variables.page = 1
       resetTableData()
     }
 
