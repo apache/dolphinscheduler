@@ -25,11 +25,16 @@ security:
         email-attribute: mail
         # action when ldap user is not exist (supported types: CREATE,DENY)
         not-exist-action: CREATE
+      ssl:
+        enable: false
+        # jks file absolute path && password
+        trust-store: "/ldapkeystore.jks"
+        trust-store-password: "password"
 ```
 
 具体字段解释详见：[Api-server相关配置](../../architecture/configuration.md)
 
-## LDAP测试
+## 开发者LDAP测试
 
 我们提供了一个单元测试类，可以在不启动项目的情况下测试DolphinScheduler与LDAP的集成。
 
@@ -40,6 +45,17 @@ security:
 - 修改`ldapLogin`方法中的userId和userPwd为你的账号密码;
 - 修改`ldapLogin`方法中的expected email为正常登陆的返回值;
 - 执行`ldapLogin`方法，判断LDAP登陆结果是否为预期;
+
+如果你要启用ssl，请修改`TestPropertySource`配置中ssl相关参数为：
+
+```
+security.authentication.ldap.ssl.enable=false
+// absolute path
+security.authentication.ldap.ssl.trust-store=/ldapkeystore.jks 
+security.authentication.ldap.ssl.trust-store-password=yourpassword
+```
+
+运行`ldapLoginSSL`方法，判断email是否为预期的返回值。
 
 ## 通过 Casdoor 实现 SSO 登录
 

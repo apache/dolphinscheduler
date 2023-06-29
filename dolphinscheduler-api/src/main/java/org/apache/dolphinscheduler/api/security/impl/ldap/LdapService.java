@@ -70,6 +70,15 @@ public class LdapService {
     @Value("${security.authentication.ldap.user.not-exist-action:CREATE}")
     private String ldapUserNotExistAction;
 
+    @Value("${security.authentication.ldap.ssl.enable:false}")
+    private Boolean sslEnable;
+
+    @Value("${security.authentication.ldap.ssl.trust-store:#{null}}")
+    private String trustStore;
+
+    @Value("${security.authentication.ldap.ssl.trust-store-password:#{null}}")
+    private String trustStorePassword;
+
     /***
      * get user type by configured admin userId
      * @param userId login userId
@@ -144,6 +153,14 @@ public class LdapService {
         env.put(Context.SECURITY_PRINCIPAL, ldapSecurityPrincipal);
         env.put(Context.SECURITY_CREDENTIALS, ldapPrincipalPassword);
         env.put(Context.PROVIDER_URL, ldapUrls);
+
+        if (sslEnable) {
+            env.put(Context.SECURITY_PROTOCOL, "ssl");
+            System.setProperty("javax.net.ssl.trustStore", trustStore);
+            if (StringUtils.isNotEmpty(trustStorePassword)) {
+                System.setProperty("javax.net.ssl.trustStorePassword", trustStorePassword);
+            }
+        }
         return env;
     }
 

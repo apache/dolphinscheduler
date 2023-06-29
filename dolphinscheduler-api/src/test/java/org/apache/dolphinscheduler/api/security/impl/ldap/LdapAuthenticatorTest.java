@@ -58,6 +58,9 @@ import org.springframework.test.context.TestPropertySource;
         "security.authentication.ldap.user.identity-attribute=uid",
         "security.authentication.ldap.user.email-attribute=mail",
         "security.authentication.ldap.user.not-exist-action=CREATE",
+        "security.authentication.ldap.ssl.enable=false",
+        "security.authentication.ldap.ssl.trust-store=",
+        "security.authentication.ldap.ssl.trust-store-password=",
 })
 public class LdapAuthenticatorTest extends AbstractControllerTest {
 
