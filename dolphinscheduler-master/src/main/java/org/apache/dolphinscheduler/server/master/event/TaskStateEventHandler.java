@@ -56,6 +56,26 @@ public class TaskStateEventHandler implements StateEventHandler {
                 task.getState().name(), taskStateEvent.getStatus().name());
 
         Set<Long> completeTaskSet = workflowExecuteRunnable.getCompleteTaskCodes();
+
+        // Handle timeout fail task situation
+        if (task.getState().isFailure()
+                && (taskStateEvent.getStatus() != null && taskStateEvent.getStatus().isRunning())) {
+            if (completeTaskSet.contains(task.getTaskCode())) {
+                log.warn("The task instance is already failed: {}, even if stateEvent is : {}", task.getState().name(), stateEvent);
+                return true;
+            }
+            workflowExecuteRunnable.taskFinished(task);
+            if (task.getTaskGroupId() > 0) {
+                log.info("The task instance need to release task Group: {}", task.getTaskGroupId());
+                try {
+                    workflowExecuteRunnable.releaseTaskGroup(task);
+                } catch (RemotingException | InterruptedException e) {
+                    throw new StateEventHandleException("Release task group failed", e);
+                }
+            }
+            return true;
+        }
+
         if (task.getState().isFinished()
                 && (taskStateEvent.getStatus() != null && taskStateEvent.getStatus().isRunning())) {
             String errorMessage = String.format(
