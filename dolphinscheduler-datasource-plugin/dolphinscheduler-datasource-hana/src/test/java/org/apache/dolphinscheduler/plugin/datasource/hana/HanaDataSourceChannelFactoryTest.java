@@ -15,30 +15,18 @@
  * limitations under the License.
  */
 
-import { h } from 'vue'
-import { NTag } from 'naive-ui'
+package org.apache.dolphinscheduler.plugin.datasource.hana;
 
-export function renderEnvironmentalDistinctionCell(
-  testFlag: number | undefined,
-  t: Function
-) {
-  if (testFlag === 0) {
-    return h(
-      NTag,
-      { type: 'success', size: 'small' },
-      {
-        default: () => t('datasource.on_line')
-      }
-    )
-  } else if (testFlag === 1) {
-    return h(
-      NTag,
-      { type: 'warning', size: 'small' },
-      {
-        default: () => t('datasource.test')
-      }
-    )
-  } else {
-    return '-'
-  }
+import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+public class HanaDataSourceChannelFactoryTest {
+
+    @Test
+    public void testCreate() {
+        HanaDataSourceChannelFactory sourceChannelFactory = new HanaDataSourceChannelFactory();
+        DataSourceChannel dataSourceChannel = sourceChannelFactory.create();
+        Assertions.assertNotNull(dataSourceChannel);
+    }
 }

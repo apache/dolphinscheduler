@@ -42,6 +42,8 @@ public class DataSourceConstants {
     public static final String COM_OCEANBASE_JDBC_DRIVER = "com.oceanbase.jdbc.Driver";
     public static final String NET_SNOWFLAKE_JDBC_DRIVER = "net.snowflake.client.jdbc.SnowflakeDriver";
     public static final String COM_VERTICA_JDBC_DRIVER = "com.vertica.jdbc.Driver";
+    public static final String COM_HANA_DB_JDBC_DRIVER = "com.sap.db.jdbc.Driver";
+
     /**
      * validation Query
      */
@@ -62,6 +64,8 @@ public class DataSourceConstants {
 
     public static final String KYUUBI_VALIDATION_QUERY = "select 1";
     public static final String VERTICA_VALIDATION_QUERY = "select 1";
+
+    public static final String HANA_VALIDATION_QUERY = "select 1";
 
     /**
      * jdbc url
@@ -86,6 +90,7 @@ public class DataSourceConstants {
     public static final String JDBC_OCEANBASE = "jdbc:oceanbase://";
     public static final String JDBC_SNOWFLAKE = "jdbc:snowflake://";
     public static final String JDBC_VERTICA = "jdbc:vertica://";
+    public static final String JDBC_HANA = "jdbc:sap://";
 
     /**
      * database type
