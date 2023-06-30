@@ -244,28 +244,54 @@ Create a registry environment variables.
 - name: REGISTRY_TYPE
   {{- if .Values.zookeeper.enabled }}
   value: "zookeeper"
-  {{- else if .Values.etcd.enabled }}
+  {{- else if .Values.registryEtcd.enabled }}
   value: "etcd"
+  {{- else if .Values.registryJdbc.enabled }}
+  value: "jdbc"
   {{- else }}
   value: {{ .Values.externalRegistry.registryPluginName }}
   {{- end }}
-{{- if .Values.etcd.enabled }}
+{{- if .Values.registryEtcd.enabled }}
 - name: REGISTRY_ENDPOINTS
-  value: {{ .Values.etcd.endpoints }}
+  value: {{ .Values.registryEtcd.endpoints }}
 - name: REGISTRY_NAMESPACE
-  value: {{ .Values.etcd.namespace }}
+  value: {{ .Values.registryEtcd.namespace }}
 - name: REGISTRY_USER
-  value: {{ .Values.etcd.user }}
+  value: {{ .Values.registryEtcd.user }}
 - name: REGISTRY_PASSWORD
-  value: {{ .Values.etcd.passWord }}
+  value: {{ .Values.registryEtcd.passWord }}
 - name: REGISTRY_AUTHORITY
-  value: {{ .Values.etcd.authority }}
+  value: {{ .Values.registryEtcd.authority }}
 - name: REGISTRY_CERT_FILE
-  value: {{ .Values.etcd.ssl.certFile }}
+  value: {{ .Values.registryEtcd.ssl.certFile }}
 - name: REGISTRY_KEY_CERT_CHAIN_FILE
-  value: {{ .Values.etcd.ssl.keyCertChainFile }}
+  value: {{ .Values.registryEtcd.ssl.keyCertChainFile }}
 - name: REGISTRY_KEY_FILE
-  value: {{ .Values.etcd.ssl.keyFile }}
+  value: {{ .Values.registryEtcd.ssl.keyFile }}
+{{- else if .Values.registryJdbc.enabled }}
+- name: REGISTRY_TERM_REFRESH_INTERVAL
+  value: {{ .Values.registryJdbc.termRefreshInterval }}
+- name: REGISTRY_TERM_EXPIRE_TIMES
+  value: {{ .Values.registryJdbc.termExpireTimes | quote}}
+{{- if .Values.registryJdbc.hikariConfig.username }}
+- name: REGISTRY_HIKARI_CONFIG_MAXIMUM_POOL_SIZE
+  value: {{ .Values.registryJdbc.hikariConfig.maximumPoolSize | quote}}
+- name: REGISTRY_HIKARI_CONFIG_CONNECTION_TIMEOUT
+  value: {{ .Values.registryJdbc.hikariConfig.connectionTimeout | quote}}
+- name: REGISTRY_HIKARI_CONFIG_IDLE_TIMEOUT
+  value: {{ .Values.registryJdbc.hikariConfig.idleTimeout | quote}}
+- name: REGISTRY_HIKARI_CONFIG_DRIVER_CLASS_NAME
+  value: {{ .Values.registryJdbc.hikariConfig.driverClassName }}
+- name: REGISTRY_HIKARI_CONFIG_JDBC_URL
+  value: {{ .Values.registryJdbc.hikariConfig.jdbcurl }}
+- name: REGISTRY_HIKARI_CONFIG_USERNAME
+  value: {{ .Values.registryJdbc.hikariConfig.username }}
+- name: REGISTRY_HIKARI_CONFIG_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "dolphinscheduler.fullname" . }}-externaldb
+      key: registry-password
+{{- end }}
 {{- else }}
 - name: REGISTRY_ZOOKEEPER_CONNECT_STRING
   {{- if .Values.zookeeper.enabled }}

@@ -251,7 +251,7 @@ Location: `api-server/conf/application.yaml`
 |security.authentication.ldap.user.identity-attribute|uid|LDAP user identity attribute|
 |security.authentication.ldap.user.email-attribute|mail|LDAP user email attribute|
 |security.authentication.ldap.user.not-exist-action|CREATE|action when ldap user is not exist,default value: CREATE. Optional values include(CREATE,DENY)|
-|security.authentication.ldap.ssl.enable|false|LDAP switch|
+|security.authentication.ldap.ssl.enable|false|LDAP ssl switch|
 |security.authentication.ldap.ssl.trust-store|ldapkeystore.jks|LDAP jks file absolute path|
 |security.authentication.ldap.ssl.trust-store-password|password|LDAP jks password|
 |traffic.control.global.switch|false|traffic control global switch|
