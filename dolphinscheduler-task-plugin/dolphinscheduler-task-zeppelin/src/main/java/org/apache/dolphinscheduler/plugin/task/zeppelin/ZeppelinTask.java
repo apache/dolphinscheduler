@@ -17,30 +17,22 @@
 
 package org.apache.dolphinscheduler.plugin.task.zeppelin;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import kong.unirest.Unirest;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
-import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
-import org.apache.dolphinscheduler.plugin.task.api.TaskException;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
+import org.apache.dolphinscheduler.plugin.datasource.zeppelin.param.ZeppelinConnectionParam;
+import org.apache.dolphinscheduler.plugin.task.api.*;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.zeppelin.client.ClientConfig;
-import org.apache.zeppelin.client.NoteResult;
-import org.apache.zeppelin.client.ParagraphResult;
-import org.apache.zeppelin.client.Status;
-import org.apache.zeppelin.client.ZeppelinClient;
+import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.apache.zeppelin.client.*;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import kong.unirest.Unirest;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ZeppelinTask extends AbstractRemoteTask {
 
@@ -59,6 +51,10 @@ public class ZeppelinTask extends AbstractRemoteTask {
      */
     private ZeppelinClient zClient;
 
+    private ZeppelinConnectionParam zeppelinConnectionParam;
+
+    private ZeppelinTaskExecutionContext zeppelinTaskExecutionContext;
+
     /**
      * constructor
      *
@@ -76,6 +72,11 @@ public class ZeppelinTask extends AbstractRemoteTask {
         if (this.zeppelinParameters == null || !this.zeppelinParameters.checkParameters()) {
             throw new ZeppelinTaskException("zeppelin task params is not valid");
         }
+        zeppelinTaskExecutionContext = zeppelinParameters.generateExtendedContext(taskExecutionContext.getResourceParametersHelper());
+        zeppelinConnectionParam = (ZeppelinConnectionParam) DataSourceUtils.buildConnectionParams(DbType.valueOf("ZEPPELIN"), zeppelinTaskExecutionContext.getConnectionParams());
+        zeppelinParameters.setUsername(zeppelinConnectionParam.getUsername());
+        zeppelinParameters.setPassword(zeppelinConnectionParam.getPassword());
+        zeppelinParameters.setRestEndpoint(zeppelinConnectionParam.getRestEndpoint());
         log.info("Initialize zeppelin task params:{}", JSONUtils.toPrettyJsonString(taskParams));
         this.zClient = getZeppelinClient();
     }

@@ -157,6 +157,7 @@ const DetailModal = defineComponent({
       requiredDataBase,
       showHost,
       showPort,
+      showRestEndpoint,
       showAwsRegion,
       showCompatibleMode,
       showConnectType,
@@ -244,6 +245,21 @@ const DetailModal = defineComponent({
                     type='text'
                     maxlength={255}
                     placeholder={t('datasource.ip_tips')}
+                  />
+                </NFormItem>
+                <NFormItem
+                  v-show={showRestEndpoint}
+                  label={t('datasource.zeppelin_rest_endpoint')}
+                  path='restEndPoint'
+                  show-require-mark
+                >
+                  <NInput
+                    allowInput={this.trim}
+                    class='input-zeppelin_rest_endpoint'
+                    v-model={[detailForm.restEndpoint, 'value']}
+                    type='text'
+                    maxlength={255}
+                    placeholder={t('datasource.zeppelin_rest_endpoint_tips')}
                   />
                 </NFormItem>
                 <NFormItem

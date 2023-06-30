@@ -117,5 +117,10 @@
             <artifactId>dolphinscheduler-datasource-kyuubi</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-datasource-zeppelin</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 </project>

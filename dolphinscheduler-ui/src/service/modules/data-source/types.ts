@@ -33,6 +33,7 @@ type IDataBase =
   | 'DAMENG'
   | 'OCEANBASE'
   | 'SSH'
+  | 'ZEPPELIN'
 
 type IDataBaseLabel =
 | 'MYSQL'
@@ -52,6 +53,8 @@ type IDataBaseLabel =
 | 'DAMENG'
 | 'OCEANBASE'
 | 'SSH'
+| 'ZEPPELIN'
+
 
 interface IDataSource {
   id?: number
@@ -75,6 +78,7 @@ interface IDataSource {
   testFlag?: number
   bindTestId?: number
   endpoint?: string
+  restEndpoint?: string
   MSIClientId?: string
   dbUser?: string
   compatibleMode?: string

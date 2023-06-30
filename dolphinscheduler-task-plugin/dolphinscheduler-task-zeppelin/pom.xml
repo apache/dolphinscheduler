@@ -38,6 +38,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-datasource-all</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.zeppelin</groupId>
             <artifactId>zeppelin-client</artifactId>
             <version>0.10.1</version>

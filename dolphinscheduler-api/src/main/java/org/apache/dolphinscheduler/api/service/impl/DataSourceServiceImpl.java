@@ -394,6 +394,15 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             }
             return result;
         }
+        if (type == DbType.ZEPPELIN) {
+            DataSourceProcessor zeppelinDataSourceProcessor = DataSourceUtils.getDatasourceProcessor(type);
+            if (zeppelinDataSourceProcessor.testConnection(connectionParam)) {
+                putMsg(result, Status.SUCCESS);
+            } else {
+                putMsg(result, Status.CONNECT_DATASOURCE_FAILURE);
+            }
+            return result;
+        }
         try (Connection connection = DataSourceClientProvider.getInstance().getConnection(type, connectionParam)) {
             if (connection == null) {
                 log.error("Connection test to {} datasource failed, connectionParam:{}.", type.getDescp(),

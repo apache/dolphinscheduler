@@ -65,6 +65,7 @@ export function useForm(id?: number) {
     showHost: true,
     showPort: true,
     showAwsRegion: false,
+    showRestEndpoint: false,
     showCompatibleMode: false,
     showConnectType: false,
     showPrincipal: false,
@@ -266,17 +267,24 @@ export function useForm(id?: number) {
     } else {
       state.showPrincipal = false
     }
-    if (type === 'SSH') {
+    if (type === 'SSH' || type === 'ZEPPELIN') {
       state.showDataBaseName = false
       state.requiredDataBase = false
       state.showJDBCConnectParameters = false
-      state.showPublicKey = true
-    }else {
+      state.showPublicKey = false
+      if (type === 'SSH') {
+        state.showPublicKey = true
+      }
+      if (type === 'ZEPPELIN') {
+        state.showHost = false
+        state.showPort = false
+        state.showRestEndpoint = true
+      }
+    } else {
       state.showDataBaseName = true
       state.requiredDataBase = true
       state.showJDBCConnectParameters = true
       state.showPublicKey = false
-
     }
 
     if (state.detailForm.id === undefined) {
@@ -303,13 +311,13 @@ export function useForm(id?: number) {
     const params = { type: state.detailForm.type, testFlag: 1 } as TypeReq
     const result = await queryDataSourceList(params)
     state.bindTestDataSourceExample = result
-        .filter((value: { label: string; value: string }) => {
-          // @ts-ignore
-          if (state.detailForm.id && state.detailForm.id === value.id)
-            return false
-          return true
-        })
-        .map((TestDataSourceExample: { name: string; id: number }) => ({
+      .filter((value: { label: string; value: string }) => {
+        // @ts-ignore
+        if (state.detailForm.id && state.detailForm.id === value.id)
+          return false
+        return true
+      })
+      .map((TestDataSourceExample: { name: string; id: number }) => ({
         label: TestDataSourceExample.name,
         value: TestDataSourceExample.id
       }))
@@ -409,9 +417,9 @@ export const datasourceType: IDataBaseOptionKeys = {
     defaultPort: 1433
   },
   STARROCKS: {
-      value: 'STARROCKS',
-      label: 'STARROCKS',
-      defaultPort: 9030
+    value: 'STARROCKS',
+    label: 'STARROCKS',
+    defaultPort: 9030
   },
   DAMENG: {
     value: 'DAMENG',
@@ -427,6 +435,11 @@ export const datasourceType: IDataBaseOptionKeys = {
     value: 'SSH',
     label: 'SSH',
     defaultPort: 22
+  },
+  ZEPPELIN: {
+    value: 'ZEPPELIN',
+    label: 'ZEPPELIN',
+    defaultPort: 8080
   }
 }
 

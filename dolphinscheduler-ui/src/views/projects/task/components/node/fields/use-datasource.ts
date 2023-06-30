@@ -118,6 +118,11 @@ export function useDatasource(
       code: 'SSH',
       disabled: true
     },
+    {
+      id: 16,
+      code: 'ZEPPELIN',
+      disabled: false
+    }
   ]
 
   const getDatasourceTypes = async () => {
