@@ -60,14 +60,19 @@ export function useTable() {
     state.itemCount = total
   }
 
-  const updateList = () => {
-    state.page = 1
+  const updateList = (initPage = true) => {
+    if (initPage) {
+      state.page = 1
+    }
     getList()
   }
 
   const deleteUser = async (userId: number) => {
     await delUserById({ id: userId })
-    updateList()
+    if (state.list.length === 1 && state.page > 1) {
+      --state.page
+    }
+    updateList(false)
   }
 
   const onOperationClick = (

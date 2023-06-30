@@ -45,14 +45,19 @@ export function useTable() {
     data.itemCount = listRes.total
   }
 
-  const updateList = () => {
-    data.page = 1
+  const updateList = (initPage = true) => {
+    if (initPage) {
+      data.page = 1
+    }
     getList()
   }
 
   const deleteRecord = async (id: number) => {
-    const ignored = await deleteDataSource(id)
-    updateList()
+    await deleteDataSource(id)
+    if (data.list.length === 1 && data.page > 1) {
+      --data.page
+    }
+    updateList(false)
   }
 
   const changePage = (page: number) => {
