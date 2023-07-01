@@ -38,6 +38,7 @@ import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
+import org.apache.dolphinscheduler.common.enums.ExecutionOrder;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
@@ -283,7 +284,8 @@ public class ExecuteFunctionServiceTest {
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 10, null, 0, Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
                 ComplementDependentMode.OFF_MODE, null,
-                false);
+                false,
+                ExecutionOrder.DESC_ORDER);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(commandService, times(1)).createCommand(any(Command.class));
 
@@ -308,7 +310,8 @@ public class ExecuteFunctionServiceTest {
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
                 ComplementDependentMode.OFF_MODE, null,
-                false);
+                false,
+                ExecutionOrder.DESC_ORDER);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(commandService, times(1)).createCommand(any(Command.class));
 
@@ -332,7 +335,8 @@ public class ExecuteFunctionServiceTest {
                     Constants.DRY_RUN_FLAG_NO,
                     Constants.TEST_FLAG_NO,
                     ComplementDependentMode.OFF_MODE, null,
-                    false);
+                    false,
+                    ExecutionOrder.DESC_ORDER);
         } catch (ServiceException e) {
             Assertions.assertEquals(Status.START_NODE_NOT_EXIST_IN_LAST_PROCESS.getCode(), e.getCode());
         }
@@ -416,7 +420,8 @@ public class ExecuteFunctionServiceTest {
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
                 ComplementDependentMode.OFF_MODE, null,
-                false);
+                false,
+                ExecutionOrder.DESC_ORDER);
         Assertions.assertEquals(Status.START_PROCESS_INSTANCE_ERROR, result.get(Constants.STATUS));
         verify(commandService, times(0)).createCommand(any(Command.class));
     }
@@ -440,7 +445,8 @@ public class ExecuteFunctionServiceTest {
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
                 ComplementDependentMode.OFF_MODE, null,
-                false);
+                false,
+                ExecutionOrder.DESC_ORDER);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(commandService, times(1)).createCommand(any(Command.class));
     }
@@ -464,7 +470,8 @@ public class ExecuteFunctionServiceTest {
                 Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
                 ComplementDependentMode.OFF_MODE, null,
-                false);
+                false,
+                ExecutionOrder.DESC_ORDER);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(commandService, times(31)).createCommand(any(Command.class));
 
@@ -490,7 +497,8 @@ public class ExecuteFunctionServiceTest {
                 Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
                 ComplementDependentMode.OFF_MODE, null,
-                false);
+                false,
+                ExecutionOrder.DESC_ORDER);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(commandService, times(15)).createCommand(any(Command.class));
 
@@ -522,7 +530,8 @@ public class ExecuteFunctionServiceTest {
                 Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
                 ComplementDependentMode.OFF_MODE, null,
-                false));
+                false,
+                ExecutionOrder.DESC_ORDER));
     }
 
     @Test
@@ -555,7 +564,8 @@ public class ExecuteFunctionServiceTest {
                 Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_YES,
                 ComplementDependentMode.OFF_MODE, null,
-                false);
+                false,
+                ExecutionOrder.DESC_ORDER);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
