@@ -17,24 +17,28 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.zeppelin.param;
 
-import com.google.auto.service.AutoService;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.zeppelin.client.ClientConfig;
 import org.apache.zeppelin.client.ZeppelinClient;
 
 import java.sql.Connection;
 import java.text.MessageFormat;
 
+import lombok.extern.slf4j.Slf4j;
+
+import com.google.auto.service.AutoService;
+
 @AutoService(DataSourceProcessor.class)
 @Slf4j
 public class ZeppelinDataSourceProcessor implements DataSourceProcessor {
+
     @Override
     public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
         return JSONUtils.parseObject(paramJson, ZeppelinDataSourceParamDTO.class);
@@ -43,7 +47,8 @@ public class ZeppelinDataSourceProcessor implements DataSourceProcessor {
     @Override
     public void checkDatasourceParam(BaseDataSourceParamDTO datasourceParamDTO) {
         ZeppelinDataSourceParamDTO zeppelinDataSourceParamDTO = (ZeppelinDataSourceParamDTO) datasourceParamDTO;
-        if (StringUtils.isEmpty(zeppelinDataSourceParamDTO.getRestEndpoint()) || StringUtils.isEmpty(zeppelinDataSourceParamDTO.getUserName())) {
+        if (StringUtils.isEmpty(zeppelinDataSourceParamDTO.getRestEndpoint())
+                || StringUtils.isEmpty(zeppelinDataSourceParamDTO.getUserName())) {
             throw new IllegalArgumentException("zeppelin datasource param is not valid");
         }
     }
@@ -51,7 +56,8 @@ public class ZeppelinDataSourceProcessor implements DataSourceProcessor {
     @Override
     public String getDatasourceUniqueId(ConnectionParam connectionParam, DbType dbType) {
         ZeppelinConnectionParam baseConnectionParam = (ZeppelinConnectionParam) connectionParam;
-        return MessageFormat.format("{0}@{1}@{2}@{3}", dbType.getDescp(), baseConnectionParam.getRestEndpoint(), baseConnectionParam.getUsername(), PasswordUtils.encodePassword(baseConnectionParam.getPassword()));
+        return MessageFormat.format("{0}@{1}@{2}@{3}", dbType.getDescp(), baseConnectionParam.getRestEndpoint(),
+                baseConnectionParam.getUsername(), PasswordUtils.encodePassword(baseConnectionParam.getPassword()));
     }
 
     @Override

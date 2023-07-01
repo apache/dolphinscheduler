@@ -17,9 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.zeppelin.param;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Data;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
+
+import lombok.Data;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)

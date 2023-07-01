@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import java.sql.Connection;
 
 public class ZeppelinDataSourceClient extends CommonDataSourceClient {
+
     public ZeppelinDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
         super(baseConnectionParam, dbType);
     }

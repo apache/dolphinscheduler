@@ -24,33 +24,59 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
 
   const configEditorSpan = computed(() => (model.useCustom ? 24 : 0))
   const resourceEditorSpan = computed(() => (model.useCustom ? 0 : 24))
-  const flinkSpan = computed(() => (model.engine === 'FLINK' || model.engine === 'FLINK_V2' ? 24 : 0))
-  const deployModeSpan = computed(() => (model.engine === 'SPARK' || model.engine === 'SPARK_V2' || model.engine === "SEATUNNEL_ENGINE" ? 24 : 0))
+  const flinkSpan = computed(() =>
+    model.startupScript.includes('flink') ? 24 : 0
+  )
+  const deployModeSpan = computed(() =>
+    model.startupScript.includes('spark') ||
+    model.startupScript === 'seatunnel.sh'
+      ? 24
+      : 0
+  )
   const masterSpan = computed(() =>
-      (model.engine === 'SPARK' || model.engine === 'SPARK_V2') && model.deployMode !== 'local' ? 12 : 0
+    model.startupScript.includes('spark') && model.deployMode !== 'local'
+      ? 12
+      : 0
   )
   const masterUrlSpan = computed(() =>
-    (model.engine === 'SPARK' || model.engine === 'SPARK_V2') &&
+    model.startupScript.includes('spark') &&
     model.deployMode !== 'local' &&
     (model.master === 'SPARK' || model.master === 'MESOS')
       ? 12
       : 0
   )
-  const showClient = computed(() => model.engine === 'SPARK' || model.engine === 'SPARK_V2')
-  const showLocal = computed(() => model.engine === 'SEATUNNEL_ENGINE')
-  const othersSpan = computed(() => (model.engine === 'FLINK' || model.engine === 'FLINK_V2' || model.engine === 'SEATUNNEL_ENGINE' ? 24 : 0))
+  const showClient = computed(() => model.startupScript.includes('spark'))
+  const showLocal = computed(() => model.startupScript === 'seatunnel.sh')
+  const othersSpan = computed(() =>
+    model.startupScript.includes('flink') ||
+    model.startupScript === 'seatunnel.sh'
+      ? 24
+      : 0
+  )
 
   return [
     {
       type: 'select',
-      field: 'engine',
-      span: 12,
-      name: t('project.node.engine'),
-      options: ENGINE,
+      field: 'startupScript',
+      span: 15,
+      name: t('project.node.startup_script'),
+      options: STARTUP_SCRIPT,
       validate: {
         trigger: ['input', 'blur'],
         required: true,
-        message: t('project.node.engine_tips')
+        message: t('project.node.startup_script_tips')
+      },
+      props: {
+        'on-update:value': (value: boolean) => {
+          if (value) {
+            if (model.startupScript === 'seatunnel.sh') {
+              model.deployMode = 'local'
+            }
+            if (model.startupScript.includes('spark')) {
+              model.deployMode = 'client'
+            }
+          }
+        }
       }
     },
 
@@ -130,26 +156,42 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
   ]
 }
 
-export const ENGINE = [
+export const STARTUP_SCRIPT = [
   {
-    label: 'SPARK',
-    value: 'SPARK'
+    label: 'seatunnel.sh',
+    value: 'seatunnel.sh'
   },
   {
-    label: 'FLINK',
-    value: 'FLINK'
+    label: 'start-seatunnel-flink-13-connector-v2.sh',
+    value: 'start-seatunnel-flink-13-connector-v2.sh'
   },
   {
-    label: 'SPARK_V2',
-    value: 'SPARK_V2'
+    label: 'start-seatunnel-flink-15-connector-v2.sh',
+    value: 'start-seatunnel-flink-15-connector-v2.sh'
   },
   {
-    label: 'FLINK_V2',
-    value: 'FLINK_V2'
+    label: 'start-seatunnel-flink-connector-v2.sh',
+    value: 'start-seatunnel-flink-connector-v2.sh'
   },
   {
-    label: 'SEATUNNEL_ENGINE',
-    value: 'SEATUNNEL_ENGINE'
+    label: 'start-seatunnel-flink.sh',
+    value: 'start-seatunnel-flink.sh'
+  },
+  {
+    label: 'start-seatunnel-spark-2-connector-v2.sh',
+    value: 'start-seatunnel-spark-2-connector-v2.sh'
+  },
+  {
+    label: 'start-seatunnel-spark-3-connector-v2.sh',
+    value: 'start-seatunnel-spark-3-connector-v2.sh'
+  },
+  {
+    label: 'start-seatunnel-spark-connector-v2.sh',
+    value: 'start-seatunnel-spark-connector-v2.sh'
+  },
+  {
+    label: 'start-seatunnel-spark.sh',
+    value: 'start-seatunnel-spark.sh'
   }
 ]
 

@@ -24,6 +24,30 @@ type IDataBase =
   | 'ORACLE'
   | 'SQLSERVER'
   | 'DB2'
+  | 'VERTICA'
+  | 'PRESTO'
+  | 'REDSHIFT'
+  | 'ATHENA'
+  | 'TRINO'
+  | 'AZURESQL'
+  | 'STARROCKS'
+  | 'DAMENG'
+  | 'OCEANBASE'
+  | 'SSH'
+  | 'DATABEND'
+  | 'SNOWFLAKE'
+  | 'HANA'
+  | 'ZEPPELIN'
+
+type IDataBaseLabel =
+  | 'MYSQL'
+  | 'POSTGRESQL'
+  | 'HIVE'
+  | 'SPARK'
+  | 'CLICKHOUSE'
+  | 'ORACLE'
+  | 'SQLSERVER'
+  | 'DB2'
   | 'PRESTO'
   | 'REDSHIFT'
   | 'ATHENA'
@@ -34,27 +58,6 @@ type IDataBase =
   | 'OCEANBASE'
   | 'SSH'
   | 'ZEPPELIN'
-
-type IDataBaseLabel =
-| 'MYSQL'
-| 'POSTGRESQL'
-| 'HIVE'
-| 'SPARK'
-| 'CLICKHOUSE'
-| 'ORACLE'
-| 'SQLSERVER'
-| 'DB2'
-| 'PRESTO'
-| 'REDSHIFT'
-| 'ATHENA'
-| 'TRINO'
-| 'AZURESQL'
-| 'STARROCKS'
-| 'DAMENG'
-| 'OCEANBASE'
-| 'SSH'
-| 'ZEPPELIN'
-
 
 interface IDataSource {
   id?: number
@@ -75,14 +78,13 @@ interface IDataSource {
   database?: string
   connectType?: string
   other?: object
-  testFlag?: number
-  bindTestId?: number
   endpoint?: string
   restEndpoint?: string
   MSIClientId?: string
   dbUser?: string
   compatibleMode?: string
   publicKey?: string
+  datawarehouse?: string
 }
 
 interface ListReq {

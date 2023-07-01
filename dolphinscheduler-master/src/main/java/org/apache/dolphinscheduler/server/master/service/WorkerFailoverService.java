@@ -36,7 +36,7 @@ import org.apache.dolphinscheduler.server.master.event.TaskStateEvent;
 import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
-import org.apache.dolphinscheduler.server.master.runner.task.TaskProcessorFactory;
+import org.apache.dolphinscheduler.server.master.utils.TaskUtils;
 import org.apache.dolphinscheduler.service.log.LogClient;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.utils.ProcessUtils;
@@ -123,26 +123,28 @@ public class WorkerFailoverService {
                     final LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
                             LogUtils.setWorkflowAndTaskInstanceIDMDC(taskInstance.getProcessInstanceId(),
                                     taskInstance.getId())) {
-                ProcessInstance processInstance = processInstanceCacheMap.computeIfAbsent(
-                        taskInstance.getProcessInstanceId(), k -> {
-                            WorkflowExecuteRunnable workflowExecuteRunnable = cacheManager.getByProcessInstanceId(
-                                    taskInstance.getProcessInstanceId());
-                            if (workflowExecuteRunnable == null) {
-                                return null;
-                            }
-                            return workflowExecuteRunnable.getProcessInstance();
-                        });
-                if (!checkTaskInstanceNeedFailover(needFailoverWorkerStartTime, processInstance, taskInstance)) {
-                    log.info("Worker[{}] the current taskInstance doesn't need to failover", workerHost);
-                    continue;
+                try {
+                    ProcessInstance processInstance = processInstanceCacheMap.computeIfAbsent(
+                            taskInstance.getProcessInstanceId(), k -> {
+                                WorkflowExecuteRunnable workflowExecuteRunnable = cacheManager.getByProcessInstanceId(
+                                        taskInstance.getProcessInstanceId());
+                                if (workflowExecuteRunnable == null) {
+                                    return null;
+                                }
+                                return workflowExecuteRunnable.getProcessInstance();
+                            });
+                    if (!checkTaskInstanceNeedFailover(needFailoverWorkerStartTime, processInstance, taskInstance)) {
+                        log.info("Worker[{}] the current taskInstance doesn't need to failover", workerHost);
+                        continue;
+                    }
+                    log.info(
+                            "Worker[{}] failover: begin to failover taskInstance, will set the status to NEED_FAULT_TOLERANCE",
+                            workerHost);
+                    failoverTaskInstance(processInstance, taskInstance);
+                    log.info("Worker[{}] failover: Finish failover taskInstance", workerHost);
+                } catch (Exception ex) {
+                    log.info("Worker[{}] failover taskInstance occur exception", workerHost, ex);
                 }
-                log.info(
-                        "Worker[{}] failover: begin to failover taskInstance, will set the status to NEED_FAULT_TOLERANCE",
-                        workerHost);
-                failoverTaskInstance(processInstance, taskInstance);
-                log.info("Worker[{}] failover: Finish failover taskInstance", workerHost);
-            } catch (Exception ex) {
-                log.info("Worker[{}] failover taskInstance occur exception", workerHost, ex);
             }
         }
         failoverTimeCost.stop();
@@ -163,11 +165,10 @@ public class WorkerFailoverService {
      */
     private void failoverTaskInstance(@NonNull ProcessInstance processInstance, @NonNull TaskInstance taskInstance) {
         TaskMetrics.incTaskInstanceByState("failover");
-        boolean isMasterTask = TaskProcessorFactory.isMasterTask(taskInstance.getTaskType());
 
         taskInstance.setProcessInstance(processInstance);
 
-        if (!isMasterTask) {
+        if (!TaskUtils.isMasterTask(taskInstance.getTaskType())) {
             log.info("The failover taskInstance is not master task");
             TaskExecutionContext taskExecutionContext = TaskExecutionContextBuilder.get()
                     .buildWorkflowInstanceHost(masterConfig.getMasterAddress())

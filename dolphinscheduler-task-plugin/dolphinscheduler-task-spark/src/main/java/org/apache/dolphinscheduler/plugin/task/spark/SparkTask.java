@@ -30,9 +30,8 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ArgsUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
@@ -114,11 +113,11 @@ public class SparkTask extends AbstractYarnTask {
         // populate spark options
         args.addAll(populateSparkOptions());
 
-        // replace placeholder, and combining local and global parameters
+        // replace placeholder
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
 
         String command =
-                ParameterUtils.convertParameterPlaceholders(String.join(" ", args), ParamUtils.convert(paramsMap));
+                ParameterUtils.convertParameterPlaceholders(String.join(" ", args), ParameterUtils.convert(paramsMap));
 
         log.info("spark task command: {}", command);
 
@@ -267,9 +266,9 @@ public class SparkTask extends AbstractYarnTask {
 
     private String replaceParam(String script) {
         script = script.replaceAll("\\r\\n", System.lineSeparator());
-        // replace placeholder, and combining local and global parameters
+        // replace placeholder
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
-        script = ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
+        script = ParameterUtils.convertParameterPlaceholders(script, ParameterUtils.convert(paramsMap));
         return script;
     }
 

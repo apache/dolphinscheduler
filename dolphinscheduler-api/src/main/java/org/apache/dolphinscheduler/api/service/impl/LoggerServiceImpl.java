@@ -92,7 +92,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
     @SuppressWarnings("unchecked")
     public Result<ResponseTaskLog> queryLog(User loginUser, int taskInstId, int skipLineNum, int limit) {
 
-        TaskInstance taskInstance = taskInstanceDao.findTaskInstanceById(taskInstId);
+        TaskInstance taskInstance = taskInstanceDao.queryById(taskInstId);
 
         if (taskInstance == null) {
             log.error("Task instance does not exist, taskInstanceId:{}.", taskInstId);
@@ -120,7 +120,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
      */
     @Override
     public byte[] getLogBytes(User loginUser, int taskInstId) {
-        TaskInstance taskInstance = taskInstanceDao.findTaskInstanceById(taskInstId);
+        TaskInstance taskInstance = taskInstanceDao.queryById(taskInstId);
         if (taskInstance == null || StringUtils.isBlank(taskInstance.getHost())) {
             throw new ServiceException("task instance is null or host is null");
         }
@@ -149,7 +149,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
             return result;
         }
         // check whether the task instance can be found
-        TaskInstance task = taskInstanceDao.findTaskInstanceById(taskInstId);
+        TaskInstance task = taskInstanceDao.queryById(taskInstId);
         if (task == null || StringUtils.isBlank(task.getHost())) {
             putMsg(result, Status.TASK_INSTANCE_NOT_FOUND);
             return result;
@@ -182,7 +182,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
             throw new ServiceException("user has no permission");
         }
         // check whether the task instance can be found
-        TaskInstance task = taskInstanceDao.findTaskInstanceById(taskInstId);
+        TaskInstance task = taskInstanceDao.queryById(taskInstId);
         if (task == null || StringUtils.isBlank(task.getHost())) {
             throw new ServiceException("task instance is null or host is null");
         }

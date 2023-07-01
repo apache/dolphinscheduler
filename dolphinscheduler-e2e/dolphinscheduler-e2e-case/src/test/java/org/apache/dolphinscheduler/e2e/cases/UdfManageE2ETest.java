@@ -120,7 +120,7 @@ public class UdfManageE2ETest {
 
         new WebDriverWait(page.driver(), 10)
             .until(ExpectedConditions.urlContains("/resource-manage"));
-        page.createDirectory(testDirectoryName, "test_desc");
+        page.createDirectory(testDirectoryName);
         await().untilAsserted(() -> assertThat(page.udfList())
             .as("File list should contain newly-created file")
             .extracting(WebElement::getText)

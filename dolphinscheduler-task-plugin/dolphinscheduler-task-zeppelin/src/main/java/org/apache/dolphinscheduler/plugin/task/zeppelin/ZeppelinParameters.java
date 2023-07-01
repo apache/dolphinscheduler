@@ -17,19 +17,21 @@
 
 package org.apache.dolphinscheduler.plugin.task.zeppelin;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
@@ -61,9 +63,11 @@ public class ZeppelinParameters extends AbstractParameters {
     }
 
     public ZeppelinTaskExecutionContext generateExtendedContext(ResourceParametersHelper parametersHelper) {
-        DataSourceParameters dataSourceParameters = (DataSourceParameters) parametersHelper.getResourceParameters(ResourceType.DATASOURCE, datasource);
+        DataSourceParameters dataSourceParameters =
+                (DataSourceParameters) parametersHelper.getResourceParameters(ResourceType.DATASOURCE, datasource);
         ZeppelinTaskExecutionContext zeppelinTaskExecutionContext = new ZeppelinTaskExecutionContext();
-        zeppelinTaskExecutionContext.setConnectionParams(Objects.nonNull(dataSourceParameters) ? dataSourceParameters.getConnectionParams() : null);
+        zeppelinTaskExecutionContext.setConnectionParams(
+                Objects.nonNull(dataSourceParameters) ? dataSourceParameters.getConnectionParams() : null);
         return zeppelinTaskExecutionContext;
     }
 

@@ -21,6 +21,7 @@ import static org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUt
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
 
+import org.apache.dolphinscheduler.common.log.SensitiveDataConverter;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
@@ -32,8 +33,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.enums.Flag;
@@ -92,6 +92,11 @@ public class DataxTask extends AbstractTask {
      * select all
      */
     private static final String SELECT_ALL_CHARACTER = "*";
+
+    /**
+     * post jdbc info regex
+     */
+    private static final String POST_JDBC_INFO_REGEX = "(?<=(post jdbc info:)).*(?=)";
     /**
      * datax path
      */
@@ -142,7 +147,7 @@ public class DataxTask extends AbstractTask {
         if (dataXParameters == null || !dataXParameters.checkParameters()) {
             throw new RuntimeException("datax task params is not valid");
         }
-
+        SensitiveDataConverter.addMaskPattern(POST_JDBC_INFO_REGEX);
         dataxTaskExecutionContext =
                 dataXParameters.generateExtendedContext(taskExecutionContext.getResourceParametersHelper());
     }
@@ -224,7 +229,7 @@ public class DataxTask extends AbstractTask {
         }
 
         // replace placeholder
-        json = ParameterUtils.convertParameterPlaceholders(json, ParamUtils.convert(paramsMap));
+        json = ParameterUtils.convertParameterPlaceholders(json, ParameterUtils.convert(paramsMap));
 
         log.debug("datax job json : {}", json);
 
@@ -406,7 +411,7 @@ public class DataxTask extends AbstractTask {
                 jobConfigFilePath;
 
         // replace placeholder
-        String dataxCommand = ParameterUtils.convertParameterPlaceholders(sbr, ParamUtils.convert(paramsMap));
+        String dataxCommand = ParameterUtils.convertParameterPlaceholders(sbr, ParameterUtils.convert(paramsMap));
 
         log.debug("raw script : {}", dataxCommand);
 

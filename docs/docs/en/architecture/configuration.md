@@ -197,7 +197,7 @@ The default configuration is as follows:
 | Parameters | Default value | Description |
 |--|--|--|
 |data.basedir.path | /tmp/dolphinscheduler | local directory used to store temp files|
-|resource.storage.type | NONE | type of resource files: HDFS, S3, OSS, GCS, NONE|
+|resource.storage.type | NONE | type of resource files: HDFS, S3, OSS, GCS, ABS, NONE|
 |resource.upload.path | /dolphinscheduler | storage path of resource files|
 |aws.access.key.id | minioadmin | access key id of S3|
 |aws.secret.access.key | minioadmin | secret access key of S3|
@@ -251,6 +251,9 @@ Location: `api-server/conf/application.yaml`
 |security.authentication.ldap.user.identity-attribute|uid|LDAP user identity attribute|
 |security.authentication.ldap.user.email-attribute|mail|LDAP user email attribute|
 |security.authentication.ldap.user.not-exist-action|CREATE|action when ldap user is not exist,default value: CREATE. Optional values include(CREATE,DENY)|
+|security.authentication.ldap.ssl.enable|false|LDAP switch|
+|security.authentication.ldap.ssl.trust-store|ldapkeystore.jks|LDAP jks file absolute path|
+|security.authentication.ldap.ssl.trust-store-password|password|LDAP jks password|
 |traffic.control.global.switch|false|traffic control global switch|
 |traffic.control.max-global-qps-rate|300|global max request number per second|
 |traffic.control.tenant-switch|false|traffic control tenant switch|

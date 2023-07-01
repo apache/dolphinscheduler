@@ -17,12 +17,14 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.zeppelin.param;
 
-import lombok.Data;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
+import lombok.Data;
+
 @Data
 public class ZeppelinDataSourceParamDTO extends BaseDataSourceParamDTO {
+
     protected String restEndpoint;
 
     @Override

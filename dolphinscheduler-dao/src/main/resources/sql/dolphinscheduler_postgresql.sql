@@ -289,8 +289,6 @@ CREATE TABLE t_ds_datasource (
   connection_params text NOT NULL ,
   create_time timestamp NOT NULL ,
   update_time timestamp DEFAULT NULL ,
-  test_flag   int DEFAULT NULL ,
-  bind_test_id   int DEFAULT NULL ,
   PRIMARY KEY (id),
   CONSTRAINT t_ds_datasource_name_un UNIQUE (name, type)
 ) ;
@@ -321,6 +319,7 @@ CREATE TABLE t_ds_error_command (
   message                   text ,
   process_instance_id       int DEFAULT 0,
   process_definition_version int DEFAULT 0,
+  test_flag                 int DEFAULT NULL ,
   PRIMARY KEY (id)
 );
 
@@ -586,6 +585,26 @@ CREATE TABLE t_ds_project (
 create index user_id_index on t_ds_project (user_id);
 CREATE UNIQUE INDEX unique_name on t_ds_project (name);
 CREATE UNIQUE INDEX unique_code on t_ds_project (code);
+
+--
+-- Table structure for table t_ds_project_parameter
+--
+
+DROP TABLE IF EXISTS t_ds_project_parameter;
+CREATE TABLE t_ds_project_parameter (
+  id int NOT NULL  ,
+  param_name varchar(255) NOT NULL ,
+  param_value varchar(255) NOT NULL ,
+  code bigint NOT NULL,
+  project_code bigint NOT NULL,
+  user_id int DEFAULT NULL ,
+  create_time timestamp DEFAULT CURRENT_TIMESTAMP ,
+  update_time timestamp DEFAULT CURRENT_TIMESTAMP ,
+  PRIMARY KEY (id)
+) ;
+
+CREATE UNIQUE INDEX unique_project_parameter_name on t_ds_project_parameter (project_code, param_name);
+CREATE UNIQUE INDEX unique_project_parameter_code on t_ds_project_parameter (code);
 
 --
 -- Table structure for table t_ds_queue
@@ -975,13 +994,17 @@ DROP SEQUENCE IF EXISTS t_ds_worker_group_id_sequence;
 CREATE SEQUENCE  t_ds_worker_group_id_sequence;
 ALTER TABLE t_ds_worker_group ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_worker_group_id_sequence');
 
+DROP SEQUENCE IF EXISTS t_ds_project_parameter_id_sequence;
+CREATE SEQUENCE  t_ds_project_parameter_id_sequence;
+ALTER TABLE t_ds_project_parameter ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_project_parameter_id_sequence');
+
 -- Records of t_ds_user?user : admin , password : dolphinscheduler123
 INSERT INTO t_ds_user(user_name, user_password, user_type, email, phone, tenant_id, state, create_time, update_time, time_zone)
 VALUES ('admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '-1', 1, '2018-03-27 15:48:50', '2018-10-24 17:40:22', null);
 
 -- Records of t_ds_tenant
 INSERT INTO t_ds_tenant(id, tenant_code, description, queue_id, create_time, update_time)
-VALUES (-1, 'default', 'default tenant', '0', '2018-03-27 15:48:50', '2018-10-24 17:40:22');
+VALUES (-1, 'default', 'default tenant', '1', '2018-03-27 15:48:50', '2018-10-24 17:40:22');
 
 -- Records of t_ds_alertgroup, default admin warning group
 INSERT INTO t_ds_alertgroup(alert_instance_ids, create_user_id, group_name, description, create_time, update_time)
@@ -2000,3 +2023,16 @@ CREATE TABLE t_ds_trigger_relation (
     PRIMARY KEY (id),
     CONSTRAINT t_ds_trigger_relation_unique UNIQUE (trigger_type,job_id,trigger_code)
 );
+
+DROP TABLE IF EXISTS t_ds_relation_sub_workflow;
+CREATE TABLE t_ds_relation_sub_workflow (
+    id        serial      NOT NULL,
+    parent_workflow_instance_id BIGINT NOT NULL,
+    parent_task_code BIGINT NOT NULL,
+    sub_workflow_instance_id BIGINT NOT NULL,
+    PRIMARY KEY (id)
+);
+CREATE INDEX idx_parent_workflow_instance_id ON t_ds_relation_sub_workflow (parent_workflow_instance_id);
+CREATE INDEX idx_parent_task_code ON t_ds_relation_sub_workflow (parent_task_code);
+CREATE INDEX idx_sub_workflow_instance_id ON t_ds_relation_sub_workflow (sub_workflow_instance_id);
+

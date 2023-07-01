@@ -17,12 +17,14 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.zeppelin;
 
-import com.google.auto.service.AutoService;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannelFactory;
 
+import com.google.auto.service.AutoService;
+
 @AutoService(DataSourceChannelFactory.class)
 public class ZeppelinDataSourceChannelFactory implements DataSourceChannelFactory {
+
     @Override
     public DataSourceChannel create() {
         return new ZeppelinDataSourceChannel();

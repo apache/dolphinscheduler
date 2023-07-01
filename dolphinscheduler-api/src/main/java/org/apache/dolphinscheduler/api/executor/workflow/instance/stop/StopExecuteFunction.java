@@ -57,7 +57,7 @@ public class StopExecuteFunction implements ExecuteFunction<StopRequest, StopRes
         workflowInstance.setCommandType(CommandType.STOP);
         workflowInstance.addHistoryCmd(CommandType.STOP);
         workflowInstance.setStateWithDesc(WorkflowExecutionStatus.READY_STOP, CommandType.STOP.getDescp() + " by user");
-        if (processInstanceDao.updateProcessInstance(workflowInstance) > 0) {
+        if (processInstanceDao.updateById(workflowInstance)) {
             log.info("Workflow instance {} ready to stop success, will call master to stop the workflow instance",
                     workflowInstance.getName());
             // todo: Use specific stop command instead of WorkflowStateEventChangeCommand

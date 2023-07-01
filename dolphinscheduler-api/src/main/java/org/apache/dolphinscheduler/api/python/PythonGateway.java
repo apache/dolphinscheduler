@@ -404,7 +404,8 @@ public class PythonGateway {
                 DEFAULT_DRY_RUN,
                 DEFAULT_TEST_FLAG,
                 COMPLEMENT_DEPENDENT_MODE,
-                processDefinition.getVersion());
+                processDefinition.getVersion(),
+                false);
     }
 
     // side object
@@ -449,7 +450,7 @@ public class PythonGateway {
 
     public void updateProject(String userName, Long projectCode, String projectName, String desc) {
         User user = usersService.queryUser(userName);
-        projectService.update(user, projectCode, projectName, desc, userName);
+        projectService.update(user, projectCode, projectName, desc);
     }
 
     public void deleteProject(String userName, Long projectCode) {
