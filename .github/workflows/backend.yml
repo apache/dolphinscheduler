@@ -81,7 +81,7 @@ jobs:
           ./mvnw -B clean install \
                  -Prelease,docker \
                  -Dmaven.test.skip=true \
-                 -Dcheckstyle.skip=true \
+                 -Dspotless.skip=true \
                  -Dhttp.keepAlive=false \
                  -Dmaven.wagon.http.pool=false \
                  -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
