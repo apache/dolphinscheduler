@@ -142,6 +142,10 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/task/datax.html',
                             },
                             {
+                                title: 'Sqoop',
+                                link: '/en-us/docs/dev/user_doc/guide/task/sqoop.html',
+                            },
+                            {
                                 title: 'Pigeon',
                                 link: '/en-us/docs/dev/user_doc/guide/task/pigeon.html',
                             },
@@ -857,6 +861,10 @@ export default {
                             {
                                 title: 'DataX',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/datax.html',
+                            },
+                            {
+                                title: 'Sqoop',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/sqoop.html',
                             },
                             {
                                 title: 'Pigeon',
