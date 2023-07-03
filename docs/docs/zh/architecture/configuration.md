@@ -265,7 +265,7 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn相关的配置�
 |master.heartbeat-interval|10|master心跳间隔,单位为秒|
 |master.task-commit-retry-times|5|任务重试次数|
 |master.task-commit-interval|1000|任务提交间隔,单位为毫秒|
-|master.state-wheel-interval|5|轮询检查状态时间|
+|master.state-wheel-interval|500|轮询检查状态时间,单位为毫秒|
 |master.max-cpu-load-avg|-1|master最大cpuload均值,只有高于系统cpuload均值时,master服务才能调度任务. 默认值为-1: cpu cores * 2|
 |master.reserved-memory|0.3|master预留内存,只有低于系统可用内存时,master服务才能调度任务,单位为G|
 |master.failover-interval|10|failover间隔，单位为分钟|

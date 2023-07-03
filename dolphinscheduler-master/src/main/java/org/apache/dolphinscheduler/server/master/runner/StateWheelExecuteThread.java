@@ -401,7 +401,7 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
                 .type(StateEventType.TASK_STATE_CHANGE)
                 .status(TaskExecutionStatus.RUNNING_EXECUTION)
                 .build();
-        workflowExecuteThreadPool.submitStateEvent(stateEvent);
+        workflowExecuteThreadPool.submitStateEvent(stateEvent, false);
     }
 
     private void addProcessStopEvent(ProcessInstance processInstance) {

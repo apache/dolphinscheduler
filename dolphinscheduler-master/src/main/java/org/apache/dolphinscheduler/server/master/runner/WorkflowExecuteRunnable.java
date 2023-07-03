@@ -331,6 +331,17 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
         return true;
     }
 
+    public boolean addUniqueStateEvent(StateEvent stateEvent) {
+        if (processInstance.getId() != stateEvent.getProcessInstanceId()) {
+            logger.info("state event would be abounded :{}", stateEvent);
+            return false;
+        }
+        if (!stateEvents.contains(stateEvent)) {
+            this.stateEvents.add(stateEvent);
+        }
+        return true;
+    }
+
     public int eventSize() {
         return this.stateEvents.size();
     }

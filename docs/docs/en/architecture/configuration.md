@@ -270,7 +270,7 @@ Location: `master-server/conf/application.yaml`
 |master.heartbeat-interval|10|master heartbeat interval, the unit is second|
 |master.task-commit-retry-times|5|master commit task retry times|
 |master.task-commit-interval|1000|master commit task interval, the unit is millisecond|
-|master.state-wheel-interval|5|time to check status|
+|master.state-wheel-interval|500|time to check status, the unit is millisecond|
 |master.max-cpu-load-avg|-1|master max CPU load avg, only higher than the system CPU load average, master server can schedule. default value -1: the number of CPU cores * 2|
 |master.reserved-memory|0.3|master reserved memory, only lower than system available memory, master server can schedule. default value 0.3, the unit is G|
 |master.failover-interval|10|failover interval, the unit is minute|

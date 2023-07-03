@@ -86,6 +86,10 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
      * submit state event
      */
     public void submitStateEvent(StateEvent stateEvent) {
+        submitStateEvent(stateEvent, true);
+    }
+
+    public void submitStateEvent(StateEvent stateEvent, boolean redundancyAllowed) {
         WorkflowExecuteRunnable workflowExecuteThread =
                 processInstanceExecCacheManager.getByProcessInstanceId(stateEvent.getProcessInstanceId());
         if (workflowExecuteThread == null) {
@@ -93,7 +97,11 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
                     stateEvent);
             return;
         }
-        workflowExecuteThread.addStateEvent(stateEvent);
+        if (redundancyAllowed) {
+            workflowExecuteThread.addStateEvent(stateEvent);
+        } else {
+            workflowExecuteThread.addUniqueStateEvent(stateEvent);
+        }
         logger.info("Submit state event success, stateEvent: {}", stateEvent);
     }
 
