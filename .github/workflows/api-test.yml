@@ -67,7 +67,7 @@ jobs:
           ./mvnw -B clean install \
           -Dmaven.test.skip \
           -Dmaven.javadoc.skip \
-          -Dcheckstyle.skip=true \
+          -Dspotless.skip=true \
           -Pdocker,release -Ddocker.tag=ci \
           -pl dolphinscheduler-standalone-server -am
       - name: Export Docker Images
@@ -118,7 +118,7 @@ jobs:
         run: |
           ./mvnw -B -f dolphinscheduler-api-test/pom.xml -am \
             -DfailIfNoTests=false \
-            -Dcheckstyle.skip=false \
+            -Dspotless.skip=false \
             -Dtest=${{ matrix.case.class }} test
       - uses: actions/upload-artifact@v2
         if: always()
