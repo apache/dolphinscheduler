@@ -86,7 +86,7 @@ public class ZeppelinTask extends AbstractRemoteTask {
         zeppelinTaskExecutionContext =
                 zeppelinParameters.generateExtendedContext(taskExecutionContext.getResourceParametersHelper());
         zeppelinConnectionParam = (ZeppelinConnectionParam) DataSourceUtils
-                .buildConnectionParams(DbType.valueOf("ZEPPELIN"), zeppelinTaskExecutionContext.getConnectionParams());
+                .buildConnectionParams(DbType.valueOf(zeppelinParameters.getType()), zeppelinTaskExecutionContext.getConnectionParams());
         zeppelinParameters.setUsername(zeppelinConnectionParam.getUsername());
         zeppelinParameters.setPassword(zeppelinConnectionParam.getPassword());
         zeppelinParameters.setRestEndpoint(zeppelinConnectionParam.getRestEndpoint());
