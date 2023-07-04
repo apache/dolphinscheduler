@@ -16,8 +16,6 @@
  */
 package org.apache.dolphinscheduler.plugin.doris.param;
 
-import com.google.auto.service.AutoService;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -28,10 +26,17 @@ import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
+import org.apache.commons.collections4.MapUtils;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.google.auto.service.AutoService;
 @AutoService(DataSourceProcessor.class)
 public class DorisDataSourceProcessor extends AbstractDataSourceProcessor {
 
@@ -55,11 +60,10 @@ public class DorisDataSourceProcessor extends AbstractDataSourceProcessor {
 
         dorisDataSourceParamDTO.setPort(Integer.parseInt(hostPortArrays[0].split(Constants.COLON)[1]));
 
-        for (int i = 0; i < hostPortArrays.length; i++){
+        for (int i = 0; i < hostPortArrays.length; i++) {
             hostPortArrays[i] = hostPortArrays[i].split(Constants.COLON)[0];
         }
         dorisDataSourceParamDTO.setHost(String.join(",", hostPortArrays));
-
 
         return dorisDataSourceParamDTO;
     }
@@ -69,7 +73,7 @@ public class DorisDataSourceProcessor extends AbstractDataSourceProcessor {
         DorisDataSourceParamDTO mysqlDatasourceParam = (DorisDataSourceParamDTO) datasourceParam;
         String[] hosts = datasourceParam.getHost().split(Constants.COMMA);
 
-        for (int i = 0; i < hosts.length; i++){
+        for (int i = 0; i < hosts.length; i++) {
             hosts[i] = String.format(Constants.FORMAT_S_S_COLON, hosts[i], mysqlDatasourceParam.getPort());
         }
 
@@ -146,6 +150,5 @@ public class DorisDataSourceProcessor extends AbstractDataSourceProcessor {
         otherMap.forEach((key, value) -> otherList.add(String.format("%s=%s", key, value)));
         return String.join("&", otherList);
     }
-
 
 }

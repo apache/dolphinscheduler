@@ -20,8 +20,8 @@ import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSource
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-
 public class DorisDataSourceClient extends CommonDataSourceClient {
+
     public DorisDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
         super(baseConnectionParam, dbType);
     }

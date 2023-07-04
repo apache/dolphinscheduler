@@ -20,15 +20,16 @@ package org.apache.dolphinscheduler.plugin.doris.param;
 import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @ExtendWith(MockitoExtension.class)
 public class DorisDataSourceProcessorTest {
@@ -55,8 +56,6 @@ public class DorisDataSourceProcessorTest {
             Assertions.assertEquals("jdbc:mysql:loadbalance://localhost:3306/default", connectionParams.getJdbcUrl());
         }
 
-
-
         dorisDatasourceParamDTO.setUserName("root");
         dorisDatasourceParamDTO.setPassword("123456");
         dorisDatasourceParamDTO.setHost("localhost,localhost1");
@@ -67,8 +66,10 @@ public class DorisDataSourceProcessorTest {
             Mockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
             DorisConnectionParam connectionParams = (DorisConnectionParam) dorisDatasourceProcessor
                     .createConnectionParams(dorisDatasourceParamDTO);
-            Assertions.assertEquals("jdbc:mysql:loadbalance://localhost:3306,localhost1:3306", connectionParams.getAddress());
-            Assertions.assertEquals("jdbc:mysql:loadbalance://localhost:3306,localhost1:3306/default", connectionParams.getJdbcUrl());
+            Assertions.assertEquals("jdbc:mysql:loadbalance://localhost:3306,localhost1:3306",
+                    connectionParams.getAddress());
+            Assertions.assertEquals("jdbc:mysql:loadbalance://localhost:3306,localhost1:3306/default",
+                    connectionParams.getJdbcUrl());
         }
     }
 
@@ -91,7 +92,8 @@ public class DorisDataSourceProcessorTest {
     @Test
     public void testGetJdbcUrl() {
         DorisConnectionParam dorisConnectionParam = new DorisConnectionParam();
-        dorisConnectionParam.setJdbcUrl("jdbc:mysql://localhost:3306/default?allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false");
+        dorisConnectionParam.setJdbcUrl(
+                "jdbc:mysql://localhost:3306/default?allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false");
         Assertions.assertEquals(
                 "jdbc:mysql://localhost:3306/default?allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false",
                 dorisDatasourceProcessor.getJdbcUrl(dorisConnectionParam));

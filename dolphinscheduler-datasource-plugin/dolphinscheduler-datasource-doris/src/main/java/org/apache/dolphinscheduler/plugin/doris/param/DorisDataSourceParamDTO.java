@@ -19,8 +19,8 @@ package org.apache.dolphinscheduler.plugin.doris.param;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-
 public class DorisDataSourceParamDTO extends BaseDataSourceParamDTO {
+
     @Override
     public String toString() {
         return "DorisDataSourceParamDTO{"

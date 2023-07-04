@@ -27,17 +27,18 @@ import org.apache.dolphinscheduler.plugin.doris.param.DorisConnectionParam;
 import org.apache.dolphinscheduler.plugin.doris.param.DorisDataSourceParamDTO;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
+
+import java.sql.Connection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.sql.Connection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 @ExtendWith(MockitoExtension.class)
 public class DataSourceUtilsTest {
@@ -54,7 +55,7 @@ public class DataSourceUtilsTest {
         dorisDatasourceParamDTO.setOther(other);
         DataSourceUtils.checkDatasourceParam(dorisDatasourceParamDTO);
         Assertions.assertTrue(true);
-        Assertions.assertEquals("localhost,localhost1",dorisDatasourceParamDTO.getHost());
+        Assertions.assertEquals("localhost,localhost1", dorisDatasourceParamDTO.getHost());
     }
 
     @Test

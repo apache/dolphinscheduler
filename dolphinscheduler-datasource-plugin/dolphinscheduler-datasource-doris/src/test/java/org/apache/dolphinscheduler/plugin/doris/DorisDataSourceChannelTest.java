@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.doris;
 
 import org.apache.dolphinscheduler.plugin.doris.param.DorisConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
