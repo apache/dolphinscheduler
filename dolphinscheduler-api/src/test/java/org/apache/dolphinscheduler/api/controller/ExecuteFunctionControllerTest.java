@@ -246,7 +246,7 @@ public class ExecuteFunctionControllerTest extends AbstractControllerTest {
                 eq(scheduleTime), eq(null), eq(failureStrategy), eq(null), eq(null), eq(warningType),
                 eq(null), eq(null), eq(null), eq("default"), eq("default"), eq(-1L),
                 eq(Constants.MAX_TASK_TIMEOUT), eq(null), eq(null), eq(0), eq(0),
-                eq(complementDependentMode), eq(version), eq(allLevelDependent), eq(executionOrder)))
+                eq(complementDependentMode), eq(version), eq(allLevelDependent), eq(null)))
                         .thenReturn(executeServiceResult);
 
         // When
