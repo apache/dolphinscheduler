@@ -64,12 +64,13 @@ type IFormRules =
 
 interface IJsonItemParams {
   field: string
-  name?: string
+  name?: string | VNode
   props?: any
   title?: string
   type?: IType
-  validate?: IFormItemRule
+  validate?: FormItemRule
   value?: any
+  showRequireMark?: boolean
   options?: IOption[] | Ref<IOption[]>
   children?: IJsonItem[]
   slots?: object
@@ -77,7 +78,9 @@ interface IJsonItemParams {
   widget?: any
   class?: string
   path?: string
-  rule?: IFormItemRule
+  rule?: FormItemRule
+  content?: string
+  showFeedback?: boolean
 }
 
 type IJsonItemFn = (i?: number) => IJsonItemParams
