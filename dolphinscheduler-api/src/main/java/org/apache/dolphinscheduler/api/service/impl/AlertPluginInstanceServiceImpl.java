@@ -229,15 +229,16 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
     }
 
     private List<AlertPluginInstanceVO> buildPluginInstanceVOList(List<AlertPluginInstance> alertPluginInstances) {
+        List<AlertPluginInstanceVO> alertPluginInstanceVOS = new ArrayList<>();
         if (CollectionUtils.isEmpty(alertPluginInstances)) {
-            return null;
+            return alertPluginInstanceVOS;
         }
         List<PluginDefine> pluginDefineList = pluginDefineMapper.queryAllPluginDefineList();
         if (CollectionUtils.isEmpty(pluginDefineList)) {
-            return null;
+            return alertPluginInstanceVOS;
         }
-        Map<Integer, PluginDefine> pluginDefineMap = pluginDefineList.stream().collect(Collectors.toMap(PluginDefine::getId, Function.identity()));
-        List<AlertPluginInstanceVO> alertPluginInstanceVOS = new ArrayList<>();
+        Map<Integer, PluginDefine> pluginDefineMap =
+                pluginDefineList.stream().collect(Collectors.toMap(PluginDefine::getId, Function.identity()));
         alertPluginInstances.forEach(alertPluginInstance -> {
             AlertPluginInstanceVO alertPluginInstanceVO = new AlertPluginInstanceVO();
 
