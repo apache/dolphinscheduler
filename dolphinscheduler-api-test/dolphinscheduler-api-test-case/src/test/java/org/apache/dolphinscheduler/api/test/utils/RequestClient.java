@@ -103,22 +103,16 @@ public class RequestClient {
         }
 
         String requestUrl = String.format("%s%s", Constants.DOLPHINSCHEDULER_API_URL, url);
-
         headers.put("Content-Type", Constants.REQUEST_CONTENT_TYPE);
-
         Headers headersBuilder = Headers.of(headers);
-
         RequestBody requestBody = FormBody.create(MediaType.parse(Constants.REQUEST_CONTENT_TYPE), getParams(params));
-
         log.info("POST request to {}, Headers: {}, Params: {}", requestUrl, headersBuilder, params);
         Request request = new Request.Builder()
             .headers(headersBuilder)
             .url(requestUrl)
             .post(requestBody)
             .build();
-
         Response response = this.httpClient.newCall(request).execute();
-
         int responseCode = response.code();
         HttpResponseBody responseData = null;
         if (response.body() != null) {
@@ -132,6 +126,38 @@ public class RequestClient {
 
         return httpResponse;
     }
+
+    @SneakyThrows
+    public HttpResponse put(String url, Map<String, String> headers, Map<String, Object> params) {
+        if (headers == null) {
+            headers = new HashMap<>();
+        }
+
+        String requestUrl = String.format("%s%s", Constants.DOLPHINSCHEDULER_API_URL, url);
+        headers.put("Content-Type", Constants.REQUEST_CONTENT_TYPE);
+        Headers headersBuilder = Headers.of(headers);
+        RequestBody requestBody = FormBody.create(MediaType.parse(Constants.REQUEST_CONTENT_TYPE), getParams(params));
+        log.info("PUT request to {}, Headers: {}, Params: {}", requestUrl, headersBuilder, params);
+        Request request = new Request.Builder()
+            .headers(headersBuilder)
+            .url(requestUrl)
+            .put(requestBody)
+            .build();
+        Response response = this.httpClient.newCall(request).execute();
+        int responseCode = response.code();
+        HttpResponseBody responseData = null;
+        if (response.body() != null) {
+            responseData = JSONUtils.parseObject(response.body().string(), HttpResponseBody.class);
+        }
+        response.close();
+
+        HttpResponse httpResponse = new HttpResponse(responseCode, responseData);
+
+        log.info("PUT response: {}", httpResponse);
+
+        return httpResponse;
+    }
+
 
     @SneakyThrows
     public HttpResponse delete(String url, Map<String, String> headers, Map<String, Object> params) {

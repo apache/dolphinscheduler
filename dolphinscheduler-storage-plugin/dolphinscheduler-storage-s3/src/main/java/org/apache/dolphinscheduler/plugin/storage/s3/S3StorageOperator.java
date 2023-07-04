@@ -494,7 +494,6 @@ public class S3StorageOperator implements Closeable, StorageOperate {
                     entity.setFileName(fileName);
                     entity.setFullName(summary.getKey());
                     entity.setDirectory(false);
-                    entity.setDescription("");
                     entity.setUserName(tenantCode);
                     entity.setType(type);
                     entity.setSize(summary.getSize());
@@ -516,7 +515,6 @@ public class S3StorageOperator implements Closeable, StorageOperate {
                 entity.setFileName(fileName);
                 entity.setFullName(commonPrefix);
                 entity.setDirectory(true);
-                entity.setDescription("");
                 entity.setUserName(tenantCode);
                 entity.setType(type);
                 entity.setSize(0);
@@ -565,7 +563,6 @@ public class S3StorageOperator implements Closeable, StorageOperate {
             entity.setFileName(fileName);
             entity.setFullName(path);
             entity.setDirectory(true);
-            entity.setDescription("");
             entity.setUserName(tenantCode);
             entity.setType(type);
             entity.setSize(0);
@@ -585,7 +582,6 @@ public class S3StorageOperator implements Closeable, StorageOperate {
                 entity.setFileName(fileName);
                 entity.setFullName(summary.getKey());
                 entity.setDirectory(false);
-                entity.setDescription("");
                 entity.setUserName(tenantCode);
                 entity.setType(type);
                 entity.setSize(summary.getSize());

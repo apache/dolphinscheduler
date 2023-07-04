@@ -142,6 +142,10 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/task/datax.html',
                             },
                             {
+                                title: 'Sqoop',
+                                link: '/en-us/docs/dev/user_doc/guide/task/sqoop.html',
+                            },
+                            {
                                 title: 'Pigeon',
                                 link: '/en-us/docs/dev/user_doc/guide/task/pigeon.html',
                             },
@@ -347,6 +351,10 @@ export default {
                                 title: 'Databend',
                                 link: '/en-us/docs/dev/user_doc/guide/datasource/databend.html',
                             },
+                            {
+                                title: 'HANA',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/hana.html',
+                            }
                         ],
                     },
                     {
@@ -855,6 +863,10 @@ export default {
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/datax.html',
                             },
                             {
+                                title: 'Sqoop',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/sqoop.html',
+                            },
+                            {
                                 title: 'Pigeon',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/pigeon.html',
                             },
@@ -1044,6 +1056,10 @@ export default {
                                 title: 'Databend',
                                 link: '/zh-cn/docs/dev/user_doc/guide/datasource/databend.html',
                             },
+                            {
+                                title: 'HANA',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/hana.html',
+                            }
                         ],
                     },
                     {

@@ -573,6 +573,7 @@ export default {
     add_pre_task_check_condition: '添加前置检查条件',
     switch_condition: '条件',
     switch_branch_flow: '分支流转',
+    switch_branch_flow_default: '默认分支流转',
     switch_branch_flow_tips: '请选择分支流转',
     and: '且',
     or: '或',
