@@ -58,7 +58,7 @@ export default {
       name: 'projects-parameter',
       component: components['projects-parameter'],
       meta: {
-        title: '项目级变量',
+        title: '项目级参数',
         activeMenu: 'projects',
         showSide: true,
         auth: []
