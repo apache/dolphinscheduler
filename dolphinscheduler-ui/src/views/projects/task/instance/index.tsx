@@ -24,7 +24,6 @@ import StreamTaskInstance from './stream-task'
 import type { Router } from 'vue-router'
 
 
-
 const TaskDefinition = defineComponent({
   name: 'task-instance',
   setup() {

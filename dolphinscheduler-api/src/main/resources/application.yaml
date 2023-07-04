@@ -146,7 +146,7 @@ python-gateway:
 
 security:
   authentication:
-    # Authentication types (supported types: PASSWORD,LDAP)
+    # Authentication types (supported types: PASSWORD,LDAP,CASDOOR_SSO)
     type: PASSWORD
     # IF you set type `LDAP`, below config will be effective
     ldap:
@@ -162,6 +162,11 @@ security:
         email-attribute: mail
         # action when ldap user is not exist (supported types: CREATE,DENY)
         not-exist-action: CREATE
+      ssl:
+        enable: false
+        # jks file absolute path && password
+        trust-store: "/ldapkeystore.jks"
+        trust-store-password: "password"
 
 # Traffic control, if you turn on this config, the maximum number of request/s will be limited.
 # global max request number per second

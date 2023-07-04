@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
-import org.apache.dolphinscheduler.plugin.task.api.utils.FileUtils;
+import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ShellUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -29,6 +29,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.Objects;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
 
@@ -114,6 +115,15 @@ public class ShellCommandExecutor extends AbstractCommandExecutor {
             }
             if (StringUtils.isNotBlank(taskRequest.getEnvironmentConfig())) {
                 sb.append(taskRequest.getEnvironmentConfig()).append(System.lineSeparator());
+            }
+            if (Objects.nonNull(taskRequest.getK8sTaskExecutionContext())) {
+                String configYaml = taskRequest.getK8sTaskExecutionContext().getConfigYaml();
+                Path kubeConfigPath = Paths.get(org.apache.dolphinscheduler.common.utils.FileUtils
+                        .getKubeConfigPath(taskRequest.getExecutePath()));
+                FileUtils.createFileWith755(kubeConfigPath);
+                Files.write(kubeConfigPath, configYaml.getBytes(), StandardOpenOption.APPEND);
+                sb.append("export KUBECONFIG=" + kubeConfigPath).append(System.lineSeparator());
+                logger.info("Create kubernetes configuration file: {}.", kubeConfigPath);
             }
         }
         sb.append(execCommand);

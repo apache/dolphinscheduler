@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.flink;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
@@ -38,7 +39,7 @@ public class FlinkArgsUtilsTest {
         flinkParameters.setParallelism(4);
         ResourceInfo resourceInfo = new ResourceInfo();
         resourceInfo.setId(1);
-        resourceInfo.setResourceName("job");
+        resourceInfo.setResourceName("/opt/job.jar");
         resourceInfo.setRes("/opt/job.jar");
         flinkParameters.setMainJar(resourceInfo);
         flinkParameters.setMainClass("org.example.Main");
@@ -53,6 +54,9 @@ public class FlinkArgsUtilsTest {
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
         taskExecutionContext.setTaskAppId("app-id");
         taskExecutionContext.setExecutePath("/tmp/execution");
+        HashMap<String, String> map = new HashMap<>();
+        map.put("/opt/job.jar", "/opt/job.jar");
+        taskExecutionContext.setResources(map);
         return taskExecutionContext;
     }
 

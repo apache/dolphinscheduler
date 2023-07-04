@@ -21,10 +21,9 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.stream.StreamTask;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -58,7 +57,6 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
             throw new RuntimeException("flink task params is not valid");
         }
         flinkParameters.setQueue(taskExecutionContext.getQueue());
-        setMainJarName();
 
         FileUtils.generateScriptFile(taskExecutionContext, flinkParameters);
     }
@@ -78,14 +76,6 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
 
         log.info("flink task command : {}", command);
         return command;
-    }
-
-    @Override
-    protected void setMainJarName() {
-        ResourceInfo mainJar = flinkParameters.getMainJar();
-        String resourceName = getResourceNameOfMainJar(mainJar);
-        mainJar.setRes(resourceName);
-        flinkParameters.setMainJar(mainJar);
     }
 
     @Override

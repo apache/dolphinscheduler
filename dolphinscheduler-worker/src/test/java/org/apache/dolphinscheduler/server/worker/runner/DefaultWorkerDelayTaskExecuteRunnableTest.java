@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
+import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcClient;
 
@@ -46,6 +47,8 @@ public class DefaultWorkerDelayTaskExecuteRunnableTest {
 
     private StorageOperate storageOperate = Mockito.mock(StorageOperate.class);
 
+    private WorkerRegistryClient workerRegistryClient = Mockito.mock(WorkerRegistryClient.class);
+
     @Test
     public void testDryRun() {
         TaskExecutionContext taskExecutionContext = TaskExecutionContext.builder()
@@ -53,16 +56,15 @@ public class DefaultWorkerDelayTaskExecuteRunnableTest {
                 .taskInstanceId(0)
                 .processDefineId(0)
                 .firstSubmitTime(System.currentTimeMillis())
-                .taskLogName("TestLogName")
                 .build();
         WorkerTaskExecuteRunnable workerTaskExecuteRunnable = new DefaultWorkerDelayTaskExecuteRunnable(
                 taskExecutionContext,
                 workerConfig,
-                masterAddress,
                 workerMessageSender,
                 alertClientService,
                 taskPluginManager,
-                storageOperate);
+                storageOperate,
+                workerRegistryClient);
 
         Assertions.assertAll(workerTaskExecuteRunnable::run);
         Assertions.assertEquals(TaskExecutionStatus.SUCCESS, taskExecutionContext.getCurrentExecutionStatus());
@@ -76,7 +78,6 @@ public class DefaultWorkerDelayTaskExecuteRunnableTest {
                 .taskInstanceId(0)
                 .processDefineId(0)
                 .firstSubmitTime(System.currentTimeMillis())
-                .taskLogName("TestLogName")
                 .taskType("SQL")
                 .taskParams(
                         "{\"localParams\":[],\"resourceList\":[],\"type\":\"POSTGRESQL\",\"datasource\":null,\"sql\":\"select * from t_ds_user\",\"sqlType\":\"0\",\"preStatements\":[],\"postStatements\":[],\"segmentSeparator\":\"\",\"displayRows\":10,\"conditionResult\":\"null\",\"dependence\":\"null\",\"switchResult\":\"null\",\"waitStartTimeout\":null}")
@@ -84,11 +85,11 @@ public class DefaultWorkerDelayTaskExecuteRunnableTest {
         WorkerTaskExecuteRunnable workerTaskExecuteRunnable = new DefaultWorkerDelayTaskExecuteRunnable(
                 taskExecutionContext,
                 workerConfig,
-                masterAddress,
                 workerMessageSender,
                 alertClientService,
                 taskPluginManager,
-                storageOperate);
+                storageOperate,
+                workerRegistryClient);
 
         Assertions.assertAll(workerTaskExecuteRunnable::run);
         Assertions.assertEquals(TaskExecutionStatus.FAILURE, taskExecutionContext.getCurrentExecutionStatus());

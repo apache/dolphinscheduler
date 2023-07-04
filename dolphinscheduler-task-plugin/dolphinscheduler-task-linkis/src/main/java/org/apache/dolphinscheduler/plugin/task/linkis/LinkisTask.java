@@ -29,8 +29,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -102,7 +101,7 @@ public class LinkisTask extends AbstractRemoteTask {
         try {
             // construct process
             String command = buildCommand();
-            TaskResponse commandExecuteResult = shellCommandExecutor.run(command);
+            TaskResponse commandExecuteResult = shellCommandExecutor.run(command, null);
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
             setAppIds(findTaskId(commandExecuteResult.getResultString()));
             setProcessId(commandExecuteResult.getProcessId());
@@ -128,7 +127,7 @@ public class LinkisTask extends AbstractRemoteTask {
             args.add(Constants.STATUS_OPTIONS);
             args.add(taskId);
             String command = String.join(Constants.SPACE, args);
-            TaskResponse commandExecuteResult = shellCommandExecutor.run(command);
+            TaskResponse commandExecuteResult = shellCommandExecutor.run(command, null);
             String status = findStatus(commandExecuteResult.getResultString());
             LinkisJobStatus jobStatus = LinkisJobStatus.convertFromJobStatusString(status);
             switch (jobStatus) {
@@ -161,7 +160,7 @@ public class LinkisTask extends AbstractRemoteTask {
             args.add(Constants.KILL_OPTIONS);
             args.add(taskId);
             String command = String.join(Constants.SPACE, args);
-            shellCommandExecutor.run(command);
+            shellCommandExecutor.run(command, null);
             setExitStatusCode(EXIT_CODE_KILL);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -250,8 +249,7 @@ public class LinkisTask extends AbstractRemoteTask {
     }
 
     private String parseScript(String script) {
-        // combining local and global parameters
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
-        return ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
+        return ParameterUtils.convertParameterPlaceholders(script, ParameterUtils.convert(paramsMap));
     }
 }

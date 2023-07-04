@@ -20,9 +20,9 @@ on:
   push:
     branches:
       - dev
-
-env:
-  HUB: ghcr.io/apache/dolphinscheduler
+  release:
+    types:
+      - released
 
 jobs:
   build:
@@ -34,17 +34,32 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v2
+      - name: Set environment variables
+        run: |
+          if [[ ${{ github.event_name }} == "release" ]]; then
+            echo "HUB=registry-1.docker.io/apache" >> $GITHUB_ENV
+            echo "DOCKER_REGISTRY=docker.io" >> $GITHUB_ENV
+            echo "DOCKER_USERNAME=${{ secrets.DOCKERHUB_USER }}" >> $GITHUB_ENV
+            echo "DOCKER_PASSWORD=${{ secrets.DOCKERHUB_TOKEN }}" >> $GITHUB_ENV
+          else
+            echo "HUB=ghcr.io/apache/dolphinscheduler" >> $GITHUB_ENV
+            echo "DOCKER_REGISTRY=ghcr.io/apache/dolphinscheduler" >> $GITHUB_ENV
+            echo "DOCKER_USERNAME=${{ github.actor }}" >> $GITHUB_ENV
+            echo "DOCKER_PASSWORD=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
+          fi
       - name: Log in to the Container registry
-        uses: docker/login-action@v1.10.0
+        uses: docker/login-action@v2
         with:
-          registry: ${{ env.HUB }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: ${{ env.DOCKER_REGISTRY }}
+          username: ${{ env.DOCKER_USERNAME }}
+          password: ${{ env.DOCKER_PASSWORD }}
       - name: Publish Helm Chart
         working-directory: deploy/kubernetes
         run: |
-          VERSION=0.0.0-$(git rev-parse --short HEAD)
-          sed -i "s/^version: .*/version: $VERSION/" dolphinscheduler/Chart.yaml
+          if [[ ${{ env.HUB }} == "ghcr.io/apache/dolphinscheduler" ]]; then
+            VERSION=0.0.0-$(git rev-parse --short HEAD)
+            sed -i "s/^version: .*/version: $VERSION/" dolphinscheduler/Chart.yaml
+          fi
           helm dep up dolphinscheduler
           helm package dolphinscheduler
-          helm push dolphinscheduler-helm-$VERSION.tgz oci://${{ env.HUB }}
+          helm push dolphinscheduler-helm-*.tgz oci://${{ env.HUB }}

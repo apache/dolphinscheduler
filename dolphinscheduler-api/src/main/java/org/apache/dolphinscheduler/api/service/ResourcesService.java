@@ -40,7 +40,6 @@ public interface ResourcesService {
      *
      * @param loginUser login user
      * @param name alias
-     * @param description description
      * @param type type
      * @param pid parent id
      * @param currentDir current directory
@@ -48,7 +47,6 @@ public interface ResourcesService {
      */
     Result<Object> createDirectory(User loginUser,
                                    String name,
-                                   String description,
                                    ResourceType type,
                                    int pid,
                                    String currentDir);
@@ -58,7 +56,6 @@ public interface ResourcesService {
      *
      * @param loginUser login user
      * @param name alias
-     * @param desc description
      * @param type type
      * @param file file
      * @param currentDir current directory
@@ -66,7 +63,6 @@ public interface ResourcesService {
      */
     Result<Object> createResource(User loginUser,
                                   String name,
-                                  String desc,
                                   ResourceType type,
                                   MultipartFile file,
                                   String currentDir);
@@ -75,7 +71,6 @@ public interface ResourcesService {
      * update resource
      * @param loginUser     login user
      * @param name          name
-     * @param desc          description
      * @param type          resource type
      * @param file          resource file
      * @return  update result code
@@ -84,7 +79,6 @@ public interface ResourcesService {
                                   String fullName,
                                   String tenantCode,
                                   String name,
-                                  String desc,
                                   ResourceType type,
                                   MultipartFile file);
 
@@ -163,12 +157,11 @@ public interface ResourcesService {
      * @param type resource type
      * @param fileName file name
      * @param fileSuffix file suffix
-     * @param desc description
      * @param content content
      * @return create result code
      */
     Result<Object> onlineCreateResource(User loginUser, ResourceType type, String fileName, String fileSuffix,
-                                        String desc, String content, String currentDirectory);
+                                        String content, String currentDirectory);
 
     /**
      * create or update resource.
@@ -270,5 +263,14 @@ public interface ResourcesService {
      */
     Result<Object> queryResourceByFullName(User loginUser, String fullName, String tenantCode,
                                            ResourceType type) throws IOException;
+
+    /**
+     * get resource base dir
+     *
+     * @param loginUser login user
+     * @param type      resource type
+     * @return
+     */
+    Result<Object> queryResourceBaseDir(User loginUser, ResourceType type);
 
 }

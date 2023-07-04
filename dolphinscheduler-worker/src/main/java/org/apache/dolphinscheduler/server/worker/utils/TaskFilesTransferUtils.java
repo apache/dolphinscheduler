@@ -23,7 +23,6 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
@@ -40,16 +39,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.zeroturnaround.zip.ZipUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+@Slf4j
 public class TaskFilesTransferUtils {
-
-    protected final static Logger log = LoggerFactory
-            .getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, TaskFilesTransferUtils.class));
 
     // tmp path in local path for transfer
     final static String DOWNLOAD_TMP = ".DT_TMP";
@@ -104,9 +101,9 @@ public class TaskFilesTransferUtils {
             try {
                 // upload file to storage
                 String resourceWholePath =
-                        storageOperate.getResourceFileName(taskExecutionContext.getTenantCode(), resourcePath);
+                        storageOperate.getResourceFullName(taskExecutionContext.getTenantCode(), resourcePath);
                 String resourceCRCWholePath =
-                        storageOperate.getResourceFileName(taskExecutionContext.getTenantCode(), resourceCRCPath);
+                        storageOperate.getResourceFullName(taskExecutionContext.getTenantCode(), resourceCRCPath);
                 log.info("{} --- Local:{} to Remote:{}", property, srcPath, resourceWholePath);
                 storageOperate.upload(taskExecutionContext.getTenantCode(), srcPath, resourceWholePath, false, true);
                 log.info("{} --- Local:{} to Remote:{}", "CRC file", srcCRCPath, resourceCRCWholePath);
@@ -179,10 +176,9 @@ public class TaskFilesTransferUtils {
 
             try {
                 String resourceWholePath =
-                        storageOperate.getResourceFileName(taskExecutionContext.getTenantCode(), resourcePath);
+                        storageOperate.getResourceFullName(taskExecutionContext.getTenantCode(), resourcePath);
                 log.info("{} --- Remote:{} to Local:{}", property, resourceWholePath, downloadPath);
-                storageOperate.download(taskExecutionContext.getTenantCode(), resourceWholePath, downloadPath, false,
-                        true);
+                storageOperate.download(taskExecutionContext.getTenantCode(), resourceWholePath, downloadPath, true);
             } catch (IOException ex) {
                 throw new TaskException("Download file from storage error", ex);
             }

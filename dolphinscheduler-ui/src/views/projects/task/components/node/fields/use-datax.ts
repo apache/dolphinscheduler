@@ -102,7 +102,6 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
   const destinationDatasourceSpan = ref(8)
   const otherStatementSpan = ref(22)
   const jobSpeedSpan = ref(12)
-  const customParameterSpan = ref(0)
   const useResourcesSpan = ref(0)
 
   const initConstants = () => {
@@ -113,7 +112,6 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       destinationDatasourceSpan.value = 0
       otherStatementSpan.value = 0
       jobSpeedSpan.value = 0
-      customParameterSpan.value = 24
       useResourcesSpan.value = 24
     } else {
       sqlEditorSpan.value = 24
@@ -122,7 +120,6 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       destinationDatasourceSpan.value = 8
       otherStatementSpan.value = 22
       jobSpeedSpan.value = 12
-      customParameterSpan.value = 0
       useResourcesSpan.value = 0
     }
   }
@@ -132,6 +129,7 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
     'ORACLE',
     'SQLSERVER',
     'CLICKHOUSE',
+    'DATABEND',
     'HIVE',
     'PRESTO'
   ]
@@ -236,49 +234,6 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       span: jobSpeedSpan,
       options: jobSpeedRecordOptions,
       value: 1000
-    },
-    {
-      type: 'custom-parameters',
-      field: 'localParams',
-      name: t('project.node.custom_parameters'),
-      span: customParameterSpan,
-      children: [
-        {
-          type: 'input',
-          field: 'prop',
-          span: 10,
-          props: {
-            placeholder: t('project.node.prop_tips'),
-            maxLength: 256
-          },
-          validate: {
-            trigger: ['input', 'blur'],
-            required: true,
-            validator(validate: any, value: string) {
-              if (!value) {
-                return new Error(t('project.node.prop_tips'))
-              }
-
-              const sameItems = model.localParams.filter(
-                (item: { prop: string }) => item.prop === value
-              )
-
-              if (sameItems.length > 1) {
-                return new Error(t('project.node.prop_repeat'))
-              }
-            }
-          }
-        },
-        {
-          type: 'input',
-          field: 'value',
-          span: 10,
-          props: {
-            placeholder: t('project.node.value_tips'),
-            maxLength: 256
-          }
-        }
-      ]
     },
     {
       type: 'select',

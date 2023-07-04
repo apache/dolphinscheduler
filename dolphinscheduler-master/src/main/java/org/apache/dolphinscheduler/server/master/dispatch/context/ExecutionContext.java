@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.server.master.dispatch.context;
 import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_WORKER_GROUP;
 
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.remote.command.Command;
+import org.apache.dolphinscheduler.remote.command.Message;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 
@@ -43,7 +43,7 @@ public class ExecutionContext {
     /**
      * command
      */
-    private Command command;
+    private Message message;
 
     private TaskInstance taskInstance;
 
@@ -54,12 +54,12 @@ public class ExecutionContext {
      */
     private String workerGroup;
 
-    public ExecutionContext(Command command, ExecutorType executorType, TaskInstance taskInstance) {
-        this(command, executorType, DEFAULT_WORKER_GROUP, taskInstance);
+    public ExecutionContext(Message message, ExecutorType executorType, TaskInstance taskInstance) {
+        this(message, executorType, DEFAULT_WORKER_GROUP, taskInstance);
     }
 
-    public ExecutionContext(Command command, ExecutorType executorType, String workerGroup, TaskInstance taskInstance) {
-        this.command = command;
+    public ExecutionContext(Message message, ExecutorType executorType, String workerGroup, TaskInstance taskInstance) {
+        this.message = message;
         this.executorType = executorType;
         this.workerGroup = workerGroup;
         this.taskInstance = taskInstance;

@@ -44,8 +44,8 @@ import org.apache.dolphinscheduler.dao.repository.DqExecuteResultDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.TaskCacheUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
-import org.apache.dolphinscheduler.remote.command.TaskSavePointRequestCommand;
+import org.apache.dolphinscheduler.remote.command.task.TaskKillRequest;
+import org.apache.dolphinscheduler.remote.command.task.TaskSavePointRequest;
 import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.service.log.LogClient;
@@ -294,7 +294,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
             return result;
         }
 
-        TaskSavePointRequestCommand command = new TaskSavePointRequestCommand(taskInstanceId);
+        TaskSavePointRequest command = new TaskSavePointRequest(taskInstanceId);
 
         Host host = new Host(taskInstance.getHost());
         stateEventCallbackService.sendResult(host, command.convert2Command());
@@ -325,7 +325,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
             return result;
         }
 
-        TaskKillRequestCommand command = new TaskKillRequestCommand(taskInstanceId);
+        TaskKillRequest command = new TaskKillRequest(taskInstanceId);
         Host host = new Host(taskInstance.getHost());
         stateEventCallbackService.sendResult(host, command.convert2Command());
         putMsg(result, Status.SUCCESS);
@@ -374,7 +374,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
     @Override
     public void deleteByWorkflowInstanceId(Integer workflowInstanceId) {
         List<TaskInstance> needToDeleteTaskInstances =
-                taskInstanceDao.findTaskInstanceByWorkflowInstanceId(workflowInstanceId);
+                taskInstanceDao.queryByWorkflowInstanceId(workflowInstanceId);
         if (org.apache.commons.collections4.CollectionUtils.isEmpty(needToDeleteTaskInstances)) {
             return;
         }

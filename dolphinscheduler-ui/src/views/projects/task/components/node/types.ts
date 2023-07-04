@@ -45,6 +45,10 @@ interface IOption {
   value: string | number
 }
 
+interface IRenderOption extends IOption {
+  filterLabel: string
+}
+
 interface ITaskPriorityOption extends SelectOption {
   icon: VNode
   color: string
@@ -60,6 +64,17 @@ interface ILocalParam {
   direct?: string
   type?: string
   value?: string
+}
+
+interface ILabel {
+  label: string
+  value: string
+}
+
+interface IMatchExpression {
+  key: string
+  operator: string
+  values: string
 }
 
 interface IResponseJsonItem extends Omit<IJsonItemParams, 'type'> {
@@ -98,13 +113,21 @@ interface ISwitchResult {
   nextNode?: number
 }
 
+interface IDependentParameters {
+  checkInterval?: number
+  failurePolicy?: 'DEPENDENT_FAILURE_FAILURE' | 'DEPENDENT_FAILURE_WAITING'
+  failureWaitingTime?: number
+  relation?: RelationType
+  dependTaskList?: IDependTask[]
+}
+
 /*
  * resourceName: resource full name
  * res: resource file name
  */
 interface ISourceItem {
-  id?: number,
-  resourceName: string,
+  id?: number
+  resourceName: string
   res?: string
 }
 
@@ -292,10 +315,7 @@ interface ITaskParams {
   switchResult?: ISwitchResult
   dependTaskList?: IDependTask[]
   nextNode?: number
-  dependence?: {
-    relation?: RelationType
-    dependTaskList?: IDependTask[]
-  }
+  dependence?: IDependentParameters
   customConfig?: number
   json?: string
   dsType?: string
@@ -316,6 +336,10 @@ interface ITaskParams {
   zeppelinParagraphId?: string
   zeppelinRestEndpoint?: string
   restEndpoint?: string
+  zeppelinUsername?: string
+  username?: string
+  zeppelinPassword?: string
+  password?: string
   zeppelinProductionNoteDirectory?: string
   productionNoteDirectory?: string
   hiveCliOptions?: string
@@ -329,6 +353,7 @@ interface ITaskParams {
   parameters?: string
   kernel?: string
   engine?: string
+  startupScript?: string
   executionTimeout?: string
   startTimeout?: string
   processDefinitionCode?: number
@@ -346,6 +371,9 @@ interface ITaskParams {
   minMemorySpace?: string
   image?: string
   command?: string
+  args?: string
+  customizedLabels?: ILabel[]
+  nodeSelectors?: IMatchExpression[]
   algorithm?: string
   params?: string
   searchParams?: string
@@ -408,6 +436,10 @@ interface ITaskParams {
   factoryName?: string
   resourceGroupName?: string
   pipelineName?: string
+  maxNumOfSubWorkflowInstances?: number
+  degreeOfParallelism?: number
+  filterCondition?: string
+  listParameters?: Array<any>
 }
 
 interface INodeData
@@ -425,6 +457,7 @@ interface INodeData
     >,
     ISqoopTargetData,
     ISqoopSourceData,
+    IDependentParameters,
     Omit<IRuleParameters, 'mapping_columns'> {
   id?: string
   taskType?: ITaskType
@@ -473,7 +506,7 @@ interface ITaskData
   > {
   name?: string
   taskPriority?: string
-  isCache?: "YES" | "NO"
+  isCache?: 'YES' | 'NO'
   timeoutFlag?: 'OPEN' | 'CLOSE'
   timeoutNotifyStrategy?: string | []
   taskParams?: ITaskParams
@@ -488,6 +521,7 @@ export {
   INodeData,
   ITaskParams,
   IOption,
+  IRenderOption,
   IDataBase,
   ModelType,
   SourceType,
@@ -502,5 +536,6 @@ export {
   FormRules,
   IJsonItemParams,
   IResponseJsonItem,
-  IDateType
+  IDateType,
+  IDependentParameters
 }

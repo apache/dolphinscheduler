@@ -94,17 +94,55 @@ zookeeper:
     size: "20Gi"
     storageClass: "-"
 
+etcd:
+  enabled: false
+  endpoints: ""
+  namespace: "dolphinscheduler"
+  user: ""
+  passWord: ""
+  authority: ""
+  # Please create a new folder: deploy/kubernetes/dolphinscheduler/etcd-certs
+  ssl:
+    enabled: false
+    certFile: "etcd-certs/ca.crt"
+    keyCertChainFile: "etcd-certs/client.crt"
+    keyFile: "etcd-certs/client.pem"
+
 ## If exists external registry and set zookeeper.enable value to false, the external registry will be used.
 externalRegistry:
   registryPluginName: "zookeeper"
   registryServers: "127.0.0.1:2181"
+
+security:
+  authentication:
+    type: PASSWORD
+    ldap:
+      urls: ldap://ldap.forumsys.com:389/
+      basedn: dc=example,dc=com
+      username: cn=read-only-admin,dc=example,dc=com
+      password: password
+      user:
+        admin: read-only-admin
+        identityattribute: uid
+        emailattribute: mail
+        notexistaction: CREATE
+      ssl:
+        enable: false
+        # do not change this value
+        truststore: "/opt/ldapkeystore.jks"
+        # if you use macOS, please run `base64 -b 0 -i /path/to/your.jks`
+        # if you use Linux, please run `base64 -w 0 /path/to/your.jks`
+        # if you use Windows, please run `certutil -f -encode /path/to/your.jks`
+        # Then copy the base64 content to below field in one line
+        jksbase64content: ""
+        truststorepassword: ""
 
 conf:
   common:
     # user data local directory path, please make sure the directory exists and have read write permissions
     data.basedir.path: /tmp/dolphinscheduler
 
-    # resource storage type: HDFS, S3, NONE
+    # resource storage type: HDFS, S3, OSS, GCS, ABS, NONE
     resource.storage.type: S3
 
     # resource store on HDFS/S3 path, resource file will store to this base path, self configuration, please make sure the directory exists on hdfs and have read write permissions. "/dolphinscheduler" is recommended
@@ -310,10 +348,10 @@ master:
     MASTER_TASK_COMMIT_RETRYTIMES: "5"
     MASTER_TASK_COMMIT_INTERVAL: "1s"
     MASTER_STATE_WHEEL_INTERVAL: "5s"
-    MASTER_MAX_CPU_LOAD_AVG: "-1"
+    MASTER_MAX_CPU_LOAD_AVG: "1"
     MASTER_RESERVED_MEMORY: "0.3"
     MASTER_FAILOVER_INTERVAL: "10m"
-    MASTER_KILL_YARN_JOB_WHEN_HANDLE_FAILOVER: "true"
+    MASTER_KILL_APPLICATION_WHEN_HANDLE_FAILOVER: "true"
 
 worker:
   ## PodManagementPolicy controls how pods are created during initial scale up, when replacing pods on nodes, or when scaling down.
@@ -382,14 +420,12 @@ worker:
       storageClassName: "-"
       storage: "20Gi"
   env:
-    WORKER_GROUPS_0: default
-    WORKER_MAX_CPU_LOAD_AVG: "-1"
+    WORKER_MAX_CPU_LOAD_AVG: "1"
     WORKER_RESERVED_MEMORY: "0.3"
     WORKER_EXEC_THREADS: "100"
     WORKER_HEARTBEAT_INTERVAL: "10s"
     WORKER_HEART_ERROR_THRESHOLD: "5"
     WORKER_HOST_WEIGHT: "100"
-    WORKER_GROUPS: "default"
   keda:
     enabled: false
     namespaceLabels: { }
@@ -431,18 +467,18 @@ alert:
   ## You can use annotations to attach arbitrary non-identifying metadata to objects.
   ## Clients such as tools and libraries can retrieve this metadata.
   annotations: {}
+  ## Affinity is a group of affinity scheduling rules. If specified, the pod's scheduling constraints.
+  ## More info: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#affinity-v1-core
+  affinity: {}
   ## NodeSelector is a selector which must be true for the pod to fit on a node.
   ## Selector which must match a node's labels for the pod to be scheduled on that node.
   ## More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
-  affinity: {}
-  ## Compute Resources required by this container. Cannot be updated.
-  ## More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container
   nodeSelector: {}
   ## Tolerations are appended (excluding duplicates) to pods running with this RuntimeClass during admission,
   ## effectively unioning the set of nodes tolerated by the pod and the RuntimeClass.
   tolerations: []
-  ## Affinity is a group of affinity scheduling rules. If specified, the pod's scheduling constraints.
-  ## More info: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#affinity-v1-core
+  ## Compute Resources required by this container. Cannot be updated.
+  ## More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container
   resources: {}
   # resources:
   #   limits:
@@ -492,18 +528,18 @@ api:
   ## You can use annotations to attach arbitrary non-identifying metadata to objects.
   ## Clients such as tools and libraries can retrieve this metadata.
   annotations: {}
+  ## Affinity is a group of affinity scheduling rules. If specified, the pod's scheduling constraints.
+  ## More info: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#affinity-v1-core
+  affinity: {}
   ## NodeSelector is a selector which must be true for the pod to fit on a node.
   ## Selector which must match a node's labels for the pod to be scheduled on that node.
   ## More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
-  affinity: {}
-  ## Compute Resources required by this container. Cannot be updated.
-  ## More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container
   nodeSelector: {}
   ## Tolerations are appended (excluding duplicates) to pods running with this RuntimeClass during admission,
   ## effectively unioning the set of nodes tolerated by the pod and the RuntimeClass.
   tolerations: []
-  ## Affinity is a group of affinity scheduling rules. If specified, the pod's scheduling constraints.
-  ## More info: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#affinity-v1-core
+  ## Compute Resources required by this container. Cannot be updated.
+  ## More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container
   resources: {}
   # resources:
   #   limits:

@@ -58,6 +58,7 @@ public class TaskDefinitionLog extends TaskDefinition {
         this.setTaskParamList(taskDefinition.getTaskParamList());
         this.setTaskParamMap(taskDefinition.getTaskParamMap());
         this.setTaskPriority(taskDefinition.getTaskPriority());
+        this.setTaskExecuteType(taskDefinition.getTaskExecuteType());
         this.setTimeoutNotifyStrategy(taskDefinition.getTimeoutNotifyStrategy());
         this.setTaskType(taskDefinition.getTaskType());
         this.setTimeout(taskDefinition.getTimeout());
@@ -72,6 +73,7 @@ public class TaskDefinitionLog extends TaskDefinition {
         this.setModifyBy(taskDefinition.getModifyBy());
         this.setCpuQuota(taskDefinition.getCpuQuota());
         this.setMemoryMax(taskDefinition.getMemoryMax());
+        this.setTaskExecuteType(taskDefinition.getTaskExecuteType());
     }
 
     public int getOperator() {

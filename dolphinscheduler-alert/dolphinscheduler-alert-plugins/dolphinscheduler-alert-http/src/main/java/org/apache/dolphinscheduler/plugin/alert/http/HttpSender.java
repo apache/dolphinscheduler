@@ -120,7 +120,7 @@ public final class HttpSender {
             // GET request add param in url
             setMsgInUrl(msg);
             URL unencodeUrl = new URL(url);
-            URI uri = new URI(unencodeUrl.getProtocol(), unencodeUrl.getHost(), unencodeUrl.getPath(),
+            URI uri = new URI(unencodeUrl.getProtocol(), unencodeUrl.getAuthority(), unencodeUrl.getPath(),
                     unencodeUrl.getQuery(), null);
 
             httpRequest = new HttpGet(uri);
@@ -163,7 +163,10 @@ public final class HttpSender {
      */
     private void setMsgInRequestBody(String msg) {
         try {
-            ObjectNode objectNode = JSONUtils.parseObject(bodyParams);
+            ObjectNode objectNode = JSONUtils.createObjectNode();
+            if (StringUtils.isNotBlank(bodyParams)) {
+                objectNode = JSONUtils.parseObject(bodyParams);
+            }
             // set msg content field
             objectNode.put(contentField, msg);
             StringEntity entity = new StringEntity(JSONUtils.toJsonString(objectNode), DEFAULT_CHARSET);
@@ -171,5 +174,9 @@ public final class HttpSender {
         } catch (Exception e) {
             log.error("send http alert msg  exception : {}", e.getMessage());
         }
+    }
+
+    public String getRequestUrl() {
+        return httpRequest.getURI().toString();
     }
 }
