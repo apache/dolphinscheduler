@@ -31,14 +31,6 @@ import static org.apache.dolphinscheduler.common.constants.Constants.COMMA;
 import static org.apache.dolphinscheduler.common.constants.Constants.MAX_TASK_TIMEOUT;
 import static org.apache.dolphinscheduler.common.constants.Constants.SCHEDULE_TIME_MAX_LENGTH;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Objects;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowExecuteResponse;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
@@ -111,12 +103,15 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -127,7 +122,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.collect.Lists;
+import com.google.common.base.Splitter;
 
 /**
  * executor service impl
@@ -247,8 +242,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             return result;
         }
 
-        if (Objects.nonNull(expectedParallelismNumber) && expectedParallelismNumber<=0) {
-            log.warn("Parameter expectedParallelismNumber is invalid, expectedParallelismNumber:{}.", expectedParallelismNumber);
+        if (Objects.nonNull(expectedParallelismNumber) && expectedParallelismNumber <= 0) {
+            log.warn("Parameter expectedParallelismNumber is invalid, expectedParallelismNumber:{}.",
+                    expectedParallelismNumber);
             putMsg(result, Status.TASK_PARALLELISM_PARAMS_ERROR);
             return result;
         }
@@ -765,7 +761,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                               Long environmentCode,
                               Map<String, String> startParams, Integer expectedParallelismNumber, int dryRun,
                               int testFlag, ComplementDependentMode complementDependentMode,
-                              boolean allLevelDependent,  ExecutionOrder executionOrder) {
+                              boolean allLevelDependent, ExecutionOrder executionOrder) {
 
         /**
          * instantiate command schedule instance
@@ -841,14 +837,14 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     }
 
     private int createComplementCommand(Long triggerCode, Command command, Map<String, String> cmdParam,
-        List<ZonedDateTime> dateTimeList, List<Schedule> schedules,
-        ComplementDependentMode complementDependentMode, boolean allLevelDependent) {
+                                        List<ZonedDateTime> dateTimeList, List<Schedule> schedules,
+                                        ComplementDependentMode complementDependentMode, boolean allLevelDependent) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         int createCount = 0;
         String dateTimeListStr = dateTimeList.stream()
-            .map(item -> item.toLocalDateTime().format(formatter))
-            .collect(Collectors.joining(COMMA));
+                .map(item -> item.toLocalDateTime().format(formatter))
+                .collect(Collectors.joining(COMMA));
 
         cmdParam.put(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST, dateTimeListStr);
         command.setCommandParam(JSONUtils.toJsonString(cmdParam));
@@ -858,21 +854,21 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         if (createCount > 0) {
             log.info("Create {} command complete, processDefinitionCode:{}",
-                command.getCommandType().getDescp(), command.getProcessDefinitionCode());
+                    command.getCommandType().getDescp(), command.getProcessDefinitionCode());
         } else {
             log.error("Create {} command error, processDefinitionCode:{}",
-                command.getCommandType().getDescp(), command.getProcessDefinitionCode());
+                    command.getCommandType().getDescp(), command.getProcessDefinitionCode());
         }
 
         if (schedules.isEmpty() || complementDependentMode == ComplementDependentMode.OFF_MODE) {
             log.info(
-                "Complement dependent mode is off mode or Scheduler is empty, so skip create complement dependent command, processDefinitionCode:{}.",
-                command.getProcessDefinitionCode());
+                    "Complement dependent mode is off mode or Scheduler is empty, so skip create complement dependent command, processDefinitionCode:{}.",
+                    command.getProcessDefinitionCode());
         } else {
             log.info(
-                "Complement dependent mode is all dependent and Scheduler is not empty, need create complement dependent command, processDefinitionCode:{}.",
-                command.getProcessDefinitionCode());
-                createComplementDependentCommand(schedules, command, allLevelDependent);
+                    "Complement dependent mode is all dependent and Scheduler is not empty, need create complement dependent command, processDefinitionCode:{}.",
+                    command.getProcessDefinitionCode());
+            createComplementDependentCommand(schedules, command, allLevelDependent);
         }
 
         if (createCount > 0) {
@@ -894,7 +890,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                               Command command,
                                               Integer expectedParallelismNumber,
                                               ComplementDependentMode complementDependentMode,
-                                              boolean allLevelDependent, ExecutionOrder executionOrder) throws CronParseException {
+                                              boolean allLevelDependent,
+                                              ExecutionOrder executionOrder) throws CronParseException {
         int createCount = 0;
         String startDate = null;
         String endDate = null;
@@ -909,18 +906,18 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         }
 
         List<Schedule> schedules = processService.queryReleaseSchedulerListByProcessDefinitionCode(
-            command.getProcessDefinitionCode());
+                command.getProcessDefinitionCode());
 
         List<ZonedDateTime> listDate = new ArrayList<>();
         if (scheduleParam.containsKey(CMD_PARAM_COMPLEMENT_DATA_START_DATE) && scheduleParam.containsKey(
-            CMD_PARAM_COMPLEMENT_DATA_END_DATE)) {
+                CMD_PARAM_COMPLEMENT_DATA_END_DATE)) {
             startDate = scheduleParam.get(CMD_PARAM_COMPLEMENT_DATA_START_DATE);
             endDate = scheduleParam.get(CMD_PARAM_COMPLEMENT_DATA_END_DATE);
             if (startDate != null && endDate != null) {
                 listDate = CronUtils.getSelfFireDateList(
-                    DateUtils.stringToZoneDateTime(startDate),
-                    DateUtils.stringToZoneDateTime(endDate),
-                    schedules);
+                        DateUtils.stringToZoneDateTime(startDate),
+                        DateUtils.stringToZoneDateTime(endDate),
+                        schedules);
             }
         }
 
@@ -928,8 +925,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             dateList = scheduleParam.get(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST);
             dateList = removeDuplicates(dateList);
 
-            listDate = Splitter.on(COMMA).splitToStream(dateList).map(item -> DateUtils.stringToZoneDateTime(item)).collect(
-                Collectors.toList());
+            listDate = Splitter.on(COMMA).splitToStream(dateList).map(item -> DateUtils.stringToZoneDateTime(item))
+                    .collect(
+                            Collectors.toList());
         }
 
         if (executionOrder.equals(ExecutionOrder.DESC_ORDER)) {
@@ -941,8 +939,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         switch (runMode) {
             case RUN_MODE_SERIAL: {
                 log.info("RunMode of {} command is serial run, processDefinitionCode:{}.",
-                    command.getCommandType().getDescp(), command.getProcessDefinitionCode());
-                createCount = createComplementCommand(triggerCode,command, cmdParam, listDate, schedules, complementDependentMode, allLevelDependent);
+                        command.getCommandType().getDescp(), command.getProcessDefinitionCode());
+                createCount = createComplementCommand(triggerCode, command, cmdParam, listDate, schedules,
+                        complementDependentMode, allLevelDependent);
                 break;
             }
             case RUN_MODE_PARALLEL: {
@@ -955,17 +954,19 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                     if (expectedParallelismNumber != null && expectedParallelismNumber != 0) {
                         queueNum = Math.min(queueNum, expectedParallelismNumber);
                     }
-                    log.info("Complement command run in parallel mode, current expectedParallelismNumber:{}.", queueNum);
+                    log.info("Complement command run in parallel mode, current expectedParallelismNumber:{}.",
+                            queueNum);
                     List[] queues = new List[queueNum];
 
-                    for (int i = 0; i < listDate.size() ; i++) {
+                    for (int i = 0; i < listDate.size(); i++) {
                         if (Objects.isNull(queues[i % queueNum])) {
                             queues[i % queueNum] = new ArrayList();
                         }
                         queues[i % queueNum].add(listDate.get(i));
                     }
                     for (List queue : queues) {
-                        createCount = createComplementCommand(triggerCode,command, cmdParam, queue, schedules, complementDependentMode, allLevelDependent);
+                        createCount = createComplementCommand(triggerCode, command, cmdParam, queue, schedules,
+                                complementDependentMode, allLevelDependent);
                     }
                 }
                 break;
