@@ -170,8 +170,10 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Schedule scheduleExists =
                 scheduleMapper.queryByProcessDefinitionCode(processDefineCode);
         if (scheduleExists != null) {
-            throw new ServiceException(Status.SCHEDULE_ALREADY_EXISTS, processDefineCode,
-                    scheduleExists.getId());
+            log.error("Schedule already exist, scheduleId:{},processDefineCode:{}", scheduleExists.getId(),
+                    processDefineCode);
+            putMsg(result, Status.SCHEDULE_ALREADY_EXISTS, processDefineCode, scheduleExists.getId());
+            return result;
         }
 
         Schedule scheduleObj = new Schedule();
