@@ -23,6 +23,7 @@ import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.C
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_START_DATE;
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_EMPTY_SUB_PROCESS;
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_START_PARAMS;
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_SUB_PROCESS;
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_SUB_PROCESS_DEFINE_CODE;
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_SUB_PROCESS_PARENT_INSTANCE_ID;
@@ -385,9 +386,9 @@ public class ProcessServiceImpl implements ProcessService {
                 info.setCommandType(CommandType.STOP);
                 info.addHistoryCmd(CommandType.STOP);
                 info.setStateWithDesc(WorkflowExecutionStatus.READY_STOP, "ready stop by serial_priority strategy");
-                int update = processInstanceDao.updateProcessInstance(info);
+                boolean update = processInstanceDao.updateById(info);
                 // determine whether the process is normal
-                if (update > 0) {
+                if (update) {
                     WorkflowStateEventChangeRequest workflowStateEventChangeRequest =
                             new WorkflowStateEventChangeRequest(
                                     info.getId(), 0, info.getState(), info.getId(), 0);
@@ -505,7 +506,7 @@ public class ProcessServiceImpl implements ProcessService {
      */
     @Override
     public void removeTaskLogFile(Integer processInstanceId) {
-        List<TaskInstance> taskInstanceList = taskInstanceDao.findTaskInstanceByWorkflowInstanceId(processInstanceId);
+        List<TaskInstance> taskInstanceList = taskInstanceDao.queryByWorkflowInstanceId(processInstanceId);
         if (CollectionUtils.isEmpty(taskInstanceList)) {
             return;
         }
@@ -743,8 +744,8 @@ public class ProcessServiceImpl implements ProcessService {
      * @param host    host
      * @return process instance
      */
-    protected @Nullable ProcessInstance constructProcessInstance(Command command,
-                                                                 String host) throws CronParseException, CodeGenerateException {
+    public @Nullable ProcessInstance constructProcessInstance(Command command,
+                                                              String host) throws CronParseException, CodeGenerateException {
         ProcessInstance processInstance;
         ProcessDefinition processDefinition;
         CommandType commandType = command.getCommandType();
@@ -764,14 +765,16 @@ public class ProcessServiceImpl implements ProcessService {
             processInstance = generateNewProcessInstance(processDefinition, command, cmdParam);
         } else {
             processInstance = this.findProcessInstanceDetailById(processInstanceId).orElse(null);
+            setGlobalParamIfCommanded(processDefinition, cmdParam);
             if (processInstance == null) {
                 return null;
             }
         }
 
         CommandType commandTypeIfComplement = getCommandTypeIfComplement(processInstance, command);
-        // reset global params while repeat running is needed by cmdParam
-        if (commandTypeIfComplement == CommandType.REPEAT_RUNNING) {
+        // reset global params while repeat running and recover tolerance fault process is needed by cmdParam
+        if (commandTypeIfComplement == CommandType.REPEAT_RUNNING ||
+                commandTypeIfComplement == CommandType.RECOVER_TOLERANCE_FAULT_PROCESS) {
             setGlobalParamIfCommanded(processDefinition, cmdParam);
         }
 
@@ -814,6 +817,7 @@ public class ProcessServiceImpl implements ProcessService {
         int runTime = processInstance.getRunTimes();
         switch (commandType) {
             case START_PROCESS:
+            case DYNAMIC_GENERATION:
                 break;
             case START_FAILURE_TASK_PROCESS:
                 // find failed tasks and init these tasks
@@ -828,7 +832,7 @@ public class ProcessServiceImpl implements ProcessService {
                 failedList.addAll(killedList);
                 failedList.addAll(toleranceList);
                 for (Integer taskId : failedList) {
-                    initTaskInstance(taskInstanceDao.findTaskInstanceById(taskId));
+                    initTaskInstance(taskInstanceDao.queryById(taskId));
                 }
                 cmdParam.put(CommandKeyConstants.CMD_PARAM_RECOVERY_START_NODE_STRING,
                         String.join(Constants.COMMA, convertIntListToString(failedList)));
@@ -846,7 +850,7 @@ public class ProcessServiceImpl implements ProcessService {
                         TaskExecutionStatus.KILL);
                 for (Integer taskId : stopNodeList) {
                     // initialize the pause state
-                    initTaskInstance(taskInstanceDao.findTaskInstanceById(taskId));
+                    initTaskInstance(taskInstanceDao.queryById(taskId));
                 }
                 cmdParam.put(CommandKeyConstants.CMD_PARAM_RECOVERY_START_NODE_STRING,
                         String.join(Constants.COMMA, convertIntListToString(stopNodeList)));
@@ -863,11 +867,11 @@ public class ProcessServiceImpl implements ProcessService {
                 // delete all the valid tasks when complement data if id is not null
                 if (processInstance.getId() != null) {
                     List<TaskInstance> taskInstanceList =
-                            taskInstanceDao.findValidTaskListByProcessId(processInstance.getId(),
+                            taskInstanceDao.queryValidTaskListByWorkflowInstanceId(processInstance.getId(),
                                     processInstance.getTestFlag());
                     for (TaskInstance taskInstance : taskInstanceList) {
                         taskInstance.setFlag(Flag.NO);
-                        taskInstanceDao.updateTaskInstance(taskInstance);
+                        taskInstanceDao.updateById(taskInstance);
                     }
                 }
                 break;
@@ -885,11 +889,11 @@ public class ProcessServiceImpl implements ProcessService {
                 }
                 // delete all the valid tasks when repeat running
                 List<TaskInstance> validTaskList =
-                        taskInstanceDao.findValidTaskListByProcessId(processInstance.getId(),
+                        taskInstanceDao.queryValidTaskListByWorkflowInstanceId(processInstance.getId(),
                                 processInstance.getTestFlag());
                 for (TaskInstance taskInstance : validTaskList) {
                     taskInstance.setFlag(Flag.NO);
-                    taskInstanceDao.updateTaskInstance(taskInstance);
+                    taskInstanceDao.updateById(taskInstance);
                 }
                 processInstance.setStartTime(new Date());
                 processInstance.setRestartTime(processInstance.getStartTime());
@@ -1046,7 +1050,7 @@ public class ProcessServiceImpl implements ProcessService {
         // update sub process id to process map table
         processInstanceMap.setProcessInstanceId(subProcessInstance.getId());
 
-        processInstanceMapDao.updateWorkProcessInstanceMap(processInstanceMap);
+        processInstanceMapDao.updateById(processInstanceMap);
     }
 
     /**
@@ -1108,11 +1112,11 @@ public class ProcessServiceImpl implements ProcessService {
         if (!taskInstance.isSubProcess()
                 && (taskInstance.getState().isKill() || taskInstance.getState().isFailure())) {
             taskInstance.setFlag(Flag.NO);
-            taskInstanceDao.updateTaskInstance(taskInstance);
+            taskInstanceDao.updateById(taskInstance);
             return;
         }
         taskInstance.setState(TaskExecutionStatus.SUBMITTED_SUCCESS);
-        taskInstanceDao.updateTaskInstance(taskInstance);
+        taskInstanceDao.updateById(taskInstance);
     }
 
     /**
@@ -1203,7 +1207,7 @@ public class ProcessServiceImpl implements ProcessService {
             processMap = findPreviousTaskProcessMap(parentInstance, parentTask);
             if (processMap != null) {
                 processMap.setParentTaskInstanceId(parentTask.getId());
-                processInstanceMapDao.updateWorkProcessInstanceMap(processMap);
+                processInstanceMapDao.updateById(processMap);
                 return processMap;
             }
         }
@@ -1211,7 +1215,7 @@ public class ProcessServiceImpl implements ProcessService {
         processMap = new ProcessInstanceMap();
         processMap.setParentProcessInstanceId(parentInstance.getId());
         processMap.setParentTaskInstanceId(parentTask.getId());
-        processInstanceMapDao.createWorkProcessInstanceMap(processMap);
+        processInstanceMapDao.insert(processMap);
         return processMap;
     }
 
@@ -1227,12 +1231,12 @@ public class ProcessServiceImpl implements ProcessService {
 
         Integer preTaskId = 0;
         List<TaskInstance> preTaskList =
-                taskInstanceDao.findPreviousTaskListByWorkProcessId(parentProcessInstance.getId());
+                taskInstanceDao.queryPreviousTaskListByWorkflowInstanceId(parentProcessInstance.getId());
         for (TaskInstance task : preTaskList) {
             if (task.getName().equals(parentTask.getName())) {
                 preTaskId = task.getId();
                 ProcessInstanceMap map =
-                        processInstanceMapDao.findWorkProcessMapByParent(parentProcessInstance.getId(), preTaskId);
+                        processInstanceMapDao.queryWorkProcessMapByParent(parentProcessInstance.getId(), preTaskId);
                 if (map != null) {
                     return map;
                 }
@@ -1256,7 +1260,7 @@ public class ProcessServiceImpl implements ProcessService {
         }
         // check create sub work flow firstly
         ProcessInstanceMap instanceMap =
-                processInstanceMapDao.findWorkProcessMapByParent(parentProcessInstance.getId(), task.getId());
+                processInstanceMapDao.queryWorkProcessMapByParent(parentProcessInstance.getId(), task.getId());
         if (null != instanceMap
                 && CommandType.RECOVER_TOLERANCE_FAULT_PROCESS == parentProcessInstance.getCommandType()) {
             // recover failover tolerance would not create a new command when the sub command already have been created
@@ -1291,7 +1295,7 @@ public class ProcessServiceImpl implements ProcessService {
     private void initSubInstanceState(ProcessInstance childInstance) {
         if (childInstance != null) {
             childInstance.setStateWithDesc(WorkflowExecutionStatus.RUNNING_EXECUTION, "init sub workflow instance");
-            processInstanceDao.updateProcessInstance(childInstance);
+            processInstanceDao.updateById(childInstance);
         }
     }
 
@@ -1590,8 +1594,7 @@ public class ProcessServiceImpl implements ProcessService {
         cmd.setProcessDefinitionCode(processInstance.getProcessDefinitionCode());
         cmd.setProcessDefinitionVersion(processInstance.getProcessDefinitionVersion());
         cmd.setProcessInstanceId(processInstance.getId());
-        cmd.setCommandParam(
-                String.format("{\"%s\":%d}", CMD_PARAM_RECOVER_PROCESS_ID_STRING, processInstance.getId()));
+        cmd.setCommandParam(JSONUtils.toJsonString(createCommandParams(processInstance)));
         cmd.setExecutorId(processInstance.getExecutorId());
         cmd.setCommandType(CommandType.RECOVER_TOLERANCE_FAULT_PROCESS);
         cmd.setProcessInstancePriority(processInstance.getProcessInstancePriority());
@@ -2137,10 +2140,11 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public DagData genDagData(ProcessDefinition processDefinition) {
         List<ProcessTaskRelation> taskRelations =
-                this.findRelationByCode(processDefinition.getCode(), processDefinition.getVersion());
-        List<TaskDefinitionLog> taskDefinitionLogList = taskDefinitionLogDao.getTaskDefineLogList(taskRelations);
-        List<TaskDefinition> taskDefinitions =
-                taskDefinitionLogList.stream().map(t -> (TaskDefinition) t).collect(Collectors.toList());
+                findRelationByCode(processDefinition.getCode(), processDefinition.getVersion());
+        List<TaskDefinition> taskDefinitions = taskDefinitionLogDao.queryTaskDefineLogList(taskRelations)
+                .stream()
+                .map(t -> (TaskDefinition) t)
+                .collect(Collectors.toList());
         return new DagData(processDefinition, taskRelations, taskDefinitions);
     }
 
@@ -2187,7 +2191,7 @@ public class ProcessServiceImpl implements ProcessService {
             });
         }
         if (CollectionUtils.isEmpty(taskDefinitionLogs)) {
-            taskDefinitionLogs = taskDefinitionLogDao.getTaskDefineLogList(taskRelationList);
+            taskDefinitionLogs = taskDefinitionLogDao.queryTaskDefineLogList(taskRelationList);
         }
         Map<Long, TaskDefinitionLog> taskDefinitionLogMap = taskDefinitionLogs.stream()
                 .collect(Collectors.toMap(TaskDefinitionLog::getCode, taskDefinitionLog -> taskDefinitionLog));
@@ -2243,7 +2247,7 @@ public class ProcessServiceImpl implements ProcessService {
             return processTaskMap;
         }
         ProcessInstance fatherProcess = this.findProcessInstanceById(processInstanceMap.getParentProcessInstanceId());
-        TaskInstance fatherTask = taskInstanceDao.findTaskInstanceById(processInstanceMap.getParentTaskInstanceId());
+        TaskInstance fatherTask = taskInstanceDao.queryById(processInstanceMap.getParentTaskInstanceId());
 
         if (fatherProcess != null) {
             processTaskMap.put(fatherProcess, fatherTask);
@@ -2333,14 +2337,17 @@ public class ProcessServiceImpl implements ProcessService {
         TaskGroup taskGroup = taskGroupMapper.selectById(taskGroupId);
         if (taskGroup == null) {
             // we don't throw exception here, to avoid the task group has been deleted during workflow running
+            log.warn("The taskGroup is not exist no need to acquire taskGroup, taskGroupId: {}", taskGroupId);
             return true;
         }
         // if task group is not applicable
         if (taskGroup.getStatus() == Flag.NO.getCode()) {
+            log.warn("The taskGroup status is {}, no need to acquire taskGroup, taskGroupId: {}", taskGroup.getStatus(),
+                    taskGroupId);
             return true;
         }
         // Create a waiting taskGroupQueue, after acquire resource, we can update the status to ACQUIRE_SUCCESS
-        TaskGroupQueue taskGroupQueue = this.taskGroupQueueMapper.queryByTaskId(taskInstanceId);
+        TaskGroupQueue taskGroupQueue = taskGroupQueueMapper.queryByTaskId(taskInstanceId);
         if (taskGroupQueue == null) {
             taskGroupQueue = insertIntoTaskGroupQueue(
                     taskInstanceId,
@@ -2349,14 +2356,12 @@ public class ProcessServiceImpl implements ProcessService {
                     workflowInstanceId,
                     taskGroupPriority,
                     TaskGroupQueueStatus.WAIT_QUEUE);
+            log.info("Insert TaskGroupQueue: {} successfully", taskGroupQueue.getId());
         } else {
             log.info("The task queue is already exist, taskId: {}", taskInstanceId);
             if (taskGroupQueue.getStatus() == TaskGroupQueueStatus.ACQUIRE_SUCCESS) {
                 return true;
             }
-            taskGroupQueue.setInQueue(Flag.NO.getCode());
-            taskGroupQueue.setStatus(TaskGroupQueueStatus.WAIT_QUEUE);
-            this.taskGroupQueueMapper.updateById(taskGroupQueue);
         }
         // check if there already exist higher priority tasks
         List<TaskGroupQueue> highPriorityTasks = taskGroupQueueMapper.queryHighPriorityTasks(
@@ -2367,14 +2372,15 @@ public class ProcessServiceImpl implements ProcessService {
             return false;
         }
         // try to get taskGroup
-        int count = taskGroupMapper.selectAvailableCountById(taskGroupId);
-        if (count == 1 && robTaskGroupResource(taskGroupQueue)) {
-            log.info("Success acquire taskGroup, taskInstanceId: {}, taskGroupId: {}", taskInstanceId, taskGroupId);
-            return true;
+        int availableTaskGroupCount = taskGroupMapper.selectAvailableCountById(taskGroupId);
+        if (availableTaskGroupCount < 1) {
+            log.info(
+                    "Failed to acquire taskGroup, there is no avaliable taskGroup, taskInstanceId: {}, taskGroupId: {}",
+                    taskInstanceId, taskGroupId);
+            taskGroupQueueMapper.updateInQueue(Flag.NO.getCode(), taskGroupQueue.getId());
+            return false;
         }
-        log.info("Failed to acquire taskGroup, taskInstanceId: {}, taskGroupId: {}", taskInstanceId, taskGroupId);
-        this.taskGroupQueueMapper.updateInQueue(Flag.NO.getCode(), taskGroupQueue.getId());
-        return false;
+        return robTaskGroupResource(taskGroupQueue);
     }
 
     /**
@@ -2386,10 +2392,13 @@ public class ProcessServiceImpl implements ProcessService {
         for (int i = 0; i < 10; i++) {
             TaskGroup taskGroup = taskGroupMapper.selectById(taskGroupQueue.getGroupId());
             if (taskGroup.getGroupSize() <= taskGroup.getUseSize()) {
+                // remove
+                taskGroupQueueMapper.updateInQueue(Flag.NO.getCode(), taskGroupQueue.getId());
                 log.info("The current task Group is full, taskGroup: {}", taskGroup);
                 return false;
             }
-            int affectedCount = taskGroupMapper.robTaskGroupResource(taskGroup.getId(),
+            int affectedCount = taskGroupMapper.robTaskGroupResource(
+                    taskGroup.getId(),
                     taskGroup.getUseSize(),
                     taskGroupQueue.getId(),
                     TaskGroupQueueStatus.WAIT_QUEUE.getCode());
@@ -2403,6 +2412,7 @@ public class ProcessServiceImpl implements ProcessService {
             }
         }
         log.info("Failed to rob taskGroup, taskGroupQueue: {}", taskGroupQueue);
+        taskGroupQueueMapper.updateInQueue(Flag.NO.getCode(), taskGroupQueue.getId());
         return false;
     }
 
@@ -2430,10 +2440,11 @@ public class ProcessServiceImpl implements ProcessService {
             do {
                 taskGroup = taskGroupMapper.selectById(taskInstance.getTaskGroupId());
                 if (taskGroup == null) {
-                    log.error("The taskGroup is null, taskGroupId: {}", taskInstance.getTaskGroupId());
+                    log.error("The taskGroup is not exist no need to release taskGroup, taskGroupId: {}",
+                            taskInstance.getTaskGroupId());
                     return null;
                 }
-                thisTaskGroupQueue = this.taskGroupQueueMapper.queryByTaskId(taskInstance.getId());
+                thisTaskGroupQueue = taskGroupQueueMapper.queryByTaskId(taskInstance.getId());
                 if (thisTaskGroupQueue.getStatus() == TaskGroupQueueStatus.RELEASE) {
                     log.info("The taskGroupQueue's status is release, taskInstanceId: {}", taskInstance.getId());
                     return null;
@@ -2457,20 +2468,22 @@ public class ProcessServiceImpl implements ProcessService {
         changeTaskGroupQueueStatus(taskInstance.getId(), TaskGroupQueueStatus.RELEASE);
         TaskGroupQueue taskGroupQueue;
         do {
-            taskGroupQueue = this.taskGroupQueueMapper.queryTheHighestPriorityTasks(taskGroup.getId(),
+            taskGroupQueue = taskGroupQueueMapper.queryTheHighestPriorityTasks(
+                    taskGroup.getId(),
                     TaskGroupQueueStatus.WAIT_QUEUE.getCode(),
                     Flag.NO.getCode(),
                     Flag.NO.getCode());
             if (taskGroupQueue == null) {
-                log.info("The taskGroupQueue is null, taskGroup: {}", taskGroup.getId());
+                log.info("There is no taskGroupQueue need to be wakeup taskGroup: {}", taskGroup.getId());
                 return null;
             }
-        } while (this.taskGroupQueueMapper.updateInQueueCAS(Flag.NO.getCode(),
+        } while (this.taskGroupQueueMapper.updateInQueueCAS(
+                Flag.NO.getCode(),
                 Flag.YES.getCode(),
                 taskGroupQueue.getId()) != 1);
         log.info("Finished to release task group queue: taskGroupId: {}, taskGroupQueueId: {}",
                 taskInstance.getTaskGroupId(), taskGroupQueue.getId());
-        return this.taskInstanceMapper.selectById(taskGroupQueue.getTaskId());
+        return taskInstanceMapper.selectById(taskGroupQueue.getTaskId());
     }
 
     /**
@@ -2504,6 +2517,7 @@ public class ProcessServiceImpl implements ProcessService {
                 .processId(workflowInstanceId)
                 .priority(taskGroupPriority)
                 .status(status)
+                .forceStart(Flag.NO.getCode())
                 .inQueue(Flag.NO.getCode())
                 .createTime(now)
                 .updateTime(now)
@@ -2568,13 +2582,13 @@ public class ProcessServiceImpl implements ProcessService {
         if (processInstance != null
                 && (processInstance.getState().isFailure() || processInstance.getState().isStop())) {
             List<TaskInstance> validTaskList =
-                    taskInstanceDao.findValidTaskListByProcessId(processInstance.getId(),
+                    taskInstanceDao.queryValidTaskListByWorkflowInstanceId(processInstance.getId(),
                             processInstance.getTestFlag());
             List<Long> instanceTaskCodeList =
                     validTaskList.stream().map(TaskInstance::getTaskCode).collect(Collectors.toList());
             List<ProcessTaskRelation> taskRelations = findRelationByCode(processInstance.getProcessDefinitionCode(),
                     processInstance.getProcessDefinitionVersion());
-            List<TaskDefinitionLog> taskDefinitionLogs = taskDefinitionLogDao.getTaskDefineLogList(taskRelations);
+            List<TaskDefinitionLog> taskDefinitionLogs = taskDefinitionLogDao.queryTaskDefineLogList(taskRelations);
             List<Long> definiteTaskCodeList =
                     taskDefinitionLogs.stream().filter(definitionLog -> definitionLog.getFlag() == Flag.YES)
                             .map(TaskDefinitionLog::getCode).collect(Collectors.toList());
@@ -2586,23 +2600,26 @@ public class ProcessServiceImpl implements ProcessService {
                         .map(TaskInstance::getId).collect(Collectors.toList());
                 if (failTaskList.size() == 1 && failTaskList.contains(taskInstanceId)) {
                     processInstance.setStateWithDesc(WorkflowExecutionStatus.SUCCESS, "success by task force success");
-                    processInstanceDao.updateProcessInstance(processInstance);
+                    processInstanceDao.updateById(processInstance);
                 }
             }
         }
     }
 
     @Override
-    public Integer queryTestDataSourceId(Integer onlineDataSourceId) {
-        Integer testDataSourceId = dataSourceMapper.queryTestDataSourceId(onlineDataSourceId);
-        if (testDataSourceId != null)
-            return testDataSourceId;
-        return null;
-    }
-
-    @Override
     public void saveCommandTrigger(Integer commandId, Integer processInstanceId) {
         triggerRelationService.saveCommandTrigger(commandId, processInstanceId);
+    }
+
+    private Map<String, Object> createCommandParams(ProcessInstance processInstance) {
+        Map<String, Object> commandMap =
+                JSONUtils.parseObject(processInstance.getCommandParam(), new TypeReference<Map<String, Object>>() {
+                });
+        Map<String, Object> recoverFailoverCommandParams = new HashMap<>();
+        Optional.ofNullable(MapUtils.getObject(commandMap, CMD_PARAM_START_PARAMS))
+                .ifPresent(startParams -> recoverFailoverCommandParams.put(CMD_PARAM_START_PARAMS, startParams));
+        recoverFailoverCommandParams.put(CMD_PARAM_RECOVER_PROCESS_ID_STRING, processInstance.getId());
+        return recoverFailoverCommandParams;
     }
 
 }

@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.runner.execute;
 
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.log.TaskInstanceLogHeader;
 
@@ -54,8 +53,9 @@ public class AsyncTaskCallbackFunctionImpl implements AsyncTaskCallbackFunction 
 
     private void executeFinished() {
         TaskInstanceLogHeader.printFinalizeTaskHeader();
-        TaskExecutionContextCacheManager.removeByTaskInstanceId(
-                asyncMasterDelayTaskExecuteRunnable.getTaskExecutionContext().getTaskInstanceId());
+        int taskInstanceId = asyncMasterDelayTaskExecuteRunnable.getTaskExecutionContext().getTaskInstanceId();
+        MasterTaskExecutionContextHolder.removeTaskExecutionContext(taskInstanceId);
+        MasterTaskExecuteRunnableHolder.removeMasterTaskExecuteRunnable(taskInstanceId);
         log.info("Task execute finished, removed the TaskExecutionContext");
         asyncMasterDelayTaskExecuteRunnable.sendTaskResult();
         log.info(

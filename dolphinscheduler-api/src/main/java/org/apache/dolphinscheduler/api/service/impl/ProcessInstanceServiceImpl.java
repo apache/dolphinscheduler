@@ -30,6 +30,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYP
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SUB_PROCESS;
 
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
+import org.apache.dolphinscheduler.api.dto.DynamicSubWorkflowDto;
 import org.apache.dolphinscheduler.api.dto.gantt.GanttDto;
 import org.apache.dolphinscheduler.api.dto.gantt.Task;
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceQueryRequest;
@@ -44,6 +45,7 @@ import org.apache.dolphinscheduler.api.service.TaskInstanceService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.constants.CommandKeyConstants;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
@@ -57,6 +59,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.RelationSubWorkflow;
 import org.apache.dolphinscheduler.dao.entity.ResponseTaskLog;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
@@ -66,6 +69,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.mapper.RelationSubWorkflowMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
@@ -93,6 +97,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -185,6 +190,9 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
     private ScheduleMapper scheduleMapper;
 
     @Autowired
+    private RelationSubWorkflowMapper relationSubWorkflowMapper;
+
+    @Autowired
     private AlertDao alertDao;
 
     @Autowired
@@ -275,7 +283,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
 
     @Override
     public ProcessInstance queryByWorkflowInstanceIdThrowExceptionIfNotFound(Integer workflowInstanceId) {
-        ProcessInstance processInstance = processInstanceDao.queryByWorkflowInstanceId(workflowInstanceId);
+        ProcessInstance processInstance = processInstanceDao.queryById(workflowInstanceId);
         if (processInstance == null) {
             throw new ServiceException(PROCESS_INSTANCE_NOT_EXIST, workflowInstanceId);
         }
@@ -477,7 +485,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             return result;
         }
         List<TaskInstance> taskInstanceList =
-                taskInstanceDao.findValidTaskListByProcessId(processId, processInstance.getTestFlag());
+                taskInstanceDao.queryValidTaskListByWorkflowInstanceId(processId, processInstance.getTestFlag());
         addDependResultForTaskList(loginUser, taskInstanceList);
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put(PROCESS_INSTANCE_STATE, processInstance.getState().toString());
@@ -488,6 +496,66 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         return result;
     }
 
+    @Override
+    public List<DynamicSubWorkflowDto> queryDynamicSubWorkflowInstances(User loginUser, Integer taskId) {
+        TaskInstance taskInstance = taskInstanceDao.queryById(taskId);
+        Map<String, Object> result = new HashMap<>();
+        if (taskInstance == null) {
+            putMsg(result, Status.TASK_INSTANCE_NOT_EXISTS, taskId);
+            throw new ServiceException(Status.TASK_INSTANCE_NOT_EXISTS, taskId);
+        }
+
+        TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskInstance.getTaskCode());
+        if (taskDefinition == null) {
+            putMsg(result, Status.TASK_INSTANCE_NOT_EXISTS, taskId);
+            throw new ServiceException(Status.TASK_INSTANCE_NOT_EXISTS, taskId);
+        }
+
+        if (!taskInstance.isDynamic()) {
+            putMsg(result, Status.TASK_INSTANCE_NOT_DYNAMIC_TASK, taskInstance.getName());
+            throw new ServiceException(Status.TASK_INSTANCE_NOT_EXISTS, taskId);
+        }
+        List<RelationSubWorkflow> relationSubWorkflows = relationSubWorkflowMapper
+                .queryAllSubProcessInstance((long) taskInstance.getProcessInstanceId(),
+                        taskInstance.getTaskCode());
+        List<Long> allSubProcessInstanceId = relationSubWorkflows.stream()
+                .map(RelationSubWorkflow::getSubWorkflowInstanceId).collect(java.util.stream.Collectors.toList());
+        List<ProcessInstance> allSubWorkflows = processInstanceDao.queryByIds(allSubProcessInstanceId);
+
+        if (allSubWorkflows == null || allSubWorkflows.isEmpty()) {
+            putMsg(result, Status.SUB_PROCESS_INSTANCE_NOT_EXIST, taskId);
+            throw new ServiceException(Status.SUB_PROCESS_INSTANCE_NOT_EXIST, taskId);
+        }
+        Long subWorkflowCode = allSubWorkflows.get(0).getProcessDefinitionCode();
+        int subWorkflowVersion = allSubWorkflows.get(0).getProcessDefinitionVersion();
+        ProcessDefinition subProcessDefinition =
+                processService.findProcessDefinition(subWorkflowCode, subWorkflowVersion);
+        if (subProcessDefinition == null) {
+            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, subWorkflowCode);
+            throw new ServiceException(Status.PROCESS_DEFINE_NOT_EXIST, subWorkflowCode);
+        }
+
+        allSubWorkflows.sort(Comparator.comparing(ProcessInstance::getId));
+
+        List<DynamicSubWorkflowDto> allDynamicSubWorkflowDtos = new ArrayList<>();
+        int index = 1;
+        for (ProcessInstance processInstance : allSubWorkflows) {
+            DynamicSubWorkflowDto dynamicSubWorkflowDto = new DynamicSubWorkflowDto();
+            dynamicSubWorkflowDto.setProcessInstanceId(processInstance.getId());
+            dynamicSubWorkflowDto.setIndex(index);
+            dynamicSubWorkflowDto.setState(processInstance.getState());
+            dynamicSubWorkflowDto.setName(subProcessDefinition.getName());
+            Map<String, String> commandParamMap = JSONUtils.toMap(processInstance.getCommandParam());
+            String parameter = commandParamMap.get(CommandKeyConstants.CMD_DYNAMIC_START_PARAMS);
+            dynamicSubWorkflowDto.setParameters(JSONUtils.toMap(parameter));
+            allDynamicSubWorkflowDtos.add(dynamicSubWorkflowDto);
+            index++;
+
+        }
+
+        return allDynamicSubWorkflowDtos;
+    }
+
     /**
      * add dependent result for dependent task
      */
@@ -496,6 +564,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             if (TASK_TYPE_DEPENDENT.equalsIgnoreCase(taskInstance.getTaskType())) {
                 log.info("DEPENDENT type task instance need to set dependent result, taskCode:{}, taskInstanceId:{}",
                         taskInstance.getTaskCode(), taskInstance.getId());
+                // TODO The result of dependent item should not be obtained from the log, waiting for optimization.
                 Result<ResponseTaskLog> logResult = loggerService.queryLog(loginUser,
                         taskInstance.getId(), Constants.LOG_QUERY_SKIP_LINE_NUMBER, Constants.LOG_QUERY_LIMIT);
                 if (logResult.getCode() == Status.SUCCESS.ordinal()) {
@@ -557,7 +626,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             return result;
         }
 
-        TaskInstance taskInstance = taskInstanceDao.findTaskInstanceById(taskId);
+        TaskInstance taskInstance = taskInstanceDao.queryById(taskId);
         if (taskInstance == null) {
             log.error("Task instance does not exist, projectCode:{}, taskInstanceId{}.", projectCode, taskId);
             putMsg(result, Status.TASK_INSTANCE_NOT_EXISTS, taskId);
@@ -717,8 +786,8 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             throw new ServiceException(Status.UPDATE_PROCESS_DEFINITION_ERROR);
         }
         processInstance.setProcessDefinitionVersion(insertVersion);
-        int update = processInstanceDao.updateProcessInstance(processInstance);
-        if (update == 0) {
+        boolean update = processInstanceDao.updateById(processInstance);
+        if (!update) {
             log.error(
                     "Update process instance version error, projectCode:{}, processDefinitionCode:{}, processDefinitionVersion:{}",
                     projectCode, processDefinition.getCode(), insertVersion);

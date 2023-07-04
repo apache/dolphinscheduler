@@ -39,7 +39,6 @@ const PERM_LIST = [
     value: 7
   }
 ]
-  
 
 export function useColumns() {
   const { t } = useI18n()
@@ -64,8 +63,10 @@ export function useColumns() {
       {
         title: t('project.list.authorize_level'),
         key: 'perm',
-        render: (record: any):any => {
-          return PERM_LIST.filter(item => item.value == record.perm).map(item => t(item.label))
+        render: (record: any): any => {
+          return PERM_LIST.filter((item) => item.value == record.perm).map(
+            (item) => t(item.label)
+          )
         },
         ...COLUMN_WIDTH_CONFIG['index']
       }

@@ -29,8 +29,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -148,10 +147,10 @@ public class JupyterTask extends AbstractRemoteTask {
             args.add(String.format(JupyterConstants.REMOVE_ENV, timestamp));
         }
 
-        // replace placeholder, and combining local and global parameters
+        // replace placeholder
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
         String command = ParameterUtils
-                .convertParameterPlaceholders(String.join(" ", args), ParamUtils.convert(paramsMap));
+                .convertParameterPlaceholders(String.join(" ", args), ParameterUtils.convert(paramsMap));
 
         log.info("jupyter task command: {}", command);
 

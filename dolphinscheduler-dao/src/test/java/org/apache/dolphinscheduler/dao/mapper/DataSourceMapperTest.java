@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.dao.mapper;
 
 import static java.util.stream.Collectors.toList;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
@@ -126,7 +125,7 @@ public class DataSourceMapperTest extends BaseDaoTest {
         Map<Integer, DataSource> datasourceMap = createDataSourceMap(userId, "test");
 
         List<DataSource> actualDataSources = dataSourceMapper.queryDataSourceByType(
-                0, DbType.MYSQL.ordinal(), Constants.TEST_FLAG_NO);
+                0, DbType.MYSQL.ordinal());
 
         Assertions.assertTrue(actualDataSources.size() >= 2);
 
@@ -380,7 +379,6 @@ public class DataSourceMapperTest extends BaseDaoTest {
         dataSource.setType(DbType.MYSQL);
         dataSource.setNote("mysql test");
         dataSource.setConnectionParams("hello mysql");
-        dataSource.setTestFlag(Constants.TEST_FLAG_NO);
         dataSource.setUpdateTime(DateUtils.getCurrentDate());
         dataSource.setCreateTime(DateUtils.getCurrentDate());
 

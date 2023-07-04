@@ -14,16 +14,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- import { computed } from 'vue'
+import { computed, watch, Ref, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useCustomParams, useResources } from '.'
 import type { IJsonItem } from '../types'
 
 export function useHiveCli(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
-  const hiveSqlScriptSpan = computed(() => (model.hiveCliTaskExecutionType === 'SCRIPT' ? 24 : 0))
-  const resourcesRequired = computed(() => (model.hiveCliTaskExecutionType === 'SCRIPT' ? false : true))
-  const resourcesLimit = computed(() => (model.hiveCliTaskExecutionType === 'SCRIPT' ? -1 : 1))
+  const hiveSqlScriptSpan = computed(() =>
+    model.hiveCliTaskExecutionType === 'SCRIPT' ? 24 : 0
+  )
+  const resourcesRequired = ref(
+    model.hiveCliTaskExecutionType === 'SCRIPT' ? false : true
+  )
+
+  const resourcesLimit = computed(() =>
+    model.hiveCliTaskExecutionType === 'SCRIPT' ? -1 : 1
+  )
+
+  watch(
+    () => model.hiveCliTaskExecutionType,
+    () => {
+      resourcesRequired.value =
+        model.hiveCliTaskExecutionType === 'SCRIPT' ? false : true
+    }
+  )
 
   return [
     {

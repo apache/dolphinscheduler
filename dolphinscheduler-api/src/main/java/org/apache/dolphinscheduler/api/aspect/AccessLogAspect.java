@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.aspect;
 
+import org.apache.dolphinscheduler.api.metrics.ApiServerMetrics;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -81,6 +82,9 @@ public class AccessLogAspect {
 
         String traceId = String.valueOf(CodeGenerateUtils.getInstance().genCode());
 
+        int userId = -1;
+        String userName = "NOT LOGIN";
+
         // log request
         if (!annotation.ignoreRequest()) {
             if (attributes != null) {
@@ -90,7 +94,11 @@ public class AccessLogAspect {
                     traceId = traceIdFromHeader;
                 }
                 // handle login info
-                String userName = parseLoginInfo(request);
+                User loginUser = parseLoginInfo(request);
+                if (loginUser != null) {
+                    userName = loginUser.getUserName();
+                    userId = loginUser.getId();
+                }
 
                 // handle args
                 String argsString = parseArgs(proceedingJoinPoint, annotation);
@@ -110,7 +118,12 @@ public class AccessLogAspect {
 
         Object ob = proceedingJoinPoint.proceed();
 
-        log.info("Call {}:{} success, cost: {}ms", requestMethod, URI, (System.currentTimeMillis() - startTime));
+        long costTime = System.currentTimeMillis() - startTime;
+        log.info("Call {}:{} success, cost: {}ms", requestMethod, URI, costTime);
+
+        if (userId != -1) {
+            ApiServerMetrics.recordApiResponseTime(costTime, userId);
+        }
 
         return ob;
     }
@@ -157,13 +170,9 @@ public class AccessLogAspect {
         return originalData;
     }
 
-    private String parseLoginInfo(HttpServletRequest request) {
-        String userName = "NOT LOGIN";
+    private User parseLoginInfo(HttpServletRequest request) {
         User loginUser = (User) (request.getAttribute(Constants.SESSION_USER));
-        if (loginUser != null) {
-            userName = loginUser.getUserName();
-        }
-        return userName;
+        return loginUser;
     }
 
 }

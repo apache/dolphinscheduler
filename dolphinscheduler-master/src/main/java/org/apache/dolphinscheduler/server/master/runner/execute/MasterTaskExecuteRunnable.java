@@ -22,7 +22,6 @@ import static ch.qos.logback.classic.ClassicConstants.FINALIZE_SESSION_MARKER;
 import org.apache.dolphinscheduler.common.log.remote.RemoteLogUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.log.TaskInstanceLogHeader;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
@@ -59,7 +58,7 @@ public abstract class MasterTaskExecuteRunnable implements Runnable {
     protected void afterThrowing(Throwable throwable) {
         try {
             cancelTask();
-            log.info("Get a exception when execute the task, canceled the task");
+            log.error("Get a exception when execute the task, canceled the task", throwable);
         } catch (Exception e) {
             log.error("Cancel task failed,", e);
         }
@@ -68,7 +67,8 @@ public abstract class MasterTaskExecuteRunnable implements Runnable {
         log.info(
                 "Get a exception when execute the task, sent the task execute result to master, the current task execute result is {}",
                 taskExecutionContext.getCurrentExecutionStatus());
-        TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+        MasterTaskExecutionContextHolder.removeTaskExecutionContext(taskExecutionContext.getTaskInstanceId());
+        MasterTaskExecuteRunnableHolder.removeMasterTaskExecuteRunnable(taskExecutionContext.getTaskInstanceId());
         log.info("Get a exception when execute the task, removed the TaskExecutionContext");
     }
 
@@ -90,11 +90,11 @@ public abstract class MasterTaskExecuteRunnable implements Runnable {
 
     @Override
     public void run() {
-        try (
-                final LogUtils.MDCAutoClosableContext mdcAutoClosableContext = LogUtils.setWorkflowAndTaskInstanceIDMDC(
-                        taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId());
-                final LogUtils.MDCAutoClosableContext mdcAutoClosableContext1 =
-                        LogUtils.setTaskInstanceLogFullPathMDC(taskExecutionContext.getLogPath())) {
+        try {
+            LogUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(),
+                    taskExecutionContext.getTaskInstanceId());
+            LogUtils.setTaskInstanceLogFullPathMDC(taskExecutionContext.getLogPath());
+
             TaskInstanceLogHeader.printInitializeTaskContextHeader();
             initializeTask();
 
@@ -109,6 +109,9 @@ public abstract class MasterTaskExecuteRunnable implements Runnable {
             log.error("Task execute failed, due to meet an exception", ex);
             afterThrowing(ex);
             closeLogAppender();
+        } finally {
+            LogUtils.removeWorkflowAndTaskInstanceIdMDC();
+            LogUtils.removeTaskInstanceLogFullPathMDC();
         }
     }
 

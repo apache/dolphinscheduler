@@ -120,7 +120,7 @@ public final class HttpSender {
             // GET request add param in url
             setMsgInUrl(msg);
             URL unencodeUrl = new URL(url);
-            URI uri = new URI(unencodeUrl.getProtocol(), unencodeUrl.getHost(), unencodeUrl.getPath(),
+            URI uri = new URI(unencodeUrl.getProtocol(), unencodeUrl.getAuthority(), unencodeUrl.getPath(),
                     unencodeUrl.getQuery(), null);
 
             httpRequest = new HttpGet(uri);
@@ -174,5 +174,9 @@ public final class HttpSender {
         } catch (Exception e) {
             log.error("send http alert msg  exception : {}", e.getMessage());
         }
+    }
+
+    public String getRequestUrl() {
+        return httpRequest.getURI().toString();
     }
 }

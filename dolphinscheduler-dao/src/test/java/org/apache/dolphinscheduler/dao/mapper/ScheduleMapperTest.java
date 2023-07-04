@@ -142,6 +142,44 @@ public class ScheduleMapperTest extends BaseDaoTest {
     }
 
     /**
+     * test page
+     */
+    @Test
+    public void testQueryByProjectAndProcessDefineIdPaging() {
+
+        User user = new User();
+        user.setUserName("ut name");
+        userMapper.insert(user);
+
+        Project project = new Project();
+        project.setName("ut project");
+        project.setUserId(user.getId());
+        project.setCode(1L);
+        project.setUpdateTime(new Date());
+        project.setCreateTime(new Date());
+        projectMapper.insert(project);
+
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setCode(1L);
+        processDefinition.setProjectCode(project.getCode());
+        processDefinition.setUserId(user.getId());
+        processDefinition.setLocations("");
+        processDefinition.setCreateTime(new Date());
+        processDefinition.setUpdateTime(new Date());
+        processDefinitionMapper.insert(processDefinition);
+
+        Schedule schedule = insertOne();
+        schedule.setUserId(user.getId());
+        schedule.setProcessDefinitionCode(processDefinition.getCode());
+        scheduleMapper.updateById(schedule);
+
+        Page<Schedule> page = new Page(1, 3);
+        IPage<Schedule> scheduleIPage = scheduleMapper.queryByProjectAndProcessDefineCodePaging(page, project.getCode(),
+                processDefinition.getCode(), "");
+        Assertions.assertNotEquals(scheduleIPage.getSize(), 0);
+    }
+
+    /**
      * test query schedule list by project name
      */
     @Test

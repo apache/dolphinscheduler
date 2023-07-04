@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.constants.TenantConstants;
 import org.apache.dolphinscheduler.common.shell.ShellExecutor;
 
 import oshi.SystemInfo;
@@ -386,6 +387,8 @@ public class OSUtils {
         if (!isSudoEnable() || StringUtils.isEmpty(tenantCode)) {
             return command;
         }
+        tenantCode = TenantConstants.DEFAULT_TENANT_CODE.equals(tenantCode) ? TenantConstants.BOOTSTRAPT_SYSTEM_USER
+                : tenantCode;
         return String.format("sudo -u %s %s", tenantCode, command);
     }
 
@@ -455,6 +458,10 @@ public class OSUtils {
             return true;
         }
         return false;
+    }
+
+    public static Boolean isWindows() {
+        return System.getProperty("os.name").startsWith("Windows");
     }
 
 }

@@ -61,11 +61,11 @@ public class MasterTaskDispatchProcessor implements MasterRpcProcessor {
         log.info("Receive task dispatch request, command: {}", taskDispatchRequest);
         TaskExecutionContext taskExecutionContext = taskDispatchRequest.getTaskExecutionContext();
         taskExecutionContext.setLogPath(LogUtils.getTaskInstanceLogFullPath(taskExecutionContext));
-        try (
-                final LogUtils.MDCAutoClosableContext mdcAutoClosableContext = LogUtils.setWorkflowAndTaskInstanceIDMDC(
-                        taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId());
-                final LogUtils.MDCAutoClosableContext mdcAutoClosableContext1 =
-                        LogUtils.setTaskInstanceLogFullPathMDC(taskExecutionContext.getLogPath())) {
+        try {
+            // Since we need to make sure remove MDC key after cache, so we use finally to remove MDC key
+            LogUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(),
+                    taskExecutionContext.getTaskInstanceId());
+            LogUtils.setTaskInstanceLogFullPathMDC(taskExecutionContext.getLogPath());
             MasterTaskExecutionContextHolder.putTaskExecutionContext(taskExecutionContext);
             // todo: calculate the delay in master dispatcher then we don't need to use a queue to store the task
             long remainTime =
@@ -78,7 +78,8 @@ public class MasterTaskDispatchProcessor implements MasterRpcProcessor {
                         taskExecutionContext.getTaskName(),
                         TimeUnit.SECONDS.toMillis(taskExecutionContext.getDelayTime()), remainTime);
                 taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.DELAY_EXECUTION);
-                masterMessageSenderManager.getMasterTaskExecuteResultMessageSender().sendMessage(taskExecutionContext);
+                masterMessageSenderManager.getMasterTaskExecuteResultMessageSender()
+                        .sendMessage(taskExecutionContext);
             }
 
             MasterDelayTaskExecuteRunnable masterDelayTaskExecuteRunnable = masterTaskExecuteRunnableFactoryBuilder
@@ -98,7 +99,11 @@ public class MasterTaskDispatchProcessor implements MasterRpcProcessor {
             }
         } catch (Exception ex) {
             log.error("Handle task dispatch request error, command: {}", taskDispatchRequest, ex);
+            MasterTaskExecutionContextHolder.removeTaskExecutionContext(taskExecutionContext.getTaskInstanceId());
             sendDispatchFailedResult(channel, message, taskExecutionContext, ex);
+        } finally {
+            LogUtils.removeWorkflowAndTaskInstanceIdMDC();
+            LogUtils.removeTaskInstanceLogFullPathMDC();
         }
     }
 

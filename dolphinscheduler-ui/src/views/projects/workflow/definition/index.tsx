@@ -43,7 +43,7 @@ import TimingModal from './components/timing-modal'
 import VersionModal from './components/version-modal'
 import CopyModal from './components/copy-modal'
 import type { Router } from 'vue-router'
-import Search from "@/components/input-search";
+import Search from '@/components/input-search'
 
 export default defineComponent({
   name: 'WorkflowDefinitionList',
@@ -158,15 +158,15 @@ export default defineComponent({
               >
                 {t('project.workflow.create_workflow')}
               </NButton>
-              {
-                this.uiSettingStore.getDynamicTask && <NButton
+              {this.uiSettingStore.getDynamicTask && (
+                <NButton
                   type='warning'
                   size='small'
                   onClick={this.createDefinitionDynamic}
                 >
                   {t('project.workflow.create_workflow_dynamic')}
                 </NButton>
-              }
+              )}
               <NButton
                 strong
                 secondary
@@ -178,7 +178,7 @@ export default defineComponent({
             </NSpace>
             <NSpace>
               <Search
-                placeholder = {t('resource.function.enter_keyword_tips')}
+                placeholder={t('resource.function.enter_keyword_tips')}
                 v-model:value={this.searchVal}
                 onSearch={this.handleSearch}
                 onClear={this.onClearSearch}
@@ -207,7 +207,7 @@ export default defineComponent({
               <NSpace>
                 <NTooltip>
                   {{
-                    default: () => t('project.workflow.delete'),
+                    default: () => t('project.workflow.batch_delete'),
                     trigger: () => (
                       <NPopconfirm onPositiveClick={this.batchDeleteWorkflow}>
                         {{
@@ -220,7 +220,7 @@ export default defineComponent({
                               disabled={this.checkedRowKeys.length <= 0}
                               class='btn-delete-all'
                             >
-                              {t('project.workflow.delete')}
+                              {t('project.workflow.batch_delete')}
                             </NButton>
                           )
                         }}
@@ -230,7 +230,7 @@ export default defineComponent({
                 </NTooltip>
                 <NTooltip>
                   {{
-                    default: () => t('project.workflow.export'),
+                    default: () => t('project.workflow.batch_export'),
                     trigger: () => (
                       <NButton
                         tag='div'
@@ -240,7 +240,7 @@ export default defineComponent({
                         onClick={this.batchExportWorkflow}
                         class='btn-delete-all'
                       >
-                        {t('project.workflow.export')}
+                        {t('project.workflow.batch_export')}
                       </NButton>
                     )
                   }}

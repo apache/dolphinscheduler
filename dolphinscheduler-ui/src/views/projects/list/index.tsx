@@ -16,13 +16,7 @@
  */
 
 import { SearchOutlined } from '@vicons/antd'
-import {
-  NButton,
-  NDataTable,
-  NIcon,
-  NPagination,
-  NSpace
-} from 'naive-ui'
+import { NButton, NDataTable, NIcon, NPagination, NSpace } from 'naive-ui'
 import {
   defineComponent,
   getCurrentInstance,
@@ -33,7 +27,7 @@ import {
 import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
 import Card from '@/components/card'
-import Search from "@/components/input-search";
+import Search from '@/components/input-search'
 import ProjectModal from './components/project-modal'
 
 const list = defineComponent({
@@ -122,10 +116,10 @@ const list = defineComponent({
             </NButton>
             <NSpace>
               <Search
-                  v-model:value = {this.searchVal}
-                  placeholder={t('project.list.project_tips')}
-                  onSearch={this.handleSearch}
-                  onClear={this.onClearSearch}
+                v-model:value={this.searchVal}
+                placeholder={t('project.list.project_tips')}
+                onSearch={this.handleSearch}
+                onClear={this.onClearSearch}
               />
 
               <NButton size='small' type='primary' onClick={this.handleSearch}>

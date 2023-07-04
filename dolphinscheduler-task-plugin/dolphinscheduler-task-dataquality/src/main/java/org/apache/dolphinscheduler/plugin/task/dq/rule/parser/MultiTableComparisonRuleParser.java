@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.dq.rule.parser;
 
 import org.apache.dolphinscheduler.plugin.task.api.DataQualityTaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.dq.exception.DataQualityException;
 import org.apache.dolphinscheduler.plugin.task.dq.rule.RuleManager;
 import org.apache.dolphinscheduler.plugin.task.dq.rule.parameter.BaseConfig;
