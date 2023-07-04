@@ -37,3 +37,16 @@ DROP PROCEDURE dolphin_t_ds_tenant_insert_default;
 -- tenant improvement
 UPDATE t_ds_schedules t1 JOIN t_ds_process_definition t2 ON t1.process_definition_code = t2.code LEFT JOIN t_ds_tenant t3 ON t2.tenant_id = t3.id SET t1.tenant_code = COALESCE(t3.tenant_code, 'default');
 UPDATE `t_ds_process_instance` SET `tenant_code` = 'default' WHERE `tenant_code` IS NULL;
+
+
+-- udpate t_ds_dq_rule_input_entry.options value to add `|Actual - Expected|`
+update t_ds_dq_rule_input_entry
+set options = '[{"label":"Expected - Actual","value":"0"},{"label":"Actual - Expected","value":"1"},{"label":"Actual / Expected","value":"2"},{"label":"(Expected - Actual) / Expected","value":"3"},{"label":"|Actual - Expected|","value":"4"}]'
+where id = 7;
+
+-- update t_ds_relation_rule_input_entry remove src_filter in custom sql
+delete from t_ds_relation_rule_input_entry
+where rule_id = 2 and rule_input_entry_id = 4;
+
+-- Ask require for some of select input
+update t_ds_dq_rule_input_entry set is_validate = 1 where id in (1, 2, 11, 12, 25, 28);

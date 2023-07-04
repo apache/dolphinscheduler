@@ -36,7 +36,9 @@ public enum CheckType {
     COMPARISON_MINUS_STATISTICS(0, "comparison_minus_statistics"),
     STATISTICS_MINUS_COMPARISON(1, "statistics_minus_comparison"),
     STATISTICS_COMPARISON_PERCENTAGE(2, "statistics_comparison_percentage"),
-    STATISTICS_COMPARISON_DIFFERENCE_COMPARISON_PERCENTAGE(3, "statistics_comparison_difference_comparison_percentage");
+    STATISTICS_COMPARISON_DIFFERENCE_COMPARISON_PERCENTAGE(3, "statistics_comparison_difference_comparison_percentage"),
+    ABSOLUTE_VALUE_COMPARISON_STATISTICS(4, "ABSOLUTE_VALUE_OF_COMPARISON_STATISTICS"),
+    ;
 
     CheckType(int code, String description) {
         this.code = code;

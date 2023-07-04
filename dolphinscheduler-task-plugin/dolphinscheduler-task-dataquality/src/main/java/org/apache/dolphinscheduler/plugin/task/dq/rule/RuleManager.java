@@ -39,10 +39,13 @@ import org.apache.dolphinscheduler.plugin.task.dq.utils.RuleParserUtils;
 import java.util.Date;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * RuleManager is responsible for parsing the input parameters to the DataQualityConfiguration
  * And DataQualityConfiguration will be used in DataQualityApplication
  */
+@Slf4j
 public class RuleManager {
 
     private final Map<String, String> inputParameterValue;
@@ -107,6 +110,7 @@ public class RuleManager {
                 RuleParserUtils.getInputParameterMapFromEntryList(
                         JSONUtils.toList(dataQualityTaskExecutionContext.getRuleInputEntryList(),
                                 DqRuleInputEntry.class));
+        log.debug("inputParameterValueResult: " + inputParameterValueResult);
         inputParameterValueResult.putAll(inputParameterValue);
         inputParameterValueResult
                 .putAll(BusinessTimeUtils.getBusinessTime(CommandType.START_PROCESS, new Date(), null));

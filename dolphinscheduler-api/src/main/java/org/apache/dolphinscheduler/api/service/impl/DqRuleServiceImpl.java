@@ -306,6 +306,9 @@ public class DqRuleServiceImpl extends BaseServiceImpl implements DqRuleService 
                 .setSize(SMALL)
                 .setPlaceHolder(inputEntry.getPlaceholder())
                 .setEmit(Boolean.TRUE.equals(inputEntry.getIsEmit()) ? Collections.singletonList(CHANGE) : null)
+                .addValidate(Validate.newBuilder()
+                        .setRequired(inputEntry.getIsValidate())
+                        .build())
                 .build();
     }
 

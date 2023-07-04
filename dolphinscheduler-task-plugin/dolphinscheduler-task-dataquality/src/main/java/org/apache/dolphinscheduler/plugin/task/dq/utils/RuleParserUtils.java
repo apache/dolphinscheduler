@@ -479,9 +479,9 @@ public class RuleParserUtils {
         List<MappingColumn> list = new ArrayList<>();
         mappingColumnList.forEach(item -> {
             MappingColumn column = new MappingColumn(
-                    String.valueOf(item.get(SRC_FIELD)).replace("\"", ""),
-                    String.valueOf(item.get(OPERATOR)).replace("\"", " "),
-                    String.valueOf(item.get(TARGET_FIELD)).replace("\"", ""));
+                    String.valueOf(item.get(SRC_FIELD)).replace("\"", "").trim(),
+                    String.valueOf(item.get(OPERATOR)).replace("\"", " ").trim(),
+                    String.valueOf(item.get(TARGET_FIELD)).replace("\"", "").trim());
             list.add(column);
         });
 

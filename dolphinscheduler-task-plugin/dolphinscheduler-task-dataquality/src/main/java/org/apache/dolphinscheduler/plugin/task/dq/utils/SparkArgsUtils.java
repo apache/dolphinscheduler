@@ -17,20 +17,25 @@
 
 package org.apache.dolphinscheduler.plugin.task.dq.utils;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.dataquality.spark.ProgramType;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.dataquality.spark.SparkConstants;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.dataquality.spark.SparkParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ArgsUtils;
+import org.apache.dolphinscheduler.plugin.task.dq.rule.parameter.DataQualityConfiguration;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * spark args utils
  */
+@Slf4j
 public class SparkArgsUtils {
 
     private static final String SPARK_CLUSTER = "cluster";
@@ -124,6 +129,11 @@ public class SparkArgsUtils {
         }
 
         String mainArgs = param.getMainArgs();
+        // print main args here for debug convenience, many task failed due to this args
+        String dataQualityConfigurationString = StringUtils.strip(mainArgs, "\"").replace("\\\"", "\"");
+        DataQualityConfiguration dataQualityConfiguration =
+                JSONUtils.parseObject(dataQualityConfigurationString, DataQualityConfiguration.class);
+        log.info("data quality task mainArgs: {}", JSONUtils.toPrettyJsonString(dataQualityConfiguration));
         if (StringUtils.isNotEmpty(mainArgs)) {
             args.add(mainArgs);
         }

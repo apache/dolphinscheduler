@@ -23,9 +23,12 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.Data;
+
 /**
  * spark parameters
  */
+@Data
 public class SparkParameters extends AbstractParameters {
 
     /**
@@ -99,118 +102,6 @@ public class SparkParameters extends AbstractParameters {
      * resource list
      */
     private List<ResourceInfo> resourceList = new ArrayList<>();
-
-    public ResourceInfo getMainJar() {
-        return mainJar;
-    }
-
-    public void setMainJar(ResourceInfo mainJar) {
-        this.mainJar = mainJar;
-    }
-
-    public String getMainClass() {
-        return mainClass;
-    }
-
-    public void setMainClass(String mainClass) {
-        this.mainClass = mainClass;
-    }
-
-    public String getDeployMode() {
-        return deployMode;
-    }
-
-    public void setDeployMode(String deployMode) {
-        this.deployMode = deployMode;
-    }
-
-    public String getMainArgs() {
-        return mainArgs;
-    }
-
-    public void setMainArgs(String mainArgs) {
-        this.mainArgs = mainArgs;
-    }
-
-    public int getDriverCores() {
-        return driverCores;
-    }
-
-    public void setDriverCores(int driverCores) {
-        this.driverCores = driverCores;
-    }
-
-    public String getDriverMemory() {
-        return driverMemory;
-    }
-
-    public void setDriverMemory(String driverMemory) {
-        this.driverMemory = driverMemory;
-    }
-
-    public int getNumExecutors() {
-        return numExecutors;
-    }
-
-    public void setNumExecutors(int numExecutors) {
-        this.numExecutors = numExecutors;
-    }
-
-    public int getExecutorCores() {
-        return executorCores;
-    }
-
-    public void setExecutorCores(int executorCores) {
-        this.executorCores = executorCores;
-    }
-
-    public String getExecutorMemory() {
-        return executorMemory;
-    }
-
-    public void setExecutorMemory(String executorMemory) {
-        this.executorMemory = executorMemory;
-    }
-
-    public String getAppName() {
-        return appName;
-    }
-
-    public void setAppName(String appName) {
-        this.appName = appName;
-    }
-
-    public String getQueue() {
-        return queue;
-    }
-
-    public void setQueue(String queue) {
-        this.queue = queue;
-    }
-
-    public String getOthers() {
-        return others;
-    }
-
-    public void setOthers(String others) {
-        this.others = others;
-    }
-
-    public List<ResourceInfo> getResourceList() {
-        return resourceList;
-    }
-
-    public void setResourceList(List<ResourceInfo> resourceList) {
-        this.resourceList = resourceList;
-    }
-
-    public ProgramType getProgramType() {
-        return programType;
-    }
-
-    public void setProgramType(ProgramType programType) {
-        this.programType = programType;
-    }
 
     @Override
     public boolean checkParameters() {

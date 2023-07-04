@@ -46,6 +46,7 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.ArgsUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.dq.rule.RuleManager;
 import org.apache.dolphinscheduler.plugin.task.dq.rule.parameter.DataQualityConfiguration;
+import org.apache.dolphinscheduler.plugin.task.dq.utils.ConfigurationCheckUtils;
 import org.apache.dolphinscheduler.plugin.task.dq.utils.SparkArgsUtils;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -113,6 +114,7 @@ public class DataQualityTask extends AbstractYarnTask {
 
         DataQualityConfiguration dataQualityConfiguration =
                 ruleManager.generateDataQualityParameter();
+        ConfigurationCheckUtils.checkMissingFormat(dataQualityConfiguration);
 
         dataQualityParameters
                 .getSparkParameters()
