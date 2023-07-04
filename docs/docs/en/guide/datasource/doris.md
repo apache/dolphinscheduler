@@ -1,6 +1,6 @@
 # DORIS
 
-![hana](../../../../img/new_ui/dev/datasource/doris.png)
+![doris](../../../../img/new_ui/dev/datasource/doris.png)
 
 ## Datasource Parameters
 
