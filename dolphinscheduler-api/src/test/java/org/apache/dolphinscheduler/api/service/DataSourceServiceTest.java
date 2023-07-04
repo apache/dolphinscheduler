@@ -38,6 +38,7 @@ import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClient
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.datasource.hive.param.HiveDataSourceParamDTO;
+import org.apache.dolphinscheduler.plugin.datasource.mysql.param.MySQLConnectionParam;
 import org.apache.dolphinscheduler.plugin.datasource.mysql.param.MySQLDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.oracle.param.OracleDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.postgresql.param.PostgreSQLDataSourceParamDTO;
@@ -48,6 +49,7 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -517,4 +519,30 @@ public class DataSourceServiceTest {
         }
     }
 
+    @Test
+    public void testGetDatabases() throws SQLException {
+        DataSource dataSource = getOracleDataSource();
+        int datasourceId = 1;
+        dataSource.setId(datasourceId);
+        Map<String, Object> result;
+        Mockito.when(dataSourceMapper.selectById(datasourceId)).thenReturn(null);
+        result = dataSourceService.getDatabases(datasourceId);
+        Assertions.assertEquals(Status.QUERY_DATASOURCE_ERROR, result.get(Constants.STATUS));
+
+        Mockito.when(dataSourceMapper.selectById(datasourceId)).thenReturn(dataSource);
+        MySQLConnectionParam connectionParam = new MySQLConnectionParam();
+        Connection connection = Mockito.mock(Connection.class);
+        MockedStatic<DataSourceUtils> dataSourceUtils = Mockito.mockStatic(DataSourceUtils.class);
+        dataSourceUtils.when(() -> DataSourceUtils.getConnection(Mockito.any(), Mockito.any())).thenReturn(connection);
+        dataSourceUtils.when(() -> DataSourceUtils.buildConnectionParams(Mockito.any(), Mockito.any()))
+                .thenReturn(connectionParam);
+        result = dataSourceService.getDatabases(datasourceId);
+        Assertions.assertEquals(Status.GET_DATASOURCE_TABLES_ERROR, result.get(Constants.STATUS));
+
+        dataSourceUtils.when(() -> DataSourceUtils.buildConnectionParams(Mockito.any(), Mockito.any()))
+                .thenReturn(null);
+        result = dataSourceService.getDatabases(datasourceId);
+        Assertions.assertEquals(Status.DATASOURCE_CONNECT_FAILED, result.get(Constants.STATUS));
+
+    }
 }

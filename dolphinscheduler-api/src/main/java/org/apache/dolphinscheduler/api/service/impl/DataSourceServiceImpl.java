@@ -649,6 +649,11 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
 
         DataSource dataSource = dataSourceMapper.selectById(datasourceId);
 
+        if (dataSource == null) {
+            putMsg(result, Status.QUERY_DATASOURCE_ERROR);
+            return result;
+        }
+
         List<String> tableList;
         BaseConnectionParam connectionParam =
                 (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
