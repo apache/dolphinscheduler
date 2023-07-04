@@ -281,7 +281,7 @@ public class ExecuteFunctionServiceTest {
                 null, null,
                 null, null, null,
                 RunMode.RUN_MODE_SERIAL,
-                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 10, null, 0, Constants.DRY_RUN_FLAG_NO,
+                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 10, null, null, Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
                 ComplementDependentMode.OFF_MODE, null,
                 false,
@@ -307,7 +307,7 @@ public class ExecuteFunctionServiceTest {
                 null, "123456789,987654321",
                 null, null, null,
                 RunMode.RUN_MODE_SERIAL,
-                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
+                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, null, Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
                 ComplementDependentMode.OFF_MODE, null,
                 false,
@@ -417,7 +417,7 @@ public class ExecuteFunctionServiceTest {
                 null, null,
                 null, null, null,
                 RunMode.RUN_MODE_SERIAL,
-                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
+                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 2, Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
                 ComplementDependentMode.OFF_MODE, null,
                 false,
@@ -442,7 +442,7 @@ public class ExecuteFunctionServiceTest {
                 null, null,
                 null, null, null,
                 RunMode.RUN_MODE_SERIAL,
-                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
+                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, null, Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
                 ComplementDependentMode.OFF_MODE, null,
                 false,
@@ -467,14 +467,14 @@ public class ExecuteFunctionServiceTest {
                 null, null,
                 null, null, null,
                 RunMode.RUN_MODE_PARALLEL,
-                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
+                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 2, Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
                 ComplementDependentMode.OFF_MODE, null,
                 false,
                 ExecutionOrder.DESC_ORDER);
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-        verify(commandService, times(31)).createCommand(any(Command.class));
 
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        verify(commandService, times(2)).createCommand(any(Command.class));
     }
 
     /**
@@ -526,7 +526,7 @@ public class ExecuteFunctionServiceTest {
                 100L,
                 110,
                 null,
-                0,
+                null,
                 Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
                 ComplementDependentMode.OFF_MODE, null,
