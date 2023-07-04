@@ -771,3 +771,4 @@ common:
 | `ingress.path`                                                       | Ingress path                                                                                                                                                                                           | `/dolphinscheduler`                    |
 | `ingress.tls.enabled`                                                | Enable ingress tls                                                                                                                                                                                     | `false`                                |
 | `ingress.tls.secretName`                                             | Ingress tls secret name                                                                                                                                                                                | `dolphinscheduler-tls`                 |
+
