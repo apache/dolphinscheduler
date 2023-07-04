@@ -4,7 +4,7 @@
 
 ## Datasource Parameters
 
-|       **Datasource**       | **Description**                                                                       |
+| **Datasource**             | **Description**                                                                       |
 |----------------------------|---------------------------------------------------------------------------------------|
 | Datasource                 | Select DORIS.                                                                         |
 | Datasource name            | Enter the name of the DataSource.                                                     |
@@ -18,5 +18,6 @@
 
 ## Native Supported
 
-No, read section example in [datasource-setting](../howto/datasource-setting.md) `DataSource Center` section to activate this datasource.
+No, read section example in [datasource-setting](../howto/datasource-setting.md) `DataSource Center` section to activate
+this datasource.
 
