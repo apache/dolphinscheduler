@@ -321,7 +321,7 @@ export default {
     serial_discard: 'Serial discard',
     serial_priority: 'Serial priority',
     recover_serial_wait: 'Recover serial wait',
-    global_variables: 'Global Variables',
+    global_variables: 'Global Parameters',
     basic_info: 'Basic Information',
     minute: 'Minute',
     key: 'Key',
