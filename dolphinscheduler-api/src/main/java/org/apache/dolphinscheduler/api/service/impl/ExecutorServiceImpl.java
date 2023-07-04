@@ -33,9 +33,12 @@ import static org.apache.dolphinscheduler.common.constants.Constants.SCHEDULE_TI
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Objects;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowExecuteResponse;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
@@ -243,6 +246,13 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             putMsg(result, Status.TASK_TIMEOUT_PARAMS_ERROR);
             return result;
         }
+
+        if (Objects.nonNull(expectedParallelismNumber) && expectedParallelismNumber<=0) {
+            log.warn("Parameter expectedParallelismNumber is invalid, expectedParallelismNumber:{}.", expectedParallelismNumber);
+            putMsg(result, Status.TASK_PARALLELISM_PARAMS_ERROR);
+            return result;
+        }
+
         checkValidTenant(tenantCode);
         ProcessDefinition processDefinition;
         if (null != version) {
@@ -833,9 +843,14 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     private int createComplementCommand(Long triggerCode, Command command, Map<String, String> cmdParam,
         List<ZonedDateTime> dateTimeList, List<Schedule> schedules,
         ComplementDependentMode complementDependentMode, boolean allLevelDependent) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         int createCount = 0;
-        cmdParam.put(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST, Joiner.on(COMMA).join(dateTimeList));
+        String dateTimeListStr = dateTimeList.stream()
+            .map(item -> item.toLocalDateTime().format(formatter))
+            .collect(Collectors.joining(COMMA));
+
+        cmdParam.put(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST, dateTimeListStr);
         command.setCommandParam(JSONUtils.toJsonString(cmdParam));
 
         log.info("Creating command, commandInfo:{}.", command);
@@ -933,17 +948,24 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             case RUN_MODE_PARALLEL: {
                 log.info("RunMode of {} command is parallel run, processDefinitionCode:{}.",
                         command.getCommandType().getDescp(), command.getProcessDefinitionCode());
-                if (StringUtils.isNotEmpty(dateList)) {
-                    createCount = listDate.size();
-                    if (!CollectionUtils.isEmpty(listDate)) {
-                        if (expectedParallelismNumber != null && expectedParallelismNumber != 0) {
-                            createCount = Math.min(createCount, expectedParallelismNumber);
+
+                int queueNum = 0;
+                if (CollectionUtils.isNotEmpty(listDate)) {
+                    queueNum = listDate.size();
+                    if (expectedParallelismNumber != null && expectedParallelismNumber != 0) {
+                        queueNum = Math.min(queueNum, expectedParallelismNumber);
+                    }
+                    log.info("Complement command run in parallel mode, current expectedParallelismNumber:{}.", queueNum);
+                    List[] queues = new List[queueNum];
+
+                    for (int i = 0; i < listDate.size() ; i++) {
+                        if (Objects.isNull(queues[i % queueNum])) {
+                            queues[i % queueNum] = new ArrayList();
                         }
-                        log.info("Complement command run in parallel mode, current expectedParallelismNumber:{}.",
-                                createCount);
-                        for (List<ZonedDateTime> dateTimeList : Lists.partition(listDate, createCount)) {
-                            createComplementCommand(triggerCode,command, cmdParam, dateTimeList, schedules, complementDependentMode, allLevelDependent);
-                        }
+                        queues[i % queueNum].add(listDate.get(i));
+                    }
+                    for (List queue : queues) {
+                        createCount = createComplementCommand(triggerCode,command, cmdParam, queue, schedules, complementDependentMode, allLevelDependent);
                     }
                 }
                 break;
