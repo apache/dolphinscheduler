@@ -43,7 +43,6 @@ import type { Router } from 'vue-router'
 import type { IWorkflowInstance } from '@/service/modules/process-instances/types'
 import type { ICountDownParam } from './types'
 import type { ExecuteReq } from '@/service/modules/executors/types'
-import { renderEnvironmentalDistinctionCell } from "@/utils/environmental-distinction";
 import { IWorkflowExecutionState } from '@/common/types'
 
 export function useTable() {
