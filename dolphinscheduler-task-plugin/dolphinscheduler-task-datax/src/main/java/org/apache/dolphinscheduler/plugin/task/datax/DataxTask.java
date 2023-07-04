@@ -101,6 +101,11 @@ public class DataxTask extends AbstractTask {
      * datax path
      */
     private static final String DATAX_PATH = "${DATAX_HOME}/bin/datax.py";
+
+    /**
+     * datax win path
+     */
+    private static final String DATAX_WIN_PATH = "%DATAX_HOME%/bin/datax.py";
     /**
      * datax channel count
      */
@@ -403,7 +408,7 @@ public class DataxTask extends AbstractTask {
         // datax python command
         String sbr = DATAX_PYTHON +
                 " " +
-                DATAX_PATH +
+                (SystemUtils.IS_OS_WINDOWS ? DATAX_WIN_PATH : DATAX_PATH) +
                 " " +
                 loadJvmEnv(dataXParameters) +
                 addCustomParameters(paramsMap) +
