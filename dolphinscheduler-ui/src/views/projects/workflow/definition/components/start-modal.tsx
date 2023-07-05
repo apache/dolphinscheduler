@@ -433,6 +433,21 @@ export default defineComponent({
                   </NFormItem>
                 )}
                 <NFormItem
+                    label={t('project.workflow.order_of_execution')}
+                    path='executionOrder'
+                >
+                  <NRadioGroup v-model:value={this.startForm.executionOrder}>
+                    <NSpace>
+                      <NRadio value={'DESC_ORDER'}>
+                        {t('project.workflow.descending_order')}
+                      </NRadio>
+                      <NRadio value={'ASC_ORDER'}>
+                        {t('project.workflow.ascending_order')}
+                      </NRadio>
+                    </NSpace>
+                  </NRadioGroup>
+                </NFormItem>
+                <NFormItem
                   label={t('project.workflow.schedule_date')}
                   path={
                     this.startForm.dataDateType === 1
