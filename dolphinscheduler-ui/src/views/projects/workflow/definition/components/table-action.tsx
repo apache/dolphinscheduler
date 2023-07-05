@@ -184,30 +184,31 @@ export default defineComponent({
                 ? t('project.workflow.down_line')
                 : t('project.workflow.up_line'),
             trigger: () => (
-                  <NButton
-                      size='small'
-                      type={releaseState === 'ONLINE' ? 'warning' : 'error'}
-                      tag='div'
-                      circle
-                      class='btn-publish'
-                  >
-                    <NPopconfirm
-                        onPositiveClick={this.handleReleaseWorkflow}
-                    >
-                      {{
-                        default: () => releaseState === 'ONLINE' ? t('project.workflow.confirm_to_offline') : t('project.workflow.confirm_to_online'),
-                        trigger: () => (
-                            <NIcon>
-                              {releaseState === 'ONLINE' ? (
-                                  <DownloadOutlined />
-                              ) : (
-                                  <UploadOutlined />
-                              )}
-                            </NIcon>
-                        )
-                      }}
-                    </NPopconfirm>
-                  </NButton>
+              <NButton
+                size='small'
+                type={releaseState === 'ONLINE' ? 'warning' : 'error'}
+                tag='div'
+                circle
+                class='btn-publish'
+              >
+                <NPopconfirm onPositiveClick={this.handleReleaseWorkflow}>
+                  {{
+                    default: () =>
+                      releaseState === 'ONLINE'
+                        ? t('project.workflow.confirm_to_offline')
+                        : t('project.workflow.confirm_to_online'),
+                    trigger: () => (
+                      <NIcon>
+                        {releaseState === 'ONLINE' ? (
+                          <DownloadOutlined />
+                        ) : (
+                          <UploadOutlined />
+                        )}
+                      </NIcon>
+                    )
+                  }}
+                </NPopconfirm>
+              </NButton>
             )
           }}
         </NTooltip>

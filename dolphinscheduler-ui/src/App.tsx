@@ -25,7 +25,7 @@ import {
   darkTheme,
   GlobalThemeOverrides,
   NMessageProvider,
-  NDialogProvider,
+  NDialogProvider
 } from 'naive-ui'
 import { useThemeStore } from '@/store/theme/theme'
 import { useLocalesStore } from '@/store/locales/locales'
