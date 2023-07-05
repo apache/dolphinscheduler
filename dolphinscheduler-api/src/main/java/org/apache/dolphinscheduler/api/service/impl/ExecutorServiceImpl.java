@@ -839,18 +839,17 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     private int createComplementCommand(Long triggerCode, Command command, Map<String, String> cmdParam,
                                         List<ZonedDateTime> dateTimeList, List<Schedule> schedules,
                                         ComplementDependentMode complementDependentMode, boolean allLevelDependent) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-        int createCount = 0;
+
         String dateTimeListStr = dateTimeList.stream()
-                .map(item -> item.toLocalDateTime().format(formatter))
+                .map(item -> DateUtils.dateToString(item))
                 .collect(Collectors.joining(COMMA));
 
         cmdParam.put(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST, dateTimeListStr);
         command.setCommandParam(JSONUtils.toJsonString(cmdParam));
 
         log.info("Creating command, commandInfo:{}.", command);
-        createCount = commandService.createCommand(command);
+        int createCount = commandService.createCommand(command);
 
         if (createCount > 0) {
             log.info("Create {} command complete, processDefinitionCode:{}",
@@ -893,9 +892,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                               boolean allLevelDependent,
                                               ExecutionOrder executionOrder) throws CronParseException {
         int createCount = 0;
-        String startDate = null;
-        String endDate = null;
-        String dateList = null;
         int dependentProcessDefinitionCreateCount = 0;
         runMode = (runMode == null) ? RunMode.RUN_MODE_SERIAL : runMode;
         Map<String, String> cmdParam = JSONUtils.toMap(command.getCommandParam());
@@ -911,8 +907,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         List<ZonedDateTime> listDate = new ArrayList<>();
         if (scheduleParam.containsKey(CMD_PARAM_COMPLEMENT_DATA_START_DATE) && scheduleParam.containsKey(
                 CMD_PARAM_COMPLEMENT_DATA_END_DATE)) {
-            startDate = scheduleParam.get(CMD_PARAM_COMPLEMENT_DATA_START_DATE);
-            endDate = scheduleParam.get(CMD_PARAM_COMPLEMENT_DATA_END_DATE);
+            String startDate = scheduleParam.get(CMD_PARAM_COMPLEMENT_DATA_START_DATE);
+            String endDate = scheduleParam.get(CMD_PARAM_COMPLEMENT_DATA_END_DATE);
             if (startDate != null && endDate != null) {
                 listDate = CronUtils.getSelfFireDateList(
                         DateUtils.stringToZoneDateTime(startDate),
@@ -922,12 +918,17 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         }
 
         if (scheduleParam.containsKey(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)) {
-            dateList = scheduleParam.get(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST);
-            dateList = removeDuplicates(dateList);
+            String dateList = scheduleParam.get(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST);
 
-            listDate = Splitter.on(COMMA).splitToStream(dateList).map(item -> DateUtils.stringToZoneDateTime(item))
-                    .collect(
-                            Collectors.toList());
+            if (StringUtils.isNotBlank(dateList)) {
+                listDate = Splitter.on(COMMA).splitToStream(dateList).map(item -> DateUtils.stringToZoneDateTime(item.trim()))
+                    .distinct()
+                    .collect(Collectors.toList());
+            }
+        }
+
+        if (CollectionUtils.isEmpty(listDate)) {
+            throw new ServiceException(Status.TASK_COMPLEMENT_DATA_DATE_ERROR);
         }
 
         if (executionOrder.equals(ExecutionOrder.DESC_ORDER)) {
