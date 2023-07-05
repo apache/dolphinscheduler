@@ -31,6 +31,8 @@ import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.http.client.methods.CloseableHttpResponse;
+
 
 @Slf4j
 @AllArgsConstructor
@@ -38,7 +40,7 @@ public class ProcessDefinitionPage {
 
     private String sessionId;
 
-    public HttpResponse importProcessDefinition(User loginUser, long projectCode, File file) {
+    public CloseableHttpResponse importProcessDefinition(User loginUser, long projectCode, File file) {
         Map<String, Object> params = new HashMap<>();
         params.put("loginUser", loginUser);
 //        params.put("projectCode", projectCode);

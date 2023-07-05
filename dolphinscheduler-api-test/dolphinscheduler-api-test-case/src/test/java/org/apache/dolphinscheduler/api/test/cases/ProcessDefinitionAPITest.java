@@ -29,25 +29,20 @@ import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.File;;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
-import org.testcontainers.shaded.com.google.common.io.Resources;
 
 import lombok.extern.slf4j.Slf4j;
+
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.util.EntityUtils;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 @Slf4j
@@ -64,6 +59,9 @@ public class ProcessDefinitionAPITest {
     private static ProcessDefinitionPage processDefinitionPage;
 
     private static ProjectPage projectPage;
+
+    private static long projectCode;
+
 
     @BeforeAll
     public static void setup() {
@@ -84,55 +82,23 @@ public class ProcessDefinitionAPITest {
 
     @Test
     @Order(1)
-    public void testCreateProject() {
-        try {
-            HttpResponse createProjectResponse = projectPage.createProject(loginUser, "project-test");
-            log.info("[debug111] {}", createProjectResponse.toString());
-            log.info(createProjectResponse.getBody().getSuccess().toString());
-            log.info(createProjectResponse.getBody().getData().toString());
-            HttpResponse queryAllProjectListResponse = projectPage.queryAllProjectList(loginUser);
-            log.info("[debug111] {}", createProjectResponse.toString());
-            log.info(createProjectResponse.getBody().getSuccess().toString());
-            log.info(createProjectResponse.getBody().getData().toString());
-        }  catch (Exception e) {
-            log.error("failed", e);
-            Assertions.fail();
-        }
-    }
-
-    @Disabled
-    @Test
-    @Order(2)
     public void testImportProcessDefinition() {
         try {
-//            MultipartFile file = getMultipartFile("workflow-json/test.json");
+            HttpResponse createProjectResponse = projectPage.createProject(loginUser, "project-test");
+            HttpResponse queryAllProjectListResponse = projectPage.queryAllProjectList(loginUser);
+            Assertions.assertTrue(queryAllProjectListResponse.getBody().getSuccess());
+
+            projectCode = (long) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllProjectListResponse.getBody().getData()).get(0)).get("code");
             ClassLoader classLoader = getClass().getClassLoader();
             File file = new File(classLoader.getResource("workflow-json/test.json").getFile());
-            HttpResponse importProcessDefinitionResponse = processDefinitionPage
-                .importProcessDefinition(loginUser, 1, file);
-            log.info("[debug111] {}", importProcessDefinitionResponse.toString());
-            log.info(importProcessDefinitionResponse.getBody().getSuccess().toString());
-            log.info(importProcessDefinitionResponse.getBody().getData().toString());
+            CloseableHttpResponse importProcessDefinitionResponse = processDefinitionPage
+                .importProcessDefinition(loginUser, projectCode, file);
+            String data = EntityUtils.toString(importProcessDefinitionResponse.getEntity());
+            Assertions.assertTrue(data.contains("\"success\":true"));
         }  catch (Exception e) {
             log.error("failed", e);
             Assertions.fail();
         }
-    }
-
-    private MultipartFile getMultipartFile(String filePath) throws URISyntaxException {
-        URL urlPath = Resources.getResource(filePath);
-        Path path = Paths.get(urlPath.toURI());
-//        String contentType = "text/plain";
-        String contentType = "multipart/form-data";
-        byte[] content = null;
-        try {
-            content = Files.readAllBytes(path);
-        } catch (final IOException e) {
-        }
-        MultipartFile result = new MockMultipartFile(filePath,
-            filePath, contentType, content);
-        log.info("workflow json size: {}", result.getSize());
-        return result;
     }
 }
 

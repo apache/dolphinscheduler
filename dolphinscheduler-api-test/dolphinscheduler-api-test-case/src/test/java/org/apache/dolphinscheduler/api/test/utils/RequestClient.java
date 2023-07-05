@@ -47,6 +47,8 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
+import org.apache.http.util.EntityUtils;
+
 
 @Slf4j
 public class RequestClient {
@@ -169,56 +171,32 @@ public class RequestClient {
         return httpResponse;
     }
 
-    public HttpResponse postWithFile(String url, Map<String, String> headers, Map<String, Object> params, File file) {
-//        headers.put("enctype", "multipart/form-data");
-//        headers.put("Content-Type", "multipart/form-data");
-
-        Headers headersBuilder = Headers.of(headers);
-
-//        RequestBody requestBody = FormBody.create(MediaType.parse(Constants.REQUEST_CONTENT_TYPE), getParams(params));
-
-        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-        builder.addTextBody("json", getParams(params), ContentType.MULTIPART_FORM_DATA);
-        builder.addBinaryBody(
-            "file",
-            new FileInputStream(file),
-            ContentType.APPLICATION_OCTET_STREAM,
-            file.getName()
-        );
-
-        HttpEntity multipart = builder.build();
-
-//        RequestBody requestBody = FormBody.create(MediaType.parse(Constants.MULTIPART_FORM_DATA), getParams(params));
-
-        log.info("POST request to {}, Headers: {}, Params: {}", requestUrl, headersBuilder, params);
-//        Request request = new Request.Builder()
-//            .headers(headersBuilder)
-//            .url(requestUrl)
-//            .post(requestBody)
-//            .build();
-        HttpPost httpPost = new HttpPost(requestUrl);
-        for (Map.Entry<String, String> header : headers.entrySet()) {
-            httpPost.setHeader(new BasicHeader(header.getKey(), header.getValue()));
+    public CloseableHttpResponse postWithFile(String url, Map<String, String> headers, Map<String, Object> params, File file) {
+        try {
+            Headers headersBuilder = Headers.of(headers);
+            MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+            builder.addTextBody("json", getParams(params), ContentType.MULTIPART_FORM_DATA);
+            builder.addBinaryBody(
+                "file",
+                new FileInputStream(file),
+                ContentType.APPLICATION_OCTET_STREAM,
+                file.getName()
+            );
+            HttpEntity multipart = builder.build();
+            String requestUrl = String.format("%s%s", Constants.DOLPHINSCHEDULER_API_URL, url);
+            log.info("POST request to {}, Headers: {}, Params: {}", requestUrl, headersBuilder, params);
+            HttpPost httpPost = new HttpPost(requestUrl);
+            for (Map.Entry<String, String> header : headers.entrySet()) {
+                httpPost.setHeader(new BasicHeader(header.getKey(), header.getValue()));
+            }
+            httpPost.setEntity(multipart);
+            CloseableHttpClient client = HttpClients.createDefault();
+            CloseableHttpResponse response = client.execute(httpPost);
+//            log.info("[debug111] response - {}", EntityUtils.toString(response.getEntity()));
+            return response;
+        } catch (Exception e) {
+            log.error("error", e);
         }
-        httpPost.setEntity(multipart);
-        CloseableHttpClient client = HttpClients.createDefault();
-
-//        Response response = this.httpClient.newCall(request).execute();
-        CloseableHttpResponse response = client.execute(httpPost);
-        log.info("[debug111] response - {}", response);
-
-//        int responseCode = response.code();
-//        HttpResponseBody responseData = null;
-//        if (response.body() != null) {
-//            responseData = JSONUtils.parseObject(response.body().string(), HttpResponseBody.class);
-//        }
-//        response.close();
-//
-//        HttpResponse httpResponse = new HttpResponse(responseCode, responseData);
-//
-//        log.info("POST response: {}", httpResponse);
-
-//        return httpResponse;
         return null;
     }
 
