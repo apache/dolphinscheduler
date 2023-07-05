@@ -223,7 +223,10 @@ export default {
     workflow_relation_no_data_result_desc:
       '目前没有任何工作流，请先创建工作流，再访问该页面',
     ready_to_block: '准备锁定',
-    block: '锁定'
+    block: '锁定',
+    want_to_set_timing: '现在想去配置该工作流定时?',
+    confirm_to_online: '是否确定上线该工作流?',
+    confirm_to_offline: '是否确定下线该工作流?',
   },
   task: {
     on_line: '线上',

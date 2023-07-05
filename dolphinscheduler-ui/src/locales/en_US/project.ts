@@ -75,6 +75,8 @@ export default {
     modify_user: 'Modify User',
     operation: 'Operation',
     edit: 'Edit',
+    confirm: 'Confirm',
+    cancel: 'Cancel',
     start: 'Start',
     timing: 'Timing',
     timezone: 'Timezone',
@@ -223,7 +225,10 @@ export default {
     workflow_relation_no_data_result_desc:
       'There is not any workflows. Please create a workflow, and then visit this page again.',
     ready_to_block: 'Ready to block',
-    block: 'Block'
+    block: 'Block',
+    want_to_set_timing: 'Would you like to set the workflow\'s timing?',
+    confirm_to_online: 'Confirm to make the workflow online?',
+    confirm_to_offline: 'Confirm to make the workflow offline?',
   },
   task: {
     on_line: 'Online',
