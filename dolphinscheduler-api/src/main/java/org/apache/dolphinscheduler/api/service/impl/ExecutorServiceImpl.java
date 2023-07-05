@@ -103,7 +103,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -840,7 +839,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                         List<ZonedDateTime> dateTimeList, List<Schedule> schedules,
                                         ComplementDependentMode complementDependentMode, boolean allLevelDependent) {
 
-
         String dateTimeListStr = dateTimeList.stream()
                 .map(item -> DateUtils.dateToString(item))
                 .collect(Collectors.joining(COMMA));
@@ -921,9 +919,10 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             String dateList = scheduleParam.get(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST);
 
             if (StringUtils.isNotBlank(dateList)) {
-                listDate = Splitter.on(COMMA).splitToStream(dateList).map(item -> DateUtils.stringToZoneDateTime(item.trim()))
-                    .distinct()
-                    .collect(Collectors.toList());
+                listDate = Splitter.on(COMMA).splitToStream(dateList)
+                        .map(item -> DateUtils.stringToZoneDateTime(item.trim()))
+                        .distinct()
+                        .collect(Collectors.toList());
             }
         }
 
