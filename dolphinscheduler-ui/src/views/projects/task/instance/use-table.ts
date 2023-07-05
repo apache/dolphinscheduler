@@ -39,7 +39,6 @@ import {
   DefaultTableWidth
 } from '@/common/column-width-config'
 import type { Router, TaskInstancesRes, IRecord, ITaskState } from './types'
-import { renderEnvironmentalDistinctionCell } from "@/utils/environmental-distinction";
 
 
 export function useTable() {
