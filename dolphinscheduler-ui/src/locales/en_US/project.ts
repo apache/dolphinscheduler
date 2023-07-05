@@ -579,6 +579,7 @@ export default {
     add_pre_task_check_condition: 'Add pre task check condition',
     switch_condition: 'Condition',
     switch_branch_flow: 'Branch Flow',
+    switch_branch_flow_default: 'Default Branch Flow',
     switch_branch_flow_tips: 'Please select branch flow',
     and: 'and',
     or: 'or',

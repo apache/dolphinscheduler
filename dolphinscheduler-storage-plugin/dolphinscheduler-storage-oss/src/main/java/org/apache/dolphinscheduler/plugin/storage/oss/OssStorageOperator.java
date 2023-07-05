@@ -59,7 +59,6 @@ import lombok.extern.slf4j.Slf4j;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSException;
 import com.aliyun.oss.ServiceException;
-import com.aliyun.oss.model.Bucket;
 import com.aliyun.oss.model.DeleteObjectsRequest;
 import com.aliyun.oss.model.ListObjectsV2Request;
 import com.aliyun.oss.model.ListObjectsV2Result;
@@ -378,7 +377,6 @@ public class OssStorageOperator implements Closeable, StorageOperate {
                     entity.setFileName(fileName);
                     entity.setFullName(summary.getKey());
                     entity.setDirectory(false);
-                    entity.setDescription("");
                     entity.setUserName(tenantCode);
                     entity.setType(type);
                     entity.setSize(summary.getSize());
@@ -400,7 +398,6 @@ public class OssStorageOperator implements Closeable, StorageOperate {
                 entity.setFileName(fileName);
                 entity.setFullName(commonPrefix);
                 entity.setDirectory(true);
-                entity.setDescription("");
                 entity.setUserName(tenantCode);
                 entity.setType(type);
                 entity.setSize(0);
@@ -444,7 +441,6 @@ public class OssStorageOperator implements Closeable, StorageOperate {
             entity.setFileName(fileName);
             entity.setFullName(path);
             entity.setDirectory(true);
-            entity.setDescription("");
             entity.setUserName(tenantCode);
             entity.setType(type);
             entity.setSize(0);
@@ -464,7 +460,6 @@ public class OssStorageOperator implements Closeable, StorageOperate {
                 entity.setFileName(fileName);
                 entity.setFullName(summary.getKey());
                 entity.setDirectory(false);
-                entity.setDescription("");
                 entity.setUserName(tenantCode);
                 entity.setType(type);
                 entity.setSize(summary.getSize());
@@ -513,17 +508,13 @@ public class OssStorageOperator implements Closeable, StorageOperate {
             throw new IllegalArgumentException("resource.alibaba.cloud.oss.bucket.name is empty");
         }
 
-        Bucket existsBucket = ossClient.listBuckets()
-                .stream()
-                .filter(
-                        bucket -> bucket.getName().equals(bucketName))
-                .findFirst()
-                .orElseThrow(() -> {
-                    return new IllegalArgumentException(
-                            "bucketName: " + bucketName + " does not exist, you need to create them by yourself");
-                });
+        boolean existsBucket = ossClient.doesBucketExist(bucketName);
+        if (!existsBucket) {
+            throw new IllegalArgumentException(
+                    "bucketName: " + bucketName + " is not exists, you need to create them by yourself");
+        }
 
-        log.info("bucketName: {} has been found, the current regionName is {}", existsBucket.getName(), region);
+        log.info("bucketName: {} has been found, the current regionName is {}", bucketName, region);
     }
 
     protected void deleteDir(String directoryName) {

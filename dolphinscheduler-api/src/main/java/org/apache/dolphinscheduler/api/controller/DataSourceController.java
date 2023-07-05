@@ -83,7 +83,7 @@ public class DataSourceController extends BaseController {
      *
      * @param loginUser login user
      * @param jsonStr   datasource param
-     *                  example: {"type":"MYSQL","name":"txx","note":"","host":"localhost","port":3306,"principal":"","javaSecurityKrb5Conf":"","loginUserKeytabUsername":"","loginUserKeytabPath":"","userName":"root","password":"xxx","database":"ds","connectType":"","other":{"serverTimezone":"GMT-8"},"id":2,"testFlag":0,"bindTestId":1}
+     *                  example: {"type":"MYSQL","name":"txx","note":"","host":"localhost","port":3306,"principal":"","javaSecurityKrb5Conf":"","loginUserKeytabUsername":"","loginUserKeytabPath":"","userName":"root","password":"xxx","database":"ds","connectType":"","other":{"serverTimezone":"GMT-8"},"id":2}
      * @return create result code
      */
     @Operation(summary = "createDataSource", description = "CREATE_DATA_SOURCE_NOTES")
@@ -103,7 +103,7 @@ public class DataSourceController extends BaseController {
      * @param loginUser login user
      * @param id        datasource id
      * @param jsonStr   datasource param
-     *                  example: {"type":"MYSQL","name":"txx","note":"","host":"localhost","port":3306,"principal":"","javaSecurityKrb5Conf":"","loginUserKeytabUsername":"","loginUserKeytabPath":"","userName":"root","password":"xxx","database":"ds","connectType":"","other":{"serverTimezone":"GMT-8"},"id":2,"testFlag":0,"bindTestId":1}
+     *                  example: {"type":"MYSQL","name":"txx","note":"","host":"localhost","port":3306,"principal":"","javaSecurityKrb5Conf":"","loginUserKeytabUsername":"","loginUserKeytabPath":"","userName":"root","password":"xxx","database":"ds","connectType":"","other":{"serverTimezone":"GMT-8"},"id":2}
      * @return update result code
      */
     @Operation(summary = "updateDataSource", description = "UPDATE_DATA_SOURCE_NOTES")
@@ -147,7 +147,7 @@ public class DataSourceController extends BaseController {
     }
 
     /**
-     * query online/testDatasource by type
+     * query datasource by type
      *
      * @param loginUser login user
      * @param type data source type
@@ -156,16 +156,14 @@ public class DataSourceController extends BaseController {
     @Operation(summary = "queryDataSourceList", description = "QUERY_DATA_SOURCE_LIST_BY_TYPE_NOTES")
     @Parameters({
             @Parameter(name = "type", description = "DB_TYPE", required = true, schema = @Schema(implementation = DbType.class)),
-            @Parameter(name = "testFlag", description = "DB_TEST_FLAG", required = true, schema = @Schema(implementation = int.class))
     })
     @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_DATASOURCE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryDataSourceList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                      @RequestParam("type") DbType type,
-                                      @RequestParam("testFlag") int testFlag) {
-        Map<String, Object> result = dataSourceService.queryDataSourceList(loginUser, type.ordinal(), testFlag);
+                                      @RequestParam("type") DbType type) {
+        Map<String, Object> result = dataSourceService.queryDataSourceList(loginUser, type.ordinal());
         return returnDataList(result);
     }
 

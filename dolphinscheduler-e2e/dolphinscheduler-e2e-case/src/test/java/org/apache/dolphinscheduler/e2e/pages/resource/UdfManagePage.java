@@ -70,11 +70,10 @@ public class UdfManagePage extends NavBarPage implements ResourcePage.Tab {
         createDirectoryBox = new CreateDirectoryBox();
     }
 
-    public UdfManagePage createDirectory(String name, String description) {
+    public UdfManagePage createDirectory(String name) {
         buttonCreateDirectory().click();
 
         createDirectoryBox().inputDirectoryName().sendKeys(name);
-        createDirectoryBox().inputDescription().sendKeys(description);
         createDirectoryBox().buttonSubmit().click();
 
         return this;
@@ -150,12 +149,6 @@ public class UdfManagePage extends NavBarPage implements ResourcePage.Tab {
         })
         private WebElement inputName;
 
-        @FindBys({
-            @FindBy(className = "input-description"),
-            @FindBy(tagName = "textarea"),
-        })
-        private WebElement inputDescription;
-
         @FindBy(className = "btn-submit")
         private WebElement buttonSubmit;
 
@@ -193,12 +186,6 @@ public class UdfManagePage extends NavBarPage implements ResourcePage.Tab {
                 @FindBy(tagName = "input"),
         })
         private WebElement inputDirectoryName;
-
-        @FindBys({
-                @FindBy(className = "input-description"),
-                @FindBy(tagName = "textarea"),
-        })
-        private WebElement inputDescription;
 
         @FindBy(className = "btn-submit")
         private WebElement buttonSubmit;
