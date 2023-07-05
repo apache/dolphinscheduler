@@ -37,11 +37,12 @@ public class K8sTaskParameters extends AbstractParameters {
     private String image;
     private String namespace;
     private String command;
-    private List<Label> customizedLabels;
-    private List<NodeSelectorExpression> nodeSelectors;
     private String args;
+    private String imagePullPolicy;
     private double minCpuCores;
     private double minMemorySpace;
+    private List<Label> customizedLabels;
+    private List<NodeSelectorExpression> nodeSelectors;
 
     @Override
     public boolean checkParameters() {

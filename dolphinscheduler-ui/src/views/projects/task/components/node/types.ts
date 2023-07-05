@@ -370,6 +370,7 @@ interface ITaskParams {
   minCpuCores?: string
   minMemorySpace?: string
   image?: string
+  imagePullPolicy?: string
   command?: string
   args?: string
   customizedLabels?: ILabel[]

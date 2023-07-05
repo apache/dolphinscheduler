@@ -22,6 +22,7 @@ kubernetes任务类型，用于在kubernetes上执行一个短时和批处理的
 | 最小CPU    | 任务在kubernetes上运行所需的最小CPU                                                                                                                                                            |
 | 最小内存     | 任务在kubernetes上运行所需的最小内存                                                                                                                                                             |
 | 镜像       | 镜像地址                                                                                                                                                                                |
+| 镜像拉取策略   | 镜像的拉取策略                                                                                                                                                                             |
 | 容器执行命令   | 容器执行命令（yaml格式数组），例如：["printenv"]                                                                                                                                                    |
 | 执行命令参数   | 执行命令参数（yaml格式数组），例如：["HOSTNAME", "KUBERNETES_PORT"]                                                                                                                                 |
 | 自定义标签    | 作业自定义标签                                                                                                                                                                             |

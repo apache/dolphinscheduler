@@ -347,6 +347,7 @@ export function formatParams(data: INodeData): {
     taskParams.minCpuCores = data.minCpuCores
     taskParams.minMemorySpace = data.minMemorySpace
     taskParams.image = data.image
+    taskParams.imagePullPolicy = data.imagePullPolicy
     taskParams.command = data.command
     taskParams.args = data.args
     taskParams.customizedLabels = data.customizedLabels

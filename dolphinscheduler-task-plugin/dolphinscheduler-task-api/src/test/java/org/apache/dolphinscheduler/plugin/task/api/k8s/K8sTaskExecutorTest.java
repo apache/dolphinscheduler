@@ -44,6 +44,7 @@ public class K8sTaskExecutorTest {
     private K8sTaskExecutor k8sTaskExecutor = null;
     private K8sTaskMainParameters k8sTaskMainParameters = null;
     private final String image = "ds-dev";
+    private final String imagePullPolicy = "IfNotPresent";
     private final String namespace = "{\"name\":\"default\",\"cluster\":\"lab\"}";
     private final double minCpuCores = 2;
     private final double minMemorySpace = 10;
@@ -68,6 +69,7 @@ public class K8sTaskExecutorTest {
         k8sTaskExecutor = new K8sTaskExecutor(null, taskRequest);
         k8sTaskMainParameters = new K8sTaskMainParameters();
         k8sTaskMainParameters.setImage(image);
+        k8sTaskMainParameters.setImagePullPolicy(imagePullPolicy);
         k8sTaskMainParameters.setNamespaceName(namespaceName);
         k8sTaskMainParameters.setClusterName(clusterName);
         k8sTaskMainParameters.setMinCpuCores(minCpuCores);

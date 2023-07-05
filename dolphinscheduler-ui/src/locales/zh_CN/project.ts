@@ -385,6 +385,8 @@ export default {
     mb: 'MB',
     image: '镜像',
     image_tips: '请输入镜像',
+    image_pull_policy: '镜像拉取策略',
+    image_pull_policy_tips: '请选择镜像拉取策略（必选）',
     command: '容器执行命令',
     command_tips: '请输入容器执行命令，例如：["printenv"]',
     args: '执行命令参数',
