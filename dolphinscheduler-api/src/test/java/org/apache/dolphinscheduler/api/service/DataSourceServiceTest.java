@@ -543,6 +543,7 @@ public class DataSourceServiceTest {
                 .thenReturn(null);
         result = dataSourceService.getDatabases(datasourceId);
         Assertions.assertEquals(Status.DATASOURCE_CONNECT_FAILED, result.get(Constants.STATUS));
-
+        connection.close();
+        dataSourceUtils.close();
     }
 }
