@@ -341,7 +341,8 @@ public class StreamTaskExecuteRunnable implements Runnable {
         taskExecutionContext.setProcessDefineVersion(processDefinition.getVersion());
         // process instance id default 0
         taskExecutionContext.setProcessInstanceId(0);
-        taskExecutionContextFactory.buildTaskExecutionContext(taskExecutionContext, taskInstance, tenantCode);
+        taskExecutionContextFactory.setDataQualityTaskExecutionContext(taskExecutionContext, taskInstance, tenantCode);
+        taskExecutionContextFactory.setK8sTaskRelatedInfo(taskExecutionContext, taskInstance);
         return taskExecutionContext;
     }
 

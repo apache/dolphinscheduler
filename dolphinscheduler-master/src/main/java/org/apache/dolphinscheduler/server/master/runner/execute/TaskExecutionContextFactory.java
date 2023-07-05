@@ -138,21 +138,24 @@ public class TaskExecutionContextFactory {
                 .buildParamInfo(propertyMap)
                 .create();
 
-        buildTaskExecutionContext(taskExecutionContext, taskInstance, workflowInstance.getTenantCode());
+        setDataQualityTaskExecutionContext(taskExecutionContext, taskInstance, workflowInstance.getTenantCode());
+        setK8sTaskRelatedInfo(taskExecutionContext, taskInstance);
         return taskExecutionContext;
     }
 
-    public void buildTaskExecutionContext(TaskExecutionContext taskExecutionContext, TaskInstance taskInstance,
-                                          String tenantCode) {
+    public void setDataQualityTaskExecutionContext(TaskExecutionContext taskExecutionContext, TaskInstance taskInstance,
+                                                   String tenantCode) {
         // TODO to be optimized
         DataQualityTaskExecutionContext dataQualityTaskExecutionContext = null;
         if (TASK_TYPE_DATA_QUALITY.equalsIgnoreCase(taskInstance.getTaskType())) {
             dataQualityTaskExecutionContext = new DataQualityTaskExecutionContext();
             setDataQualityTaskRelation(dataQualityTaskExecutionContext, taskInstance, tenantCode);
         }
-
-        K8sTaskExecutionContext k8sTaskExecutionContext = setK8sTaskRelation(taskInstance);
         taskExecutionContext.setDataQualityTaskExecutionContext(dataQualityTaskExecutionContext);
+    }
+
+    public void setK8sTaskRelatedInfo(TaskExecutionContext taskExecutionContext, TaskInstance taskInstance) {
+        K8sTaskExecutionContext k8sTaskExecutionContext = setK8sTaskRelation(taskInstance);
         taskExecutionContext.setK8sTaskExecutionContext(k8sTaskExecutionContext);
     }
 
