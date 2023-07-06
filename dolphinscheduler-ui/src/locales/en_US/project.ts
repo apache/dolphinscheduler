@@ -318,7 +318,7 @@ export default {
     serial_discard: 'Serial discard',
     serial_priority: 'Serial priority',
     recover_serial_wait: 'Recover serial wait',
-    global_variables: 'Global Variables',
+    global_variables: 'Global Parameters',
     basic_info: 'Basic Information',
     minute: 'Minute',
     key: 'Key',
@@ -386,6 +386,8 @@ export default {
     mb: 'MB',
     image: 'Image',
     image_tips: 'Please enter image',
+    image_pull_policy: 'Image pull policy',
+    image_pull_policy_tips: 'Please select a image pull policy (required)',
     command: 'Command',
     command_tips:
       'Please enter the container execution command, for example: ["printenv"]',

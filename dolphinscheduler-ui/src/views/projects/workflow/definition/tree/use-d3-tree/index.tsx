@@ -15,23 +15,20 @@
  * limitations under the License.
  */
 
-.content {
-  width: 100%;
-  position: relative;
+import { defineComponent } from 'vue'
+import './index.scss'
 
-  .card {
-    margin-bottom: 8px;
+const UseTree = defineComponent({
+  name: 'D3Tree',
+  render() {
+    return (
+      <div class='tree-model'>
+        <div class='d3-tree'>
+          <svg class='tree-svg' width='100%'></svg>
+        </div>
+      </div>
+    )
   }
+})
 
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 10px 0;
-    .right {
-      float: right;
-      margin: 3px 0 3px 4px;
-      width: 15%;
-    }
-  }
-}
+export default UseTree
