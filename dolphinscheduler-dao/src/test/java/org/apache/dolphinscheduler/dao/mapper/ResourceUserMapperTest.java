@@ -79,7 +79,7 @@ public class ResourceUserMapperTest extends BaseDaoTest {
         ResourcesUser queue = insertOne();
         // query
         List<ResourcesUser> queues = resourceUserMapper.selectList(null);
-        Assertions.assertNotEquals(queues.size(), 0);
+        Assertions.assertNotEquals(0, queues.size());
     }
 
     /**
@@ -92,7 +92,7 @@ public class ResourceUserMapperTest extends BaseDaoTest {
         int delete = resourceUserMapper.deleteResourceUser(
                 queue.getUserId(),
                 queue.getResourcesId());
-        Assertions.assertNotEquals(delete, 0);
+        Assertions.assertNotEquals(0, delete);
     }
 
     /**
@@ -106,6 +106,6 @@ public class ResourceUserMapperTest extends BaseDaoTest {
         int delete = resourceUserMapper.deleteResourceUserArray(
                 resourcesUser.getUserId(),
                 resourceIdArray);
-        Assertions.assertNotEquals(delete, 0);
+        Assertions.assertNotEquals(0, delete);
     }
 }

@@ -85,7 +85,7 @@ public class ErrorCommandMapperTest extends BaseDaoTest {
                 null,
                 projectCodeArray);
 
-        Assertions.assertNotEquals(commandCounts.size(), 0);
-        Assertions.assertNotEquals(commandCounts2.size(), 0);
+        Assertions.assertNotEquals(0, commandCounts.size());
+        Assertions.assertNotEquals(0, commandCounts2.size());
     }
 }

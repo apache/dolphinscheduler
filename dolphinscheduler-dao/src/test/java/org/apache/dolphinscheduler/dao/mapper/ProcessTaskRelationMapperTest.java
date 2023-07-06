@@ -57,14 +57,14 @@ public class ProcessTaskRelationMapperTest extends BaseDaoTest {
     public void testQueryByProcessCode() {
         ProcessTaskRelation processTaskRelation = insertOne();
         List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper.queryByProcessCode(1L, 1L);
-        Assertions.assertNotEquals(processTaskRelations.size(), 0);
+        Assertions.assertNotEquals(0, processTaskRelations.size());
     }
 
     @Test
     public void testQueryByTaskCode() {
         ProcessTaskRelation processTaskRelation = insertOne();
         List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper.queryByTaskCode(2L);
-        Assertions.assertNotEquals(processTaskRelations.size(), 0);
+        Assertions.assertNotEquals(0, processTaskRelations.size());
     }
 
     @Test
@@ -73,14 +73,14 @@ public class ProcessTaskRelationMapperTest extends BaseDaoTest {
 
         Long[] codes = Arrays.array(1L, 2L);
         List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper.queryByTaskCodes(codes);
-        Assertions.assertNotEquals(processTaskRelations.size(), 0);
+        Assertions.assertNotEquals(0, processTaskRelations.size());
     }
 
     @Test
     public void testDeleteByCode() {
         ProcessTaskRelation processTaskRelation = insertOne();
         int i = processTaskRelationMapper.deleteByCode(1L, 1L);
-        Assertions.assertNotEquals(i, 0);
+        Assertions.assertNotEquals(0, i);
     }
 
 }

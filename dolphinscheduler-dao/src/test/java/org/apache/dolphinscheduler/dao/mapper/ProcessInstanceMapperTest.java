@@ -114,7 +114,7 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
         ProcessInstance processInstance = insertOne();
         // query
         List<ProcessInstance> dataSources = processInstanceMapper.selectList(null);
-        Assertions.assertNotEquals(dataSources.size(), 0);
+        Assertions.assertNotEquals(0, dataSources.size());
         processInstanceMapper.deleteById(processInstance.getId());
     }
 
@@ -148,7 +148,7 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
         List<ProcessInstance> processInstances = processInstanceMapper.queryByHostAndStatus(null, stateArray);
 
         processInstanceMapper.deleteById(processInstance.getId());
-        Assertions.assertNotEquals(processInstances.size(), 0);
+        Assertions.assertNotEquals(0, processInstances.size());
     }
 
     /**
@@ -190,7 +190,7 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
                 processInstance.getHost(),
                 null,
                 null);
-        Assertions.assertNotEquals(processInstanceIPage.getTotal(), 0);
+        Assertions.assertNotEquals(0, processInstanceIPage.getTotal());
 
         processDefinitionMapper.deleteById(processDefinition.getId());
         processInstanceMapper.deleteById(processInstance.getId());
@@ -213,7 +213,7 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
         processInstanceMapper.updateById(processInstance);
         String host = processInstance.getHost();
         int update = processInstanceMapper.setFailoverByHostAndStateArray(host, stateArray);
-        Assertions.assertNotEquals(update, 0);
+        Assertions.assertNotEquals(0, update);
 
         processInstance = processInstanceMapper.selectById(processInstance.getId());
         Assertions.assertNull(processInstance.getHost());
@@ -269,7 +269,7 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
         List<ExecuteStatusCount> executeStatusCounts =
                 processInstanceMapper.countInstanceStateByProjectCodes(null, null, projectCodes);
 
-        Assertions.assertNotEquals(executeStatusCounts.size(), 0);
+        Assertions.assertNotEquals(0, executeStatusCounts.size());
 
         projectMapper.deleteById(project.getId());
         processDefinitionMapper.deleteById(processDefinition.getId());
@@ -308,7 +308,7 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
         ProcessInstance processInstance1 =
                 processInstanceMapper.queryLastSchedulerProcess(processInstance.getProcessDefinitionCode(), null, null,
                         processInstance.getTestFlag());
-        Assertions.assertNotEquals(processInstance1, null);
+        Assertions.assertNotEquals(null, processInstance1);
         processInstanceMapper.deleteById(processInstance.getId());
     }
 
@@ -329,7 +329,7 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
                 .queryLastRunningProcess(processInstance.getProcessDefinitionCode(), null, null,
                         processInstance.getTestFlag(), stateArray);
 
-        Assertions.assertNotEquals(processInstance1, null);
+        Assertions.assertNotEquals(null, processInstance1);
         processInstanceMapper.deleteById(processInstance.getId());
     }
 

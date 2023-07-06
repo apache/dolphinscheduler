@@ -137,7 +137,7 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
         // query
         List<TaskInstance> taskInstances = taskInstanceMapper.selectList(null);
         taskInstanceMapper.deleteById(taskInstance.getId());
-        Assertions.assertNotEquals(taskInstances.size(), 0);
+        Assertions.assertNotEquals(0, taskInstances.size());
     }
 
     /**
@@ -156,7 +156,7 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
                 task.getProcessInstanceId(),
                 TaskExecutionStatus.RUNNING_EXECUTION.getCode());
         taskInstanceMapper.deleteById(task.getId());
-        Assertions.assertNotEquals(taskInstances.size(), 0);
+        Assertions.assertNotEquals(0, taskInstances.size());
     }
 
     /**
@@ -187,8 +187,8 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
                 processInstance.getTestFlag());
         taskInstanceMapper.deleteById(task2.getId());
         taskInstanceMapper.deleteById(task.getId());
-        Assertions.assertNotEquals(taskInstances.size(), 0);
-        Assertions.assertNotEquals(taskInstances1.size(), 0);
+        Assertions.assertNotEquals(0, taskInstances.size());
+        Assertions.assertNotEquals(0, taskInstances1.size());
     }
 
     /**
@@ -207,7 +207,7 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
         List<TaskInstance> taskInstances = taskInstanceMapper.queryByHostAndStatus(
                 task.getHost(), new int[]{TaskExecutionStatus.RUNNING_EXECUTION.getCode()});
         taskInstanceMapper.deleteById(task.getId());
-        Assertions.assertNotEquals(taskInstances.size(), 0);
+        Assertions.assertNotEquals(0, taskInstances.size());
     }
 
     /**
@@ -228,7 +228,7 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
                 new int[]{TaskExecutionStatus.RUNNING_EXECUTION.getCode()},
                 TaskExecutionStatus.NEED_FAULT_TOLERANCE);
         taskInstanceMapper.deleteById(task.getId());
-        Assertions.assertNotEquals(setResult, 0);
+        Assertions.assertNotEquals(0, setResult);
     }
 
     /**
@@ -248,7 +248,7 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
                 task.getProcessInstanceId(),
                 task.getName());
         taskInstanceMapper.deleteById(task.getId());
-        Assertions.assertNotEquals(taskInstance, null);
+        Assertions.assertNotEquals(null, taskInstance);
     }
 
     /**
@@ -268,7 +268,7 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
                 task.getProcessInstanceId(),
                 task.getTaskCode());
         taskInstanceMapper.deleteById(task.getId());
-        Assertions.assertNotEquals(taskInstance, null);
+        Assertions.assertNotEquals(null, taskInstance);
     }
 
     /**
@@ -288,7 +288,7 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
                 Collections.singletonList(task.getProcessInstanceId()),
                 Collections.singletonList(task.getTaskCode()));
         taskInstanceMapper.deleteById(task.getId());
-        Assertions.assertEquals(taskInstances.size(), 1);
+        Assertions.assertEquals(1, taskInstances.size());
     }
 
     /**
@@ -317,8 +317,8 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
                 new int[]{task.getId()});
         taskInstanceMapper.deleteById(task.getId());
         processDefinitionMapper.deleteById(definition.getId());
-        Assertions.assertEquals(countTask, 0);
-        Assertions.assertEquals(countTask2, 0);
+        Assertions.assertEquals(0, countTask);
+        Assertions.assertEquals(0, countTask2);
 
     }
 
@@ -383,7 +383,7 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
         processInstanceMapper.deleteById(processInstance.getId());
         taskInstanceMapper.deleteById(task.getId());
         processDefinitionMapper.deleteById(definition.getId());
-        Assertions.assertEquals(taskInstanceIPage.getTotal(), 0);
+        Assertions.assertEquals(0, taskInstanceIPage.getTotal());
 
     }
 }

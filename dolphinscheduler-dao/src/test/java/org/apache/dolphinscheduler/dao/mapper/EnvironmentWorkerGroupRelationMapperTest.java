@@ -83,7 +83,7 @@ public class EnvironmentWorkerGroupRelationMapperTest extends BaseDaoTest {
         EnvironmentWorkerGroupRelation relation = insertOne();
         List<EnvironmentWorkerGroupRelation> environmentWorkerGroupRelations =
                 environmentWorkerGroupRelationMapper.queryByEnvironmentCode(1L);
-        Assertions.assertNotEquals(environmentWorkerGroupRelations.size(), 0);
+        Assertions.assertNotEquals(0, environmentWorkerGroupRelations.size());
     }
 
     @Test
@@ -91,13 +91,13 @@ public class EnvironmentWorkerGroupRelationMapperTest extends BaseDaoTest {
         EnvironmentWorkerGroupRelation relation = insertOne();
         List<EnvironmentWorkerGroupRelation> environmentWorkerGroupRelations =
                 environmentWorkerGroupRelationMapper.queryByWorkerGroupName("default");
-        Assertions.assertNotEquals(environmentWorkerGroupRelations.size(), 0);
+        Assertions.assertNotEquals(0, environmentWorkerGroupRelations.size());
     }
 
     @Test
     public void testDeleteByCode() {
         EnvironmentWorkerGroupRelation relation = insertOne();
         int i = environmentWorkerGroupRelationMapper.deleteByCode(1L, "default");
-        Assertions.assertNotEquals(i, 0);
+        Assertions.assertNotEquals(0, i);
     }
 }

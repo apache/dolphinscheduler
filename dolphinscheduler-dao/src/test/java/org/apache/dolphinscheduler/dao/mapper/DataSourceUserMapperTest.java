@@ -81,7 +81,7 @@ public class DataSourceUserMapperTest extends BaseDaoTest {
         DatasourceUser dataSourceUser = insertOne();
         // query
         List<DatasourceUser> dataSources = dataSourceUserMapper.selectList(null);
-        Assertions.assertNotEquals(dataSources.size(), 0);
+        Assertions.assertNotEquals(0, dataSources.size());
     }
 
     /**
@@ -91,7 +91,7 @@ public class DataSourceUserMapperTest extends BaseDaoTest {
     public void testDeleteByUserId() {
         DatasourceUser dataSourceUser = insertOne();
         int delete = dataSourceUserMapper.deleteByUserId(dataSourceUser.getUserId());
-        Assertions.assertNotEquals(delete, 0);
+        Assertions.assertNotEquals(0, delete);
     }
 
     /**
@@ -101,6 +101,6 @@ public class DataSourceUserMapperTest extends BaseDaoTest {
     public void testDeleteByDatasourceId() {
         DatasourceUser dataSourceUser = insertOne();
         int delete = dataSourceUserMapper.deleteByDatasourceId(dataSourceUser.getDatasourceId());
-        Assertions.assertNotEquals(delete, 0);
+        Assertions.assertNotEquals(0, delete);
     }
 }

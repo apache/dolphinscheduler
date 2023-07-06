@@ -77,7 +77,7 @@ public class ProcessInstanceMapMapperTest extends BaseDaoTest {
         ProcessInstanceMap processInstanceMap = insertOne();
         // query
         List<ProcessInstanceMap> dataSources = processInstanceMapMapper.selectList(null);
-        Assertions.assertNotEquals(dataSources.size(), 0);
+        Assertions.assertNotEquals(0, dataSources.size());
     }
 
     /**
@@ -121,7 +121,7 @@ public class ProcessInstanceMapMapperTest extends BaseDaoTest {
         List<Integer> subIds =
                 processInstanceMapMapper.querySubIdListByParentId(processInstanceMap.getParentProcessInstanceId());
 
-        Assertions.assertNotEquals(subIds.size(), 0);
+        Assertions.assertNotEquals(0, subIds.size());
 
     }
 }

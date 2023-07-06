@@ -57,7 +57,7 @@ public class TaskDefinitionLogMapperTest extends BaseDaoTest {
     @Test
     public void testInsert() {
         TaskDefinitionLog taskDefinitionLog = insertOne();
-        Assertions.assertNotEquals(taskDefinitionLog.getId().intValue(), 0);
+        Assertions.assertNotEquals(0, taskDefinitionLog.getId().intValue());
     }
 
     @Test
@@ -65,7 +65,7 @@ public class TaskDefinitionLogMapperTest extends BaseDaoTest {
         TaskDefinitionLog taskDefinitionLog = insertOne();
         int version = taskDefinitionLogMapper
                 .queryMaxVersionForDefinition(taskDefinitionLog.getCode());
-        Assertions.assertNotEquals(version, 0);
+        Assertions.assertNotEquals(0, version);
     }
 
     @Test
@@ -91,7 +91,7 @@ public class TaskDefinitionLogMapperTest extends BaseDaoTest {
 
         TaskDefinitionLog taskDefinitionLog = insertOne();
         List<TaskDefinitionLog> taskDefinitionLogs = taskDefinitionLogMapper.queryByTaskDefinitions(taskDefinitions);
-        Assertions.assertNotEquals(taskDefinitionLogs.size(), 0);
+        Assertions.assertNotEquals(0, taskDefinitionLogs.size());
     }
 
 }

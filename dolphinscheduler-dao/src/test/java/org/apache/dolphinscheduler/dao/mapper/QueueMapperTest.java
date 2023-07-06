@@ -83,7 +83,7 @@ public class QueueMapperTest extends BaseDaoTest {
         Queue queue = insertOne();
         // query
         List<Queue> queues = queueMapper.selectList(null);
-        Assertions.assertNotEquals(queues.size(), 0);
+        Assertions.assertNotEquals(0, queues.size());
     }
 
     /**
@@ -96,10 +96,10 @@ public class QueueMapperTest extends BaseDaoTest {
         Page<Queue> page = new Page(1, 3);
 
         IPage<Queue> queueIPage = queueMapper.queryQueuePaging(page, Collections.singletonList(queue.getId()), null);
-        Assertions.assertNotEquals(queueIPage.getTotal(), 0);
+        Assertions.assertNotEquals(0, queueIPage.getTotal());
 
         queueIPage = queueMapper.queryQueuePaging(page, Collections.singletonList(queue.getId()), queue.getQueueName());
-        Assertions.assertNotEquals(queueIPage.getTotal(), 0);
+        Assertions.assertNotEquals(0, queueIPage.getTotal());
     }
 
     /**
@@ -110,10 +110,10 @@ public class QueueMapperTest extends BaseDaoTest {
         Queue queue = insertOne();
 
         List<Queue> queues = queueMapper.queryAllQueueList(queue.getQueue(), null);
-        Assertions.assertNotEquals(queues.size(), 0);
+        Assertions.assertNotEquals(0, queues.size());
 
         queues = queueMapper.queryAllQueueList(null, queue.getQueueName());
-        Assertions.assertNotEquals(queues.size(), 0);
+        Assertions.assertNotEquals(0, queues.size());
     }
 
     @Test

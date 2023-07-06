@@ -148,7 +148,7 @@ public class UDFUserMapperTest extends BaseDaoTest {
         UDFUser udfUser = insertOne();
         // query
         List<UDFUser> udfUserList = udfUserMapper.selectList(null);
-        Assertions.assertNotEquals(udfUserList.size(), 0);
+        Assertions.assertNotEquals(0, udfUserList.size());
     }
 
     /**
@@ -163,7 +163,7 @@ public class UDFUserMapperTest extends BaseDaoTest {
         // insertOne
         UDFUser udfUser = insertOne(user, udfFunc);
         int delete = udfUserMapper.deleteByUserId(user.getId());
-        Assertions.assertEquals(delete, 1);
+        Assertions.assertEquals(1, delete);
 
     }
 
@@ -179,6 +179,6 @@ public class UDFUserMapperTest extends BaseDaoTest {
         // insertOne
         UDFUser udfUser = insertOne(user, udfFunc);
         int delete = udfUserMapper.deleteByUdfFuncId(udfFunc.getId());
-        Assertions.assertEquals(delete, 1);
+        Assertions.assertEquals(1, delete);
     }
 }

@@ -86,7 +86,7 @@ public class ProcessDefinitionLogMapperTest extends BaseDaoTest {
     @Test
     public void testInsert() {
         ProcessDefinitionLog processDefinitionLog = insertOne();
-        Assertions.assertNotEquals(processDefinitionLog.getId().intValue(), 0);
+        Assertions.assertNotEquals(0, processDefinitionLog.getId().intValue());
     }
 
     @Test
@@ -145,7 +145,7 @@ public class ProcessDefinitionLogMapperTest extends BaseDaoTest {
         Page<ProcessDefinitionLog> page = new Page(1, 3);
         IPage<ProcessDefinitionLog> processDefinitionLogs =
                 processDefinitionLogMapper.queryProcessDefinitionVersionsPaging(page, 1L, 1L);
-        Assertions.assertNotEquals(processDefinitionLogs.getTotal(), 0);
+        Assertions.assertNotEquals(0, processDefinitionLogs.getTotal());
     }
 
     @Test
@@ -153,7 +153,7 @@ public class ProcessDefinitionLogMapperTest extends BaseDaoTest {
         insertOne();
         Page<ProcessDefinitionLog> page = new Page(1, 3);
         int processDefinitionLogs = processDefinitionLogMapper.deleteByProcessDefinitionCodeAndVersion(1L, 1);
-        Assertions.assertNotEquals(processDefinitionLogs, 0);
+        Assertions.assertNotEquals(0, processDefinitionLogs);
     }
 
     @Test
