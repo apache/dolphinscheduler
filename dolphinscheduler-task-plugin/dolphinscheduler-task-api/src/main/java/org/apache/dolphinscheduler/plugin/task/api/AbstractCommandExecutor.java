@@ -93,11 +93,6 @@ public abstract class AbstractCommandExecutor {
 
     protected boolean podLogOutputIsFinished = false;
 
-    /*
-     * SHELL result string
-     */
-    protected String taskResultString;
-
     /**
      * taskRequest
      */
@@ -370,7 +365,6 @@ public abstract class AbstractCommandExecutor {
                         varPool.append("$VarPool$");
                     } else {
                         logBuffer.add(line);
-                        taskResultString = line;
                     }
                 }
                 processLogOutputIsSuccess = true;
