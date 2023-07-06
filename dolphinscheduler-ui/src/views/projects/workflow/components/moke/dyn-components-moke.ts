@@ -161,5 +161,5 @@ export const componentList = [
       }
     },
     taskCategory: 'Dynamic'
-  },
+  }
 ]

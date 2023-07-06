@@ -17,30 +17,33 @@
 
 import { defineComponent, onMounted, reactive } from 'vue'
 import styles from './dag.module.scss'
-import type { TaskType } from './types'
-import { NCollapse, NCollapseItem, NIcon } from 'naive-ui'
+import type { nodeItem, TaskType } from './types'
+import { NCollapse, NCollapseItem, NEllipsis, NIcon } from 'naive-ui'
 import { StarFilled, StarOutlined } from '@vicons/antd'
 import {
   CancelCollection,
   Collection,
-  getDagMenu
+  getDagMenu,
+  GetDynList
 } from '@/service/modules/dag-menu'
 import { useI18n } from 'vue-i18n'
+import { componentList } from '../moke/dyn-components-moke'
 
 export default defineComponent({
   name: 'workflow-dag-sidebar',
   emits: ['dragStart'],
   setup(props, context) {
     const variables = reactive({
-      dataList: [],
-      universal: [],
-      cloud: [],
-      logic: [],
-      di: [],
-      dq: [],
-      ml: [],
-      other: [],
-      fav: []
+      dataList: [] as nodeItem[],
+      universal: [] as nodeItem[],
+      cloud: [] as nodeItem[],
+      logic: [] as nodeItem[],
+      di: [] as nodeItem[],
+      dq: [] as nodeItem[],
+      ml: [] as nodeItem[],
+      other: [] as nodeItem[],
+      fav: [] as nodeItem[],
+      dynamic: [] as nodeItem[]
     })
 
     const { t } = useI18n()
@@ -79,6 +82,48 @@ export default defineComponent({
           (item: any) => item.collection === true
         )
       })
+
+      GetDynList()
+        .then((res: any) => {
+          const list = res && res.length > 0 ? res : componentList
+          list.forEach((node: any) => {
+            switchAngAddList(node.taskCategory, node)
+          })
+        })
+        .catch(() => {
+          componentList.forEach((node: any) => {
+            switchAngAddList(node.taskCategory, node)
+          })
+        })
+    }
+
+    const switchAngAddList = (taskCategory: string, node: any) => {
+      switch (taskCategory) {
+        case 'Universal':
+          variables.universal.push(node)
+          break
+        case 'Cloud':
+          variables.cloud.push(node)
+          break
+        case 'Logic':
+          variables.logic.push(node)
+          break
+        case 'DataIntegration':
+          variables.di.push(node)
+          break
+        case 'DataQuality':
+          variables.dq.push(node)
+          break
+        case 'MachineLearning':
+          variables.ml.push(node)
+          break
+        case 'Other':
+          variables.other.push(node)
+          break
+        case 'Dynamic':
+          variables.dynamic.push(node)
+          break
+      }
     }
 
     const handleCollection = (item: any) => {
@@ -111,7 +156,12 @@ export default defineComponent({
                       class={[styles.draggable, `task-item-${task.type}`]}
                       draggable='true'
                       onDragstart={(e) => {
-                        context.emit('dragStart', e, task.type as TaskType)
+                        context.emit(
+                          'dragStart',
+                          e,
+                          task.type as TaskType,
+                          task
+                        )
                       }}
                     >
                       <em
@@ -160,7 +210,12 @@ export default defineComponent({
                       class={[styles.draggable, `task-item-${task.type}`]}
                       draggable='true'
                       onDragstart={(e) => {
-                        context.emit('dragStart', e, task.type as TaskType)
+                        context.emit(
+                          'dragStart',
+                          e,
+                          task.type as TaskType,
+                          task
+                        )
                       }}
                     >
                       <em
@@ -209,7 +264,12 @@ export default defineComponent({
                       class={[styles.draggable, `task-item-${task.type}`]}
                       draggable='true'
                       onDragstart={(e) => {
-                        context.emit('dragStart', e, task.type as TaskType)
+                        context.emit(
+                          'dragStart',
+                          e,
+                          task.type as TaskType,
+                          task
+                        )
                       }}
                     >
                       <em
@@ -258,7 +318,12 @@ export default defineComponent({
                       class={[styles.draggable, `task-item-${task.type}`]}
                       draggable='true'
                       onDragstart={(e) => {
-                        context.emit('dragStart', e, task.type as TaskType)
+                        context.emit(
+                          'dragStart',
+                          e,
+                          task.type as TaskType,
+                          task
+                        )
                       }}
                     >
                       <em
@@ -307,7 +372,12 @@ export default defineComponent({
                       class={[styles.draggable, `task-item-${task.type}`]}
                       draggable='true'
                       onDragstart={(e) => {
-                        context.emit('dragStart', e, task.type as TaskType)
+                        context.emit(
+                          'dragStart',
+                          e,
+                          task.type as TaskType,
+                          task
+                        )
                       }}
                     >
                       <em
@@ -356,7 +426,12 @@ export default defineComponent({
                       class={[styles.draggable, `task-item-${task.type}`]}
                       draggable='true'
                       onDragstart={(e) => {
-                        context.emit('dragStart', e, task.type as TaskType)
+                        context.emit(
+                          'dragStart',
+                          e,
+                          task.type as TaskType,
+                          task
+                        )
                       }}
                     >
                       <em
@@ -405,7 +480,12 @@ export default defineComponent({
                       class={[styles.draggable, `task-item-${task.type}`]}
                       draggable='true'
                       onDragstart={(e) => {
-                        context.emit('dragStart', e, task.type as TaskType)
+                        context.emit(
+                          'dragStart',
+                          e,
+                          task.type as TaskType,
+                          task
+                        )
                       }}
                     >
                       <em
@@ -454,7 +534,12 @@ export default defineComponent({
                       class={[styles.draggable, `task-item-${task.type}`]}
                       draggable='true'
                       onDragstart={(e) => {
-                        context.emit('dragStart', e, task.type as TaskType)
+                        context.emit(
+                          'dragStart',
+                          e,
+                          task.type as TaskType,
+                          task
+                        )
                       }}
                     >
                       <em
@@ -464,6 +549,75 @@ export default defineComponent({
                         ]}
                       />
                       <span>{task.taskType}</span>
+                      <div
+                        class={styles.stars}
+                        onMouseenter={() => {
+                          task.starHover = true
+                        }}
+                        onMouseleave={() => {
+                          task.starHover = false
+                        }}
+                        onClick={() => handleCollection(task)}
+                      >
+                        <NIcon
+                          size='20'
+                          color={
+                            task.collection || task.starHover
+                              ? '#288FFF'
+                              : '#ccc'
+                          }
+                        >
+                          {task.collection ? <StarFilled /> : <StarOutlined />}
+                        </NIcon>
+                      </div>
+                    </div>
+                  ))
+                }
+              }}
+            ></NCollapseItem>
+          )}
+          {variables.dynamic.length > 0 && (
+            <NCollapseItem
+              title={t('project.menu.dynamic')}
+              name='8'
+              class='task-cate-universal'
+              v-slots={{
+                default: () => {
+                  return variables.dynamic.map((task: any) => (
+                    <div
+                      class={[styles.draggable, `task-item-${task.type}`]}
+                      draggable='true'
+                      onDragstart={(e) => {
+                        context.emit(
+                          'dragStart',
+                          e,
+                          task.type as TaskType,
+                          task
+                        )
+                      }}
+                      onMouseenter={() => {}}
+                    >
+                      {task.isDyn}
+                      <em
+                        class={[
+                          styles['sidebar-icon'],
+                          task.isDyn
+                            ? ''
+                            : styles['icon-' + task.type.toLocaleLowerCase()]
+                        ]}
+                        style={
+                          task.isDyn
+                            ? {
+                                backgroundImage: `url('${
+                                  import.meta.env.BASE_URL
+                                }images/task-icons/${task.icon}')`
+                              }
+                            : {}
+                        }
+                      />
+                      <NEllipsis style={{ maxWidth: '80px' }}>
+                        {task.taskType}-Dyn
+                      </NEllipsis>
                       <div
                         class={styles.stars}
                         onMouseenter={() => {

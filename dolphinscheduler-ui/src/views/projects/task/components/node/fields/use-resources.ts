@@ -73,7 +73,7 @@ export function useResources(
     },
     validate: {
       trigger: ['input', 'blur'],
-      required: required,
+      required: Boolean(required) || false,
       validator(validate: any, value: IResource[]) {
         if (required) {
           if (!value) {

@@ -37,3 +37,10 @@ export function CancelCollection(taskType: string): any {
     method: 'delete'
   })
 }
+
+export function GetDynList(): any {
+  return axios({
+    url: 'static/dynamic-task-config.json',
+    method: 'get'
+  })
+}

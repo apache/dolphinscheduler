@@ -505,6 +505,7 @@ interface ITaskData
   isCache?: 'YES' | 'NO'
   timeoutFlag?: 'OPEN' | 'CLOSE'
   timeoutNotifyStrategy?: string | []
+  isDyn?: boolean
   taskParams?: ITaskParams
 }
 

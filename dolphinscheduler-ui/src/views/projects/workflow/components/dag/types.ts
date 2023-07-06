@@ -18,6 +18,41 @@
 import type { TaskType } from '@/store/project/types'
 export type { ITaskState } from '@/common/types'
 
+export interface nodeItem {
+  isDyn?: boolean
+  taskType: string
+  collection: boolean
+  taskCategory: string
+  hover?: string
+  icon?: string
+  json?: any
+  taskName?: string
+}
+
+export interface dynComponent extends Omit<any, 'name'> {
+  code: number
+  name: string
+  version?: number
+  language?: string
+  taskType: any
+  instanceId?: number
+  hover: string
+  icon: string
+  isDyn: boolean
+  jsonData: jsonData
+  taskName: string
+  taskCategory: string
+}
+
+export interface jsonData {
+  apis: any
+  forms: Array<any>
+  locales: any
+  model: any
+  task: string
+  taskConfig: any
+}
+
 export interface ProcessDefinition {
   id: number
   code: number

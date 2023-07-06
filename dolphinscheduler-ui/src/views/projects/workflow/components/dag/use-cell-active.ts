@@ -96,12 +96,20 @@ export function useCellActive(options: Options) {
     let nodeAttrs = null
     let portAttrs = null
 
+    const img_hover = node.data.isDyn
+      ? node.data.hover_icon
+      : (node.data.taskType !== 'FLINK_STREAM'
+          ? node.data.taskType
+          : 'FLINK'
+        ).toLocaleLowerCase() + '_hover.png'
+    const img_icon = node.data.isDyn
+      ? node.data.icon
+      : (node.data.taskType !== 'FLINK_STREAM'
+          ? node.data.taskType
+          : 'FLINK'
+        ).toLocaleLowerCase() + '.png'
     if (isHover || isSelected) {
-      img = `${import.meta.env.BASE_URL}images/task-icons/${(node.data
-        .taskType !== 'FLINK_STREAM'
-        ? node.data.taskType
-        : 'FLINK'
-      ).toLocaleLowerCase()}_hover.png`
+      img = `${import.meta.env.BASE_URL}images/task-icons/${img_hover}`
       if (isHover) {
         nodeAttrs = nodeHover
         portAttrs = _.merge(portDefault, portHover)
@@ -110,11 +118,7 @@ export function useCellActive(options: Options) {
         portAttrs = _.merge(portDefault, portSelected)
       }
     } else {
-      img = `${import.meta.env.BASE_URL}images/task-icons/${(node.data
-        .taskType !== 'FLINK_STREAM'
-        ? node.data.taskType
-        : 'FLINK'
-      ).toLocaleLowerCase()}.png`
+      img = `${import.meta.env.BASE_URL}images/task-icons/${img_icon}`
       nodeAttrs = NODE.attrs
       portAttrs = portDefault
     }

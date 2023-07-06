@@ -27,6 +27,7 @@ import type {
   FormRules,
   EditWorkflowDefinition
 } from './types'
+import { dealDynForm } from './dynComponent'
 
 export function useTask({
   data,
@@ -62,13 +63,20 @@ export function useTask({
       getElements()
     }
   }
+  const { model, json } = data.isDyn
+    ? dealDynForm(data, params)
+    : nodes[data?.taskType || 'SHELL'](params)
 
-  const { model, json } = nodes[data.taskType || 'SHELL'](params)
+  // const { model, json } = nodes[data.taskType || 'SHELL'](params)
+
   jsonRef.value = json
   model.preTasks = taskStore.getPreTasks
   model.name = taskStore.getName
-  model.taskExecuteType =
-    TASK_TYPES_MAP[data.taskType || 'SHELL'].taskExecuteType || 'BATCH'
+  // model.taskExecuteType =
+  //   TASK_TYPES_MAP[data.taskType || 'SHELL'].taskExecuteType || 'BATCH'
+  model.taskExecuteType = (data as any).isDyn
+    ? data?.taskExecuteType || 'BATCH'
+    : TASK_TYPES_MAP[data.taskType || 'SHELL'].taskExecuteType || 'BATCH'
 
   const getElements = () => {
     const { rules, elements } = getElementByJson(jsonRef.value, model)

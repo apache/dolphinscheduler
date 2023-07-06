@@ -62,12 +62,13 @@ export function useCellUpdate(options: Options) {
     type: TaskType,
     name: string,
     flag: string,
-    coordinate: Coordinate = { x: 100, y: 100 }
+    coordinate: Coordinate = { x: 100, y: 100 },
+    data = {}
   ) {
     if (!TASK_TYPES_MAP[type as TaskType]) {
       return
     }
-    const node = buildNode(id, type, name, flag, coordinate)
+    const node = buildNode(id, type, name, flag, coordinate, data)
     graph.value?.addNode(node)
   }
 

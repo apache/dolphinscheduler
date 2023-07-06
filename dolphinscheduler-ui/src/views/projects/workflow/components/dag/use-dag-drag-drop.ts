@@ -26,7 +26,12 @@ import { useRoute } from 'vue-router'
 interface Options {
   readonly: Ref<boolean>
   graph: Ref<Graph | undefined>
-  appendTask: (code: number, type: TaskType, coor: Coordinate) => void
+  appendTask: (
+    code: number,
+    type: TaskType,
+    coor: Coordinate,
+    extraData: any
+  ) => void
 }
 
 /**
@@ -45,12 +50,13 @@ export function useDagDragAndDrop(options: Options) {
     type: 'SHELL'
   })
 
-  function onDragStart(e: DragEvent, type: TaskType) {
+  function onDragStart(e: DragEvent, type: TaskType & any, data: any) {
     if (readonly.value) {
       e.preventDefault()
       return
     }
     dragged.value = {
+      ...data,
       x: e.offsetX,
       y: e.offsetY,
       type: type
@@ -69,7 +75,7 @@ export function useDagDragAndDrop(options: Options) {
       const genNums = 1
       genTaskCodeList(genNums, projectCode).then((res) => {
         const [code] = res
-        appendTask(code, type, { x: x - eX, y: y - eY })
+        appendTask(code, type, { x: x - eX, y: y - eY }, { ...dragged.value })
       })
     }
   }

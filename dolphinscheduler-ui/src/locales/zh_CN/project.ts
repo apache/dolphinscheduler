@@ -822,6 +822,7 @@ export default {
     di: '数据集成',
     dq: '数据质量',
     ml: '机器学习',
-    other: '其他'
+    other: '其他',
+    dynamic: '动态组件'
   }
 }

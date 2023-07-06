@@ -69,8 +69,19 @@ export function useTaskEdit(options: Options) {
   /**
    * Append a new task
    */
-  function appendTask(code: number, type: TaskType, coordinate: Coordinate) {
-    addNode(code + '', type, '', 'YES', coordinate)
+  function appendTask(
+    code: number,
+    type: TaskType,
+    coordinate: Coordinate,
+    extraData: any
+  ) {
+    const data = {
+      ...extraData,
+      code: code,
+      name: '',
+      taskType: type
+    }
+    addNode(code + '', type, '', 'YES', coordinate, data)
     processDefinition.value.taskDefinitionList.push({
       code,
       taskType: type,

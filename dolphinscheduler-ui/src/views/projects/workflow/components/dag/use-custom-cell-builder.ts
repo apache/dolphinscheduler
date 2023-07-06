@@ -75,9 +75,16 @@ export function useCustomCellBuilder() {
     type: TaskType,
     taskName: string,
     flag: string,
-    coordinate: Coordinate = { x: 100, y: 100 }
+    coordinate: Coordinate = { x: 100, y: 100 },
+    data = {} as any
   ): Node.Metadata {
     const truncation = taskName ? utils.truncateText(taskName, 18) : id
+    const taskExecuteType = data.isDyn
+      ? {
+          alias: type.toLocaleUpperCase(),
+          helperLinkDisable: true
+        }
+      : TASK_TYPES_MAP[type].taskExecuteType
     return {
       id: id,
       shape: X6_NODE_NAME,
@@ -87,17 +94,21 @@ export function useCustomCellBuilder() {
         taskType: type,
         taskName: taskName || id,
         flag: flag,
-        taskExecuteType: TASK_TYPES_MAP[type].taskExecuteType
+        taskExecuteType: taskExecuteType,
+        isDyn: data.isDyn || false,
+        icon: data.icon || '',
+        hover_icon: data.hover || ''
       },
       attrs: {
         image: {
           // Use href instead of xlink:href, you may lose the icon when downloadPNG
-          'xlink:href': `${
-            import.meta.env.BASE_URL
-          }images/task-icons/${(type !== ('FLINK_STREAM' as TaskType)
-            ? type
-            : 'FLINK'
-          ).toLocaleLowerCase()}.png`
+          'xlink:href': data.isDyn
+            ? `${import.meta.env.BASE_URL}images/task-icons/${data.icon}`
+            : `${import.meta.env.BASE_URL}images/task-icons/${(type !==
+              ('FLINK_STREAM' as any)
+                ? type
+                : 'FLINK'
+              ).toLocaleLowerCase()}.png`
         },
         title: {
           text: truncation
@@ -134,7 +145,8 @@ export function useCustomCellBuilder() {
         {
           x: location.x,
           y: location.y
-        }
+        },
+        task
       )
       nodes.push(node)
       taskTypeMap[String(task.code)] = task.taskType

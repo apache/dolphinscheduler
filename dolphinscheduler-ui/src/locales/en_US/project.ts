@@ -846,6 +846,7 @@ export default {
     di: 'Data Integration',
     dq: 'Data Quality',
     ml: 'Machine Learning',
-    other: 'Other'
+    other: 'Other',
+    dynamic: 'Dynamic'
   }
 }

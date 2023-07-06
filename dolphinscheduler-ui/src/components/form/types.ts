@@ -64,7 +64,7 @@ type IFormRules =
 
 interface IJsonItemParams {
   field: string
-  name?: string | VNode
+  name?: string | any
   props?: any
   title?: string
   type?: IType
