@@ -49,8 +49,8 @@ public class SparkRuntimeEnvironment {
     public void prepare(boolean hiveClientSupport) {
         SparkSession.Builder sparkSessionBuilder = SparkSession.builder().config(createSparkConf());
 
-        this.sparkSession = hiveClientSupport ? sparkSessionBuilder.enableHiveSupport().getOrCreate() :
-                sparkSessionBuilder.getOrCreate();
+        this.sparkSession = hiveClientSupport ? sparkSessionBuilder.enableHiveSupport().getOrCreate()
+                : sparkSessionBuilder.getOrCreate();
     }
 
     private SparkConf createSparkConf() {

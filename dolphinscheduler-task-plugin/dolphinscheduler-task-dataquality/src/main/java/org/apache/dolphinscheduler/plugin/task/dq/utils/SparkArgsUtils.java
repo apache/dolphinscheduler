@@ -39,7 +39,8 @@ public class SparkArgsUtils {
 
     private static final String SPARK_ON_YARN = "yarn";
 
-    private static final String DEFAULT_QUALITY_CLASS = "org.apache.dolphinscheduler.data.quality.DataQualityApplication";
+    private static final String DEFAULT_QUALITY_CLASS =
+            "org.apache.dolphinscheduler.data.quality.DataQualityApplication";
 
     private SparkArgsUtils() {
         throw new IllegalStateException("Utility class");
