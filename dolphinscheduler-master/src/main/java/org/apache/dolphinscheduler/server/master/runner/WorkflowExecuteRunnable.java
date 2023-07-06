@@ -207,6 +207,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
      */
     private final ConcurrentLinkedQueue<StateEvent> stateEvents = new ConcurrentLinkedQueue<>();
 
+    private final ConcurrentLinkedQueue<StateEvent> stateCheckEvents = new ConcurrentLinkedQueue<>();
+
     /**
      * The StandBy task list, will be executed, need to know, the taskInstance in this queue may doesn't have id.
      */
@@ -270,43 +272,53 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
                     stateEvents);
             return;
         }
-        StateEvent stateEvent = null;
-        while (!this.stateEvents.isEmpty()) {
-            try {
-                stateEvent = this.stateEvents.peek();
-                LoggerUtils.setWorkflowAndTaskInstanceIDMDC(stateEvent.getProcessInstanceId(),
-                        stateEvent.getTaskInstanceId());
-                // if state handle success then will remove this state, otherwise will retry this state next time.
-                // The state should always handle success except database error.
-                checkProcessInstance(stateEvent);
-
-                StateEventHandler stateEventHandler =
-                        StateEventHandlerManager.getStateEventHandler(stateEvent.getType())
-                                .orElseThrow(() -> new StateEventHandleError(
-                                        "Cannot find handler for the given state event"));
-                logger.info("Begin to handle state event, {}", stateEvent);
-                if (stateEventHandler.handleStateEvent(this, stateEvent)) {
-                    this.stateEvents.remove(stateEvent);
-                }
-            } catch (StateEventHandleError stateEventHandleError) {
-                logger.error("State event handle error, will remove this event: {}", stateEvent, stateEventHandleError);
-                this.stateEvents.remove(stateEvent);
-                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
-            } catch (StateEventHandleException stateEventHandleException) {
-                logger.error("State event handle error, will retry this event: {}",
-                        stateEvent,
-                        stateEventHandleException);
-                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
-            } catch (Exception e) {
-                // we catch the exception here, since if the state event handle failed, the state event will still keep
-                // in the stateEvents queue.
-                logger.error("State event handle error, get a unknown exception, will retry this event: {}",
-                        stateEvent,
-                        e);
-                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
-            } finally {
-                LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
+        while (!this.stateEvents.isEmpty() || !this.stateCheckEvents.isEmpty()) {
+            if (!this.stateEvents.isEmpty()) {
+                doHandleEvent(this.stateEvents);
             }
+            if (!this.stateCheckEvents.isEmpty()) {
+                doHandleEvent(this.stateCheckEvents);
+            }
+        }
+    }
+
+    private void doHandleEvent(ConcurrentLinkedQueue<StateEvent> stateEvents) {
+        StateEvent stateEvent = null;
+        try {
+            stateEvent = stateEvents.peek();
+            assert stateEvent != null;
+            LoggerUtils.setWorkflowAndTaskInstanceIDMDC(stateEvent.getProcessInstanceId(),
+                    stateEvent.getTaskInstanceId());
+            // if state handle success then will remove this state, otherwise will retry this state next time.
+            // The state should always handle success except database error.
+            checkProcessInstance(stateEvent);
+
+            StateEventHandler stateEventHandler =
+                    StateEventHandlerManager.getStateEventHandler(stateEvent.getType())
+                            .orElseThrow(() -> new StateEventHandleError(
+                                    "Cannot find handler for the given state event"));
+            logger.info("Begin to handle state event, {}", stateEvent);
+            if (stateEventHandler.handleStateEvent(this, stateEvent)) {
+                stateEvents.remove(stateEvent);
+            }
+        } catch (StateEventHandleError stateEventHandleError) {
+            logger.error("State event handle error, will remove this event: {}", stateEvent, stateEventHandleError);
+            stateEvents.remove(stateEvent);
+            ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
+        } catch (StateEventHandleException stateEventHandleException) {
+            logger.error("State event handle error, will retry this event: {}",
+                    stateEvent,
+                    stateEventHandleException);
+            ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
+        } catch (Exception e) {
+            // we catch the exception here, since if the state event handle failed, the state event will still keep
+            // in the stateEvents queue.
+            logger.error("State event handle error, get a unknown exception, will retry this event: {}",
+                    stateEvent,
+                    e);
+            ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
+        } finally {
+            LoggerUtils.removeWorkflowAndTaskInstanceIdMDC();
         }
     }
 
@@ -336,10 +348,12 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatue> {
             logger.info("state event would be abounded :{}", stateEvent);
             return false;
         }
-        if (!stateEvents.contains(stateEvent)) {
-            this.stateEvents.add(stateEvent);
+        if (!stateCheckEvents.contains(stateEvent)) {
+            logger.info("Event :" + stateEvent + " is unique, add to queue.");
+            this.stateCheckEvents.add(stateEvent);
+            return true;
         }
-        return true;
+        return false;
     }
 
     public int eventSize() {

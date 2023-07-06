@@ -97,12 +97,15 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
                     stateEvent);
             return;
         }
+        boolean submitRes;
         if (redundancyAllowed) {
-            workflowExecuteThread.addStateEvent(stateEvent);
+            submitRes = workflowExecuteThread.addStateEvent(stateEvent);
         } else {
-            workflowExecuteThread.addUniqueStateEvent(stateEvent);
+            submitRes = workflowExecuteThread.addUniqueStateEvent(stateEvent);
         }
-        logger.info("Submit state event success, stateEvent: {}", stateEvent);
+        if (submitRes) {
+            logger.info("Submit state event success, stateEvent: {}", stateEvent);
+        }
     }
 
     /**
