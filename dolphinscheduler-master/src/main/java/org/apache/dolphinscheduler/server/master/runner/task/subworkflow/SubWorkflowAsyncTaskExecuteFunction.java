@@ -46,14 +46,14 @@ public class SubWorkflowAsyncTaskExecuteFunction implements AsyncTaskExecuteFunc
     public @NonNull AsyncTaskExecutionStatus getAsyncTaskExecutionStatus() {
         // query the status of sub workflow instance
         if (subWorkflowInstance == null) {
-            subWorkflowInstance = processInstanceDao.findSubProcessInstanceByParentId(
+            subWorkflowInstance = processInstanceDao.querySubProcessInstanceByParentId(
                     taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId());
         }
         if (subWorkflowInstance == null) {
             log.info("The sub workflow instance doesn't created");
             return AsyncTaskExecutionStatus.RUNNING;
         }
-        subWorkflowInstance = processInstanceDao.queryByWorkflowInstanceId(subWorkflowInstance.getId());
+        subWorkflowInstance = processInstanceDao.queryById(subWorkflowInstance.getId());
         if (subWorkflowInstance != null && subWorkflowInstance.getState().isFinished()) {
             return subWorkflowInstance.getState().isSuccess() ? AsyncTaskExecutionStatus.SUCCESS
                     : AsyncTaskExecutionStatus.FAILED;

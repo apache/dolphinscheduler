@@ -15,9 +15,38 @@
  * limitations under the License.
  */
 
-.task-item {
-  cursor: pointer;
-  height: 20px;
-  width: 100px;
-  border: 1px solid #1890ff;
+.sidebar {
+}
+
+.draggable {
+  color: #000;
+  border: 1px solid #00000040;
+  display: flex;
+  align-items: center;
+  width: 130px;
+  justify-content: space-around;
+  border-radius: 5px;
+  height: 30px;
+  margin-bottom: 10px;
+  margin-right: 20px;
+}
+.fav {
+  width: 18px;
+  height: 18px;
+}
+
+.draggable {
+  &:hover {
+    color: blue;
+    border: 1px dashed blue;
+    background-color: #fff;
+  }
+}
+
+.sidebar-icon {
+  display: block;
+  width: 18px;
+  height: 18px;
+  background-size: 100% 100%;
+  background-color: #fafafa;
 }

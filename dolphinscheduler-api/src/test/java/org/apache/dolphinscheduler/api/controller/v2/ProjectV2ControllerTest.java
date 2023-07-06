@@ -77,9 +77,8 @@ public class ProjectV2ControllerTest {
         ProjectUpdateRequest projectUpdateReq = new ProjectUpdateRequest();
         projectUpdateReq.setProjectName("james");
         projectUpdateReq.setDescription("james lbj");
-        projectUpdateReq.setUserName("admin");
         Mockito.when(projectService.update(user, projectCode, projectUpdateReq.getProjectName(),
-                projectUpdateReq.getDescription(), projectUpdateReq.getUserName())).thenReturn(result);
+                projectUpdateReq.getDescription())).thenReturn(result);
         Result response = projectV2Controller.updateProject(user, projectCode, projectUpdateReq);
         Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }

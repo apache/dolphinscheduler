@@ -40,6 +40,7 @@ public enum WorkflowExecutionStatus {
     SERIAL_WAIT(14, "serial wait"),
     READY_BLOCK(15, "ready block"),
     BLOCK(16, "block"),
+    WAIT_TO_RUN(17, "wait to run"),
     ;
 
     private static final Map<Integer, WorkflowExecutionStatus> CODE_MAP = new HashMap<>();

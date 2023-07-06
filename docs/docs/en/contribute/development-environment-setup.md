@@ -65,7 +65,7 @@ cd dolphinscheduler
 ./mvnw -B clean package \
        -Dmaven.test.skip \
        -Dmaven.javadoc.skip \
-       -Dmaven.checkstyle.skip \
+       -Dspotless.skip = true \
        -Ddocker.tag=<TAG> \
        -Pdocker,release
 ```
@@ -79,7 +79,7 @@ cd dolphinscheduler
 ./mvnw -B clean deploy \
        -Dmaven.test.skip \
        -Dmaven.javadoc.skip \
-       -Dmaven.checkstyle.skip \
+       -Dspotless.skip = true \
        -Dmaven.deploy.skip \
        -Ddocker.tag=<TAG> \
        -Ddocker.hub=<HUB_URL> \
