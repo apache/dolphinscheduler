@@ -121,33 +121,42 @@ public class TaskExecutionContextFactory {
                         .orElse(null);
         setTaskResourceInfo(resources);
 
-        // TODO to be optimized
-        DataQualityTaskExecutionContext dataQualityTaskExecutionContext = null;
-        if (TASK_TYPE_DATA_QUALITY.equalsIgnoreCase(taskInstance.getTaskType())) {
-            dataQualityTaskExecutionContext = new DataQualityTaskExecutionContext();
-            setDataQualityTaskRelation(dataQualityTaskExecutionContext, taskInstance, workflowInstance.getTenantCode());
-        }
-
-        K8sTaskExecutionContext k8sTaskExecutionContext = setK8sTaskRelation(taskInstance);
-
         Map<String, Property> businessParamsMap = curingParamsService.preBuildBusinessParams(workflowInstance);
 
         AbstractParameters baseParam = taskPluginManager.getParameters(ParametersNode.builder()
                 .taskType(taskInstance.getTaskType()).taskParams(taskInstance.getTaskParams()).build());
         Map<String, Property> propertyMap =
                 curingParamsService.paramParsingPreparation(taskInstance, baseParam, workflowInstance);
-        return TaskExecutionContextBuilder.get()
+        TaskExecutionContext taskExecutionContext = TaskExecutionContextBuilder.get()
                 .buildWorkflowInstanceHost(masterConfig.getMasterAddress())
                 .buildTaskInstanceRelatedInfo(taskInstance)
                 .buildTaskDefinitionRelatedInfo(taskInstance.getTaskDefine())
                 .buildProcessInstanceRelatedInfo(taskInstance.getProcessInstance())
                 .buildProcessDefinitionRelatedInfo(taskInstance.getProcessDefine())
                 .buildResourceParametersInfo(resources)
-                .buildDataQualityTaskExecutionContext(dataQualityTaskExecutionContext)
-                .buildK8sTaskRelatedInfo(k8sTaskExecutionContext)
                 .buildBusinessParamsMap(businessParamsMap)
                 .buildParamInfo(propertyMap)
                 .create();
+
+        setDataQualityTaskExecutionContext(taskExecutionContext, taskInstance, workflowInstance.getTenantCode());
+        setK8sTaskRelatedInfo(taskExecutionContext, taskInstance);
+        return taskExecutionContext;
+    }
+
+    public void setDataQualityTaskExecutionContext(TaskExecutionContext taskExecutionContext, TaskInstance taskInstance,
+                                                   String tenantCode) {
+        // TODO to be optimized
+        DataQualityTaskExecutionContext dataQualityTaskExecutionContext = null;
+        if (TASK_TYPE_DATA_QUALITY.equalsIgnoreCase(taskInstance.getTaskType())) {
+            dataQualityTaskExecutionContext = new DataQualityTaskExecutionContext();
+            setDataQualityTaskRelation(dataQualityTaskExecutionContext, taskInstance, tenantCode);
+        }
+        taskExecutionContext.setDataQualityTaskExecutionContext(dataQualityTaskExecutionContext);
+    }
+
+    public void setK8sTaskRelatedInfo(TaskExecutionContext taskExecutionContext, TaskInstance taskInstance) {
+        K8sTaskExecutionContext k8sTaskExecutionContext = setK8sTaskRelation(taskInstance);
+        taskExecutionContext.setK8sTaskExecutionContext(k8sTaskExecutionContext);
     }
 
     private Map<String, String> getResourceFullNames(TaskInstance taskInstance) {
