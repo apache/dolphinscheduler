@@ -46,7 +46,7 @@ public class DorisDataSourceProcessor extends AbstractDataSourceProcessor {
     }
 
     @Override
-    public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
+    public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) throws NumberFormatException{
         DorisConnectionParam connectionParams = (DorisConnectionParam) createConnectionParams(connectionJson);
         DorisDataSourceParamDTO dorisDataSourceParamDTO = new DorisDataSourceParamDTO();
 
