@@ -69,7 +69,7 @@ public class KubeflowTaskTest {
         KubeflowTask task = Mockito.spy(createTask(kubeflowParameters));
         Mockito.when(task.runCommand(Mockito.anyString())).thenReturn("test_result");
         task.submitApplication();
-        Assertions.assertNotEquals(task.getAppIds(), null);
+        Assertions.assertNotEquals(null, task.getAppIds());
         Assertions.assertEquals(task.getExitStatusCode(), TaskConstants.EXIT_CODE_SUCCESS);
     }
 

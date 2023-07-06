@@ -107,7 +107,7 @@ public class ProcessDefinitionMapperTest extends BaseDaoTest {
         insertOne("def 1");
         // query
         List<ProcessDefinition> dataSources = processDefinitionMapper.selectList(null);
-        Assertions.assertNotEquals(dataSources.size(), 0);
+        Assertions.assertNotEquals(0, dataSources.size());
     }
 
     /**
@@ -146,7 +146,7 @@ public class ProcessDefinitionMapperTest extends BaseDaoTest {
         processDefinition.setUserId(user.getId());
         processDefinitionMapper.insert(processDefinition);
         ProcessDefinition definition = processDefinitionMapper.verifyByDefineName(10L, "xxx");
-        Assertions.assertEquals(definition, null);
+        Assertions.assertEquals(null, definition);
     }
 
     /**
@@ -190,7 +190,7 @@ public class ProcessDefinitionMapperTest extends BaseDaoTest {
         processDefinitionMapper.insert(processDefinition);
 
         ProcessDefinition processDefinition1 = processDefinitionMapper.queryByDefineName(project.getCode(), "def 1");
-        Assertions.assertNotEquals(processDefinition1, null);
+        Assertions.assertNotEquals(null, processDefinition1);
     }
 
     /**
@@ -233,7 +233,7 @@ public class ProcessDefinitionMapperTest extends BaseDaoTest {
         processDefinition.setUserId(user.getId());
         processDefinitionMapper.insert(processDefinition);
         ProcessDefinition definition = processDefinitionMapper.queryByDefineId(333);
-        Assertions.assertEquals(definition, null);
+        Assertions.assertEquals(null, definition);
     }
 
     /**
@@ -245,7 +245,7 @@ public class ProcessDefinitionMapperTest extends BaseDaoTest {
         Page<ProcessDefinition> page = new Page(1, 3);
         IPage<ProcessDefinition> processDefinitionIPage =
                 processDefinitionMapper.queryDefineListPaging(page, "def", 101, 1010L);
-        Assertions.assertNotEquals(processDefinitionIPage.getTotal(), 0);
+        Assertions.assertNotEquals(0, processDefinitionIPage.getTotal());
     }
 
     /**
@@ -255,7 +255,7 @@ public class ProcessDefinitionMapperTest extends BaseDaoTest {
     public void testQueryAllDefinitionList() {
         insertOne("def 1");
         List<ProcessDefinition> processDefinitionIPage = processDefinitionMapper.queryAllDefinitionList(1010L);
-        Assertions.assertNotEquals(processDefinitionIPage.size(), 0);
+        Assertions.assertNotEquals(0, processDefinitionIPage.size());
     }
 
     /**
@@ -300,7 +300,7 @@ public class ProcessDefinitionMapperTest extends BaseDaoTest {
         projectCodes[0] = processDefinition.getProjectCode();
         List<DefinitionGroupByUser> processDefinitions =
                 processDefinitionMapper.countDefinitionByProjectCodes(projectCodes);
-        Assertions.assertNotEquals(processDefinitions.size(), 0);
+        Assertions.assertNotEquals(0, processDefinitions.size());
     }
 
     @Test
