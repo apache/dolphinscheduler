@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.api.test.pages.LoginPage;
 import org.apache.dolphinscheduler.api.test.pages.project.ProjectPage;
 import org.apache.dolphinscheduler.api.test.pages.workflow.ProcessDefinitionPage;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
@@ -61,6 +62,10 @@ public class ProcessDefinitionAPITest {
     private static ProjectPage projectPage;
 
     private static long projectCode;
+
+    private static long processDefinitionCode;
+
+    private static String processDefinitionName;
 
 
     @BeforeAll
@@ -99,6 +104,76 @@ public class ProcessDefinitionAPITest {
             log.error("failed", e);
             Assertions.fail();
         }
+    }
+
+    @Test
+    @Order(2)
+    public void testQueryAllProcessDefinitionByProjectCode() {
+        HttpResponse queryAllProcessDefinitionByProjectCodeResponse = processDefinitionPage.queryAllProcessDefinitionByProjectCode(loginUser, projectCode);
+        Assertions.assertTrue(queryAllProcessDefinitionByProjectCodeResponse.getBody().getSuccess());
+        Assertions.assertTrue(queryAllProcessDefinitionByProjectCodeResponse.getBody().getData().toString().contains("hello world"));
+        processDefinitionCode = (long) ((LinkedHashMap<String, Object>) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllProcessDefinitionByProjectCodeResponse.getBody().getData()).get(0)).get("processDefinition")).get("code");
+        processDefinitionName = (String) ((LinkedHashMap<String, Object>) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllProcessDefinitionByProjectCodeResponse.getBody().getData()).get(0)).get("processDefinition")).get("name");
+    }
+
+    @Test
+    @Order(3)
+    public void testQueryProcessDefinitionByCode() {
+        HttpResponse queryProcessDefinitionByCodeResponse = processDefinitionPage.queryProcessDefinitionByCode(loginUser, projectCode, processDefinitionCode);
+        Assertions.assertTrue(queryProcessDefinitionByCodeResponse.getBody().getSuccess());
+        Assertions.assertTrue(queryProcessDefinitionByCodeResponse.getBody().getData().toString().contains("hello world"));
+    }
+
+    @Test
+    @Order(4)
+    public void testGetProcessListByProjectCodes() {
+        HttpResponse getProcessListByProjectCodesResponse = processDefinitionPage.getProcessListByProjectCodes(loginUser, projectCode);
+        Assertions.assertTrue(getProcessListByProjectCodesResponse.getBody().getSuccess());
+        Assertions.assertTrue(getProcessListByProjectCodesResponse.getBody().getData().toString().contains("test_import"));
+    }
+
+    @Test
+    @Order(5)
+    public void testQueryProcessDefinitionByName() {
+        HttpResponse queryProcessDefinitionByNameResponse = processDefinitionPage.queryProcessDefinitionByName(loginUser, projectCode, processDefinitionName);
+        Assertions.assertTrue(queryProcessDefinitionByNameResponse.getBody().getSuccess());
+        Assertions.assertTrue(queryProcessDefinitionByNameResponse.getBody().getData().toString().contains("hello world"));
+    }
+
+    @Test
+    @Order(6)
+    public void testQueryProcessDefinitionList() {
+        HttpResponse queryProcessDefinitionListResponse = processDefinitionPage.queryProcessDefinitionList(loginUser, projectCode);
+        Assertions.assertTrue(queryProcessDefinitionListResponse.getBody().getSuccess());
+        Assertions.assertTrue(queryProcessDefinitionListResponse.getBody().getData().toString().contains("hello world"));
+    }
+
+    @Test
+    @Order(7)
+    public void testReleaseProcessDefinition() {
+        HttpResponse releaseProcessDefinitionResponse = processDefinitionPage.releaseProcessDefinition(loginUser, projectCode, processDefinitionCode, ReleaseState.ONLINE);
+        Assertions.assertTrue(releaseProcessDefinitionResponse.getBody().getSuccess());
+
+        HttpResponse queryProcessDefinitionByCodeResponse = processDefinitionPage.queryProcessDefinitionByCode(loginUser, projectCode, processDefinitionCode);
+        Assertions.assertTrue(queryProcessDefinitionByCodeResponse.getBody().getSuccess());
+        Assertions.assertTrue(queryProcessDefinitionByCodeResponse.getBody().getData().toString().contains("releaseState=ONLINE"));
+    }
+
+    @Test
+    @Order(8)
+    public void testDeleteProcessDefinitionByCode() {
+        HttpResponse deleteProcessDefinitionByCodeResponse = processDefinitionPage.deleteProcessDefinitionByCode(loginUser, projectCode, processDefinitionCode);
+        Assertions.assertFalse(deleteProcessDefinitionByCodeResponse.getBody().getSuccess());
+
+        HttpResponse releaseProcessDefinitionResponse = processDefinitionPage.releaseProcessDefinition(loginUser, projectCode, processDefinitionCode, ReleaseState.OFFLINE);
+        Assertions.assertTrue(releaseProcessDefinitionResponse.getBody().getSuccess());
+
+        deleteProcessDefinitionByCodeResponse = processDefinitionPage.deleteProcessDefinitionByCode(loginUser, projectCode, processDefinitionCode);
+        Assertions.assertTrue(deleteProcessDefinitionByCodeResponse.getBody().getSuccess());
+
+        HttpResponse queryProcessDefinitionListResponse = processDefinitionPage.queryProcessDefinitionList(loginUser, projectCode);
+        Assertions.assertTrue(queryProcessDefinitionListResponse.getBody().getSuccess());
+        Assertions.assertFalse(queryProcessDefinitionListResponse.getBody().getData().toString().contains("hello world"));
     }
 }
 

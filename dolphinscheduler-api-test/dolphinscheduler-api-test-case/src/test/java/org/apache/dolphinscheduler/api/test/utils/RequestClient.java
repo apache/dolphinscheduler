@@ -192,7 +192,6 @@ public class RequestClient {
             httpPost.setEntity(multipart);
             CloseableHttpClient client = HttpClients.createDefault();
             CloseableHttpResponse response = client.execute(httpPost);
-//            log.info("[debug111] response - {}", EntityUtils.toString(response.getEntity()));
             return response;
         } catch (Exception e) {
             log.error("error", e);
