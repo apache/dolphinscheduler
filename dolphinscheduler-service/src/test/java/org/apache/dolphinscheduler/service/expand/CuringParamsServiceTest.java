@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.mapper.ProjectParameterMapper;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
@@ -33,6 +34,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SubProcessParameters;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -50,7 +52,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.google.common.collect.Lists;
 
 @ExtendWith(MockitoExtension.class)
-public class CuringGlobalParamsServiceTest {
+public class CuringParamsServiceTest {
 
     private static final String placeHolderName = "$[yyyy-MM-dd-1]";
 
@@ -58,10 +60,13 @@ public class CuringGlobalParamsServiceTest {
     private CuringParamsService curingGlobalParamsService;
 
     @InjectMocks
-    private CuringGlobalParams dolphinSchedulerCuringGlobalParams;
+    private CuringParamsServiceImpl dolphinSchedulerCuringGlobalParams;
 
     @Mock
     private TimePlaceholderResolverExpandService timePlaceholderResolverExpandService;
+
+    @Mock
+    private ProjectParameterMapper projectParameterMapper;
 
     @InjectMocks
     private TimePlaceholderResolverExpandServiceImpl timePlaceholderResolverExpandServiceImpl;
@@ -201,8 +206,11 @@ public class CuringGlobalParamsServiceTest {
         taskInstance.setProcessDefine(processDefinition);
         taskInstance.setProcessInstance(processInstance);
         taskInstance.setTaskDefine(taskDefinition);
+        taskInstance.setProjectCode(3000001l);
 
         AbstractParameters parameters = new SubProcessParameters();
+
+        Mockito.when(projectParameterMapper.queryByProjectCode(Mockito.anyLong())).thenReturn(Collections.emptyList());
 
         Map<String, Property> propertyMap =
                 dolphinSchedulerCuringGlobalParams.paramParsingPreparation(taskInstance, parameters, processInstance);
