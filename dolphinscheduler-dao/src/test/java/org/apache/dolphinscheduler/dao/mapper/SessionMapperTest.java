@@ -57,7 +57,7 @@ public class SessionMapperTest extends BaseDaoTest {
         session.setLastLoginTime(new Date());
         // update
         int update = sessionMapper.updateById(session);
-        Assertions.assertEquals(update, 1);
+        Assertions.assertEquals(1, update);
     }
 
     /**
@@ -67,7 +67,7 @@ public class SessionMapperTest extends BaseDaoTest {
     public void testDelete() {
         Session session = insertOne();
         int delete = sessionMapper.deleteById(session.getId());
-        Assertions.assertEquals(delete, 1);
+        Assertions.assertEquals(1, delete);
     }
 
     /**
@@ -78,7 +78,7 @@ public class SessionMapperTest extends BaseDaoTest {
         Session session = insertOne();
         // query
         List<Session> sessions = sessionMapper.selectList(null);
-        Assertions.assertNotEquals(sessions.size(), 0);
+        Assertions.assertNotEquals(0, sessions.size());
     }
 
     /**
@@ -88,7 +88,7 @@ public class SessionMapperTest extends BaseDaoTest {
     public void testQueryByUserId() {
         Session session = insertOne();
         List<Session> sessions = sessionMapper.queryByUserId(session.getUserId());
-        Assertions.assertNotEquals(sessions.size(), 0);
+        Assertions.assertNotEquals(0, sessions.size());
 
     }
 }
