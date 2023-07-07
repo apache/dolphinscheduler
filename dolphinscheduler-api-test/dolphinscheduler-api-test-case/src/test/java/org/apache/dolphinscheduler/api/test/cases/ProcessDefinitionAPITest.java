@@ -126,10 +126,10 @@ public class ProcessDefinitionAPITest {
 
     @Test
     @Order(4)
-    public void testGetProcessListByProjectCodes() {
-        HttpResponse getProcessListByProjectCodesResponse = processDefinitionPage.getProcessListByProjectCodes(loginUser, projectCode);
-        Assertions.assertTrue(getProcessListByProjectCodesResponse.getBody().getSuccess());
-        Assertions.assertTrue(getProcessListByProjectCodesResponse.getBody().getData().toString().contains("test_import"));
+    public void testgetProcessListByProjectCode() {
+        HttpResponse getProcessListByProjectCodeResponse = processDefinitionPage.getProcessListByProjectCode(loginUser, projectCode);
+        Assertions.assertTrue(getProcessListByProjectCodeResponse.getBody().getSuccess());
+        Assertions.assertTrue(getProcessListByProjectCodeResponse.getBody().getData().toString().contains("test_import"));
     }
 
     @Test

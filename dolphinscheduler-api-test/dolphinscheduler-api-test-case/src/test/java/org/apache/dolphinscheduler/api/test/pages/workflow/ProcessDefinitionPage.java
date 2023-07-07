@@ -73,7 +73,7 @@ public class ProcessDefinitionPage {
         return requestClient.get(url, headers, params);
     }
 
-    public HttpResponse getProcessListByProjectCodes(User loginUser, long projectCode) {
+    public HttpResponse getProcessListByProjectCode(User loginUser, long projectCode) {
         Map<String, Object> params = new HashMap<>();
         params.put("loginUser", loginUser);
         Map<String, String> headers = new HashMap<>();
