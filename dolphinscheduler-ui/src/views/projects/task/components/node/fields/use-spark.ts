@@ -26,7 +26,8 @@ import {
   useExecutorCores,
   useMainJar,
   useNamespace,
-  useResources
+  useResources,
+  useYarnQueue
 } from '.'
 import type { IJsonItem } from '../types'
 
@@ -105,6 +106,7 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
     useExecutorNumber(),
     useExecutorMemory(),
     useExecutorCores(),
+    useYarnQueue(),
     {
       type: 'input',
       field: 'mainArgs',
