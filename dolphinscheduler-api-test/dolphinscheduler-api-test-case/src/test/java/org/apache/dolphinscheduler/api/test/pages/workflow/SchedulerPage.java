@@ -90,7 +90,7 @@ public class SchedulerPage {
         Map<String, Object> params = new HashMap<>();
         params.put("loginUser", loginUser);
         params.put("schedule", schedule);
-        params.put("warningGroupId", 1);
+//        params.put("warningGroupId", 1);
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.SESSION_ID_KEY, sessionId);
 
