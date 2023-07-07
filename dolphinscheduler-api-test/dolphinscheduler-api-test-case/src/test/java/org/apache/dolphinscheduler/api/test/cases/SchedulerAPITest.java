@@ -143,7 +143,7 @@ public class SchedulerAPITest {
     @Test
     @Order(5)
     public void testUpdateSchedule() {
-        final String schedule = "{\"startTime\":\"1996-08-08 00:00:00\",\"endTime\":\"2200-08-08 00:00:00\",\"timezoneId\":\"America/Phoenix\",\"crontab\":\"0 0 3/6 * * ? *\"}" ;
+        final String schedule = "{\"startTime\":\"1996-08-08 00:00:00\",\"endTime\":\"2200-08-08 00:00:00\",\"timezoneId\":\"America/Phoenix\",\"crontab\":\"0 0 3/6 * * ? *\"}";
         HttpResponse updateScheduleResponse = schedulerPage.updateSchedule(loginUser, projectCode, scheduleId, schedule);
         Assertions.assertTrue(updateScheduleResponse.getBody().getSuccess());
 
