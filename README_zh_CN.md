@@ -55,7 +55,6 @@ DolphinScheduler 的主要特性如下：
 ## 参与贡献
 
 社区欢迎大家贡献，请参考此页面了解更多：[如何贡献](docs/docs/zh/contribute/join/contribute.md)，如果你是首次贡献 DolphinScheduler，在[这里](https://github.com/apache/dolphinscheduler/contribute)可以找到good first issue
-。
 
 ## 社区
 
