@@ -98,7 +98,7 @@ public class K8sUtils {
             String podName = null;
             for (Pod pod : podList) {
                 podName = pod.getMetadata().getName();
-                if (jobName.equals(podName.substring(0, pod.getMetadata().getName().lastIndexOf("-")))) {
+                if (podName.contains("-") && jobName.equals(podName.substring(0, podName.lastIndexOf("-")))) {
                     break;
                 }
             }
