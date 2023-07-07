@@ -84,34 +84,41 @@ public class MasterRegistryClient implements AutoCloseable {
 
     /**
      * remove master node path
+     *这段代码是用于从注册表中移除主节点路径的。以下是代码的解释：
      *
+     * 整个方法的目的是删除一个主节点路径，并在遇到错误或者开启了失败重试的情况下进行相关处理。
      * @param path     node path
      * @param nodeType node type
      * @param failover is failover
      */
     public void removeMasterNodePath(String path, RegistryNodeType nodeType, boolean failover) {
+        //记录一条信息，表示正在删除指定的节点。
         log.info("{} node deleted : {}", nodeType, path);
-
+        //如果路径参数（path）为空，该方法就不会继续执行，并且会记录一条错误信息。
         if (StringUtils.isEmpty(path)) {
             log.error("server down error: empty path: {}, nodeType:{}", path, nodeType);
             return;
         }
-
+        //通过路径（path）获取主机名（serverHost）。
         String serverHost = registryClient.getHostByEventDataPath(path);
+        //如果获取的主机名为空，该方法会停止执行，并记录一条错误信息。
         if (StringUtils.isEmpty(serverHost)) {
             log.error("server down error: unknown path: {}, nodeType:{}", path, nodeType);
             return;
         }
 
         try {
+            //如果指定的路径不存在，就会记录一条信息。
             if (!registryClient.exists(path)) {
                 log.info("path: {} not exists", path);
             }
             // failover server
+            //如果开启了失败重试（failover），就调用 failoverService.failoverServerWhenDown(serverHost, nodeType) 方法，根据服务器主机名和节点类型实施失败重试。
             if (failover) {
                 failoverService.failoverServerWhenDown(serverHost, nodeType);
             }
         } catch (Exception e) {
+            //如果在执行过程中发生异常，就会捕获这个异常，并记录一条包含节点类型、主机名和异常信息的错误信息。
             log.error("{} server failover failed, host:{}", nodeType, serverHost, e);
         }
     }

@@ -1578,7 +1578,25 @@ public class ProcessServiceImpl implements ProcessService {
 
     /**
      * process need failover process instance
+     *这是一个Java函数，其主要目标是处理需要进行故障转移的流程实例。
      *
+     * 以下是各部分的详细解释：
+     *
+     * 函数名processNeedFailoverProcessInstances，接受一个参数processInstance，表示流程实例对象。
+     *
+     * 在函数内部，首先通过调用processInstance.setHost(Constants.NULL)方法将processInstance的主机设置为空，用于标记这个processInstance已经进行了故障转移。
+     *
+     * 然后通过调用processInstanceMapper.updateById(processInstance)方法更新数据库中对应的流程实例记录，将主机字段设置为空。
+     *
+     * 接下来，创建一个新的Command对象cmd，并设置相应的属性值，包括流程定义代码、流程定义版本、流程实例ID、命令参数，以及执行器ID等。
+     *
+     * 通过调用createCommandParams方法创建一个命令参数对象，并将其转换为JSON字符串，并设置为cmd的命令参数。
+     *
+     * 设置cmd的命令类型为RECOVER_TOLERANCE_FAULT_PROCESS，表示这是一个恢复容错失败的流程的命令。
+     *
+     * 通过调用commandService.createCommand(cmd)方法将cmd对象插入到命令表中，用于后续执行故障恢复操作。
+     *
+     * 总的来说，该函数的目标是处理需要进行故障转移的流程实例。它将设置流程实例的主机为空，并创建一个恢复容错失败的流程的命令，并插入到命令表中以进行后续处理。
      * @param processInstance processInstance
      */
     @Override
