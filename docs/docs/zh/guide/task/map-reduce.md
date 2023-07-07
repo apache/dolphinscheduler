@@ -24,6 +24,7 @@ MapReduce(MR) 任务类型，用于执行 MapReduce 程序。对于 MapReduce �
 | 主函数的 Class | 是 MapReduce 程序的入口 Main Class 的**全路径**    |
 | 主程序包       | 执行 MapReduce 程序的 jar 包                   |
 | 任务名称（选填）   | MapReduce 任务名称                           |
+| Yarn 队列    | 设置 Yarn 队列，默认使用 default                  |
 | 命令行参数      | 是设置 MapReduce 程序的输入参数，支持自定义参数变量的替换       |
 | 其他参数       | 支持 –D、-files、-libjars、-archives 格式       |
 | 自定义参数      | 是 MapReduce 局部的用户自定义参数，会替换脚本中以 ${变量} 的内容 |

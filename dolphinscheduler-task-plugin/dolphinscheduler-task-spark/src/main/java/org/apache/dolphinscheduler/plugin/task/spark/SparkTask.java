@@ -81,7 +81,6 @@ public class SparkTask extends AbstractYarnTask {
         if (!sparkParameters.checkParameters()) {
             throw new RuntimeException("spark task params is not valid");
         }
-        sparkParameters.setQueue(taskExecutionContext.getQueue());
 
         log.info("Initialize spark task params {}", JSONUtils.toPrettyJsonString(sparkParameters));
     }
@@ -165,11 +164,11 @@ public class SparkTask extends AbstractYarnTask {
 
         String others = sparkParameters.getOthers();
         if (!SparkConstants.DEPLOY_MODE_LOCAL.equals(deployMode)
-                && (StringUtils.isEmpty(others) || !others.contains(SparkConstants.SPARK_QUEUE))) {
-            String queue = sparkParameters.getQueue();
-            if (StringUtils.isNotEmpty(queue)) {
-                args.add(SparkConstants.SPARK_QUEUE);
-                args.add(queue);
+                && (StringUtils.isEmpty(others) || !others.contains(SparkConstants.SPARK_YARN_QUEUE))) {
+            String yarnQueue = sparkParameters.getYarnQueue();
+            if (StringUtils.isNotEmpty(yarnQueue)) {
+                args.add(SparkConstants.SPARK_YARN_QUEUE);
+                args.add(yarnQueue);
             }
         }
 

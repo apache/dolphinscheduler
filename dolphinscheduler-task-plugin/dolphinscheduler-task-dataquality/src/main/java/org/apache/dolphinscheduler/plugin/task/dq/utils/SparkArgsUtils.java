@@ -106,7 +106,7 @@ public class SparkArgsUtils {
         String others = param.getOthers();
         if (!SPARK_LOCAL.equals(deployMode)
                 && (StringUtils.isEmpty(others) || !others.contains(SparkConstants.SPARK_QUEUE))) {
-            String queue = param.getQueue();
+            String queue = param.getYarnQueue();
             if (StringUtils.isNotEmpty(queue)) {
                 args.add(SparkConstants.SPARK_QUEUE);
                 args.add(queue);

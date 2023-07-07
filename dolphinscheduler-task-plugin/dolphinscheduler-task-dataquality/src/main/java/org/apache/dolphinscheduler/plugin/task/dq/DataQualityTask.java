@@ -121,10 +121,6 @@ public class DataQualityTask extends AbstractYarnTask {
                                 StringEscapeUtils.escapeJava(JSONUtils.toJsonString(dataQualityConfiguration)))
                         + "\"");
 
-        dataQualityParameters
-                .getSparkParameters()
-                .setQueue(dqTaskExecutionContext.getQueue());
-
         setMainJarName();
     }
 

@@ -32,6 +32,7 @@ Spark  任务类型用于执行 Spark 应用。对于 Spark 节点，worker 支�
 - Driver 内存数：用于设置 Driver 内存数，可根据实际生产环境设置对应的内存数。
 - Executor 数量：用于设置 Executor 的数量，可根据实际生产环境设置对应的内存数。
 - Executor 内存数：用于设置 Executor 内存数，可根据实际生产环境设置对应的内存数。
+- Yarn 队列：用于设置 Yarn 队列，默认使用 default 队列。
 - 主程序参数：设置 Spark 程序的输入参数，支持自定义参数变量的替换。
 - 选项参数：支持 `--jars`、`--files`、`--archives`、`--conf` 格式。
 - 资源：如果其他参数中引用了资源文件，需要在资源中选择指定。

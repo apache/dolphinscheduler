@@ -223,6 +223,7 @@ interface ISparkParameters {
   executorMemory?: string
   numExecutors?: number
   others?: string
+  yarnQueue?: string
 }
 
 interface IRuleParameters {
@@ -441,6 +442,7 @@ interface ITaskParams {
   degreeOfParallelism?: number
   filterCondition?: string
   listParameters?: Array<any>
+  yarnQueue?: string
 }
 
 interface INodeData

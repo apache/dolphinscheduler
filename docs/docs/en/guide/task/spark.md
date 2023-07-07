@@ -33,6 +33,7 @@ Spark task type for executing Spark application. When executing the Spark task, 
 | Driver memory size         | Set the size of Driver memories, which can be set according to the actual production environment.                                  |
 | Number of Executor         | Set the number of Executor, which can be set according to the actual production environment.                                       |
 | Executor memory size       | Set the size of Executor memories, which can be set according to the actual production environment.                                |
+| Yarn queue                 | Set the yarn queue, use `default` queue by default.                                                                                |
 | Main program parameters    | Set the input parameters of the Spark program and support the substitution of custom parameter variables.                          |
 | Optional parameters        | Support `--jars`, `--files`,` --archives`, `--conf` format.                                                                        |
 | Resource                   | Appoint resource files in the `Resource` if parameters refer to them.                                                              |
