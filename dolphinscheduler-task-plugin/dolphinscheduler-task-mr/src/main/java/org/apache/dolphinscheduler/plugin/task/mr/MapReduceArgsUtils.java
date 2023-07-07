@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.mr;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.D;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.JAR;
 import static org.apache.dolphinscheduler.plugin.task.mr.MapReduceTaskConstants.MR_NAME;
-import static org.apache.dolphinscheduler.plugin.task.mr.MapReduceTaskConstants.MR_QUEUE;
+import static org.apache.dolphinscheduler.plugin.task.mr.MapReduceTaskConstants.MR_YARN_QUEUE;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
@@ -67,10 +67,10 @@ public class MapReduceArgsUtils {
         }
 
         String others = param.getOthers();
-        if (StringUtils.isEmpty(others) || !others.contains(MR_QUEUE)) {
-            String queue = param.getQueue();
-            if (StringUtils.isNotEmpty(queue)) {
-                args.add(String.format("%s%s=%s", D, MR_QUEUE, queue));
+        if (StringUtils.isEmpty(others) || !others.contains(MR_YARN_QUEUE)) {
+            String yarnQueue = param.getYarnQueue();
+            if (StringUtils.isNotEmpty(yarnQueue)) {
+                args.add(String.format("%s%s=%s", D, MR_YARN_QUEUE, yarnQueue));
             }
         }
 
