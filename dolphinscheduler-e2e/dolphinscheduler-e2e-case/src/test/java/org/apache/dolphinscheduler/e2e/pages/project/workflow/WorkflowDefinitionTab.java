@@ -30,7 +30,6 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 
 import java.util.List;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Getter
@@ -60,7 +59,7 @@ public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDe
         @FindBy(className = "n-dialog__action"),
         @FindBy(className = "n-button--default-type"),
     })
-    private WebElement publishSuccessButtonConfirm;
+    private WebElement publishSuccessButtonCancel;
 
     @FindBy(className = "items")
     private List<WebElement> workflowList;
@@ -97,7 +96,7 @@ public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDe
 
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", buttonConfirm());
 
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", publishSuccessButtonConfirm());
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", publishSuccessButtonCancel());
 
         return this;
     }
@@ -126,6 +125,21 @@ public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDe
             cancelButton.click();
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", buttonConfirm());
         }
+
+        return this;
+    }
+
+    public WorkflowDefinitionTab delete(String workflow) {
+        workflowList()
+            .stream()
+            .filter(it -> it.findElement(By.className("workflow-name")).getAttribute("innerText").equals(workflow))
+            .flatMap(it -> it.findElements(By.className("btn-delete")).stream())
+            .filter(WebElement::isDisplayed)
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("Can not find delete button in workflow definition"))
+            .click();
+
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", buttonConfirm());
 
         return this;
     }

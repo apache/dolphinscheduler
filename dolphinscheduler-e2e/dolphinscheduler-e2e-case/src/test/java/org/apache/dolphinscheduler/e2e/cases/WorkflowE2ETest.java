@@ -49,6 +49,8 @@ import static org.awaitility.Awaitility.await;
 class WorkflowE2ETest {
     private static final String project = "test-workflow-1";
 
+    private static final String workflow = "test-workflow-1";
+
     private static final String user = "admin";
 
     private static final String password = "dolphinscheduler123";
@@ -87,7 +89,7 @@ class WorkflowE2ETest {
             .goTo(project)
             .goToTab(WorkflowDefinitionTab.class)
             .cancelPublishAll()
-            .deleteAll()
+            .delete(workflow);
         ;
         new NavBarPage(browser)
             .goToNav(ProjectPage.class)
@@ -101,7 +103,6 @@ class WorkflowE2ETest {
     @Test
     @Order(1)
     void testCreateWorkflow() {
-        final String workflow = "test-workflow-1";
         WorkflowDefinitionTab workflowDefinitionPage =
             new ProjectPage(browser)
                 .goTo(project)
@@ -163,7 +164,6 @@ class WorkflowE2ETest {
     @Test
     @Order(30)
     void testRunWorkflow() {
-        final String workflow = "test-workflow-1";
         final ProjectDetailPage projectPage =
                 new ProjectPage(browser)
                         .goToNav(ProjectPage.class)
