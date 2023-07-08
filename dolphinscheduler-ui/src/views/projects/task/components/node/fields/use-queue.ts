@@ -14,23 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { useI18n } from 'vue-i18n'
+import type { IJsonItem } from '../types'
 
-package org.apache.dolphinscheduler.plugin.task.mr;
+export function useYarnQueue(): IJsonItem {
+  const { t } = useI18n()
 
-public class MapReduceTaskConstants {
-
-    private MapReduceTaskConstants() {
-        throw new UnsupportedOperationException("Construct Constants");
-    }
-
-    /**
-     * -D mapreduce.job.name=name
-     */
-    public static final String MR_NAME = "mapreduce.job.name";
-
-    /**
-     * -D mapreduce.job.queuename=queuename
-     */
-    public static final String MR_YARN_QUEUE = "mapreduce.job.queuename";
-
+  return {
+    type: 'input',
+    field: 'yarnQueue',
+    name: t('project.node.yarn_queue'),
+    span: 12,
+    props: {
+      placeholder: t('project.node.yarn_queue_tips')
+    },
+  }
 }

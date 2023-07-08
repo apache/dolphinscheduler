@@ -106,7 +106,6 @@ public class TaskExecutionContextBuilder {
         taskExecutionContext.setExecutorId(processInstance.getExecutorId());
         taskExecutionContext.setCmdTypeIfComplement(processInstance.getCmdTypeIfComplement().getCode());
         taskExecutionContext.setTenantCode(processInstance.getTenantCode());
-        taskExecutionContext.setQueue(processInstance.getQueue());
         return this;
     }
 

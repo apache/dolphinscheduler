@@ -84,7 +84,7 @@ public class TenantMapperTest extends BaseDaoTest {
         Tenant tenant = insertOne();
         // query
         List<Tenant> tenants = tenantMapper.selectList(null);
-        Assertions.assertNotEquals(tenants.size(), 0);
+        Assertions.assertNotEquals(0, tenants.size());
     }
 
     /**
@@ -104,7 +104,7 @@ public class TenantMapperTest extends BaseDaoTest {
 
         Tenant tenant1 = tenantMapper.queryById(tenant.getId());
 
-        Assertions.assertNotEquals(tenant1, null);
+        Assertions.assertNotEquals(null, tenant1);
     }
 
     /**
@@ -139,7 +139,7 @@ public class TenantMapperTest extends BaseDaoTest {
         IPage<Tenant> tenantIPage =
                 tenantMapper.queryTenantPaging(page, Collections.singletonList(tenant.getId()), tenant.getTenantCode());
 
-        Assertions.assertNotEquals(tenantIPage.getTotal(), 0);
+        Assertions.assertNotEquals(0, tenantIPage.getTotal());
     }
 
     public void testExistTenant() {
