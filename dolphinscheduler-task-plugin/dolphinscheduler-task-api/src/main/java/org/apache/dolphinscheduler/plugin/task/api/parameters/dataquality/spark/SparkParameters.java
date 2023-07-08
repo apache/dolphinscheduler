@@ -82,7 +82,7 @@ public class SparkParameters extends AbstractParameters {
     /**
      * The YARN queue to submit to
      */
-    private String queue;
+    private String yarnQueue;
 
     /**
      * other arguments
@@ -180,12 +180,12 @@ public class SparkParameters extends AbstractParameters {
         this.appName = appName;
     }
 
-    public String getQueue() {
-        return queue;
+    public String getYarnQueue() {
+        return yarnQueue;
     }
 
-    public void setQueue(String queue) {
-        this.queue = queue;
+    public void setYarnQueue(String yarnQueue) {
+        this.yarnQueue = yarnQueue;
     }
 
     public String getOthers() {
