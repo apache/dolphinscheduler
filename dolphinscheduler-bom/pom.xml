@@ -114,6 +114,7 @@
         <fabric8.client.version>6.0.0</fabric8.client.version>
         <casdoor.version>1.6.0</casdoor.version>
         <azure-sdk-bom.version>1.2.10</azure-sdk-bom.version>
+        <zeppelin-client.version>0.10.1</zeppelin-client.version>
     </properties>
 
     <dependencyManagement>
@@ -887,6 +888,12 @@
                 <groupId>net.snowflake</groupId>
                 <artifactId>snowflake-jdbc</artifactId>
                 <version>${snowflake-jdbc.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.zeppelin</groupId>
+                <artifactId>zeppelin-client</artifactId>
+                <version>${zeppelin-client.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

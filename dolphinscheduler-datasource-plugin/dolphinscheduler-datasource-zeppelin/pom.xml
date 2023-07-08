@@ -44,7 +44,6 @@
         <dependency>
             <groupId>org.apache.zeppelin</groupId>
             <artifactId>zeppelin-client</artifactId>
-            <version>0.10.1</version>
         </dependency>
     </dependencies>
 
