@@ -67,6 +67,16 @@ public class HttpParameters extends AbstractParameters {
      */
     private int socketTimeout;
 
+    private Boolean enableProxy;
+
+    private String proxy;
+
+    private Integer port;
+
+    private String user;
+
+    private String password;
+
     @Override
     public boolean checkParameters() {
         return StringUtils.isNotEmpty(url);
@@ -131,5 +141,45 @@ public class HttpParameters extends AbstractParameters {
 
     public void setSocketTimeout(int socketTimeout) {
         this.socketTimeout = socketTimeout;
+    }
+
+    public Boolean getEnableProxy() {
+        return enableProxy;
+    }
+
+    public void setEnableProxy(Boolean enableProxy) {
+        this.enableProxy = enableProxy;
+    }
+
+    public String getProxy() {
+        return proxy;
+    }
+
+    public void setProxy(String proxy) {
+        this.proxy = proxy;
+    }
+
+    public Integer getPort() {
+        return port;
+    }
+
+    public void setPort(Integer port) {
+        this.port = port;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

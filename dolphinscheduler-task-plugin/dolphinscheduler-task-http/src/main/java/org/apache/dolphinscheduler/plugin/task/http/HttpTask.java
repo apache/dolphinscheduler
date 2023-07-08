@@ -36,11 +36,15 @@ import org.apache.commons.io.Charsets;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.ParseException;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
@@ -289,8 +293,20 @@ public class HttpTask extends AbstractTask {
      */
     protected CloseableHttpClient createHttpClient() {
         final RequestConfig requestConfig = requestConfig();
-        HttpClientBuilder httpClientBuilder;
-        httpClientBuilder = HttpClients.custom().setDefaultRequestConfig(requestConfig);
+        HttpClientBuilder httpClientBuilder = HttpClients.custom();
+        if (httpParameters.getEnableProxy()) {
+            CredentialsProvider provider = new BasicCredentialsProvider();
+            AuthScope authScope = null;
+            // basic auth could tak effect alone without proxy
+            if (!StringUtils.isEmpty(httpParameters.getProxy()) && httpParameters.getPort() != null
+                    && httpParameters.getPort() > 0) {
+                authScope = new AuthScope(httpParameters.getProxy(), httpParameters.getPort());
+            }
+            provider.setCredentials(authScope == null ? AuthScope.ANY : authScope,
+                    new UsernamePasswordCredentials(httpParameters.getUser(), httpParameters.getPassword()));
+            httpClientBuilder.setDefaultCredentialsProvider(provider);
+        }
+        httpClientBuilder.setDefaultRequestConfig(requestConfig);
         return httpClientBuilder.build();
     }
 
