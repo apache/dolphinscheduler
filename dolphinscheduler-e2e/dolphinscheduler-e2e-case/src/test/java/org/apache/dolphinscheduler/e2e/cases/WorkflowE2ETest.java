@@ -88,16 +88,20 @@ class WorkflowE2ETest {
             .goToNav(ProjectPage.class)
             .goTo(project)
             .goToTab(WorkflowDefinitionTab.class)
-            .cancelPublishAll()
+            .cancelPublishAll();
+
+        new NavBarPage(browser)
+            .goToNav(ProjectPage.class)
+            .goTo(project)
+            .goToTab(WorkflowDefinitionTab.class)
             .delete(workflow);
-        ;
+
         new NavBarPage(browser)
             .goToNav(ProjectPage.class)
             .delete(project)
             .goToNav(SecurityPage.class)
             .goToTab(TenantPage.class)
-            .delete(tenant)
-        ;
+            .delete(tenant);
     }
 
     @Test
