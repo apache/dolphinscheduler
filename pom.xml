@@ -56,7 +56,6 @@
         <module>dolphinscheduler-ui</module>
         <module>dolphinscheduler-scheduler-plugin</module>
         <module>dolphinscheduler-storage-plugin</module>
-        <module>dolphinscheduler-e2e</module>
     </modules>
 
     <properties>
