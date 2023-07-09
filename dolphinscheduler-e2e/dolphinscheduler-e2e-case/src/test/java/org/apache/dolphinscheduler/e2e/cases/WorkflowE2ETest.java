@@ -92,7 +92,11 @@ class WorkflowE2ETest {
 
         new NavBarPage(browser)
             .goToNav(ProjectPage.class)
-            .delete(project)
+            .delete(project);
+
+        browser.navigate().refresh();
+
+        new NavBarPage(browser)
             .goToNav(SecurityPage.class)
             .goToTab(TenantPage.class)
             .delete(tenant);
