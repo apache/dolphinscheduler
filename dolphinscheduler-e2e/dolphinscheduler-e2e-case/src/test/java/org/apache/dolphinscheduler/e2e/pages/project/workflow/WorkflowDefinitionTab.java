@@ -148,8 +148,6 @@ public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDe
             .orElseThrow(() -> new RuntimeException("Can not find delete button in workflow definition"))
             .click();
 
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", buttonConfirm());
-
         return this;
     }
 
