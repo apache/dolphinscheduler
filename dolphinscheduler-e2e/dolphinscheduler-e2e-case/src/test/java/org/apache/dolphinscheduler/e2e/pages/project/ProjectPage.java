@@ -76,8 +76,6 @@ public final class ProjectPage extends NavBarPage implements NavBarItem {
             .orElseThrow(() -> new RuntimeException("Cannot find project: " + project))
             .findElement(By.className("delete")).click();
 
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", buttonConfirm());
-
         return this;
     }
 
