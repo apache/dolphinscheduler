@@ -229,7 +229,7 @@ export default {
       'There is not any workflows. Please create a workflow, and then visit this page again.',
     ready_to_block: 'Ready to block',
     block: 'Block',
-    want_to_set_timing: 'Would you like to set the workflow\'s timing?',
+    want_to_set_timing: 'Would you like to set the workflow timing?',
     confirm_to_online: 'Confirm to make the workflow online?',
     confirm_to_offline: 'Confirm to make the workflow offline?',
   },

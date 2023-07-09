@@ -31,15 +31,7 @@ import {
 } from '@/service/modules/process-definition'
 import TableAction from './components/table-action'
 import styles from './index.module.scss'
-import {
-  NTag,
-  NSpace,
-  NIcon,
-  NButton,
-  NEllipsis,
-  NTooltip,
-  useDialog
-} from 'naive-ui'
+import { NTag, NSpace, NIcon, NButton, NEllipsis, NTooltip } from 'naive-ui'
 import { CopyOutlined, UnorderedListOutlined } from '@vicons/antd'
 import ButtonLink from '@/components/button-link'
 import {
@@ -71,10 +63,9 @@ export function useTable() {
     timingShowRef: ref(false),
     versionShowRef: ref(false),
     copyShowRef: ref(false),
-    loadingRef: ref(false)
+    loadingRef: ref(false),
+    setTimingDialogShowRef: ref(false)
   })
-
-  const dialog = useDialog()
 
   const createColumns = (variables: any) => {
     variables.columns = [
@@ -364,16 +355,8 @@ export function useTable() {
 
     release(data, variables.projectCode, row.code).then(() => {
       if (data.releaseState === 'ONLINE') {
-        dialog.success({
-          title: t('project.workflow.success'),
-          content: t('project.workflow.want_to_set_timing'),
-          positiveText: t('project.workflow.confirm'),
-          negativeText: t('project.workflow.cancel'),
-          maskClosable: false,
-          onPositiveClick: () => {
-            gotoTimingManage(row)
-          }
-        })
+        variables.setTimingDialogShowRef = true
+        variables.row = row
       } else {
         window.$message.success(t('project.workflow.success'))
       }
@@ -472,6 +455,7 @@ export function useTable() {
     getTableData,
     batchDeleteWorkflow,
     batchExportWorkflow,
-    batchCopyWorkflow
+    batchCopyWorkflow,
+    gotoTimingManage
   }
 }

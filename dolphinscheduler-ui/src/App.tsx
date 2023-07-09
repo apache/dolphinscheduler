@@ -24,8 +24,7 @@ import {
   NConfigProvider,
   darkTheme,
   GlobalThemeOverrides,
-  NMessageProvider,
-  NDialogProvider
+  NMessageProvider
 } from 'naive-ui'
 import { useThemeStore } from '@/store/theme/theme'
 import { useLocalesStore } from '@/store/locales/locales'
@@ -71,11 +70,9 @@ const App = defineComponent({
         }
         locale={String(this.localesStore.getLocales) === 'zh_CN' ? zhCN : enUS}
       >
-        <NDialogProvider>
-          <NMessageProvider>
-            {this.isRouterAlive ? <router-view /> : ''}
-          </NMessageProvider>
-        </NDialogProvider>
+        <NMessageProvider>
+          {this.isRouterAlive ? <router-view /> : ''}
+        </NMessageProvider>
       </NConfigProvider>
     )
   }
