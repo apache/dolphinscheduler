@@ -88,12 +88,6 @@ class WorkflowE2ETest {
             .goToNav(ProjectPage.class)
             .goTo(project)
             .goToTab(WorkflowDefinitionTab.class)
-            .cancelPublishAll();
-
-        new NavBarPage(browser)
-            .goToNav(ProjectPage.class)
-            .goTo(project)
-            .goToTab(WorkflowDefinitionTab.class)
             .delete(workflow);
 
         new NavBarPage(browser)

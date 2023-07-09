@@ -19,6 +19,9 @@
  */
 package org.apache.dolphinscheduler.e2e.pages.project.workflow;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
+
 import lombok.Getter;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectDetailPage;
@@ -130,6 +133,12 @@ public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDe
     }
 
     public WorkflowDefinitionTab delete(String workflow) {
+        await().untilAsserted(() -> assertThat(workflowList())
+            .as("Workflow list should contain newly-created workflow")
+            .anyMatch(
+                it -> it.getText().contains(workflow)
+            ));
+
         workflowList()
             .stream()
             .filter(it -> it.findElement(By.className("workflow-name")).getAttribute("innerText").equals(workflow))
