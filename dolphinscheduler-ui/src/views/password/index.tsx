@@ -21,7 +21,7 @@ import { useForm } from './use-form'
 import { useUpdate } from './use-update'
 import Card from '@/components/card'
 
-export const PasswordCard = defineComponent({
+const password = defineComponent({
   name: 'password',
   setup() {
     const { state, rules, t } = useForm()
@@ -90,4 +90,4 @@ export const PasswordCard = defineComponent({
   }
 })
 
-export default PasswordCard
+export default password
