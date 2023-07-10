@@ -28,6 +28,7 @@ export default {
     actions: '操作',
     edit_tenant: '编辑租户',
     tenant_code_tips: '请输入操作系统租户',
+    tenant_code_invalid_tips: '操作系统租户名称含有非法字符',
     queue_name_tips: '请选择队列',
     description_tips: '请输入描述',
     delete_confirm: '确定删除吗?',
