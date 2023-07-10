@@ -48,9 +48,14 @@ import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -287,10 +292,29 @@ public class HttpTask extends AbstractTask {
      *
      * @return CloseableHttpClient
      */
-    protected CloseableHttpClient createHttpClient() {
+    protected CloseableHttpClient createHttpClient() throws Exception {
         final RequestConfig requestConfig = requestConfig();
         HttpClientBuilder httpClientBuilder;
         httpClientBuilder = HttpClients.custom().setDefaultRequestConfig(requestConfig);
+        if (httpParameters.getEnableSSL()) {
+            TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
+
+                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                    return null;
+                }
+
+                public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+                }
+
+                public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+                }
+            }};
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(null, trustAllCerts, new SecureRandom());
+            httpClientBuilder.setSSLContext(sslContext);
+            httpClientBuilder.setSSLHostnameVerifier((s, sslSession) -> true);
+        }
+        httpClientBuilder.setDefaultRequestConfig(requestConfig);
         return httpClientBuilder.build();
     }
 
