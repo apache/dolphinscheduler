@@ -246,7 +246,7 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
         Page<ProjectParameter> page = new Page<>(pageNo, pageSize);
 
         IPage<ProjectParameter> iPage =
-                projectParameterMapper.queryProjectParameterListPaging(page, null, searchVal);
+                projectParameterMapper.queryProjectParameterListPaging(page, projectCode,null, searchVal);
 
         List<ProjectParameter> projectParameterList = iPage.getRecords();
 

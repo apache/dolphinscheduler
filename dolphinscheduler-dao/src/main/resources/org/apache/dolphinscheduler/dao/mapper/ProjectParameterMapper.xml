@@ -53,7 +53,7 @@
         select
         <include refid="baseSql"/>
         from t_ds_project_parameter
-        where 1=1
+        where project_code = #{project_code}
         <if test="projectParameterIds != null and projectParameterIds.size() > 0">
             and id  in
             <foreach item="id" index="index" collection="projectParameterIds" open="(" separator="," close=")">
