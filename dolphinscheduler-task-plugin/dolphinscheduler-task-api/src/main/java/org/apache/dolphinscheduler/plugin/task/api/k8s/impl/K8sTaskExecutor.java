@@ -266,8 +266,6 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
     public TaskResponse run(String k8sParameterStr) throws Exception {
         TaskResponse result = new TaskResponse();
         int taskInstanceId = taskRequest.getTaskInstanceId();
-        K8sTaskMainParameters k8STaskMainParameters =
-                JSONUtils.parseObject(k8sParameterStr, K8sTaskMainParameters.class);
         try {
             if (null == TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId)) {
                 result.setExitStatusCode(EXIT_CODE_KILL);

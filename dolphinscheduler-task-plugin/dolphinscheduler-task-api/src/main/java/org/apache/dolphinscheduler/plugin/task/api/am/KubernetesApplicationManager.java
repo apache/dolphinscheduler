@@ -182,9 +182,9 @@ public class KubernetesApplicationManager implements ApplicationManager {
      */
     public LogWatch getPodLogWatcher(KubernetesApplicationManagerContext kubernetesApplicationManagerContext) {
         KubernetesClient client = getClient(kubernetesApplicationManagerContext);
-        boolean podReady = false;
+        boolean podIsReady = false;
         Pod pod = null;
-        while (!podReady) {
+        while (!podIsReady) {
             FilterWatchListDeletable<Pod, PodList, PodResource> watchList =
                     getListenPod(kubernetesApplicationManagerContext);
             List<Pod> podList = watchList.list().getItems();
@@ -192,11 +192,10 @@ public class KubernetesApplicationManager implements ApplicationManager {
                 return null;
             }
             pod = podList.get(0);
-            System.out.println("!!!!!" + pod.getStatus().getPhase());
             if (pod.getStatus().getPhase().equals(PENDING)) {
                 ThreadUtils.sleep(SLEEP_TIME_MILLIS);
             } else {
-                podReady = true;
+                podIsReady = true;
             }
         }
 
