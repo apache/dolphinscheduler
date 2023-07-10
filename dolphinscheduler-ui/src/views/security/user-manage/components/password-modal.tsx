@@ -84,7 +84,7 @@ export const PasswordModal = defineComponent({
   },
   render(props: { currentRecord: IRecord }) {
     const { t } = this
-    const { currentRecord } = props
+
     return (
       <Modal
         show={this.show}
