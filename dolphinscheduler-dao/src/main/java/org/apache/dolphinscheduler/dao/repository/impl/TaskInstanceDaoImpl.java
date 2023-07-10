@@ -65,7 +65,7 @@ public class TaskInstanceDaoImpl extends BaseDao<TaskInstance, TaskInstanceMappe
     @Override
     public boolean submitTaskInstanceToDB(TaskInstance taskInstance, ProcessInstance processInstance) {
         WorkflowExecutionStatus processInstanceState = processInstance.getState();
-        if (processInstanceState.isFinished() || processInstanceState == WorkflowExecutionStatus.READY_STOP) {
+        if (processInstanceState.isFinished()) {
             log.warn("processInstance: {} state was: {}, skip submit this task, taskCode: {}",
                     processInstance.getId(),
                     processInstanceState,
