@@ -75,6 +75,104 @@ export function useTable() {
     ])
   }
 
+  const createTimingListTableColumns = (variables: any) => {
+    variables.columns = [
+      {
+        title: '#',
+        key: 'id',
+        ...COLUMN_WIDTH_CONFIG['index'],
+        render: (row: any, index: number) => index + 1
+      },
+      {
+        title: t('project.workflow.start_time'),
+        key: 'startTime',
+        ...COLUMN_WIDTH_CONFIG['timeZone'],
+        render: (row: any) => renderTime(row.startTime, row.timezoneId)
+      },
+      {
+        title: t('project.workflow.end_time'),
+        key: 'endTime',
+        ...COLUMN_WIDTH_CONFIG['timeZone'],
+        render: (row: any) => renderTime(row.endTime, row.timezoneId)
+      },
+      {
+        title: t('project.workflow.crontab'),
+        key: 'crontab',
+        width: 140
+      },
+      {
+        title: t('project.workflow.status'),
+        key: 'releaseState',
+        ...COLUMN_WIDTH_CONFIG['state'],
+        render: (row: any) => {
+          if (row.releaseState === 'ONLINE') {
+            return h(
+                NTag,
+                { type: 'success', size: 'small' },
+                {
+                  default: () => t('project.workflow.up_line')
+                }
+            )
+          } else {
+            return h(
+                NTag,
+                { type: 'warning', size: 'small' },
+                {
+                  default: () => t('project.workflow.down_line')
+                }
+            )
+          }
+        }
+      },
+      {
+        title: t('project.workflow.operation'),
+        key: 'operation',
+        ...COLUMN_WIDTH_CONFIG['operation'](3),
+        render: (row: any) => {
+          return h(NSpace, null, {
+            default: () => [
+              h(
+                  NTooltip,
+                  {},
+                  {
+                    trigger: () =>
+                        h(
+                            NButton,
+                            {
+                              circle: true,
+                              type:
+                                  row.releaseState === 'ONLINE' ? 'error' : 'warning',
+                              size: 'small',
+                              onClick: () => {
+                                handleReleaseState(row)
+                              }
+                            },
+                            {
+                              icon: () =>
+                                  h(
+                                      row.releaseState === 'ONLINE'
+                                          ? ArrowDownOutlined
+                                          : ArrowUpOutlined
+                                  )
+                            }
+                        ),
+                    default: () =>
+                        row.releaseState === 'ONLINE'
+                            ? t('project.workflow.down_line')
+                            : t('project.workflow.up_line')
+                  }
+              ),
+            ]
+          })
+        }
+      }
+    ]
+    if (variables.tableWidth) {
+      variables.tableWidth = calculateTableWidth(variables.columns)
+    }
+  }
+
+
   const createColumns = (variables: any) => {
     variables.columns = [
       {
@@ -326,6 +424,7 @@ export function useTable() {
   return {
     variables,
     createColumns,
+    createTimingListTableColumns,
     getTableData
   }
 }

@@ -23,7 +23,8 @@ import {
   NPagination,
   NSpace,
   NTooltip,
-  NPopconfirm
+  NPopconfirm,
+  NModal
 } from 'naive-ui'
 import {
   defineComponent,
@@ -59,7 +60,8 @@ export default defineComponent({
       getTableData,
       batchDeleteWorkflow,
       batchExportWorkflow,
-      batchCopyWorkflow
+      batchCopyWorkflow,
+      gotoTimingManage
     } = useTable()
 
     const requestData = () => {
@@ -77,6 +79,10 @@ export default defineComponent({
     const handleCopyUpdateList = () => {
       variables.checkedRowKeys = []
       requestData()
+    }
+
+    const confirmToSetWorkflowTiming = () => {
+      gotoTimingManage(variables.row)
     }
 
     const handleSearch = () => {
@@ -136,6 +142,7 @@ export default defineComponent({
       batchExportWorkflow,
       batchCopyWorkflow,
       handleCopyUpdateList,
+      confirmToSetWorkflowTiming,
       ...toRefs(variables),
       uiSettingStore,
       trim
@@ -299,6 +306,16 @@ export default defineComponent({
           v-model:codes={this.checkedRowKeys}
           v-model:show={this.copyShowRef}
           onUpdateList={this.handleCopyUpdateList}
+        />
+        <NModal
+          v-model:show={this.setTimingDialogShowRef}
+          preset={'dialog'}
+          title={t('project.workflow.success')}
+          content={t('project.workflow.want_to_set_timing')}
+          positiveText={t('project.workflow.confirm')}
+          negativeText={t('project.workflow.cancel')}
+          maskClosable={false}
+          onPositiveClick={this.confirmToSetWorkflowTiming}
         />
       </NSpace>
     )

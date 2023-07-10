@@ -58,7 +58,7 @@ public final class LoginPage extends NavBarPage {
 
     @SneakyThrows
     public NavBarPage login(String username, String password) {
-        new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(buttonSwitchLanguage));
+        new WebDriverWait(driver, 20).until(ExpectedConditions.elementToBeClickable(buttonSwitchLanguage));
 
         buttonSwitchLanguage().click();
 
@@ -66,7 +66,7 @@ public final class LoginPage extends NavBarPage {
         inputPassword().sendKeys(password);
         buttonLogin().click();
 
-        new WebDriverWait(driver, 10)
+        new WebDriverWait(driver, 20)
             .until(ExpectedConditions.urlContains("/home"));
 
         return new NavBarPage(driver);

@@ -63,7 +63,8 @@ export function useTable() {
     timingShowRef: ref(false),
     versionShowRef: ref(false),
     copyShowRef: ref(false),
-    loadingRef: ref(false)
+    loadingRef: ref(false),
+    setTimingDialogShowRef: ref(false)
   })
 
   const createColumns = (variables: any) => {
@@ -351,8 +352,14 @@ export function useTable() {
         | 'OFFLINE'
         | 'ONLINE'
     }
+
     release(data, variables.projectCode, row.code).then(() => {
-      window.$message.success(t('project.workflow.success'))
+      if (data.releaseState === 'ONLINE') {
+        variables.setTimingDialogShowRef = true
+        variables.row = row
+      } else {
+        window.$message.success(t('project.workflow.success'))
+      }
       getTableData({
         pageSize: variables.pageSize,
         pageNo: variables.page,
@@ -448,6 +455,7 @@ export function useTable() {
     getTableData,
     batchDeleteWorkflow,
     batchExportWorkflow,
-    batchCopyWorkflow
+    batchCopyWorkflow,
+    gotoTimingManage
   }
 }
