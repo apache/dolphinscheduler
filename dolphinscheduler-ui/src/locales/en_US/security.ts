@@ -28,11 +28,12 @@ export default {
     actions: 'Operation',
     edit_tenant: 'Edit Tenant',
     tenant_code_tips: 'Please enter the operating system tenant',
+    tenant_code_invalid_tips: 'The tenant code is invalid.',
     queue_name_tips: 'Please select queue',
     description_tips: 'Please enter a description',
     delete_confirm: 'Delete?',
     edit: 'Edit',
-    delete: 'Delete'
+    delete: 'Delete',
   },
   alarm_group: {
     create_alarm_group: 'Create Alarm Group',

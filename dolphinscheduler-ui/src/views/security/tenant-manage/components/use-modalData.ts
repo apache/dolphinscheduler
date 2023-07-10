@@ -47,6 +47,9 @@ export function useModalData(
           if (!variables.model.tenantCode) {
             return new Error(t('security.tenant.tenant_code_tips'))
           }
+          if (variables.model.tenantCode.search('[^-._a-zA-Z0-9]')!=-1) {
+            return new Error(t('security.tenant.tenant_code_invalid_tips'))
+          }
         }
       },
       queueId: {
@@ -96,6 +99,7 @@ export function useModalData(
           queueId: variables.model.queueId as number,
           description: variables.model.description
         }
+        console.log(data)
         createTenant(data).then(
           (unused: any) => {
             variables.model.tenantCode = ''
