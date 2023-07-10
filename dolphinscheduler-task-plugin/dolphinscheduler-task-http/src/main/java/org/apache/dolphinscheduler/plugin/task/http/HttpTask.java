@@ -297,7 +297,7 @@ public class HttpTask extends AbstractTask {
         if (httpParameters.getEnableProxy()) {
             CredentialsProvider provider = new BasicCredentialsProvider();
             AuthScope authScope = null;
-            // basic auth could tak effect alone without proxy
+            // basic auth could take effect alone without proxy
             if (!StringUtils.isEmpty(httpParameters.getProxy()) && httpParameters.getPort() != null
                     && httpParameters.getPort() > 0) {
                 authScope = new AuthScope(httpParameters.getProxy(), httpParameters.getPort());
