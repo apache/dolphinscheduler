@@ -33,7 +33,7 @@ export default {
     description_tips: 'Please enter a description',
     delete_confirm: 'Delete?',
     edit: 'Edit',
-    delete: 'Delete',
+    delete: 'Delete'
   },
   alarm_group: {
     create_alarm_group: 'Create Alarm Group',

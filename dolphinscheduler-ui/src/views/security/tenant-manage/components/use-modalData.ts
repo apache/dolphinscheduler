@@ -99,7 +99,6 @@ export function useModalData(
           queueId: variables.model.queueId as number,
           description: variables.model.description
         }
-        console.log(data)
         createTenant(data).then(
           (unused: any) => {
             variables.model.tenantCode = ''
