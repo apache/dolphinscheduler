@@ -17,9 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.am;
 
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SLEEP_TIME_MILLIS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.UNIQUE_LABEL_NAME;
 
 import org.apache.dolphinscheduler.common.enums.ResourceManagerType;
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -180,13 +182,23 @@ public class KubernetesApplicationManager implements ApplicationManager {
      */
     public LogWatch getPodLogWatcher(KubernetesApplicationManagerContext kubernetesApplicationManagerContext) {
         KubernetesClient client = getClient(kubernetesApplicationManagerContext);
-        FilterWatchListDeletable<Pod, PodList, PodResource> watchList =
-                getListenPod(kubernetesApplicationManagerContext);
-        List<Pod> podList = watchList.list().getItems();
-        if (CollectionUtils.isEmpty(podList)) {
-            return null;
+        boolean podReady = false;
+        Pod pod = null;
+        while (!podReady) {
+            FilterWatchListDeletable<Pod, PodList, PodResource> watchList =
+                    getListenPod(kubernetesApplicationManagerContext);
+            List<Pod> podList = watchList.list().getItems();
+            if (CollectionUtils.isEmpty(podList)) {
+                return null;
+            }
+            pod = podList.get(0);
+            System.out.println("!!!!!" + pod.getStatus().getPhase());
+            if (pod.getStatus().getPhase().equals(PENDING)) {
+                ThreadUtils.sleep(SLEEP_TIME_MILLIS);
+            } else {
+                podReady = true;
+            }
         }
-        Pod pod = podList.get(0);
 
         return client.pods().inNamespace(pod.getMetadata().getNamespace())
                 .withName(pod.getMetadata().getName())

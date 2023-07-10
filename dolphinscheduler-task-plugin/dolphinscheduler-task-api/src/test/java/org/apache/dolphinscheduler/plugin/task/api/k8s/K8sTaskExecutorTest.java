@@ -94,9 +94,8 @@ public class K8sTaskExecutorTest {
     public void testSetTaskStatusNormal() {
         int jobStatus = 0;
         TaskResponse taskResponse = new TaskResponse();
-        K8sTaskMainParameters k8STaskMainParameters = new K8sTaskMainParameters();
         k8sTaskExecutor.setJob(job);
-        k8sTaskExecutor.setTaskStatus(jobStatus, String.valueOf(taskInstanceId), taskResponse, k8STaskMainParameters);
+        k8sTaskExecutor.setTaskStatus(jobStatus, String.valueOf(taskInstanceId), taskResponse);
         Assertions.assertEquals(0, Integer.compare(EXIT_CODE_KILL, taskResponse.getExitStatusCode()));
     }
     @Test
