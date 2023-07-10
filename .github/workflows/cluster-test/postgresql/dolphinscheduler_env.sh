@@ -45,6 +45,9 @@ export DATAX_HOME=${DATAX_HOME:-/opt/soft/datax}
 
 export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH
 
+export MASTER_RESERVED_MEMORY=0.01
+export WORKER_RESERVED_MEMORY=0.01
+
 # applicationId auto collection related configuration, the following configurations are unnecessary if setting appId.collect=log
 #export HADOOP_CLASSPATH=`hadoop classpath`:${DOLPHINSCHEDULER_HOME}/tools/libs/*
 #export SPARK_DIST_CLASSPATH=$HADOOP_CLASSPATH:$SPARK_DIST_CLASS_PATH

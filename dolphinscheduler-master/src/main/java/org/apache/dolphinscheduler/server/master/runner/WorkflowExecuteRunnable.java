@@ -672,6 +672,11 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
 
         Date scheduleDate = processInstance.getScheduleTime();
         if (scheduleDate == null) {
+            if (CollectionUtils.isEmpty(complementListDate)) {
+                log.info("complementListDate is empty, process complement end. process id:{}", processInstance.getId());
+
+                return true;
+            }
             scheduleDate = complementListDate.get(0);
         } else if (processInstance.getState().isFinished()) {
             endProcess();
@@ -2203,14 +2208,14 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
 
         // remove task instance from taskInstanceMap, completeTaskSet, validTaskMap, errorTaskMap
         // completeTaskSet remove dependency taskInstanceMap, so the sort can't change
-        completeTaskSet.removeIf(set -> {
-            Optional<TaskInstance> existTaskInstanceOptional = getTaskInstance(set);
+        completeTaskSet.removeIf(taskCode -> {
+            Optional<TaskInstance> existTaskInstanceOptional = getTaskInstance(taskCode);
             return existTaskInstanceOptional
-                    .filter(taskInstance -> dag.containsNode(Integer.toString(taskInstance.getId()))).isPresent();
+                    .filter(taskInstance -> dag.containsNode(Long.toString(taskInstance.getTaskCode()))).isPresent();
         });
-        taskInstanceMap.entrySet().removeIf(map -> dag.containsNode(Long.toString(map.getValue().getTaskCode())));
-        validTaskMap.entrySet().removeIf(map -> dag.containsNode(Long.toString(map.getKey())));
-        errorTaskMap.entrySet().removeIf(map -> dag.containsNode(Long.toString(map.getKey())));
+        taskInstanceMap.entrySet().removeIf(entry -> dag.containsNode(Long.toString(entry.getValue().getTaskCode())));
+        validTaskMap.entrySet().removeIf(entry -> dag.containsNode(Long.toString(entry.getKey())));
+        errorTaskMap.entrySet().removeIf(entry -> dag.containsNode(Long.toString(entry.getKey())));
     }
 
     private void saveCacheTaskInstance(TaskInstance taskInstance) {

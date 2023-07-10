@@ -130,7 +130,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      *
      * @param loginUser   login user
      * @param name        alias
-     * @param description description
      * @param type        type
      * @param pid         parent id
      * @param currentDir  current directory
@@ -140,7 +139,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Transactional
     public Result<Object> createDirectory(User loginUser,
                                           String name,
-                                          String description,
                                           ResourceType type,
                                           int pid,
                                           String currentDir) {
@@ -168,12 +166,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, "")) {
             log.error("current user does not have permission");
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-            return result;
-        }
-
-        if (checkDescriptionLength(description)) {
-            log.warn("Parameter description is too long.");
-            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
 
@@ -207,7 +199,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      *
      * @param loginUser  login user
      * @param name       alias
-     * @param desc       description
      * @param type       type
      * @param file       file
      * @param currentDir current directory
@@ -217,7 +208,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Transactional
     public Result<Object> createResource(User loginUser,
                                          String name,
-                                         String desc,
                                          ResourceType type,
                                          MultipartFile file,
                                          String currentDir) {
@@ -339,7 +329,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @param resTenantCode tenantCode in the request field "resTenantCode" for tenant code owning the resource,
      *                      can be different from the login user in the case of logging in as admin users.
      * @param name       name
-     * @param desc       description
      * @param type       resource type
      * @param file       resource file
      * @return update result code
@@ -350,7 +339,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                                          String resourceFullName,
                                          String resTenantCode,
                                          String name,
-                                         String desc,
                                          ResourceType type,
                                          MultipartFile file) {
         Result<Object> result = new Result<>();
@@ -401,13 +389,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        if (file == null && name.equals(resource.getAlias()) && desc.equals(resource.getDescription())) {
-            log.info("Resource does not need to be updated due to no change, resource full name:{}.",
-                    resourceFullName);
-            putMsg(result, Status.SUCCESS);
-            return result;
-        }
-
         // check if updated name of the resource already exists
         String originFullName = resource.getFullName();
         String originResourceName = resource.getAlias();
@@ -441,7 +422,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         resource.setAlias(name);
         resource.setFileName(name);
         resource.setFullName(fullName);
-        resource.setDescription(desc);
         resource.setUpdateTime(now);
         if (file != null) {
             resource.setSize(file.getSize());
@@ -868,7 +848,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         entity.setAlias(resource.getAlias());
         entity.setId(resource.getId());
         entity.setType(resource.getType());
-        entity.setDescription(resource.getDescription());
 
         return entity;
     }
@@ -1177,7 +1156,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * @param type       resource type
      * @param fileName   file name
      * @param fileSuffix file suffix
-     * @param desc       description
      * @param content    content
      * @param currentDir current directory
      * @return create result code
@@ -1185,7 +1163,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     @Transactional
     public Result<Object> onlineCreateResource(User loginUser, ResourceType type, String fileName, String fileSuffix,
-                                               String desc, String content, String currentDir) {
+                                               String content, String currentDir) {
         Result<Object> result = new Result<>();
 
         result = checkResourceUploadStartupState();

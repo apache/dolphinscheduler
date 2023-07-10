@@ -62,6 +62,7 @@ export function formatParams(data: INodeData): {
     if (data.namespace) {
       taskParams.namespace = data.namespace
     }
+    taskParams.yarnQueue = data.yarnQueue
   }
 
   if (data.taskType === 'SPARK') {
@@ -321,7 +322,8 @@ export function formatParams(data: INodeData): {
       executorCores: data.executorCores,
       executorMemory: data.executorMemory,
       numExecutors: data.numExecutors,
-      others: data.others
+      others: data.others,
+      yarnQueue: data.yarnQueue
     }
   }
 
@@ -347,6 +349,7 @@ export function formatParams(data: INodeData): {
     taskParams.minCpuCores = data.minCpuCores
     taskParams.minMemorySpace = data.minMemorySpace
     taskParams.image = data.image
+    taskParams.imagePullPolicy = data.imagePullPolicy
     taskParams.command = data.command
     taskParams.args = data.args
     taskParams.customizedLabels = data.customizedLabels

@@ -26,7 +26,6 @@ const defaultValue: IUploadDefaultValue = () => ({
   user_name: '',
   name: '',
   file: '',
-  description: '',
   type: undefined!,
   pid: -1,
   currentDir: '/'

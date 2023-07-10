@@ -59,7 +59,7 @@ public class AuditLogMapperTest extends BaseDaoTest {
         int[] operationType = new int[0];
 
         IPage<AuditLog> logIPage = logMapper.queryAuditLog(page, resourceType, operationType, "", null, null);
-        Assertions.assertNotEquals(logIPage.getTotal(), 0);
+        Assertions.assertNotEquals(0, logIPage.getTotal());
     }
 
     @Test

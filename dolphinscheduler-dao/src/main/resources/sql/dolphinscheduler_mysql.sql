@@ -366,8 +366,6 @@ CREATE TABLE `t_ds_datasource` (
   `connection_params` text NOT NULL COMMENT 'json connection params',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
-  `test_flag`   tinyint(4) DEFAULT NULL COMMENT 'test flag：0 normal, 1 testDataSource',
-  `bind_test_id` int(11)  DEFAULT NULL COMMENT 'bind testDataSource id',
   PRIMARY KEY (`id`),
   UNIQUE KEY `t_ds_datasource_name_un` (`name`, `type`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
@@ -1041,7 +1039,8 @@ VALUES ('1', 'admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '',
 -- ----------------------------
 -- Table structure for t_ds_plugin_define
 -- ----------------------------
-SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
+SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY','') into @new_sql_mode;
+SET sql_mode=@new_sql_mode;
 DROP TABLE IF EXISTS `t_ds_plugin_define`;
 CREATE TABLE `t_ds_plugin_define` (
   `id` int NOT NULL AUTO_INCREMENT,

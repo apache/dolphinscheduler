@@ -32,6 +32,7 @@ The directory structure of DolphinScheduler is as follows:
 ├── alert-server                                directory of DolphinScheduler alert-server commands, configurations scripts and libs
 │   ├── bin
 │   │   └── start.sh                            script to start DolphinScheduler alert-server
+│   │   └── jvm_args_env.sh                     script to set JVM args of DolphinScheduler alert-server
 │   ├── conf
 │   │   ├── application.yaml                    configurations of alert-server
 │   │   ├── bootstrap.yaml                      configurations for Spring Cloud bootstrap, mostly you don't need to modify this,
@@ -43,6 +44,7 @@ The directory structure of DolphinScheduler is as follows:
 ├── api-server                                  directory of DolphinScheduler api-server commands, configurations scripts and libs
 │   ├── bin
 │   │   └── start.sh                            script to start DolphinScheduler api-server
+│   │   └── jvm_args_env.sh                     script to set JVM args of DolphinScheduler api-server
 │   ├── conf
 │   │   ├── application.yaml                    configurations of api-server
 │   │   ├── bootstrap.yaml                      configurations for Spring Cloud bootstrap, mostly you don't need to modify this,
@@ -55,6 +57,7 @@ The directory structure of DolphinScheduler is as follows:
 ├── master-server                               directory of DolphinScheduler master-server commands, configurations scripts and libs
 │   ├── bin
 │   │   └── start.sh                            script to start DolphinScheduler master-server
+│   │   └── jvm_args_env.sh                     script to set JVM args of DolphinScheduler master-server
 │   ├── conf
 │   │   ├── application.yaml                    configurations of master-server
 │   │   ├── bootstrap.yaml                      configurations for Spring Cloud bootstrap, mostly you don't need to modify this,
@@ -66,6 +69,7 @@ The directory structure of DolphinScheduler is as follows:
 ├── standalone-server                           directory of DolphinScheduler standalone-server commands, configurations scripts and libs
 │   ├── bin
 │   │   └── start.sh                            script to start DolphinScheduler standalone-server
+│   │   └── jvm_args_env.sh                     script to set JVM args of DolphinScheduler standalone-server
 │   ├── conf
 │   │   ├── application.yaml                    configurations of standalone-server
 │   │   ├── bootstrap.yaml                      configurations for Spring Cloud bootstrap, mostly you don't need to modify this,
@@ -86,15 +90,16 @@ The directory structure of DolphinScheduler is as follows:
 │   └── sql                                     .sql files to create or upgrade DolphinScheduler metadata
 │  
 ├── worker-server                               directory of DolphinScheduler worker-server commands, configurations scripts and libs
-│       ├── bin
-│       │   └── start.sh                        script to start DolphinScheduler worker-server
-│       ├── conf
-│       │   ├── application.yaml                configurations of worker-server
-│       │   ├── bootstrap.yaml                  configurations for Spring Cloud bootstrap, mostly you don't need to modify this,
-│       │   ├── common.properties               configurations of common-service like storage, credentials, etc.
-│       │   ├── dolphinscheduler_env.sh         script to load environment variables for worker-server
-│       │   └── logback-spring.xml              configurations of worker-service log
-│       └── libs                                directory of worker-server libs
+│   ├── bin
+│   │   └── start.sh                        script to start DolphinScheduler worker-server
+│   │   └── jvm_args_env.sh                 script to set JVM args of DolphinScheduler worker-server
+│   ├── conf
+│   │   ├── application.yaml                configurations of worker-server
+│   │   ├── bootstrap.yaml                  configurations for Spring Cloud bootstrap, mostly you don't need to modify this,
+│   │   ├── common.properties               configurations of common-service like storage, credentials, etc.
+│   │   ├── dolphinscheduler_env.sh         script to load environment variables for worker-server
+│   │   └── logback-spring.xml              configurations of worker-service log
+│   └── libs                                directory of worker-server libs
 │
 └── ui                                          directory of front-end web resources
 ```
@@ -251,6 +256,9 @@ Location: `api-server/conf/application.yaml`
 |security.authentication.ldap.user.identity-attribute|uid|LDAP user identity attribute|
 |security.authentication.ldap.user.email-attribute|mail|LDAP user email attribute|
 |security.authentication.ldap.user.not-exist-action|CREATE|action when ldap user is not exist,default value: CREATE. Optional values include(CREATE,DENY)|
+|security.authentication.ldap.ssl.enable|false|LDAP switch|
+|security.authentication.ldap.ssl.trust-store|ldapkeystore.jks|LDAP jks file absolute path|
+|security.authentication.ldap.ssl.trust-store-password|password|LDAP jks password|
 |traffic.control.global.switch|false|traffic control global switch|
 |traffic.control.max-global-qps-rate|300|global max request number per second|
 |traffic.control.tenant-switch|false|traffic control tenant switch|

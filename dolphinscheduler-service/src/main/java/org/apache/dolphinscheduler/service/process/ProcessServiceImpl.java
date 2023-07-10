@@ -2607,14 +2607,6 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
-    public Integer queryTestDataSourceId(Integer onlineDataSourceId) {
-        Integer testDataSourceId = dataSourceMapper.queryTestDataSourceId(onlineDataSourceId);
-        if (testDataSourceId != null)
-            return testDataSourceId;
-        return null;
-    }
-
-    @Override
     public void saveCommandTrigger(Integer commandId, Integer processInstanceId) {
         triggerRelationService.saveCommandTrigger(commandId, processInstanceId);
     }
