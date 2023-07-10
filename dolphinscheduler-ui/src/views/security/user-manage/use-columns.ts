@@ -26,15 +26,20 @@ import {
   NDropdown,
   NPopconfirm
 } from 'naive-ui'
-import { EditOutlined, DeleteOutlined, UserOutlined, KeyOutlined } from '@vicons/antd'
+import {
+  EditOutlined,
+  DeleteOutlined,
+  UserOutlined,
+  KeyOutlined
+} from '@vicons/antd'
 import {
   COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
   DefaultTableWidth
 } from '@/common/column-width-config'
 import type { TableColumns, InternalRowData } from './types'
-import {useUserStore} from "@/store/user/user";
-import {UserInfoRes} from "./types";
+import { useUserStore } from '@/store/user/user'
+import { UserInfoRes } from './types'
 
 export function useColumns(onCallback: Function) {
   const { t } = useI18n()
@@ -195,25 +200,27 @@ export function useColumns(onCallback: Function) {
                   default: () => t('security.user.edit')
                 }
               ),
-              (IS_ADMIN && h(
+              IS_ADMIN &&
+                h(
                   NTooltip,
                   { trigger: 'hover' },
                   {
                     trigger: () =>
-                        h(
-                            NButton,
-                            {
-                              circle: true,
-                              type: 'error',
-                              size: 'small',
-                              class: 'edit',
-                              onClick: () => void onCallback({ rowData }, 'resetPassword')
-                            },
-                            () => h(NIcon, null, () => h(KeyOutlined))
-                        ),
+                      h(
+                        NButton,
+                        {
+                          circle: true,
+                          type: 'error',
+                          size: 'small',
+                          class: 'edit',
+                          onClick: () =>
+                            void onCallback({ rowData }, 'resetPassword')
+                        },
+                        () => h(NIcon, null, () => h(KeyOutlined))
+                      ),
                     default: () => t('security.user.reset_password')
                   }
-              )),
+                ),
               h(
                 NPopconfirm,
                 {

@@ -127,9 +127,9 @@ const UsersManage = defineComponent({
           onCancel={this.onAuthorizeModalCancel}
         />
         <PasswordModal
-            show={this.passwordModalShow}
-            currentRecord={this.currentRecord}
-            onCancel={this.onPasswordModalCancel}
+          show={this.passwordModalShow}
+          currentRecord={this.currentRecord}
+          onCancel={this.onPasswordModalCancel}
         />
       </NSpace>
     )

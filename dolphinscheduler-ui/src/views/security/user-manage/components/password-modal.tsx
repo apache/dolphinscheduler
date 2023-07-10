@@ -23,11 +23,7 @@ import {
   watch
 } from 'vue'
 import { useI18n } from 'vue-i18n'
-import {
-  NInput,
-  NForm,
-  NFormItem
-} from 'naive-ui'
+import { NInput, NForm, NFormItem } from 'naive-ui'
 import { usePassword } from './use-password'
 import Modal from '@/components/modal'
 import type { IRecord } from '../types'
@@ -49,7 +45,8 @@ export const PasswordModal = defineComponent({
   emits: ['cancel', 'update'],
   setup(props, ctx) {
     const { t } = useI18n()
-    const { state, IS_ADMIN, formRules, onReset, onSave, onSetValues } = usePassword()
+    const { state, IS_ADMIN, formRules, onReset, onSave, onSetValues } =
+      usePassword()
 
     const onCancel = () => {
       onReset()
@@ -130,14 +127,14 @@ export const PasswordModal = defineComponent({
             />
           </NFormItem>
           <NFormItem
-              label={t('password.confirm_password')}
-              path='confirmPassword'
+            label={t('password.confirm_password')}
+            path='confirmPassword'
           >
             <NInput
-                allowInput={this.trim}
-                type='password'
-                v-model:value={this.formData.confirmPassword}
-                placeholder={t('password.confirm_password_tips')}
+              allowInput={this.trim}
+              type='password'
+              v-model:value={this.formData.confirmPassword}
+              placeholder={t('password.confirm_password_tips')}
             />
           </NFormItem>
         </NForm>

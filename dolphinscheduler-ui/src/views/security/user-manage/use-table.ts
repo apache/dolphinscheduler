@@ -20,7 +20,7 @@ import { queryUserList, delUserById } from '@/service/modules/users'
 import { format } from 'date-fns'
 import { parseTime } from '@/common/common'
 import type { IRecord, TAuthType } from './types'
-import {Router, useRouter} from "vue-router";
+import { Router, useRouter } from 'vue-router'
 
 export function useTable() {
   const router: Router = useRouter()

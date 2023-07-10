@@ -20,9 +20,9 @@ import { pick } from 'lodash'
 import { useUserStore } from '@/store/user/user'
 import { updateUser } from '@/service/modules/users'
 import type { IRecord, UserInfoRes } from '../types'
-import {FormItemRule} from "naive-ui";
-import {UserReq} from "../types";
-import {IdReq} from "@/service/modules/users/types";
+import { FormItemRule } from 'naive-ui'
+import { UserReq } from '../types'
+import { IdReq } from '@/service/modules/users/types'
 
 export function usePassword() {
   const { t } = useI18n()
@@ -33,25 +33,28 @@ export function usePassword() {
   const initialValues = {
     userName: '',
     userPassword: '',
-    confirmPassword: '',
+    confirmPassword: ''
   }
 
   const state = reactive({
     formRef: ref(),
     formData: { ...initialValues },
     saving: false,
-    loading: false,
+    loading: false
   })
 
-  function validatePasswordStartWith (rule: FormItemRule, value: string): boolean {
+  function validatePasswordStartWith(
+    rule: FormItemRule,
+    value: string
+  ): boolean {
     return (
-        !!state.formRef.model.userPassword &&
-        state.formRef.model.userPassword.startsWith(value) &&
-        state.formRef.model.userPassword.length >= value.length
+      !!state.formRef.model.userPassword &&
+      state.formRef.model.userPassword.startsWith(value) &&
+      state.formRef.model.userPassword.length >= value.length
     )
   }
 
-  function validatePasswordSame (rule: FormItemRule, value: string): boolean {
+  function validatePasswordSame(rule: FormItemRule, value: string): boolean {
     return value === state.formRef.model.userPassword
   }
 
@@ -71,22 +74,22 @@ export function usePassword() {
       }
     },
     confirmPassword: [
-        {
-          trigger: ['input', 'blur'],
-          required: true
-        },
-        {
-          validator: validatePasswordStartWith,
-          message: t('security.user.confirm_password_tips'),
-          trigger: ['input']
-        },
-        {
-          validator: validatePasswordSame,
-          message: t('security.user.confirm_password_tips'),
-          trigger: ['blur', 'password-input']
-        }]
+      {
+        trigger: ['input', 'blur'],
+        required: true
+      },
+      {
+        validator: validatePasswordStartWith,
+        message: t('security.user.confirm_password_tips'),
+        trigger: ['input']
+      },
+      {
+        validator: validatePasswordSame,
+        message: t('security.user.confirm_password_tips'),
+        trigger: ['blur', 'password-input']
+      }
+    ]
   }
-
 
   const onReset = () => {
     state.formData = { ...initialValues }
@@ -105,9 +108,9 @@ export function usePassword() {
           'email',
           'queue',
           'phone',
-          'state',
+          'state'
         ]),
-        userPassword: state.formData.userPassword,
+        userPassword: state.formData.userPassword
       } as IdReq & UserReq
 
       await updateUser(resetPasswordReq)
@@ -121,9 +124,7 @@ export function usePassword() {
   }
   const onSetValues = (record: IRecord) => {
     state.formData = {
-      ...pick(record, [
-        'userName',
-      ]),
+      ...pick(record, ['userName']),
       userPassword: '',
       confirmPassword: ''
     }
