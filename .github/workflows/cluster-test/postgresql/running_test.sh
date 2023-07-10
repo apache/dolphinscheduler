@@ -24,7 +24,7 @@ WORKER_HEALTHCHECK_COMMAND="curl -I -m 10 -o /dev/null -s -w %{http_code} http:/
 ALERT_HEALTHCHECK_COMMAND="curl -I -m 10 -o /dev/null -s -w %{http_code} http://0.0.0.0:50053/actuator/health"
 
 #Cluster start health check
-TIMEOUT=120
+TIMEOUT=180
 START_HEALTHCHECK_EXITCODE=0
 
 for ((i=1; i<=TIMEOUT; i++))
@@ -45,10 +45,28 @@ do
   fi
 
   if [[ $i -eq $TIMEOUT ]];then
-    docker exec -u root ds bash -c "cat /root/apache-dolphinscheduler-*-SNAPSHOT-bin/master-server/logs/dolphinscheduler-master.log"
-    echo "cluster start health check failed"
-    exit $START_HEALTHCHECK_EXITCODE
-  fi
+      if [[ $MASTER_HTTP_STATUS -ne 200 ]];then
+        docker exec -u root ds bash -c "cat /root/apache-dolphinscheduler-*-SNAPSHOT-bin/master-server/logs/dolphinscheduler-master.log"
+        docker exec -u root ds bash -c "cat /root/apache-dolphinscheduler-*-SNAPSHOT-bin/master-server/logs/*.out"
+        echo "master start health check failed"
+      fi
+      if [[ $WORKER_HTTP_STATUS -ne 200 ]]; then
+        docker exec -u root ds bash -c "cat /root/apache-dolphinscheduler-*-SNAPSHOT-bin/worker-server/logs/dolphinscheduler-worker.log"
+        docker exec -u root ds bash -c "cat /root/apache-dolphinscheduler-*-SNAPSHOT-bin/worker-server/logs/*.out"
+        echo "worker start health check failed"
+      fi
+      if [[ $API_HTTP_STATUS -ne 200 ]]; then
+        docker exec -u root ds bash -c "cat /root/apache-dolphinscheduler-*-SNAPSHOT-bin/api-server/logs/dolphinscheduler-api.log"
+        docker exec -u root ds bash -c "cat /root/apache-dolphinscheduler-*-SNAPSHOT-bin/api-server/logs/*.out"
+        echo "api start health check failed"
+      fi
+      if [[ $ALERT_HTTP_STATUS -ne 200 ]]; then
+        docker exec -u root ds bash -c "cat /root/apache-dolphinscheduler-*-SNAPSHOT-bin/alert-server/logs/dolphinscheduler-alert.log"
+        docker exec -u root ds bash -c "cat /root/apache-dolphinscheduler-*-SNAPSHOT-bin/alert-server/logs/*.out"
+        echo "alert start health check failed"
+      fi
+      exit $START_HEALTHCHECK_EXITCODE
+    fi
 
   sleep 1
 done
