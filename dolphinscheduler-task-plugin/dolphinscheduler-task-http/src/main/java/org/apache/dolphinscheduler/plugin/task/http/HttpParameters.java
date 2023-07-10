@@ -25,9 +25,12 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.Data;
+
 /**
  * http parameter
  */
+@Data
 public class HttpParameters extends AbstractParameters {
 
     /**
@@ -67,7 +70,7 @@ public class HttpParameters extends AbstractParameters {
      */
     private int socketTimeout;
 
-    private Boolean enableProxy;
+    private Boolean enableProxy = false;
 
     private String proxy;
 
@@ -85,101 +88,5 @@ public class HttpParameters extends AbstractParameters {
     @Override
     public List<ResourceInfo> getResourceFilesList() {
         return new ArrayList<>();
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public HttpMethod getHttpMethod() {
-        return httpMethod;
-    }
-
-    public void setHttpMethod(HttpMethod httpMethod) {
-        this.httpMethod = httpMethod;
-    }
-
-    public List<HttpProperty> getHttpParams() {
-        return httpParams;
-    }
-
-    public void setHttpParams(List<HttpProperty> httpParams) {
-        this.httpParams = httpParams;
-    }
-
-    public HttpCheckCondition getHttpCheckCondition() {
-        return httpCheckCondition;
-    }
-
-    public void setHttpCheckCondition(HttpCheckCondition httpCheckCondition) {
-        this.httpCheckCondition = httpCheckCondition;
-    }
-
-    public String getCondition() {
-        return condition;
-    }
-
-    public void setCondition(String condition) {
-        this.condition = condition;
-    }
-
-    public int getConnectTimeout() {
-        return connectTimeout;
-    }
-
-    public void setConnectTimeout(int connectTimeout) {
-        this.connectTimeout = connectTimeout;
-    }
-
-    public int getSocketTimeout() {
-        return socketTimeout;
-    }
-
-    public void setSocketTimeout(int socketTimeout) {
-        this.socketTimeout = socketTimeout;
-    }
-
-    public Boolean getEnableProxy() {
-        return enableProxy;
-    }
-
-    public void setEnableProxy(Boolean enableProxy) {
-        this.enableProxy = enableProxy;
-    }
-
-    public String getProxy() {
-        return proxy;
-    }
-
-    public void setProxy(String proxy) {
-        this.proxy = proxy;
-    }
-
-    public Integer getPort() {
-        return port;
-    }
-
-    public void setPort(Integer port) {
-        this.port = port;
-    }
-
-    public String getUser() {
-        return user;
-    }
-
-    public void setUser(String user) {
-        this.user = user;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 }
