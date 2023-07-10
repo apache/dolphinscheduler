@@ -38,7 +38,7 @@ public class MasterRpcClient {
 
     public MasterRpcClient() {
         client = new NettyRemotingClient(new NettyClientConfig());
-        log.info("Success initialized ApiServerRPCClient...");
+        log.info("Success initialized MasterRPCClient...");
     }
 
     public Message sendSyncCommand(@NonNull Host host,

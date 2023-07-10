@@ -1,4 +1,3 @@
-#!/bin/bash
 #
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -16,32 +15,16 @@
 # limitations under the License.
 #
 
-BIN_DIR=$(dirname $0)
-DOLPHINSCHEDULER_HOME=${DOLPHINSCHEDULER_HOME:-$(cd $BIN_DIR/..; pwd)}
+-Xms4g
+-Xmx4g
+-Xmn2g
 
-source "$DOLPHINSCHEDULER_HOME/conf/dolphinscheduler_env.sh"
+-XX:+IgnoreUnrecognizedVMOptions
+-XX:+PrintGCDateStamps
+-XX:+PrintGCDetails
+-Xloggc:gc.log
 
-JVM_ARGS_ENV_FILE=${BIN_DIR}/jvm_args_env.sh
-JVM_ARGS="-server"
+-XX:+HeapDumpOnOutOfMemoryError
+-XX:HeapDumpPath=dump.hprof
 
-if [ -f $JVM_ARGS_ENV_FILE ]; then
-  while read line
-  do
-      if [[ "$line" == -* ]]; then
-            JVM_ARGS="${JVM_ARGS} $line"
-      fi
-  done < $JVM_ARGS_ENV_FILE
-fi
-
-JAVA_OPTS=${JAVA_OPTS:-"${JVM_ARGS}"}
-
-if [[ "$DOCKER" == "true" ]]; then
-  JAVA_OPTS="${JAVA_OPTS} -XX:-UseContainerSupport"
-fi
-
-echo "JAVA_HOME=${JAVA_HOME}"
-echo "JAVA_OPTS=${JAVA_OPTS}"
-
-$JAVA_HOME/bin/java $JAVA_OPTS \
-  -cp "$DOLPHINSCHEDULER_HOME/conf":"$DOLPHINSCHEDULER_HOME/libs/*" \
-  org.apache.dolphinscheduler.alert.AlertServer
+-Duser.timezone=${SPRING_JACKSON_TIME_ZONE}
