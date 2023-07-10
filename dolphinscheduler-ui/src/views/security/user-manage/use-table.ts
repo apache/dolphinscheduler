@@ -20,8 +20,11 @@ import { queryUserList, delUserById } from '@/service/modules/users'
 import { format } from 'date-fns'
 import { parseTime } from '@/common/common'
 import type { IRecord, TAuthType } from './types'
+import {Router, useRouter} from "vue-router";
 
 export function useTable() {
+  const router: Router = useRouter()
+
   const state = reactive({
     page: 1,
     pageSize: 10,
@@ -32,7 +35,8 @@ export function useTable() {
     currentRecord: {} as IRecord | null,
     authorizeType: 'authorize_project' as TAuthType,
     detailModalShow: false,
-    authorizeModalShow: false
+    authorizeModalShow: false,
+    passwordModalShow: false
   })
 
   const getList = async () => {
@@ -74,9 +78,10 @@ export function useTable() {
 
   const onOperationClick = (
     data: { rowData: IRecord; key?: TAuthType },
-    type: 'authorize' | 'edit' | 'delete'
+    type: 'authorize' | 'edit' | 'delete' | 'resetPassword'
   ) => {
     state.currentRecord = data.rowData
+    console.log(data.rowData)
     if (type === 'edit') {
       state.detailModalShow = true
     }
@@ -87,12 +92,10 @@ export function useTable() {
     if (type === 'delete') {
       deleteUser(data.rowData.id)
     }
+    if (type === 'resetPassword') {
+      state.passwordModalShow = true
+    }
   }
-
-  // const deleteRecord = async (id: number) => {
-  //   const ignored = await deleteAlertPluginInstance(id)
-  //   updateList()
-  // }
 
   const changePage = (page: number) => {
     state.page = page
