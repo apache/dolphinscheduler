@@ -34,7 +34,11 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.ProjectParameter;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.mapper.ProjectParameterMapper;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
@@ -56,10 +60,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CuringGlobalParams implements CuringParamsService {
+public class CuringParamsServiceImpl implements CuringParamsService {
 
     @Autowired
     private TimePlaceholderResolverExpandService timePlaceholderResolverExpandService;
+
+    @Autowired
+    private ProjectParameterMapper projectParameterMapper;
 
     @Override
     public String convertParameterPlaceholders(String val, Map<String, String> allParamMap) {
@@ -140,6 +147,8 @@ public class CuringGlobalParams implements CuringParamsService {
     public Map<String, Property> paramParsingPreparation(@NonNull TaskInstance taskInstance,
                                                          @NonNull AbstractParameters parameters,
                                                          @NonNull ProcessInstance processInstance) {
+        Map<String, Property> prepareParamsMap = new HashMap<>();
+
         // assign value to definedParams here
         Map<String, String> globalParamsMap = setGlobalParamsMap(processInstance);
         Map<String, Property> globalParams = ParameterUtils.getUserDefParamsMap(globalParamsMap);
@@ -158,22 +167,36 @@ public class CuringGlobalParams implements CuringParamsService {
         String timeZone = cmdParam.get(Constants.SCHEDULE_TIMEZONE);
 
         // built-in params
-        Map<String, String> params = setBuiltInParamsMap(taskInstance, timeZone);
+        Map<String, String> builtInParams = setBuiltInParamsMap(taskInstance, timeZone);
 
-        if (MapUtils.isNotEmpty(params)) {
-            globalParams.putAll(ParameterUtils.getUserDefParamsMap(params));
+        // project-level params
+        Map<String, Property> projectParams = getProjectParameterMap(taskInstance.getProjectCode());
+
+        if (MapUtils.isNotEmpty(builtInParams)) {
+            prepareParamsMap.putAll(ParameterUtils.getUserDefParamsMap(builtInParams));
+        }
+
+        if (MapUtils.isNotEmpty(projectParams)) {
+            prepareParamsMap.putAll(projectParams);
+        }
+
+        if (MapUtils.isNotEmpty(globalParams)) {
+            prepareParamsMap.putAll(globalParams);
         }
 
         if (MapUtils.isNotEmpty(varParams)) {
-            globalParams.putAll(varParams);
+            prepareParamsMap.putAll(varParams);
         }
+
         if (MapUtils.isNotEmpty(localParams)) {
-            globalParams.putAll(localParams);
+            prepareParamsMap.putAll(localParams);
         }
+
         if (MapUtils.isNotEmpty(cmdParam)) {
-            globalParams.putAll(ParameterUtils.getUserDefParamsMap(cmdParam));
+            prepareParamsMap.putAll(ParameterUtils.getUserDefParamsMap(cmdParam));
         }
-        Iterator<Map.Entry<String, Property>> iter = globalParams.entrySet().iterator();
+
+        Iterator<Map.Entry<String, Property>> iter = prepareParamsMap.entrySet().iterator();
         while (iter.hasNext()) {
             Map.Entry<String, Property> en = iter.next();
             Property property = en.getValue();
@@ -193,15 +216,13 @@ public class CuringGlobalParams implements CuringParamsService {
                 property.setValue(val);
             }
         }
-        if (MapUtils.isEmpty(globalParams)) {
-            globalParams = new HashMap<>();
-        }
+
         // put schedule time param to params map
         Map<String, Property> paramsMap = preBuildBusinessParams(processInstance);
         if (MapUtils.isNotEmpty(paramsMap)) {
-            globalParams.putAll(paramsMap);
+            prepareParamsMap.putAll(paramsMap);
         }
-        return globalParams;
+        return prepareParamsMap;
     }
 
     /**
@@ -257,5 +278,21 @@ public class CuringGlobalParams implements CuringParamsService {
             paramsMap.put(DateConstants.PARAMETER_DATETIME, p);
         }
         return paramsMap;
+    }
+
+    @Override
+    public Map<String, Property> getProjectParameterMap(long projectCode) {
+        Map<String, Property> result = new HashMap<>(16);
+        List<ProjectParameter> projectParameterList = projectParameterMapper.queryByProjectCode(projectCode);
+
+        projectParameterList.forEach(projectParameter -> {
+            Property property = new Property(projectParameter.getParamName(),
+                    Direct.IN,
+                    DataType.VARCHAR,
+                    projectParameter.getParamValue());
+            result.put(projectParameter.getParamName(), property);
+        });
+
+        return result;
     }
 }
