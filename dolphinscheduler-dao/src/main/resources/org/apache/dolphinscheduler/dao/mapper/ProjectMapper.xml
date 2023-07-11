@@ -183,6 +183,12 @@
             and  dp.id in (select project_id from t_ds_relation_project_user  where user_id=#{userId}
             union select id as project_id  from t_ds_project where user_id=#{userId})
         </if>
+        <if test="projectsIds != null and projectsIds.size() > 0">
+            and dp.id  in
+            <foreach item="id" index="index" collection="projectsIds" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </if>
     </select>
 
     <select id="queryAllProjectForDependent" resultType="org.apache.dolphinscheduler.dao.entity.Project">
