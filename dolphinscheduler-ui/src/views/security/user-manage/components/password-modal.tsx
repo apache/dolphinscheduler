@@ -82,7 +82,7 @@ export const PasswordModal = defineComponent({
       trim
     }
   },
-  render(props: { currentRecord: IRecord }) {
+  render() {
     const { t } = this
 
     return (
