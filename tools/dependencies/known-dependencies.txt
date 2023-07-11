@@ -257,7 +257,6 @@ poi-ooxml-schemas-4.1.2.jar
 postgresql-42.4.1.jar
 presto-jdbc-0.238.1.jar
 profiles-2.17.282.jar
-protobuf-java-2.5.0.jar
 protocol-core-2.17.282.jar
 protostuff-api-1.7.2.jar
 protostuff-collectionschema-1.7.2.jar
