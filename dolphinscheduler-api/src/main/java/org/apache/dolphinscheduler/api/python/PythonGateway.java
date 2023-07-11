@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.api.python;
 
-import org.apache.dolphinscheduler.api.configuration.PythonGatewayConfiguration;
+import org.apache.dolphinscheduler.api.configuration.ApiConfig;
 import org.apache.dolphinscheduler.api.dto.EnvironmentDto;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -145,7 +145,7 @@ public class PythonGateway {
     private DataSourceMapper dataSourceMapper;
 
     @Autowired
-    private PythonGatewayConfiguration pythonGatewayConfiguration;
+    private ApiConfig apiConfig;
 
     @Autowired
     private ProjectUserMapper projectUserMapper;
@@ -689,13 +689,14 @@ public class PythonGateway {
 
     @PostConstruct
     public void init() {
-        if (pythonGatewayConfiguration.isEnabled()) {
+        if (apiConfig.getPythonGateway().isEnabled()) {
             this.start();
         }
     }
 
     private void start() {
         try {
+            ApiConfig.PythonGatewayConfiguration pythonGatewayConfiguration = apiConfig.getPythonGateway();
             InetAddress gatewayHost = InetAddress.getByName(pythonGatewayConfiguration.getGatewayServerAddress());
             GatewayServerBuilder serverBuilder = new GatewayServer.GatewayServerBuilder()
                     .entryPoint(this)
