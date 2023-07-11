@@ -47,7 +47,6 @@ import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -244,19 +243,10 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
 
     private final CuringParamsService curingParamsService;
 
-    private final String masterAddress;
-
     private final DefaultTaskExecuteRunnableFactory defaultTaskExecuteRunnableFactory;
 
-    /**
-     * @param processInstance         processInstance
-     * @param processService          processService
-     * @param processInstanceDao      processInstanceDao
-     * @param masterRpcClient         masterRpcClient
-     * @param processAlertManager     processAlertManager
-     * @param masterConfig            masterConfig
-     * @param stateWheelExecuteThread stateWheelExecuteThread
-     */
+    private final MasterConfig masterConfig;
+
     public WorkflowExecuteRunnable(
                                    @NonNull ProcessInstance processInstance,
                                    @NonNull CommandService commandService,
@@ -275,12 +265,12 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
         this.processInstanceDao = processInstanceDao;
         this.processInstance = processInstance;
         this.masterRpcClient = masterRpcClient;
+        this.masterConfig = masterConfig;
         this.processAlertManager = processAlertManager;
         this.stateWheelExecuteThread = stateWheelExecuteThread;
         this.curingParamsService = curingParamsService;
         this.taskInstanceDao = taskInstanceDao;
         this.taskDefinitionLogDao = taskDefinitionLogDao;
-        this.masterAddress = NetUtils.getAddr(masterConfig.getListenPort());
         this.defaultTaskExecuteRunnableFactory = defaultTaskExecuteRunnableFactory;
         this.processDefinition = processService.findProcessDefinition(processInstance.getProcessDefinitionCode(),
                 processInstance.getProcessDefinitionVersion());
@@ -480,7 +470,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
                     taskInstance.getState());
             this.updateProcessInstanceState();
 
-            sendTaskLogOnMasterToRemoteIfNeeded(taskInstance.getLogPath(), taskInstance.getHost());
+            sendTaskLogOnMasterToRemoteIfNeeded(taskInstance);
         } catch (Exception ex) {
             log.error("Task finish failed, get a exception, will remove this taskInstance from completeTaskSet", ex);
             // remove the task from complete map, so that we can finish in the next time.
@@ -1424,7 +1414,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
         try {
             Message message =
                     masterRpcClient.sendSyncCommand(Host.of(taskInstance.getHost()),
-                            new WorkflowHostChangeRequest(taskInstance.getId(), masterAddress).convert2Command());
+                            new WorkflowHostChangeRequest(taskInstance.getId(), masterConfig.getMasterAddress())
+                                    .convert2Command());
             if (message == null) {
                 log.error(
                         "Takeover task instance failed, the worker {} might not be alive, will try to create a new task instance",
@@ -2237,15 +2228,11 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
 
     }
 
-    private void sendTaskLogOnMasterToRemoteIfNeeded(String logPath, String host) {
-        if (RemoteLogUtils.isRemoteLoggingEnable() && isExecutedOnMaster(host)) {
-            RemoteLogUtils.sendRemoteLog(logPath);
-            log.info("Master sends task log {} to remote storage asynchronously.", logPath);
+    private void sendTaskLogOnMasterToRemoteIfNeeded(TaskInstance taskInstance) {
+        if (RemoteLogUtils.isRemoteLoggingEnable() && TaskUtils.isMasterTask(taskInstance.getTaskType())) {
+            RemoteLogUtils.sendRemoteLog(taskInstance.getLogPath());
+            log.info("Master sends task log {} to remote storage asynchronously.", taskInstance.getLogPath());
         }
-    }
-
-    private boolean isExecutedOnMaster(String host) {
-        return host.endsWith(masterAddress.split(Constants.COLON)[1]);
     }
 
     private void mergeTaskInstanceVarPool(TaskInstance taskInstance) {

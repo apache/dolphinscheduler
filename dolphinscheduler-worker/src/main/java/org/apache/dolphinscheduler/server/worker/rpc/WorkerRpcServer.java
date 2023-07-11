@@ -44,7 +44,7 @@ public class WorkerRpcServer implements Closeable {
 
     public void start() {
         log.info("Worker rpc server starting...");
-        NettyServerConfig serverConfig = new NettyServerConfig();
+        NettyServerConfig serverConfig = workerConfig.getWorkerRpcServerConfig();
         serverConfig.setListenPort(workerConfig.getListenPort());
         nettyRemotingServer = new NettyRemotingServer(serverConfig);
         for (WorkerRpcProcessor workerRpcProcessor : workerRpcProcessors) {

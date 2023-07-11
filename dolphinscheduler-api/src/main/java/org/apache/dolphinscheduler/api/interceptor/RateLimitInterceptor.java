@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.api.interceptor;
 
-import org.apache.dolphinscheduler.api.configuration.TrafficConfiguration;
+import org.apache.dolphinscheduler.api.configuration.ApiConfig;
 
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -47,7 +47,7 @@ import com.google.common.util.concurrent.RateLimiter;
 @Slf4j
 public class RateLimitInterceptor implements HandlerInterceptor {
 
-    private TrafficConfiguration trafficConfiguration;
+    private ApiConfig.TrafficConfiguration trafficConfiguration;
 
     private RateLimiter globalRateLimiter;
 
@@ -98,7 +98,7 @@ public class RateLimitInterceptor implements HandlerInterceptor {
         return true;
     }
 
-    public RateLimitInterceptor(TrafficConfiguration trafficConfiguration) {
+    public RateLimitInterceptor(ApiConfig.TrafficConfiguration trafficConfiguration) {
         this.trafficConfiguration = trafficConfiguration;
         if (trafficConfiguration.isGlobalSwitch()) {
             this.globalRateLimiter =

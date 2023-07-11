@@ -25,33 +25,33 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class TrafficConfigurationTest extends AbstractControllerTest {
+public class ApiConfigTest extends AbstractControllerTest {
 
     @Autowired
-    private TrafficConfiguration trafficConfiguration;
+    private ApiConfig apiConfig;
 
     @Test
-    public void isTrafficGlobalControlSwitch() {
-        Assertions.assertFalse(trafficConfiguration.isGlobalSwitch());
+    public void testIsAuditEnable() {
+        Assertions.assertTrue(apiConfig.isAuditEnable());
     }
 
     @Test
-    public void getMaxGlobalQpsLimit() {
-        Assertions.assertEquals(300, (int) trafficConfiguration.getMaxGlobalQpsRate());
+    public void testGetTrafficControlConfig() {
+        ApiConfig.TrafficConfiguration trafficControl = apiConfig.getTrafficControl();
+
+        Assertions.assertFalse(trafficControl.isGlobalSwitch());
+        Assertions.assertEquals(299, (int) trafficControl.getMaxGlobalQpsRate());
+        Assertions.assertFalse(trafficControl.isTenantSwitch());
+        Assertions.assertEquals(9, (int) trafficControl.getDefaultTenantQpsRate());
+        Assertions.assertTrue(MapUtils.isEmpty(trafficControl.getCustomizeTenantQpsRate()));
+
     }
 
     @Test
-    public void isTrafficTenantControlSwitch() {
-        Assertions.assertFalse(trafficConfiguration.isTenantSwitch());
+    public void testGetPythonGateway() {
+        ApiConfig.PythonGatewayConfiguration pythonGateway = apiConfig.getPythonGateway();
+
+        Assertions.assertFalse(pythonGateway.isEnabled());
     }
 
-    @Test
-    public void getDefaultTenantQpsLimit() {
-        Assertions.assertEquals(10, (int) trafficConfiguration.getDefaultTenantQpsRate());
-    }
-
-    @Test
-    public void getCustomizeTenantQpsRate() {
-        Assertions.assertTrue(MapUtils.isEmpty(trafficConfiguration.getCustomizeTenantQpsRate()));
-    }
 }

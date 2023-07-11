@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.api.audit;
 
-import org.apache.dolphinscheduler.api.configuration.AuditConfiguration;
+import org.apache.dolphinscheduler.api.configuration.ApiConfig;
 
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -34,20 +34,20 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class AuditPublishService {
 
-    private BlockingQueue<AuditMessage> auditMessageQueue = new LinkedBlockingQueue<>();
+    private final BlockingQueue<AuditMessage> auditMessageQueue = new LinkedBlockingQueue<>();
 
     @Autowired
     private List<AuditSubscriber> subscribers;
 
     @Autowired
-    private AuditConfiguration auditConfiguration;
+    private ApiConfig apiConfig;
 
     /**
      * create a daemon thread to process the message queue
      */
     @PostConstruct
     private void init() {
-        if (auditConfiguration.getEnabled()) {
+        if (apiConfig.isAuditEnable()) {
             Thread thread = new Thread(this::doPublish);
             thread.setDaemon(true);
             thread.setName("Audit-Log-Consume-Thread");
@@ -61,7 +61,7 @@ public class AuditPublishService {
      * @param message audit message
      */
     public void publish(AuditMessage message) {
-        if (auditConfiguration.getEnabled() && !auditMessageQueue.offer(message)) {
+        if (apiConfig.isAuditEnable() && !auditMessageQueue.offer(message)) {
             log.error("Publish audit message failed, message:{}", message);
         }
     }

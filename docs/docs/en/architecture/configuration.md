@@ -259,11 +259,11 @@ Location: `api-server/conf/application.yaml`
 |security.authentication.ldap.ssl.enable|false|LDAP switch|
 |security.authentication.ldap.ssl.trust-store|ldapkeystore.jks|LDAP jks file absolute path|
 |security.authentication.ldap.ssl.trust-store-password|password|LDAP jks password|
-|traffic.control.global.switch|false|traffic control global switch|
-|traffic.control.max-global-qps-rate|300|global max request number per second|
-|traffic.control.tenant-switch|false|traffic control tenant switch|
-|traffic.control.default-tenant-qps-rate|10|default tenant max request number per second|
-|traffic.control.customize-tenant-qps-rate||customize tenant max request number per second|
+|api.traffic.control.global.switch|false|traffic control global switch|
+|api.traffic.control.max-global-qps-rate|300|global max request number per second|
+|api.traffic.control.tenant-switch|false|traffic control tenant switch|
+|api.traffic.control.default-tenant-qps-rate|10|default tenant max request number per second|
+|api.traffic.control.customize-tenant-qps-rate||customize tenant max request number per second|
 
 ### Master Server related configuration
 

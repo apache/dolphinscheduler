@@ -21,6 +21,8 @@ import static org.apache.dolphinscheduler.common.constants.Constants.REGISTRY_DO
 
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.registry.api.ConnectStrategyProperties;
+import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
+import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 
 import java.time.Duration;
 
@@ -49,6 +51,9 @@ public class WorkerConfig implements Validator {
     private int maxCpuLoadAvg = -1;
     private double reservedMemory = 0.1;
     private ConnectStrategyProperties registryDisconnectStrategy = new ConnectStrategyProperties();
+
+    private NettyClientConfig workerRpcClientConfig = new NettyClientConfig();
+    private NettyServerConfig workerRpcServerConfig = new NettyServerConfig();
 
     /**
      * This field doesn't need to set at config file, it will be calculated by workerIp:listenPort
