@@ -40,6 +40,7 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -316,7 +317,7 @@ public class HttpTask extends AbstractTask {
             SSLContext sslContext = SSLContext.getInstance("TLS");
             sslContext.init(null, trustAllCerts, new SecureRandom());
             httpClientBuilder.setSSLContext(sslContext);
-            httpClientBuilder.setSSLHostnameVerifier((s, sslSession) -> true);
+            httpClientBuilder.setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE);
         }
         httpClientBuilder.setDefaultRequestConfig(requestConfig);
         return httpClientBuilder.build();
