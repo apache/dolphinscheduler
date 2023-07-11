@@ -49,6 +49,7 @@ import org.apache.http.util.EntityUtils;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -299,14 +300,17 @@ public class HttpTask extends AbstractTask {
         if (httpParameters.getEnableSSL()) {
             TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
 
-                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                @Override
+                public X509Certificate[] getAcceptedIssuers() {
                     return null;
                 }
 
-                public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+                @Override
+                public void checkClientTrusted(X509Certificate[] certs, String authType) {
                 }
 
-                public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+                @Override
+                public void checkServerTrusted(X509Certificate[] certs, String authType) {
                 }
             }};
             SSLContext sslContext = SSLContext.getInstance("TLS");
