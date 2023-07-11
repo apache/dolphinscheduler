@@ -240,12 +240,15 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         ExecutorService collectPodLogExecutorService = ThreadUtils
                 .newSingleDaemonScheduledExecutorService("CollectPodLogOutput-thread-" + taskRequest.getTaskName());
 
+        String taskInstanceId = String.valueOf(taskRequest.getTaskInstanceId());
+        String taskName = taskRequest.getTaskName().toLowerCase(Locale.ROOT);
+        String containerName = String.format("%s-%s", taskName, taskInstanceId);
         podLogOutputFuture = collectPodLogExecutorService.submit(() -> {
             try (
                     final LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
                             LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());
                     LogWatch watcher = ProcessUtils.getPodLogWatcher(taskRequest.getK8sTaskExecutionContext(),
-                            taskRequest.getTaskAppId())) {
+                            taskRequest.getTaskAppId(), containerName)) {
                 String line;
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(watcher.getOutput()))) {
                     while ((line = reader.readLine()) != null) {

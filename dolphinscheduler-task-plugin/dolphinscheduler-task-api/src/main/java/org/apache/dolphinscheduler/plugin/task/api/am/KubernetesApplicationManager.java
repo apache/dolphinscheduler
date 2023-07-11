@@ -56,6 +56,8 @@ public class KubernetesApplicationManager implements ApplicationManager {
     private static final String FAILED = "Failed";
     private static final String UNKNOWN = "Unknown";
 
+    private static final int MAX_RETRY_TIMES = 10;
+
     /**
      * cache k8s client for same task
      */
@@ -102,13 +104,17 @@ public class KubernetesApplicationManager implements ApplicationManager {
     private FilterWatchListDeletable<Pod, PodList, PodResource> getListenPod(KubernetesApplicationManagerContext kubernetesApplicationManagerContext) {
         KubernetesClient client = getClient(kubernetesApplicationManagerContext);
         String labelValue = kubernetesApplicationManagerContext.getLabelValue();
-        FilterWatchListDeletable<Pod, PodList, PodResource> watchList = client.pods()
-                .inNamespace(kubernetesApplicationManagerContext.getK8sTaskExecutionContext().getNamespace())
-                .withLabel(UNIQUE_LABEL_NAME, labelValue);
-        List<Pod> podList = watchList.list().getItems();
-        if (podList.size() != 1) {
-            log.warn("Expected driver pod 1, but get {}.", podList.size());
+        List<Pod> podList = null;
+        FilterWatchListDeletable<Pod, PodList, PodResource> watchList = null;
+        int retryTimes = 0;
+        while (CollectionUtils.isEmpty(podList) && retryTimes < MAX_RETRY_TIMES) {
+            watchList = client.pods()
+                    .inNamespace(kubernetesApplicationManagerContext.getK8sTaskExecutionContext().getNamespace())
+                    .withLabel(UNIQUE_LABEL_NAME, labelValue);
+            podList = watchList.list().getItems();
+            retryTimes += 1;
         }
+
         return watchList;
     }
 
@@ -192,7 +198,8 @@ public class KubernetesApplicationManager implements ApplicationManager {
                 return null;
             }
             pod = podList.get(0);
-            if (pod.getStatus().getPhase().equals(PENDING)) {
+            String phase = pod.getStatus().getPhase();
+            if (phase.equals(PENDING) || phase.equals(UNKNOWN)) {
                 ThreadUtils.sleep(SLEEP_TIME_MILLIS);
             } else {
                 podIsReady = true;
@@ -201,6 +208,7 @@ public class KubernetesApplicationManager implements ApplicationManager {
 
         return client.pods().inNamespace(pod.getMetadata().getNamespace())
                 .withName(pod.getMetadata().getName())
+                .inContainer(kubernetesApplicationManagerContext.getContainerName())
                 .watchLog();
     }
 
