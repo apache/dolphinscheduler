@@ -23,16 +23,8 @@ import {
   watch
 } from 'vue'
 import { useI18n } from 'vue-i18n'
-import {
-  NInput,
-  NForm,
-  NFormItem,
-  NSelect,
-  NRadio,
-  NRadioGroup,
-  NSpace
-} from 'naive-ui'
-import { useUserDetail } from './use-user-detail'
+import { NInput, NForm, NFormItem } from 'naive-ui'
+import { usePassword } from './use-password'
 import Modal from '@/components/modal'
 import type { IRecord } from '../types'
 
@@ -47,21 +39,24 @@ const props = {
   }
 }
 
-export const UserModal = defineComponent({
-  name: 'user-modal',
+export const PasswordModal = defineComponent({
+  name: 'password-modal',
   props,
   emits: ['cancel', 'update'],
   setup(props, ctx) {
     const { t } = useI18n()
     const { state, IS_ADMIN, formRules, onReset, onSave, onSetValues } =
-      useUserDetail()
+      usePassword()
+
     const onCancel = () => {
       onReset()
       ctx.emit('cancel')
     }
     const onConfirm = async () => {
-      const result = await onSave(props.currentRecord?.id)
-      if (!result) return
+      if (props.currentRecord?.id) {
+        const result = await onSave(props.currentRecord)
+        if (!result) return
+      }
       onCancel()
       ctx.emit('update')
     }
@@ -87,17 +82,13 @@ export const UserModal = defineComponent({
       trim
     }
   },
-  render(props: { currentRecord: IRecord }) {
+  render() {
     const { t } = this
-    const { currentRecord } = props
+
     return (
       <Modal
         show={this.show}
-        title={`${t(
-          currentRecord?.id
-            ? 'security.user.edit_user'
-            : 'security.user.create_user'
-        )}`}
+        title={t('security.user.reset_password')}
         onCancel={this.onCancel}
         confirmLoading={this.loading}
         onConfirm={this.onConfirm}
@@ -110,7 +101,7 @@ export const UserModal = defineComponent({
           rules={this.formRules}
           labelPlacement='left'
           labelAlign='left'
-          labelWidth={120}
+          labelWidth={150}
         >
           <NFormItem label={t('security.user.username')} path='userName'>
             <NInput
@@ -119,69 +110,32 @@ export const UserModal = defineComponent({
               v-model:value={this.formData.userName}
               minlength={3}
               maxlength={39}
+              disabled={true}
               placeholder={t('security.user.username_tips')}
             />
           </NFormItem>
-          {!this.currentRecord?.id && (
-            <NFormItem
-              label={t('security.user.user_password')}
-              path='userPassword'
-            >
-              <NInput
-                allowInput={this.trim}
-                class='input-password'
-                type='password'
-                v-model:value={this.formData.userPassword}
-                placeholder={t('security.user.user_password_tips')}
-              />
-            </NFormItem>
-          )}
-          {this.IS_ADMIN && (
-            <NFormItem label={t('security.user.tenant_code')} path='tenantId'>
-              <NSelect
-                class='select-tenant'
-                options={this.tenants}
-                v-model:value={this.formData.tenantId}
-              />
-            </NFormItem>
-          )}
-          {this.IS_ADMIN && (
-            <NFormItem label={t('security.user.queue')} path='queue'>
-              <NSelect
-                class='select-queue'
-                options={this.queues}
-                v-model:value={this.formData.queue}
-                placeholder={t('security.user.queue_tips')}
-              />
-            </NFormItem>
-          )}
-          <NFormItem label={t('security.user.email')} path='email'>
+          <NFormItem
+            label={t('security.user.user_password')}
+            path='userPassword'
+          >
             <NInput
               allowInput={this.trim}
-              class='input-email'
-              v-model:value={this.formData.email}
-              placeholder={t('security.user.email_empty_tips')}
+              class='input-password'
+              type='password'
+              v-model:value={this.formData.userPassword}
+              placeholder={t('security.user.user_password_tips')}
             />
           </NFormItem>
-          <NFormItem label={t('security.user.phone')} path='phone'>
+          <NFormItem
+            label={t('password.confirm_password')}
+            path='confirmPassword'
+          >
             <NInput
               allowInput={this.trim}
-              class='input-phone'
-              v-model:value={this.formData.phone}
-              placeholder={t('security.user.phone_empty_tips')}
+              type='password'
+              v-model:value={this.formData.confirmPassword}
+              placeholder={t('password.confirm_password_tips')}
             />
-          </NFormItem>
-          <NFormItem label={t('security.user.state')} path='state'>
-            <NRadioGroup v-model:value={this.formData.state}>
-              <NSpace>
-                <NRadio value={1} class='radio-state-enable'>
-                  {this.t('security.user.enable')}
-                </NRadio>
-                <NRadio value={0} class='radio-state-disable'>
-                  {this.t('security.user.disable')}
-                </NRadio>
-              </NSpace>
-            </NRadioGroup>
           </NFormItem>
         </NForm>
       </Modal>
@@ -189,4 +143,4 @@ export const UserModal = defineComponent({
   }
 })
 
-export default UserModal
+export default PasswordModal

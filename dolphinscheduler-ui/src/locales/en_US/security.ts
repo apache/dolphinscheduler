@@ -144,6 +144,7 @@ export default {
     delete_confirm: 'Are you sure to delete?',
     delete_confirm_tip:
       'Deleting user is a dangerous operation，please be careful',
+    reset_password: 'Reset Password',
     project: 'Project',
     resource: 'Resource',
     file_resource: 'File Resource',
@@ -165,6 +166,7 @@ export default {
     user_password: 'Password',
     user_password_tips:
       'Please enter a password containing letters and numbers with a length between 6 and 20',
+    confirm_password_tips: 'The both of password and confirm password are not same.',
     user_type: 'User Type',
     ordinary_user: 'Ordinary users',
     administrator: 'Administrator',
