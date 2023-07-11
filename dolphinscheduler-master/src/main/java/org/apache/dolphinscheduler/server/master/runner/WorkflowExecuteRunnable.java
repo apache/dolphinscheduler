@@ -1372,13 +1372,28 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
                 if (StringUtils.isNotEmpty(taskInstanceVarPool)) {
                     Set<Property> taskProperties = new HashSet<>(JSONUtils.toList(taskInstanceVarPool, Property.class));
                     String processInstanceVarPool = processInstance.getVarPool();
+                    System.out.println(processInstanceVarPool);
+                    List<Property> processGlobalParams = new ArrayList<>(JSONUtils.toList(processInstance.getGlobalParams(), Property.class));
+                    Map<String, Direct> oldProcessGlobalParamsMap = processGlobalParams.stream().collect(Collectors.toMap(Property::getProp, Property::getDirect));
+                    Set<Property> processVarPoolOut = taskProperties.stream().filter(property -> property.getDirect().equals(Direct.OUT) && oldProcessGlobalParamsMap.containsKey(property.getProp()) && oldProcessGlobalParamsMap.get(property.getProp()).equals(Direct.OUT))
+                            .collect(Collectors.toSet());
+                    Set<Property> taskVarPoolIn = taskProperties.stream().filter(property -> property.getDirect().equals(Direct.IN))
+                            .collect(Collectors.toSet());
                     if (StringUtils.isNotEmpty(processInstanceVarPool)) {
                         Set<Property> properties =
                                 new HashSet<>(JSONUtils.toList(processInstanceVarPool, Property.class));
-                        properties.addAll(taskProperties);
+                        Set<String> newProcessVarPoolKeys = taskProperties.stream().map(Property::getProp).collect(Collectors.toSet());
+                        properties = properties.stream().filter(property -> !newProcessVarPoolKeys.contains(property.getProp()))
+                                .collect(Collectors.toSet());
+                        properties.addAll(processVarPoolOut);
+                        properties.addAll(taskVarPoolIn);
+
                         processInstance.setVarPool(JSONUtils.toJsonString(properties));
                     } else {
-                        processInstance.setVarPool(JSONUtils.toJsonString(taskProperties));
+                        Set<Property> varPool = new HashSet<>();
+                        varPool.addAll(taskVarPoolIn);
+                        varPool.addAll(processVarPoolOut);
+                        processInstance.setVarPool(JSONUtils.toJsonString(varPool));
                     }
                 }
             }
