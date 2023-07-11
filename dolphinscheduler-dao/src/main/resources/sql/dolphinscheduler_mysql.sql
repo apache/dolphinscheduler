@@ -685,6 +685,27 @@ CREATE TABLE `t_ds_project_parameter` (
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for t_ds_project_preference
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_project_preference`;
+CREATE TABLE `t_ds_project_preference` (
+   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
+   `code` bigint(20) NOT NULL COMMENT 'encoding',
+   `project_code` bigint(20) NOT NULL COMMENT 'project code',
+   `preferences` varchar(512) NOT NULL COMMENT 'project preferences',
+   `user_id` int(11) DEFAULT NULL COMMENT 'creator id',
+   `create_time` datetime NOT NULL COMMENT 'create time',
+   `update_time` datetime DEFAULT NULL COMMENT 'update time',
+   PRIMARY KEY (`id`),
+   UNIQUE KEY `unique_project_preference_project_code`(`project_code`),
+   UNIQUE KEY `unique_project_preference_code`(`code`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
+
+-- ----------------------------
+-- Records of t_ds_project_preference
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for t_ds_queue
 -- ----------------------------
 DROP TABLE IF EXISTS `t_ds_queue`;
