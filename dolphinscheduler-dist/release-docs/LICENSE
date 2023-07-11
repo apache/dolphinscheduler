@@ -578,7 +578,6 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     jsch 0.1.42: https://mvnrepository.com/artifact/com.jcraft/jsch/0.1.42, BSD
     leveldbjni-all 1.8: https://mvnrepository.com/artifact/org.fusesource.leveldbjni/leveldbjni-all/1.8, BSD 3-clause
     postgresql 42.4.1: https://mvnrepository.com/artifact/org.postgresql/postgresql/42.4.1, BSD 2-clause
-    protobuf-java 2.5.0: https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java/2.5.0, BSD 2-clause
     paranamer 2.3: https://mvnrepository.com/artifact/com.thoughtworks.paranamer/paranamer/2.3, BSD
     re2j 1.1: https://github.com/google/re2j/blob/re2j-1.1/LICENSE, BSD 3-clause
     stax2-api 4.2.1: https://mvnrepository.com/artifact/org.codehaus.woodstox/stax2-api/4.2.1, BSD
