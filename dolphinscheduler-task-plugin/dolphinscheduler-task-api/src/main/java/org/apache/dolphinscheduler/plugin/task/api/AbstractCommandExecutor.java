@@ -44,10 +44,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
@@ -55,7 +53,6 @@ import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.fabric8.kubernetes.client.dsl.LogWatch;
 
 /**
@@ -452,14 +449,6 @@ public abstract class AbstractCommandExecutor {
     protected abstract String buildCommandFilePath();
 
     protected abstract void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException;
-
-    ExecutorService newDaemonSingleThreadExecutor(String threadName) {
-        ThreadFactory threadFactory = new ThreadFactoryBuilder()
-                .setDaemon(true)
-                .setNameFormat(threadName)
-                .build();
-        return Executors.newSingleThreadExecutor(threadFactory);
-    }
 
     protected abstract String commandInterpreter();
 }
