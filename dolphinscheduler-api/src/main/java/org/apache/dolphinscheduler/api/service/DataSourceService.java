@@ -132,15 +132,24 @@ public interface DataSourceService {
     /**
      * get tables
      * @param datasourceId
+     * @param database
      * @return
      */
-    Map<String, Object> getTables(Integer datasourceId);
+    Map<String, Object> getTables(Integer datasourceId, String database);
 
     /**
      * get table columns
      * @param datasourceId
+     * @param database
      * @param tableName
      * @return
      */
-    Map<String, Object> getTableColumns(Integer datasourceId, String tableName);
+    Map<String, Object> getTableColumns(Integer datasourceId, String database, String tableName);
+
+    /**
+     * get databases
+     * @param datasourceId
+     * @return
+     */
+    Map<String, Object> getDatabases(Integer datasourceId);
 }
