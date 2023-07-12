@@ -98,6 +98,8 @@ jobs:
             class: org.apache.dolphinscheduler.api.test.cases.ProcessDefinitionAPITest
           - name: Scheduler
             class: org.apache.dolphinscheduler.api.test.cases.SchedulerAPITest
+          - name: Executor
+            class: org.apache.dolphinscheduler.api.test.cases.ExecutorAPITest
     env:
       RECORDING_PATH: /tmp/recording-${{ matrix.case.name }}
     steps:
