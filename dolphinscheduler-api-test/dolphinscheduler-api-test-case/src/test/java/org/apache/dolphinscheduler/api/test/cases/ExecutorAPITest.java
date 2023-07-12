@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
 
@@ -50,10 +51,10 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+//TODO: Some test cases rely on ProcessInstance APIs. Should complete remaining cases after ProcessInstance related API tests done.
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 @Slf4j
 public class ExecutorAPITest {
-
 
     private static final String username = "admin";
 
@@ -73,7 +74,7 @@ public class ExecutorAPITest {
 
     private static long processDefinitionCode;
 
-    private static String processDefinitionName;
+    private static long triggerCode;
 
     @BeforeAll
     public static void setup() {
@@ -125,16 +126,23 @@ public class ExecutorAPITest {
             // trigger workflow instance
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Date date = new Date();
-            String scheduleTime = String.format("%s,%s", formatter.format(date));
+            String scheduleTime = String.format("%s,%s", formatter.format(date), formatter.format(date));
             log.info("use current time {} as scheduleTime", scheduleTime);
-            HttpResponse startProcessInstanceResponse = executorPage.startProcessInstance(loginUser, projectCode, processDefinitionCode, scheduleTime, FailureStrategy.END);
-            log.info("[debug111] {}", startProcessInstanceResponse);
+            HttpResponse startProcessInstanceResponse = executorPage.startProcessInstance(loginUser, projectCode, processDefinitionCode, scheduleTime, FailureStrategy.END, WarningType.NONE);
+            Assertions.assertTrue(startProcessInstanceResponse.getBody().getSuccess());
+
+            triggerCode = (long) startProcessInstanceResponse.getBody().getData();
         }  catch (Exception e) {
             log.error("failed", e);
             Assertions.fail();
         }
     }
 
+    @Test
+    @Order(2)
+    public void testStartCheckProcessDefinition() {
+        HttpResponse testStartCheckProcessDefinitionResponse = executorPage.startCheckProcessDefinition(loginUser, projectCode, processDefinitionCode);
+        Assertions.assertTrue(testStartCheckProcessDefinitionResponse.getBody().getSuccess());
+    }
+
 }
-
-
