@@ -181,6 +181,10 @@ export const STARTUP_SCRIPT = [
 
 export const FLINK_RUN_MODE = [
   {
+    label: 'none',
+    value: 'NONE'
+  },
+  {
     label: 'run',
     value: 'RUN'
   },
