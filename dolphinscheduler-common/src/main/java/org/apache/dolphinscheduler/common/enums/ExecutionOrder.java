@@ -15,24 +15,36 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.configuration;
+package org.apache.dolphinscheduler.common.enums;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.baomidou.mybatisplus.annotation.EnumValue;
 
-import lombok.Data;
+/**
+ * complement data in some kind of order
+ */
+public enum ExecutionOrder {
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+    /**
+     * 0 complement data in descending order
+     * 1 complement data in ascending order
+     */
+    DESC_ORDER(0, "descending order"),
+    ASC_ORDER(1, "ascending order");
 
-@Data
-@Configuration
-@ConfigurationProperties(prefix = "traffic.control")
-public class TrafficConfiguration {
+    ExecutionOrder(int code, String desc) {
+        this.code = code;
+        this.desc = desc;
+    }
 
-    private boolean globalSwitch;
-    private Integer maxGlobalQpsRate = 300;
-    private boolean tenantSwitch;
-    private Integer defaultTenantQpsRate = 10;
-    private Map<String, Integer> customizeTenantQpsRate = new HashMap<>();
+    @EnumValue
+    private final int code;
+    private final String desc;
+
+    public int getCode() {
+        return code;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
 }

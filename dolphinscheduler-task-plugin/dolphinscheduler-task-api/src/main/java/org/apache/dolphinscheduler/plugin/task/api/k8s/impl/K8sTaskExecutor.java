@@ -22,7 +22,6 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.CPU;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.IMAGE_PULL_POLICY;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.JOB_TTL_SECONDS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LAYER_LABEL;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LAYER_LABEL_VALUE;
@@ -56,6 +55,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 
+import io.fabric8.kubernetes.api.model.Affinity;
+import io.fabric8.kubernetes.api.model.AffinityBuilder;
 import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.NodeSelectorTerm;
 import io.fabric8.kubernetes.api.model.Quantity;
@@ -82,6 +83,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         String taskName = taskRequest.getTaskName().toLowerCase(Locale.ROOT);
         String image = k8STaskMainParameters.getImage();
         String namespaceName = k8STaskMainParameters.getNamespaceName();
+        String imagePullPolicy = k8STaskMainParameters.getImagePullPolicy();
         Map<String, String> otherParams = k8STaskMainParameters.getParamsMap();
         Double podMem = k8STaskMainParameters.getMinMemorySpace();
         Double podCpu = k8STaskMainParameters.getMinCpuCores();
@@ -129,7 +131,16 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         NodeSelectorTerm nodeSelectorTerm = new NodeSelectorTerm();
         nodeSelectorTerm.setMatchExpressions(k8STaskMainParameters.getNodeSelectorRequirements());
 
-        return new JobBuilder()
+        Affinity affinity = k8STaskMainParameters.getNodeSelectorRequirements().size() == 0 ? null
+                : new AffinityBuilder()
+                        .withNewNodeAffinity()
+                        .withNewRequiredDuringSchedulingIgnoredDuringExecution()
+                        .addNewNodeSelectorTermLike(nodeSelectorTerm)
+                        .endNodeSelectorTerm()
+                        .endRequiredDuringSchedulingIgnoredDuringExecution()
+                        .endNodeAffinity().build();
+
+        JobBuilder jobBuilder = new JobBuilder()
                 .withApiVersion(API_VERSION)
                 .withNewMetadata()
                 .withName(k8sJobName)
@@ -145,24 +156,18 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 .withImage(image)
                 .withCommand(commands.size() == 0 ? null : commands)
                 .withArgs(args.size() == 0 ? null : args)
-                .withImagePullPolicy(IMAGE_PULL_POLICY)
+                .withImagePullPolicy(imagePullPolicy)
                 .withResources(new ResourceRequirements(limitRes, reqRes))
                 .withEnv(envVars)
                 .endContainer()
                 .withRestartPolicy(RESTART_POLICY)
-                .withNewAffinity()
-                .withNewNodeAffinity()
-                .withNewRequiredDuringSchedulingIgnoredDuringExecution()
-                .addNewNodeSelectorTermLike(nodeSelectorTerm)
-                .endNodeSelectorTerm()
-                .endRequiredDuringSchedulingIgnoredDuringExecution()
-                .endNodeAffinity()
-                .endAffinity()
+                .withAffinity(affinity)
                 .endSpec()
                 .endTemplate()
                 .withBackoffLimit(retryNum)
-                .endSpec()
-                .build();
+                .endSpec();
+
+        return jobBuilder.build();
     }
 
     public void registerBatchJobWatcher(Job job, String taskInstanceId, TaskResponse taskResponse,

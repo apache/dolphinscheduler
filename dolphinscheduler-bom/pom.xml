@@ -114,6 +114,7 @@
         <fabric8.client.version>6.0.0</fabric8.client.version>
         <casdoor.version>1.6.0</casdoor.version>
         <azure-sdk-bom.version>1.2.10</azure-sdk-bom.version>
+        <protobuf.version>3.17.2</protobuf.version>
         <zeppelin-client.version>0.10.1</zeppelin-client.version>
     </properties>
 
@@ -894,6 +895,12 @@
                 <groupId>org.apache.zeppelin</groupId>
                 <artifactId>zeppelin-client</artifactId>
                 <version>${zeppelin-client.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.protobuf</groupId>
+                <artifactId>protobuf-java</artifactId>
+                <version>${protobuf.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
