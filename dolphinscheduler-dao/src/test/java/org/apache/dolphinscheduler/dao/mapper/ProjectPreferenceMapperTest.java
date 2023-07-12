@@ -30,11 +30,12 @@ public class ProjectPreferenceMapperTest extends BaseDaoTest {
     @Autowired
     private ProjectPreferenceMapper projectPreferenceMapper;
 
-    private ProjectPreference insertOne(long code, String name, long projectCode) {
+
+    private ProjectPreference insertOne(long code, long projectCode) {
         ProjectPreference projectPreference = new ProjectPreference();
         projectPreference.setCode(code);
         projectPreference.setProjectCode(projectCode);
-        projectPreference.setPreferences("value");
+        projectPreference.setPreferences("{workerGroup:{availableOptions:[],default:1}}");
         projectPreference.setCreateTime(new Date());
         projectPreference.setUpdateTime(new Date());
         projectPreference.setUserId(1);
@@ -44,7 +45,7 @@ public class ProjectPreferenceMapperTest extends BaseDaoTest {
 
     @Test
     public void testUpdate() {
-        ProjectPreference projectPreference = insertOne(1, "name", 1);
+        ProjectPreference projectPreference = insertOne(1, 1);
         projectPreference.setUpdateTime(new Date());
 
         int update = projectPreferenceMapper.updateById(projectPreference);
@@ -54,12 +55,12 @@ public class ProjectPreferenceMapperTest extends BaseDaoTest {
 
     @Test
     public void testQueryByProjectCode() {
-        insertOne(1, "name1", 1);
-        insertOne(2, "name2", 2);
+        long projectCode = 2;
+        ProjectPreference expectedProjectPreference = insertOne(2, projectCode);
 
         ProjectPreference projectPreference = projectPreferenceMapper
-            .selectOne(new QueryWrapper<ProjectPreference>().lambda().eq(ProjectPreference::getProjectCode, 1));
-        Assertions.assertEquals(1, projectPreference);
+            .selectOne(new QueryWrapper<ProjectPreference>().lambda().eq(ProjectPreference::getProjectCode, projectCode));
+        Assertions.assertEquals(expectedProjectPreference, projectPreference);
     }
 
 }
