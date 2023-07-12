@@ -385,6 +385,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             }
             return result;
         }
+        // TODO: When merging datasource plugin and task plugin, DbType will be changed to ConnectionType.
         if (type == DbType.ZEPPELIN) {
             DataSourceProcessor zeppelinDataSourceProcessor = DataSourceUtils.getDatasourceProcessor(type);
             if (zeppelinDataSourceProcessor.testConnection(connectionParam)) {

@@ -21,11 +21,11 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
+import org.apache.dolphinscheduler.plugin.datasource.zeppelin.ZeppelinUtils;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.zeppelin.client.ClientConfig;
 import org.apache.zeppelin.client.ZeppelinClient;
 
 import java.sql.Connection;
@@ -110,11 +110,9 @@ public class ZeppelinDataSourceProcessor implements DataSourceProcessor {
     @Override
     public boolean testConnection(ConnectionParam connectionParam) {
         ZeppelinConnectionParam baseConnectionParam = (ZeppelinConnectionParam) connectionParam;
-        ClientConfig clientConfig = new ClientConfig(baseConnectionParam.getRestEndpoint());
-
         try {
             // If the login fails, an exception will be thrown directly
-            ZeppelinClient zeppelinClient = new ZeppelinClient(clientConfig);
+            ZeppelinClient zeppelinClient = ZeppelinUtils.getZeppelinClient(baseConnectionParam);
             zeppelinClient.login(baseConnectionParam.username, baseConnectionParam.password);
             String version = zeppelinClient.getVersion();
             log.info("zeppelin client connects to server successfully, version is {}", version);

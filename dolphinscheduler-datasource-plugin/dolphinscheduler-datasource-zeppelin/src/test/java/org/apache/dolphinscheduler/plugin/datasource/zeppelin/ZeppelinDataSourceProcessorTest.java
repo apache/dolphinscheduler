@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.zeppelin;
 
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.when;
+
 import org.apache.dolphinscheduler.plugin.datasource.zeppelin.param.ZeppelinConnectionParam;
 import org.apache.dolphinscheduler.plugin.datasource.zeppelin.param.ZeppelinDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.zeppelin.param.ZeppelinDataSourceProcessor;
@@ -28,7 +31,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -37,8 +40,6 @@ public class ZeppelinDataSourceProcessorTest {
 
     private ZeppelinDataSourceProcessor zeppelinDataSourceProcessor;
 
-    @Mock
-    private ZeppelinClient zeppelinClient;
     private String connectJson =
             "{\"username\":\"lucky\",\"password\":\"123456\",\"restEndpoint\":\"https://dolphinscheduler.com:8080\"}";
 
@@ -95,12 +96,19 @@ public class ZeppelinDataSourceProcessorTest {
     void testTestConnection() throws Exception {
         ZeppelinDataSourceParamDTO zeppelinDataSourceParamDTO =
                 (ZeppelinDataSourceParamDTO) zeppelinDataSourceProcessor.createDatasourceParamDTO(connectJson);
-        ZeppelinConnectionParam zeppelinConnectionParam =
+        ZeppelinConnectionParam connectionParam =
                 zeppelinDataSourceProcessor.createConnectionParams(zeppelinDataSourceParamDTO);
 
-        Mockito.doNothing().when(zeppelinClient).login(zeppelinConnectionParam.getUsername(),
-                zeppelinConnectionParam.getPassword());
-        boolean isConnected = zeppelinDataSourceProcessor.testConnection(zeppelinConnectionParam);
-        Assertions.assertTrue(isConnected);
+        MockedStatic<ZeppelinUtils> zeppelinConnectionUtilsMockedStatic =
+                Mockito.mockStatic(ZeppelinUtils.class);
+        zeppelinConnectionUtilsMockedStatic.when(() -> ZeppelinUtils.getZeppelinClient(Mockito.any())).thenReturn(null);
+        Assertions.assertFalse(zeppelinDataSourceProcessor.testConnection(connectionParam));
+
+        ZeppelinClient zeppelinClient = Mockito.mock(ZeppelinClient.class, RETURNS_DEEP_STUBS);
+        zeppelinConnectionUtilsMockedStatic.when(() -> ZeppelinUtils.getZeppelinClient(Mockito.any()))
+                .thenReturn(zeppelinClient);
+        Mockito.doNothing().when(zeppelinClient).login(Mockito.any(), Mockito.any());
+        when(zeppelinClient.getVersion()).thenReturn("1.0");
+        Assertions.assertTrue(zeppelinDataSourceProcessor.testConnection(connectionParam));
     }
 }
