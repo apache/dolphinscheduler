@@ -57,9 +57,7 @@ public class PythonTask extends AbstractTask {
 
     protected TaskExecutionContext taskRequest;
 
-    protected static final String PYTHON_HOME = "PYTHON_HOME";
-
-    private static final String DEFAULT_PYTHON_VERSION = "python";
+    protected static final String PYTHON_LAUNCHER = "PYTHON_LAUNCHER";
 
     /**
      * constructor
@@ -181,7 +179,7 @@ public class PythonTask extends AbstractTask {
 
     /**
      * Build the python task command.
-     * If user have set the 'PYTHON_HOME' environment, we will use the 'PYTHON_HOME',
+     * If user have set the 'PYTHON_LAUNCHER' environment, we will use the 'PYTHON_LAUNCHER',
      * if not, we will default use python.
      *
      * @param pythonFile Python file, cannot be empty.
@@ -190,7 +188,7 @@ public class PythonTask extends AbstractTask {
     protected String buildPythonExecuteCommand(String pythonFile) {
         Preconditions.checkNotNull(pythonFile, "Python file cannot be null");
 
-        String pythonHome = String.format("${%s}", PYTHON_HOME);
+        String pythonHome = String.format("${%s}", PYTHON_LAUNCHER);
 
         return pythonHome + " " + pythonFile;
     }

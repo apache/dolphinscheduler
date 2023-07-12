@@ -58,7 +58,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
@@ -83,10 +82,9 @@ public class DataxTask extends AbstractTask {
 
     public static final String CUSTOM_PARAM = " -D%s='%s'";
     /**
-     * python process(datax only supports version 2.7 by default)
      * todo: Create a shell script to execute the datax task, and read the python version from the env, so we can support multiple versions of datax python
      */
-    private static final String DATAX_PYTHON = Optional.ofNullable(System.getenv("DATAX_PYTHON")).orElse("python2.7");
+    private static final String PYTHON_LAUNCHER = "${PYTHON_LAUNCHER}";
 
     /**
      * select all
@@ -100,7 +98,7 @@ public class DataxTask extends AbstractTask {
     /**
      * datax path
      */
-    private static final String DATAX_PATH = "${DATAX_HOME}/bin/datax.py";
+    private static final String DATAX_LAUNCHER = "${DATAX_LAUNCHER}";
     /**
      * datax channel count
      */
@@ -401,9 +399,9 @@ public class DataxTask extends AbstractTask {
         }
 
         // datax python command
-        String sbr = DATAX_PYTHON +
+        String sbr = PYTHON_LAUNCHER +
                 " " +
-                DATAX_PATH +
+                DATAX_LAUNCHER +
                 " " +
                 loadJvmEnv(dataXParameters) +
                 addCustomParameters(paramsMap) +

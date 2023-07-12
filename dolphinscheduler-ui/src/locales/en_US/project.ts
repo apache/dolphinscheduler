@@ -844,7 +844,7 @@ export default {
     pytorch_python_path: 'Project Path',
     pytorch_is_create_environment: 'Create An Environment Or Not',
     pytorch_python_command: 'Python Command Path',
-    pytorch_python_command_tips: 'If empty，will be set $PYTHON_HOME',
+    pytorch_python_command_tips: 'If empty，will be set $PYTHON_LAUNCHER',
     pytorch_python_env_tool: 'Python Environment Manager Tool',
     pytorch_requirements: 'Requirement File',
     pytorch_conda_python_version: 'Python Version',

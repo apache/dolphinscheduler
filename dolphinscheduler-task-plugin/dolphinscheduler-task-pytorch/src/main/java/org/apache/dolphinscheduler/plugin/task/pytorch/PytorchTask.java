@@ -126,7 +126,7 @@ public class PytorchTask extends AbstractTask {
         if (pytorchParameters.getIsCreateEnvironment()) {
             pythonCommand = pythonEnvManager.getPythonCommand();
         } else {
-            pythonCommand = pytorchParameters.getPythonCommand();
+            pythonCommand = pytorchParameters.getPythonLauncher();
         }
         return pythonCommand;
 

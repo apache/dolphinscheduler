@@ -126,7 +126,7 @@ public class DataxTaskTest {
                 : new File("/tmp/execution/app-id_node.sh");
         InputStream shellCommandInputStream = Files.newInputStream(shellCommandFile.toPath());
         String shellCommandStr = FileUtils.readFile2Str(shellCommandInputStream);
-        Assertions.assertEquals(shellCommandStr, "python2.7 ${DATAX_HOME}/bin/datax.py  --jvm=\"-Xms1G -Xmx1G\" " +
+        Assertions.assertEquals(shellCommandStr, "python2.7 ${DATAX_LAUNCHER} --jvm=\"-Xms1G -Xmx1G\" " +
                 " /tmp/execution/app-id_job.json");
         delete = shellCommandFile.delete();
         Assertions.assertTrue(delete);
@@ -167,7 +167,7 @@ public class DataxTaskTest {
                 : new File("/tmp/execution/app-id_node.sh");
         InputStream shellCommandInputStream = Files.newInputStream(shellCommandFile.toPath());
         String shellCommandStr = FileUtils.readFile2Str(shellCommandInputStream);
-        Assertions.assertEquals(shellCommandStr, "python2.7 ${DATAX_HOME}/bin/datax.py  --jvm=\"-Xms1G -Xmx1G\" " +
+        Assertions.assertEquals(shellCommandStr, "python2.7 ${DATAX_LAUNCHER} --jvm=\"-Xms1G -Xmx1G\" " +
                 "-p \"-DDT='DT' -DDS='DS'\" /tmp/execution/app-id_job.json");
         delete = shellCommandFile.delete();
         Assertions.assertTrue(delete);
