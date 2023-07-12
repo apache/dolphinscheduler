@@ -54,7 +54,7 @@
                 and name like concat('%', #{name}, '%')
             </if>
         </where>
-        order by update_time desc
+        order by update_time desc, id
     </select>
 
     <select id="queryTaskGroupPagingByProjectCode" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroup">
@@ -70,7 +70,7 @@
             </foreach>
         </if>
         and project_code in ( #{projectCode} , 0)
-        order by update_time desc
+        order by update_time desc, id
     </select>
 
     <select id="selectByProjectCode" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroup">

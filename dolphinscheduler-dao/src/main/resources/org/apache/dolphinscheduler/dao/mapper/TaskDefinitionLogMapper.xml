@@ -80,7 +80,7 @@
         <if test="projectCode != 0">
             and project_code = #{projectCode}
         </if>
-        order by version desc
+        order by version desc, id
     </select>
     <delete id="deleteByTaskDefinitionCodes">
         delete

@@ -53,7 +53,7 @@
         <if test="userName != null and userName != ''">
             and u.user_name = #{userName}
         </if>
-        order by log.time desc
+        order by log.time desc, log.id
     </select>
 
     <select id="queryResourceNameByType" resultType="String">

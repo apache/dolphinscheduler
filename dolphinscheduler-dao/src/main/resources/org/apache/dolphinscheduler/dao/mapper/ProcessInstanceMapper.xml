@@ -149,7 +149,7 @@
         <if test="executorName != null and executorName != ''">
             and executor_name = #{executorName}
         </if>
-        order by start_time desc, end_time desc
+        order by start_time desc, end_time desc, id
     </select>
     <update id="setFailoverByHostAndStateArray">
         update t_ds_process_instance

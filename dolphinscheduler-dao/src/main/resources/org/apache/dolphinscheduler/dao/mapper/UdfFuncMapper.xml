@@ -73,7 +73,7 @@
 <!--            select udf_id from t_ds_relation_udfs_user where user_id=#{userId}-->
 <!--            union select id as udf_id from t_ds_udfs where user_id=#{userId})-->
 <!--        </if>-->
-        order by udf.create_time desc
+        order by udf.create_time desc, udf.id
     </select>
     <select id="getUdfFuncByType" resultType="org.apache.dolphinscheduler.dao.entity.UdfFunc">
         select

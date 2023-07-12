@@ -121,7 +121,7 @@
         <if test="searchTaskName != null and searchTaskName != ''">
             and td.name like concat('%', #{searchTaskName}, '%')
         </if>
-        order by td.update_time desc
+        order by td.update_time desc, td.id
     </select>
 
     <select id="queryDefineListByCodeList" resultType="org.apache.dolphinscheduler.dao.entity.TaskMainInfo">

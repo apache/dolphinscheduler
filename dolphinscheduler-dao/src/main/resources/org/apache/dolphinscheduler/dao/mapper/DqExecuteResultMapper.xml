@@ -69,7 +69,7 @@
                 and a.rule_type = #{ruleType}
             </if>
         </where>
-        order by a.update_time desc
+        order by a.update_time desc, a.id
     </select>
 
     <select id="getExecuteResultById" resultType="org.apache.dolphinscheduler.dao.entity.DqExecuteResult">

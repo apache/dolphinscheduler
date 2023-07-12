@@ -41,7 +41,7 @@
         <if test="searchName!=null and searchName != ''">
             and name like concat('%', #{searchName}, '%')
         </if>
-        order by create_time desc
+        order by create_time desc, id
     </select>
     <select id="queryByClusterCode" resultType="org.apache.dolphinscheduler.dao.entity.Cluster">
         select

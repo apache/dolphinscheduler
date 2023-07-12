@@ -39,7 +39,7 @@
         <if test="searchVal != null and searchVal != ''">
             and p.namespace like concat('%', #{searchVal}, '%')
         </if>
-        order by p.update_time desc
+        order by p.update_time desc, p.id
     </select>
 
     <select id="existNamespace" resultType="java.lang.Boolean">

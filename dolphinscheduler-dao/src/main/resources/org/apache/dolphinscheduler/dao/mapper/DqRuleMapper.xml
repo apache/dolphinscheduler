@@ -32,6 +32,6 @@
                 and a.type = #{ruleType}
             </if>
         </where>
-        order by a.update_time desc
+        order by a.update_time desc, a.id
     </select>
 </mapper>

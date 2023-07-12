@@ -65,7 +65,7 @@
                 #{i}
             </foreach>
         </if>
-        order by t.update_time desc
+        order by t.update_time desc, t.id
     </select>
 
     <select id="queryTenantPagingByIds" resultType="org.apache.dolphinscheduler.dao.entity.Tenant">
@@ -85,7 +85,7 @@
         <if test="searchVal != null and searchVal != ''">
             and t.tenant_code like concat('%', #{searchVal}, '%')
         </if>
-        order by t.update_time desc
+        order by t.update_time desc, t.id
     </select>
 
     <select id="existTenant" resultType="java.lang.Boolean">

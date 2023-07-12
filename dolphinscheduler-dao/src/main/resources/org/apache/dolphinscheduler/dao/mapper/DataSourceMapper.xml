@@ -59,7 +59,7 @@
         <if test="name != null and name != ''">
             and name like concat ('%', #{name}, '%')
         </if>
-        order by update_time, id desc
+        order by update_time desc, id
     </select>
     <select id="queryDataSourceByName" resultType="org.apache.dolphinscheduler.dao.entity.DataSource">
         select
@@ -130,7 +130,7 @@
                 #{i}
             </foreach>
         </if>
-        order by update_time desc
+        order by update_time desc, id
     </select>
 
 </mapper>

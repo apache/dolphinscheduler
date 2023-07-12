@@ -29,7 +29,7 @@
         select
         <include refid="baseSql"/>
         from t_ds_alert_plugin_instance
-        where 1 = 1 order by update_time desc
+        order by update_time desc
     </select>
 
     <select id="queryByIds" resultType="org.apache.dolphinscheduler.dao.entity.AlertPluginInstance">
@@ -53,7 +53,7 @@
         <if test="instanceName != null and instanceName != ''">
             and instance_name like concat('%', #{instanceName}, '%')
         </if>
-        order by update_time desc
+        order by update_time desc, id
     </select>
 
     <select id="existInstanceName" resultType="java.lang.Boolean">

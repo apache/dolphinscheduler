@@ -285,7 +285,7 @@
         <if test="processInstanceName != null and processInstanceName != ''">
             and process_instance_name like concat('%', #{processInstanceName}, '%')
         </if>
-        order by submit_time desc
+        order by submit_time desc, id
     </select>
     <select id="queryStreamTaskInstanceListPaging" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
         select
@@ -322,7 +322,7 @@
         <if test="processDefinitionName != null and processDefinitionName != ''">
             and process_instance_name like concat('%', #{processDefinitionName}, '%')
         </if>
-        order by start_time desc
+        order by start_time desc, id
     </select>
     <select id="loadAllInfosNoRelease" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
         select

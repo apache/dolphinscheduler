@@ -35,7 +35,7 @@
                 #{i}
             </foreach>
         </if>
-        order by update_time desc
+        order by update_time desc, id
     </select>
     <select id="queryAllQueueList" resultType="org.apache.dolphinscheduler.dao.entity.Queue">
         select

@@ -29,7 +29,7 @@
         <if test="userId != 0">
             and t.user_id = #{userId}
         </if>
-        order by t.update_time desc
+        order by t.update_time desc, t.id
     </select>
 
     <select id="queryAccessTokenByUser" resultType="org.apache.dolphinscheduler.dao.entity.AccessToken">
