@@ -112,6 +112,10 @@ public class KubernetesApplicationManager implements ApplicationManager {
                     .inNamespace(kubernetesApplicationManagerContext.getK8sTaskExecutionContext().getNamespace())
                     .withLabel(UNIQUE_LABEL_NAME, labelValue);
             podList = watchList.list().getItems();
+            if (!CollectionUtils.isEmpty(podList)) {
+                break;
+            }
+            ThreadUtils.sleep(SLEEP_TIME_MILLIS);
             retryTimes += 1;
         }
 
@@ -193,7 +197,7 @@ public class KubernetesApplicationManager implements ApplicationManager {
         while (!podIsReady) {
             FilterWatchListDeletable<Pod, PodList, PodResource> watchList =
                     getListenPod(kubernetesApplicationManagerContext);
-            List<Pod> podList = watchList.list().getItems();
+            List<Pod> podList = watchList == null ? null : watchList.list().getItems();
             if (CollectionUtils.isEmpty(podList)) {
                 return null;
             }
