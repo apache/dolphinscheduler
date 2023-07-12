@@ -22,6 +22,7 @@ import {
   getDatasourceOptionsById
 } from '@/service/modules/data-quality'
 import {
+  getDatasourceDatabasesById,
   getDatasourceTablesById,
   getDatasourceTableColumnsById
 } from '@/service/modules/data-source'
@@ -35,9 +36,11 @@ export function useRules(
   const rules = ref([])
   const ruleLoading = ref(false)
   const srcDatasourceOptions = ref([] as { label: string; value: number }[])
+  const srcDatabaseOptions = ref([] as { label: string; value: number }[])
   const srcTableOptions = ref([] as { label: string; value: number }[])
   const srcTableColumnOptions = ref([] as { label: string; value: number }[])
   const targetDatasourceOptions = ref([] as { label: string; value: number }[])
+  const targetDatabaseOptions = ref([] as { label: string; value: number }[])
   const targetTableOptions = ref([] as { label: string; value: string }[])
   const targetTableColumnOptions = ref([] as { label: string; value: number }[])
   const writerDatasourceOptions = ref([] as { label: string; value: number }[])
@@ -122,8 +125,14 @@ export function useRules(
     if (item.field === 'src_datasource_id') {
       item.options = srcDatasourceOptions
     }
+    if (item.field === 'src_database') {
+      item.options = srcDatabaseOptions
+    }
     if (item.field === 'target_datasource_id') {
       item.options = targetDatasourceOptions
+    }
+    if (item.field === 'target_database') {
+      item.options = targetDatabaseOptions
     }
     if (item.field === 'writer_datasource_id') {
       item.options = writerDatasourceOptions
@@ -159,8 +168,11 @@ export function useRules(
       const result = await getDatasourceOptionsById(value)
       srcDatasourceOptions.value = result || []
       if (reset) {
+        srcDatabaseOptions.value = []
         srcTableOptions.value = []
+        srcTableColumnOptions.value = []
         model.src_datasource_id = null
+        model.src_database = null
         model.src_table = null
         model.src_field = null
       }
@@ -170,8 +182,11 @@ export function useRules(
       const result = await getDatasourceOptionsById(value)
       targetDatasourceOptions.value = result || []
       if (reset) {
+        targetDatabaseOptions.value = []
         targetTableOptions.value = []
+        targetTableColumnOptions.value = []
         model.target_datasource_id = null
+        model.target_database = null
         model.target_table = null
         model.target_field = null
       }
@@ -186,24 +201,58 @@ export function useRules(
       return
     }
     if (field === 'src_datasource_id' && typeof value === 'number') {
-      const result = await getDatasourceTablesById(value)
-      srcTableOptions.value = result || []
+      const result = await getDatasourceDatabasesById(value)
+      srcDatabaseOptions.value = result || []
       if (reset) {
+        srcTableOptions.value = []
+        srcTableColumnOptions.value = []
+        model.src_database = null
         model.src_table = null
         model.src_field = null
       }
     }
     if (field === 'target_datasource_id' && typeof value === 'number') {
-      const result = await getDatasourceTablesById(value)
+        const result = await getDatasourceDatabasesById(value)
+        targetDatabaseOptions.value = result || []
+        if (reset) {
+            targetTableOptions.value = []
+            targetTableColumnOptions.value = []
+            model.target_database = null
+            model.target_table = null
+            model.target_field = null
+        }
+    }
+
+    if (field === 'src_database' && typeof value === 'string') {
+     const result = await getDatasourceTablesById(
+        model.src_datasource_id,
+        value
+      )
+      srcTableOptions.value = result || []
+      if (reset) {
+        srcTableColumnOptions.value = []
+        model.src_table = null
+        model.src_field = null
+      }
+    }
+
+    if (field === 'target_database' && typeof value === 'string') {
+      const result = await getDatasourceTablesById(
+        model.target_datasource_id,
+        value
+      )
       targetTableOptions.value = result || []
       if (reset) {
+        targetTableColumnOptions.value = []
         model.target_table = null
         model.target_field = null
       }
     }
+
     if (field === 'src_table' && typeof value === 'string') {
       const result = await getDatasourceTableColumnsById(
         model.src_datasource_id,
+        model.src_database,
         value
       )
       srcTableColumnOptions.value = result || []
@@ -214,6 +263,7 @@ export function useRules(
     if (field === 'target_table' && typeof value === 'string') {
       const result = await getDatasourceTableColumnsById(
         model.target_datasource_id,
+        model.target_database,
         value
       )
       targetTableColumnOptions.value = result || []

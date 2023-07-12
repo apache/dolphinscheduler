@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.data.quality.flow.batch.reader;
 
+import static org.apache.dolphinscheduler.data.quality.Constants.DATABASE;
 import static org.apache.dolphinscheduler.data.quality.Constants.DB_TABLE;
 import static org.apache.dolphinscheduler.data.quality.Constants.DOTS;
 import static org.apache.dolphinscheduler.data.quality.Constants.DRIVER;
@@ -78,7 +79,7 @@ public class JdbcReader implements BatchReader {
         DataFrameReader reader = sparkSession.read()
                 .format(JDBC)
                 .option(URL, config.getString(URL))
-                .option(DB_TABLE, config.getString(TABLE))
+                .option(DB_TABLE, config.getString(DATABASE) + "." + config.getString(TABLE))
                 .option(USER, config.getString(USER))
                 .option(PASSWORD, ParserUtils.decode(config.getString(PASSWORD)))
                 .option(DRIVER, config.getString(DRIVER));

@@ -31,11 +31,13 @@ public class DataQualityConstants {
      */
     public static final String SRC_CONNECTOR_TYPE = "src_connector_type";
     public static final String SRC_DATASOURCE_ID = "src_datasource_id";
+    public static final String SRC_DATABASE = "src_database";
     public static final String SRC_TABLE = "src_table";
     public static final String SRC_FILTER = "src_filter";
     public static final String SRC_FIELD = "src_field";
     public static final String TARGET_CONNECTOR_TYPE = "target_connector_type";
     public static final String TARGET_DATASOURCE_ID = "target_datasource_id";
+    public static final String TARGET_DATABASE = "target_database";
     public static final String TARGET_TABLE = "target_table";
     public static final String TARGET_FILTER = "target_filter";
     public static final String TARGET_FIELD = "target_field";
