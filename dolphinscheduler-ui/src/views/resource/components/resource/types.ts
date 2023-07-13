@@ -46,7 +46,14 @@ export interface IRtDisb {
 }
 
 export interface IResourceListState {
-  (type: ResourceType, searchVal?: string, fullName?: string, tenantCode?: string, pageNo?: number, pageSize?: number): any
+  (
+    type: ResourceType,
+    searchVal?: string,
+    fullName?: string,
+    tenantCode?: string,
+    pageNo?: number,
+    pageSize?: number
+  ): any
 }
 
 export interface BasicTableProps {
@@ -81,25 +88,24 @@ export interface BreadcrumbItem {
 
 export interface ICreateFileDefaultValue {
   (): {
-    pid: number,
-    type: ResourceType,
-    suffix: string,
-    fileName: string,
-    description: string,
-    content: string,
+    pid: number
+    type: ResourceType
+    suffix: string
+    fileName: string
+    description: string
+    content: string
     currentDir: string
   }
 }
 
 export interface IFolderDefaultValue {
-  ():
-    {
-      pid: number,
-      type: ResourceType,
-      name: string,
-      description: string,
-      currentDir: string
-    }
+  (): {
+    pid: number
+    type: ResourceType
+    name: string
+    description: string
+    currentDir: string
+  }
 }
 
 export interface IRenameDefaultValue {
@@ -109,20 +115,24 @@ export interface IRenameDefaultValue {
     name?: string,
     description?: string,
     user_name?: string
-  ): {fullName: string, name: string, type: ResourceType, description: string, user_name: string}
+  ): {
+    fullName: string
+    name: string
+    type: ResourceType
+    description: string
+    user_name: string
+  }
 }
 
 export interface IUploadDefaultValue {
-  ():
-    {
-      isReupload: boolean,
-      fullName: string,
-      user_name: string,
-      name: string,
-      file: string,
-      description: string,
-      type: ResourceType,
-      pid: number,
-      currentDir: string
-    }
+  (): {
+    isReupload: boolean
+    fullName: string
+    user_name: string
+    name: string
+    file: string
+    type: ResourceType
+    pid: number
+    currentDir: string
+  }
 }

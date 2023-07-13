@@ -36,7 +36,7 @@ public class SparkConstants {
     /**
      * --queue QUEUE
      */
-    public static final String SPARK_QUEUE = "--queue";
+    public static final String SPARK_YARN_QUEUE = "--queue";
 
     public static final String DEPLOY_MODE = "--deploy-mode";
 

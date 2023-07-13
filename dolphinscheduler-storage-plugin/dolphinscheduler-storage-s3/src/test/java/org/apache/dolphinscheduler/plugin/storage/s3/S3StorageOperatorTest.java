@@ -219,7 +219,6 @@ public class S3StorageOperatorTest {
     public void copy() {
         boolean isSuccess = false;
         doReturn(null).when(s3Client).copyObject(anyString(), anyString(), anyString(), anyString());
-        doNothing().when(s3Client).deleteObject(anyString(), anyString());
         try {
             isSuccess = s3StorageOperator.copy(FILE_PATH_MOCK, FILE_PATH_MOCK, false, false);
         } catch (IOException e) {
@@ -228,7 +227,6 @@ public class S3StorageOperatorTest {
 
         Assertions.assertTrue(isSuccess);
         verify(s3Client, times(1)).copyObject(anyString(), anyString(), anyString(), anyString());
-        verify(s3Client, times(1)).deleteObject(anyString(), anyString());
     }
 
     @Test

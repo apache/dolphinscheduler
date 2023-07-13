@@ -24,6 +24,7 @@ type IDataBase =
   | 'ORACLE'
   | 'SQLSERVER'
   | 'DB2'
+  | 'VERTICA'
   | 'PRESTO'
   | 'REDSHIFT'
   | 'ATHENA'
@@ -35,25 +36,26 @@ type IDataBase =
   | 'SSH'
   | 'DATABEND'
   | 'SNOWFLAKE'
+  | 'HANA'
 
 type IDataBaseLabel =
-| 'MYSQL'
-| 'POSTGRESQL'
-| 'HIVE'
-| 'SPARK'
-| 'CLICKHOUSE'
-| 'ORACLE'
-| 'SQLSERVER'
-| 'DB2'
-| 'PRESTO'
-| 'REDSHIFT'
-| 'ATHENA'
-| 'TRINO'
-| 'AZURESQL'
-| 'STARROCKS'
-| 'DAMENG'
-| 'OCEANBASE'
-| 'SSH'
+  | 'MYSQL'
+  | 'POSTGRESQL'
+  | 'HIVE'
+  | 'SPARK'
+  | 'CLICKHOUSE'
+  | 'ORACLE'
+  | 'SQLSERVER'
+  | 'DB2'
+  | 'PRESTO'
+  | 'REDSHIFT'
+  | 'ATHENA'
+  | 'TRINO'
+  | 'AZURESQL'
+  | 'STARROCKS'
+  | 'DAMENG'
+  | 'OCEANBASE'
+  | 'SSH'
 
 interface IDataSource {
   id?: number
@@ -74,8 +76,6 @@ interface IDataSource {
   database?: string
   connectType?: string
   other?: object
-  testFlag?: number
-  bindTestId?: number
   endpoint?: string
   MSIClientId?: string
   dbUser?: string

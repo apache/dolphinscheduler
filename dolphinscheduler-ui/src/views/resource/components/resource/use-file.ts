@@ -55,7 +55,6 @@ export function useFileState(
             user_name: item.userName,
             directory: item.directory,
             file_name: item.fileName,
-            description: item.description,
             size: item.size,
             create_time: item.createTime,
             update_time: item.updateTime

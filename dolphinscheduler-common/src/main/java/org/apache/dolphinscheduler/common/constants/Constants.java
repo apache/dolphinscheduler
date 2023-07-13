@@ -141,6 +141,12 @@ public final class Constants {
 
     public static final String GOOGLE_CLOUD_STORAGE_CREDENTIAL = "resource.google.cloud.storage.credential";
 
+    public static final String AZURE_BLOB_STORAGE_CONNECTION_STRING = "resource.azure.blob.storage.connection.string";
+
+    public static final String AZURE_BLOB_STORAGE_CONTAINER_NAME = "resource.azure.blob.storage.container.name";
+
+    public static final String AZURE_BLOB_STORAGE_ACCOUNT_NAME = "resource.azure.blob.storage.account.name";
+
     /**
      * fetch applicationId way
      */
@@ -844,4 +850,10 @@ public final class Constants {
     public static final String REMOTE_LOGGING_GCS_CREDENTIAL = "remote.logging.google.cloud.storage.credential";
 
     public static final String REMOTE_LOGGING_GCS_BUCKET_NAME = "remote.logging.google.cloud.storage.bucket.name";
+
+    /**
+     * data quality
+     */
+    public static final String DATABASES_QUERY = "show databases";
+    public static final String DATABASES_QUERY_PG = "SELECT datname FROM pg_database";
 }

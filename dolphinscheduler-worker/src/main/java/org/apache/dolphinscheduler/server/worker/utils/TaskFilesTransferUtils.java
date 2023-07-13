@@ -178,8 +178,7 @@ public class TaskFilesTransferUtils {
                 String resourceWholePath =
                         storageOperate.getResourceFullName(taskExecutionContext.getTenantCode(), resourcePath);
                 log.info("{} --- Remote:{} to Local:{}", property, resourceWholePath, downloadPath);
-                storageOperate.download(taskExecutionContext.getTenantCode(), resourceWholePath, downloadPath, false,
-                        true);
+                storageOperate.download(taskExecutionContext.getTenantCode(), resourceWholePath, downloadPath, true);
             } catch (IOException ex) {
                 throw new TaskException("Download file from storage error", ex);
             }

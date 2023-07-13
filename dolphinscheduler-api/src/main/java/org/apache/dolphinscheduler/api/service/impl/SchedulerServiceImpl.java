@@ -167,6 +167,15 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         executorService.checkProcessDefinitionValid(projectCode, processDefinition, processDefineCode,
                 processDefinition.getVersion());
 
+        Schedule scheduleExists =
+                scheduleMapper.queryByProcessDefinitionCode(processDefineCode);
+        if (scheduleExists != null) {
+            log.error("Schedule already exist, scheduleId:{},processDefineCode:{}", scheduleExists.getId(),
+                    processDefineCode);
+            putMsg(result, Status.SCHEDULE_ALREADY_EXISTS, processDefineCode, scheduleExists.getId());
+            return result;
+        }
+
         Schedule scheduleObj = new Schedule();
         Date now = new Date();
 
@@ -568,16 +577,20 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             return result;
         }
 
-        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefineCode);
-        if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
-            log.error("Process definition does not exist, processDefinitionCode:{}.", processDefineCode);
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(processDefineCode));
-            return result;
+        if (processDefineCode != 0) {
+            ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefineCode);
+            if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
+                log.error("Process definition does not exist, processDefinitionCode:{}.", processDefineCode);
+                putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(processDefineCode));
+                return result;
+            }
         }
 
         Page<Schedule> page = new Page<>(pageNo, pageSize);
+
         IPage<Schedule> schedulePage =
-                scheduleMapper.queryByProcessDefineCodePaging(page, processDefineCode, searchVal);
+                scheduleMapper.queryByProjectAndProcessDefineCodePaging(page, projectCode, processDefineCode,
+                        searchVal);
 
         List<ScheduleVo> scheduleList = new ArrayList<>();
         for (Schedule schedule : schedulePage.getRecords()) {

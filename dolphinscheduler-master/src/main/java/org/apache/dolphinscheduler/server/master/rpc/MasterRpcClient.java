@@ -19,26 +19,29 @@ package org.apache.dolphinscheduler.server.master.rpc;
 
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Message;
-import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class MasterRpcClient {
+public class MasterRpcClient implements AutoCloseable {
 
-    private final NettyRemotingClient client;
+    @Autowired
+    private MasterConfig masterConfig;
 
     private static final long DEFAULT_TIME_OUT_MILLS = 10_000L;
+    private NettyRemotingClient client;
 
-    public MasterRpcClient() {
-        client = new NettyRemotingClient(new NettyClientConfig());
-        log.info("Success initialized ApiServerRPCClient...");
+    public void start() {
+        client = new NettyRemotingClient(masterConfig.getMasterRpcClientConfig());
+        log.info("Success initialized MasterRPCClient...");
     }
 
     public Message sendSyncCommand(@NonNull Host host,
@@ -46,7 +49,15 @@ public class MasterRpcClient {
         return client.sendSync(host, rpcMessage, DEFAULT_TIME_OUT_MILLS);
     }
 
-    public void send(Host of, Message message) throws RemotingException {
-        client.send(of, message);
+    public void send(@NonNull Host host, @NonNull Message message) throws RemotingException {
+        client.send(host, message);
     }
+
+    @Override
+    public void close() {
+        if (client != null) {
+            client.close();
+        }
+    }
+
 }

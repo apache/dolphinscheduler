@@ -50,7 +50,7 @@ public class AppConfiguration implements WebMvcConfigurer {
     public static final String LOCALE_LANGUAGE_COOKIE = "language";
 
     @Autowired
-    private TrafficConfiguration trafficConfiguration;
+    private ApiConfig apiConfig;
 
     @Bean
     public CorsFilter corsFilter() {
@@ -90,14 +90,15 @@ public class AppConfiguration implements WebMvcConfigurer {
 
     @Bean
     public RateLimitInterceptor createRateLimitInterceptor() {
-        return new RateLimitInterceptor(trafficConfiguration);
+        return new RateLimitInterceptor(apiConfig.getTrafficControl());
     }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         // i18n
         registry.addInterceptor(localeChangeInterceptor());
-        if (trafficConfiguration.isGlobalSwitch() || trafficConfiguration.isTenantSwitch()) {
+        ApiConfig.TrafficConfiguration trafficControl = apiConfig.getTrafficControl();
+        if (trafficControl.isGlobalSwitch() || trafficControl.isTenantSwitch()) {
             registry.addInterceptor(createRateLimitInterceptor());
         }
         registry.addInterceptor(loginInterceptor())
