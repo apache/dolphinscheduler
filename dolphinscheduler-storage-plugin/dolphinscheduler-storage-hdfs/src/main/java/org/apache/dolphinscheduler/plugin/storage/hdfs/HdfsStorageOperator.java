@@ -478,7 +478,6 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
                     entity.setFileName(fileName);
                     entity.setFullName(fullName);
                     entity.setDirectory(true);
-                    entity.setDescription("");
                     entity.setUserName(tenantCode);
                     entity.setType(type);
                     entity.setSize(fileStatus.getLen());
@@ -500,7 +499,6 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
                     entity.setFileName(fileName);
                     entity.setFullName(fullName);
                     entity.setDirectory(false);
-                    entity.setDescription("");
                     entity.setUserName(tenantCode);
                     entity.setType(type);
                     entity.setSize(fileStatus.getLen());
@@ -543,7 +541,6 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
             entity.setFileName(fileName);
             entity.setFullName(fullName);
             entity.setDirectory(fileStatus.isDirectory());
-            entity.setDescription("");
             entity.setUserName(tenantCode);
             entity.setType(type);
             entity.setSize(fileStatus.getLen());
