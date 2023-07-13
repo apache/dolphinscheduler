@@ -37,6 +37,8 @@ github:
   protected_branches:
     dev:
       required_status_checks:
+        # strict means "Require branches to be up to date before merging".
+        strict: true
         contexts:
           - Build
           - Unit Test
