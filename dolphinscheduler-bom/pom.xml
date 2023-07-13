@@ -55,7 +55,7 @@
         <logback.version>1.2.11</logback.version>
         <hadoop.version>3.2.4</hadoop.version>
         <cron-utils.version>9.1.6</cron-utils.version>
-        <h2.version>2.1.210</h2.version>
+        <h2.version>2.2.220</h2.version>
         <mysql-connector.version>8.0.16</mysql-connector.version>
         <vertica-jdbc.version>12.0.4-0</vertica-jdbc.version>
         <oracle-jdbc.version>21.5.0.0</oracle-jdbc.version>
