@@ -89,6 +89,11 @@ export function formatParams(data: INodeData): {
     taskParams.condition = data.condition
     taskParams.connectTimeout = data.connectTimeout
     taskParams.socketTimeout = data.socketTimeout
+    taskParams.enableProxy = data.enableProxy
+    taskParams.proxy = data.proxy
+    taskParams.port = data.port
+    taskParams.user = data.user
+    taskParams.password = data.password
   }
 
   if (data.taskType === 'SQOOP') {

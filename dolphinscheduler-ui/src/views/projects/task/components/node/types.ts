@@ -500,6 +500,11 @@ interface INodeData
   customConfig?: boolean
   mapping_columns?: object[]
   taskExecuteType?: TaskExecuteType
+  enableProxy?: boolean
+  proxy?: string
+  port?: number
+  user?: string
+  password?: string
 }
 
 interface ITaskData

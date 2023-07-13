@@ -191,7 +191,119 @@ export function useHttp(model: { [field: string]: any }): IJsonItem[] {
       model,
       field: 'localParams',
       isSimple: true
-    })
+    }),
+    {
+      props: null,
+      field: 'enableProxy',
+      name: t('security.alarm_instance.IsEnableProxy'),
+      type: 'radio',
+
+      value: false,
+      validate: [
+        {
+          required: false,
+          message: null,
+          type: 'boolean',
+          trigger: 'blur',
+          min: null,
+          max: null
+        }
+      ],
+      emit: null,
+      options: [
+        { label: 'YES', value: true, disabled: false },
+        { label: 'NO', value: false, disabled: false }
+      ]
+    },
+    {
+      props: null,
+      field: 'proxy',
+      name: t('security.alarm_instance.Proxy'),
+      type: 'input',
+      value: null,
+      validate: [
+        {
+          required: false,
+          message: null,
+          type: 'string',
+          trigger: 'blur',
+          min: null,
+          max: null
+        }
+      ],
+      emit: null
+    },
+    {
+      props: null,
+      field: 'port',
+      name: t('security.alarm_instance.Port'),
+      type: 'input-number',
+      value: null,
+      validate: [
+        {
+          required: false,
+          message: null,
+          type: 'number',
+          trigger: 'blur',
+          min: null,
+          max: null
+        }
+      ],
+      emit: null
+    },
+    {
+      props: null,
+      field: 'user',
+      name: t('security.alarm_instance.User'),
+      type: 'input',
+      value: null,
+      validate: [
+        {
+          required: false,
+          message: null,
+          type: 'string',
+          trigger: 'blur',
+          min: null,
+          max: null
+        }
+      ],
+      emit: null
+    },
+    {
+      props: {
+        disabled: null,
+        type: 'password',
+        maxlength: null,
+        minlength: null,
+        clearable: null,
+        prefixIcon: null,
+        suffixIcon: null,
+        rows: null,
+        autosize: null,
+        autocomplete: null,
+        name: null,
+        readonly: null,
+        max: null,
+        min: null,
+        step: null,
+        resize: null,
+        autofocus: null,
+        form: null,
+        label: null,
+        tabindex: null,
+        validateEvent: null,
+        showPassword: null,
+        placeholder: '如果开启代理，则需要输入密码',
+        size: 'small'
+      },
+      field: 'password',
+      name: t('security.alarm_instance.Password'),
+      type: 'input',
+      title: t('security.alarm_instance.Password'),
+      value: null,
+      validate: null,
+      emit: null
+    }
   ]
 }
 

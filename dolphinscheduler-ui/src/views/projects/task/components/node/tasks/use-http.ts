@@ -50,7 +50,12 @@ export function useHttp({
     condition: '',
     connectTimeout: 60000,
     socketTimeout: 60000,
-    timeoutNotifyStrategy: ['WARN']
+    timeoutNotifyStrategy: ['WARN'],
+    enableProxy: false,
+    proxy: '',
+    port: null,
+    user: '',
+    password: ''
   } as INodeData)
 
   return {
