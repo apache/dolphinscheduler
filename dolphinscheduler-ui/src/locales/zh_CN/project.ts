@@ -863,4 +863,9 @@ export default {
     delete_confirm: '确定删除吗?',
     success: '成功',
   },
+  preference: {
+    edit_preference: '修改项目偏好设置',
+    preference_manage: '偏好管理',
+    success: '成功',
+  },
 }

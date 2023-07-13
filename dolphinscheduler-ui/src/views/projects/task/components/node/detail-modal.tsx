@@ -116,6 +116,13 @@ const NodeDetailModal = defineComponent({
       }
     }
 
+    const initProjectPreferences = (projectCode: number, data: ITaskData) => {
+      console.log('initProjectPreferences')
+      console.log(projectCode)
+      console.log(data)
+    }
+
+
     const initHeaderLinks = (processInstance: any, taskType?: ITaskType) => {
       headerLinks.value = [
         {
@@ -211,6 +218,7 @@ const NodeDetailModal = defineComponent({
         initHeaderLinks(props.processInstance, props.data.taskType)
         taskStore.init()
         await nextTick()
+        initProjectPreferences(props.projectCode, props.data)
         detailRef.value.value.setValues(formatModel(props.data))
       }
     )

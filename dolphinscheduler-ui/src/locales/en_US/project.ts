@@ -889,4 +889,9 @@ export default {
     delete_confirm: 'Delete?',
     success: 'Success',
   },
+  preference: {
+    edit_preference: 'Edit Preference',
+    preference_manage: 'Preference Management',
+    success: 'Success',
+  },
 }

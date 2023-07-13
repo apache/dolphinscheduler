@@ -31,6 +31,7 @@ export function formatParams(data: INodeData): {
   upstreamCodes: string
   taskDefinitionJsonObj: object
 } {
+
   const taskParams: ITaskParams = {}
   if (data.taskType === 'SUB_PROCESS' || data.taskType === 'DYNAMIC') {
     taskParams.processDefinitionCode = data.processDefinitionCode
@@ -555,6 +556,9 @@ export function formatParams(data: INodeData): {
 }
 
 export function formatModel(data: ITaskData) {
+
+  console.log('formatModel')
+  console.log(data)
   const params = {
     ...omit(data, [
       'environmentCode',
@@ -740,5 +744,6 @@ export function formatModel(data: ITaskData) {
     params.isCustomTask = data.taskParams.jobType === 'CUSTOM'
   }
 
+  console.log(params)
   return params
 }
