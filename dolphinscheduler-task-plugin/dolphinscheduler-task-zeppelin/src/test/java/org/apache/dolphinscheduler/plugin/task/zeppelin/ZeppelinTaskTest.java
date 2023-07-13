@@ -17,29 +17,21 @@
 
 package org.apache.dolphinscheduler.plugin.task.zeppelin;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
+import org.apache.dolphinscheduler.plugin.datasource.zeppelin.param.ZeppelinConnectionParam;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
-
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.zeppelin.client.NoteResult;
 import org.apache.zeppelin.client.ParagraphResult;
 import org.apache.zeppelin.client.Status;
 import org.apache.zeppelin.client.ZeppelinClient;
-
-import java.util.Map;
-
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,7 +40,11 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Map;
+
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ZeppelinTaskTest {
@@ -59,6 +55,8 @@ public class ZeppelinTaskTest {
     private static final String MOCK_REST_ENDPOINT = "localhost:8080";
     private static final String MOCK_CLONE_NOTE_ID = "3GYJR92R8";
     private static final String MOCK_PRODUCTION_DIRECTORY = "/prod/";
+    private static final String MOCK_TYPE = "ZEPPELIN";
+    private static MockedStatic<DataSourceUtils> dataSourceUtilsStaticMock = null;
     private final ObjectMapper mapper = new ObjectMapper();
 
     private ZeppelinClient zClient;
@@ -80,9 +78,15 @@ public class ZeppelinTaskTest {
 
     @BeforeEach
     public void before() throws Exception {
-        String zeppelinParameters = buildZeppelinTaskParameters();
+        String zeppelinTaskParameters = buildZeppelinTaskParameters();
         TaskExecutionContext taskExecutionContext = mock(TaskExecutionContext.class);
-        when(taskExecutionContext.getTaskParams()).thenReturn(zeppelinParameters);
+        ResourceParametersHelper resourceParametersHelper = mock(ResourceParametersHelper.class);
+        ZeppelinConnectionParam zeppelinConnectionParam = mock(ZeppelinConnectionParam.class);
+        when(taskExecutionContext.getTaskParams()).thenReturn(zeppelinTaskParameters);
+        when(taskExecutionContext.getResourceParametersHelper()).thenReturn(resourceParametersHelper);
+
+        dataSourceUtilsStaticMock = Mockito.mockStatic(DataSourceUtils.class);
+        dataSourceUtilsStaticMock.when(() -> DataSourceUtils.buildConnectionParams(Mockito.any(), Mockito.any())).thenReturn(zeppelinConnectionParam);
         this.zeppelinTask = spy(new ZeppelinTask(taskExecutionContext));
 
         this.zClient = mock(ZeppelinClient.class);
@@ -91,6 +95,11 @@ public class ZeppelinTaskTest {
         doReturn(this.zClient).when(this.zeppelinTask).getZeppelinClient();
 
         this.zeppelinTask.init();
+    }
+
+    @AfterEach
+    public void afterEach() {
+        dataSourceUtilsStaticMock.close();
     }
 
     @Test
@@ -131,9 +140,7 @@ public class ZeppelinTaskTest {
 
         this.zeppelinTask.handle(taskCallBack);
 
-        Mockito.verify(this.zClient).executeParagraph(MOCK_NOTE_ID,
-                MOCK_PARAGRAPH_ID,
-                (Map<String, String>) mapper.readValue(MOCK_PARAMETERS, Map.class));
+        Mockito.verify(this.zClient).executeParagraph(MOCK_NOTE_ID, MOCK_PARAGRAPH_ID, (Map<String, String>) mapper.readValue(MOCK_PARAMETERS, Map.class));
         Mockito.verify(this.paragraphResult).getResultInText();
         Mockito.verify(this.paragraphResult).getStatus();
         Assertions.assertEquals(EXIT_CODE_FAILURE, this.zeppelinTask.getExitStatusCode());
@@ -141,16 +148,13 @@ public class ZeppelinTaskTest {
 
     @Test
     public void testHandleWithParagraphExecutionException() throws Exception {
-        when(this.zClient.executeParagraph(any(), any(), any(Map.class)))
-                .thenThrow(new TaskException("Something wrong happens from zeppelin side"));
+        when(this.zClient.executeParagraph(any(), any(), any(Map.class))).thenThrow(new TaskException("Something wrong happens from zeppelin side"));
 
         Assertions.assertThrows(TaskException.class, () -> {
             this.zeppelinTask.handle(taskCallBack);
         });
 
-        Mockito.verify(this.zClient).executeParagraph(MOCK_NOTE_ID,
-                MOCK_PARAGRAPH_ID,
-                (Map<String, String>) mapper.readValue(MOCK_PARAMETERS, Map.class));
+        Mockito.verify(this.zClient).executeParagraph(MOCK_NOTE_ID, MOCK_PARAGRAPH_ID, (Map<String, String>) mapper.readValue(MOCK_PARAMETERS, Map.class));
         Mockito.verify(this.paragraphResult, Mockito.times(0)).getResultInText();
         Mockito.verify(this.paragraphResult, Mockito.times(0)).getStatus();
         Assertions.assertEquals(EXIT_CODE_FAILURE, this.zeppelinTask.getExitStatusCode());
@@ -158,20 +162,23 @@ public class ZeppelinTaskTest {
 
     @Test
     public void testHandleWithNoteExecutionSuccess() throws Exception {
-        String zeppelinParametersWithNoParagraphId = buildZeppelinTaskParametersWithNoParagraphId();
+        String zeppelinTaskParametersWithNoParagraphId = buildZeppelinTaskParametersWithNoParagraphId();
         TaskExecutionContext taskExecutionContext = mock(TaskExecutionContext.class);
-        when(taskExecutionContext.getTaskParams()).thenReturn(zeppelinParametersWithNoParagraphId);
+        ResourceParametersHelper resourceParametersHelper = mock(ResourceParametersHelper.class);
+        when(taskExecutionContext.getTaskParams()).thenReturn(zeppelinTaskParametersWithNoParagraphId);
+        when(taskExecutionContext.getResourceParametersHelper()).thenReturn(resourceParametersHelper);
+
         this.zeppelinTask = spy(new ZeppelinTask(taskExecutionContext));
         this.zClient = mock(ZeppelinClient.class);
         this.noteResult = mock(NoteResult.class);
         doReturn(this.zClient).when(this.zeppelinTask).getZeppelinClient();
         when(this.zClient.executeNote(any(), any(Map.class))).thenReturn(this.noteResult);
 
+
         this.zeppelinTask.init();
         this.zeppelinTask.handle(taskCallBack);
 
-        Mockito.verify(this.zClient).executeNote(MOCK_NOTE_ID,
-                (Map<String, String>) mapper.readValue(MOCK_PARAMETERS, Map.class));
+        Mockito.verify(this.zClient).executeNote(MOCK_NOTE_ID, (Map<String, String>) mapper.readValue(MOCK_PARAMETERS, Map.class));
         Mockito.verify(this.noteResult).getParagraphResultList();
         Assertions.assertEquals(EXIT_CODE_SUCCESS, this.zeppelinTask.getExitStatusCode());
     }
@@ -183,6 +190,9 @@ public class ZeppelinTaskTest {
 
         try (MockedStatic<DateUtils> mockedStaticDateUtils = Mockito.mockStatic(DateUtils.class)) {
             when(taskExecutionContext.getTaskParams()).thenReturn(zeppelinParametersWithNoParagraphId);
+            ResourceParametersHelper resourceParametersHelper = mock(ResourceParametersHelper.class);
+            when(taskExecutionContext.getResourceParametersHelper()).thenReturn(resourceParametersHelper);
+
             this.zeppelinTask = spy(new ZeppelinTask(taskExecutionContext));
 
             this.zClient = mock(ZeppelinClient.class);
@@ -194,11 +204,8 @@ public class ZeppelinTaskTest {
             this.zeppelinTask.init();
             when(DateUtils.getTimestampString()).thenReturn("123456789");
             this.zeppelinTask.handle(taskCallBack);
-            Mockito.verify(this.zClient).cloneNote(
-                    MOCK_NOTE_ID,
-                    String.format("%s%s_%s", MOCK_PRODUCTION_DIRECTORY, MOCK_NOTE_ID, "123456789"));
-            Mockito.verify(this.zClient).executeNote(MOCK_CLONE_NOTE_ID,
-                    (Map<String, String>) mapper.readValue(MOCK_PARAMETERS, Map.class));
+            Mockito.verify(this.zClient).cloneNote(MOCK_NOTE_ID, String.format("%s%s_%s", MOCK_PRODUCTION_DIRECTORY, MOCK_NOTE_ID, "123456789"));
+            Mockito.verify(this.zClient).executeNote(MOCK_CLONE_NOTE_ID, (Map<String, String>) mapper.readValue(MOCK_PARAMETERS, Map.class));
             Mockito.verify(this.noteResult).getParagraphResultList();
             Mockito.verify(this.zClient).deleteNote(MOCK_CLONE_NOTE_ID);
             Assertions.assertEquals(EXIT_CODE_SUCCESS, this.zeppelinTask.getExitStatusCode());
@@ -211,6 +218,7 @@ public class ZeppelinTaskTest {
         zeppelinParameters.setParagraphId(MOCK_PARAGRAPH_ID);
         zeppelinParameters.setRestEndpoint(MOCK_REST_ENDPOINT);
         zeppelinParameters.setParameters(MOCK_PARAMETERS);
+        zeppelinParameters.setType(MOCK_TYPE);
 
         return JSONUtils.toJsonString(zeppelinParameters);
     }
@@ -220,6 +228,7 @@ public class ZeppelinTaskTest {
         zeppelinParameters.setNoteId(MOCK_NOTE_ID);
         zeppelinParameters.setParameters(MOCK_PARAMETERS);
         zeppelinParameters.setRestEndpoint(MOCK_REST_ENDPOINT);
+        zeppelinParameters.setType(MOCK_TYPE);
 
         return JSONUtils.toJsonString(zeppelinParameters);
     }
@@ -230,6 +239,7 @@ public class ZeppelinTaskTest {
         zeppelinParameters.setParameters(MOCK_PARAMETERS);
         zeppelinParameters.setRestEndpoint(MOCK_REST_ENDPOINT);
         zeppelinParameters.setProductionNoteDirectory(MOCK_PRODUCTION_DIRECTORY);
+        zeppelinParameters.setType(MOCK_TYPE);
 
         return JSONUtils.toJsonString(zeppelinParameters);
     }
