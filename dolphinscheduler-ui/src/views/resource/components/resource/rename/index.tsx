@@ -111,15 +111,6 @@ export default defineComponent({
               class='input-name'
             />
           </NFormItem>
-          <NFormItem label={t('resource.file.description')} path='description'>
-            <NInput
-              allowInput={this.trim}
-              type='textarea'
-              v-model={[this.renameForm.description, 'value']}
-              placeholder={t('resource.file.enter_description_tips')}
-              class='input-description'
-            />
-          </NFormItem>
         </NForm>
       </Modal>
     )

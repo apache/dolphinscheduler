@@ -23,8 +23,8 @@ import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 
-import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -55,7 +55,7 @@ public class TaskStateEventHandler implements StateEventHandler {
                 "Handle task instance state event, the current task instance state {} will be changed to {}",
                 task.getState().name(), taskStateEvent.getStatus().name());
 
-        Map<Long, Integer> completeTaskMap = workflowExecuteRunnable.getCompleteTaskMap();
+        Set<Long> completeTaskSet = workflowExecuteRunnable.getCompleteTaskCodes();
         if (task.getState().isFinished()
                 && (taskStateEvent.getStatus() != null && taskStateEvent.getStatus().isRunning())) {
             String errorMessage = String.format(
@@ -67,8 +67,7 @@ public class TaskStateEventHandler implements StateEventHandler {
         }
 
         if (task.getState().isFinished()) {
-            if (completeTaskMap.containsKey(task.getTaskCode())
-                    && completeTaskMap.get(task.getTaskCode()).equals(task.getId())) {
+            if (completeTaskSet.contains(task.getTaskCode())) {
                 log.warn("The task instance is already complete, stateEvent: {}", stateEvent);
                 return true;
             }

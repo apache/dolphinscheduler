@@ -94,17 +94,55 @@ zookeeper:
     size: "20Gi"
     storageClass: "-"
 
+etcd:
+  enabled: false
+  endpoints: ""
+  namespace: "dolphinscheduler"
+  user: ""
+  passWord: ""
+  authority: ""
+  # Please create a new folder: deploy/kubernetes/dolphinscheduler/etcd-certs
+  ssl:
+    enabled: false
+    certFile: "etcd-certs/ca.crt"
+    keyCertChainFile: "etcd-certs/client.crt"
+    keyFile: "etcd-certs/client.pem"
+
 ## If exists external registry and set zookeeper.enable value to false, the external registry will be used.
 externalRegistry:
   registryPluginName: "zookeeper"
   registryServers: "127.0.0.1:2181"
+
+security:
+  authentication:
+    type: PASSWORD
+    ldap:
+      urls: ldap://ldap.forumsys.com:389/
+      basedn: dc=example,dc=com
+      username: cn=read-only-admin,dc=example,dc=com
+      password: password
+      user:
+        admin: read-only-admin
+        identityattribute: uid
+        emailattribute: mail
+        notexistaction: CREATE
+      ssl:
+        enable: false
+        # do not change this value
+        truststore: "/opt/ldapkeystore.jks"
+        # if you use macOS, please run `base64 -b 0 -i /path/to/your.jks`
+        # if you use Linux, please run `base64 -w 0 /path/to/your.jks`
+        # if you use Windows, please run `certutil -f -encode /path/to/your.jks`
+        # Then copy the base64 content to below field in one line
+        jksbase64content: ""
+        truststorepassword: ""
 
 conf:
   common:
     # user data local directory path, please make sure the directory exists and have read write permissions
     data.basedir.path: /tmp/dolphinscheduler
 
-    # resource storage type: HDFS, S3, OSS, GCS, NONE
+    # resource storage type: HDFS, S3, OSS, GCS, ABS, NONE
     resource.storage.type: S3
 
     # resource store on HDFS/S3 path, resource file will store to this base path, self configuration, please make sure the directory exists on hdfs and have read write permissions. "/dolphinscheduler" is recommended

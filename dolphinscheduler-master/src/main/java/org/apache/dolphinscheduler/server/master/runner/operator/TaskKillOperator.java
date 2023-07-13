@@ -65,7 +65,7 @@ public class TaskKillOperator implements TaskOperator {
     private void killTaskInstanceInDB(TaskInstance taskInstance) {
         taskInstance.setState(TaskExecutionStatus.KILL);
         taskInstance.setEndTime(new Date());
-        taskInstanceDao.updateTaskInstance(taskInstance);
+        taskInstanceDao.updateById(taskInstance);
     }
 
     private void killRemoteTaskInstanceInThreadPool(TaskInstance taskInstance) throws RemotingException {

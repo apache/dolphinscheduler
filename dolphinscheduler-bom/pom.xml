@@ -71,7 +71,7 @@
         <kyuubi-jdbc.version>1.7.0</kyuubi-jdbc.version>
         <commons-io.version>2.11.0</commons-io.version>
         <oshi-core.version>6.1.1</oshi-core.version>
-        <clickhouse-jdbc.version>0.3.2-patch11</clickhouse-jdbc.version>
+        <clickhouse-jdbc.version>0.4.6</clickhouse-jdbc.version>
         <databend-jdbc.version>0.0.7</databend-jdbc.version>
         <lz4-java.version>1.4.0</lz4-java.version>
         <mssql-jdbc.version>11.2.1.jre8</mssql-jdbc.version>
@@ -88,7 +88,7 @@
         <aws-sdk.version>1.12.300</aws-sdk.version>
         <aliyun-sdk-oss.version>3.15.1</aliyun-sdk-oss.version>
         <joda-time.version>2.10.13</joda-time.version>
-        <okhttp.version>3.14.9</okhttp.version>
+        <okhttp.version>4.9.3</okhttp.version>
         <json-path.version>2.7.0</json-path.version>
         <spring-cloud-dependencies.version>2021.0.3</spring-cloud-dependencies.version>
         <gson.version>2.9.1</gson.version>
@@ -113,6 +113,8 @@
         <sshd.version>2.8.0</sshd.version>
         <fabric8.client.version>6.0.0</fabric8.client.version>
         <casdoor.version>1.6.0</casdoor.version>
+        <azure-sdk-bom.version>1.2.10</azure-sdk-bom.version>
+        <protobuf.version>3.17.2</protobuf.version>
     </properties>
 
     <dependencyManagement>
@@ -701,6 +703,14 @@
             </dependency>
 
             <dependency>
+                <groupId>com.azure</groupId>
+                <artifactId>azure-sdk-bom</artifactId>
+                <version>${azure-sdk-bom.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
                 <groupId>joda-time</groupId>
                 <artifactId>joda-time</artifactId>
                 <version>${joda-time.version}</version>
@@ -878,6 +888,12 @@
                 <groupId>net.snowflake</groupId>
                 <artifactId>snowflake-jdbc</artifactId>
                 <version>${snowflake-jdbc.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.protobuf</groupId>
+                <artifactId>protobuf-java</artifactId>
+                <version>${protobuf.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
