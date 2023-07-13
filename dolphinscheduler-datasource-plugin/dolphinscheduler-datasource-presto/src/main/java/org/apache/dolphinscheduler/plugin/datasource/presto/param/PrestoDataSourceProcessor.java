@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.datasource.presto.param;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
@@ -41,6 +40,11 @@ import com.google.auto.service.AutoService;
 
 @AutoService(DataSourceProcessor.class)
 public class PrestoDataSourceProcessor extends AbstractDataSourceProcessor {
+
+    private static final String JDBC_PRESTO = "jdbc:presto://";
+    private static final String COM_PRESTO_JDBC_DRIVER = "com.facebook.presto.jdbc.PrestoDriver";
+    private static final String PRESTO_VALIDATION_QUERY = "select 1";
+
 
     @Override
     public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
@@ -68,7 +72,7 @@ public class PrestoDataSourceProcessor extends AbstractDataSourceProcessor {
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
         PrestoDataSourceParamDTO prestoParam = (PrestoDataSourceParamDTO) datasourceParam;
         String address =
-                String.format("%s%s:%s", DataSourceConstants.JDBC_PRESTO, prestoParam.getHost(), prestoParam.getPort());
+                String.format("%s%s:%s", JDBC_PRESTO, prestoParam.getHost(), prestoParam.getPort());
         String jdbcUrl = address + "/" + prestoParam.getDatabase();
 
         PrestoConnectionParam prestoConnectionParam = new PrestoConnectionParam();
@@ -91,12 +95,12 @@ public class PrestoDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return DataSourceConstants.COM_PRESTO_JDBC_DRIVER;
+        return COM_PRESTO_JDBC_DRIVER;
     }
 
     @Override
     public String getValidationQuery() {
-        return DataSourceConstants.PRESTO_VALIDATION_QUERY;
+        return PRESTO_VALIDATION_QUERY;
     }
 
     @Override

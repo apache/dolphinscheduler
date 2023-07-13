@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.kyuubi.param;
 
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
@@ -123,11 +122,6 @@ public class KyuubiDataSourceProcessorTest {
         Assertions.assertEquals("default", kyuubiDataSourceParamDTO.getUserName());
     }
 
-    @Test
-    public void testGetDatasourceDriver() {
-        Assertions.assertEquals(DataSourceConstants.ORG_APACHE_KYUUBI_JDBC_DRIVER,
-                kyuubiDatasourceProcessor.getDatasourceDriver());
-    }
 
     @Test
     public void testGetJdbcUrl() {
@@ -150,12 +144,6 @@ public class KyuubiDataSourceProcessorTest {
     @Test
     public void testGetDbType() {
         Assertions.assertEquals(DbType.KYUUBI, kyuubiDatasourceProcessor.getDbType());
-    }
-
-    @Test
-    public void testGetValidationQuery() {
-        Assertions.assertEquals(DataSourceConstants.KYUUBI_VALIDATION_QUERY,
-                kyuubiDatasourceProcessor.getValidationQuery());
     }
 
     @Test

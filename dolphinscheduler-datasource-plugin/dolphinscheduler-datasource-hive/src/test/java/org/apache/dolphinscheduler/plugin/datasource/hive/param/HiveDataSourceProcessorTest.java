@@ -71,12 +71,6 @@ public class HiveDataSourceProcessorTest {
     }
 
     @Test
-    public void testGetDatasourceDriver() {
-        Assertions.assertEquals(DataSourceConstants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER,
-                hiveDatasourceProcessor.getDatasourceDriver());
-    }
-
-    @Test
     public void testGetJdbcUrl() {
         HiveConnectionParam connectionParam = new HiveConnectionParam();
         connectionParam.setJdbcUrl("jdbc:hive2://localhost1:5142,localhost2:5142/default");
@@ -89,9 +83,4 @@ public class HiveDataSourceProcessorTest {
         Assertions.assertEquals(DbType.HIVE, hiveDatasourceProcessor.getDbType());
     }
 
-    @Test
-    public void testGetValidationQuery() {
-        Assertions.assertEquals(DataSourceConstants.HIVE_VALIDATION_QUERY,
-                hiveDatasourceProcessor.getValidationQuery());
-    }
 }

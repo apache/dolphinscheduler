@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.datasource.trino.param;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
@@ -41,6 +40,10 @@ import com.google.auto.service.AutoService;
 
 @AutoService(DataSourceProcessor.class)
 public class TrinoDataSourceProcessor extends AbstractDataSourceProcessor {
+
+    private static final String JDBC_TRINO = "jdbc:trino://";
+    private static final String TRINO_VALIDATION_QUERY = "select 1";
+    private static final String COM_TRINO_JDBC_DRIVER = "io.trino.jdbc.TrinoDriver";
 
     @Override
     public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
@@ -69,7 +72,7 @@ public class TrinoDataSourceProcessor extends AbstractDataSourceProcessor {
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
         TrinoDataSourceParamDTO TrinoParam = (TrinoDataSourceParamDTO) datasourceParam;
         String address =
-                String.format("%s%s:%s", DataSourceConstants.JDBC_TRINO, TrinoParam.getHost(), TrinoParam.getPort());
+                String.format("%s%s:%s", JDBC_TRINO, TrinoParam.getHost(), TrinoParam.getPort());
         String jdbcUrl = address + "/" + TrinoParam.getDatabase();
 
         TrinoConnectionParam TrinoConnectionParam = new TrinoConnectionParam();
@@ -92,12 +95,12 @@ public class TrinoDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return DataSourceConstants.COM_TRINO_JDBC_DRIVER;
+        return COM_TRINO_JDBC_DRIVER;
     }
 
     @Override
     public String getValidationQuery() {
-        return DataSourceConstants.TRINO_VALIDATION_QUERY;
+        return TRINO_VALIDATION_QUERY;
     }
 
     @Override

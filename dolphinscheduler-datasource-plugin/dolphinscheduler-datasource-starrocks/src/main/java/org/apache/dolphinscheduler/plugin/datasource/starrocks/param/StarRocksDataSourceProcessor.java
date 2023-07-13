@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.datasource.starrocks.param;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
@@ -45,6 +44,12 @@ import com.google.auto.service.AutoService;
 @Slf4j
 @AutoService(DataSourceProcessor.class)
 public class StarRocksDataSourceProcessor extends AbstractDataSourceProcessor {
+
+    private static final String MYSQL_VALIDATION_QUERY = "select 1";
+
+    private static final String JDBC_MYSQL = "jdbc:mysql://";
+
+    private static final String COM_MYSQL_CJ_JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
 
     private static final String ALLOW_LOAD_LOCAL_IN_FILE_NAME = "allowLoadLocalInfile";
 
@@ -83,7 +88,7 @@ public class StarRocksDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO dataSourceParam) {
         StarRocksDataSourceParamDTO starRocksDataSourceParamDTO = (StarRocksDataSourceParamDTO) dataSourceParam;
-        String address = String.format("%s%s:%s", DataSourceConstants.JDBC_MYSQL, starRocksDataSourceParamDTO.getHost(),
+        String address = String.format("%s%s:%s", JDBC_MYSQL, starRocksDataSourceParamDTO.getHost(),
                 starRocksDataSourceParamDTO.getPort());
         String jdbcUrl = String.format("%s/%s", address, starRocksDataSourceParamDTO.getDatabase());
 
@@ -107,12 +112,12 @@ public class StarRocksDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return DataSourceConstants.COM_MYSQL_CJ_JDBC_DRIVER;
+        return COM_MYSQL_CJ_JDBC_DRIVER;
     }
 
     @Override
     public String getValidationQuery() {
-        return DataSourceConstants.MYSQL_VALIDATION_QUERY;
+        return MYSQL_VALIDATION_QUERY;
     }
 
     @Override

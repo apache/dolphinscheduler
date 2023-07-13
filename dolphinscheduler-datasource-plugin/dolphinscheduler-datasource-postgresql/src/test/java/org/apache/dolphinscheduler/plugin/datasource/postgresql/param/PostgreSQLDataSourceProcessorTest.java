@@ -17,9 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.postgresql.param;
 
-import static org.apache.dolphinscheduler.common.constants.DataSourceConstants.ORG_POSTGRESQL_DRIVER;
-import static org.apache.dolphinscheduler.common.constants.DataSourceConstants.POSTGRESQL_VALIDATION_QUERY;
-
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
@@ -73,11 +70,6 @@ public class PostgreSQLDataSourceProcessorTest {
     }
 
     @Test
-    public void testGetDatasourceDriver() {
-        Assertions.assertEquals(ORG_POSTGRESQL_DRIVER, postgreSqlDatasourceProcessor.getDatasourceDriver());
-    }
-
-    @Test
     public void testGetJdbcUrl() {
         PostgreSQLConnectionParam postgreSqlConnectionParam = new PostgreSQLConnectionParam();
         postgreSqlConnectionParam.setJdbcUrl("jdbc:postgresql://localhost:3308/default");
@@ -96,9 +88,4 @@ public class PostgreSQLDataSourceProcessorTest {
         Assertions.assertEquals(DbType.POSTGRESQL, postgreSqlDatasourceProcessor.getDbType());
     }
 
-    @Test
-    public void testGetValidationQuery() {
-        Assertions.assertEquals(POSTGRESQL_VALIDATION_QUERY,
-                postgreSqlDatasourceProcessor.getValidationQuery());
-    }
 }

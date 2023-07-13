@@ -74,12 +74,6 @@ public class SparkDataSourceProcessorTest {
     }
 
     @Test
-    public void testGetDatasourceDriver() {
-        Assertions.assertEquals(DataSourceConstants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER,
-                sparkDatasourceProcessor.getDatasourceDriver());
-    }
-
-    @Test
     public void testGetJdbcUrl() {
         SparkConnectionParam sparkConnectionParam = new SparkConnectionParam();
         sparkConnectionParam.setJdbcUrl("jdbc:hive2://localhost1:1234,localhost2:1234/default");
@@ -92,9 +86,4 @@ public class SparkDataSourceProcessorTest {
         Assertions.assertEquals(DbType.SPARK, sparkDatasourceProcessor.getDbType());
     }
 
-    @Test
-    public void testGetValidationQuery() {
-        Assertions.assertEquals(DataSourceConstants.HIVE_VALIDATION_QUERY,
-                sparkDatasourceProcessor.getValidationQuery());
-    }
 }

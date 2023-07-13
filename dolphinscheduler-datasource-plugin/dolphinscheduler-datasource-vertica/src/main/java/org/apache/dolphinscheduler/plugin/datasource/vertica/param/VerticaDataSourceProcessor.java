@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.vertica.param;
 
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
@@ -38,6 +37,10 @@ import com.google.auto.service.AutoService;
 
 @AutoService(DataSourceProcessor.class)
 public class VerticaDataSourceProcessor extends AbstractDataSourceProcessor {
+
+    private static final String JDBC_VERTICA = "jdbc:vertica://";
+    private static final String VERTICA_VALIDATION_QUERY = "select 1";
+    private static final String COM_VERTICA_JDBC_DRIVER = "com.vertica.jdbc.Driver";
 
     @Override
     public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
@@ -61,7 +64,7 @@ public class VerticaDataSourceProcessor extends AbstractDataSourceProcessor {
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO dataSourceParam) {
         VerticaDataSourceParamDTO verticaDatasourceParam = (VerticaDataSourceParamDTO) dataSourceParam;
         // address format: "jdbc:vertica://VerticaHost:portNumber"
-        String address = String.format("%s%s:%s", DataSourceConstants.JDBC_VERTICA, verticaDatasourceParam.getHost(),
+        String address = String.format("%s%s:%s", JDBC_VERTICA, verticaDatasourceParam.getHost(),
                 verticaDatasourceParam.getPort());
         // jdbc format: "jdbc:vertica://VerticaHost:portNumber/databaseName"
         String jdbcUrl = String.format("%s/%s", address, verticaDatasourceParam.getDatabase());
@@ -85,12 +88,12 @@ public class VerticaDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return DataSourceConstants.COM_VERTICA_JDBC_DRIVER;
+        return COM_VERTICA_JDBC_DRIVER;
     }
 
     @Override
     public String getValidationQuery() {
-        return DataSourceConstants.VERTICA_VALIDATION_QUERY;
+        return VERTICA_VALIDATION_QUERY;
     }
 
     @Override

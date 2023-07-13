@@ -78,6 +78,10 @@ public class DataSourceUtils {
         return getDatasourceProcessor(dbType).getDatasourceDriver();
     }
 
+    public static String getValidationQuery(DbType dbType) {
+        return getDatasourceProcessor(dbType).getValidationQuery();
+    }
+
     public static BaseDataSourceParamDTO buildDatasourceParamDTO(DbType dbType, String connectionParams) {
         return getDatasourceProcessor(dbType).createDatasourceParamDTO(connectionParams);
     }

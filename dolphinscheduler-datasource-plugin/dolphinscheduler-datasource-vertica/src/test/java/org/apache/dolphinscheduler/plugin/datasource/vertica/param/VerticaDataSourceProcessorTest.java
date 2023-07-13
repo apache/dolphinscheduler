@@ -68,12 +68,6 @@ public class VerticaDataSourceProcessorTest {
     }
 
     @Test
-    public void testGetDatasourceDriver() {
-        Assertions.assertEquals(DataSourceConstants.COM_VERTICA_JDBC_DRIVER,
-                verticaDatasourceProcessor.getDatasourceDriver());
-    }
-
-    @Test
     public void testGetJdbcUrl() {
         VerticaConnectionParam verticaConnectionParam = new VerticaConnectionParam();
         verticaConnectionParam.setJdbcUrl("jdbc:vertica://localhost:5433/default");
@@ -85,12 +79,6 @@ public class VerticaDataSourceProcessorTest {
     @Test
     public void testGetDbType() {
         Assertions.assertEquals(DbType.VERTICA, verticaDatasourceProcessor.getDbType());
-    }
-
-    @Test
-    public void testGetValidationQuery() {
-        Assertions.assertEquals(DataSourceConstants.VERTICA_VALIDATION_QUERY,
-                verticaDatasourceProcessor.getValidationQuery());
     }
 
     @Test

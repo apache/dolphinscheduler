@@ -97,7 +97,7 @@ public class JDBCDataSourceProvider {
 
     protected static void loaderJdbcDriver(ClassLoader classLoader, BaseConnectionParam properties, DbType dbType) {
         String drv = StringUtils.isBlank(properties.getDriverClassName())
-                ? DataSourceUtils.getDatasourceProcessor(dbType).getDatasourceDriver()
+                ? DataSourceUtils.getDatasourceDriver(dbType)
                 : properties.getDriverClassName();
         try {
             final Class<?> clazz = Class.forName(drv, true, classLoader);

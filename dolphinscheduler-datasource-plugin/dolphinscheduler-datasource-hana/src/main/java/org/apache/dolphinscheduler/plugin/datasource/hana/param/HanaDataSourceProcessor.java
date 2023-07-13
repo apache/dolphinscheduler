@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.datasource.hana.param;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
@@ -43,6 +42,9 @@ public class HanaDataSourceProcessor extends AbstractDataSourceProcessor {
 
     private final Logger logger = LoggerFactory.getLogger(HanaDataSourceProcessor.class);
 
+    private static final String JDBC_HANA = "jdbc:sap://";
+    private static final String COM_HANA_DB_JDBC_DRIVER = "com.sap.db.jdbc.Driver";
+    private static final String HANA_VALIDATION_QUERY = "select 1";
     private static final String APPEND_PARAMS = "reconnect=true";
     @Override
     public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
@@ -67,7 +69,7 @@ public class HanaDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO dataSourceParam) {
         HanaDataSourceParamDTO hanaDatasourceParam = (HanaDataSourceParamDTO) dataSourceParam;
-        String address = String.format("%s%s:%s", DataSourceConstants.JDBC_HANA, hanaDatasourceParam.getHost(),
+        String address = String.format("%s%s:%s", JDBC_HANA, hanaDatasourceParam.getHost(),
                 hanaDatasourceParam.getPort());
         String jdbcUrl = String.format("%s?currentschema=%s", address, hanaDatasourceParam.getDatabase());
 
@@ -91,12 +93,12 @@ public class HanaDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return DataSourceConstants.COM_HANA_DB_JDBC_DRIVER;
+        return COM_HANA_DB_JDBC_DRIVER;
     }
 
     @Override
     public String getValidationQuery() {
-        return DataSourceConstants.COM_HANA_DB_JDBC_DRIVER;
+        return HANA_VALIDATION_QUERY;
     }
 
     @Override

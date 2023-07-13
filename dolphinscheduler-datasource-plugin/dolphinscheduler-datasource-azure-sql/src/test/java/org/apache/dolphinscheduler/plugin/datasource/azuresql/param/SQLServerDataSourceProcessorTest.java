@@ -73,12 +73,6 @@ public class SQLServerDataSourceProcessorTest {
     }
 
     @Test
-    public void testGetDatasourceDriver() {
-        Assertions.assertEquals(DataSourceConstants.COM_SQLSERVER_JDBC_DRIVER,
-                sqlServerDatasourceProcessor.getDatasourceDriver());
-    }
-
-    @Test
     public void testGetJdbcUrl() {
         AzureSQLConnectionParam sqlServerConnectionParam = new AzureSQLConnectionParam();
         sqlServerConnectionParam.setJdbcUrl("jdbc:sqlserver://localhost:1234;databaseName=default");
@@ -91,9 +85,4 @@ public class SQLServerDataSourceProcessorTest {
         Assertions.assertEquals(DbType.AZURESQL, sqlServerDatasourceProcessor.getDbType());
     }
 
-    @Test
-    public void testGetValidationQuery() {
-        Assertions.assertEquals(DataSourceConstants.SQLSERVER_VALIDATION_QUERY,
-                sqlServerDatasourceProcessor.getValidationQuery());
-    }
 }

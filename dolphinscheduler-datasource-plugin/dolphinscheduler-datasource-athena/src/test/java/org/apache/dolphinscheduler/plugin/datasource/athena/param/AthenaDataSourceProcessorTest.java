@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.athena.param;
 
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
@@ -70,12 +69,6 @@ public class AthenaDataSourceProcessorTest {
     }
 
     @Test
-    public void testGetDatasourceDriver() {
-        Assertions.assertEquals(DataSourceConstants.COM_ATHENA_JDBC_DRIVER,
-                this.athenaDataSourceProcessor.getDatasourceDriver());
-    }
-
-    @Test
     public void testGetJdbcUrl() {
         AthenaConnectionParam athenaConnectionParam = new AthenaConnectionParam();
         athenaConnectionParam.setJdbcUrl("jdbc:awsathena://AwsRegion=cn-north-1");
@@ -101,13 +94,6 @@ public class AthenaDataSourceProcessorTest {
     @Test
     public void testGetDbType() {
         Assertions.assertEquals(DbType.ATHENA, this.athenaDataSourceProcessor.getDbType());
-    }
-
-    @Test
-    public void testGetValidationQuery() {
-        Assertions.assertEquals(DataSourceConstants.ATHENA_VALIDATION_QUERY,
-                this.athenaDataSourceProcessor.getValidationQuery());
-
     }
 
     @Test

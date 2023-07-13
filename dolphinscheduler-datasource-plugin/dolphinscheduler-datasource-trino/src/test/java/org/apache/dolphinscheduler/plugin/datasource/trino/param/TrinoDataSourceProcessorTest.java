@@ -68,12 +68,6 @@ public class TrinoDataSourceProcessorTest {
     }
 
     @Test
-    public void testGetDatasourceDriver() {
-        Assertions.assertEquals(DataSourceConstants.COM_TRINO_JDBC_DRIVER,
-                TrinoDatasourceProcessor.getDatasourceDriver());
-    }
-
-    @Test
     public void testGetJdbcUrl() {
         TrinoConnectionParam TrinoConnectionParam = new TrinoConnectionParam();
         TrinoConnectionParam.setJdbcUrl("jdbc:postgresql://localhost:8080/default");
@@ -87,9 +81,4 @@ public class TrinoDataSourceProcessorTest {
         Assertions.assertEquals(DbType.TRINO, TrinoDatasourceProcessor.getDbType());
     }
 
-    @Test
-    public void testGetValidationQuery() {
-        Assertions.assertEquals(DataSourceConstants.TRINO_VALIDATION_QUERY,
-                TrinoDatasourceProcessor.getValidationQuery());
-    }
 }

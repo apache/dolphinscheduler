@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.datasource.sqlserver.param;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
@@ -39,6 +38,10 @@ import com.google.auto.service.AutoService;
 
 @AutoService(DataSourceProcessor.class)
 public class SQLServerDataSourceProcessor extends AbstractDataSourceProcessor {
+
+    private static final String JDBC_SQLSERVER = "jdbc:sqlserver://";
+    private static final String COM_SQLSERVER_JDBC_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
+    private static final String SQLSERVER_VALIDATION_QUERY = "select 1";
 
     @Override
     public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
@@ -64,7 +67,7 @@ public class SQLServerDataSourceProcessor extends AbstractDataSourceProcessor {
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
         SQLServerDataSourceParamDTO sqlServerParam = (SQLServerDataSourceParamDTO) datasourceParam;
         String address =
-                String.format("%s%s:%s", DataSourceConstants.JDBC_SQLSERVER, sqlServerParam.getHost(),
+                String.format("%s%s:%s", JDBC_SQLSERVER, sqlServerParam.getHost(),
                         sqlServerParam.getPort());
         String jdbcUrl = address + ";databaseName=" + sqlServerParam.getDatabase();
 
@@ -87,12 +90,12 @@ public class SQLServerDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return DataSourceConstants.COM_SQLSERVER_JDBC_DRIVER;
+        return COM_SQLSERVER_JDBC_DRIVER;
     }
 
     @Override
     public String getValidationQuery() {
-        return DataSourceConstants.SQLSERVER_VALIDATION_QUERY;
+        return SQLSERVER_VALIDATION_QUERY;
     }
 
     @Override

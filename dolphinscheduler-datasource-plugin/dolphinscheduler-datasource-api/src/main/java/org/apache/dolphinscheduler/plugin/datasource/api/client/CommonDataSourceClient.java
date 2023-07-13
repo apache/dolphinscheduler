@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.datasource.api.client;
 
 import org.apache.dolphinscheduler.plugin.datasource.api.provider.JDBCDataSourceProvider;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
 import org.apache.dolphinscheduler.spi.enums.DbType;
@@ -39,13 +40,14 @@ import com.zaxxer.hikari.HikariDataSource;
 public class CommonDataSourceClient implements DataSourceClient {
 
     public static final String COMMON_USER = "root";
-    public static final String COMMON_VALIDATION_QUERY = "select 1";
 
+    protected final DbType dbType;
     protected final BaseConnectionParam baseConnectionParam;
     protected HikariDataSource dataSource;
     protected JdbcTemplate jdbcTemplate;
 
     public CommonDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+        this.dbType = dbType;
         this.baseConnectionParam = baseConnectionParam;
         preInit();
         checkEnv(baseConnectionParam);
@@ -84,7 +86,7 @@ public class CommonDataSourceClient implements DataSourceClient {
     }
 
     protected void setDefaultValidationQuery(BaseConnectionParam baseConnectionParam) {
-        baseConnectionParam.setValidationQuery(COMMON_VALIDATION_QUERY);
+        baseConnectionParam.setValidationQuery(DataSourceUtils.getValidationQuery(dbType));
     }
 
     @Override

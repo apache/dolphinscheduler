@@ -71,11 +71,6 @@ public class SQLServerDataSourceProcessorTest {
         Assertions.assertEquals("root", sqlServerConnectionParam.getUser());
     }
 
-    @Test
-    public void testGetDatasourceDriver() {
-        Assertions.assertEquals(DataSourceConstants.COM_SQLSERVER_JDBC_DRIVER,
-                sqlServerDatasourceProcessor.getDatasourceDriver());
-    }
 
     @Test
     public void testGetJdbcUrl() {
@@ -90,9 +85,4 @@ public class SQLServerDataSourceProcessorTest {
         Assertions.assertEquals(DbType.SQLSERVER, sqlServerDatasourceProcessor.getDbType());
     }
 
-    @Test
-    public void testGetValidationQuery() {
-        Assertions.assertEquals(DataSourceConstants.SQLSERVER_VALIDATION_QUERY,
-                sqlServerDatasourceProcessor.getValidationQuery());
-    }
 }

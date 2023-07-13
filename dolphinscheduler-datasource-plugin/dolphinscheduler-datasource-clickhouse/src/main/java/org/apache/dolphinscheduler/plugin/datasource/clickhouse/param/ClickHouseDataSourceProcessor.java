@@ -41,6 +41,10 @@ import com.google.auto.service.AutoService;
 @AutoService(DataSourceProcessor.class)
 public class ClickHouseDataSourceProcessor extends AbstractDataSourceProcessor {
 
+    private static final String CLICKHOUSE_VALIDATION_QUERY = "select 1";
+    private static final String JDBC_CLICKHOUSE = "jdbc:clickhouse://";
+    private static final String COM_CLICKHOUSE_JDBC_DRIVER = "com.clickhouse.jdbc.ClickHouseDriver";
+
     @Override
     public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
         return JSONUtils.parseObject(paramJson, ClickHouseDataSourceParamDTO.class);
@@ -66,7 +70,7 @@ public class ClickHouseDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public ConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
         ClickHouseDataSourceParamDTO clickHouseParam = (ClickHouseDataSourceParamDTO) datasourceParam;
-        String address = String.format("%s%s:%s", DataSourceConstants.JDBC_CLICKHOUSE, clickHouseParam.getHost(),
+        String address = String.format("%s%s:%s", JDBC_CLICKHOUSE, clickHouseParam.getHost(),
                 clickHouseParam.getPort());
         String jdbcUrl = address + "/" + clickHouseParam.getDatabase();
 
@@ -89,12 +93,12 @@ public class ClickHouseDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return DataSourceConstants.COM_CLICKHOUSE_JDBC_DRIVER;
+        return COM_CLICKHOUSE_JDBC_DRIVER;
     }
 
     @Override
     public String getValidationQuery() {
-        return DataSourceConstants.CLICKHOUSE_VALIDATION_QUERY;
+        return CLICKHOUSE_VALIDATION_QUERY;
     }
 
     @Override

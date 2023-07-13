@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.databend.param;
 
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
@@ -132,12 +131,6 @@ public class DatabendDataSourceProcessorTest {
     }
 
     @Test
-    public void testGetDatasourceDriver() {
-        Assertions.assertEquals(DataSourceConstants.COM_DATABEND_JDBC_DRIVER,
-                databendDataSourceProcessor.getDatasourceDriver());
-    }
-
-    @Test
     public void testGetJdbcUrl() {
         DatabendConnectionParam connectionParam = new DatabendConnectionParam();
         connectionParam.setJdbcUrl("jdbc:databend://localhost:8000/default");
@@ -158,12 +151,6 @@ public class DatabendDataSourceProcessorTest {
     @Test
     public void testGetDbType() {
         Assertions.assertEquals(DbType.DATABEND, databendDataSourceProcessor.getDbType());
-    }
-
-    @Test
-    public void testGetValidationQuery() {
-        Assertions.assertEquals(DataSourceConstants.DATABEND_VALIDATION_QUERY,
-                databendDataSourceProcessor.getValidationQuery());
     }
 
     @Test

@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.mysql.param;
 
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
@@ -67,12 +66,6 @@ public class MySQLDataSourceProcessorTest {
     }
 
     @Test
-    public void testGetDatasourceDriver() {
-        Assertions.assertEquals(DataSourceConstants.COM_MYSQL_CJ_JDBC_DRIVER,
-                mysqlDatasourceProcessor.getDatasourceDriver());
-    }
-
-    @Test
     public void testGetJdbcUrl() {
         MySQLConnectionParam mysqlConnectionParam = new MySQLConnectionParam();
         mysqlConnectionParam.setJdbcUrl("jdbc:mysql://localhost:3306/default");
@@ -84,12 +77,6 @@ public class MySQLDataSourceProcessorTest {
     @Test
     public void testGetDbType() {
         Assertions.assertEquals(DbType.MYSQL, mysqlDatasourceProcessor.getDbType());
-    }
-
-    @Test
-    public void testGetValidationQuery() {
-        Assertions.assertEquals(DataSourceConstants.MYSQL_VALIDATION_QUERY,
-                mysqlDatasourceProcessor.getValidationQuery());
     }
 
     @Test

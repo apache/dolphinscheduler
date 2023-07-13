@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.datasource.redshift.param;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
@@ -42,6 +41,11 @@ import com.google.auto.service.AutoService;
 
 @AutoService(DataSourceProcessor.class)
 public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
+
+    private static final String JDBC_REDSHIFT = "jdbc:redshift://";
+    private static final String JDBC_REDSHIFT_IAM = "jdbc:redshift:iam://";
+    private static final String COM_REDSHIFT_JDBC_DRIVER = "com.amazon.redshift.jdbc42.Driver";
+    private static final String REDHIFT_VALIDATION_QUERY = "select 1";
 
     @Override
     public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
@@ -110,12 +114,12 @@ public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return DataSourceConstants.COM_REDSHIFT_JDBC_DRIVER;
+        return COM_REDSHIFT_JDBC_DRIVER;
     }
 
     @Override
     public String getValidationQuery() {
-        return DataSourceConstants.REDHIFT_VALIDATION_QUERY;
+        return REDHIFT_VALIDATION_QUERY;
     }
 
     @Override
@@ -164,15 +168,15 @@ public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
      */
     private String getAddress(RedshiftDataSourceParamDTO redshiftParam) {
         if (redshiftParam.getMode().equals(RedshiftAuthMode.PASSWORD)) {
-            return String.format("%s%s:%s", DataSourceConstants.JDBC_REDSHIFT, redshiftParam.getHost(),
+            return String.format("%s%s:%s", JDBC_REDSHIFT, redshiftParam.getHost(),
                     redshiftParam.getPort());
         } else if (redshiftParam.getMode().equals(RedshiftAuthMode.IAM_ACCESS_KEY)) {
             if (redshiftParam.getPort() == null) {
                 // construct IAM_ACCESS_KEY example 1 format
-                return String.format("%s%s", DataSourceConstants.JDBC_REDSHIFT_IAM, redshiftParam.getHost());
+                return String.format("%s%s", JDBC_REDSHIFT_IAM, redshiftParam.getHost());
             } else {
                 // construct IAM_ACCESS_KEY example 2 format
-                return String.format("%s%s:%s", DataSourceConstants.JDBC_REDSHIFT_IAM, redshiftParam.getHost(),
+                return String.format("%s%s:%s", JDBC_REDSHIFT_IAM, redshiftParam.getHost(),
                         redshiftParam.getPort());
             }
         }
@@ -218,7 +222,7 @@ public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
             connectionUrl = String.format("%s?%s", basic, authParams);
         }
         try {
-            Class.forName(DataSourceConstants.COM_REDSHIFT_JDBC_DRIVER);
+            Class.forName(COM_REDSHIFT_JDBC_DRIVER);
             return DriverManager.getConnection(connectionUrl);
         } catch (SQLException e) {
             throw new RuntimeException(e);

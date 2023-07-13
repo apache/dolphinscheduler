@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.datasource.kyuubi.param;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
@@ -41,6 +40,10 @@ import com.google.auto.service.AutoService;
 
 @AutoService(DataSourceProcessor.class)
 public class KyuubiDataSourceProcessor extends AbstractDataSourceProcessor {
+
+    private static final String JDBC_KYUUBI = "jdbc:kyuubi://";
+    private static final String ORG_APACHE_KYUUBI_JDBC_DRIVER = "org.apache.kyuubi.jdbc.KyuubiHiveDriver";
+    private static final String KYUUBI_VALIDATION_QUERY = "select 1";
 
     @Override
     public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
@@ -72,7 +75,7 @@ public class KyuubiDataSourceProcessor extends AbstractDataSourceProcessor {
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
         KyuubiDataSourceParamDTO kyuubiParam = (KyuubiDataSourceParamDTO) datasourceParam;
         StringBuilder address = new StringBuilder();
-        address.append(DataSourceConstants.JDBC_KYUUBI);
+        address.append(JDBC_KYUUBI);
         for (String zkHost : kyuubiParam.getHost().split(",")) {
             address.append(String.format("%s:%s,", zkHost, kyuubiParam.getPort()));
         }
@@ -98,12 +101,12 @@ public class KyuubiDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return DataSourceConstants.ORG_APACHE_KYUUBI_JDBC_DRIVER;
+        return ORG_APACHE_KYUUBI_JDBC_DRIVER;
     }
 
     @Override
     public String getValidationQuery() {
-        return DataSourceConstants.KYUUBI_VALIDATION_QUERY;
+        return KYUUBI_VALIDATION_QUERY;
     }
 
     @Override

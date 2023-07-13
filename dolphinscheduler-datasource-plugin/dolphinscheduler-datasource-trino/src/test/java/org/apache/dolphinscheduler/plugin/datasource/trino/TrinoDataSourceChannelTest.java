@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.trino;
 
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.datasource.trino.param.TrinoConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
@@ -33,9 +33,9 @@ public class TrinoDataSourceChannelTest {
     public void testCreateDataSourceClient() {
         TrinoDataSourceChannel sourceChannel = new TrinoDataSourceChannel();
         TrinoConnectionParam trinoConnectionParam = new TrinoConnectionParam();
-        trinoConnectionParam.setValidationQuery(DataSourceConstants.TRINO_VALIDATION_QUERY);
-        trinoConnectionParam.setDriverLocation(DataSourceConstants.COM_TRINO_JDBC_DRIVER);
-        trinoConnectionParam.setDriverClassName(DataSourceConstants.COM_TRINO_JDBC_DRIVER);
+        trinoConnectionParam.setValidationQuery(DataSourceUtils.getValidationQuery(DbType.TRINO));
+        trinoConnectionParam.setDriverLocation(DataSourceUtils.getDatasourceDriver(DbType.TRINO));
+        trinoConnectionParam.setDriverClassName(DataSourceUtils.getDatasourceDriver(DbType.TRINO));
         try {
             sourceChannel.createDataSourceClient(trinoConnectionParam, DbType.TRINO);
         } catch (Exception e) {

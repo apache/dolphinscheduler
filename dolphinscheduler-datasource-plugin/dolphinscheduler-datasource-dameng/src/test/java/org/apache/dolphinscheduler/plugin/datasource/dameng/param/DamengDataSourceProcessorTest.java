@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.dameng.param;
 
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
@@ -63,12 +62,6 @@ public class DamengDataSourceProcessorTest {
     }
 
     @Test
-    public void testGetDatasourceDriver() {
-        Assertions.assertEquals(DataSourceConstants.COM_DAMENG_JDBC_DRIVER,
-                damengDatasourceProcessor.getDatasourceDriver());
-    }
-
-    @Test
     public void testGetJdbcUrl() {
         DamengConnectionParam damengConnectionParam = new DamengConnectionParam();
         damengConnectionParam.setJdbcUrl("jdbc:dm://localhost:5236/PERSON");
@@ -80,12 +73,6 @@ public class DamengDataSourceProcessorTest {
     @Test
     public void testGetDbType() {
         Assertions.assertEquals(DbType.DAMENG, damengDatasourceProcessor.getDbType());
-    }
-
-    @Test
-    public void testGetValidationQuery() {
-        Assertions.assertEquals(DataSourceConstants.DAMENG_VALIDATION_QUERY,
-                damengDatasourceProcessor.getValidationQuery());
     }
 
 }

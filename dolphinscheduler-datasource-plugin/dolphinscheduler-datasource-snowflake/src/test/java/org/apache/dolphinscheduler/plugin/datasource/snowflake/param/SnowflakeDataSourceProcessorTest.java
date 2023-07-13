@@ -118,12 +118,6 @@ public class SnowflakeDataSourceProcessorTest {
     }
 
     @Test
-    public void testGetDatasourceDriver() {
-        Assertions.assertEquals(DataSourceConstants.NET_SNOWFLAKE_JDBC_DRIVER,
-                snowflakeDataSourceProcessor.getDatasourceDriver());
-    }
-
-    @Test
     public void testGetJdbcUrl() {
         SnowflakeConnectionParam connectionParam = new SnowflakeConnectionParam();
         connectionParam.setJdbcUrl("jdbc:snowflake://localhost1:5142,localhost2:5142/default");
@@ -134,12 +128,6 @@ public class SnowflakeDataSourceProcessorTest {
     @Test
     public void testGetDbType() {
         Assertions.assertEquals(DbType.SNOWFLAKE, snowflakeDataSourceProcessor.getDbType());
-    }
-
-    @Test
-    public void testGetValidationQuery() {
-        Assertions.assertEquals(DataSourceConstants.SNOWFLAKE_VALIDATION_QUERY,
-                snowflakeDataSourceProcessor.getValidationQuery());
     }
 
     @Test

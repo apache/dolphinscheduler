@@ -70,11 +70,6 @@ public class RedshiftDataSourceProcessorTest {
         Assertions.assertEquals("awsuser", connectionParams.getUser());
     }
 
-    @Test
-    public void testGetDatasourceDriver() {
-        Assertions.assertEquals(DataSourceConstants.COM_REDSHIFT_JDBC_DRIVER,
-                redshiftDatasourceProcessor.getDatasourceDriver());
-    }
 
     @Test
     public void testGetJdbcUrl() {
@@ -95,9 +90,4 @@ public class RedshiftDataSourceProcessorTest {
         Assertions.assertEquals(DbType.REDSHIFT, redshiftDatasourceProcessor.getDbType());
     }
 
-    @Test
-    public void testGetValidationQuery() {
-        Assertions.assertEquals(DataSourceConstants.REDHIFT_VALIDATION_QUERY,
-                redshiftDatasourceProcessor.getValidationQuery());
-    }
 }

@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.datasource.postgresql.param;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
@@ -41,6 +40,10 @@ import com.google.auto.service.AutoService;
 
 @AutoService(DataSourceProcessor.class)
 public class PostgreSQLDataSourceProcessor extends AbstractDataSourceProcessor {
+
+    private static final String POSTGRESQL_VALIDATION_QUERY = "select version()";
+    private static final String ORG_POSTGRESQL_DRIVER = "org.postgresql.Driver";
+    private static final String JDBC_POSTGRESQL = "jdbc:postgresql://";
 
     @Override
     public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
@@ -67,7 +70,7 @@ public class PostgreSQLDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
         PostgreSQLDataSourceParamDTO postgreSqlParam = (PostgreSQLDataSourceParamDTO) datasourceParam;
-        String address = String.format("%s%s:%s", DataSourceConstants.JDBC_POSTGRESQL, postgreSqlParam.getHost(),
+        String address = String.format("%s%s:%s", JDBC_POSTGRESQL, postgreSqlParam.getHost(),
                 postgreSqlParam.getPort());
         String jdbcUrl = String.format("%s/%s", address, postgreSqlParam.getDatabase());
 
@@ -91,12 +94,12 @@ public class PostgreSQLDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return DataSourceConstants.ORG_POSTGRESQL_DRIVER;
+        return ORG_POSTGRESQL_DRIVER;
     }
 
     @Override
     public String getValidationQuery() {
-        return DataSourceConstants.POSTGRESQL_VALIDATION_QUERY;
+        return POSTGRESQL_VALIDATION_QUERY;
     }
 
     @Override

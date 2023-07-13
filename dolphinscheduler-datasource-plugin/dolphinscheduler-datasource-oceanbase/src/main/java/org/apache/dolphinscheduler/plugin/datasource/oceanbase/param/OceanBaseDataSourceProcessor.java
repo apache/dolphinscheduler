@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.datasource.oceanbase.param;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
@@ -45,6 +44,11 @@ import com.google.auto.service.AutoService;
 @Slf4j
 @AutoService(DataSourceProcessor.class)
 public class OceanBaseDataSourceProcessor extends AbstractDataSourceProcessor {
+
+    private static final String MYSQL_VALIDATION_QUERY = "select 1";
+    private static final String ORACLE_VALIDATION_QUERY = "select 1 from dual";
+    private static final String JDBC_OCEANBASE = "jdbc:oceanbase://";
+    private static final String COM_OCEANBASE_JDBC_DRIVER = "com.oceanbase.jdbc.Driver";
 
     private static final String ALLOW_LOAD_LOCAL_IN_FILE_NAME = "allowLoadLocalInfile";
 
@@ -81,7 +85,7 @@ public class OceanBaseDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public ConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
         OceanBaseDataSourceParamDTO obDataSourceParamDTO = (OceanBaseDataSourceParamDTO) datasourceParam;
-        String address = String.format("%s%s:%s", DataSourceConstants.JDBC_OCEANBASE, obDataSourceParamDTO.getHost(),
+        String address = String.format("%s%s:%s", JDBC_OCEANBASE, obDataSourceParamDTO.getHost(),
                 obDataSourceParamDTO.getPort());
         String jdbcUrl = String.format("%s/%s", address, obDataSourceParamDTO.getDatabase());
 
@@ -105,7 +109,7 @@ public class OceanBaseDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return DataSourceConstants.COM_OCEANBASE_JDBC_DRIVER;
+        return COM_OCEANBASE_JDBC_DRIVER;
     }
 
     @Override
@@ -117,9 +121,9 @@ public class OceanBaseDataSourceProcessor extends AbstractDataSourceProcessor {
         if (compatibleMode != null) {
             switch (compatibleMode.trim().toLowerCase()) {
                 case "mysql":
-                    return DataSourceConstants.MYSQL_VALIDATION_QUERY;
+                    return MYSQL_VALIDATION_QUERY;
                 case "oracle":
-                    return DataSourceConstants.ORACLE_VALIDATION_QUERY;
+                    return ORACLE_VALIDATION_QUERY;
             }
         }
         throw new UnsupportedOperationException("Invalid compatible mode: " + compatibleMode);

@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.datasource.dameng.param;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
@@ -42,6 +41,10 @@ import com.google.auto.service.AutoService;
 
 @AutoService(DataSourceProcessor.class)
 public class DamengDataSourceProcessor extends AbstractDataSourceProcessor {
+
+    private static final String JDBC_DAMENG = "jdbc:dm://";
+    private static final String DAMENG_VALIDATION_QUERY = "select 1";
+    private static final String COM_DAMENG_JDBC_DRIVER = "dm.jdbc.driver.DmDriver";
 
     @Override
     public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
@@ -70,7 +73,7 @@ public class DamengDataSourceProcessor extends AbstractDataSourceProcessor {
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO dataSourceParam) {
         DamengDataSourceParamDTO dmDatasourceParam = (DamengDataSourceParamDTO) dataSourceParam;
         String address = String
-                .format("%s%s:%s", DataSourceConstants.JDBC_DAMENG, dmDatasourceParam.getHost(),
+                .format("%s%s:%s", JDBC_DAMENG, dmDatasourceParam.getHost(),
                         dmDatasourceParam.getPort());
         String jdbcUrl = StringUtils.isEmpty(dmDatasourceParam.getDatabase()) ? address
                 : String.format("%s/%s", address,
@@ -96,12 +99,12 @@ public class DamengDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return DataSourceConstants.COM_DAMENG_JDBC_DRIVER;
+        return COM_DAMENG_JDBC_DRIVER;
     }
 
     @Override
     public String getValidationQuery() {
-        return DataSourceConstants.DAMENG_VALIDATION_QUERY;
+        return DAMENG_VALIDATION_QUERY;
     }
 
     @Override

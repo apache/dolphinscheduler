@@ -44,6 +44,10 @@ import com.google.auto.service.AutoService;
 @AutoService(DataSourceProcessor.class)
 public class HiveDataSourceProcessor extends AbstractDataSourceProcessor {
 
+    private static final String HIVE_VALIDATION_QUERY = "select 1";
+    private static final String JDBC_HIVE_2 = "jdbc:hive2://";
+    private static final String ORG_APACHE_HIVE_JDBC_HIVE_DRIVER = "org.apache.hive.jdbc.HiveDriver";
+
     @Override
     public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
         return JSONUtils.parseObject(paramJson, HiveDataSourceParamDTO.class);
@@ -78,7 +82,7 @@ public class HiveDataSourceProcessor extends AbstractDataSourceProcessor {
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
         HiveDataSourceParamDTO hiveParam = (HiveDataSourceParamDTO) datasourceParam;
         StringBuilder address = new StringBuilder();
-        address.append(DataSourceConstants.JDBC_HIVE_2);
+        address.append(JDBC_HIVE_2);
         for (String zkHost : hiveParam.getHost().split(",")) {
             address.append(String.format("%s:%s,", zkHost, hiveParam.getPort()));
         }
@@ -111,12 +115,12 @@ public class HiveDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return DataSourceConstants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER;
+        return ORG_APACHE_HIVE_JDBC_HIVE_DRIVER;
     }
 
     @Override
     public String getValidationQuery() {
-        return DataSourceConstants.HIVE_VALIDATION_QUERY;
+        return HIVE_VALIDATION_QUERY;
     }
 
     @Override

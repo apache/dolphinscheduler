@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.datasource.oracle.param;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
@@ -42,6 +41,11 @@ import com.google.auto.service.AutoService;
 
 @AutoService(DataSourceProcessor.class)
 public class OracleDataSourceProcessor extends AbstractDataSourceProcessor {
+
+    private static final String JDBC_ORACLE_SID = "jdbc:oracle:thin:@";
+    private static final String JDBC_ORACLE_SERVICE_NAME = "jdbc:oracle:thin:@//";
+    private static final String COM_ORACLE_JDBC_DRIVER = "oracle.jdbc.OracleDriver";
+    private static final String ORACLE_VALIDATION_QUERY = "select 1 from dual";
 
     @Override
     public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
@@ -77,11 +81,11 @@ public class OracleDataSourceProcessor extends AbstractDataSourceProcessor {
         String jdbcUrl;
         if (DbConnectType.ORACLE_SID.equals(oracleParam.getConnectType())) {
             address = String.format("%s%s:%s",
-                    DataSourceConstants.JDBC_ORACLE_SID, oracleParam.getHost(), oracleParam.getPort());
+                    JDBC_ORACLE_SID, oracleParam.getHost(), oracleParam.getPort());
             jdbcUrl = address + ":" + oracleParam.getDatabase();
         } else {
             address = String.format("%s%s:%s",
-                    DataSourceConstants.JDBC_ORACLE_SERVICE_NAME, oracleParam.getHost(), oracleParam.getPort());
+                    JDBC_ORACLE_SERVICE_NAME, oracleParam.getHost(), oracleParam.getPort());
             jdbcUrl = address + "/" + oracleParam.getDatabase();
         }
 
@@ -106,12 +110,12 @@ public class OracleDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return DataSourceConstants.COM_ORACLE_JDBC_DRIVER;
+        return COM_ORACLE_JDBC_DRIVER;
     }
 
     @Override
     public String getValidationQuery() {
-        return DataSourceConstants.ORACLE_VALIDATION_QUERY;
+        return ORACLE_VALIDATION_QUERY;
     }
 
     @Override

@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.datasource.snowflake.param;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
@@ -40,6 +39,10 @@ import com.google.auto.service.AutoService;
 @AutoService(DataSourceProcessor.class)
 @Slf4j
 public class SnowflakeDatasourceProcessor extends AbstractDataSourceProcessor {
+
+    private static final String JDBC_SNOWFLAKE = "jdbc:snowflake://";
+    private static final String SNOWFLAKE_VALIDATION_QUERY = "select 1";
+    private static final String NET_SNOWFLAKE_JDBC_DRIVER = "net.snowflake.client.jdbc.SnowflakeDriver";
 
     @Override
     public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
@@ -71,7 +74,7 @@ public class SnowflakeDatasourceProcessor extends AbstractDataSourceProcessor {
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
         SnowflakeDatasourceParamDTO snowflakeParam = (SnowflakeDatasourceParamDTO) datasourceParam;
         StringBuilder address = new StringBuilder();
-        address.append(DataSourceConstants.JDBC_SNOWFLAKE);
+        address.append(JDBC_SNOWFLAKE);
         for (String zkHost : datasourceParam.getHost().split(",")) {
             address.append(String.format("%s:%s,", zkHost, datasourceParam.getPort()));
         }
@@ -95,12 +98,12 @@ public class SnowflakeDatasourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return DataSourceConstants.NET_SNOWFLAKE_JDBC_DRIVER;
+        return NET_SNOWFLAKE_JDBC_DRIVER;
     }
 
     @Override
     public String getValidationQuery() {
-        return DataSourceConstants.SNOWFLAKE_VALIDATION_QUERY;
+        return SNOWFLAKE_VALIDATION_QUERY;
     }
 
     @Override
