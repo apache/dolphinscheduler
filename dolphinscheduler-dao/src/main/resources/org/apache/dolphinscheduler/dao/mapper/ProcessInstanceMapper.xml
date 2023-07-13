@@ -356,6 +356,7 @@
           and next_process_instance_id = 0
     </update>
 
+<!-- There are some columns with the same names in both tables, we use a sub-query here to avoid ambiguity-->
     <select id="queryByTriggerCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select
         <include refid="baseSql"/>
