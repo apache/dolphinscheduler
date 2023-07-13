@@ -78,7 +78,7 @@ public class DataxTask extends AbstractTask {
     /**
      * jvm parameters
      */
-    public static final String JVM_PARAM = " --jvm=\"-Xms%sG -Xmx%sG\" ";
+    public static final String JVM_PARAM = "--jvm=\"-Xms%sG -Xmx%sG\" ";
 
     public static final String CUSTOM_PARAM = " -D%s='%s'";
     /**
