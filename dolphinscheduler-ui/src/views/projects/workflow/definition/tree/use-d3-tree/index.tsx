@@ -15,24 +15,20 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.configuration;
+import { defineComponent } from 'vue'
+import './index.scss'
 
-import java.util.HashMap;
-import java.util.Map;
+const UseTree = defineComponent({
+  name: 'D3Tree',
+  render() {
+    return (
+      <div class='tree-model'>
+        <div class='d3-tree'>
+          <svg class='tree-svg' width='100%'></svg>
+        </div>
+      </div>
+    )
+  }
+})
 
-import lombok.Data;
-
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
-
-@Data
-@Configuration
-@ConfigurationProperties(prefix = "traffic.control")
-public class TrafficConfiguration {
-
-    private boolean globalSwitch;
-    private Integer maxGlobalQpsRate = 300;
-    private boolean tenantSwitch;
-    private Integer defaultTenantQpsRate = 10;
-    private Map<String, Integer> customizeTenantQpsRate = new HashMap<>();
-}
+export default UseTree

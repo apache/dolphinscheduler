@@ -15,24 +15,36 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.configuration;
+package org.apache.dolphinscheduler.common.enums;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.stereotype.Component;
+import com.baomidou.mybatisplus.annotation.EnumValue;
 
-@Component
-@EnableConfigurationProperties
-@ConfigurationProperties(value = "audit", ignoreUnknownFields = false)
-public class AuditConfiguration {
+/**
+ * complement data in some kind of order
+ */
+public enum ExecutionOrder {
 
-    private boolean enabled;
+    /**
+     * 0 complement data in descending order
+     * 1 complement data in ascending order
+     */
+    DESC_ORDER(0, "descending order"),
+    ASC_ORDER(1, "ascending order");
 
-    public boolean getEnabled() {
-        return enabled;
+    ExecutionOrder(int code, String desc) {
+        this.code = code;
+        this.desc = desc;
     }
 
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
+    @EnumValue
+    private final int code;
+    private final String desc;
+
+    public int getCode() {
+        return code;
+    }
+
+    public String getDesc() {
+        return desc;
     }
 }

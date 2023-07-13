@@ -15,30 +15,38 @@
  * limitations under the License.
  */
 
-import { h } from 'vue'
-import { NTag } from 'naive-ui'
-
-export function renderEnvironmentalDistinctionCell(
-  testFlag: number | undefined,
-  t: Function
-) {
-  if (testFlag === 0) {
-    return h(
-      NTag,
-      { type: 'success', size: 'small' },
-      {
-        default: () => t('datasource.on_line')
+ .tree-model {
+  width: calc(100%);
+  height: calc(100vh - 300px);
+  overflow-x: scroll;
+  .d3-tree {
+    padding-left: 30px;
+    .node {
+      text {
+        font: 11px sans-serif;
+        pointer-events: none;
       }
-    )
-  } else if (testFlag === 1) {
-    return h(
-      NTag,
-      { type: 'warning', size: 'small' },
-      {
-        default: () => t('datasource.test')
+    }
+    rect {
+      cursor: pointer;
+      &.state {
+        stroke: #666;
+        shape-rendering: crispEdges;
       }
-    )
-  } else {
-    return '-'
+    }
+    path {
+      &.link{
+        fill: none;
+        stroke: #666;
+        stroke-width: 2px;
+      }
+    }
+    circle {
+      stroke: #666;
+      fill: #0097e0;
+      stroke-width: 1.5px;
+      cursor: pointer;
+    }
   }
 }
+

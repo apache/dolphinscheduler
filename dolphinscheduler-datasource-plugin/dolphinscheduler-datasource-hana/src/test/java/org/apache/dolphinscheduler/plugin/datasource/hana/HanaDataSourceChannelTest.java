@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.plugin.datasource.hana;
 
 import org.apache.dolphinscheduler.plugin.datasource.hana.param.HanaConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -185,7 +185,6 @@ const ClusterModal = defineComponent({
                   path='description'
                 >
                   <NInput
-                    allowInput={this.trim}
                     class='input-cluster-desc'
                     placeholder={t('security.cluster.cluster_description_tips')}
                     v-model={[this.model.description, 'value']}

@@ -14,24 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { useI18n } from 'vue-i18n'
+import type { IJsonItem } from '../types'
 
-package org.apache.dolphinscheduler.api.configuration;
+export function useYarnQueue(): IJsonItem {
+  const { t } = useI18n()
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-
-@ActiveProfiles("audit")
-@SpringBootTest(classes = AuditConfiguration.class)
-public class AuditConfigurationTest {
-
-    @Autowired
-    private AuditConfiguration auditConfiguration;
-
-    @Test
-    public void isAuditGlobalControlSwitch() {
-        Assertions.assertTrue(auditConfiguration.getEnabled());
-    }
+  return {
+    type: 'input',
+    field: 'yarnQueue',
+    name: t('project.node.yarn_queue'),
+    span: 12,
+    props: {
+      placeholder: t('project.node.yarn_queue_tips')
+    },
+  }
 }

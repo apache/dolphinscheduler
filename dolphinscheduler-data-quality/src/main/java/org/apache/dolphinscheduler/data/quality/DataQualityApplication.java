@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.data.quality;
 
 import static org.apache.dolphinscheduler.data.quality.Constants.SPARK_APP_NAME;
+import static org.apache.dolphinscheduler.data.quality.enums.ReaderType.HIVE;
 
 import org.apache.dolphinscheduler.data.quality.config.Config;
 import org.apache.dolphinscheduler.data.quality.config.DataQualityConfiguration;
@@ -64,9 +65,16 @@ public class DataQualityApplication {
             config.put(SPARK_APP_NAME, dataQualityConfiguration.getName());
         }
 
-        SparkRuntimeEnvironment sparkRuntimeEnvironment = new SparkRuntimeEnvironment(config);
+        boolean hiveClientSupport = dataQualityConfiguration
+                .getReaderConfigs()
+                .stream()
+                .anyMatch(line -> line.getType().equalsIgnoreCase(HIVE.name()));
+
+        SparkRuntimeEnvironment sparkRuntimeEnvironment = new SparkRuntimeEnvironment(config, hiveClientSupport);
+
         DataQualityContext dataQualityContext =
                 new DataQualityContext(sparkRuntimeEnvironment, dataQualityConfiguration);
+
         dataQualityContext.execute();
     }
 }
