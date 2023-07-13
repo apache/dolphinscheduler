@@ -80,7 +80,8 @@ public class BlockingLogicTask extends BaseSyncLogicTask<BlockingParameters> {
         boolean isBlocked = (expected == conditionResult);
         log.info("blocking opportunity: expected-->{}, actual-->{}", expected, conditionResult);
         ProcessInstance workflowInstance = processInstanceExecCacheManager
-                .getByProcessInstanceId(taskExecutionContext.getProcessInstanceId()).getProcessInstance();
+                .getByProcessInstanceId(taskExecutionContext.getProcessInstanceId()).getWorkflowExecuteContext()
+                .getWorkflowInstance();
         workflowInstance.setBlocked(isBlocked);
         if (isBlocked) {
             workflowInstance.setStateWithDesc(WorkflowExecutionStatus.READY_BLOCK, "ready block");
