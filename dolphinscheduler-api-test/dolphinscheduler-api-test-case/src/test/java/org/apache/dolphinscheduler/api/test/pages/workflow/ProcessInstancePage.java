@@ -53,77 +53,49 @@ public class ProcessInstancePage {
         return requestClient.get(url, headers, params);
     }
 
-    public HttpResponse queryProcessInstanceList(User loginUser, long projectCode, long processDefinitionCode, String scheduleTime, FailureStrategy failureStrategy, WarningType warningType) {
+    public HttpResponse queryProcessInstanceList(User loginUser, long projectCode, int pageNo, int pageSize) {
         Map<String, Object> params = new HashMap<>();
         params.put("loginUser", loginUser);
-        params.put("processDefinitionCode", processDefinitionCode);
-        params.put("scheduleTime", scheduleTime);
-        params.put("failureStrategy", failureStrategy);
-        params.put("warningType", warningType);
+        params.put("pageNo", pageNo);
+        params.put("pageSize", pageSize);
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.SESSION_ID_KEY, sessionId);
 
         RequestClient requestClient = new RequestClient();
-        String url = String.format("/projects/%s/executors/start-process-instance", projectCode);
-        return requestClient.post(url, headers, params);
-    }
-
-    public HttpResponse queryTaskListByProcessId(User loginUser, long projectCode, long processInstanceCode) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("loginUser", loginUser);
-        params.put("id", processInstanceCode);
-        Map<String, String> headers = new HashMap<>();
-        headers.put(Constants.SESSION_ID_KEY, sessionId);
-        RequestClient requestClient = new RequestClient();
-        String url = String.format("/projects/%s/executors/query-executing-workflow", projectCode);
+        String url = String.format("/projects/%s/process-instances", projectCode);
         return requestClient.get(url, headers, params);
     }
 
-    public HttpResponse updateProcessInstance(User loginUser, long projectCode, int processInstanceId, ExecuteType executeType) {
+    public HttpResponse queryTaskListByProcessId(User loginUser, long projectCode, long processInstanceId) {
         Map<String, Object> params = new HashMap<>();
         params.put("loginUser", loginUser);
-        params.put("projectCode", projectCode);
-        params.put("processInstanceId", processInstanceId);
-        params.put("executeType", executeType);
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.SESSION_ID_KEY, sessionId);
-
         RequestClient requestClient = new RequestClient();
-        String url = String.format("/projects/%s/executors/execute", projectCode);
-        return requestClient.post(url, headers, params);
+        String url = String.format("/projects/%s/process-instances/%s/tasks", projectCode, processInstanceId);
+        return requestClient.get(url, headers, params);
     }
 
-    public HttpResponse queryProcessInstanceById(User loginUser, long projectCode, long processDefinitionCode) {
+    public HttpResponse queryProcessInstanceById(User loginUser, long projectCode, long processInstanceId) {
         Map<String, Object> params = new HashMap<>();
         params.put("loginUser", loginUser);
-        params.put("processDefinitionCode", processDefinitionCode);
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.SESSION_ID_KEY, sessionId);
 
         RequestClient requestClient = new RequestClient();
-        String url = String.format("/projects/%s/executors/start-check", projectCode);
-        return requestClient.post(url, headers, params);
+        String url = String.format("/projects/%s/process-instances/%s", projectCode, processInstanceId);
+        return requestClient.get(url, headers, params);
     }
 
-    public HttpResponse deleteProcessInstanceById(User loginUser, long projectCode, int processInstanceId, String startNodeList, TaskDependType taskDependType) {
+    public HttpResponse deleteProcessInstanceById(User loginUser, long projectCode, long processInstanceId) {
         Map<String, Object> params = new HashMap<>();
         params.put("loginUser", loginUser);
-        params.put("processInstanceId", processInstanceId);
-        params.put("startNodeList", startNodeList);
-        params.put("taskDependType", taskDependType);
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.SESSION_ID_KEY, sessionId);
 
         RequestClient requestClient = new RequestClient();
-        String url = String.format("/projects/%s/executors/execute-task", projectCode);
-        return requestClient.post(url, headers, params);
+        String url = String.format("/projects/%s/process-instances/%s", projectCode, processInstanceId);
+        return requestClient.delete(url, headers, params);
     }
 
 }
-
-//    queryProcessInstanceList
-//        queryTaskListByProcessId
-//    updateProcessInstance
-//        queryProcessInstanceById
-//        deleteProcessInstanceById
-//queryProcessInstancesByTriggerCode

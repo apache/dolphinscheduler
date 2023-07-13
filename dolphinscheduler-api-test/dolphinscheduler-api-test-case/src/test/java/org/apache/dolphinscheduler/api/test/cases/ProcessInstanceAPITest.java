@@ -134,22 +134,53 @@ public class ProcessInstanceAPITest {
             log.info("use current time {} as scheduleTime", scheduleTime);
             HttpResponse startProcessInstanceResponse = executorPage.startProcessInstance(loginUser, projectCode, processDefinitionCode, scheduleTime, FailureStrategy.END, WarningType.NONE);
             Assertions.assertTrue(startProcessInstanceResponse.getBody().getSuccess());
+            // make sure process instance has completed and successfully persisted into db
+            Thread.sleep(5000);
 
             // query workflow instance by trigger code
             triggerCode = (long) startProcessInstanceResponse.getBody().getData();
             HttpResponse queryProcessInstancesByTriggerCodeResponse = processInstancePage.queryProcessInstancesByTriggerCode(loginUser, projectCode, triggerCode);
             Assertions.assertTrue(queryProcessInstancesByTriggerCodeResponse.getBody().getSuccess());
+            processInstanceId = (int) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryProcessInstancesByTriggerCodeResponse.getBody().getData()).get(0)).get("id");
         }  catch (Exception e) {
             log.error("failed", e);
             Assertions.fail();
         }
     }
 
-//    @Test
-//    @Order(2)
-//    public void testStartCheckProcessDefinition() {
-//        HttpResponse testStartCheckProcessDefinitionResponse = executorPage.startCheckProcessDefinition(loginUser, projectCode, processDefinitionCode);
-//        Assertions.assertTrue(testStartCheckProcessDefinitionResponse.getBody().getSuccess());
-//    }
+    @Test
+    @Order(2)
+    public void testQueryProcessInstanceList() {
+        HttpResponse queryProcessInstanceListResponse = processInstancePage.queryProcessInstanceList(loginUser, projectCode, 1, 10);
+        Assertions.assertTrue(queryProcessInstanceListResponse.getBody().getSuccess());
+        Assertions.assertTrue(queryProcessInstanceListResponse.getBody().getData().toString().contains("test_import"));
+    }
+
+    @Test
+    @Order(3)
+    public void testQueryTaskListByProcessId() {
+        HttpResponse queryTaskListByProcessIdResponse = processInstancePage.queryTaskListByProcessId(loginUser, projectCode, processInstanceId);
+        Assertions.assertTrue(queryTaskListByProcessIdResponse.getBody().getSuccess());
+        Assertions.assertTrue(queryTaskListByProcessIdResponse.getBody().getData().toString().contains("test_import"));
+    }
+
+    @Test
+    @Order(4)
+    public void testQueryProcessInstanceById() {
+        HttpResponse queryProcessInstanceByIdResponse = processInstancePage.queryProcessInstanceById(loginUser, projectCode, processInstanceId);
+        Assertions.assertTrue(queryProcessInstanceByIdResponse.getBody().getSuccess());
+        Assertions.assertTrue(queryProcessInstanceByIdResponse.getBody().getData().toString().contains("test_import"));
+    }
+
+    @Test
+    @Order(5)
+    public void testDeleteProcessInstanceById() {
+        HttpResponse deleteProcessInstanceByIdResponse = processInstancePage.deleteProcessInstanceById(loginUser, projectCode, processInstanceId);
+        Assertions.assertTrue(deleteProcessInstanceByIdResponse.getBody().getSuccess());
+
+        HttpResponse queryProcessInstanceListResponse = processInstancePage.queryProcessInstanceList(loginUser, projectCode, 1, 10);
+        Assertions.assertTrue(queryProcessInstanceListResponse.getBody().getSuccess());
+        Assertions.assertFalse(queryProcessInstanceListResponse.getBody().getData().toString().contains("test_import"));
+    }
 
 }
