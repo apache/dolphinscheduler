@@ -246,15 +246,12 @@ export default defineComponent({
             >
               {{
                 default: function (value: any) {
-                  // eslint-disable-next-line no-console
-                  console.log(value)
                   return (
                     <NGrid xGap={12} cols={24}>
                       <NGridItem span={9}>
                         <NInput
                           v-model:value={value.value.key}
                           placeholder={t('project.dag.key')}
-                          style='margin-right: 12px'
                         />
                       </NGridItem>
                       <NGridItem span={6}>
@@ -265,14 +262,12 @@ export default defineComponent({
                           ]}
                           v-model:value={value.value.direct}
                           defaultValue={'IN'}
-                          style='margin-right: 12px'
                         />
                       </NGridItem>
                       <NGridItem span={9}>
                         <NInput
                           v-model:value={value.value.value}
                           placeholder={t('project.dag.value')}
-                          style='margin-right: 12px'
                         />
                       </NGridItem>
                     </NGrid>
