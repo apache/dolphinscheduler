@@ -1,0 +1,110 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+on:
+  pull_request:
+  push:
+    branches:
+      - dev
+
+name: E2E-K8S
+
+concurrency:
+  group: E2E-K8S-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+
+jobs:
+  paths-filter:
+    name: E2E-K8S-Path-Filter
+    runs-on: ubuntu-latest
+    outputs:
+      not-ignore: ${{ steps.filter.outputs.not-ignore }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dorny/paths-filter@b2feaf19c27470162a626bd6fa8438ae5b263721
+        id: filter
+        with:
+          filters: |
+            not-ignore:
+              - '!(docs/**)'
+  e2e-k8s:
+    name: E2E-K8S-Execute
+    needs: paths-filter
+    if: ${{ (needs.paths-filter.outputs.not-ignore == 'true') || (github.event_name == 'push') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Build Image
+        run: |
+          ./mvnw -B clean package \
+          -Dmaven.test.skip \
+          -Dmaven.javadoc.skip \
+          -Dspotless.skip=true \
+          -Dmaven.checkstyle.skip \
+          -Dmaven.deploy.skip \
+          -Ddocker.push.skip=true \
+          -Pdocker,release -Ddocker.tag=ci \
+          -pl org.apache.dolphinscheduler:dolphinscheduler-alert-server \
+          -pl dolphinscheduler-tools \
+          -pl dolphinscheduler-api \
+          -pl dolphinscheduler-master \
+          -pl dolphinscheduler-worker -am
+      - name: Create k8s Kind Cluster
+        run: |
+          # install kubectl
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          sudo chmod +x kubectl /usr/local/bin/kubectl
+          sudo mv kubectl /usr/local/bin/kubectl
+
+          # install kind
+          curl -LO https://github.com/kubernetes-sigs/kind/releases/download/v0.20.0/kind-linux-amd64
+          sudo chmod +x kind-linux-amd64
+          sudo mv kind-linux-amd64 /usr/local/bin/kind
+          kind version
+
+          # create kind cluster
+          kind_node_image="kindest/node:v1.23.17"
+          echo "Kubernetes version: ${kind_node_image}"
+          kind create cluster --name dolphinscheduler --image ${kind_node_image}
+          kubectl version --short
+          kubectl get all --all-namespaces
+      - name: Load images
+        run: |
+          kind load docker-image apache/dolphinscheduler-master:ci --name dolphinscheduler
+          kind load docker-image apache/dolphinscheduler-worker:ci --name dolphinscheduler
+          kind load docker-image apache/dolphinscheduler-api:ci --name dolphinscheduler
+          kind load docker-image apache/dolphinscheduler-tools:ci --name dolphinscheduler
+          kind load docker-image apache/dolphinscheduler-alert-server:ci --name dolphinscheduler
+      - name: Helm install dolphinscheduler
+        working-directory: ${{ github.workspace }}/deploy/kubernetes/dolphinscheduler
+        run: |
+          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm dependency update .
+          helm upgrade --install --create-namespace -n dolphinscheduler dolphinscheduler . \
+          --set image.registry=apache --set image.tag=ci
+      - name: Wait for pods
+        run: |
+          kubectl get all -n dolphinscheduler
+          kubectl wait --for=condition=Ready pod -l app.kubernetes.io/component=alert -n dolphinscheduler --timeout=120s
+          kubectl wait --for=condition=Ready pod -l app.kubernetes.io/component=api -n dolphinscheduler --timeout=120s
+          kubectl wait --for=condition=Ready pod -l app.kubernetes.io/component=worker -n dolphinscheduler --timeout=120s
+          kubectl wait --for=condition=Ready pod -l app.kubernetes.io/component=master -n dolphinscheduler --timeout=120s
