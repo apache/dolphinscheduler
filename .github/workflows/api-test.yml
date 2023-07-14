@@ -102,6 +102,8 @@ jobs:
             class: org.apache.dolphinscheduler.api.test.cases.ExecutorAPITest
           - name: ProcessInstance
             class: org.apache.dolphinscheduler.api.test.cases.ProcessInstanceAPITest
+          - name: Resources
+            class: org.apache.dolphinscheduler.api.test.cases.ResourcesAPITest
     env:
       RECORDING_PATH: /tmp/recording-${{ matrix.case.name }}
     steps:
