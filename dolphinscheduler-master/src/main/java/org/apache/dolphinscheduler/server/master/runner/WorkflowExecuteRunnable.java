@@ -1372,7 +1372,6 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
                 if (StringUtils.isNotEmpty(taskInstanceVarPool)) {
                     Set<Property> taskProperties = new HashSet<>(JSONUtils.toList(taskInstanceVarPool, Property.class));
                     String processInstanceVarPool = processInstance.getVarPool();
-                    System.out.println(processInstanceVarPool);
                     List<Property> processGlobalParams = new ArrayList<>(JSONUtils.toList(processInstance.getGlobalParams(), Property.class));
                     Map<String, Direct> oldProcessGlobalParamsMap = processGlobalParams.stream().collect(Collectors.toMap(Property::getProp, Property::getDirect));
                     Set<Property> processVarPoolOut = taskProperties.stream().filter(property -> property.getDirect().equals(Direct.OUT) && oldProcessGlobalParamsMap.containsKey(property.getProp()) && oldProcessGlobalParamsMap.get(property.getProp()).equals(Direct.OUT))
