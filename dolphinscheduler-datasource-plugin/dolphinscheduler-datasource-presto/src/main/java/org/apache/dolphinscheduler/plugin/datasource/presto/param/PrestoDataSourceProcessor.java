@@ -45,7 +45,6 @@ public class PrestoDataSourceProcessor extends AbstractDataSourceProcessor {
     private static final String COM_PRESTO_JDBC_DRIVER = "com.facebook.presto.jdbc.PrestoDriver";
     private static final String PRESTO_VALIDATION_QUERY = "select 1";
 
-
     @Override
     public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
         return JSONUtils.parseObject(paramJson, PrestoDataSourceParamDTO.class);

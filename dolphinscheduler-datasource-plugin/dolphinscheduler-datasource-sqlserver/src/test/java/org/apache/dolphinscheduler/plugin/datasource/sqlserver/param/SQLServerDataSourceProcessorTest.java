@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.sqlserver.param;
 
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
@@ -70,7 +69,6 @@ public class SQLServerDataSourceProcessorTest {
         Assertions.assertNotNull(sqlServerConnectionParam);
         Assertions.assertEquals("root", sqlServerConnectionParam.getUser());
     }
-
 
     @Test
     public void testGetJdbcUrl() {

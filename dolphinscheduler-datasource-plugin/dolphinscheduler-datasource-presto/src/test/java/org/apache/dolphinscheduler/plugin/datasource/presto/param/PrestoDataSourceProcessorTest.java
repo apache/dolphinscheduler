@@ -66,7 +66,6 @@ public class PrestoDataSourceProcessorTest {
         Assertions.assertEquals("root", connectionParams.getUser());
     }
 
-
     @Test
     public void testGetJdbcUrl() {
         PrestoConnectionParam prestoConnectionParam = new PrestoConnectionParam();

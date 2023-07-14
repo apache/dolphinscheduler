@@ -35,6 +35,7 @@ public class OceanBaseDataSourceClient extends CommonDataSourceClient {
         OceanBaseConnectionParam connectionParam = (OceanBaseConnectionParam) baseConnectionParam;
         OceanBaseDataSourceProcessor datasourceProcessor =
                 (OceanBaseDataSourceProcessor) DataSourceUtils.getDatasourceProcessor(DbType.OCEANBASE);
-        baseConnectionParam.setValidationQuery(datasourceProcessor.getValidationQuery(connectionParam.getCompatibleMode()));
+        baseConnectionParam
+                .setValidationQuery(datasourceProcessor.getValidationQuery(connectionParam.getCompatibleMode()));
     }
 }

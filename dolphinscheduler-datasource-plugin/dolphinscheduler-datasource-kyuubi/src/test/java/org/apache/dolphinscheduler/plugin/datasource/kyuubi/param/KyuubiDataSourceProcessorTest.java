@@ -122,7 +122,6 @@ public class KyuubiDataSourceProcessorTest {
         Assertions.assertEquals("default", kyuubiDataSourceParamDTO.getUserName());
     }
 
-
     @Test
     public void testGetJdbcUrl() {
         KyuubiConnectionParam connectionParam = new KyuubiConnectionParam();
