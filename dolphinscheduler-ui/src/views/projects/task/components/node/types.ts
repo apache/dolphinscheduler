@@ -348,6 +348,7 @@ interface ITaskParams {
   hiveCliOptions?: string
   hiveSqlScript?: string
   hiveCliTaskExecutionType?: string
+  hiveCliShellType?: string
   noteId?: string
   paragraphId?: string
   condaEnvName?: string

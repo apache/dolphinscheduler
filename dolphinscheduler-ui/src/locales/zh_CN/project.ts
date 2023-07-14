@@ -704,6 +704,7 @@ export default {
     zeppelin_password: 'zeppelinPassword',
     zeppelin_password_tips: '请输入zeppelin server的登陆密码',
     hive_cli_task_execution_type: 'Hive Cli 任务类型',
+    hive_cli_shell_type: 'Hive Cli 命令类型',
     hive_sql_script: 'Hive SQL 脚本',
     hive_cli_options: 'Hive Cli 选项',
     hive_cli_options_tips: '请输入您的Hive Cli选项，如--verbose等',

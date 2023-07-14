@@ -53,6 +53,17 @@ export function useHiveCli(model: { [field: string]: any }): IJsonItem[] {
       }
     },
     {
+      type: 'select',
+      field: 'hiveCliShellType',
+      span: 12,
+      name: t('project.node.hive_cli_shell_type'),
+      options: HIVE_CLI_SHELL_TYPES,
+      validate: {
+        trigger: ['input', 'blur'],
+        required: true
+      }
+    },
+    {
       type: 'editor',
       field: 'hiveSqlScript',
       name: t('project.node.hive_sql_script'),
@@ -86,5 +97,16 @@ export const HIVE_CLI_TASK_EXECUTION_TYPES = [
   {
     label: 'FROM_FILE',
     value: 'FILE'
+  }
+]
+
+export const HIVE_CLI_SHELL_TYPES = [
+  {
+    label: 'hive',
+    value: 'HIVE'
+  },
+  {
+    label: 'beeline',
+    value: 'BEELINE'
   }
 ]

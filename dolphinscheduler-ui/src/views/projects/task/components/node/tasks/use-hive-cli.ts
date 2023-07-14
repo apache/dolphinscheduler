@@ -43,7 +43,8 @@ export function useHiveCli({
     workerGroup: 'default',
     delayTime: 0,
     timeout: 30,
-    hiveCliTaskExecutionType: 'SCRIPT'
+    hiveCliTaskExecutionType: 'SCRIPT',
+    hiveCliShellType: 'HIVE'
   } as INodeData)
 
   let extra: IJsonItem[] = []

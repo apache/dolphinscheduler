@@ -719,6 +719,7 @@ export default {
     zeppelin_password: 'zeppelinPassword',
     zeppelin_password_tips: 'Please enter the zeppelin server password',
     hive_cli_task_execution_type: 'Hive Cli Task Execution Type',
+    hive_cli_shell_type: 'Hive Cli Shell Type',
     hive_sql_script: 'Hive SQL Script',
     hive_cli_options: 'Hive Cli Options',
     hive_cli_options_tips:

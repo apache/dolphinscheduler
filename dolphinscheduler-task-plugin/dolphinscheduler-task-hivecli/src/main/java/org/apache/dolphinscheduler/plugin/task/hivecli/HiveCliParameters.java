@@ -33,6 +33,8 @@ public class HiveCliParameters extends AbstractParameters {
 
     private String hiveCliTaskExecutionType;
 
+    private String hiveCliShellType;
+
     private String hiveCliOptions;
 
     private List<ResourceInfo> resourceList;

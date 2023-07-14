@@ -439,6 +439,7 @@ export function formatParams(data: INodeData): {
 
   if (data.taskType === 'HIVECLI') {
     taskParams.hiveCliTaskExecutionType = data.hiveCliTaskExecutionType
+    taskParams.hiveCliShellType = data.hiveCliShellType
     taskParams.hiveSqlScript = data.hiveSqlScript
     taskParams.hiveCliOptions = data.hiveCliOptions
   }

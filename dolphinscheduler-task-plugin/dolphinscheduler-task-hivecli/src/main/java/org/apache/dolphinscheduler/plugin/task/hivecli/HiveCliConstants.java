@@ -26,8 +26,9 @@ public class HiveCliConstants {
 
     public static final String TYPE_FILE = "FILE";
 
+    public static final String HIVE = "HIVE";
+
     public static final String HIVE_CLI_EXECUTE_FILE = "hive -f";
 
-    public static final String HIVE_CLI_EXECUTE_SCRIPT = "hive -e \"%s\"";
-
+    public static final String BEELINE_EXECUTE_FILE = "beeline -f";
 }

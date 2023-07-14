@@ -121,6 +121,8 @@ public class HiveCliTask extends AbstractRemoteTask {
 
         final String type = hiveCliParameters.getHiveCliTaskExecutionType();
 
+        final String shellType = hiveCliParameters.getHiveCliShellType();
+
         String sqlContent = "";
         String resourceFileName = "";
         // TODO: make sure type is not unknown
@@ -148,7 +150,11 @@ public class HiveCliTask extends AbstractRemoteTask {
         log.info("HiveCli sql content: {}", sqlContent);
         String sqlFilePath = generateSqlScriptFile(sqlContent);
 
-        args.add(HiveCliConstants.HIVE_CLI_EXECUTE_FILE);
+        if (HiveCliConstants.HIVE.equals(shellType)) {
+            args.add(HiveCliConstants.HIVE_CLI_EXECUTE_FILE);
+        } else {
+            args.add(HiveCliConstants.BEELINE_EXECUTE_FILE);
+        }
         args.add(new File(sqlFilePath).getName());
         final String hiveCliOptions = hiveCliParameters.getHiveCliOptions();
         if (StringUtils.isNotEmpty(hiveCliOptions)) {
