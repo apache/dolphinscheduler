@@ -15,23 +15,20 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.configuration;
+import { defineComponent } from 'vue'
+import './index.scss'
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
+const UseTree = defineComponent({
+  name: 'D3Tree',
+  render() {
+    return (
+      <div class='tree-model'>
+        <div class='d3-tree'>
+          <svg class='tree-svg' width='100%'></svg>
+        </div>
+      </div>
+    )
+  }
+})
 
-@ActiveProfiles("audit")
-@SpringBootTest(classes = AuditConfiguration.class)
-public class AuditConfigurationTest {
-
-    @Autowired
-    private AuditConfiguration auditConfiguration;
-
-    @Test
-    public void isAuditGlobalControlSwitch() {
-        Assertions.assertTrue(auditConfiguration.getEnabled());
-    }
-}
+export default UseTree

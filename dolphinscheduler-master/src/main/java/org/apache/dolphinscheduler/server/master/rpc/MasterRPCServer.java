@@ -47,7 +47,7 @@ public class MasterRPCServer implements AutoCloseable {
     public void start() {
         log.info("Starting Master RPC Server...");
         // init remoting server
-        NettyServerConfig serverConfig = new NettyServerConfig();
+        NettyServerConfig serverConfig = masterConfig.getMasterRpcServerConfig();
         serverConfig.setListenPort(masterConfig.getListenPort());
         this.nettyRemotingServer = new NettyRemotingServer(serverConfig);
         for (MasterRpcProcessor masterRpcProcessor : masterRpcProcessors) {

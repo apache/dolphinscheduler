@@ -142,6 +142,10 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/task/datax.html',
                             },
                             {
+                                title: 'Sqoop',
+                                link: '/en-us/docs/dev/user_doc/guide/task/sqoop.html',
+                            },
+                            {
                                 title: 'Pigeon',
                                 link: '/en-us/docs/dev/user_doc/guide/task/pigeon.html',
                             },
@@ -245,6 +249,10 @@ export default {
                             {
                                 title: 'Local Parameter',
                                 link: '/en-us/docs/dev/user_doc/guide/parameter/local.html',
+                            },
+                            {
+                                title: 'Project-level Parameter',
+                                link: '/en-us/docs/dev/user_doc/guide/parameter/project-parameter.html',
                             },
                             {
                                 title: 'Parameter Context',
@@ -859,6 +867,10 @@ export default {
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/datax.html',
                             },
                             {
+                                title: 'Sqoop',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/sqoop.html',
+                            },
+                            {
                                 title: 'Pigeon',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/pigeon.html',
                             },
@@ -966,6 +978,10 @@ export default {
                             {
                                 title: '本地参数',
                                 link: '/zh-cn/docs/dev/user_doc/guide/parameter/local.html',
+                            },
+                            {
+                                title: '项目级别参数',
+                                link: '/zh-cn/docs/dev/user_doc/guide/parameter/project-parameter.html',
                             },
                             {
                                 title: '参数传递',

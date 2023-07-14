@@ -54,6 +54,7 @@ import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
 import org.apache.dolphinscheduler.server.master.runner.dispatcher.WorkerTaskDispatcher;
 import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnableFactory;
+import org.apache.dolphinscheduler.server.master.runner.execute.TaskExecutionContextFactory;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
@@ -104,6 +105,8 @@ public class StreamTaskExecuteRunnable implements Runnable {
 
     protected TaskExecuteStartMessage taskExecuteStartMessage;
 
+    protected TaskExecutionContextFactory taskExecutionContextFactory;
+
     /**
      * task event queue
      */
@@ -122,6 +125,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
                 SpringApplicationContext.getBean(StreamTaskInstanceExecCacheManager.class);
         this.taskDefinition = taskDefinition;
         this.taskExecuteStartMessage = taskExecuteStartMessage;
+        this.taskExecutionContextFactory = SpringApplicationContext.getBean(TaskExecutionContextFactory.class);
     }
 
     public TaskInstance getTaskInstance() {
@@ -337,7 +341,8 @@ public class StreamTaskExecuteRunnable implements Runnable {
         taskExecutionContext.setProcessDefineVersion(processDefinition.getVersion());
         // process instance id default 0
         taskExecutionContext.setProcessInstanceId(0);
-
+        taskExecutionContextFactory.setDataQualityTaskExecutionContext(taskExecutionContext, taskInstance, tenantCode);
+        taskExecutionContextFactory.setK8sTaskRelatedInfo(taskExecutionContext, taskInstance);
         return taskExecutionContext;
     }
 

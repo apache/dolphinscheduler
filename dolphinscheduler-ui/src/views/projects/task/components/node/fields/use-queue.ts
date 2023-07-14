@@ -14,25 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { useI18n } from 'vue-i18n'
+import type { IJsonItem } from '../types'
 
-package org.apache.dolphinscheduler.api.configuration;
+export function useYarnQueue(): IJsonItem {
+  const { t } = useI18n()
 
-import lombok.Data;
-
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
-
-@Data
-@Configuration
-@ConfigurationProperties(value = "python-gateway")
-public class PythonGatewayConfiguration {
-
-    private boolean enabled;
-    private String gatewayServerAddress;
-    private int gatewayServerPort;
-    private String pythonAddress;
-    private int pythonPort;
-    private int connectTimeout;
-    private int readTimeout;
-    private String authToken;
+  return {
+    type: 'input',
+    field: 'yarnQueue',
+    name: t('project.node.yarn_queue'),
+    span: 12,
+    props: {
+      placeholder: t('project.node.yarn_queue_tips')
+    },
+  }
 }
