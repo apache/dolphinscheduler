@@ -209,6 +209,10 @@ public class WorkflowExecuteRunnableTest {
             taskInstanceMap.put(taskInstance1.getId(), taskInstance1);
             taskInstanceMap.put(taskInstance2.getId(), taskInstance2);
 
+            Map<Long, TaskInstance> taskCodeInstanceMap = new ConcurrentHashMap<>();
+            taskCodeInstanceMap.put(taskInstance1.getTaskCode(), taskInstance1);
+            taskCodeInstanceMap.put(taskInstance2.getTaskCode(), taskInstance2);
+
             Set<Long> completeTaskSet = Sets.newConcurrentHashSet();
             completeTaskSet.add(taskInstance1.getTaskCode());
             completeTaskSet.add(taskInstance2.getTaskCode());
@@ -222,6 +226,10 @@ public class WorkflowExecuteRunnableTest {
             Field taskInstanceMapField = masterExecThreadClass.getDeclaredField("taskInstanceMap");
             taskInstanceMapField.setAccessible(true);
             taskInstanceMapField.set(workflowExecuteThread, taskInstanceMap);
+
+            Field taskCodeInstanceMapField = masterExecThreadClass.getDeclaredField("taskCodeInstanceMap");
+            taskCodeInstanceMapField.setAccessible(true);
+            taskCodeInstanceMapField.set(workflowExecuteThread, taskCodeInstanceMap);
 
             workflowExecuteThread.getPreVarPool(taskInstance, preTaskName);
             Assertions.assertNotNull(taskInstance.getVarPool());
@@ -281,6 +289,10 @@ public class WorkflowExecuteRunnableTest {
         taskInstanceMap.put(taskInstance1.getId(), taskInstance1);
         taskInstanceMap.put(taskInstance2.getId(), taskInstance2);
 
+        Map<Long, TaskInstance> taskCodeInstanceMap = new ConcurrentHashMap<>();
+        taskCodeInstanceMap.put(taskInstance1.getTaskCode(), taskInstance1);
+        taskCodeInstanceMap.put(taskInstance2.getTaskCode(), taskInstance2);
+
         Set<Long> completeTaskSet = Sets.newConcurrentHashSet();
         completeTaskSet.add(taskInstance1.getTaskCode());
         completeTaskSet.add(taskInstance2.getTaskCode());
@@ -294,6 +306,10 @@ public class WorkflowExecuteRunnableTest {
         Field taskInstanceMapField = masterExecThreadClass.getDeclaredField("taskInstanceMap");
         taskInstanceMapField.setAccessible(true);
         taskInstanceMapField.set(workflowExecuteThread, taskInstanceMap);
+
+        Field taskCodeInstanceMapField = masterExecThreadClass.getDeclaredField("taskCodeInstanceMap");
+        taskCodeInstanceMapField.setAccessible(true);
+        taskCodeInstanceMapField.set(workflowExecuteThread, taskCodeInstanceMap);
 
         Mockito.when(processInstance.getCommandType()).thenReturn(CommandType.EXECUTE_TASK);
         Mockito.when(processInstance.getId()).thenReturn(123);
