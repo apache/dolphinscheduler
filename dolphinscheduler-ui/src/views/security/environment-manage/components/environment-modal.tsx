@@ -172,7 +172,6 @@ const EnvironmentModal = defineComponent({
                   path='description'
                 >
                   <NInput
-                    allowInput={this.trim}
                     class='input-environment-desc'
                     placeholder={t(
                       'security.environment.environment_description_tips'

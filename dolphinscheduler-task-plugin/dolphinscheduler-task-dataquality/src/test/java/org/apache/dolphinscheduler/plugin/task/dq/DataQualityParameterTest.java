@@ -61,6 +61,7 @@ public class DataQualityParameterTest {
         Map<String, String> inputParameterValue = new HashMap<>();
         inputParameterValue.put("src_connector_type", "JDBC");
         inputParameterValue.put("src_datasource_id", "1");
+        inputParameterValue.put("src_database", "test");
         inputParameterValue.put("src_table", "test1");
         inputParameterValue.put("src_filter", "date=2012-10-05");
         inputParameterValue.put("src_field", "id");

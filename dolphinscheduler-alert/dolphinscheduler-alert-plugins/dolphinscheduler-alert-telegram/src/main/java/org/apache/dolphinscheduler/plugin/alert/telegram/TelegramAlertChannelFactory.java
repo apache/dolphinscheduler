@@ -25,7 +25,6 @@ import static org.apache.dolphinscheduler.common.constants.Constants.STRING_YES;
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertChannelFactory;
 import org.apache.dolphinscheduler.alert.api.AlertInputTips;
-import org.apache.dolphinscheduler.spi.params.PasswordParam;
 import org.apache.dolphinscheduler.spi.params.base.DataType;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
@@ -131,12 +130,13 @@ public final class TelegramAlertChannelFactory implements AlertChannelFactory {
                                 .build())
                         .build();
 
-        PasswordParam passwordParam = PasswordParam
+        InputParam passwordParam = InputParam
                 .newBuilder(TelegramParamsConstants.NAME_TELEGRAM_PASSWORD, TelegramParamsConstants.TELEGRAM_PASSWORD)
                 .addValidate(Validate.newBuilder()
                         .setRequired(false)
                         .build())
                 .setPlaceholder("if enable use authentication, you need input password")
+                .setType("password")
                 .build();
 
         return Arrays.asList(webHookParam, botTokenParam, chatIdParam, parseMode, isEnableProxy, proxyParam, portParam,
