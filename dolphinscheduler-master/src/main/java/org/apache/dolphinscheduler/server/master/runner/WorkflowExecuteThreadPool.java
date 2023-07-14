@@ -163,7 +163,7 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
         for (Map.Entry<ProcessInstance, TaskInstance> entry : fatherMaps.entrySet()) {
             ProcessInstance processInstance = entry.getKey();
             TaskInstance taskInstance = entry.getValue();
-            crossWorkflowParameterPassing(finishProcessInstance, processInstance, taskInstance);
+            crossWorkflowParameterPassing(finishProcessInstance, taskInstance);
             String address = NetUtils.getAddr(masterConfig.getListenPort());
             try (
                     final LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
@@ -179,7 +179,7 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
         }
     }
 
-    private void crossWorkflowParameterPassing(ProcessInstance finishProcessInstance, ProcessInstance processInstance, TaskInstance taskInstance) {
+    private void crossWorkflowParameterPassing(ProcessInstance finishProcessInstance, TaskInstance taskInstance) {
         TaskInstance oldTaskInstance = new TaskInstance();
         TaskInstanceUtils.copyTaskInstance(taskInstance, oldTaskInstance);
         try {
