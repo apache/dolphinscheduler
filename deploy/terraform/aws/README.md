@@ -7,7 +7,7 @@
 
 Set necessary variables by creating a file `ds-ami.pkrvars.hcl` and adding the following variables according to your own usage.
 
-```hcl
+```shel
 cat <<EOF > ds-ami.pkrvars.hcl
 aws_access_key = ""
 aws_secret_key = ""
@@ -17,7 +17,7 @@ aws_region     = "cn-north-1"
 ds_ami_name = "my-test-ds-2"
 
 # If you want to use the official distribution tar, just set the `ds_version` to the one you want.
-ds_version  = 3.1.1
+ds_version  = "3.1.1"
 
 # If you want to use a locally built distribution tar, set the `ds_tar` to the tar file location.
 ds_tar      = "~/workspace/dolphinscheduler/dolphinscheduler-dist/target/apache-dolphinscheduler-3.1.3-SNAPSHOT-bin.tar.gz"
@@ -50,6 +50,7 @@ Make sure `ds_ami_name` is the same as the one in `ds-ami.pkrvars.hcl` above.
 cat <<EOF > terraform.tfvars
 aws_access_key = ""
 aws_secret_key = ""
+aws_region     = ""
 
 name_prefix = "test-ds-terraform"
 ds_ami_name = "my-test-ds"

@@ -58,30 +58,6 @@ delimiter ;
 select uc_dolphin_T_t_ds_error_command_R_test_flag();
 DROP FUNCTION uc_dolphin_T_t_ds_error_command_R_test_flag();
 
--- uc_dolphin_T_t_ds_datasource_R_test_flag_bind_test_id
-delimiter ;
-DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_datasource_R_test_flag_bind_test_id();
-delimiter d//
-CREATE FUNCTION uc_dolphin_T_t_ds_datasource_R_test_flag_bind_test_id() RETURNS void AS $$
-BEGIN
-       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
-          WHERE TABLE_CATALOG=current_database()
-          AND TABLE_SCHEMA=current_schema()
-          AND TABLE_NAME='t_ds_datasource'
-          AND COLUMN_NAME ='test_flag')
-      THEN
-ALTER TABLE t_ds_datasource alter column test_flag type int;
-ALTER TABLE t_ds_datasource alter column test_flag set DEFAULT NULL;
-ALTER TABLE t_ds_datasource alter column bind_test_id type int;
-ALTER TABLE t_ds_datasource alter column bind_test_id set DEFAULT NULL;
-END IF;
-END;
-$$ LANGUAGE plpgsql;
-d//
-delimiter ;
-select uc_dolphin_T_t_ds_datasource_R_test_flag_bind_test_id();
-DROP FUNCTION uc_dolphin_T_t_ds_datasource_R_test_flag_bind_test_id();
-
 -- uc_dolphin_T_t_ds_process_instance_R_test_flag
 delimiter ;
 DROP FUNCTION IF EXISTS uc_dolphin_T_t_ds_process_instance_R_test_flag();

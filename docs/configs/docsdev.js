@@ -142,6 +142,10 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/task/datax.html',
                             },
                             {
+                                title: 'Sqoop',
+                                link: '/en-us/docs/dev/user_doc/guide/task/sqoop.html',
+                            },
+                            {
                                 title: 'Pigeon',
                                 link: '/en-us/docs/dev/user_doc/guide/task/pigeon.html',
                             },
@@ -247,6 +251,10 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/parameter/local.html',
                             },
                             {
+                                title: 'Project-level Parameter',
+                                link: '/en-us/docs/dev/user_doc/guide/parameter/project-parameter.html',
+                            },
+                            {
                                 title: 'Parameter Context',
                                 link: '/en-us/docs/dev/user_doc/guide/parameter/context.html',
                             },
@@ -347,6 +355,10 @@ export default {
                                 title: 'Databend',
                                 link: '/en-us/docs/dev/user_doc/guide/datasource/databend.html',
                             },
+                            {
+                                title: 'HANA',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/hana.html',
+                            }
                         ],
                     },
                     {
@@ -855,6 +867,10 @@ export default {
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/datax.html',
                             },
                             {
+                                title: 'Sqoop',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/sqoop.html',
+                            },
+                            {
                                 title: 'Pigeon',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/pigeon.html',
                             },
@@ -964,6 +980,10 @@ export default {
                                 link: '/zh-cn/docs/dev/user_doc/guide/parameter/local.html',
                             },
                             {
+                                title: '项目级别参数',
+                                link: '/zh-cn/docs/dev/user_doc/guide/parameter/project-parameter.html',
+                            },
+                            {
                                 title: '参数传递',
                                 link: '/zh-cn/docs/dev/user_doc/guide/parameter/context.html',
                             },
@@ -1044,6 +1064,10 @@ export default {
                                 title: 'Databend',
                                 link: '/zh-cn/docs/dev/user_doc/guide/datasource/databend.html',
                             },
+                            {
+                                title: 'HANA',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/hana.html',
+                            }
                         ],
                     },
                     {

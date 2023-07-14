@@ -283,7 +283,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
 
     @Override
     public ProcessInstance queryByWorkflowInstanceIdThrowExceptionIfNotFound(Integer workflowInstanceId) {
-        ProcessInstance processInstance = processInstanceDao.queryByWorkflowInstanceId(workflowInstanceId);
+        ProcessInstance processInstance = processInstanceDao.queryById(workflowInstanceId);
         if (processInstance == null) {
             throw new ServiceException(PROCESS_INSTANCE_NOT_EXIST, workflowInstanceId);
         }
@@ -485,7 +485,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             return result;
         }
         List<TaskInstance> taskInstanceList =
-                taskInstanceDao.findValidTaskListByProcessId(processId, processInstance.getTestFlag());
+                taskInstanceDao.queryValidTaskListByWorkflowInstanceId(processId, processInstance.getTestFlag());
         addDependResultForTaskList(loginUser, taskInstanceList);
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put(PROCESS_INSTANCE_STATE, processInstance.getState().toString());
@@ -498,7 +498,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
 
     @Override
     public List<DynamicSubWorkflowDto> queryDynamicSubWorkflowInstances(User loginUser, Integer taskId) {
-        TaskInstance taskInstance = taskInstanceDao.findTaskInstanceById(taskId);
+        TaskInstance taskInstance = taskInstanceDao.queryById(taskId);
         Map<String, Object> result = new HashMap<>();
         if (taskInstance == null) {
             putMsg(result, Status.TASK_INSTANCE_NOT_EXISTS, taskId);
@@ -516,11 +516,11 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             throw new ServiceException(Status.TASK_INSTANCE_NOT_EXISTS, taskId);
         }
         List<RelationSubWorkflow> relationSubWorkflows = relationSubWorkflowMapper
-                .queryAllSubProcessInstance(Long.valueOf(taskInstance.getProcessInstanceId()),
+                .queryAllSubProcessInstance((long) taskInstance.getProcessInstanceId(),
                         taskInstance.getTaskCode());
         List<Long> allSubProcessInstanceId = relationSubWorkflows.stream()
                 .map(RelationSubWorkflow::getSubWorkflowInstanceId).collect(java.util.stream.Collectors.toList());
-        List<ProcessInstance> allSubWorkflows = processInstanceDao.queryBatchIds(allSubProcessInstanceId);
+        List<ProcessInstance> allSubWorkflows = processInstanceDao.queryByIds(allSubProcessInstanceId);
 
         if (allSubWorkflows == null || allSubWorkflows.isEmpty()) {
             putMsg(result, Status.SUB_PROCESS_INSTANCE_NOT_EXIST, taskId);
@@ -626,7 +626,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             return result;
         }
 
-        TaskInstance taskInstance = taskInstanceDao.findTaskInstanceById(taskId);
+        TaskInstance taskInstance = taskInstanceDao.queryById(taskId);
         if (taskInstance == null) {
             log.error("Task instance does not exist, projectCode:{}, taskInstanceId{}.", projectCode, taskId);
             putMsg(result, Status.TASK_INSTANCE_NOT_EXISTS, taskId);
@@ -786,8 +786,8 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             throw new ServiceException(Status.UPDATE_PROCESS_DEFINITION_ERROR);
         }
         processInstance.setProcessDefinitionVersion(insertVersion);
-        int update = processInstanceDao.updateProcessInstance(processInstance);
-        if (update == 0) {
+        boolean update = processInstanceDao.updateById(processInstance);
+        if (!update) {
             log.error(
                     "Update process instance version error, projectCode:{}, processDefinitionCode:{}, processDefinitionVersion:{}",
                     projectCode, processDefinition.getCode(), insertVersion);

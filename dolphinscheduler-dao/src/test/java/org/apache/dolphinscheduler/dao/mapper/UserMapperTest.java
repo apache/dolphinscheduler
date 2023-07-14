@@ -213,7 +213,7 @@ public class UserMapperTest extends BaseDaoTest {
         user.setUserName("user1_update");
         user.setUserType(UserType.ADMIN_USER);
         int update = userMapper.updateById(user);
-        Assertions.assertEquals(update, 1);
+        Assertions.assertEquals(1, update);
     }
 
     /**
@@ -225,7 +225,7 @@ public class UserMapperTest extends BaseDaoTest {
         User user = insertOne();
         // delete
         int delete = userMapper.deleteById(user.getId());
-        Assertions.assertEquals(delete, 1);
+        Assertions.assertEquals(1, delete);
     }
 
     /**
@@ -237,7 +237,7 @@ public class UserMapperTest extends BaseDaoTest {
         User user = insertOne();
         // query
         List<User> userList = userMapper.selectList(null);
-        Assertions.assertNotEquals(userList.size(), 0);
+        Assertions.assertNotEquals(0, userList.size());
     }
 
     /**
@@ -249,7 +249,7 @@ public class UserMapperTest extends BaseDaoTest {
         User user = insertOne();
         // queryAllGeneralUser
         List<User> userList = userMapper.queryAllGeneralUser();
-        Assertions.assertNotEquals(userList.size(), 0);
+        Assertions.assertNotEquals(0, userList.size());
     }
 
     /**
@@ -266,7 +266,7 @@ public class UserMapperTest extends BaseDaoTest {
         // queryUserPaging
         Page<User> page = new Page(1, 3);
         IPage<User> userIPage = userMapper.queryUserPaging(page, user.getUserName());
-        Assertions.assertNotEquals(userIPage.getTotal(), 0);
+        Assertions.assertNotEquals(0, userIPage.getTotal());
     }
 
     /**

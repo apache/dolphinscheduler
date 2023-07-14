@@ -181,7 +181,7 @@ public class UdfFuncMapperTest extends BaseDaoTest {
         Integer[] idArray = new Integer[]{udfFunc.getId(), udfFunc1.getId()};
         // queryUdfByIdStr
         List<UdfFunc> udfFuncList = udfFuncMapper.queryUdfByIdStr(idArray, "");
-        Assertions.assertNotEquals(udfFuncList.size(), 0);
+        Assertions.assertNotEquals(0, udfFuncList.size());
     }
 
     /**
@@ -198,7 +198,7 @@ public class UdfFuncMapperTest extends BaseDaoTest {
 
         IPage<UdfFunc> udfFuncIPage =
                 udfFuncMapper.queryUdfFuncPaging(page, Collections.singletonList(udfFunc.getId()), "");
-        Assertions.assertNotEquals(udfFuncIPage.getTotal(), 0);
+        Assertions.assertNotEquals(0, udfFuncIPage.getTotal());
 
     }
 
@@ -214,7 +214,7 @@ public class UdfFuncMapperTest extends BaseDaoTest {
         // getUdfFuncByType
         List<UdfFunc> udfFuncList =
                 udfFuncMapper.getUdfFuncByType(Collections.singletonList(udfFunc.getId()), udfFunc.getType().ordinal());
-        Assertions.assertNotEquals(udfFuncList.size(), 0);
+        Assertions.assertNotEquals(0, udfFuncList.size());
 
     }
 
@@ -230,7 +230,7 @@ public class UdfFuncMapperTest extends BaseDaoTest {
         UdfFunc udfFunc1 = insertOne(user1);
         UdfFunc udfFunc2 = insertOne(user2);
         List<UdfFunc> udfFuncList = udfFuncMapper.queryUdfFuncExceptUserId(user1.getId());
-        Assertions.assertNotEquals(udfFuncList.size(), 0);
+        Assertions.assertNotEquals(0, udfFuncList.size());
 
     }
 
@@ -249,7 +249,7 @@ public class UdfFuncMapperTest extends BaseDaoTest {
         UDFUser udfUser = insertOneUDFUser(user, udfFunc);
         // queryAuthedUdfFunc
         List<UdfFunc> udfFuncList = udfFuncMapper.queryAuthedUdfFunc(user.getId());
-        Assertions.assertNotEquals(udfFuncList.size(), 0);
+        Assertions.assertNotEquals(0, udfFuncList.size());
     }
 
     @Test

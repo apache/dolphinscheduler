@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.task.k8s;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.CLUSTER;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.COMMA;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.NAMESPACE_NAME;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -31,7 +30,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.NodeSelectorExpression;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.K8sTaskParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -92,12 +91,13 @@ public class K8sTask extends AbstractK8sTask {
         k8sTaskMainParameters.setClusterName(clusterName);
         k8sTaskMainParameters.setMinCpuCores(k8sTaskParameters.getMinCpuCores());
         k8sTaskMainParameters.setMinMemorySpace(k8sTaskParameters.getMinMemorySpace());
-        k8sTaskMainParameters.setParamsMap(ParamUtils.convert(paramsMap));
+        k8sTaskMainParameters.setParamsMap(ParameterUtils.convert(paramsMap));
         k8sTaskMainParameters.setLabelMap(convertToLabelMap(k8sTaskParameters.getCustomizedLabels()));
         k8sTaskMainParameters
                 .setNodeSelectorRequirements(convertToNodeSelectorRequirements(k8sTaskParameters.getNodeSelectors()));
         k8sTaskMainParameters.setCommand(k8sTaskParameters.getCommand());
         k8sTaskMainParameters.setArgs(k8sTaskParameters.getArgs());
+        k8sTaskMainParameters.setImagePullPolicy(k8sTaskParameters.getImagePullPolicy());
         return JSONUtils.toJsonString(k8sTaskMainParameters);
     }
 
@@ -110,7 +110,7 @@ public class K8sTask extends AbstractK8sTask {
                 expression.getKey(),
                 expression.getOperator(),
                 StringUtils.isEmpty(expression.getValues()) ? Collections.emptyList()
-                        : Arrays.asList(expression.getValues().trim().split(COMMA))))
+                        : Arrays.asList(expression.getValues().trim().split("\\s*,\\s*"))))
                 .collect(Collectors.toList());
     }
 

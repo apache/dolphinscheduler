@@ -27,8 +27,7 @@ import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -236,7 +235,7 @@ public class DmsTask extends AbstractRemoteTask {
         // create a new parameter object using the json data if the json data is not empty
         if (parameters.getIsJsonFormat() && parameters.getJsonData() != null) {
             String jsonData = ParameterUtils.convertParameterPlaceholders(parameters.getJsonData(),
-                    ParamUtils.convert(taskExecutionContext.getPrepareParamsMap()));
+                    ParameterUtils.convert(taskExecutionContext.getPrepareParamsMap()));
 
             boolean isRestartTask = parameters.getIsRestartTask();
             try {

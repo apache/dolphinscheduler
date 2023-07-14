@@ -32,6 +32,7 @@ public class K8sParametersTest {
 
     private K8sTaskParameters k8sTaskParameters = null;
     private final String image = "ds-dev";
+    private final String imagePullPolicy = "IfNotPresent";
     private final String namespace = "{\"name\":\"default\",\"cluster\":\"lab\"}";
     private final double minCpuCores = 2;
     private final double minMemorySpace = 10;
@@ -45,6 +46,7 @@ public class K8sParametersTest {
     public void before() {
         k8sTaskParameters = new K8sTaskParameters();
         k8sTaskParameters.setImage(image);
+        k8sTaskParameters.setImagePullPolicy(imagePullPolicy);
         k8sTaskParameters.setNamespace(namespace);
         k8sTaskParameters.setMinCpuCores(minCpuCores);
         k8sTaskParameters.setMinMemorySpace(minMemorySpace);
@@ -68,6 +70,7 @@ public class K8sParametersTest {
     @Test
     public void testK8sParameters() {
         Assertions.assertEquals(image, k8sTaskParameters.getImage());
+        Assertions.assertEquals(imagePullPolicy, k8sTaskParameters.getImagePullPolicy());
         Assertions.assertEquals(namespace, k8sTaskParameters.getNamespace());
         Assertions.assertEquals(0, Double.compare(minCpuCores, k8sTaskParameters.getMinCpuCores()));
         Assertions.assertEquals(0, Double.compare(minMemorySpace, k8sTaskParameters.getMinMemorySpace()));

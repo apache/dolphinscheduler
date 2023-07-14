@@ -23,8 +23,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,18 +70,16 @@ public class MapReduceTask extends AbstractYarnTask {
             throw new RuntimeException("mapreduce task params is not valid");
         }
 
-        mapreduceParameters.setQueue(taskExecutionContext.getQueue());
-
         // replace placeholder,and combine local and global parameters
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
 
         String args = ParameterUtils.convertParameterPlaceholders(mapreduceParameters.getMainArgs(),
-                ParamUtils.convert(paramsMap));
+                ParameterUtils.convert(paramsMap));
         mapreduceParameters.setMainArgs(args);
         if (mapreduceParameters.getProgramType() != null
                 && mapreduceParameters.getProgramType() == ProgramType.PYTHON) {
             String others = ParameterUtils.convertParameterPlaceholders(mapreduceParameters.getOthers(),
-                    ParamUtils.convert(paramsMap));
+                    ParameterUtils.convert(paramsMap));
             mapreduceParameters.setOthers(others);
         }
         log.info("Initialize mapreduce task params {}", JSONUtils.toPrettyJsonString(mapreduceParameters));
