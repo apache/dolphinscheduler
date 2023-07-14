@@ -181,6 +181,11 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
     private final Map<Integer, TaskInstance> taskInstanceMap = new ConcurrentHashMap<>();
 
     /**
+     * task instance hash map, taskCode as key
+     */
+    private final Map<Long, TaskInstance> taskCodeInstanceMap = new ConcurrentHashMap<>();
+
+    /**
      * TaskCode as Key, TaskExecuteRunnable as Value
      */
     private final Map<Long, DefaultTaskExecuteRunnable> taskExecuteRunnableMap = new ConcurrentHashMap<>();
@@ -570,6 +575,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
         }
         processService.packageTaskInstance(taskInstance, processInstance);
         taskInstanceMap.put(taskInstance.getId(), taskInstance);
+        taskCodeInstanceMap.put(taskInstance.getTaskCode(), taskInstance);
 
         validTaskMap.remove(taskInstance.getTaskCode());
         if (Flag.YES == taskInstance.getFlag()) {
@@ -617,15 +623,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
     }
 
     public Optional<TaskInstance> getTaskInstance(long taskCode) {
-        if (taskInstanceMap.isEmpty()) {
-            return Optional.empty();
-        }
-        for (TaskInstance taskInstance : taskInstanceMap.values()) {
-            if (taskInstance.getTaskCode() == taskCode) {
-                return Optional.of(taskInstance);
-            }
-        }
-        return Optional.empty();
+        return Optional.ofNullable(taskCodeInstanceMap.get(taskCode));
     }
 
     public Optional<TaskInstance> getActiveTaskInstanceByTaskCode(long taskCode) {
@@ -901,6 +899,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
 
                     validTaskMap.put(task.getTaskCode(), task.getId());
                     taskInstanceMap.put(task.getId(), task);
+                    taskCodeInstanceMap.put(task.getTaskCode(), task);
 
                     if (task.isTaskComplete()) {
                         log.info("TaskInstance is already complete.");
@@ -1012,6 +1011,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
 
                 validTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
                 taskInstanceMap.put(taskInstance.getId(), taskInstance);
+                taskCodeInstanceMap.put(taskInstance.getTaskCode(), taskInstance);
                 taskExecuteRunnableMap.put(taskInstance.getTaskCode(), taskExecuteRunnable);
                 // 3. acquire the task group.
                 // if we use task group, then need to acquire the task group resource
@@ -1307,14 +1307,12 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
         completeTaskSet.forEach(taskCode -> {
             Optional<TaskInstance> existTaskInstanceOptional = getTaskInstance(taskCode);
             if (existTaskInstanceOptional.isPresent()) {
-                TaskInstance taskInstance = taskInstanceMap.get(existTaskInstanceOptional.get().getId());
-                if (taskInstance == null) {
-                    // This case will happen when we submit to db failed, then the taskInstanceId is 0
-                    log.warn("Cannot find the taskInstance from taskInstanceMap, taskConde: {}",
-                            taskCode);
-                } else {
-                    completeTaskInstanceMap.put(Long.toString(taskCode), taskInstance);
-                }
+                TaskInstance taskInstance = existTaskInstanceOptional.get();
+                completeTaskInstanceMap.put(Long.toString(taskCode), taskInstance);
+            } else {
+                // This case will happen when we submit to db failed, then the taskInstanceId is 0
+                log.warn("Cannot find the taskInstance from taskInstanceMap, taskConde: {}",
+                        taskCode);
             }
         });
 
@@ -1458,6 +1456,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
                     defaultTaskExecuteRunnableFactory.createTaskExecuteRunnable(taskInstance));
 
             taskInstanceMap.put(taskInstance.getId(), taskInstance);
+            taskCodeInstanceMap.put(taskInstance.getTaskCode(), taskInstance);
             stateWheelExecuteThread.addTask4TimeoutCheck(processInstance, taskInstance);
             stateWheelExecuteThread.addTask4RetryCheck(processInstance, taskInstance);
             return true;
@@ -1574,7 +1573,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
             return false;
         }
 
-        TaskExecutionStatus depTaskState = taskInstanceMap.get(existTaskInstanceOptional.get().getId()).getState();
+        TaskExecutionStatus depTaskState = existTaskInstanceOptional.get().getState();
         return !depTaskState.isFailure();
     }
 
@@ -1590,8 +1589,8 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
         completeTaskSet.forEach(taskCode -> {
             Optional<TaskInstance> existTaskInstanceOptional = getTaskInstance(taskCode);
             if (existTaskInstanceOptional.isPresent()) {
-                TaskInstance taskInstance = taskInstanceMap.get(existTaskInstanceOptional.get().getId());
-                if (taskInstance != null && taskInstance.getState() == state) {
+                TaskInstance taskInstance = existTaskInstanceOptional.get();
+                if (taskInstance.getState() == state) {
                     resultList.add(taskInstance);
                 }
             }
@@ -1950,6 +1949,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
                     removeTaskFromStandbyList(task);
                     completeTaskSet.add(task.getTaskCode());
                     taskInstanceMap.put(task.getId(), task);
+                    taskCodeInstanceMap.put(task.getTaskCode(), task);
                     submitPostNode(Long.toString(task.getTaskCode()));
                     continue;
                 }
@@ -1976,6 +1976,7 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
                     }
                     completeTaskSet.add(task.getTaskCode());
                     taskInstanceMap.put(task.getId(), task);
+                    taskCodeInstanceMap.put(task.getTaskCode(), task);
                     errorTaskMap.put(task.getTaskCode(), task.getId());
 
                     taskExecuteRunnableMap.remove(task.getTaskCode());
