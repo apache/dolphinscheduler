@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.datasource.hana;
 
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
