@@ -28,7 +28,7 @@ import java.util.Properties;
  */
 public class FlowTestBase extends SparkApplicationTestBase {
 
-    protected String url = "jdbc:h2:mem:test;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=true";
+    protected String url = "jdbc:h2:mem:test;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=true;NON_KEYWORDS=value";
 
     protected String driver = "org.h2.Driver";
 
