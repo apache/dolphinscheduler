@@ -15,30 +15,19 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.model;
+package org.apache.dolphinscheduler.server.master.runner;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.server.master.graph.IWorkflowGraph;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+// todo: Add method to manage the task instance
+public interface IWorkflowExecuteContext {
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class SwitchResultVo {
+    ProcessDefinition getWorkflowDefinition();
 
-    private String condition;
-    private List<Long> nextNode;
+    ProcessInstance getWorkflowInstance();
 
-    public void setNextNode(Object nextNode) {
-        if (nextNode instanceof Long) {
-            List<Long> nextNodeList = new ArrayList<>();
-            nextNodeList.add((Long) nextNode);
-            this.nextNode = nextNodeList;
-        } else {
-            this.nextNode = (ArrayList) nextNode;
-        }
-    }
+    IWorkflowGraph getWorkflowGraph();
+
 }

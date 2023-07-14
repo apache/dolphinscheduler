@@ -66,7 +66,7 @@ public class SwitchLogicTask extends BaseSyncLogicTask<SwitchParameters> {
                         .getSwitchDependency());
         WorkflowExecuteRunnable workflowExecuteRunnable =
                 processInstanceExecCacheManager.getByProcessInstanceId(taskExecutionContext.getProcessInstanceId());
-        this.processInstance = workflowExecuteRunnable.getProcessInstance();
+        this.processInstance = workflowExecuteRunnable.getWorkflowExecuteContext().getWorkflowInstance();
         this.taskInstance = workflowExecuteRunnable.getTaskInstance(taskExecutionContext.getTaskInstanceId())
                 .orElseThrow(() -> new LogicTaskInitializeException(
                         "Cannot find the task instance in workflow execute runnable"));
@@ -168,8 +168,8 @@ public class SwitchLogicTask extends BaseSyncLogicTask<SwitchParameters> {
         if (CollectionUtils.isEmpty(switchResult.getNextNode())) {
             return false;
         }
-        for (String nextNode : switchResult.getNextNode()) {
-            if (StringUtils.isEmpty(nextNode)) {
+        for (Long nextNode : switchResult.getNextNode()) {
+            if (nextNode == null) {
                 return false;
             }
         }

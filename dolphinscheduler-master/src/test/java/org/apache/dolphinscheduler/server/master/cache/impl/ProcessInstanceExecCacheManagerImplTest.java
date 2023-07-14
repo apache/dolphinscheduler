@@ -27,7 +27,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -44,14 +43,13 @@ public class ProcessInstanceExecCacheManagerImplTest {
 
     @BeforeEach
     public void before() {
-        Mockito.when(workflowExecuteThread.getKey()).thenReturn("workflowExecuteThread1");
         processInstanceExecCacheManager.cache(1, workflowExecuteThread);
     }
 
     @Test
     public void testGetByProcessInstanceId() {
         WorkflowExecuteRunnable workflowExecuteThread = processInstanceExecCacheManager.getByProcessInstanceId(1);
-        Assertions.assertEquals("workflowExecuteThread1", workflowExecuteThread.getKey());
+        Assertions.assertNotNull(workflowExecuteThread);
     }
 
     @Test
@@ -61,9 +59,7 @@ public class ProcessInstanceExecCacheManagerImplTest {
 
     @Test
     public void testCacheNull() {
-        Assertions.assertThrows(NullPointerException.class, () -> {
-            processInstanceExecCacheManager.cache(2, null);
-        });
+        Assertions.assertThrows(NullPointerException.class, () -> processInstanceExecCacheManager.cache(2, null));
         WorkflowExecuteRunnable workflowExecuteThread = processInstanceExecCacheManager.getByProcessInstanceId(2);
         Assertions.assertNull(workflowExecuteThread);
     }

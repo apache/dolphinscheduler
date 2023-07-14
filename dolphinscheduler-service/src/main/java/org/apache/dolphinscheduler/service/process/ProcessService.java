@@ -171,7 +171,7 @@ public interface ProcessService {
 
     boolean isTaskOnline(long taskCode);
 
-    DAG<String, TaskNode, TaskNodeRelation> genDagGraph(ProcessDefinition processDefinition);
+    DAG<Long, TaskNode, TaskNodeRelation> genDagGraph(ProcessDefinition processDefinition);
 
     DagData genDagData(ProcessDefinition processDefinition);
 

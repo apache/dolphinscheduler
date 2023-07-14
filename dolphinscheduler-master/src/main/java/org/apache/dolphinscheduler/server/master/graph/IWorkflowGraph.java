@@ -15,30 +15,19 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.model;
+package org.apache.dolphinscheduler.server.master.graph;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.apache.dolphinscheduler.common.graph.DAG;
+import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
+import org.apache.dolphinscheduler.service.model.TaskNode;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+public interface IWorkflowGraph {
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class SwitchResultVo {
+    TaskNode getTaskNodeByCode(Long taskCode);
 
-    private String condition;
-    private List<Long> nextNode;
+    // todo: refactor DAG class
+    DAG<Long, TaskNode, TaskNodeRelation> getDag();
 
-    public void setNextNode(Object nextNode) {
-        if (nextNode instanceof Long) {
-            List<Long> nextNodeList = new ArrayList<>();
-            nextNodeList.add((Long) nextNode);
-            this.nextNode = nextNodeList;
-        } else {
-            this.nextNode = (ArrayList) nextNode;
-        }
-    }
+    boolean isForbiddenTask(Long taskCode);
+
 }

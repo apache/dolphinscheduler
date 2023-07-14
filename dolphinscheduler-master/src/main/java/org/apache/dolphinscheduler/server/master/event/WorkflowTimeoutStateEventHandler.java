@@ -33,7 +33,8 @@ public class WorkflowTimeoutStateEventHandler implements StateEventHandler {
     @Override
     public boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable, StateEvent stateEvent) {
         log.info("Handle workflow instance timeout event");
-        ProcessInstance processInstance = workflowExecuteRunnable.getProcessInstance();
+        ProcessInstance processInstance =
+                workflowExecuteRunnable.getWorkflowExecuteContext().getWorkflowInstance();
         ProcessInstanceMetrics.incProcessInstanceByStateAndProcessDefinitionCode("timeout",
                 processInstance.getProcessDefinitionCode().toString());
         workflowExecuteRunnable.processTimeout();

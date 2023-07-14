@@ -55,7 +55,8 @@ public class ExecutingService {
         }
         try {
             WorkflowExecuteDto workflowExecuteDto = new WorkflowExecuteDto();
-            BeanUtils.copyProperties(workflowExecuteDto, workflowExecuteRunnable.getProcessInstance());
+            BeanUtils.copyProperties(workflowExecuteDto,
+                    workflowExecuteRunnable.getWorkflowExecuteContext().getWorkflowInstance());
             List<TaskInstanceExecuteDto> taskInstanceList = Lists.newArrayList();
             if (CollectionUtils.isNotEmpty(workflowExecuteRunnable.getAllTaskInstances())) {
                 for (TaskInstance taskInstance : workflowExecuteRunnable.getAllTaskInstances()) {
