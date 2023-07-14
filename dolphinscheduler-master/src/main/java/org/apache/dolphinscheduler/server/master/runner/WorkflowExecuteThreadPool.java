@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.utils.TaskInstanceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.remote.command.workflow.WorkflowStateEventChangeRequest;
@@ -180,14 +179,11 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
     }
 
     private void crossWorkflowParameterPassing(ProcessInstance finishProcessInstance, TaskInstance taskInstance) {
-        TaskInstance oldTaskInstance = new TaskInstance();
-        TaskInstanceUtils.copyTaskInstance(taskInstance, oldTaskInstance);
         try {
             MasterTaskExecuteRunnable masterTaskExecuteRunnable= MasterTaskExecuteRunnableHolder.getMasterTaskExecuteRunnable(taskInstance.getId());
             masterTaskExecuteRunnable.getILogicTask().getTaskParameters().setVarPool(finishProcessInstance.getVarPool());
             log.info("Cross workflow parameter passing success");
         } catch (Exception ex) {
-            TaskInstanceUtils.copyTaskInstance(oldTaskInstance, taskInstance);
             log.info("Cross workflow parameter passing error");
         }
     }
