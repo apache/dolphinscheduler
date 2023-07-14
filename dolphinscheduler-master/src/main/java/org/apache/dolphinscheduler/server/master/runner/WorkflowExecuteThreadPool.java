@@ -180,8 +180,10 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
 
     private void crossWorkflowParameterPassing(ProcessInstance finishProcessInstance, TaskInstance taskInstance) {
         try {
-            MasterTaskExecuteRunnable masterTaskExecuteRunnable= MasterTaskExecuteRunnableHolder.getMasterTaskExecuteRunnable(taskInstance.getId());
-            masterTaskExecuteRunnable.getILogicTask().getTaskParameters().setVarPool(finishProcessInstance.getVarPool());
+            MasterTaskExecuteRunnable masterTaskExecuteRunnable =
+                    MasterTaskExecuteRunnableHolder.getMasterTaskExecuteRunnable(taskInstance.getId());
+            masterTaskExecuteRunnable.getILogicTask().getTaskParameters()
+                    .setVarPool(finishProcessInstance.getVarPool());
             log.info("Cross workflow parameter passing success");
         } catch (Exception ex) {
             log.info("Cross workflow parameter passing error");

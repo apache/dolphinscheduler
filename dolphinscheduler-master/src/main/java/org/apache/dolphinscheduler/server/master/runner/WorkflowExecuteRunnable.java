@@ -1372,17 +1372,25 @@ public class WorkflowExecuteRunnable implements Callable<WorkflowSubmitStatus> {
                 if (StringUtils.isNotEmpty(taskInstanceVarPool)) {
                     Set<Property> taskProperties = new HashSet<>(JSONUtils.toList(taskInstanceVarPool, Property.class));
                     String processInstanceVarPool = processInstance.getVarPool();
-                    List<Property> processGlobalParams = new ArrayList<>(JSONUtils.toList(processInstance.getGlobalParams(), Property.class));
-                    Map<String, Direct> oldProcessGlobalParamsMap = processGlobalParams.stream().collect(Collectors.toMap(Property::getProp, Property::getDirect));
-                    Set<Property> processVarPoolOut = taskProperties.stream().filter(property -> property.getDirect().equals(Direct.OUT) && oldProcessGlobalParamsMap.containsKey(property.getProp()) && oldProcessGlobalParamsMap.get(property.getProp()).equals(Direct.OUT))
+                    List<Property> processGlobalParams =
+                            new ArrayList<>(JSONUtils.toList(processInstance.getGlobalParams(), Property.class));
+                    Map<String, Direct> oldProcessGlobalParamsMap = processGlobalParams.stream()
+                            .collect(Collectors.toMap(Property::getProp, Property::getDirect));
+                    Set<Property> processVarPoolOut = taskProperties.stream()
+                            .filter(property -> property.getDirect().equals(Direct.OUT)
+                                    && oldProcessGlobalParamsMap.containsKey(property.getProp())
+                                    && oldProcessGlobalParamsMap.get(property.getProp()).equals(Direct.OUT))
                             .collect(Collectors.toSet());
-                    Set<Property> taskVarPoolIn = taskProperties.stream().filter(property -> property.getDirect().equals(Direct.IN))
-                            .collect(Collectors.toSet());
+                    Set<Property> taskVarPoolIn =
+                            taskProperties.stream().filter(property -> property.getDirect().equals(Direct.IN))
+                                    .collect(Collectors.toSet());
                     if (StringUtils.isNotEmpty(processInstanceVarPool)) {
                         Set<Property> properties =
                                 new HashSet<>(JSONUtils.toList(processInstanceVarPool, Property.class));
-                        Set<String> newProcessVarPoolKeys = taskProperties.stream().map(Property::getProp).collect(Collectors.toSet());
-                        properties = properties.stream().filter(property -> !newProcessVarPoolKeys.contains(property.getProp()))
+                        Set<String> newProcessVarPoolKeys =
+                                taskProperties.stream().map(Property::getProp).collect(Collectors.toSet());
+                        properties = properties.stream()
+                                .filter(property -> !newProcessVarPoolKeys.contains(property.getProp()))
                                 .collect(Collectors.toSet());
                         properties.addAll(processVarPoolOut);
                         properties.addAll(taskVarPoolIn);
