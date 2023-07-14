@@ -167,6 +167,15 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         executorService.checkProcessDefinitionValid(projectCode, processDefinition, processDefineCode,
                 processDefinition.getVersion());
 
+        Schedule scheduleExists =
+                scheduleMapper.queryByProcessDefinitionCode(processDefineCode);
+        if (scheduleExists != null) {
+            log.error("Schedule already exist, scheduleId:{},processDefineCode:{}", scheduleExists.getId(),
+                    processDefineCode);
+            putMsg(result, Status.SCHEDULE_ALREADY_EXISTS, processDefineCode, scheduleExists.getId());
+            return result;
+        }
+
         Schedule scheduleObj = new Schedule();
         Date now = new Date();
 
