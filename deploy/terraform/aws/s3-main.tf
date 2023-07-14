@@ -19,11 +19,13 @@ module "s3_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "~> 3.6"
 
-  bucket_prefix = var.s3_bucket_prefix
-  acl           = "private"
-  force_destroy = true
-  attach_policy = true
-  policy        = data.aws_iam_policy_document.s3.json
+  bucket_prefix            = var.s3_bucket_prefix
+  acl                      = "private"
+  control_object_ownership = true
+  object_ownership         = "ObjectWriter"
+  force_destroy            = true
+  attach_policy            = true
+  policy                   = data.aws_iam_policy_document.s3.json
 }
 
 resource "aws_iam_user" "s3" {
