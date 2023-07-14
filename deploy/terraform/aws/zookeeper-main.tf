@@ -68,6 +68,7 @@ resource "aws_instance" "zookeeper" {
   vpc_security_group_ids      = [aws_security_group.zookeeper_sg[count.index].id]
   source_dest_check           = false
   associate_public_ip_address = var.vm_associate_public_ip_address.standalone_server
+  key_name                    = aws_key_pair.key_pair.key_name
 
   user_data = data.template_file.zookeeper_user_data.rendered
 
@@ -94,7 +95,7 @@ resource "aws_instance" "zookeeper" {
 
   connection {
     type        = "ssh"
-    user        = "root"
+    user        = "ec2-user"
     private_key = tls_private_key.key_pair.private_key_pem
     host        = self.public_ip
     timeout     = "30s"
