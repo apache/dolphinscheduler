@@ -114,7 +114,6 @@ public class ProjectPreferenceServiceImpl extends BaseServiceImpl implements
         return result;
     }
 
-
     @Override
     public Result queryProjectPreferenceByProjectCode(User loginUser, long projectCode) {
         Result result = new Result();
@@ -130,10 +129,8 @@ public class ProjectPreferenceServiceImpl extends BaseServiceImpl implements
 
         if (Objects.nonNull(projectPreference)) {
             result.setData(projectPreference);
-            putMsg(result, Status.SUCCESS);
-        } else {
-            putMsg(result, Status.QUERY_PROJECT_PREFERENCE_ERROR);
         }
+        putMsg(result, Status.SUCCESS);
         return result;
     }
 }

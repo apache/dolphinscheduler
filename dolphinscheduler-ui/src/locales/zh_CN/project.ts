@@ -865,7 +865,8 @@ export default {
   },
   preference: {
     edit_preference: '修改项目偏好设置',
-    preference_manage: '偏好管理',
+    preference_manage: '项目偏好管理',
     success: '成功',
+    submit: '提交'
   },
 }

@@ -891,7 +891,8 @@ export default {
   },
   preference: {
     edit_preference: 'Edit Preference',
-    preference_manage: 'Preference Management',
+    preference_manage: 'Project Preference Management',
     success: 'Success',
+    submit: 'Submit'
   },
 }

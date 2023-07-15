@@ -15,36 +15,28 @@
  * limitations under the License.
  */
 
-import { NSpace } from 'naive-ui'
-import { defineComponent, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
-import Card from '@/components/card'
-import PreferenceForm from "@/views/projects/preference/detail";
+import { axios } from '@/service/service'
 
-export default defineComponent({
-  name: 'ProjectPreference',
-  setup() {
+import {
+  UpdateProjectPreferenceReq
+} from './types'
 
-    const detailRef = ref()
+export function queryProjectPreferenceByProjectCode(
+  projectCode: number
+): any {
+  return axios({
+    url: `/projects/${projectCode}/project-preference`,
+    method: 'get'
+  })
+}
 
-    return {
-      detailRef
-    }
-  },
-  render() {
-    const { t } = useI18n()
-    const { detailRef } = this
-
-    return (
-      <NSpace vertical>
-        <Card title={t('project.preference.preference_manage')}>
-          <NSpace vertical>
-            <PreferenceForm
-                ref={detailRef}
-            />
-          </NSpace>
-        </Card>
-      </NSpace>
-    )
-  }
-})
+export function updateProjectPreference(
+  data: UpdateProjectPreferenceReq,
+  projectCode: number
+): any {
+  return axios({
+    url: `/projects/${projectCode}/project-preference`,
+    method: 'put',
+    data
+  })
+}

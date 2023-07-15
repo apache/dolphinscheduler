@@ -15,36 +15,43 @@
  * limitations under the License.
  */
 
-import { NSpace } from 'naive-ui'
 import { defineComponent, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
-import Card from '@/components/card'
-import PreferenceForm from "@/views/projects/preference/detail";
+import Form from '@/components/form'
+import { useForm } from './use-form'
+import { NButton, NSpace } from "naive-ui";
 
-export default defineComponent({
-  name: 'ProjectPreference',
+const PreferenceForm = defineComponent({
+  name: 'PreferenceForm',
   setup() {
 
-    const detailRef = ref()
+    const { formRef, elementsRef, rulesRef, model, formProps, t, handleUpdate } = useForm()
 
-    return {
-      detailRef
-    }
-  },
-  render() {
-    const { t } = useI18n()
-    const { detailRef } = this
-
-    return (
-      <NSpace vertical>
-        <Card title={t('project.preference.preference_manage')}>
-          <NSpace vertical>
-            <PreferenceForm
-                ref={detailRef}
-            />
+    return () => (
+        <div>
+          <Form
+            ref={formRef}
+            meta={{
+              model,
+              rules: rulesRef.value,
+              elements: elementsRef.value,
+              ...formProps.value
+            }}
+            layout={{
+              xGap: 10
+            }}
+            style={{margin: "10px"}}
+          />
+          <NSpace justify='end'>
+            <NButton
+                type='info'
+                onClick={handleUpdate}
+            >
+              {t('project.preference.submit')}
+            </NButton>
           </NSpace>
-        </Card>
-      </NSpace>
+        </div>
     )
   }
 })
+
+export default PreferenceForm

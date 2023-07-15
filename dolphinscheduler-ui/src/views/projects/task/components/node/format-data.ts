@@ -556,9 +556,6 @@ export function formatParams(data: INodeData): {
 }
 
 export function formatModel(data: ITaskData) {
-
-  console.log('formatModel')
-  console.log(data)
   const params = {
     ...omit(data, [
       'environmentCode',
@@ -743,7 +740,5 @@ export function formatModel(data: ITaskData) {
   if (data.taskParams?.jobType) {
     params.isCustomTask = data.taskParams.jobType === 'CUSTOM'
   }
-
-  console.log(params)
   return params
 }
