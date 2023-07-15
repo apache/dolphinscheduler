@@ -17,63 +17,23 @@
 
 package org.apache.dolphinscheduler.common.model;
 
-import java.util.Objects;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class TaskNodeRelation {
 
     /**
-     * task start node name
+     * task start node Code
      */
-    private String startNode;
+    private Long startNode;
 
     /**
-     * task end node name
+     * task end node Code
      */
-    private String endNode;
+    private Long endNode;
 
-    public TaskNodeRelation() {
-    }
-
-    public TaskNodeRelation(String startNode, String endNode) {
-        this.startNode = startNode;
-        this.endNode = endNode;
-    }
-
-    public String getStartNode() {
-        return startNode;
-    }
-
-    public void setStartNode(String startNode) {
-        this.startNode = startNode;
-    }
-
-    public String getEndNode() {
-        return endNode;
-    }
-
-    public void setEndNode(String endNode) {
-        this.endNode = endNode;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof TaskNodeRelation)) {
-            return false;
-        }
-        TaskNodeRelation relation = (TaskNodeRelation) o;
-        return (relation.getStartNode().equals(this.startNode) && relation.getEndNode().equals(this.endNode));
-    }
-
-    @Override
-    public String toString() {
-        return "TaskNodeRelation{"
-                + "startNode='" + startNode + '\''
-                + ", endNode='" + endNode + '\''
-                + '}';
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(startNode, endNode);
-    }
 }
