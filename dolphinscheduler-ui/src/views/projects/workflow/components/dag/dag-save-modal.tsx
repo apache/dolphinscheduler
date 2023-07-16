@@ -245,34 +245,34 @@ export default defineComponent({
               class='input-global-params'
             >
               {{
-                default: function (value: any) {
-                  return (
-                    <NGrid xGap={12} cols={24}>
-                      <NGridItem span={9}>
-                        <NInput
-                          v-model:value={value.value.key}
-                          placeholder={t('project.dag.key')}
-                        />
-                      </NGridItem>
-                      <NGridItem span={6}>
-                        <NSelect
-                          options={[
-                            { value: 'IN', label: 'IN' },
-                            { value: 'OUT', label: 'OUT' }
-                          ]}
-                          v-model:value={value.value.direct}
-                          defaultValue={'IN'}
-                        />
-                      </NGridItem>
-                      <NGridItem span={9}>
-                        <NInput
-                          v-model:value={value.value.value}
-                          placeholder={t('project.dag.value')}
-                        />
-                      </NGridItem>
-                    </NGrid>
-                  )
-                }
+                default: (param: {
+                  value: { key: string; direct: string; value: string }
+                }) => (
+                  <NGrid xGap={12} cols={24}>
+                    <NGridItem span={9}>
+                      <NInput
+                        v-model:value={param.value.key}
+                        placeholder={t('project.dag.key')}
+                      />
+                    </NGridItem>
+                    <NGridItem span={6}>
+                      <NSelect
+                        options={[
+                          { value: 'IN', label: 'IN' },
+                          { value: 'OUT', label: 'OUT' }
+                        ]}
+                        v-model:value={param.value.direct}
+                        defaultValue={'IN'}
+                      />
+                    </NGridItem>
+                    <NGridItem span={9}>
+                      <NInput
+                        v-model:value={param.value.value}
+                        placeholder={t('project.dag.value')}
+                      />
+                    </NGridItem>
+                  </NGrid>
+                )
               }}
             </NDynamicInput>
           </NFormItem>
