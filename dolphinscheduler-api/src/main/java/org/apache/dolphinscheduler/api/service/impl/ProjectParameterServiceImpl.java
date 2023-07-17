@@ -78,7 +78,12 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
             return result;
         }
 
-        ProjectParameter projectParameter = projectParameterMapper.queryByName(projectParameterName);
+        // check if project parameter name exists
+        ProjectParameter projectParameter = projectParameterMapper.selectOne(new QueryWrapper<ProjectParameter>()
+                .lambda()
+                .eq(ProjectParameter::getProjectCode, projectCode)
+                .eq(ProjectParameter::getParamName, projectParameterName));
+
         if (projectParameter != null) {
             log.warn("ProjectParameter {} already exists.", projectParameter.getParamName());
             putMsg(result, Status.PROJECT_PARAMETER_ALREADY_EXISTS, projectParameter.getParamName());
@@ -246,7 +251,7 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
         Page<ProjectParameter> page = new Page<>(pageNo, pageSize);
 
         IPage<ProjectParameter> iPage =
-                projectParameterMapper.queryProjectParameterListPaging(page, null, searchVal);
+                projectParameterMapper.queryProjectParameterListPaging(page, projectCode, null, searchVal);
 
         List<ProjectParameter> projectParameterList = iPage.getRecords();
 

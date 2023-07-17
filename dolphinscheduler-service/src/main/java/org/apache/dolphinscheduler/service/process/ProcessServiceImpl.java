@@ -2143,7 +2143,7 @@ public class ProcessServiceImpl implements ProcessService {
      * @return dag graph
      */
     @Override
-    public DAG<String, TaskNode, TaskNodeRelation> genDagGraph(ProcessDefinition processDefinition) {
+    public DAG<Long, TaskNode, TaskNodeRelation> genDagGraph(ProcessDefinition processDefinition) {
         List<ProcessTaskRelation> taskRelations =
                 this.findRelationByCode(processDefinition.getCode(), processDefinition.getVersion());
         List<TaskNode> taskNodeList = transformTask(taskRelations, Lists.newArrayList());

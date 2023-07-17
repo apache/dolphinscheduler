@@ -160,7 +160,8 @@ public class WorkerFailoverService {
                                 if (workflowExecuteRunnable == null) {
                                     return null;
                                 }
-                                return workflowExecuteRunnable.getProcessInstance();
+                                return workflowExecuteRunnable.getWorkflowExecuteContext()
+                                        .getWorkflowInstance();
                             });
                     //如果任务实例需要失败重试，那么就进行失败重试，并记录日志。
                     if (!checkTaskInstanceNeedFailover(needFailoverWorkerStartTime, processInstance, taskInstance)) {
@@ -260,13 +261,11 @@ public class WorkerFailoverService {
                                                   TaskInstance taskInstance) throws IOException {
         // 首先，检查processInstance和taskInstance是否为空。如果为空，打印错误日志，并返回false。
         if (processInstance == null) {
-            // This case should be happened.
             log.error(
                     "Failover task instance error, cannot find the related processInstance form memory, this case shouldn't happened");
             return false;
         }
         if (taskInstance == null) {
-            // This case should be happened.
             log.error("Master failover task instance error, taskInstance is null, this case shouldn't happened");
             return false;
         }
