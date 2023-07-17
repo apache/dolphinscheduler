@@ -131,7 +131,8 @@ public class WorkerFailoverService {
                                 if (workflowExecuteRunnable == null) {
                                     return null;
                                 }
-                                return workflowExecuteRunnable.getProcessInstance();
+                                return workflowExecuteRunnable.getWorkflowExecuteContext()
+                                        .getWorkflowInstance();
                             });
                     if (!checkTaskInstanceNeedFailover(needFailoverWorkerStartTime, processInstance, taskInstance)) {
                         log.info("Worker[{}] the current taskInstance doesn't need to failover", workerHost);
@@ -208,13 +209,11 @@ public class WorkerFailoverService {
                                                   @Nullable ProcessInstance processInstance,
                                                   TaskInstance taskInstance) {
         if (processInstance == null) {
-            // This case should be happened.
             log.error(
                     "Failover task instance error, cannot find the related processInstance form memory, this case shouldn't happened");
             return false;
         }
         if (taskInstance == null) {
-            // This case should be happened.
             log.error("Master failover task instance error, taskInstance is null, this case shouldn't happened");
             return false;
         }

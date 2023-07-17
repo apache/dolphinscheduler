@@ -600,8 +600,8 @@ public class ProcessDefinitionController extends BaseController {
     @GetMapping(value = "/query-process-definition-list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(GET_TASKS_LIST_BY_PROCESS_DEFINITION_ID_ERROR)
-    public Result getProcessListByProjectCodes(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                               @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
+    public Result getProcessListByProjectCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                              @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
         Map<String, Object> result = processDefinitionService.queryProcessDefinitionListByProjectCode(projectCode);
         return returnDataList(result);
     }
