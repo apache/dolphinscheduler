@@ -15,24 +15,18 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.configuration;
+package org.apache.dolphinscheduler.server.master.runner;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.stereotype.Component;
+import java.util.concurrent.Callable;
 
-@Component
-@EnableConfigurationProperties
-@ConfigurationProperties(value = "audit", ignoreUnknownFields = false)
-public class AuditConfiguration {
+public interface IWorkflowExecuteRunnable extends Callable<WorkflowStartStatus> {
+    // todo: add control method to manage the workflow runnable e.g. pause/stop ....
 
-    private boolean enabled;
-
-    public boolean getEnabled() {
-        return enabled;
+    @Override
+    default WorkflowStartStatus call() {
+        return startWorkflow();
     }
 
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
+    WorkflowStartStatus startWorkflow();
+
 }

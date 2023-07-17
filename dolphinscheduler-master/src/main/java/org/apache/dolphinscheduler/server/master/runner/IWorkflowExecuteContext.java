@@ -15,23 +15,19 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.configuration;
+package org.apache.dolphinscheduler.server.master.runner;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.server.master.graph.IWorkflowGraph;
 
-@ActiveProfiles("audit")
-@SpringBootTest(classes = AuditConfiguration.class)
-public class AuditConfigurationTest {
+// todo: Add method to manage the task instance
+public interface IWorkflowExecuteContext {
 
-    @Autowired
-    private AuditConfiguration auditConfiguration;
+    ProcessDefinition getWorkflowDefinition();
 
-    @Test
-    public void isAuditGlobalControlSwitch() {
-        Assertions.assertTrue(auditConfiguration.getEnabled());
-    }
+    ProcessInstance getWorkflowInstance();
+
+    IWorkflowGraph getWorkflowGraph();
+
 }

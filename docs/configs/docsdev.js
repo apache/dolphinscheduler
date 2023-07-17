@@ -251,6 +251,10 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/parameter/local.html',
                             },
                             {
+                                title: 'Project-level Parameter',
+                                link: '/en-us/docs/dev/user_doc/guide/parameter/project-parameter.html',
+                            },
+                            {
                                 title: 'Parameter Context',
                                 link: '/en-us/docs/dev/user_doc/guide/parameter/context.html',
                             },
@@ -974,6 +978,10 @@ export default {
                             {
                                 title: '本地参数',
                                 link: '/zh-cn/docs/dev/user_doc/guide/parameter/local.html',
+                            },
+                            {
+                                title: '项目级别参数',
+                                link: '/zh-cn/docs/dev/user_doc/guide/parameter/project-parameter.html',
                             },
                             {
                                 title: '参数传递',

@@ -15,24 +15,19 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.configuration;
+package org.apache.dolphinscheduler.server.master.graph;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.apache.dolphinscheduler.common.graph.DAG;
+import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
+import org.apache.dolphinscheduler.service.model.TaskNode;
 
-import lombok.Data;
+public interface IWorkflowGraph {
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+    TaskNode getTaskNodeByCode(Long taskCode);
 
-@Data
-@Configuration
-@ConfigurationProperties(prefix = "traffic.control")
-public class TrafficConfiguration {
+    // todo: refactor DAG class
+    DAG<Long, TaskNode, TaskNodeRelation> getDag();
 
-    private boolean globalSwitch;
-    private Integer maxGlobalQpsRate = 300;
-    private boolean tenantSwitch;
-    private Integer defaultTenantQpsRate = 10;
-    private Map<String, Integer> customizeTenantQpsRate = new HashMap<>();
+    boolean isForbiddenTask(Long taskCode);
+
 }

@@ -15,24 +15,20 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.configuration;
+package org.apache.dolphinscheduler.server.master.runner;
 
-import lombok.Data;
-
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
-
-@Data
-@Configuration
-@ConfigurationProperties(value = "python-gateway")
-public class PythonGatewayConfiguration {
-
-    private boolean enabled;
-    private String gatewayServerAddress;
-    private int gatewayServerPort;
-    private String pythonAddress;
-    private int pythonPort;
-    private int connectTimeout;
-    private int readTimeout;
-    private String authToken;
+public enum WorkflowStartStatus {
+    /**
+     * Submit success
+     */
+    SUCCESS,
+    /**
+     * Submit failed, this status should be retry
+     */
+    FAILED,
+    /**
+     * Duplicated submitted, this status should never occur.
+     */
+    DUPLICATED_SUBMITTED,
+    ;
 }
