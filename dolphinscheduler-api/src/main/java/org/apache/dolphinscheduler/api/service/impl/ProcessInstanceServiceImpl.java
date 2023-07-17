@@ -1016,22 +1016,20 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             return result;
         }
         GanttDto ganttDto = new GanttDto();
-        DAG<String, TaskNode, TaskNodeRelation> dag = processService.genDagGraph(processDefinition);
+        DAG<Long, TaskNode, TaskNodeRelation> dag = processService.genDagGraph(processDefinition);
         // topological sort
-        List<String> nodeList = dag.topologicalSort();
+        List<Long> nodeList = dag.topologicalSort();
 
         ganttDto.setTaskNames(nodeList);
 
         List<Task> taskList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(nodeList)) {
-            List<Long> taskCodes = nodeList.stream().map(Long::parseLong).collect(Collectors.toList());
             List<TaskInstance> taskInstances = taskInstanceMapper.queryByProcessInstanceIdsAndTaskCodes(
-                    Collections.singletonList(processInstanceId), taskCodes);
-            for (String node : nodeList) {
+                    Collections.singletonList(processInstanceId), nodeList);
+            for (Long node : nodeList) {
                 TaskInstance taskInstance = null;
                 for (TaskInstance instance : taskInstances) {
-                    if (instance.getProcessInstanceId() == processInstanceId
-                            && instance.getTaskCode() == Long.parseLong(node)) {
+                    if (instance.getProcessInstanceId() == processInstanceId && instance.getTaskCode() == node) {
                         taskInstance = instance;
                         break;
                     }
