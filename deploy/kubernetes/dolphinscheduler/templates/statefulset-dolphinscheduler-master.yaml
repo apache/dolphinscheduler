@@ -60,6 +60,8 @@ spec:
           ports:
             - containerPort: 5678
               name: "master-port"
+            - containerPort: 5679
+              name: "actuator-port"
           env:
             - name: TZ
               value: {{ .Values.timezone }}
