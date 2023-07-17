@@ -28,7 +28,10 @@ import {
   updateProjectPreference
 } from "@/service/modules/projects-preference";
 import {useI18n} from "vue-i18n";
-import { UpdateProjectPreferenceReq, ProjectPreferenceRes } from "@/service/modules/projects-preference/types";
+import { UpdateProjectPreferenceReq } from "@/service/modules/projects-preference/types";
+import {useWarningType} from "@/views/projects/preference/components/use-warning-type";
+import {useTenant} from "@/views/projects/preference/components/use-tenant";
+import {useAlertGroup} from "@/views/projects/preference/components/use-alert-group";
 
 export function useForm() {
 
@@ -51,10 +54,16 @@ export function useForm() {
 
   const data = reactive({
     model: {
+      taskPriority: 'MEDIUM',
       workerGroup: 'default',
       environmentCode: null,
+      failRetryTimes: 0,
       failRetryInterval: 1,
-      failRetryTimes: 0
+      cpuQuota: -1,
+      memoryMax: -1,
+      timeoutFlag: false,
+      timeoutNotifyStrategy: ['WARN'],
+      timeout: 30
     } as INodeData
   })
 
@@ -79,26 +88,39 @@ export function useForm() {
     const requestData = {
       projectPreferences: JSON.stringify(data.model)
     } as UpdateProjectPreferenceReq
-    updateProjectPreference(requestData, projectCode)
+    updateProjectPreference(requestData, projectCode).then(() => {
+      window.$message.success(t('project.preference.success'))
+    })
   }
 
   const preferencesItems: IJsonItem[] = [
+    Fields.useTaskPriority(),
     Fields.useWorkerGroup(),
+    Fields.useEnvironmentName(data.model, true),
+    ...Fields.useFailed(),
+    ...Fields.useResourceLimit(),
+    Fields.useDelayTime(data.model),
+    ...Fields.useTimeoutAlarm(data.model),
+    useWarningType(),
+    useTenant(),
+    useAlertGroup(),
   ]
 
-  jsonRef.value = preferencesItems
+  const restructurePreferencesItems = (preferencesItems: any) => {
+    for (let item of preferencesItems) {
+      if (item.validate?.required) {
+        item.validate.required = false
+      }
+    }
+    return preferencesItems
+  }
+
+  jsonRef.value = restructurePreferencesItems(preferencesItems)
 
   const getElements = () => {
     const { rules, elements } = getElementByJson(jsonRef.value, data.model)
-    if (rules) {
-      for (let key in rules) {
-        rules[key].required = false
-      }
-    }
     elementsRef.value = elements
     rulesRef.value = rules
-    console.log('elements')
-    console.log(rules)
   }
 
   getElements()

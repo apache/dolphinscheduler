@@ -740,5 +740,6 @@ export function formatModel(data: ITaskData) {
   if (data.taskParams?.jobType) {
     params.isCustomTask = data.taskParams.jobType === 'CUSTOM'
   }
+
   return params
 }

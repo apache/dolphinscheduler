@@ -47,9 +47,11 @@ import {
   NThing,
   NPopover
 } from 'naive-ui'
+import { Router, useRouter } from "vue-router";
 import { ArrowDownOutlined, ArrowUpOutlined } from '@vicons/antd'
 import { timezoneList } from '@/common/timezone'
 import Crontab from '@/components/crontab'
+import {queryProjectPreferenceByProjectCode} from "@/service/modules/projects-preference"
 
 const props = {
   row: {
@@ -74,6 +76,8 @@ export default defineComponent({
     const crontabRef = ref()
     const parallelismRef = ref(false)
     const { t } = useI18n()
+    const router: Router = useRouter()
+
     const { timingState } = useForm()
     const {
       variables,
@@ -86,11 +90,24 @@ export default defineComponent({
       getPreviewSchedule
     } = useModal(timingState, ctx)
 
+    const projectCode = Number(router.currentRoute.value.params.projectCode)
+
     const environmentOptions = computed(() =>
       variables.environmentList.filter((item: any) =>
         item.workerGroups?.includes(timingState.timingForm.workerGroup)
       )
     )
+
+    const projectPreferences = ref({} as any)
+
+    const initProjectPreferences = (projectCode: number) => {
+      queryProjectPreferenceByProjectCode(projectCode).then((result: any) => {
+        if (result?.preferences) {
+          projectPreferences.value = JSON.parse(result.preferences)
+        }
+      })
+    }
+
 
     const hideModal = () => {
       ctx.emit('update:show')
@@ -193,6 +210,7 @@ export default defineComponent({
       getTenantList()
       getAlertGroups()
       getEnvironmentList()
+      initProjectPreferences(projectCode)
     })
 
     watch(

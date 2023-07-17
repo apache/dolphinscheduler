@@ -28,6 +28,7 @@ const PreferenceForm = defineComponent({
 
     return () => (
         <div>
+          <div style={{margin: "10px"}}>{t('project.preference.instruction_tips')}</div>
           <Form
             ref={formRef}
             meta={{
@@ -37,7 +38,8 @@ const PreferenceForm = defineComponent({
               ...formProps.value
             }}
             layout={{
-              xGap: 10
+              xGap: 10,
+              cols: 4
             }}
             style={{margin: "10px"}}
           />

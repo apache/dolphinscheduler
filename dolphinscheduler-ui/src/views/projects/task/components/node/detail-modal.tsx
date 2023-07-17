@@ -24,7 +24,7 @@ import {
   provide,
   computed,
   h,
-  Ref
+  Ref, onMounted
 } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Modal from '@/components/modal'
@@ -48,6 +48,8 @@ import type {
   IWorkflowTaskInstance,
   WorkflowInstance
 } from './types'
+import {queryProjectPreferenceByProjectCode} from "@/service/modules/projects-preference";
+import {INodeData} from "./types";
 
 const props = {
   show: {
@@ -109,6 +111,7 @@ const NodeDetailModal = defineComponent({
     }
 
     const headerLinks = ref([] as any)
+    const projectPreferences = ref({} as any)
 
     const handleViewLog = () => {
       if (props.taskInstance) {
@@ -116,12 +119,13 @@ const NodeDetailModal = defineComponent({
       }
     }
 
-    const initProjectPreferences = (projectCode: number, data: ITaskData) => {
-      console.log('initProjectPreferences')
-      console.log(projectCode)
-      console.log(data)
+    const initProjectPreferences = (projectCode: number) => {
+      queryProjectPreferenceByProjectCode(projectCode).then((result: any) => {
+        if (result?.preferences) {
+          projectPreferences.value = JSON.parse(result.preferences)
+        }
+      })
     }
-
 
     const initHeaderLinks = (processInstance: any, taskType?: ITaskType) => {
       headerLinks.value = [
@@ -211,15 +215,21 @@ const NodeDetailModal = defineComponent({
       }))
     )
 
+    onMounted(() => {
+      initProjectPreferences(props.projectCode)
+    })
+
+
     watch(
       () => [props.show, props.data],
       async () => {
         if (!props.show) return
         initHeaderLinks(props.processInstance, props.data.taskType)
         taskStore.init()
+        const nodeData = formatModel(props.data)
+        Object.assign(nodeData, projectPreferences.value)
         await nextTick()
-        initProjectPreferences(props.projectCode, props.data)
-        detailRef.value.value.setValues(formatModel(props.data))
+        detailRef.value.value.setValues(nodeData)
       }
     )
 

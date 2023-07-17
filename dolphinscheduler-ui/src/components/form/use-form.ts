@@ -33,12 +33,10 @@ export function useForm() {
         delete state.formRef.model[key]
       }
     }
-
     setValues(initialValues)
   }
 
   const setValues = (initialValues: { [field: string]: any }) => {
-    console.log(initialValues)
     for (const [key, value] of Object.entries(initialValues)) {
       state.formRef.model[key] = value
     }

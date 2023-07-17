@@ -866,6 +866,7 @@ export default {
   preference: {
     edit_preference: '修改项目偏好设置',
     preference_manage: '项目偏好管理',
+    instruction_tips: '下面这些项目偏好配置将影响这个项目下的所有工作流和任务。当创建工作流和任务时，这些配置将影响组件中的默认选项',
     success: '成功',
     submit: '提交'
   },
