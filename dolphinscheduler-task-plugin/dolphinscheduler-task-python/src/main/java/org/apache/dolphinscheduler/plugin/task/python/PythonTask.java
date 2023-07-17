@@ -27,8 +27,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.io.FileUtils;
 
@@ -88,17 +87,6 @@ public class PythonTask extends AbstractTask {
     }
 
     @Override
-    public String getPreScript() {
-        String rawPythonScript = pythonParameters.getRawScript().replaceAll("\\r\\n", System.lineSeparator());
-        try {
-            rawPythonScript = convertPythonScriptPlaceholders(rawPythonScript);
-        } catch (StringIndexOutOfBoundsException e) {
-            log.error("setShareVar field format error, raw python script : {}", rawPythonScript);
-        }
-        return rawPythonScript;
-    }
-
-    @Override
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             // generate the content of this python script
@@ -135,38 +123,6 @@ public class PythonTask extends AbstractTask {
     @Override
     public AbstractParameters getParameters() {
         return pythonParameters;
-    }
-
-    /**
-     * convertPythonScriptPlaceholders
-     *
-     * @param rawScript rawScript
-     * @return String
-     * @throws StringIndexOutOfBoundsException if substring index is out of bounds
-     */
-    private static String convertPythonScriptPlaceholders(String rawScript) throws StringIndexOutOfBoundsException {
-        int len = "${setShareVar(${".length();
-        int scriptStart = 0;
-        while ((scriptStart = rawScript.indexOf("${setShareVar(${", scriptStart)) != -1) {
-            int start = -1;
-            int end = rawScript.indexOf('}', scriptStart + len);
-            String prop = rawScript.substring(scriptStart + len, end);
-
-            start = rawScript.indexOf(',', end);
-            end = rawScript.indexOf(')', start);
-
-            String value = rawScript.substring(start + 1, end);
-
-            start = rawScript.indexOf('}', start) + 1;
-            end = rawScript.length();
-
-            String replaceScript = String.format("print(\"${{setValue({},{})}}\".format(\"%s\",%s))", prop, value);
-
-            rawScript = rawScript.substring(0, scriptStart) + replaceScript + rawScript.substring(start, end);
-
-            scriptStart += replaceScript.length();
-        }
-        return rawScript;
     }
 
     /**
@@ -215,7 +171,7 @@ public class PythonTask extends AbstractTask {
         log.info("raw python script : {}", pythonParameters.getRawScript());
         String rawPythonScript = pythonParameters.getRawScript().replaceAll("\\r\\n", System.lineSeparator());
         Map<String, Property> paramsMap = mergeParamsWithContext(pythonParameters);
-        return ParameterUtils.convertParameterPlaceholders(rawPythonScript, ParamUtils.convert(paramsMap));
+        return ParameterUtils.convertParameterPlaceholders(rawPythonScript, ParameterUtils.convert(paramsMap));
     }
 
     protected Map<String, Property> mergeParamsWithContext(AbstractParameters parameters) {

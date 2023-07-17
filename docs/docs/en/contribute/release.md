@@ -208,7 +208,7 @@ git push "${GH_REMOTE}" "${VERSION}"-release
 > first to clone the source code. And then make sure you set `GH_REMOTE="origin"` to make all command work fine.
 
 ```shell
-mvn release:prepare -Prelease -Darguments="-Dmaven.test.skip=true -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true -Dspotless.check.skip=true" -DautoVersionSubmodules=true -DdryRun=true -Dusername="${GH_USERNAME}"
+mvn release:prepare -Prelease -Darguments="-Dmaven.test.skip=true -Dspotless.skip=true -Dmaven.javadoc.skip=true -Dspotless.check.skip=true" -DautoVersionSubmodules=true -DdryRun=true -Dusername="${GH_USERNAME}"
 ```
 
 - `-Prelease`: choose release profile, which will pack all the source codes, jar files and executable binary packages.
@@ -226,7 +226,7 @@ mvn release:clean
 Then, prepare to execute the release.
 
 ```shell
-mvn release:prepare -Prelease -Darguments="-Dmaven.test.skip=true -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true -Dspotless.check.skip=true" -DautoVersionSubmodules=true -DpushChanges=false -Dusername="${GH_USERNAME}"
+mvn release:prepare -Prelease -Darguments="-Dmaven.test.skip=true -Dspotless.skip=true -Dmaven.javadoc.skip=true -Dspotless.check.skip=true" -DautoVersionSubmodules=true -DpushChanges=false -Dusername="${GH_USERNAME}"
 ```
 
 It is basically the same as the previous rehearsal command, but deleting `-DdryRun=true` parameter.
@@ -258,7 +258,7 @@ git push "${GH_REMOTE}" --tags
 #### Maven Release Deploy
 
 ```shell
-mvn release:perform -Prelease -Darguments="-Dmaven.test.skip=true -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true -Dspotless.check.skip=true" -DautoVersionSubmodules=true -Dusername="${GH_USERNAME}"
+mvn release:perform -Prelease -Darguments="-Dmaven.test.skip=true -Dspotless.skip=true -Dmaven.javadoc.skip=true -Dspotless.check.skip=true" -DautoVersionSubmodules=true -Dusername="${GH_USERNAME}"
 ```
 
 After that command is executed, the version to be released will be uploaded to Apache staging repository automatically.
@@ -315,7 +315,7 @@ cp -f "${SOURCE_CODE_DIR}"/dolphinscheduler-dist/target/*.tar.gz "${SVN_DIR_DEV}
 cp -f "${SOURCE_CODE_DIR}"/dolphinscheduler-dist/target/*.tar.gz.asc "${SVN_DIR_DEV}/${VERSION}"
 
 # Create sign
-cd "${SVN_DIR_DEV}"
+cd "${SVN_DIR_DEV}/${VERSION}"
 shasum -a 512 apache-dolphinscheduler-"${VERSION}"-src.tar.gz >> apache-dolphinscheduler-"${VERSION}"-src.tar.gz.sha512
 shasum -b -a 512 apache-dolphinscheduler-"${VERSION}"-bin.tar.gz >> apache-dolphinscheduler-"${VERSION}"-bin.tar.gz.sha512
 
@@ -327,7 +327,8 @@ gpg --verify apache-dolphinscheduler-"${VERSION}"-src.tar.gz.asc
 gpg --verify apache-dolphinscheduler-"${VERSION}"-bin.tar.gz.asc
 
 # Commit to Apache SVN
-svn add *
+cd "${SVN_DIR_DEV}"
+svn add "${VERSION}"
 svn --username="${A_USERNAME}" commit -m "release ${VERSION}"
 ```
 
@@ -492,56 +493,13 @@ the release version is `<VERSION>`, the following updates are required(note it w
     issue template have **Version** selection bottom. So after released we should add the new `<VERSION>` to
     bug-report.yml
 
-### Publish Docker Image
+### Publish Docker Image and Helm Chart
 
-we already have the exists CI to publish the latest Docker image to GitHub container register with [config](https://github.com/apache/dolphinscheduler/blob/d80cf21456265c9d84e642bdb4db4067c7577fc6/.github/workflows/publish-docker.yaml#L55-L63).
-We could reuse the main command the CI run and publish our Docker images to Docker Hub by single command.
-
-It is highly recommended to build and test docker images locally first before push to docker hub
-
-```shell
-# Checkout and create to target tag
-git checkout -b "${VERSION}" "${VERSION}"
-
-# Build docker images locally
-./mvnw -B clean package \
-    -Dmaven.test.skip \
-    -Dmaven.javadoc.skip \
-    -Dmaven.checkstyle.skip \
-    -Dmaven.deploy.skip \
-    -Ddocker.tag="${VERSION}" \
-    -Pdocker,release
-
-# You should test whether the standalone-server images work or not
-docker run --name dolphinscheduler-standalone-server -p 12345:12345 -p 25333:25333 -d apache/dolphinscheduler-standalone-server:"${DOLPHINSCHEDULER_VERSION}"
-```
-
-> Note: To push to dockerhub, you must have Apache organization permission of dockerhub. If you don’t you need to require
-> from Apache infra Jira. You can refer to here to submit an application from [here](https://issues.apache.org/jira/projects/INFRA/issues/INFRA-23314)
-
-After verifying the Docker images works as expected, you need to publish the Docker images by the following command:
-
-```shell
-./mvnw -B clean deploy \
-    -Dmaven.test.skip \
-    -Dmaven.javadoc.skip \
-    -Dmaven.checkstyle.skip \
-    -Dmaven.deploy.skip \
-    -Ddocker.tag="${VERSION}" \
-    -Ddocker.hub=apache \
-    -Pdocker,release
-```
-
-## Publish Helm Chart
-
-We will also publish the Helm Chart to Docker Hub so that users don't need to download our source codes just in order
-to install DolphinScheduler with Helm, run the following command to publish the Helm Chart to Docker Hub.
-
-```bash
-cd deploy/kubernetes
-helm package dolphinscheduler
-helm push dolphinscheduler-helm-$VERSION.tgz oci://registry-1.docker.io/apache
-```
+We have a [workflow](../../../../.github/workflows/publish-docker.yaml) to automatically publish Docker images
+and a [workflow](../../../../.github/workflows/publish-helm-chart.yaml) to automatically publish Helm Chart to Docker Hub,
+after you change the release from "pre-release" to "release", the workflow will be triggered. All you need to do
+is to observe the aforementioned workflows, and after they are completed, you can pull the Docker images locally and
+verify that they work as expected.
 
 ### Send Announcement E-mail Community
 
@@ -576,7 +534,7 @@ Website: https://dolphinscheduler.apache.org/
 DolphinScheduler Resources:
 - Issue: https://github.com/apache/dolphinscheduler/issues/
 - Mailing list: dev@dolphinscheduler.apache.org
-- Documents: https://dolphinscheduler.apache.org/zh-cn/docs/<VERSION>/about/introduction
+- Documents: https://dolphinscheduler.apache.org/en-us/docs/<VERSION>/about/introduction
 ```
 
 ## News

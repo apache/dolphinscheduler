@@ -18,21 +18,18 @@
 package org.apache.dolphinscheduler.server.worker.rpc;
 
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
+import org.apache.dolphinscheduler.remote.command.Message;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
+import org.apache.dolphinscheduler.remote.processor.WorkerRpcProcessor;
 import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteResultAckProcessor;
-import org.apache.dolphinscheduler.server.worker.processor.TaskExecuteRunningAckProcessor;
-import org.apache.dolphinscheduler.server.worker.processor.TaskRejectAckProcessor;
-import org.apache.dolphinscheduler.server.worker.processor.TaskUpdatePidAckProcessor;
+import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 
-import javax.annotation.Resource;
+import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 /**
@@ -43,35 +40,26 @@ import org.springframework.stereotype.Component;
 public class WorkerRpcClient implements AutoCloseable {
 
     @Autowired
-    private TaskExecuteRunningAckProcessor taskExecuteRunningAckProcessor;
+    @Lazy
+    private List<WorkerRpcProcessor> workerRpcProcessors;
 
     @Autowired
-    private TaskExecuteResultAckProcessor taskExecuteResultAckProcessor;
-
-    @Resource
-    private TaskUpdatePidAckProcessor taskUpdatePidAckProcessor;
-
-    @Autowired
-    private TaskRejectAckProcessor taskRejectAckProcessor;
+    private WorkerConfig workerConfig;
 
     private NettyRemotingClient nettyRemotingClient;
 
     public void start() {
         log.info("Worker rpc client starting");
-        NettyClientConfig nettyClientConfig = new NettyClientConfig();
-        this.nettyRemotingClient = new NettyRemotingClient(nettyClientConfig);
+        this.nettyRemotingClient = new NettyRemotingClient(workerConfig.getWorkerRpcClientConfig());
         // we only use the client to handle the ack message, we can optimize this, send ack to the nettyServer.
-        this.nettyRemotingClient.registerProcessor(CommandType.TASK_EXECUTE_RUNNING_ACK,
-                taskExecuteRunningAckProcessor);
-        this.nettyRemotingClient.registerProcessor(CommandType.TASK_UPDATE_PID_ACK,
-                taskUpdatePidAckProcessor);
-        this.nettyRemotingClient.registerProcessor(CommandType.TASK_EXECUTE_RESULT_ACK, taskExecuteResultAckProcessor);
-        this.nettyRemotingClient.registerProcessor(CommandType.TASK_REJECT_ACK, taskRejectAckProcessor);
+        for (WorkerRpcProcessor workerRpcProcessor : workerRpcProcessors) {
+            this.nettyRemotingClient.registerProcessor(workerRpcProcessor);
+        }
         log.info("Worker rpc client started");
     }
 
-    public void send(Host host, Command command) throws RemotingException {
-        nettyRemotingClient.send(host, command);
+    public void send(Host host, Message message) throws RemotingException {
+        nettyRemotingClient.send(host, message);
     }
 
     public void close() {

@@ -65,8 +65,6 @@ spec:
               value: {{ .Values.timezone }}
             - name: SPRING_JACKSON_TIME_ZONE
               value: {{ .Values.timezone }}
-            - name: WORKER_ALERT_LISTEN_HOST
-              value: {{ include "dolphinscheduler.fullname" . }}-alert
             {{- include "dolphinscheduler.database.env_vars" . | nindent 12 }}
             {{- include "dolphinscheduler.registry.env_vars" . | nindent 12 }}
             {{ range $key, $value :=  .Values.worker.env }}
@@ -110,6 +108,7 @@ spec:
               subPath: common_properties
             {{- include "dolphinscheduler.sharedStorage.volumeMount" . | nindent 12 }}
             {{- include "dolphinscheduler.fsFileResource.volumeMount" . | nindent 12 }}
+            {{- include "dolphinscheduler.etcd.ssl.volumeMount" . | nindent 12 }}
       volumes:
         {{- if .Values.worker.persistentVolumeClaim.enabled }}
         - name: {{ include "dolphinscheduler.fullname" . }}-worker-data
@@ -137,6 +136,7 @@ spec:
             name: {{ include "dolphinscheduler.fullname" . }}-configs
         {{- include "dolphinscheduler.sharedStorage.volume" . | nindent 8 }}
         {{- include "dolphinscheduler.fsFileResource.volume" . | nindent 8 }}
+        {{- include "dolphinscheduler.etcd.ssl.volume" . | nindent 8 }}
   {{- if .Values.worker.persistentVolumeClaim.enabled }}
   volumeClaimTemplates:
     {{- if .Values.worker.persistentVolumeClaim.dataPersistentVolume.enabled }}

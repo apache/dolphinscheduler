@@ -84,7 +84,7 @@ export function useTable() {
               onClick: () => {
                 router.push({
                   path: `/projects/${row.code}`,
-                  query: {projectName: row.name}
+                  query: { projectName: row.name }
                 })
               }
             },

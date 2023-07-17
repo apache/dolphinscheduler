@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.common.log.remote;
 
+import static org.apache.dolphinscheduler.common.utils.LogUtils.getLocalLogBaseDir;
+
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 
@@ -59,7 +61,6 @@ public class RemoteLogUtils {
             mkdirOfLog(logPath);
             RemoteLogHandler remoteLogHandler = RemoteLogHandlerFactory.getRemoteLogHandler();
             if (remoteLogHandler == null) {
-                log.error("remote log handler is null");
                 return;
             }
             remoteLogHandler.getRemoteLog(logPath);
@@ -75,5 +76,16 @@ public class RemoteLogUtils {
 
     public static boolean isRemoteLoggingEnable() {
         return PropertyUtils.getBoolean(Constants.REMOTE_LOGGING_ENABLE, Boolean.FALSE);
+    }
+
+    public static String getObjectNameFromLogPath(String logPath) {
+        Path localLogBaseDirPath = Paths.get(getLocalLogBaseDir()).toAbsolutePath();
+
+        Path path = Paths.get(logPath);
+        int nameCount = path.getNameCount();
+
+        String remoteLogBaseDir = PropertyUtils.getString(Constants.REMOTE_LOGGING_BASE_DIR);
+        return Paths.get(remoteLogBaseDir, path.subpath(localLogBaseDirPath.getNameCount(), nameCount).toString())
+                .toString();
     }
 }

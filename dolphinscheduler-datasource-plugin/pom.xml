@@ -33,6 +33,7 @@
         <module>dolphinscheduler-datasource-db2</module>
         <module>dolphinscheduler-datasource-hive</module>
         <module>dolphinscheduler-datasource-mysql</module>
+        <module>dolphinscheduler-datasource-oceanbase</module>
         <module>dolphinscheduler-datasource-oracle</module>
         <module>dolphinscheduler-datasource-postgresql</module>
         <module>dolphinscheduler-datasource-spark</module>
@@ -41,10 +42,15 @@
         <module>dolphinscheduler-datasource-all</module>
         <module>dolphinscheduler-datasource-redshift</module>
         <module>dolphinscheduler-datasource-athena</module>
+        <module>dolphinscheduler-datasource-kyuubi</module>
         <module>dolphinscheduler-datasource-trino</module>
         <module>dolphinscheduler-datasource-starrocks</module>
         <module>dolphinscheduler-datasource-azure-sql</module>
         <module>dolphinscheduler-datasource-dameng</module>
+        <module>dolphinscheduler-datasource-ssh</module>
+        <module>dolphinscheduler-datasource-databend</module>
+        <module>dolphinscheduler-datasource-snowflake</module>
+        <module>dolphinscheduler-datasource-vertica</module>
     </modules>
 
     <dependencyManagement>

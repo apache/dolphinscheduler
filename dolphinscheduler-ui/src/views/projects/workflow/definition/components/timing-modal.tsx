@@ -80,6 +80,7 @@ export default defineComponent({
       handleCreateTiming,
       handleUpdateTiming,
       getWorkerGroups,
+      getTenantList,
       getAlertGroups,
       getEnvironmentList,
       getPreviewSchedule
@@ -189,6 +190,7 @@ export default defineComponent({
 
     onMounted(() => {
       getWorkerGroups()
+      getTenantList()
       getAlertGroups()
       getEnvironmentList()
     })
@@ -209,6 +211,7 @@ export default defineComponent({
         timingState.timingForm.processInstancePriority =
           props.row.processInstancePriority
         timingState.timingForm.workerGroup = props.row.workerGroup
+        timingState.timingForm.tenantCode = props.row.tenantCode
         initWarningGroup()
         initEnvironment()
       }
@@ -295,18 +298,19 @@ export default defineComponent({
           </NFormItem>
           <NFormItem label=' ' showFeedback={false}>
             <NList>
-              <NListItem>
-                <NThing
-                  description={t('project.workflow.next_five_execution_times')}
-                >
-                  {this.schedulePreviewList.map((item: string) => (
-                    <NSpace>
-                      {item}
-                      <br />
-                    </NSpace>
-                  ))}
-                </NThing>
-              </NListItem>
+                {this.schedulePreviewList.length > 0 ?
+                    <NListItem>
+                        <NThing
+                            description={t('project.workflow.next_five_execution_times')}
+                        >
+                            {this.schedulePreviewList.map((item: string) => (
+                                <NSpace>
+                                    {item}
+                                    <br/>
+                                </NSpace>
+                            ))}
+                        </NThing>
+                    </NListItem> : null}
             </NList>
           </NFormItem>
           <NFormItem
@@ -369,6 +373,15 @@ export default defineComponent({
             />
           </NFormItem>
           <NFormItem
+            label={t('project.workflow.tenant_code')}
+            path='tenantCode'
+          >
+            <NSelect
+              options={this.tenantList}
+              v-model:value={this.timingForm.tenantCode}
+            />
+          </NFormItem>
+          <NFormItem
             label={t('project.workflow.environment_name')}
             path='environmentCode'
           >
@@ -378,17 +391,19 @@ export default defineComponent({
               clearable
             />
           </NFormItem>
-          {this.timingForm.warningType !== 'NONE' && ( <NFormItem
-            label={t('project.workflow.alarm_group')}
-            path='warningGroupId'
-          >
-            <NSelect
-              options={this.alertGroups}
-              placeholder={t('project.workflow.please_choose')}
-              v-model:value={this.timingForm.warningGroupId}
-              clearable
-            />
-          </NFormItem> )}
+          {this.timingForm.warningType !== 'NONE' && (
+            <NFormItem
+              label={t('project.workflow.alarm_group')}
+              path='warningGroupId'
+            >
+              <NSelect
+                options={this.alertGroups}
+                placeholder={t('project.workflow.please_choose')}
+                v-model:value={this.timingForm.warningGroupId}
+                clearable
+              />
+            </NFormItem>
+          )}
         </NForm>
       </Modal>
     )

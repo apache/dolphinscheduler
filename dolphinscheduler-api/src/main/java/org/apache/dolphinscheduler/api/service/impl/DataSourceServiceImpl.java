@@ -35,6 +35,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
@@ -132,8 +133,6 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         dataSource.setConnectionParams(JSONUtils.toJsonString(connectionParam));
         dataSource.setCreateTime(now);
         dataSource.setUpdateTime(now);
-        dataSource.setTestFlag(datasourceParam.getTestFlag());
-        dataSource.setBindTestId(datasourceParam.getBindTestId());
         try {
             dataSourceMapper.insert(dataSource);
             putMsg(result, Status.SUCCESS);
@@ -186,9 +185,10 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             return result;
         }
         // check password，if the password is not updated, set to the old password.
-        BaseConnectionParam connectionParam =
-                (BaseConnectionParam) DataSourceUtils.buildConnectionParams(dataSourceParam);
+        ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(dataSourceParam);
+
         String password = connectionParam.getPassword();
+
         if (StringUtils.isBlank(password)) {
             String oldConnectionParams = dataSource.getConnectionParams();
             ObjectNode oldParams = JSONUtils.parseObject(oldConnectionParams);
@@ -203,11 +203,6 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         dataSource.setType(dataSource.getType());
         dataSource.setConnectionParams(JSONUtils.toJsonString(connectionParam));
         dataSource.setUpdateTime(now);
-        if (dataSource.getTestFlag() == 1 && dataSourceParam.getTestFlag() == 0) {
-            clearBindTestId(id);
-        }
-        dataSource.setTestFlag(dataSourceParam.getTestFlag());
-        dataSource.setBindTestId(dataSourceParam.getBindTestId());
         try {
             dataSourceMapper.updateById(dataSource);
             log.info("Update datasource complete, datasourceId:{}, datasourceName:{}.", dataSource.getId(),
@@ -255,8 +250,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         baseDataSourceParamDTO.setId(dataSource.getId());
         baseDataSourceParamDTO.setName(dataSource.getName());
         baseDataSourceParamDTO.setNote(dataSource.getNote());
-        baseDataSourceParamDTO.setTestFlag(dataSource.getTestFlag());
-        baseDataSourceParamDTO.setBindTestId(dataSource.getBindTestId());
+
         result.put(Constants.DATA_LIST, baseDataSourceParamDTO);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -328,12 +322,12 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * @return data source list page
      */
     @Override
-    public Map<String, Object> queryDataSourceList(User loginUser, Integer type, int testFlag) {
+    public Map<String, Object> queryDataSourceList(User loginUser, Integer type) {
         Map<String, Object> result = new HashMap<>();
 
         List<DataSource> datasourceList = null;
         if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
-            datasourceList = dataSourceMapper.queryDataSourceByType(0, type, testFlag);
+            datasourceList = dataSourceMapper.queryDataSourceByType(0, type);
         } else {
             Set<Integer> ids = resourcePermissionCheckService
                     .userOwnedResourceIdsAcquisition(AuthorizationType.DATASOURCE, loginUser.getId(), log);
@@ -343,8 +337,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
                 return result;
             }
             datasourceList = dataSourceMapper.selectBatchIds(ids).stream()
-                    .filter(dataSource -> dataSource.getType().getCode() == type)
-                    .filter(dataSource -> dataSource.getTestFlag() == testFlag).collect(Collectors.toList());
+                    .filter(dataSource -> dataSource.getType().getCode() == type).collect(Collectors.toList());
         }
         result.put(Constants.DATA_LIST, datasourceList);
         putMsg(result, Status.SUCCESS);
@@ -383,6 +376,15 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     @Override
     public Result<Object> checkConnection(DbType type, ConnectionParam connectionParam) {
         Result<Object> result = new Result<>();
+        if (type == DbType.SSH) {
+            DataSourceProcessor sshDataSourceProcessor = DataSourceUtils.getDatasourceProcessor(type);
+            if (sshDataSourceProcessor.testConnection(connectionParam)) {
+                putMsg(result, Status.SUCCESS);
+            } else {
+                putMsg(result, Status.CONNECT_DATASOURCE_FAILURE);
+            }
+            return result;
+        }
         try (Connection connection = DataSourceClientProvider.getInstance().getConnection(type, connectionParam)) {
             if (connection == null) {
                 log.error("Connection test to {} datasource failed, connectionParam:{}.", type.getDescp(),
@@ -400,7 +402,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
                     .orElse(e.getMessage());
             log.error("Datasource test connection error, dbType:{}, connectionParam:{}, message:{}.", type,
                     connectionParam, message);
-            return new Result<>(Status.CONNECTION_TEST_FAILURE.getCode(), message);
+            return new Result<>(Status.CONNECTION_TEST_FAILURE);
         }
     }
 
@@ -449,7 +451,6 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             }
             dataSourceMapper.deleteById(datasourceId);
             datasourceUserMapper.deleteByDatasourceId(datasourceId);
-            clearBindTestId(datasourceId);
             log.info("Delete datasource complete, datasourceId:{}.", datasourceId);
             putMsg(result, Status.SUCCESS);
         } catch (Exception e) {
@@ -514,7 +515,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     }
 
     @Override
-    public Map<String, Object> getTables(Integer datasourceId) {
+    public Map<String, Object> getTables(Integer datasourceId, String database) {
         Map<String, Object> result = new HashMap<>();
 
         DataSource dataSource = dataSourceMapper.selectById(datasourceId);
@@ -550,7 +551,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             }
 
             tables = metaData.getTables(
-                    connectionParam.getDatabase(),
+                    database,
                     getDbSchemaPattern(dataSource.getType(), schema, connectionParam),
                     "%", TABLE_TYPES);
             if (null == tables) {
@@ -582,7 +583,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     }
 
     @Override
-    public Map<String, Object> getTableColumns(Integer datasourceId, String tableName) {
+    public Map<String, Object> getTableColumns(Integer datasourceId, String database, String tableName) {
         Map<String, Object> result = new HashMap<>();
 
         DataSource dataSource = dataSourceMapper.selectById(datasourceId);
@@ -602,8 +603,6 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         ResultSet rs = null;
 
         try {
-
-            String database = connectionParam.getDatabase();
             if (null == connection) {
                 return result;
             }
@@ -628,6 +627,62 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         }
 
         List<ParamsOptions> options = getParamsOptions(columnList);
+
+        result.put(Constants.DATA_LIST, options);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> getDatabases(Integer datasourceId) {
+        Map<String, Object> result = new HashMap<>();
+
+        DataSource dataSource = dataSourceMapper.selectById(datasourceId);
+
+        if (dataSource == null) {
+            putMsg(result, Status.QUERY_DATASOURCE_ERROR);
+            return result;
+        }
+
+        List<String> tableList;
+        BaseConnectionParam connectionParam =
+                (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
+                        dataSource.getType(),
+                        dataSource.getConnectionParams());
+
+        if (null == connectionParam) {
+            putMsg(result, Status.DATASOURCE_CONNECT_FAILED);
+            return result;
+        }
+
+        Connection connection =
+                DataSourceUtils.getConnection(dataSource.getType(), connectionParam);
+        ResultSet rs = null;
+
+        try {
+            if (null == connection) {
+                putMsg(result, Status.DATASOURCE_CONNECT_FAILED);
+                return result;
+            }
+            if (dataSource.getType() == DbType.POSTGRESQL) {
+                rs = connection.createStatement().executeQuery(Constants.DATABASES_QUERY_PG);
+            }
+            rs = connection.createStatement().executeQuery(Constants.DATABASES_QUERY);
+            tableList = new ArrayList<>();
+            while (rs.next()) {
+                String name = rs.getString(1);
+                tableList.add(name);
+            }
+        } catch (Exception e) {
+            log.error("Get databases error, datasourceId:{}.", datasourceId, e);
+            putMsg(result, Status.GET_DATASOURCE_TABLES_ERROR);
+            return result;
+        } finally {
+            closeResult(rs);
+            releaseConnection(connection);
+        }
+
+        List<ParamsOptions> options = getParamsOptions(tableList);
 
         result.put(Constants.DATA_LIST, options);
         putMsg(result, Status.SUCCESS);
@@ -667,6 +722,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
                 schemaPattern = "dbo";
                 break;
             case CLICKHOUSE:
+            case DATABEND:
             case PRESTO:
                 if (!StringUtils.isEmpty(schema)) {
                     schemaPattern = schema;
@@ -696,9 +752,6 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
                 log.error("ResultSet close error", e);
             }
         }
-    }
-    private void clearBindTestId(Integer bindTestId) {
-        dataSourceMapper.clearBindTestId(bindTestId);
     }
 
 }

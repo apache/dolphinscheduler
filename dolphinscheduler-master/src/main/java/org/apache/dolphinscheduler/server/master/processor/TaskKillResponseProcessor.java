@@ -18,16 +18,15 @@
 package org.apache.dolphinscheduler.server.master.processor;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.TaskKillResponseCommand;
-import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
+import org.apache.dolphinscheduler.remote.command.task.TaskKillResponse;
+import org.apache.dolphinscheduler.remote.processor.MasterRpcProcessor;
 
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Preconditions;
 import io.netty.channel.Channel;
 
 /**
@@ -35,24 +34,25 @@ import io.netty.channel.Channel;
  */
 @Component
 @Slf4j
-public class TaskKillResponseProcessor implements NettyRequestProcessor {
+public class TaskKillResponseProcessor implements MasterRpcProcessor {
 
     /**
      * task final result response
      * need master process , state persistence
      *
      * @param channel channel
-     * @param command command
+     * @param message command
      */
     @Override
-    public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.TASK_KILL_RESPONSE == command.getType(),
-                String.format("invalid command type : %s", command.getType()));
-
-        TaskKillResponseCommand responseCommand =
-                JSONUtils.parseObject(command.getBody(), TaskKillResponseCommand.class);
+    public void process(Channel channel, Message message) {
+        TaskKillResponse responseCommand = JSONUtils.parseObject(message.getBody(), TaskKillResponse.class);
         log.info("[TaskInstance-{}] Received task kill response command : {}",
                 responseCommand.getTaskInstanceId(), responseCommand);
+    }
+
+    @Override
+    public MessageType getCommandType() {
+        return MessageType.RESPONSE;
     }
 
 }

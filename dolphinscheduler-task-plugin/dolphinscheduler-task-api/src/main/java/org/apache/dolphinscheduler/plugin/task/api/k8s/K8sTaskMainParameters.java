@@ -17,9 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.k8s;
 
+import java.util.List;
 import java.util.Map;
 
 import lombok.Data;
+import io.fabric8.kubernetes.api.model.NodeSelectorRequirement;
 
 /**
  * k8s task parameters
@@ -29,9 +31,13 @@ public class K8sTaskMainParameters {
 
     private String image;
     private String command;
+    private String args;
     private String namespaceName;
     private String clusterName;
+    private String imagePullPolicy;
     private double minCpuCores;
     private double minMemorySpace;
     private Map<String, String> paramsMap;
+    private Map<String, String> labelMap;
+    private List<NodeSelectorRequirement> nodeSelectorRequirements;
 }

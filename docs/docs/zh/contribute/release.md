@@ -215,7 +215,7 @@ git push "${GH_REMOTE}" "${VERSION}"-release
 
 ```shell
 # 运行发版校验
-mvn release:prepare -Prelease -Darguments="-Dmaven.test.skip=true -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true -Dspotless.check.skip=true" -DautoVersionSubmodules=true -DdryRun=true -Dusername="${GH_USERNAME}"
+mvn release:prepare -Prelease -Darguments="-Dmaven.test.skip=true -Dspotless.skip=true -Dmaven.javadoc.skip=true -Dspotless.check.skip=true" -DautoVersionSubmodules=true -DdryRun=true -Dusername="${GH_USERNAME}"
 ```
 
 - `-Prelease`: 选择 release 的 profile，这个 profile 会打包所有源码、jar 文件以及可执行二进制包。
@@ -233,7 +233,7 @@ mvn release:clean
 然后准备执行发布。
 
 ```shell
-mvn release:prepare -Prelease -Darguments="-Dmaven.test.skip=true -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true  -Dspotless.check.skip=true" -DautoVersionSubmodules=true -DpushChanges=false -Dusername="${GH_USERNAME}"
+mvn release:prepare -Prelease -Darguments="-Dmaven.test.skip=true -Dspotless.skip=true -Dmaven.javadoc.skip=true  -Dspotless.check.skip=true" -DautoVersionSubmodules=true -DpushChanges=false -Dusername="${GH_USERNAME}"
 ```
 
 和上一步演练的命令基本相同，去掉了 `-DdryRun=true` 参数。
@@ -262,7 +262,7 @@ git push "${GH_REMOTE}" --tags
 #### 部署发布
 
 ```shell
-mvn release:perform -Prelease -Darguments="-Dmaven.test.skip=true -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true -Dspotless.check.skip=true" -DautoVersionSubmodules=true -Dusername="${GH_USERNAME}"
+mvn release:perform -Prelease -Darguments="-Dmaven.test.skip=true -Dspotless.skip=true -Dmaven.javadoc.skip=true -Dspotless.check.skip=true" -DautoVersionSubmodules=true -Dusername="${GH_USERNAME}"
 ```
 
 执行完该命令后，待发布版本会自动上传到 Apache 的临时筹备仓库(staging repository)。你可以通过访问 [apache staging repositories](https://repository.apache.org/#stagingRepositories)
@@ -320,7 +320,7 @@ cp -f "${SOURCE_CODE_DIR}"/dolphinscheduler-dist/target/*.tar.gz "${SVN_DIR_DEV}
 cp -f "${SOURCE_CODE_DIR}"/dolphinscheduler-dist/target/*.tar.gz.asc "${SVN_DIR_DEV}/${VERSION}"
 
 # Create sign
-cd "${SVN_DIR_DEV}"
+cd "${SVN_DIR_DEV}/${VERSION}"
 shasum -a 512 apache-dolphinscheduler-"${VERSION}"-src.tar.gz >> apache-dolphinscheduler-"${VERSION}"-src.tar.gz.sha512
 shasum -b -a 512 apache-dolphinscheduler-"${VERSION}"-bin.tar.gz >> apache-dolphinscheduler-"${VERSION}"-bin.tar.gz.sha512
 
@@ -332,7 +332,8 @@ gpg --verify apache-dolphinscheduler-"${VERSION}"-src.tar.gz.asc
 gpg --verify apache-dolphinscheduler-"${VERSION}"-bin.tar.gz.asc
 
 # Commit to Apache SVN
-svn add *
+cd "${SVN_DIR_DEV}"
+svn add "${VERSION}"
 svn --username="${A_USERNAME}" commit -m "release ${VERSION}"
 ```
 
@@ -495,53 +496,10 @@ git push --delete "${GH_REMOTE}" "${VERSION}-prepare"
 
 ### 发布 Docker Image
 
-我们已经有了现有的 CI，可以将最新的 Docker image 发布到 GitHub 容器注册 [config](https://github.com/apache/dolphinscheduler/blob/d80cf21456265c9d84e642bdb4db4067c7577fc6/.github/workflows/publish-docker.yaml#L55- L63).
-我们可以重用 CI 运行的主要命令，并通过单个命令将 Docker iamge 发布到 DockerHub。
-
-强烈建议在推送到 docker hub 之前先在本地构建和测试 docker 镜像
-
-```shell
-# Checkout and create to target tag
-git checkout -b "${VERSION}" "${VERSION}"
-
-# Build docker images locally
-./mvnw -B clean package \
-    -Dmaven.test.skip \
-    -Dmaven.javadoc.skip \
-    -Dmaven.checkstyle.skip \
-    -Dmaven.deploy.skip \
-    -Ddocker.tag="${VERSION}" \
-    -Pdocker,release
-
-# You should test whether the standalone-server images work or not
-docker run --name dolphinscheduler-standalone-server -p 12345:12345 -p 25333:25333 -d apache/dolphinscheduler-standalone-server:"${DOLPHINSCHEDULER_VERSION}"
-```
-
-> 注意：推送到 dockerhub，必须有 dockerhub 的 Apache 组织权限。 如果你没有权限，你需要向 Apache infra Jira 申请。 您可以参考
-> [此处](https://issues.apache.org/jira/projects/INFRA/issues/INFRA-23314)提交申请
-
-如果您确保 docker 镜像正常工作，您需要通过以下命令将镜像发布到 Docker Hub
-
-```shell
-./mvnw -B clean deploy \
-    -Dmaven.test.skip \
-    -Dmaven.javadoc.skip \
-    -Dmaven.checkstyle.skip \
-    -Dmaven.deploy.skip \
-    -Ddocker.tag="${VERSION}" \
-    -Ddocker.hub=apache \
-    -Pdocker,release
-```
-
-## 发布 Helm Chart
-
-我们也会将 Helm Chart 发布到 Docker Hub，这样用户就不需要下载我们的源码就可以使用 Helm 安装 DolphinScheduler，运行以下命令发布 Helm Chart 到 Docker Hub。
-
-```bash
-cd deploy/kubernetes
-helm package dolphinscheduler
-helm push dolphinscheduler-helm-$VERSION.tgz oci://registry-1.docker.io/apache
-```
+我们有一个 [工作流](../../../../.github/workflows/publish-docker.yaml) 来自动发布 Docker 镜像，
+以及一个 [工作流](../../../../.github/workflows/publish-helm-chart.yaml) 来自动发布 Helm Chart 到 Docker Hub。
+当你将发版从 "pre-release" 改为 "release" 后，这两个工作流就会被触发。你需要做的就是观察上述的工作流，
+当它们完成后，你可以在本地拉取 Docker 镜像并验证它们是否按预期工作。
 
 ### 发送公告邮件通知社区
 

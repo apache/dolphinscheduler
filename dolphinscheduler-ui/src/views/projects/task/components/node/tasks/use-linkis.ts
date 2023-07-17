@@ -52,7 +52,7 @@ export function useLinkis({
       {
         prop: '',
         value: ''
-      },
+      }
     ],
     rawScript: ''
   } as INodeData)

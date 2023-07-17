@@ -18,12 +18,12 @@
 package org.apache.dolphinscheduler.dao.repository.impl;
 
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
+import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
+import org.apache.dolphinscheduler.dao.repository.BaseDao;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
-
-import org.apache.commons.collections4.CollectionUtils;
-
-import java.util.List;
+import org.apache.dolphinscheduler.plugin.task.api.model.DateInterval;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -33,45 +33,89 @@ import org.springframework.stereotype.Repository;
 
 @Slf4j
 @Repository
-public class ProcessInstanceDaoImpl implements ProcessInstanceDao {
+public class ProcessInstanceDaoImpl extends BaseDao<ProcessInstance, ProcessInstanceMapper>
+        implements
+            ProcessInstanceDao {
 
     @Autowired
-    private ProcessInstanceMapper processInstanceMapper;
+    private ProcessInstanceMapMapper processInstanceMapMapper;
 
-    @Override
-    public int insertProcessInstance(ProcessInstance processInstance) {
-        return processInstanceMapper.insert(processInstance);
+    public ProcessInstanceDaoImpl(@NonNull ProcessInstanceMapper processInstanceMapper) {
+        super(processInstanceMapper);
     }
 
     @Override
-    public int updateProcessInstance(ProcessInstance processInstance) {
-        return processInstanceMapper.updateById(processInstance);
-    }
-
-    @Override
-    public int upsertProcessInstance(@NonNull ProcessInstance processInstance) {
+    public void upsertProcessInstance(@NonNull ProcessInstance processInstance) {
         if (processInstance.getId() != null) {
-            return updateProcessInstance(processInstance);
+            updateById(processInstance);
         } else {
-            return insertProcessInstance(processInstance);
+            insert(processInstance);
         }
     }
 
+    /**
+     * find last scheduler process instance in the date interval
+     *
+     * @param definitionCode definitionCode
+     * @param dateInterval   dateInterval
+     * @return process instance
+     */
     @Override
-    public void deleteByIds(List<Integer> needToDeleteWorkflowInstanceIds) {
-        if (CollectionUtils.isEmpty(needToDeleteWorkflowInstanceIds)) {
-            return;
+    public ProcessInstance queryLastSchedulerProcessInterval(Long definitionCode, DateInterval dateInterval,
+                                                             int testFlag) {
+        return mybatisMapper.queryLastSchedulerProcess(definitionCode,
+                dateInterval.getStartTime(),
+                dateInterval.getEndTime(),
+                testFlag);
+    }
+
+    /**
+     * find last manual process instance interval
+     *
+     * @param definitionCode process definition code
+     * @param dateInterval   dateInterval
+     * @return process instance
+     */
+    @Override
+    public ProcessInstance queryLastManualProcessInterval(Long definitionCode, DateInterval dateInterval,
+                                                          int testFlag) {
+        return mybatisMapper.queryLastManualProcess(definitionCode,
+                dateInterval.getStartTime(),
+                dateInterval.getEndTime(),
+                testFlag);
+    }
+
+    /**
+     * query first schedule process instance
+     *
+     * @param definitionCode definitionCode
+     * @return process instance
+     */
+    @Override
+    public ProcessInstance queryFirstScheduleProcessInstance(Long definitionCode) {
+        return mybatisMapper.queryFirstScheduleProcessInstance(definitionCode);
+    }
+
+    /**
+     * query first manual process instance
+     *
+     * @param definitionCode definitionCode
+     * @return process instance
+     */
+    @Override
+    public ProcessInstance queryFirstStartProcessInstance(Long definitionCode) {
+        return mybatisMapper.queryFirstStartProcessInstance(definitionCode);
+    }
+
+    @Override
+    public ProcessInstance querySubProcessInstanceByParentId(Integer processInstanceId, Integer taskInstanceId) {
+        ProcessInstance processInstance = null;
+        ProcessInstanceMap processInstanceMap =
+                processInstanceMapMapper.queryByParentId(processInstanceId, taskInstanceId);
+        if (processInstanceMap == null || processInstanceMap.getProcessInstanceId() == 0) {
+            return processInstance;
         }
-        processInstanceMapper.deleteBatchIds(needToDeleteWorkflowInstanceIds);
-    }
-
-    @Override
-    public void deleteById(Integer workflowInstanceId) {
-        processInstanceMapper.deleteById(workflowInstanceId);
-    }
-
-    @Override
-    public ProcessInstance queryByWorkflowInstanceId(Integer workflowInstanceId) {
-        return processInstanceMapper.selectById(workflowInstanceId);
+        processInstance = queryById(processInstanceMap.getProcessInstanceId());
+        return processInstance;
     }
 }

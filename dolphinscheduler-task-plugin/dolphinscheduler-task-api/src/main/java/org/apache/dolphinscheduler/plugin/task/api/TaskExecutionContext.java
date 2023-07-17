@@ -69,6 +69,8 @@ public class TaskExecutionContext implements Serializable {
      */
     private String taskType;
 
+    private String workflowInstanceHost;
+
     /**
      * host
      */
@@ -145,11 +147,6 @@ public class TaskExecutionContext implements Serializable {
     private String tenantCode;
 
     /**
-     * task queue
-     */
-    private String queue;
-
-    /**
      * process define id
      */
     private int processDefineId;
@@ -213,12 +210,6 @@ public class TaskExecutionContext implements Serializable {
      * current execution status
      */
     private TaskExecutionStatus currentExecutionStatus;
-
-    /**
-     * Task Logger name should be like:
-     * TaskAppId=TASK-{firstSubmitTime}-{processDefineCode}_{processDefineVersion}-{processInstanceId}-{taskInstanceId}
-     */
-    private String taskLogName;
 
     private ResourceParametersHelper resourceParametersHelper;
 

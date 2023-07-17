@@ -51,10 +51,13 @@ import { useDatasync } from './use-datasync'
 import { useKubeflow } from './use-kubeflow'
 import { useLinkis } from './use-linkis'
 import { useDataFactory } from './use-data-factory'
+import { useRemoteShell } from './use-remote-shell'
+import { useDynamic } from './use-dynamic'
 
 export default {
   SHELL: useShell,
   SUB_PROCESS: useSubProcess,
+  DYNAMIC: useDynamic,
   PYTHON: usePython,
   SPARK: useSpark,
   MR: useMr,
@@ -88,5 +91,6 @@ export default {
   DATASYNC: useDatasync,
   KUBEFLOW: useKubeflow,
   LINKIS: useLinkis,
-  DATA_FACTORY: useDataFactory
+  DATA_FACTORY: useDataFactory,
+  REMOTESHELL: useRemoteShell
 }

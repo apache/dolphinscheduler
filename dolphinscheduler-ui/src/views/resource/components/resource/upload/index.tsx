@@ -14,14 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { defineComponent, toRefs, PropType, getCurrentInstance, watch } from 'vue'
+import {
+  defineComponent,
+  toRefs,
+  PropType,
+  getCurrentInstance,
+  watch
+} from 'vue'
 import { NButton, NForm, NFormItem, NInput, NUpload } from 'naive-ui'
 
 import { useI18n } from 'vue-i18n'
 import Modal from '@/components/modal'
 import { useForm } from './use-form'
 import { useUpload } from './use-upload'
-import { ResourceType } from "@/views/resource/components/resource/types";
+import { ResourceType } from '@/views/resource/components/resource/types'
 
 const props = {
   show: {
@@ -84,7 +90,6 @@ export default defineComponent({
 
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
-
     watch(
       () => props.show,
       () => {
@@ -93,7 +98,6 @@ export default defineComponent({
         if (props.isReupload && props.show) {
           state.uploadForm.fullName = props.fullName
           state.uploadForm.name = props.name
-          state.uploadForm.description = props.description
           state.uploadForm.user_name = props.userName
         }
       }
@@ -131,15 +135,6 @@ export default defineComponent({
               v-model={[this.uploadForm.name, 'value']}
               placeholder={t('resource.file.enter_name_tips')}
               class='input-file-name'
-            />
-          </NFormItem>
-          <NFormItem label={t('resource.file.description')} path='description'>
-            <NInput
-              allowInput={this.trim}
-              type='textarea'
-              v-model={[this.uploadForm.description, 'value']}
-              placeholder={t('resource.file.enter_description_tips')}
-              class='input-description'
             />
           </NFormItem>
           <NFormItem label={t('resource.file.upload_files')} path='file'>

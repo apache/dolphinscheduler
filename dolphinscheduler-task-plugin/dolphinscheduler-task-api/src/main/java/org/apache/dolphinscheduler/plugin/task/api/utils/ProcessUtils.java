@@ -23,6 +23,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.COMMA;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SET_K8S;
 
 import org.apache.dolphinscheduler.common.enums.ResourceManagerType;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
@@ -49,6 +50,7 @@ import java.util.regex.Pattern;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import io.fabric8.kubernetes.client.dsl.LogWatch;
 
 @Slf4j
 public final class ProcessUtils {
@@ -79,6 +81,7 @@ public final class ProcessUtils {
     /**
      * kill tasks according to different task types.
      */
+    @Deprecated
     public static boolean kill(@NonNull TaskExecutionContext request) {
         try {
             log.info("Begin kill task instance, processId: {}", request.getProcessId());
@@ -169,6 +172,7 @@ public final class ProcessUtils {
                 }
                 if (CollectionUtils.isEmpty(appIds)) {
                     log.info("The appId is empty");
+                    return;
                 }
                 ApplicationManager applicationManager = applicationManagerMap.get(ResourceManagerType.YARN);
                 applicationManager.killApplication(new YarnApplicationManagerContext(executePath, tenantCode, appIds));
@@ -203,12 +207,12 @@ public final class ProcessUtils {
      * @param taskAppId
      * @return
      */
-    public static String getPodLog(K8sTaskExecutionContext k8sTaskExecutionContext, String taskAppId) {
+    public static LogWatch getPodLogWatcher(K8sTaskExecutionContext k8sTaskExecutionContext, String taskAppId) {
         KubernetesApplicationManager applicationManager =
                 (KubernetesApplicationManager) applicationManagerMap.get(ResourceManagerType.KUBERNETES);
 
         return applicationManager
-                .collectPodLog(new KubernetesApplicationManagerContext(k8sTaskExecutionContext, taskAppId));
+                .getPodLogWatcher(new KubernetesApplicationManagerContext(k8sTaskExecutionContext, taskAppId));
     }
 
 }

@@ -20,9 +20,9 @@ on:
   push:
     branches:
       - dev
-
-env:
-  HUB: ghcr.io/apache/dolphinscheduler
+  release:
+    types:
+      - released
 
 jobs:
   build:
@@ -41,12 +41,27 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
+      - name: Set environment variables
+        run: |
+          if [[ ${{ github.event_name }} == "release" ]]; then
+            echo "DOCKER_REGISTRY=docker.io" >> $GITHUB_ENV
+            echo "DOCKER_USERNAME=${{ secrets.DOCKERHUB_USER }}" >> $GITHUB_ENV
+            echo "DOCKER_PASSWORD=${{ secrets.DOCKERHUB_TOKEN }}" >> $GITHUB_ENV
+            echo "HUB=apache" >> $GITHUB_ENV
+            echo "DOCKER_TAG=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
+          else
+            echo "DOCKER_REGISTRY=ghcr.io/apache/dolphinscheduler" >> $GITHUB_ENV
+            echo "DOCKER_USERNAME=${{ github.actor }}" >> $GITHUB_ENV
+            echo "DOCKER_PASSWORD=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
+            echo "HUB=ghcr.io/apache/dolphinscheduler" >> $GITHUB_ENV
+            echo "DOCKER_TAG=${{ github.sha }}" >> $GITHUB_ENV
+          fi
       - name: Log in to the Container registry
-        uses: docker/login-action@v1.10.0
+        uses: docker/login-action@v2
         with:
-          registry: ${{ env.HUB }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: ${{ env.DOCKER_REGISTRY }}
+          username: ${{ env.DOCKER_USERNAME }}
+          password: ${{ env.DOCKER_PASSWORD }}
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
@@ -56,8 +71,8 @@ jobs:
           ./mvnw -B clean deploy \
           -Dmaven.test.skip \
           -Dmaven.javadoc.skip \
-          -Dcheckstyle.skip=true \
+          -Dspotless.skip=true \
           -Dmaven.deploy.skip \
-          -Ddocker.tag=${{ github.sha }} \
+          -Ddocker.tag=${{ env.DOCKER_TAG }} \
           -Ddocker.hub=${{ env.HUB }} \
           -Pdocker,release

@@ -25,7 +25,7 @@ import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
-import org.apache.dolphinscheduler.remote.command.WorkflowStateEventChangeCommand;
+import org.apache.dolphinscheduler.remote.command.workflow.WorkflowStateEventChangeRequest;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.utils.Host;
 
@@ -53,16 +53,16 @@ public class PauseExecuteFunction implements ExecuteFunction<PauseExecuteRequest
         workflowInstance.setStateWithDesc(WorkflowExecutionStatus.READY_PAUSE,
                 CommandType.PAUSE.getDescp() + " by " + request.getExecuteUser().getUserName());
 
-        if (processInstanceDao.updateProcessInstance(workflowInstance) <= 0) {
+        if (!processInstanceDao.updateById(workflowInstance)) {
             throw new ExecuteRuntimeException(
                     String.format(
                             "The workflow instance: %s pause failed, due to update the workflow instance status in DB failed",
                             workflowInstance.getName()));
         }
-        WorkflowStateEventChangeCommand workflowStateEventChangeCommand = new WorkflowStateEventChangeCommand(
+        WorkflowStateEventChangeRequest workflowStateEventChangeRequest = new WorkflowStateEventChangeRequest(
                 workflowInstance.getId(), 0, workflowInstance.getState(), workflowInstance.getId(), 0);
         try {
-            apiRpcClient.send(Host.of(workflowInstance.getHost()), workflowStateEventChangeCommand.convert2Command());
+            apiRpcClient.send(Host.of(workflowInstance.getHost()), workflowStateEventChangeRequest.convert2Command());
         } catch (RemotingException e) {
             throw new ExecuteRuntimeException(
                     String.format(

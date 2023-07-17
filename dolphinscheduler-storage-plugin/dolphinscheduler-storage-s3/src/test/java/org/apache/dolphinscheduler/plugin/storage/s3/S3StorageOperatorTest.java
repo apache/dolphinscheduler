@@ -165,10 +165,19 @@ public class S3StorageOperatorTest {
     }
 
     @Test
-    public void getResourceFileName() {
-        final String expectedResourceFileName =
+    public void getResourceFullName() {
+        final String expectedResourceFullName =
                 String.format("dolphinscheduler/%s/resources/%s", TENANT_CODE_MOCK, FILE_NAME_MOCK);
-        final String resourceFileName = s3StorageOperator.getResourceFileName(TENANT_CODE_MOCK, FILE_NAME_MOCK);
+        final String resourceFullName = s3StorageOperator.getResourceFullName(TENANT_CODE_MOCK, FILE_NAME_MOCK);
+        Assertions.assertEquals(expectedResourceFullName, resourceFullName);
+    }
+
+    @Test
+    public void getResourceFileName() {
+        final String expectedResourceFileName = FILE_NAME_MOCK;
+        final String resourceFullName =
+                String.format("dolphinscheduler/%s/resources/%s", TENANT_CODE_MOCK, FILE_NAME_MOCK);
+        final String resourceFileName = s3StorageOperator.getResourceFileName(TENANT_CODE_MOCK, resourceFullName);
         Assertions.assertEquals(expectedResourceFileName, resourceFileName);
     }
 
@@ -210,7 +219,6 @@ public class S3StorageOperatorTest {
     public void copy() {
         boolean isSuccess = false;
         doReturn(null).when(s3Client).copyObject(anyString(), anyString(), anyString(), anyString());
-        doNothing().when(s3Client).deleteObject(anyString(), anyString());
         try {
             isSuccess = s3StorageOperator.copy(FILE_PATH_MOCK, FILE_PATH_MOCK, false, false);
         } catch (IOException e) {
@@ -219,7 +227,6 @@ public class S3StorageOperatorTest {
 
         Assertions.assertTrue(isSuccess);
         verify(s3Client, times(1)).copyObject(anyString(), anyString(), anyString(), anyString());
-        verify(s3Client, times(1)).deleteObject(anyString(), anyString());
     }
 
     @Test

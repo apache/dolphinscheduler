@@ -92,6 +92,8 @@
         <docker.build.skip>true</docker.build.skip>
         <docker.push.skip>true</docker.push.skip>
         <skipDepCheck>true</skipDepCheck>
+        <build.ui.skip>false</build.ui.skip>
+        <spotless.skip>false</spotless.skip>
     </properties>
 
     <dependencyManagement>
@@ -183,17 +185,6 @@
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-alert-all</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-registry-api</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-registry-all</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -615,6 +606,7 @@
                 <artifactId>spotless-maven-plugin</artifactId>
                 <version>${spotless.version}</version>
                 <configuration>
+                    <skip>${spotless.skip}</skip>
                     <java>
                         <eclipse>
                             <file>style/spotless_dolphinscheduler_formatter.xml</file>

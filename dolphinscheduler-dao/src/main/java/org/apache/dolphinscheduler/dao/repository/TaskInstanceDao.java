@@ -25,30 +25,17 @@ import java.util.List;
 /**
  * Task Instance DAO
  */
-public interface TaskInstanceDao {
+public interface TaskInstanceDao extends IDao<TaskInstance> {
 
     /**
      * Update or Insert task instance to DB.
      * ID is null -> Insert
      * ID is not null -> Update
+     *
      * @param taskInstance task instance
      * @return result
      */
     boolean upsertTaskInstance(TaskInstance taskInstance);
-
-    /**
-     * Insert task instance to DB.
-     * @param taskInstance task instance
-     * @return result
-     */
-    boolean insertTaskInstance(TaskInstance taskInstance);
-
-    /**
-     * Update task instance to DB.
-     * @param taskInstance task instance
-     * @return result
-     */
-    boolean updateTaskInstance(TaskInstance taskInstance);
 
     /**
      * Submit a task instance to DB.
@@ -56,7 +43,7 @@ public interface TaskInstanceDao {
      * @param processInstance process instance
      * @return task instance
      */
-    TaskInstance submitTaskInstanceToDB(TaskInstance taskInstance, ProcessInstance processInstance);
+    boolean submitTaskInstanceToDB(TaskInstance taskInstance, ProcessInstance processInstance);
 
     /**
      * Query list of valid task instance by process instance id
@@ -64,7 +51,7 @@ public interface TaskInstanceDao {
      * @param testFlag test flag
      * @return list of valid task instance
      */
-    List<TaskInstance> findValidTaskListByProcessId(Integer processInstanceId, int testFlag);
+    List<TaskInstance> queryValidTaskListByWorkflowInstanceId(Integer processInstanceId, int testFlag);
 
     /**
      * Query list of task instance by process instance id and task code
@@ -72,28 +59,21 @@ public interface TaskInstanceDao {
      * @param taskCode task code
      * @return list of valid task instance
      */
-    TaskInstance findTaskByInstanceIdAndCode(Integer processInstanceId, Long taskCode);
+    TaskInstance queryByWorkflowInstanceIdAndTaskCode(Integer processInstanceId, Long taskCode);
 
     /**
      * find previous task list by work process id
      * @param processInstanceId processInstanceId
      * @return task instance list
      */
-    List<TaskInstance> findPreviousTaskListByWorkProcessId(Integer processInstanceId);
-
-    /**
-     * find task instance by id
-     * @param taskId task id
-     * @return task instance
-     */
-    TaskInstance findTaskInstanceById(Integer taskId);
+    List<TaskInstance> queryPreviousTaskListByWorkflowInstanceId(Integer processInstanceId);
 
     /**
      * find task instance by cache_key
      * @param cacheKey cache key
      * @return task instance
      */
-    TaskInstance findTaskInstanceByCacheKey(String cacheKey);
+    TaskInstance queryByCacheKey(String cacheKey);
 
     /**
      * clear task instance cache by cache_key
@@ -102,14 +82,7 @@ public interface TaskInstanceDao {
      */
     Boolean clearCacheByCacheKey(String cacheKey);
 
-    /**
-     * find task instance list by id list
-     * @param idList task id list
-     * @return task instance list
-     */
-    List<TaskInstance> findTaskInstanceByIdList(List<Integer> idList);
-
     void deleteByWorkflowInstanceId(int workflowInstanceId);
 
-    List<TaskInstance> findTaskInstanceByWorkflowInstanceId(Integer processInstanceId);
+    List<TaskInstance> queryByWorkflowInstanceId(Integer processInstanceId);
 }
