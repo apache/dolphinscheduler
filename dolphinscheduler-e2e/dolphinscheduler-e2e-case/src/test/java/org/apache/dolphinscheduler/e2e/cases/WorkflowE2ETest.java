@@ -203,7 +203,7 @@ class WorkflowE2ETest {
                 .next()
                 .rerun();
 
-        await().pollDelay(Duration.ofSeconds(20)).untilAsserted(() -> {
+        await().timeout(Duration.ofSeconds(20)).untilAsserted(() -> {
             browser.navigate().refresh();
 
             final Row row = projectPage
