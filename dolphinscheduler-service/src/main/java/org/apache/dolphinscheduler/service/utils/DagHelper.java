@@ -424,19 +424,61 @@ public class DagHelper {
         int resultConditionLocation = switchParameters.getResultConditionLocation();
         List<SwitchResultVo> conditionResultVoList = switchParameters.getDependTaskList();
         List<Long> switchTaskList = conditionResultVoList.get(resultConditionLocation).getNextNode();
+        Set<Long> switchNeedWorkCodes = new HashSet<>();
         if (CollectionUtils.isEmpty(switchTaskList)) {
             switchTaskList = new ArrayList<>();
+        } else {
+            // get all downstream nodes of the branch that the switch node needs to execute
+            for (Long switchTaskCode : switchTaskList) {
+                getSwitchNeedWorkCodes(switchTaskCode, dag, switchNeedWorkCodes);
+            }
         }
         // conditionResultVoList.remove(resultConditionLocation);
         for (SwitchResultVo info : conditionResultVoList) {
             if (CollectionUtils.isEmpty(info.getNextNode())) {
                 continue;
             }
-            setTaskNodeSkip(info.getNextNode().get(0), dag, completeTaskList, skipTaskNodeList);
+            setSwitchTaskNodeSkip(info.getNextNode().get(0), dag, completeTaskList, skipTaskNodeList,
+                    switchNeedWorkCodes);
         }
         return switchTaskList;
     }
 
+    /**
+     * get all downstream nodes of the branch that the switch node needs to execute
+     * @param taskCode
+     * @param dag
+     * @param switchNeedWorkCodes
+     */
+    public static void getSwitchNeedWorkCodes(Long taskCode, DAG<Long, TaskNode, TaskNodeRelation> dag,
+                                              Set<Long> switchNeedWorkCodes) {
+        switchNeedWorkCodes.add(taskCode);
+        Set<Long> subsequentNodes = dag.getSubsequentNodes(taskCode);
+        if (org.apache.commons.collections.CollectionUtils.isNotEmpty(subsequentNodes)) {
+            for (Long subCode : subsequentNodes) {
+                getSwitchNeedWorkCodes(subCode, dag, switchNeedWorkCodes);
+            }
+        }
+    }
+
+    private static void setSwitchTaskNodeSkip(Long skipNodeCode,
+                                              DAG<Long, TaskNode, TaskNodeRelation> dag,
+                                              Map<Long, TaskInstance> completeTaskList,
+                                              Map<Long, TaskNode> skipTaskNodeList,
+                                              Set<Long> switchNeedWorkCodes) {
+        // ignore when the node that needs to be skipped exists on the branch that the switch type node needs to execute
+        if (!dag.containsNode(skipNodeCode) || switchNeedWorkCodes.contains(skipNodeCode)) {
+            return;
+        }
+        skipTaskNodeList.putIfAbsent(skipNodeCode, dag.getNode(skipNodeCode));
+        Collection<Long> postNodeList = dag.getSubsequentNodes(skipNodeCode);
+        for (Long post : postNodeList) {
+            TaskNode postNode = dag.getNode(post);
+            if (isTaskNodeNeedSkip(postNode, skipTaskNodeList)) {
+                setTaskNodeSkip(post, dag, completeTaskList, skipTaskNodeList);
+            }
+        }
+    }
     /**
      * set task node and the post nodes skip flag
      */
