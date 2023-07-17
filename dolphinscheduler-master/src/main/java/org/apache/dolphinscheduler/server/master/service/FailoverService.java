@@ -23,7 +23,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Component;
-////失败重试服务
+
 @Component
 @Slf4j
 public class FailoverService {
@@ -39,7 +39,7 @@ public class FailoverService {
 
     /**
      * failover server when server down
-     *节点挂起时失败重试
+     *
      * @param serverHost server host
      * @param nodeType   node type
      */
