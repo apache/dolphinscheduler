@@ -21,6 +21,9 @@ metadata:
   labels:
     app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-worker-headless
     {{- include "dolphinscheduler.common.labels" . | nindent 4 }}
+  {{- if .Values.worker.service.annotations }}
+  annotations: {{- toYaml .Values.worker.service.annotations | nindent 4 }}
+  {{- end }}
 spec:
   clusterIP: "None"
   ports:
@@ -28,5 +31,39 @@ spec:
       targetPort: worker-port
       protocol: TCP
       name: worker-port
+    - port: 1235
+      targetPort: actuator-port
+      protocol: TCP
+      name: actuator-port
   selector:
     {{- include "dolphinscheduler.worker.labels" . | nindent 4 }}
+
+---
+{{- if .Values.worker.service.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "dolphinscheduler.fullname" . }}-worker
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "dolphinscheduler.common.labels" . | nindent 4 }}
+    {{- if .Values.worker.service.serviceMonitor.labels }}
+    {{- toYaml .Values.worker.service.serviceMonitor.labels | nindent 4 }}
+    {{- end }}
+  {{- if .Values.worker.service.serviceMonitor.annotations }}
+  annotations: {{- toYaml .Values.worker.service.serviceMonitor.annotations | nindent 4 }}
+  {{- end }}
+spec:
+  namespaceSelector:
+    matchNames:
+    - {{ .Values.worker.service.serviceMonitor.namespace | default .Release.Namespace }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-worker-headless
+      {{- include "dolphinscheduler.common.labels" . | nindent 6 }}
+  endpoints:
+  - scheme: http
+    targetPort: actuator-port
+    path: {{ .Values.worker.service.serviceMonitor.path }}
+    interval: {{ .Values.worker.service.serviceMonitor.interval }}
+{{- end }}

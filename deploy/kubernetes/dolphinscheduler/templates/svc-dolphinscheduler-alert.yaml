@@ -18,9 +18,13 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ include "dolphinscheduler.fullname" . }}-alert
+  namespace: {{ .Release.Namespace }}
   labels:
     app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-alert
     {{- include "dolphinscheduler.common.labels" . | nindent 4 }}
+  {{- if .Values.alert.service.annotations }}
+  annotations: {{- toYaml .Values.alert.service.annotations | nindent 4 }}
+  {{- end }}
 spec:
   ports:
     - port: 50052
@@ -33,3 +37,33 @@ spec:
       name: actuator-port
   selector:
     {{- include "dolphinscheduler.alert.labels" . | nindent 4 }}
+
+---
+{{- if .Values.alert.service.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "dolphinscheduler.fullname" . }}-alert
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "dolphinscheduler.common.labels" . | nindent 4 }}
+    {{- if .Values.alert.service.serviceMonitor.labels }}
+    {{- toYaml .Values.alert.service.serviceMonitor.labels | nindent 4 }}
+    {{- end }}
+  {{- if .Values.alert.service.serviceMonitor.annotations }}
+  annotations: {{- toYaml .Values.alert.service.serviceMonitor.annotations | nindent 4 }}
+  {{- end }}
+spec:
+  namespaceSelector:
+    matchNames:
+    - {{ .Values.alert.service.serviceMonitor.namespace | default .Release.Namespace }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-alert
+      {{- include "dolphinscheduler.common.labels" . | nindent 6 }}
+  endpoints:
+  - scheme: http
+    targetPort: actuator-port
+    path: {{ .Values.alert.service.serviceMonitor.path }}
+    interval: {{ .Values.alert.service.serviceMonitor.interval }}
+{{- end }}
