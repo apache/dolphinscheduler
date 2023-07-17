@@ -85,6 +85,7 @@ public class WorkerTaskKillProcessor implements WorkerRpcProcessor {
                 return;
             }
 
+            boolean result = doKill(taskExecutionContext);
             this.cancelApplication(taskInstanceId);
 
             int processId = taskExecutionContext.getProcessId();
@@ -96,8 +97,6 @@ public class WorkerTaskKillProcessor implements WorkerRpcProcessor {
                 log.info("the task has not been executed and has been cancelled, task id:{}", taskInstanceId);
                 return;
             }
-
-            boolean result = doKill(taskExecutionContext);
 
             taskExecutionContext.setCurrentExecutionStatus(
                     result ? TaskExecutionStatus.SUCCESS : TaskExecutionStatus.FAILURE);
