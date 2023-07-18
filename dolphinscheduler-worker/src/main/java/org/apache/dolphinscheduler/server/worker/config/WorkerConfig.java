@@ -24,6 +24,8 @@ import org.apache.dolphinscheduler.registry.api.ConnectStrategyProperties;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.time.Duration;
 
 import lombok.Data;
@@ -80,7 +82,9 @@ public class WorkerConfig implements Validator {
         if (workerConfig.getMaxCpuLoadAvg() <= 0) {
             workerConfig.setMaxCpuLoadAvg(Runtime.getRuntime().availableProcessors() * 2);
         }
-        workerConfig.setWorkerAddress(NetUtils.getAddr(workerConfig.getListenPort()));
+        if (StringUtils.isEmpty(workerConfig.getWorkerAddress())) {
+            workerConfig.setWorkerAddress(NetUtils.getAddr(workerConfig.getListenPort()));
+        }
 
         workerConfig.setWorkerRegistryPath(REGISTRY_DOLPHINSCHEDULER_WORKERS + "/" + workerConfig.getWorkerAddress());
         printConfig();
