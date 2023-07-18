@@ -857,5 +857,8 @@ public final class Constants {
     public static final String DATABASES_QUERY = "show databases";
     public static final String DATABASES_QUERY_PG = "SELECT datname FROM pg_database";
 
+    /**
+     * K8S sensitive param
+     */
     public static final String K8S_CONFIG_REGEX = "(?<=((?i)configYaml(\" : \"))).*?(?=(\",\\n))";
 }
