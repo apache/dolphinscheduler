@@ -193,7 +193,7 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
                     .setVarPool(finishProcessInstance.getVarPool());
             log.info("Cross workflow parameter passing success");
         } catch (Exception ex) {
-            log.info("Cross workflow parameter passing error");
+            log.error("Cross workflow parameter passing error: {}", ex);
         }
     }
 
