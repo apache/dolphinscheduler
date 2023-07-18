@@ -526,7 +526,7 @@ export default {
     model_type: '模式',
     form: '表单',
     table: '表名',
-    table_tips: '请输入Mysql表名(必填)',
+    table_tips: '请输入表名(必填)',
     column_type: '列类型',
     all_columns: '全表导入',
     some_columns: '选择列',
