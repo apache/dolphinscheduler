@@ -20,8 +20,10 @@ package org.apache.dolphinscheduler.server.worker.runner;
 import static ch.qos.logback.classic.ClassicConstants.FINALIZE_SESSION_MARKER;
 import static org.apache.dolphinscheduler.common.constants.Constants.DRY_RUN_FLAG_YES;
 import static org.apache.dolphinscheduler.common.constants.Constants.SINGLE_SLASH;
+import static org.apache.dolphinscheduler.common.constants.Constants.K8S_CONFIG_REGEX;
 
 import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.common.log.SensitiveDataConverter;
 import org.apache.dolphinscheduler.common.log.remote.RemoteLogUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
@@ -93,6 +95,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         this.taskPluginManager = taskPluginManager;
         this.storageOperate = storageOperate;
         this.workerRegistryClient = workerRegistryClient;
+        SensitiveDataConverter.addMaskPattern(K8S_CONFIG_REGEX);
     }
 
     protected abstract void executeTask(TaskCallBack taskCallBack);

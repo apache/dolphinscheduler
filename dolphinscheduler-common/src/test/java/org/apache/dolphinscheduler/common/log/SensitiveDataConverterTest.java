@@ -22,6 +22,8 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.apache.dolphinscheduler.common.constants.Constants.K8S_CONFIG_REGEX;
+
 public class SensitiveDataConverterTest {
 
     private final Logger logger = LoggerFactory.getLogger(SensitiveDataConverterTest.class);
@@ -62,4 +64,32 @@ public class SensitiveDataConverterTest {
         Assertions.assertEquals(expectedMsg, maskedLog);
     }
 
+
+    @Test
+    public void testK8SLogMsgConverter() {
+        String msg ="End initialize task {\n" +
+                "  \"taskName\" : \"echo\",\n" +
+                "  \"k8sTaskExecutionContext\" : {\n" +
+                "    \"configYaml\" : \"apiVersion: v1 xxx client-key-data: ==\",\n" +
+                "    \"namespace\" : \"abc\"\n" +
+                "  },\n" +
+                "  \"logBufferEnable\" : false\n" +
+                "}";
+        String maskMsg = "End initialize task {\n" +
+                "  \"taskName\" : \"echo\",\n" +
+                "  \"k8sTaskExecutionContext\" : {\n" +
+                "    \"configYaml\" : \"**************************************\",\n" +
+                "    \"namespace\" : \"abc\"\n" +
+                "  },\n" +
+                "  \"logBufferEnable\" : false\n" +
+                "}";
+        SensitiveDataConverter.addMaskPattern(K8S_CONFIG_REGEX);
+        final String maskedLog = SensitiveDataConverter.maskSensitiveData(msg);
+
+        logger.info("original parameter : {}", msg);
+        logger.info("masked parameter : {}", maskedLog);
+
+        Assertions.assertEquals(maskMsg, maskedLog);
+
+    }
 }
