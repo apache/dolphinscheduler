@@ -850,4 +850,15 @@ public final class Constants {
     public static final String REMOTE_LOGGING_GCS_CREDENTIAL = "remote.logging.google.cloud.storage.credential";
 
     public static final String REMOTE_LOGGING_GCS_BUCKET_NAME = "remote.logging.google.cloud.storage.bucket.name";
+
+    /**
+     * data quality
+     */
+    public static final String DATABASES_QUERY = "show databases";
+    public static final String DATABASES_QUERY_PG = "SELECT datname FROM pg_database";
+
+    /**
+     * K8S sensitive param
+     */
+    public static final String K8S_CONFIG_REGEX = "(?<=((?i)configYaml(\" : \"))).*?(?=(\",\\n))";
 }

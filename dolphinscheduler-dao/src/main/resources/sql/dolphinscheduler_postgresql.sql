@@ -1360,6 +1360,12 @@ VALUES(28, 'enum_list', 'input', '$t(enum_list)', NULL, NULL, 'Please enter enum
 INSERT INTO t_ds_dq_rule_input_entry
 (id, field, "type", title, value, "options", placeholder, option_source_type, value_type, input_type, is_show, can_edit, is_emit, is_validate, create_time, update_time)
 VALUES(29, 'begin_time', 'input', '$t(begin_time)', NULL, NULL, 'Please enter begin time', 0, 0, 0, 1, 1, 0, 0, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+INSERT INTO t_ds_dq_rule_input_entry
+(id, field, "type", title, value, "options", placeholder, option_source_type, value_type, input_type, is_show, can_edit, is_emit, is_validate, create_time, update_time)
+VALUES(30, 'src_database', 'select', '$t(src_database)', NULL, NULL, 'Please select source database', 0, 0, 0, 1, 1, 1, 1, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+INSERT INTO t_ds_dq_rule_input_entry
+(id, field, "type", title, value, "options", placeholder, option_source_type, value_type, input_type, is_show, can_edit, is_emit, is_validate, create_time, update_time)
+VALUES(31, 'target_database', 'select', '$t(target_database)', NULL, NULL, 'Please select target database', 0, 0, 0, 1, 1, 1, 1, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 
 --
 -- Table structure for table t_ds_dq_task_statistics_value
@@ -1844,7 +1850,42 @@ VALUES(149, 10, 19, NULL, 12, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.00
 INSERT INTO t_ds_relation_rule_input_entry
 (id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
 VALUES(150, 8, 29, NULL, 7, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
-
+INSERT INTO t_ds_relation_rule_input_entry
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(151, 1, 30, NULL, 2, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+INSERT INTO t_ds_relation_rule_input_entry
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(152, 2, 30, NULL, 2, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+INSERT INTO t_ds_relation_rule_input_entry
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(153, 3, 30, NULL, 2, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+INSERT INTO t_ds_relation_rule_input_entry
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(154, 4, 30, NULL, 2, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+INSERT INTO t_ds_relation_rule_input_entry
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(155, 5, 30, NULL, 2, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+INSERT INTO t_ds_relation_rule_input_entry
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(156, 6, 30, NULL, 2, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+INSERT INTO t_ds_relation_rule_input_entry
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(157, 7, 30, NULL, 2, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+INSERT INTO t_ds_relation_rule_input_entry
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(158, 8, 30, NULL, 2, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+INSERT INTO t_ds_relation_rule_input_entry
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(159, 9, 30, NULL, 2, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+INSERT INTO t_ds_relation_rule_input_entry
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(160, 10, 30, NULL, 2, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+INSERT INTO t_ds_relation_rule_input_entry
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(161, 3, 31, NULL, 6, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
+INSERT INTO t_ds_relation_rule_input_entry
+(id, rule_id, rule_input_entry_id, values_map, "index", create_time, update_time)
+VALUES(162, 4, 31, NULL, 7, '2021-03-03 11:31:24.000', '2021-03-03 11:31:24.000');
 --
 -- Table structure for table t_ds_environment
 --

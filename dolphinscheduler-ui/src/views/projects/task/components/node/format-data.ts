@@ -298,6 +298,7 @@ export function formatParams(data: INodeData): {
       operator: data.operator,
       src_connector_type: data.src_connector_type,
       src_datasource_id: data.src_datasource_id,
+      src_database: data.src_database,
       field_length: data.field_length,
       begin_time: data.begin_time,
       deadline: data.deadline,
@@ -312,6 +313,7 @@ export function formatParams(data: INodeData): {
       statistics_name: data.statistics_name,
       target_connector_type: data.target_connector_type,
       target_datasource_id: data.target_datasource_id,
+      target_database: data.target_database,
       target_table: data.target_table,
       threshold: data.threshold,
       mapping_columns: JSON.stringify(data.mapping_columns)
@@ -691,6 +693,7 @@ export function formatModel(data: ITaskData) {
       data.taskParams.ruleInputParameter.src_connector_type
     params.src_datasource_id =
       data.taskParams.ruleInputParameter.src_datasource_id
+    params.src_database = data.taskParams.ruleInputParameter.src_database
     params.src_table = data.taskParams.ruleInputParameter.src_table
     params.field_length = data.taskParams.ruleInputParameter.field_length
     params.begin_time = data.taskParams.ruleInputParameter.begin_time
@@ -708,6 +711,7 @@ export function formatModel(data: ITaskData) {
       data.taskParams.ruleInputParameter.target_connector_type
     params.target_datasource_id =
       data.taskParams.ruleInputParameter.target_datasource_id
+    params.target_database = data.taskParams.ruleInputParameter.target_database
     params.target_table = data.taskParams.ruleInputParameter.target_table
     params.threshold = data.taskParams.ruleInputParameter.threshold
     if (data.taskParams.ruleInputParameter.mapping_columns)
