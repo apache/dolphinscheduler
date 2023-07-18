@@ -41,8 +41,7 @@ const PieChart = defineComponent({
 
     const option = {
       tooltip: {
-        trigger: 'item',
-        backgroundColor: '#fff'
+        trigger: 'item'
       },
       legend: {
         bottom: '0%',

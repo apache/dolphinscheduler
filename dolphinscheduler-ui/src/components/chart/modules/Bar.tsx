@@ -50,7 +50,6 @@ const BarChart = defineComponent({
         axisPointer: {
           type: 'shadow'
         },
-        backgroundColor: '#fff'
       },
       grid: {
         left: '3%',
