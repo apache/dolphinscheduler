@@ -14,27 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {onMounted, reactive, ref, Ref, unref} from 'vue'
+import { onMounted, reactive, ref, Ref, unref } from 'vue'
 import getElementByJson from '@/components/form/get-elements-by-json'
 import type {
   IFormItem,
   IJsonItem,
-  INodeData,
+  INodeData
 } from '../task/components/node/types'
-import * as Fields from "@/views/projects/task/components/node/fields";
-import { Router, useRouter } from "vue-router";
+import * as Fields from '@/views/projects/task/components/node/fields'
+import { Router, useRouter } from 'vue-router'
 import {
   queryProjectPreferenceByProjectCode,
   updateProjectPreference
-} from "@/service/modules/projects-preference";
-import {useI18n} from "vue-i18n";
-import { UpdateProjectPreferenceReq } from "@/service/modules/projects-preference/types";
-import {useWarningType} from "@/views/projects/preference/components/use-warning-type";
-import {useTenant} from "@/views/projects/preference/components/use-tenant";
-import {useAlertGroup} from "@/views/projects/preference/components/use-alert-group";
+} from '@/service/modules/projects-preference'
+import { useI18n } from 'vue-i18n'
+import { UpdateProjectPreferenceReq } from '@/service/modules/projects-preference/types'
+import { useWarningType } from '@/views/projects/preference/components/use-warning-type'
+import { useTenant } from '@/views/projects/preference/components/use-tenant'
+import { useAlertGroup } from '@/views/projects/preference/components/use-alert-group'
 
 export function useForm() {
-
   const router: Router = useRouter()
   const { t } = useI18n()
 
@@ -95,22 +94,22 @@ export function useForm() {
 
   const preferencesItems: IJsonItem[] = [
     Fields.useTaskPriority(),
+    useTenant(),
     Fields.useWorkerGroup(),
     Fields.useEnvironmentName(data.model, true),
     ...Fields.useFailed(),
-    ...Fields.useResourceLimit(),
-    Fields.useDelayTime(data.model),
-    ...Fields.useTimeoutAlarm(data.model),
     useWarningType(),
-    useTenant(),
     useAlertGroup(),
+    ...Fields.useResourceLimit()
   ]
 
   const restructurePreferencesItems = (preferencesItems: any) => {
     for (let item of preferencesItems) {
       if (item.validate?.required) {
         item.validate.required = false
+        item.span = 12
       }
+      Object.assign(item, { props: { style: 'width: 250px' } })
     }
     return preferencesItems
   }
@@ -125,5 +124,13 @@ export function useForm() {
 
   getElements()
 
-  return { formRef, elementsRef, rulesRef, model: data.model, formProps, t, handleUpdate }
+  return {
+    formRef,
+    elementsRef,
+    rulesRef,
+    model: data.model,
+    formProps,
+    t,
+    handleUpdate
+  }
 }

@@ -47,11 +47,11 @@ import {
   NThing,
   NPopover
 } from 'naive-ui'
-import { Router, useRouter } from "vue-router";
+import { Router, useRouter } from 'vue-router'
 import { ArrowDownOutlined, ArrowUpOutlined } from '@vicons/antd'
 import { timezoneList } from '@/common/timezone'
 import Crontab from '@/components/crontab'
-import {queryProjectPreferenceByProjectCode} from "@/service/modules/projects-preference"
+import { queryProjectPreferenceByProjectCode } from '@/service/modules/projects-preference'
 
 const props = {
   row: {
@@ -107,7 +107,6 @@ export default defineComponent({
         }
       })
     }
-
 
     const hideModal = () => {
       ctx.emit('update:show')
@@ -203,6 +202,71 @@ export default defineComponent({
       })
     }
 
+    const containValueInOptions = (
+      options: Array<any>,
+      findingValue: string
+    ): boolean => {
+      for (let { value } of options) {
+        if (findingValue === value) {
+          return true
+        }
+      }
+      return false
+    }
+
+    const restructureTimingForm = (timingForm: any) => {
+      if (projectPreferences.value?.taskPriority) {
+        timingForm.processInstancePriority =
+          projectPreferences.value.taskPriority
+      }
+      if (projectPreferences.value?.warningType) {
+        timingForm.warningType = projectPreferences.value.warningType
+      }
+      if (projectPreferences.value?.workerGroup) {
+        if (
+          containValueInOptions(
+            variables.workerGroups,
+            projectPreferences.value.workerGroup
+          )
+        ) {
+          timingForm.workerGroup = projectPreferences.value.workerGroup
+        }
+      }
+      if (projectPreferences.value?.tenant) {
+        if (
+          containValueInOptions(
+            variables.tenantList,
+            projectPreferences.value.tenant
+          )
+        ) {
+          timingForm.tenantCode = projectPreferences.value.tenant
+        }
+      }
+      if (
+        projectPreferences.value?.environmentCode &&
+        variables?.environmentList
+      ) {
+        if (
+          containValueInOptions(
+            variables.environmentList,
+            projectPreferences.value.environmentCode
+          )
+        ) {
+          timingForm.environmentCode = projectPreferences.value.environmentCode
+        }
+      }
+      if (projectPreferences.value?.alertGroup && variables?.alertGroups) {
+        if (
+          containValueInOptions(
+            variables.alertGroups,
+            projectPreferences.value.alertGroup
+          )
+        ) {
+          timingForm.warningGroupId = projectPreferences.value.alertGroup
+        }
+      }
+    }
+
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
     onMounted(() => {
@@ -216,7 +280,10 @@ export default defineComponent({
     watch(
       () => props.row,
       () => {
-        if (!props.row.crontab) return
+        if (!props.row.crontab) {
+          restructureTimingForm(timingState.timingForm)
+          return
+        }
 
         timingState.timingForm.startEndTime = [
           new Date(props.row.startTime),
@@ -316,19 +383,22 @@ export default defineComponent({
           </NFormItem>
           <NFormItem label=' ' showFeedback={false}>
             <NList>
-                {this.schedulePreviewList.length > 0 ?
-                    <NListItem>
-                        <NThing
-                            description={t('project.workflow.next_five_execution_times')}
-                        >
-                            {this.schedulePreviewList.map((item: string) => (
-                                <NSpace>
-                                    {item}
-                                    <br/>
-                                </NSpace>
-                            ))}
-                        </NThing>
-                    </NListItem> : null}
+              {this.schedulePreviewList.length > 0 ? (
+                <NListItem>
+                  <NThing
+                    description={t(
+                      'project.workflow.next_five_execution_times'
+                    )}
+                  >
+                    {this.schedulePreviewList.map((item: string) => (
+                      <NSpace>
+                        {item}
+                        <br />
+                      </NSpace>
+                    ))}
+                  </NThing>
+                </NListItem>
+              ) : null}
             </NList>
           </NFormItem>
           <NFormItem

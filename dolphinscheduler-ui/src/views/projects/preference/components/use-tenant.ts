@@ -18,7 +18,7 @@
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { IJsonItem } from '../../task/components/node/types'
-import {queryTenantList} from "@/service/modules/tenants";
+import { queryTenantList } from '@/service/modules/tenants'
 
 export function useTenant(): IJsonItem {
   const { t } = useI18n()
@@ -27,8 +27,10 @@ export function useTenant(): IJsonItem {
 
   const getTenantList = async () => {
     const res = await queryTenantList()
-    console.log(res)
-    options.value = res.map((item: any) => ({ label: item.tenantCode, value: item.tenantCode }))
+    options.value = res.map((item: any) => ({
+      label: item.tenantCode,
+      value: item.tenantCode
+    }))
   }
 
   onMounted(() => {
@@ -38,7 +40,7 @@ export function useTenant(): IJsonItem {
   return {
     type: 'select',
     field: 'tenant',
-    span: 8,
+    span: 12,
     name: t('project.workflow.tenant_code'),
     options: options,
     value: 'default'

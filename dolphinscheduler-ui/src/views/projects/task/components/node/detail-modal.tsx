@@ -24,7 +24,8 @@ import {
   provide,
   computed,
   h,
-  Ref, onMounted
+  Ref,
+  onMounted
 } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Modal from '@/components/modal'
@@ -48,8 +49,8 @@ import type {
   IWorkflowTaskInstance,
   WorkflowInstance
 } from './types'
-import {queryProjectPreferenceByProjectCode} from "@/service/modules/projects-preference";
-import {INodeData} from "./types";
+import { queryProjectPreferenceByProjectCode } from '@/service/modules/projects-preference'
+import { INodeData } from './types'
 
 const props = {
   show: {
@@ -127,6 +128,12 @@ const NodeDetailModal = defineComponent({
       })
     }
 
+    const restructureNodeData = (data: INodeData) => {
+      if (!data?.id) {
+        Object.assign(data, projectPreferences.value)
+      }
+    }
+
     const initHeaderLinks = (processInstance: any, taskType?: ITaskType) => {
       headerLinks.value = [
         {
@@ -169,7 +176,9 @@ const NodeDetailModal = defineComponent({
         },
         {
           text: t('project.node.enter_this_child_node'),
-          show: props.data.taskType === 'SUB_PROCESS' || props.data.taskType === 'DYNAMIC',
+          show:
+            props.data.taskType === 'SUB_PROCESS' ||
+            props.data.taskType === 'DYNAMIC',
           disabled:
             !props.data.id ||
             (router.currentRoute.value.name === 'workflow-instance-detail' &&
@@ -219,7 +228,6 @@ const NodeDetailModal = defineComponent({
       initProjectPreferences(props.projectCode)
     })
 
-
     watch(
       () => [props.show, props.data],
       async () => {
@@ -227,8 +235,8 @@ const NodeDetailModal = defineComponent({
         initHeaderLinks(props.processInstance, props.data.taskType)
         taskStore.init()
         const nodeData = formatModel(props.data)
-        Object.assign(nodeData, projectPreferences.value)
         await nextTick()
+        restructureNodeData(nodeData)
         detailRef.value.value.setValues(nodeData)
       }
     )

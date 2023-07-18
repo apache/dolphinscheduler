@@ -18,8 +18,8 @@
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { IJsonItem } from '../../task/components/node/types'
-import {queryTenantList} from "@/service/modules/tenants";
-import {listAlertGroupById} from "@/service/modules/alert-group";
+import { queryTenantList } from '@/service/modules/tenants'
+import { listAlertGroupById } from '@/service/modules/alert-group'
 
 export function useAlertGroup(): IJsonItem {
   const { t } = useI18n()
@@ -28,9 +28,11 @@ export function useAlertGroup(): IJsonItem {
 
   const getAlertGroups = async () => {
     const res = await listAlertGroupById()
-    options.value = res.map((item: any) => ({ label: item.groupName, value: item.id }))
+    options.value = res.map((item: any) => ({
+      label: item.groupName,
+      value: item.id
+    }))
   }
-
 
   onMounted(() => {
     getAlertGroups()
@@ -39,7 +41,7 @@ export function useAlertGroup(): IJsonItem {
   return {
     type: 'select',
     field: 'alertGroups',
-    span: 8,
+    span: 12,
     name: t('project.workflow.alarm_group'),
     options: options,
     value: 'default'

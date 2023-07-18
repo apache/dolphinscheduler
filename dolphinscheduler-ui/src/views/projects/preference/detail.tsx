@@ -18,40 +18,47 @@
 import { defineComponent, ref } from 'vue'
 import Form from '@/components/form'
 import { useForm } from './use-form'
-import { NButton, NSpace } from "naive-ui";
+import { NButton, NDivider, NSpace } from 'naive-ui'
 
 const PreferenceForm = defineComponent({
   name: 'PreferenceForm',
   setup() {
-
-    const { formRef, elementsRef, rulesRef, model, formProps, t, handleUpdate } = useForm()
+    const {
+      formRef,
+      elementsRef,
+      rulesRef,
+      model,
+      formProps,
+      t,
+      handleUpdate
+    } = useForm()
 
     return () => (
-        <div>
-          <div style={{margin: "10px"}}>{t('project.preference.instruction_tips')}</div>
-          <Form
-            ref={formRef}
-            meta={{
-              model,
-              rules: rulesRef.value,
-              elements: elementsRef.value,
-              ...formProps.value
-            }}
-            layout={{
-              xGap: 10,
-              cols: 4
-            }}
-            style={{margin: "10px"}}
-          />
-          <NSpace justify='end'>
-            <NButton
-                type='info'
-                onClick={handleUpdate}
-            >
-              {t('project.preference.submit')}
-            </NButton>
-          </NSpace>
+      <div>
+        <div style={{ margin: '30px' }}>
+          {t('project.preference.instruction_tips')}
         </div>
+        <NDivider />
+        <Form
+          ref={formRef}
+          meta={{
+            model,
+            rules: rulesRef.value,
+            elements: elementsRef.value,
+            ...formProps.value
+          }}
+          layout={{
+            xGap: 10
+          }}
+          style={{ marginLeft: '150px' }}
+        />
+        <NDivider />
+        <NSpace justify='end'>
+          <NButton type='info' onClick={handleUpdate}>
+            {t('project.preference.submit')}
+          </NButton>
+        </NSpace>
+      </div>
     )
   }
 })

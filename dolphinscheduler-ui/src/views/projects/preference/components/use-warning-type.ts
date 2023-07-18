@@ -17,7 +17,7 @@
 
 import { useI18n } from 'vue-i18n'
 import type { IJsonItem } from '../../task/components/node/types'
-import { warningTypeList } from "@/common/common";
+import { warningTypeList } from '@/common/common'
 
 export function useWarningType(): IJsonItem {
   const { t } = useI18n()
@@ -25,8 +25,8 @@ export function useWarningType(): IJsonItem {
   const options = [] as any
 
   const initOptions = () => {
-    warningTypeList.forEach(item => {
-      options.push({label: t(item.code), value: item.id})
+    warningTypeList.forEach((item) => {
+      options.push({ label: t(item.code), value: item.id })
     })
   }
 
@@ -36,7 +36,7 @@ export function useWarningType(): IJsonItem {
     type: 'select',
     field: 'warningType',
     name: t('project.workflow.notification_strategy'),
-    span: 8,
+    span: 12,
     options,
     validate: {
       required: true

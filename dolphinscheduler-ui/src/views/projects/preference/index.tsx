@@ -19,12 +19,11 @@ import { NSpace } from 'naive-ui'
 import { defineComponent, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Card from '@/components/card'
-import PreferenceForm from "@/views/projects/preference/detail";
+import PreferenceForm from '@/views/projects/preference/detail'
 
 export default defineComponent({
   name: 'ProjectPreference',
   setup() {
-
     const detailRef = ref()
 
     return {
@@ -39,9 +38,7 @@ export default defineComponent({
       <NSpace vertical>
         <Card title={t('project.preference.preference_manage')}>
           <NSpace vertical>
-            <PreferenceForm
-                ref={detailRef}
-            />
+            <PreferenceForm ref={detailRef} />
           </NSpace>
         </Card>
       </NSpace>
