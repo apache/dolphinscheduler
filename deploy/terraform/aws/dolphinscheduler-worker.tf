@@ -57,6 +57,7 @@ data "template_file" "worker_user_data" {
     "database_username"          = aws_db_instance.database.username
     "database_password"          = aws_db_instance.database.password
     "zookeeper_connect_string"   = var.zookeeper_connect_string != "" ? var.zookeeper_connect_string : aws_instance.zookeeper[0].private_ip
+    "alert_server_host"          = ""
     "s3_access_key_id"           = aws_iam_access_key.s3.id
     "s3_secret_access_key"       = aws_iam_access_key.s3.secret
     "s3_region"                  = var.aws_region
