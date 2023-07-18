@@ -112,7 +112,7 @@ public class UsersController extends BaseController {
                              @RequestParam(value = "phone", required = false) String phone,
                              @RequestParam(value = "state", required = false) int state) throws Exception {
         Result verifyRet = usersService.verifyUserName(userName);
-        if(verifyRet.getCode() != Status.SUCCESS.getCode()){
+        if (verifyRet.getCode() != Status.SUCCESS.getCode()) {
             return verifyRet;
         }
         Map<String, Object> result =
@@ -575,7 +575,7 @@ public class UsersController extends BaseController {
         repeatPassword = ParameterUtils.handleEscapes(repeatPassword);
         email = ParameterUtils.handleEscapes(email);
         Result<Object> verifyRet = usersService.verifyUserName(userName);
-        if(verifyRet.getCode() != Status.SUCCESS.getCode()){
+        if (verifyRet.getCode() != Status.SUCCESS.getCode()) {
             return verifyRet;
         }
         Map<String, Object> result = usersService.registerUser(userName, userPassword, repeatPassword, email);
