@@ -17,18 +17,16 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-public enum WorkflowSubmitStatus {
-    /**
-     * Submit success
-     */
-    SUCCESS,
-    /**
-     * Submit failed, this status should be retry
-     */
-    FAILED,
-    /**
-     * Duplicated submitted, this status should never occur.
-     */
-    DUPLICATED_SUBMITTED,
-    ;
+import java.util.concurrent.Callable;
+
+public interface IWorkflowExecuteRunnable extends Callable<WorkflowStartStatus> {
+    // todo: add control method to manage the workflow runnable e.g. pause/stop ....
+
+    @Override
+    default WorkflowStartStatus call() {
+        return startWorkflow();
+    }
+
+    WorkflowStartStatus startWorkflow();
+
 }
