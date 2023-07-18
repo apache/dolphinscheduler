@@ -194,7 +194,8 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
             log.info("Cross workflow parameter passing success, finishProcessInstanceId: {}, taskInstanceId: {}",
                     finishProcessInstance.getId(), taskInstance.getId());
         } catch (Exception ex) {
-            log.error("Cross workflow parameter passing error: {}", ex);
+            log.error("Cross workflow parameter passing error, finishProcessInstanceId: {}, taskInstanceId: {}",
+                    finishProcessInstance.getId(), taskInstance.getId(), ex);
         }
     }
 
