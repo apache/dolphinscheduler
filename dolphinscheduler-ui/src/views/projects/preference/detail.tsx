@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, ref } from 'vue'
+import { defineComponent } from 'vue'
 import Form from '@/components/form'
 import { useForm } from './use-form'
 import { NButton, NDivider, NSpace } from 'naive-ui'

@@ -18,7 +18,6 @@
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { IJsonItem } from '../../task/components/node/types'
-import { queryTenantList } from '@/service/modules/tenants'
 import { listAlertGroupById } from '@/service/modules/alert-group'
 
 export function useAlertGroup(): IJsonItem {
