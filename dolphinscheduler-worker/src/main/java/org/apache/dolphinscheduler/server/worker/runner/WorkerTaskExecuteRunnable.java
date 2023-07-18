@@ -19,8 +19,8 @@ package org.apache.dolphinscheduler.server.worker.runner;
 
 import static ch.qos.logback.classic.ClassicConstants.FINALIZE_SESSION_MARKER;
 import static org.apache.dolphinscheduler.common.constants.Constants.DRY_RUN_FLAG_YES;
-import static org.apache.dolphinscheduler.common.constants.Constants.SINGLE_SLASH;
 import static org.apache.dolphinscheduler.common.constants.Constants.K8S_CONFIG_REGEX;
+import static org.apache.dolphinscheduler.common.constants.Constants.SINGLE_SLASH;
 
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.log.SensitiveDataConverter;

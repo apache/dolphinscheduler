@@ -17,12 +17,12 @@
 
 package org.apache.dolphinscheduler.common.log;
 
+import static org.apache.dolphinscheduler.common.constants.Constants.K8S_CONFIG_REGEX;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.apache.dolphinscheduler.common.constants.Constants.K8S_CONFIG_REGEX;
 
 public class SensitiveDataConverterTest {
 
@@ -64,10 +64,9 @@ public class SensitiveDataConverterTest {
         Assertions.assertEquals(expectedMsg, maskedLog);
     }
 
-
     @Test
     public void testK8SLogMsgConverter() {
-        String msg ="End initialize task {\n" +
+        String msg = "End initialize task {\n" +
                 "  \"taskName\" : \"echo\",\n" +
                 "  \"k8sTaskExecutionContext\" : {\n" +
                 "    \"configYaml\" : \"apiVersion: v1 xxx client-key-data: ==\",\n" +
