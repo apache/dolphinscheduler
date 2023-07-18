@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.alert.config;
 
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.time.Duration;
 
 import lombok.Data;
@@ -56,7 +58,10 @@ public final class AlertConfig implements Validator {
             errors.rejectValue("heartbeat-interval", null, "should be a valid duration");
         }
 
-        alertConfig.setAlertServerAddress(NetUtils.getAddr(port));
+        if (StringUtils.isEmpty(alertServerAddress)) {
+            alertConfig.setAlertServerAddress(NetUtils.getAddr(alertConfig.getPort()));
+        }
+
         printConfig();
     }
 
