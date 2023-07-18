@@ -21,11 +21,8 @@ metadata:
   labels:
     app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-api
     {{- include "dolphinscheduler.common.labels" . | nindent 4 }}
-  {{- if and (eq .Values.api.service.type "LoadBalancer") .Values.api.service.annotations }}
-  annotations:
-    {{- range $key, $value := .Values.api.service.annotations }}
-    {{ $key }}: {{ $value | quote }}
-    {{- end }}
+  {{- if .Values.api.service.annotations }}
+  annotations: {{- toYaml .Values.api.service.annotations | nindent 4 }}
   {{- end }}
 spec:
   type: {{ .Values.api.service.type }}
@@ -59,3 +56,33 @@ spec:
   {{- end }}
   selector:
     {{- include "dolphinscheduler.api.labels" . | nindent 4 }}
+
+---
+{{- if .Values.api.service.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "dolphinscheduler.fullname" . }}-api
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "dolphinscheduler.common.labels" . | nindent 4 }}
+    {{- if .Values.api.service.serviceMonitor.labels }}
+    {{- toYaml .Values.api.service.serviceMonitor.labels | nindent 4 }}
+    {{- end }}
+  {{- if .Values.api.service.serviceMonitor.annotations }}
+  annotations: {{- toYaml .Values.api.service.serviceMonitor.annotations | nindent 4 }}
+  {{- end }}
+spec:
+  namespaceSelector:
+    matchNames:
+    - {{ .Values.api.service.serviceMonitor.namespace | default .Release.Namespace }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-api
+      {{- include "dolphinscheduler.common.labels" . | nindent 6 }}
+  endpoints:
+  - scheme: http
+    targetPort: api-port
+    path: {{ .Values.api.service.serviceMonitor.path }}
+    interval: {{ .Values.api.service.serviceMonitor.interval }}
+{{- end }}
