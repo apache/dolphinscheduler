@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.api.service.impl.ProjectPreferenceServiceImpl
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.User;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,7 +43,6 @@ public class ProjectPreferenceControllerTest {
     @Mock
     private ProjectPreferenceServiceImpl projectPreferenceService;
 
-
     @Test
     public void testUpdateProjectPreference() {
         User loginUser = getGeneralUser();
@@ -59,7 +59,7 @@ public class ProjectPreferenceControllerTest {
         User loginUser = getGeneralUser();
 
         Mockito.when(projectPreferenceService.queryProjectPreferenceByProjectCode(Mockito.any(), Mockito.anyLong()))
-            .thenReturn(getSuccessResult());
+                .thenReturn(getSuccessResult());
         Result result = projectPreferenceController.queryProjectPreferenceByProjectCode(loginUser, 1);
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
     }

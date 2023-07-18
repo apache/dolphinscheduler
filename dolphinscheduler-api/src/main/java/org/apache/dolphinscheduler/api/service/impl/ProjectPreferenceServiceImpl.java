@@ -19,43 +19,32 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.google.common.collect.Lists;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.exceptions.ServiceException;
-import org.apache.dolphinscheduler.api.service.ProjectParameterService;
 import org.apache.dolphinscheduler.api.service.ProjectPreferenceService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
-import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.ProjectParameter;
 import org.apache.dolphinscheduler.dao.entity.ProjectPreference;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectParameterMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectPreferenceMapper;
+
+import java.util.Date;
+import java.util.Objects;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
 @Service
 @Slf4j
-public class ProjectPreferenceServiceImpl extends BaseServiceImpl implements
-    ProjectPreferenceService {
+public class ProjectPreferenceServiceImpl extends BaseServiceImpl
+        implements
+            ProjectPreferenceService {
 
     @Autowired
     private ProjectPreferenceMapper projectPreferenceMapper;
@@ -78,7 +67,8 @@ public class ProjectPreferenceServiceImpl extends BaseServiceImpl implements
         }
 
         ProjectPreference projectPreference = projectPreferenceMapper
-            .selectOne(new QueryWrapper<ProjectPreference>().lambda().eq(ProjectPreference::getProjectCode, projectCode));
+                .selectOne(new QueryWrapper<ProjectPreference>().lambda().eq(ProjectPreference::getProjectCode,
+                        projectCode));
 
         Date now = new Date();
         if (Objects.isNull(projectPreference)) {
@@ -125,7 +115,8 @@ public class ProjectPreferenceServiceImpl extends BaseServiceImpl implements
         }
 
         ProjectPreference projectPreference = projectPreferenceMapper
-            .selectOne(new QueryWrapper<ProjectPreference>().lambda().eq(ProjectPreference::getProjectCode, projectCode));
+                .selectOne(new QueryWrapper<ProjectPreference>().lambda().eq(ProjectPreference::getProjectCode,
+                        projectCode));
 
         if (Objects.nonNull(projectPreference)) {
             result.setData(projectPreference);

@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.dao.entity.ProjectPreference;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectPreferenceMapper;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -66,7 +67,7 @@ public class ProjectPreferenceServiceTest {
         Mockito.when(projectPreferenceMapper.selectOne(Mockito.any())).thenReturn(null);
         Mockito.when(projectPreferenceMapper.insert(Mockito.any())).thenReturn(1);
 
-        Result result = projectPreferenceService.updateProjectPreference(loginUser, projectCode,  "value");
+        Result result = projectPreferenceService.updateProjectPreference(loginUser, projectCode, "value");
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
     }
 

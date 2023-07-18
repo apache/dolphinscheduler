@@ -17,19 +17,21 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import java.util.Date;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.ProjectPreference;
+
+import java.util.Date;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
 public class ProjectPreferenceMapperTest extends BaseDaoTest {
 
     @Autowired
     private ProjectPreferenceMapper projectPreferenceMapper;
-
 
     private ProjectPreference insertOne(long code, long projectCode) {
         ProjectPreference projectPreference = new ProjectPreference();
@@ -52,14 +54,14 @@ public class ProjectPreferenceMapperTest extends BaseDaoTest {
         Assertions.assertEquals(1, update);
     }
 
-
     @Test
     public void testQueryByProjectCode() {
         long projectCode = 2;
         ProjectPreference expectedProjectPreference = insertOne(2, projectCode);
 
         ProjectPreference projectPreference = projectPreferenceMapper
-            .selectOne(new QueryWrapper<ProjectPreference>().lambda().eq(ProjectPreference::getProjectCode, projectCode));
+                .selectOne(new QueryWrapper<ProjectPreference>().lambda().eq(ProjectPreference::getProjectCode,
+                        projectCode));
         Assertions.assertEquals(expectedProjectPreference, projectPreference);
     }
 

@@ -17,8 +17,9 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.dolphinscheduler.dao.entity.ProjectPreference;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 public interface ProjectPreferenceMapper extends BaseMapper<ProjectPreference> {
 
