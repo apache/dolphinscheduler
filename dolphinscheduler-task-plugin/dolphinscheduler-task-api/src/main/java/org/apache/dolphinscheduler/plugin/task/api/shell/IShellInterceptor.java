@@ -15,22 +15,16 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api;
+package org.apache.dolphinscheduler.plugin.task.api.shell;
 
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.function.Consumer;
-
-import org.slf4j.Logger;
+import java.io.IOException;
 
 /**
- * shell command executor
+ * This interface is used to execute shell commands.
+ * It should be created by @{@link IShellInterceptorBuilder}.
  */
-public class ShellCommandExecutor extends AbstractCommandExecutor {
+public interface IShellInterceptor {
 
-    public ShellCommandExecutor(Consumer<LinkedBlockingQueue<String>> logHandler,
-                                TaskExecutionContext taskRequest,
-                                Logger logger) {
-        super(logHandler, taskRequest, logger);
-    }
+    Process execute() throws IOException;
 
 }

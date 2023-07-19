@@ -15,22 +15,38 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api;
+package org.apache.dolphinscheduler.plugin.task.api.shell;
 
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.function.Consumer;
+import java.io.IOException;
+import java.util.Map;
 
-import org.slf4j.Logger;
+public interface IShellInterceptorBuilder<T extends IShellInterceptorBuilder<T, Y>, Y extends IShellInterceptor> {
 
-/**
- * shell command executor
- */
-public class ShellCommandExecutor extends AbstractCommandExecutor {
+    T newBuilder();
 
-    public ShellCommandExecutor(Consumer<LinkedBlockingQueue<String>> logHandler,
-                                TaskExecutionContext taskRequest,
-                                Logger logger) {
-        super(logHandler, taskRequest, logger);
-    }
+    T newBuilder(T builder);
 
+    T shellDirectory(String directory);
+
+    T shellName(String shellFilename);
+
+    T runUser(String systemUser);
+
+    T cpuQuota(Integer cpuQuota);
+
+    T memoryQuota(Integer memoryQuota);
+
+    T appendSystemEnv(String envFiles);
+
+    T appendCustomEnvScript(String customEnvScript);
+
+    T k8sConfigYaml(String k8sConfigYaml);
+
+    T properties(Map<String, String> propertyMap);
+
+    T sudoMode(boolean sudoEnable);
+
+    T appendScript(String script);
+
+    Y build() throws IOException;
 }

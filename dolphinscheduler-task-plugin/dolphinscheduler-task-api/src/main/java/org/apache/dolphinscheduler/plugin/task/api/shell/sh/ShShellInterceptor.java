@@ -15,22 +15,15 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api;
+package org.apache.dolphinscheduler.plugin.task.api.shell.sh;
 
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.function.Consumer;
+import org.apache.dolphinscheduler.plugin.task.api.shell.BaseShellInterceptor;
 
-import org.slf4j.Logger;
+import java.util.List;
 
-/**
- * shell command executor
- */
-public class ShellCommandExecutor extends AbstractCommandExecutor {
+public class ShShellInterceptor extends BaseShellInterceptor {
 
-    public ShellCommandExecutor(Consumer<LinkedBlockingQueue<String>> logHandler,
-                                TaskExecutionContext taskRequest,
-                                Logger logger) {
-        super(logHandler, taskRequest, logger);
+    protected ShShellInterceptor(List<String> executeCommands, String shellDirectory) {
+        super(executeCommands, shellDirectory);
     }
-
 }
