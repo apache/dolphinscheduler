@@ -42,7 +42,6 @@ export function useAlertGroup(): IJsonItem {
     field: 'alertGroups',
     span: 12,
     name: t('project.workflow.alarm_group'),
-    options: options,
-    value: 'default'
+    options: options
   }
 }
