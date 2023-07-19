@@ -72,6 +72,7 @@ export function formatParams(data: INodeData): {
     taskParams.numExecutors = data.numExecutors
     taskParams.executorMemory = data.executorMemory
     taskParams.executorCores = data.executorCores
+    taskParams.sqlExecutionType = data.sqlExecutionType
   }
 
   if (data.taskType === 'FLINK' || data.taskType === 'FLINK_STREAM') {
@@ -326,7 +327,8 @@ export function formatParams(data: INodeData): {
       executorMemory: data.executorMemory,
       numExecutors: data.numExecutors,
       others: data.others,
-      yarnQueue: data.yarnQueue
+      yarnQueue: data.yarnQueue,
+      sqlExecutionType: data.sqlExecutionType
     }
   }
 
@@ -727,6 +729,7 @@ export function formatModel(data: ITaskData) {
     params.executorMemory = data.taskParams.sparkParameters.executorMemory
     params.numExecutors = data.taskParams.sparkParameters.numExecutors
     params.others = data.taskParams.sparkParameters.others
+    params.sqlExecutionType = data.taskParams.sparkParameters.sqlExecutionType
   }
 
   if (data.taskParams?.conditionResult?.successNode?.length) {
