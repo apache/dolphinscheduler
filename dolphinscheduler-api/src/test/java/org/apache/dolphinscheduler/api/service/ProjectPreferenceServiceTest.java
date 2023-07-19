@@ -82,7 +82,7 @@ public class ProjectPreferenceServiceTest {
 
         Mockito.when(projectPreferenceMapper.selectOne(Mockito.any())).thenReturn(null);
         Result result = projectPreferenceService.queryProjectPreferenceByProjectCode(loginUser, projectCode);
-        Assertions.assertEquals(Status.QUERY_PROJECT_PREFERENCE_ERROR.getCode(), result.getCode());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
 
         // SUCCESS
         Mockito.when(projectPreferenceMapper.selectOne(Mockito.any())).thenReturn(getProjectPreference());

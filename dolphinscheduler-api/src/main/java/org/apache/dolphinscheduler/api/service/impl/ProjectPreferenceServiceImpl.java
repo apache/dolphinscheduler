@@ -98,7 +98,7 @@ public class ProjectPreferenceServiceImpl extends BaseServiceImpl
                 putMsg(result, Status.SUCCESS);
             } else {
                 log.error("Project preference update error, projectCode:{}.", projectPreference.getProjectCode());
-                putMsg(result, Status.CREATE_PROJECT_PREFERENCE_ERROR);
+                putMsg(result, Status.UPDATE_PROJECT_PREFERENCE_ERROR);
             }
         }
         return result;
@@ -118,9 +118,8 @@ public class ProjectPreferenceServiceImpl extends BaseServiceImpl
                 .selectOne(new QueryWrapper<ProjectPreference>().lambda().eq(ProjectPreference::getProjectCode,
                         projectCode));
 
-        if (Objects.nonNull(projectPreference)) {
-            result.setData(projectPreference);
-        }
+        result.setData(projectPreference);
+
         putMsg(result, Status.SUCCESS);
         return result;
     }
