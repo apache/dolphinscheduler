@@ -718,6 +718,9 @@ export default {
     zeppelin_username_tips: 'Please enter the zeppelin server username',
     zeppelin_password: 'zeppelinPassword',
     zeppelin_password_tips: 'Please enter the zeppelin server password',
+    sql_execution_type: 'SQL Input',
+    sql_execution_type_from_file: 'FROM_FILE',
+    sql_execution_type_from_script: 'FROM_SCRIPT',
     hive_cli_task_execution_type: 'Hive Cli Task Execution Type',
     hive_sql_script: 'Hive SQL Script',
     hive_cli_options: 'Hive Cli Options',
@@ -900,5 +903,12 @@ export default {
     delete: 'Delete',
     delete_confirm: 'Delete?',
     success: 'Success',
+  },
+  preference: {
+    edit_preference: 'Edit Preference',
+    preference_manage: 'Project Preference Management',
+    instruction_tips: 'The settings below will affect all workflows and tasks under this project.When creating the workflow or task, these preferences will be the default value of their components.',
+    success: 'Success',
+    submit: 'Submit'
   },
 }

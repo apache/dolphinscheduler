@@ -26,6 +26,8 @@ import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostSelect
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.time.Duration;
 
 import lombok.Data;
@@ -157,8 +159,10 @@ public class MasterConfig implements Validator {
         if (masterConfig.getWorkerGroupRefreshInterval().getSeconds() < 10) {
             errors.rejectValue("worker-group-refresh-interval", null, "should >= 10s");
         }
+        if (StringUtils.isEmpty(masterConfig.getMasterAddress())) {
+            masterConfig.setMasterAddress(NetUtils.getAddr(masterConfig.getListenPort()));
+        }
 
-        masterConfig.setMasterAddress(NetUtils.getAddr(masterConfig.getListenPort()));
         masterConfig.setMasterRegistryPath(
                 RegistryNodeType.MASTER.getRegistryPath() + "/" + masterConfig.getMasterAddress());
         printConfig();
