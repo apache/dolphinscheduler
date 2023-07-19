@@ -51,6 +51,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import io.fabric8.kubernetes.client.Config;
 
@@ -88,13 +89,8 @@ public class SparkTask extends AbstractYarnTask {
         log.info("Initialize spark task params {}", JSONUtils.toPrettyJsonString(sparkParameters));
     }
 
-    /**
-     * create command
-     *
-     * @return command
-     */
     @Override
-    protected String buildCommand() {
+    protected String getScript() {
         /**
          * (1) spark-submit [options] <app jar | python file> [app arguments]
          * (2) spark-sql [options] -f <filename>
@@ -116,14 +112,12 @@ public class SparkTask extends AbstractYarnTask {
         args.addAll(populateSparkOptions());
 
         // replace placeholder
-        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+        return args.stream().collect(Collectors.joining(" "));
+    }
 
-        String command =
-                ParameterUtils.convertParameterPlaceholders(String.join(" ", args), ParameterUtils.convert(paramsMap));
-
-        log.info("spark task command: {}", command);
-
-        return command;
+    @Override
+    protected Map<String, String> getProperties() {
+        return ParameterUtils.convert(taskExecutionContext.getPrepareParamsMap());
     }
 
     /**
