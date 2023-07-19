@@ -52,7 +52,8 @@ export function useSpark({
     executorMemory: '2G',
     executorCores: 2,
     yarnQueue: '',
-    timeoutNotifyStrategy: ['WARN']
+    timeoutNotifyStrategy: ['WARN'],
+    sqlExecutionType: 'SCRIPT'
   } as INodeData)
 
   return {
