@@ -228,19 +228,9 @@ public class SqlTask extends AbstractTask {
                                   List<String> createFuncs) throws Exception {
         Connection connection = null;
         try {
-
             // create connection
-            if (DbType.valueOf(sqlParameters.getType()) == KYUUBI) {
-                log.info("full jdbc url : {}, user : {} begin to build a connection",
-                        DataSourceUtils.getJdbcUrl(DbType.KYUUBI, baseConnectionParam), baseConnectionParam.getUser());
-                Class.forName(baseConnectionParam.getDriverClassName());
-                connection = DriverManager.getConnection(baseConnectionParam.getJdbcUrl(),
-                        baseConnectionParam.getUser(), baseConnectionParam.getPassword());
-            } else {
-                connection =
-                        DataSourceClientProvider.getInstance().getConnection(DbType.valueOf(sqlParameters.getType()),
-                                baseConnectionParam);
-            }
+            connection = DataSourceClientProvider.getInstance().getConnection(DbType.valueOf(sqlParameters.getType()),
+                    baseConnectionParam);
             // create temp function
             if (CollectionUtils.isNotEmpty(createFuncs)) {
                 createTempFunction(connection, createFuncs);
