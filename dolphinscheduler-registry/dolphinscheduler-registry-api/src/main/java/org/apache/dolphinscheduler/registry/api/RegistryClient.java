@@ -109,10 +109,10 @@ public class RegistryClient {
             // todo: add host, port in heartBeat Info, so that we don't need to parse this again
             server.setZkDirectory(registryNodeType.getRegistryPath() + "/" + serverPath);
             // set host and port
-            String[] hostAndPort = serverPath.split(Constants.COLON);
+            int lastColonIndex = serverPath.lastIndexOf(":");
             // fetch the last one
-            server.setHost(hostAndPort[0]);
-            server.setPort(Integer.parseInt(hostAndPort[1]));
+            server.setHost(serverPath.substring(0, lastColonIndex));
+            server.setPort(Integer.parseInt(serverPath.substring(lastColonIndex + 1)));
             serverList.add(server);
         }
         return serverList;

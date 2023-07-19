@@ -36,6 +36,7 @@ import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.graph.IWorkflowGraph;
 import org.apache.dolphinscheduler.server.master.rpc.MasterRpcClient;
 import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnableFactory;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
@@ -98,6 +99,8 @@ public class WorkflowExecuteRunnableTest {
 
     private DefaultTaskExecuteRunnableFactory defaultTaskExecuteRunnableFactory;
 
+    private WorkflowExecuteContextFactory workflowExecuteContextFactory;
+
     @BeforeEach
     public void init() throws Exception {
         applicationContext = Mockito.mock(ApplicationContext.class);
@@ -112,6 +115,8 @@ public class WorkflowExecuteRunnableTest {
         taskInstanceDao = Mockito.mock(TaskInstanceDao.class);
         taskDefinitionLogDao = Mockito.mock(TaskDefinitionLogDao.class);
         defaultTaskExecuteRunnableFactory = Mockito.mock(DefaultTaskExecuteRunnableFactory.class);
+        workflowExecuteContextFactory = Mockito.mock(WorkflowExecuteContextFactory.class);
+
         Map<String, String> cmdParam = new HashMap<>();
         cmdParam.put(CMD_PARAM_COMPLEMENT_DATA_START_DATE, "2020-01-01 00:00:00");
         cmdParam.put(CMD_PARAM_COMPLEMENT_DATA_END_DATE, "2020-01-20 23:00:00");
@@ -124,14 +129,25 @@ public class WorkflowExecuteRunnableTest {
         curingGlobalParamsService = Mockito.mock(CuringParamsService.class);
         MasterRpcClient masterRpcClient = Mockito.mock(MasterRpcClient.class);
         ProcessAlertManager processAlertManager = Mockito.mock(ProcessAlertManager.class);
+        WorkflowExecuteContext workflowExecuteContext = Mockito.mock(WorkflowExecuteContext.class);
+        Mockito.when(workflowExecuteContext.getWorkflowInstance()).thenReturn(processInstance);
+        IWorkflowGraph workflowGraph = Mockito.mock(IWorkflowGraph.class);
+        Mockito.when(workflowExecuteContext.getWorkflowGraph()).thenReturn(workflowGraph);
+        Mockito.when(workflowGraph.getDag()).thenReturn(new DAG<>());
+
         workflowExecuteThread = Mockito.spy(
-                new WorkflowExecuteRunnable(processInstance, commandService, processService, processInstanceDao,
+                new WorkflowExecuteRunnable(
+                        workflowExecuteContext,
+                        commandService,
+                        processService,
+                        processInstanceDao,
                         masterRpcClient,
-                        processAlertManager, config, stateWheelExecuteThread, curingGlobalParamsService,
-                        taskInstanceDao, taskDefinitionLogDao, defaultTaskExecuteRunnableFactory));
-        Field dag = WorkflowExecuteRunnable.class.getDeclaredField("dag");
-        dag.setAccessible(true);
-        dag.set(workflowExecuteThread, new DAG());
+                        processAlertManager,
+                        config,
+                        stateWheelExecuteThread,
+                        curingGlobalParamsService,
+                        taskInstanceDao,
+                        defaultTaskExecuteRunnableFactory));
     }
 
     @Test
@@ -187,9 +203,9 @@ public class WorkflowExecuteRunnableTest {
     @Test
     public void testGetPreVarPool() {
         try {
-            Set<String> preTaskName = new HashSet<>();
-            preTaskName.add(Long.toString(1));
-            preTaskName.add(Long.toString(2));
+            Set<Long> preTaskName = new HashSet<>();
+            preTaskName.add(1L);
+            preTaskName.add(2L);
 
             TaskInstance taskInstance = new TaskInstance();
 
@@ -209,6 +225,10 @@ public class WorkflowExecuteRunnableTest {
             taskInstanceMap.put(taskInstance1.getId(), taskInstance1);
             taskInstanceMap.put(taskInstance2.getId(), taskInstance2);
 
+            Map<Long, TaskInstance> taskCodeInstanceMap = new ConcurrentHashMap<>();
+            taskCodeInstanceMap.put(taskInstance1.getTaskCode(), taskInstance1);
+            taskCodeInstanceMap.put(taskInstance2.getTaskCode(), taskInstance2);
+
             Set<Long> completeTaskSet = Sets.newConcurrentHashSet();
             completeTaskSet.add(taskInstance1.getTaskCode());
             completeTaskSet.add(taskInstance2.getTaskCode());
@@ -222,6 +242,10 @@ public class WorkflowExecuteRunnableTest {
             Field taskInstanceMapField = masterExecThreadClass.getDeclaredField("taskInstanceMap");
             taskInstanceMapField.setAccessible(true);
             taskInstanceMapField.set(workflowExecuteThread, taskInstanceMap);
+
+            Field taskCodeInstanceMapField = masterExecThreadClass.getDeclaredField("taskCodeInstanceMap");
+            taskCodeInstanceMapField.setAccessible(true);
+            taskCodeInstanceMapField.set(workflowExecuteThread, taskCodeInstanceMap);
 
             workflowExecuteThread.getPreVarPool(taskInstance, preTaskName);
             Assertions.assertNotNull(taskInstance.getVarPool());
@@ -263,7 +287,7 @@ public class WorkflowExecuteRunnableTest {
             Mockito.when(processService.findProcessInstanceById(222)).thenReturn(processInstance9);
             workflowExecuteThread.checkSerialProcess(processDefinition1);
         } catch (Exception e) {
-            Assertions.fail();
+            Assertions.fail(e);
         }
     }
 
@@ -281,6 +305,10 @@ public class WorkflowExecuteRunnableTest {
         taskInstanceMap.put(taskInstance1.getId(), taskInstance1);
         taskInstanceMap.put(taskInstance2.getId(), taskInstance2);
 
+        Map<Long, TaskInstance> taskCodeInstanceMap = new ConcurrentHashMap<>();
+        taskCodeInstanceMap.put(taskInstance1.getTaskCode(), taskInstance1);
+        taskCodeInstanceMap.put(taskInstance2.getTaskCode(), taskInstance2);
+
         Set<Long> completeTaskSet = Sets.newConcurrentHashSet();
         completeTaskSet.add(taskInstance1.getTaskCode());
         completeTaskSet.add(taskInstance2.getTaskCode());
@@ -295,20 +323,30 @@ public class WorkflowExecuteRunnableTest {
         taskInstanceMapField.setAccessible(true);
         taskInstanceMapField.set(workflowExecuteThread, taskInstanceMap);
 
+        Field taskCodeInstanceMapField = masterExecThreadClass.getDeclaredField("taskCodeInstanceMap");
+        taskCodeInstanceMapField.setAccessible(true);
+        taskCodeInstanceMapField.set(workflowExecuteThread, taskCodeInstanceMap);
+
         Mockito.when(processInstance.getCommandType()).thenReturn(CommandType.EXECUTE_TASK);
         Mockito.when(processInstance.getId()).thenReturn(123);
 
-        DAG<String, TaskNode, TaskNodeRelation> dag = Mockito.mock(DAG.class);
-        Set<String> taskCodesString = new HashSet<>();
-        taskCodesString.add("1");
-        taskCodesString.add("2");
+        DAG<Long, TaskNode, TaskNodeRelation> dag = Mockito.mock(DAG.class);
+        Set<Long> taskCodesString = new HashSet<>();
+        taskCodesString.add(1L);
+        taskCodesString.add(2L);
         Mockito.when(dag.getAllNodesList()).thenReturn(taskCodesString);
-        Mockito.when(dag.containsNode("1")).thenReturn(true);
-        Mockito.when(dag.containsNode("2")).thenReturn(false);
+        Mockito.when(dag.containsNode(1L)).thenReturn(true);
+        Mockito.when(dag.containsNode(2L)).thenReturn(false);
 
-        Field dagField = masterExecThreadClass.getDeclaredField("dag");
+        WorkflowExecuteContext workflowExecuteContext = Mockito.mock(WorkflowExecuteContext.class);
+        Mockito.when(workflowExecuteContext.getWorkflowInstance()).thenReturn(processInstance);
+        IWorkflowGraph workflowGraph = Mockito.mock(IWorkflowGraph.class);
+        Mockito.when(workflowExecuteContext.getWorkflowGraph()).thenReturn(workflowGraph);
+        Mockito.when(workflowGraph.getDag()).thenReturn(dag);
+
+        Field dagField = masterExecThreadClass.getDeclaredField("workflowExecuteContext");
         dagField.setAccessible(true);
-        dagField.set(workflowExecuteThread, dag);
+        dagField.set(workflowExecuteThread, workflowExecuteContext);
 
         Mockito.when(taskInstanceDao.queryByWorkflowInstanceIdAndTaskCode(processInstance.getId(),
                 taskInstance1.getTaskCode()))
