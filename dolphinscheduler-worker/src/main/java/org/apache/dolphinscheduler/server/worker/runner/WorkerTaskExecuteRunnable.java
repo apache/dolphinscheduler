@@ -19,9 +19,11 @@ package org.apache.dolphinscheduler.server.worker.runner;
 
 import static ch.qos.logback.classic.ClassicConstants.FINALIZE_SESSION_MARKER;
 import static org.apache.dolphinscheduler.common.constants.Constants.DRY_RUN_FLAG_YES;
+import static org.apache.dolphinscheduler.common.constants.Constants.K8S_CONFIG_REGEX;
 import static org.apache.dolphinscheduler.common.constants.Constants.SINGLE_SLASH;
 
 import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.common.log.SensitiveDataConverter;
 import org.apache.dolphinscheduler.common.log.remote.RemoteLogUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
@@ -93,6 +95,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         this.taskPluginManager = taskPluginManager;
         this.storageOperate = storageOperate;
         this.workerRegistryClient = workerRegistryClient;
+        SensitiveDataConverter.addMaskPattern(K8S_CONFIG_REGEX);
     }
 
     protected abstract void executeTask(TaskCallBack taskCallBack);
@@ -142,11 +145,11 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
 
     @Override
     public void run() {
-        try (
-                final LogUtils.MDCAutoClosableContext mdcAutoClosableContext = LogUtils.setWorkflowAndTaskInstanceIDMDC(
-                        taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId());
-                final LogUtils.MDCAutoClosableContext mdcAutoClosableContext1 =
-                        LogUtils.setTaskInstanceLogFullPathMDC(taskExecutionContext.getLogPath())) {
+        try {
+            LogUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(),
+                    taskExecutionContext.getTaskInstanceId());
+            LogUtils.setTaskInstanceLogFullPathMDC(taskExecutionContext.getLogPath());
+
             TaskInstanceLogHeader.printInitializeTaskContextHeader();
             initializeTask();
 
@@ -154,7 +157,8 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
                 taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.SUCCESS);
                 taskExecutionContext.setEndTime(System.currentTimeMillis());
                 TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
-                workerMessageSender.sendMessageWithRetry(taskExecutionContext, MessageType.TASK_EXECUTE_RESULT_MESSAGE);
+                workerMessageSender.sendMessageWithRetry(taskExecutionContext,
+                        MessageType.TASK_EXECUTE_RESULT_MESSAGE);
                 log.info(
                         "The current execute mode is dry run, will stop the subsequent process and set the taskInstance status to success");
                 return;
@@ -177,6 +181,9 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
             log.error("Task execute failed, due to meet an exception", ex);
             afterThrowing(ex);
             closeLogAppender();
+        } finally {
+            LogUtils.removeWorkflowAndTaskInstanceIdMDC();
+            LogUtils.removeTaskInstanceLogFullPathMDC();
         }
     }
 

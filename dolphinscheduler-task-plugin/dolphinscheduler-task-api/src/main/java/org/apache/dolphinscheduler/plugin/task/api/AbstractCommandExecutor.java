@@ -24,12 +24,12 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_COD
 
 import org.apache.dolphinscheduler.common.constants.TenantConstants;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.utils.AbstractCommandExecutorConstants;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -44,10 +44,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
@@ -55,7 +53,6 @@ import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.fabric8.kubernetes.client.dsl.LogWatch;
 
 /**
@@ -92,11 +89,6 @@ public abstract class AbstractCommandExecutor {
     protected boolean processLogOutputIsSuccess = false;
 
     protected boolean podLogOutputIsFinished = false;
-
-    /*
-     * SHELL result string
-     */
-    protected String taskResultString;
 
     /**
      * taskRequest
@@ -370,7 +362,6 @@ public abstract class AbstractCommandExecutor {
                         varPool.append("$VarPool$");
                     } else {
                         logBuffer.add(line);
-                        taskResultString = line;
                     }
                 }
                 processLogOutputIsSuccess = true;
@@ -458,14 +449,6 @@ public abstract class AbstractCommandExecutor {
     protected abstract String buildCommandFilePath();
 
     protected abstract void createCommandFileIfNotExists(String execCommand, String commandFile) throws IOException;
-
-    ExecutorService newDaemonSingleThreadExecutor(String threadName) {
-        ThreadFactory threadFactory = new ThreadFactoryBuilder()
-                .setDaemon(true)
-                .setNameFormat(threadName)
-                .build();
-        return Executors.newSingleThreadExecutor(threadFactory);
-    }
 
     protected abstract String commandInterpreter();
 }

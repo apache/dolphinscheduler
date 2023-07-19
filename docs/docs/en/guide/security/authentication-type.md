@@ -25,6 +25,11 @@ security:
         email-attribute: mail
         # action when ldap user is not exist (supported types: CREATE,DENY)
         not-exist-action: CREATE
+      ssl:
+        enable: false
+        # jks file absolute path && password
+        trust-store: "/ldapkeystore.jks"
+        trust-store-password: "password"
 ```
 
 For detailed explanation of specific fields, please see: [Api-server related configuration](../../architecture/configuration.md)
@@ -40,6 +45,17 @@ You can follow guide below：
 - Change userId && userPwd to your information in the `ldapLogin` method.
 - Change the expected email to the return value you expect in the `ldapLogin` method.
 - Run`ldapLogin`method and determine whether the LDAP login result is expected.
+
+If you want to enable ssl, please change configuration in `TestPropertySource` like below:
+
+```
+security.authentication.ldap.ssl.enable=false
+// absolute path
+security.authentication.ldap.ssl.trust-store=/ldapkeystore.jks
+security.authentication.ldap.ssl.trust-store-password=yourpassword
+```
+
+Then run`ldapLoginSSL`method and determine whether the LDAP login result is expected.
 
 ## Casdoor SSO
 

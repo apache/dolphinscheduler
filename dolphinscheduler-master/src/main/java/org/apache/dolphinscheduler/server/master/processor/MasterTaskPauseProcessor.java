@@ -25,12 +25,11 @@ import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.task.TaskPauseRequest;
 import org.apache.dolphinscheduler.remote.processor.MasterRpcProcessor;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
-import org.apache.dolphinscheduler.server.master.runner.MasterTaskExecuteRunnableThreadPool;
 import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecuteRunnableHolder;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import io.netty.channel.Channel;
@@ -39,22 +38,19 @@ import io.netty.channel.Channel;
 @Component
 public class MasterTaskPauseProcessor implements MasterRpcProcessor {
 
-    @Autowired
-    private MasterTaskExecuteRunnableThreadPool masterTaskExecuteRunnableThreadPool;
-
     @Override
     public void process(Channel channel, Message message) {
         TaskPauseRequest taskPauseRequest = JSONUtils.parseObject(message.getBody(), TaskPauseRequest.class);
         MasterTaskExecuteRunnable masterTaskExecuteRunnable =
-                masterTaskExecuteRunnableThreadPool.getMasterTaskExecuteRunnable(taskPauseRequest.getTaskInstanceId());
+                MasterTaskExecuteRunnableHolder.getMasterTaskExecuteRunnable(taskPauseRequest.getTaskInstanceId());
         if (masterTaskExecuteRunnable == null) {
             log.info("Cannot find the MasterTaskExecuteRunnable");
             return;
         }
         TaskExecutionContext taskExecutionContext = masterTaskExecuteRunnable.getTaskExecutionContext();
-        try (
-                LogUtils.MDCAutoClosableContext mdcAutoClosableContext = LogUtils.setWorkflowAndTaskInstanceIDMDC(
-                        taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId())) {
+        try {
+            LogUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(),
+                    taskExecutionContext.getTaskInstanceId());
             masterTaskExecuteRunnable.pauseTask();
         } catch (MasterTaskExecuteException e) {
             log.error("Pause MasterTaskExecuteRunnable failed", e);

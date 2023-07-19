@@ -36,7 +36,7 @@ public class SparkConstants {
     /**
      * --queue QUEUE
      */
-    public static final String SPARK_QUEUE = "--queue";
+    public static final String SPARK_YARN_QUEUE = "--queue";
 
     public static final String DEPLOY_MODE = "--deploy-mode";
 
@@ -100,5 +100,9 @@ public class SparkConstants {
      * spark submit command
      */
     public static final String SPARK_SUBMIT_COMMAND = "${SPARK_HOME}/bin/spark-submit";
+
+    public static final String TYPE_SCRIPT = "SCRIPT";
+
+    public static final String TYPE_FILE = "FILE";
 
 }

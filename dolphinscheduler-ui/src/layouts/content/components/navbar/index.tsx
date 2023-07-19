@@ -85,9 +85,11 @@ const Navbar = defineComponent({
         <div class={styles.settings}>
           <NButton quaternary onClick={this.handleUISettingClick}>
             {{
-              icon: () => <NIcon size='16'>
-                <SettingOutlined />
-              </NIcon>,
+              icon: () => (
+                <NIcon size='16'>
+                  <SettingOutlined />
+                </NIcon>
+              ),
               default: this.t('menu.ui_setting')
             }}
           </NButton>

@@ -133,7 +133,7 @@ public class TaskNode {
     /**
      * node dependency list
      */
-    private List<String> depList;
+    private List<Long> depList;
 
     /**
      * outer dependency information
@@ -242,7 +242,7 @@ public class TaskNode {
 
     public void setPreTasks(String preTasks) {
         this.preTasks = preTasks;
-        this.depList = JSONUtils.toList(preTasks, String.class);
+        this.depList = JSONUtils.toList(preTasks, Long.class);
     }
 
     public String getExtras() {
@@ -253,11 +253,11 @@ public class TaskNode {
         this.extras = extras;
     }
 
-    public List<String> getDepList() {
+    public List<Long> getDepList() {
         return depList;
     }
 
-    public void setDepList(List<String> depList) {
+    public void setDepList(List<Long> depList) {
         if (depList != null) {
             this.depList = depList;
             this.preTasks = JSONUtils.toJsonString(depList);

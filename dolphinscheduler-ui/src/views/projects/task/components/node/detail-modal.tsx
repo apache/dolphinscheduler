@@ -158,7 +158,7 @@ const NodeDetailModal = defineComponent({
         },
         {
           text: t('project.node.enter_this_child_node'),
-          show: props.data.taskType === 'SUB_PROCESS',
+          show: props.data.taskType === 'SUB_PROCESS' || props.data.taskType === 'DYNAMIC',
           disabled:
             !props.data.id ||
             (router.currentRoute.value.name === 'workflow-instance-detail' &&

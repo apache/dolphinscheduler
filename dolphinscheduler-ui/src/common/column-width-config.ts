@@ -98,11 +98,14 @@ export const COLUMN_WIDTH_CONFIG = {
   tag: {
     width: 160
   },
-  checkbox:{
+  checkbox: {
     width: 20
   },
   copy: {
-    width: 50
+    width: 35
+  },
+  instances: {
+    width: 40
   }
 }
 

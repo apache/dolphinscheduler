@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.utils;
 
+import static org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters.DependentFailurePolicyEnum.DEPENDENT_FAILURE_WAITING;
+
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -27,9 +29,12 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.DependentRelation;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.DateInterval;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.DependentUtils;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -61,11 +66,6 @@ public class DependentExecute {
     private ProcessInstance processInstance;
 
     private TaskInstance taskInstance;
-
-    /**
-     * depend result
-     */
-    private DependResult modelDependResult = DependResult.WAITING;
 
     /**
      * depend result map
@@ -156,7 +156,7 @@ public class DependentExecute {
         DependResult result;
         TaskInstance taskInstance = null;
         List<TaskInstance> taskInstanceList =
-                taskInstanceDao.findValidTaskListByProcessId(processInstance.getId(), testFlag);
+                taskInstanceDao.queryValidTaskListByWorkflowInstanceId(processInstance.getId(), testFlag);
 
         for (TaskInstance task : taskInstanceList) {
             if (task.getTaskCode() == taskCode) {
@@ -192,10 +192,10 @@ public class DependentExecute {
     private ProcessInstance findLastProcessInterval(Long definitionCode, DateInterval dateInterval, int testFlag) {
 
         ProcessInstance lastSchedulerProcess =
-                processInstanceDao.findLastSchedulerProcessInterval(definitionCode, dateInterval, testFlag);
+                processInstanceDao.queryLastSchedulerProcessInterval(definitionCode, dateInterval, testFlag);
 
         ProcessInstance lastManualProcess =
-                processInstanceDao.findLastManualProcessInterval(definitionCode, dateInterval, testFlag);
+                processInstanceDao.queryLastManualProcessInterval(definitionCode, dateInterval, testFlag);
 
         if (lastManualProcess == null) {
             return lastSchedulerProcess;
@@ -231,10 +231,15 @@ public class DependentExecute {
      * @param currentTime current time
      * @return boolean
      */
-    public boolean finish(Date currentTime, int testFlag) {
+    public boolean finish(Date currentTime, int testFlag, DependentParameters.DependentFailurePolicyEnum failurePolicy,
+                          Integer failureWaitingTime) {
+        DependResult modelDependResult = getModelDependResult(currentTime, testFlag);
         if (modelDependResult == DependResult.WAITING) {
-            modelDependResult = getModelDependResult(currentTime, testFlag);
             return false;
+        } else if (modelDependResult == DependResult.FAILED && DEPENDENT_FAILURE_WAITING == failurePolicy
+                && failureWaitingTime != null) {
+            return Duration.between(currentTime.toInstant(), Instant.now())
+                    .compareTo(Duration.ofMinutes(failureWaitingTime)) > 0;
         }
         return true;
     }
@@ -260,13 +265,12 @@ public class DependentExecute {
                 continue;
             }
             DependResult dependResult = getDependResultForItem(dependentItem, currentTime, testFlag);
-            if (dependResult != DependResult.WAITING) {
+            if (dependResult != DependResult.WAITING && dependResult != DependResult.FAILED) {
                 dependResultMap.put(dependentItem.getKey(), dependResult);
             }
             dependResultList.add(dependResult);
         }
-        modelDependResult = DependentUtils.getDependResultForRelation(this.relation, dependResultList);
-        return modelDependResult;
+        return DependentUtils.getDependResultForRelation(this.relation, dependResultList);
     }
 
     /**

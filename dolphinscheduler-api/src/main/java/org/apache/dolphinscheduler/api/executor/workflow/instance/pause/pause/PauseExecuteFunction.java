@@ -53,7 +53,7 @@ public class PauseExecuteFunction implements ExecuteFunction<PauseExecuteRequest
         workflowInstance.setStateWithDesc(WorkflowExecutionStatus.READY_PAUSE,
                 CommandType.PAUSE.getDescp() + " by " + request.getExecuteUser().getUserName());
 
-        if (processInstanceDao.updateProcessInstance(workflowInstance) <= 0) {
+        if (!processInstanceDao.updateById(workflowInstance)) {
             throw new ExecuteRuntimeException(
                     String.format(
                             "The workflow instance: %s pause failed, due to update the workflow instance status in DB failed",

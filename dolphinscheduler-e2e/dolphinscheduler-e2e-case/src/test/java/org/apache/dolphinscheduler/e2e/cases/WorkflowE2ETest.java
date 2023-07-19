@@ -45,9 +45,13 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
+import java.time.Duration;
+
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 class WorkflowE2ETest {
     private static final String project = "test-workflow-1";
+
+    private static final String workflow = "test-workflow-1";
 
     private static final String user = "admin";
 
@@ -86,22 +90,23 @@ class WorkflowE2ETest {
             .goToNav(ProjectPage.class)
             .goTo(project)
             .goToTab(WorkflowDefinitionTab.class)
-            .cancelPublishAll()
-            .deleteAll()
-        ;
+            .delete(workflow);
+
         new NavBarPage(browser)
             .goToNav(ProjectPage.class)
-            .delete(project)
+            .delete(project);
+
+        browser.navigate().refresh();
+
+        new NavBarPage(browser)
             .goToNav(SecurityPage.class)
             .goToTab(TenantPage.class)
-            .delete(tenant)
-        ;
+            .delete(tenant);
     }
 
     @Test
     @Order(1)
     void testCreateWorkflow() {
-        final String workflow = "test-workflow-1";
         WorkflowDefinitionTab workflowDefinitionPage =
             new ProjectPage(browser)
                 .goTo(project)
@@ -163,7 +168,6 @@ class WorkflowE2ETest {
     @Test
     @Order(30)
     void testRunWorkflow() {
-        final String workflow = "test-workflow-1";
         final ProjectDetailPage projectPage =
                 new ProjectPage(browser)
                         .goToNav(ProjectPage.class)
@@ -199,7 +203,7 @@ class WorkflowE2ETest {
                 .next()
                 .rerun();
 
-        await().untilAsserted(() -> {
+        await().timeout(Duration.ofSeconds(20)).untilAsserted(() -> {
             browser.navigate().refresh();
 
             final Row row = projectPage

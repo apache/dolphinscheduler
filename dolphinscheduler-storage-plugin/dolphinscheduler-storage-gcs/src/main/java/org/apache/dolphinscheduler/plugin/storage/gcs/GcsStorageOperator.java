@@ -144,7 +144,7 @@ public class GcsStorageOperator implements Closeable, StorageOperate {
     }
 
     @Override
-    public void download(String tenantCode, String srcFilePath, String dstFilePath, boolean deleteSource,
+    public void download(String tenantCode, String srcFilePath, String dstFilePath,
                          boolean overwrite) throws IOException {
         File dstFile = new File(dstFilePath);
         if (dstFile.isDirectory()) {
@@ -201,7 +201,9 @@ public class GcsStorageOperator implements Closeable, StorageOperate {
                         .setTarget(target)
                         .build());
 
-        gcsStorage.delete(source);
+        if (deleteSource) {
+            gcsStorage.delete(source);
+        }
         return true;
     }
 
@@ -212,7 +214,12 @@ public class GcsStorageOperator implements Closeable, StorageOperate {
             BlobInfo blobInfo = BlobInfo.newBuilder(
                     BlobId.of(bucketName, dstPath)).build();
 
-            gcsStorage.create(blobInfo, Files.readAllBytes(Paths.get(srcFile)));
+            Path srcPath = Paths.get(srcFile);
+            gcsStorage.create(blobInfo, Files.readAllBytes(srcPath));
+
+            if (deleteSource) {
+                Files.delete(srcPath);
+            }
             return true;
         } catch (Exception e) {
             log.error("upload failed,the bucketName is {},the filePath is {}", bucketName, dstPath);
@@ -380,7 +387,6 @@ public class GcsStorageOperator implements Closeable, StorageOperate {
                 entity.setFileName(fileName);
                 entity.setFullName(blob.getName());
                 entity.setDirectory(true);
-                entity.setDescription(EMPTY_STRING);
                 entity.setUserName(tenantCode);
                 entity.setType(type);
                 entity.setSize(0);
@@ -399,7 +405,6 @@ public class GcsStorageOperator implements Closeable, StorageOperate {
                 entity.setFileName(fileName);
                 entity.setFullName(blob.getName());
                 entity.setDirectory(false);
-                entity.setDescription(EMPTY_STRING);
                 entity.setUserName(tenantCode);
                 entity.setType(type);
                 entity.setSize(blob.getSize());
@@ -427,7 +432,6 @@ public class GcsStorageOperator implements Closeable, StorageOperate {
             entity.setFileName(fileName);
             entity.setFullName(path);
             entity.setDirectory(true);
-            entity.setDescription(EMPTY_STRING);
             entity.setUserName(tenantCode);
             entity.setType(type);
             entity.setSize(0);
@@ -446,7 +450,6 @@ public class GcsStorageOperator implements Closeable, StorageOperate {
                 entity.setFileName(fileName);
                 entity.setFullName(blob.getName());
                 entity.setDirectory(false);
-                entity.setDescription(EMPTY_STRING);
                 entity.setUserName(tenantCode);
                 entity.setType(type);
                 entity.setSize(blob.getSize());

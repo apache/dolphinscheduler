@@ -41,6 +41,7 @@ public class SparkApplicationTestBase {
         config.put("spark.ui.port", 13000);
         config.put("spark.master", "local[4]");
 
-        sparkRuntimeEnvironment = new SparkRuntimeEnvironment(new Config(config));
+        // The hive client is disabled by default, and the local execution of Unit Test is guaranteed to be successful.
+        sparkRuntimeEnvironment = new SparkRuntimeEnvironment(new Config(config), false);
     }
 }
