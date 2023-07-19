@@ -111,6 +111,10 @@ public class UsersController extends BaseController {
                              @RequestParam(value = "email") String email,
                              @RequestParam(value = "phone", required = false) String phone,
                              @RequestParam(value = "state", required = false) int state) throws Exception {
+        Result verifyRet = usersService.verifyUserName(userName);
+        if (verifyRet.getCode() != Status.SUCCESS.getCode()) {
+            return verifyRet;
+        }
         Map<String, Object> result =
                 usersService.createUser(loginUser, userName, userPassword, email, tenantId, phone, queue, state);
         return returnDataList(result);
@@ -570,6 +574,10 @@ public class UsersController extends BaseController {
         userPassword = ParameterUtils.handleEscapes(userPassword);
         repeatPassword = ParameterUtils.handleEscapes(repeatPassword);
         email = ParameterUtils.handleEscapes(email);
+        Result<Object> verifyRet = usersService.verifyUserName(userName);
+        if (verifyRet.getCode() != Status.SUCCESS.getCode()) {
+            return verifyRet;
+        }
         Map<String, Object> result = usersService.registerUser(userName, userPassword, repeatPassword, email);
         return returnDataList(result);
     }
