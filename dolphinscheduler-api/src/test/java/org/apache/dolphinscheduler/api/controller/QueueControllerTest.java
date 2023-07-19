@@ -182,9 +182,9 @@ public class QueueControllerTest extends AbstractControllerTest {
     @Test
     public void testDeleteQueueById() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("id", "1");
+        paramsMap.add("id", "2");
 
-        MvcResult mvcResult = mockMvc.perform(delete("/queues/{id}", 1)
+        MvcResult mvcResult = mockMvc.perform(delete("/queues/{id}", 2)
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
