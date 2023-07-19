@@ -42,7 +42,6 @@ export function useTenant(): IJsonItem {
     field: 'tenant',
     span: 12,
     name: t('project.workflow.tenant_code'),
-    options: options,
-    value: 'default'
+    options: options
   }
 }
