@@ -35,7 +35,6 @@ import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.model.Bucket;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 
@@ -162,17 +161,13 @@ public class S3RemoteLogHandler implements RemoteLogHandler, Closeable {
             throw new IllegalArgumentException("remote.logging.s3.bucket.name is blank");
         }
 
-        Bucket existsBucket = s3Client.listBuckets()
-                .stream()
-                .filter(
-                        bucket -> bucket.getName().equals(bucketName))
-                .findFirst()
-                .orElseThrow(() -> {
-                    return new IllegalArgumentException(
-                            "bucketName: " + bucketName + " is not exists, you need to create them by yourself");
-                });
+        boolean existsBucket = s3Client.doesBucketExistV2(bucketName);
+        if (!existsBucket) {
+            throw new IllegalArgumentException(
+                    "bucketName: " + bucketName + " is not exists, you need to create them by yourself");
+        }
 
-        log.info("bucketName: {} has been found, the current regionName is {}", existsBucket.getName(),
+        log.info("bucketName: {} has been found, the current regionName is {}", bucketName,
                 s3Client.getRegionName());
     }
 }

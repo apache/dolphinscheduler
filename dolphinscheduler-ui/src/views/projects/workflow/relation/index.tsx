@@ -15,10 +15,17 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, toRefs, watch } from 'vue'
+import { defineComponent, onMounted, toRefs, watch, VNode, h, unref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
-import { NSelect, NButton, NIcon, NSpace, NTooltip } from 'naive-ui'
+import {
+  NSelect,
+  NButton,
+  NIcon,
+  NSpace,
+  NTooltip,
+  SelectOption
+} from 'naive-ui'
 import { ReloadOutlined, EyeOutlined } from '@vicons/antd'
 import { useRelation } from './use-relation'
 import Card from '@/components/card'
@@ -48,6 +55,28 @@ const workflowRelation = defineComponent({
         : getWorkflowList(Number(route.params.projectCode))
     }
 
+    const renderOption = ({
+      node,
+      option
+    }: {
+      node: VNode
+      option: SelectOption
+    }) =>
+      h(NTooltip, null, {
+        trigger: () => node,
+        default: () => option.label
+      })
+
+    const selectFilter = (query: string, option: SelectOption) => {
+      return option.label
+        ? option.label.toString().toLowerCase().includes(query.toLowerCase())
+        : false
+    }
+
+    const updateValue = (value: any) => {
+      variables.workflow = value
+    }
+
     watch(
       () => [variables.workflow, variables.labelShow, locale.value],
       () => {
@@ -55,7 +84,14 @@ const workflowRelation = defineComponent({
       }
     )
 
-    return { t, handleResetDate, ...toRefs(variables) }
+    return {
+      t,
+      handleResetDate,
+      ...toRefs(variables),
+      renderOption,
+      selectFilter,
+      updateValue
+    }
   },
   render() {
     const { t, handleResetDate } = this
@@ -84,13 +120,20 @@ const workflowRelation = defineComponent({
               ),
             'header-extra': () => (
               <NSpace>
-                <NSelect
-                  clearable
-                  style={{ width: '300px' }}
-                  placeholder={t('project.workflow.workflow_name')}
-                  options={this.workflowOptions}
-                  v-model={[this.workflow, 'value']}
-                />
+                {h(NSelect, {
+                  style: {
+                    width: '300px'
+                  },
+                  clearable: true,
+                  filterable: true,
+                  placeholder: t('project.workflow.workflow_name'),
+                  options: unref(this.workflowOptions),
+                  value: this.workflow,
+                  filter: this.selectFilter,
+                  onUpdateValue: (value: any) => {
+                    this.updateValue(value)
+                  }
+                })}
                 <NTooltip trigger={'hover'}>
                   {{
                     default: () => t('project.workflow.refresh'),

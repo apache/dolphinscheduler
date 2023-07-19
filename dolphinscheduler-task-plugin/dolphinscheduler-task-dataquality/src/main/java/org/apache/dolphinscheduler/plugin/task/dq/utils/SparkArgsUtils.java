@@ -39,6 +39,9 @@ public class SparkArgsUtils {
 
     private static final String SPARK_ON_YARN = "yarn";
 
+    private static final String DEFAULT_QUALITY_CLASS =
+            "org.apache.dolphinscheduler.data.quality.DataQualityApplication";
+
     private SparkArgsUtils() {
         throw new IllegalStateException("Utility class");
     }
@@ -62,9 +65,9 @@ public class SparkArgsUtils {
 
         ProgramType programType = param.getProgramType();
         String mainClass = param.getMainClass();
-        if (programType != null && programType != ProgramType.PYTHON && StringUtils.isNotEmpty(mainClass)) {
+        if (programType != null && programType != ProgramType.PYTHON) {
             args.add(SparkConstants.MAIN_CLASS);
-            args.add(mainClass);
+            args.add(StringUtils.isNotEmpty(mainClass) ? mainClass : DEFAULT_QUALITY_CLASS);
         }
 
         int driverCores = param.getDriverCores();
@@ -106,7 +109,7 @@ public class SparkArgsUtils {
         String others = param.getOthers();
         if (!SPARK_LOCAL.equals(deployMode)
                 && (StringUtils.isEmpty(others) || !others.contains(SparkConstants.SPARK_QUEUE))) {
-            String queue = param.getQueue();
+            String queue = param.getYarnQueue();
             if (StringUtils.isNotEmpty(queue)) {
                 args.add(SparkConstants.SPARK_QUEUE);
                 args.add(queue);
@@ -120,7 +123,7 @@ public class SparkArgsUtils {
 
         ResourceInfo mainJar = param.getMainJar();
         if (mainJar != null) {
-            args.add(mainJar.getRes());
+            args.add(mainJar.getResourceName());
         }
 
         String mainArgs = param.getMainArgs();

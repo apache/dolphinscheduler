@@ -80,7 +80,7 @@ public final class LoginPage {
 
 其余的都是类似的情况，可参考具体的源码来理解。
 
-https://github.com/apache/dolphinscheduler/tree/dev/dolphinscheduler-api-test/dolphinscheduler-api-test-case/src/test/java/org/apache/dolphinscheduler/api.test/cases
+https://github.com/apache/dolphinscheduler/tree/dev/dolphinscheduler-api-test/dolphinscheduler-api-test-case/src/test/java/org/apache/dolphinscheduler/api/test/cases
 
 ## 补充
 

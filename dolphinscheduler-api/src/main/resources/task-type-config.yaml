@@ -29,6 +29,7 @@ task:
     - 'DINKY'
     - 'FLINK_STREAM'
     - 'HIVECLI'
+    - 'REMOTESHELL'
   cloud:
     - 'EMR'
     - 'K8S'
@@ -39,6 +40,7 @@ task:
     - 'DEPENDENT'
     - 'CONDITIONS'
     - 'SWITCH'
+    - 'DYNAMIC'
   dataIntegration:
     - 'SEATUNNEL'
     - 'DATAX'

@@ -22,6 +22,8 @@
 | Zeppelin Note ID                   | Zeppelin Note对应的唯一ID                              |
 | Zeppelin Paragraph ID              | Zeppelin Paragraph对应的唯一ID。如果你想一次性调度整个note，这一栏不填即可 |
 | Zeppelin Rest Endpoint             | 您的Zeppelin服务的REST Endpoint                        |
+| Zeppelin username                  | 您的Zeppelin服务的登陆用户名                                |
+| Zeppelin password                  | 您的Zeppelin服务的登陆密码                                 |
 | Zeppelin Production Note Directory | 生产模式下存放克隆note的目录                                  |
 | Zeppelin Parameters                | 用于传入Zeppelin Dynamic Form的参数                      |
 

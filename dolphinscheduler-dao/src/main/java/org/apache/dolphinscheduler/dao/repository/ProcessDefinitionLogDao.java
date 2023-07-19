@@ -19,9 +19,9 @@ package org.apache.dolphinscheduler.dao.repository;
 
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 
-public interface ProcessDefinitionLogDao {
+public interface ProcessDefinitionLogDao extends IDao<ProcessDefinitionLog> {
 
-    ProcessDefinitionLog queryProcessDefinitionLog(long workflowDefinitionCode, int workflowDefinitionVersion);
+    ProcessDefinitionLog queryByDefinitionCodeAndVersion(long workflowDefinitionCode, int workflowDefinitionVersion);
 
     void deleteByWorkflowDefinitionCode(long workflowDefinitionCode);
 }

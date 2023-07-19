@@ -17,12 +17,13 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import org.apache.dolphinscheduler.api.metrics.ApiServerMetrics;
 import org.apache.dolphinscheduler.api.rpc.ApiRpcClient;
 import org.apache.dolphinscheduler.api.service.MetricsCleanUpService;
-import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
-import org.apache.dolphinscheduler.remote.command.WorkflowMetricsCleanUpCommand;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
+import org.apache.dolphinscheduler.remote.command.workflow.WorkflowMetricsCleanUpRequest;
 import org.apache.dolphinscheduler.remote.utils.Host;
 
 import java.util.List;
@@ -44,13 +45,13 @@ public class MetricsCleanUpServiceImpl implements MetricsCleanUpService {
 
     @Override
     public void cleanUpWorkflowMetricsByDefinitionCode(String workflowDefinitionCode) {
-        WorkflowMetricsCleanUpCommand workflowMetricsCleanUpCommand = new WorkflowMetricsCleanUpCommand();
-        workflowMetricsCleanUpCommand.setProcessDefinitionCode(workflowDefinitionCode);
-        List<Server> masterNodeList = registryClient.getServerList(NodeType.MASTER);
+        WorkflowMetricsCleanUpRequest workflowMetricsCleanUpRequest = new WorkflowMetricsCleanUpRequest();
+        workflowMetricsCleanUpRequest.setProcessDefinitionCode(workflowDefinitionCode);
+        List<Server> masterNodeList = registryClient.getServerList(RegistryNodeType.MASTER);
         for (Server server : masterNodeList) {
             try {
                 final String host = String.format("%s:%s", server.getHost(), server.getPort());
-                apiRpcClient.send(Host.of(host), workflowMetricsCleanUpCommand.convert2Command());
+                apiRpcClient.send(Host.of(host), workflowMetricsCleanUpRequest.convert2Command());
             } catch (Exception e) {
                 log.error(
                         "Fail to clean up workflow related metrics on {} when deleting workflow definition {}, error message {}",
@@ -59,4 +60,8 @@ public class MetricsCleanUpServiceImpl implements MetricsCleanUpService {
         }
     }
 
+    @Override
+    public void cleanUpApiResponseTimeMetricsByUserId(int userId) {
+        ApiServerMetrics.cleanUpApiResponseTimeMetricsByUserId(userId);
+    }
 }

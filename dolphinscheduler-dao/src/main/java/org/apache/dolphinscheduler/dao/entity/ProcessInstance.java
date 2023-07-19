@@ -124,8 +124,6 @@ public class ProcessInstance {
 
     private String executorName;
 
-    private int tenantId;
-
     private String tenantCode;
 
     /**

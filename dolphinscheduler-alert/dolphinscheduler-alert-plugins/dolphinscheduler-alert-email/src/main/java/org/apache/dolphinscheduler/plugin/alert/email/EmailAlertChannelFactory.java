@@ -27,11 +27,12 @@ import org.apache.dolphinscheduler.alert.api.AlertChannelFactory;
 import org.apache.dolphinscheduler.alert.api.AlertConstants;
 import org.apache.dolphinscheduler.alert.api.AlertInputTips;
 import org.apache.dolphinscheduler.alert.api.ShowType;
-import org.apache.dolphinscheduler.spi.params.PasswordParam;
+import org.apache.dolphinscheduler.spi.params.base.DataType;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
 import org.apache.dolphinscheduler.spi.params.input.InputParam;
+import org.apache.dolphinscheduler.spi.params.input.number.InputNumberParam;
 import org.apache.dolphinscheduler.spi.params.radio.RadioParam;
 
 import java.util.ArrayList;
@@ -69,11 +70,12 @@ public final class EmailAlertChannelFactory implements AlertChannelFactory {
                         .addValidate(Validate.newBuilder().setRequired(true).build())
                         .build();
 
-        InputParam mailSmtpPort =
-                InputParam.newBuilder(MailParamsConstants.NAME_MAIL_SMTP_PORT, MailParamsConstants.MAIL_SMTP_PORT)
-                        .setValue("25")
+        InputNumberParam mailSmtpPort =
+                InputNumberParam.newBuilder(MailParamsConstants.NAME_MAIL_SMTP_PORT, MailParamsConstants.MAIL_SMTP_PORT)
+                        .setValue(25)
                         .addValidate(Validate.newBuilder()
                                 .setRequired(true)
+                                .setType(DataType.NUMBER.getDataType())
                                 .build())
                         .build();
 
@@ -94,9 +96,10 @@ public final class EmailAlertChannelFactory implements AlertChannelFactory {
                 .setPlaceholder(AlertInputTips.USERNAME.getMsg())
                 .build();
 
-        PasswordParam mailPassword =
-                PasswordParam.newBuilder(MailParamsConstants.NAME_MAIL_PASSWD, MailParamsConstants.MAIL_PASSWD)
+        InputParam mailPassword =
+                InputParam.newBuilder(MailParamsConstants.NAME_MAIL_PASSWD, MailParamsConstants.MAIL_PASSWD)
                         .setPlaceholder(AlertInputTips.PASSWORD.getMsg())
+                        .setType("password")
                         .build();
 
         RadioParam enableTls = RadioParam

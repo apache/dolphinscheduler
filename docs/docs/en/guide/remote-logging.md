@@ -50,3 +50,30 @@ remote.logging.s3.endpoint=<endpoint>
 remote.logging.s3.region=<region>
 ```
 
+## Writing task logs to [Google Cloud Storage (GCS)](https://cloud.google.com/storage)
+
+Configure `common.properties` as follows:
+
+```properties
+# the location of the google cloud credential, required if you set remote.logging.target=GCS
+remote.logging.google.cloud.storage.credential=/path/to/credential
+# gcs bucket name, required if you set remote.logging.target=GCS
+remote.logging.google.cloud.storage.bucket.name=<your-bucket>
+```
+
+## Writing task logs to [Azure Blob Storage (ABS)](https://azure.microsoft.com/en-us/products/storage/blobs)
+
+Configure `common.properties` as follows:
+
+```properties
+# abs container name, required if you set resource.storage.type=ABS
+resource.azure.blob.storage.container.name=<your-container>
+# abs account name, required if you set resource.storage.type=ABS
+resource.azure.blob.storage.account.name=<your-account-name>
+# abs connection string, required if you set resource.storage.type=ABS
+resource.azure.blob.storage.connection.string=<your-connection-string>
+```
+
+### Notice
+
+Since Azure Blob Storage does not support the existence of empty directories, there will be empty files `<no name>` under the resource directory. But it does not affect the file display on the Dolphinscheduler resource center.

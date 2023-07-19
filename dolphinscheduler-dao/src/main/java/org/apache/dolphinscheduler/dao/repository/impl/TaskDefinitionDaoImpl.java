@@ -25,15 +25,19 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.dao.repository.BaseDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +50,7 @@ import com.google.common.collect.Lists;
  */
 @Repository
 @Slf4j
-public class TaskDefinitionDaoImpl implements TaskDefinitionDao {
+public class TaskDefinitionDaoImpl extends BaseDao<TaskDefinition, TaskDefinitionMapper> implements TaskDefinitionDao {
 
     @Autowired
     private ProcessDefinitionMapper processDefinitionMapper;
@@ -57,8 +61,9 @@ public class TaskDefinitionDaoImpl implements TaskDefinitionDao {
     @Autowired
     private TaskDefinitionLogMapper taskDefinitionLogMapper;
 
-    @Autowired
-    private TaskDefinitionMapper taskDefinitionMapper;
+    public TaskDefinitionDaoImpl(@NonNull TaskDefinitionMapper taskDefinitionMapper) {
+        super(taskDefinitionMapper);
+    }
 
     @Override
     public List<TaskDefinition> getTaskDefinitionListByDefinition(long processDefinitionCode) {
@@ -68,11 +73,13 @@ public class TaskDefinitionDaoImpl implements TaskDefinitionDao {
             return Lists.newArrayList();
         }
 
-        List<ProcessTaskRelationLog> processTaskRelations = processTaskRelationLogMapper
-                .queryByProcessCodeAndVersion(processDefinition.getCode(), processDefinition.getVersion());
-        Set<TaskDefinition> taskDefinitionSet = new HashSet<>();
-        processTaskRelations.stream().filter(p -> p.getPostTaskCode() > 0)
-                .forEach(p -> taskDefinitionSet.add(new TaskDefinition(p.getPostTaskCode(), p.getPostTaskVersion())));
+        List<ProcessTaskRelationLog> processTaskRelations = processTaskRelationLogMapper.queryByProcessCodeAndVersion(
+                processDefinition.getCode(), processDefinition.getVersion());
+        Set<TaskDefinition> taskDefinitionSet = processTaskRelations
+                .stream()
+                .filter(p -> p.getPostTaskCode() > 0)
+                .map(p -> new TaskDefinition(p.getPostTaskCode(), p.getPostTaskVersion()))
+                .collect(Collectors.toSet());
 
         if (taskDefinitionSet.isEmpty()) {
             return Lists.newArrayList();
@@ -88,8 +95,7 @@ public class TaskDefinitionDaoImpl implements TaskDefinitionDao {
 
     @Override
     public void deleteByWorkflowDefinitionCodeAndVersion(long workflowDefinitionCode, int workflowDefinitionVersion) {
-        taskDefinitionMapper.deleteByWorkflowDefinitionCodeAndVersion(workflowDefinitionCode,
-                workflowDefinitionVersion);
+        mybatisMapper.deleteByWorkflowDefinitionCodeAndVersion(workflowDefinitionCode, workflowDefinitionVersion);
     }
 
     @Override
@@ -97,7 +103,15 @@ public class TaskDefinitionDaoImpl implements TaskDefinitionDao {
         if (CollectionUtils.isEmpty(needToDeleteTaskDefinitionCodes)) {
             return;
         }
-        taskDefinitionMapper.deleteByBatchCodes(new ArrayList<>(needToDeleteTaskDefinitionCodes));
+        mybatisMapper.deleteByBatchCodes(new ArrayList<>(needToDeleteTaskDefinitionCodes));
+    }
+
+    @Override
+    public List<TaskDefinition> queryByCodes(Collection<Long> taskDefinitionCodes) {
+        if (CollectionUtils.isEmpty(taskDefinitionCodes)) {
+            return Collections.emptyList();
+        }
+        return mybatisMapper.queryByCodeList(taskDefinitionCodes);
     }
 
 }

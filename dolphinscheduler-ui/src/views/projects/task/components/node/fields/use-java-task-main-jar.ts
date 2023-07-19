@@ -59,12 +59,13 @@ export function useJavaTaskMainJar(model: { [field: string]: any }): IJsonItem {
     name: t('project.node.main_package'),
     span: mainJarSpan,
     props: {
+      checkable: true,
       cascade: true,
       showPath: true,
       checkStrategy: 'child',
       placeholder: t('project.node.main_package_tips'),
-      keyField: 'id',
-      labelField: 'fullName'
+      keyField: 'fullName',
+      labelField: 'name'
     },
     validate: {
       trigger: ['input', 'blur'],

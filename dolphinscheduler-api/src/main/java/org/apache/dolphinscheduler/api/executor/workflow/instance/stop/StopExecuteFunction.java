@@ -25,7 +25,7 @@ import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
-import org.apache.dolphinscheduler.remote.command.WorkflowStateEventChangeCommand;
+import org.apache.dolphinscheduler.remote.command.workflow.WorkflowStateEventChangeRequest;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.utils.Host;
 
@@ -57,15 +57,15 @@ public class StopExecuteFunction implements ExecuteFunction<StopRequest, StopRes
         workflowInstance.setCommandType(CommandType.STOP);
         workflowInstance.addHistoryCmd(CommandType.STOP);
         workflowInstance.setStateWithDesc(WorkflowExecutionStatus.READY_STOP, CommandType.STOP.getDescp() + " by user");
-        if (processInstanceDao.updateProcessInstance(workflowInstance) > 0) {
+        if (processInstanceDao.updateById(workflowInstance)) {
             log.info("Workflow instance {} ready to stop success, will call master to stop the workflow instance",
                     workflowInstance.getName());
             // todo: Use specific stop command instead of WorkflowStateEventChangeCommand
-            WorkflowStateEventChangeCommand workflowStateEventChangeCommand = new WorkflowStateEventChangeCommand(
+            WorkflowStateEventChangeRequest workflowStateEventChangeRequest = new WorkflowStateEventChangeRequest(
                     workflowInstance.getId(), 0, workflowInstance.getState(), workflowInstance.getId(), 0);
             try {
                 apiRpcClient.send(Host.of(workflowInstance.getHost()),
-                        workflowStateEventChangeCommand.convert2Command());
+                        workflowStateEventChangeRequest.convert2Command());
             } catch (RemotingException e) {
                 throw new ExecuteRuntimeException(
                         String.format("Workflow instance: %s stop failed, due to send request to master: %s failed",

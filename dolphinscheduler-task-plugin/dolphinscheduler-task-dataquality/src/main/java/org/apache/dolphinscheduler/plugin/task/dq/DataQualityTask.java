@@ -42,9 +42,8 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.dataquality.DataQualityParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ArgsUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.dq.rule.RuleManager;
 import org.apache.dolphinscheduler.plugin.task.dq.rule.parameter.DataQualityConfiguration;
 import org.apache.dolphinscheduler.plugin.task.dq.utils.SparkArgsUtils;
@@ -122,10 +121,6 @@ public class DataQualityTask extends AbstractYarnTask {
                                 StringEscapeUtils.escapeJava(JSONUtils.toJsonString(dataQualityConfiguration)))
                         + "\"");
 
-        dataQualityParameters
-                .getSparkParameters()
-                .setQueue(dqTaskExecutionContext.getQueue());
-
         setMainJarName();
     }
 
@@ -174,17 +169,17 @@ public class DataQualityTask extends AbstractYarnTask {
         // replace placeholder
         Map<String, Property> paramsMap = dqTaskExecutionContext.getPrepareParamsMap();
         String command =
-                ParameterUtils.convertParameterPlaceholders(String.join(" ", args), ParamUtils.convert(paramsMap));
+                ParameterUtils.convertParameterPlaceholders(String.join(" ", args), ParameterUtils.convert(paramsMap));
         log.info("data quality task command: {}", command);
 
         return command;
     }
 
-    @Override
     protected void setMainJarName() {
         ResourceInfo mainJar = new ResourceInfo();
         String basePath = System.getProperty("user.dir").replace(File.separator + "bin", "");
-        mainJar.setRes(basePath + File.separator + "libs" + File.separator + CommonUtils.getDataQualityJarName());
+        mainJar.setResourceName(
+                basePath + File.separator + "libs" + File.separator + CommonUtils.getDataQualityJarName());
         dataQualityParameters.getSparkParameters().setMainJar(mainJar);
     }
 

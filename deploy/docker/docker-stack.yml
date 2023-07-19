@@ -18,7 +18,7 @@ version: "3.1"
 
 services:
   dolphinscheduler-postgresql:
-    image: bitnami/postgresql:11.11.0
+    image: bitnami/postgresql:15.2.0
     environment:
       TZ: Asia/Shanghai
       POSTGRESQL_USERNAME: root
@@ -33,7 +33,7 @@ services:
       replicas: 1
 
   dolphinscheduler-zookeeper:
-    image: bitnami/zookeeper:3.6.2
+    image: bitnami/zookeeper:3.7.1
     environment:
       TZ: Asia/Shanghai
       ALLOW_ANONYMOUS_LOGIN: "yes"

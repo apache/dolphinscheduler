@@ -2,7 +2,7 @@
 
 ## Overview
 
-`SeaTunnel` task type for creating and executing `SeaTunnel` tasks. When the worker executes this task, it will parse the config file through the `start-seatunnel-spark.sh` or `start-seatunnel-flink.sh` command.
+`SeaTunnel` task type for creating and executing `SeaTunnel` tasks. When the worker executes this task, it will parse the config file through the `start-seatunnel-spark.sh` , `start-seatunnel-flink.sh` or `seatunnel.sh` command.
 Click [here](https://seatunnel.apache.org/) for more information about `Apache SeaTunnel`.
 
 ## Create Task
@@ -16,13 +16,15 @@ Click [here](https://seatunnel.apache.org/) for more information about `Apache S
 [//]: # (- Please refer to [DolphinScheduler Task Parameters Appendix]&#40;appendix.md#default-task-parameters&#41; `Default Task Parameters` section for default parameters.)
 
 - Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
-- Engine: Supports FLINK and SPARK
+- Startup script: Select script name to start the task, including `seatunnel.sh`, `start-seatunnel-flink-13-connector-v2.sh`, `start-seatunnel-flink-15-connector-v2.sh`, `start-seatunnel-flink-connector-v2.sh`, `start-seatunnel-flink.sh`, `start-seatunnel-spark-2-connector-v2.sh`, `start-seatunnel-spark-3-connector-v2.sh`, `start-seatunnel-spark-connector-v2.sh`, `start-seatunnel-spark.sh`
 - FLINK
 - Run model: supports `run` and `run-application` modes
 - Option parameters: used to add the parameters of the Flink engine, such as `-m yarn-cluster -ynm seatunnel`
 - SPARK
-- Deployment mode: specify the deployment mode, `cluster` `client` `local`
+- Deployment mode: specify the deployment mode, `cluster` `client`
 - Master: Specify the `Master` model, `yarn` `local` `spark` `mesos`, where `spark` and `mesos` need to specify the `Master` service address, for example: 127.0.0.1:7077
+- SEATUNNEL_ENGINE
+- Deployment mode: specify the deployment mode, `cluster` `local`
 
           > Click [here](https://seatunnel.apache.org/docs/2.1.2/command/usage) for more information on the usage of `Apache SeaTunnel command`
 

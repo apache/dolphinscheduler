@@ -62,7 +62,7 @@ const DagCanvas = defineComponent({
     })
 
     watch(dagTasks, () => {
-      useAddDagShape((graph.value as Graph))
+      useAddDagShape(graph.value as Graph)
     })
 
     return {
@@ -74,16 +74,19 @@ const DagCanvas = defineComponent({
     }
   },
   render() {
-    return(
+    return (
       <>
-        <div ref='container' class={styles.container}
-           onDrop={this.handleDrop}
-           onDragenter={this.handlePreventDefault}
-           onDragover={this.handlePreventDefault}
-           onDragleave={this.handlePreventDefault}>
-          <div ref='dag-container' class={styles['dag-container']}/>
+        <div
+          ref='container'
+          class={styles.container}
+          onDrop={this.handleDrop}
+          onDragenter={this.handlePreventDefault}
+          onDragover={this.handlePreventDefault}
+          onDragleave={this.handlePreventDefault}
+        >
+          <div ref='dag-container' class={styles['dag-container']} />
         </div>
-        <div ref='minimapContainer' class={styles.minimap}/>
+        <div ref='minimapContainer' class={styles.minimap} />
       </>
     )
   }

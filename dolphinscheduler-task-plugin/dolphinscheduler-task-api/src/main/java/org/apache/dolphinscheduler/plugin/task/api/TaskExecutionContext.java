@@ -69,6 +69,8 @@ public class TaskExecutionContext implements Serializable {
      */
     private String taskType;
 
+    private String workflowInstanceHost;
+
     /**
      * host
      */
@@ -143,11 +145,6 @@ public class TaskExecutionContext implements Serializable {
      * tenant code
      */
     private String tenantCode;
-
-    /**
-     * task queue
-     */
-    private String queue;
 
     /**
      * process define id
