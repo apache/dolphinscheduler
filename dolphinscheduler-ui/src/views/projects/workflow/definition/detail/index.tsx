@@ -84,7 +84,7 @@ export default defineComponent({
         return {
           prop: p.key,
           value: p.value,
-          direct: 'IN',
+          direct: p.direct,
           type: 'VARCHAR'
         }
       })

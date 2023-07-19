@@ -2,7 +2,11 @@
 
 ## Scope
 
-Global parameters are parameters that are valid for all task nodes of the entire workflow. It can be configured on the workflow definition page.
+Global parameters can be configured on the workflow definition page.
+
+The `IN` direction parameter is valid for all task nodes of the entire workflow.
+
+The `OUT` direction parameter is the output parameter of the workflow and passed to the downstream task of the corresponding SubProcess task in the parent workflow.
 
 ## Usage
 

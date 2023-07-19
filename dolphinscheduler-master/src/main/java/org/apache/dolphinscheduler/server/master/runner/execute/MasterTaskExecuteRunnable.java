@@ -88,6 +88,10 @@ public abstract class MasterTaskExecuteRunnable implements Runnable {
         return taskExecutionContext;
     }
 
+    public ILogicTask getILogicTask() {
+        return logicTask;
+    }
+
     @Override
     public void run() {
         try {
