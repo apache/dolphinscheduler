@@ -443,6 +443,10 @@ interface ITaskParams {
   filterCondition?: string
   listParameters?: Array<any>
   yarnQueue?: string
+  enableProxy?: boolean
+  proxy?: string
+  port?: number
+  user?: string
 }
 
 interface INodeData

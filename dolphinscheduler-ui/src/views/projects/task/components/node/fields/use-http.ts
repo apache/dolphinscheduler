@@ -197,19 +197,7 @@ export function useHttp(model: { [field: string]: any }): IJsonItem[] {
       field: 'enableProxy',
       name: t('security.alarm_instance.IsEnableProxy'),
       type: 'radio',
-
       value: false,
-      validate: [
-        {
-          required: false,
-          message: null,
-          type: 'boolean',
-          trigger: 'blur',
-          min: null,
-          max: null
-        }
-      ],
-      emit: null,
       options: [
         { label: 'YES', value: true, disabled: false },
         { label: 'NO', value: false, disabled: false }
@@ -220,54 +208,21 @@ export function useHttp(model: { [field: string]: any }): IJsonItem[] {
       field: 'proxy',
       name: t('security.alarm_instance.Proxy'),
       type: 'input',
-      value: null,
-      validate: [
-        {
-          required: false,
-          message: null,
-          type: 'string',
-          trigger: 'blur',
-          min: null,
-          max: null
-        }
-      ],
-      emit: null
+      value: null
     },
     {
       props: null,
       field: 'port',
       name: t('security.alarm_instance.Port'),
       type: 'input-number',
-      value: null,
-      validate: [
-        {
-          required: false,
-          message: null,
-          type: 'number',
-          trigger: 'blur',
-          min: null,
-          max: null
-        }
-      ],
-      emit: null
+      value: null
     },
     {
       props: null,
       field: 'user',
       name: t('security.alarm_instance.User'),
       type: 'input',
-      value: null,
-      validate: [
-        {
-          required: false,
-          message: null,
-          type: 'string',
-          trigger: 'blur',
-          min: null,
-          max: null
-        }
-      ],
-      emit: null
+      value: null
     },
     {
       props: {
@@ -300,9 +255,7 @@ export function useHttp(model: { [field: string]: any }): IJsonItem[] {
       name: t('security.alarm_instance.Password'),
       type: 'input',
       title: t('security.alarm_instance.Password'),
-      value: null,
-      validate: null,
-      emit: null
+      value: null
     }
   ]
 }

@@ -53,7 +53,7 @@ export function useHttp({
     timeoutNotifyStrategy: ['WARN'],
     enableProxy: false,
     proxy: '',
-    port: null,
+    port: undefined,
     user: '',
     password: ''
   } as INodeData)
