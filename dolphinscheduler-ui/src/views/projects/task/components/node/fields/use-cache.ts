@@ -19,11 +19,11 @@ import { useI18n } from 'vue-i18n'
 import type { IJsonItem } from '../types'
 
 export function useCache(): IJsonItem {
-    const { t } = useI18n()
-    return {
-        type: 'switch',
-        field: 'isCache',
-        name: t('project.node.is_cache'),
-        span: 12
-    }
+  const { t } = useI18n()
+  return {
+    type: 'switch',
+    field: 'isCache',
+    name: t('project.node.is_cache'),
+    span: 12
+  }
 }

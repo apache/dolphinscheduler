@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.server.master.processor.queue;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.remote.command.StateEventResponseCommand;
+import org.apache.dolphinscheduler.remote.command.StateEventResponse;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
@@ -114,7 +114,7 @@ public class StateEventResponseService {
                 try {
                     stateEvent = eventQueue.take();
                 } catch (InterruptedException e) {
-                    log.warn("State event loop service interrupted, will stop this loop", e);
+                    log.warn("State event loop service interrupted, will stop loop");
                     Thread.currentThread().interrupt();
                     break;
                 }
@@ -133,7 +133,7 @@ public class StateEventResponseService {
     private void writeResponse(StateEvent stateEvent) {
         Channel channel = stateEvent.getChannel();
         if (channel != null) {
-            StateEventResponseCommand command = new StateEventResponseCommand(stateEvent.getKey());
+            StateEventResponse command = new StateEventResponse(stateEvent.getKey());
             channel.writeAndFlush(command.convert2Command());
         }
     }

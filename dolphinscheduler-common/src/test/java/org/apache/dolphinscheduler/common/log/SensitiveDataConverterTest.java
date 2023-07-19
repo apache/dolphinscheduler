@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.common.log;
 
+import static org.apache.dolphinscheduler.common.constants.Constants.K8S_CONFIG_REGEX;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -52,4 +54,41 @@ public class SensitiveDataConverterTest {
 
     }
 
+    @Test
+    public void testPostJdbcInfoLogMsgConverter() {
+        String POST_JDBC_INFO_REGEX = "(?<=(post jdbc info:)).*(?=)";
+        SensitiveDataConverter.addMaskPattern(POST_JDBC_INFO_REGEX);
+        String postJdbcInfoLogMsg = "post jdbc info:clickhouse,jdbc:clickhouse://127.0.0.1:8123/td_cdp,admin,123%@@56";
+        final String maskedLog = SensitiveDataConverter.maskSensitiveData(postJdbcInfoLogMsg);
+        String expectedMsg = "post jdbc info:*****************************************************************";
+        Assertions.assertEquals(expectedMsg, maskedLog);
+    }
+
+    @Test
+    public void testK8SLogMsgConverter() {
+        String msg = "End initialize task {\n" +
+                "  \"taskName\" : \"echo\",\n" +
+                "  \"k8sTaskExecutionContext\" : {\n" +
+                "    \"configYaml\" : \"apiVersion: v1 xxx client-key-data: ==\",\n" +
+                "    \"namespace\" : \"abc\"\n" +
+                "  },\n" +
+                "  \"logBufferEnable\" : false\n" +
+                "}";
+        String maskMsg = "End initialize task {\n" +
+                "  \"taskName\" : \"echo\",\n" +
+                "  \"k8sTaskExecutionContext\" : {\n" +
+                "    \"configYaml\" : \"**************************************\",\n" +
+                "    \"namespace\" : \"abc\"\n" +
+                "  },\n" +
+                "  \"logBufferEnable\" : false\n" +
+                "}";
+        SensitiveDataConverter.addMaskPattern(K8S_CONFIG_REGEX);
+        final String maskedLog = SensitiveDataConverter.maskSensitiveData(msg);
+
+        logger.info("original parameter : {}", msg);
+        logger.info("masked parameter : {}", maskedLog);
+
+        Assertions.assertEquals(maskMsg, maskedLog);
+
+    }
 }

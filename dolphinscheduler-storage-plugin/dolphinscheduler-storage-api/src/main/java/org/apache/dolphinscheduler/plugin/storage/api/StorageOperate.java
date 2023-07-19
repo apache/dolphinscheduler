@@ -48,7 +48,6 @@ public interface StorageOperate {
      * @param tenantCode
      * @return
      */
-
     String getUdfDir(String tenantCode);
 
     /**
@@ -61,19 +60,19 @@ public interface StorageOperate {
     boolean mkdir(String tenantCode, String path) throws IOException;
 
     /**
-     * get the path of the resource file
+     * get the path of the resource file (fullName)
      * @param tenantCode
+     * @param fileName
+     * @return
+     */
+    String getResourceFullName(String tenantCode, String fileName);
+
+    /**
+     * get the path of the resource file excluding the base path (fileName)
      * @param fullName
      * @return
      */
     String getResourceFileName(String tenantCode, String fullName);
-
-    /**
-     * get the path of the resource file excluding the base path.
-     * @param fullName
-     * @return
-     */
-    String getResourceFileName(String fullName);
 
     /**
      * get the path of the file
@@ -141,11 +140,10 @@ public interface StorageOperate {
      * @param tenantCode
      * @param srcFilePath the full path of the srcPath
      * @param dstFile
-     * @param deleteSource
      * @param overwrite
      * @throws IOException
      */
-    void download(String tenantCode, String srcFilePath, String dstFile, boolean deleteSource,
+    void download(String tenantCode, String srcFilePath, String dstFile,
                   boolean overwrite) throws IOException;
 
     /**

@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
+import java.util.Objects;
+
 import lombok.Data;
 
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -59,7 +61,7 @@ public class ProcessInstanceMap {
 
         ProcessInstanceMap that = (ProcessInstanceMap) o;
 
-        if (id != that.id) {
+        if (!Objects.equals(id, that.id)) {
             return false;
         }
         if (parentProcessInstanceId != that.parentProcessInstanceId) {

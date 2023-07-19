@@ -15,26 +15,17 @@
  * limitations under the License.
  */
 
-import {
-  defineComponent,
-  getCurrentInstance,
-  toRefs
-} from 'vue'
-import {
-  NButton,
-  NIcon,
-  NSpace,
-  NDataTable,
-  NPagination
-} from 'naive-ui'
+import { defineComponent, getCurrentInstance, toRefs } from 'vue'
+import { NButton, NIcon, NSpace, NDataTable, NPagination } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { SearchOutlined } from '@vicons/antd'
 import { useColumns } from './use-columns'
 import { useTable } from './use-table'
 import UserDetailModal from './components/user-detail-modal'
 import AuthorizeModal from './components/authorize-modal'
+import PasswordModal from './components/password-modal'
 import Card from '@/components/card'
-import Search from "@/components/input-search";
+import Search from '@/components/input-search'
 
 const UsersManage = defineComponent({
   name: 'user-manage',
@@ -54,6 +45,10 @@ const UsersManage = defineComponent({
     const onAuthorizeModalCancel = () => {
       state.authorizeModalShow = false
     }
+    const onPasswordModalCancel = () => {
+      state.passwordModalShow = false
+    }
+
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
     return {
@@ -66,6 +61,7 @@ const UsersManage = defineComponent({
       onUpdatedList: updateList,
       onDetailModalCancel,
       onAuthorizeModalCancel,
+      onPasswordModalCancel,
       trim
     }
   },
@@ -129,6 +125,11 @@ const UsersManage = defineComponent({
           type={this.authorizeType}
           userId={this.currentRecord?.id}
           onCancel={this.onAuthorizeModalCancel}
+        />
+        <PasswordModal
+          show={this.passwordModalShow}
+          currentRecord={this.currentRecord}
+          onCancel={this.onPasswordModalCancel}
         />
       </NSpace>
     )

@@ -36,8 +36,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.UdfFuncParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
@@ -477,8 +476,11 @@ public class SqlTask extends AbstractTask {
     private SqlBinds getSqlAndSqlParamsMap(String sql) {
         Map<Integer, Property> sqlParamsMap = new HashMap<>();
         StringBuilder sqlBuilder = new StringBuilder();
+        // new
+        // replace variable TIME with $[YYYYmmddd...] in sql when history run job and batch complement job
+        sql = ParameterUtils.replaceScheduleTime(sql,
+                DateUtils.timeStampToDate(taskExecutionContext.getScheduleTime()));
 
-        // combining local and global parameters
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
 
         // spell SQL according to the final user-defined variable
@@ -489,15 +491,11 @@ public class SqlTask extends AbstractTask {
 
         if (StringUtils.isNotEmpty(sqlParameters.getTitle())) {
             String title = ParameterUtils.convertParameterPlaceholders(sqlParameters.getTitle(),
-                    ParamUtils.convert(paramsMap));
+                    ParameterUtils.convert(paramsMap));
             log.info("SQL title : {}", title);
             sqlParameters.setTitle(title);
         }
 
-        // new
-        // replace variable TIME with $[YYYYmmddd...] in sql when history run job and batch complement job
-        sql = ParameterUtils.replaceScheduleTime(sql,
-                DateUtils.timeStampToDate(taskExecutionContext.getScheduleTime()));
         // special characters need to be escaped, ${} needs to be escaped
         setSqlParamsMap(sql, rgex, sqlParamsMap, paramsMap, taskExecutionContext.getTaskInstanceId());
         // Replace the original value in sql ！{...} ，Does not participate in precompilation

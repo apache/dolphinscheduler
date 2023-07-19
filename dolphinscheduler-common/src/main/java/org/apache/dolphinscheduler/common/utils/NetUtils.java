@@ -121,9 +121,9 @@ public class NetUtils {
 
         InetAddress localAddress = null;
         try {
-            NetworkInterface networkInterface = findNetworkInterface();
-            if (networkInterface != null) {
-                Enumeration<InetAddress> addresses = networkInterface.getInetAddresses();
+            Optional<NetworkInterface> networkInterface = findNetworkInterface();
+            if (networkInterface.isPresent()) {
+                Enumeration<InetAddress> addresses = networkInterface.get().getInetAddresses();
                 while (addresses.hasMoreElements()) {
                     Optional<InetAddress> addressOp = toValidAddress(addresses.nextElement());
                     if (addressOp.isPresent()) {
@@ -137,8 +137,8 @@ public class NetUtils {
                         }
                     }
                 }
-            }
 
+            }
             localAddress = InetAddress.getLocalHost();
         } catch (UnknownHostException e) {
             log.warn("InetAddress get LocalHost exception", e);
@@ -154,12 +154,15 @@ public class NetUtils {
         if (address instanceof Inet6Address) {
             Inet6Address v6Address = (Inet6Address) address;
             if (isPreferIPV6Address()) {
-                return Optional.ofNullable(normalizeV6Address(v6Address));
+                InetAddress inetAddress = normalizeV6Address(v6Address);
+                log.debug("The host prefer ipv6 address, will use ipv6 address: {} directly", inetAddress);
+                return Optional.ofNullable(inetAddress);
             }
         }
         if (isValidV4Address(address)) {
             return Optional.of(address);
         }
+        log.warn("The address of the host is invalid, address: {}", address);
         return Optional.empty();
     }
 
@@ -202,7 +205,7 @@ public class NetUtils {
      *
      * @return If no {@link NetworkInterface} is available , return <code>null</code>
      */
-    private static NetworkInterface findNetworkInterface() {
+    private static Optional<NetworkInterface> findNetworkInterface() {
 
         List<NetworkInterface> validNetworkInterfaces = emptyList();
 
@@ -211,19 +214,19 @@ public class NetUtils {
         } catch (SocketException e) {
             log.warn("ValidNetworkInterfaces exception", e);
         }
+        if (CollectionUtils.isEmpty(validNetworkInterfaces)) {
+            log.warn("ValidNetworkInterfaces is empty");
+            return Optional.empty();
+        }
 
-        NetworkInterface result = null;
         // Try to specify config NetWork Interface
-        for (NetworkInterface networkInterface : validNetworkInterfaces) {
-            if (isSpecifyNetworkInterface(networkInterface)) {
-                result = networkInterface;
-                break;
-            }
+        Optional<NetworkInterface> specifyNetworkInterface =
+                validNetworkInterfaces.stream().filter(NetUtils::isSpecifyNetworkInterface).findFirst();
+        if (specifyNetworkInterface.isPresent()) {
+            log.info("Use specified NetworkInterface: {}", specifyNetworkInterface.get());
+            return specifyNetworkInterface;
         }
 
-        if (null != result) {
-            return result;
-        }
         return findAddress(validNetworkInterfaces);
     }
 
@@ -239,8 +242,10 @@ public class NetUtils {
             NetworkInterface networkInterface = interfaces.nextElement();
             // ignore
             if (ignoreNetworkInterface(networkInterface)) {
+                log.debug("Info NetworkInterface: {}", networkInterface);
                 continue;
             }
+            log.info("Found valid NetworkInterface: {}", networkInterface);
             validNetworkInterfaces.add(networkInterface);
         }
         return validNetworkInterfaces;
@@ -265,34 +270,40 @@ public class NetUtils {
         return Objects.equals(networkInterface.getDisplayName(), preferredNetworkInterface);
     }
 
-    private static NetworkInterface findAddress(List<NetworkInterface> validNetworkInterfaces) {
+    private static Optional<NetworkInterface> findAddress(List<NetworkInterface> validNetworkInterfaces) {
         if (CollectionUtils.isEmpty(validNetworkInterfaces)) {
-            return null;
+            return Optional.empty();
         }
         String networkPriority = PropertyUtils.getString(Constants.DOLPHIN_SCHEDULER_NETWORK_PRIORITY_STRATEGY,
                 NETWORK_PRIORITY_DEFAULT);
-        if (NETWORK_PRIORITY_DEFAULT.equalsIgnoreCase(networkPriority)) {
-            return findAddressByDefaultPolicy(validNetworkInterfaces);
-        } else if (NETWORK_PRIORITY_INNER.equalsIgnoreCase(networkPriority)) {
-            return findInnerAddress(validNetworkInterfaces);
-        } else if (NETWORK_PRIORITY_OUTER.equalsIgnoreCase(networkPriority)) {
-            return findOuterAddress(validNetworkInterfaces);
-        } else {
-            log.error("There is no matching network card acquisition policy!");
-            return null;
+        switch (networkPriority) {
+            case NETWORK_PRIORITY_DEFAULT:
+                log.debug("Use default NetworkInterface acquisition policy");
+                return findAddressByDefaultPolicy(validNetworkInterfaces);
+            case NETWORK_PRIORITY_INNER:
+                log.debug("Use inner NetworkInterface acquisition policy");
+                return findInnerAddress(validNetworkInterfaces);
+            case NETWORK_PRIORITY_OUTER:
+                log.debug("Use outer NetworkInterface acquisition policy");
+                return findOuterAddress(validNetworkInterfaces);
+            default:
+                log.error("There is no matching network card acquisition policy!");
+                return Optional.empty();
         }
     }
 
-    private static NetworkInterface findAddressByDefaultPolicy(List<NetworkInterface> validNetworkInterfaces) {
-        NetworkInterface networkInterface;
-        networkInterface = findInnerAddress(validNetworkInterfaces);
-        if (networkInterface == null) {
-            networkInterface = findOuterAddress(validNetworkInterfaces);
-            if (networkInterface == null) {
-                networkInterface = validNetworkInterfaces.get(0);
-            }
+    private static Optional<NetworkInterface> findAddressByDefaultPolicy(List<NetworkInterface> validNetworkInterfaces) {
+        Optional<NetworkInterface> innerAddress = findInnerAddress(validNetworkInterfaces);
+        if (innerAddress.isPresent()) {
+            log.debug("Found inner NetworkInterface: {}", innerAddress.get());
+            return innerAddress;
         }
-        return networkInterface;
+        Optional<NetworkInterface> outerAddress = findOuterAddress(validNetworkInterfaces);
+        if (outerAddress.isPresent()) {
+            log.debug("Found outer NetworkInterface: {}", outerAddress.get());
+            return outerAddress;
+        }
+        return Optional.empty();
     }
 
     /**
@@ -300,35 +311,39 @@ public class NetUtils {
      *
      * @return If no {@link NetworkInterface} is available , return <code>null</code>
      */
-    private static NetworkInterface findInnerAddress(List<NetworkInterface> validNetworkInterfaces) {
+    private static Optional<NetworkInterface> findInnerAddress(List<NetworkInterface> validNetworkInterfaces) {
+        if (CollectionUtils.isEmpty(validNetworkInterfaces)) {
+            return Optional.empty();
+        }
 
-        NetworkInterface networkInterface = null;
         for (NetworkInterface ni : validNetworkInterfaces) {
             Enumeration<InetAddress> address = ni.getInetAddresses();
             while (address.hasMoreElements()) {
                 InetAddress ip = address.nextElement();
                 if (ip.isSiteLocalAddress()
                         && !ip.isLoopbackAddress()) {
-                    networkInterface = ni;
+                    return Optional.of(ni);
                 }
             }
         }
-        return networkInterface;
+        return Optional.empty();
     }
 
-    private static NetworkInterface findOuterAddress(List<NetworkInterface> validNetworkInterfaces) {
-        NetworkInterface networkInterface = null;
+    private static Optional<NetworkInterface> findOuterAddress(List<NetworkInterface> validNetworkInterfaces) {
+        if (CollectionUtils.isEmpty(validNetworkInterfaces)) {
+            return Optional.empty();
+        }
         for (NetworkInterface ni : validNetworkInterfaces) {
             Enumeration<InetAddress> address = ni.getInetAddresses();
             while (address.hasMoreElements()) {
                 InetAddress ip = address.nextElement();
                 if (!ip.isSiteLocalAddress()
                         && !ip.isLoopbackAddress()) {
-                    networkInterface = ni;
+                    return Optional.of(ni);
                 }
             }
         }
-        return networkInterface;
+        return Optional.empty();
     }
 
 }

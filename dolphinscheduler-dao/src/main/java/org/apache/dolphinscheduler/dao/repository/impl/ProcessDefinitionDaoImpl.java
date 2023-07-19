@@ -18,39 +18,40 @@
 package org.apache.dolphinscheduler.dao.repository.impl;
 
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
+import org.apache.dolphinscheduler.dao.repository.BaseDao;
 import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import org.apache.commons.collections4.CollectionUtils;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import lombok.NonNull;
+
 import org.springframework.stereotype.Repository;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 @Repository
-public class ProcessDefinitionDaoImpl implements ProcessDefinitionDao {
+public class ProcessDefinitionDaoImpl extends BaseDao<ProcessDefinition, ProcessDefinitionMapper>
+        implements
+            ProcessDefinitionDao {
 
-    @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
-    @Autowired
-    private ProcessDefinitionLogMapper processDefinitionLogMapper;
+    public ProcessDefinitionDaoImpl(@NonNull ProcessDefinitionMapper processDefinitionMapper) {
+        super(processDefinitionMapper);
+    }
 
     @Override
     public PageListingResult<ProcessDefinition> listingProcessDefinition(int pageNumber, int pageSize, String searchVal,
                                                                          int userId, long projectCode) {
         Page<ProcessDefinition> page = new Page<>(pageNumber, pageSize);
         IPage<ProcessDefinition> processDefinitions =
-                processDefinitionMapper.queryDefineListPaging(page, searchVal, userId, projectCode);
+                mybatisMapper.queryDefineListPaging(page, searchVal, userId, projectCode);
 
         return PageListingResult.<ProcessDefinition>builder()
                 .totalCount(processDefinitions.getTotal())
@@ -61,39 +62,20 @@ public class ProcessDefinitionDaoImpl implements ProcessDefinitionDao {
     }
 
     @Override
-    public List<ProcessDefinition> queryProcessDefinitionsByCodesAndVersions(List<ProcessInstance> processInstances) {
-        if (Objects.isNull(processInstances) || processInstances.isEmpty()) {
-            return new ArrayList<>();
-        }
-        List<ProcessDefinitionLog> processDefinitionLogs = processInstances
-                .parallelStream()
-                .map(processInstance -> {
-                    ProcessDefinitionLog processDefinitionLog = processDefinitionLogMapper
-                            .queryByDefinitionCodeAndVersion(processInstance.getProcessDefinitionCode(),
-                                    processInstance.getProcessDefinitionVersion());
-                    return processDefinitionLog;
-                })
-                .collect(Collectors.toList());
-
-        List<ProcessDefinition> processDefinitions =
-                processDefinitionLogs.stream().map(log -> (ProcessDefinition) log).collect(Collectors.toList());
-
-        return processDefinitions;
-    }
-
-    @Override
     public Optional<ProcessDefinition> queryByCode(long code) {
-        return Optional.ofNullable(
-                processDefinitionMapper.queryByCode(code));
-    }
-
-    @Override
-    public void deleteById(Integer workflowDefinitionId) {
-        processDefinitionMapper.deleteById(workflowDefinitionId);
+        return Optional.ofNullable(mybatisMapper.queryByCode(code));
     }
 
     @Override
     public void deleteByWorkflowDefinitionCode(long workflowDefinitionCode) {
-        processDefinitionMapper.deleteByCode(workflowDefinitionCode);
+        mybatisMapper.deleteByCode(workflowDefinitionCode);
+    }
+
+    @Override
+    public List<ProcessDefinition> queryByCodes(Collection<Long> processDefinitionCodes) {
+        if (CollectionUtils.isEmpty(processDefinitionCodes)) {
+            return Collections.emptyList();
+        }
+        return mybatisMapper.queryByCodes(processDefinitionCodes);
     }
 }

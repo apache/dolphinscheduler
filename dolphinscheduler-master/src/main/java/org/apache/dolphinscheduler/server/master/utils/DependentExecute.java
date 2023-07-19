@@ -17,34 +17,39 @@
 
 package org.apache.dolphinscheduler.server.master.utils;
 
+import static org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters.DependentFailurePolicyEnum.DEPENDENT_FAILURE_WAITING;
+
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependentRelation;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.DateInterval;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.DependentUtils;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * dependent item execute
  */
+@Slf4j
 public class DependentExecute {
 
-    /**
-     * process service
-     */
-    private final ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
+    private final ProcessInstanceDao processInstanceDao = SpringApplicationContext.getBean(ProcessInstanceDao.class);
 
     private final TaskInstanceDao taskInstanceDao = SpringApplicationContext.getBean(TaskInstanceDao.class);
 
@@ -58,10 +63,9 @@ public class DependentExecute {
      */
     private DependentRelation relation;
 
-    /**
-     * depend result
-     */
-    private DependResult modelDependResult = DependResult.WAITING;
+    private ProcessInstance processInstance;
+
+    private TaskInstance taskInstance;
 
     /**
      * depend result map
@@ -74,9 +78,12 @@ public class DependentExecute {
      * @param itemList item list
      * @param relation relation
      */
-    public DependentExecute(List<DependentItem> itemList, DependentRelation relation) {
+    public DependentExecute(List<DependentItem> itemList, DependentRelation relation, ProcessInstance processInstance,
+                            TaskInstance taskInstance) {
         this.dependItemList = itemList;
         this.relation = relation;
+        this.processInstance = processInstance;
+        this.taskInstance = taskInstance;
     }
 
     /**
@@ -149,7 +156,7 @@ public class DependentExecute {
         DependResult result;
         TaskInstance taskInstance = null;
         List<TaskInstance> taskInstanceList =
-                taskInstanceDao.findValidTaskListByProcessId(processInstance.getId(), testFlag);
+                taskInstanceDao.queryValidTaskListByWorkflowInstanceId(processInstance.getId(), testFlag);
 
         for (TaskInstance task : taskInstanceList) {
             if (task.getTaskCode() == taskCode) {
@@ -185,10 +192,10 @@ public class DependentExecute {
     private ProcessInstance findLastProcessInterval(Long definitionCode, DateInterval dateInterval, int testFlag) {
 
         ProcessInstance lastSchedulerProcess =
-                processService.findLastSchedulerProcessInterval(definitionCode, dateInterval, testFlag);
+                processInstanceDao.queryLastSchedulerProcessInterval(definitionCode, dateInterval, testFlag);
 
         ProcessInstance lastManualProcess =
-                processService.findLastManualProcessInterval(definitionCode, dateInterval, testFlag);
+                processInstanceDao.queryLastManualProcessInterval(definitionCode, dateInterval, testFlag);
 
         if (lastManualProcess == null) {
             return lastSchedulerProcess;
@@ -224,10 +231,15 @@ public class DependentExecute {
      * @param currentTime current time
      * @return boolean
      */
-    public boolean finish(Date currentTime, int testFlag) {
+    public boolean finish(Date currentTime, int testFlag, DependentParameters.DependentFailurePolicyEnum failurePolicy,
+                          Integer failureWaitingTime) {
+        DependResult modelDependResult = getModelDependResult(currentTime, testFlag);
         if (modelDependResult == DependResult.WAITING) {
-            modelDependResult = getModelDependResult(currentTime, testFlag);
             return false;
+        } else if (modelDependResult == DependResult.FAILED && DEPENDENT_FAILURE_WAITING == failurePolicy
+                && failureWaitingTime != null) {
+            return Duration.between(currentTime.toInstant(), Instant.now())
+                    .compareTo(Duration.ofMinutes(failureWaitingTime)) > 0;
         }
         return true;
     }
@@ -243,14 +255,22 @@ public class DependentExecute {
         List<DependResult> dependResultList = new ArrayList<>();
 
         for (DependentItem dependentItem : dependItemList) {
+            if (isSelfDependent(dependentItem) && isFirstProcessInstance(dependentItem)) {
+                // if self-dependent, default success at first time
+                dependResultMap.put(dependentItem.getKey(), DependResult.SUCCESS);
+                dependResultList.add(DependResult.SUCCESS);
+                log.info(
+                        "This dependent item is self-dependent and run at first time, default success, processDefinitionCode:{}, depTaskCode:{}",
+                        dependentItem.getDefinitionCode(), dependentItem.getDepTaskCode());
+                continue;
+            }
             DependResult dependResult = getDependResultForItem(dependentItem, currentTime, testFlag);
-            if (dependResult != DependResult.WAITING) {
+            if (dependResult != DependResult.WAITING && dependResult != DependResult.FAILED) {
                 dependResultMap.put(dependentItem.getKey(), dependResult);
             }
             dependResultList.add(dependResult);
         }
-        modelDependResult = DependentUtils.getDependResultForRelation(this.relation, dependResultList);
-        return modelDependResult;
+        return DependentUtils.getDependResultForRelation(this.relation, dependResultList);
     }
 
     /**
@@ -272,4 +292,42 @@ public class DependentExecute {
         return dependResultMap;
     }
 
+    /**
+     * check for self-dependent
+     * @param dependentItem
+     * @return
+     */
+    public boolean isSelfDependent(DependentItem dependentItem) {
+        if (processInstance.getProcessDefinitionCode().equals(dependentItem.getDefinitionCode())) {
+            if (dependentItem.getDepTaskCode() == Constants.DEPENDENT_ALL_TASK_CODE) {
+                return true;
+            }
+            if (dependentItem.getDepTaskCode() == taskInstance.getTaskCode()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * check for first-running
+     * query the first processInstance by scheduleTime(or startTime if scheduleTime is null)
+     * @param dependentItem
+     * @return
+     */
+    public boolean isFirstProcessInstance(DependentItem dependentItem) {
+        ProcessInstance firstProcessInstance =
+                processInstanceDao.queryFirstScheduleProcessInstance(dependentItem.getDefinitionCode());
+        if (firstProcessInstance == null) {
+            firstProcessInstance = processInstanceDao.queryFirstStartProcessInstance(dependentItem.getDefinitionCode());
+            if (firstProcessInstance == null) {
+                log.warn("First process instance is null, processDefinitionCode:{}", dependentItem.getDefinitionCode());
+                return false;
+            }
+        }
+        if (firstProcessInstance.getId() == processInstance.getId()) {
+            return true;
+        }
+        return false;
+    }
 }
