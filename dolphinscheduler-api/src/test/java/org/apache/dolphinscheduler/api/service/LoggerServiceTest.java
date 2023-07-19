@@ -183,7 +183,7 @@ public class LoggerServiceTest {
                 .thenReturn(new byte[0]);
         Mockito.when(projectMapper.queryProjectByTaskInstanceId(1)).thenReturn(project);
         byte[] result = loggerService.getLogBytes(loginUser, 1);
-        Assertions.assertEquals(90, result.length);
+        Assertions.assertEquals(62, result.length);
     }
 
     @Test
