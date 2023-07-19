@@ -28,6 +28,4 @@ public class HiveCliConstants {
 
     public static final String HIVE_CLI_EXECUTE_FILE = "hive -f";
 
-    public static final String HIVE_CLI_EXECUTE_SCRIPT = "hive -e \"%s\"";
-
 }

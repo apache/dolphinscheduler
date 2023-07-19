@@ -25,18 +25,29 @@ export function useHiveCli(model: { [field: string]: any }): IJsonItem[] {
     model.hiveCliTaskExecutionType === 'SCRIPT' ? 24 : 0
   )
   const resourcesRequired = ref(
-    model.hiveCliTaskExecutionType === 'SCRIPT' ? false : true
+    model.hiveCliTaskExecutionType !== 'SCRIPT'
   )
 
   const resourcesLimit = computed(() =>
     model.hiveCliTaskExecutionType === 'SCRIPT' ? -1 : 1
   )
 
+  const SQL_EXECUTION_TYPES = [
+    {
+      label: t('project.node.sql_execution_type_from_script'),
+      value: 'SCRIPT'
+    },
+    {
+      label: t('project.node.sql_execution_type_from_file'),
+      value: 'FILE'
+    }
+  ]
+
   watch(
     () => model.hiveCliTaskExecutionType,
     () => {
       resourcesRequired.value =
-        model.hiveCliTaskExecutionType === 'SCRIPT' ? false : true
+        model.hiveCliTaskExecutionType !== 'SCRIPT'
     }
   )
 
@@ -45,8 +56,8 @@ export function useHiveCli(model: { [field: string]: any }): IJsonItem[] {
       type: 'select',
       field: 'hiveCliTaskExecutionType',
       span: 12,
-      name: t('project.node.hive_cli_task_execution_type'),
-      options: HIVE_CLI_TASK_EXECUTION_TYPES,
+      name: t('project.node.sql_execution_type'),
+      options: SQL_EXECUTION_TYPES,
       validate: {
         trigger: ['input', 'blur'],
         required: true
@@ -77,14 +88,3 @@ export function useHiveCli(model: { [field: string]: any }): IJsonItem[] {
     ...useCustomParams({ model, field: 'localParams', isSimple: false })
   ]
 }
-
-export const HIVE_CLI_TASK_EXECUTION_TYPES = [
-  {
-    label: 'FROM_SCRIPT',
-    value: 'SCRIPT'
-  },
-  {
-    label: 'FROM_FILE',
-    value: 'FILE'
-  }
-]

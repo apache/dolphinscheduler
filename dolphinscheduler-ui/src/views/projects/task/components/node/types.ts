@@ -224,6 +224,7 @@ interface ISparkParameters {
   numExecutors?: number
   others?: string
   yarnQueue?: string
+  sqlExecutionType?: string
 }
 
 interface IRuleParameters {
@@ -348,6 +349,7 @@ interface ITaskParams {
   hiveCliOptions?: string
   hiveSqlScript?: string
   hiveCliTaskExecutionType?: string
+  sqlExecutionType?: string
   noteId?: string
   paragraphId?: string
   condaEnvName?: string

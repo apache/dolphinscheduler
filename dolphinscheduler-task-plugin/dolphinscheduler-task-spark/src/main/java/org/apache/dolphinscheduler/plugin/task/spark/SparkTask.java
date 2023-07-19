@@ -26,6 +26,7 @@ import static org.apache.dolphinscheduler.plugin.task.spark.SparkConstants.SPARK
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
@@ -33,11 +34,13 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import org.apache.dolphinscheduler.plugin.task.api.utils.ArgsUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -196,8 +199,28 @@ public class SparkTask extends AbstractYarnTask {
 
         // bin/spark-sql -f fileName
         if (ProgramType.SQL == programType) {
+            String sqlContent = "";
+            String resourceFileName = "";
             args.add(SparkConstants.SQL_FROM_FILE);
-            args.add(generateScriptFile());
+            if (SparkConstants.TYPE_FILE.equals(sparkParameters.getSqlExecutionType())) {
+                final List<ResourceInfo> resourceInfos = sparkParameters.getResourceList();
+                if (resourceInfos.size() > 1) {
+                    log.warn("more than 1 files detected, use the first one by default");
+                }
+
+                try {
+                    resourceFileName = resourceInfos.get(0).getResourceName();
+                    sqlContent = FileUtils.readFileToString(
+                            new File(String.format("%s/%s", taskExecutionContext.getExecutePath(), resourceFileName)),
+                            StandardCharsets.UTF_8);
+                } catch (IOException e) {
+                    log.error("read sql content from file {} error ", resourceFileName, e);
+                    throw new TaskException("read sql content error", e);
+                }
+            } else {
+                sqlContent = sparkParameters.getRawScript();
+            }
+            args.add(generateScriptFile(sqlContent));
         }
         return args;
     }
@@ -229,7 +252,7 @@ public class SparkTask extends AbstractYarnTask {
         }
     }
 
-    private String generateScriptFile() {
+    private String generateScriptFile(String sqlContent) {
         String scriptFileName = String.format("%s/%s_node.sql", taskExecutionContext.getExecutePath(),
                 taskExecutionContext.getTaskAppId());
 
@@ -237,10 +260,9 @@ public class SparkTask extends AbstractYarnTask {
         Path path = file.toPath();
 
         if (!Files.exists(path)) {
-            String script = replaceParam(sparkParameters.getRawScript());
-            sparkParameters.setRawScript(script);
+            String script = replaceParam(sqlContent);
 
-            log.info("raw script : {}", sparkParameters.getRawScript());
+            log.info("raw script : {}", script);
             log.info("task execute path : {}", taskExecutionContext.getExecutePath());
 
             Set<PosixFilePermission> perms = PosixFilePermissions.fromString(RWXR_XR_X);
@@ -254,7 +276,7 @@ public class SparkTask extends AbstractYarnTask {
                     }
                     Files.createFile(path, attr);
                 }
-                Files.write(path, sparkParameters.getRawScript().getBytes(), StandardOpenOption.APPEND);
+                Files.write(path, script.getBytes(), StandardOpenOption.APPEND);
             } catch (IOException e) {
                 throw new RuntimeException("generate spark sql script error", e);
             }
