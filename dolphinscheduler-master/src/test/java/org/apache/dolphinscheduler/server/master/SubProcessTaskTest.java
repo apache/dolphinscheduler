@@ -150,6 +150,60 @@ public class SubProcessTaskTest {
         Assert.assertEquals(TaskExecutionStatus.SUCCESS, status);
     }
 
+    @Test
+    public void testStop() {
+        TaskInstance taskInstance = testBasicInit(WorkflowExecutionStatus.STOP);
+        taskInstance.setVarPool(getProperty());
+        taskInstance.setTaskParams("{\"processDefinitionCode\":110," +
+                "\"dependence\":{},\"localParams\":[{\"prop\":\"key\"," +
+                "\"direct\":\"out\",\"type\":\"VARCHAR\",\"value\":\"\"}," +
+                "{\"prop\":\"database_name\",\"direct\":\"OUT\"," +
+                "\"type\":\"VARCHAR\",\"value\":\"\"}]," +
+                "\"conditionResult\":{\"successNode\":[],\"failedNode\":[]}," +
+                "\"waitStartTimeout\":{},\"switchResult\":{}}");
+        SubTaskProcessor subTaskProcessor = new SubTaskProcessor();
+        subTaskProcessor.init(taskInstance, processInstance);
+        subTaskProcessor.action(TaskAction.RUN);
+        TaskExecutionStatus status = taskInstance.getState();
+        Assert.assertEquals(TaskExecutionStatus.KILL, status);
+    }
+
+    @Test
+    public void testFail() {
+        TaskInstance taskInstance = testBasicInit(WorkflowExecutionStatus.FAILURE);
+        taskInstance.setVarPool(getProperty());
+        taskInstance.setTaskParams("{\"processDefinitionCode\":110," +
+                "\"dependence\":{},\"localParams\":[{\"prop\":\"key\"," +
+                "\"direct\":\"out\",\"type\":\"VARCHAR\",\"value\":\"\"}," +
+                "{\"prop\":\"database_name\",\"direct\":\"OUT\"," +
+                "\"type\":\"VARCHAR\",\"value\":\"\"}]," +
+                "\"conditionResult\":{\"successNode\":[],\"failedNode\":[]}," +
+                "\"waitStartTimeout\":{},\"switchResult\":{}}");
+        SubTaskProcessor subTaskProcessor = new SubTaskProcessor();
+        subTaskProcessor.init(taskInstance, processInstance);
+        subTaskProcessor.action(TaskAction.RUN);
+        TaskExecutionStatus status = taskInstance.getState();
+        Assert.assertEquals(TaskExecutionStatus.FAILURE, status);
+    }
+
+    @Test
+    public void testPAUSE() {
+        TaskInstance taskInstance = testBasicInit(WorkflowExecutionStatus.PAUSE);
+        taskInstance.setVarPool(getProperty());
+        taskInstance.setTaskParams("{\"processDefinitionCode\":110," +
+                "\"dependence\":{},\"localParams\":[{\"prop\":\"key\"," +
+                "\"direct\":\"out\",\"type\":\"VARCHAR\",\"value\":\"\"}," +
+                "{\"prop\":\"database_name\",\"direct\":\"OUT\"," +
+                "\"type\":\"VARCHAR\",\"value\":\"\"}]," +
+                "\"conditionResult\":{\"successNode\":[],\"failedNode\":[]}," +
+                "\"waitStartTimeout\":{},\"switchResult\":{}}");
+        SubTaskProcessor subTaskProcessor = new SubTaskProcessor();
+        subTaskProcessor.init(taskInstance, processInstance);
+        subTaskProcessor.action(TaskAction.RUN);
+        TaskExecutionStatus status = taskInstance.getState();
+        Assert.assertEquals(TaskExecutionStatus.PAUSE, status);
+    }
+
     private String getProperty() {
         List<Property> varPools = new ArrayList<>();
         Property property = new Property();
