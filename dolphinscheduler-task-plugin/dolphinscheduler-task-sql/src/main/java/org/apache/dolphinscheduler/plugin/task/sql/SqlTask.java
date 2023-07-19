@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.sql;
 
-import static org.apache.dolphinscheduler.spi.enums.DbType.KYUUBI;
-
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
@@ -46,7 +44,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -228,6 +225,7 @@ public class SqlTask extends AbstractTask {
                                   List<String> createFuncs) throws Exception {
         Connection connection = null;
         try {
+
             // create connection
             connection = DataSourceClientProvider.getInstance().getConnection(DbType.valueOf(sqlParameters.getType()),
                     baseConnectionParam);
