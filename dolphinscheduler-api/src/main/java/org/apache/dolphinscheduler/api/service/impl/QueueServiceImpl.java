@@ -251,28 +251,28 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
 
         Queue queue = queueMapper.selectById(id);
         if (Objects.isNull(queue)) {
-            logger.error("Queue does not exist");
+            log.error("Queue does not exist");
             throw new ServiceException(Status.QUEUE_NOT_EXIST, queue.getQueue());
         }
 
         List<Tenant> tenantList = tenantMapper.queryTenantListByQueueId(queue.getId());
         if (CollectionUtils.isNotEmpty(tenantList)) {
-            logger.warn("Delete queue failed, because there are {} tenants using it.", tenantList.size());
+            log.warn("Delete queue failed, because there are {} tenants using it.", tenantList.size());
             throw new ServiceException(Status.DELETE_TENANT_BY_ID_FAIL_TENANTS, tenantList.size());
         }
 
         List<User> userList = userMapper.queryUserListByQueue(queue.getQueueName());
         if (CollectionUtils.isNotEmpty(userList)) {
-            logger.warn("Delete queue failed, because there are {} users using it.", userList.size());
+            log.warn("Delete queue failed, because there are {} users using it.", userList.size());
             throw new ServiceException(Status.DELETE_QUEUE_BY_ID_FAIL_USERS, userList.size());
         }
 
         int delete = queueMapper.deleteById(id);
         if (delete > 0) {
-            logger.info("Queue is deleted and id is {}.", id);
+            log.info("Queue is deleted and id is {}.", id);
             putMsg(result, Status.SUCCESS);
         } else {
-            logger.error("Queue delete failed, queueId:{}.", id);
+            log.error("Queue delete failed, queueId:{}.", id);
             putMsg(result, Status.DELETE_QUEUE_BY_ID_ERROR);
         }
 
