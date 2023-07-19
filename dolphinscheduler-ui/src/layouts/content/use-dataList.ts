@@ -117,6 +117,11 @@ export function useDataList() {
                 key: `/projects/${projectCode}/parameter`,
                 payload: { projectName: projectName },
               },
+              {
+                label: t('menu.project_preferences'),
+                key: `/projects/${projectCode}/preferences`,
+                payload: { projectName: projectName },
+              },
             ]
           },
           {
