@@ -100,7 +100,7 @@ public class ScheduleMapperTest extends BaseDaoTest {
         Schedule schedule = insertOne();
         // query
         List<Schedule> schedules = scheduleMapper.selectList(null);
-        Assertions.assertNotEquals(schedules.size(), 0);
+        Assertions.assertNotEquals(0, schedules.size());
     }
 
     /**
@@ -138,7 +138,7 @@ public class ScheduleMapperTest extends BaseDaoTest {
         Page<Schedule> page = new Page(1, 3);
         IPage<Schedule> scheduleIPage = scheduleMapper.queryByProcessDefineCodePaging(page,
                 processDefinition.getCode(), "");
-        Assertions.assertNotEquals(scheduleIPage.getSize(), 0);
+        Assertions.assertNotEquals(0, scheduleIPage.getSize());
     }
 
     /**
@@ -176,7 +176,7 @@ public class ScheduleMapperTest extends BaseDaoTest {
         Page<Schedule> page = new Page(1, 3);
         IPage<Schedule> scheduleIPage = scheduleMapper.queryByProjectAndProcessDefineCodePaging(page, project.getCode(),
                 processDefinition.getCode(), "");
-        Assertions.assertNotEquals(scheduleIPage.getSize(), 0);
+        Assertions.assertNotEquals(0, scheduleIPage.getSize());
     }
 
     /**
@@ -215,7 +215,7 @@ public class ScheduleMapperTest extends BaseDaoTest {
         List<Schedule> schedules = scheduleMapper.querySchedulerListByProjectName(
                 project.getName());
 
-        Assertions.assertNotEquals(schedules.size(), 0);
+        Assertions.assertNotEquals(0, schedules.size());
     }
 
     /**
@@ -231,7 +231,7 @@ public class ScheduleMapperTest extends BaseDaoTest {
 
         List<Schedule> schedules =
                 scheduleMapper.selectAllByProcessDefineArray(new long[]{schedule.getProcessDefinitionCode()});
-        Assertions.assertNotEquals(schedules.size(), 0);
+        Assertions.assertNotEquals(0, schedules.size());
     }
 
     /**

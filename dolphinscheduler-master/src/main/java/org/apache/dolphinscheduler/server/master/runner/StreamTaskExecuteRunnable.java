@@ -40,8 +40,8 @@ import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.remote.command.task.TaskExecuteRunningMessageAck;
 import org.apache.dolphinscheduler.remote.command.task.TaskExecuteStartMessage;
 import org.apache.dolphinscheduler.server.master.builder.TaskExecutionContextBuilder;
@@ -54,6 +54,7 @@ import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
 import org.apache.dolphinscheduler.server.master.runner.dispatcher.WorkerTaskDispatcher;
 import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnableFactory;
+import org.apache.dolphinscheduler.server.master.runner.execute.TaskExecutionContextFactory;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
@@ -104,6 +105,8 @@ public class StreamTaskExecuteRunnable implements Runnable {
 
     protected TaskExecuteStartMessage taskExecuteStartMessage;
 
+    protected TaskExecutionContextFactory taskExecutionContextFactory;
+
     /**
      * task event queue
      */
@@ -122,6 +125,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
                 SpringApplicationContext.getBean(StreamTaskInstanceExecCacheManager.class);
         this.taskDefinition = taskDefinition;
         this.taskExecuteStartMessage = taskExecuteStartMessage;
+        this.taskExecutionContextFactory = SpringApplicationContext.getBean(TaskExecutionContextFactory.class);
     }
 
     public TaskInstance getTaskInstance() {
@@ -337,7 +341,8 @@ public class StreamTaskExecuteRunnable implements Runnable {
         taskExecutionContext.setProcessDefineVersion(processDefinition.getVersion());
         // process instance id default 0
         taskExecutionContext.setProcessInstanceId(0);
-
+        taskExecutionContextFactory.setDataQualityTaskExecutionContext(taskExecutionContext, taskInstance, tenantCode);
+        taskExecutionContextFactory.setK8sTaskRelatedInfo(taskExecutionContext, taskInstance);
         return taskExecutionContext;
     }
 
@@ -394,7 +399,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
         taskInstance.setEndTime(taskEvent.getEndTime());
         taskInstance.setVarPool(taskEvent.getVarPool());
         processService.changeOutParam(taskInstance);
-        taskInstanceDao.updateTaskInstance(taskInstance);
+        taskInstanceDao.updateById(taskInstance);
 
         // send ack
         sendAckToWorker(taskEvent);
@@ -436,7 +441,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
                                                          @NonNull AbstractParameters parameters) {
         // assign value to definedParams here
         Map<String, String> globalParamsMap = taskExecuteStartMessage.getStartParams();
-        Map<String, Property> globalParams = ParamUtils.getUserDefParamsMap(globalParamsMap);
+        Map<String, Property> globalParams = ParameterUtils.getUserDefParamsMap(globalParamsMap);
 
         // combining local and global parameters
         Map<String, Property> localParams = parameters.getInputLocalParametersMap();

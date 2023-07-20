@@ -65,9 +65,7 @@ const DetailModal = defineComponent({
       state,
       changeType,
       changePort,
-      changeTestFlag,
       resetFieldsValue,
-      getSameTypeTestDataSource,
       setFieldsValue,
       getFieldsValue
     } = useForm(props.id)
@@ -96,7 +94,6 @@ const DetailModal = defineComponent({
 
     const onChangeType = changeType
     const onChangePort = changePort
-    const onChangeTestFlag = changeTestFlag
 
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
@@ -117,9 +114,6 @@ const DetailModal = defineComponent({
             datasourceType[state.detailForm.type]
           ))
         props.show && props.id && setFieldsValue(await queryById(props.id))
-        props.show &&
-          state.detailForm.testFlag == 0 &&
-          (await getSameTypeTestDataSource())
       }
     )
 
@@ -142,7 +136,6 @@ const DetailModal = defineComponent({
       ...toRefs(state),
       ...toRefs(status),
       onChangeType,
-      onChangeTestFlag,
       onChangePort,
       onSubmit,
       onTest,
@@ -174,7 +167,6 @@ const DetailModal = defineComponent({
       loading,
       saving,
       testing,
-      onChangeTestFlag,
       onChangePort,
       onCancel,
       onTest,
@@ -238,7 +230,6 @@ const DetailModal = defineComponent({
                 </NFormItem>
                 <NFormItem label={t('datasource.description')} path='note'>
                   <NInput
-                    allowInput={this.trim}
                     class='input-data-source-description'
                     v-model={[detailForm.note, 'value']}
                     type='textarea'
@@ -649,37 +640,6 @@ const DetailModal = defineComponent({
                     )} {"key1":"value1","key2":"value2"...} ${t(
                       'datasource.connection_parameter'
                     )}`}
-                  />
-                </NFormItem>
-                <NFormItem
-                  label={t('datasource.datasource_definition')}
-                  path='testFlag'
-                  show-require-mark
-                >
-                  <NRadioGroup
-                    v-model={[detailForm.testFlag, 'value']}
-                    onUpdate:value={onChangeTestFlag}
-                  >
-                    <NSpace>
-                      <NRadio value={1} class='radio-test-datasource'>
-                        {t('datasource.test_datasource')}
-                      </NRadio>
-                      <NRadio value={0} class='radio-online-datasource'>
-                        {t('datasource.online_datasource')}
-                      </NRadio>
-                    </NSpace>
-                  </NRadioGroup>
-                </NFormItem>
-                <NFormItem
-                  v-show={detailForm.testFlag == 0}
-                  label={t('datasource.bind_test_datasource')}
-                  path='bindTestId'
-                  show-require-mark
-                >
-                  <NSelect
-                    class='select-bind-test-data-source-type-drop-down'
-                    v-model={[detailForm.bindTestId, 'value']}
-                    options={this.bindTestDataSourceExample}
                   />
                 </NFormItem>
                 <NFormItem

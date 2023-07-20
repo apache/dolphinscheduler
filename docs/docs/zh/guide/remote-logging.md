@@ -61,3 +61,19 @@ remote.logging.google.cloud.storage.credential=/path/to/credential
 remote.logging.google.cloud.storage.bucket.name=<your-bucket>
 ```
 
+## 将任务日志写入[Azure Blob Storage (ABS)](https://azure.microsoft.com/en-us/products/storage/blobs)
+
+配置`common.propertis`如下：
+
+```properties
+# abs container name, required if you set resource.storage.type=ABS
+resource.azure.blob.storage.container.name=<your-container>
+# abs account name, required if you set resource.storage.type=ABS
+resource.azure.blob.storage.account.name=<your-account-name>
+# abs connection string, required if you set resource.storage.type=ABS
+resource.azure.blob.storage.connection.string=<your-connection-string>
+```
+
+### 注意事项
+
+由于Azure Blob Storage不支持空目录单独存在，因此资源目录下会有空文件`<no name>`。但是并不影响Dolphinscheduler资源中心上的文件展示。
