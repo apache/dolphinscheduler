@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.DataSourceServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -270,9 +269,9 @@ public class DataSourceServiceTest {
         // test admin user
         Mockito.when(dataSourceMapper.queryAuthedDatasource(userId)).thenReturn(getSingleDataSourceList());
         Mockito.when(dataSourceMapper.queryDatasourceExceptUserId(userId)).thenReturn(getDataSourceList());
-        Map<String, Object> result = dataSourceService.unauthDatasource(loginUser, userId);
+        Result<Object> result = dataSourceService.unAuthDatasource(loginUser, userId);
         logger.info(result.toString());
-        List<DataSource> dataSources = (List<DataSource>) result.get(Constants.DATA_LIST);
+        List<DataSource> dataSources = (List<DataSource>) result.getData();
         Assertions.assertTrue(CollectionUtils.isNotEmpty(dataSources));
 
         // test non-admin user
@@ -280,9 +279,9 @@ public class DataSourceServiceTest {
         loginUser.setUserType(UserType.GENERAL_USER);
         Mockito.when(dataSourceMapper.selectByMap(Collections.singletonMap("user_id", loginUser.getId())))
                 .thenReturn(getDataSourceList());
-        result = dataSourceService.unauthDatasource(loginUser, userId);
+        result = dataSourceService.unAuthDatasource(loginUser, userId);
         logger.info(result.toString());
-        dataSources = (List<DataSource>) result.get(Constants.DATA_LIST);
+        dataSources = (List<DataSource>) result.getData();
         Assertions.assertTrue(CollectionUtils.isNotEmpty(dataSources));
     }
 
@@ -295,17 +294,17 @@ public class DataSourceServiceTest {
 
         // test admin user
         Mockito.when(dataSourceMapper.queryAuthedDatasource(userId)).thenReturn(getSingleDataSourceList());
-        Map<String, Object> result = dataSourceService.authedDatasource(loginUser, userId);
+        Result<Object> result = dataSourceService.authedDatasource(loginUser, userId);
         logger.info(result.toString());
-        List<DataSource> dataSources = (List<DataSource>) result.get(Constants.DATA_LIST);
+        List<DataSource> dataSources = (List<DataSource>) result.getData();
         Assertions.assertTrue(CollectionUtils.isNotEmpty(dataSources));
 
         // test non-admin user
         loginUser.setId(2);
         loginUser.setUserType(UserType.GENERAL_USER);
-        Map<String, Object> success = dataSourceService.authedDatasource(loginUser, userId);
+        Result<Object> success = dataSourceService.authedDatasource(loginUser, userId);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, success.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS.getCode(), success.getCode());
     }
 
     @Test
@@ -320,9 +319,9 @@ public class DataSourceServiceTest {
         DataSource dataSource = new DataSource();
         dataSource.setType(DbType.MYSQL);
         Mockito.when(dataSourceMapper.selectBatchIds(dataSourceIds)).thenReturn(Collections.singletonList(dataSource));
-        Map<String, Object> map =
+        Result<Object> result =
                 dataSourceService.queryDataSourceList(loginUser, DbType.MYSQL.ordinal());
-        Assertions.assertEquals(Status.SUCCESS, map.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
     }
 
     @Test
@@ -341,8 +340,8 @@ public class DataSourceServiceTest {
         User loginUser = new User();
         loginUser.setUserType(UserType.GENERAL_USER);
         loginUser.setId(2);
-        Map<String, Object> result = dataSourceService.queryDataSource(Mockito.anyInt(), loginUser);
-        Assertions.assertEquals(((Status) result.get(Constants.STATUS)).getCode(), Status.RESOURCE_NOT_EXIST.getCode());
+        Result<Object> result = dataSourceService.queryDataSource(Mockito.anyInt(), loginUser);
+        Assertions.assertEquals(result.getCode(), Status.RESOURCE_NOT_EXIST.getCode());
 
         DataSource dataSource = getOracleDataSource(1);
         Mockito.when(dataSourceMapper.selectById(Mockito.anyInt())).thenReturn(dataSource);
@@ -351,7 +350,7 @@ public class DataSourceServiceTest {
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.DATASOURCE,
                 new Object[]{dataSource.getId()}, loginUser.getId(), baseServiceLogger)).thenReturn(true);
         result = dataSourceService.queryDataSource(dataSource.getId(), loginUser);
-        Assertions.assertEquals(((Status) result.get(Constants.STATUS)).getCode(), Status.SUCCESS.getCode());
+        Assertions.assertEquals(result.getCode(), Status.SUCCESS.getCode());
     }
 
     private List<DataSource> getDataSourceList() {
@@ -524,10 +523,10 @@ public class DataSourceServiceTest {
         DataSource dataSource = getOracleDataSource();
         int datasourceId = 1;
         dataSource.setId(datasourceId);
-        Map<String, Object> result;
+        Result<Object> result;
         Mockito.when(dataSourceMapper.selectById(datasourceId)).thenReturn(null);
         result = dataSourceService.getDatabases(datasourceId);
-        Assertions.assertEquals(Status.QUERY_DATASOURCE_ERROR, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.QUERY_DATASOURCE_ERROR.getCode(), result.getCode());
 
         Mockito.when(dataSourceMapper.selectById(datasourceId)).thenReturn(dataSource);
         MySQLConnectionParam connectionParam = new MySQLConnectionParam();
@@ -537,12 +536,12 @@ public class DataSourceServiceTest {
         dataSourceUtils.when(() -> DataSourceUtils.buildConnectionParams(Mockito.any(), Mockito.any()))
                 .thenReturn(connectionParam);
         result = dataSourceService.getDatabases(datasourceId);
-        Assertions.assertEquals(Status.GET_DATASOURCE_TABLES_ERROR, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.GET_DATASOURCE_TABLES_ERROR.getCode(), result.getCode());
 
         dataSourceUtils.when(() -> DataSourceUtils.buildConnectionParams(Mockito.any(), Mockito.any()))
                 .thenReturn(null);
         result = dataSourceService.getDatabases(datasourceId);
-        Assertions.assertEquals(Status.DATASOURCE_CONNECT_FAILED, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.DATASOURCE_CONNECT_FAILED.getCode(), result.getCode());
         connection.close();
         dataSourceUtils.close();
     }
