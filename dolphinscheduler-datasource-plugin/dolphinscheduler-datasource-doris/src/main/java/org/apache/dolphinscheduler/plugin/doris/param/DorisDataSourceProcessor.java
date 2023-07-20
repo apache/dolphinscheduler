@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.auto.service.AutoService;
+
 @AutoService(DataSourceProcessor.class)
 public class DorisDataSourceProcessor extends AbstractDataSourceProcessor {
 
@@ -46,7 +47,7 @@ public class DorisDataSourceProcessor extends AbstractDataSourceProcessor {
     }
 
     @Override
-    public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) throws NumberFormatException{
+    public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) throws NumberFormatException {
         DorisConnectionParam connectionParams = (DorisConnectionParam) createConnectionParams(connectionJson);
         DorisDataSourceParamDTO dorisDataSourceParamDTO = new DorisDataSourceParamDTO();
 
