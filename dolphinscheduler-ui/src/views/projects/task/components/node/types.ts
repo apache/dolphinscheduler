@@ -370,6 +370,7 @@ interface ITaskParams {
   minCpuCores?: string
   minMemorySpace?: string
   image?: string
+  imagePullPolicy?: string
   command?: string
   args?: string
   customizedLabels?: ILabel[]
@@ -436,6 +437,10 @@ interface ITaskParams {
   factoryName?: string
   resourceGroupName?: string
   pipelineName?: string
+  maxNumOfSubWorkflowInstances?: number
+  degreeOfParallelism?: number
+  filterCondition?: string
+  listParameters?: Array<any>
 }
 
 interface INodeData

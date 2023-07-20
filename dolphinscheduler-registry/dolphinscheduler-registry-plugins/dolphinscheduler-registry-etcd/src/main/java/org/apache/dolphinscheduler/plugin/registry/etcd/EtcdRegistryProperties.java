@@ -47,4 +47,9 @@ public class EtcdRegistryProperties {
 
     // loadBalancerPolicy
     private String loadBalancerPolicy;
+
+    // ssl
+    private String certFile;
+    private String keyCertChainFile;
+    private String keyFile;
 }

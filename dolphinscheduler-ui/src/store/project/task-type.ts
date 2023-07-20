@@ -32,6 +32,9 @@ export const TASK_TYPES_MAP = {
   SUB_PROCESS: {
     alias: 'SUB_PROCESS'
   },
+  DYNAMIC: {
+    alias: 'DYNAMIC'
+  },
   PROCEDURE: {
     alias: 'PROCEDURE'
   },

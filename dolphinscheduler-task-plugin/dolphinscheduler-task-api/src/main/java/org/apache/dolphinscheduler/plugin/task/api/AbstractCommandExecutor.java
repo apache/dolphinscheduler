@@ -24,12 +24,12 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_COD
 
 import org.apache.dolphinscheduler.common.constants.TenantConstants;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.utils.AbstractCommandExecutorConstants;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -92,11 +92,6 @@ public abstract class AbstractCommandExecutor {
     protected boolean processLogOutputIsSuccess = false;
 
     protected boolean podLogOutputIsFinished = false;
-
-    /*
-     * SHELL result string
-     */
-    protected String taskResultString;
 
     /**
      * taskRequest
@@ -370,7 +365,6 @@ public abstract class AbstractCommandExecutor {
                         varPool.append("$VarPool$");
                     } else {
                         logBuffer.add(line);
-                        taskResultString = line;
                     }
                 }
                 processLogOutputIsSuccess = true;
