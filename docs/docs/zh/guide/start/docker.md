@@ -18,7 +18,7 @@
 你可以最快速的体验到 DolphinScheduler 的大部分功能，了解主要和概念和内容。
 
 ```shell
-$ DOLPHINSCHEDULER_VERSION=3.1.7
+$ DOLPHINSCHEDULER_VERSION=3.1.8
 $ docker run --name dolphinscheduler-standalone-server -p 12345:12345 -p 25333:25333 -d apache/dolphinscheduler-standalone-server:"${DOLPHINSCHEDULER_VERSION}"
 ```
 
@@ -37,7 +37,7 @@ $ docker run --name dolphinscheduler-standalone-server -p 12345:12345 -p 25333:2
 下载对应版本源码包可能是最快的方法，当下载完源码后就可以运行命令进行部署了。
 
 ```shell
-$ DOLPHINSCHEDULER_VERSION=3.1.7
+$ DOLPHINSCHEDULER_VERSION=3.1.8
 $ tar -zxf apache-dolphinscheduler-"${DOLPHINSCHEDULER_VERSION}"-src.tar.gz
 # Mac Linux 用户
 $ cd apache-dolphinscheduler-"${DOLPHINSCHEDULER_VERSION}"-src/deploy/docker
@@ -61,7 +61,7 @@ $ docker-compose --profile all up -d
 ZooKeeper 且不想启动新的服务，可以使用这个方式分别启动 DolphinScheduler 容器。
 
 ```shell
-$ DOLPHINSCHEDULER_VERSION=3.1.7
+$ DOLPHINSCHEDULER_VERSION=3.1.8
 # 初始化数据库，其确保数据库 <DATABASE> 已经存在
 $ docker run -d --name dolphinscheduler-tools \
     -e DATABASE="postgresql" \
