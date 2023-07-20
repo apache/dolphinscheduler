@@ -36,4 +36,7 @@ public class MasterHeartBeat implements HeartBeat {
     private double reservedMemory;
     private double diskAvailable;
     private int processId;
+
+    private String host;
+    private int port;
 }

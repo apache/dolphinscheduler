@@ -18,4 +18,9 @@
 package org.apache.dolphinscheduler.common.model;
 
 public interface HeartBeat {
+
+    String getHost();
+
+    int getPort();
+
 }

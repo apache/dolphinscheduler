@@ -129,6 +129,8 @@ export DOLPHINSCHEDULER_OPTS="
 ```
 
 > 不建议设置"-XX:DisableExplicitGC" , DolphinScheduler使用Netty进行通讯,设置该参数,可能会导致内存泄漏.
+>
+>> 如果设置"-Djava.net.preferIPv6Addresses=true" 将会使用ipv6的IP地址， 如果设置"-Djava.net.preferIPv4Addresses=true"将会使用ipv4的IP地址, 如果都不设置，将会随机使用ipv4或者ipv6.
 
 ## 数据库连接相关配置
 
