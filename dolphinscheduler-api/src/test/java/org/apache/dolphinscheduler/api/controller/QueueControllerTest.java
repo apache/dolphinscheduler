@@ -130,8 +130,8 @@ public class QueueControllerTest extends AbstractControllerTest {
         paramsMap.add("id", "2");
 
         MvcResult mvcResult = mockMvc.perform(delete("/queues/{id}", 2)
-                        .header(SESSION_ID, sessionId)
-                        .params(paramsMap))
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
