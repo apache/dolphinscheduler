@@ -15,33 +15,21 @@
  * limitations under the License.
  */
 
-import { ref, onMounted } from 'vue'
-import { useI18n } from 'vue-i18n'
-import type { IJsonItem } from '../../task/components/node/types'
-import { queryTenantList } from '@/service/modules/tenants'
+package org.apache.dolphinscheduler.dao.entity;
 
-export function useTenant(): IJsonItem {
-  const { t } = useI18n()
+import lombok.Data;
 
-  const options = ref([] as { label: string; value: string }[])
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 
-  const getTenantList = async () => {
-    const res = await queryTenantList()
-    options.value = res.map((item: any) => ({
-      label: item.tenantCode,
-      value: item.tenantCode
-    }))
-  }
+@Data
+@TableName("t_ds_version")
+public class DsVersion {
 
-  onMounted(() => {
-    getTenantList()
-  })
+    @TableId(value = "id", type = IdType.AUTO)
+    private Integer id;
 
-  return {
-    type: 'select',
-    field: 'tenant',
-    span: 12,
-    name: t('project.workflow.tenant_code'),
-    options: options
-  }
+    private String version;
+
 }
