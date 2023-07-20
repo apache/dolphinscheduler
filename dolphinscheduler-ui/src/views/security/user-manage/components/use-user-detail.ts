@@ -103,7 +103,7 @@ export function useUserDetail() {
       trigger: ['input', 'blur'],
       required: false,
       validator(validator: any, value: string) {
-        const regExp = new RegExp('^[1][3,4,5,7,8,9][0-9]{9}$')
+        const regExp = new RegExp('^[1][3,4,5,6,7,8,9][0-9]{9}$')
         if (value && !regExp.test(value)) {
           return new Error(t('security.user.phone_correct_tips'))
         }
