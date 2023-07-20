@@ -60,8 +60,6 @@ export function useDatasync({
     ]
   }
 
-  console.log('useDatasync')
-
   return {
     json: [
       Fields.useName(from),
