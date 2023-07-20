@@ -30,9 +30,9 @@
 mkdir -p /opt
 cd /opt
 # 解压缩
-tar -zxvf apache-dolphinscheduler-3.1.7-bin.tar.gz -C /opt 
+tar -zxvf apache-dolphinscheduler-3.1.8-bin.tar.gz -C /opt 
 cd /opt
-mv apache-dolphinscheduler-3.1.7-bin  dolphinscheduler
+mv apache-dolphinscheduler-3.1.8-bin  dolphinscheduler
 ```
 
 ```markdown

@@ -45,7 +45,7 @@ export default {
         children: [
           {
             key: 'docs0',
-            text: 'latest(3.1.7)',
+            text: 'latest(3.1.8)',
             link: '/en-us/docs/latest/user_doc/about/introduction.html',
           },
           {
@@ -173,7 +173,7 @@ export default {
         children: [
           {
             key: 'docs0',
-            text: '最新版本latest(3.1.7)',
+            text: '最新版本latest(3.1.8)',
             link: '/zh-cn/docs/latest/user_doc/about/introduction.html',
           },
           {
