@@ -35,31 +35,10 @@ public class KyuubiDataSourceClient extends CommonDataSourceClient {
         log.info("PreInit in {}", getClass().getName());
     }
 
-    // @Override
-    // protected void initClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-    //
-    // this.dataSource = JDBCDataSourceProvider.createOneSessionJdbcDataSource(baseConnectionParam, dbType);
-    // this.jdbcTemplate = new JdbcTemplate(dataSource);
-    // log.info("Init {} success.", getClass().getName());
-    // }
-
     @Override
     protected void checkEnv(BaseConnectionParam baseConnectionParam) {
         super.checkEnv(baseConnectionParam);
     }
-
-    // @Override
-    // public Connection getConnection() {
-    // Connection connection = null;
-    // while (connection == null) {
-    // try {
-    // connection = dataSource.getConnection();
-    // } catch (SQLException e) {
-    // log.error("Failed to get Kyuubi Connection.", e);
-    // }
-    // }
-    // return connection;
-    // }
 
     @Override
     public void close() {
