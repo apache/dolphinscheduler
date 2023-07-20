@@ -15,33 +15,14 @@
  * limitations under the License.
  */
 
-import { ref, onMounted } from 'vue'
-import { useI18n } from 'vue-i18n'
-import type { IJsonItem } from '../../task/components/node/types'
-import { queryTenantList } from '@/service/modules/tenants'
+package org.apache.dolphinscheduler.dao.repository;
 
-export function useTenant(): IJsonItem {
-  const { t } = useI18n()
+import org.apache.dolphinscheduler.dao.entity.DsVersion;
 
-  const options = ref([] as { label: string; value: string }[])
+import java.util.Optional;
 
-  const getTenantList = async () => {
-    const res = await queryTenantList()
-    options.value = res.map((item: any) => ({
-      label: item.tenantCode,
-      value: item.tenantCode
-    }))
-  }
+public interface DsVersionDao extends IDao<DsVersion> {
 
-  onMounted(() => {
-    getTenantList()
-  })
+    Optional<DsVersion> selectVersion();
 
-  return {
-    type: 'select',
-    field: 'tenant',
-    span: 12,
-    name: t('project.workflow.tenant_code'),
-    options: options
-  }
 }
