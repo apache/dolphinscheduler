@@ -121,18 +121,7 @@ export const componentList = [
           node_name_tips: 'Please entry node name'
         }
       },
-      apis: {
-        getWorkerGroupList: {
-          url: '/ws/seaTunnel/taskQuery',
-          method: 'get',
-          params: [
-            {
-              key: 'name',
-              type: 'string'
-            }
-          ]
-        }
-      },
+      apis: {},
       forms: [
         {
           type: 'common'
