@@ -32,9 +32,10 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
+import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilderFactory;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.java.exception.JavaSourceFileExistException;
 import org.apache.dolphinscheduler.plugin.task.java.exception.PublicClassNotFoundException;
 import org.apache.dolphinscheduler.plugin.task.java.exception.RunTypeNotFoundException;
@@ -123,7 +124,9 @@ public class JavaTask extends AbstractTask {
                     throw new RunTypeNotFoundException("run type is required, but it is null now.");
             }
             Preconditions.checkNotNull(command, "command not be null.");
-            TaskResponse taskResponse = shellCommandExecutor.run(command, taskCallBack);
+            IShellInterceptorBuilder<?, ?> shellActuatorBuilder = ShellInterceptorBuilderFactory.newBuilder()
+                    .appendScript(command);
+            TaskResponse taskResponse = shellCommandExecutor.run(shellActuatorBuilder, taskCallBack);
             log.info("java task run result: {}", taskResponse);
             setExitStatusCode(taskResponse.getExitStatusCode());
             setAppIds(taskResponse.getAppIds());
@@ -324,7 +327,7 @@ public class JavaTask extends AbstractTask {
             paramsMap.putAll(taskRequest.getParamsMap());
         }
         log.info("The current java source code will begin to replace the placeholder: {}", rawJavaScript);
-        rawJavaScript = ParameterUtils.convertParameterPlaceholders(rawJavaScript, ParamUtils.convert(paramsMap));
+        rawJavaScript = ParameterUtils.convertParameterPlaceholders(rawJavaScript, ParameterUtils.convert(paramsMap));
         return rawJavaScript;
     }
 

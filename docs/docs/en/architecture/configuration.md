@@ -32,6 +32,7 @@ The directory structure of DolphinScheduler is as follows:
 ├── alert-server                                directory of DolphinScheduler alert-server commands, configurations scripts and libs
 │   ├── bin
 │   │   └── start.sh                            script to start DolphinScheduler alert-server
+│   │   └── jvm_args_env.sh                     script to set JVM args of DolphinScheduler alert-server
 │   ├── conf
 │   │   ├── application.yaml                    configurations of alert-server
 │   │   ├── bootstrap.yaml                      configurations for Spring Cloud bootstrap, mostly you don't need to modify this,
@@ -43,6 +44,7 @@ The directory structure of DolphinScheduler is as follows:
 ├── api-server                                  directory of DolphinScheduler api-server commands, configurations scripts and libs
 │   ├── bin
 │   │   └── start.sh                            script to start DolphinScheduler api-server
+│   │   └── jvm_args_env.sh                     script to set JVM args of DolphinScheduler api-server
 │   ├── conf
 │   │   ├── application.yaml                    configurations of api-server
 │   │   ├── bootstrap.yaml                      configurations for Spring Cloud bootstrap, mostly you don't need to modify this,
@@ -55,6 +57,7 @@ The directory structure of DolphinScheduler is as follows:
 ├── master-server                               directory of DolphinScheduler master-server commands, configurations scripts and libs
 │   ├── bin
 │   │   └── start.sh                            script to start DolphinScheduler master-server
+│   │   └── jvm_args_env.sh                     script to set JVM args of DolphinScheduler master-server
 │   ├── conf
 │   │   ├── application.yaml                    configurations of master-server
 │   │   ├── bootstrap.yaml                      configurations for Spring Cloud bootstrap, mostly you don't need to modify this,
@@ -66,6 +69,7 @@ The directory structure of DolphinScheduler is as follows:
 ├── standalone-server                           directory of DolphinScheduler standalone-server commands, configurations scripts and libs
 │   ├── bin
 │   │   └── start.sh                            script to start DolphinScheduler standalone-server
+│   │   └── jvm_args_env.sh                     script to set JVM args of DolphinScheduler standalone-server
 │   ├── conf
 │   │   ├── application.yaml                    configurations of standalone-server
 │   │   ├── bootstrap.yaml                      configurations for Spring Cloud bootstrap, mostly you don't need to modify this,
@@ -86,15 +90,16 @@ The directory structure of DolphinScheduler is as follows:
 │   └── sql                                     .sql files to create or upgrade DolphinScheduler metadata
 │  
 ├── worker-server                               directory of DolphinScheduler worker-server commands, configurations scripts and libs
-│       ├── bin
-│       │   └── start.sh                        script to start DolphinScheduler worker-server
-│       ├── conf
-│       │   ├── application.yaml                configurations of worker-server
-│       │   ├── bootstrap.yaml                  configurations for Spring Cloud bootstrap, mostly you don't need to modify this,
-│       │   ├── common.properties               configurations of common-service like storage, credentials, etc.
-│       │   ├── dolphinscheduler_env.sh         script to load environment variables for worker-server
-│       │   └── logback-spring.xml              configurations of worker-service log
-│       └── libs                                directory of worker-server libs
+│   ├── bin
+│   │   └── start.sh                        script to start DolphinScheduler worker-server
+│   │   └── jvm_args_env.sh                 script to set JVM args of DolphinScheduler worker-server
+│   ├── conf
+│   │   ├── application.yaml                configurations of worker-server
+│   │   ├── bootstrap.yaml                  configurations for Spring Cloud bootstrap, mostly you don't need to modify this,
+│   │   ├── common.properties               configurations of common-service like storage, credentials, etc.
+│   │   ├── dolphinscheduler_env.sh         script to load environment variables for worker-server
+│   │   └── logback-spring.xml              configurations of worker-service log
+│   └── libs                                directory of worker-server libs
 │
 └── ui                                          directory of front-end web resources
 ```
@@ -197,7 +202,7 @@ The default configuration is as follows:
 | Parameters | Default value | Description |
 |--|--|--|
 |data.basedir.path | /tmp/dolphinscheduler | local directory used to store temp files|
-|resource.storage.type | NONE | type of resource files: HDFS, S3, OSS, GCS, NONE|
+|resource.storage.type | NONE | type of resource files: HDFS, S3, OSS, GCS, ABS, NONE|
 |resource.upload.path | /dolphinscheduler | storage path of resource files|
 |aws.access.key.id | minioadmin | access key id of S3|
 |aws.secret.access.key | minioadmin | secret access key of S3|
@@ -251,11 +256,14 @@ Location: `api-server/conf/application.yaml`
 |security.authentication.ldap.user.identity-attribute|uid|LDAP user identity attribute|
 |security.authentication.ldap.user.email-attribute|mail|LDAP user email attribute|
 |security.authentication.ldap.user.not-exist-action|CREATE|action when ldap user is not exist,default value: CREATE. Optional values include(CREATE,DENY)|
-|traffic.control.global.switch|false|traffic control global switch|
-|traffic.control.max-global-qps-rate|300|global max request number per second|
-|traffic.control.tenant-switch|false|traffic control tenant switch|
-|traffic.control.default-tenant-qps-rate|10|default tenant max request number per second|
-|traffic.control.customize-tenant-qps-rate||customize tenant max request number per second|
+|security.authentication.ldap.ssl.enable|false|LDAP switch|
+|security.authentication.ldap.ssl.trust-store|ldapkeystore.jks|LDAP jks file absolute path|
+|security.authentication.ldap.ssl.trust-store-password|password|LDAP jks password|
+|api.traffic.control.global.switch|false|traffic control global switch|
+|api.traffic.control.max-global-qps-rate|300|global max request number per second|
+|api.traffic.control.tenant-switch|false|traffic control tenant switch|
+|api.traffic.control.default-tenant-qps-rate|10|default tenant max request number per second|
+|api.traffic.control.customize-tenant-qps-rate||customize tenant max request number per second|
 
 ### Master Server related configuration
 
@@ -365,12 +373,12 @@ export JAVA_HOME=${JAVA_HOME:-/opt/soft/java}
 export HADOOP_HOME=${HADOOP_HOME:-/opt/soft/hadoop}
 export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-/opt/soft/hadoop/etc/hadoop}
 export SPARK_HOME=${SPARK_HOME:-/opt/soft/spark}
-export PYTHON_HOME=${PYTHON_HOME:-/opt/soft/python}
+export PYTHON_LAUNCHER=${PYTHON_LAUNCHER:-/opt/soft/python/bin/python3}
 export HIVE_HOME=${HIVE_HOME:-/opt/soft/hive}
 export FLINK_HOME=${FLINK_HOME:-/opt/soft/flink}
-export DATAX_HOME=${DATAX_HOME:-/opt/soft/datax}
+export DATAX_LAUNCHER=${DATAX_LAUNCHER:-/opt/soft/datax/bin/datax.py}
 
-export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH
+export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_LAUNCHER:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_LAUNCHER:$PATH
 
 # applicationId auto collection related configuration, the following configurations are unnecessary if setting appId.collect=log
 export HADOOP_CLASSPATH=`hadoop classpath`:${DOLPHINSCHEDULER_HOME}/tools/libs/*

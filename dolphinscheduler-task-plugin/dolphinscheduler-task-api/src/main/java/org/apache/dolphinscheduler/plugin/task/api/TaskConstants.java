@@ -436,6 +436,8 @@ public class TaskConstants {
 
     public static final String TASK_TYPE_SUB_PROCESS = "SUB_PROCESS";
 
+    public static final String TASK_TYPE_DYNAMIC = "DYNAMIC";
+
     public static final String TASK_TYPE_DEPENDENT = "DEPENDENT";
 
     public static final String TASK_TYPE_SQL = "SQL";

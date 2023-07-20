@@ -44,7 +44,7 @@ public class TaskDefinitionLogServiceImpl implements TaskDefinitionLogService {
     @Override
     public void deleteTaskByWorkflowDefinitionCode(long workflowDefinitionCode) {
         List<ProcessTaskRelationLog> processTaskRelations =
-                processTaskRelationLogDao.findByWorkflowDefinitionCode(workflowDefinitionCode);
+                processTaskRelationLogDao.queryByWorkflowDefinitionCode(workflowDefinitionCode);
         if (CollectionUtils.isEmpty(processTaskRelations)) {
             return;
         }

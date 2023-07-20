@@ -39,7 +39,6 @@ import {
   DefaultTableWidth
 } from '@/common/column-width-config'
 import type { Router, TaskInstancesRes, IRecord, ITaskState } from './types'
-import { renderEnvironmentalDistinctionCell } from '@/utils/environmental-distinction'
 
 export function useTable() {
   const { t } = useI18n()
@@ -129,13 +128,6 @@ export function useTable() {
         ...COLUMN_WIDTH_CONFIG['name']
       },
       {
-        title: t('project.task.operating_environment'),
-        key: 'testFlag',
-        width: 160,
-        render: (_row: IRecord) =>
-          renderEnvironmentalDistinctionCell(_row.testFlag, t)
-      },
-      {
         title: t('project.task.node_type'),
         key: 'taskType',
         ...COLUMN_WIDTH_CONFIG['type']
@@ -186,6 +178,12 @@ export function useTable() {
         key: 'host',
         ...COLUMN_WIDTH_CONFIG['name'],
         render: (row: IRecord) => row.host || '-'
+      },
+      {
+        title: t('project.task.app_link'),
+        key: 'appLink',
+        ...COLUMN_WIDTH_CONFIG['name'],
+        render: (row: IRecord) => row.appLink || '-'
       },
       {
         title: t('project.task.operation'),

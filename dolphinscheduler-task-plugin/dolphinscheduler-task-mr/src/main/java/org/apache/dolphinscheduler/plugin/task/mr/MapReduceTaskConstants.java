@@ -31,6 +31,6 @@ public class MapReduceTaskConstants {
     /**
      * -D mapreduce.job.queuename=queuename
      */
-    public static final String MR_QUEUE = "mapreduce.job.queuename";
+    public static final String MR_YARN_QUEUE = "mapreduce.job.queuename";
 
 }

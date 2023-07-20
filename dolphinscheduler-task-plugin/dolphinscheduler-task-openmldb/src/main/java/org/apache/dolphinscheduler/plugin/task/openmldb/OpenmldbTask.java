@@ -21,8 +21,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.python.PythonTask;
 
 import org.apache.commons.lang3.StringUtils;
@@ -92,7 +91,7 @@ public class OpenmldbTask extends PythonTask {
 
         String rawSQLScript = openmldbParameters.getSql().replaceAll("[\\r]?\\n", "\n");
         Map<String, Property> paramsMap = mergeParamsWithContext(openmldbParameters);
-        rawSQLScript = ParameterUtils.convertParameterPlaceholders(rawSQLScript, ParamUtils.convert(paramsMap));
+        rawSQLScript = ParameterUtils.convertParameterPlaceholders(rawSQLScript, ParameterUtils.convert(paramsMap));
 
         // convert sql to python script
         String pythonScript = buildPythonScriptsFromSql(rawSQLScript);
@@ -133,7 +132,7 @@ public class OpenmldbTask extends PythonTask {
 
     /**
      * Build the python task command.
-     * If user have set the 'PYTHON_HOME' environment, we will use the 'PYTHON_HOME',
+     * If user have set the 'PYTHON_LAUNCHER' environment, we will use the 'PYTHON_LAUNCHER',
      * if not, we will default use python.
      *
      * @param pythonFile Python file, cannot be empty.
@@ -146,7 +145,7 @@ public class OpenmldbTask extends PythonTask {
     }
 
     private String getPythonCommand() {
-        String pythonHome = System.getenv(PYTHON_HOME);
+        String pythonHome = System.getenv(PYTHON_LAUNCHER);
         return getPythonCommand(pythonHome);
     }
 

@@ -41,12 +41,12 @@ The preceding two parameters are used to minimize the running of the configurati
 
 *no*
 
-- **Python Command Path** ：Such as `/usr/bin/python`，The default value is ${PYTHON_HOME} in environment.
+- **Python Command Path** ：Such as `/usr/bin/python`，The default value is ${PYTHON_LAUNCHER} in environment.
 
 *yes*
 
 - **Python Environment Manager Tool** ：You can choose `virtualenv` or `conda`.
-  - if choose `virtualenv`，that may use `virtualenv` to create a new environment. Use command `virtualenv -p ${PYTHON_HOME} venv`.
+  - if choose `virtualenv`，that may use `virtualenv` to create a new environment. Use command `virtualenv -p ${PYTHON_LAUNCHER} venv`.
   - if choose `conda`, ，that may use `conda` to create a new environment，And you need to specify the Python version.
 - **Requirement File** ：The default is requirements.txt。
 
@@ -86,7 +86,7 @@ It applies to a new environment to run the project. You need to create an enviro
 ```shell
 # Add the directory for the virtualenv command
 export PATH=/home/xxx/anaconda3/bin:$PATH
-export PYTHON_HOME=/usr/local/bin/python3.7
+export PYTHON_LAUNCHER=/usr/local/bin/python3.7
 ```
 
 ## Other

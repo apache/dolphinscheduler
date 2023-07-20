@@ -203,7 +203,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
             .withTailChildContainers(true)
             .withExposedService("dolphinscheduler_1", 12345)
             .withLogConsumer("dolphinscheduler_1", outputFrame -> LOGGER.info(outputFrame.getUtf8String()))
-            .waitingFor("dolphinscheduler_1", Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(180)));
+            .waitingFor("dolphinscheduler_1", Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(300)));
 
         return compose;
     }

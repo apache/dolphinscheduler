@@ -19,25 +19,30 @@ package org.apache.dolphinscheduler.dao.repository.impl;
 
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
+import org.apache.dolphinscheduler.dao.repository.BaseDao;
 import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionLogDao;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.NonNull;
+
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ProcessDefinitionLogDaoImpl implements ProcessDefinitionLogDao {
+public class ProcessDefinitionLogDaoImpl extends BaseDao<ProcessDefinitionLog, ProcessDefinitionLogMapper>
+        implements
+            ProcessDefinitionLogDao {
 
-    @Autowired
-    private ProcessDefinitionLogMapper processDefinitionLogMapper;
+    public ProcessDefinitionLogDaoImpl(@NonNull ProcessDefinitionLogMapper processDefinitionLogMapper) {
+        super(processDefinitionLogMapper);
+    }
 
     @Override
-    public ProcessDefinitionLog queryProcessDefinitionLog(long workflowDefinitionCode, int workflowDefinitionVersion) {
-        return processDefinitionLogMapper.queryByDefinitionCodeAndVersion(workflowDefinitionCode,
-                workflowDefinitionVersion);
+    public ProcessDefinitionLog queryByDefinitionCodeAndVersion(long workflowDefinitionCode,
+                                                                int workflowDefinitionVersion) {
+        return mybatisMapper.queryByDefinitionCodeAndVersion(workflowDefinitionCode, workflowDefinitionVersion);
     }
 
     @Override
     public void deleteByWorkflowDefinitionCode(long workflowDefinitionCode) {
-        processDefinitionLogMapper.deleteByProcessDefinitionCode(workflowDefinitionCode);
+        mybatisMapper.deleteByProcessDefinitionCode(workflowDefinitionCode);
     }
 }

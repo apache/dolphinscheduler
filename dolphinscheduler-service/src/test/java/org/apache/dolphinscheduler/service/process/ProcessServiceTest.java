@@ -700,11 +700,11 @@ public class ProcessServiceTest {
         taskDefinitionLogs.add(taskDefinition);
         taskDefinitionLogs.add(td2);
 
-        Mockito.when(taskDefinitionLogDao.getTaskDefineLogList(any())).thenReturn(taskDefinitionLogs);
+        Mockito.when(taskDefinitionLogDao.queryTaskDefineLogList(any())).thenReturn(taskDefinitionLogs);
         Mockito.when(processTaskRelationLogMapper.queryByProcessCodeAndVersion(Mockito.anyLong(), Mockito.anyInt()))
                 .thenReturn(list);
 
-        DAG<String, TaskNode, TaskNodeRelation> stringTaskNodeTaskNodeRelationDAG =
+        DAG<Long, TaskNode, TaskNodeRelation> stringTaskNodeTaskNodeRelationDAG =
                 processService.genDagGraph(processDefinition);
         Assertions.assertEquals(1, stringTaskNodeTaskNodeRelationDAG.getNodesCount());
     }
@@ -772,21 +772,6 @@ public class ProcessServiceTest {
 
     }
 
-    @Test
-    public void testQueryTestDataSourceId() {
-        Integer onlineDataSourceId = 1;
-
-        // unbound testDataSourceId
-        Mockito.when(dataSourceMapper.queryTestDataSourceId(any(Integer.class))).thenReturn(null);
-        Integer result = processService.queryTestDataSourceId(onlineDataSourceId);
-        Assertions.assertNull(result);
-
-        // bound testDataSourceId
-        Integer testDataSourceId = 2;
-        Mockito.when(dataSourceMapper.queryTestDataSourceId(any(Integer.class))).thenReturn(testDataSourceId);
-        result = processService.queryTestDataSourceId(onlineDataSourceId);
-        Assertions.assertNotNull(result);
-    }
     private TaskGroupQueue getTaskGroupQueue() {
         TaskGroupQueue taskGroupQueue = new TaskGroupQueue();
         taskGroupQueue.setTaskName("task name");

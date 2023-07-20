@@ -134,7 +134,8 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
                             try {
                                 WorkflowExecuteRunnable workflowExecuteRunnable =
                                         workflowExecuteRunnableFactory.createWorkflowExecuteRunnable(command);
-                                ProcessInstance processInstance = workflowExecuteRunnable.getProcessInstance();
+                                ProcessInstance processInstance = workflowExecuteRunnable
+                                        .getWorkflowExecuteContext().getWorkflowInstance();
                                 if (processInstanceExecCacheManager.contains(processInstance.getId())) {
                                     log.error(
                                             "The workflow instance is already been cached, this case shouldn't be happened");

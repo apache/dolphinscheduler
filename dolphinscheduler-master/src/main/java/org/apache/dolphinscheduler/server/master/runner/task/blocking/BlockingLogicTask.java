@@ -80,7 +80,8 @@ public class BlockingLogicTask extends BaseSyncLogicTask<BlockingParameters> {
         boolean isBlocked = (expected == conditionResult);
         log.info("blocking opportunity: expected-->{}, actual-->{}", expected, conditionResult);
         ProcessInstance workflowInstance = processInstanceExecCacheManager
-                .getByProcessInstanceId(taskExecutionContext.getProcessInstanceId()).getProcessInstance();
+                .getByProcessInstanceId(taskExecutionContext.getProcessInstanceId()).getWorkflowExecuteContext()
+                .getWorkflowInstance();
         workflowInstance.setBlocked(isBlocked);
         if (isBlocked) {
             workflowInstance.setStateWithDesc(WorkflowExecutionStatus.READY_BLOCK, "ready block");
@@ -91,7 +92,7 @@ public class BlockingLogicTask extends BaseSyncLogicTask<BlockingParameters> {
     private DependResult calculateConditionResult() throws MasterTaskExecuteException {
         // todo: Directly get the task instance from the cache
         Map<Long, TaskInstance> completeTaskList = taskInstanceDao
-                .findValidTaskListByProcessId(taskExecutionContext.getProcessInstanceId(),
+                .queryValidTaskListByWorkflowInstanceId(taskExecutionContext.getProcessInstanceId(),
                         taskExecutionContext.getTestFlag())
                 .stream()
                 .collect(Collectors.toMap(TaskInstance::getTaskCode, Function.identity()));
