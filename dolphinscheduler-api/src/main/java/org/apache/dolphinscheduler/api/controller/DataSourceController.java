@@ -35,8 +35,10 @@ import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.DataSourceService;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
@@ -44,6 +46,9 @@ import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
+
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -139,7 +144,8 @@ public class DataSourceController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<Object> queryDataSource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @PathVariable("id") int id) {
-        return dataSourceService.queryDataSource(id, loginUser);
+        BaseDataSourceParamDTO dataSource = dataSourceService.queryDataSource(id, loginUser);
+        return Result.success(dataSource);
     }
 
     /**
@@ -159,7 +165,8 @@ public class DataSourceController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<Object> queryDataSourceList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                               @RequestParam("type") DbType type) {
-        return dataSourceService.queryDataSourceList(loginUser, type.ordinal());
+        List<DataSource> datasourceList = dataSourceService.queryDataSourceList(loginUser, type.ordinal());
+        return Result.success(datasourceList);
     }
 
     /**
@@ -190,7 +197,9 @@ public class DataSourceController extends BaseController {
             return result;
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        return dataSourceService.queryDataSourceListPaging(loginUser, searchVal, pageNo, pageSize);
+        PageInfo<DataSource> pageInfo =
+                dataSourceService.queryDataSourceListPaging(loginUser, searchVal, pageNo, pageSize);
+        return Result.success(pageInfo);
     }
 
     /**
@@ -292,7 +301,8 @@ public class DataSourceController extends BaseController {
     public Result<Object> unAuthDatasource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @RequestParam("userId") Integer userId) {
 
-        return dataSourceService.unAuthDatasource(loginUser, userId);
+        List<DataSource> unAuthDatasourceList = dataSourceService.unAuthDatasource(loginUser, userId);
+        return Result.success(unAuthDatasourceList);
     }
 
     /**
@@ -312,7 +322,8 @@ public class DataSourceController extends BaseController {
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<Object> authedDatasource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @RequestParam("userId") Integer userId) {
-        return dataSourceService.authedDatasource(loginUser, userId);
+        List<DataSource> authedDatasourceList = dataSourceService.authedDatasource(loginUser, userId);
+        return Result.success(authedDatasourceList);
     }
 
     /**
@@ -341,7 +352,8 @@ public class DataSourceController extends BaseController {
     @ApiException(GET_DATASOURCE_TABLES_ERROR)
     public Result<Object> getTables(@RequestParam("datasourceId") Integer datasourceId,
                                     @RequestParam(value = "database") String database) {
-        return dataSourceService.getTables(datasourceId, database);
+        List<ParamsOptions> options = dataSourceService.getTables(datasourceId, database);
+        return Result.success(options);
     }
 
     @Operation(summary = "tableColumns", description = "GET_DATASOURCE_TABLE_COLUMNS_NOTES")
@@ -356,7 +368,8 @@ public class DataSourceController extends BaseController {
     public Result<Object> getTableColumns(@RequestParam("datasourceId") Integer datasourceId,
                                           @RequestParam("tableName") String tableName,
                                           @RequestParam(value = "database") String database) {
-        return dataSourceService.getTableColumns(datasourceId, database, tableName);
+        List<ParamsOptions> options = dataSourceService.getTableColumns(datasourceId, database, tableName);
+        return Result.success(options);
     }
 
     @Operation(summary = "databases", description = "GET_DATASOURCE_DATABASE_NOTES")
@@ -367,6 +380,7 @@ public class DataSourceController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(GET_DATASOURCE_DATABASES_ERROR)
     public Result<Object> getDatabases(@RequestParam("datasourceId") Integer datasourceId) {
-        return dataSourceService.getDatabases(datasourceId);
+        List<ParamsOptions> options = dataSourceService.getDatabases(datasourceId);
+        return Result.success(options);
     }
 }
