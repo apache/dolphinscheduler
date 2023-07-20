@@ -44,7 +44,10 @@ import java.util.Map;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(MockitoExtension.class)
 public class ZeppelinTaskTest {
