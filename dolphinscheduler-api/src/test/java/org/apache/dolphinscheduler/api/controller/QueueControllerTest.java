@@ -49,6 +49,7 @@ public class QueueControllerTest extends AbstractControllerTest {
 
     private static final String QUEUE_VERIFY_MODIFY_NAME = "queue_verify_modify";
     private static final String QUEUE_NAME_CREATE_NAME = "queue_name_create";
+    private static final String QUEUE_VERIFY_CREATE_NAME = "queue_verify_name_create";
     private static final String QUEUE_NAME_MODIFY_NAME = "queue_name_modify";
     private static final String NOT_EXISTS_NAME = "not_exists";
 
@@ -167,7 +168,7 @@ public class QueueControllerTest extends AbstractControllerTest {
         // queue name exist
         paramsMap.clear();
         paramsMap.add("queue", NOT_EXISTS_NAME);
-        paramsMap.add("queueName", QUEUE_NAME_CREATE_NAME);
+        paramsMap.add("queueName", QUEUE_VERIFY_CREATE_NAME);
 
         mvcResult = mockMvc.perform(post("/queues/verify")
                 .header(SESSION_ID, sessionId)
