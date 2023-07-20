@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.alert.config.AlertConfig;
 import org.apache.dolphinscheduler.common.model.AlertServerHeartBeat;
 import org.apache.dolphinscheduler.common.model.BaseHeartBeatTask;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
@@ -59,7 +60,8 @@ public class AlertHeartbeatTask extends BaseHeartBeatTask<AlertServerHeartBeat> 
                 .cpuUsage(OSUtils.cpuUsagePercentage())
                 .memoryUsage(OSUtils.memoryUsagePercentage())
                 .availablePhysicalMemorySize(OSUtils.availablePhysicalMemorySize())
-                .alertServerAddress(alertConfig.getAlertServerAddress())
+                .host(NetUtils.getHost())
+                .port(alertConfig.getPort())
                 .build();
     }
 
