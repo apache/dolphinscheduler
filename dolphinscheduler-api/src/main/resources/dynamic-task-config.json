@@ -1,0 +1,151 @@
+[
+  {
+    "taskName": "SHELL",
+    "isDyn": true,
+    "hover": "shell_hover.png",
+    "icon": "shell.png",
+    "type": "SHELL",
+    "taskType": "SHELL",
+    "jsonData": {
+      "task": "shell",
+      "useCommonForm": "true",
+      "locales": {
+        "zh_CN": {
+          "node_name": "节点名称 dyn",
+          "highest": "HIGHEST",
+          "node_name_validate_message": "请选择节点id",
+          "task_name": "任务名称"
+        },
+        "en_US": {
+          "node_name": "Node Name dyn",
+          "highest": "HIGHEST",
+          "node_name_validate_message": "please select taskId",
+          "node_name_tips": "Please entry node name"
+        }
+      },
+      "apis": {},
+      "forms": [
+        {
+          "type": "common"
+        },
+        {
+          "type": "taskGroup"
+        },
+        {
+          "type": "failed"
+        },
+        {
+          "type": "input-number",
+          "field": "delayTime",
+          "label": "task_components.delay_time",
+          "props": {
+            "suffix": "project.node.minute"
+          },
+          "span": 12,
+          "defaultValue": 0
+        },
+        {
+          "type": "remoteConnect"
+        },
+        {
+          "type": "shell"
+        },
+        {
+          "type": "preTask"
+        }
+      ],
+      "model": {
+        "taskType": "SHELL",
+        "name": "",
+        "flag": "YES",
+        "description": "",
+        "timeoutFlag": false,
+        "timeoutNotifyStrategy": ["WARN"],
+        "timeout": 30,
+        "localParams": [],
+        "dataSourceList": [],
+        "environmentCode": null,
+        "failRetryInterval": 1,
+        "failRetryTimes": 0,
+        "workerGroup": null,
+        "delayTime": 0,
+        "rawScript": "",
+        "code": -1
+      },
+      "taskConfig": {
+        "language": "shell",
+        "paneType": "setting",
+        "handlers": [
+          {
+            "key": "script",
+            "name": "project.node.script"
+          }
+        ]
+      }
+    },
+    "taskCategory": "Dynamic"
+  },
+  {
+    "taskName": "SUB_PROCESS",
+    "hover": "sub_process_hover.png",
+    "icon": "sub_process.png",
+    "type": "SUB_PROCESS",
+    "taskType": "SUB_PROCESS",
+    "isDyn": true,
+    "jsonData": {
+      "task": "shell",
+      "useCommonForm": "true",
+      "locales": {
+        "zh_CN": {
+          "highest": "HIGHEST",
+          "select_name2": "任务名称 dyn",
+          "node_name_validate_message": "请选择节点id",
+          "task_name": "任务名称"
+        },
+        "en_US": {
+          "highest": "HIGHEST",
+          "node_name_validate_message": "please select taskId",
+          "node_name_tips": "Please entry node name"
+        }
+      },
+      "apis": {
+        "getWorkerGroupList": {
+          "url": "/ws/seaTunnel/taskQuery",
+          "method": "get",
+          "params": [
+            {
+              "key": "name",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "forms": [
+        {
+          "type": "common"
+        },
+        {
+          "type": "childNode"
+        },
+        {
+          "type": "preTask"
+        }
+      ],
+      "model": {
+        "taskType": "SUB_PROCESS",
+        "name": "",
+        "flag": "YES",
+        "description": "",
+        "timeoutFlag": false,
+        "localParams": [],
+        "environmentCode": null,
+        "failRetryInterval": 1,
+        "failRetryTimes": 0,
+        "workerGroup": null,
+        "delayTime": 0,
+        "timeout": 30
+      }
+    },
+    "taskCategory": "Dynamic"
+  }
+]

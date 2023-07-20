@@ -28,6 +28,7 @@ import {
 } from '@/service/modules/dag-menu'
 import { useI18n } from 'vue-i18n'
 import { componentList } from '../moke/dyn-components-moke'
+import { useUISettingStore } from '@/store/ui-setting/ui-setting'
 
 export default defineComponent({
   name: 'workflow-dag-sidebar',
@@ -47,6 +48,7 @@ export default defineComponent({
     })
 
     const { t } = useI18n()
+    const uiSettingStore = useUISettingStore()
 
     const handleDagMenu = () => {
       getDagMenu().then((res: any) => {
@@ -576,7 +578,7 @@ export default defineComponent({
               }}
             ></NCollapseItem>
           )}
-          {variables.dynamic.length > 0 && (
+          {uiSettingStore.getDynamicTask && variables.dynamic.length > 0 && (
             <NCollapseItem
               title={t('project.menu.dynamic')}
               name='8'

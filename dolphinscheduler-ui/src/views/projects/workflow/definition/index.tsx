@@ -158,7 +158,7 @@ export default defineComponent({
               >
                 {t('project.workflow.create_workflow')}
               </NButton>
-              {this.uiSettingStore.getDynamicTask && (
+              {/* {this.uiSettingStore.getDynamicTask && (
                 <NButton
                   type='warning'
                   size='small'
@@ -166,7 +166,7 @@ export default defineComponent({
                 >
                   {t('project.workflow.create_workflow_dynamic')}
                 </NButton>
-              )}
+              )} */}
               <NButton
                 strong
                 secondary
