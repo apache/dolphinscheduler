@@ -34,12 +34,16 @@ import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.fabric8.kubernetes.api.model.NodeSelectorRequirement;
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
 import io.fabric8.kubernetes.api.model.batch.v1.JobStatus;
 
 public class K8sTaskExecutorTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(K8sTaskExecutorTest.class);
 
     private K8sTaskExecutor k8sTaskExecutor = null;
     private K8sTaskMainParameters k8sTaskMainParameters = null;
@@ -66,7 +70,7 @@ public class K8sTaskExecutorTest {
         requirement.setKey("node-label");
         requirement.setOperator("In");
         requirement.setValues(Arrays.asList("1234", "123456"));
-        k8sTaskExecutor = new K8sTaskExecutor(null, taskRequest);
+        k8sTaskExecutor = new K8sTaskExecutor(logger, taskRequest);
         k8sTaskMainParameters = new K8sTaskMainParameters();
         k8sTaskMainParameters.setImage(image);
         k8sTaskMainParameters.setImagePullPolicy(imagePullPolicy);
@@ -90,9 +94,8 @@ public class K8sTaskExecutorTest {
     public void testSetTaskStatusNormal() {
         int jobStatus = 0;
         TaskResponse taskResponse = new TaskResponse();
-        K8sTaskMainParameters k8STaskMainParameters = new K8sTaskMainParameters();
         k8sTaskExecutor.setJob(job);
-        k8sTaskExecutor.setTaskStatus(jobStatus, String.valueOf(taskInstanceId), taskResponse, k8STaskMainParameters);
+        k8sTaskExecutor.setTaskStatus(jobStatus, String.valueOf(taskInstanceId), taskResponse);
         Assertions.assertEquals(0, Integer.compare(EXIT_CODE_KILL, taskResponse.getExitStatusCode()));
     }
     @Test

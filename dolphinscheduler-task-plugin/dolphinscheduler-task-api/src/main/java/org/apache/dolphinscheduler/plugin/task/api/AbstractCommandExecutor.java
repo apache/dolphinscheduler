@@ -201,7 +201,7 @@ public abstract class AbstractCommandExecutor {
                 // Wait the task log process finished.
                 taskOutputFuture.get();
             } catch (ExecutionException e) {
-                logger.info("Handle task log error", e);
+                logger.error("Handle task log error", e);
             }
         }
 
@@ -272,7 +272,7 @@ public abstract class AbstractCommandExecutor {
             ThreadUtils.sleep(SLEEP_TIME_MILLIS * 5L);
             try (
                     LogWatch watcher = ProcessUtils.getPodLogWatcher(taskRequest.getK8sTaskExecutionContext(),
-                            taskRequest.getTaskAppId())) {
+                            taskRequest.getTaskAppId(), "")) {
                 if (watcher == null) {
                     throw new RuntimeException("The driver pod does not exist.");
                 } else {
