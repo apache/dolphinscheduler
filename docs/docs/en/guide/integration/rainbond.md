@@ -47,7 +47,7 @@ API and Worker Services share the configuration file `/opt/dolphinscheduler/conf
 
 ## How to support Python 3？
 
-Worker service is installed with default `Python3`，you can add environment variables `PYTHON_HOME=/usr/bin/python3`
+Worker service is installed with default `Python3`，you can add environment variables `PYTHON_LAUNCHER=/usr/bin/python3`
 
 ## How to support Hadoop, Spark, DataX ？
 

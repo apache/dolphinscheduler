@@ -47,7 +47,7 @@ API 和 Worker 服务共用 `/opt/dolphinscheduler/conf/common.properties` ，�
 
 ## 如何支持 Python 3？
 
-Worker 服务默认安装了 Python3，使用时可以添加环境变量  `PYTHON_HOME=/usr/bin/python3`
+Worker 服务默认安装了 Python3，使用时可以添加环境变量  `PYTHON_LAUNCHER=/usr/bin/python3`
 
 ## 如何支持 Hadoop, Spark, DataX 等？
 

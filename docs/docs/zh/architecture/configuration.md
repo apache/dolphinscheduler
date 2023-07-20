@@ -365,12 +365,12 @@ export JAVA_HOME=${JAVA_HOME:-/opt/soft/java}
 export HADOOP_HOME=${HADOOP_HOME:-/opt/soft/hadoop}
 export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-/opt/soft/hadoop/etc/hadoop}
 export SPARK_HOME=${SPARK_HOME:-/opt/soft/spark}
-export PYTHON_HOME=${PYTHON_HOME:-/opt/soft/python}
+export PYTHON_LAUNCHER=${PYTHON_LAUNCHER:-/opt/soft/python}
 export HIVE_HOME=${HIVE_HOME:-/opt/soft/hive}
 export FLINK_HOME=${FLINK_HOME:-/opt/soft/flink}
-export DATAX_HOME=${DATAX_HOME:-/opt/soft/datax}
+export DATAX_LAUNCHER=${DATAX_LAUNCHER:-/opt/soft/datax/bin/datax.py}
 
-export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH
+export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_LAUNCHER:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_LAUNCHER:$PATH
 
 # applicationId auto collection related configuration, the following configurations are unnecessary if setting appId.collect=log
 export HADOOP_CLASSPATH=`hadoop classpath`:${DOLPHINSCHEDULER_HOME}/tools/libs/*

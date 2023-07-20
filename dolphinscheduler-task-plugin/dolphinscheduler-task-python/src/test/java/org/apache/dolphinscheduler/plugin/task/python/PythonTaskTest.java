@@ -25,7 +25,7 @@ public class PythonTaskTest {
     @Test
     public void buildPythonExecuteCommand() throws Exception {
         PythonTask pythonTask = createPythonTask();
-        Assertions.assertEquals("${PYTHON_HOME} test.py", pythonTask.buildPythonExecuteCommand("test.py"));
+        Assertions.assertEquals("${PYTHON_LAUNCHER} test.py", pythonTask.buildPythonExecuteCommand("test.py"));
     }
 
     private PythonTask createPythonTask() {

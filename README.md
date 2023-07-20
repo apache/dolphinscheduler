@@ -76,3 +76,5 @@ DolphinScheduler enriches the <a href="https://landscape.cncf.io/?landscape=obse
 
 </p >
 
+
+/opt/soft/datax

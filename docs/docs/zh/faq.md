@@ -199,16 +199,16 @@ A： 1，在 **流程定义列表**，点击 **启动** 按钮
 
 ## Q：Python 任务设置 Python 版本
 
-A： 只需要修改 `bin/env/dolphinscheduler_env.sh` 中的 PYTHON_HOME
+A： 只需要修改 `bin/env/dolphinscheduler_env.sh` 中的 PYTHON_LAUNCHER
 
 ```
-export PYTHON_HOME=/bin/python
+export PYTHON_LAUNCHER=/bin/python
 ```
 
-注意：这了 **PYTHON_HOME** ，是 python 命令的绝对路径，而不是单纯的 PYTHON_HOME，还需要注意的是 export PATH 的时候，需要直接
+注意：这了 **PYTHON_LAUNCHER** ，是 python 命令的绝对路径，而不是单纯的 PYTHON_LAUNCHER，还需要注意的是 export PATH 的时候，需要直接
 
 ```
-export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_HOME:$JAVA_HOME/bin:$HIVE_HOME/bin:$PATH
+export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_LAUNCHER:$JAVA_HOME/bin:$HIVE_HOME/bin:$PATH
 ```
 
 ## Q：Worker Task 通过 sudo -u 租户 sh xxx.command 会产生子进程，在 kill 的时候，是否会杀掉

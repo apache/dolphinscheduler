@@ -132,7 +132,7 @@ public class OpenmldbTask extends PythonTask {
 
     /**
      * Build the python task command.
-     * If user have set the 'PYTHON_HOME' environment, we will use the 'PYTHON_HOME',
+     * If user have set the 'PYTHON_LAUNCHER' environment, we will use the 'PYTHON_LAUNCHER',
      * if not, we will default use python.
      *
      * @param pythonFile Python file, cannot be empty.
@@ -145,7 +145,7 @@ public class OpenmldbTask extends PythonTask {
     }
 
     private String getPythonCommand() {
-        String pythonHome = System.getenv(PYTHON_HOME);
+        String pythonHome = System.getenv(PYTHON_LAUNCHER);
         return getPythonCommand(pythonHome);
     }
 

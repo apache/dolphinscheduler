@@ -372,7 +372,7 @@ docker build -t apache/dolphinscheduler-worker:python3 .
 
 4. Modify image `repository` and update `tag` to `python3` in `values.yaml`.
 
-5. Modify `PYTHON_HOME` to `/usr/bin/python3` in `values.yaml`.
+5. Modify `PYTHON_LAUNCHER` to `/usr/bin/python3` in `values.yaml`.
 
 6. Run a DolphinScheduler release in Kubernetes (See **Install DolphinScheduler**).
 
@@ -575,11 +575,11 @@ common:
 | `common.configmap.HADOOP_HOME`                                       | Set `HADOOP_HOME` for DolphinScheduler's task environment                                                                     | `/opt/soft/hadoop`                    |
 | `common.configmap.HADOOP_CONF_DIR`                                   | Set `HADOOP_CONF_DIR` for DolphinScheduler's task environment                                                                 | `/opt/soft/hadoop/etc/hadoop`         |
 | `common.configmap.SPARK_HOME`                                        | Set `SPARK_HOME` for DolphinScheduler's task environment                                                                      | `/opt/soft/spark`                     |
-| `common.configmap.PYTHON_HOME`                                       | Set `PYTHON_HOME` for DolphinScheduler's task environment                                                                     | `/usr/bin/python`                     |
+| `common.configmap.PYTHON_LAUNCHER`                                   | Set `PYTHON_LAUNCHER` for DolphinScheduler's task environment                                                                 | `/usr/bin/python`                     |
 | `common.configmap.JAVA_HOME`                                         | Set `JAVA_HOME` for DolphinScheduler's task environment                                                                       | `/opt/java/openjdk`                   |
 | `common.configmap.HIVE_HOME`                                         | Set `HIVE_HOME` for DolphinScheduler's task environment                                                                       | `/opt/soft/hive`                      |
 | `common.configmap.FLINK_HOME`                                        | Set `FLINK_HOME` for DolphinScheduler's task environment                                                                      | `/opt/soft/flink`                     |
-| `common.configmap.DATAX_HOME`                                        | Set `DATAX_HOME` for DolphinScheduler's task environment                                                                      | `/opt/soft/datax`                     |
+| `common.configmap.DATAX_LAUNCHER`                                    | Set `DATAX_LAUNCHER` for DolphinScheduler's task environment                                                                  | `/opt/soft/datax`                     |
 | `common.sharedStoragePersistence.enabled`                            | Set `common.sharedStoragePersistence.enabled` to `true` to mount a shared storage volume for Hadoop, Spark binary and etc     | `false`                               |
 | `common.sharedStoragePersistence.mountPath`                          | The mount path for the shared storage volume                                                                                  | `/opt/soft`                           |
 | `common.sharedStoragePersistence.accessModes`                        | `PersistentVolumeClaim` access modes, must be `ReadWriteMany`                                                                 | `[ReadWriteMany]`                     |

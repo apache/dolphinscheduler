@@ -41,12 +41,12 @@
 
 #### python环境参数
 
-|   **任务参数**   |                                                                          **描述**                                                                           |
-|--------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 是否创建新环境      | 是否创建新的python环境来运行该任务                                                                                                                                      |
-| python命令路径   | 如`/usr/bin/python`，默认为DS环境配置中的`${PYTHON_HOME}`                                                                                                            |
-| python环境管理工具 | 可以选择virtualenv或者conda，若选择`virtualenv`，则会用`virtualenv`创建一个新环境，使用命令 `virtualenv -p ${PYTHON_HOME} venv` 创建；若选择`conda`, 则会使用`conda` 创建一个新环境，并需要指定创建的python版本 |
-| 依赖文件         | 默认为 requirements.txt                                                                                                                                      |
+|   **任务参数**   |                                                                            **描述**                                                                             |
+|--------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 是否创建新环境      | 是否创建新的python环境来运行该任务                                                                                                                                          |
+| python命令路径   | 如`/usr/bin/python`，默认为DS环境配置中的`${PYTHON_LAUNCHER}`                                                                                                            |
+| python环境管理工具 | 可以选择virtualenv或者conda，若选择`virtualenv`，则会用`virtualenv`创建一个新环境，使用命令 `virtualenv -p ${PYTHON_LAUNCHER} venv` 创建；若选择`conda`, 则会使用`conda` 创建一个新环境，并需要指定创建的python版本 |
+| 依赖文件         | 默认为 requirements.txt                                                                                                                                          |
 
 配置了`python项目地址`参数，那么`python脚本`和`依赖文件`参数允许输入相对路径
 
@@ -84,7 +84,7 @@ export PATH=$HOME/anaconda3/bin:$PATH
 ```shell
 # virtualenv命令对应的目录加入PATH中
 export PATH=/home/lucky/anaconda3/bin:$PATH
-export PYTHON_HOME=/usr/local/bin/python3.7
+export PYTHON_LAUNCHER=/usr/local/bin/python3.7
 ```
 
 ## 其他

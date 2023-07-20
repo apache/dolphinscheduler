@@ -823,7 +823,7 @@ export default {
     pytorch_python_path: 'python项目地址',
     pytorch_is_create_environment: '是否创建新环境',
     pytorch_python_command: 'python命令路径',
-    pytorch_python_command_tips: '若为空，则使用$PYTHON_HOME',
+    pytorch_python_command_tips: '若为空，则使用$PYTHON_LAUNCHER',
     pytorch_python_env_tool: 'python环境管理工具',
     pytorch_requirements: '依赖文件',
     pytorch_conda_python_version: 'python版本',
