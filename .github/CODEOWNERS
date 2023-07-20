@@ -28,7 +28,7 @@
 /dolphinscheduler-standalone-server/ @caishunfeng
 /dolphinscheduler-datasource-plugin/ @caishunfeng
 /dolphinscheduler-dist/ @caishunfeng
-/dolphinscheduler-meter/ @caishunfeng @kezhenxu94 @ruanwenjun @EricGao888
+/dolphinscheduler-meter/ @caishunfeng @ruanwenjun @EricGao888
 /dolphinscheduler-scheduler-plugin/ @caishunfeng
 /dolphinscheduler-master/ @caishunfeng @SbloodyS @ruanwenjun
 /dolphinscheduler-worker/ @caishunfeng @SbloodyS @ruanwenjun
@@ -40,9 +40,6 @@
 /script/ @caishunfeng @SbloodyS @zhongjiajie @EricGao888
 /dolphinscheduler-ui/ @songjianet @Amy0104
 /docs/ @zhongjiajie @EricGao888
-/licenses/ @kezhenxu94 @zhongjiajie
+/licenses/ @zhongjiajie
 /images/ @zhongjiajie @EricGao888
 /style/ @caishunfeng
-
-# All pom files
-pom.xml @kezhenxu94

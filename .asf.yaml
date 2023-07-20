@@ -30,6 +30,7 @@ github:
     - workflow-schedule
     - powerful-data-pipelines
     - data-pipelines
+  dependabot_updates: false
   enabled_merge_buttons:
     squash: true
     merge: false
