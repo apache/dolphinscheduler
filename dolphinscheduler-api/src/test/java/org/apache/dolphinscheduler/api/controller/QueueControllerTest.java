@@ -46,6 +46,8 @@ public class QueueControllerTest extends AbstractControllerTest {
 
     private static final String QUEUE_CREATE_NAME = "queue_create";
     private static final String QUEUE_MODIFY_NAME = "queue_modify";
+
+    private static final String QUEUE_VERIFY_MODIFY_NAME = "queue_verify_modify";
     private static final String QUEUE_NAME_CREATE_NAME = "queue_name_create";
     private static final String QUEUE_NAME_MODIFY_NAME = "queue_name_modify";
     private static final String NOT_EXISTS_NAME = "not_exists";
@@ -147,7 +149,7 @@ public class QueueControllerTest extends AbstractControllerTest {
 
         // queue value exist
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("queue", QUEUE_MODIFY_NAME);
+        paramsMap.add("queue", QUEUE_VERIFY_MODIFY_NAME);
         paramsMap.add("queueName", NOT_EXISTS_NAME);
 
         MvcResult mvcResult = mockMvc.perform(post("/queues/verify")
