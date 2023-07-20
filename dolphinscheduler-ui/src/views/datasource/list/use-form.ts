@@ -415,6 +415,11 @@ export const datasourceType: IDataBaseOptionKeys = {
     value: 'ZEPPELIN',
     label: 'ZEPPELIN',
     defaultPort: 8080
+  },
+  DORIS: {
+    value: 'DORIS',
+    label: 'DORIS',
+    defaultPort: 9030
   }
 }
 

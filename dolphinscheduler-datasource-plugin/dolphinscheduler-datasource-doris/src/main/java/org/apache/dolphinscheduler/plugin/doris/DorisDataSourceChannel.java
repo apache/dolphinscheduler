@@ -14,22 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.dolphinscheduler.plugin.doris;
 
-package org.apache.dolphinscheduler.plugin.task.python;
+import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
+import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
+import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
-public class PythonConstants {
+public class DorisDataSourceChannel implements DataSourceChannel {
 
-    private PythonConstants() {
-        throw new IllegalStateException("Utility class");
+    @Override
+    public DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+        return null;
     }
-
-    /**
-     * python home
-     */
-    public static final String PYTHON_HOME = "PYTHON_HOME";
-
-    /**
-     * EQUAL SIGN
-     */
-    public static final String EQUAL_SIGN = "=";
 }
