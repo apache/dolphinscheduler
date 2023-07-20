@@ -50,9 +50,9 @@ public enum DbType {
     DATABEND(19, "databend"),
     SNOWFLAKE(20, "snowflake"),
     VERTICA(21, "vertica"),
-    ZEPPELIN(23, "zeppelin"),
     HANA(22, "hana"),
-    DORIS(23, "doris");
+    DORIS(23, "doris"),
+    ZEPPELIN(24, "zeppelin");
 
     private static final Map<Integer, DbType> DB_TYPE_MAP =
             Arrays.stream(DbType.values()).collect(toMap(DbType::getCode, Functions.identity()));
