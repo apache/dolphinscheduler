@@ -15,20 +15,32 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.runner;
+import { useI18n } from 'vue-i18n'
+import type { IJsonItem } from '../../task/components/node/types'
+import { warningTypeList } from '@/common/common'
 
-public enum WorkflowSubmitStatus {
-    /**
-     * Submit success
-     */
-    SUCCESS,
-    /**
-     * Submit failed, this status should be retry
-     */
-    FAILED,
-    /**
-     * Duplicated submitted, this status should never occur.
-     */
-    DUPLICATED_SUBMITTED,
-    ;
+export function useWarningType(): IJsonItem {
+  const { t } = useI18n()
+
+  const options = [] as any
+
+  const initOptions = () => {
+    warningTypeList.forEach((item) => {
+      options.push({ label: t(item.code), value: item.id })
+    })
+  }
+
+  initOptions()
+
+  return {
+    type: 'select',
+    field: 'warningType',
+    name: t('project.workflow.notification_strategy'),
+    span: 12,
+    options,
+    validate: {
+      required: true
+    },
+    value: 'NONE'
+  }
 }

@@ -259,11 +259,11 @@ Location: `api-server/conf/application.yaml`
 |security.authentication.ldap.ssl.enable|false|LDAP switch|
 |security.authentication.ldap.ssl.trust-store|ldapkeystore.jks|LDAP jks file absolute path|
 |security.authentication.ldap.ssl.trust-store-password|password|LDAP jks password|
-|traffic.control.global.switch|false|traffic control global switch|
-|traffic.control.max-global-qps-rate|300|global max request number per second|
-|traffic.control.tenant-switch|false|traffic control tenant switch|
-|traffic.control.default-tenant-qps-rate|10|default tenant max request number per second|
-|traffic.control.customize-tenant-qps-rate||customize tenant max request number per second|
+|api.traffic.control.global.switch|false|traffic control global switch|
+|api.traffic.control.max-global-qps-rate|300|global max request number per second|
+|api.traffic.control.tenant-switch|false|traffic control tenant switch|
+|api.traffic.control.default-tenant-qps-rate|10|default tenant max request number per second|
+|api.traffic.control.customize-tenant-qps-rate||customize tenant max request number per second|
 
 ### Master Server related configuration
 
@@ -373,12 +373,12 @@ export JAVA_HOME=${JAVA_HOME:-/opt/soft/java}
 export HADOOP_HOME=${HADOOP_HOME:-/opt/soft/hadoop}
 export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-/opt/soft/hadoop/etc/hadoop}
 export SPARK_HOME=${SPARK_HOME:-/opt/soft/spark}
-export PYTHON_HOME=${PYTHON_HOME:-/opt/soft/python}
+export PYTHON_LAUNCHER=${PYTHON_LAUNCHER:-/opt/soft/python/bin/python3}
 export HIVE_HOME=${HIVE_HOME:-/opt/soft/hive}
 export FLINK_HOME=${FLINK_HOME:-/opt/soft/flink}
-export DATAX_HOME=${DATAX_HOME:-/opt/soft/datax}
+export DATAX_LAUNCHER=${DATAX_LAUNCHER:-/opt/soft/datax/bin/datax.py}
 
-export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH
+export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_LAUNCHER:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_LAUNCHER:$PATH
 
 # applicationId auto collection related configuration, the following configurations are unnecessary if setting appId.collect=log
 export HADOOP_CLASSPATH=`hadoop classpath`:${DOLPHINSCHEDULER_HOME}/tools/libs/*

@@ -15,24 +15,33 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.configuration;
+import { ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
+import type { IJsonItem } from '../../task/components/node/types'
+import { queryTenantList } from '@/service/modules/tenants'
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.stereotype.Component;
+export function useTenant(): IJsonItem {
+  const { t } = useI18n()
 
-@Component
-@EnableConfigurationProperties
-@ConfigurationProperties(value = "audit", ignoreUnknownFields = false)
-public class AuditConfiguration {
+  const options = ref([] as { label: string; value: string }[])
 
-    private boolean enabled;
+  const getTenantList = async () => {
+    const res = await queryTenantList()
+    options.value = res.map((item: any) => ({
+      label: item.tenantCode,
+      value: item.tenantCode
+    }))
+  }
 
-    public boolean getEnabled() {
-        return enabled;
-    }
+  onMounted(() => {
+    getTenantList()
+  })
 
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
+  return {
+    type: 'select',
+    field: 'tenant',
+    span: 12,
+    name: t('project.workflow.tenant_code'),
+    options: options
+  }
 }

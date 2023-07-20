@@ -73,7 +73,7 @@ failureaccess-1.0.1.jar
 gson-2.9.1.jar
 guava-31.1-jre.jar
 guava-retrying-2.0.0.jar
-h2-2.1.210.jar
+h2-2.2.220.jar
 hadoop-annotations-3.2.4.jar
 hadoop-auth-3.2.4.jar
 hadoop-client-3.2.4.jar
@@ -257,7 +257,6 @@ poi-ooxml-schemas-4.1.2.jar
 postgresql-42.4.1.jar
 presto-jdbc-0.238.1.jar
 profiles-2.17.282.jar
-protobuf-java-2.5.0.jar
 protocol-core-2.17.282.jar
 protostuff-api-1.7.2.jar
 protostuff-collectionschema-1.7.2.jar
@@ -278,7 +277,7 @@ simpleclient_tracer_otel-0.15.0.jar
 simpleclient_tracer_otel_agent-0.15.0.jar
 slf4j-api-1.7.36.jar
 snakeyaml-1.33.jar
-snappy-java-1.1.8.4.jar
+snappy-java-1.1.10.1.jar
 spring-aop-5.3.22.jar
 spring-beans-5.3.22.jar
 spring-boot-2.7.3.jar
@@ -479,7 +478,7 @@ casdoor-java-sdk-1.11.0.jar
 casdoor-spring-boot-starter-1.6.0.jar
 org.apache.oltu.oauth2.client-1.0.2.jar
 org.apache.oltu.oauth2.common-1.0.2.jar
-snowflake-jdbc-3.13.10.jar
+snowflake-jdbc-3.13.29.jar
 azure-storage-blob-12.21.0.jar
 azure-storage-internal-avro-12.6.0.jar
 vertica-jdbc-12.0.4-0.jar

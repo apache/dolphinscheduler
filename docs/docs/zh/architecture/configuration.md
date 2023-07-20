@@ -257,11 +257,11 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn/applicationId�
 |security.authentication.ldap.ssl.enable|false|LDAP ssl开关|
 |security.authentication.ldap.ssl.trust-store|ldapkeystore.jks|LDAP jks文件绝对路径|
 |security.authentication.ldap.ssl.trust-store-password|password|LDAP jks密码|
-|traffic.control.global.switch|false|流量控制全局开关|
-|traffic.control.max-global-qps-rate|300|全局最大请求数/秒|
-|traffic.control.tenant-switch|false|流量控制租户开关|
-|traffic.control.default-tenant-qps-rate|10|默认租户最大请求数/秒限制|
-|traffic.control.customize-tenant-qps-rate||自定义租户最大请求数/秒限制|
+|api.traffic.control.global.switch|false|流量控制全局开关|
+|api.traffic.control.max-global-qps-rate|300|全局最大请求数/秒|
+|api.traffic.control.tenant-switch|false|流量控制租户开关|
+|api.traffic.control.default-tenant-qps-rate|10|默认租户最大请求数/秒限制|
+|api.traffic.control.customize-tenant-qps-rate||自定义租户最大请求数/秒限制|
 
 ## Master Server相关配置
 
@@ -365,12 +365,12 @@ export JAVA_HOME=${JAVA_HOME:-/opt/soft/java}
 export HADOOP_HOME=${HADOOP_HOME:-/opt/soft/hadoop}
 export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-/opt/soft/hadoop/etc/hadoop}
 export SPARK_HOME=${SPARK_HOME:-/opt/soft/spark}
-export PYTHON_HOME=${PYTHON_HOME:-/opt/soft/python}
+export PYTHON_LAUNCHER=${PYTHON_LAUNCHER:-/opt/soft/python}
 export HIVE_HOME=${HIVE_HOME:-/opt/soft/hive}
 export FLINK_HOME=${FLINK_HOME:-/opt/soft/flink}
-export DATAX_HOME=${DATAX_HOME:-/opt/soft/datax}
+export DATAX_LAUNCHER=${DATAX_LAUNCHER:-/opt/soft/datax/bin/datax.py}
 
-export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH
+export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_LAUNCHER:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_LAUNCHER:$PATH
 
 # applicationId auto collection related configuration, the following configurations are unnecessary if setting appId.collect=log
 export HADOOP_CLASSPATH=`hadoop classpath`:${DOLPHINSCHEDULER_HOME}/tools/libs/*

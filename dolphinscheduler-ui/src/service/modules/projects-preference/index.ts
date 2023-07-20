@@ -15,23 +15,28 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.configuration;
+import { axios } from '@/service/service'
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
+import {
+  UpdateProjectPreferenceReq
+} from './types'
 
-@ActiveProfiles("audit")
-@SpringBootTest(classes = AuditConfiguration.class)
-public class AuditConfigurationTest {
+export function queryProjectPreferenceByProjectCode(
+  projectCode: number
+): any {
+  return axios({
+    url: `/projects/${projectCode}/project-preference`,
+    method: 'get'
+  })
+}
 
-    @Autowired
-    private AuditConfiguration auditConfiguration;
-
-    @Test
-    public void isAuditGlobalControlSwitch() {
-        Assertions.assertTrue(auditConfiguration.getEnabled());
-    }
+export function updateProjectPreference(
+  data: UpdateProjectPreferenceReq,
+  projectCode: number
+): any {
+  return axios({
+    url: `/projects/${projectCode}/project-preference`,
+    method: 'put',
+    data
+  })
 }

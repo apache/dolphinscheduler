@@ -15,24 +15,18 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.configuration;
+package org.apache.dolphinscheduler.server.master.runner;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.Callable;
 
-import lombok.Data;
+public interface IWorkflowExecuteRunnable extends Callable<WorkflowStartStatus> {
+    // todo: add control method to manage the workflow runnable e.g. pause/stop ....
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+    @Override
+    default WorkflowStartStatus call() {
+        return startWorkflow();
+    }
 
-@Data
-@Configuration
-@ConfigurationProperties(prefix = "traffic.control")
-public class TrafficConfiguration {
+    WorkflowStartStatus startWorkflow();
 
-    private boolean globalSwitch;
-    private Integer maxGlobalQpsRate = 300;
-    private boolean tenantSwitch;
-    private Integer defaultTenantQpsRate = 10;
-    private Map<String, Integer> customizeTenantQpsRate = new HashMap<>();
 }

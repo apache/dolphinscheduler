@@ -15,24 +15,33 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.configuration;
+import { ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
+import type { IJsonItem } from '../../task/components/node/types'
+import { listAlertGroupById } from '@/service/modules/alert-group'
 
-import lombok.Data;
+export function useAlertGroup(): IJsonItem {
+  const { t } = useI18n()
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+  const options = ref([] as { label: string; value: string }[])
 
-@Data
-@Configuration
-@ConfigurationProperties(value = "python-gateway")
-public class PythonGatewayConfiguration {
+  const getAlertGroups = async () => {
+    const res = await listAlertGroupById()
+    options.value = res.map((item: any) => ({
+      label: item.groupName,
+      value: item.id
+    }))
+  }
 
-    private boolean enabled;
-    private String gatewayServerAddress;
-    private int gatewayServerPort;
-    private String pythonAddress;
-    private int pythonPort;
-    private int connectTimeout;
-    private int readTimeout;
-    private String authToken;
+  onMounted(() => {
+    getAlertGroups()
+  })
+
+  return {
+    type: 'select',
+    field: 'alertGroups',
+    span: 12,
+    name: t('project.workflow.alarm_group'),
+    options: options
+  }
 }

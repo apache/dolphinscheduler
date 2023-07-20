@@ -15,21 +15,12 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.python;
+package org.apache.dolphinscheduler.dao.mapper;
 
-public class PythonConstants {
+import org.apache.dolphinscheduler.dao.entity.ProjectPreference;
 
-    private PythonConstants() {
-        throw new IllegalStateException("Utility class");
-    }
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
-    /**
-     * python home
-     */
-    public static final String PYTHON_HOME = "PYTHON_HOME";
+public interface ProjectPreferenceMapper extends BaseMapper<ProjectPreference> {
 
-    /**
-     * EQUAL SIGN
-     */
-    public static final String EQUAL_SIGN = "=";
 }

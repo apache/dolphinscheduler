@@ -174,6 +174,7 @@ public final class ProcessUtils {
                 }
                 if (CollectionUtils.isEmpty(appIds)) {
                     log.info("The appId is empty");
+                    return;
                 }
                 ApplicationManager applicationManager = applicationManagerMap.get(ResourceManagerType.YARN);
                 applicationManager.killApplication(new YarnApplicationManagerContext(executePath, tenantCode, appIds));

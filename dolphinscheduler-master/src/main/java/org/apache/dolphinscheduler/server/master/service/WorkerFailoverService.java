@@ -131,7 +131,8 @@ public class WorkerFailoverService {
                                 if (workflowExecuteRunnable == null) {
                                     return null;
                                 }
-                                return workflowExecuteRunnable.getProcessInstance();
+                                return workflowExecuteRunnable.getWorkflowExecuteContext()
+                                        .getWorkflowInstance();
                             });
                     if (!checkTaskInstanceNeedFailover(needFailoverWorkerStartTime, processInstance, taskInstance)) {
                         log.info("Worker[{}] the current taskInstance doesn't need to failover", workerHost);
