@@ -139,14 +139,16 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
                     .withCapabilities(new ChromeOptions())
                     .withCreateContainerCmdModifier(cmd -> cmd.withUser("root"))
                     .withFileSystemBind(Constants.HOST_CHROME_DOWNLOAD_PATH.toFile().getAbsolutePath(),
-                            Constants.SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH);
+                            Constants.SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH)
+                    .withStartupTimeout(Duration.ofSeconds(120));
         } else {
             browser = new BrowserWebDriverContainer<>()
                     .withCapabilities(new ChromeOptions())
                     .withCreateContainerCmdModifier(cmd -> cmd.withUser("root"))
                     .withFileSystemBind(Constants.HOST_CHROME_DOWNLOAD_PATH.toFile().getAbsolutePath(),
                             Constants.SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH)
-                    .withRecordingMode(RECORD_ALL, record.toFile(), MP4);
+                    .withRecordingMode(RECORD_ALL, record.toFile(), MP4)
+                    .withStartupTimeout(Duration.ofSeconds(120));
         }
     }
 
