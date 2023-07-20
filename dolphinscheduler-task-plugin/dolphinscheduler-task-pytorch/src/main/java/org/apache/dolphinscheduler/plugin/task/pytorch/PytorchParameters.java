@@ -35,7 +35,7 @@ public class PytorchParameters extends AbstractParameters {
     private String pythonPath = ".";
     private String script;
     private String scriptParams;
-    private String pythonCommand = "${PYTHON_HOME}";
+    private String pythonLauncher = "${PYTHON_LAUNCHER}";
     private String pythonEnvTool = PythonEnvManager.ENV_TOOL_VENV;
     private String requirements = "requirements.txt";
     private String condaPythonVersion = "3.9";
@@ -58,12 +58,12 @@ public class PytorchParameters extends AbstractParameters {
         return getPossiblePath(requirements);
     }
 
-    public String getPythonCommand() {
+    public String getPythonLauncher() {
         String command;
-        if (pythonCommand.isEmpty()) {
-            command = "${PYTHON_HOME}";
+        if (pythonLauncher.isEmpty()) {
+            command = "${PYTHON_LAUNCHER}";
         } else {
-            command = pythonCommand;
+            command = pythonLauncher;
         }
         return command;
     }

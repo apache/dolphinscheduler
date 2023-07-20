@@ -682,6 +682,28 @@ CREATE TABLE t_ds_project_parameter
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for t_ds_project_preference
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_project_preference CASCADE;
+CREATE TABLE t_ds_project_preference
+(
+    id              int(11) NOT NULL AUTO_INCREMENT,
+    code            bigint(20) NOT NULL,
+    project_code    bigint(20) NOT NULL,
+    preferences     varchar(512) NOT NULL,
+    user_id         int(11) DEFAULT NULL,
+    create_time     datetime NOT NULL,
+    update_time     datetime     DEFAULT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY unique_project_preference_project_code (project_code),
+    UNIQUE KEY unique_project_preference_code (code)
+);
+
+-- ----------------------------
+-- Records of t_ds_project_preference
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for t_ds_queue
 -- ----------------------------
 DROP TABLE IF EXISTS t_ds_queue CASCADE;
@@ -1029,7 +1051,7 @@ CREATE TABLE t_ds_version
 -- Records of t_ds_version
 -- ----------------------------
 INSERT INTO t_ds_version
-VALUES ('1', '1.4.0');
+VALUES ('1', 'dev');
 
 
 -- ----------------------------

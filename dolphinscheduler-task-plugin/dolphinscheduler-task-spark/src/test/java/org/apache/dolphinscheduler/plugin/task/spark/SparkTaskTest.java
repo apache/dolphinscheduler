@@ -54,7 +54,7 @@ public class SparkTaskTest {
                         "--conf spark.executor.memory=1G " +
                         "--name sparksql " +
                         "-f /tmp/5536_node.sql",
-                sparkTask.buildCommand());
+                sparkTask.getScript());
     }
 
     @Test
@@ -79,7 +79,7 @@ public class SparkTaskTest {
                         "--conf spark.executor.memory=1G " +
                         "--name spark " +
                         "/lib/dolphinscheduler-task-spark.jar",
-                sparkTask.buildCommand());
+                sparkTask.getScript());
     }
 
     private String buildSparkParametersWithSparkSql() {
