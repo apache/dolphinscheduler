@@ -125,6 +125,24 @@ public class QueueControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    public void testDeleteQueueById() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("id", "2");
+
+        MvcResult mvcResult = mockMvc.perform(delete("/queues/{id}", 2)
+                        .header(SESSION_ID, sessionId)
+                        .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        logger.info("delete queue return result:{}", mvcResult.getResponse().getContentAsString());
+    }
+
+    @Test
     public void testVerifyQueue() throws Exception {
 
         // queue value exist
@@ -177,23 +195,5 @@ public class QueueControllerTest extends AbstractControllerTest {
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
         logger.info("verify queue return result:{}", mvcResult.getResponse().getContentAsString());
-    }
-
-    @Test
-    public void testDeleteQueueById() throws Exception {
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("id", "2");
-
-        MvcResult mvcResult = mockMvc.perform(delete("/queues/{id}", 2)
-                .header(SESSION_ID, sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
-        logger.info("delete queue return result:{}", mvcResult.getResponse().getContentAsString());
     }
 }
