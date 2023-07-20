@@ -17,7 +17,15 @@
 
 package org.apache.dolphinscheduler.plugin.task.zeppelin;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
+
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
@@ -27,10 +35,14 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
+
 import org.apache.zeppelin.client.NoteResult;
 import org.apache.zeppelin.client.ParagraphResult;
 import org.apache.zeppelin.client.Status;
 import org.apache.zeppelin.client.ZeppelinClient;
+
+import java.util.Map;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,14 +52,7 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Map;
-
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.doReturn;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ExtendWith(MockitoExtension.class)
 public class ZeppelinTaskTest {
@@ -88,7 +93,8 @@ public class ZeppelinTaskTest {
         when(taskExecutionContext.getTaskParams()).thenReturn(zeppelinTaskParameters);
         when(taskExecutionContext.getResourceParametersHelper()).thenReturn(resourceParametersHelper);
         dataSourceUtilsStaticMock = Mockito.mockStatic(DataSourceUtils.class);
-        dataSourceUtilsStaticMock.when(() -> DataSourceUtils.buildConnectionParams(Mockito.any(), Mockito.any())).thenReturn(zeppelinConnectionParam);
+        dataSourceUtilsStaticMock.when(() -> DataSourceUtils.buildConnectionParams(Mockito.any(), Mockito.any()))
+                .thenReturn(zeppelinConnectionParam);
         this.zeppelinTask = spy(new ZeppelinTask(taskExecutionContext));
 
         this.zClient = mock(ZeppelinClient.class);
@@ -179,7 +185,6 @@ public class ZeppelinTaskTest {
         this.noteResult = mock(NoteResult.class);
         doReturn(this.zClient).when(this.zeppelinTask).getZeppelinClient();
         when(this.zClient.executeNote(any(), any(Map.class))).thenReturn(this.noteResult);
-
 
         this.zeppelinTask.init();
         this.zeppelinTask.handle(taskCallBack);
