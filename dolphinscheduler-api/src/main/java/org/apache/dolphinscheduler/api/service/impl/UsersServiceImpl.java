@@ -1336,7 +1336,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "two passwords are not same");
             return result;
         }
-        User user = createUser(userName, userPassword, email, 1, "", "", Flag.NO.ordinal());
+        User user = createUser(userName, userPassword, email, -1, "", "", Flag.NO.ordinal());
         putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, user);
         return result;

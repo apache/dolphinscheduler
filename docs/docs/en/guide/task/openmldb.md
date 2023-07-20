@@ -54,6 +54,6 @@ to a quick start.
 
 The OpenMLDB task will use OpenMLDB Python SDK to connect OpenMLDB cluster. So you should have the Python env.
 
-We will use `python3` by default. You can set `PYTHON_HOME` to use your custom python env.
+We will use `python3` by default. You can set `PYTHON_LAUNCHER` to use your custom python env.
 
 Make sure you have installed OpenMLDB Python SDK in the host where the worker server running, using `pip install openmldb`.
