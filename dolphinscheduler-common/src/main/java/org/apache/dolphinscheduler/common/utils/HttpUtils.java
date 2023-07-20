@@ -83,7 +83,7 @@ public class HttpUtils {
 
     private static Registry<ConnectionSocketFactory> socketFactoryRegistry;
 
-    private static X509TrustManager xtm = new X509TrustManager() {
+    public static X509TrustManager xtm = new X509TrustManager() {
 
         @Override
         public void checkClientTrusted(X509Certificate[] chain, String authType) {

@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.http;
 import static org.apache.dolphinscheduler.plugin.task.http.HttpTaskConstants.APPLICATION_JSON;
 
 import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.HttpUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
@@ -299,21 +300,7 @@ public class HttpTask extends AbstractTask {
         HttpClientBuilder httpClientBuilder;
         httpClientBuilder = HttpClients.custom().setDefaultRequestConfig(requestConfig);
         if (httpParameters.getEnableSSL()) {
-            TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
-
-                @Override
-                public X509Certificate[] getAcceptedIssuers() {
-                    return null;
-                }
-
-                @Override
-                public void checkClientTrusted(X509Certificate[] certs, String authType) {
-                }
-
-                @Override
-                public void checkServerTrusted(X509Certificate[] certs, String authType) {
-                }
-            }};
+            TrustManager[] trustAllCerts = new TrustManager[]{HttpUtils.xtm};
             SSLContext sslContext = SSLContext.getInstance("TLS");
             sslContext.init(null, trustAllCerts, new SecureRandom());
             httpClientBuilder.setSSLContext(sslContext);
