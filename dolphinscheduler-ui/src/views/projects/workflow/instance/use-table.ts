@@ -43,7 +43,6 @@ import type { Router } from 'vue-router'
 import type { IWorkflowInstance } from '@/service/modules/process-instances/types'
 import type { ICountDownParam } from './types'
 import type { ExecuteReq } from '@/service/modules/executors/types'
-import { renderEnvironmentalDistinctionCell } from '@/utils/environmental-distinction'
 import { IWorkflowExecutionState } from '@/common/types'
 
 export function useTable() {
@@ -125,14 +124,6 @@ export function useTable() {
         className: 'workflow-status',
         render: (_row: IWorkflowInstance) =>
           renderWorkflowStateCell(_row.state, t)
-      },
-      {
-        title: t('project.workflow.operating_environment'),
-        key: 'testFlag',
-        width: 160,
-        className: 'workflow-testFlag',
-        render: (_row: IWorkflowInstance) =>
-          renderEnvironmentalDistinctionCell(_row.testFlag, t)
       },
       {
         title: t('project.workflow.run_type'),

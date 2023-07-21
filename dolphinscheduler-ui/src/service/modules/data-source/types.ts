@@ -24,6 +24,7 @@ type IDataBase =
   | 'ORACLE'
   | 'SQLSERVER'
   | 'DB2'
+  | 'VERTICA'
   | 'PRESTO'
   | 'REDSHIFT'
   | 'ATHENA'
@@ -35,6 +36,8 @@ type IDataBase =
   | 'SSH'
   | 'DATABEND'
   | 'SNOWFLAKE'
+  | 'HANA'
+  | 'DORIS'
 
 type IDataBaseLabel =
   | 'MYSQL'
@@ -74,8 +77,6 @@ interface IDataSource {
   database?: string
   connectType?: string
   other?: object
-  testFlag?: number
-  bindTestId?: number
   endpoint?: string
   MSIClientId?: string
   dbUser?: string

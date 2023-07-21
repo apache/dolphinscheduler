@@ -23,12 +23,12 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * mapreduce task
@@ -71,18 +71,16 @@ public class MapReduceTask extends AbstractYarnTask {
             throw new RuntimeException("mapreduce task params is not valid");
         }
 
-        mapreduceParameters.setQueue(taskExecutionContext.getQueue());
-
         // replace placeholder,and combine local and global parameters
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
 
         String args = ParameterUtils.convertParameterPlaceholders(mapreduceParameters.getMainArgs(),
-                ParamUtils.convert(paramsMap));
+                ParameterUtils.convert(paramsMap));
         mapreduceParameters.setMainArgs(args);
         if (mapreduceParameters.getProgramType() != null
                 && mapreduceParameters.getProgramType() == ProgramType.PYTHON) {
             String others = ParameterUtils.convertParameterPlaceholders(mapreduceParameters.getOthers(),
-                    ParamUtils.convert(paramsMap));
+                    ParameterUtils.convert(paramsMap));
             mapreduceParameters.setOthers(others);
         }
         log.info("Initialize mapreduce task params {}", JSONUtils.toPrettyJsonString(mapreduceParameters));
@@ -93,19 +91,19 @@ public class MapReduceTask extends AbstractYarnTask {
      * @return command
      */
     @Override
-    protected String buildCommand() {
+    protected String getScript() {
         // hadoop jar <jar> [mainClass] [GENERIC_OPTIONS] args...
         List<String> args = new ArrayList<>();
         args.add(MAPREDUCE_COMMAND);
 
         // other parameters
         args.addAll(MapReduceArgsUtils.buildArgs(mapreduceParameters, taskExecutionContext));
+        return args.stream().collect(Collectors.joining(" "));
+    }
 
-        String command = ParameterUtils.convertParameterPlaceholders(String.join(" ", args),
-                taskExecutionContext.getDefinedParams());
-        log.info("mapreduce task command: {}", command);
-
-        return command;
+    @Override
+    protected Map<String, String> getProperties() {
+        return taskExecutionContext.getDefinedParams();
     }
 
     @Override

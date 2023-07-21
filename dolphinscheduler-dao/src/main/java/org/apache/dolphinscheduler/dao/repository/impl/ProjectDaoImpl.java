@@ -19,22 +19,25 @@ package org.apache.dolphinscheduler.dao.repository.impl;
 
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.repository.BaseDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 
 import java.util.Collection;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.NonNull;
+
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ProjectDaoImpl implements ProjectDao {
+public class ProjectDaoImpl extends BaseDao<Project, ProjectMapper> implements ProjectDao {
 
-    @Autowired
-    private ProjectMapper projectMapper;
+    public ProjectDaoImpl(@NonNull ProjectMapper projectMapper) {
+        super(projectMapper);
+    }
 
     @Override
     public List<Project> queryByCodes(Collection<Long> projectCodes) {
-        return projectMapper.queryByCodes(projectCodes);
+        return mybatisMapper.queryByCodes(projectCodes);
     }
 }
