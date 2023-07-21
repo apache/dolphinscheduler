@@ -66,24 +66,12 @@ public class KyuubiDataSourceClient extends CommonDataSourceClient {
 
     @Override
     public Connection getConnection() {
-        int attempts = 0;
         Connection connection = null;
-        while (connection == null && attempts < maxRetryAttempts) {
             try {
                 connection = driverManagerDataSource.getConnection();
-                break;
             } catch (SQLException e) {
-                attempts++;
-                if (attempts < maxRetryAttempts) {
-                    try {
-                        Thread.sleep(retryIntervalMs);
-                    } catch (InterruptedException interruptedException) {
-                        Thread.currentThread().interrupt();
-                    }
-                }
                 log.error("Failed to get Kyuubi Connection.", e);
             }
-        }
         return connection;
     }
 
