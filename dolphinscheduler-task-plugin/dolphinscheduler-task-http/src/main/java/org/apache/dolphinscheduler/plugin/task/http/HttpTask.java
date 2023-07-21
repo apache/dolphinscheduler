@@ -289,7 +289,7 @@ public class HttpTask extends AbstractTask {
      *
      * @return CloseableHttpClient
      */
-    protected CloseableHttpClient createHttpClient() throws Exception {
+    protected CloseableHttpClient createHttpClient() {
         final RequestConfig requestConfig = requestConfig();
         HttpClientBuilder httpClientBuilder;
         httpClientBuilder = HttpClients.custom().setDefaultRequestConfig(requestConfig);
