@@ -44,7 +44,11 @@ public class K8sClientService {
 
     public ResourceQuota upsertNamespaceAndResourceToK8s(K8sNamespace k8sNamespace,
                                                          String yamlStr) throws RemotingException {
-        upsertNamespaceToK8s(k8sNamespace.getNamespace(), k8sNamespace.getClusterCode());
+        if (!checkNamespaceToK8s(k8sNamespace.getNamespace(), k8sNamespace.getClusterCode())) {
+            throw new RemotingException(String.format(
+                    "namespace %s does not exist in k8s cluster, please create namespace in k8s cluster first",
+                    k8sNamespace.getNamespace()));
+        }
         return upsertNamespacedResourceToK8s(k8sNamespace, yamlStr);
     }
 
@@ -101,19 +105,9 @@ public class K8sClientService {
         return list;
     }
 
-    private Namespace upsertNamespaceToK8s(String name, Long clusterCode) throws RemotingException {
+    private boolean checkNamespaceToK8s(String name, Long clusterCode) throws RemotingException {
         Optional<Namespace> result = getNamespaceFromK8s(name, clusterCode);
-        // if not exist create
-        if (!result.isPresent()) {
-            KubernetesClient client = k8sManager.getK8sClient(clusterCode);
-            Namespace body = new Namespace();
-            ObjectMeta meta = new ObjectMeta();
-            meta.setNamespace(name);
-            meta.setName(name);
-            body.setMetadata(meta);
-            return client.namespaces().create(body);
-        }
-        return result.get();
+        return result.isPresent();
     }
 
 }
