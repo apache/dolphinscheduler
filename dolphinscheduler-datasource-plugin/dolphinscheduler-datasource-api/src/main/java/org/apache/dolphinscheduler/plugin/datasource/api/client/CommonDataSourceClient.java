@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.client;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.provider.JDBCDataSourceProvider;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
 import org.apache.dolphinscheduler.spi.enums.DbType;
@@ -25,15 +24,13 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.jdbc.core.JdbcTemplate;
-
 import com.google.common.base.Stopwatch;
-import com.zaxxer.hikari.HikariDataSource;
 
 @Slf4j
 public class CommonDataSourceClient implements DataSourceClient {
@@ -42,8 +39,7 @@ public class CommonDataSourceClient implements DataSourceClient {
     public static final String COMMON_VALIDATION_QUERY = "select 1";
 
     protected final BaseConnectionParam baseConnectionParam;
-    protected HikariDataSource dataSource;
-    protected JdbcTemplate jdbcTemplate;
+    protected Connection connection;
 
     public CommonDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
         this.baseConnectionParam = baseConnectionParam;
@@ -63,14 +59,27 @@ public class CommonDataSourceClient implements DataSourceClient {
     }
 
     protected void initClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        this.dataSource = JDBCDataSourceProvider.createJdbcDataSource(baseConnectionParam, dbType);
-        this.jdbcTemplate = new JdbcTemplate(dataSource);
+        this.connection = buildConn(baseConnectionParam);
     }
 
     protected void checkUser(BaseConnectionParam baseConnectionParam) {
         if (StringUtils.isBlank(baseConnectionParam.getUser())) {
             setDefaultUsername(baseConnectionParam);
         }
+    }
+
+    private Connection buildConn(BaseConnectionParam baseConnectionParam) {
+        Connection conn = null;
+        try {
+            Class.forName(baseConnectionParam.getDriverClassName());
+            conn = DriverManager.getConnection(baseConnectionParam.getJdbcUrl(), baseConnectionParam.getUser(),
+                    baseConnectionParam.getPassword());
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Driver load fail", e);
+        } catch (SQLException e) {
+            throw new RuntimeException("JDBC connect failed", e);
+        }
+        return conn;
     }
 
     protected void setDefaultUsername(BaseConnectionParam baseConnectionParam) {
@@ -92,7 +101,7 @@ public class CommonDataSourceClient implements DataSourceClient {
         // Checking data source client
         Stopwatch stopwatch = Stopwatch.createStarted();
         try {
-            this.jdbcTemplate.execute(this.baseConnectionParam.getValidationQuery());
+            this.connection.prepareStatement(this.baseConnectionParam.getValidationQuery()).executeQuery();
         } catch (Exception e) {
             throw new RuntimeException("JDBC connect failed", e);
         } finally {
@@ -104,20 +113,21 @@ public class CommonDataSourceClient implements DataSourceClient {
     @Override
     public Connection getConnection() {
         try {
-            return this.dataSource.getConnection();
+            return connection.isClosed() ? buildConn(baseConnectionParam) : connection;
         } catch (SQLException e) {
-            log.error("get druidDataSource Connection fail SQLException: {}", e.getMessage(), e);
-            return null;
+            throw new RuntimeException("get conn is fail", e);
         }
     }
 
     @Override
     public void close() {
-        log.info("do close dataSource {}.", baseConnectionParam.getDatabase());
-        try (HikariDataSource closedDatasource = dataSource) {
-            // only close the resource
+        log.info("do close connection {}.", baseConnectionParam.getDatabase());
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            log.info("colse connection fail");
+            throw new RuntimeException(e);
         }
-        this.jdbcTemplate = null;
     }
 
 }

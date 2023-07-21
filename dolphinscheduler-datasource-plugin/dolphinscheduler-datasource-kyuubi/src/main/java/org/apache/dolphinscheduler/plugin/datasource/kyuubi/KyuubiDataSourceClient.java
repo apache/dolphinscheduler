@@ -18,16 +18,10 @@
 package org.apache.dolphinscheduler.plugin.datasource.kyuubi;
 
 import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
-import org.apache.dolphinscheduler.plugin.datasource.api.provider.JDBCDataSourceProvider;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.jdbc.core.JdbcTemplate;
 
 @Slf4j
 public class KyuubiDataSourceClient extends CommonDataSourceClient {
@@ -42,29 +36,8 @@ public class KyuubiDataSourceClient extends CommonDataSourceClient {
     }
 
     @Override
-    protected void initClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-
-        this.dataSource = JDBCDataSourceProvider.createOneSessionJdbcDataSource(baseConnectionParam, dbType);
-        this.jdbcTemplate = new JdbcTemplate(dataSource);
-        log.info("Init {} success.", getClass().getName());
-    }
-
-    @Override
     protected void checkEnv(BaseConnectionParam baseConnectionParam) {
         super.checkEnv(baseConnectionParam);
-    }
-
-    @Override
-    public Connection getConnection() {
-        Connection connection = null;
-        while (connection == null) {
-            try {
-                connection = dataSource.getConnection();
-            } catch (SQLException e) {
-                log.error("Failed to get Kyuubi Connection.", e);
-            }
-        }
-        return connection;
     }
 
     @Override
