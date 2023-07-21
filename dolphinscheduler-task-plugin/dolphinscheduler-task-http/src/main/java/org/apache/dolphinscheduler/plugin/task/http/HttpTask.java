@@ -297,7 +297,7 @@ public class HttpTask extends AbstractTask {
         final RequestConfig requestConfig = requestConfig();
         HttpClientBuilder httpClientBuilder;
         httpClientBuilder = HttpClients.custom().setDefaultRequestConfig(requestConfig);
-        if (httpParameters.getEnableSSL()) {
+        if (httpParameters.getUrl().startsWith("https://")) {
             TrustManager[] trustAllCerts = new TrustManager[]{HttpUtils.xtm};
             SSLContext sslContext = SSLContext.getInstance("TLS");
             sslContext.init(null, trustAllCerts, new SecureRandom());

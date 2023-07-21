@@ -70,8 +70,6 @@ public class HttpParameters extends AbstractParameters {
      */
     private int socketTimeout;
 
-    private Boolean enableSSL = false;
-
     @Override
     public boolean checkParameters() {
         return StringUtils.isNotEmpty(url);
