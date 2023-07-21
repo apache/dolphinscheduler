@@ -77,7 +77,8 @@ public class KyuubiDataSourceClient extends CommonDataSourceClient {
                 if (attempts < maxRetryAttempts) {
                     try {
                         Thread.sleep(retryIntervalMs);
-                    } catch (InterruptedException ignored) {
+                    } catch (InterruptedException interruptedException) {
+                        Thread.currentThread().interrupt();
                     }
                 }
                 log.error("Failed to get Kyuubi Connection.", e);
