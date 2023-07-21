@@ -630,6 +630,11 @@
                             <searchRegex>import\s+org\.junit\.[^jupiter][^\*\s]*(|\*);(\r\n|\r|\n)</searchRegex>
                             <replacement>$1</replacement>
                         </replaceRegex>
+                        <replaceRegex>
+                            <name>Block kubernetes-client</name>
+                            <searchRegex>import\s+io\.kubernetes\.client\.[^\*\s]*(|\*);(\r\n|\r|\n)</searchRegex>
+                            <replacement>$1</replacement>
+                        </replaceRegex>
                     </java>
                     <pom>
                         <sortPom>
