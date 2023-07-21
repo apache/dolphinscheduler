@@ -35,8 +35,7 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 public class KyuubiDataSourceClient extends CommonDataSourceClient {
 
     private DriverManagerDataSource driverManagerDataSource;
-    private final int maxRetryAttempts = 5;
-    private final int retryIntervalMs = 5000;
+    private Connection connection = null;
 
     public KyuubiDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
         super(baseConnectionParam, dbType);
@@ -66,7 +65,6 @@ public class KyuubiDataSourceClient extends CommonDataSourceClient {
 
     @Override
     public Connection getConnection() {
-        Connection connection = null;
             try {
                 connection = driverManagerDataSource.getConnection();
             } catch (SQLException e) {
@@ -78,7 +76,7 @@ public class KyuubiDataSourceClient extends CommonDataSourceClient {
     @Override
     public void close() {
         try {
-            driverManagerDataSource.getConnection().close();
+            connection.close();
         } catch (SQLException e) {
             log.error("failed to close the kyuubi connection: {}", e.getMessage(), e);
         }
