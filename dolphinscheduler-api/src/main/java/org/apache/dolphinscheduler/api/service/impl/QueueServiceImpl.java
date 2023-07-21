@@ -252,7 +252,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
         Queue queue = queueMapper.selectById(id);
         if (Objects.isNull(queue)) {
             log.error("Queue does not exist");
-            throw new ServiceException(Status.QUEUE_NOT_EXIST, queue.getQueue());
+            throw new ServiceException(Status.QUEUE_NOT_EXIST);
         }
 
         List<Tenant> tenantList = tenantMapper.queryTenantListByQueueId(queue.getId());

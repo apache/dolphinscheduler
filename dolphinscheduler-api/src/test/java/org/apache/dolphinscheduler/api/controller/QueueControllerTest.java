@@ -46,10 +46,7 @@ public class QueueControllerTest extends AbstractControllerTest {
 
     private static final String QUEUE_CREATE_NAME = "queue_create";
     private static final String QUEUE_MODIFY_NAME = "queue_modify";
-
-    private static final String QUEUE_VERIFY_MODIFY_NAME = "queue_verify_modify";
     private static final String QUEUE_NAME_CREATE_NAME = "queue_name_create";
-    private static final String QUEUE_VERIFY_CREATE_NAME = "queue_verify_name_create";
     private static final String QUEUE_NAME_MODIFY_NAME = "queue_name_modify";
     private static final String NOT_EXISTS_NAME = "not_exists";
 
@@ -128,29 +125,11 @@ public class QueueControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testDeleteQueueById() throws Exception {
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("id", "2");
-
-        MvcResult mvcResult = mockMvc.perform(delete("/queues/{id}", 2)
-                .header(SESSION_ID, sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
-        logger.info("delete queue return result:{}", mvcResult.getResponse().getContentAsString());
-    }
-
-    @Test
     public void testVerifyQueue() throws Exception {
 
         // queue value exist
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("queue", QUEUE_VERIFY_MODIFY_NAME);
+        paramsMap.add("queue", QUEUE_MODIFY_NAME);
         paramsMap.add("queueName", NOT_EXISTS_NAME);
 
         MvcResult mvcResult = mockMvc.perform(post("/queues/verify")
@@ -168,7 +147,7 @@ public class QueueControllerTest extends AbstractControllerTest {
         // queue name exist
         paramsMap.clear();
         paramsMap.add("queue", NOT_EXISTS_NAME);
-        paramsMap.add("queueName", QUEUE_VERIFY_CREATE_NAME);
+        paramsMap.add("queueName", QUEUE_NAME_CREATE_NAME);
 
         mvcResult = mockMvc.perform(post("/queues/verify")
                 .header(SESSION_ID, sessionId)
@@ -198,5 +177,22 @@ public class QueueControllerTest extends AbstractControllerTest {
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
         logger.info("verify queue return result:{}", mvcResult.getResponse().getContentAsString());
+    }
+    @Test
+    public void testDeleteQueueById() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("id", "64");
+
+        MvcResult mvcResult = mockMvc.perform(delete("/queues/{id}", 64)
+                        .header(SESSION_ID, sessionId)
+                        .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(Status.QUEUE_NOT_EXIST.getCode(), result.getCode().intValue());
+        logger.info("delete queue return result:{}", mvcResult.getResponse().getContentAsString());
     }
 }
