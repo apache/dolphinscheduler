@@ -347,7 +347,8 @@ public class TaskInstance implements Serializable {
 
         return this.getState().isSuccess()
                 || this.getState().isKill()
-                || (this.getState().isFailure() && !taskCanRetry());
+                || (this.getState().isFailure() && !taskCanRetry())
+                || this.getState().isForceSuccess();
     }
 
     public boolean isSubProcess() {
