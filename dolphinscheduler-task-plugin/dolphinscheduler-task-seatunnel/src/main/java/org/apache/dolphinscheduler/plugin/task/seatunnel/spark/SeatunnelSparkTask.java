@@ -61,8 +61,8 @@ public class SeatunnelSparkTask extends SeatunnelTask {
         if (MasterTypeEnum.SPARK.equals(master) || MasterTypeEnum.MESOS.equals(master)) {
             args.add(master.getCommand() + seatunnelParameters.getMasterUrl());
         } else {
-	    args.add(master.getCommand());
-	}
+            args.add(master.getCommand());
+        }
 
         return args;
     }
