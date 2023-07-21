@@ -129,6 +129,7 @@ export DOLPHINSCHEDULER_OPTS="
 ```
 
 > "-XX:DisableExplicitGC" is not recommended due to may lead to memory link (DolphinScheduler dependent on Netty to communicate).
+> If add "-Djava.net.preferIPv6Addresses=true" will use ipv6 address, if add "-Djava.net.preferIPv4Addresses=true" will use ipv4 address, if doesn't set the two parameter will use ipv4 or ipv6.
 
 ### Database connection related configuration
 

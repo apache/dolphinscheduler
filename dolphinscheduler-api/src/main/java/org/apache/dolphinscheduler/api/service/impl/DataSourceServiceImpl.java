@@ -53,10 +53,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -228,20 +226,16 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * @return data source detail
      */
     @Override
-    public Map<String, Object> queryDataSource(int id, User loginUser) {
-
-        Map<String, Object> result = new HashMap<>();
+    public BaseDataSourceParamDTO queryDataSource(int id, User loginUser) {
         DataSource dataSource = dataSourceMapper.selectById(id);
         if (dataSource == null) {
             log.error("Datasource does not exist, id:{}.", id);
-            putMsg(result, Status.RESOURCE_NOT_EXIST);
-            return result;
+            throw new ServiceException(Status.RESOURCE_NOT_EXIST);
         }
 
         if (!canOperatorPermissions(loginUser, new Object[]{dataSource.getId()}, AuthorizationType.DATASOURCE,
                 ApiFuncIdentificationConstant.DATASOURCE)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
 
         // type
@@ -251,9 +245,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         baseDataSourceParamDTO.setName(dataSource.getName());
         baseDataSourceParamDTO.setNote(dataSource.getNote());
 
-        result.put(Constants.DATA_LIST, baseDataSourceParamDTO);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return baseDataSourceParamDTO;
     }
 
     /**
@@ -266,8 +258,8 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * @return data source list page
      */
     @Override
-    public Result queryDataSourceListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
-        Result result = new Result();
+    public PageInfo<DataSource> queryDataSourceListPaging(User loginUser, String searchVal, Integer pageNo,
+                                                          Integer pageSize) {
         IPage<DataSource> dataSourceList = null;
         Page<DataSource> dataSourcePage = new Page<>(pageNo, pageSize);
         PageInfo<DataSource> pageInfo = new PageInfo<>(pageNo, pageSize);
@@ -277,9 +269,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             Set<Integer> ids = resourcePermissionCheckService
                     .userOwnedResourceIdsAcquisition(AuthorizationType.DATASOURCE, loginUser.getId(), log);
             if (ids.isEmpty()) {
-                result.setData(pageInfo);
-                putMsg(result, Status.SUCCESS);
-                return result;
+                return pageInfo;
             }
             dataSourceList = dataSourceMapper.selectPagingByIds(dataSourcePage, new ArrayList<>(ids), searchVal);
         }
@@ -288,9 +278,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         handlePasswd(dataSources);
         pageInfo.setTotal((int) (dataSourceList != null ? dataSourceList.getTotal() : 0L));
         pageInfo.setTotalList(dataSources);
-        result.setData(pageInfo);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return pageInfo;
     }
 
     /**
@@ -322,8 +310,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * @return data source list page
      */
     @Override
-    public Map<String, Object> queryDataSourceList(User loginUser, Integer type) {
-        Map<String, Object> result = new HashMap<>();
+    public List<DataSource> queryDataSourceList(User loginUser, Integer type) {
 
         List<DataSource> datasourceList = null;
         if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
@@ -332,16 +319,13 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             Set<Integer> ids = resourcePermissionCheckService
                     .userOwnedResourceIdsAcquisition(AuthorizationType.DATASOURCE, loginUser.getId(), log);
             if (ids.isEmpty()) {
-                result.put(Constants.DATA_LIST, Collections.emptyList());
-                putMsg(result, Status.SUCCESS);
-                return result;
+                return Collections.emptyList();
             }
             datasourceList = dataSourceMapper.selectBatchIds(ids).stream()
                     .filter(dataSource -> dataSource.getType().getCode() == type).collect(Collectors.toList());
         }
-        result.put(Constants.DATA_LIST, datasourceList);
-        putMsg(result, Status.SUCCESS);
-        return result;
+
+        return datasourceList;
     }
 
     /**
@@ -478,8 +462,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * @return unauthed data source result code
      */
     @Override
-    public Map<String, Object> unauthDatasource(User loginUser, Integer userId) {
-        Map<String, Object> result = new HashMap<>();
+    public List<DataSource> unAuthDatasource(User loginUser, Integer userId) {
         List<DataSource> datasourceList;
         if (canOperatorPermissions(loginUser, null, AuthorizationType.DATASOURCE, null)) {
             // admin gets all data sources except userId
@@ -502,9 +485,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             }
             resultList = new ArrayList<>(datasourceSet);
         }
-        result.put(Constants.DATA_LIST, resultList);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return resultList;
     }
 
     /**
@@ -515,19 +496,13 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * @return authorized result code
      */
     @Override
-    public Map<String, Object> authedDatasource(User loginUser, Integer userId) {
-        Map<String, Object> result = new HashMap<>();
-
+    public List<DataSource> authedDatasource(User loginUser, Integer userId) {
         List<DataSource> authedDatasourceList = dataSourceMapper.queryAuthedDatasource(userId);
-        result.put(Constants.DATA_LIST, authedDatasourceList);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return authedDatasourceList;
     }
 
     @Override
-    public Map<String, Object> getTables(Integer datasourceId, String database) {
-        Map<String, Object> result = new HashMap<>();
-
+    public List<ParamsOptions> getTables(Integer datasourceId, String database) {
         DataSource dataSource = dataSourceMapper.selectById(datasourceId);
 
         List<String> tableList = null;
@@ -537,8 +512,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
                         dataSource.getConnectionParams());
 
         if (null == connectionParam) {
-            putMsg(result, Status.DATASOURCE_CONNECT_FAILED);
-            return result;
+            throw new ServiceException(Status.DATASOURCE_CONNECT_FAILED);
         }
 
         Connection connection =
@@ -548,8 +522,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         try {
 
             if (null == connection) {
-                putMsg(result, Status.DATASOURCE_CONNECT_FAILED);
-                return result;
+                throw new ServiceException(Status.DATASOURCE_CONNECT_FAILED);
             }
 
             DatabaseMetaData metaData = connection.getMetaData();
@@ -558,6 +531,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
                 schema = metaData.getConnection().getSchema();
             } catch (SQLException e) {
                 log.error("Cant not get the schema, datasourceId:{}.", datasourceId, e);
+                throw new ServiceException(Status.GET_DATASOURCE_TABLES_ERROR);
             }
 
             tables = metaData.getTables(
@@ -566,8 +540,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
                     "%", TABLE_TYPES);
             if (null == tables) {
                 log.error("Get datasource tables error, datasourceId:{}.", datasourceId);
-                putMsg(result, Status.GET_DATASOURCE_TABLES_ERROR);
-                return result;
+                throw new ServiceException(Status.GET_DATASOURCE_TABLES_ERROR);
             }
 
             tableList = new ArrayList<>();
@@ -578,24 +551,18 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
 
         } catch (Exception e) {
             log.error("Get datasource tables error, datasourceId:{}.", datasourceId, e);
-            putMsg(result, Status.GET_DATASOURCE_TABLES_ERROR);
-            return result;
+            throw new ServiceException(Status.GET_DATASOURCE_TABLES_ERROR);
         } finally {
             closeResult(tables);
             releaseConnection(connection);
         }
 
         List<ParamsOptions> options = getParamsOptions(tableList);
-
-        result.put(Constants.DATA_LIST, options);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return options;
     }
 
     @Override
-    public Map<String, Object> getTableColumns(Integer datasourceId, String database, String tableName) {
-        Map<String, Object> result = new HashMap<>();
-
+    public List<ParamsOptions> getTableColumns(Integer datasourceId, String database, String tableName) {
         DataSource dataSource = dataSourceMapper.selectById(datasourceId);
         BaseConnectionParam connectionParam =
                 (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
@@ -603,8 +570,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
                         dataSource.getConnectionParams());
 
         if (null == connectionParam) {
-            putMsg(result, Status.DATASOURCE_CONNECT_FAILED);
-            return result;
+            throw new ServiceException(Status.DATASOURCE_CONNECT_FAILED);
         }
 
         Connection connection =
@@ -614,7 +580,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
 
         try {
             if (null == connection) {
-                return result;
+                throw new ServiceException(Status.DATASOURCE_CONNECT_FAILED);
             }
 
             DatabaseMetaData metaData = connection.getMetaData();
@@ -624,34 +590,30 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             }
             rs = metaData.getColumns(database, null, tableName, "%");
             if (rs == null) {
-                return result;
+                throw new ServiceException(Status.DATASOURCE_CONNECT_FAILED);
             }
             while (rs.next()) {
                 columnList.add(rs.getString(COLUMN_NAME));
             }
         } catch (Exception e) {
             log.error("Get datasource table columns error, datasourceId:{}.", dataSource.getId(), e);
+            throw new ServiceException(Status.DATASOURCE_CONNECT_FAILED);
         } finally {
             closeResult(rs);
             releaseConnection(connection);
         }
 
         List<ParamsOptions> options = getParamsOptions(columnList);
-
-        result.put(Constants.DATA_LIST, options);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return options;
     }
 
     @Override
-    public Map<String, Object> getDatabases(Integer datasourceId) {
-        Map<String, Object> result = new HashMap<>();
+    public List<ParamsOptions> getDatabases(Integer datasourceId) {
 
         DataSource dataSource = dataSourceMapper.selectById(datasourceId);
 
         if (dataSource == null) {
-            putMsg(result, Status.QUERY_DATASOURCE_ERROR);
-            return result;
+            throw new ServiceException(Status.QUERY_DATASOURCE_ERROR);
         }
 
         List<String> tableList;
@@ -661,8 +623,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
                         dataSource.getConnectionParams());
 
         if (null == connectionParam) {
-            putMsg(result, Status.DATASOURCE_CONNECT_FAILED);
-            return result;
+            throw new ServiceException(Status.DATASOURCE_CONNECT_FAILED);
         }
 
         Connection connection =
@@ -671,8 +632,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
 
         try {
             if (null == connection) {
-                putMsg(result, Status.DATASOURCE_CONNECT_FAILED);
-                return result;
+                throw new ServiceException(Status.DATASOURCE_CONNECT_FAILED);
             }
             if (dataSource.getType() == DbType.POSTGRESQL) {
                 rs = connection.createStatement().executeQuery(Constants.DATABASES_QUERY_PG);
@@ -686,18 +646,14 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             }
         } catch (Exception e) {
             log.error("Get databases error, datasourceId:{}.", datasourceId, e);
-            putMsg(result, Status.GET_DATASOURCE_TABLES_ERROR);
-            return result;
+            throw new ServiceException(Status.GET_DATASOURCE_TABLES_ERROR);
         } finally {
             closeResult(rs);
             releaseConnection(connection);
         }
 
         List<ParamsOptions> options = getParamsOptions(tableList);
-
-        result.put(Constants.DATA_LIST, options);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return options;
     }
 
     private List<ParamsOptions> getParamsOptions(List<String> columnList) {
