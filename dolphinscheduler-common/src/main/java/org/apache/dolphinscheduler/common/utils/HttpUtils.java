@@ -75,7 +75,7 @@ public class HttpUtils {
 
     private static PoolingHttpClientConnectionManager cm;
 
-    private static SSLContext ctx = null;
+    public static SSLContext ctx = null;
 
     private static SSLConnectionSocketFactory socketFactory;
 
@@ -83,7 +83,7 @@ public class HttpUtils {
 
     private static Registry<ConnectionSocketFactory> socketFactoryRegistry;
 
-    public final static X509TrustManager xtm = new X509TrustManager() {
+    private static X509TrustManager xtm = new X509TrustManager() {
 
         @Override
         public void checkClientTrusted(X509Certificate[] chain, String authType) {
