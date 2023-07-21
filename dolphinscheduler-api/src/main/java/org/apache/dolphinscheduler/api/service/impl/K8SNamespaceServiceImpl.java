@@ -29,7 +29,6 @@ import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ClusterMapper;
 import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceMapper;
-import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -322,15 +321,7 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
             putMsg(result, Status.K8S_NAMESPACE_NOT_EXIST, id);
             return result;
         }
-        if (!Constants.K8S_LOCAL_TEST_CLUSTER_CODE.equals(k8sNamespaceObj.getClusterCode())) {
-            try {
-                k8sClientService.deleteNamespaceToK8s(k8sNamespaceObj.getNamespace(), k8sNamespaceObj.getClusterCode());
-            } catch (RemotingException e) {
-                log.error("Namespace delete in k8s error, namespaceId:{}.", id, e);
-                putMsg(result, Status.K8S_CLIENT_OPS_ERROR, id);
-                return result;
-            }
-        }
+
         k8sNamespaceMapper.deleteById(id);
         log.info("K8s namespace delete complete, namespace:{}.", k8sNamespaceObj.getNamespace());
         putMsg(result, Status.SUCCESS);
