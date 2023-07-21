@@ -135,7 +135,7 @@ public final class ProcessUtils {
     }
 
     /**
-     * cacel k8s / yarn application
+     * cancel k8s / yarn application
      *
      * @param taskExecutionContext
      * @return
