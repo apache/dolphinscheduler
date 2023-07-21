@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.sqoop;
 public enum SqoopColumnType {
 
     ALL_COLUMNS(0, "GET_ALL_COLUMNS"),
-    SOME_COLUMNS(1, "CUSTOMIZE_COLUMNS");
+    CUSTOMIZE_COLUMNS(1, "CUSTOMIZE_COLUMNS");
 
     private final Integer code;
 
