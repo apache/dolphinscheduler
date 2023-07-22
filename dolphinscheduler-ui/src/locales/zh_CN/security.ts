@@ -265,7 +265,13 @@ export default {
     AtUserIds: "被{'@'}人的用户ID",
     MsgType: '消息类型',
     // eslint-disable-next-line quotes
-    IsAtAll: "{'@'}所有人"
+    IsAtAll: "{'@'}所有人",
+    calledNumber:"被叫电话号码",
+    calledShowNumber:"呼叫显示号码",
+    ttsCode:"语音模板",
+    address:'访问域名',
+    accessKeyId:"AccessKeyId",
+    accessKeySecret:"AccessKeySecret"
   },
   k8s_namespace: {
     create_namespace: '创建命名空间',
