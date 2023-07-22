@@ -47,6 +47,11 @@ public class CommonGenerator {
                     .append(SPACE)
                     .append(sqoopParameters.getModelType());
 
+            // sqoop sqoop.export.records.per.statement
+            commonSb.append(SPACE).append(D).append(SPACE)
+                    .append(String.format("%s%s%s", SqoopConstants.SQOOP_EXPORT_RECORDS_PER_STATEMENT,
+                            EQUAL_SIGN, 1));
+
             // sqoop map-reduce job name
             commonSb.append(SPACE).append(D).append(SPACE)
                     .append(String.format("%s%s%s", SqoopConstants.SQOOP_MR_JOB_NAME,

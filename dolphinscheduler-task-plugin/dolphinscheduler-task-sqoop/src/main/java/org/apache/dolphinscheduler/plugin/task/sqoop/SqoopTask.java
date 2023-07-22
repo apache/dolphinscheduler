@@ -30,19 +30,13 @@ import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SqoopParameters;
 
 import java.util.Map;
 
-/**
- * sqoop task extends the shell task
- */
+/** sqoop task extends the shell task */
 public class SqoopTask extends AbstractYarnTask {
 
-    /**
-     * sqoop task params
-     */
+    /** sqoop task params */
     private SqoopParameters sqoopParameters;
 
-    /**
-     * taskExecutionContext
-     */
+    /** taskExecutionContext */
     private final TaskExecutionContext taskExecutionContext;
 
     private SqoopTaskExecutionContext sqoopTaskExecutionContext;
@@ -66,7 +60,8 @@ public class SqoopTask extends AbstractYarnTask {
         }
 
         sqoopTaskExecutionContext =
-                sqoopParameters.generateExtendedContext(taskExecutionContext.getResourceParametersHelper());
+                sqoopParameters.generateExtendedContext(
+                        taskExecutionContext.getResourceParametersHelper());
 
         SensitiveDataConverter.addMaskPattern(SqoopConstants.SQOOP_PASSWORD_REGEX);
     }
@@ -79,10 +74,11 @@ public class SqoopTask extends AbstractYarnTask {
 
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
 
-        String resultScripts = ParameterUtils.convertParameterPlaceholders(script, ParameterUtils.convert(paramsMap));
+        String resultScripts =
+                ParameterUtils.convertParameterPlaceholders(
+                        script, ParameterUtils.convert(paramsMap));
         log.info("sqoop script: {}", resultScripts);
         return resultScripts;
-
     }
 
     @Override

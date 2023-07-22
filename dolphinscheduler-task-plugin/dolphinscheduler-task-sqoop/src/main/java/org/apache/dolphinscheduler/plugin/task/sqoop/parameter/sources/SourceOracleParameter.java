@@ -23,9 +23,9 @@ import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SourceCommonParam
 import java.util.List;
 
 /**
- * source mysql parameter
+ * source oracle parameter
  */
-public class SourceMysqlParameter extends SourceCommonParameter {
+public class SourceOracleParameter extends SourceCommonParameter {
 
     /**
      * src table
