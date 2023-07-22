@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.datasource.kyuubi;
 
 import org.apache.dolphinscheduler.plugin.datasource.kyuubi.param.KyuubiConnectionParam;
-import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.sql.Connection;
 
@@ -47,13 +46,6 @@ public class KyuubiDataSourceClientTest {
         KyuubiConnectionParam kyuubiConnectionParam = new KyuubiConnectionParam();
         kyuubiDataSourceClient.checkEnv(kyuubiConnectionParam);
         Mockito.verify(kyuubiDataSourceClient).checkEnv(kyuubiConnectionParam);
-    }
-
-    @Test
-    public void testInitClient() {
-        KyuubiConnectionParam kyuubiConnectionParam = new KyuubiConnectionParam();
-        kyuubiDataSourceClient.initClient(kyuubiConnectionParam, DbType.KYUUBI);
-        Mockito.verify(kyuubiDataSourceClient).initClient(kyuubiConnectionParam, DbType.KYUUBI);
     }
 
     @Test

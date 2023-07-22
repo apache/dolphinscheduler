@@ -38,7 +38,7 @@ public class PythonEnvManager {
 
     private static final String VIRTUALENV_SOURCE = "source %s/bin/activate";
 
-    private static final String VIRTUALENV_BUILD = "virtualenv -p ${PYTHON_HOME} %s";
+    private static final String VIRTUALENV_BUILD = "virtualenv -p ${PYTHON_LAUNCHER} %s";
 
     private static final String INSTALL_COMMAND = "%s -m pip install -r %s";
 

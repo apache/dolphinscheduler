@@ -15,20 +15,33 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.runner;
+import { ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
+import type { IJsonItem } from '../../task/components/node/types'
+import { queryTenantList } from '@/service/modules/tenants'
 
-public enum WorkflowSubmitStatus {
-    /**
-     * Submit success
-     */
-    SUCCESS,
-    /**
-     * Submit failed, this status should be retry
-     */
-    FAILED,
-    /**
-     * Duplicated submitted, this status should never occur.
-     */
-    DUPLICATED_SUBMITTED,
-    ;
+export function useTenant(): IJsonItem {
+  const { t } = useI18n()
+
+  const options = ref([] as { label: string; value: string }[])
+
+  const getTenantList = async () => {
+    const res = await queryTenantList()
+    options.value = res.map((item: any) => ({
+      label: item.tenantCode,
+      value: item.tenantCode
+    }))
+  }
+
+  onMounted(() => {
+    getTenantList()
+  })
+
+  return {
+    type: 'select',
+    field: 'tenant',
+    span: 12,
+    name: t('project.workflow.tenant_code'),
+    options: options
+  }
 }

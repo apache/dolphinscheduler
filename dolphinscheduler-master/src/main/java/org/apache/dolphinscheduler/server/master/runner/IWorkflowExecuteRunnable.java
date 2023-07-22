@@ -15,21 +15,18 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.python;
+package org.apache.dolphinscheduler.server.master.runner;
 
-public class PythonConstants {
+import java.util.concurrent.Callable;
 
-    private PythonConstants() {
-        throw new IllegalStateException("Utility class");
+public interface IWorkflowExecuteRunnable extends Callable<WorkflowStartStatus> {
+    // todo: add control method to manage the workflow runnable e.g. pause/stop ....
+
+    @Override
+    default WorkflowStartStatus call() {
+        return startWorkflow();
     }
 
-    /**
-     * python home
-     */
-    public static final String PYTHON_HOME = "PYTHON_HOME";
+    WorkflowStartStatus startWorkflow();
 
-    /**
-     * EQUAL SIGN
-     */
-    public static final String EQUAL_SIGN = "=";
 }
