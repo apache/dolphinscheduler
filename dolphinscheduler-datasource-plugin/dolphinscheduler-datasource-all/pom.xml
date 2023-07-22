@@ -136,6 +136,10 @@
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-datasource-hana</artifactId>
             <version>${project.version}</version>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-datasource-doris</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>

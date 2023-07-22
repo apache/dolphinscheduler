@@ -52,6 +52,7 @@
         <module>dolphinscheduler-datasource-snowflake</module>
         <module>dolphinscheduler-datasource-vertica</module>
         <module>dolphinscheduler-datasource-hana</module>
+        <module>dolphinscheduler-datasource-doris</module>
     </modules>
 
     <dependencyManagement>

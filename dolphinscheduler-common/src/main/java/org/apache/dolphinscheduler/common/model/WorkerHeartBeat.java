@@ -39,6 +39,9 @@ public class WorkerHeartBeat implements HeartBeat {
     private int serverStatus;
     private int processId;
 
+    private String host;
+    private int port;
+
     private int workerHostWeight; // worker host weight
     private int workerWaitingTaskCount; // worker waiting task count
     private int workerExecThreadCount; // worker thread pool thread count
