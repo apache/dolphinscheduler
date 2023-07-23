@@ -19,7 +19,7 @@ import { h, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { format } from 'date-fns'
 import { queryTaskGroupListPaging } from '@/service/modules/task-group'
-import { queryAllProjectList } from '@/service/modules/projects'
+import { queryProjectCreatedAndAuthorizedByUser } from '@/service/modules/projects'
 import TableAction from './components/table-action'
 import _ from 'lodash'
 import { parseTime } from '@/common/common'
@@ -125,7 +125,7 @@ export function useTable(
   const getTableData = (params: any) => {
     if (variables.loadingRef) return
     variables.loadingRef = true
-    Promise.all([queryTaskGroupListPaging(params), queryAllProjectList()]).then(
+    Promise.all([queryTaskGroupListPaging(params), queryProjectCreatedAndAuthorizedByUser()]).then(
       (values: any[]) => {
         variables.totalPage = values[0].totalPage
         variables.tableData = values[0].totalList.map(
