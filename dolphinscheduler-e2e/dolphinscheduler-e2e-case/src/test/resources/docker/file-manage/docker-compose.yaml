@@ -30,7 +30,7 @@ services:
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:12345/actuator/health" ]
       interval: 5s
-      timeout: 60s
+      timeout: 300s
       retries: 120
     volumes:
       - ./common.properties:/opt/dolphinscheduler/conf/common.properties
@@ -55,7 +55,7 @@ services:
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 5s
-      timeout: 120s
+      timeout: 300s
       retries: 120
   mc:
     image: minio/mc:RELEASE.2022-01-07T06-01-38Z

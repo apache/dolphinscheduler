@@ -30,7 +30,7 @@ services:
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:12345/actuator/health" ]
       interval: 5s
-      timeout: 60s
+      timeout: 300s
       retries: 120
     depends_on:
       clickhouse:
@@ -54,7 +54,7 @@ services:
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "localhost:8123/ping"]
       interval: 5s
-      timeout: 60s
+      timeout: 300s
       retries: 120
 
 networks:

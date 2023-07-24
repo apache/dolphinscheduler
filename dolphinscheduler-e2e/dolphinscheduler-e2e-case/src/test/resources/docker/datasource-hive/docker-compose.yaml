@@ -30,7 +30,7 @@ services:
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:12345/actuator/health" ]
       interval: 5s
-      timeout: 60s
+      timeout: 300s
       retries: 120
     depends_on:
       hive-server:
@@ -48,7 +48,7 @@ services:
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:50070/" ]
       interval: 5s
-      timeout: 60s
+      timeout: 300s
       retries: 120
   datanode:
     image: bde2020/hadoop-datanode:2.0.0-hadoop2.7.4-java8
@@ -63,7 +63,7 @@ services:
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:50075" ]
       interval: 5s
-      timeout: 60s
+      timeout: 300s
       retries: 120
   hive-server:
     image: bde2020/hive:2.3.2-postgresql-metastore
@@ -84,7 +84,7 @@ services:
     healthcheck:
       test: beeline -u "jdbc:hive2://127.0.0.1:10000/default" -n health_check -e "show databases;"
       interval: 5s
-      timeout: 60s
+      timeout: 300s
       retries: 120
   hive-metastore:
     image: bde2020/hive:2.3.2-postgresql-metastore
@@ -109,7 +109,7 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
-      timeout: 60s
+      timeout: 300s
       retries: 120
 
 
