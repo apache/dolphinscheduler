@@ -50,6 +50,12 @@ public enum AlertInputTips {
     SECRET("please input secret", "请输入secret"),
     WECHAT_MENTION_USERS("use `|` to separate userIds and `@all` to everyone", "使用`|`来分割userId或使用`@all`来提到所有人"),
     WECHAT_AGENT_ID("please input agent id or chat id", "请输入agent id或chat id"),
+    CALLED_NUMBER("please input called number", "请输入被叫电话号码"),
+    CALLED_SHOW_NUMBER("please input called show number", "请输入呼叫显示号码(不填则使用默认号码)"),
+    TTS_CODE("please input tts code", "请输入语音模板编码"),
+    ALIYUN_VIICE_ADDRESS("please input aliyun viice address", "请输入阿里云访问域名"),
+    ALIYUN_VIICE_ACCESSKEYID("please input 请输入accessKeyId", "请输入accessKeyId"),
+    ALIYUN_VIICE_ACCESSKEY_SECRET("please input accessKeySecret", "请输入accessKeySecret"),
     ;
 
     private final String enMsg;
