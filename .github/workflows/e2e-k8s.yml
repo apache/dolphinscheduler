@@ -88,23 +88,101 @@ jobs:
           kubectl get all --all-namespaces
       - name: Load images
         run: |
-          kind load docker-image apache/dolphinscheduler-master:ci --name dolphinscheduler
-          kind load docker-image apache/dolphinscheduler-worker:ci --name dolphinscheduler
-          kind load docker-image apache/dolphinscheduler-api:ci --name dolphinscheduler
-          kind load docker-image apache/dolphinscheduler-tools:ci --name dolphinscheduler
-          kind load docker-image apache/dolphinscheduler-alert-server:ci --name dolphinscheduler
+          components=("master" "worker" "api" "tools" "alert-server")
+          for component in "${components[@]}"; do
+            kind load docker-image apache/dolphinscheduler-${component}:ci --name dolphinscheduler
+          done
       - name: Helm install dolphinscheduler
         working-directory: ${{ github.workspace }}/deploy/kubernetes/dolphinscheduler
         run: |
           curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
           helm repo add bitnami https://charts.bitnami.com/bitnami
           helm dependency update .
-          helm upgrade --install --create-namespace -n dolphinscheduler dolphinscheduler . \
-          --set image.registry=apache --set image.tag=ci
+          helm upgrade --install --create-namespace -n dolphinscheduler dolphinscheduler . -f - <<EOF
+          image:
+            registry: apache
+            tag: ci
+          conf:
+            common:
+              resource.azure.client.id: minioadmin
+              resource.azure.client.secret: minioadmin
+              resource.azure.subId: minioadmin
+              resource.azure.tenant.id: minioadmin
+          master:
+            livenessProbe:
+              enabled: true
+              initialDelaySeconds: 120
+              periodSeconds: 30
+              timeoutSeconds: 5
+              failureThreshold: 3
+              successThreshold: 1
+            readinessProbe:
+              enabled: true
+              initialDelaySeconds: 120
+              periodSeconds: 30
+              timeoutSeconds: 5
+              failureThreshold: 3
+              successThreshold: 1
+          worker:
+            livenessProbe:
+              enabled: true
+              initialDelaySeconds: 120
+              periodSeconds: 30
+              timeoutSeconds: 5
+              failureThreshold: 3
+              successThreshold: 1
+            readinessProbe:
+              enabled: true
+              initialDelaySeconds: 120
+              periodSeconds: 30
+              timeoutSeconds: 5
+              failureThreshold: 3
+              successThreshold: 1
+          alert:
+            livenessProbe:
+              enabled: true
+              initialDelaySeconds: 120
+              periodSeconds: 30
+              timeoutSeconds: 5
+              failureThreshold: 3
+              successThreshold: 1
+            readinessProbe:
+              enabled: true
+              initialDelaySeconds: 120
+              periodSeconds: 30
+              timeoutSeconds: 5
+              failureThreshold: 3
+              successThreshold: 1
+          api:
+            livenessProbe:
+              enabled: true
+              initialDelaySeconds: 120
+              periodSeconds: 30
+              timeoutSeconds: 5
+              failureThreshold: 3
+              successThreshold: 1
+            readinessProbe:
+              enabled: true
+              initialDelaySeconds: 120
+              periodSeconds: 30
+              timeoutSeconds: 5
+              failureThreshold: 3
+              successThreshold: 1
+          EOF
+
       - name: Wait for pods
         run: |
-          kubectl get all -n dolphinscheduler
-          kubectl wait --for=condition=Ready pod -l app.kubernetes.io/component=alert -n dolphinscheduler --timeout=120s
-          kubectl wait --for=condition=Ready pod -l app.kubernetes.io/component=api -n dolphinscheduler --timeout=120s
-          kubectl wait --for=condition=Ready pod -l app.kubernetes.io/component=worker -n dolphinscheduler --timeout=120s
-          kubectl wait --for=condition=Ready pod -l app.kubernetes.io/component=master -n dolphinscheduler --timeout=120s
+          JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; 
+          components=("master" "worker" "api" "alert")
+          for component in "${components[@]}"; do
+            until kubectl -n dolphinscheduler get pods -l app.kubernetes.io/component=${component} -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do
+              sleep 10
+              echo "waiting for dolphinscheduler ${component} to be available"
+              kubectl get pods --all-namespaces
+              kubectl get events --all-namespaces
+              for pod in $(kubectl get pods -n dolphinscheduler -o jsonpath='{.items[*].metadata.name}'); do
+                echo "logs for pod $pod:"
+                kubectl logs --tail=1000 -n dolphinscheduler $pod
+              done
+            done
+          done
