@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -41,36 +42,31 @@ import com.google.common.cache.RemovalListener;
 public class DataSourceClientProvider {
 
     private static final long duration = PropertyUtils.getLong(TaskConstants.KERBEROS_EXPIRE_TIME, 24);
+
+    // We use the cache here to avoid creating a new datasource client every time,
+    // One DataSourceClient corresponds to one unique datasource.
     private static final Cache<String, DataSourceClient> uniqueId2dataSourceClientCache = CacheBuilder.newBuilder()
             .expireAfterWrite(duration, TimeUnit.HOURS)
             .removalListener((RemovalListener<String, DataSourceClient>) notification -> {
                 try (DataSourceClient closedClient = notification.getValue()) {
                     log.info("Datasource: {} is removed from cache due to expire", notification.getKey());
+                } catch (Exception e) {
+                    log.error("Close datasource client error", e);
                 }
             })
             .maximumSize(100)
             .build();
-    private DataSourcePluginManager dataSourcePluginManager;
+    private static final DataSourcePluginManager dataSourcePluginManager = new DataSourcePluginManager();
 
-    private DataSourceClientProvider() {
-        initDataSourcePlugin();
+    static {
+        dataSourcePluginManager.installPlugin();
     }
 
-    private static class DataSourceClientProviderHolder {
-
-        private static final DataSourceClientProvider INSTANCE = new DataSourceClientProvider();
-    }
-
-    public static DataSourceClientProvider getInstance() {
-        return DataSourceClientProviderHolder.INSTANCE;
-    }
-
-    public Connection getConnection(DbType dbType, ConnectionParam connectionParam) throws ExecutionException {
+    public static DataSourceClient getDataSourceClient(DbType dbType,
+                                                       ConnectionParam connectionParam) throws ExecutionException {
         BaseConnectionParam baseConnectionParam = (BaseConnectionParam) connectionParam;
         String datasourceUniqueId = DataSourceUtils.getDatasourceUniqueId(baseConnectionParam, dbType);
-        log.info("Get connection from datasource {}", datasourceUniqueId);
-
-        DataSourceClient dataSourceClient = uniqueId2dataSourceClientCache.get(datasourceUniqueId, () -> {
+        return uniqueId2dataSourceClientCache.get(datasourceUniqueId, () -> {
             Map<String, DataSourceChannel> dataSourceChannelMap = dataSourcePluginManager.getDataSourceChannelMap();
             DataSourceChannel dataSourceChannel = dataSourceChannelMap.get(dbType.getDescp());
             if (null == dataSourceChannel) {
@@ -78,11 +74,12 @@ public class DataSourceClientProvider {
             }
             return dataSourceChannel.createDataSourceClient(baseConnectionParam, dbType);
         });
+    }
+
+    public static Connection getConnection(DbType dbType,
+                                           ConnectionParam connectionParam) throws SQLException, ExecutionException {
+        DataSourceClient dataSourceClient = getDataSourceClient(dbType, connectionParam);
         return dataSourceClient.getConnection();
     }
 
-    private void initDataSourcePlugin() {
-        dataSourcePluginManager = new DataSourcePluginManager();
-        dataSourcePluginManager.installPlugin();
-    }
 }

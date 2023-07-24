@@ -32,7 +32,7 @@ public class PrestoDataSourceChannelTest {
     @Test
     public void testCreateDataSourceClient() {
         PrestoDataSourceChannel sourceChannel = Mockito.mock(PrestoDataSourceChannel.class);
-        PrestoDataSourceClient dataSourceClient = Mockito.mock(PrestoDataSourceClient.class);
+        PrestoPooledDataSourceClient dataSourceClient = Mockito.mock(PrestoPooledDataSourceClient.class);
         Mockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
         Assertions.assertNotNull(sourceChannel.createDataSourceClient(new PrestoConnectionParam(), DbType.PRESTO));
     }

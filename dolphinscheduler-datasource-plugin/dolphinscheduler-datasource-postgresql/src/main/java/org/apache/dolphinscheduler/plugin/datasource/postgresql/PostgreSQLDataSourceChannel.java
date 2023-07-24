@@ -26,6 +26,6 @@ public class PostgreSQLDataSourceChannel implements DataSourceChannel {
 
     @Override
     public DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        return new PostgreSQLDataSourceClient(baseConnectionParam, dbType);
+        return new PostgrePooledSQLDataSourceClient(baseConnectionParam, dbType);
     }
 }

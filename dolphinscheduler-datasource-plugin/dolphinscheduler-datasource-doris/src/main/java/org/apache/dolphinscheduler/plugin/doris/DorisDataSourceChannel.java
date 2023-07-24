@@ -25,6 +25,6 @@ public class DorisDataSourceChannel implements DataSourceChannel {
 
     @Override
     public DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        return null;
+        return new DorisAdHocDataSourceClient(baseConnectionParam, dbType);
     }
 }

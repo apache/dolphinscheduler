@@ -26,6 +26,6 @@ public class StarRocksDataSourceChannel implements DataSourceChannel {
 
     @Override
     public DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        return new StarRocksDataSourceClient(baseConnectionParam, dbType);
+        return new StarRocksAdHocPooledDataSourceClient(baseConnectionParam, dbType);
     }
 }

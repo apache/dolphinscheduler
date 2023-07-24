@@ -26,6 +26,6 @@ public class AzureSQLDataSourceChannel implements DataSourceChannel {
 
     @Override
     public DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        return new AzureSQLDataSourceClient(baseConnectionParam, dbType);
+        return new AzureSQLAdHocDataSourceClient(baseConnectionParam, dbType);
     }
 }

@@ -26,6 +26,6 @@ public class OceanBaseDataSourceChannel implements DataSourceChannel {
 
     @Override
     public DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        return new OceanBaseDataSourceClient(baseConnectionParam, dbType);
+        return new OceanBasePooledDataSourceClient(baseConnectionParam, dbType);
     }
 }

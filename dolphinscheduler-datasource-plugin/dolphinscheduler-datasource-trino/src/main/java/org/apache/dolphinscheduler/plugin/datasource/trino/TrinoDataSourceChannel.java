@@ -26,6 +26,6 @@ public class TrinoDataSourceChannel implements DataSourceChannel {
 
     @Override
     public DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        return new TrinoDataSourceClient(baseConnectionParam, dbType);
+        return new TrinoAdHocDataSourceClient(baseConnectionParam, dbType);
     }
 }

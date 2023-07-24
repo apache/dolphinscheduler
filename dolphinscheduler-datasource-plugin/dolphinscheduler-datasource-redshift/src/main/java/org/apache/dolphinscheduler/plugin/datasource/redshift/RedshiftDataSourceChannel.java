@@ -26,6 +26,6 @@ public class RedshiftDataSourceChannel implements DataSourceChannel {
 
     @Override
     public DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        return new RedshiftDataSourceClient(baseConnectionParam, dbType);
+        return new RedshiftAdHocDataSourceClient(baseConnectionParam, dbType);
     }
 }

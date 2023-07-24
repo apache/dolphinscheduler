@@ -26,6 +26,6 @@ public class VerticaDataSourceChannel implements DataSourceChannel {
 
     @Override
     public DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        return new VerticaDataSourceClient(baseConnectionParam, dbType);
+        return new VerticaPooledDataSourceClient(baseConnectionParam, dbType);
     }
 }

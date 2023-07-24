@@ -17,14 +17,21 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.ssh;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
+import org.apache.dolphinscheduler.plugin.datasource.api.client.BasePooledDataSourceClient;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-public class SSHDataSourceClient extends CommonDataSourceClient {
+import com.zaxxer.hikari.HikariDataSource;
+
+public class SSHDataSourceClient extends BasePooledDataSourceClient {
 
     public SSHDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
         super(baseConnectionParam, dbType);
+    }
+
+    // ssh client doesn't use this method
+    protected HikariDataSource createDataSource() {
+        return null;
     }
 
 }

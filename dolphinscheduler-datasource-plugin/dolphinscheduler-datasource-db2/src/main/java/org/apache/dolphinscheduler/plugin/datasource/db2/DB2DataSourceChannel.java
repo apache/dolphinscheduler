@@ -26,6 +26,6 @@ public class DB2DataSourceChannel implements DataSourceChannel {
 
     @Override
     public DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        return new DB2DataSourceClient(baseConnectionParam, dbType);
+        return new DB2AdHocDataSourceClient(baseConnectionParam, dbType);
     }
 }

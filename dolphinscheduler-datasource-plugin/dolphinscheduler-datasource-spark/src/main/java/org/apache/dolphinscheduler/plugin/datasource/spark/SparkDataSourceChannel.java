@@ -26,6 +26,6 @@ public class SparkDataSourceChannel implements DataSourceChannel {
 
     @Override
     public DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        return new SparkDataSourceClient(baseConnectionParam, dbType);
+        return new SparkAdHocDataSourceClient(baseConnectionParam, dbType);
     }
 }

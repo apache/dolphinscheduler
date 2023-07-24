@@ -32,7 +32,7 @@ public class VerticaDataSourceChannelTest {
     @Test
     public void testCreateDataSourceClient() {
         VerticaDataSourceChannel sourceChannel = Mockito.mock(VerticaDataSourceChannel.class);
-        VerticaDataSourceClient dataSourceClient = Mockito.mock(VerticaDataSourceClient.class);
+        VerticaPooledDataSourceClient dataSourceClient = Mockito.mock(VerticaPooledDataSourceClient.class);
         Mockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
         Assertions.assertNotNull(sourceChannel.createDataSourceClient(new VerticaConnectionParam(), DbType.VERTICA));
     }

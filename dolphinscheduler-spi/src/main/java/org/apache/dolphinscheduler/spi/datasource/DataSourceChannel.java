@@ -21,5 +21,6 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 
 public interface DataSourceChannel {
 
+    // todo: crease base method to create AdHocDataSourceClient and PooledDataSourceClient
     DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType);
 }

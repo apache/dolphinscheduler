@@ -26,6 +26,8 @@ public class AthenaDataSourceChannel implements DataSourceChannel {
 
     @Override
     public DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        return new AthenaDataSourceClient(baseConnectionParam, dbType);
+        // todo: choose whether create a pooled data source client or ad hoc data source client
+        return new AthenaAdHocDataSourceClient(baseConnectionParam, dbType);
     }
+
 }

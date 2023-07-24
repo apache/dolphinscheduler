@@ -26,6 +26,6 @@ public class OracleDataSourceChannel implements DataSourceChannel {
 
     @Override
     public DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        return new OracleDataSourceClient(baseConnectionParam, dbType);
+        return new OraclePooledDataSourceClient(baseConnectionParam, dbType);
     }
 }

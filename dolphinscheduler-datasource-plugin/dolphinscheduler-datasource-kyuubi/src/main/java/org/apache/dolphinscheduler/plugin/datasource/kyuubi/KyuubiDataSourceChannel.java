@@ -26,6 +26,6 @@ public class KyuubiDataSourceChannel implements DataSourceChannel {
 
     @Override
     public DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        return new KyuubiDataSourceClient(baseConnectionParam, dbType);
+        return new KyuubiPooledDataSourceClient(baseConnectionParam, dbType);
     }
 }

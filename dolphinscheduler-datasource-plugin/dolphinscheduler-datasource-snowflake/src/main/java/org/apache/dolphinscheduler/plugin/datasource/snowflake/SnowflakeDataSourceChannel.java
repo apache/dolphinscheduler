@@ -26,6 +26,6 @@ public class SnowflakeDataSourceChannel implements DataSourceChannel {
 
     @Override
     public DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        return new SnowflakeDataSourceClient(baseConnectionParam, dbType);
+        return new SnowflakeAdHocDataSourceClient(baseConnectionParam, dbType);
     }
 }

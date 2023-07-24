@@ -26,6 +26,6 @@ public class ClickHouseDataSourceChannel implements DataSourceChannel {
 
     @Override
     public DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        return new ClickHouseDataSourceClient(baseConnectionParam, dbType);
+        return new ClickHouseAdHocDataSourceClient(baseConnectionParam, dbType);
     }
 }

@@ -26,6 +26,6 @@ public class MySQLDataSourceChannel implements DataSourceChannel {
 
     @Override
     public DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        return new MySQLDataSourceClient(baseConnectionParam, dbType);
+        return new MySQLAdHocDataSourceClient(baseConnectionParam, dbType);
     }
 }

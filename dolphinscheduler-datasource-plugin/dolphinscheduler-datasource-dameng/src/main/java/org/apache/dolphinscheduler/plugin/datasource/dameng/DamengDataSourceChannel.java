@@ -26,6 +26,6 @@ public class DamengDataSourceChannel implements DataSourceChannel {
 
     @Override
     public DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        return new DamengDataSourceClient(baseConnectionParam, dbType);
+        return new DamengAdHocDataSourceClient(baseConnectionParam, dbType);
     }
 }

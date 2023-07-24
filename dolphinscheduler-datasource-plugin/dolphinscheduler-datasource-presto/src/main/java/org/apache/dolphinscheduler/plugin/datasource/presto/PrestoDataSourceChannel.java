@@ -26,6 +26,6 @@ public class PrestoDataSourceChannel implements DataSourceChannel {
 
     @Override
     public DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        return new PrestoDataSourceClient(baseConnectionParam, dbType);
+        return new PrestoPooledDataSourceClient(baseConnectionParam, dbType);
     }
 }

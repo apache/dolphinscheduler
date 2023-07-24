@@ -32,7 +32,7 @@ public class DorisDataSourceChannelTest {
     @Test
     public void testCreateDataSourceClient() {
         DorisDataSourceChannel sourceChannel = Mockito.mock(DorisDataSourceChannel.class);
-        DorisDataSourceClient dataSourceClient = Mockito.mock(DorisDataSourceClient.class);
+        DorisPooledDataSourceClient dataSourceClient = Mockito.mock(DorisPooledDataSourceClient.class);
         Mockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
         Assertions.assertNotNull(sourceChannel.createDataSourceClient(new DorisConnectionParam(), DbType.DORIS));
     }

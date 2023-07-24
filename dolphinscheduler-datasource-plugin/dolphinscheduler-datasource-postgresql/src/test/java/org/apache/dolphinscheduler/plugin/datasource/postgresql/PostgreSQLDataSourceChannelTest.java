@@ -32,7 +32,7 @@ public class PostgreSQLDataSourceChannelTest {
     @Test
     public void testCreateDataSourceClient() {
         PostgreSQLDataSourceChannel sourceChannel = Mockito.mock(PostgreSQLDataSourceChannel.class);
-        PostgreSQLDataSourceClient dataSourceClient = Mockito.mock(PostgreSQLDataSourceClient.class);
+        PostgrePooledSQLDataSourceClient dataSourceClient = Mockito.mock(PostgrePooledSQLDataSourceClient.class);
         Mockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
         Assertions.assertNotNull(
                 sourceChannel.createDataSourceClient(new PostgreSQLConnectionParam(), DbType.POSTGRESQL));

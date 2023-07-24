@@ -26,6 +26,6 @@ public class SQLServerDataSourceChannel implements DataSourceChannel {
 
     @Override
     public DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        return new SQLServerDataSourceClient(baseConnectionParam, dbType);
+        return new SQLServerPooledDataSourceClient(baseConnectionParam, dbType);
     }
 }

@@ -26,6 +26,6 @@ public class DatabendDataSourceChannel implements DataSourceChannel {
 
     @Override
     public DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        return new DatabendDataSourceClient(baseConnectionParam, dbType);
+        return new DatabendAdHocDataSourceClient(baseConnectionParam, dbType);
     }
 }
