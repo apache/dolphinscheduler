@@ -44,8 +44,8 @@ public final class VoiceAlertChannel implements AlertChannel {
         if (null == paramsMap) {
             return new AlertResult("false", "mail params is null");
         }
-        VoidceParam voidceParam = buildVoiceParam(paramsMap);
-        VoiceSender voiceSender = new VoiceSender(voidceParam);
+        VoiceParam voiceParam = buildVoiceParam(paramsMap);
+        VoiceSender voiceSender = new VoiceSender(voiceParam);
 
         AlertResult alertResult = voiceSender.send();
         Boolean flag = Boolean.parseBoolean(String.valueOf(alertResult.getStatus()));
@@ -61,15 +61,15 @@ public final class VoiceAlertChannel implements AlertChannel {
         return alertResult;
     }
 
-    public VoidceParam buildVoiceParam(Map<String, String> paramsMap) {
+    public VoiceParam buildVoiceParam(Map<String, String> paramsMap) {
         String calledNumber = paramsMap.get(NAME_CALLED_NUMBER);
         String calledShowNumber = paramsMap.get(NAME_CALLED_SHOW_NUMBER);
         String ttsCode = paramsMap.get(NAME_TTS_CODE);
-        VoidceParam param = new VoidceParam();
+        VoiceParam param = new VoiceParam();
         param.setCalledNumber(calledNumber);
         param.setCalledShowNumber(calledShowNumber);
         param.setTtsCode(ttsCode);
-        VoidceParam.Connection connection = new VoidceParam.Connection();
+        VoiceParam.Connection connection = new VoiceParam.Connection();
         String address = paramsMap.get(NAME_ADDRESS);
         String accessKeyId = paramsMap.get(NAME_ACCESS_KEY_ID);
         String accessKeySecret = paramsMap.get(NAME_ACCESS_KEY_SECRET);

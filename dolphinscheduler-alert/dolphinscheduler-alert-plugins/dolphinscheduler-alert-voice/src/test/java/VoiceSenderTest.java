@@ -17,7 +17,7 @@
 
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.plugin.alert.voice.VoiceSender;
-import org.apache.dolphinscheduler.plugin.alert.voice.VoidceParam;
+import org.apache.dolphinscheduler.plugin.alert.voice.VoiceParam;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,22 +28,22 @@ import org.junit.jupiter.api.Test;
  */
 public class VoiceSenderTest {
 
-    private static VoidceParam voidceParam = new VoidceParam();
+    private static VoiceParam voiceParam = new VoiceParam();
 
     @BeforeEach
     public void initVoidceParam() {
-        voidceParam.setCalledNumber("12345678910");
-        voidceParam.setTtsParam("TTS_2450XXXXX");
-        VoidceParam.Connection connection = new VoidceParam.Connection();
+        voiceParam.setCalledNumber("12345678910");
+        voiceParam.setTtsParam("TTS_2450XXXXX");
+        VoiceParam.Connection connection = new VoiceParam.Connection();
         connection.setAddress("xxxxxx.aliyuncs.com");
         connection.setAccessKeyId("XXXXXXXXX");
         connection.setAccessKeySecret("XXXXXXXXX");
-        voidceParam.setConnection(connection);
+        voiceParam.setConnection(connection);
     }
 
     @Test
     public void testSendWeChatTableMsg() {
-        VoiceSender weChatSender = new VoiceSender(voidceParam);
+        VoiceSender weChatSender = new VoiceSender(voiceParam);
 
         AlertResult alertResult = weChatSender.send();
         Assertions.assertEquals("false", alertResult.getStatus());

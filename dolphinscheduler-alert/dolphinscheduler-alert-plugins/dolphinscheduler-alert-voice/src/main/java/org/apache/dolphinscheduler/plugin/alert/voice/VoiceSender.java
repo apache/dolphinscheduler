@@ -31,28 +31,28 @@ import com.aliyun.teautil.models.RuntimeOptions;
 @Slf4j
 public final class VoiceSender {
 
-    private VoidceParam voidceParam;
+    private VoiceParam voiceParam;
 
     /**
      * create Client
      *
-     * @param voidceParam voidce Param
+     * @param voiceParam voidce Param
      * @return Client
      * @throws Exception
      */
-    public VoiceSender(VoidceParam voidceParam) {
-        this.voidceParam = voidceParam;
+    public VoiceSender(VoiceParam voiceParam) {
+        this.voiceParam = voiceParam;
     }
 
     public AlertResult send() {
         AlertResult alertResult = new AlertResult();
         alertResult.setStatus("false");
         try {
-            Client client = createClient(voidceParam.getConnection());
+            Client client = createClient(voiceParam.getConnection());
             SingleCallByTtsRequest singleCallByTtsRequest = new SingleCallByTtsRequest()
-                    .setCalledNumber(voidceParam.getCalledNumber())
-                    .setTtsCode(voidceParam.getTtsCode())
-                    .setOutId(voidceParam.getOutId());
+                    .setCalledNumber(voiceParam.getCalledNumber())
+                    .setTtsCode(voiceParam.getTtsCode())
+                    .setOutId(voiceParam.getOutId());
             RuntimeOptions runtime = new RuntimeOptions();
             SingleCallByTtsResponse response = client.singleCallByTtsWithOptions(singleCallByTtsRequest, runtime);
             if (response == null) {
@@ -75,7 +75,7 @@ public final class VoiceSender {
      * @return Client
      * @throws Exception
      */
-    private com.aliyun.dyvmsapi20170525.Client createClient(VoidceParam.Connection conn) throws Exception {
+    private com.aliyun.dyvmsapi20170525.Client createClient(VoiceParam.Connection conn) throws Exception {
         Config config = new Config()
                 // AccessKey ID
                 .setAccessKeyId(conn.getAccessKeyId())
@@ -86,11 +86,11 @@ public final class VoiceSender {
         return new com.aliyun.dyvmsapi20170525.Client(config);
     }
 
-    public VoidceParam getVoidcePara() {
-        return voidceParam;
+    public VoiceParam getVoidcePara() {
+        return voiceParam;
     }
 
-    public void setVoidcePara(VoidceParam voidcePara) {
-        this.voidceParam = voidcePara;
+    public void setVoidcePara(VoiceParam voidcePara) {
+        this.voiceParam = voidcePara;
     }
 }
