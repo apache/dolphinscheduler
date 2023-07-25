@@ -217,7 +217,7 @@ public class UdfManageE2ETest {
         final UdfManagePage page = new UdfManagePage(browser);
         page.delete(testUploadUdfRenameFileName);
 
-        await().untilAsserted(() -> {
+        Awaitility.await().untilAsserted(() -> {
             browser.navigate().refresh();
 
             assertThat(
