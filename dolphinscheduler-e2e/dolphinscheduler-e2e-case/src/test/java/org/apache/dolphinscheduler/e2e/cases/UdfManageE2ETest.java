@@ -41,7 +41,7 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Comparator;
 
-import org.awaitility.Awaitility;
+import org.testcontainers.shaded.org.awaitility.Awaitility;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;

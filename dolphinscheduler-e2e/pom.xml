@@ -39,7 +39,6 @@
         <selenium.version>4.6.0</selenium.version>
         <lombok.version>1.18.20</lombok.version>
         <assertj-core.version>3.20.2</assertj-core.version>
-        <awaitility.version>4.2.0</awaitility.version>
         <kotlin.version>1.5.30</kotlin.version>
         <slf4j-api.version>1.7.36</slf4j-api.version>
         <log4j-slf4j-impl.version>2.17.2</log4j-slf4j-impl.version>
@@ -92,13 +91,6 @@
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
             <version>${assertj-core.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.awaitility</groupId>
-            <artifactId>awaitility</artifactId>
-            <version>${awaitility.version}</version>
             <scope>test</scope>
         </dependency>
 

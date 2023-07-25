@@ -29,7 +29,7 @@ import org.apache.dolphinscheduler.e2e.pages.security.WorkerGroupPage;
 
 import java.time.Duration;
 
-import org.awaitility.Awaitility;
+import org.testcontainers.shaded.org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
