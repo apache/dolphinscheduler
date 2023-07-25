@@ -22,7 +22,6 @@ package org.apache.dolphinscheduler.e2e.cases;
 
 import lombok.SneakyThrows;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
 
 import org.apache.dolphinscheduler.e2e.core.Constants;
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
@@ -44,6 +43,7 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Comparator;
 
+import org.testcontainers.shaded.org.awaitility.Awaitility;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
@@ -89,7 +89,7 @@ public class FunctionManageE2ETest {
                 .goToTab(TenantPage.class)
                 .create(tenant);
 
-        await().untilAsserted(() -> assertThat(tenantPage.tenantList())
+        Awaitility.await().untilAsserted(() -> assertThat(tenantPage.tenantList())
                 .as("Tenant list should contain newly-created tenant")
                 .extracting(WebElement::getText)
                 .anyMatch(it -> it.contains(tenant)));
@@ -99,7 +99,7 @@ public class FunctionManageE2ETest {
         UserPage userPage = tenantPage.goToNav(SecurityPage.class)
                 .goToTab(UserPage.class);
 
-        new WebDriverWait(userPage.driver(), 20).until(ExpectedConditions.visibilityOfElementLocated(
+        new WebDriverWait(userPage.driver(), Duration.ofSeconds(20)).until(ExpectedConditions.visibilityOfElementLocated(
                 new By.ByClassName("name")));
 
         UdfManagePage udfManagePage = userPage.update(user, user, email, phone, tenant)
@@ -147,7 +147,7 @@ public class FunctionManageE2ETest {
 
         page.createUdfFunction(testUdfFunctionName, testClassName, testUploadUdfFileName, testDescription);
 
-        await().untilAsserted(() -> assertThat(page.functionList())
+        Awaitility.await().untilAsserted(() -> assertThat(page.functionList())
             .as("Function list should contain newly-created file")
             .extracting(WebElement::getText)
             .anyMatch(it -> it.contains(testUdfFunctionName)));
@@ -162,7 +162,7 @@ public class FunctionManageE2ETest {
 
         page.renameUdfFunction(testUdfFunctionName, testRenameUdfFunctionName);
 
-        await().pollDelay(Duration.ofSeconds(2)).untilAsserted(() -> assertThat(page.functionList())
+        Awaitility.await().pollDelay(Duration.ofSeconds(2)).untilAsserted(() -> assertThat(page.functionList())
             .as("Function list should contain newly-created file")
             .extracting(WebElement::getText)
             .anyMatch(it -> it.contains(testRenameUdfFunctionName)));
@@ -175,7 +175,7 @@ public class FunctionManageE2ETest {
 
         page.deleteUdfFunction(testRenameUdfFunctionName);
 
-        await().untilAsserted(() -> {
+        Awaitility.await().untilAsserted(() -> {
             browser.navigate().refresh();
 
             assertThat(

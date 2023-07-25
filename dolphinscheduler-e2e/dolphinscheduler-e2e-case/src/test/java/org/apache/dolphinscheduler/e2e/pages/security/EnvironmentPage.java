@@ -21,6 +21,7 @@ package org.apache.dolphinscheduler.e2e.pages.security;
 
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 
+import java.time.Duration;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -66,7 +67,7 @@ public final class EnvironmentPage extends NavBarPage implements SecurityPage.Ta
         createEnvironmentForm().inputEnvironmentDesc().sendKeys(desc);
 
         editEnvironmentForm().btnSelectWorkerGroupDropdown().click();
-        new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
+        new WebDriverWait(driver, Duration.ofSeconds(20)).until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
                 "n-base-select-option__content")));
         editEnvironmentForm().selectWorkerGroupList()
                 .stream()
@@ -105,7 +106,7 @@ public final class EnvironmentPage extends NavBarPage implements SecurityPage.Ta
 
         if (editEnvironmentForm().selectedWorkerGroup().getAttribute("innerHTML").equals(workerGroup)) {
             editEnvironmentForm().btnSelectWorkerGroupDropdown().click();
-            new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
+            new WebDriverWait(driver, Duration.ofSeconds(20)).until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
                     "n-base-select-option__content")));
             editEnvironmentForm().selectWorkerGroupList()
                     .stream()

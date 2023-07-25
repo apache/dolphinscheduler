@@ -20,13 +20,13 @@
 package org.apache.dolphinscheduler.e2e.cases;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
 
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 
+import org.testcontainers.shaded.org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -56,7 +56,7 @@ class TenantE2ETest {
         final TenantPage page = new TenantPage(browser);
         page.create(tenant);
 
-        await().untilAsserted(() -> assertThat(page.tenantList())
+        Awaitility.await().untilAsserted(() -> assertThat(page.tenantList())
             .as("Tenant list should contain newly-created tenant")
             .extracting(WebElement::getText)
             .anyMatch(it -> it.contains(tenant)));
@@ -69,7 +69,7 @@ class TenantE2ETest {
 
         page.create(tenant);
 
-        await().untilAsserted(() ->
+        Awaitility.await().untilAsserted(() ->
             assertThat(browser.findElement(By.tagName("body")).getText())
                 .contains("already exists")
         );
@@ -84,7 +84,7 @@ class TenantE2ETest {
 
         page.update(tenant, editDescription);
 
-        await().untilAsserted(() -> {
+        Awaitility.await().untilAsserted(() -> {
             browser.navigate().refresh();
             assertThat(page.tenantList())
                 .as("Tenant list should contain newly-modified tenant")
@@ -99,7 +99,7 @@ class TenantE2ETest {
         final TenantPage page = new TenantPage(browser);
         page.delete(tenant);
 
-        await().untilAsserted(() -> {
+        Awaitility.await().untilAsserted(() -> {
             browser.navigate().refresh();
 
             assertThat(

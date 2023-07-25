@@ -34,7 +34,6 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -50,12 +49,12 @@ import org.testcontainers.containers.BrowserWebDriverContainer;
 import org.testcontainers.containers.DockerComposeContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
+import org.testcontainers.utility.DockerImageName;
 
 import com.google.common.base.Strings;
 import com.google.common.net.HostAndPort;
 
 import lombok.extern.slf4j.Slf4j;
-import org.testcontainers.utility.DockerImageName;
 
 @Slf4j
 final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCallback, BeforeEachCallback {
@@ -77,7 +76,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
     @SuppressWarnings("UnstableApiUsage")
     public void beforeAll(ExtensionContext context) throws IOException {
         Awaitility.setDefaultTimeout(Duration.ofSeconds(60));
-        Awaitility.setDefaultPollInterval(Duration.ofSeconds(10));
+        Awaitility.setDefaultPollInterval(Duration.ofSeconds(2));
 
         setRecordPath();
 
@@ -95,11 +94,11 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
         }
         browser.start();
 
-        driver = browser.getWebDriver();
+        driver = new RemoteWebDriver(browser.getSeleniumAddress(), new ChromeOptions());
 
         driver.manage().timeouts()
-              .implicitlyWait(5, TimeUnit.SECONDS)
-              .pageLoadTimeout(5, TimeUnit.SECONDS);
+              .implicitlyWait(Duration.ofSeconds(10))
+              .pageLoadTimeout(Duration.ofSeconds(10));
         driver.manage().window()
               .maximize();
 

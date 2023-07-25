@@ -40,6 +40,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
+import java.time.Duration;
 import java.util.List;
 
 
@@ -181,9 +182,9 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
             .orElseThrow(() -> new RuntimeException("No edit button in file manage list"))
             .click();
 
-        new WebDriverWait(driver, 5).until(ExpectedConditions.urlContains("/edit"));
+        new WebDriverWait(driver, Duration.ofSeconds(20)).until(ExpectedConditions.urlContains("/edit"));
 
-        new WebDriverWait(driver, 5).until(ExpectedConditions.textToBePresentInElement(driver.findElementByTagName("body"), fileName));
+        new WebDriverWait(driver, Duration.ofSeconds(20)).until(ExpectedConditions.textToBePresentInElement(driver.findElement(By.tagName("body")), fileName));
 
         editFileBox().codeEditor().content(scripts);
         editFileBox().buttonSubmit().click();

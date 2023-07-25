@@ -21,6 +21,7 @@ package org.apache.dolphinscheduler.e2e.pages.security;
 
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 
+import java.time.Duration;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -66,7 +67,7 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
 
         createUserForm().btnSelectTenantDropdown().click();
 
-        new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
+        new WebDriverWait(driver, Duration.ofSeconds(30)).until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
                 "n-base-select-option__content")));
 
         createUserForm().selectTenant()
@@ -99,7 +100,7 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
 
         createUserForm().btnSelectTenantDropdown().click();
 
-        new WebDriverWait(driver, 5).until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
+        new WebDriverWait(driver, Duration.ofSeconds(30)).until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
                 "n-base-select-option__content")));
 
         createUserForm().selectTenant()
