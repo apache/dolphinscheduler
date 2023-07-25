@@ -29,8 +29,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -85,7 +84,7 @@ public class SagemakerTask extends AbstractRemoteTask {
 
         parameters = JSONUtils.parseObject(taskRequest.getTaskParams(), SagemakerParameters.class);
 
-        logger.info("Initialize Sagemaker task params {}", JSONUtils.toPrettyJsonString(parameters));
+        log.info("Initialize Sagemaker task params {}", JSONUtils.toPrettyJsonString(parameters));
         if (parameters == null) {
             throw new SagemakerTaskException("Sagemaker task params is empty");
         }
@@ -152,11 +151,11 @@ public class SagemakerTask extends AbstractRemoteTask {
         try {
             startPipelineRequest = objectMapper.readValue(requestJson, StartPipelineExecutionRequest.class);
         } catch (Exception e) {
-            logger.error("can not parse SagemakerRequestJson from json: {}", requestJson);
+            log.error("can not parse SagemakerRequestJson from json: {}", requestJson);
             throw new SagemakerTaskException("can not parse SagemakerRequestJson ", e);
         }
 
-        logger.info("Sagemaker task create StartPipelineRequest: {}", startPipelineRequest);
+        log.info("Sagemaker task create StartPipelineRequest: {}", startPipelineRequest);
         return startPipelineRequest;
     }
 
@@ -166,9 +165,8 @@ public class SagemakerTask extends AbstractRemoteTask {
     }
 
     private String parseRequstJson(String requestJson) {
-        // combining local and global parameters
         Map<String, Property> paramsMap = taskRequest.getPrepareParamsMap();
-        return ParameterUtils.convertParameterPlaceholders(requestJson, ParamUtils.convert(paramsMap));
+        return ParameterUtils.convertParameterPlaceholders(requestJson, ParameterUtils.convert(paramsMap));
     }
 
     protected AmazonSageMaker createClient() {

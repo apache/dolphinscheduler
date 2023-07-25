@@ -24,9 +24,10 @@
         command_type, command_param, task_depend_type, max_try_times, failure_strategy, warning_type,
         warning_group_id, schedule_time, command_start_time, global_params, flag,
         update_time, is_sub_process, executor_id, history_cmd,
-        process_instance_priority, worker_group,environment_code, timeout, tenant_id, tenant_code, var_pool,
+        process_instance_priority, worker_group,environment_code, timeout, tenant_code, var_pool,
         dry_run, test_flag, next_process_instance_id, restart_time, state_history
     </sql>
+
     <select id="queryDetailById" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select
         <include refid="baseSql"/>
@@ -74,13 +75,13 @@
         limit #{size}
     </select>
 
-    <select id="queryByTenantIdAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
+    <select id="queryByTenantCodeAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select
         <include refid="baseSql"/>
         from t_ds_process_instance
         where 1=1
-        <if test="tenantId != -1">
-            and tenant_id =#{tenantId}
+        <if test="tenantCode != ''">
+            and tenant_code =#{tenantCode}
         </if>
         <if test="states != null and states.length != 0">
             and state in
@@ -157,10 +158,10 @@
         where state = #{originState}
     </update>
 
-    <update id="updateProcessInstanceByTenantId">
+    <update id="updateProcessInstanceByTenantCode">
         update t_ds_process_instance
-        set tenant_id = #{destTenantId}
-        where tenant_id = #{originTenantId}
+        set tenant_code = #{destTenantCode}
+        where tenant_code = #{originTenantCode}
     </update>
 
     <update id="updateProcessInstanceByWorkerGroupName">
@@ -231,6 +232,25 @@
         </if>
         order by end_time desc limit 1
     </select>
+
+    <select id="queryFirstScheduleProcessInstance" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
+        select
+        <include refid="baseSql"/>
+        from t_ds_process_instance
+        where process_definition_code = #{processDefinitionCode} and schedule_time is not null
+        order by schedule_time
+        limit 1
+    </select>
+
+    <select id="queryFirstStartProcessInstance" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
+        select
+        <include refid="baseSql"/>
+        from t_ds_process_instance
+        where process_definition_code = #{processDefinitionCode} and start_time is not null
+        order by start_time
+        limit 1
+    </select>
+
     <select id="queryByProcessDefineCodeAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select
         <include refid="baseSql"/>
@@ -335,4 +355,15 @@
         where id = #{runningInstanceId}
           and next_process_instance_id = 0
     </update>
+
+<!-- There are some columns with the same names in both tables, we use a sub-query here to avoid ambiguity-->
+    <select id="queryByTriggerCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
+        select
+        <include refid="baseSql"/>
+        from t_ds_process_instance a
+        join
+            (select trigger_type, job_id, trigger_code from t_ds_trigger_relation) b
+        on a.id = b.job_id
+        where b.trigger_type = 0 and b.trigger_code = #{triggerCode}
+    </select>
 </mapper>

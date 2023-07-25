@@ -24,8 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -33,12 +32,8 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 
+@Slf4j
 public class WorkerExecService {
-
-    /**
-     * logger of WorkerExecService
-     */
-    private static final Logger logger = LoggerFactory.getLogger(WorkerExecService.class);
 
     private final ListeningExecutorService listeningExecutorService;
 
@@ -57,7 +52,7 @@ public class WorkerExecService {
         this.execService = execService;
         this.listeningExecutorService = MoreExecutors.listeningDecorator(this.execService);
         this.taskExecuteThreadMap = taskExecuteThreadMap;
-        WorkerServerMetrics.registerWorkerRunningTaskGauge(taskExecuteThreadMap::size);
+        WorkerServerMetrics.registerWorkerTaskTotalGauge(taskExecuteThreadMap::size);
     }
 
     public void submit(final WorkerTaskExecuteRunnable taskExecuteThread) {
@@ -72,7 +67,7 @@ public class WorkerExecService {
 
             @Override
             public void onFailure(Throwable throwable) {
-                logger.error("task execute failed, processInstanceId:{}, taskInstanceId:{}",
+                log.error("task execute failed, processInstanceId:{}, taskInstanceId:{}",
                         taskExecuteThread.getTaskExecutionContext().getProcessInstanceId(),
                         taskExecuteThread.getTaskExecutionContext().getTaskInstanceId(),
                         throwable);
@@ -89,6 +84,10 @@ public class WorkerExecService {
      */
     public int getThreadPoolQueueSize() {
         return ((ThreadPoolExecutor) this.execService).getQueue().size();
+    }
+
+    public int getActiveExecThreadCount() {
+        return ((ThreadPoolExecutor) this.execService).getActiveCount();
     }
 
     public Map<Integer, WorkerTaskExecuteRunnable> getTaskExecuteThreadMap() {

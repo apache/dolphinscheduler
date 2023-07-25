@@ -18,74 +18,68 @@
 package org.apache.dolphinscheduler.server.worker.rpc;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.remote.command.BaseCommand;
-import org.apache.dolphinscheduler.remote.command.CommandType;
+import org.apache.dolphinscheduler.remote.command.BaseMessage;
+import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 import org.apache.dolphinscheduler.server.worker.message.MessageSender;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class WorkerMessageSender {
-
-    private final Logger logger = LoggerFactory.getLogger(WorkerMessageSender.class);
 
     @Autowired
     private MessageRetryRunner messageRetryRunner;
 
     @Autowired
-    private ApplicationContext applicationContext;
+    private List<MessageSender> messageSenders;
 
-    private Map<CommandType, MessageSender> messageSenderMap = new HashMap<>();
+    private Map<MessageType, MessageSender> messageSenderMap = new HashMap<>();
 
     @PostConstruct
     public void init() {
-        Map<String, MessageSender> messageSenders = applicationContext.getBeansOfType(MessageSender.class);
-        messageSenders.values().forEach(messageSender -> messageSenderMap.put(messageSender.getMessageType(),
+        messageSenders.forEach(messageSender -> messageSenderMap.put(messageSender.getMessageType(),
                 messageSender));
     }
 
     // todo: use message rather than context
     public void sendMessageWithRetry(@NonNull TaskExecutionContext taskExecutionContext,
-                                     @NonNull String messageReceiverAddress,
-                                     @NonNull CommandType messageType) {
+                                     @NonNull MessageType messageType) {
         MessageSender messageSender = messageSenderMap.get(messageType);
         if (messageSender == null) {
             throw new IllegalArgumentException("The messageType is invalidated, messageType: " + messageType);
         }
-        BaseCommand baseCommand = messageSender.buildMessage(taskExecutionContext, messageReceiverAddress);
+        BaseMessage baseMessage = messageSender.buildMessage(taskExecutionContext);
         try {
-            messageRetryRunner.addRetryMessage(taskExecutionContext.getTaskInstanceId(), messageType, baseCommand);
-            messageSender.sendMessage(baseCommand);
+            messageRetryRunner.addRetryMessage(taskExecutionContext.getTaskInstanceId(), messageType, baseMessage);
+            messageSender.sendMessage(baseMessage);
         } catch (RemotingException e) {
-            logger.error("Send message error, messageType: {}, message: {}", messageType, baseCommand);
+            log.error("Send message error, messageType: {}, message: {}", messageType, baseMessage);
         }
     }
 
-    public void sendMessage(@NonNull TaskExecutionContext taskExecutionContext,
-                            @NonNull String messageReceiverAddress,
-                            @NonNull CommandType messageType) {
+    public void sendMessage(@NonNull TaskExecutionContext taskExecutionContext, @NonNull MessageType messageType) {
         MessageSender messageSender = messageSenderMap.get(messageType);
         if (messageSender == null) {
             throw new IllegalArgumentException("The messageType is invalidated, messageType: " + messageType);
         }
-        BaseCommand baseCommand = messageSender.buildMessage(taskExecutionContext, messageReceiverAddress);
+        BaseMessage baseMessage = messageSender.buildMessage(taskExecutionContext);
         try {
-            messageSender.sendMessage(baseCommand);
+            messageSender.sendMessage(baseMessage);
         } catch (RemotingException e) {
-            logger.error("Send message error, messageType: {}, message: {}", messageType, baseCommand);
+            log.error("Send message error, messageType: {}, message: {}", messageType, baseMessage);
         }
     }
 

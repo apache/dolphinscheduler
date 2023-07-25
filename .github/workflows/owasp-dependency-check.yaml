@@ -19,6 +19,8 @@ name: OWASP Dependency Check
 
 on:
   push:
+    branches:
+      - dev
   pull_request:
     paths:
       - '**/pom.xml'
@@ -38,7 +40,7 @@ jobs:
           java-version: 8
           distribution: 'adopt'
       - name: Run OWASP Dependency Check
-        run: ./mvnw -B clean install verify dependency-check:check -DskipDepCheck=false -Dmaven.test.skip=true -Dcheckstyle.skip=true 
+        run: ./mvnw -B clean install verify dependency-check:check -DskipDepCheck=false -Dmaven.test.skip=true -Dspotless.skip=true
       - name: Upload report
         uses: actions/upload-artifact@v3
         if: ${{ cancelled() || failure() }}

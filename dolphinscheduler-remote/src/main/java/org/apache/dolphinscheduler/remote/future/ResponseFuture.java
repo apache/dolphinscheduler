@@ -17,25 +17,21 @@
 
 package org.apache.dolphinscheduler.remote.future;
 
-import org.apache.dolphinscheduler.remote.command.Command;
+import org.apache.dolphinscheduler.remote.command.Message;
 
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * response future
  */
+@Slf4j
 public class ResponseFuture {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ResponseFuture.class);
 
     private static final ConcurrentHashMap<Long, ResponseFuture> FUTURE_TABLE = new ConcurrentHashMap<>(256);
 
@@ -66,7 +62,7 @@ public class ResponseFuture {
     /**
      * response command
      */
-    private Command responseCommand;
+    private Message responseMessage;
 
     private volatile boolean sendOk = true;
 
@@ -86,18 +82,20 @@ public class ResponseFuture {
      *
      * @return command
      */
-    public Command waitResponse() throws InterruptedException {
-        this.latch.await(timeoutMillis, TimeUnit.MILLISECONDS);
-        return this.responseCommand;
+    public Message waitResponse() throws InterruptedException {
+        if (!latch.await(timeoutMillis, TimeUnit.MILLISECONDS)) {
+            log.warn("Wait response timeout, request id {}", opaque);
+        }
+        return this.responseMessage;
     }
 
     /**
      * put response
      *
-     * @param responseCommand responseCommand
+     * @param responseMessage responseCommand
      */
-    public void putResponse(final Command responseCommand) {
-        this.responseCommand = responseCommand;
+    public void putResponse(final Message responseMessage) {
+        this.responseMessage = responseMessage;
         this.latch.countDown();
         FUTURE_TABLE.remove(opaque);
     }
@@ -157,12 +155,12 @@ public class ResponseFuture {
         return beginTimestamp;
     }
 
-    public Command getResponseCommand() {
-        return responseCommand;
+    public Message getResponseCommand() {
+        return responseMessage;
     }
 
-    public void setResponseCommand(Command responseCommand) {
-        this.responseCommand = responseCommand;
+    public void setResponseCommand(Message responseMessage) {
+        this.responseMessage = responseMessage;
     }
 
     public InvokeCallback getInvokeCallback() {
@@ -182,24 +180,22 @@ public class ResponseFuture {
      * scan future table
      */
     public static void scanFutureTable() {
-        final List<ResponseFuture> futureList = new LinkedList<>();
         Iterator<Map.Entry<Long, ResponseFuture>> it = FUTURE_TABLE.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<Long, ResponseFuture> next = it.next();
             ResponseFuture future = next.getValue();
-            if ((future.getBeginTimestamp() + future.getTimeoutMillis() + 1000) <= System.currentTimeMillis()) {
-                futureList.add(future);
-                it.remove();
-                LOGGER.warn("remove timeout request : {}", future);
+            if ((future.getBeginTimestamp() + future.getTimeoutMillis() + 1000) > System.currentTimeMillis()) {
+                continue;
             }
-        }
-        for (ResponseFuture future : futureList) {
             try {
+                // todo: use thread pool to execute the async callback, otherwise will block the scan thread
                 future.release();
                 future.executeInvokeCallback();
             } catch (Exception ex) {
-                LOGGER.warn("scanFutureTable, execute callback error", ex);
+                log.error("ScanFutureTable, execute callback error, requestId: {}", future.getOpaque(), ex);
             }
+            it.remove();
+            log.debug("Remove timeout request: {}", future);
         }
     }
 
@@ -212,7 +208,7 @@ public class ResponseFuture {
                 + ", releaseSemaphore=" + releaseSemaphore
                 + ", latch=" + latch
                 + ", beginTimestamp=" + beginTimestamp
-                + ", responseCommand=" + responseCommand
+                + ", responseCommand=" + responseMessage
                 + ", sendOk=" + sendOk
                 + ", cause=" + cause
                 + '}';

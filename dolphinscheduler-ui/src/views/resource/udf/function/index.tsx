@@ -24,19 +24,13 @@ import {
   watch,
   getCurrentInstance
 } from 'vue'
-import {
-  NIcon,
-  NSpace,
-  NDataTable,
-  NButton,
-  NPagination
-} from 'naive-ui'
+import { NIcon, NSpace, NDataTable, NButton, NPagination } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { SearchOutlined } from '@vicons/antd'
 import { useTable } from './use-table'
 import Card from '@/components/card'
 import FolderModal from './components/function-modal'
-import Search from "@/components/input-search";
+import Search from '@/components/input-search'
 import styles from './index.module.scss'
 
 export default defineComponent({

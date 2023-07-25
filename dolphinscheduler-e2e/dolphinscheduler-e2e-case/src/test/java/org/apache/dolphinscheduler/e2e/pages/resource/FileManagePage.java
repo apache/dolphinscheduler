@@ -51,7 +51,7 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
     @FindBy(className = "btn-create-file")
     private WebElement buttonCreateFile;
 
-    @FindBy(className = "btn-upload-file")
+    @FindBy(className = "btn-upload-resource")
     private WebElement buttonUploadFile;
 
     private final CreateDirectoryBox createDirectoryBox;
@@ -93,21 +93,19 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
         editFileBox = new EditFileBox();
     }
 
-    public FileManagePage createDirectory(String name, String description) {
+    public FileManagePage createDirectory(String name) {
         buttonCreateDirectory().click();
 
         createDirectoryBox().inputDirectoryName().sendKeys(name);
-        createDirectoryBox().inputDescription().sendKeys(description);
         createDirectoryBox().buttonSubmit().click();
 
         return this;
     }
 
-    public FileManagePage cancelCreateDirectory(String name, String description) {
+    public FileManagePage cancelCreateDirectory(String name) {
         buttonCreateDirectory().click();
 
         createDirectoryBox().inputDirectoryName().sendKeys(name);
-        createDirectoryBox().inputDescription().sendKeys(description);
         createDirectoryBox().buttonCancel().click();
 
         return this;
@@ -131,7 +129,7 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
         return this;
     }
 
-    public FileManagePage createSubDirectory(String directoryName, String subDirectoryName, String description) {
+    public FileManagePage createSubDirectory(String directoryName, String subDirectoryName) {
         fileList()
             .stream()
             .filter(it -> it.getText().contains(directoryName))
@@ -143,7 +141,6 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
         buttonCreateDirectory().click();
 
         createDirectoryBox().inputDirectoryName().sendKeys(subDirectoryName);
-        createDirectoryBox().inputDescription().sendKeys(description);
         createDirectoryBox().buttonSubmit().click();
 
         return this;
@@ -230,12 +227,6 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
         })
         private WebElement inputDirectoryName;
 
-        @FindBys({
-                @FindBy(className = "input-description"),
-                @FindBy(tagName = "textarea"),
-        })
-        private WebElement inputDescription;
-
         @FindBy(className = "btn-submit")
         private WebElement buttonSubmit;
 
@@ -254,12 +245,6 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
                 @FindBy(tagName = "input"),
         })
         private WebElement inputName;
-
-        @FindBys({
-                @FindBy(className = "input-description"),
-                @FindBy(tagName = "textarea"),
-        })
-        private WebElement inputDescription;
 
         @FindBy(className = "btn-submit")
         private WebElement buttonSubmit;

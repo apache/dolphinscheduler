@@ -18,7 +18,7 @@ version: "3.8"
 
 services:
   dolphinscheduler-postgresql:
-    image: bitnami/postgresql:11.11.0
+    image: bitnami/postgresql:15.2.0
     ports:
       - "5432:5432"
     profiles: ["all", "schema"]
@@ -37,7 +37,7 @@ services:
       - dolphinscheduler
 
   dolphinscheduler-zookeeper:
-    image: bitnami/zookeeper:3.6.2
+    image: bitnami/zookeeper:3.7.1
     profiles: ["all"]
     environment:
       ALLOW_ANONYMOUS_LOGIN: "yes"
@@ -98,6 +98,9 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
+    depends_on:
+      dolphinscheduler-zookeeper:
+        condition: service_healthy
     volumes:
       - dolphinscheduler-logs:/opt/dolphinscheduler/logs
     networks:

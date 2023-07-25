@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.task.chunjun;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
@@ -30,26 +29,21 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
+import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilderFactory;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.spi.enums.Flag;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.SystemUtils;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.nio.file.attribute.FileAttribute;
-import java.nio.file.attribute.PosixFilePermission;
-import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * chunjun task
@@ -86,7 +80,7 @@ public class ChunJunTask extends AbstractTask {
         this.taskExecutionContext = taskExecutionContext;
 
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-                taskExecutionContext, logger);
+                taskExecutionContext, log);
     }
 
     /**
@@ -95,7 +89,7 @@ public class ChunJunTask extends AbstractTask {
     @Override
     public void init() {
         chunJunParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), ChunJunParameters.class);
-        logger.info("Initialize chunjun task params {}",
+        log.info("Initialize chunjun task params {}",
                 JSONUtils.toPrettyJsonString(taskExecutionContext.getTaskParams()));
 
         if (!chunJunParameters.checkParameters()) {
@@ -103,19 +97,16 @@ public class ChunJunTask extends AbstractTask {
         }
     }
 
-    /**
-     * run chunjun process
-     *
-     * @throws TaskException exception
-     */
+    @SuppressWarnings("unchecked")
     @Override
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
 
-            String jsonFilePath = buildChunJunJsonFile(paramsMap);
-            String shellCommandFilePath = buildShellCommandFile(jsonFilePath, paramsMap);
-            TaskResponse commandExecuteResult = shellCommandExecutor.run(shellCommandFilePath);
+            IShellInterceptorBuilder<?, ?> shellActuatorBuilder = ShellInterceptorBuilderFactory.newBuilder()
+                    .properties(ParameterUtils.convert(paramsMap))
+                    .appendScript(buildCommand(buildChunJunJsonFile(paramsMap)));
+            TaskResponse commandExecuteResult = shellCommandExecutor.run(shellActuatorBuilder, taskCallBack);
 
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
 
@@ -124,11 +115,11 @@ public class ChunJunTask extends AbstractTask {
             setProcessId(commandExecuteResult.getProcessId());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            logger.error("The current ChunJun Task has been interrupted", e);
+            log.error("The current ChunJun Task has been interrupted", e);
             setExitStatusCode(EXIT_CODE_FAILURE);
             throw new TaskException("The current ChunJun Task has been interrupted", e);
         } catch (Exception e) {
-            logger.error("chunjun task failed.", e);
+            log.error("chunjun task failed.", e);
             setExitStatusCode(EXIT_CODE_FAILURE);
             throw new TaskException("Execute chunjun task failed", e);
         }
@@ -159,34 +150,16 @@ public class ChunJunTask extends AbstractTask {
         }
 
         // replace placeholder
-        json = ParameterUtils.convertParameterPlaceholders(json, ParamUtils.convert(paramsMap));
+        json = ParameterUtils.convertParameterPlaceholders(json, ParameterUtils.convert(paramsMap));
 
-        logger.debug("chunjun job json : {}", json);
+        log.debug("chunjun job json : {}", json);
 
         // create chunjun json file
         FileUtils.writeStringToFile(new File(fileName), json, StandardCharsets.UTF_8);
         return fileName;
     }
 
-    /**
-     * create command
-     *
-     * @return shell command file name
-     * @throws Exception if error throws Exception
-     */
-    private String buildShellCommandFile(String jobConfigFilePath, Map<String, Property> paramsMap) throws Exception {
-        // generate scripts
-        String fileName = String.format("%s/%s_node.%s",
-                taskExecutionContext.getExecutePath(),
-                taskExecutionContext.getTaskAppId(),
-                SystemUtils.IS_OS_WINDOWS ? "bat" : "sh");
-
-        Path path = new File(fileName).toPath();
-
-        if (Files.exists(path)) {
-            return fileName;
-        }
-
+    private String buildCommand(String jobConfigFilePath) {
         // chunjun command
         List<String> args = new ArrayList<>();
 
@@ -216,24 +189,7 @@ public class ChunJunTask extends AbstractTask {
 
         String command = String.join(" ", args);
 
-        // replace placeholder
-        String chunjunCommand = ParameterUtils.convertParameterPlaceholders(command, ParamUtils.convert(paramsMap));
-
-        logger.info("raw script : {}", chunjunCommand);
-
-        // create shell command file
-        Set<PosixFilePermission> perms = PosixFilePermissions.fromString(RWXR_XR_X);
-        FileAttribute<Set<PosixFilePermission>> attr = PosixFilePermissions.asFileAttribute(perms);
-
-        if (SystemUtils.IS_OS_WINDOWS) {
-            Files.createFile(path);
-        } else {
-            Files.createFile(path, attr);
-        }
-
-        Files.write(path, chunjunCommand.getBytes(), StandardOpenOption.APPEND);
-
-        return fileName;
+        return command;
     }
 
     public String getExecMode(ChunJunParameters chunJunParameters) {

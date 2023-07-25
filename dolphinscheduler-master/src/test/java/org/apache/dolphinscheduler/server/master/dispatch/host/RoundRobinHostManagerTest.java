@@ -21,11 +21,11 @@ import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.ExecutionContextTestUtils;
 import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
+import org.apache.dolphinscheduler.server.master.dispatch.exceptions.WorkerGroupNotFoundException;
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 
 import java.util.Optional;
 
-import org.assertj.core.util.Strings;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,21 +49,21 @@ public class RoundRobinHostManagerTest {
     RoundRobinHostManager roundRobinHostManager;
 
     @Test
-    public void testSelectWithEmptyResult() {
+    public void testSelectWithEmptyResult() throws WorkerGroupNotFoundException {
         Mockito.when(serverNodeManager.getWorkerGroupNodes("default")).thenReturn(null);
         ExecutionContext context = ExecutionContextTestUtils.getExecutionContext(10000);
-        Host emptyHost = roundRobinHostManager.select(context);
-        Assertions.assertTrue(Strings.isNullOrEmpty(emptyHost.getAddress()));
+        Optional<Host> emptyHost = roundRobinHostManager.select(context.getWorkerGroup());
+        Assertions.assertFalse(emptyHost.isPresent());
     }
 
     @Test
-    public void testSelectWithResult() {
+    public void testSelectWithResult() throws WorkerGroupNotFoundException {
         Mockito.when(serverNodeManager.getWorkerGroupNodes("default")).thenReturn(Sets.newHashSet("192.168.1.1:22"));
         Mockito.when(serverNodeManager.getWorkerNodeInfo("192.168.1.1:22"))
                 .thenReturn(Optional.of(new WorkerHeartBeat()));
         ExecutionContext context = ExecutionContextTestUtils.getExecutionContext(10000);
-        Host host = roundRobinHostManager.select(context);
-        Assertions.assertFalse(Strings.isNullOrEmpty(host.getAddress()));
-        Assertions.assertTrue(host.getAddress().equalsIgnoreCase("192.168.1.1:22"));
+        Optional<Host> host = roundRobinHostManager.select(context.getWorkerGroup());
+        Assertions.assertTrue(host.isPresent());
+        Assertions.assertTrue(host.get().getAddress().equalsIgnoreCase("192.168.1.1:22"));
     }
 }

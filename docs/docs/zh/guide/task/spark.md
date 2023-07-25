@@ -24,13 +24,15 @@ Spark  任务类型用于执行 Spark 应用。对于 Spark 节点，worker 支�
 - 主函数的 Class：Spark 程序的入口 Main class 的全路径。
 - 主程序包：执行 Spark 程序的 jar 包（通过资源中心上传）。
 - SQL脚本：Spark sql 运行的 .sql 文件中的 SQL 语句。
-- 部署方式：(1) spark submit 支持 yarn-clusetr、yarn-client 和 local 三种模式。
-  (2) spark sql 支持 yarn-client 和 local 两种模式。
+- 部署方式：(1) spark submit 支持 cluster、client 和 local 三种模式。
+  (2) spark sql 支持 client 和 local 两种模式。
+- 命名空间（集群）：若选择命名空间（集群），则以原生的方式提交至所选择 K8S 集群执行，未选择则提交至 Yarn 集群执行（默认）。
 - 任务名称（可选）：Spark 程序的名称。
 - Driver 核心数：用于设置 Driver 内核数，可根据实际生产环境设置对应的核心数。
 - Driver 内存数：用于设置 Driver 内存数，可根据实际生产环境设置对应的内存数。
 - Executor 数量：用于设置 Executor 的数量，可根据实际生产环境设置对应的内存数。
 - Executor 内存数：用于设置 Executor 内存数，可根据实际生产环境设置对应的内存数。
+- Yarn 队列：用于设置 Yarn 队列，默认使用 default 队列。
 - 主程序参数：设置 Spark 程序的输入参数，支持自定义参数变量的替换。
 - 选项参数：支持 `--jars`、`--files`、`--archives`、`--conf` 格式。
 - 资源：如果其他参数中引用了资源文件，需要在资源中选择指定。

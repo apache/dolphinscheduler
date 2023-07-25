@@ -19,11 +19,21 @@ package org.apache.dolphinscheduler.dao.repository;
 
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
-public interface ProcessTaskRelationLogDao {
+public interface ProcessTaskRelationLogDao extends IDao<ProcessTaskRelationLog> {
 
-    List<ProcessTaskRelationLog> findByWorkflowDefinitionCode(long workflowDefinitionCode);
+    List<ProcessTaskRelationLog> queryByWorkflowDefinitionCode(long workflowDefinitionCode);
 
     void deleteByWorkflowDefinitionCode(long workflowDefinitionCode);
+
+    /**
+     * batch insert process task relation
+     *
+     * @param taskRelationList taskRelationList
+     * @return int
+     */
+    int batchInsert(@Param("taskRelationList") List<ProcessTaskRelationLog> taskRelationList);
 }

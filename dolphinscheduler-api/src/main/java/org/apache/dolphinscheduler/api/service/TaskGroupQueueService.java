@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -68,7 +69,13 @@ public interface TaskGroupQueueService {
      */
     boolean deleteByTaskId(int taskId);
 
+    void deleteByTaskInstanceIds(List<Integer> taskInstanceIds);
+
+    void deleteByWorkflowInstanceId(Integer workflowInstanceId);
+
     void forceStartTask(int queueId, int forceStart);
 
     void modifyPriority(Integer queueId, Integer priority);
+
+    void deleteByTaskGroupIds(List<Integer> taskGroupIds);
 }

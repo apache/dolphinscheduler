@@ -17,7 +17,9 @@
 
 package org.apache.dolphinscheduler.api.aspect;
 
+import org.apache.dolphinscheduler.api.metrics.ApiServerMetrics;
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import org.apache.commons.lang3.StringUtils;
@@ -26,7 +28,6 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -34,22 +35,21 @@ import java.util.stream.IntStream;
 
 import javax.servlet.http.HttpServletRequest;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Aspect
 @Component
+@Slf4j
 public class AccessLogAspect {
-
-    private static final Logger logger = LoggerFactory.getLogger(AccessLogAspect.class);
 
     private static final String TRACE_ID = "traceId";
 
@@ -66,31 +66,45 @@ public class AccessLogAspect {
     public Object doAround(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         long startTime = System.currentTimeMillis();
 
+        String URI = null;
+        String requestMethod = null;
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attributes != null) {
+            HttpServletRequest request = attributes.getRequest();
+            URI = request.getRequestURI();
+            requestMethod = request.getMethod();
+        }
+
         // fetch AccessLogAnnotation
         MethodSignature sign = (MethodSignature) proceedingJoinPoint.getSignature();
         Method method = sign.getMethod();
         AccessLogAnnotation annotation = method.getAnnotation(AccessLogAnnotation.class);
 
-        String traceId = UUID.randomUUID().toString();
+        String traceId = String.valueOf(CodeGenerateUtils.getInstance().genCode());
+
+        int userId = -1;
+        String userName = "NOT LOGIN";
 
         // log request
         if (!annotation.ignoreRequest()) {
-            ServletRequestAttributes attributes =
-                    (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
             if (attributes != null) {
                 HttpServletRequest request = attributes.getRequest();
                 String traceIdFromHeader = request.getHeader(TRACE_ID);
-                if (!StringUtils.isEmpty(traceIdFromHeader)) {
+                if (StringUtils.isNotEmpty(traceIdFromHeader)) {
                     traceId = traceIdFromHeader;
                 }
                 // handle login info
-                String userName = parseLoginInfo(request);
+                User loginUser = parseLoginInfo(request);
+                if (loginUser != null) {
+                    userName = loginUser.getUserName();
+                    userId = loginUser.getId();
+                }
 
                 // handle args
                 String argsString = parseArgs(proceedingJoinPoint, annotation);
                 // handle sensitive data in the string
                 argsString = handleSensitiveData(argsString);
-                logger.info("REQUEST TRACE_ID:{}, LOGIN_USER:{}, URI:{}, METHOD:{}, HANDLER:{}, ARGS:{}",
+                log.info("REQUEST TRACE_ID:{}, LOGIN_USER:{}, URI:{}, METHOD:{}, HANDLER:{}, ARGS:{}",
                         traceId,
                         userName,
                         request.getRequestURI(),
@@ -104,10 +118,11 @@ public class AccessLogAspect {
 
         Object ob = proceedingJoinPoint.proceed();
 
-        // log response
-        if (!annotation.ignoreResponse()) {
-            logger.info("RESPONSE TRACE_ID:{}, BODY:{}, REQUEST DURATION:{} milliseconds", traceId, ob,
-                    (System.currentTimeMillis() - startTime));
+        long costTime = System.currentTimeMillis() - startTime;
+        log.info("Call {}:{} success, cost: {}ms", requestMethod, URI, costTime);
+
+        if (userId != -1) {
+            ApiServerMetrics.recordApiResponseTime(costTime, userId);
         }
 
         return ob;
@@ -155,13 +170,9 @@ public class AccessLogAspect {
         return originalData;
     }
 
-    private String parseLoginInfo(HttpServletRequest request) {
-        String userName = "NOT LOGIN";
+    private User parseLoginInfo(HttpServletRequest request) {
         User loginUser = (User) (request.getAttribute(Constants.SESSION_USER));
-        if (loginUser != null) {
-            userName = loginUser.getUserName();
-        }
-        return userName;
+        return loginUser;
     }
 
 }

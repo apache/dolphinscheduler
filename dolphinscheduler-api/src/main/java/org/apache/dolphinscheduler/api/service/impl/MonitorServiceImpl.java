@@ -20,13 +20,13 @@ package org.apache.dolphinscheduler.api.service.impl;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.MonitorService;
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.model.WorkerServerModel;
 import org.apache.dolphinscheduler.dao.MonitorDBDao;
 import org.apache.dolphinscheduler.dao.entity.MonitorRecord;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
 import java.util.HashMap;
 import java.util.List;
@@ -34,8 +34,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -45,9 +45,8 @@ import com.google.common.collect.Sets;
  * monitor service impl
  */
 @Service
+@Slf4j
 public class MonitorServiceImpl extends BaseServiceImpl implements MonitorService {
-
-    public static final Logger logger = LoggerFactory.getLogger(MonitorServiceImpl.class);
 
     @Autowired
     private MonitorDBDao monitorDBDao;
@@ -131,8 +130,8 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
     @Override
     public List<Server> getServerListFromRegistry(boolean isMaster) {
         return isMaster
-                ? registryClient.getServerList(NodeType.MASTER)
-                : registryClient.getServerList(NodeType.WORKER);
+                ? registryClient.getServerList(RegistryNodeType.MASTER)
+                : registryClient.getServerList(RegistryNodeType.WORKER);
     }
 
 }

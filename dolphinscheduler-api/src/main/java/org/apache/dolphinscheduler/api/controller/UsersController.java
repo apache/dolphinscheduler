@@ -46,8 +46,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -71,9 +71,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "USERS_TAG")
 @RestController
 @RequestMapping("/users")
+@Slf4j
 public class UsersController extends BaseController {
-
-    private static final Logger logger = LoggerFactory.getLogger(UsersController.class);
 
     @Autowired
     private UsersService usersService;
@@ -112,6 +111,10 @@ public class UsersController extends BaseController {
                              @RequestParam(value = "email") String email,
                              @RequestParam(value = "phone", required = false) String phone,
                              @RequestParam(value = "state", required = false) int state) throws Exception {
+        Result verifyRet = usersService.verifyUserName(userName);
+        if (verifyRet.getCode() != Status.SUCCESS.getCode()) {
+            return verifyRet;
+        }
         Map<String, Object> result =
                 usersService.createUser(loginUser, userName, userPassword, email, tenantId, phone, queue, state);
         return returnDataList(result);
@@ -539,7 +542,7 @@ public class UsersController extends BaseController {
             Map<String, Object> result = usersService.authorizedUser(loginUser, alertgroupId);
             return returnDataList(result);
         } catch (Exception e) {
-            logger.error(Status.AUTHORIZED_USER_ERROR.getMsg(), e);
+            log.error(Status.AUTHORIZED_USER_ERROR.getMsg(), e);
             return error(Status.AUTHORIZED_USER_ERROR.getCode(), Status.AUTHORIZED_USER_ERROR.getMsg());
         }
     }
@@ -571,6 +574,10 @@ public class UsersController extends BaseController {
         userPassword = ParameterUtils.handleEscapes(userPassword);
         repeatPassword = ParameterUtils.handleEscapes(repeatPassword);
         email = ParameterUtils.handleEscapes(email);
+        Result<Object> verifyRet = usersService.verifyUserName(userName);
+        if (verifyRet.getCode() != Status.SUCCESS.getCode()) {
+            return verifyRet;
+        }
         Map<String, Object> result = usersService.registerUser(userName, userPassword, repeatPassword, email);
         return returnDataList(result);
     }

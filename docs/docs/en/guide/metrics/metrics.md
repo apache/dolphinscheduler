@@ -17,7 +17,7 @@ cd dolphinscheduler-meter/src/main/resources/grafana-demo
 docker compose up
 ```
 
-then access the `Grafana` by the url: `http://localhost/3001` for dashboards.
+then access the `Grafana` by the url: `http://localhost:3001` for dashboards.
 
 ![image.png](../../../../img/metrics/metrics-master.png)
 ![image.png](../../../../img/metrics/metrics-worker.png)
@@ -73,7 +73,6 @@ For example, you can get the master metrics by `curl http://localhost:5679/actua
 - ds.task.dispatch.failure.count: (counter) the number of tasks failed to dispatch, retry failure included
 - ds.task.dispatch.error.count: (counter) the number of task dispatch errors
 - ds.task.execution.count.by.type: (counter) the number of task executions grouped by tag `task_type`
-- ds.task.running: (gauge) the number of running tasks
 - ds.task.prepared: (gauge) the number of tasks prepared for task queue
 - ds.task.execution.count: (counter) the number of executed tasks
 - ds.task.execution.duration: (histogram) duration of task executions
@@ -83,7 +82,8 @@ For example, you can get the master metrics by `curl http://localhost:5679/actua
 - ds.workflow.create.command.count: (counter) the number of commands created and inserted by workflows
 - ds.workflow.instance.submit.count: (counter) the number of submitted workflow instances
 - ds.workflow.instance.running: (gauge) the number of running workflow instances
-- ds.workflow.instance.count: (counter) the number of workflow instances, sliced by the tag `state`:
+- ds.workflow.instance.count: (counter) the number of workflow instances, sliced by tags `process.definition.code` and `state`. To monitor a specific workflow, you could filter the metrics by tag `process.definition.code`, which refers to the definition code of your workflow. There are seven different states for workflow instances as follows:
+  - submit: the number of submitted workflow instances
   - timeout: the number of timeout workflow instances
   - finish: the number of finished workflow instances, both successes and failures included
   - success: the number of successful workflow instances
@@ -103,6 +103,12 @@ For example, you can get the master metrics by `curl http://localhost:5679/actua
 ### Worker Server Metrics
 
 - ds.worker.overload.count: (counter) the number of times the worker overloaded
+- ds.worker.task: (gauge) the number of tasks on the worker, including pending and running ones
+- ds.worker.execute.queue.size: (gauge) the number of pending tasks on the worker
+- ds.worker.active.execute.thread: (gauge) the number of running tasks on the worker
+- ds.worker.memory.available: (gauge) the available physical memory of the worker (GB)
+- ds.worker.cpu.usage: (gauge) the cpu usage percentage of the worker
+- ds.worker.memory.usage: (gauge) the memory usage percentage of the worker
 - ds.worker.full.submit.queue.count: (counter) the number of times the worker's submit queue being full
 - ds.worker.resource.download.count: (counter) the number of downloaded resource files on workers, sliced by tag `status`
 - ds.worker.resource.download.duration: (histogram) the time cost of resource download on workers
@@ -110,7 +116,11 @@ For example, you can get the master metrics by `curl http://localhost:5679/actua
 
 ### Api Server Metrics
 
-- Currently, we have not embedded any metrics in Api Server.
+- ds.api.request.count: (counter) the number of requests received by the api server
+- ds.api.response.count: (counter) the number of responses received by the api server, sliced by tag `code`
+- ds.api.response.time: (timer) the response time distribution of the api server, sliced by tag `user_id`
+- ds.api.resource.upload.size: (histogram) size distribution of resource files uploaded by the api server (bytes)
+- ds.api.resource.download.size: (histogram) size distribution of resource files download by the api server (bytes)
 
 ### Alert Server Related
 

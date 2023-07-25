@@ -21,5 +21,5 @@ public interface DolphinSchedulerUpgrader {
 
     void doUpgrade();
 
-    String getCurrentVersion();
+    DolphinSchedulerVersion getCurrentVersion();
 }

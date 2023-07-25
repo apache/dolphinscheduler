@@ -18,21 +18,19 @@
 package org.apache.dolphinscheduler.service.alert;
 
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.alert.AlertSendRequestCommand;
-import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponseCommand;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.alert.AlertSendRequest;
+import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponse;
 import org.apache.dolphinscheduler.remote.factory.NettyRemotingClientFactory;
 import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.remote.utils.JsonSerializer;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class AlertClientService implements AutoCloseable {
-
-    private static final Logger logger = LoggerFactory.getLogger(AlertClientService.class);
 
     private final NettyRemotingClient client;
 
@@ -56,27 +54,18 @@ public class AlertClientService implements AutoCloseable {
     }
 
     /**
-     * alert client
-     */
-    public AlertClientService(String host, int port) {
-        this();
-        this.host = host;
-        this.port = port;
-    }
-
-    /**
      * close
      */
     @Override
     public void close() {
         if (isRunning.compareAndSet(true, false)) {
-            logger.warn("Alert client is already closed");
+            log.warn("Alert client is already closed");
             return;
         }
 
-        logger.info("Alter client closing");
+        log.info("Alter client closing");
         this.client.close();
-        logger.info("Alter client closed");
+        log.info("Alter client closed");
     }
 
     /**
@@ -86,7 +75,7 @@ public class AlertClientService implements AutoCloseable {
      * @param content
      * @return
      */
-    public AlertSendResponseCommand sendAlert(int groupId, String title, String content, int strategy) {
+    public AlertSendResponse sendAlert(int groupId, String title, String content, int strategy) {
         return this.sendAlert(this.host, this.port, groupId, title, content, strategy);
     }
 
@@ -99,20 +88,20 @@ public class AlertClientService implements AutoCloseable {
      * @param content content
      * @return AlertSendResponseCommand
      */
-    public AlertSendResponseCommand sendAlert(String host, int port, int groupId, String title, String content,
-                                              int strategy) {
-        logger.info("sync alert send, host : {}, port : {}, groupId : {}, title : {} , strategy : {} ", host, port,
+    public AlertSendResponse sendAlert(String host, int port, int groupId, String title, String content,
+                                       int strategy) {
+        log.info("sync alert send, host : {}, port : {}, groupId : {}, title : {} , strategy : {} ", host, port,
                 groupId, title, strategy);
-        AlertSendRequestCommand request = new AlertSendRequestCommand(groupId, title, content, strategy);
+        AlertSendRequest request = new AlertSendRequest(groupId, title, content, strategy);
         final Host address = new Host(host, port);
         try {
-            Command command = request.convert2Command();
-            Command response = this.client.sendSync(address, command, ALERT_REQUEST_TIMEOUT);
+            Message message = request.convert2Command();
+            Message response = this.client.sendSync(address, message, ALERT_REQUEST_TIMEOUT);
             if (response != null) {
-                return JsonSerializer.deserialize(response.getBody(), AlertSendResponseCommand.class);
+                return JsonSerializer.deserialize(response.getBody(), AlertSendResponse.class);
             }
         } catch (Exception e) {
-            logger.error("sync alert send error", e);
+            log.error("sync alert send error", e);
         } finally {
             this.client.closeChannel(address);
         }

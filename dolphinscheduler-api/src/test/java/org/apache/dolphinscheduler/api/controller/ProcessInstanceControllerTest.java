@@ -108,7 +108,7 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
         Mockito.when(processInstanceService
                 .updateProcessInstance(Mockito.any(), Mockito.anyLong(), Mockito.anyInt(), Mockito.anyString(),
                         Mockito.anyString(), Mockito.anyString(), Mockito.anyBoolean(), Mockito.anyString(),
-                        Mockito.anyString(), Mockito.anyInt(), Mockito.anyString()))
+                        Mockito.anyString(), Mockito.anyInt()))
                 .thenReturn(mockResult);
 
         String json =
@@ -244,6 +244,26 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+    }
+
+    @Test
+    public void queryProcessInstancesByTriggerCode() throws Exception {
+        Map<String, Object> mockResult = new HashMap<>();
+        mockResult.put(Constants.STATUS, Status.SUCCESS);
+
+        Mockito.when(processInstanceService
+                .queryByTriggerCode(Mockito.any(), Mockito.anyLong(), Mockito.anyLong()))
+                .thenReturn(mockResult);
+
+        MvcResult mvcResult = mockMvc.perform(get("/projects/1113/process-instances/trigger")
+                .header("sessionId", sessionId)
+                .param("triggerCode", "12051206"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertNotNull(result);
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());

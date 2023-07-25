@@ -8,11 +8,11 @@ This section describes the one-click deployment of high availability DolphinSche
 
 ## DolphinScheduler Cluster One-click Deployment
 
-* Logging in and accessing the built-in open source app store, search the keyword `dolphinscheduler` to find the DolphinScheduler App.
+1. Go to Rainbond **Platform Management -> App Marketplace -> Open Source App Store** and search for **dolphinScheduler** to find the DolphinScheduler application.
 
 ![](../../../../img/rainbond/appstore-dolphinscheduler.png)
 
-* Click `install` on the right side of DolphinScheduler to go to the installation page. Fill in the corresponding information and click `OK` to start the installation. You will get automatically redirected to the application view.
+2. Click **install** on the right side of DolphinScheduler to go to the installation page. Fill in the corresponding information and click `OK` to start the installation. You will get automatically redirected to the application view.
 
 | Select item  |             Description             |
 |--------------|-------------------------------------|
@@ -23,13 +23,11 @@ This section describes the one-click deployment of high availability DolphinSche
 
 ![](../../../../img/rainbond/install-dolphinscheduler.png)
 
-* Wait a few minutes, the installation completes and `DolphinScheduler` will be running.
+3. Wait a few minutes, the installation completes and `DolphinScheduler` will be running.
 
 ![](../../../../img/rainbond/topology-dolphinscheduler.png)
 
-* Access DolphinScheduler-API components and the default user credentials are `admin` / `dolphinscheduler123`.
-
-![](../../../../img/rainbond/homepage-dolphinscheduler.png)
+4. Click the `access` button in the application to access the DolphinScheduler-API components through the domain name provided by Rainbond by default. Default user password is **admin/dolphinscheduler123**.
 
 ## API Master Worker Node Telescopic
 
@@ -49,7 +47,7 @@ API and Worker Services share the configuration file `/opt/dolphinscheduler/conf
 
 ## How to support Python 3？
 
-Worker service is installed with default `Python3`，you can add environment variables `PYTHON_HOME=/usr/bin/python3`
+Worker service is installed with default `Python3`，you can add environment variables `PYTHON_LAUNCHER=/usr/bin/python3`
 
 ## How to support Hadoop, Spark, DataX ？
 

@@ -78,12 +78,12 @@ public class EmrJobFlowTask extends AbstractEmrTask {
             clusterStatus = getClusterStatus();
 
         } catch (EmrTaskException | SdkBaseException e) {
-            logger.error("emr task submit failed with error", e);
+            log.error("emr task submit failed with error", e);
             throw new TaskException("emr task submit failed", e);
         } finally {
             final int exitStatusCode = calculateExitStatusCode(clusterStatus);
             setExitStatusCode(exitStatusCode);
-            logger.info("emr task finished with cluster status : {}", clusterStatus);
+            log.info("emr task finished with cluster status : {}", clusterStatus);
         }
     }
 
@@ -98,14 +98,14 @@ public class EmrJobFlowTask extends AbstractEmrTask {
                 clusterStatus = getClusterStatus();
             }
         } catch (EmrTaskException | SdkBaseException e) {
-            logger.error("emr task failed with error", e);
+            log.error("emr task failed with error", e);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new TaskException("Execute emr task failed", e);
         } finally {
             final int exitStatusCode = calculateExitStatusCode(clusterStatus);
             setExitStatusCode(exitStatusCode);
-            logger.info("emr task finished with cluster status : {}", clusterStatus);
+            log.info("emr task finished with cluster status : {}", clusterStatus);
         }
     }
 
@@ -165,18 +165,18 @@ public class EmrJobFlowTask extends AbstractEmrTask {
             throw new EmrTaskException("fetch cluster status failed");
         }
         ClusterStatus clusterStatus = result.getCluster().getStatus();
-        logger.info("emr cluster [clusterId:{}] running with status:{}", clusterId, clusterStatus);
+        log.info("emr cluster [clusterId:{}] running with status:{}", clusterId, clusterStatus);
         return clusterStatus;
 
     }
 
     @Override
     public void cancelApplication() throws TaskException {
-        logger.info("trying terminate job flow, taskId:{}, clusterId:{}", this.taskExecutionContext.getTaskInstanceId(),
+        log.info("trying terminate job flow, taskId:{}, clusterId:{}", this.taskExecutionContext.getTaskInstanceId(),
                 clusterId);
         TerminateJobFlowsRequest terminateJobFlowsRequest = new TerminateJobFlowsRequest().withJobFlowIds(clusterId);
         TerminateJobFlowsResult terminateJobFlowsResult = emrClient.terminateJobFlows(terminateJobFlowsRequest);
-        logger.info("the result of terminate job flow is:{}", terminateJobFlowsResult);
+        log.info("the result of terminate job flow is:{}", terminateJobFlowsResult);
     }
 
 }

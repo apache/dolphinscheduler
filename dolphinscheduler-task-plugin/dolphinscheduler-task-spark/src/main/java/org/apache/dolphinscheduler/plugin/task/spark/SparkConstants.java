@@ -36,21 +36,21 @@ public class SparkConstants {
     /**
      * --queue QUEUE
      */
-    public static final String SPARK_QUEUE = "--queue";
+    public static final String SPARK_YARN_QUEUE = "--queue";
 
     public static final String DEPLOY_MODE = "--deploy-mode";
 
     public static final String DEPLOY_MODE_LOCAL = "local";
 
     /**
-     * --driver-cores NUM
+     * --conf spark.driver.cores NUM
      */
-    public static final String DRIVER_CORES = "--driver-cores";
+    public static final String DRIVER_CORES = "--conf spark.driver.cores=%d";
 
     /**
-     * --driver-memory MEM
+     * --conf spark.driver.memory MEM
      */
-    public static final String DRIVER_MEMORY = "--driver-memory";
+    public static final String DRIVER_MEMORY = "--conf spark.driver.memory=%s";
 
     /**
      * master
@@ -59,20 +59,32 @@ public class SparkConstants {
 
     public static final String SPARK_ON_YARN = "yarn";
 
-    /**
-     * --num-executors NUM
-     */
-    public static final String NUM_EXECUTORS = "--num-executors";
+    public static final String SPARK_ON_K8S_MASTER_PREFIX = "k8s://";
 
     /**
-     * --executor-cores NUM
+     * add label for driver pod
      */
-    public static final String EXECUTOR_CORES = "--executor-cores";
+    public static final String DRIVER_LABEL_CONF = "--conf spark.kubernetes.driver.label.%s=%s";
 
     /**
-     * --executor-memory MEM
+     * spark kubernetes namespace
      */
-    public static final String EXECUTOR_MEMORY = "--executor-memory";
+    public static final String SPARK_KUBERNETES_NAMESPACE = "--conf spark.kubernetes.namespace=%s";
+
+    /**
+     * --conf spark.executor.instances NUM
+     */
+    public static final String NUM_EXECUTORS = "--conf spark.executor.instances=%d";
+
+    /**
+     * --conf spark.executor.cores NUM
+     */
+    public static final String EXECUTOR_CORES = "--conf spark.executor.cores=%d";
+
+    /**
+     * --conf spark.executor.memory MEM
+     */
+    public static final String EXECUTOR_MEMORY = "--conf spark.executor.memory=%s";
 
     /**
      * -f <filename> SQL from files
@@ -88,5 +100,9 @@ public class SparkConstants {
      * spark submit command
      */
     public static final String SPARK_SUBMIT_COMMAND = "${SPARK_HOME}/bin/spark-submit";
+
+    public static final String TYPE_SCRIPT = "SCRIPT";
+
+    public static final String TYPE_FILE = "FILE";
 
 }

@@ -57,7 +57,8 @@ export function useNamespace(): IJsonItem {
     name: t('project.node.namespace_cluster'),
     props: {
       loading,
-      'render-label': renderLabel
+      'render-label': renderLabel,
+      clearable: true
     },
     options: [
       {

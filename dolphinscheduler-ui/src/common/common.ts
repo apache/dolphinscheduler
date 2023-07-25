@@ -30,7 +30,8 @@ import {
   StopOutlined,
   IssuesCloseOutlined,
   SendOutlined,
-  HistoryOutlined
+  HistoryOutlined,
+  HourglassOutlined
 } from '@vicons/antd'
 import { format, parseISO } from 'date-fns'
 import _ from 'lodash'
@@ -123,6 +124,10 @@ export const runningType = (t: any) => [
   {
     desc: `${t('project.workflow.execute_task')}`,
     code: 'EXECUTE_TASK'
+  },
+  {
+    desc: `${t('project.workflow.dynamic_generation')}`,
+    code: 'DYNAMIC_GENERATION'
   }
 ]
 
@@ -153,7 +158,6 @@ export const workflowExecutionStateType = (t: any) => [
     label: item.desc
   }))
 ]
-
 
 /**
  * Stream task state
@@ -271,7 +275,7 @@ export const tasksState = (t: any): ITaskStateConfig => ({
     icon: SendOutlined,
     isSpin: false,
     classNames: 'dispatch'
-  },
+  }
 })
 
 /**
@@ -282,7 +286,9 @@ export const tasksState = (t: any): ITaskStateConfig => ({
  * @icon icon
  * @isSpin is loading (Need to execute the code block to write if judgment)
  */
-export const workflowExecutionState = (t: any): IWorkflowExecutionStateConfig => ({
+export const workflowExecutionState = (
+  t: any
+): IWorkflowExecutionStateConfig => ({
   SUBMITTED_SUCCESS: {
     id: 0,
     desc: `${t('project.workflow.submit_success')}`,
@@ -378,7 +384,15 @@ export const workflowExecutionState = (t: any): IWorkflowExecutionStateConfig =>
     icon: HistoryOutlined,
     isSpin: false,
     classNames: 'pending'
-  }
+  },
+  WAIT_TO_RUN: {
+    id: 18,
+    desc: `${t('project.overview.wait_to_run')}`,
+    color: '#5102ce',
+    icon: HourglassOutlined,
+    isSpin: false,
+    classNames: 'wait_to_run'
+  },
 })
 
 /**

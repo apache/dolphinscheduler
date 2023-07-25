@@ -43,13 +43,16 @@ public abstract class AbstractDataSourceProcessor implements DataSourceProcessor
 
     private static final Pattern DATABASE_PATTER = Pattern.compile("^[a-zA-Z0-9\\_\\-\\.]+$");
 
-    private static final Pattern PARAMS_PATTER = Pattern.compile("^[a-zA-Z0-9\\-\\_\\/\\@\\.]+$");
+    private static final Pattern PARAMS_PATTER = Pattern.compile("^[a-zA-Z0-9\\-\\_\\/\\@\\.\\:]+$");
 
     private static final Set<String> POSSIBLE_MALICIOUS_KEYS = Sets.newHashSet("allowLoadLocalInfile");
 
     @Override
     public void checkDatasourceParam(BaseDataSourceParamDTO baseDataSourceParamDTO) {
-        checkHost(baseDataSourceParamDTO.getHost());
+        if (!baseDataSourceParamDTO.getType().equals(DbType.REDSHIFT)) {
+            // due to redshift use not regular hosts
+            checkHost(baseDataSourceParamDTO.getHost());
+        }
         checkDatabasePatter(baseDataSourceParamDTO.getDatabase());
         checkOther(baseDataSourceParamDTO.getOther());
     }

@@ -30,20 +30,18 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Driver;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.zaxxer.hikari.HikariDataSource;
 
 /**
  * Jdbc Data Source Provider
  */
+@Slf4j
 public class JDBCDataSourceProvider {
 
-    private static final Logger logger = LoggerFactory.getLogger(JDBCDataSourceProvider.class);
-
     public static HikariDataSource createJdbcDataSource(BaseConnectionParam properties, DbType dbType) {
-        logger.info("Creating HikariDataSource pool for maxActive:{}",
+        log.info("Creating HikariDataSource pool for maxActive:{}",
                 PropertyUtils.getInt(DataSourceConstants.SPRING_DATASOURCE_MAX_ACTIVE, 50));
         HikariDataSource dataSource = new HikariDataSource();
 
@@ -64,7 +62,7 @@ public class JDBCDataSourceProvider {
             properties.getOther().forEach(dataSource::addDataSourceProperty);
         }
 
-        logger.info("Creating HikariDataSource pool success.");
+        log.info("Creating HikariDataSource pool success.");
         return dataSource;
     }
 
@@ -72,7 +70,7 @@ public class JDBCDataSourceProvider {
      * @return One Session Jdbc DataSource
      */
     public static HikariDataSource createOneSessionJdbcDataSource(BaseConnectionParam properties, DbType dbType) {
-        logger.info("Creating OneSession HikariDataSource pool for maxActive:{}",
+        log.info("Creating OneSession HikariDataSource pool for maxActive:{}",
                 PropertyUtils.getInt(DataSourceConstants.SPRING_DATASOURCE_MAX_ACTIVE, 50));
 
         HikariDataSource dataSource = new HikariDataSource();
@@ -93,7 +91,7 @@ public class JDBCDataSourceProvider {
             properties.getOther().forEach(dataSource::addDataSourceProperty);
         }
 
-        logger.info("Creating OneSession HikariDataSource pool success.");
+        log.info("Creating OneSession HikariDataSource pool success.");
         return dataSource;
     }
 
@@ -105,7 +103,7 @@ public class JDBCDataSourceProvider {
             final Class<?> clazz = Class.forName(drv, true, classLoader);
             final Driver driver = (Driver) clazz.newInstance();
             if (!driver.acceptsURL(properties.getJdbcUrl())) {
-                logger.warn("Jdbc driver loading error. Driver {} cannot accept url.", drv);
+                log.warn("Jdbc driver loading error. Driver {} cannot accept url.", drv);
                 throw new RuntimeException("Jdbc driver loading error.");
             }
             if (dbType.equals(DbType.MYSQL)) {
@@ -116,7 +114,7 @@ public class JDBCDataSourceProvider {
                 }
             }
         } catch (final Exception e) {
-            logger.warn("The specified driver not suitable.");
+            log.warn("The specified driver not suitable.");
         }
     }
 

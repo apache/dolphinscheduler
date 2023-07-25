@@ -30,20 +30,15 @@ import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.Marker;
-import org.slf4j.MarkerFactory;
 
 /**
  * executive task
  */
 public abstract class AbstractTask {
 
-    public static final Marker FINALIZE_SESSION_MARKER = MarkerFactory.getMarker("FINALIZE_SESSION");
+    protected final Logger log = LoggerFactory.getLogger(AbstractTask.class);
 
-    protected final Logger logger =
-            LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
-
-    public String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
+    public String rgex = "['\"]\\$\\{(.*?)}['\"]|\\$\\{(.*?)}";
 
     /**
      * varPool string
@@ -59,11 +54,6 @@ public abstract class AbstractTask {
      * SHELL process pid
      */
     protected int processId;
-
-    /**
-     * SHELL result string
-     */
-    protected String resultString;
 
     /**
      * other resource manager appId , for example : YARN etc
@@ -94,10 +84,7 @@ public abstract class AbstractTask {
     public void init() {
     }
 
-    public String getPreScript() {
-        return null;
-    }
-
+    // todo: return TaskResult rather than store the result in Task
     public abstract void handle(TaskCallBack taskCallBack) throws TaskException;
 
     public abstract void cancel() throws TaskException;
@@ -129,14 +116,6 @@ public abstract class AbstractTask {
 
     public void setProcessId(int processId) {
         this.processId = processId;
-    }
-
-    public String getResultString() {
-        return resultString;
-    }
-
-    public void setResultString(String resultString) {
-        this.resultString = resultString;
     }
 
     public String getAppIds() {
@@ -176,19 +155,14 @@ public abstract class AbstractTask {
      * @return exit status
      */
     public TaskExecutionStatus getExitStatus() {
-        TaskExecutionStatus status;
         switch (getExitStatusCode()) {
             case TaskConstants.EXIT_CODE_SUCCESS:
-                status = TaskExecutionStatus.SUCCESS;
-                break;
+                return TaskExecutionStatus.SUCCESS;
             case TaskConstants.EXIT_CODE_KILL:
-                status = TaskExecutionStatus.KILL;
-                break;
+                return TaskExecutionStatus.KILL;
             default:
-                status = TaskExecutionStatus.FAILURE;
-                break;
+                return TaskExecutionStatus.FAILURE;
         }
-        return status;
     }
 
     /**
@@ -197,16 +171,12 @@ public abstract class AbstractTask {
      * @param logs log list
      */
     public void logHandle(LinkedBlockingQueue<String> logs) {
-        // note that the "new line" is added here to facilitate log parsing
-        if (logs.contains(FINALIZE_SESSION_MARKER.toString())) {
-            logger.info(FINALIZE_SESSION_MARKER, FINALIZE_SESSION_MARKER.toString());
-        } else {
-            StringJoiner joiner = new StringJoiner("\n\t");
-            while (!logs.isEmpty()) {
-                joiner.add(logs.poll());
-            }
-            logger.info(" -> {}", joiner);
+
+        StringJoiner joiner = new StringJoiner("\n\t");
+        while (!logs.isEmpty()) {
+            joiner.add(logs.poll());
         }
+        log.info(" -> {}", joiner);
     }
 
     /**
@@ -232,14 +202,14 @@ public abstract class AbstractTask {
             Property prop = paramsPropsMap.get(paramName);
 
             if (prop == null) {
-                logger.error(
+                log.error(
                         "setSqlParamsMap: No Property with paramName: {} is found in paramsPropsMap of task instance"
                                 + " with id: {}. So couldn't put Property in sqlParamsMap.",
                         paramName, taskInstanceId);
             } else {
                 sqlParamsMap.put(index, prop);
                 index++;
-                logger.info(
+                log.info(
                         "setSqlParamsMap: Property with paramName: {} put in sqlParamsMap of content {} successfully.",
                         paramName, content);
             }

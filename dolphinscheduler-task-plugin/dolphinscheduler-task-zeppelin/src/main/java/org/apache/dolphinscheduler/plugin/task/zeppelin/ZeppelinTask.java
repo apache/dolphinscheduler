@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.zeppelin.client.ClientConfig;
 import org.apache.zeppelin.client.NoteResult;
 import org.apache.zeppelin.client.ParagraphResult;
@@ -75,14 +76,25 @@ public class ZeppelinTask extends AbstractRemoteTask {
         if (this.zeppelinParameters == null || !this.zeppelinParameters.checkParameters()) {
             throw new ZeppelinTaskException("zeppelin task params is not valid");
         }
-        logger.info("Initialize zeppelin task params:{}", JSONUtils.toPrettyJsonString(taskParams));
+        log.info("Initialize zeppelin task params:{}", JSONUtils.toPrettyJsonString(taskParams));
         this.zClient = getZeppelinClient();
+    }
+
+    public boolean login() throws Exception {
+        String username = this.zeppelinParameters.getUsername();
+        String password = this.zeppelinParameters.getPassword();
+        if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
+            this.zClient.login(username, password);
+            log.info("username : {}  login  success ", username);
+        }
+        return true;
     }
 
     // todo split handle to submit and track
     @Override
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
+            login();
             final String paragraphId = this.zeppelinParameters.getParagraphId();
             final String productionNoteDirectory = this.zeppelinParameters.getProductionNoteDirectory();
             final String parameters = this.zeppelinParameters.getParameters();
@@ -142,10 +154,10 @@ public class ZeppelinTask extends AbstractRemoteTask {
             final int exitStatusCode = mapStatusToExitCode(status);
             setAppIds(String.format("%s-%s", noteId, paragraphId));
             setExitStatusCode(exitStatusCode);
-            logger.info("zeppelin task finished with results: {}", resultContent);
+            log.info("zeppelin task finished with results: {}", resultContent);
         } catch (Exception e) {
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
-            logger.error("zeppelin task submit failed with error", e);
+            log.error("zeppelin task submit failed with error", e);
             throw new TaskException("Execute ZeppelinTask exception");
         }
     }
@@ -172,10 +184,10 @@ public class ZeppelinTask extends AbstractRemoteTask {
         try {
             zClient = new ZeppelinClient(clientConfig);
             final String zeppelinVersion = zClient.getVersion();
-            logger.info("zeppelin version: {}", zeppelinVersion);
+            log.info("zeppelin version: {}", zeppelinVersion);
         } catch (Exception e) {
             // TODO: complete error handling
-            logger.error("some error");
+            log.error("some error");
         }
         return zClient;
     }
@@ -208,16 +220,16 @@ public class ZeppelinTask extends AbstractRemoteTask {
         final String noteId = this.zeppelinParameters.getNoteId();
         final String paragraphId = this.zeppelinParameters.getParagraphId();
         if (paragraphId == null) {
-            logger.info("trying terminate zeppelin task, taskId: {}, noteId: {}",
+            log.info("trying terminate zeppelin task, taskId: {}, noteId: {}",
                     this.taskExecutionContext.getTaskInstanceId(),
                     noteId);
             Unirest.config().defaultBaseUrl(restEndpoint + "/api");
             Unirest.delete("/notebook/job/{noteId}").routeParam("noteId", noteId).asJson();
-            logger.info("zeppelin task terminated, taskId: {}, noteId: {}",
+            log.info("zeppelin task terminated, taskId: {}, noteId: {}",
                     this.taskExecutionContext.getTaskInstanceId(),
                     noteId);
         } else {
-            logger.info("trying terminate zeppelin task, taskId: {}, noteId: {}, paragraphId: {}",
+            log.info("trying terminate zeppelin task, taskId: {}, noteId: {}, paragraphId: {}",
                     this.taskExecutionContext.getTaskInstanceId(),
                     noteId,
                     paragraphId);
@@ -226,7 +238,7 @@ public class ZeppelinTask extends AbstractRemoteTask {
             } catch (Exception e) {
                 throw new TaskException("cancel paragraph error", e);
             }
-            logger.info("zeppelin task terminated, taskId: {}, noteId: {}, paragraphId: {}",
+            log.info("zeppelin task terminated, taskId: {}, noteId: {}, paragraphId: {}",
                     this.taskExecutionContext.getTaskInstanceId(),
                     noteId,
                     paragraphId);

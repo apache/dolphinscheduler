@@ -17,7 +17,10 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR;
+
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
+import org.apache.dolphinscheduler.api.dto.DynamicSubWorkflowDto;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
@@ -37,8 +40,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -64,9 +67,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "PROCESS_INSTANCE_TAG")
 @RestController
 @RequestMapping("/projects/{projectCode}/process-instances")
+@Slf4j
 public class ProcessInstanceController extends BaseController {
-
-    private static final Logger logger = LoggerFactory.getLogger(ProcessInstanceController.class);
 
     @Autowired
     private ProcessInstanceService processInstanceService;
@@ -174,7 +176,6 @@ public class ProcessInstanceController extends BaseController {
             @Parameter(name = "globalParams", description = "PROCESS_GLOBAL_PARAMS", schema = @Schema(implementation = String.class, example = "[]")),
             @Parameter(name = "locations", description = "PROCESS_INSTANCE_LOCATIONS", schema = @Schema(implementation = String.class)),
             @Parameter(name = "timeout", description = "PROCESS_TIMEOUT", schema = @Schema(implementation = int.class, example = "0")),
-            @Parameter(name = "tenantCode", description = "TENANT_CODE", schema = @Schema(implementation = String.class, example = "default"))
     })
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -189,11 +190,9 @@ public class ProcessInstanceController extends BaseController {
                                         @RequestParam(value = "syncDefine", required = true) Boolean syncDefine,
                                         @RequestParam(value = "globalParams", required = false, defaultValue = "[]") String globalParams,
                                         @RequestParam(value = "locations", required = false) String locations,
-                                        @RequestParam(value = "timeout", required = false, defaultValue = "0") int timeout,
-                                        @RequestParam(value = "tenantCode", required = true) String tenantCode) {
+                                        @RequestParam(value = "timeout", required = false, defaultValue = "0") int timeout) {
         Map<String, Object> result = processInstanceService.updateProcessInstance(loginUser, projectCode, id,
-                taskRelationJson, taskDefinitionJson, scheduleTime, syncDefine, globalParams, locations, timeout,
-                tenantCode);
+                taskRelationJson, taskDefinitionJson, scheduleTime, syncDefine, globalParams, locations, timeout);
         return returnDataList(result);
     }
 
@@ -322,6 +321,28 @@ public class ProcessInstanceController extends BaseController {
     }
 
     /**
+     * query dynamic sub process instance detail info by task id
+     *
+     * @param loginUser login user
+     * @param taskId task id
+     * @return sub process instance detail
+     */
+    @Operation(summary = "queryDynamicSubWorkflowInstances", description = "QUERY_DYNAMIC_SUBPROCESS_INSTANCE_BY_TASK_CODE_NOTES")
+    @Parameters({
+            @Parameter(name = "taskId", description = "taskInstanceId", required = true, schema = @Schema(implementation = int.class, example = "100"))
+    })
+    @GetMapping(value = "/query-dynamic-sub-workflows")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(Status.QUERY_SUB_PROCESS_INSTANCE_DETAIL_INFO_BY_TASK_ID_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result<List<DynamicSubWorkflowDto>> queryDynamicSubWorkflowInstances(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                                @RequestParam("taskId") Integer taskId) {
+        List<DynamicSubWorkflowDto> dynamicSubWorkflowDtos =
+                processInstanceService.queryDynamicSubWorkflowInstances(loginUser, taskId);
+        return new Result(Status.SUCCESS.getCode(), Status.SUCCESS.getMsg(), dynamicSubWorkflowDtos);
+    }
+
+    /**
      * query process instance global variables and local variables
      *
      * @param loginUser login user
@@ -398,7 +419,7 @@ public class ProcessInstanceController extends BaseController {
                 try {
                     processInstanceService.deleteProcessInstanceById(loginUser, processInstanceId);
                 } catch (Exception e) {
-                    logger.error("Delete workflow instance: {} error", strProcessInstanceId, e);
+                    log.error("Delete workflow instance: {} error", strProcessInstanceId, e);
                     deleteFailedIdList
                             .add(MessageFormat.format(Status.PROCESS_INSTANCE_ERROR.getMsg(), strProcessInstanceId));
                 }
@@ -409,6 +430,22 @@ public class ProcessInstanceController extends BaseController {
         } else {
             putMsg(result, Status.SUCCESS);
         }
+        return returnDataList(result);
+    }
+
+    @Operation(summary = "queryProcessInstanceListByTrigger", description = "QUERY_PROCESS_INSTANCE_BY_TRIGGER_NOTES")
+    @Parameters({
+            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = Long.class)),
+            @Parameter(name = "triggerCode", description = "TRIGGER_CODE", required = true, schema = @Schema(implementation = Long.class))
+    })
+    @GetMapping("/trigger")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR)
+    @AccessLogAnnotation()
+    public Result queryProcessInstancesByTriggerCode(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                     @PathVariable long projectCode,
+                                                     @RequestParam(value = "triggerCode") Long triggerCode) {
+        Map<String, Object> result = processInstanceService.queryByTriggerCode(loginUser, projectCode, triggerCode);
         return returnDataList(result);
     }
 }

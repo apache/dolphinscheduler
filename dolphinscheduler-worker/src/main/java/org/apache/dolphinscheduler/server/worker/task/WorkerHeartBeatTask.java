@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.model.BaseHeartBeatTask;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
@@ -53,23 +54,21 @@ public class WorkerHeartBeatTask extends BaseHeartBeatTask<WorkerHeartBeat> {
 
     @Override
     public WorkerHeartBeat getHeartBeat() {
-        double loadAverage = OSUtils.loadAverage();
-        double cpuUsage = OSUtils.cpuUsage();
-        int maxCpuLoadAvg = workerConfig.getMaxCpuLoadAvg();
+        double cpuUsagePercentage = OSUtils.cpuUsagePercentage();
+        int maxCpuUsePercentage = workerConfig.getMaxCpuLoadAvg();
         double reservedMemory = workerConfig.getReservedMemory();
-        double availablePhysicalMemorySize = OSUtils.availablePhysicalMemorySize();
+        double memoryUsagePercentage = OSUtils.memoryUsagePercentage();
         int execThreads = workerConfig.getExecThreads();
-        int serverStatus = getServerStatus(loadAverage, maxCpuLoadAvg, availablePhysicalMemorySize, reservedMemory,
-                execThreads, this.workerWaitingTaskCount.get());
+        int serverStatus =
+                getServerStatus(cpuUsagePercentage, maxCpuUsePercentage, memoryUsagePercentage, reservedMemory,
+                        execThreads, this.workerWaitingTaskCount.get());
 
         return WorkerHeartBeat.builder()
                 .startupTime(ServerLifeCycleManager.getServerStartupTime())
                 .reportTime(System.currentTimeMillis())
-                .cpuUsage(cpuUsage)
-                .loadAverage(loadAverage)
-                .availablePhysicalMemorySize(availablePhysicalMemorySize)
-                .maxCpuloadAvg(maxCpuLoadAvg)
-                .memoryUsage(OSUtils.memoryUsage())
+                .cpuUsage(cpuUsagePercentage)
+                .availablePhysicalMemorySize(OSUtils.availablePhysicalMemorySize())
+                .memoryUsage(OSUtils.memoryUsagePercentage())
                 .reservedMemory(reservedMemory)
                 .diskAvailable(OSUtils.diskAvailable())
                 .processId(processId)
@@ -77,6 +76,8 @@ public class WorkerHeartBeatTask extends BaseHeartBeatTask<WorkerHeartBeat> {
                 .workerWaitingTaskCount(this.workerWaitingTaskCount.get())
                 .workerExecThreadCount(workerConfig.getExecThreads())
                 .serverStatus(serverStatus)
+                .host(NetUtils.getHost())
+                .port(workerConfig.getListenPort())
                 .build();
     }
 
@@ -90,16 +91,16 @@ public class WorkerHeartBeatTask extends BaseHeartBeatTask<WorkerHeartBeat> {
                 workerRegistryPath, workerHeartBeatJson);
     }
 
-    public int getServerStatus(double loadAverage,
-                               double maxCpuloadAvg,
-                               double availablePhysicalMemorySize,
+    public int getServerStatus(double cpuUsagePercentage,
+                               double maxCpuUsePercentage,
+                               double memoryUsagePercentage,
                                double reservedMemory,
                                int workerExecThreadCount,
                                int workerWaitingTaskCount) {
-        if (loadAverage > maxCpuloadAvg || availablePhysicalMemorySize < reservedMemory) {
+        if (cpuUsagePercentage > maxCpuUsePercentage || (1 - memoryUsagePercentage) < reservedMemory) {
             log.warn(
-                    "current cpu load average {} is too high or available memory {}G is too low, under max.cpuload.avg={} and reserved.memory={}G",
-                    loadAverage, availablePhysicalMemorySize, maxCpuloadAvg, reservedMemory);
+                    "current cpu load average {} is higher than {} or available memory {} is lower than {}",
+                    cpuUsagePercentage, maxCpuUsePercentage, 1 - memoryUsagePercentage, reservedMemory);
             return Constants.ABNORMAL_NODE_STATUS;
         } else if (workerWaitingTaskCount > workerExecThreadCount) {
             log.warn("current waiting task count {} is large than worker thread count {}, worker is busy",

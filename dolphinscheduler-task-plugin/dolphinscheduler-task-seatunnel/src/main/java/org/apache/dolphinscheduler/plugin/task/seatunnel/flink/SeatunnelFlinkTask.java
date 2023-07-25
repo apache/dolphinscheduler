@@ -44,9 +44,12 @@ public class SeatunnelFlinkTask extends SeatunnelTask {
     @Override
     public List<String> buildOptions() throws Exception {
         List<String> args = super.buildOptions();
-        args.add(
-                Objects.isNull(seatunnelParameters.getRunMode()) ? SeatunnelFlinkParameters.RunModeEnum.RUN.getCommand()
-                        : seatunnelParameters.getRunMode().getCommand());
+
+        if (Objects.nonNull(seatunnelParameters.getRunMode())
+                && !SeatunnelFlinkParameters.RunModeEnum.NONE.equals(seatunnelParameters.getRunMode())) {
+            args.add(seatunnelParameters.getRunMode().getCommand());
+        }
+
         if (StringUtils.isNotBlank(seatunnelParameters.getOthers())) {
             args.add(seatunnelParameters.getOthers());
         }

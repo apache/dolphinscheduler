@@ -61,8 +61,8 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.IOException;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -93,9 +93,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "RESOURCES_TAG")
 @RestController
 @RequestMapping("resources")
+@Slf4j
 public class ResourcesController extends BaseController {
-
-    private static final Logger logger = LoggerFactory.getLogger(ResourcesController.class);
 
     @Autowired
     private ResourcesService resourceService;
@@ -106,7 +105,6 @@ public class ResourcesController extends BaseController {
      * @param loginUser login user
      * @param type type
      * @param alias alias
-     * @param description description
      * @param pid parent id
      * @param currentDir current directory
      * @return create result code
@@ -115,7 +113,6 @@ public class ResourcesController extends BaseController {
     @Parameters({
             @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema = @Schema(implementation = ResourceType.class)),
             @Parameter(name = "name", description = "RESOURCE_NAME", required = true, schema = @Schema(implementation = String.class)),
-            @Parameter(name = "description", description = "RESOURCE_DESC", schema = @Schema(implementation = String.class)),
             @Parameter(name = "pid", description = "RESOURCE_PID", required = true, schema = @Schema(implementation = int.class, example = "10")),
             @Parameter(name = "currentDir", description = "RESOURCE_CURRENT_DIR", required = true, schema = @Schema(implementation = String.class))
     })
@@ -125,11 +122,10 @@ public class ResourcesController extends BaseController {
     public Result<Object> createDirectory(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @RequestParam(value = "type") ResourceType type,
                                           @RequestParam(value = "name") String alias,
-                                          @RequestParam(value = "description", required = false) String description,
                                           @RequestParam(value = "pid") int pid,
                                           @RequestParam(value = "currentDir") String currentDir) {
         // todo verify the directory name
-        return resourceService.createDirectory(loginUser, alias, description, type, pid, currentDir);
+        return resourceService.createDirectory(loginUser, alias, type, pid, currentDir);
     }
 
     /**
@@ -141,7 +137,6 @@ public class ResourcesController extends BaseController {
     @Parameters({
             @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema = @Schema(implementation = ResourceType.class)),
             @Parameter(name = "name", description = "RESOURCE_NAME", required = true, schema = @Schema(implementation = String.class)),
-            @Parameter(name = "description", description = "RESOURCE_DESC", schema = @Schema(implementation = String.class)),
             @Parameter(name = "file", description = "RESOURCE_FILE", required = true, schema = @Schema(implementation = MultipartFile.class)),
             @Parameter(name = "currentDir", description = "RESOURCE_CURRENT_DIR", required = true, schema = @Schema(implementation = String.class))
     })
@@ -151,11 +146,10 @@ public class ResourcesController extends BaseController {
     public Result<Object> createResource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @RequestParam(value = "type") ResourceType type,
                                          @RequestParam(value = "name") String alias,
-                                         @RequestParam(value = "description", required = false) String description,
                                          @RequestParam("file") MultipartFile file,
                                          @RequestParam(value = "currentDir") String currentDir) {
         // todo verify the file name
-        return resourceService.createResource(loginUser, alias, description, type, file, currentDir);
+        return resourceService.createResource(loginUser, alias, type, file, currentDir);
     }
 
     /**
@@ -164,7 +158,6 @@ public class ResourcesController extends BaseController {
      * @param loginUser login user
      * @param alias alias
      * @param type resource type
-     * @param description description
      * @param file resource file
      * @return update result code
      */
@@ -174,7 +167,6 @@ public class ResourcesController extends BaseController {
             @Parameter(name = "tenantCode", description = "TENANT_CODE", required = true, schema = @Schema(implementation = String.class)),
             @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema = @Schema(implementation = ResourceType.class)),
             @Parameter(name = "name", description = "RESOURCE_NAME", required = true, schema = @Schema(implementation = String.class)),
-            @Parameter(name = "description", description = "RESOURCE_DESC", schema = @Schema(implementation = String.class)),
             @Parameter(name = "file", description = "RESOURCE_FILE", required = true, schema = @Schema(implementation = MultipartFile.class))
     })
     @PutMapping()
@@ -185,9 +177,8 @@ public class ResourcesController extends BaseController {
                                          @RequestParam(value = "tenantCode", required = false) String tenantCode,
                                          @RequestParam(value = "type") ResourceType type,
                                          @RequestParam(value = "name") String alias,
-                                         @RequestParam(value = "description", required = false) String description,
                                          @RequestParam(value = "file", required = false) MultipartFile file) {
-        return resourceService.updateResource(loginUser, fullName, tenantCode, alias, description, type, file);
+        return resourceService.updateResource(loginUser, fullName, tenantCode, alias, type, file);
     }
 
     /**
@@ -410,15 +401,13 @@ public class ResourcesController extends BaseController {
                                        @RequestParam(value = "type") ResourceType type,
                                        @RequestParam(value = "fileName") String fileName,
                                        @RequestParam(value = "suffix") String fileSuffix,
-                                       @RequestParam(value = "description", required = false) String description,
                                        @RequestParam(value = "content") String content,
                                        @RequestParam(value = "currentDir") String currentDir) {
         if (StringUtils.isEmpty(content)) {
-            logger.error("resource file contents are not allowed to be empty");
+            log.error("resource file contents are not allowed to be empty");
             return error(RESOURCE_FILE_IS_EMPTY.getCode(), RESOURCE_FILE_IS_EMPTY.getMsg());
         }
-        return resourceService.onlineCreateResource(loginUser, type, fileName, fileSuffix, description, content,
-                currentDir);
+        return resourceService.onlineCreateResource(loginUser, type, fileName, fileSuffix, content, currentDir);
     }
 
     /**
@@ -442,7 +431,7 @@ public class ResourcesController extends BaseController {
                                         @RequestParam(value = "tenantCode") String tenantCode,
                                         @RequestParam(value = "content") String content) {
         if (StringUtils.isEmpty(content)) {
-            logger.error("The resource file contents are not allowed to be empty");
+            log.error("The resource file contents are not allowed to be empty");
             return error(RESOURCE_FILE_IS_EMPTY.getCode(), RESOURCE_FILE_IS_EMPTY.getMsg());
         }
         return resourceService.updateResourceContent(loginUser, fullName, tenantCode, content);
@@ -772,5 +761,18 @@ public class ResourcesController extends BaseController {
                                           @RequestParam(value = "tenantCode") String tenantCode) throws IOException {
 
         return resourceService.queryResourceByFullName(loginUser, fullName, tenantCode, type);
+    }
+
+    @Operation(summary = "queryResourceBaseDir", description = "QUERY_RESOURCE_BASE_DIR")
+    @Parameters({
+            @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema = @Schema(implementation = ResourceType.class))
+    })
+    @GetMapping(value = "/base-dir")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(RESOURCE_NOT_EXIST)
+    @AccessLogAnnotation
+    public Result<Object> queryResourceBaseDir(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                               @RequestParam(value = "type") ResourceType type) {
+        return resourceService.queryResourceBaseDir(loginUser, type);
     }
 }

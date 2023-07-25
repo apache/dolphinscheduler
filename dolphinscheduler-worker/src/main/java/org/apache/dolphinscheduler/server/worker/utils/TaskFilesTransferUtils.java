@@ -23,7 +23,6 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
@@ -40,16 +39,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.zeroturnaround.zip.ZipUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+@Slf4j
 public class TaskFilesTransferUtils {
-
-    protected final static Logger logger = LoggerFactory
-            .getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, TaskFilesTransferUtils.class));
 
     // tmp path in local path for transfer
     final static String DOWNLOAD_TMP = ".DT_TMP";
@@ -84,7 +81,7 @@ public class TaskFilesTransferUtils {
             return;
         }
 
-        logger.info("Upload output files ...");
+        log.info("Upload output files ...");
         for (Property property : localParamsProperty) {
             // get local file path
             String path = String.format("%s/%s", taskExecutionContext.getExecutePath(), property.getValue());
@@ -104,12 +101,12 @@ public class TaskFilesTransferUtils {
             try {
                 // upload file to storage
                 String resourceWholePath =
-                        storageOperate.getResourceFileName(taskExecutionContext.getTenantCode(), resourcePath);
+                        storageOperate.getResourceFullName(taskExecutionContext.getTenantCode(), resourcePath);
                 String resourceCRCWholePath =
-                        storageOperate.getResourceFileName(taskExecutionContext.getTenantCode(), resourceCRCPath);
-                logger.info("{} --- Local:{} to Remote:{}", property, srcPath, resourceWholePath);
+                        storageOperate.getResourceFullName(taskExecutionContext.getTenantCode(), resourceCRCPath);
+                log.info("{} --- Local:{} to Remote:{}", property, srcPath, resourceWholePath);
                 storageOperate.upload(taskExecutionContext.getTenantCode(), srcPath, resourceWholePath, false, true);
-                logger.info("{} --- Local:{} to Remote:{}", "CRC file", srcCRCPath, resourceCRCWholePath);
+                log.info("{} --- Local:{} to Remote:{}", "CRC file", srcCRCPath, resourceCRCWholePath);
                 storageOperate.upload(taskExecutionContext.getTenantCode(), srcCRCPath, resourceCRCWholePath, false,
                         true);
             } catch (IOException ex) {
@@ -155,11 +152,11 @@ public class TaskFilesTransferUtils {
         // data path to download packaged data
         String downloadTmpPath = String.format("%s/%s", executePath, DOWNLOAD_TMP);
 
-        logger.info("Download upstream files...");
+        log.info("Download upstream files...");
         for (Property property : localParamsProperty) {
             Property inVarPool = varPoolsMap.get(property.getValue());
             if (inVarPool == null) {
-                logger.error("{} not in  {}", property.getValue(), varPoolsMap.keySet());
+                log.error("{} not in  {}", property.getValue(), varPoolsMap.keySet());
                 throw new TaskException(String.format("Can not find upstream file using %s, please check the key",
                         property.getValue()));
             }
@@ -179,10 +176,9 @@ public class TaskFilesTransferUtils {
 
             try {
                 String resourceWholePath =
-                        storageOperate.getResourceFileName(taskExecutionContext.getTenantCode(), resourcePath);
-                logger.info("{} --- Remote:{} to Local:{}", property, resourceWholePath, downloadPath);
-                storageOperate.download(taskExecutionContext.getTenantCode(), resourceWholePath, downloadPath, false,
-                        true);
+                        storageOperate.getResourceFullName(taskExecutionContext.getTenantCode(), resourcePath);
+                log.info("{} --- Remote:{} to Local:{}", property, resourceWholePath, downloadPath);
+                storageOperate.download(taskExecutionContext.getTenantCode(), resourceWholePath, downloadPath, true);
             } catch (IOException ex) {
                 throw new TaskException("Download file from storage error", ex);
             }
@@ -190,7 +186,7 @@ public class TaskFilesTransferUtils {
             // unpack if the data is packaged
             if (isPack) {
                 File downloadFile = new File(downloadPath);
-                logger.info("Unpack {} to {}", downloadPath, targetPath);
+                log.info("Unpack {} to {}", downloadPath, targetPath);
                 ZipUtil.unpack(downloadFile, new File(targetPath));
             }
         }
@@ -199,7 +195,7 @@ public class TaskFilesTransferUtils {
         try {
             org.apache.commons.io.FileUtils.deleteDirectory(new File(downloadTmpPath));
         } catch (IOException e) {
-            logger.error("Delete DownloadTmpPath {} failed, this will not affect the task status", downloadTmpPath, e);
+            log.error("Delete DownloadTmpPath {} failed, this will not affect the task status", downloadTmpPath, e);
         }
     }
 
@@ -278,7 +274,7 @@ public class TaskFilesTransferUtils {
         String newPath;
         if (file.isDirectory()) {
             newPath = file.getPath() + PACK_SUFFIX;
-            logger.info("Pack {} to {}", path, newPath);
+            log.info("Pack {} to {}", path, newPath);
             ZipUtil.pack(file, new File(newPath));
         } else {
             newPath = path;

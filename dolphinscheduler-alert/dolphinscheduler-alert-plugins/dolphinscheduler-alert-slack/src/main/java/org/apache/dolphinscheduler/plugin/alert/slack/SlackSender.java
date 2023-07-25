@@ -38,14 +38,12 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.google.common.base.Preconditions;
 
+@Slf4j
 public final class SlackSender {
-
-    private static final Logger logger = LoggerFactory.getLogger(SlackSender.class);
 
     private final String webHookUrl;
     private final String botName;
@@ -86,7 +84,7 @@ public final class SlackSender {
             HttpEntity entity = response.getEntity();
             return EntityUtils.toString(entity, "UTF-8");
         } catch (Exception e) {
-            logger.error("Send message to slack error.", e);
+            log.error("Send message to slack error.", e);
             return "System Exception";
         }
     }

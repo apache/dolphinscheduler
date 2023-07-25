@@ -112,9 +112,9 @@
         select
         <include refid="baseSql" />
         from t_ds_task_group_queue
-        where priority = (select max(priority) from t_ds_task_group_queue where group_id = #{groupId}
-        and status = #{status} and  in_queue = #{inQueue} and force_start = #{forceStart} ) and group_id = #{groupId}
-        and status = #{status} and  in_queue = #{inQueue} and force_start = #{forceStart} limit 1
+        where group_id = #{groupId} and status = #{status} and  in_queue = #{inQueue} and force_start = #{forceStart}
+        order by priority desc
+        limit 1
     </select>
 
     <select id="queryByTaskId" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroupQueue">
@@ -156,5 +156,28 @@
         </where>
         order by queue.update_time desc
     </select>
+
+    <delete id="deleteByTaskIds">
+        delete from t_ds_task_group_queue
+        where task_id in
+        <foreach collection="taskInstanceIds" index="index" item="i" open="(" separator="," close=")">
+            #{i}
+        </foreach>
+    </delete>
+
+    <delete id="deleteByWorkflowInstanceId">
+        delete
+        from t_ds_task_group_queue
+        where process_id = #{workflowInstanceId}
+    </delete>
+
+    <delete id="deleteByTaskGroupIds">
+        delete
+        from t_ds_task_group_queue
+        where group_id in
+        <foreach collection="taskGroupIds" index="index" item="i" open="(" separator="," close=")">
+            #{i}
+        </foreach>
+    </delete>
 
 </mapper>

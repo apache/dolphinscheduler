@@ -57,11 +57,11 @@ Create a shell file, print `hello world`.
 
 In the workflow definition module of project Manage, create a new workflow using a shell task.
 
-- Script: 'sh hello.sh'
-- Resource: Select 'hello.sh'
+- Script: 'sh resource/hello.sh'
+- Resource: Select 'resource/hello.sh'
 
 > Notice: When using a resource file in the script, the file name needs to be the same as the full path of the selected resource:
-> For example: if the resource path is `/resource/hello.sh`, you need to use the full path of `/resource/hello.sh` to use it in the script.
+> For example: if the resource path is `resource/hello.sh`, you need to use the full path of `resource/hello.sh` to use it in the script.
 
 ![use-shell](../../../../img/new_ui/dev/resource/demo/file-demo02.png)
 

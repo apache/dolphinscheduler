@@ -106,7 +106,7 @@ export default defineComponent({
         state.functionForm.funcName = props.row.funcName
         state.functionForm.className = props.row.className
         state.functionForm.resourceId = props.row.resourceId || -1
-        state.functionForm.fullName = props.row.resourceName || ""
+        state.functionForm.fullName = props.row.resourceName || ''
         state.functionForm.description = props.row.description
       }
     )
@@ -189,7 +189,7 @@ export default defineComponent({
                 disabled={this.uploadShow}
                 showPath={false}
                 class='btn-udf-resource-dropdown'
-              ></NTreeSelect>
+              />
               <NButton
                 type='primary'
                 ghost
@@ -217,7 +217,7 @@ export default defineComponent({
                     'resource.function.enter_select_udf_resources_directory_tips'
                   )}
                   defaultValue={this.uploadForm.pid}
-                ></NTreeSelect>
+                />
               </NFormItem>
               <NFormItem
                 label=' '
@@ -252,7 +252,6 @@ export default defineComponent({
                 style={{ marginBottom: '5px' }}
               >
                 <NInput
-                  allowInput={this.trim}
                   type='textarea'
                   v-model={[this.uploadForm.description, 'value']}
                   placeholder={t('resource.function.enter_description_tips')}
@@ -272,7 +271,6 @@ export default defineComponent({
             path='description'
           >
             <NInput
-              allowInput={this.trim}
               type='textarea'
               v-model={[this.functionForm.description, 'value']}
               placeholder={t('resource.function.enter_instructions_tips')}

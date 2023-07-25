@@ -21,6 +21,9 @@ import static org.apache.dolphinscheduler.plugin.task.api.parser.TimePlaceholder
 
 import org.apache.dolphinscheduler.common.constants.DateConstants;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parser.PlaceholderUtils;
 
 import java.text.ParseException;
@@ -30,19 +33,33 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-@ExtendWith(MockitoExtension.class)
+import com.google.common.collect.Lists;
+
 public class ParameterUtilsTest {
 
-    public static final Logger logger = LoggerFactory.getLogger(ParameterUtilsTest.class);
+    @Test
+    public void expandListParameter() {
+        Map<Integer, Property> params = new HashMap<>();
+        params.put(1,
+                new Property(null, null, DataType.LIST, JSONUtils.toJsonString(Lists.newArrayList("c1", "c2", "c3"))));
+        params.put(2, new Property(null, null, DataType.DATE, "2020-06-30"));
+        params.put(3, new Property(null, null, DataType.LIST,
+                JSONUtils.toJsonString(Lists.newArrayList(3.1415, 2.44, 3.44))));
+        String sql = ParameterUtils.expandListParameter(params,
+                "select * from test where col1 in (?) and date=? and col2 in (?)");
+        Assertions.assertEquals("select * from test where col1 in (?,?,?) and date=? and col2 in (?,?,?)", sql);
+        Assertions.assertEquals(7, params.size());
 
-    /**
-     * Test convertParameterPlaceholders
-     */
+        Map<Integer, Property> params2 = new HashMap<>();
+        params2.put(1, new Property(null, null, DataType.LIST, JSONUtils.toJsonString(Lists.newArrayList("c1"))));
+        params2.put(2, new Property(null, null, DataType.DATE, "2020-06-30"));
+        String sql2 = ParameterUtils.expandListParameter(params2, "select * from test where col1 in (?) and date=?");
+        Assertions.assertEquals("select * from test where col1 in (?) and date=?", sql2);
+        Assertions.assertEquals(2, params2.size());
+
+    }
+
     @Test
     public void testConvertParameterPlaceholders() throws ParseException {
         // parameterString,parameterMap is null
@@ -96,5 +113,4 @@ public class ParameterUtilsTest {
         Assertions.assertEquals("test Parameter", ParameterUtils.handleEscapes("test Parameter"));
         Assertions.assertEquals("////%test////%Parameter", ParameterUtils.handleEscapes("%test%Parameter"));
     }
-
 }

@@ -42,6 +42,7 @@ export default defineComponent({
     }
 
     const handleSearch = (params: IWorkflowInstanceSearch) => {
+      variables.processDefineCode = params.processDefineCode
       variables.searchVal = params.searchVal
       variables.executorName = params.executorName
       variables.host = params.host
@@ -49,6 +50,7 @@ export default defineComponent({
       variables.startDate = params.startDate
       variables.endDate = params.endDate
       variables.page = 1
+
       requestData()
     }
 

@@ -34,13 +34,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 
 import com.google.common.base.Preconditions;
 
+@Slf4j
 public final class PagerDutySender {
-
-    private static final Logger log = org.slf4j.LoggerFactory.getLogger(PagerDutySender.class);
 
     private final String integrationKey;
 

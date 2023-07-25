@@ -15,14 +15,8 @@
  * limitations under the License.
  */
 
-import {
-  defineComponent,
-  PropType,
-  toRefs
-} from 'vue'
-import {
-  NSpace
-} from 'naive-ui'
+import { defineComponent, PropType, toRefs } from 'vue'
+import { NSpace } from 'naive-ui'
 import Modal from '@/components/modal'
 import { useI18n } from 'vue-i18n'
 import { useForm, datasourceTypeList } from './use-form'
@@ -41,7 +35,7 @@ const props = {
 const SourceModal = defineComponent({
   name: 'SourceModal',
   props,
-  emits: ['change'],
+  emits: ['change', 'maskClick'],
   setup(props, ctx) {
     const { t } = useI18n()
 
@@ -51,18 +45,19 @@ const SourceModal = defineComponent({
       ctx.emit('change', value)
     }
 
+    const handleMaskClick = () => {
+      ctx.emit('maskClick')
+    }
+
     return {
       t,
       ...toRefs(state),
-      handleTypeSelect
+      handleTypeSelect,
+      handleMaskClick
     }
   },
   render() {
-    const {
-      show,
-      t,
-      handleTypeSelect
-    } = this
+    const { show, t, handleTypeSelect, handleMaskClick } = this
 
     return (
       <Modal
@@ -71,13 +66,17 @@ const SourceModal = defineComponent({
         title={t('datasource.choose_datasource_type')}
         cancelShow={false}
         confirmShow={false}
+        onMaskClick={handleMaskClick}
       >
         {{
           default: () => (
             <div class={styles.content}>
               <NSpace>
                 {datasourceTypeList.map((item) => (
-                  <div class={[styles.itemBox, `${item.label}-box`]} onClick={() => handleTypeSelect(item.value)}>
+                  <div
+                    class={[styles.itemBox, `${item.label}-box`]}
+                    onClick={() => handleTypeSelect(item.value)}
+                  >
                     {item.label}
                   </div>
                 ))}

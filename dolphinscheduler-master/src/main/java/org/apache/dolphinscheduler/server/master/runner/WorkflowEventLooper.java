@@ -18,32 +18,31 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEvent;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEventHandleError;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEventHandleException;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEventHandler;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEventQueue;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEventType;
-import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class WorkflowEventLooper extends BaseDaemonThread {
-
-    private final Logger logger = LoggerFactory.getLogger(WorkflowEventLooper.class);
+@Slf4j
+public class WorkflowEventLooper extends BaseDaemonThread implements AutoCloseable {
 
     @Autowired
     private WorkflowEventQueue workflowEventQueue;
@@ -52,6 +51,8 @@ public class WorkflowEventLooper extends BaseDaemonThread {
     private List<WorkflowEventHandler> workflowEventHandlerList;
 
     private final Map<WorkflowEventType, WorkflowEventHandler> workflowEventHandlerMap = new HashMap<>();
+
+    private final AtomicBoolean RUNNING_FLAG = new AtomicBoolean(false);
 
     protected WorkflowEventLooper() {
         super("WorkflowEventLooper");
@@ -66,44 +67,59 @@ public class WorkflowEventLooper extends BaseDaemonThread {
 
     @Override
     public synchronized void start() {
-        logger.info("WorkflowEventLooper thread starting");
+        if (!RUNNING_FLAG.compareAndSet(false, true)) {
+            log.error("WorkflowEventLooper thread has already started, will not start again");
+            return;
+        }
+        log.info("WorkflowEventLooper starting...");
         super.start();
-        logger.info("WorkflowEventLooper thread started");
+        log.info("WorkflowEventLooper started...");
     }
 
     public void run() {
-        WorkflowEvent workflowEvent = null;
-        while (!ServerLifeCycleManager.isStopped()) {
+        WorkflowEvent workflowEvent;
+        while (RUNNING_FLAG.get()) {
             try {
                 workflowEvent = workflowEventQueue.poolEvent();
-                LoggerUtils.setWorkflowInstanceIdMDC(workflowEvent.getWorkflowInstanceId());
-                logger.info("Workflow event looper receive a workflow event: {}, will handle this", workflowEvent);
+            } catch (InterruptedException e) {
+                log.warn("WorkflowEventLooper thread is interrupted, will close this loop");
+                Thread.currentThread().interrupt();
+                break;
+            }
+            try (
+                    LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
+                            LogUtils.setWorkflowInstanceIdMDC(workflowEvent.getWorkflowInstanceId())) {
+                log.info("Begin to handle WorkflowEvent: {}", workflowEvent);
                 WorkflowEventHandler workflowEventHandler =
                         workflowEventHandlerMap.get(workflowEvent.getWorkflowEventType());
                 workflowEventHandler.handleWorkflowEvent(workflowEvent);
-            } catch (InterruptedException e) {
-                logger.warn("WorkflowEventLooper thread is interrupted, will close this loop", e);
-                Thread.currentThread().interrupt();
-                break;
+                log.info("Success handle WorkflowEvent: {}", workflowEvent);
             } catch (WorkflowEventHandleException workflowEventHandleException) {
-                logger.error("Handle workflow event failed, will add this event to event queue again, event: {}",
-                        workflowEvent, workflowEventHandleException);
+                log.error("Handle workflow event failed, will retry again: {}", workflowEvent,
+                        workflowEventHandleException);
                 workflowEventQueue.addEvent(workflowEvent);
                 ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
             } catch (WorkflowEventHandleError workflowEventHandleError) {
-                logger.error("Handle workflow event error, will drop this event, event: {}",
+                log.error("Handle workflow event error, will drop this event: {}",
                         workflowEvent,
                         workflowEventHandleError);
             } catch (Exception unknownException) {
-                logger.error(
-                        "Handle workflow event failed, get a unknown exception, will add this event to event queue again, event: {}",
-                        workflowEvent, unknownException);
+                log.error("Handle workflow event failed, get a unknown exception, will retry again: {}", workflowEvent,
+                        unknownException);
                 workflowEventQueue.addEvent(workflowEvent);
                 ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
-            } finally {
-                LoggerUtils.removeWorkflowInstanceIdMDC();
             }
         }
     }
 
+    @Override
+    public void close() throws Exception {
+        if (!RUNNING_FLAG.compareAndSet(true, false)) {
+            log.info("WorkflowEventLooper thread is not start, no need to close");
+            return;
+        }
+        log.info("WorkflowEventLooper is closing...");
+        this.interrupt();
+        log.info("WorkflowEventLooper closed...");
+    }
 }

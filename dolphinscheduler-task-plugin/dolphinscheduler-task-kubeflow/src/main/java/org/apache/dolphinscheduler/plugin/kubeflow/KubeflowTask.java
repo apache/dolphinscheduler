@@ -19,14 +19,13 @@ package org.apache.dolphinscheduler.plugin.kubeflow;
 
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -54,7 +53,7 @@ public class KubeflowTask extends AbstractRemoteTask {
     @Override
     public void init() throws TaskException {
         kubeflowParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), KubeflowParameters.class);
-        logger.info("Initialize Kubeflow task params {}", taskExecutionContext.getTaskParams());
+        log.info("Initialize Kubeflow task params {}", taskExecutionContext.getTaskParams());
 
         kubeflowParameters.setClusterYAML(taskExecutionContext.getK8sTaskExecutionContext().getConfigYaml());
         if (!kubeflowParameters.checkParameters()) {
@@ -68,9 +67,9 @@ public class KubeflowTask extends AbstractRemoteTask {
     @Override
     public void submitApplication() throws TaskException {
         String command = kubeflowHelper.buildSubmitCommand(yamlPath.toString());
-        logger.info("Kubeflow task submit command: \n{}", command);
+        log.info("Kubeflow task submit command: \n{}", command);
         String message = runCommand(command);
-        logger.info("Kubeflow task submit result: \n{}", message);
+        log.info("Kubeflow task submit result: \n{}", message);
 
         KubeflowHelper.ApplicationIds applicationIds = new KubeflowHelper.ApplicationIds();
         applicationIds.setAlreadySubmitted(true);
@@ -85,18 +84,18 @@ public class KubeflowTask extends AbstractRemoteTask {
     @Override
     public void trackApplicationStatus() throws TaskException {
         String command = kubeflowHelper.buildGetCommand(yamlPath.toString());
-        logger.info("Kubeflow task get command: \n{}", command);
+        log.info("Kubeflow task get command: \n{}", command);
         do {
             ThreadUtils.sleep(KubeflowHelper.CONSTANTS.TRACK_INTERVAL);
             String message = runCommand(command);
             String phase = kubeflowHelper.parseGetMessage(message);
             if (KubeflowHelper.STATUS.FAILED_SET.contains(phase)) {
                 exitStatusCode = TaskConstants.EXIT_CODE_FAILURE;
-                logger.info("Kubeflow task get Failed result: \n{}", message);
+                log.info("Kubeflow task get Failed result: \n{}", message);
                 break;
             } else if (KubeflowHelper.STATUS.SUCCESS_SET.contains(phase)) {
                 exitStatusCode = TaskConstants.EXIT_CODE_SUCCESS;
-                logger.info("Kubeflow task get Succeeded result: \n{}", message);
+                log.info("Kubeflow task get Succeeded result: \n{}", message);
                 break;
             }
         } while (true);
@@ -106,9 +105,9 @@ public class KubeflowTask extends AbstractRemoteTask {
     @Override
     public void cancelApplication() throws TaskException {
         String command = kubeflowHelper.buildDeleteCommand(yamlPath.toString());
-        logger.info("Kubeflow task delete command: \n{}", command);
+        log.info("Kubeflow task delete command: \n{}", command);
         String message = runCommand(command);
-        logger.info("Kubeflow task delete result: \n{}", message);
+        log.info("Kubeflow task delete result: \n{}", message);
         exitStatusCode = TaskConstants.EXIT_CODE_KILL;
     }
 
@@ -132,13 +131,13 @@ public class KubeflowTask extends AbstractRemoteTask {
         String clusterYAML = kubeflowParameters.getClusterYAML();
 
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
-        yamlContent = ParameterUtils.convertParameterPlaceholders(yamlContent, ParamUtils.convert(paramsMap));
+        yamlContent = ParameterUtils.convertParameterPlaceholders(yamlContent, ParameterUtils.convert(paramsMap));
 
         yamlPath = Paths.get(taskExecutionContext.getExecutePath(), KubeflowHelper.CONSTANTS.YAML_FILE_PATH);
         clusterYAMLPath =
                 Paths.get(taskExecutionContext.getExecutePath(), KubeflowHelper.CONSTANTS.CLUSTER_CONFIG_PATH);
 
-        logger.info("Kubeflow task yaml content: \n{}", yamlContent);
+        log.info("Kubeflow task yaml content: \n{}", yamlContent);
         try {
             Files.write(yamlPath, yamlContent.getBytes(), StandardOpenOption.CREATE);
             Files.write(clusterYAMLPath, clusterYAML.getBytes(), StandardOpenOption.CREATE);

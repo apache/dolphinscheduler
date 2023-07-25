@@ -24,15 +24,15 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
+import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilderFactory;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 public class PytorchTask extends AbstractTask {
 
@@ -47,14 +47,14 @@ public class PytorchTask extends AbstractTask {
 
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
                 taskExecutionContext,
-                logger);
+                log);
     }
 
     @Override
     public void init() {
 
         pytorchParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), PytorchParameters.class);
-        logger.info("Initialize pytorch task params {}", JSONUtils.toPrettyJsonString(taskExecutionContext));
+        log.info("Initialize pytorch task params {}", JSONUtils.toPrettyJsonString(taskExecutionContext));
 
         if (pytorchParameters == null || !pytorchParameters.checkParameters()) {
             throw new TaskException("python task params is not valid");
@@ -65,17 +65,21 @@ public class PytorchTask extends AbstractTask {
         pythonEnvManager.setCondaPythonVersion(pytorchParameters.getCondaPythonVersion());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
-            String command = buildPythonExecuteCommand();
-            TaskResponse taskResponse = shellCommandExecutor.run(command);
+            IShellInterceptorBuilder<?, ?> shellActuatorBuilder = ShellInterceptorBuilderFactory.newBuilder()
+                    .properties(ParameterUtils.convert(taskExecutionContext.getPrepareParamsMap()))
+                    .appendScript(buildPythonExecuteCommand());
+
+            TaskResponse taskResponse = shellCommandExecutor.run(shellActuatorBuilder, taskCallBack);
             setExitStatusCode(taskResponse.getExitStatusCode());
             setProcessId(taskResponse.getProcessId());
             setVarPool(shellCommandExecutor.getVarPool());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            logger.error("The current Pytorch task has been interrupted", e);
+            log.error("The current Pytorch task has been interrupted", e);
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
             throw new TaskException("The current Pytorch task has been interrupted", e);
         } catch (Exception e) {
@@ -117,9 +121,7 @@ public class PytorchTask extends AbstractTask {
             args.add(String.format("%s %s", getPythonCommand(), pytorchParameters.getScriptPath()));
 
         }
-
-        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
-        return ParameterUtils.convertParameterPlaceholders(String.join("\n", args), ParamUtils.convert(paramsMap));
+        return args.stream().collect(Collectors.joining("\n"));
     }
 
     private String getPythonCommand() {
@@ -127,7 +129,7 @@ public class PytorchTask extends AbstractTask {
         if (pytorchParameters.getIsCreateEnvironment()) {
             pythonCommand = pythonEnvManager.getPythonCommand();
         } else {
-            pythonCommand = pytorchParameters.getPythonCommand();
+            pythonCommand = pytorchParameters.getPythonLauncher();
         }
         return pythonCommand;
 

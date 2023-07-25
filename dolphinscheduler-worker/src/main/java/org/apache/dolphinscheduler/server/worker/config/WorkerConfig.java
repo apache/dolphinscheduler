@@ -21,13 +21,16 @@ import static org.apache.dolphinscheduler.common.constants.Constants.REGISTRY_DO
 
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.registry.api.ConnectStrategyProperties;
+import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
+import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.time.Duration;
 
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.Errors;
@@ -38,9 +41,8 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 @Configuration
 @ConfigurationProperties(prefix = "worker")
+@Slf4j
 public class WorkerConfig implements Validator {
-
-    private Logger logger = LoggerFactory.getLogger(WorkerConfig.class);
 
     private int listenPort = 1234;
     private int execThreads = 10;
@@ -49,10 +51,11 @@ public class WorkerConfig implements Validator {
     private boolean tenantAutoCreate = true;
     private boolean tenantDistributedUser = false;
     private int maxCpuLoadAvg = -1;
-    private double reservedMemory = 0.3;
-    private String alertListenHost = "localhost";
-    private int alertListenPort = 50052;
+    private double reservedMemory = 0.1;
     private ConnectStrategyProperties registryDisconnectStrategy = new ConnectStrategyProperties();
+
+    private NettyClientConfig workerRpcClientConfig = new NettyClientConfig();
+    private NettyServerConfig workerRpcServerConfig = new NettyServerConfig();
 
     /**
      * This field doesn't need to set at config file, it will be calculated by workerIp:listenPort
@@ -79,26 +82,26 @@ public class WorkerConfig implements Validator {
         if (workerConfig.getMaxCpuLoadAvg() <= 0) {
             workerConfig.setMaxCpuLoadAvg(Runtime.getRuntime().availableProcessors() * 2);
         }
-        workerConfig.setWorkerAddress(NetUtils.getAddr(workerConfig.getListenPort()));
+        if (StringUtils.isEmpty(workerConfig.getWorkerAddress())) {
+            workerConfig.setWorkerAddress(NetUtils.getAddr(workerConfig.getListenPort()));
+        }
 
         workerConfig.setWorkerRegistryPath(REGISTRY_DOLPHINSCHEDULER_WORKERS + "/" + workerConfig.getWorkerAddress());
         printConfig();
     }
 
     private void printConfig() {
-        logger.info("Worker config: listenPort -> {}", listenPort);
-        logger.info("Worker config: execThreads -> {}", execThreads);
-        logger.info("Worker config: heartbeatInterval -> {}", heartbeatInterval);
-        logger.info("Worker config: hostWeight -> {}", hostWeight);
-        logger.info("Worker config: tenantAutoCreate -> {}", tenantAutoCreate);
-        logger.info("Worker config: tenantDistributedUser -> {}", tenantDistributedUser);
-        logger.info("Worker config: maxCpuLoadAvg -> {}", maxCpuLoadAvg);
-        logger.info("Worker config: reservedMemory -> {}", reservedMemory);
-        logger.info("Worker config: alertListenHost -> {}", alertListenHost);
-        logger.info("Worker config: alertListenPort -> {}", alertListenPort);
-        logger.info("Worker config: registryDisconnectStrategy -> {}", registryDisconnectStrategy);
-        logger.info("Worker config: workerAddress -> {}", registryDisconnectStrategy);
-        logger.info("Worker config: workerRegistryPath: {}", workerRegistryPath);
-        logger.info("Worker config: taskExecuteThreadsFullPolicy: {}", taskExecuteThreadsFullPolicy);
+        log.info("Worker config: listenPort -> {}", listenPort);
+        log.info("Worker config: execThreads -> {}", execThreads);
+        log.info("Worker config: heartbeatInterval -> {}", heartbeatInterval);
+        log.info("Worker config: hostWeight -> {}", hostWeight);
+        log.info("Worker config: tenantAutoCreate -> {}", tenantAutoCreate);
+        log.info("Worker config: tenantDistributedUser -> {}", tenantDistributedUser);
+        log.info("Worker config: maxCpuLoadAvg -> {}", maxCpuLoadAvg);
+        log.info("Worker config: reservedMemory -> {}", reservedMemory);
+        log.info("Worker config: registryDisconnectStrategy -> {}", registryDisconnectStrategy);
+        log.info("Worker config: workerAddress -> {}", workerAddress);
+        log.info("Worker config: workerRegistryPath: {}", workerRegistryPath);
+        log.info("Worker config: taskExecuteThreadsFullPolicy: {}", taskExecuteThreadsFullPolicy);
     }
 }

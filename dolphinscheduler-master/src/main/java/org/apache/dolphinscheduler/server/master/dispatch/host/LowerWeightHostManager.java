@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.server.master.dispatch.host;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
+import org.apache.dolphinscheduler.server.master.dispatch.exceptions.WorkerGroupNotFoundException;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostWeight;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostWorker;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.LowerWeightRoundRobin;
@@ -35,20 +35,17 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * lower weight host manager
  */
+@Slf4j
 public class LowerWeightHostManager extends CommonHostManager {
-
-    private final Logger logger = LoggerFactory.getLogger(LowerWeightHostManager.class);
 
     /**
      * selector
@@ -60,32 +57,25 @@ public class LowerWeightHostManager extends CommonHostManager {
      */
     private ConcurrentHashMap<String, Set<HostWeight>> workerHostWeightsMap;
 
-    /**
-     * worker group host lock
-     */
-    private Lock lock;
+    private final ReentrantReadWriteLock workerGroupLock = new ReentrantReadWriteLock();
+
+    private final ReentrantReadWriteLock.ReadLock workerGroupReadLock = workerGroupLock.readLock();
+    private final ReentrantReadWriteLock.WriteLock workerGroupWriteLock = workerGroupLock.writeLock();
 
     @PostConstruct
     public void init() {
         this.selector = new LowerWeightRoundRobin();
         this.workerHostWeightsMap = new ConcurrentHashMap<>();
-        this.lock = new ReentrantLock();
         serverNodeManager.addWorkerInfoChangeListener(new WorkerWeightListener());
     }
 
-    /**
-     * select host
-     *
-     * @param context context
-     * @return host
-     */
     @Override
-    public Host select(ExecutionContext context) {
-        Set<HostWeight> workerHostWeights = getWorkerHostWeights(context.getWorkerGroup());
+    public Optional<Host> select(String workerGroup) throws WorkerGroupNotFoundException {
+        Set<HostWeight> workerHostWeights = getWorkerHostWeights(workerGroup);
         if (CollectionUtils.isNotEmpty(workerHostWeights)) {
-            return selector.select(workerHostWeights).getHost();
+            return Optional.ofNullable(selector.select(workerHostWeights).getHost());
         }
-        return new Host();
+        return Optional.empty();
     }
 
     @Override
@@ -125,33 +115,33 @@ public class LowerWeightHostManager extends CommonHostManager {
                 }
                 syncWorkerHostWeight(workerHostWeights);
             } catch (Throwable ex) {
-                logger.error("Sync worker resource error", ex);
+                log.error("Sync worker resource error", ex);
             }
         }
 
         private void syncWorkerHostWeight(Map<String, Set<HostWeight>> workerHostWeights) {
-            lock.lock();
+            workerGroupWriteLock.lock();
             try {
                 workerHostWeightsMap.clear();
                 workerHostWeightsMap.putAll(workerHostWeights);
             } finally {
-                lock.unlock();
+                workerGroupWriteLock.unlock();
             }
         }
     }
 
     public Optional<HostWeight> getHostWeight(String addr, String workerGroup, WorkerHeartBeat heartBeat) {
         if (heartBeat == null) {
-            logger.warn("worker {} in work group {} have not received the heartbeat", addr, workerGroup);
+            log.warn("worker {} in work group {} have not received the heartbeat", addr, workerGroup);
             return Optional.empty();
         }
         if (Constants.ABNORMAL_NODE_STATUS == heartBeat.getServerStatus()) {
-            logger.warn("worker {} current cpu load average {} is too high or available memory {}G is too low",
+            log.warn("worker {} current cpu load average {} is too high or available memory {}G is too low",
                     addr, heartBeat.getLoadAverage(), heartBeat.getAvailablePhysicalMemorySize());
             return Optional.empty();
         }
         if (Constants.BUSY_NODE_STATUE == heartBeat.getServerStatus()) {
-            logger.warn("worker {} is busy, current waiting task count {} is large than worker thread count {}",
+            log.warn("worker {} is busy, current waiting task count {} is large than worker thread count {}",
                     addr, heartBeat.getWorkerWaitingTaskCount(), heartBeat.getWorkerExecThreadCount());
             return Optional.empty();
         }
@@ -165,12 +155,16 @@ public class LowerWeightHostManager extends CommonHostManager {
                         heartBeat.getStartupTime()));
     }
 
-    private Set<HostWeight> getWorkerHostWeights(String workerGroup) {
-        lock.lock();
+    private Set<HostWeight> getWorkerHostWeights(String workerGroup) throws WorkerGroupNotFoundException {
+        workerGroupReadLock.lock();
         try {
-            return workerHostWeightsMap.get(workerGroup);
+            Set<HostWeight> hostWeights = workerHostWeightsMap.get(workerGroup);
+            if (hostWeights == null) {
+                throw new WorkerGroupNotFoundException("Can not find worker group " + workerGroup);
+            }
+            return hostWeights;
         } finally {
-            lock.unlock();
+            workerGroupReadLock.unlock();
         }
     }
 

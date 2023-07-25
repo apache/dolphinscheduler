@@ -35,8 +35,8 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -62,9 +62,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "PROJECT_TAG")
 @RestController
 @RequestMapping("projects")
+@Slf4j
 public class ProjectController extends BaseController {
-
-    private static final Logger logger = LoggerFactory.getLogger(ProjectController.class);
 
     @Autowired
     private ProjectService projectService;
@@ -105,8 +104,7 @@ public class ProjectController extends BaseController {
     @Parameters({
             @Parameter(name = "code", description = "PROJECT_CODE", schema = @Schema(implementation = long.class, example = "123456")),
             @Parameter(name = "projectName", description = "PROJECT_NAME", schema = @Schema(implementation = String.class)),
-            @Parameter(name = "description", description = "PROJECT_DESC", schema = @Schema(implementation = String.class)),
-            @Parameter(name = "userName", description = "USER_NAME", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "description", description = "PROJECT_DESC", schema = @Schema(implementation = String.class))
     })
     @PutMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
@@ -115,9 +113,8 @@ public class ProjectController extends BaseController {
     public Result updateProject(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @PathVariable("code") Long code,
                                 @RequestParam("projectName") String projectName,
-                                @RequestParam(value = "description", required = false) String description,
-                                @RequestParam(value = "userName") String userName) {
-        return projectService.update(loginUser, code, projectName, description, userName);
+                                @RequestParam(value = "description", required = false) String description) {
+        return projectService.update(loginUser, code, projectName, description);
     }
 
     /**
@@ -166,7 +163,7 @@ public class ProjectController extends BaseController {
 
         Result result = checkPageParams(pageNo, pageSize);
         if (!result.checkResult()) {
-            logger.warn("Pagination parameters check failed, pageNo:{}, pageSize:{}", pageNo, pageSize);
+            log.warn("Pagination parameters check failed, pageNo:{}, pageSize:{}", pageNo, pageSize);
             return result;
         }
         searchVal = ParameterUtils.handleEscapes(searchVal);

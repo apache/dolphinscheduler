@@ -17,6 +17,7 @@
 export type TaskType =
   | 'SHELL'
   | 'SUB_PROCESS'
+  | 'DYNAMIC'
   | 'PROCEDURE'
   | 'SQL'
   | 'SPARK'
@@ -50,6 +51,8 @@ export type TaskType =
   | 'DATASYNC'
   | 'KUBEFLOW'
   | 'LINKIS'
+  | 'DATA_FACTORY'
+  | 'REMOTESHELL'
 
 export type TaskExecuteType = 'STREAM' | 'BATCH'
 
@@ -62,6 +65,9 @@ export const TASK_TYPES_MAP = {
   },
   SUB_PROCESS: {
     alias: 'SUB_PROCESS'
+  },
+  DYNAMIC: {
+    alias: 'DYNAMIC'
   },
   PROCEDURE: {
     alias: 'PROCEDURE'
@@ -179,6 +185,14 @@ export const TASK_TYPES_MAP = {
   },
   LINKIS: {
     alias: 'LINKIS',
+    helperLinkDisable: true
+  },
+  DATA_FACTORY: {
+    alias: 'DATA_FACTORY',
+    helperLinkDisable: true
+  },
+  REMOTESHELL: {
+    alias: 'REMOTESHELL',
     helperLinkDisable: true
   }
 } as {

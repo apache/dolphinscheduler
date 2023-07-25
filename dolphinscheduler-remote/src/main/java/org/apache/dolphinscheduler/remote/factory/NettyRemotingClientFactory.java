@@ -21,18 +21,15 @@ import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 
 import lombok.experimental.UtilityClass;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 @UtilityClass
+@Slf4j
 public class NettyRemotingClientFactory {
-
-    private final Logger logger = LoggerFactory.getLogger(NettyRemotingClientFactory.class);
 
     public NettyRemotingClient buildNettyRemotingClient() {
         NettyClientConfig nettyClientConfig = new NettyClientConfig();
-        logger.info("NettyRemotingClient initialized with config: {}", nettyClientConfig);
+        log.info("NettyRemotingClient initialized with config: {}", nettyClientConfig);
         return new NettyRemotingClient(nettyClientConfig);
     }
 }

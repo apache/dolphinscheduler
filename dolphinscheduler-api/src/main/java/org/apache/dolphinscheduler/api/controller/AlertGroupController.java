@@ -35,8 +35,8 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -62,9 +62,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "ALERT_GROUP_TAG")
 @RestController
 @RequestMapping("/alert-groups")
+@Slf4j
 public class AlertGroupController extends BaseController {
-
-    private static final Logger logger = LoggerFactory.getLogger(AlertGroupController.class);
 
     @Autowired
     private AlertGroupService alertGroupService;
@@ -238,7 +237,7 @@ public class AlertGroupController extends BaseController {
         boolean exist = alertGroupService.existGroupName(groupName);
         Result result = new Result();
         if (exist) {
-            logger.error("group {} has exist, can't create again.", groupName);
+            log.error("group {} has exist, can't create again.", groupName);
             result.setCode(Status.ALERT_GROUP_EXIST.getCode());
             result.setMsg(Status.ALERT_GROUP_EXIST.getMsg());
         } else {

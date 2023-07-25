@@ -25,6 +25,7 @@ import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.RUN_TYP
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.java.exception.JavaSourceFileExistException;
@@ -38,14 +39,24 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class JavaTaskTest {
 
-    private TaskCallBack taskCallBack = (taskInstanceId, appIds) -> {
+    private TaskCallBack taskCallBack = new TaskCallBack() {
 
+        @Override
+        public void updateRemoteApplicationInfo(int taskInstanceId, ApplicationInfo applicationInfo) {
+
+        }
+
+        @Override
+        public void updateTaskInstanceInfo(int taskInstanceId) {
+
+        }
     };
 
     @Test
@@ -242,6 +253,11 @@ public class JavaTaskTest {
         taskExecutionContext.setTaskParams(JSONUtils.toJsonString(createJavaParametersObject(RUN_TYPE_JAVA)));
         taskExecutionContext.setExecutePath("/tmp/dolphinscheduler/test/executepath");
         taskExecutionContext.setTaskAppId("runJavaType");
+        HashMap<String, String> map = new HashMap<>();
+        map.put("/opt/share/jar/resource2.jar", "opt/share/jar/resource2.jar");
+        map.put("/opt/share/jar/main.jar", "opt/share/jar/main.jar");
+        map.put("/JavaTaskTest.java", "JavaTaskTest.java");
+        taskExecutionContext.setResources(map);
         JavaTask javaTask = new JavaTask(taskExecutionContext);
         javaTask.init();
         return javaTask;
@@ -257,6 +273,10 @@ public class JavaTaskTest {
         taskExecutionContext.setTaskParams(JSONUtils.toJsonString(createJavaParametersObject(RUN_TYPE_JAR)));
         taskExecutionContext.setExecutePath("/tmp/dolphinscheduler/test/executepath");
         taskExecutionContext.setTaskAppId("runJavaType");
+        HashMap<String, String> map = new HashMap<>();
+        map.put("/opt/share/jar/resource2.jar", "opt/share/jar/resource2.jar");
+        map.put("/opt/share/jar/main.jar", "opt/share/jar/main.jar");
+        taskExecutionContext.setResources(map);
         JavaTask javaTask = new JavaTask(taskExecutionContext);
         javaTask.init();
         return javaTask;

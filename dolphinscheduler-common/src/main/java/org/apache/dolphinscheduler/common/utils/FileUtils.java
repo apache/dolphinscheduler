@@ -19,12 +19,14 @@ package org.apache.dolphinscheduler.common.utils;
 
 import static org.apache.dolphinscheduler.common.constants.Constants.DATA_BASEDIR_PATH;
 import static org.apache.dolphinscheduler.common.constants.Constants.FOLDER_SEPARATOR;
+import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_S_S;
 import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_VIEW_SUFFIXES;
 import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_VIEW_SUFFIXES_DEFAULT_VALUE;
 import static org.apache.dolphinscheduler.common.constants.Constants.UTF_8;
 import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYYMMDDHHMMSS;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.SystemUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -33,23 +35,35 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
+import java.util.Set;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedInputStream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * file utils
  */
+@Slf4j
 public class FileUtils {
-
-    public static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
 
     public static final String DATA_BASEDIR = PropertyUtils.getString(DATA_BASEDIR_PATH, "/tmp/dolphinscheduler");
 
     public static final String APPINFO_PATH = "appInfo.log";
+
+    public static final String KUBE_CONFIG_FILE = "config";
+
+    private static final String RWXR_XR_X = "rwxr-xr-x";
+
+    private static final FileAttribute<Set<PosixFilePermission>> PERMISSION_755 =
+            PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString(RWXR_XR_X));
 
     private FileUtils() {
         throw new UnsupportedOperationException("Construct FileUtils");
@@ -119,6 +133,16 @@ public class FileUtils {
     }
 
     /**
+     * absolute path of kubernetes configuration file
+     *
+     * @param execPath
+     * @return
+     */
+    public static String getKubeConfigPath(String execPath) {
+        return String.format(FORMAT_S_S, execPath, KUBE_CONFIG_FILE);
+    }
+
+    /**
      * absolute path of appInfo file
      *
      * @param execPath  directory of process execution
@@ -160,7 +184,7 @@ public class FileUtils {
         // create work dir
         org.apache.commons.io.FileUtils.forceMkdir(execLocalPathFile);
         String mkdirLog = "create dir success " + execLocalPath;
-        logger.info(mkdirLog);
+        log.info(mkdirLog);
     }
 
     /**
@@ -175,13 +199,13 @@ public class FileUtils {
         try {
             File distFile = new File(filePath);
             if (!distFile.getParentFile().exists() && !distFile.getParentFile().mkdirs()) {
-                logger.error("mkdir parent failed");
+                log.error("mkdir parent failed");
                 return false;
             }
             fos = new FileOutputStream(filePath);
             IOUtils.write(content, fos, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             return false;
         } finally {
             IOUtils.closeQuietly(fos);
@@ -241,7 +265,7 @@ public class FileUtils {
             }
             return output.toString(UTF_8);
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }
@@ -297,6 +321,17 @@ public class FileUtils {
         }
 
         return crcString;
+    }
+
+    /**
+     * Create a file with '755'.
+     */
+    public static void createFileWith755(@NonNull Path path) throws IOException {
+        if (SystemUtils.IS_OS_WINDOWS) {
+            Files.createFile(path);
+        } else {
+            Files.createFile(path, PERMISSION_755);
+        }
     }
 
 }

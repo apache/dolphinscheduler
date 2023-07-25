@@ -17,19 +17,23 @@
 
 package org.apache.dolphinscheduler.tools.datasource.upgrader.v320;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.tools.datasource.dao.UpgradeDao;
 import org.apache.dolphinscheduler.tools.datasource.upgrader.DolphinSchedulerUpgrader;
+import org.apache.dolphinscheduler.tools.datasource.upgrader.DolphinSchedulerVersion;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -38,6 +42,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -54,7 +59,7 @@ public class V320DolphinSchedulerUpgrader implements DolphinSchedulerUpgrader {
     private ProcessDefinitionLogMapper processDefinitionLogMapper;
 
     @Autowired
-    private TenantMapper tenantMapper;
+    private ScheduleMapper scheduleMapper;
 
     @Autowired
     private UserMapper userMapper;
@@ -62,22 +67,25 @@ public class V320DolphinSchedulerUpgrader implements DolphinSchedulerUpgrader {
     @Autowired
     private TaskInstanceMapper taskInstanceMapper;
 
+    @Lazy()
+    @Autowired
+    private UpgradeDao upgradeDao;
+
     @Override
     public void doUpgrade() {
         upgradeWorkflowInstance();
         upgradeTaskInstance();
+        upgradeDao.upgradeDolphinSchedulerDDL(getCurrentVersion().getVersionName() + "_schema",
+                "dolphinscheduler_ddl_post.sql");
     }
 
     private void upgradeWorkflowInstance() {
-        Map<Integer, String> tenantMap = tenantMapper.selectList(new QueryWrapper<>())
-                .stream()
-                .collect(Collectors.toMap(Tenant::getId, Tenant::getTenantCode));
         Map<Integer, String> userMap = userMapper.selectList(new QueryWrapper<>())
                 .stream()
                 .collect(Collectors.toMap(User::getId, User::getUserName));
 
         while (true) {
-            LambdaQueryWrapper<ProcessInstance> wrapper = new QueryWrapper<>(new ProcessInstance())
+            LambdaQueryWrapper<ProcessInstance> wrapper = new QueryWrapper<ProcessInstance>()
                     .lambda()
                     .eq(ProcessInstance::getProjectCode, null)
                     .last("limit 1000");
@@ -85,31 +93,31 @@ public class V320DolphinSchedulerUpgrader implements DolphinSchedulerUpgrader {
             if (CollectionUtils.isEmpty(needUpdateWorkflowInstance)) {
                 return;
             }
-            for (ProcessInstance processInstance : needUpdateWorkflowInstance) {
-                ProcessDefinitionLog processDefinitionLog = processDefinitionLogMapper.queryByDefinitionCodeAndVersion(
-                        processInstance.getProcessDefinitionCode(), processInstance.getProcessDefinitionVersion());
-                if (processDefinitionLog != null) {
-                    processInstance.setProjectCode(processDefinitionLog.getProjectCode());
-                    processInstance.setTenantCode(tenantMap.get(processDefinitionLog.getTenantId()));
-                    processInstance.setExecutorName(userMap.get(processInstance.getExecutorId()));
-                } else {
-                    processInstance.setProjectCode(-1L);
-                }
-                processInstanceMapper.updateById(processInstance);
-            }
+            needUpdateWorkflowInstance.parallelStream()
+                    .forEach(processInstance -> {
+                        ProcessDefinitionLog processDefinitionLog =
+                                processDefinitionLogMapper.queryByDefinitionCodeAndVersion(
+                                        processInstance.getProcessDefinitionCode(),
+                                        processInstance.getProcessDefinitionVersion());
+                        Schedule schedule =
+                                scheduleMapper.queryByProcessDefinitionCode(processInstance.getProcessDefinitionCode());
+                        if (processDefinitionLog != null) {
+                            processInstance.setProjectCode(processDefinitionLog.getProjectCode());
+                            processInstance.setTenantCode(
+                                    StringUtils.defaultIfEmpty(schedule.getTenantCode(), Constants.DEFAULT));
+                            processInstance.setExecutorName(userMap.get(processInstance.getExecutorId()));
+                        } else {
+                            processInstance.setProjectCode(-1L);
+                        }
+                        processInstanceMapper.updateById(processInstance);
+                    });
             log.info("Success upgrade workflow instance, current batch size: {}", needUpdateWorkflowInstance.size());
-
-            try {
-                Thread.sleep(1000L);
-            } catch (InterruptedException e) {
-                log.error("Upgrade workflow instance error", e);
-            }
         }
     }
 
     private void upgradeTaskInstance() {
         while (true) {
-            LambdaQueryWrapper<TaskInstance> wrapper = new QueryWrapper<>(new TaskInstance())
+            LambdaQueryWrapper<TaskInstance> wrapper = new QueryWrapper<TaskInstance>()
                     .lambda()
                     .eq(TaskInstance::getProjectCode, null)
                     .last("limit 1000");
@@ -117,29 +125,25 @@ public class V320DolphinSchedulerUpgrader implements DolphinSchedulerUpgrader {
             if (CollectionUtils.isEmpty(taskInstances)) {
                 return;
             }
-            for (TaskInstance taskInstance : taskInstances) {
-                ProcessInstance processInstance = processInstanceMapper.selectById(taskInstance.getProcessInstanceId());
-                if (processInstance == null) {
-                    taskInstance.setProjectCode(-1L);
-                } else {
-                    taskInstance.setProjectCode(processInstance.getProjectCode());
-                    taskInstance.setProcessInstanceName(processInstance.getName());
-                    taskInstance.setExecutorName(processInstance.getExecutorName());
-                }
-                taskInstanceMapper.updateById(taskInstance);
-            }
-
+            taskInstances.parallelStream()
+                    .forEach(taskInstance -> {
+                        ProcessInstance processInstance =
+                                processInstanceMapper.selectById(taskInstance.getProcessInstanceId());
+                        if (processInstance == null) {
+                            taskInstance.setProjectCode(-1L);
+                        } else {
+                            taskInstance.setProjectCode(processInstance.getProjectCode());
+                            taskInstance.setProcessInstanceName(processInstance.getName());
+                            taskInstance.setExecutorName(processInstance.getExecutorName());
+                        }
+                        taskInstanceMapper.updateById(taskInstance);
+                    });
             log.info("Success upgrade task instance, current batch size: {}", taskInstances.size());
-            try {
-                Thread.sleep(1000L);
-            } catch (InterruptedException e) {
-                log.error("Upgrade task instance error", e);
-            }
         }
     }
 
     @Override
-    public String getCurrentVersion() {
-        return "3.2.0";
+    public DolphinSchedulerVersion getCurrentVersion() {
+        return DolphinSchedulerVersion.V3_2_0;
     }
 }
