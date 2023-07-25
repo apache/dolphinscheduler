@@ -20,10 +20,12 @@ package org.apache.dolphinscheduler.plugin.datasource.api.plugin;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.spi.datasource.AdHocDataSourceClient;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
+import org.apache.dolphinscheduler.spi.datasource.PooledDataSourceClient;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.sql.Connection;
@@ -45,41 +47,55 @@ public class DataSourceClientProvider {
 
     // We use the cache here to avoid creating a new datasource client every time,
     // One DataSourceClient corresponds to one unique datasource.
-    private static final Cache<String, DataSourceClient> uniqueId2dataSourceClientCache = CacheBuilder.newBuilder()
-            .expireAfterWrite(duration, TimeUnit.HOURS)
-            .removalListener((RemovalListener<String, DataSourceClient>) notification -> {
-                try (DataSourceClient closedClient = notification.getValue()) {
-                    log.info("Datasource: {} is removed from cache due to expire", notification.getKey());
-                } catch (Exception e) {
-                    log.error("Close datasource client error", e);
-                }
-            })
-            .maximumSize(100)
-            .build();
+    private static final Cache<String, PooledDataSourceClient> POOLED_DATASOURCE_CLIENT_CACHE =
+            CacheBuilder.newBuilder()
+                    .expireAfterWrite(duration, TimeUnit.HOURS)
+                    .removalListener((RemovalListener<String, PooledDataSourceClient>) notification -> {
+                        try (PooledDataSourceClient closedClient = notification.getValue()) {
+                            log.info("Datasource: {} is removed from cache due to expire", notification.getKey());
+                        } catch (Exception e) {
+                            log.error("Close datasource client error", e);
+                        }
+                    })
+                    .maximumSize(100)
+                    .build();
     private static final DataSourcePluginManager dataSourcePluginManager = new DataSourcePluginManager();
 
     static {
         dataSourcePluginManager.installPlugin();
     }
 
-    public static DataSourceClient getDataSourceClient(DbType dbType,
-                                                       ConnectionParam connectionParam) throws ExecutionException {
+    public static DataSourceClient getPooledDataSourceClient(DbType dbType,
+                                                             ConnectionParam connectionParam) throws ExecutionException {
         BaseConnectionParam baseConnectionParam = (BaseConnectionParam) connectionParam;
         String datasourceUniqueId = DataSourceUtils.getDatasourceUniqueId(baseConnectionParam, dbType);
-        return uniqueId2dataSourceClientCache.get(datasourceUniqueId, () -> {
+        return POOLED_DATASOURCE_CLIENT_CACHE.get(datasourceUniqueId, () -> {
             Map<String, DataSourceChannel> dataSourceChannelMap = dataSourcePluginManager.getDataSourceChannelMap();
             DataSourceChannel dataSourceChannel = dataSourceChannelMap.get(dbType.getDescp());
             if (null == dataSourceChannel) {
                 throw new RuntimeException(String.format("datasource plugin '%s' is not found", dbType.getDescp()));
             }
-            return dataSourceChannel.createDataSourceClient(baseConnectionParam, dbType);
+            return dataSourceChannel.createPooledDataSourceClient(baseConnectionParam, dbType);
         });
     }
 
-    public static Connection getConnection(DbType dbType,
-                                           ConnectionParam connectionParam) throws SQLException, ExecutionException {
-        DataSourceClient dataSourceClient = getDataSourceClient(dbType, connectionParam);
-        return dataSourceClient.getConnection();
+    public static Connection getPooledConnection(DbType dbType,
+                                                 ConnectionParam connectionParam) throws SQLException, ExecutionException {
+        return getPooledDataSourceClient(dbType, connectionParam).getConnection();
     }
 
+    public static AdHocDataSourceClient getAdHocDataSourceClient(DbType dbType, ConnectionParam connectionParam) {
+        BaseConnectionParam baseConnectionParam = (BaseConnectionParam) connectionParam;
+        Map<String, DataSourceChannel> dataSourceChannelMap = dataSourcePluginManager.getDataSourceChannelMap();
+        DataSourceChannel dataSourceChannel = dataSourceChannelMap.get(dbType.getDescp());
+        if (null == dataSourceChannel) {
+            throw new RuntimeException(String.format("datasource plugin '%s' is not found", dbType.getDescp()));
+        }
+        return dataSourceChannel.createAdHocDataSourceClient(baseConnectionParam, dbType);
+    }
+
+    public static Connection getAdHocConnection(DbType dbType,
+                                                ConnectionParam connectionParam) throws SQLException, ExecutionException {
+        return getAdHocDataSourceClient(dbType, connectionParam).getConnection();
+    }
 }

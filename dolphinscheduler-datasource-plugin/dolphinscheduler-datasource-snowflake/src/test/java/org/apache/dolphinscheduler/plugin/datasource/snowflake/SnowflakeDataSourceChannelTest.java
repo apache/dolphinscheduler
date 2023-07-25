@@ -33,8 +33,10 @@ public class SnowflakeDataSourceChannelTest {
     public void testCreateDataSourceClient() {
         SnowflakeDataSourceChannel sourceChannel = Mockito.mock(SnowflakeDataSourceChannel.class);
         SnowflakePooledDataSourceClient dataSourceClient = Mockito.mock(SnowflakePooledDataSourceClient.class);
-        Mockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
+        Mockito.when(sourceChannel.createPooledDataSourceClient(Mockito.any(), Mockito.any()))
+                .thenReturn(dataSourceClient);
         Assertions
-                .assertNotNull(sourceChannel.createDataSourceClient(new SnowflakeConnectionParam(), DbType.SNOWFLAKE));
+                .assertNotNull(
+                        sourceChannel.createPooledDataSourceClient(new SnowflakeConnectionParam(), DbType.SNOWFLAKE));
     }
 }

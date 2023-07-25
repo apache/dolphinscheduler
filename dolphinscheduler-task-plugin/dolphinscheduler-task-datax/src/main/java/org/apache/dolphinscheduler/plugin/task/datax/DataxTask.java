@@ -520,7 +520,7 @@ public class DataxTask extends AbstractTask {
 
         try (
                 Connection connection =
-                        DataSourceClientProvider.getConnection(sourceType, baseDataSource);
+                        DataSourceClientProvider.getAdHocConnection(sourceType, baseDataSource);
                 PreparedStatement stmt = connection.prepareStatement(sql);
                 ResultSet resultSet = stmt.executeQuery()) {
 

@@ -509,7 +509,8 @@ public class DataSourceServiceTest {
             Assertions.assertEquals(Status.CONNECTION_TEST_FAILURE.getCode(), result.getCode().intValue());
 
             Connection connection = Mockito.mock(Connection.class);
-            Mockito.when(DataSourceClientProvider.getConnection(Mockito.any(), Mockito.any())).thenReturn(connection);
+            Mockito.when(DataSourceClientProvider.getAdHocConnection(Mockito.any(), Mockito.any()))
+                    .thenReturn(connection);
             result = dataSourceService.checkConnection(dataSourceType, connectionParam);
             Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         }

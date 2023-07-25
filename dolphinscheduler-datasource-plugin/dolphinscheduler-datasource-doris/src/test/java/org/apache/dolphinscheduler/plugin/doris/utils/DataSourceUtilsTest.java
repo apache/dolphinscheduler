@@ -100,12 +100,13 @@ public class DataSourceUtilsTest {
                         Mockito.mockStatic(DataSourceClientProvider.class)) {
 
             Connection connection = Mockito.mock(Connection.class);
-            Mockito.when(DataSourceClientProvider.getConnection(Mockito.any(), Mockito.any())).thenReturn(connection);
+            Mockito.when(DataSourceClientProvider.getAdHocConnection(Mockito.any(), Mockito.any()))
+                    .thenReturn(connection);
 
             DorisConnectionParam connectionParam = new DorisConnectionParam();
             connectionParam.setUser("root");
             connectionParam.setPassword("123456");
-            connection = DataSourceClientProvider.getConnection(DbType.DORIS, connectionParam);
+            connection = DataSourceClientProvider.getAdHocConnection(DbType.DORIS, connectionParam);
 
             Assertions.assertNotNull(connection);
         }

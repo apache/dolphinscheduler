@@ -100,7 +100,7 @@ public class ProcedureTask extends AbstractTask {
         DataSourceProcessor dataSourceProcessor = DataSourceProcessorProvider.getDataSourceProcessor(dbType);
         ConnectionParam connectionParams =
                 dataSourceProcessor.createConnectionParams(procedureTaskExecutionContext.getConnectionParams());
-        try (Connection connection = DataSourceClientProvider.getConnection(dbType, connectionParams)) {
+        try (Connection connection = DataSourceClientProvider.getAdHocConnection(dbType, connectionParams)) {
             Map<Integer, Property> sqlParamsMap = new HashMap<>();
             Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap() == null ? Maps.newHashMap()
                     : taskExecutionContext.getPrepareParamsMap();

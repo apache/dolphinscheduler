@@ -33,7 +33,8 @@ public class HiveDataSourceChannelTest {
     public void testCreateDataSourceClient() {
         HiveDataSourceChannel sourceChannel = Mockito.mock(HiveDataSourceChannel.class);
         HivePooledDataSourceClient dataSourceClient = Mockito.mock(HivePooledDataSourceClient.class);
-        Mockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
-        Assertions.assertNotNull(sourceChannel.createDataSourceClient(new HiveConnectionParam(), DbType.HIVE));
+        Mockito.when(sourceChannel.createPooledDataSourceClient(Mockito.any(), Mockito.any()))
+                .thenReturn(dataSourceClient);
+        Assertions.assertNotNull(sourceChannel.createPooledDataSourceClient(new HiveConnectionParam(), DbType.HIVE));
     }
 }

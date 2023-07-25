@@ -17,17 +17,22 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.athena;
 
+import org.apache.dolphinscheduler.spi.datasource.AdHocDataSourceClient;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
-import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
+import org.apache.dolphinscheduler.spi.datasource.PooledDataSourceClient;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 public class AthenaDataSourceChannel implements DataSourceChannel {
 
     @Override
-    public DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        // todo: choose whether create a pooled data source client or ad hoc data source client
+    public AdHocDataSourceClient createAdHocDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
         return new AthenaAdHocDataSourceClient(baseConnectionParam, dbType);
+    }
+
+    @Override
+    public PooledDataSourceClient createPooledDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+        return new AthenaPooledDataSourceClient(baseConnectionParam, dbType);
     }
 
 }

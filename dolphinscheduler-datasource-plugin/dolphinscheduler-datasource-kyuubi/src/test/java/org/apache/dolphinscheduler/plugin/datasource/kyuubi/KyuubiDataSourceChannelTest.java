@@ -33,8 +33,9 @@ public class KyuubiDataSourceChannelTest {
     public void testCreateDataSourceClient() {
         KyuubiDataSourceChannel sourceChannel = Mockito.mock(KyuubiDataSourceChannel.class);
         KyuubiPooledDataSourceClient dataSourceClient = Mockito.mock(KyuubiPooledDataSourceClient.class);
-        Mockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
+        Mockito.when(sourceChannel.createPooledDataSourceClient(Mockito.any(), Mockito.any()))
+                .thenReturn(dataSourceClient);
         Assertions
-                .assertNotNull(sourceChannel.createDataSourceClient(new KyuubiConnectionParam(), DbType.KYUUBI));
+                .assertNotNull(sourceChannel.createPooledDataSourceClient(new KyuubiConnectionParam(), DbType.KYUUBI));
     }
 }

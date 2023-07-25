@@ -206,7 +206,7 @@ public class DataxTaskTest {
                         mockStatic(DataSourceClientProvider.class)) {
 
             Connection connection = mock(Connection.class);
-            when(DataSourceClientProvider.getConnection(Mockito.any(), Mockito.any())).thenReturn(connection);
+            when(DataSourceClientProvider.getAdHocConnection(Mockito.any(), Mockito.any())).thenReturn(connection);
 
             PreparedStatement stmt = mock(PreparedStatement.class);
             when(connection.prepareStatement(anyString())).thenReturn(stmt);

@@ -17,11 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.db2;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.client.BasePooledDataSourceClient;
+import org.apache.dolphinscheduler.plugin.datasource.api.client.BaseAdHocDataSourceClient;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-public class DB2AdHocDataSourceClient extends BasePooledDataSourceClient {
+public class DB2AdHocDataSourceClient extends BaseAdHocDataSourceClient {
 
     public DB2AdHocDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
         super(baseConnectionParam, dbType);

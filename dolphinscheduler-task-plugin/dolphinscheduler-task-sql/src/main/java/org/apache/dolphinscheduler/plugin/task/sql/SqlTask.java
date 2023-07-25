@@ -224,8 +224,9 @@ public class SqlTask extends AbstractTask {
                                   List<SqlBinds> postStatementsBinds,
                                   List<String> createFuncs) throws Exception {
         try (
-                Connection connection = DataSourceClientProvider.getConnection(DbType.valueOf(sqlParameters.getType()),
-                        baseConnectionParam)) {
+                Connection connection =
+                        DataSourceClientProvider.getAdHocConnection(DbType.valueOf(sqlParameters.getType()),
+                                baseConnectionParam)) {
 
             // create temp function
             if (CollectionUtils.isNotEmpty(createFuncs)) {

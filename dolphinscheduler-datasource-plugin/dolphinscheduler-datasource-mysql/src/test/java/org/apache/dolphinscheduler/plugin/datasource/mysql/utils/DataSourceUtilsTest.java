@@ -100,7 +100,8 @@ public class DataSourceUtilsTest {
             mockedStaticPropertyUtils.when(() -> PropertyUtils.getLong("kerberos.expire.time", 24L)).thenReturn(24L);
 
             Connection connection = Mockito.mock(Connection.class);
-            Mockito.when(DataSourceClientProvider.getConnection(Mockito.any(), Mockito.any())).thenReturn(connection);
+            Mockito.when(DataSourceClientProvider.getAdHocConnection(Mockito.any(), Mockito.any()))
+                    .thenReturn(connection);
 
             MySQLConnectionParam connectionParam = new MySQLConnectionParam();
             connectionParam.setUser("root");

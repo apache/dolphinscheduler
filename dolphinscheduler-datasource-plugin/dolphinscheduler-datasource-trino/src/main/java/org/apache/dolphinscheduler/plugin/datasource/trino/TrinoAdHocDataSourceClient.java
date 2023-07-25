@@ -17,11 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.trino;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.client.BasePooledDataSourceClient;
+import org.apache.dolphinscheduler.plugin.datasource.api.client.BaseAdHocDataSourceClient;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-public class TrinoAdHocDataSourceClient extends BasePooledDataSourceClient {
+public class TrinoAdHocDataSourceClient extends BaseAdHocDataSourceClient {
 
     public TrinoAdHocDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
         super(baseConnectionParam, dbType);
