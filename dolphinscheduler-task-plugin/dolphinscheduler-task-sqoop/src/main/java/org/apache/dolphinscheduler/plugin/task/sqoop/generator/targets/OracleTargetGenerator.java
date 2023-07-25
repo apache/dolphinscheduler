@@ -61,62 +61,64 @@ public class OracleTargetGenerator implements ITargetGenerator {
             TargetOracleParameter targetOracleParameter =
                     JSONUtils.parseObject(sqoopParameters.getTargetParams(), TargetOracleParameter.class);
 
-            if (null != targetOracleParameter && targetOracleParameter.getTargetDatasource() != 0) {
+            if (null == targetOracleParameter || targetOracleParameter.getTargetDatasource() == 0)
+                return oracleTargetSb.toString();
 
-                // get datasource
-                BaseConnectionParam baseDataSource = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
-                        sqoopTaskExecutionContext.getTargetType(),
-                        sqoopTaskExecutionContext.getTargetConnectionParams());
+            // get datasource
+            BaseConnectionParam baseDataSource = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
+                    sqoopTaskExecutionContext.getTargetType(),
+                    sqoopTaskExecutionContext.getTargetConnectionParams());
 
-                if (null != baseDataSource) {
+            if (null == baseDataSource) {
+                return oracleTargetSb.toString();
+            }
 
-                    oracleTargetSb.append(SPACE).append(DB_CONNECT)
-                            .append(SPACE).append(DOUBLE_QUOTES)
-                            .append(DataSourceUtils.getJdbcUrl(DbType.ORACLE, baseDataSource)).append(DOUBLE_QUOTES)
-                            .append(SPACE).append(DB_USERNAME)
-                            .append(SPACE).append(baseDataSource.getUser())
-                            .append(SPACE).append(DB_PWD)
-                            .append(SPACE).append(DOUBLE_QUOTES)
-                            .append(decodePassword(baseDataSource.getPassword())).append(DOUBLE_QUOTES)
-                            .append(SPACE).append(TABLE)
-                            .append(SPACE).append(targetOracleParameter.getTargetTable());
+            oracleTargetSb.append(SPACE).append(DB_CONNECT)
+                    .append(SPACE).append(DOUBLE_QUOTES)
+                    .append(DataSourceUtils.getJdbcUrl(DbType.ORACLE, baseDataSource)).append(DOUBLE_QUOTES)
+                    .append(SPACE).append(DB_USERNAME)
+                    .append(SPACE).append(baseDataSource.getUser())
+                    .append(SPACE).append(DB_PWD)
+                    .append(SPACE).append(DOUBLE_QUOTES)
+                    .append(decodePassword(baseDataSource.getPassword())).append(DOUBLE_QUOTES)
+                    .append(SPACE).append(TABLE)
+                    .append(SPACE).append(targetOracleParameter.getTargetTable());
 
-                    if (StringUtils.isNotEmpty(targetOracleParameter.getTargetColumns())) {
-                        oracleTargetSb.append(SPACE).append(COLUMNS)
-                                .append(SPACE).append(targetOracleParameter.getTargetColumns());
-                    }
+            if (StringUtils.isNotEmpty(targetOracleParameter.getTargetColumns())) {
+                oracleTargetSb.append(SPACE).append(COLUMNS)
+                        .append(SPACE).append(targetOracleParameter.getTargetColumns());
+            }
 
-                    if (StringUtils.isNotEmpty(targetOracleParameter.getFieldsTerminated())) {
-                        oracleTargetSb.append(SPACE).append(FIELDS_TERMINATED_BY);
-                        if (targetOracleParameter.getFieldsTerminated().contains("'")) {
-                            oracleTargetSb.append(SPACE).append(targetOracleParameter.getFieldsTerminated());
+            if (StringUtils.isNotEmpty(targetOracleParameter.getFieldsTerminated())) {
+                oracleTargetSb.append(SPACE).append(FIELDS_TERMINATED_BY);
+                if (targetOracleParameter.getFieldsTerminated().contains("'")) {
+                    oracleTargetSb.append(SPACE).append(targetOracleParameter.getFieldsTerminated());
 
-                        } else {
-                            oracleTargetSb.append(SPACE).append(SINGLE_QUOTES)
-                                    .append(targetOracleParameter.getFieldsTerminated()).append(SINGLE_QUOTES);
-                        }
-                    }
-
-                    if (StringUtils.isNotEmpty(targetOracleParameter.getLinesTerminated())) {
-                        oracleTargetSb.append(SPACE).append(LINES_TERMINATED_BY);
-                        if (targetOracleParameter.getLinesTerminated().contains(SINGLE_QUOTES)) {
-                            oracleTargetSb.append(SPACE).append(targetOracleParameter.getLinesTerminated());
-                        } else {
-                            oracleTargetSb.append(SPACE).append(SINGLE_QUOTES)
-                                    .append(targetOracleParameter.getLinesTerminated()).append(SINGLE_QUOTES);
-                        }
-                    }
-
-                    if (targetOracleParameter.getIsUpdate()
-                            && StringUtils.isNotEmpty(targetOracleParameter.getTargetUpdateKey())
-                            && StringUtils.isNotEmpty(targetOracleParameter.getTargetUpdateMode())) {
-                        oracleTargetSb.append(SPACE).append(UPDATE_KEY)
-                                .append(SPACE).append(targetOracleParameter.getTargetUpdateKey())
-                                .append(SPACE).append(UPDATE_MODE)
-                                .append(SPACE).append(targetOracleParameter.getTargetUpdateMode());
-                    }
+                } else {
+                    oracleTargetSb.append(SPACE).append(SINGLE_QUOTES)
+                            .append(targetOracleParameter.getFieldsTerminated()).append(SINGLE_QUOTES);
                 }
             }
+
+            if (StringUtils.isNotEmpty(targetOracleParameter.getLinesTerminated())) {
+                oracleTargetSb.append(SPACE).append(LINES_TERMINATED_BY);
+                if (targetOracleParameter.getLinesTerminated().contains(SINGLE_QUOTES)) {
+                    oracleTargetSb.append(SPACE).append(targetOracleParameter.getLinesTerminated());
+                } else {
+                    oracleTargetSb.append(SPACE).append(SINGLE_QUOTES)
+                            .append(targetOracleParameter.getLinesTerminated()).append(SINGLE_QUOTES);
+                }
+            }
+
+            if (targetOracleParameter.getIsUpdate()
+                    && StringUtils.isNotEmpty(targetOracleParameter.getTargetUpdateKey())
+                    && StringUtils.isNotEmpty(targetOracleParameter.getTargetUpdateMode())) {
+                oracleTargetSb.append(SPACE).append(UPDATE_KEY)
+                        .append(SPACE).append(targetOracleParameter.getTargetUpdateKey())
+                        .append(SPACE).append(UPDATE_MODE)
+                        .append(SPACE).append(targetOracleParameter.getTargetUpdateMode());
+            }
+
         } catch (Exception e) {
             logger.error(String.format("Sqoop oracle target params build failed: [%s]", e.getMessage()));
         }

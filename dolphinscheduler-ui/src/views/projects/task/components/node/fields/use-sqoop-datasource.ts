@@ -15,13 +15,11 @@
  * limitations under the License.
  */
 
-import {h, onMounted, ref, Ref, watch} from 'vue'
+import {onMounted, ref, Ref, watch} from 'vue'
 import {queryDataSourceList} from '@/service/modules/data-source'
 import {useI18n} from 'vue-i18n'
 import type {IJsonItem, IDataBase} from '../types'
 import type {TypeReq} from '@/service/modules/data-source/types'
-import {IOption, ModelType} from "../types";
-import styles from "@/views/projects/task/components/node/index.module.scss";
 
 export function useDatasource(
     model: { [field: string]: any },

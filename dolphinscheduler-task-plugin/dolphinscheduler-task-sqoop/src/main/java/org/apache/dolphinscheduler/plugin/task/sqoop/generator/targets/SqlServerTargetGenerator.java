@@ -61,64 +61,66 @@ public class SqlServerTargetGenerator implements ITargetGenerator {
             TargetSqlServerParameter targetSqlServerParameter =
                     JSONUtils.parseObject(sqoopParameters.getTargetParams(), TargetSqlServerParameter.class);
 
-            if (null != targetSqlServerParameter && targetSqlServerParameter.getTargetDatasource() != 0) {
+            if (null == targetSqlServerParameter || targetSqlServerParameter.getTargetDatasource() == 0)
+                return oracleTargetSb.toString();
 
-                // get datasource
-                BaseConnectionParam baseDataSource = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
-                        sqoopTaskExecutionContext.getTargetType(),
-                        sqoopTaskExecutionContext.getTargetConnectionParams());
+            // get datasource
+            BaseConnectionParam baseDataSource = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
+                    sqoopTaskExecutionContext.getTargetType(),
+                    sqoopTaskExecutionContext.getTargetConnectionParams());
 
-                if (null != baseDataSource) {
+            if (null == baseDataSource) {
+                return oracleTargetSb.toString();
+            }
 
-                    oracleTargetSb.append(SPACE).append(DB_CONNECT)
-                            .append(SPACE).append(DOUBLE_QUOTES)
-                            .append(DataSourceUtils.getJdbcUrl(DbType.SQLSERVER, baseDataSource)).append(DOUBLE_QUOTES)
-                            // .append(SPACE).append(DRIVER)
-                            .append(SPACE).append(DataSourceUtils.getDatasourceDriver(DbType.SQLSERVER))
-                            .append(SPACE).append(DB_USERNAME)
-                            .append(SPACE).append(baseDataSource.getUser())
-                            .append(SPACE).append(DB_PWD)
-                            .append(SPACE).append(DOUBLE_QUOTES)
-                            .append(decodePassword(baseDataSource.getPassword())).append(DOUBLE_QUOTES)
-                            .append(SPACE).append(TABLE)
-                            .append(SPACE).append(targetSqlServerParameter.getTargetTable());
+            oracleTargetSb.append(SPACE).append(DB_CONNECT)
+                    .append(SPACE).append(DOUBLE_QUOTES)
+                    .append(DataSourceUtils.getJdbcUrl(DbType.SQLSERVER, baseDataSource)).append(DOUBLE_QUOTES)
+                    // .append(SPACE).append(DRIVER)
+                    .append(SPACE).append(DataSourceUtils.getDatasourceDriver(DbType.SQLSERVER))
+                    .append(SPACE).append(DB_USERNAME)
+                    .append(SPACE).append(baseDataSource.getUser())
+                    .append(SPACE).append(DB_PWD)
+                    .append(SPACE).append(DOUBLE_QUOTES)
+                    .append(decodePassword(baseDataSource.getPassword())).append(DOUBLE_QUOTES)
+                    .append(SPACE).append(TABLE)
+                    .append(SPACE).append(targetSqlServerParameter.getTargetTable());
 
-                    if (StringUtils.isNotEmpty(targetSqlServerParameter.getTargetColumns())) {
-                        oracleTargetSb.append(SPACE).append(COLUMNS)
-                                .append(SPACE).append(targetSqlServerParameter.getTargetColumns());
-                    }
+            if (StringUtils.isNotEmpty(targetSqlServerParameter.getTargetColumns())) {
+                oracleTargetSb.append(SPACE).append(COLUMNS)
+                        .append(SPACE).append(targetSqlServerParameter.getTargetColumns());
+            }
 
-                    if (StringUtils.isNotEmpty(targetSqlServerParameter.getFieldsTerminated())) {
-                        oracleTargetSb.append(SPACE).append(FIELDS_TERMINATED_BY);
-                        if (targetSqlServerParameter.getFieldsTerminated().contains("'")) {
-                            oracleTargetSb.append(SPACE).append(targetSqlServerParameter.getFieldsTerminated());
+            if (StringUtils.isNotEmpty(targetSqlServerParameter.getFieldsTerminated())) {
+                oracleTargetSb.append(SPACE).append(FIELDS_TERMINATED_BY);
+                if (targetSqlServerParameter.getFieldsTerminated().contains("'")) {
+                    oracleTargetSb.append(SPACE).append(targetSqlServerParameter.getFieldsTerminated());
 
-                        } else {
-                            oracleTargetSb.append(SPACE).append(SINGLE_QUOTES)
-                                    .append(targetSqlServerParameter.getFieldsTerminated()).append(SINGLE_QUOTES);
-                        }
-                    }
-
-                    if (StringUtils.isNotEmpty(targetSqlServerParameter.getLinesTerminated())) {
-                        oracleTargetSb.append(SPACE).append(LINES_TERMINATED_BY);
-                        if (targetSqlServerParameter.getLinesTerminated().contains(SINGLE_QUOTES)) {
-                            oracleTargetSb.append(SPACE).append(targetSqlServerParameter.getLinesTerminated());
-                        } else {
-                            oracleTargetSb.append(SPACE).append(SINGLE_QUOTES)
-                                    .append(targetSqlServerParameter.getLinesTerminated()).append(SINGLE_QUOTES);
-                        }
-                    }
-
-                    if (targetSqlServerParameter.getIsUpdate()
-                            && StringUtils.isNotEmpty(targetSqlServerParameter.getTargetUpdateKey())
-                            && StringUtils.isNotEmpty(targetSqlServerParameter.getTargetUpdateMode())) {
-                        oracleTargetSb.append(SPACE).append(UPDATE_KEY)
-                                .append(SPACE).append(targetSqlServerParameter.getTargetUpdateKey())
-                                .append(SPACE).append(UPDATE_MODE)
-                                .append(SPACE).append(targetSqlServerParameter.getTargetUpdateMode());
-                    }
+                } else {
+                    oracleTargetSb.append(SPACE).append(SINGLE_QUOTES)
+                            .append(targetSqlServerParameter.getFieldsTerminated()).append(SINGLE_QUOTES);
                 }
             }
+
+            if (StringUtils.isNotEmpty(targetSqlServerParameter.getLinesTerminated())) {
+                oracleTargetSb.append(SPACE).append(LINES_TERMINATED_BY);
+                if (targetSqlServerParameter.getLinesTerminated().contains(SINGLE_QUOTES)) {
+                    oracleTargetSb.append(SPACE).append(targetSqlServerParameter.getLinesTerminated());
+                } else {
+                    oracleTargetSb.append(SPACE).append(SINGLE_QUOTES)
+                            .append(targetSqlServerParameter.getLinesTerminated()).append(SINGLE_QUOTES);
+                }
+            }
+
+            if (targetSqlServerParameter.getIsUpdate()
+                    && StringUtils.isNotEmpty(targetSqlServerParameter.getTargetUpdateKey())
+                    && StringUtils.isNotEmpty(targetSqlServerParameter.getTargetUpdateMode())) {
+                oracleTargetSb.append(SPACE).append(UPDATE_KEY)
+                        .append(SPACE).append(targetSqlServerParameter.getTargetUpdateKey())
+                        .append(SPACE).append(UPDATE_MODE)
+                        .append(SPACE).append(targetSqlServerParameter.getTargetUpdateMode());
+            }
+
         } catch (Exception e) {
             logger.error(String.format("Sqoop oracle target params build failed: [%s]", e.getMessage()));
         }

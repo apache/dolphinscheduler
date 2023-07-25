@@ -293,7 +293,7 @@ public class SqoopParameters extends AbstractParameters {
      * @param targetType sqoop target type
      * @return sqoop target generator
      */
-    private Class getTargetParameter(String targetType) {
+    private Class<?> getTargetParameter(String targetType) {
         switch (targetType) {
             case MYSQL:
                 return TargetMysqlParameter.class;
@@ -318,7 +318,7 @@ public class SqoopParameters extends AbstractParameters {
      * @param targetType sqoop target type
      * @return sqoop target generator
      */
-    private Class getSourceParameter(String targetType) {
+    private Class<?> getSourceParameter(String targetType) {
         switch (targetType) {
             case HIVE:
                 return SourceHiveParameter.class;

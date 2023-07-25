@@ -61,64 +61,62 @@ public class HanaTargetGenerator implements ITargetGenerator {
         try {
             TargetHanaParameter targetHanaParameter =
                     JSONUtils.parseObject(sqoopParameters.getTargetParams(), TargetHanaParameter.class);
+            if (null == targetHanaParameter || targetHanaParameter.getTargetDatasource() == 0)
+                return hanaTargetSb.toString();
+            // get datasource
+            BaseConnectionParam baseDataSource = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
+                    sqoopTaskExecutionContext.getTargetType(),
+                    sqoopTaskExecutionContext.getTargetConnectionParams());
 
-            if (null != targetHanaParameter && targetHanaParameter.getTargetDatasource() != 0) {
+            if (null == baseDataSource) {
+                return hanaTargetSb.toString();
+            }
+            hanaTargetSb.append(SPACE).append(DB_CONNECT)
+                    .append(SPACE).append(DOUBLE_QUOTES)
+                    .append(DataSourceUtils.getJdbcUrl(DbType.HANA, baseDataSource)).append(DOUBLE_QUOTES)
+                    .append(SPACE).append(DRIVER)
+                    .append(SPACE).append(DataSourceUtils.getDatasourceDriver(DbType.HANA))
+                    .append(SPACE).append(DB_USERNAME)
+                    .append(SPACE).append(baseDataSource.getUser())
+                    .append(SPACE).append(DB_PWD)
+                    .append(SPACE).append(DOUBLE_QUOTES)
+                    .append(decodePassword(baseDataSource.getPassword())).append(DOUBLE_QUOTES)
+                    .append(SPACE).append(TABLE)
+                    .append(SPACE).append(targetHanaParameter.getTargetTable());
 
-                // get datasource
-                BaseConnectionParam baseDataSource = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
-                        sqoopTaskExecutionContext.getTargetType(),
-                        sqoopTaskExecutionContext.getTargetConnectionParams());
+            if (StringUtils.isNotEmpty(targetHanaParameter.getTargetColumns())) {
+                hanaTargetSb.append(SPACE).append(COLUMNS)
+                        .append(SPACE).append(targetHanaParameter.getTargetColumns());
+            }
 
-                if (null != baseDataSource) {
+            if (StringUtils.isNotEmpty(targetHanaParameter.getFieldsTerminated())) {
+                hanaTargetSb.append(SPACE).append(FIELDS_TERMINATED_BY);
+                if (targetHanaParameter.getFieldsTerminated().contains("'")) {
+                    hanaTargetSb.append(SPACE).append(targetHanaParameter.getFieldsTerminated());
 
-                    hanaTargetSb.append(SPACE).append(DB_CONNECT)
-                            .append(SPACE).append(DOUBLE_QUOTES)
-                            .append(DataSourceUtils.getJdbcUrl(DbType.HANA, baseDataSource)).append(DOUBLE_QUOTES)
-                            .append(SPACE).append(DRIVER)
-                            .append(SPACE).append(DataSourceUtils.getDatasourceDriver(DbType.HANA))
-                            .append(SPACE).append(DB_USERNAME)
-                            .append(SPACE).append(baseDataSource.getUser())
-                            .append(SPACE).append(DB_PWD)
-                            .append(SPACE).append(DOUBLE_QUOTES)
-                            .append(decodePassword(baseDataSource.getPassword())).append(DOUBLE_QUOTES)
-                            .append(SPACE).append(TABLE)
-                            .append(SPACE).append(targetHanaParameter.getTargetTable());
-
-                    if (StringUtils.isNotEmpty(targetHanaParameter.getTargetColumns())) {
-                        hanaTargetSb.append(SPACE).append(COLUMNS)
-                                .append(SPACE).append(targetHanaParameter.getTargetColumns());
-                    }
-
-                    if (StringUtils.isNotEmpty(targetHanaParameter.getFieldsTerminated())) {
-                        hanaTargetSb.append(SPACE).append(FIELDS_TERMINATED_BY);
-                        if (targetHanaParameter.getFieldsTerminated().contains("'")) {
-                            hanaTargetSb.append(SPACE).append(targetHanaParameter.getFieldsTerminated());
-
-                        } else {
-                            hanaTargetSb.append(SPACE).append(SINGLE_QUOTES)
-                                    .append(targetHanaParameter.getFieldsTerminated()).append(SINGLE_QUOTES);
-                        }
-                    }
-
-                    if (StringUtils.isNotEmpty(targetHanaParameter.getLinesTerminated())) {
-                        hanaTargetSb.append(SPACE).append(LINES_TERMINATED_BY);
-                        if (targetHanaParameter.getLinesTerminated().contains(SINGLE_QUOTES)) {
-                            hanaTargetSb.append(SPACE).append(targetHanaParameter.getLinesTerminated());
-                        } else {
-                            hanaTargetSb.append(SPACE).append(SINGLE_QUOTES)
-                                    .append(targetHanaParameter.getLinesTerminated()).append(SINGLE_QUOTES);
-                        }
-                    }
-
-                    if (targetHanaParameter.getIsUpdate()
-                            && StringUtils.isNotEmpty(targetHanaParameter.getTargetUpdateKey())
-                            && StringUtils.isNotEmpty(targetHanaParameter.getTargetUpdateMode())) {
-                        hanaTargetSb.append(SPACE).append(UPDATE_KEY)
-                                .append(SPACE).append(targetHanaParameter.getTargetUpdateKey())
-                                .append(SPACE).append(UPDATE_MODE)
-                                .append(SPACE).append(targetHanaParameter.getTargetUpdateMode());
-                    }
+                } else {
+                    hanaTargetSb.append(SPACE).append(SINGLE_QUOTES)
+                            .append(targetHanaParameter.getFieldsTerminated()).append(SINGLE_QUOTES);
                 }
+            }
+
+            if (StringUtils.isNotEmpty(targetHanaParameter.getLinesTerminated())) {
+                hanaTargetSb.append(SPACE).append(LINES_TERMINATED_BY);
+                if (targetHanaParameter.getLinesTerminated().contains(SINGLE_QUOTES)) {
+                    hanaTargetSb.append(SPACE).append(targetHanaParameter.getLinesTerminated());
+                } else {
+                    hanaTargetSb.append(SPACE).append(SINGLE_QUOTES)
+                            .append(targetHanaParameter.getLinesTerminated()).append(SINGLE_QUOTES);
+                }
+            }
+
+            if (targetHanaParameter.getIsUpdate()
+                    && StringUtils.isNotEmpty(targetHanaParameter.getTargetUpdateKey())
+                    && StringUtils.isNotEmpty(targetHanaParameter.getTargetUpdateMode())) {
+                hanaTargetSb.append(SPACE).append(UPDATE_KEY)
+                        .append(SPACE).append(targetHanaParameter.getTargetUpdateKey())
+                        .append(SPACE).append(UPDATE_MODE)
+                        .append(SPACE).append(targetHanaParameter.getTargetUpdateMode());
             }
         } catch (Exception e) {
             logger.error(String.format("Sqoop hana target params build failed: [%s]", e.getMessage()));
@@ -126,4 +124,5 @@ public class HanaTargetGenerator implements ITargetGenerator {
 
         return hanaTargetSb.toString();
     }
+
 }

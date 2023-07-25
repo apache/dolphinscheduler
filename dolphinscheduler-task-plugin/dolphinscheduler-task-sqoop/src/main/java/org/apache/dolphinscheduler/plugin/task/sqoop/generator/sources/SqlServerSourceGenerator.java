@@ -69,84 +69,95 @@ public class SqlServerSourceGenerator implements ISourceGenerator {
             SourceSqlServerParameter sourceSqlServerParameter =
                     JSONUtils.parseObject(sqoopParameters.getSourceParams(), SourceSqlServerParameter.class);
 
-            if (null != sourceSqlServerParameter) {
-                BaseConnectionParam baseDataSource = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
-                        sqoopTaskExecutionContext.getSourcetype(),
-                        sqoopTaskExecutionContext.getSourceConnectionParams());
+            if (null == sourceSqlServerParameter)
+                return sqlServerSourceSb.toString();
 
-                if (null != baseDataSource) {
+            BaseConnectionParam baseDataSource = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
+                    sqoopTaskExecutionContext.getSourcetype(),
+                    sqoopTaskExecutionContext.getSourceConnectionParams());
 
-                    sqlServerSourceSb.append(SPACE).append(DB_CONNECT)
-                            .append(SPACE).append(DOUBLE_QUOTES)
-                            .append(DataSourceUtils.getJdbcUrl(DbType.SQLSERVER, baseDataSource)).append(DOUBLE_QUOTES)
-                            .append(SPACE).append(DRIVER)
-                            .append(SPACE).append(DataSourceUtils.getDatasourceDriver(DbType.SQLSERVER))
-                            .append(SPACE).append(DB_USERNAME)
-                            .append(SPACE).append(baseDataSource.getUser())
-                            .append(SPACE).append(DB_PWD)
-                            .append(SPACE).append(DOUBLE_QUOTES)
-                            .append(decodePassword(baseDataSource.getPassword())).append(DOUBLE_QUOTES);
+            if (null == baseDataSource)
+                return sqlServerSourceSb.toString();
 
-                    // sqoop table & sql query
-                    if (sourceSqlServerParameter.getSrcQueryType() == SqoopQueryType.FORM.getCode()) {
-                        if (StringUtils.isNotEmpty(sourceSqlServerParameter.getSrcTable())) {
-                            sqlServerSourceSb.append(SPACE).append(TABLE)
-                                    .append(SPACE).append(sourceSqlServerParameter.getSrcTable());
-                        }
+            sqlServerSourceSb.append(SPACE).append(DB_CONNECT)
+                    .append(SPACE).append(DOUBLE_QUOTES)
+                    .append(DataSourceUtils.getJdbcUrl(DbType.SQLSERVER, baseDataSource)).append(DOUBLE_QUOTES)
+                    .append(SPACE).append(DRIVER)
+                    .append(SPACE).append(DataSourceUtils.getDatasourceDriver(DbType.SQLSERVER))
+                    .append(SPACE).append(DB_USERNAME)
+                    .append(SPACE).append(baseDataSource.getUser())
+                    .append(SPACE).append(DB_PWD)
+                    .append(SPACE).append(DOUBLE_QUOTES)
+                    .append(decodePassword(baseDataSource.getPassword())).append(DOUBLE_QUOTES);
 
-                        if (StringUtils.isNotEmpty(sourceSqlServerParameter.getSrcColumns())) {
-                            sqlServerSourceSb.append(SPACE).append(COLUMNS)
-                                    .append(SPACE).append(sourceSqlServerParameter.getSrcColumns());
-                        }
-                    } else if (sourceSqlServerParameter.getSrcQueryType() == SqoopQueryType.SQL.getCode()
-                            && StringUtils.isNotEmpty(sourceSqlServerParameter.getSrcQuerySql())) {
+            // sqoop table & sql query
+            if (sourceSqlServerParameter.getSrcQueryType() == SqoopQueryType.FORM.getCode()) {
+                if (StringUtils.isNotEmpty(sourceSqlServerParameter.getSrcTable())) {
+                    sqlServerSourceSb.append(SPACE).append(TABLE)
+                            .append(SPACE).append(sourceSqlServerParameter.getSrcTable());
+                }
 
-                        String srcQuery = sourceSqlServerParameter.getSrcQuerySql();
-                        sqlServerSourceSb.append(SPACE).append(QUERY)
-                                .append(SPACE).append(DOUBLE_QUOTES).append(srcQuery);
+                if (StringUtils.isNotEmpty(sourceSqlServerParameter.getSrcColumns())) {
+                    sqlServerSourceSb.append(SPACE).append(COLUMNS)
+                            .append(SPACE).append(sourceSqlServerParameter.getSrcColumns());
+                }
+            } else if (sourceSqlServerParameter.getSrcQueryType() == SqoopQueryType.SQL.getCode()
+                    && StringUtils.isNotEmpty(sourceSqlServerParameter.getSrcQuerySql())) {
 
-                        if (srcQuery.toLowerCase().contains(QUERY_WHERE)) {
-                            sqlServerSourceSb.append(SPACE).append(QUERY_CONDITION).append(DOUBLE_QUOTES);
-                        } else {
-                            sqlServerSourceSb.append(SPACE).append(QUERY_WITHOUT_CONDITION).append(DOUBLE_QUOTES);
-                        }
-                    }
+                String srcQuery = sourceSqlServerParameter.getSrcQuerySql();
+                sqlServerSourceSb.append(SPACE).append(QUERY)
+                        .append(SPACE).append(DOUBLE_QUOTES).append(srcQuery);
 
-                    // sqoop hive map column
-                    List<Property> mapColumnHive = sourceSqlServerParameter.getMapColumnHive();
-
-                    if (null != mapColumnHive && !mapColumnHive.isEmpty()) {
-                        StringBuilder columnMap = new StringBuilder();
-                        for (Property item : mapColumnHive) {
-                            columnMap.append(item.getProp()).append(EQUAL_SIGN).append(item.getValue()).append(COMMA);
-                        }
-
-                        if (StringUtils.isNotEmpty(columnMap.toString())) {
-                            sqlServerSourceSb.append(SPACE).append(MAP_COLUMN_HIVE)
-                                    .append(SPACE).append(columnMap.substring(0, columnMap.length() - 1));
-                        }
-                    }
-
-                    // sqoop map column java
-                    List<Property> mapColumnJava = sourceSqlServerParameter.getMapColumnJava();
-
-                    if (null != mapColumnJava && !mapColumnJava.isEmpty()) {
-                        StringBuilder columnMap = new StringBuilder();
-                        for (Property item : mapColumnJava) {
-                            columnMap.append(item.getProp()).append(EQUAL_SIGN).append(item.getValue()).append(COMMA);
-                        }
-
-                        if (StringUtils.isNotEmpty(columnMap.toString())) {
-                            sqlServerSourceSb.append(SPACE).append(MAP_COLUMN_JAVA)
-                                    .append(SPACE).append(columnMap.substring(0, columnMap.length() - 1));
-                        }
-                    }
+                if (srcQuery.toLowerCase().contains(QUERY_WHERE)) {
+                    sqlServerSourceSb.append(SPACE).append(QUERY_CONDITION).append(DOUBLE_QUOTES);
+                } else {
+                    sqlServerSourceSb.append(SPACE).append(QUERY_WITHOUT_CONDITION).append(DOUBLE_QUOTES);
                 }
             }
+            // sqoop hive map column
+            buildColumnMapToHive(sqlServerSourceSb, sourceSqlServerParameter);
+            // sqoop map column java
+            buildColumnMapToJava(sqlServerSourceSb, sourceSqlServerParameter);
+
         } catch (Exception e) {
             logger.error(String.format("Sqoop task sqlServer source params build failed: [%s]", e.getMessage()));
         }
 
         return sqlServerSourceSb.toString();
+    }
+
+    private static void buildColumnMapToHive(StringBuilder sqlServerSourceSb,
+                                             SourceSqlServerParameter sourceSqlServerParameter) {
+        List<Property> mapColumnHive = sourceSqlServerParameter.getMapColumnHive();
+
+        if (null != mapColumnHive && !mapColumnHive.isEmpty()) {
+            StringBuilder columnMap = new StringBuilder();
+            for (Property item : mapColumnHive) {
+                columnMap.append(item.getProp()).append(EQUAL_SIGN).append(item.getValue()).append(COMMA);
+            }
+
+            if (StringUtils.isNotEmpty(columnMap.toString())) {
+                sqlServerSourceSb.append(SPACE).append(MAP_COLUMN_HIVE)
+                        .append(SPACE).append(columnMap.substring(0, columnMap.length() - 1));
+            }
+        }
+    }
+
+    private static void buildColumnMapToJava(StringBuilder sqlServerSourceSb,
+                                             SourceSqlServerParameter sourceSqlServerParameter) {
+        List<Property> mapColumnJava = sourceSqlServerParameter.getMapColumnJava();
+
+        if (null != mapColumnJava && !mapColumnJava.isEmpty()) {
+            StringBuilder columnMap = new StringBuilder();
+            for (Property item : mapColumnJava) {
+                columnMap.append(item.getProp()).append(EQUAL_SIGN).append(item.getValue()).append(COMMA);
+            }
+
+            if (StringUtils.isNotEmpty(columnMap.toString())) {
+                sqlServerSourceSb.append(SPACE).append(MAP_COLUMN_JAVA)
+                        .append(SPACE).append(columnMap.substring(0, columnMap.length() - 1));
+            }
+
+        }
     }
 }

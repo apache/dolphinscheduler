@@ -21,7 +21,7 @@ public final class SqoopConstants {
 
     private SqoopConstants() {
     }
-
+    public static final String FORMAT_S_S_S = "%s%s%s";
     // sqoop general param
     public static final String SQOOP = "sqoop";
     public static final String SQOOP_MR_JOB_NAME = "mapred.job.name";
