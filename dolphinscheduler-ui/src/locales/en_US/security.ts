@@ -265,7 +265,13 @@ export default {
     AtUserIds: 'At User Ids',
     MsgType: 'Msg Type',
     // eslint-disable-next-line quotes
-    IsAtAll: "{'@'}All"
+    IsAtAll: "{'@'}All",
+    calledNumber:"Called phone number",
+    calledShowNumber:"Call display number",
+    ttsCode:"tts Code",
+    address:'address',
+    accessKeyId:"AccessKeyId",
+    accessKeySecret:"AccessKeySecret"
   },
   k8s_namespace: {
     create_namespace: 'Create Namespace',
