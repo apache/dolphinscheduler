@@ -744,6 +744,7 @@ public class ProcessServiceImpl implements ProcessService {
      * @param host    host
      * @return process instance
      */
+    @Override
     public @Nullable ProcessInstance constructProcessInstance(Command command,
                                                               String host) throws CronParseException, CodeGenerateException {
         ProcessInstance processInstance;
@@ -774,7 +775,8 @@ public class ProcessServiceImpl implements ProcessService {
         CommandType commandTypeIfComplement = getCommandTypeIfComplement(processInstance, command);
         // reset global params while repeat running and recover tolerance fault process is needed by cmdParam
         if (commandTypeIfComplement == CommandType.REPEAT_RUNNING ||
-                commandTypeIfComplement == CommandType.RECOVER_TOLERANCE_FAULT_PROCESS) {
+                commandTypeIfComplement == CommandType.RECOVER_TOLERANCE_FAULT_PROCESS ||
+                commandTypeIfComplement == CommandType.RECOVER_SERIAL_WAIT) {
             setGlobalParamIfCommanded(processDefinition, cmdParam);
         }
 
