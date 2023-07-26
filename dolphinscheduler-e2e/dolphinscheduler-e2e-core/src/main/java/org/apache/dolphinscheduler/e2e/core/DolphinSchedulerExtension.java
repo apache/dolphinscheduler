@@ -205,7 +205,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
             .withExposedService("dolphinscheduler_1", 12345)
             .withLogConsumer("dolphinscheduler_1", outputFrame -> LOGGER.info(outputFrame.getUtf8String()))
             .waitingFor("dolphinscheduler_1", Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(300)))
-            .withStartupTimeout(Duration.ofSeconds(300));
+            .withLocalCompose(true);
 
         return compose;
     }
