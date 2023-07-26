@@ -32,9 +32,11 @@ public class SQLServerDataSourceChannelTest {
     @Test
     public void testCreateDataSourceClient() {
         AzureSQLDataSourceChannel sourceChannel = Mockito.mock(AzureSQLDataSourceChannel.class);
-        AzureSQLDataSourceClient dataSourceClient = Mockito.mock(AzureSQLDataSourceClient.class);
-        Mockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
+        AzureSQLPooledDataSourceClient dataSourceClient = Mockito.mock(AzureSQLPooledDataSourceClient.class);
+        Mockito.when(sourceChannel.createPooledDataSourceClient(Mockito.any(), Mockito.any()))
+                .thenReturn(dataSourceClient);
         Assertions
-                .assertNotNull(sourceChannel.createDataSourceClient(new AzureSQLConnectionParam(), DbType.AZURESQL));
+                .assertNotNull(
+                        sourceChannel.createPooledDataSourceClient(new AzureSQLConnectionParam(), DbType.AZURESQL));
     }
 }

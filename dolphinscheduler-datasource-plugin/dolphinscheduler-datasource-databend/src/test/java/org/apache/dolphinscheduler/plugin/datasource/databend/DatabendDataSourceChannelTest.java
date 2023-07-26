@@ -32,9 +32,10 @@ public class DatabendDataSourceChannelTest {
     @Test
     public void testCreateDataSourceClient() {
         DatabendDataSourceChannel sourceChannel = Mockito.mock(DatabendDataSourceChannel.class);
-        DatabendDataSourceClient dataSourceClient = Mockito.mock(DatabendDataSourceClient.class);
-        Mockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
+        DatabendPooledDataSourceClient dataSourceClient = Mockito.mock(DatabendPooledDataSourceClient.class);
+        Mockito.when(sourceChannel.createPooledDataSourceClient(Mockito.any(), Mockito.any()))
+                .thenReturn(dataSourceClient);
         Assertions.assertNotNull(
-                sourceChannel.createDataSourceClient(new DatabendConnectionParam(), DbType.DATABEND));
+                sourceChannel.createPooledDataSourceClient(new DatabendConnectionParam(), DbType.DATABEND));
     }
 }

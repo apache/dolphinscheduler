@@ -32,8 +32,9 @@ public class MySQLDataSourceChannelTest {
     @Test
     public void testCreateDataSourceClient() {
         MySQLDataSourceChannel sourceChannel = Mockito.mock(MySQLDataSourceChannel.class);
-        MySQLDataSourceClient dataSourceClient = Mockito.mock(MySQLDataSourceClient.class);
-        Mockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
-        Assertions.assertNotNull(sourceChannel.createDataSourceClient(new MySQLConnectionParam(), DbType.MYSQL));
+        MySQLPooledDataSourceClient dataSourceClient = Mockito.mock(MySQLPooledDataSourceClient.class);
+        Mockito.when(sourceChannel.createPooledDataSourceClient(Mockito.any(), Mockito.any()))
+                .thenReturn(dataSourceClient);
+        Assertions.assertNotNull(sourceChannel.createPooledDataSourceClient(new MySQLConnectionParam(), DbType.MYSQL));
     }
 }

@@ -28,31 +28,21 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DataSourceProcessorProvider {
 
-    private DataSourceProcessorManager dataSourcePluginManager;
+    private static final DataSourceProcessorManager dataSourcePluginManager = new DataSourceProcessorManager();
+
+    static {
+        dataSourcePluginManager.installProcessor();
+    }
 
     private DataSourceProcessorProvider() {
-        initDataSourceProcessorPlugin();
     }
 
-    private static class DataSourceClientProviderHolder {
-
-        private static final DataSourceProcessorProvider INSTANCE = new DataSourceProcessorProvider();
-    }
-
-    public static DataSourceProcessorProvider getInstance() {
-        return DataSourceClientProviderHolder.INSTANCE;
-    }
-
-    public DataSourceProcessor getDataSourceProcessor(@NonNull DbType dbType) {
+    public static DataSourceProcessor getDataSourceProcessor(@NonNull DbType dbType) {
         return dataSourcePluginManager.getDataSourceProcessorMap().get(dbType.name());
     }
 
-    public Map<String, DataSourceProcessor> getDataSourceProcessorMap() {
+    public static Map<String, DataSourceProcessor> getDataSourceProcessorMap() {
         return dataSourcePluginManager.getDataSourceProcessorMap();
     }
 
-    private void initDataSourceProcessorPlugin() {
-        dataSourcePluginManager = new DataSourceProcessorManager();
-        dataSourcePluginManager.installProcessor();
-    }
 }

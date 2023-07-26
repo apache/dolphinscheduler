@@ -34,20 +34,6 @@ import com.zaxxer.hikari.HikariDataSource;
 public class SnowflakeJDBCDataSourceProviderTest {
 
     @Test
-    public void testCreateJdbcDataSource() {
-        try (
-                MockedStatic<JDBCDataSourceProvider> mockedJDBCDataSourceProvider =
-                        Mockito.mockStatic(JDBCDataSourceProvider.class)) {
-            HikariDataSource dataSource = Mockito.mock(HikariDataSource.class);
-            mockedJDBCDataSourceProvider
-                    .when(() -> JDBCDataSourceProvider.createJdbcDataSource(Mockito.any(), Mockito.any()))
-                    .thenReturn(dataSource);
-            Assertions.assertNotNull(
-                    JDBCDataSourceProvider.createJdbcDataSource(new SnowflakeConnectionParam(), DbType.SNOWFLAKE));
-        }
-    }
-
-    @Test
     public void testCreateOneSessionJdbcDataSource() {
         try (
                 MockedStatic<JDBCDataSourceProvider> mockedJDBCDataSourceProvider =

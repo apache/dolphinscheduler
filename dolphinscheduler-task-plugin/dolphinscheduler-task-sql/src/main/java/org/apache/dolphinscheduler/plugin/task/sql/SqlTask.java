@@ -223,12 +223,11 @@ public class SqlTask extends AbstractTask {
                                   List<SqlBinds> preStatementsBinds,
                                   List<SqlBinds> postStatementsBinds,
                                   List<String> createFuncs) throws Exception {
-        Connection connection = null;
-        try {
+        try (
+                Connection connection =
+                        DataSourceClientProvider.getAdHocConnection(DbType.valueOf(sqlParameters.getType()),
+                                baseConnectionParam)) {
 
-            // create connection
-            connection = DataSourceClientProvider.getInstance().getConnection(DbType.valueOf(sqlParameters.getType()),
-                    baseConnectionParam);
             // create temp function
             if (CollectionUtils.isNotEmpty(createFuncs)) {
                 createTempFunction(connection, createFuncs);
@@ -256,8 +255,6 @@ public class SqlTask extends AbstractTask {
         } catch (Exception e) {
             log.error("execute sql error: {}", e.getMessage());
             throw e;
-        } finally {
-            close(connection);
         }
     }
 

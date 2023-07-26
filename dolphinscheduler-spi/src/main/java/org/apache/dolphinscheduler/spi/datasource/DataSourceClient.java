@@ -18,13 +18,13 @@
 package org.apache.dolphinscheduler.spi.datasource;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 
+/**
+ * Interface used to get connection of a data source.
+ */
 public interface DataSourceClient extends AutoCloseable {
 
-    void checkClient();
+    Connection getConnection() throws SQLException;
 
-    @Override
-    void close();
-
-    Connection getConnection();
 }

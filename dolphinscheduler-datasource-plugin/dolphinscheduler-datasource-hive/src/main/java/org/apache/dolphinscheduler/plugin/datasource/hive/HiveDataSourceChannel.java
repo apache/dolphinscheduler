@@ -17,15 +17,21 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.hive;
 
+import org.apache.dolphinscheduler.spi.datasource.AdHocDataSourceClient;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
-import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
+import org.apache.dolphinscheduler.spi.datasource.PooledDataSourceClient;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 public class HiveDataSourceChannel implements DataSourceChannel {
 
     @Override
-    public DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        return new HiveDataSourceClient(baseConnectionParam, dbType);
+    public AdHocDataSourceClient createAdHocDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+        return new HiveAdHocDataSourceClient(baseConnectionParam, dbType);
+    }
+
+    @Override
+    public PooledDataSourceClient createPooledDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+        return new HivePooledDataSourceClient(baseConnectionParam, dbType);
     }
 }

@@ -10,7 +10,7 @@
 
 org.apache.dolphinscheduler.spi.datasource.DataSourceChannel
 org.apache.dolphinscheduler.spi.datasource.DataSourceChannelFactory
-org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient
+org.apache.dolphinscheduler.spi.datasource.client.DataSourceClient
 
 1. 第一步数据源插件实现以上接口和继承通用client即可，具体可以参考sqlserver、mysql等数据源插件实现，所有RDBMS插件的添加方式都是一样的。
 2. 在数据源插件pom.xml添加驱动配置

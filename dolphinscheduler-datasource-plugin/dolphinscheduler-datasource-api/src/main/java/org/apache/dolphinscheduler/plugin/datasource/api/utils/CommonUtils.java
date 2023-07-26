@@ -84,13 +84,14 @@ public class CommonUtils {
     /**
      * load kerberos configuration
      *
-     * @param javaSecurityKrb5Conf javaSecurityKrb5Conf
+     * @param javaSecurityKrb5Conf    javaSecurityKrb5Conf
      * @param loginUserKeytabUsername loginUserKeytabUsername
-     * @param loginUserKeytabPath loginUserKeytabPath
+     * @param loginUserKeytabPath     loginUserKeytabPath
      * @throws IOException errors
      */
-    public static void loadKerberosConf(String javaSecurityKrb5Conf, String loginUserKeytabUsername,
-                                        String loginUserKeytabPath) throws IOException {
+    public static synchronized void loadKerberosConf(String javaSecurityKrb5Conf,
+                                                     String loginUserKeytabUsername,
+                                                     String loginUserKeytabPath) throws IOException {
         Configuration configuration = new Configuration();
         configuration.setClassLoader(configuration.getClass().getClassLoader());
         loadKerberosConf(javaSecurityKrb5Conf, loginUserKeytabUsername, loginUserKeytabPath, configuration);

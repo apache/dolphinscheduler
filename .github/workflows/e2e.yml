@@ -139,7 +139,7 @@ jobs:
           path: /tmp
       - name: Load Docker Images
         run: |
-            docker load -i /tmp/standalone-image.tar
+          docker load -i /tmp/standalone-image.tar
       - name: Run Test
         run: |
           ./mvnw -B -f dolphinscheduler-e2e/pom.xml -am \
