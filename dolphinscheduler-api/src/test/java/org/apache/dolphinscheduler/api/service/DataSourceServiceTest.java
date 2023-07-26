@@ -133,8 +133,6 @@ public class DataSourceServiceTest {
         try (
                 MockedStatic<DataSourceClientProvider> mockedStaticDataSourceClientProvider =
                         Mockito.mockStatic(DataSourceClientProvider.class)) {
-            DataSourceClientProvider clientProvider = Mockito.mock(DataSourceClientProvider.class);
-            mockedStaticDataSourceClientProvider.when(DataSourceClientProvider::getInstance).thenReturn(clientProvider);
 
             Mockito.when(dataSourceMapper.queryDataSourceByName(dataSourceName.trim())).thenReturn(null);
 
@@ -199,9 +197,6 @@ public class DataSourceServiceTest {
                 MockedStatic<DataSourceClientProvider> mockedStaticDataSourceClientProvider =
                         Mockito.mockStatic(DataSourceClientProvider.class)) {
             // DATASOURCE_CONNECT_FAILED
-            DataSourceClientProvider clientProvider = Mockito.mock(DataSourceClientProvider.class);
-            mockedStaticDataSourceClientProvider.when(DataSourceClientProvider::getInstance).thenReturn(clientProvider);
-
             Mockito.when(dataSourceMapper.queryDataSourceByName(postgreSqlDatasourceParam.getName())).thenReturn(null);
 
             // SUCCESS
@@ -509,13 +504,13 @@ public class DataSourceServiceTest {
                 MockedStatic<DataSourceClientProvider> mockedStaticDataSourceClientProvider =
                         Mockito.mockStatic(DataSourceClientProvider.class)) {
             DataSourceClientProvider clientProvider = Mockito.mock(DataSourceClientProvider.class);
-            mockedStaticDataSourceClientProvider.when(DataSourceClientProvider::getInstance).thenReturn(clientProvider);
 
             Result result = dataSourceService.checkConnection(dataSourceType, connectionParam);
             Assertions.assertEquals(Status.CONNECTION_TEST_FAILURE.getCode(), result.getCode().intValue());
 
             Connection connection = Mockito.mock(Connection.class);
-            Mockito.when(clientProvider.getConnection(Mockito.any(), Mockito.any())).thenReturn(connection);
+            Mockito.when(DataSourceClientProvider.getAdHocConnection(Mockito.any(), Mockito.any()))
+                    .thenReturn(connection);
             result = dataSourceService.checkConnection(dataSourceType, connectionParam);
             Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         }
