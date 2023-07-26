@@ -106,11 +106,13 @@ jobs:
             registry: apache
             tag: ci
           master:
+            replicas: 1
             livenessProbe:
               initialDelaySeconds: 120
             readinessProbe:
               initialDelaySeconds: 120
           worker:
+            replicas: 1
             livenessProbe:
               initialDelaySeconds: 120
             readinessProbe:
