@@ -100,6 +100,11 @@ services:
     depends_on:
       hive-metastore-postgresql:
         condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", ""nc", "-z", "hivemetastore", "9083" ]
+      interval: 5s
+      timeout: 300s
+      retries: 120
   hive-metastore-postgresql:
     image: bde2020/hive-metastore-postgresql:2.3.0
     networks:
