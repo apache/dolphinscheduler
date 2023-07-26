@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TENANT_DELETE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.YARN_QUEUE_CREATE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.YARN_QUEUE_UPDATE;
 
@@ -29,16 +30,21 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Queue;
+import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
+import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -63,6 +69,9 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private TenantMapper tenantMapper;
 
     /**
      * Check the queue new object valid or not
@@ -220,6 +229,53 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
         queueMapper.updateById(updateQueue);
         result.setData(updateQueue);
         putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    /**
+     * delete queue
+     *
+     * @param loginUser login user
+     * @param id queue id
+     * @return delete result code
+     * @throws Exception exception
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Map<String, Object> deleteQueueById(User loginUser, int id) throws Exception {
+        Map<String, Object> result = new HashMap<>();
+
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.TENANT, TENANT_DELETE)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
+
+        Queue queue = queueMapper.selectById(id);
+        if (Objects.isNull(queue)) {
+            log.error("Queue does not exist");
+            throw new ServiceException(Status.QUEUE_NOT_EXIST);
+        }
+
+        List<Tenant> tenantList = tenantMapper.queryTenantListByQueueId(queue.getId());
+        if (CollectionUtils.isNotEmpty(tenantList)) {
+            log.warn("Delete queue failed, because there are {} tenants using it.", tenantList.size());
+            throw new ServiceException(Status.DELETE_TENANT_BY_ID_FAIL_TENANTS, tenantList.size());
+        }
+
+        List<User> userList = userMapper.queryUserListByQueue(queue.getQueueName());
+        if (CollectionUtils.isNotEmpty(userList)) {
+            log.warn("Delete queue failed, because there are {} users using it.", userList.size());
+            throw new ServiceException(Status.DELETE_QUEUE_BY_ID_FAIL_USERS, userList.size());
+        }
+
+        int delete = queueMapper.deleteById(id);
+        if (delete > 0) {
+            log.info("Queue is deleted and id is {}.", id);
+            putMsg(result, Status.SUCCESS);
+        } else {
+            log.error("Queue delete failed, queueId:{}.", id);
+            putMsg(result, Status.DELETE_QUEUE_BY_ID_ERROR);
+        }
+
         return result;
     }
 

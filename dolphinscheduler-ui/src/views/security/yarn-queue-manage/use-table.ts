@@ -17,10 +17,12 @@
 
 import { useAsyncState } from '@vueuse/core'
 import { reactive, h, ref } from 'vue'
-import { NButton, NIcon, NTooltip } from 'naive-ui'
+import {NButton, NIcon, NPopconfirm, NSpace, NTooltip} from 'naive-ui'
 import { useI18n } from 'vue-i18n'
-import { queryQueueListPaging } from '@/service/modules/queues'
-import { EditOutlined } from '@vicons/antd'
+import { queryQueueListPaging,
+  deleteQueueById
+} from '@/service/modules/queues'
+import {DeleteOutlined, EditOutlined} from '@vicons/antd'
 import type { QueueRes } from '@/service/modules/queues/types'
 
 export function useTable() {
@@ -30,6 +32,19 @@ export function useTable() {
     variables.showModalRef = true
     variables.statusRef = 1
     variables.row = row
+  }
+
+  const handleDelete = (row: any) => {
+    deleteQueueById(row.id).then(() => {
+      getTableData({
+        pageSize: variables.pageSize,
+        pageNo:
+            variables.tableData.length === 1 && variables.page > 1
+                ? variables.page - 1
+                : variables.page,
+        searchVal: variables.searchVal
+      })
+    })
   }
 
   const createColumns = (variables: any) => {
@@ -60,30 +75,69 @@ export function useTable() {
         title: t('security.yarn_queue.operation'),
         key: 'operation',
         render(row: any) {
-          return h(
-            NTooltip,
-            {},
-            {
-              trigger: () =>
+            return h(NSpace, null, {
+              default: () => [
                 h(
-                  NButton,
-                  {
-                    circle: true,
-                    type: 'info',
-                    size: 'small',
-                    class: 'edit',
-                    onClick: () => {
-                      handleEdit(row)
+                    NTooltip,
+                    {},
+                    {
+                      trigger: () =>
+                          h(
+                              NButton,
+                              {
+                                circle: true,
+                                type: 'info',
+                                size: 'small',
+                                class: 'edit',
+                                onClick: () => {
+                                  handleEdit(row)
+                                }
+                              },
+                              {
+                                icon: () =>
+                                    h(NIcon, null, { default: () => h(EditOutlined) })
+                              }
+                          ),
+                      default: () => t('security.yarn_queue.edit')
                     }
-                  },
-                  {
-                    icon: () =>
-                      h(NIcon, null, { default: () => h(EditOutlined) })
-                  }
                 ),
-              default: () => t('security.yarn_queue.edit')
-            }
-          )
+                h(
+                    NPopconfirm,
+                    {
+                      onPositiveClick: () => {
+                        handleDelete(row)
+                      }
+                    },
+                    {
+                      trigger: () =>
+                          h(
+                              NTooltip,
+                              {},
+                              {
+                                trigger: () =>
+                                    h(
+                                        NButton,
+                                        {
+                                          circle: true,
+                                          type: 'error',
+                                          size: 'small',
+                                          class: 'delete'
+                                        },
+                                        {
+                                          icon: () =>
+                                              h(NIcon, null, {
+                                                default: () => h(DeleteOutlined)
+                                              })
+                                        }
+                                    ),
+                                default: () => t('security.yarn_queue.delete')
+                              }
+                          ),
+                      default: () => t('security.yarn_queue.delete_confirm')
+                    }
+                )
+              ]
+            })
         }
       }
     ]
