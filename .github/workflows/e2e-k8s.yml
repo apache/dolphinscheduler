@@ -95,79 +95,36 @@ jobs:
       - name: Helm install dolphinscheduler
         working-directory: ${{ github.workspace }}/deploy/kubernetes/dolphinscheduler
         run: |
+          # install helm
           curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+          # install ds chart via helm
           helm repo add bitnami https://charts.bitnami.com/bitnami
           helm dependency update .
           helm upgrade --install --create-namespace -n dolphinscheduler dolphinscheduler . -f - <<EOF
           image:
             registry: apache
             tag: ci
-          conf:
-            common:
-              resource.azure.client.id: minioadmin
-              resource.azure.client.secret: minioadmin
-              resource.azure.subId: minioadmin
-              resource.azure.tenant.id: minioadmin
           master:
             livenessProbe:
-              enabled: true
               initialDelaySeconds: 120
-              periodSeconds: 30
-              timeoutSeconds: 5
-              failureThreshold: 3
-              successThreshold: 1
             readinessProbe:
-              enabled: true
               initialDelaySeconds: 120
-              periodSeconds: 30
-              timeoutSeconds: 5
-              failureThreshold: 3
-              successThreshold: 1
           worker:
             livenessProbe:
-              enabled: true
               initialDelaySeconds: 120
-              periodSeconds: 30
-              timeoutSeconds: 5
-              failureThreshold: 3
-              successThreshold: 1
             readinessProbe:
-              enabled: true
               initialDelaySeconds: 120
-              periodSeconds: 30
-              timeoutSeconds: 5
-              failureThreshold: 3
-              successThreshold: 1
           alert:
             livenessProbe:
-              enabled: true
               initialDelaySeconds: 120
-              periodSeconds: 30
-              timeoutSeconds: 5
-              failureThreshold: 3
-              successThreshold: 1
             readinessProbe:
-              enabled: true
               initialDelaySeconds: 120
-              periodSeconds: 30
-              timeoutSeconds: 5
-              failureThreshold: 3
-              successThreshold: 1
           api:
             livenessProbe:
-              enabled: true
               initialDelaySeconds: 120
-              periodSeconds: 30
-              timeoutSeconds: 5
-              failureThreshold: 3
-              successThreshold: 1
             readinessProbe:
-              enabled: true
               initialDelaySeconds: 120
-              periodSeconds: 30
-              timeoutSeconds: 5
-              failureThreshold: 3
-              successThreshold: 1
           EOF
 
       - name: Wait for pods
@@ -176,8 +133,8 @@ jobs:
           components=("master" "worker" "api" "alert")
           for component in "${components[@]}"; do
             until kubectl -n dolphinscheduler get pods -l app.kubernetes.io/component=${component} -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do
-              sleep 10
               echo "waiting for dolphinscheduler ${component} to be available"
+              sleep 10
               kubectl get pods --all-namespaces
               kubectl get events --all-namespaces
               for pod in $(kubectl get pods -n dolphinscheduler -o jsonpath='{.items[*].metadata.name}'); do
