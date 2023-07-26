@@ -1,0 +1,147 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+on:
+  pull_request:
+  push:
+    branches:
+      - dev
+
+name: E2E-K8S
+
+concurrency:
+  group: E2E-K8S-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+
+jobs:
+  paths-filter:
+    name: E2E-K8S-Path-Filter
+    runs-on: ubuntu-latest
+    outputs:
+      not-ignore: ${{ steps.filter.outputs.not-ignore }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dorny/paths-filter@b2feaf19c27470162a626bd6fa8438ae5b263721
+        id: filter
+        with:
+          filters: |
+            not-ignore:
+              - '!(docs/**)'
+  e2e-k8s:
+    name: E2E-K8S-Execute
+    needs: paths-filter
+    if: ${{ (needs.paths-filter.outputs.not-ignore == 'true') || (github.event_name == 'push') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Build Image
+        run: |
+          ./mvnw -B clean package \
+          -Dmaven.test.skip \
+          -Dmaven.javadoc.skip \
+          -Dspotless.skip=true \
+          -Dmaven.checkstyle.skip \
+          -Dmaven.deploy.skip \
+          -Ddocker.push.skip=true \
+          -Pdocker,release -Ddocker.tag=ci \
+          -pl org.apache.dolphinscheduler:dolphinscheduler-alert-server \
+          -pl dolphinscheduler-tools \
+          -pl dolphinscheduler-api \
+          -pl dolphinscheduler-master \
+          -pl dolphinscheduler-worker -am
+      - name: Create k8s Kind Cluster
+        run: |
+          # install kubectl
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          sudo chmod +x kubectl /usr/local/bin/kubectl
+          sudo mv kubectl /usr/local/bin/kubectl
+
+          # install kind
+          curl -LO https://github.com/kubernetes-sigs/kind/releases/download/v0.20.0/kind-linux-amd64
+          sudo chmod +x kind-linux-amd64
+          sudo mv kind-linux-amd64 /usr/local/bin/kind
+          kind version
+
+          # create kind cluster
+          kind_node_image="kindest/node:v1.23.17"
+          echo "Kubernetes version: ${kind_node_image}"
+          kind create cluster --name dolphinscheduler --image ${kind_node_image}
+          kubectl version --short
+          kubectl get all --all-namespaces
+      - name: Load images
+        run: |
+          components=("master" "worker" "api" "tools" "alert-server")
+          for component in "${components[@]}"; do
+            kind load docker-image apache/dolphinscheduler-${component}:ci --name dolphinscheduler
+          done
+      - name: Helm install dolphinscheduler
+        working-directory: ${{ github.workspace }}/deploy/kubernetes/dolphinscheduler
+        run: |
+          # install helm
+          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+          # install ds chart via helm
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm dependency update .
+          helm upgrade --install --create-namespace -n dolphinscheduler dolphinscheduler . -f - <<EOF
+          image:
+            registry: apache
+            tag: ci
+          master:
+            replicas: 1
+            livenessProbe:
+              initialDelaySeconds: 120
+            readinessProbe:
+              initialDelaySeconds: 120
+          worker:
+            replicas: 1
+            livenessProbe:
+              initialDelaySeconds: 120
+            readinessProbe:
+              initialDelaySeconds: 120
+          alert:
+            livenessProbe:
+              initialDelaySeconds: 120
+            readinessProbe:
+              initialDelaySeconds: 120
+          api:
+            livenessProbe:
+              initialDelaySeconds: 120
+            readinessProbe:
+              initialDelaySeconds: 120
+          EOF
+
+      - name: Wait for pods
+        run: |
+          JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; 
+          components=("master" "worker" "api" "alert")
+          for component in "${components[@]}"; do
+            until kubectl -n dolphinscheduler get pods -l app.kubernetes.io/component=${component} -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do
+              echo "waiting for dolphinscheduler ${component} to be available"
+              sleep 10
+              kubectl get pods --all-namespaces
+              kubectl get events --all-namespaces
+              for pod in $(kubectl get pods -n dolphinscheduler -o jsonpath='{.items[*].metadata.name}'); do
+                echo "logs for pod $pod:"
+                kubectl logs --tail=1000 -n dolphinscheduler $pod
+              done
+            done
+          done

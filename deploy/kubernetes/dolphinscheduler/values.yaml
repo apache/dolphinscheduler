@@ -181,6 +181,18 @@ conf:
     # oss bucket endpoint, required if you set resource.storage.type=OSS
     resource.alibaba.cloud.oss.endpoint: https://oss-cn-hangzhou.aliyuncs.com
 
+    # azure storage account name, required if you set resource.storage.type=ABS
+    resource.azure.client.id: minioadmin
+
+    # azure storage account key, required if you set resource.storage.type=ABS
+    resource.azure.client.secret: minioadmin
+
+    # azure storage subId, required if you set resource.storage.type=ABS
+    resource.azure.subId: minioadmin
+
+    # azure storage tenantId, required if you set resource.storage.type=ABS
+    resource.azure.tenant.id: minioadmin
+
     # if resource.storage.type=HDFS, the user must have the permission to create directories under the HDFS root path
     resource.hdfs.root.user: hdfs
 
