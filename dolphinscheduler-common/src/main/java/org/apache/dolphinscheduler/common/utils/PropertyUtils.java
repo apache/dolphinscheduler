@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,6 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.function.Function;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -293,5 +295,13 @@ public class PropertyUtils {
             }
         });
         return propertiesMap;
+    }
+
+    public static <T> Set<T> getSet(String key, Function<String, Set<T>> transformFunction, Set<T> defaultValue) {
+        String value = (String) properties.get(key);
+        if (StringUtils.isEmpty(value)) {
+            return defaultValue;
+        }
+        return transformFunction.apply(value);
     }
 }
