@@ -20,7 +20,6 @@
 
 package org.apache.dolphinscheduler.e2e.cases;
 
-import lombok.SneakyThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
