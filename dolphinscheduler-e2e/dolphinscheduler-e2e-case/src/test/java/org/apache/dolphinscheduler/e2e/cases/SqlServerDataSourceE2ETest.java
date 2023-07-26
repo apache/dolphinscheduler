@@ -20,6 +20,7 @@
 
 package org.apache.dolphinscheduler.e2e.cases;
 
+import lombok.SneakyThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
@@ -93,6 +94,7 @@ public class SqlServerDataSourceE2ETest {
 
     @Test
     @Order(20)
+//    @SneakyThrows
     void testDeleteSqlServerDataSource() {
         final DataSourcePage page = new DataSourcePage(browser);
 
@@ -107,5 +109,7 @@ public class SqlServerDataSourceE2ETest {
                 it -> it.getText().contains(dataSourceName)
             );
         });
+
+//        Thread.sleep(1000*60);
     }
 }
