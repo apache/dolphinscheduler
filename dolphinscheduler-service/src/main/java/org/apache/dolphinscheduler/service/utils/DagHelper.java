@@ -426,13 +426,12 @@ public class DagHelper {
         List<Long> switchTaskList = conditionResultVoList.get(resultConditionLocation).getNextNode();
         Set<Long> switchNeedWorkCodes = new HashSet<>();
         if (CollectionUtils.isEmpty(switchTaskList)) {
-            switchTaskList = new ArrayList<>();
-        } else {
-            // get all downstream nodes of the branch that the switch node needs to execute
-            for (Long switchTaskCode : switchTaskList) {
-                getSwitchNeedWorkCodes(switchTaskCode, dag, switchNeedWorkCodes);
-            }
-        }
+            return new ArrayList<>();
+        } 
+          // get all downstream nodes of the branch that the switch node needs to execute
+          for (Long switchTaskCode : switchTaskList) {
+              getSwitchNeedWorkCodes(switchTaskCode, dag, switchNeedWorkCodes);
+          }
         // conditionResultVoList.remove(resultConditionLocation);
         for (SwitchResultVo info : conditionResultVoList) {
             if (CollectionUtils.isEmpty(info.getNextNode())) {
