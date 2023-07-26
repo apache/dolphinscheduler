@@ -24,7 +24,7 @@ on:
 name: E2E
 
 env:
-  TESTCONTAINERS_HOST_OVERRIDE: "host.docker.internal"
+  TESTCONTAINERS_HOST_OVERRIDE: "host.testcontainers.internal"
 
 concurrency:
   group: e2e-${{ github.event.pull_request.number || github.ref }}
