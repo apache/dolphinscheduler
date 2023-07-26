@@ -30,7 +30,7 @@ services:
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:12345/actuator/health" ]
       interval: 5s
-      timeout: 60s
+      timeout: 300s
       retries: 120
     depends_on:
       sqlserver:
@@ -44,7 +44,7 @@ services:
     healthcheck:
       test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P OcP2020123 -Q "SELECT 1"
       interval: 5s
-      timeout: 60s
+      timeout: 300s
       retries: 120
 
 networks:

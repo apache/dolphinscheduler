@@ -43,6 +43,7 @@ postgresql:
   postgresqlUsername: "root"
   postgresqlPassword: "root"
   postgresqlDatabase: "dolphinscheduler"
+  driverClassName: "org.postgresql.Driver"
   params: "characterEncoding=utf8"
   persistence:
     enabled: false
@@ -51,6 +52,7 @@ postgresql:
 
 mysql:
   enabled: false
+  driverClassName: "com.mysql.cj.jdbc.Driver"
   auth:
     username: "ds"
     password: "ds"
@@ -82,6 +84,7 @@ externalDatabase:
   password: "root"
   database: "dolphinscheduler"
   params: "characterEncoding=utf8"
+  driverClassName: "org.postgresql.Driver"
 
 ## If not exists external registry, the zookeeper registry will be used by default.
 zookeeper:
@@ -258,11 +261,11 @@ common:
     HADOOP_HOME: "/opt/soft/hadoop"
     HADOOP_CONF_DIR: "/opt/soft/hadoop/etc/hadoop"
     SPARK_HOME: "/opt/soft/spark"
-    PYTHON_HOME: "/usr/bin/python"
+    PYTHON_LAUNCHER: "/usr/bin/python/bin/python3"
     JAVA_HOME: "/opt/java/openjdk"
     HIVE_HOME: "/opt/soft/hive"
     FLINK_HOME: "/opt/soft/flink"
-    DATAX_HOME: "/opt/soft/datax"
+    DATAX_LAUNCHER: "/opt/soft/datax/bin/datax.py"
   ## Shared storage persistence mounted into api, master and worker, such as Hadoop, Spark, Flink and DataX binary package
   sharedStoragePersistence:
     enabled: false
