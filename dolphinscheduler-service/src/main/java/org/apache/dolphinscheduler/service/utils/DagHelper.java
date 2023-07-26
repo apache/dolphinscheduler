@@ -437,8 +437,10 @@ public class DagHelper {
             if (CollectionUtils.isEmpty(info.getNextNode())) {
                 continue;
             }
-            setSwitchTaskNodeSkip(info.getNextNode().get(0), dag, completeTaskList, skipTaskNodeList,
-                    switchNeedWorkCodes);
+            for (Long nextNode : info.getNextNode()) {
+                setSwitchTaskNodeSkip(nextNode, dag, completeTaskList, skipTaskNodeList,
+                        switchNeedWorkCodes);
+            }
         }
         return switchTaskList;
     }
