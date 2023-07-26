@@ -94,7 +94,6 @@ public class SqlServerDataSourceE2ETest {
 
     @Test
     @Order(20)
-//    @SneakyThrows
     void testDeleteSqlServerDataSource() {
         final DataSourcePage page = new DataSourcePage(browser);
 
@@ -109,7 +108,5 @@ public class SqlServerDataSourceE2ETest {
                 it -> it.getText().contains(dataSourceName)
             );
         });
-
-//        Thread.sleep(1000*60);
     }
 }
