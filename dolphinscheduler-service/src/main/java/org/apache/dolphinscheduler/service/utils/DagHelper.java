@@ -414,7 +414,7 @@ public class DagHelper {
         return conditionTaskList;
     }
 
-    private static List<Long> skipTaskNode4Switch(TaskNode taskNode,
+    public static List<Long> skipTaskNode4Switch(TaskNode taskNode,
                                                   Map<Long, TaskNode> skipTaskNodeList,
                                                   Map<Long, TaskInstance> completeTaskList,
                                                   DAG<Long, TaskNode, TaskNodeRelation> dag) {
