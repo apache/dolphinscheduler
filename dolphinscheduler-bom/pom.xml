@@ -115,6 +115,7 @@
         <casdoor.version>1.6.0</casdoor.version>
         <azure-sdk-bom.version>1.2.10</azure-sdk-bom.version>
         <protobuf.version>3.17.2</protobuf.version>
+        <esdk-obs.version>3.23.3</esdk-obs.version>
     </properties>
 
     <dependencyManagement>
@@ -894,6 +895,12 @@
                 <groupId>com.google.protobuf</groupId>
                 <artifactId>protobuf-java</artifactId>
                 <version>${protobuf.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.huaweicloud</groupId>
+                <artifactId>esdk-obs-java-bundle</artifactId>
+                <version>${esdk-obs.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
