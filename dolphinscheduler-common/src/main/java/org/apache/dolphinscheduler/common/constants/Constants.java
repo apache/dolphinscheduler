@@ -665,18 +665,6 @@ public final class Constants {
     public static final String SYSTEM_LINE_SEPARATOR = System.getProperty("line.separator");
 
     /**
-     * network interface preferred
-     */
-    public static final String DOLPHIN_SCHEDULER_NETWORK_INTERFACE_PREFERRED =
-            "dolphin.scheduler.network.interface.preferred";
-
-    /**
-     * network IP gets priority, default inner outer
-     */
-    public static final String DOLPHIN_SCHEDULER_NETWORK_PRIORITY_STRATEGY =
-            "dolphin.scheduler.network.priority.strategy";
-
-    /**
      * exec shell scripts
      */
     public static final String SH = "sh";
