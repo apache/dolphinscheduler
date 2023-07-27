@@ -335,7 +335,7 @@ public class DagHelperTest {
         DAG<Long, TaskNode, TaskNodeRelation> dag = generateDag2();
         Map<Long, TaskNode> skipTaskNodeList = new HashMap<>();
         Map<Long, TaskInstance> completeTaskList = new HashMap<>();
-        completeTaskList.put(0l,new TaskInstance());
+        completeTaskList.put(0l, new TaskInstance());
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setState(TaskExecutionStatus.SUCCESS);
         taskInstance.setTaskCode(1l);
@@ -343,8 +343,8 @@ public class DagHelperTest {
         taskParamsMap.put(Constants.SWITCH_RESULT, "");
         taskInstance.setTaskParams(JSONUtils.toJsonString(taskParamsMap));
         taskInstance.setSwitchDependency(getSwitchNode());
-        completeTaskList.put(1l,taskInstance);
-        DagHelper.skipTaskNode4Switch(dag.getNode(1l),skipTaskNodeList,completeTaskList,dag);
+        completeTaskList.put(1l, taskInstance);
+        DagHelper.skipTaskNode4Switch(dag.getNode(1l), skipTaskNodeList, completeTaskList, dag);
         Assertions.assertNotNull(skipTaskNodeList.get(2L));
         Assertions.assertEquals(1, skipTaskNodeList.size());
     }

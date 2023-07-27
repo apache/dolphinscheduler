@@ -415,9 +415,9 @@ public class DagHelper {
     }
 
     public static List<Long> skipTaskNode4Switch(TaskNode taskNode,
-                                                  Map<Long, TaskNode> skipTaskNodeList,
-                                                  Map<Long, TaskInstance> completeTaskList,
-                                                  DAG<Long, TaskNode, TaskNodeRelation> dag) {
+                                                 Map<Long, TaskNode> skipTaskNodeList,
+                                                 Map<Long, TaskInstance> completeTaskList,
+                                                 DAG<Long, TaskNode, TaskNodeRelation> dag) {
 
         SwitchParameters switchParameters =
                 completeTaskList.get(taskNode.getCode()).getSwitchDependency();
@@ -427,11 +427,11 @@ public class DagHelper {
         Set<Long> switchNeedWorkCodes = new HashSet<>();
         if (CollectionUtils.isEmpty(switchTaskList)) {
             return new ArrayList<>();
-        } 
-          // get all downstream nodes of the branch that the switch node needs to execute
-          for (Long switchTaskCode : switchTaskList) {
-              getSwitchNeedWorkCodes(switchTaskCode, dag, switchNeedWorkCodes);
-          }
+        }
+        // get all downstream nodes of the branch that the switch node needs to execute
+        for (Long switchTaskCode : switchTaskList) {
+            getSwitchNeedWorkCodes(switchTaskCode, dag, switchNeedWorkCodes);
+        }
         // conditionResultVoList.remove(resultConditionLocation);
         for (SwitchResultVo info : conditionResultVoList) {
             if (CollectionUtils.isEmpty(info.getNextNode())) {
