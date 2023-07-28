@@ -17,25 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.redshift;
 
-<<<<<<< HEAD:dolphinscheduler-datasource-plugin/dolphinscheduler-datasource-redshift/src/main/java/org/apache/dolphinscheduler/plugin/datasource/redshift/RedshiftDataSourceClient.java
-import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
-import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
-import org.apache.dolphinscheduler.spi.enums.DbType;
-
-public class RedshiftDataSourceClient extends CommonDataSourceClient {
-    public RedshiftDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        super(baseConnectionParam, dbType);
-    }
-=======
 import org.apache.dolphinscheduler.plugin.datasource.api.client.BasePooledDataSourceClient;
-import org.apache.dolphinscheduler.plugin.datasource.redshift.param.RedshiftAuthMode;
-import org.apache.dolphinscheduler.plugin.datasource.redshift.param.RedshiftConnectionParam;
-import org.apache.dolphinscheduler.plugin.datasource.redshift.param.RedshiftDataSourceProcessor;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-
-import java.sql.Connection;
-import java.sql.SQLException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -46,14 +30,4 @@ public class RedshiftPooledDataSourceClient extends BasePooledDataSourceClient {
         super(baseConnectionParam, dbType);
     }
 
-    @Override
-    public Connection getConnection() throws SQLException {
-        RedshiftConnectionParam connectionParam = (RedshiftConnectionParam) this.baseConnectionParam;
-        if (connectionParam.getMode().equals(RedshiftAuthMode.PASSWORD)) {
-            return super.getConnection();
-        }
-        return RedshiftDataSourceProcessor.getConnectionByIAM(connectionParam);
-    }
-
->>>>>>> 4aab0b234 (Use AdHoc datasource client in sqlTask (#14631)):dolphinscheduler-datasource-plugin/dolphinscheduler-datasource-redshift/src/main/java/org/apache/dolphinscheduler/plugin/datasource/redshift/RedshiftPooledDataSourceClient.java
 }
