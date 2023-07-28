@@ -109,7 +109,7 @@ public class UdfFuncServiceTest {
         Mockito.when(
                 resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.UDF, null, 0, serviceLogger))
                 .thenReturn(true);
-        Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
+        Mockito.when(PropertyUtils.isResourceStorageStartup()).thenReturn(false);
         // hdfs not start
         Result result = udfFuncService.createUdfFunction(getLoginUser(), "UdfFuncServiceTest",
                 "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String",
@@ -117,7 +117,7 @@ public class UdfFuncServiceTest {
         logger.info(result.toString());
         Assertions.assertEquals(Status.HDFS_NOT_STARTUP.getMsg(), result.getMsg());
         // resource not exist
-        Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
+        Mockito.when(PropertyUtils.isResourceStorageStartup()).thenReturn(true);
 
         result = udfFuncService.createUdfFunction(getLoginUser(), "UdfFuncServiceTest",
                 "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String",
@@ -163,7 +163,7 @@ public class UdfFuncServiceTest {
     @Test
     public void testUpdateUdfFunc() {
 
-        Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
+        Mockito.when(PropertyUtils.isResourceStorageStartup()).thenReturn(false);
         Mockito.when(udfFuncMapper.selectUdfById(1)).thenReturn(getUdfFunc());
 
         // UDF_FUNCTION_NOT_EXIST
@@ -192,7 +192,7 @@ public class UdfFuncServiceTest {
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.UDF, new Object[]{11}, 0,
                 serviceLogger)).thenReturn(true);
         Mockito.when(udfFuncMapper.selectUdfById(11)).thenReturn(getUdfFunc());
-        Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
+        Mockito.when(PropertyUtils.isResourceStorageStartup()).thenReturn(true);
         result = udfFuncService.updateUdfFunc(getLoginUser(), 11, "UdfFuncServiceTest",
                 "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String",
                 "UdfFuncServiceTest", "UdfFuncServiceTest", UdfType.HIVE, "");

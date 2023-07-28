@@ -40,7 +40,7 @@ public class PropertyUtilsTest {
 
     @Test
     public void getResUploadStartupState() {
-        Assertions.assertTrue(PropertyUtils.getResUploadStartupState());
+        Assertions.assertTrue(PropertyUtils.isResourceStorageStartup());
     }
 
     @Test
