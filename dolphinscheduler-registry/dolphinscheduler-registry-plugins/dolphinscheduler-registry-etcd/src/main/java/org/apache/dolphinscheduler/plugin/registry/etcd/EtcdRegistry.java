@@ -71,6 +71,9 @@ public class EtcdRegistry implements Registry {
     private static Logger LOGGER = LoggerFactory.getLogger(EtcdRegistry.class);
     private final Client client;
     private EtcdConnectionStateListener etcdConnectionStateListener;
+
+    private EtcdKeepAliveLeaseManager etcdKeepAliveLeaseManager;
+
     public static final String FOLDER_SEPARATOR = "/";
     // save the lock info for thread
     // key:lockKey Value:leaseId
@@ -101,6 +104,7 @@ public class EtcdRegistry implements Registry {
         client = clientBuilder.build();
         LOGGER.info("Started Etcd Registry...");
         etcdConnectionStateListener = new EtcdConnectionStateListener(client);
+        etcdKeepAliveLeaseManager = new EtcdKeepAliveLeaseManager(client);
     }
 
     /**
@@ -186,9 +190,7 @@ public class EtcdRegistry implements Registry {
         try {
             if (deleteOnDisconnect) {
                 // keep the key by lease, if disconnected, the lease will expire and the key will delete
-                long leaseId = client.getLeaseClient().grant(TIME_TO_LIVE_SECONDS).get().getID();
-                client.getLeaseClient().keepAlive(leaseId, Observers.observer(response -> {
-                }));
+                long leaseId = etcdKeepAliveLeaseManager.getOrCreateKeepAliveLease(key, TIME_TO_LIVE_SECONDS);
                 PutOption putOption = PutOption.newBuilder().withLeaseId(leaseId).build();
                 client.getKVClient().put(byteSequence(key), byteSequence(value),putOption).get();
             } else {
