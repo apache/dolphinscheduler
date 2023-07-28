@@ -17,14 +17,13 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.utils;
 
-
 import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class ProcessUtilsTest {
 
@@ -33,7 +32,7 @@ public class ProcessUtilsTest {
     private String getPidStr(String pids) {
         Matcher mat = null;
         StringBuilder sb = new StringBuilder();
-        if(StringUtils.isNotEmpty(pids)){
+        if (StringUtils.isNotEmpty(pids)) {
             mat = LINUXPATTERN.matcher(pids);
         }
         if (null != mat) {
