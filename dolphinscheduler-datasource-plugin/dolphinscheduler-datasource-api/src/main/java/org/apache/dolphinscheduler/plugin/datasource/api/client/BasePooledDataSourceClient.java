@@ -27,8 +27,6 @@ import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.PooledDataSourceClient;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-import org.apache.commons.collections4.MapUtils;
-
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -63,8 +61,8 @@ public abstract class BasePooledDataSourceClient implements PooledDataSourceClie
         dataSource.setMaximumPoolSize(PropertyUtils.getInt(DataSourceConstants.SPRING_DATASOURCE_MAX_ACTIVE, 50));
         dataSource.setConnectionTestQuery(baseConnectionParam.getValidationQuery());
 
-        if (MapUtils.isNotEmpty(baseConnectionParam.getOther())) {
-            baseConnectionParam.getOther().forEach(dataSource::addDataSourceProperty);
+        if (baseConnectionParam.getProps() != null) {
+            baseConnectionParam.getProps().forEach(dataSource::addDataSourceProperty);
         }
 
         log.info("Creating HikariDataSource for {} success.", dbType.name());

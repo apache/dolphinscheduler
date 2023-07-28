@@ -486,4 +486,8 @@ public class OSUtils {
         return false;
     }
 
+    public static Boolean isWindows() {
+        return System.getProperty("os.name").startsWith("Windows");
+    }
+
 }
