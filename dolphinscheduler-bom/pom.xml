@@ -912,7 +912,8 @@
                         <artifactId>log4j-api</artifactId>
                     </exclusion>
                 </exclusions>
-              
+            </dependency>
+          
             <dependency>
                 <groupId>com.github.stefanbirkner</groupId>
                 <artifactId>system-lambda</artifactId>
