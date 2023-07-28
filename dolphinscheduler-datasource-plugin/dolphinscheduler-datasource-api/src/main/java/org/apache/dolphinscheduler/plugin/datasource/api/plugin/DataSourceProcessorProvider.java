@@ -17,36 +17,30 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.plugin;
 
+import lombok.NonNull;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.util.Map;
 
 
 public class DataSourceProcessorProvider {
-    private static final Logger logger = LoggerFactory.getLogger(DataSourceProcessorProvider.class);
 
-    private DataSourceProcessorManager dataSourcePluginManager;
+    private static final DataSourceProcessorManager dataSourcePluginManager = new DataSourceProcessorManager();
+
+    static {
+        dataSourcePluginManager.installProcessor();
+    }
 
     private DataSourceProcessorProvider() {
-        initDataSourceProcessorPlugin();
     }
 
-    private static class DataSourceClientProviderHolder {
-        private static final DataSourceProcessorProvider INSTANCE = new DataSourceProcessorProvider();
+    public static DataSourceProcessor getDataSourceProcessor(@NonNull DbType dbType) {
+        return dataSourcePluginManager.getDataSourceProcessorMap().get(dbType.name());
     }
 
-    public static DataSourceProcessorProvider getInstance() {
-        return DataSourceClientProviderHolder.INSTANCE;
-    }
-
-    public Map<String, DataSourceProcessor> getDataSourceProcessorMap() {
+    public static Map<String, DataSourceProcessor> getDataSourceProcessorMap() {
         return dataSourcePluginManager.getDataSourceProcessorMap();
     }
 
-    private void initDataSourceProcessorPlugin() {
-        dataSourcePluginManager = new DataSourceProcessorManager();
-        dataSourcePluginManager.installProcessor();
-    }
 }

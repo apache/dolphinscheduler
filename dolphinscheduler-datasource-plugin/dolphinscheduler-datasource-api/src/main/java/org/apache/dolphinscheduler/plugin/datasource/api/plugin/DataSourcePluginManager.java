@@ -33,10 +33,10 @@ import static java.lang.String.format;
 public class DataSourcePluginManager {
     private static final Logger logger = LoggerFactory.getLogger(DataSourcePluginManager.class);
 
-    private final Map<String, DataSourceChannel> datasourceClientMap = new ConcurrentHashMap<>();
+    private final Map<String, DataSourceChannel> datasourceChannelMap = new ConcurrentHashMap<>();
 
     public Map<String, DataSourceChannel> getDataSourceChannelMap() {
-        return Collections.unmodifiableMap(datasourceClientMap);
+        return Collections.unmodifiableMap(datasourceChannelMap);
     }
 
     public void installPlugin() {
@@ -48,7 +48,7 @@ public class DataSourcePluginManager {
 
             logger.info("Registering datasource plugin: {}", name);
 
-            if (datasourceClientMap.containsKey(name)) {
+            if (datasourceChannelMap.containsKey(name)) {
                 throw new IllegalStateException(format("Duplicate datasource plugins named '%s'", name));
             }
 
@@ -60,6 +60,6 @@ public class DataSourcePluginManager {
 
     private void loadDatasourceClient(DataSourceChannelFactory datasourceChannelFactory) {
         DataSourceChannel datasourceChannel = datasourceChannelFactory.create();
-        datasourceClientMap.put(datasourceChannelFactory.getName(), datasourceChannel);
+        datasourceChannelMap.put(datasourceChannelFactory.getName(), datasourceChannel);
     }
 }

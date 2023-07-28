@@ -15,14 +15,15 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.alert.script;
+package org.apache.dolphinscheduler.plugin.datasource.presto;
 
-public final class OSUtils {
-    private OSUtils() {
-        throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
-    }
+import org.apache.dolphinscheduler.plugin.datasource.api.client.BaseAdHocDataSourceClient;
+import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
-    static Boolean isWindows() {
-        return System.getProperty("os.name").startsWith("Windows");
+public class PrestoAdHocDataSourceClient extends BaseAdHocDataSourceClient {
+
+    public PrestoAdHocDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+        super(baseConnectionParam, dbType);
     }
 }

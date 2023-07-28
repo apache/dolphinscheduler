@@ -15,16 +15,15 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.db2;
+package org.apache.dolphinscheduler.plugin.datasource.sqlserver;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
+import org.apache.dolphinscheduler.plugin.datasource.api.client.BaseAdHocDataSourceClient;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-public class DB2DataSourceClient extends CommonDataSourceClient {
+public class SQLServerAdHocDataSourceClient extends BaseAdHocDataSourceClient {
 
-    public DB2DataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+    public SQLServerAdHocDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
         super(baseConnectionParam, dbType);
     }
-
 }

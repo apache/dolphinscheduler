@@ -41,32 +41,6 @@ public class JDBCDataSourceProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(JDBCDataSourceProvider.class);
 
-    public static HikariDataSource createJdbcDataSource(BaseConnectionParam properties, DbType dbType) {
-        logger.info("Creating HikariDataSource pool for maxActive:{}",
-                PropertyUtils.getInt(DataSourceConstants.SPRING_DATASOURCE_MAX_ACTIVE, 50));
-        HikariDataSource dataSource = new HikariDataSource();
-
-        //TODO Support multiple versions of data sources
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        loaderJdbcDriver(classLoader, properties, dbType);
-
-        dataSource.setDriverClassName(properties.getDriverClassName());
-        dataSource.setJdbcUrl(DataSourceUtils.getJdbcUrl(dbType, properties));
-        dataSource.setUsername(properties.getUser());
-        dataSource.setPassword(PasswordUtils.decodePassword(properties.getPassword()));
-
-        dataSource.setMinimumIdle(PropertyUtils.getInt(DataSourceConstants.SPRING_DATASOURCE_MIN_IDLE, 5));
-        dataSource.setMaximumPoolSize(PropertyUtils.getInt(DataSourceConstants.SPRING_DATASOURCE_MAX_ACTIVE, 50));
-        dataSource.setConnectionTestQuery(properties.getValidationQuery());
-
-        if (properties.getProps() != null) {
-            properties.getProps().forEach(dataSource::addDataSourceProperty);
-        }
-
-        logger.info("Creating HikariDataSource pool success.");
-        return dataSource;
-    }
-
     /**
      * @return One Session Jdbc DataSource
      */

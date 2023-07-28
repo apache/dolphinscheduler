@@ -17,14 +17,25 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.redshift;
 
+import org.apache.dolphinscheduler.spi.datasource.AdHocDataSourceClient;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
-import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
+import org.apache.dolphinscheduler.spi.datasource.PooledDataSourceClient;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 public class RedshiftDataSourceChannel implements DataSourceChannel {
     @Override
+<<<<<<< HEAD
     public DataSourceClient createDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
         return new RedshiftDataSourceClient(baseConnectionParam,dbType);
+=======
+    public AdHocDataSourceClient createAdHocDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+        return new RedshiftAdHocDataSourceClient(baseConnectionParam, dbType);
+    }
+
+    @Override
+    public PooledDataSourceClient createPooledDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+        return new RedshiftPooledDataSourceClient(baseConnectionParam, dbType);
+>>>>>>> 4aab0b234 (Use AdHoc datasource client in sqlTask (#14631))
     }
 }

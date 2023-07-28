@@ -15,14 +15,15 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.athena;
+package org.apache.dolphinscheduler.plugin.datasource.spark;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
+import org.apache.dolphinscheduler.plugin.datasource.api.client.BaseAdHocDataSourceClient;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-public class AthenaDataSourceClient extends CommonDataSourceClient {
-    public AthenaDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+public class SparkAdHocDataSourceClient extends BaseAdHocDataSourceClient {
+
+    public SparkAdHocDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
         super(baseConnectionParam, dbType);
     }
 }

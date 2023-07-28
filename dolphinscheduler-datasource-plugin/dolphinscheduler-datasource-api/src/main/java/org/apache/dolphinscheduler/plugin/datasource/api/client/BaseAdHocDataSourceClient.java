@@ -15,23 +15,37 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.athena;
+package org.apache.dolphinscheduler.plugin.datasource.api.client;
 
+import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceProcessorProvider;
 import org.apache.dolphinscheduler.spi.datasource.AdHocDataSourceClient;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
-import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
-import org.apache.dolphinscheduler.spi.datasource.PooledDataSourceClient;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-public class AthenaDataSourceChannel implements DataSourceChannel {
-    @Override
-    public AdHocDataSourceClient createAdHocDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        return new AthenaAdHocDataSourceClient(baseConnectionParam, dbType);
+import java.sql.Connection;
+import java.sql.SQLException;
+
+public abstract class BaseAdHocDataSourceClient implements AdHocDataSourceClient {
+
+    private final BaseConnectionParam baseConnectionParam;
+    private final DbType dbType;
+
+    protected BaseAdHocDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+        this.baseConnectionParam = baseConnectionParam;
+        this.dbType = dbType;
     }
 
     @Override
-    public PooledDataSourceClient createPooledDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        return new AthenaPooledDataSourceClient(baseConnectionParam, dbType);
+    public Connection getConnection() throws SQLException {
+        try {
+            return DataSourceProcessorProvider.getDataSourceProcessor(dbType).getConnection(baseConnectionParam);
+        } catch (Exception e) {
+            throw new SQLException("Create adhoc connection error", e);
+        }
     }
 
+    @Override
+    public void close() {
+        // do nothing
+    }
 }

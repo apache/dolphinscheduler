@@ -36,9 +36,17 @@ public class MySQLDataSourceChannelTest {
 
     @Test
     public void testCreateDataSourceClient() {
+<<<<<<< HEAD
         MySQLDataSourceChannel sourceChannel = PowerMockito.mock(MySQLDataSourceChannel.class);
         MySQLDataSourceClient dataSourceClient = PowerMockito.mock(MySQLDataSourceClient.class);
         PowerMockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
         Assert.assertNotNull(sourceChannel.createDataSourceClient(new MySQLConnectionParam(), DbType.MYSQL));
+=======
+        MySQLDataSourceChannel sourceChannel = Mockito.mock(MySQLDataSourceChannel.class);
+        MySQLPooledDataSourceClient dataSourceClient = Mockito.mock(MySQLPooledDataSourceClient.class);
+        Mockito.when(sourceChannel.createPooledDataSourceClient(Mockito.any(), Mockito.any()))
+                .thenReturn(dataSourceClient);
+        Assertions.assertNotNull(sourceChannel.createPooledDataSourceClient(new MySQLConnectionParam(), DbType.MYSQL));
+>>>>>>> 4aab0b234 (Use AdHoc datasource client in sqlTask (#14631))
     }
 }

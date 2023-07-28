@@ -36,6 +36,7 @@ import com.zaxxer.hikari.HikariDataSource;
 public class JDBCDataSourceProviderTest {
 
     @Test
+<<<<<<< HEAD
     public void testCreateJdbcDataSource() {
         PowerMockito.mockStatic(JDBCDataSourceProvider.class);
         HikariDataSource dataSource = PowerMockito.mock(HikariDataSource.class);
@@ -44,6 +45,8 @@ public class JDBCDataSourceProviderTest {
     }
 
     @Test
+=======
+>>>>>>> 4aab0b234 (Use AdHoc datasource client in sqlTask (#14631))
     public void testCreateOneSessionJdbcDataSource() {
         PowerMockito.mockStatic(JDBCDataSourceProvider.class);
         HikariDataSource dataSource = PowerMockito.mock(HikariDataSource.class);

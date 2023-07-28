@@ -15,21 +15,32 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.spark;
+package org.apache.dolphinscheduler.plugin.datasource.kyuubi;
 
-import org.apache.dolphinscheduler.plugin.datasource.hive.HiveDataSourceClient;
+import org.apache.dolphinscheduler.plugin.datasource.api.client.BasePooledDataSourceClient;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.sql.Connection;
+import java.sql.SQLException;
 
-public class SparkDataSourceClient extends HiveDataSourceClient {
+import lombok.extern.slf4j.Slf4j;
 
-    private static final Logger logger = LoggerFactory.getLogger(SparkDataSourceClient.class);
+@Slf4j
+public class KyuubiPooledDataSourceClient extends BasePooledDataSourceClient {
 
-    public SparkDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+    public KyuubiPooledDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
         super(baseConnectionParam, dbType);
     }
 
+    @Override
+    public Connection getConnection() throws SQLException {
+        return dataSource.getConnection();
+    }
+
+    @Override
+    public void close() {
+        super.close();
+        log.info("Closed Kyuubi datasource client.");
+    }
 }

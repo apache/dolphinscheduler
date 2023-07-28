@@ -15,14 +15,16 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.redshift;
+package org.apache.dolphinscheduler.plugin.datasource.sqlserver;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
+import org.apache.dolphinscheduler.plugin.datasource.api.client.BasePooledDataSourceClient;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-public class RedshiftDataSourceClient extends CommonDataSourceClient {
-    public RedshiftDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+public class SQLServerPooledDataSourceClient extends BasePooledDataSourceClient {
+
+    public SQLServerPooledDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
         super(baseConnectionParam, dbType);
     }
+
 }

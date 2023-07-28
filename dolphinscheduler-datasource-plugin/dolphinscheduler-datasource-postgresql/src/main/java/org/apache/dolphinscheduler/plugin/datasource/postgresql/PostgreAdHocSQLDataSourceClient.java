@@ -15,16 +15,15 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.clickhouse;
+package org.apache.dolphinscheduler.plugin.datasource.postgresql;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
+import org.apache.dolphinscheduler.plugin.datasource.api.client.BaseAdHocDataSourceClient;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-public class ClickHouseDataSourceClient extends CommonDataSourceClient {
+public class PostgreAdHocSQLDataSourceClient extends BaseAdHocDataSourceClient {
 
-    public ClickHouseDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+    public PostgreAdHocSQLDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
         super(baseConnectionParam, dbType);
     }
-
 }

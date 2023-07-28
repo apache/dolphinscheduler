@@ -15,15 +15,15 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.presto;
+package org.apache.dolphinscheduler.plugin.datasource.postgresql;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
+import org.apache.dolphinscheduler.plugin.datasource.api.client.BasePooledDataSourceClient;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-public class PrestoDataSourceClient extends CommonDataSourceClient {
+public class PostgrePooledSQLDataSourceClient extends BasePooledDataSourceClient {
 
-    public PrestoDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+    public PostgrePooledSQLDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
         super(baseConnectionParam, dbType);
     }
 

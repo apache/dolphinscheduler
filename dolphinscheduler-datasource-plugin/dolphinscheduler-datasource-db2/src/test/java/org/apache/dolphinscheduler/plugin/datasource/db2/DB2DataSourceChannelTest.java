@@ -31,14 +31,15 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
 @SuppressStaticInitializationFor("org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient")
-@PrepareForTest({DB2DataSourceClient.class, DB2DataSourceChannel.class})
+@PrepareForTest({DB2PooledDataSourceClient.class, DB2DataSourceChannel.class})
 public class DB2DataSourceChannelTest {
 
     @Test
     public void testCreateDataSourceClient() {
-        DB2DataSourceChannel sourceChannel = PowerMockito.mock(DB2DataSourceChannel.class);
-        DB2DataSourceClient dataSourceClient = PowerMockito.mock(DB2DataSourceClient.class);
-        PowerMockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
-        Assert.assertNotNull(sourceChannel.createDataSourceClient(new Db2ConnectionParam(), DbType.DB2));
+        DB2DataSourceChannel sourceChannel = Mockito.mock(DB2DataSourceChannel.class);
+        DB2PooledDataSourceClient dataSourceClient = Mockito.mock(DB2PooledDataSourceClient.class);
+        Mockito.when(sourceChannel.createPooledDataSourceClient(Mockito.any(), Mockito.any()))
+                .thenReturn(dataSourceClient);
+        Assert.assertNotNull(sourceChannel.createPooledDataSourceClient(new Db2ConnectionParam(), DbType.DB2));
     }
 }

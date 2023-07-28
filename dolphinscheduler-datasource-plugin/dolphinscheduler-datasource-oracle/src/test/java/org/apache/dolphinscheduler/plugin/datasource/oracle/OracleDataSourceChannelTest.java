@@ -36,9 +36,18 @@ public class OracleDataSourceChannelTest {
 
     @Test
     public void testCreateDataSourceClient() {
+<<<<<<< HEAD
         OracleDataSourceChannel sourceChannel = PowerMockito.mock(OracleDataSourceChannel.class);
         OracleDataSourceClient dataSourceClient = PowerMockito.mock(OracleDataSourceClient.class);
         PowerMockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
         Assert.assertNotNull(sourceChannel.createDataSourceClient(new OracleConnectionParam(), DbType.ORACLE));
+=======
+        OracleDataSourceChannel sourceChannel = Mockito.mock(OracleDataSourceChannel.class);
+        OraclePooledDataSourceClient dataSourceClient = Mockito.mock(OraclePooledDataSourceClient.class);
+        Mockito.when(sourceChannel.createPooledDataSourceClient(Mockito.any(), Mockito.any()))
+                .thenReturn(dataSourceClient);
+        Assertions
+                .assertNotNull(sourceChannel.createPooledDataSourceClient(new OracleConnectionParam(), DbType.ORACLE));
+>>>>>>> 4aab0b234 (Use AdHoc datasource client in sqlTask (#14631))
     }
 }

@@ -15,23 +15,17 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.athena;
+package org.apache.dolphinscheduler.spi.datasource;
 
-import org.apache.dolphinscheduler.spi.datasource.AdHocDataSourceClient;
-import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
-import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
-import org.apache.dolphinscheduler.spi.datasource.PooledDataSourceClient;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-public class AthenaDataSourceChannel implements DataSourceChannel {
-    @Override
-    public AdHocDataSourceClient createAdHocDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        return new AthenaAdHocDataSourceClient(baseConnectionParam, dbType);
-    }
+import javax.sql.DataSource;
 
-    @Override
-    public PooledDataSourceClient createPooledDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        return new AthenaPooledDataSourceClient(baseConnectionParam, dbType);
-    }
+/**
+ * This is a marker interface for pooled data source client, which means the connection is pooled.
+ */
+public interface PooledDataSourceClient extends DataSourceClient {
+
+    DataSource createDataSourcePool(BaseConnectionParam baseConnectionParam, DbType dbType);
 
 }
