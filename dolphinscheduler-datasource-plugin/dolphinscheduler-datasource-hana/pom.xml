@@ -29,7 +29,7 @@
     <name>${project.artifactId}</name>
 
     <properties>
-        <ngdbc.version>2.4.51</ngdbc.version>
+       
     </properties>
 
     <dependencies>
@@ -49,7 +49,6 @@
         <dependency>
             <groupId>com.sap.cloud.db.jdbc</groupId>
             <artifactId>ngdbc</artifactId>
-            <version>${ngdbc.version}</version>
         </dependency>
 
         <dependency>
