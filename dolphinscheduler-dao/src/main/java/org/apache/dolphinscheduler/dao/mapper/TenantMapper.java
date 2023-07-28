@@ -67,6 +67,13 @@ public interface TenantMapper extends BaseMapper<Tenant> {
     Tenant queryByTenantCode(@Param("tenantCode") String tenantCode);
 
     /**
+     * query tenants by queue id
+     *
+     * @param queueId queue id
+     * @return tenant list
+     */
+    List<Tenant> queryTenantListByQueueId(@Param("queueId") Integer queueId);
+    /**
      * tenant page
      *
      * @param page page

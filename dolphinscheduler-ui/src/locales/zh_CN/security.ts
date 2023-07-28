@@ -77,6 +77,8 @@ export default {
     update_time: '更新时间',
     operation: '操作',
     edit: '编辑',
+    delete: '删除',
+    delete_confirm: '确定删除吗?',
     queue_name_tips: '请输入队列名',
     queue_value_tips: '请输入队列值'
   },

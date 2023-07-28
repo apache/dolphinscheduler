@@ -65,7 +65,7 @@
             OR param_value LIKE concat('%', #{searchName}, '%')
             )
         </if>
-        order by id desc
+        order by update_time desc
     </select>
 
     <select id="queryByProjectCode" resultType="org.apache.dolphinscheduler.dao.entity.ProjectParameter">
