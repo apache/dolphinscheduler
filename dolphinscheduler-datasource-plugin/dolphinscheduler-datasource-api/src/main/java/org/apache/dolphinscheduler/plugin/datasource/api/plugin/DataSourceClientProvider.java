@@ -43,13 +43,11 @@ import com.google.common.cache.RemovalListener;
 @Slf4j
 public class DataSourceClientProvider {
 
-    private static final long duration = PropertyUtils.getLong(TaskConstants.KERBEROS_EXPIRE_TIME, 24);
-
     // We use the cache here to avoid creating a new datasource client every time,
     // One DataSourceClient corresponds to one unique datasource.
     private static final Cache<String, PooledDataSourceClient> POOLED_DATASOURCE_CLIENT_CACHE =
             CacheBuilder.newBuilder()
-                    .expireAfterWrite(duration, TimeUnit.HOURS)
+                    .expireAfterWrite(PropertyUtils.getLong(TaskConstants.KERBEROS_EXPIRE_TIME, 24L), TimeUnit.HOURS)
                     .removalListener((RemovalListener<String, PooledDataSourceClient>) notification -> {
                         try (PooledDataSourceClient closedClient = notification.getValue()) {
                             log.info("Datasource: {} is removed from cache due to expire", notification.getKey());

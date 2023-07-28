@@ -54,7 +54,7 @@ public class TenantControllerTest extends AbstractControllerTest {
         paramsMap.add("tenantCode", "hayden");
         paramsMap.add("queueId", "1");
         paramsMap.add("description", "tenant description");
-        Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
+        Mockito.when(PropertyUtils.isResourceStorageStartup()).thenReturn(false);
 
         MvcResult mvcResult = mockMvc.perform(post("/tenants")
                 .header(SESSION_ID, sessionId)

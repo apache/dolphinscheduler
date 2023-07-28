@@ -129,7 +129,7 @@ public class TaskExecutionCheckerUtils {
                 log.info("file : {} exists ", resFile.getName());
             }
         });
-        if (!downloadFiles.isEmpty() && !PropertyUtils.getResUploadStartupState()) {
+        if (!downloadFiles.isEmpty() && !PropertyUtils.isResourceStorageStartup()) {
             throw new StorageOperateNoConfiguredException("Storage service config does not exist!");
         }
 

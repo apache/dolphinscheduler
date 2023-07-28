@@ -19,8 +19,6 @@ package org.apache.dolphinscheduler.common.utils;
 
 import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYYMMDDHHMMSS;
 
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
@@ -60,18 +58,6 @@ public class FileUtilsTest {
         try {
             FileUtils.createWorkDirIfAbsent("/tmp/createWorkDirAndUserIfAbsent");
             Assertions.assertTrue(true);
-        } catch (Exception e) {
-            Assertions.fail();
-        }
-    }
-
-    @Test
-    public void testSetValue() {
-        try {
-            PropertyUtils.setValue(DataSourceConstants.DATASOURCE_ENCRYPTION_ENABLE, "true");
-            Assertions.assertTrue(PropertyUtils.getBoolean(DataSourceConstants.DATASOURCE_ENCRYPTION_ENABLE));
-            PropertyUtils.setValue(DataSourceConstants.DATASOURCE_ENCRYPTION_ENABLE, "false");
-            Assertions.assertFalse(PropertyUtils.getBoolean(DataSourceConstants.DATASOURCE_ENCRYPTION_ENABLE));
         } catch (Exception e) {
             Assertions.fail();
         }

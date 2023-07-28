@@ -115,6 +115,7 @@
         <casdoor.version>1.6.0</casdoor.version>
         <azure-sdk-bom.version>1.2.10</azure-sdk-bom.version>
         <protobuf.version>3.17.2</protobuf.version>
+        <system-lambda.version>1.2.1</system-lambda.version>
     </properties>
 
     <dependencyManagement>
@@ -894,6 +895,12 @@
                 <groupId>com.google.protobuf</groupId>
                 <artifactId>protobuf-java</artifactId>
                 <version>${protobuf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.stefanbirkner</groupId>
+                <artifactId>system-lambda</artifactId>
+                <version>${system-lambda.version}</version>
+                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

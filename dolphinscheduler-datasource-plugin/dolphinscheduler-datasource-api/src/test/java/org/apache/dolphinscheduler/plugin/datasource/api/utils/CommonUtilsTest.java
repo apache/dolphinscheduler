@@ -115,8 +115,6 @@ public class CommonUtilsTest {
             Mockito.when(PropertyUtils.getBoolean(DATASOURCE_ENCRYPTION_ENABLE, false))
                     .thenAnswer((Answer<Boolean>) invocation -> Boolean.TRUE);
 
-            PropertyUtils.setValue(DATASOURCE_ENCRYPTION_ENABLE, "true");
-
             mockedPasswordUtils.when(() -> PasswordUtils.decodePassword("bnVsbE1USXpORFUy")).thenReturn("123456");
             mockedPasswordUtils.when(() -> PasswordUtils.decodePassword("bnVsbElWRkJXbGhUVjBBPQ=="))
                     .thenReturn("!QAZXSW@");

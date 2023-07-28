@@ -374,9 +374,9 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             throw new ServiceException((String.format("Get file status fail, resource path: %s", resourceFullName)));
         }
 
-        if (!PropertyUtils.getResUploadStartupState()) {
+        if (!PropertyUtils.isResourceStorageStartup()) {
             log.error("Storage does not start up, resource upload startup state: {}.",
-                    PropertyUtils.getResUploadStartupState());
+                    PropertyUtils.isResourceStorageStartup());
             putMsg(result, Status.STORAGE_NOT_STARTUP);
             return result;
         }
@@ -1258,9 +1258,9 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         Result<Object> result = new Result<>();
         putMsg(result, Status.SUCCESS);
         // if resource upload startup
-        if (!PropertyUtils.getResUploadStartupState()) {
+        if (!PropertyUtils.isResourceStorageStartup()) {
             log.error("Storage does not start up, resource upload startup state: {}.",
-                    PropertyUtils.getResUploadStartupState());
+                    PropertyUtils.isResourceStorageStartup());
             putMsg(result, Status.STORAGE_NOT_STARTUP);
             return result;
         }
@@ -1420,9 +1420,9 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     public org.springframework.core.io.Resource downloadResource(User loginUser,
                                                                  String fullName) throws IOException {
         // if resource upload startup
-        if (!PropertyUtils.getResUploadStartupState()) {
+        if (!PropertyUtils.isResourceStorageStartup()) {
             log.warn("Storage does not start up, resource upload startup state: {}.",
-                    PropertyUtils.getResUploadStartupState());
+                    PropertyUtils.isResourceStorageStartup());
             throw new ServiceException("hdfs not startup");
         }
 
