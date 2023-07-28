@@ -51,11 +51,5 @@
             <artifactId>ngdbc</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <type>jar</type>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 </project>
