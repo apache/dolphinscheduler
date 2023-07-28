@@ -17,53 +17,70 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.utils;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.apache.commons.lang3.SystemUtils;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 public class ProcessUtilsTest {
 
-    private static final Pattern LINUXPATTERN = Pattern.compile("\\((\\d+)\\)");
-
-    private String getPidStr(String pids) {
-        Matcher mat = null;
-        StringBuilder sb = new StringBuilder();
-        if (StringUtils.isNotEmpty(pids)) {
-            mat = LINUXPATTERN.matcher(pids);
-        }
-        if (null != mat) {
-            while (mat.find()) {
-                sb.append(mat.group(1)).append(" ");
-            }
-        }
-        return sb.toString().trim();
-    }
-
     @Test
-    public void testGetPidsStr() {
+    public void testGetPidsStr() throws Exception {
+        // first
         String pids = "sudo(6279)---558_1497.sh(6282)---sleep(6354)";
+        int processId = 6279;
         String exceptPidsStr = "6279 6282 6354";
-        String actualPidsStr = getPidStr(pids);
+        String command;
+        MockedStatic<OSUtils> osUtilsMockedStatic = Mockito.mockStatic(OSUtils.class);
+        if (SystemUtils.IS_OS_MAC) {
+            command = String.format("%s -sp %d", TaskConstants.PSTREE, processId);
+        } else if (SystemUtils.IS_OS_LINUX) {
+            command = String.format("%s -p %d", TaskConstants.PSTREE, processId);
+        } else {
+            command = String.format("%s -p %d", TaskConstants.PSTREE, processId);
+        }
+        osUtilsMockedStatic.when(() -> OSUtils.exeCmd(command)).thenReturn(pids);
+        String actualPidsStr = ProcessUtils.getPidsStr(processId);
         Assertions.assertEquals(exceptPidsStr, actualPidsStr);
 
-        String pids2 = "init(1)---systemd(1000)---(sd-pam)(1001)";
-        String exceptPidsStr2 = "1 1000 1001";
-        String actualPidsStr2 = getPidStr(pids2);
+        // second
+        String pids2 = "apache2(2000)---222332-apache2-submit_task.py(2100)---apache2(2101)";
+        int processId2 = 2000;
+        String exceptPidsStr2 = "2000 2100 2101";
+        String command2;
+        MockedStatic<OSUtils> osUtilsMockedStatic2 = Mockito.mockStatic(OSUtils.class);
+        if (SystemUtils.IS_OS_MAC) {
+            command2 = String.format("%s -sp %d", TaskConstants.PSTREE, processId2);
+        } else if (SystemUtils.IS_OS_LINUX) {
+            command2 = String.format("%s -p %d", TaskConstants.PSTREE, processId2);
+        } else {
+            command2 = String.format("%s -p %d", TaskConstants.PSTREE, processId2);
+        }
+        osUtilsMockedStatic2.when(() -> OSUtils.exeCmd(command2)).thenReturn(pids2);
+        String actualPidsStr2 = ProcessUtils.getPidsStr(processId2);
         Assertions.assertEquals(exceptPidsStr2, actualPidsStr2);
 
+        // Third
         String pids3 = "sshd(5000)---sshd(6000)---bash(7000)---python(7100)";
+        int processId3 = 5000;
         String exceptPidsStr3 = "5000 6000 7000 7100";
-        String actualPidsStr3 = getPidStr(pids3);
+        String command3;
+        MockedStatic<OSUtils> osUtilsMockedStatic3 = Mockito.mockStatic(OSUtils.class);
+        if (SystemUtils.IS_OS_MAC) {
+            command3 = String.format("%s -sp %d", TaskConstants.PSTREE, processId3);
+        } else if (SystemUtils.IS_OS_LINUX) {
+            command3 = String.format("%s -p %d", TaskConstants.PSTREE, processId3);
+        } else {
+            command3 = String.format("%s -p %d", TaskConstants.PSTREE, processId3);
+        }
+        osUtilsMockedStatic3.when(() -> OSUtils.exeCmd(command3)).thenReturn(pids3);
+        String actualPidsStr3 = ProcessUtils.getPidsStr(processId2);
         Assertions.assertEquals(exceptPidsStr3, actualPidsStr3);
-
-        String pids4 = "apache2(2000)---apache2-submit_task.py(2100)---apache2(2101)";
-        String exceptPidsStr4 = "2000 2100 2101";
-        String actualPidsStr4 = getPidStr(pids4);
-        Assertions.assertEquals(exceptPidsStr4, actualPidsStr4);
     }
 
 }
