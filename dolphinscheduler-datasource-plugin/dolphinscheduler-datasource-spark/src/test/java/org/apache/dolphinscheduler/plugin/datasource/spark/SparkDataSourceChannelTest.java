@@ -31,22 +31,15 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
 @SuppressStaticInitializationFor("org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient")
-@PrepareForTest({SparkDataSourceChannel.class, SparkDataSourceClient.class})
+@PrepareForTest({SparkDataSourceChannel.class, SparkPooledDataSourceClient.class})
 public class SparkDataSourceChannelTest {
 
     @Test
     public void testCreateDataSourceClient() {
-<<<<<<< HEAD
-        SparkDataSourceChannel sourceChannel = PowerMockito.mock(SparkDataSourceChannel.class);
-        SparkDataSourceClient dataSourceClient = PowerMockito.mock(SparkDataSourceClient.class);
-        PowerMockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
-        Assert.assertNotNull(sourceChannel.createDataSourceClient(new SparkConnectionParam(), DbType.SPARK));
-=======
         SparkDataSourceChannel sourceChannel = Mockito.mock(SparkDataSourceChannel.class);
         SparkPooledDataSourceClient dataSourceClient = Mockito.mock(SparkPooledDataSourceClient.class);
         Mockito.when(sourceChannel.createPooledDataSourceClient(Mockito.any(), Mockito.any()))
                 .thenReturn(dataSourceClient);
-        Assertions.assertNotNull(sourceChannel.createPooledDataSourceClient(new SparkConnectionParam(), DbType.SPARK));
->>>>>>> 4aab0b234 (Use AdHoc datasource client in sqlTask (#14631))
+        Assert.assertNotNull(sourceChannel.createPooledDataSourceClient(new SparkConnectionParam(), DbType.SPARK));
     }
 }

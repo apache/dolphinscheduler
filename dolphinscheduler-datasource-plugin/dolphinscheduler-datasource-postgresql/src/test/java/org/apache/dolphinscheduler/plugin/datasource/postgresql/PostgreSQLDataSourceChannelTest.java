@@ -31,23 +31,16 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
 @SuppressStaticInitializationFor("org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient")
-@PrepareForTest({PostgreSQLDataSourceClient.class, PostgreSQLDataSourceChannel.class})
+@PrepareForTest({PostgrePooledSQLDataSourceClient.class, PostgreSQLDataSourceChannel.class})
 public class PostgreSQLDataSourceChannelTest {
 
     @Test
     public void testCreateDataSourceClient() {
-<<<<<<< HEAD
-        PostgreSQLDataSourceChannel sourceChannel = PowerMockito.mock(PostgreSQLDataSourceChannel.class);
-        PostgreSQLDataSourceClient dataSourceClient = PowerMockito.mock(PostgreSQLDataSourceClient.class);
-        PowerMockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
-        Assert.assertNotNull(sourceChannel.createDataSourceClient(new PostgreSQLConnectionParam(), DbType.POSTGRESQL));
-=======
         PostgreSQLDataSourceChannel sourceChannel = Mockito.mock(PostgreSQLDataSourceChannel.class);
         PostgrePooledSQLDataSourceClient dataSourceClient = Mockito.mock(PostgrePooledSQLDataSourceClient.class);
         Mockito.when(sourceChannel.createPooledDataSourceClient(Mockito.any(), Mockito.any()))
                 .thenReturn(dataSourceClient);
-        Assertions.assertNotNull(
+        Assert.assertNotNull(
                 sourceChannel.createPooledDataSourceClient(new PostgreSQLConnectionParam(), DbType.POSTGRESQL));
->>>>>>> 4aab0b234 (Use AdHoc datasource client in sqlTask (#14631))
     }
 }

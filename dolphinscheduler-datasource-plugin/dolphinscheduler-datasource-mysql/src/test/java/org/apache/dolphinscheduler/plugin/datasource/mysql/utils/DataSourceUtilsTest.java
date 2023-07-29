@@ -30,11 +30,8 @@ import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.sql.Connection;
-<<<<<<< HEAD
 import java.sql.DriverManager;
-=======
 import java.sql.SQLException;
->>>>>>> 4aab0b234 (Use AdHoc datasource client in sqlTask (#14631))
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -42,6 +39,7 @@ import java.util.concurrent.ExecutionException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -96,24 +94,6 @@ public class DataSourceUtilsTest {
     }
 
     @Test
-<<<<<<< HEAD
-    public void testGetConnection() throws ExecutionException {
-        PowerMockito.mockStatic(PropertyUtils.class);
-        PowerMockito.when(PropertyUtils.getLong("kerberos.expire.time", 24L)).thenReturn(24L);
-        PowerMockito.mockStatic(DataSourceClientProvider.class);
-        DataSourceClientProvider clientProvider = PowerMockito.mock(DataSourceClientProvider.class);
-        PowerMockito.when(DataSourceClientProvider.getInstance()).thenReturn(clientProvider);
-
-        Connection connection = PowerMockito.mock(Connection.class);
-        PowerMockito.when(clientProvider.getConnection(Mockito.any(), Mockito.any())).thenReturn(connection);
-
-        MySQLConnectionParam connectionParam = new MySQLConnectionParam();
-        connectionParam.setUser("root");
-        connectionParam.setPassword("123456");
-        connection = DataSourceClientProvider.getInstance().getConnection(DbType.MYSQL, connectionParam);
-
-        Assert.assertNotNull(connection);
-=======
     public void testGetConnection() throws ExecutionException, SQLException {
         try (
                 MockedStatic<PropertyUtils> mockedStaticPropertyUtils = Mockito.mockStatic(PropertyUtils.class);
@@ -128,8 +108,7 @@ public class DataSourceUtilsTest {
             MySQLConnectionParam connectionParam = new MySQLConnectionParam();
             connectionParam.setUser("root");
             connectionParam.setPassword("123456");
->>>>>>> 4aab0b234 (Use AdHoc datasource client in sqlTask (#14631))
-
+        }
     }
 
     @Test

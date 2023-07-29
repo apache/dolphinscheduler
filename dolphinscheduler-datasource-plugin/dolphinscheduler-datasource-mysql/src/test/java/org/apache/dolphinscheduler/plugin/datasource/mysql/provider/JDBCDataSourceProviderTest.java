@@ -36,17 +36,6 @@ import com.zaxxer.hikari.HikariDataSource;
 public class JDBCDataSourceProviderTest {
 
     @Test
-<<<<<<< HEAD
-    public void testCreateJdbcDataSource() {
-        PowerMockito.mockStatic(JDBCDataSourceProvider.class);
-        HikariDataSource dataSource = PowerMockito.mock(HikariDataSource.class);
-        PowerMockito.when(JDBCDataSourceProvider.createJdbcDataSource(Mockito.any(), Mockito.any())).thenReturn(dataSource);
-        Assert.assertNotNull(JDBCDataSourceProvider.createJdbcDataSource(new MySQLConnectionParam(), DbType.MYSQL));
-    }
-
-    @Test
-=======
->>>>>>> 4aab0b234 (Use AdHoc datasource client in sqlTask (#14631))
     public void testCreateOneSessionJdbcDataSource() {
         PowerMockito.mockStatic(JDBCDataSourceProvider.class);
         HikariDataSource dataSource = PowerMockito.mock(HikariDataSource.class);
