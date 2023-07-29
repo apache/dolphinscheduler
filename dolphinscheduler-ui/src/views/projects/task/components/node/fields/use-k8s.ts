@@ -76,7 +76,8 @@ export function useK8s(model: { [field: string]: any }): IJsonItem[] {
         trigger: ['input', 'blur'],
         required: true,
         message: t('project.node.image_pull_policy_tips')
-      }
+      },
+      value: 'IfNotPresent'
     },
     {
       type: 'input',
