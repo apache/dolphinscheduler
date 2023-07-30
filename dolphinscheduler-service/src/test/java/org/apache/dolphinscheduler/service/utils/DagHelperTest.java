@@ -33,11 +33,7 @@ import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessDag;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -328,6 +324,173 @@ public class DagHelperTest {
         completeTaskList.put(1L, taskInstance);
         postNodes = DagHelper.parsePostNodes(1L, skipNodeList, dag, completeTaskList);
         Assertions.assertEquals(1, postNodes.size());
+
+        // parse post nodes of 3 when 8 not complete
+        // dag: 1-2-3-5-7-9, 1-2-3-5-7-10, 4-3-6, 1-2-8-7-9, 1-2-8-7-10
+        // node3/node7: condition
+        // complete: 1, 2, 3, 4 not complete: 8
+        // expect post: 6
+        // expect skip: 5
+        DAG<Long, TaskNode, TaskNodeRelation> dag3 = generateDag3();
+        skipNodeList.clear();
+        completeTaskList.clear();
+        postNodes.clear();
+
+        completeTaskList.put(1L, new TaskInstance());
+        completeTaskList.put(2L, new TaskInstance());
+        completeTaskList.put(4L, new TaskInstance());
+        TaskInstance taskInstance3 = new TaskInstance();
+        taskInstance3.setState(TaskExecutionStatus.SUCCESS);
+        completeTaskList.put(3L, taskInstance3);
+        postNodes = DagHelper.parsePostNodes(3L, skipNodeList, dag3, completeTaskList);
+        Assertions.assertEquals(1, skipNodeList.size());
+        Assertions.assertEquals(true, skipNodeList.containsKey(5L));
+        Assertions.assertEquals(1, postNodes.size());
+        Assertions.assertEquals(true, postNodes.contains(6L));
+
+        // parse post nodes of 3 when 8 complete
+        // dag: 1-2-3-5-7-9, 1-2-3-5-7-10, 4-3-6, 1-2-8-7-9, 1-2-8-7-10
+        // node3/node7: condition
+        // complete: 1, 2, 3, 4, 8
+        // expect post: 6, 7
+        // expect skip: 5
+        dag3 = generateDag3();
+        skipNodeList.clear();
+        completeTaskList.clear();
+        postNodes.clear();
+
+        completeTaskList.put(1L, new TaskInstance());
+        completeTaskList.put(2L, new TaskInstance());
+        completeTaskList.put(4L, new TaskInstance());
+        completeTaskList.put(8L, new TaskInstance());
+        taskInstance3 = new TaskInstance();
+        taskInstance3.setState(TaskExecutionStatus.SUCCESS);
+        completeTaskList.put(3L, taskInstance3);
+        postNodes = DagHelper.parsePostNodes(3L, skipNodeList, dag3, completeTaskList);
+        Assertions.assertEquals(1, skipNodeList.size());
+        Assertions.assertEquals(true, skipNodeList.containsKey(5L));
+        Assertions.assertEquals(2, postNodes.size());
+        Assertions.assertEquals(true, postNodes.contains(6L));
+        Assertions.assertEquals(true, postNodes.contains(7L));
+
+        // parse post nodes of 8 when 5 complete
+        // dag: 1-2-3-5-7-9, 1-2-3-5-7-10, 4-3-6, 1-2-8-7-9, 1-2-8-7-10
+        // node3/node7: condition
+        // complete: 1, 2, 3, 4, 5, 8
+        // skip: 6
+        // expect post: 7
+        dag3 = generateDag3();
+        skipNodeList.clear();
+        completeTaskList.clear();
+        postNodes.clear();
+
+        completeTaskList.put(1L, new TaskInstance());
+        completeTaskList.put(2L, new TaskInstance());
+        completeTaskList.put(4L, new TaskInstance());
+        completeTaskList.put(5L, new TaskInstance());
+        completeTaskList.put(8L, new TaskInstance());
+        taskInstance3 = new TaskInstance();
+        taskInstance3.setState(TaskExecutionStatus.FAILURE);
+        completeTaskList.put(3L, taskInstance3);
+        postNodes = DagHelper.parsePostNodes(8L, skipNodeList, dag3, completeTaskList);
+        Assertions.assertEquals(1, postNodes.size());
+        Assertions.assertEquals(true, postNodes.contains(7L));
+
+        // parse post nodes of 8 when 5 skip
+        // dag: 1-2-3-5-7-9, 1-2-3-5-7-10, 4-3-6, 1-2-8-7-9, 1-2-8-7-10
+        // node3/node7: condition
+        // complete: 1, 2, 3, 4, 8
+        // skip: 5
+        // expect post: 7
+        dag3 = generateDag3();
+        skipNodeList.clear();
+        completeTaskList.clear();
+        postNodes.clear();
+
+        completeTaskList.put(1L, new TaskInstance());
+        completeTaskList.put(2L, new TaskInstance());
+        completeTaskList.put(4L, new TaskInstance());
+        skipNodeList.put(5L, dag.getNode(5L));
+        completeTaskList.put(8L, new TaskInstance());
+        taskInstance3 = new TaskInstance();
+        taskInstance3.setState(TaskExecutionStatus.SUCCESS);
+        completeTaskList.put(3L, taskInstance3);
+        postNodes = DagHelper.parsePostNodes(8L, skipNodeList, dag3, completeTaskList);
+        Assertions.assertEquals(1, postNodes.size());
+        Assertions.assertEquals(true, postNodes.contains(7L));
+
+        // parse post nodes of 8 when 5 is running
+        // dag: 1-2-3-5-7-9, 1-2-3-5-7-10, 4-3-6, 1-2-8-7-9, 1-2-8-7-10
+        // node3/node7: condition
+        // complete: 1, 2, 3, 4, 8
+        // skip: 6
+        // expect post size: 0
+        dag3 = generateDag3();
+        skipNodeList.clear();
+        completeTaskList.clear();
+        postNodes.clear();
+
+        completeTaskList.put(1L, new TaskInstance());
+        completeTaskList.put(2L, new TaskInstance());
+        completeTaskList.put(4L, new TaskInstance());
+        completeTaskList.put(8L, new TaskInstance());
+        taskInstance3 = new TaskInstance();
+        taskInstance3.setState(TaskExecutionStatus.FAILURE);
+        completeTaskList.put(3L, taskInstance3);
+        postNodes = DagHelper.parsePostNodes(8L, skipNodeList, dag3, completeTaskList);
+        Assertions.assertEquals(0, postNodes.size());
+
+        // parse post nodes of 3 when 7 is SHELL task
+        // dag: 1-2-3-5-7-9, 1-2-3-5-7-10, 4-3-6, 1-2-8-7-9, 1-2-8-7-10
+        // node3: condition
+        // complete: 1, 2, 3, 4, 8
+        // expect post: 6
+        dag3 = generateDag3();
+        skipNodeList.clear();
+        completeTaskList.clear();
+        postNodes.clear();
+
+        TaskNode node7 = dag3.getNode(7L);
+        node7.setType("SHELL");
+
+        completeTaskList.put(1L, new TaskInstance());
+        completeTaskList.put(2L, new TaskInstance());
+        completeTaskList.put(4L, new TaskInstance());
+        completeTaskList.put(8L, new TaskInstance());
+        taskInstance3 = new TaskInstance();
+        taskInstance3.setState(TaskExecutionStatus.SUCCESS);
+        completeTaskList.put(3L, taskInstance3);
+        postNodes = DagHelper.parsePostNodes(3L, skipNodeList, dag3, completeTaskList);
+        Assertions.assertEquals(1, postNodes.size());
+        Assertions.assertEquals(true, postNodes.contains(6L));
+
+        // parse post nodes of 3 when 7 is SHELL task and 8 is end node
+        // dag: 1-2-3-5-7-9, 1-2-3-5-7-10, 4-3-6, 1-2-8
+        // node3: condition
+        // complete: 1, 2, 4
+        // expect post: 6
+        // expect skip: 5, 7, 9, 10
+        dag3 = generateDag3();
+        skipNodeList.clear();
+        completeTaskList.clear();
+        postNodes.clear();
+
+        node7 = dag3.getNode(7L);
+        node7.setType("SHELL");
+        List<String> dep7 = new ArrayList<>();
+        dep7.add("5");
+        node7.setPreTasks(JSONUtils.toJsonString(dep7));
+
+        completeTaskList.put(1L, new TaskInstance());
+        completeTaskList.put(2L, new TaskInstance());
+        completeTaskList.put(4L, new TaskInstance());
+        taskInstance3 = new TaskInstance();
+        taskInstance3.setState(TaskExecutionStatus.SUCCESS);
+        completeTaskList.put(3L, taskInstance3);
+        postNodes = DagHelper.parsePostNodes(3L, skipNodeList, dag3, completeTaskList);
+        Assertions.assertEquals(1, postNodes.size());
+        Assertions.assertEquals(true, postNodes.contains(6L));
+        Assertions.assertEquals(4, skipNodeList.size());
     }
 
     /**
@@ -492,6 +655,136 @@ public class DagHelperTest {
         dep5.add(1L);
         node5.setPreTasks(JSONUtils.toJsonString(dep5));
         taskNodeList.add(node5);
+
+        List<Long> startNodes = new ArrayList<>();
+        List<Long> recoveryNodes = new ArrayList<>();
+        List<TaskNode> destTaskNodeList = DagHelper.generateFlowNodeListByStartNode(taskNodeList,
+                startNodes, recoveryNodes, TaskDependType.TASK_POST);
+        List<TaskNodeRelation> taskNodeRelations = DagHelper.generateRelationListByFlowNodes(destTaskNodeList);
+        ProcessDag processDag = new ProcessDag();
+        processDag.setEdges(taskNodeRelations);
+        processDag.setNodes(destTaskNodeList);
+        return DagHelper.buildDagGraph(processDag);
+    }
+
+    /**
+     * process:
+     * 1->2->3->5->7->9
+     * 4->3->6
+     * 1->2->8->5->7->9
+     * DAG graph:
+     *      4 ->   -> 6      -> 10
+     *          \ /         /
+     * 1 -> 2 -> 3 -> 5 -> 7 -> 9
+     *       \           /
+     *        ->   8   ->
+     *
+     * @return dag
+     * @throws JsonProcessingException if error throws JsonProcessingException
+     */
+    private DAG<Long, TaskNode, TaskNodeRelation> generateDag3() throws IOException {
+        List<TaskNode> taskNodeList = new ArrayList<>();
+        TaskNode node1 = new TaskNode();
+        node1.setId("1");
+        node1.setName("1");
+        node1.setCode(1);
+        node1.setType("SHELL");
+        taskNodeList.add(node1);
+
+        TaskNode node2 = new TaskNode();
+        node2.setId("2");
+        node2.setName("2");
+        node2.setCode(2);
+        node2.setType("SHELL");
+        List<String> dep2 = new ArrayList<>();
+        dep2.add("1");
+        node2.setPreTasks(JSONUtils.toJsonString(dep2));
+        taskNodeList.add(node2);
+
+        TaskNode node4 = new TaskNode();
+        node4.setId("4");
+        node4.setName("4");
+        node4.setCode(4);
+        node4.setType("SHELL");
+        taskNodeList.add(node4);
+
+        TaskNode node3 = new TaskNode();
+        node3.setId("3");
+        node3.setName("3");
+        node3.setCode(3);
+        node3.setType(TASK_TYPE_CONDITIONS);
+        List<String> dep3 = new ArrayList<>();
+        dep3.add("2");
+        dep3.add("4");
+        node3.setPreTasks(JSONUtils.toJsonString(dep3));
+        node3.setDependence(
+                "{\"dependTaskList\": [{\"dependItemList\": [{\"depTaskCode\": 2, \"status\": \"SUCCESS\"}], \"relation\": \"AND\"}, {\"dependItemList\": [{\"depTaskCode\": 4, \"status\": \"SUCCESS\"}], \"relation\": \"AND\"}], \"relation\": \"AND\"}");
+        node3.setConditionResult("{\"successNode\":[6],\"failedNode\":[5]}");
+        taskNodeList.add(node3);
+
+        TaskNode node5 = new TaskNode();
+        node5.setId("5");
+        node5.setName("5");
+        node5.setCode(5);
+        node5.setType("SHELL");
+        List<String> dep5 = new ArrayList<>();
+        dep5.add("3");
+        node5.setPreTasks(JSONUtils.toJsonString(dep5));
+        taskNodeList.add(node5);
+
+        TaskNode node6 = new TaskNode();
+        node6.setId("6");
+        node6.setName("6");
+        node6.setCode(6);
+        node6.setType("SHELL");
+        List<String> dep6 = new ArrayList<>();
+        dep6.add("3");
+        node6.setPreTasks(JSONUtils.toJsonString(dep6));
+        taskNodeList.add(node6);
+
+        TaskNode node7 = new TaskNode();
+        node7.setId("7");
+        node7.setName("7");
+        node7.setCode(7);
+        node7.setType(TASK_TYPE_CONDITIONS);
+        List<String> dep7 = new ArrayList<>();
+        dep7.add("5");
+        dep7.add("8");
+        node7.setPreTasks(JSONUtils.toJsonString(dep7));
+        node7.setDependence(
+                "{\"dependTaskList\": [{\"dependItemList\": [{\"depTaskCode\": 5, \"status\": \"SUCCESS\"}], \"relation\": \"AND\"}, {\"dependItemList\": [{\"depTaskCode\": 8, \"status\": \"SUCCESS\"}], \"relation\": \"AND\"}], \"relation\": \"OR\"}");
+        node7.setConditionResult("{\"successNode\":[9],\"failedNode\":[10]}");
+        taskNodeList.add(node7);
+
+        TaskNode node8 = new TaskNode();
+        node8.setId("8");
+        node8.setName("8");
+        node8.setCode(8);
+        node8.setType("SHELL");
+        List<String> dep8 = new ArrayList<>();
+        dep8.add("2");
+        node8.setPreTasks(JSONUtils.toJsonString(dep8));
+        taskNodeList.add(node8);
+
+        TaskNode node9 = new TaskNode();
+        node9.setId("9");
+        node9.setName("9");
+        node9.setCode(9);
+        node9.setType("SHELL");
+        List<String> dep9 = new ArrayList<>();
+        dep9.add("7");
+        node9.setPreTasks(JSONUtils.toJsonString(dep9));
+        taskNodeList.add(node9);
+
+        TaskNode node10 = new TaskNode();
+        node10.setId("10");
+        node10.setName("10");
+        node10.setCode(10);
+        node10.setType("SHELL");
+        List<String> dep10 = new ArrayList<>();
+        dep10.add("7");
+        node10.setPreTasks(JSONUtils.toJsonString(dep10));
+        taskNodeList.add(node10);
 
         List<Long> startNodes = new ArrayList<>();
         List<Long> recoveryNodes = new ArrayList<>();

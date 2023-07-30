@@ -384,11 +384,38 @@ public class DagHelper {
         // the skipNodeList maybe null if no next task
         skipNodeList = Optional.ofNullable(skipNodeList).orElse(new ArrayList<>());
         for (Long failedNode : skipNodeList) {
-            setTaskNodeSkip(failedNode, dag, completeTaskList, skipTaskNodeList);
+            // return nodes set to skip in setTaskNodeSkip method
+            Map<Long, TaskNode> skipNodesAfterFailedNode =
+                    setTaskNodeSkip(failedNode, dag, completeTaskList, skipTaskNodeList);
+            parseConditionNodeAfterSkippedNode(skipTaskNodeList, dag, conditionTaskList, skipNodesAfterFailedNode);
         }
         // the conditionTaskList maybe null if no next task
         conditionTaskList = Optional.ofNullable(conditionTaskList).orElse(new ArrayList<>());
         return conditionTaskList;
+    }
+
+    /**
+     * In some special cases, such as the condition task is set to "OR", the condition task after skipped node needs to be submitted to execution
+     *
+     * @param skipTaskNodeList
+     * @param dag
+     * @param conditionTaskList
+     * @param skipTaskAfterNode
+     */
+    private static void parseConditionNodeAfterSkippedNode(Map<Long, TaskNode> skipTaskNodeList,
+                                                           DAG<Long, TaskNode, TaskNodeRelation> dag,
+                                                           List<Long> conditionTaskList,
+                                                           Map<Long, TaskNode> skipTaskAfterNode) {
+
+        for (Long taskCode : skipTaskAfterNode.keySet()) {
+            Set<Long> subsequentNodes = dag.getSubsequentNodes(taskCode);
+            for (Long subsequentNodeCode : subsequentNodes) {
+                TaskNode  subsequentNode = dag.getNode(subsequentNodeCode);
+                if ( subsequentNode.isConditionsTask() && !skipTaskNodeList.containsKey(subsequentNodeCode)) {
+                    conditionTaskList.add(subsequentNodeCode);
+                }
+            }
+        }
     }
 
     /**
@@ -439,22 +466,26 @@ public class DagHelper {
 
     /**
      * set task node and the post nodes skip flag
+     * Returns some nodes that have been set to skip in this method
      */
-    private static void setTaskNodeSkip(Long skipNodeCode,
-                                        DAG<Long, TaskNode, TaskNodeRelation> dag,
-                                        Map<Long, TaskInstance> completeTaskList,
-                                        Map<Long, TaskNode> skipTaskNodeList) {
+    private static Map<Long, TaskNode> setTaskNodeSkip(Long skipNodeCode,
+                                                       DAG<Long, TaskNode, TaskNodeRelation> dag,
+                                                       Map<Long, TaskInstance> completeTaskList,
+                                                       Map<Long, TaskNode> skipTaskNodeList) {
+        HashMap<Long, TaskNode> skipNodesInThisMethod = new HashMap<>();
         if (!dag.containsNode(skipNodeCode)) {
-            return;
+            return skipNodesInThisMethod;
         }
         skipTaskNodeList.putIfAbsent(skipNodeCode, dag.getNode(skipNodeCode));
+        skipNodesInThisMethod.put(skipNodeCode, dag.getNode(skipNodeCode));
         Collection<Long> postNodeList = dag.getSubsequentNodes(skipNodeCode);
         for (Long post : postNodeList) {
             TaskNode postNode = dag.getNode(post);
             if (isTaskNodeNeedSkip(postNode, skipTaskNodeList)) {
-                setTaskNodeSkip(post, dag, completeTaskList, skipTaskNodeList);
+                skipNodesInThisMethod.putAll(setTaskNodeSkip(post, dag, completeTaskList, skipTaskNodeList));
             }
         }
+        return skipNodesInThisMethod;
     }
 
     /***
