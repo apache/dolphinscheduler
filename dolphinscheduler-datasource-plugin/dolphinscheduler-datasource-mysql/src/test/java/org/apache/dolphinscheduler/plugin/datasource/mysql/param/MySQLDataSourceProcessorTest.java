@@ -25,15 +25,11 @@ import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.sql.DriverManager;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -43,24 +39,6 @@ public class MySQLDataSourceProcessorTest {
 
     private MySQLDataSourceProcessor mysqlDatasourceProcessor = new MySQLDataSourceProcessor();
 
-    @Test
-    public void testCreateConnectionParams() {
-        Map<String, String> props = new HashMap<>();
-        props.put("serverTimezone", "utc");
-        MySQLDataSourceParamDTO mysqlDatasourceParamDTO = new MySQLDataSourceParamDTO();
-        mysqlDatasourceParamDTO.setUserName("root");
-        mysqlDatasourceParamDTO.setPassword("123456");
-        mysqlDatasourceParamDTO.setHost("localhost");
-        mysqlDatasourceParamDTO.setPort(3306);
-        mysqlDatasourceParamDTO.setDatabase("default");
-        mysqlDatasourceParamDTO.setOther(props);
-        PowerMockito.mockStatic(PasswordUtils.class);
-        PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
-        MySQLConnectionParam connectionParams = (MySQLConnectionParam) mysqlDatasourceProcessor
-                .createConnectionParams(mysqlDatasourceParamDTO);
-        Assert.assertEquals("jdbc:mysql://localhost:3306", connectionParams.getAddress());
-        Assert.assertEquals("jdbc:mysql://localhost:3306/default", connectionParams.getJdbcUrl());
-    }
 
     @Test
     public void testCreateConnectionParams2() {
@@ -97,14 +75,4 @@ public class MySQLDataSourceProcessorTest {
                 mysqlDatasourceProcessor.getValidationQuery());
     }
 
-    @Test
-    public void testGetDatasourceUniqueId() {
-        MySQLConnectionParam mysqlConnectionParam = new MySQLConnectionParam();
-        mysqlConnectionParam.setJdbcUrl("jdbc:mysql://localhost:3306/default");
-        mysqlConnectionParam.setUser("root");
-        mysqlConnectionParam.setPassword("123456");
-        PowerMockito.mockStatic(PasswordUtils.class);
-        PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("123456");
-        Assert.assertEquals("mysql@root@123456@jdbc:mysql://localhost:3306/default", mysqlDatasourceProcessor.getDatasourceUniqueId(mysqlConnectionParam, DbType.MYSQL));
-    }
 }

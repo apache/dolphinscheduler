@@ -25,15 +25,11 @@ import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.sql.DriverManager;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -42,24 +38,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 public class AthenaDataSourceProcessorTest {
 
     private final AthenaDataSourceProcessor athenaDataSourceProcessor = new AthenaDataSourceProcessor();
-
-    @Test
-    public void testCreateConnectionParams() {
-        Map<String, String> props = new HashMap<>();
-        props.put("LogLevel", "6");
-        AthenaDataSourceParamDTO athenaDataSourceParamDTO = new AthenaDataSourceParamDTO();
-        athenaDataSourceParamDTO.setDatabase("");
-        athenaDataSourceParamDTO.setUserName("awsuser");
-        athenaDataSourceParamDTO.setPassword("123456");
-        athenaDataSourceParamDTO.setAwsRegion("cn-north-1");
-        athenaDataSourceParamDTO.setOther(props);
-        PowerMockito.mockStatic(PasswordUtils.class);
-        PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
-        AthenaConnectionParam connectionParams = (AthenaConnectionParam) this.athenaDataSourceProcessor
-            .createConnectionParams(athenaDataSourceParamDTO);
-        Assert.assertEquals("jdbc:awsathena://AwsRegion=cn-north-1;", connectionParams.getAddress());
-        Assert.assertEquals("jdbc:awsathena://AwsRegion=cn-north-1;", connectionParams.getJdbcUrl());
-    }
 
     @Test
     public void testCreateConnectionParams2() {

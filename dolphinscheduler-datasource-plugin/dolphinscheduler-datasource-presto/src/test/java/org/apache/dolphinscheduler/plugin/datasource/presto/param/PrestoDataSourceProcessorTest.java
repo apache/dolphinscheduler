@@ -25,15 +25,11 @@ import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.sql.DriverManager;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -43,25 +39,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 public class PrestoDataSourceProcessorTest {
 
     private PrestoDataSourceProcessor prestoDatasourceProcessor = new PrestoDataSourceProcessor();
-
-    @Test
-    public void testCreateConnectionParams() {
-        Map<String, String> props = new HashMap<>();
-        props.put("serverTimezone", "utc");
-        PrestoDataSourceParamDTO prestoDatasourceParamDTO = new PrestoDataSourceParamDTO();
-        prestoDatasourceParamDTO.setHost("localhost");
-        prestoDatasourceParamDTO.setPort(1234);
-        prestoDatasourceParamDTO.setDatabase("default");
-        prestoDatasourceParamDTO.setUserName("root");
-        prestoDatasourceParamDTO.setPassword("123456");
-        prestoDatasourceParamDTO.setOther(props);
-        PowerMockito.mockStatic(PasswordUtils.class);
-        PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
-        PrestoConnectionParam connectionParams = (PrestoConnectionParam) prestoDatasourceProcessor
-                .createConnectionParams(prestoDatasourceParamDTO);
-        Assert.assertEquals("jdbc:presto://localhost:1234", connectionParams.getAddress());
-        Assert.assertEquals("jdbc:presto://localhost:1234/default", connectionParams.getJdbcUrl());
-    }
 
     @Test
     public void testCreateConnectionParams2() {

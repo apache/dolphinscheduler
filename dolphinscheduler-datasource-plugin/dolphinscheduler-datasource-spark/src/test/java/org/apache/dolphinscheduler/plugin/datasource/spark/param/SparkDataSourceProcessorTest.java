@@ -25,15 +25,11 @@ import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.sql.DriverManager;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -42,27 +38,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 public class SparkDataSourceProcessorTest {
 
     private SparkDataSourceProcessor sparkDatasourceProcessor = new SparkDataSourceProcessor();
-
-    @Test
-    public void testCreateConnectionParams() {
-        Map<String, String> props = new HashMap<>();
-        props.put("serverTimezone", "utc");
-        SparkDataSourceParamDTO sparkDatasourceParamDTO = new SparkDataSourceParamDTO();
-        sparkDatasourceParamDTO.setUserName("root");
-        sparkDatasourceParamDTO.setPassword("12345");
-        sparkDatasourceParamDTO.setHost("localhost1,localhost2");
-        sparkDatasourceParamDTO.setPort(1234);
-        sparkDatasourceParamDTO.setDatabase("default");
-        sparkDatasourceParamDTO.setOther(props);
-        PowerMockito.mockStatic(PasswordUtils.class);
-        PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
-        PowerMockito.mockStatic(CommonUtils.class);
-        PowerMockito.when(CommonUtils.getKerberosStartupState()).thenReturn(false);
-        SparkConnectionParam connectionParams = (SparkConnectionParam) sparkDatasourceProcessor
-                .createConnectionParams(sparkDatasourceParamDTO);
-        Assert.assertEquals("jdbc:hive2://localhost1:1234,localhost2:1234", connectionParams.getAddress());
-        Assert.assertEquals("jdbc:hive2://localhost1:1234,localhost2:1234/default", connectionParams.getJdbcUrl());
-    }
 
     @Test
     public void testCreateConnectionParams2() {

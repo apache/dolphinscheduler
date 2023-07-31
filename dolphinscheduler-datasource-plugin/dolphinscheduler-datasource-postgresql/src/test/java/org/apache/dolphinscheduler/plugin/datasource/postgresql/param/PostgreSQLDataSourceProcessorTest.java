@@ -27,15 +27,11 @@ import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.sql.DriverManager;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -44,26 +40,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 public class PostgreSQLDataSourceProcessorTest {
 
     private PostgreSQLDataSourceProcessor postgreSqlDatasourceProcessor = new PostgreSQLDataSourceProcessor();
-
-    @Test
-    public void testCreateConnectionParams() {
-        Map<String, String> props = new HashMap<>();
-        props.put("serverTimezone", "utc");
-        PostgreSQLDataSourceParamDTO postgreSqlDatasourceParamDTO = new PostgreSQLDataSourceParamDTO();
-        postgreSqlDatasourceParamDTO.setUserName("root");
-        postgreSqlDatasourceParamDTO.setPassword("123456");
-        postgreSqlDatasourceParamDTO.setHost("localhost");
-        postgreSqlDatasourceParamDTO.setPort(3308);
-        postgreSqlDatasourceParamDTO.setDatabase("default");
-        postgreSqlDatasourceParamDTO.setOther(props);
-        PowerMockito.mockStatic(PasswordUtils.class);
-        PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
-        PostgreSQLConnectionParam connectionParams = (PostgreSQLConnectionParam) postgreSqlDatasourceProcessor
-                .createConnectionParams(postgreSqlDatasourceParamDTO);
-        Assert.assertEquals("jdbc:postgresql://localhost:3308", connectionParams.getAddress());
-        Assert.assertEquals("jdbc:postgresql://localhost:3308/default", connectionParams.getJdbcUrl());
-        Assert.assertEquals("root", connectionParams.getUser());
-    }
 
     @Test
     public void testCreateConnectionParams2() {

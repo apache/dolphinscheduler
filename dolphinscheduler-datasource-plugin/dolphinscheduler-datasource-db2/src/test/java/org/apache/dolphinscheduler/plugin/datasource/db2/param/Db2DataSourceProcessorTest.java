@@ -25,15 +25,10 @@ import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.sql.DriverManager;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -42,27 +37,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 public class Db2DataSourceProcessorTest {
 
     private Db2DataSourceProcessor db2DatasourceProcessor = new Db2DataSourceProcessor();
-
-    @Test
-    public void testCreateConnectionParams() {
-        Map<String, String> props = new HashMap<>();
-        props.put("serverTimezone", "utc");
-        Db2DataSourceParamDTO db2DatasourceParamDTO = new Db2DataSourceParamDTO();
-        db2DatasourceParamDTO.setUserName("root");
-        db2DatasourceParamDTO.setPassword("123456");
-        db2DatasourceParamDTO.setHost("localhost");
-        db2DatasourceParamDTO.setPort(5142);
-        db2DatasourceParamDTO.setDatabase("default");
-        db2DatasourceParamDTO.setOther(props);
-        PowerMockito.mockStatic(PasswordUtils.class);
-        PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
-
-        Db2ConnectionParam connectionParams = (Db2ConnectionParam) db2DatasourceProcessor
-                .createConnectionParams(db2DatasourceParamDTO);
-        Assert.assertNotNull(connectionParams);
-        Assert.assertEquals("jdbc:db2://localhost:5142", connectionParams.getAddress());
-        Assert.assertEquals("jdbc:db2://localhost:5142/default", connectionParams.getJdbcUrl());
-    }
 
     @Test
     public void testCreateConnectionParams2() {

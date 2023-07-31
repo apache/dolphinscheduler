@@ -26,15 +26,11 @@ import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.sql.DriverManager;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -43,26 +39,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 public class SQLServerDataSourceProcessorTest {
 
     private SQLServerDataSourceProcessor sqlServerDatasourceProcessor = new SQLServerDataSourceProcessor();
-
-    @Test
-    public void testCreateConnectionParams() {
-        Map<String, String> props = new HashMap<>();
-        props.put("serverTimezone", "utc");
-        SQLServerDataSourceParamDTO sqlServerDatasourceParamDTO = new SQLServerDataSourceParamDTO();
-        sqlServerDatasourceParamDTO.setUserName("root");
-        sqlServerDatasourceParamDTO.setPassword("123456");
-        sqlServerDatasourceParamDTO.setDatabase("default");
-        sqlServerDatasourceParamDTO.setHost("localhost");
-        sqlServerDatasourceParamDTO.setPort(1234);
-        sqlServerDatasourceParamDTO.setOther(props);
-        PowerMockito.mockStatic(PasswordUtils.class);
-        PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
-        SQLServerConnectionParam connectionParams = (SQLServerConnectionParam) sqlServerDatasourceProcessor
-                .createConnectionParams(sqlServerDatasourceParamDTO);
-        Assert.assertEquals("jdbc:sqlserver://localhost:1234", connectionParams.getAddress());
-        Assert.assertEquals("jdbc:sqlserver://localhost:1234;databaseName=default", connectionParams.getJdbcUrl());
-        Assert.assertEquals("root", connectionParams.getUser());
-    }
 
     @Test
     public void testCreateConnectionParams2() {

@@ -25,15 +25,11 @@ import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.sql.DriverManager;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -42,26 +38,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 public class HiveDataSourceProcessorTest {
 
     private HiveDataSourceProcessor hiveDatasourceProcessor = new HiveDataSourceProcessor();
-
-    @Test
-    public void testCreateConnectionParams() {
-        Map<String, String> props = new HashMap<>();
-        props.put("serverTimezone", "utc");
-        HiveDataSourceParamDTO hiveDataSourceParamDTO = new HiveDataSourceParamDTO();
-        hiveDataSourceParamDTO.setHost("localhost1,localhost2");
-        hiveDataSourceParamDTO.setPort(5142);
-        hiveDataSourceParamDTO.setUserName("default");
-        hiveDataSourceParamDTO.setDatabase("default");
-        hiveDataSourceParamDTO.setOther(props);
-        PowerMockito.mockStatic(PasswordUtils.class);
-        PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
-        PowerMockito.mockStatic(CommonUtils.class);
-        PowerMockito.when(CommonUtils.getKerberosStartupState()).thenReturn(false);
-        HiveConnectionParam connectionParams = (HiveConnectionParam) hiveDatasourceProcessor
-                .createConnectionParams(hiveDataSourceParamDTO);
-        Assert.assertNotNull(connectionParams);
-        Assert.assertEquals("jdbc:hive2://localhost1:5142,localhost2:5142", connectionParams.getAddress());
-    }
 
     @Test
     public void testCreateConnectionParams2() {

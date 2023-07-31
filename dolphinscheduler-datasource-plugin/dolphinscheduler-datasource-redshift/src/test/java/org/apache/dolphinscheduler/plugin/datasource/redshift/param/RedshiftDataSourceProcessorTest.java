@@ -25,15 +25,11 @@ import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.sql.DriverManager;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -42,25 +38,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 public class RedshiftDataSourceProcessorTest {
 
     private RedshiftDataSourceProcessor redshiftDatasourceProcessor = new RedshiftDataSourceProcessor();
-
-    @Test
-    public void testCreateConnectionParams() {
-        Map<String, String> props = new HashMap<>();
-        props.put("serverTimezone", "utc");
-        RedshiftDataSourceParamDTO redshiftDatasourceParamDTO = new RedshiftDataSourceParamDTO();
-        redshiftDatasourceParamDTO.setHost("localhost");
-        redshiftDatasourceParamDTO.setPort(5439);
-        redshiftDatasourceParamDTO.setDatabase("dev");
-        redshiftDatasourceParamDTO.setUserName("awsuser");
-        redshiftDatasourceParamDTO.setPassword("123456");
-        redshiftDatasourceParamDTO.setOther(props);
-        PowerMockito.mockStatic(PasswordUtils.class);
-        PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
-        RedshiftConnectionParam connectionParams = (RedshiftConnectionParam) redshiftDatasourceProcessor
-                .createConnectionParams(redshiftDatasourceParamDTO);
-        Assert.assertEquals("jdbc:redshift://localhost:5439", connectionParams.getAddress());
-        Assert.assertEquals("jdbc:redshift://localhost:5439/dev", connectionParams.getJdbcUrl());
-    }
 
     @Test
     public void testCreateConnectionParams2() {

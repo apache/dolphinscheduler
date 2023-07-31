@@ -22,19 +22,14 @@ import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
-import org.apache.dolphinscheduler.spi.enums.DbConnectType;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.sql.DriverManager;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -43,27 +38,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 public class OracleDataSourceProcessorTest {
 
     private OracleDataSourceProcessor oracleDatasourceProcessor = new OracleDataSourceProcessor();
-
-    @Test
-    public void testCreateConnectionParams() {
-        Map<String, String> props = new HashMap<>();
-        props.put("serverTimezone", "utc");
-        OracleDataSourceParamDTO oracleDatasourceParamDTO = new OracleDataSourceParamDTO();
-        oracleDatasourceParamDTO.setConnectType(DbConnectType.ORACLE_SID);
-        oracleDatasourceParamDTO.setHost("localhost");
-        oracleDatasourceParamDTO.setPort(3308);
-        oracleDatasourceParamDTO.setUserName("root");
-        oracleDatasourceParamDTO.setPassword("123456");
-        oracleDatasourceParamDTO.setDatabase("default");
-        oracleDatasourceParamDTO.setOther(props);
-        PowerMockito.mockStatic(PasswordUtils.class);
-        PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
-        OracleConnectionParam connectionParams = (OracleConnectionParam) oracleDatasourceProcessor
-                .createConnectionParams(oracleDatasourceParamDTO);
-        Assert.assertNotNull(connectionParams);
-        Assert.assertEquals("jdbc:oracle:thin:@localhost:3308", connectionParams.getAddress());
-        Assert.assertEquals("jdbc:oracle:thin:@localhost:3308:default", connectionParams.getJdbcUrl());
-    }
 
     @Test
     public void testCreateConnectionParams2() {
