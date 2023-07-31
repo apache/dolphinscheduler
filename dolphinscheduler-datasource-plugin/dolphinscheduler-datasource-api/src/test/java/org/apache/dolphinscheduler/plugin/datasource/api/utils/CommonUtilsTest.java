@@ -107,35 +107,4 @@ public class CommonUtilsTest {
 
     }
 
-    @Test
-    public void decodePassword() {
-        PowerMockito.mockStatic(PropertyUtils.class);
-        PowerMockito.when(PropertyUtils.getBoolean(DATASOURCE_ENCRYPTION_ENABLE, false))
-            .thenAnswer((Answer<Boolean>) invocation -> Boolean.TRUE);
-
-        PropertyUtils.setValue(DATASOURCE_ENCRYPTION_ENABLE, "true");
-
-        PowerMockito.mockStatic(PasswordUtils.class);
-        PowerMockito.when(PasswordUtils.decodePassword("bnVsbE1USXpORFUy")).thenReturn("123456");
-        PowerMockito.when(PasswordUtils.decodePassword("bnVsbElWRkJXbGhUVjBBPQ==")).thenReturn("!QAZXSW@");
-        PowerMockito.when(PasswordUtils.decodePassword("bnVsbE5XUm1aMlZ5S0VBPQ==")).thenReturn("5dfger(@");
-
-        Assert.assertEquals(null, PasswordUtils.decodePassword(""));
-        Assert.assertEquals("123456", PasswordUtils.decodePassword("bnVsbE1USXpORFUy"));
-        Assert.assertEquals("!QAZXSW@", PasswordUtils.decodePassword("bnVsbElWRkJXbGhUVjBBPQ=="));
-        Assert.assertEquals("5dfger(@", PasswordUtils.decodePassword("bnVsbE5XUm1aMlZ5S0VBPQ=="));
-
-        PowerMockito.when(PropertyUtils.getBoolean(DATASOURCE_ENCRYPTION_ENABLE, false))
-            .thenAnswer((Answer<Boolean>) invocation -> Boolean.FALSE);
-
-        PowerMockito.when(PasswordUtils.decodePassword("123456")).thenReturn("123456");
-        PowerMockito.when(PasswordUtils.decodePassword("!QAZXSW@")).thenReturn("!QAZXSW@");
-        PowerMockito.when(PasswordUtils.decodePassword("5dfger(@")).thenReturn("5dfger(@");
-
-        Assert.assertEquals(null, PasswordUtils.decodePassword(""));
-        Assert.assertEquals("123456", PasswordUtils.decodePassword("123456"));
-        Assert.assertEquals("!QAZXSW@", PasswordUtils.decodePassword("!QAZXSW@"));
-        Assert.assertEquals("5dfger(@", PasswordUtils.decodePassword("5dfger(@"));
-    }
-
 }
