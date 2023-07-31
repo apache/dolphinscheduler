@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYYMMDDHHMMSS;
-
 import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 
 import java.io.FileInputStream;
@@ -28,21 +26,12 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(DateUtils.class)
 public class FileUtilsTest {
-
-    @Test
-    public void testGetDownloadFilename() {
-        PowerMockito.mockStatic(DateUtils.class);
-        PowerMockito.when(DateUtils.getCurrentTime(YYYYMMDDHHMMSS)).thenReturn("20190101101059");
-        Assert.assertEquals("/tmp/dolphinscheduler/download/20190101101059/test",
-                FileUtils.getDownloadFilename("test"));
-    }
 
     @Test
     public void testGetUploadFilename() {
