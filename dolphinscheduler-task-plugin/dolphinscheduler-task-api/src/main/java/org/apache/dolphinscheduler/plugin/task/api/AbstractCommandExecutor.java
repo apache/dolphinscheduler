@@ -19,8 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.api;
 
 import static org.apache.dolphinscheduler.common.constants.Constants.EMPTY_STRING;
 import static org.apache.dolphinscheduler.common.constants.Constants.SLEEP_TIME_MILLIS;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.*;
 
 import org.apache.dolphinscheduler.common.constants.TenantConstants;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
@@ -125,6 +124,16 @@ public abstract class AbstractCommandExecutor {
             result.setExitStatusCode(EXIT_CODE_KILL);
             return result;
         }
+        // add task failure retry judgement
+        //if(需要任务失败重试的任务实例)
+        //获取当前任务的进程id
+        int pid = taskRequest.getProcessId();
+        if(isProcessRunning(pid) == true){
+            result.setExitStatusCode(RUNNING_CODE);
+            cancelApplication();
+            return result;
+        }
+        //初始化一个iShellInterceptorBuilder对象，该对象负责构建任务执行的shell拦截器配置。使用taskRequest对象中的executePath和taskAppId属性设置shell目录和名称。
         iShellInterceptorBuilder = iShellInterceptorBuilder
                 .shellDirectory(taskRequest.getExecutePath())
                 .shellName(taskRequest.getTaskAppId());
@@ -392,6 +401,50 @@ public abstract class AbstractCommandExecutor {
         }
 
         return processId;
+    }
+    /**
+     * determines whether the task that failure retry is in a normal execution state
+     *
+     * @param pid process_id
+     * @return
+     */
+    public boolean isProcessRunning(int pid) throws Exception {
+        String processPath = String.valueOf(pid);
+
+        // 构建shell命令   命令使用ps -ef来列出所有的进程，并使用grep过滤器来匹配给定的进程执行路径。
+        String[] command = { "/bin/sh", "-c", "ps -ef | grep " + processPath };
+        //使用 ProcessBuilder 类来创建一个新的进程，并设置其命令行参数为上面构造的命令
+        ProcessBuilder processBuilder = new ProcessBuilder(command);
+
+        // 执行shell命令  ProcessBuilder类的start()方法执行shell命令，并返回一个Process对象，它代表了正在执行的进程。
+        // 启动进程，并等待其执行完毕
+        Process process = processBuilder.start();
+
+        // 读取命令的输出  获取进程的标准输入流
+        //使用BufferedReader从Process对象的输入流中命令的输出。
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+        String line;
+        StringBuilder output = new StringBuilder();
+        //循环读取进程的标准输入流中的每一行内容
+        while ((line = reader.readLine()) != null) {
+            //将每一行内容追加到 StringBuilder 对象中
+            output.append(line);
+        }
+        try {
+            //命令执行完成后，可以使用waitFor()方法获取命令的退出码。如果为0（表示成功），并且输出结果中包含要查找的进程名，则说明进程存在。
+            int exitCode = process.waitFor();
+            if (exitCode == 0 && output.toString().contains(processPath)) {
+                // 进程正在运行  不需要进行失败重试
+                return true;
+            } else {
+                // 进程不在运行
+                return false;
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
 }

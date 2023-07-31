@@ -45,9 +45,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -55,12 +52,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.yarn.api.records.YarnApplicationState;
-import org.apache.hadoop.yarn.client.api.YarnClient;
-import org.apache.hadoop.yarn.api.records.ApplicationId;
-import org.apache.hadoop.yarn.exceptions.YarnException;
 
 import javax.annotation.Nullable;
 
@@ -216,7 +207,7 @@ public class WorkerFailoverService {
      */
     private boolean checkTaskInstanceNeedFailover(Optional<Date> needFailoverWorkerStartTime,
                                                   @Nullable ProcessInstance processInstance,
-                                                  TaskInstance taskInstance) throws IOException {
+                                                  TaskInstance taskInstance) {
         if (processInstance == null) {
             log.error(
                     "Failover task instance error, cannot find the related processInstance form memory, this case shouldn't happened");
@@ -239,71 +230,6 @@ public class WorkerFailoverService {
             log.info("The task is already finished, doesn't need to failover");
             return false;
         }
-        if (taskInstance.getTaskType() != null){
-            switch (taskInstance.getTaskType()) {
-                case "SHELL":{
-                    String processPath = "path";
-
-                    String[] command = { "/bin/sh", "-c", "ps -ef | grep " + processPath };
-
-                    ProcessBuilder processBuilder = new ProcessBuilder(command);
-
-                    Process process = processBuilder.start();
-
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-
-                    String line;
-                    StringBuilder output = new StringBuilder();
-
-                    while ((line = reader.readLine()) != null) {
-
-                        output.append(line);
-                    }
-                    try {
-
-                        int exitCode = process.waitFor();
-                        if (exitCode == 0 && output.toString().contains(processPath)) {
-                            return false;
-                        } else {
-                            return true;
-                        }
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-                case "SPARK":{
-
-                    String applicationIdStr = "application_id";
-                    Configuration conf = new Configuration();
-                    YarnClient yarnClient = YarnClient.createYarnClient();
-                    yarnClient.init(conf);
-                    yarnClient.start();
-
-                    ApplicationId applicationId = ApplicationId.fromString(applicationIdStr);
-                    YarnApplicationState appState = null;
-                    try {
-                        appState = yarnClient.getApplicationReport(applicationId).getYarnApplicationState();
-                    } catch (YarnException e) {
-                        throw new RuntimeException(e);
-                    }
-
-                    if(appState == YarnApplicationState.RUNNING){
-                        log.info("The application with id " + applicationIdStr + " is running.");
-                        return false;
-                    } else {
-                        log.info("The application with id " + applicationIdStr + " is not running.");
-                    }
-
-                    yarnClient.stop();
-                    return true;
-
-                }
-                case "FLINK":{
-
-                }
-            }
-        }
-
         if (!needFailoverWorkerStartTime.isPresent()) {
             // The worker is still down
             return true;

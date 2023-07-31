@@ -1069,6 +1069,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         newTaskInstance.setProcessInstance(workflowInstance);
         newTaskInstance.setRetryTimes(taskInstance.getRetryTimes());
         newTaskInstance.setState(taskInstance.getState());
+        newTaskInstance.setPid(taskInstance.getPid());
         newTaskInstance.setAppLink(taskInstance.getAppLink());
         newTaskInstance.setVarPool(taskInstance.getVarPool());
         return newTaskInstance;
@@ -1302,6 +1303,22 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                         existTaskInstance = cloneTolerantTaskInstance(existTaskInstance);
                         log.info("task {} cannot be take over will generate a tolerant task instance",
                                 existTaskInstance.getName());
+                    }
+                }
+                //如果任务可以重试
+                if (existTaskInstance.taskCanRetry()) {
+                    //如果任务需要容错处理 并且又是 shell 或者 yarn任务  则需要进行修改任务执行
+                    if (existTaskInstance.getState().isNeedFaultTolerance() && (Objects.nonNull(existTaskInstance.getPid()) || existTaskInstance.getAppLink() != null)) {
+                        log.info("TaskInstance of  Linux process or Yarn application execute fault tolerance.");
+                        //设置任务的标志以指示不需要重试
+                        existTaskInstance.setFlag(Flag.NO);
+                        //在数据库中更新任务实例
+                        taskInstanceDao.updateById(existTaskInstance);
+
+                        //创建一个新的任务实例替代原始实例
+                        TaskInstance newTolerantTaskInstance = cloneTolerantTaskInstance(existTaskInstance);
+                        taskInstances.add(newTolerantTaskInstance);
+                        continue;
                     }
                 }
                 taskInstances.add(existTaskInstance);
