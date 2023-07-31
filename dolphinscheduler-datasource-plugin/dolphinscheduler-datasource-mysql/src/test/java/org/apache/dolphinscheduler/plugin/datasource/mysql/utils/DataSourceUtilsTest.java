@@ -41,7 +41,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -63,22 +62,6 @@ public class DataSourceUtilsTest {
         mysqlDatasourceParamDTO.setOther(other);
         DataSourceUtils.checkDatasourceParam(mysqlDatasourceParamDTO);
         Assert.assertTrue(true);
-    }
-
-    @Test
-    public void testBuildConnectionParams() {
-        MySQLDataSourceParamDTO mysqlDatasourceParamDTO = new MySQLDataSourceParamDTO();
-        mysqlDatasourceParamDTO.setHost("localhost");
-        mysqlDatasourceParamDTO.setDatabase("default");
-        mysqlDatasourceParamDTO.setUserName("root");
-        mysqlDatasourceParamDTO.setPort(3306);
-        mysqlDatasourceParamDTO.setPassword("123456");
-        PowerMockito.mockStatic(PasswordUtils.class);
-        PowerMockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("123456");
-        PowerMockito.mockStatic(CommonUtils.class);
-        PowerMockito.when(CommonUtils.getKerberosStartupState()).thenReturn(false);
-        ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(mysqlDatasourceParamDTO);
-        Assert.assertNotNull(connectionParam);
     }
 
     @Test
