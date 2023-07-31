@@ -27,6 +27,7 @@ ALTER TABLE t_ds_fav RENAME t_ds_fav_task;
 END IF;
 END;
 d//
+
 delimiter ;
 CALL ut_dolphin_T_t_ds_fav;
 DROP PROCEDURE ut_dolphin_T_t_ds_fav;

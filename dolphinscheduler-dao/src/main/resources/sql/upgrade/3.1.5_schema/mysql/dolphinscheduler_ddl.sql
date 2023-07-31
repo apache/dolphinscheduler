@@ -16,6 +16,7 @@
 */
 SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
 
+
 -- add unique key to t_ds_process_definition_log
 drop PROCEDURE if EXISTS add_t_ds_process_definition_log_uk_uniq_idx_code_version;
 delimiter d//
@@ -29,7 +30,9 @@ BEGIN
 ALTER TABLE t_ds_process_definition_log ADD UNIQUE KEY uniq_idx_code_version(`code`,`version`);
 END IF;
 END;
+
 d//
+
 delimiter ;
 CALL add_t_ds_process_definition_log_uk_uniq_idx_code_version;
 DROP PROCEDURE add_t_ds_process_definition_log_uk_uniq_idx_code_version;
