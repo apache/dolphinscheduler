@@ -21,7 +21,6 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_COD
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
@@ -108,7 +107,7 @@ public class ProcedureTask extends AbstractTask {
                             procedureTaskExecutionContext.getConnectionParams());
 
             // get jdbc connection
-            connection = DataSourceClientProvider.getInstance().getConnection(dbType, connectionParam);
+            connection = DataSourceUtils.getConnection(dbType, connectionParam);
 
             Map<Integer, Property> sqlParamsMap = new HashMap<>();
             Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap() == null ? Maps.newHashMap()
