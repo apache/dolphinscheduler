@@ -18,9 +18,6 @@
 package org.apache.dolphinscheduler.plugin.datasource.oceanbase;
 
 import org.apache.dolphinscheduler.plugin.datasource.api.client.BaseAdHocDataSourceClient;
-import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
-import org.apache.dolphinscheduler.plugin.datasource.oceanbase.param.OceanBaseConnectionParam;
-import org.apache.dolphinscheduler.plugin.datasource.oceanbase.param.OceanBaseDataSourceProcessor;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
@@ -30,12 +27,4 @@ public class OceanBaseAdHocDataSourceClient extends BaseAdHocDataSourceClient {
         super(baseConnectionParam, dbType);
     }
 
-    @Override
-    protected void setDefaultValidationQuery(BaseConnectionParam baseConnectionParam) {
-        OceanBaseConnectionParam connectionParam = (OceanBaseConnectionParam) baseConnectionParam;
-        OceanBaseDataSourceProcessor datasourceProcessor =
-                (OceanBaseDataSourceProcessor) DataSourceUtils.getDatasourceProcessor(DbType.OCEANBASE);
-        baseConnectionParam
-                .setValidationQuery(datasourceProcessor.getValidationQuery(connectionParam.getCompatibleMode()));
-    }
 }
