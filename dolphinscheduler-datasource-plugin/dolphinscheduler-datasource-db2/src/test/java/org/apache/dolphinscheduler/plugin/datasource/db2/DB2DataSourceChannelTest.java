@@ -32,8 +32,9 @@ public class DB2DataSourceChannelTest {
     @Test
     public void testCreateDataSourceClient() {
         DB2DataSourceChannel sourceChannel = Mockito.mock(DB2DataSourceChannel.class);
-        DB2DataSourceClient dataSourceClient = Mockito.mock(DB2DataSourceClient.class);
-        Mockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
-        Assertions.assertNotNull(sourceChannel.createDataSourceClient(new Db2ConnectionParam(), DbType.DB2));
+        DB2PooledDataSourceClient dataSourceClient = Mockito.mock(DB2PooledDataSourceClient.class);
+        Mockito.when(sourceChannel.createPooledDataSourceClient(Mockito.any(), Mockito.any()))
+                .thenReturn(dataSourceClient);
+        Assertions.assertNotNull(sourceChannel.createPooledDataSourceClient(new Db2ConnectionParam(), DbType.DB2));
     }
 }

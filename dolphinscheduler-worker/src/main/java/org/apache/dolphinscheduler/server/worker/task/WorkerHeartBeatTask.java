@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.model.BaseHeartBeatTask;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
@@ -75,6 +76,8 @@ public class WorkerHeartBeatTask extends BaseHeartBeatTask<WorkerHeartBeat> {
                 .workerWaitingTaskCount(this.workerWaitingTaskCount.get())
                 .workerExecThreadCount(workerConfig.getExecThreads())
                 .serverStatus(serverStatus)
+                .host(NetUtils.getHost())
+                .port(workerConfig.getListenPort())
                 .build();
     }
 
