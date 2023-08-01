@@ -413,28 +413,74 @@ public class DagHelper {
         return conditionTaskList;
     }
 
-    private static List<String> skipTaskNode4Switch(TaskNode taskNode, Map<String, TaskNode> skipTaskNodeList,
-                                                    Map<String, TaskInstance> completeTaskList,
-                                                    DAG<String, TaskNode, TaskNodeRelation> dag) {
+
+    public static List<String> skipTaskNode4Switch(TaskNode taskNode,
+                                                 Map<String, TaskNode> skipTaskNodeList,
+                                                 Map<String, TaskInstance> completeTaskList,
+                                                 DAG<String, TaskNode, TaskNodeRelation> dag) {
 
         SwitchParameters switchParameters =
                 completeTaskList.get(Long.toString(taskNode.getCode())).getSwitchDependency();
         int resultConditionLocation = switchParameters.getResultConditionLocation();
         List<SwitchResultVo> conditionResultVoList = switchParameters.getDependTaskList();
+
         List<String> switchTaskList = conditionResultVoList.get(resultConditionLocation).getNextNode();
+        Set<String> switchNeedWorkCodes = new HashSet<>();
         if (CollectionUtils.isEmpty(switchTaskList)) {
-            switchTaskList = new ArrayList<>();
+            return new ArrayList<>();
+        }
+        // get all downstream nodes of the branch that the switch node needs to execute
+        for (String switchTaskCode : switchTaskList) {
+            getSwitchNeedWorkCodes(switchTaskCode, dag, switchNeedWorkCodes);
         }
         conditionResultVoList.remove(resultConditionLocation);
         for (SwitchResultVo info : conditionResultVoList) {
             if (CollectionUtils.isEmpty(info.getNextNode())) {
                 continue;
             }
-            setTaskNodeSkip(info.getNextNode().get(0), dag, completeTaskList, skipTaskNodeList);
+            for (String nextNode : info.getNextNode()) {
+                setSwitchTaskNodeSkip(nextNode, dag, completeTaskList, skipTaskNodeList,
+                        switchNeedWorkCodes);
+            }
         }
         return switchTaskList;
     }
 
+    /**
+     * get all downstream nodes of the branch that the switch node needs to execute
+     * @param taskCode
+     * @param dag
+     * @param switchNeedWorkCodes
+     */
+    public static void getSwitchNeedWorkCodes(String taskCode, DAG<String, TaskNode, TaskNodeRelation> dag,
+                                              Set<String> switchNeedWorkCodes) {
+        switchNeedWorkCodes.add(taskCode);
+        Set<String> subsequentNodes = dag.getSubsequentNodes(taskCode);
+        if (org.apache.commons.collections.CollectionUtils.isNotEmpty(subsequentNodes)) {
+            for (String subCode : subsequentNodes) {
+                getSwitchNeedWorkCodes(subCode, dag, switchNeedWorkCodes);
+            }
+        }
+    }
+
+    private static void setSwitchTaskNodeSkip(String skipNodeCode,
+                                              DAG<String, TaskNode, TaskNodeRelation> dag,
+                                              Map<String, TaskInstance> completeTaskList,
+                                              Map<String, TaskNode> skipTaskNodeList,
+                                              Set<String> switchNeedWorkCodes) {
+        // ignore when the node that needs to be skipped exists on the branch that the switch type node needs to execute
+        if (!dag.containsNode(skipNodeCode) || switchNeedWorkCodes.contains(skipNodeCode)) {
+            return;
+        }
+        skipTaskNodeList.putIfAbsent(skipNodeCode, dag.getNode(skipNodeCode));
+        Collection<String> postNodeList = dag.getSubsequentNodes(skipNodeCode);
+        for (String post : postNodeList) {
+            TaskNode postNode = dag.getNode(post);
+            if (isTaskNodeNeedSkip(postNode, skipTaskNodeList)) {
+                setTaskNodeSkip(post, dag, completeTaskList, skipTaskNodeList);
+            }
+        }
+    }
     /**
      * set task node and the post nodes skip flag
      */
