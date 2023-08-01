@@ -48,7 +48,7 @@ public class DefaultTaskExecuteRunnableFactory implements TaskExecuteRunnableFac
                 processInstanceExecCacheManager.getByProcessInstanceId(taskInstance.getProcessInstanceId());
         try {
             return new DefaultTaskExecuteRunnable(
-                    workflowExecuteRunnable.getProcessInstance(),
+                    workflowExecuteRunnable.getWorkflowExecuteContext().getWorkflowInstance(),
                     taskInstance,
                     taskExecutionContextFactory.createTaskExecutionContext(taskInstance),
                     taskOperatorManager);

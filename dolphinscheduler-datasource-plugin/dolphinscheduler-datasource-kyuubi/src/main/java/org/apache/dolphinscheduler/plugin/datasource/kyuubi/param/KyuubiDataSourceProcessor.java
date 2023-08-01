@@ -124,6 +124,7 @@ public class KyuubiDataSourceProcessor extends AbstractDataSourceProcessor {
     public Connection getConnection(ConnectionParam connectionParam) throws ClassNotFoundException, SQLException {
         KyuubiConnectionParam kyuubiConnectionParam = (KyuubiConnectionParam) connectionParam;
         Class.forName(getDatasourceDriver());
+        // todo:
         return DriverManager.getConnection(getJdbcUrl(connectionParam),
                 kyuubiConnectionParam.getUser(), PasswordUtils.decodePassword(kyuubiConnectionParam.getPassword()));
     }

@@ -30,16 +30,12 @@ import lombok.NoArgsConstructor;
 public class SwitchResultVo {
 
     private String condition;
-    private List<String> nextNode;
+    private List<Long> nextNode;
 
     public void setNextNode(Object nextNode) {
-        if (nextNode instanceof String) {
-            List<String> nextNodeList = new ArrayList<>();
-            nextNodeList.add(String.valueOf(nextNode));
-            this.nextNode = nextNodeList;
-        } else if (nextNode instanceof Number) {
-            List<String> nextNodeList = new ArrayList<>();
-            nextNodeList.add(nextNode.toString());
+        if (nextNode instanceof Long) {
+            List<Long> nextNodeList = new ArrayList<>();
+            nextNodeList.add((Long) nextNode);
             this.nextNode = nextNodeList;
         } else {
             this.nextNode = (ArrayList) nextNode;

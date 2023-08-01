@@ -662,18 +662,6 @@ public final class Constants {
     public static final String SYSTEM_LINE_SEPARATOR = System.getProperty("line.separator");
 
     /**
-     * network interface preferred
-     */
-    public static final String DOLPHIN_SCHEDULER_NETWORK_INTERFACE_PREFERRED =
-            "dolphin.scheduler.network.interface.preferred";
-
-    /**
-     * network IP gets priority, default inner outer
-     */
-    public static final String DOLPHIN_SCHEDULER_NETWORK_PRIORITY_STRATEGY =
-            "dolphin.scheduler.network.priority.strategy";
-
-    /**
      * exec shell scripts
      */
     public static final String SH = "sh";
@@ -856,4 +844,9 @@ public final class Constants {
      */
     public static final String DATABASES_QUERY = "show databases";
     public static final String DATABASES_QUERY_PG = "SELECT datname FROM pg_database";
+
+    /**
+     * K8S sensitive param
+     */
+    public static final String K8S_CONFIG_REGEX = "(?<=((?i)configYaml(\" : \"))).*?(?=(\",\\n))";
 }

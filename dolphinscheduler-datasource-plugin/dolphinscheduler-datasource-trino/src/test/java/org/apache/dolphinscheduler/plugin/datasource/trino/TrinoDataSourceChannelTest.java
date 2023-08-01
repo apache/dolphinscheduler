@@ -37,7 +37,7 @@ public class TrinoDataSourceChannelTest {
         trinoConnectionParam.setDriverLocation(DataSourceUtils.getDatasourceDriver(DbType.TRINO));
         trinoConnectionParam.setDriverClassName(DataSourceUtils.getDatasourceDriver(DbType.TRINO));
         try {
-            sourceChannel.createDataSourceClient(trinoConnectionParam, DbType.TRINO);
+            sourceChannel.createPooledDataSourceClient(trinoConnectionParam, DbType.TRINO);
         } catch (Exception e) {
             Assertions.assertEquals(RuntimeException.class, e.getClass());
         }

@@ -33,7 +33,7 @@ services:
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:12345/actuator/health" ]
       interval: 5s
-      timeout: 60s
+      timeout: 300s
       retries: 120
     depends_on:
       mysql:
@@ -51,7 +51,7 @@ services:
     healthcheck:
       test: mysqladmin ping -h 127.0.0.1 -u root --password=$$MYSQL_ROOT_PASSWORD
       interval: 5s
-      timeout: 60s
+      timeout: 300s
       retries: 120
 
 networks:
