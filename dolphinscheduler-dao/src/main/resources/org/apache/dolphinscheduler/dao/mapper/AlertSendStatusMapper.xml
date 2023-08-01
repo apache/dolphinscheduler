@@ -27,7 +27,7 @@
             #{alertSendStatus.alertPluginInstanceId},
             #{alertSendStatus.sendStatus},
             #{alertSendStatus.log},
-            #{alertSendStatus.createTime},
+            #{alertSendStatus.createTime}
         </foreach>
 
     </insert>
