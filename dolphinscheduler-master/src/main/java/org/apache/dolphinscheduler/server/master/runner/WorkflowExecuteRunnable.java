@@ -85,6 +85,7 @@ import org.apache.dolphinscheduler.server.master.rpc.MasterRpcClient;
 import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnableFactory;
 import org.apache.dolphinscheduler.server.master.utils.TaskUtils;
+import org.apache.dolphinscheduler.server.master.utils.WorkflowInstanceUtils;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
@@ -123,7 +124,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.BeanUtils;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -435,7 +435,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                     taskInstance.getState());
             this.updateProcessInstanceState();
             // log the taskInstance in detail after task is finished
-            logTaskInstanceInDetail(taskInstance);
+            log.info(WorkflowInstanceUtils.logTaskInstanceInDetail(taskInstance));
             sendTaskLogOnMasterToRemoteIfNeeded(taskInstance);
         } catch (Exception ex) {
             log.error("Task finish failed, get a exception, will remove this taskInstance from completeTaskSet", ex);
@@ -762,7 +762,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
             processService.releaseAllTaskGroup(workflowInstance.getId());
         }
         // Log the workflowInstance in detail
-        logWorkflowInstanceInDetail(workflowInstance);
+        log.info(WorkflowInstanceUtils.logWorkflowInstanceInDetails(workflowInstance));
     }
 
     public void checkSerialProcess(ProcessDefinition processDefinition) {
@@ -807,65 +807,6 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         command.setProcessDefinitionVersion(processDefinition.getVersion());
         command.setCommandParam(JSONUtils.toJsonString(cmdParam));
         commandService.createCommand(command);
-    }
-
-    private void logTaskInstanceInDetail(TaskInstance taskInstance) {
-        StringBuilder logBuilder = new StringBuilder();
-        // set the length for '*'
-        int horizontalLineLength = 80;
-        // Append the title and the centered "Task Instance Detail"
-        int titleLength = 40;
-        int leftSpaces = (horizontalLineLength - titleLength) / 2;
-        String centeredTitle = String.format("%" + leftSpaces + "s%s", "", "Task Instance Detail");
-        logBuilder.append("\n").append(Strings.repeat("*", horizontalLineLength)).append("\n")
-                .append(centeredTitle).append("\n")
-                .append(Strings.repeat("*", horizontalLineLength)).append("\n")
-                .append("Task Name:              ").append(taskInstance.getName()).append("\n")
-                .append("Workflow Instance Name: ").append(taskInstance.getProcessInstance().getName()).append("\n")
-                .append("Task Execute Type:      ").append(taskInstance.getTaskExecuteType().getDesc()).append("\n")
-                .append("Execute State:          ").append(taskInstance.getState().getDesc()).append("\n")
-                .append("Host:                   ").append(taskInstance.getHost()).append("\n")
-                .append("Task Type:              ").append(taskInstance.getTaskType()).append("\n")
-                .append("Priority:               ").append(taskInstance.getTaskInstancePriority().getDescp())
-                .append("\n")
-                .append("Tenant:                 ").append(taskInstance.getProcessInstance().getTenantCode())
-                .append("\n")
-                .append("First Submit Time:      ").append(taskInstance.getFirstSubmitTime()).append("\n")
-                .append("Submit Time:            ").append(taskInstance.getSubmitTime()).append("\n")
-                .append("Start Time:             ").append(taskInstance.getStartTime()).append("\n")
-                .append("End Time:               ").append(taskInstance.getEndTime()).append("\n");
-        log.info(logBuilder.toString());
-    }
-
-    private void logWorkflowInstanceInDetail(ProcessInstance workflowInstance) {
-        StringBuilder logBuilder = new StringBuilder();
-        // set the length for '*'
-        int horizontalLineLength = 80;
-        // Append the title and the centered "Workflow Instance Detail"
-        int titleLength = 40;
-        int leftSpaces = (horizontalLineLength - titleLength) / 2;
-        String centeredTitle = String.format("%" + leftSpaces + "s%s", "", "Workflow Instance Detail");
-        logBuilder.append("\n").append(Strings.repeat("*", horizontalLineLength)).append("\n")
-                .append(centeredTitle).append("\n")
-                .append(Strings.repeat("*", horizontalLineLength)).append("\n")
-                .append("Workflow Name:             ").append(workflowInstance.getProcessDefinition().getName())
-                .append("\n")
-                .append("Workflow Instance Name:    ").append(workflowInstance.getName()).append("\n")
-                .append("Command Type:              ").append(workflowInstance.getCommandType()).append("\n")
-                .append("State:                     ").append(workflowInstance.getState().getDesc()).append("\n")
-                .append("Host:                      ").append(workflowInstance.getHost()).append("\n")
-                .append("Is Sub Process:            ").append(workflowInstance.getIsSubProcess().getDescp())
-                .append("\n")
-                .append("Run Times:                 ").append(workflowInstance.getRunTimes()).append("\n")
-                .append("Max Try Times:             ").append(workflowInstance.getMaxTryTimes()).append("\n")
-                .append("Schedule Time:             ").append(workflowInstance.getScheduleTime()).append("\n")
-                .append("Dry Run:                   ").append(workflowInstance.getDryRun()).append("\n")
-                .append("Tenant:                    ").append(workflowInstance.getTenantCode()).append("\n")
-                .append("Restart Time:              ").append(workflowInstance.getRestartTime()).append("\n")
-                .append("Work Group:                ").append(workflowInstance.getWorkerGroup()).append("\n")
-                .append("Start Time:                ").append(workflowInstance.getStartTime()).append("\n")
-                .append("End Time:                  ").append(workflowInstance.getEndTime()).append("\n");
-        log.info(logBuilder.toString());
     }
 
     private void initTaskQueue() throws StateEventHandleException, CronParseException {
