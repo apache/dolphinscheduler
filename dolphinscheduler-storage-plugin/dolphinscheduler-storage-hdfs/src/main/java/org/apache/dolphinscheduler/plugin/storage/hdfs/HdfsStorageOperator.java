@@ -140,7 +140,7 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
             // first get key from core-site.xml hdfs-site.xml ,if null ,then try to get from properties file
             // the default is the local file system
             if (StringUtils.isNotBlank(defaultFS)) {
-                Map<String, String> fsRelatedProps = PropertyUtils.getPrefixedProperties("fs.");
+                Map<String, String> fsRelatedProps = PropertyUtils.getByPrefix("fs.");
                 configuration.set(Constants.HDFS_DEFAULT_FS, defaultFS);
                 fsRelatedProps.forEach((key, value) -> configuration.set(key, value));
             } else {

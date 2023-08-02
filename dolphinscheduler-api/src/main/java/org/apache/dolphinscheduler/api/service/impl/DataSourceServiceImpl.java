@@ -379,7 +379,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             }
             return result;
         }
-        try (Connection connection = DataSourceClientProvider.getInstance().getConnection(type, connectionParam)) {
+        try (Connection connection = DataSourceClientProvider.getAdHocConnection(type, connectionParam)) {
             if (connection == null) {
                 log.error("Connection test to {} datasource failed, connectionParam:{}.", type.getDescp(),
                         connectionParam);
