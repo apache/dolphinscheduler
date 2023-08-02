@@ -40,12 +40,15 @@
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-alert-all</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-dao</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-listener</artifactId>
+            <version>dev-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-registry-all</artifactId>

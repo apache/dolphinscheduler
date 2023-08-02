@@ -19,7 +19,10 @@ package org.apache.dolphinscheduler.dao.entity;
 
 import java.util.Date;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -28,6 +31,9 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 @Data
 @TableName("t_ds_plugin_define")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class PluginDefine {
 
     /**
@@ -55,6 +61,18 @@ public class PluginDefine {
     private String pluginParams;
 
     /**
+     * plugin_location
+     */
+    @TableField("plugin_location")
+    private String pluginLocation;
+
+    /**
+     * plugin full class name
+     */
+    @TableField("plugin_class_name")
+    private String pluginClassName;
+
+    /**
      * create_time
      */
     @TableField("create_time")
@@ -70,6 +88,17 @@ public class PluginDefine {
         this.pluginName = pluginName;
         this.pluginType = pluginType;
         this.pluginParams = pluginParams;
+        this.createTime = new Date();
+        this.updateTime = new Date();
+    }
+
+    public PluginDefine(String pluginName, String pluginType, String pluginParams, String pluginLocation,
+                        String pluginClassName) {
+        this.pluginName = pluginName;
+        this.pluginType = pluginType;
+        this.pluginParams = pluginParams;
+        this.pluginLocation = pluginLocation;
+        this.pluginClassName = pluginClassName;
         this.createTime = new Date();
         this.updateTime = new Date();
     }

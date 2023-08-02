@@ -17,8 +17,10 @@
 
 package org.apache.dolphinscheduler.api.rpc;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.remote.NettyRemotingClient;
 import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.listener.ListenerResponse;
 import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
 import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.remote.utils.Host;
@@ -30,12 +32,20 @@ public class ApiRpcClient {
 
     private final NettyRemotingClient nettyRemotingClient;
 
+    private static final long DEFAULT_TIME_OUT_MILLS = 10_000L;
+
     public ApiRpcClient() {
         this.nettyRemotingClient = new NettyRemotingClient(new NettyClientConfig());
     }
 
     public void send(Host host, Message message) throws RemotingException {
         nettyRemotingClient.send(host, message);
+    }
+
+    public ListenerResponse sendListenerMessageSync(Host host,
+                                                    Message message) throws RemotingException, InterruptedException {
+        Message resMessage = nettyRemotingClient.sendSync(host, message, DEFAULT_TIME_OUT_MILLS);
+        return JSONUtils.parseObject(resMessage.getBody(), ListenerResponse.class);
     }
 
 }

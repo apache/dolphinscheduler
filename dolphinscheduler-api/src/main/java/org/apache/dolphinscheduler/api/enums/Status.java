@@ -567,7 +567,8 @@ public enum Status {
     SCHEDULE_TIME_NUMBER_EXCEED(1400003, "The number of complement dates exceed 100.", "补数日期个数超过100"),
     DESCRIPTION_TOO_LONG_ERROR(1400004, "description is too long error", "描述过长"),
     DELETE_WORKER_GROUP_BY_ID_FAIL_ENV(1400005,
-            "delete worker group fail, for there are [{0}] enviroments using:{1}", "删除工作组失败，有 [{0}] 个环境正在使用：{1}");
+            "delete worker group fail, for there are [{0}] enviroments using:{1}", "删除工作组失败，有 [{0}] 个环境正在使用：{1}"),
+    ALERT_NOT_EXISTS(1400006, "alert server does not exist", "alert server不存在"),;
     private final int code;
     private final String enMsg;
     private final String zhMsg;

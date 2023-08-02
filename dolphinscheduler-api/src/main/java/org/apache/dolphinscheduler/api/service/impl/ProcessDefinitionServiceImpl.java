@@ -43,6 +43,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LOCAL_PA
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SQL;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.dolphinscheduler.api.dto.DagDataSchedule;
 import org.apache.dolphinscheduler.api.dto.ScheduleParam;
 import org.apache.dolphinscheduler.api.dto.treeview.Instance;
@@ -81,37 +82,14 @@ import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.DagData;
-import org.apache.dolphinscheduler.dao.entity.DataSource;
-import org.apache.dolphinscheduler.dao.entity.DependentSimplifyDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
-import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.Schedule;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.TaskMainInfo;
-import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.entity.UserWithProcessDefinitionCode;
-import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.dao.entity.*;
+import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
 import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
+import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
+import org.apache.dolphinscheduler.listener.event.DsListenerWorkflowAddedEvent;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.SqlType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
@@ -251,6 +229,12 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     @Autowired
     private MetricsCleanUpService metricsCleanUpService;
 
+    @Autowired
+    private ListenerPluginInstanceMapper listenerPluginInstanceMapper;
+
+    @Autowired
+    private ListenerEventMapper listenerEventMapper;
+
     /**
      * create process definition
      *
@@ -305,8 +289,37 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 new ProcessDefinition(projectCode, name, processDefinitionCode, description,
                         globalParams, locations, timeout, loginUser.getId());
         processDefinition.setExecutionType(executionType);
-
-        return createDagDefine(loginUser, taskRelationList, processDefinition, taskDefinitionLogs, otherParamsJson);
+        result = createDagDefine(loginUser, taskRelationList, processDefinition, taskDefinitionLogs, otherParamsJson);
+        //TODO: duplicated code here
+        if (result.get(Constants.STATUS) == Status.SUCCESS){
+            LambdaQueryWrapper<ListenerPluginInstance> queryWrapper = new LambdaQueryWrapper<>();
+            // TODO:
+            queryWrapper.select(ListenerPluginInstance::getId, ListenerPluginInstance::getListenerEventType);
+            List<ListenerPluginInstance> listenerPluginInstances =
+                    listenerPluginInstanceMapper.selectList(queryWrapper)
+                            .stream()
+                            .filter(x -> Arrays.stream(x.getListenerEventType().split(","))
+                                    .map(Integer::parseInt).collect(toSet())
+                                    .contains(ListenerEventType.WORKFLOW_ADDED.getCode()))
+                            .collect(Collectors.toList());
+            if (!listenerPluginInstances.isEmpty()) {
+                DsListenerWorkflowAddedEvent workflowAddedEvent = new DsListenerWorkflowAddedEvent();
+                workflowAddedEvent.setProjectCode(projectCode);
+                workflowAddedEvent.setProcessDefinitionCode(processDefinitionCode);
+                String content = JSONUtils.toJsonString(workflowAddedEvent);
+                List<ListenerEvent> events = Lists.newArrayListWithExpectedSize(listenerPluginInstances.size());
+                for (ListenerPluginInstance instance: listenerPluginInstances){
+                    ListenerEvent event = new ListenerEvent();
+                    event.setContent(content);
+                    event.setSign("xxx");
+                    event.setEventType(ListenerEventType.WORKFLOW_ADDED);
+                    event.setPluginInstanceId(instance.getId());
+                    events.add(event);
+                }
+                listenerEventMapper.batchInsert(events);
+            }
+        }
+        return result;
     }
 
     private void createWorkflowValid(User user, ProcessDefinition processDefinition) {
