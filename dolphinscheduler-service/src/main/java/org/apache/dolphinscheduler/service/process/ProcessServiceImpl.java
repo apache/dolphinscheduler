@@ -19,6 +19,10 @@ package org.apache.dolphinscheduler.service.process;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
@@ -52,67 +56,8 @@ import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.Cluster;
-import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.DagData;
-import org.apache.dolphinscheduler.dao.entity.DataSource;
-import org.apache.dolphinscheduler.dao.entity.DependentProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.DqComparisonType;
-import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
-import org.apache.dolphinscheduler.dao.entity.DqRule;
-import org.apache.dolphinscheduler.dao.entity.DqRuleExecuteSql;
-import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
-import org.apache.dolphinscheduler.dao.entity.DqTaskStatisticsValue;
-import org.apache.dolphinscheduler.dao.entity.Environment;
-import org.apache.dolphinscheduler.dao.entity.ErrorCommand;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
-import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.ProjectUser;
-import org.apache.dolphinscheduler.dao.entity.Resource;
-import org.apache.dolphinscheduler.dao.entity.Schedule;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.TaskGroup;
-import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.dao.entity.UdfFunc;
-import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ClusterMapper;
-import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
-import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.DqComparisonTypeMapper;
-import org.apache.dolphinscheduler.dao.mapper.DqExecuteResultMapper;
-import org.apache.dolphinscheduler.dao.mapper.DqRuleExecuteSqlMapper;
-import org.apache.dolphinscheduler.dao.mapper.DqRuleInputEntryMapper;
-import org.apache.dolphinscheduler.dao.mapper.DqRuleMapper;
-import org.apache.dolphinscheduler.dao.mapper.DqTaskStatisticsValueMapper;
-import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
-import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
-import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
-import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkFlowLineageMapper;
+import org.apache.dolphinscheduler.dao.entity.*;
+import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.DqRuleUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
@@ -148,19 +93,11 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Nullable;
 import org.apache.commons.collections.MapUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -173,6 +110,9 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private DefinedParamMapper definedParamMapper;
 
     @Autowired
     private ProcessDefinitionMapper processDefineMapper;
@@ -408,7 +348,9 @@ public class ProcessServiceImpl implements ProcessService {
         // add command timezone
         Schedule schedule = scheduleMapper.queryByProcessDefinitionCode(command.getProcessDefinitionCode());
         if (schedule != null) {
-            Map<String, String> commandParams = StringUtils.isNotBlank(command.getCommandParam()) ? JSONUtils.toMap(command.getCommandParam()) : new HashMap<>();
+            Map<String, String> commandParams =
+                    StringUtils.isNotBlank(command.getCommandParam()) ? JSONUtils.toMap(command.getCommandParam())
+                            : new HashMap<>();
             commandParams.put(Constants.SCHEDULE_TIMEZONE, schedule.getTimezoneId());
             command.setCommandParam(JSONUtils.toJsonString(commandParams));
         }
@@ -1593,11 +1535,70 @@ public class ProcessServiceImpl implements ProcessService {
         if (taskInstance.getFirstSubmitTime() == null) {
             taskInstance.setFirstSubmitTime(taskInstance.getSubmitTime());
         }
+
+        // 新增 DATAX 任务自定参数
+        if ("DATAX".equals(taskInstance.getTaskType())) {
+            try {
+                List<DefinedParam> definedParams = this.definedParamMapper
+                        .queryDefinedParambyKeys(this.extractStringsInDollarParentheses(taskInstance.getTaskParams()));
+                ArrayNode paramTranArrayNode = this.tranParam(definedParams);
+                JsonNode node = JSONUtils.parseObject(taskInstance.getTaskParams());
+                ArrayNode arrayNode = (ArrayNode) node.get("localParams");
+                arrayNode.addAll(paramTranArrayNode);
+                taskInstance.setTaskParams(node.toString());
+                TaskDefinition taskDefine = taskInstance.getTaskDefine();
+                taskDefine.setTaskParams(node.toString());
+                taskInstance.setTaskDefine(taskDefine);
+            } catch (Exception var9) {
+                this.logger.error("增加配置参数 失败: {}", var9);
+            }
+        }
+
         boolean saveResult = saveTaskInstance(taskInstance);
         if (!saveResult) {
             return null;
         }
         return taskInstance;
+    }
+
+    private ArrayList<String> extractStringsInDollarParentheses(String json) {
+        ArrayList results = new ArrayList();
+
+        try {
+            Pattern pattern = Pattern.compile("\\$\\{(.*?)\\}");
+            Matcher matcher = pattern.matcher(json);
+
+            while (matcher.find()) {
+                results.add(matcher.group(1));
+            }
+
+            return results;
+        } catch (Exception var5) {
+            return results;
+        }
+    }
+
+    private ArrayNode tranParam(List<DefinedParam> definedParams) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        ArrayNode paramArrayNode = objectMapper.createArrayNode();
+
+        try {
+            Iterator var4 = definedParams.iterator();
+
+            while (var4.hasNext()) {
+                DefinedParam definedParam = (DefinedParam) var4.next();
+                ObjectNode objectNode = JsonNodeFactory.instance.objectNode();
+                objectNode.put("prop", definedParam.getKey());
+                objectNode.put("value", definedParam.getValue());
+                objectNode.put("direct", "IN");
+                objectNode.put("type", "VARCHAR");
+                paramArrayNode.add(objectNode);
+            }
+
+            return paramArrayNode;
+        } catch (Exception var7) {
+            return paramArrayNode;
+        }
     }
 
     /**
