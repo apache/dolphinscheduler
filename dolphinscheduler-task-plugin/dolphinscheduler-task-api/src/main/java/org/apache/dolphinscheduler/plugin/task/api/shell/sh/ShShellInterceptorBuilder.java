@@ -32,11 +32,6 @@ public class ShShellInterceptorBuilder
     }
 
     @Override
-    public ShShellInterceptorBuilder k8sConfigYaml(String k8sConfigYaml) {
-        return null;
-    }
-
-    @Override
     public ShShellInterceptor build() throws IOException {
         generateShellScript();
         List<String> bootstrapCommand = generateBootstrapCommand();
