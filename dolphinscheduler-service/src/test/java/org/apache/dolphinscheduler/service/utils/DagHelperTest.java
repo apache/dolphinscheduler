@@ -345,7 +345,7 @@ public class DagHelperTest {
         taskInstance.setSwitchDependency(getSwitchNode());
         completeTaskList.put("1", taskInstance);
         DagHelper.skipTaskNode4Switch(dag.getNode("1"), skipTaskNodeList, completeTaskList, dag);
-        Assert.assertNotNull(skipTaskNodeList.get(2L));
+        Assert.assertNotNull(skipTaskNodeList.get("2"));
         Assert.assertEquals(1, skipTaskNodeList.size());
     }
     /**
