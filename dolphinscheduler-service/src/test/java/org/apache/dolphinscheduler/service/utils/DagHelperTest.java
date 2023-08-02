@@ -330,6 +330,24 @@ public class DagHelperTest {
         Assert.assertEquals(1, postNodes.size());
     }
 
+    @Test
+    public void testSwitchPostNode() throws IOException {
+        DAG<String, TaskNode, TaskNodeRelation> dag = generateDag2();
+        Map<String, TaskNode> skipTaskNodeList = new HashMap<>();
+        Map<String, TaskInstance> completeTaskList = new HashMap<>();
+        completeTaskList.put("0", new TaskInstance());
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setState(TaskExecutionStatus.SUCCESS);
+        taskInstance.setTaskCode(1);
+        Map<String, Object> taskParamsMap = new HashMap<>();
+        taskParamsMap.put(Constants.SWITCH_RESULT, "");
+        taskInstance.setTaskParams(JSONUtils.toJsonString(taskParamsMap));
+        taskInstance.setSwitchDependency(getSwitchNode());
+        completeTaskList.put("1", taskInstance);
+        DagHelper.skipTaskNode4Switch(dag.getNode("1"), skipTaskNodeList, completeTaskList, dag);
+        Assert.assertNotNull(skipTaskNodeList.get("2"));
+        Assert.assertEquals(1, skipTaskNodeList.size());
+    }
     /**
      * process:
      * 1->2->3->5->7
@@ -436,11 +454,13 @@ public class DagHelperTest {
 
     /**
      * DAG graph:
-     *    2
-     *    ↑
-     * 0->1(switch)
-     *    ↓
-     *    4
+     *           -> 2->
+     *         /        \
+     *      /               \
+     * 0->1(switch)->5          6
+     *      \               /
+     *        \         /
+     *          -> 4->
      *
      * @return dag
      * @throws JsonProcessingException if error throws JsonProcessingException
@@ -484,14 +504,25 @@ public class DagHelperTest {
         taskNodeList.add(node4);
 
         TaskNode node5 = new TaskNode();
-        node5.setId("4");
-        node5.setName("4");
-        node5.setCode(4);
+        node5.setId("5");
+        node5.setName("5");
+        node5.setCode(5);
         node5.setType("SHELL");
         List<String> dep5 = new ArrayList<>();
         dep5.add("1");
         node5.setPreTasks(JSONUtils.toJsonString(dep5));
         taskNodeList.add(node5);
+
+        TaskNode node6 = new TaskNode();
+        node5.setId("6");
+        node5.setName("6");
+        node5.setCode(6);
+        node5.setType("SHELL");
+        List<String> dep6 = new ArrayList<>();
+        dep5.add("2");
+        dep5.add("4");
+        node5.setPreTasks(JSONUtils.toJsonString(dep6));
+        taskNodeList.add(node6);
 
         List<String> startNodes = new ArrayList<>();
         List<String> recoveryNodes = new ArrayList<>();
@@ -518,7 +549,7 @@ public class DagHelperTest {
         conditionsParameters.setDependTaskList(list);
         conditionsParameters.setNextNode("5");
         conditionsParameters.setRelation("AND");
-
+        conditionsParameters.setResultConditionLocation(1);
         // in: AND(AND(1 is SUCCESS))
         return conditionsParameters;
     }
