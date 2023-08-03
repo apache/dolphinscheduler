@@ -94,7 +94,6 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
 
         if (compose != null) {
             Testcontainers.exposeHostPorts(compose.getServicePort(serviceName, DOCKER_PORT));
-//            Testcontainers.exposeHostPorts(12345);
             browser.withAccessToHost(true);
         }
         browser.start();
