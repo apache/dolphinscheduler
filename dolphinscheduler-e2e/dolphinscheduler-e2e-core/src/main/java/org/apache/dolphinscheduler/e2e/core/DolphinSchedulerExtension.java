@@ -208,8 +208,10 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
         compose = new DockerComposeContainer<>(files)
             .withPull(true)
             .withTailChildContainers(true)
+            .withLocalCompose(true)
             .withExposedService(serviceName, 12345, Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(300)))
-            .withLogConsumer(serviceName, outputFrame -> LOGGER.info(outputFrame.getUtf8String()));
+            .withLogConsumer(serviceName, outputFrame -> LOGGER.info(outputFrame.getUtf8String()))
+            .waitingFor(serviceName, Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(300)));
 
         return compose;
     }
