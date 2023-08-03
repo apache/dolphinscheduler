@@ -47,7 +47,6 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testcontainers.Testcontainers;
 import org.testcontainers.containers.BrowserWebDriverContainer;
 import org.testcontainers.containers.DockerComposeContainer;
-import org.testcontainers.containers.ComposeContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
 import org.testcontainers.utility.DockerImageName;
@@ -203,7 +202,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
                                        .map(URL::getPath)
                                        .map(File::new)
                                        .collect(Collectors.toList());
-        compose = new ComposeContainer<>(files)
+        compose = new DockerComposeContainer<>(files)
             .withPull(true)
             .withTailChildContainers(true)
             .withLocalCompose(true)
