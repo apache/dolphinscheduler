@@ -37,8 +37,8 @@ services:
         condition: service_healthy
   sqlserver:
     image: alexk002/sqlserver2019_demo:1
-    expose:
-      - 1433
+    ports:
+      - "1433:1433"
     networks:
       - e2e
     healthcheck:

@@ -208,7 +208,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
             .withPull(true)
             .withTailChildContainers(true)
             .withLocalCompose(true)
-            .withExposedService(serviceName, DOCKER_PORT)
+            .withExposedService(serviceName, DOCKER_PORT, Wait.forListeningPort().withStartupTimeout(Duration.ofSeconds(60)))
             .withLogConsumer(serviceName, outputFrame -> LOGGER.info(outputFrame.getUtf8String()))
             .waitingFor(serviceName, Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(300)));
 
