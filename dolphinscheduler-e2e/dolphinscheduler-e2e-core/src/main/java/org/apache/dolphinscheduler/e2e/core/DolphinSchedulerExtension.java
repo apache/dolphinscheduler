@@ -72,7 +72,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
 
     private Path record;
 
-    private final String serviceName = "dolphinscheduler";
+    private final String serviceName = "dolphinscheduler_1";
 
     @Override
     @SuppressWarnings("UnstableApiUsage")
@@ -209,7 +209,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
             .withPull(true)
             .withTailChildContainers(true)
             .withLocalCompose(true)
-            .withExposedService(serviceName, 12345, Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(300)))
+            .withExposedService(serviceName, 12345, Wait.forListeningPort().withStartupTimeout(Duration.ofSeconds(300)))
             .withLogConsumer(serviceName, outputFrame -> LOGGER.info(outputFrame.getUtf8String()))
             .waitingFor(serviceName, Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(300)));
 
