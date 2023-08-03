@@ -70,6 +70,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
     private DockerComposeContainer<?> compose;
     private BrowserWebDriverContainer<?> browser;
     private HostAndPort address;
+    
     private String rootPath;
 
     private Path record;
