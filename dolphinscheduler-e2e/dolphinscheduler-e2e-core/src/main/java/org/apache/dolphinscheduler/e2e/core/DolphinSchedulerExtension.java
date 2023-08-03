@@ -72,6 +72,8 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
 
     private Path record;
 
+    private final String serviceName = "dolphinscheduler";
+
     @Override
     @SuppressWarnings("UnstableApiUsage")
     public void beforeAll(ExtensionContext context) throws IOException {
@@ -89,7 +91,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
         setBrowserContainerByOsName();
 
         if (compose != null) {
-            Testcontainers.exposeHostPorts(compose.getServicePort("dolphinscheduler_1", 12345));
+            Testcontainers.exposeHostPorts(compose.getServicePort(serviceName, 12345));
 //            Testcontainers.exposeHostPorts(12345);
             browser.withAccessToHost(true);
         }
@@ -124,7 +126,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
         compose = createDockerCompose(context);
         compose.start();
 
-        address = HostAndPort.fromParts("host.testcontainers.internal", compose.getServicePort("dolphinscheduler_1", 12345));
+        address = HostAndPort.fromParts("host.testcontainers.internal", compose.getServicePort(serviceName, 12345));
 //        address = HostAndPort.fromParts("host.testcontainers.internal", 12345);
         rootPath = "/dolphinscheduler/ui/";
     }
@@ -206,8 +208,8 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
         compose = new DockerComposeContainer<>(files)
             .withPull(true)
             .withTailChildContainers(true)
-            .withExposedService("dolphinscheduler_1", 12345, Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(300)))
-            .withLogConsumer("dolphinscheduler_1", outputFrame -> LOGGER.info(outputFrame.getUtf8String()));
+            .withExposedService(serviceName, 12345, Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(300)))
+            .withLogConsumer(serviceName, outputFrame -> LOGGER.info(outputFrame.getUtf8String()));
 
         return compose;
     }
