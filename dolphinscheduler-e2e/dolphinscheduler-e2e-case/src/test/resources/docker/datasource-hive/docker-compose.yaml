@@ -32,6 +32,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 120
+      start_period: 60s
     depends_on:
       hive-server:
         condition: service_healthy
