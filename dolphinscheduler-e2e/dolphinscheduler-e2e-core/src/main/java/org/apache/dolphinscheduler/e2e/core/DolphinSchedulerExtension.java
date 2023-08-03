@@ -124,7 +124,8 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
         compose = createDockerCompose(context);
         compose.start();
 
-        address = HostAndPort.fromParts("host.testcontainers.internal", compose.getServicePort("dolphinscheduler_1", 12345));
+//        address = HostAndPort.fromParts("host.testcontainers.internal", compose.getServicePort("dolphinscheduler_1", 12345));
+        address = HostAndPort.fromParts("host.testcontainers.internal", 12345);
         rootPath = "/dolphinscheduler/ui/";
     }
 
