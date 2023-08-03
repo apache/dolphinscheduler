@@ -64,6 +64,8 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
 
     private final int LOCAL_PORT = 5173;
 
+    private final int DOCKER_PORT = 12345;
+
     private RemoteWebDriver driver;
     private DockerComposeContainer<?> compose;
     private BrowserWebDriverContainer<?> browser;
@@ -71,6 +73,8 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
     private String rootPath;
 
     private Path record;
+
+    private final String serviceName = "dolphinscheduler_1";
 
     @Override
     @SuppressWarnings("UnstableApiUsage")
@@ -89,7 +93,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
         setBrowserContainerByOsName();
 
         if (compose != null) {
-            Testcontainers.exposeHostPorts(compose.getServicePort("dolphinscheduler_1", 12345));
+            Testcontainers.exposeHostPorts(compose.getServicePort(serviceName, DOCKER_PORT));
             browser.withAccessToHost(true);
         }
         browser.start();
@@ -123,7 +127,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
         compose = createDockerCompose(context);
         compose.start();
 
-        address = HostAndPort.fromParts("host.testcontainers.internal", compose.getServicePort("dolphinscheduler_1", 12345));
+        address = HostAndPort.fromParts("host.testcontainers.internal", compose.getServicePort(serviceName, DOCKER_PORT));
         rootPath = "/dolphinscheduler/ui/";
     }
 
@@ -202,9 +206,10 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
         compose = new DockerComposeContainer<>(files)
             .withPull(true)
             .withTailChildContainers(true)
-            .withExposedService("dolphinscheduler_1", 12345)
-            .withLogConsumer("dolphinscheduler_1", outputFrame -> LOGGER.info(outputFrame.getUtf8String()))
-            .waitingFor("dolphinscheduler_1", Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(300)));
+            .withLocalCompose(true)
+            .withExposedService(serviceName, DOCKER_PORT, Wait.forListeningPort().withStartupTimeout(Duration.ofSeconds(300)))
+            .withLogConsumer(serviceName, outputFrame -> LOGGER.info(outputFrame.getUtf8String()))
+            .waitingFor(serviceName, Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(300)));
 
         return compose;
     }
