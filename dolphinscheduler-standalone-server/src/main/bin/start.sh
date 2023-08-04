@@ -42,11 +42,9 @@ fi
 
 CP=""
 for d in $DOLPHINSCHEDULER_HOME/libs/*; do
-  for f in $d/*.jar; do
-    CP=$CP:$f
-  done
+  CP=$CP:"$d/*"
 done
 
 $JAVA_HOME/bin/java $JAVA_OPTS \
-  -cp "$DOLPHINSCHEDULER_HOME/conf":"$CP" \
+  -cp "$DOLPHINSCHEDULER_HOME/conf""$CP" \
   org.apache.dolphinscheduler.StandaloneServer
