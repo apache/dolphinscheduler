@@ -1,13 +1,14 @@
 package org.apache.dolphinscheduler.remote.command.listener;
 
+import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
 import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.RequestMessageBuilder;
-
-import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 /**
  * @author wxn
@@ -21,7 +22,7 @@ public class UpdateListenerPluginInstanceRequest implements RequestMessageBuilde
     private int instanceId;
     private String instanceName;
     private String pluginInstanceParams;
-    private List<Integer> eventTypes;
+    private List<ListenerEventType> eventTypes;
 
     @Override
     public MessageType getCommandType() {

@@ -138,6 +138,28 @@ export default {
         showSide: true,
         auth: ['ADMIN_USER']
       }
+    },
+    {
+      path: '/security/listener-plugin-manage',
+      name: 'listener-plugin-manage',
+      component: components['security-listener-plugin-manage'],
+      meta: {
+        title: '监听插件管理',
+        activeMenu: 'security',
+        showSide: true,
+        auth: ['ADMIN_USER']
+      }
+    },
+    {
+      path: '/security/listener-instance-manage',
+      name: 'listener-instance-manage',
+      component: components['security-listener-instance-manage'],
+      meta: {
+        title: '监听实例管理',
+        activeMenu: 'security',
+        showSide: true,
+        auth: ['ADMIN_USER']
+      }
     }
   ]
 }

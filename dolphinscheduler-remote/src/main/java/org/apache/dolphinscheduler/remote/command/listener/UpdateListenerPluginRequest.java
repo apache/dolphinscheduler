@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 public class UpdateListenerPluginRequest implements RequestMessageBuilder {
 
     private int pluginId;
+    private String fileName;
     private String classPath;
     private byte[] pluginJar;
 

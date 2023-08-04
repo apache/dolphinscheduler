@@ -40,8 +40,8 @@ public class ListenerPluginInstance {
     /**
      * listener_event_type
      */
-    @TableField("listener_event_type")
-    private String listenerEventType;
+    @TableField("listener_event_types")
+    private String listenerEventTypes;
 
     /**
      * create_time

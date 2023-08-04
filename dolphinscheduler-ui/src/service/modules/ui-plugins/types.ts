@@ -16,7 +16,7 @@
  */
 
 interface PluginTypeReq {
-  pluginType: 'ALERT' | 'REGISTER' | 'TASK'
+  pluginType: 'ALERT' | 'REGISTER' | 'TASK' | 'LISTENER'
 }
 
 type IPluginId = number

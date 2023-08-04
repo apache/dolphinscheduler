@@ -306,6 +306,16 @@ export function useDataList() {
                   icon: renderIcon(InfoCircleOutlined)
                 },
                 {
+                  label: t('menu.listener_plugin_manage'),
+                  key: '/security/listener-plugin-manage',
+                  icon: renderIcon(InfoCircleOutlined)
+                },
+                {
+                  label: t('menu.listener_instance_manage'),
+                  key: '/security/listener-instance-manage',
+                  icon: renderIcon(InfoCircleOutlined)
+                },
+                {
                   label: t('menu.worker_group_manage'),
                   key: '/security/worker-group-manage',
                   icon: renderIcon(ControlOutlined)

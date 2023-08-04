@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RegisterListenerPluginRequest implements RequestMessageBuilder {
+    private String fileName;
 
     private String classPath;
 

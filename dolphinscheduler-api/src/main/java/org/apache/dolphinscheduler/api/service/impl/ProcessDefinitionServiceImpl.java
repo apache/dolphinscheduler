@@ -294,11 +294,11 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         if (result.get(Constants.STATUS) == Status.SUCCESS){
             LambdaQueryWrapper<ListenerPluginInstance> queryWrapper = new LambdaQueryWrapper<>();
             // TODO:
-            queryWrapper.select(ListenerPluginInstance::getId, ListenerPluginInstance::getListenerEventType);
+            queryWrapper.select(ListenerPluginInstance::getId, ListenerPluginInstance::getListenerEventTypes);
             List<ListenerPluginInstance> listenerPluginInstances =
                     listenerPluginInstanceMapper.selectList(queryWrapper)
                             .stream()
-                            .filter(x -> Arrays.stream(x.getListenerEventType().split(","))
+                            .filter(x -> Arrays.stream(x.getListenerEventTypes().split(","))
                                     .map(Integer::parseInt).collect(toSet())
                                     .contains(ListenerEventType.WORKFLOW_ADDED.getCode()))
                             .collect(Collectors.toList());

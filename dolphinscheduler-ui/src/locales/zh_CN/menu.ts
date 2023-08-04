@@ -49,6 +49,8 @@ export default {
   user_manage: '用户管理',
   alarm_group_manage: '告警组管理',
   alarm_instance_manage: '告警实例管理',
+  listener_plugin_manage: '监听器插件管理',
+  listener_instance_manage: '监听器实例管理',
   worker_group_manage: 'Worker分组管理',
   yarn_queue_manage: 'Yarn队列管理',
   environment_manage: '环境管理',

@@ -1,5 +1,6 @@
 package org.apache.dolphinscheduler.remote.command.listener;
 
+import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
 import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.remote.command.RequestMessageBuilder;
 
@@ -21,7 +22,7 @@ public class CreateListenerPluginInstanceRequest implements RequestMessageBuilde
     private int pluginDefineId;
     private String instanceName;
     private String pluginInstanceParams;
-    private List<Integer> eventTypes;
+    private List<ListenerEventType> eventTypes;
 
     @Override
     public MessageType getCommandType() {

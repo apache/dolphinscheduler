@@ -1,8 +1,10 @@
 package org.apache.dolphinscheduler.listener.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
 import lombok.Getter;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author wxn
@@ -29,13 +31,30 @@ public enum ListenerEventType {
     TASK_END(12, "TASK_END"),
     TASK_FAIL(13, "TASK_FAIL");
 
-    ListenerEventType(int code, String descp) {
-        this.code = code;
-        this.descp = descp;
+    private static final Map<Integer, ListenerEventType> CODE_MAP = new HashMap<>();
+
+    static {
+        for (ListenerEventType listenerEventType : ListenerEventType.values()) {
+            CODE_MAP.put(listenerEventType.getCode(), listenerEventType);
+        }
     }
 
     @EnumValue
     private final int code;
     private final String descp;
+
+    ListenerEventType(int code, String descp) {
+        this.code = code;
+        this.descp = descp;
+    }
+
+    public static ListenerEventType of(int code) {
+        ListenerEventType listenerEventType = CODE_MAP.get(code);
+        if (listenerEventType == null) {
+            throw new IllegalArgumentException(String.format("The task execution status code: %s is invalidated",
+                    code));
+        }
+        return listenerEventType;
+    }
 
 }

@@ -2138,7 +2138,7 @@ CREATE TABLE `t_ds_listener_plugin_instance`  (
       `instance_name` varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT 'alert instance name',
       `plugin_define_id` int(11) NOT NULL,
       `plugin_instance_params` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT 'plugin instance params. Also contain the params value which user input in web ui.',
-      `listener_event_type` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL,
+      `listener_event_types` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL,
       `create_time` timestamp(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
       `update_time` timestamp(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0),
       PRIMARY KEY (`id`) USING BTREE

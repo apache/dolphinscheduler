@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.dao.entity;
 
 import java.util.Date;
+import java.util.Objects;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -84,6 +85,9 @@ public class PluginDefine {
     @TableField("update_time")
     private Date updateTime;
 
+    @TableField(exist = false)
+    private String originalFileName;
+
     public PluginDefine(String pluginName, String pluginType, String pluginParams) {
         this.pluginName = pluginName;
         this.pluginType = pluginType;
@@ -101,5 +105,13 @@ public class PluginDefine {
         this.pluginClassName = pluginClassName;
         this.createTime = new Date();
         this.updateTime = new Date();
+    }
+
+    public void setPluginLocation(String pluginLocation) {
+        this.pluginLocation = pluginLocation;
+        if (Objects.nonNull(pluginLocation)){
+            String[] split = pluginLocation.split("/");
+            this.originalFileName = split[split.length - 1].split("@")[0] + ".jar";
+        }
     }
 }

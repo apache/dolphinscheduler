@@ -51,6 +51,10 @@
             <artifactId>dolphinscheduler-task-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-listener</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
         </dependency>

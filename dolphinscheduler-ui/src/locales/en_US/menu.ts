@@ -48,6 +48,8 @@ export default {
   user_manage: 'User Manage',
   alarm_group_manage: 'Alarm Group Manage',
   alarm_instance_manage: 'Alarm Instance Manage',
+  listener_plugin_manage: 'Listener Plugin Manage',
+  listener_instance_manage: 'Listener Instance Manage',
   worker_group_manage: 'Worker Group Manage',
   yarn_queue_manage: 'Yarn Queue Manage',
   environment_manage: 'Environment Manage',

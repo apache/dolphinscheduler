@@ -1,6 +1,8 @@
 package org.apache.dolphinscheduler.listener.service;
 
+import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.listener.enums.ListenerEventPostServiceStatus;
+import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
 import org.apache.dolphinscheduler.listener.plugin.ListenerPlugin;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ListenerEvent;
@@ -21,6 +23,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -114,9 +117,10 @@ public class ListenerPluginService implements ApplicationContextAware, Applicati
         }
     }
 
-    public ListenerResponse registerListenerPlugin(String classPath, byte[] pluginJar) {
-        String fileName = String.format("%s.jar", UUID.randomUUID());
+    public ListenerResponse registerListenerPlugin(String originalFileName, String classPath, byte[] pluginJar) {
+        String fileName = String.format("%s@%s.jar", originalFileName,UUID.randomUUID());
         String filePath = path + fileName;
+        boolean success = true;
         try {
             File dest = new File(filePath);
             Files.write(dest.toPath(), pluginJar);
@@ -133,18 +137,25 @@ public class ListenerPluginService implements ApplicationContextAware, Applicati
             pluginDefineMapper.insert(pluginDefine);
             listenerPlugins.put(pluginDefine.getId(), plugin);
         } catch (IOException e) {
+            success = false;
             log.error(e.getMessage(), e);
             return ListenerResponse.fail("failed when upload jar：" + e.getMessage());
         } catch (ClassNotFoundException e) {
+            success = false;
             log.error(e.getMessage(), e);
             return ListenerResponse.fail("cannot load class：" + e.getMessage());
         } catch (Exception e) {
+            success = false;
             return ListenerResponse.fail("failed when register listener plugin：" + e.getMessage());
+        }finally {
+            if (!success){
+                FileUtils.deleteFile(filePath);
+            }
         }
         return ListenerResponse.success();
     }
 
-    public ListenerResponse updateListenerPlugin(int id, String classPath, byte[] pluginJar) {
+    public ListenerResponse updateListenerPlugin(int id, String originalFileName, String classPath, byte[] pluginJar) {
         if (!listenerPlugins.containsKey(id)) {
             return ListenerResponse.fail(String.format("listener plugin %d not exist in concurrent hash map", id));
         }
@@ -167,7 +178,7 @@ public class ListenerPluginService implements ApplicationContextAware, Applicati
             classLoaderUtil.removeJarFile(plugin.getPluginLocation());
             defaultListableBeanFactory.removeBeanDefinition(plugin.getPluginClassName());
             // 安装新的plugin
-            String fileName = String.format("%s.jar", UUID.randomUUID());
+            String fileName = String.format("%s@%s.jar", originalFileName,UUID.randomUUID());
             String filePath = path + fileName;
             File dest = new File(filePath);
             Files.write(dest.toPath(), pluginJar);
@@ -229,7 +240,7 @@ public class ListenerPluginService implements ApplicationContextAware, Applicati
 
     @Transactional
     public ListenerResponse createListenerInstance(int pluginDefineId, String instanceName, String pluginInstanceParams,
-                                                   List<Integer> listenerEventTypes) {
+                                                   List<ListenerEventType> listenerEventTypes) {
         if (!listenerPlugins.containsKey(pluginDefineId)) {
             return ListenerResponse.fail(
                     String.format("failed when register listener instance %s because listener plugin %d cannot loaded",
@@ -240,7 +251,7 @@ public class ListenerPluginService implements ApplicationContextAware, Applicati
         listenerPluginInstance.setInstanceName(instanceName);
         listenerPluginInstance.setPluginInstanceParams(paramsMapJson);
         listenerPluginInstance.setPluginDefineId(pluginDefineId);
-        listenerPluginInstance.setListenerEventType(StringUtils.join(listenerEventTypes, ","));
+        listenerPluginInstance.setListenerEventTypes(StringUtils.join(listenerEventTypes.stream().map(ListenerEventType::getCode).collect(Collectors.toSet()), ","));
         pluginInstanceMapper.insert(listenerPluginInstance);
         ListenerInstancePostService listenerInstancePostService = new ListenerInstancePostService(
                 listenerPlugins.get(pluginDefineId), listenerPluginInstance, listenerEventMapper);
@@ -250,7 +261,7 @@ public class ListenerPluginService implements ApplicationContextAware, Applicati
     }
 
     public ListenerResponse updateListenerInstance(int instanceId, String instanceName, String pluginInstanceParams,
-                                                   List<Integer> listenerEventTypes) {
+                                                   List<ListenerEventType> listenerEventTypes) {
         if (!listenerInstancePostServices.containsKey(instanceId)) {
             return ListenerResponse.fail(String.format(
                     "failed when update listener instance %s because listener instance %d not exist in map",
@@ -262,7 +273,7 @@ public class ListenerPluginService implements ApplicationContextAware, Applicati
         listenerPluginInstance.setId(instanceId);
         listenerPluginInstance.setInstanceName(instanceName);
         listenerPluginInstance.setPluginInstanceParams(pluginInstanceParams);
-        listenerPluginInstance.setListenerEventType(StringUtils.join(listenerEventTypes, ","));
+        listenerPluginInstance.setListenerEventTypes(StringUtils.join(listenerEventTypes.stream().map(ListenerEventType::getCode).collect(Collectors.toSet()), ","));
         listenerPluginInstance.setUpdateTime(new Date());
         pluginInstanceMapper.updateById(listenerPluginInstance);
         instancePostService.updateListenerPluginInstance(listenerPluginInstance);
