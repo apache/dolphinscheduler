@@ -20,15 +20,18 @@ package org.apache.dolphinscheduler.server.master.utils;
 import static org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters.DependentFailurePolicyEnum.DEPENDENT_FAILURE_WAITING;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependentRelation;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.DateInterval;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.DependentUtils;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
@@ -40,6 +43,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -71,6 +76,14 @@ public class DependentExecute {
      * depend result map
      */
     private Map<String, DependResult> dependResultMap = new HashMap<>();
+
+    private Map<String, Property> dependTaskVarPoolPropertyMap = new HashMap<>();
+
+    private Map<String, Long> dependTaskVarPoolEndTimeMap = new HashMap<>();
+
+    private Map<String, Property> dependItemVarPoolPropertyMap = new HashMap<>();
+
+    private Map<String, Long> dependItemVarPoolEndTimeMap = new HashMap<>();
 
     /**
      * constructor
@@ -140,6 +153,7 @@ public class DependentExecute {
             return DependResult.WAITING;
         }
         if (processInstance.getState().isSuccess()) {
+            addItemVarPool(processInstance.getVarPool(), processInstance.getEndTime().getTime());
             return DependResult.SUCCESS;
         }
         return DependResult.FAILED;
@@ -174,10 +188,29 @@ public class DependentExecute {
                 return DependResult.WAITING;
             }
         } else {
+            addItemVarPool(taskInstance.getVarPool(), taskInstance.getEndTime().getTime());
             result = getDependResultByState(taskInstance.getState());
         }
 
         return result;
+    }
+
+    /**
+     * add varPool to dependItemVarPoolMap
+     *
+     * @param varPoolStr
+     * @param endTime
+     */
+    private void addItemVarPool(String varPoolStr, Long endTime) {
+        List<Property> varPool = new ArrayList<>(JSONUtils.toList(varPoolStr, Property.class));
+        if (!varPool.isEmpty()){
+            Map<String, Property> varPoolPropertyMap = varPool.stream().filter(p -> p.getDirect().equals(Direct.OUT))
+                    .collect(Collectors.toMap(Property::getProp, Function.identity()));
+            Map<String, Long> varPoolEndTimeMap = varPool.stream().filter(p -> p.getDirect().equals(Direct.OUT))
+                    .collect(Collectors.toMap(Property::getProp, d -> endTime));
+            dependItemVarPoolPropertyMap.putAll(varPoolPropertyMap);
+            dependItemVarPoolEndTimeMap.putAll(varPoolEndTimeMap);
+        }
     }
 
     /**
@@ -267,10 +300,50 @@ public class DependentExecute {
             DependResult dependResult = getDependResultForItem(dependentItem, currentTime, testFlag);
             if (dependResult != DependResult.WAITING && dependResult != DependResult.FAILED) {
                 dependResultMap.put(dependentItem.getKey(), dependResult);
+                mergeVarPool(dependentItem);
             }
+            dependItemVarPoolPropertyMap.clear();
+            dependItemVarPoolEndTimeMap.clear();
             dependResultList.add(dependResult);
         }
         return DependentUtils.getDependResultForRelation(this.relation, dependResultList);
+    }
+
+    /**
+     * add varPool of dependentItem to dependTaskVarPoolMap
+     *
+     * @param dependentItem
+     * @return
+     */
+    private void mergeVarPool(DependentItem dependentItem) {
+        log.info("dependItemVarPoolPropertyMap:{}, dependTaskVarPoolPropertyMap:{}",
+                dependItemVarPoolPropertyMap.toString(), dependTaskVarPoolPropertyMap.toString());
+        if (dependentItem.getParameterPassing() && !dependItemVarPoolPropertyMap.isEmpty()) {
+            addTaskVarPool(dependItemVarPoolPropertyMap, dependItemVarPoolEndTimeMap, dependTaskVarPoolPropertyMap, dependTaskVarPoolEndTimeMap);
+        }
+    }
+
+    /**
+     * add varPool from dependItemVarPoolMap to dependTaskVarPoolMap
+     *
+     * @param dependItemVarPoolPropertyMap dependItemVarPoolPropertyMap
+     * @param dependItemVarPoolEndTimeMap dependItemVarPoolEndTimeMap
+     * @param dependTaskVarPoolPropertyMap dependTaskVarPoolPropertyMap
+     * @param dependTaskVarPoolEndTimeMap dependTaskVarPoolEndTimeMap
+     */
+    public static void addTaskVarPool(Map<String, Property> dependItemVarPoolPropertyMap, Map<String, Long> dependItemVarPoolEndTimeMap, Map<String, Property> dependTaskVarPoolPropertyMap, Map<String, Long> dependTaskVarPoolEndTimeMap) {
+        dependItemVarPoolPropertyMap.forEach((prop, property) -> {
+            Long itemEndTime = dependItemVarPoolEndTimeMap.get(prop);
+            if (dependTaskVarPoolPropertyMap.containsKey(prop)) {
+                if (itemEndTime < dependTaskVarPoolEndTimeMap.get(prop)) {
+                    dependTaskVarPoolPropertyMap.put(prop, property);
+                    dependTaskVarPoolEndTimeMap.put(prop, itemEndTime);
+                }
+            } else {
+                dependTaskVarPoolPropertyMap.put(prop, property);
+                dependTaskVarPoolEndTimeMap.put(prop, itemEndTime);
+            }
+        });
     }
 
     /**
@@ -290,6 +363,14 @@ public class DependentExecute {
 
     public Map<String, DependResult> getDependResultMap() {
         return dependResultMap;
+    }
+
+    public Map<String, Property> getDependTaskVarPoolPropertyMap() {
+        return dependTaskVarPoolPropertyMap;
+    }
+
+    public Map<String, Long> getDependTaskVarPoolEndTimeMap() {
+        return dependTaskVarPoolEndTimeMap;
     }
 
     /**

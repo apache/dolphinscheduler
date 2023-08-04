@@ -27,6 +27,8 @@ Dependent 节点，就是**依赖检查节点**。比如 A 流程依赖昨天的
 
 Dependent 节点提供了逻辑判断功能，可以按照逻辑来检测所依赖节点的执行情况。
 
+当 Dependent 节点结果为 success 且参数传递选项为 true 时，Dependent 节点会将该依赖项的输出参数输出给下游任务。当多个依赖项的参数名称相同时涉及到参数的优先级问题，详见[参数优先级](../parameter/priority.md)
+
 例如，A 流程为周报任务，B、C 流程为天任务，A 任务需要 B、C 任务在上周的每一天都执行成功，如图示：
 
 ![dependent_task01](../../../../img/tasks/demo/dependent_task01.png)

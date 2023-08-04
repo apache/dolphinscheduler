@@ -99,6 +99,7 @@ interface IDependentItem {
   definitionCode?: number
   cycle?: 'month' | 'week' | 'day' | 'hour'
   dateValue?: string
+  parameterPassing?: boolean
 }
 
 interface IDependTask {
