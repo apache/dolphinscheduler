@@ -203,7 +203,7 @@ public class DependentExecute {
      */
     private void addItemVarPool(String varPoolStr, Long endTime) {
         List<Property> varPool = new ArrayList<>(JSONUtils.toList(varPoolStr, Property.class));
-        if (!varPool.isEmpty()){
+        if (!varPool.isEmpty()) {
             Map<String, Property> varPoolPropertyMap = varPool.stream().filter(p -> p.getDirect().equals(Direct.OUT))
                     .collect(Collectors.toMap(Property::getProp, Function.identity()));
             Map<String, Long> varPoolEndTimeMap = varPool.stream().filter(p -> p.getDirect().equals(Direct.OUT))
@@ -319,7 +319,8 @@ public class DependentExecute {
         log.info("dependItemVarPoolPropertyMap:{}, dependTaskVarPoolPropertyMap:{}",
                 dependItemVarPoolPropertyMap.toString(), dependTaskVarPoolPropertyMap.toString());
         if (dependentItem.getParameterPassing() && !dependItemVarPoolPropertyMap.isEmpty()) {
-            addTaskVarPool(dependItemVarPoolPropertyMap, dependItemVarPoolEndTimeMap, dependTaskVarPoolPropertyMap, dependTaskVarPoolEndTimeMap);
+            addTaskVarPool(dependItemVarPoolPropertyMap, dependItemVarPoolEndTimeMap, dependTaskVarPoolPropertyMap,
+                    dependTaskVarPoolEndTimeMap);
         }
     }
 
@@ -331,7 +332,10 @@ public class DependentExecute {
      * @param dependTaskVarPoolPropertyMap dependTaskVarPoolPropertyMap
      * @param dependTaskVarPoolEndTimeMap dependTaskVarPoolEndTimeMap
      */
-    public static void addTaskVarPool(Map<String, Property> dependItemVarPoolPropertyMap, Map<String, Long> dependItemVarPoolEndTimeMap, Map<String, Property> dependTaskVarPoolPropertyMap, Map<String, Long> dependTaskVarPoolEndTimeMap) {
+    public static void addTaskVarPool(Map<String, Property> dependItemVarPoolPropertyMap,
+                                      Map<String, Long> dependItemVarPoolEndTimeMap,
+                                      Map<String, Property> dependTaskVarPoolPropertyMap,
+                                      Map<String, Long> dependTaskVarPoolEndTimeMap) {
         dependItemVarPoolPropertyMap.forEach((prop, property) -> {
             Long itemEndTime = dependItemVarPoolEndTimeMap.get(prop);
             if (dependTaskVarPoolPropertyMap.containsKey(prop)) {
