@@ -77,7 +77,7 @@ public class ProcessUtilsTest {
             command3 = String.format("%s -p %d", TaskConstants.PSTREE, processId3);
         }
         osUtilsMockedStatic.when(() -> OSUtils.exeCmd(command3)).thenReturn(pids3);
-        String actualPidsStr3 = ProcessUtils.getPidsStr(processId2);
+        String actualPidsStr3 = ProcessUtils.getPidsStr(processId3);
         Assertions.assertEquals(exceptPidsStr3, actualPidsStr3);
     }
 
