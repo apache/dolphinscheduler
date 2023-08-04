@@ -90,6 +90,8 @@ import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
 import org.apache.dolphinscheduler.listener.event.DsListenerWorkflowAddedEvent;
+import org.apache.dolphinscheduler.listener.event.DsListenerWorkflowRemovedEvent;
+import org.apache.dolphinscheduler.listener.event.DsListenerWorkflowUpdateEvent;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.SqlType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
@@ -229,12 +231,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     @Autowired
     private MetricsCleanUpService metricsCleanUpService;
 
-    @Autowired
-    private ListenerPluginInstanceMapper listenerPluginInstanceMapper;
-
-    @Autowired
-    private ListenerEventMapper listenerEventMapper;
-
     /**
      * create process definition
      *
@@ -290,33 +286,19 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                         globalParams, locations, timeout, loginUser.getId());
         processDefinition.setExecutionType(executionType);
         result = createDagDefine(loginUser, taskRelationList, processDefinition, taskDefinitionLogs, otherParamsJson);
-        //TODO: duplicated code here
         if (result.get(Constants.STATUS) == Status.SUCCESS){
-            LambdaQueryWrapper<ListenerPluginInstance> queryWrapper = new LambdaQueryWrapper<>();
-            // TODO:
-            queryWrapper.select(ListenerPluginInstance::getId, ListenerPluginInstance::getListenerEventTypes);
-            List<ListenerPluginInstance> listenerPluginInstances =
-                    listenerPluginInstanceMapper.selectList(queryWrapper)
-                            .stream()
-                            .filter(x -> Arrays.stream(x.getListenerEventTypes().split(","))
-                                    .map(Integer::parseInt).collect(toSet())
-                                    .contains(ListenerEventType.WORKFLOW_ADDED.getCode()))
-                            .collect(Collectors.toList());
-            if (!listenerPluginInstances.isEmpty()) {
-                DsListenerWorkflowAddedEvent workflowAddedEvent = new DsListenerWorkflowAddedEvent();
-                workflowAddedEvent.setProjectCode(projectCode);
-                workflowAddedEvent.setProcessDefinitionCode(processDefinitionCode);
-                String content = JSONUtils.toJsonString(workflowAddedEvent);
-                List<ListenerEvent> events = Lists.newArrayListWithExpectedSize(listenerPluginInstances.size());
-                for (ListenerPluginInstance instance: listenerPluginInstances){
-                    ListenerEvent event = new ListenerEvent();
-                    event.setContent(content);
-                    event.setSign("xxx");
-                    event.setEventType(ListenerEventType.WORKFLOW_ADDED);
-                    event.setPluginInstanceId(instance.getId());
-                    events.add(event);
-                }
-                listenerEventMapper.batchInsert(events);
+            List<ListenerPluginInstance> instances =
+                    needSendListenerEvent(ListenerEventType.WORKFLOW_ADDED);
+            if (CollectionUtils.isNotEmpty(instances)){
+                DsListenerWorkflowAddedEvent event = new DsListenerWorkflowAddedEvent();
+                event.setProjectId(project.getId());
+                event.setProjectCode(projectCode);
+                event.setProjectName(project.getName());
+                event.setOwner(loginUser.getUserName());
+                event.setProcessId(processDefinition.getId());
+                event.setProcessDefinitionCode(processDefinitionCode);
+                event.setProcessName(name);
+                sendListenerEvent(ListenerEventType.WORKFLOW_ADDED, event, instances);
             }
         }
         return result;
@@ -818,8 +800,25 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 JSONUtils.parseObject(JSONUtils.toJsonString(processDefinition), ProcessDefinition.class);
         processDefinition.set(projectCode, name, description, globalParams, locations, timeout);
         processDefinition.setExecutionType(executionType);
-        return updateDagDefine(loginUser, taskRelationList, processDefinition, processDefinitionDeepCopy,
+        result = updateDagDefine(loginUser, taskRelationList, processDefinition, processDefinitionDeepCopy,
                 taskDefinitionLogs, otherParamsJson);
+        // TODO: 封装逻辑待讨论
+        if (result.get(Constants.STATUS) == Status.SUCCESS){
+            List<ListenerPluginInstance> instances =
+                    needSendListenerEvent(ListenerEventType.WORKFLOW_UPDATE);
+            if (CollectionUtils.isNotEmpty(instances)){
+                DsListenerWorkflowUpdateEvent event = new DsListenerWorkflowUpdateEvent();
+                event.setProjectId(project.getId());
+                event.setProjectCode(projectCode);
+                event.setProjectName(project.getName());
+                event.setOwner(loginUser.getUserName());
+                event.setProcessId(processDefinition.getId());
+                event.setProcessDefinitionCode(processDefinition.getCode());
+                event.setProcessName(name);
+                sendListenerEvent(ListenerEventType.WORKFLOW_UPDATE, event, instances);
+            }
+        }
+        return result;
     }
 
     /**
@@ -1084,6 +1083,21 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         processDefinitionDao.deleteByWorkflowDefinitionCode(processDefinition.getCode());
         metricsCleanUpService.cleanUpWorkflowMetricsByDefinitionCode(String.valueOf(code));
         log.info("Success delete workflow definition workflowDefinitionCode: {}", code);
+
+        List<ListenerPluginInstance> instances =
+                needSendListenerEvent(ListenerEventType.WORKFLOW_REMOVED);
+        if (CollectionUtils.isNotEmpty(instances)){
+            DsListenerWorkflowRemovedEvent event = new DsListenerWorkflowRemovedEvent();
+            event.setProjectId(project.getId());
+            event.setProjectCode(project.getCode());
+            event.setProjectName(project.getName());
+            event.setOwner(loginUser.getUserName());
+            event.setProcessId(processDefinition.getId());
+            event.setProcessDefinitionCode(processDefinition.getCode());
+            event.setProcessName(processDefinition.getName());
+            sendListenerEvent(ListenerEventType.WORKFLOW_REMOVED, event, instances);
+        }
+
     }
 
     /**

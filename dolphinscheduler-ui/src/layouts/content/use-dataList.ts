@@ -37,6 +37,8 @@ import {
   UserAddOutlined,
   WarningOutlined,
   InfoCircleOutlined,
+  UpSquareOutlined,
+  NotificationOutlined,
   ControlOutlined,
   SlackOutlined,
   EnvironmentOutlined,
@@ -308,12 +310,12 @@ export function useDataList() {
                 {
                   label: t('menu.listener_plugin_manage'),
                   key: '/security/listener-plugin-manage',
-                  icon: renderIcon(InfoCircleOutlined)
+                  icon: renderIcon(UpSquareOutlined)
                 },
                 {
                   label: t('menu.listener_instance_manage'),
                   key: '/security/listener-instance-manage',
-                  icon: renderIcon(InfoCircleOutlined)
+                  icon: renderIcon(NotificationOutlined)
                 },
                 {
                   label: t('menu.worker_group_manage'),

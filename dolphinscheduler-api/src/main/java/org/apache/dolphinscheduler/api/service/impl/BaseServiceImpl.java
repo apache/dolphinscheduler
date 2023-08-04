@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.google.common.collect.Lists;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
@@ -26,20 +28,28 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.entity.ListenerEvent;
+import org.apache.dolphinscheduler.dao.entity.ListenerPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.MessageFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.dolphinscheduler.dao.mapper.ListenerEventMapper;
+import org.apache.dolphinscheduler.dao.mapper.ListenerPluginInstanceMapper;
+import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
+import org.apache.dolphinscheduler.listener.event.DsListenerEvent;
+import org.apache.dolphinscheduler.listener.event.DsListenerWorkflowAddedEvent;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import static java.util.stream.Collectors.toSet;
 
 /**
  * base service impl
@@ -49,6 +59,12 @@ public class BaseServiceImpl implements BaseService {
 
     @Autowired
     protected ResourcePermissionCheckService resourcePermissionCheckService;
+
+    @Autowired
+    private ListenerPluginInstanceMapper listenerPluginInstanceMapper;
+
+    @Autowired
+    private ListenerEventMapper listenerEventMapper;
 
     @Override
     public void permissionPostHandle(AuthorizationType authorizationType, Integer userId, List<Integer> ids,
@@ -204,4 +220,33 @@ public class BaseServiceImpl implements BaseService {
     public boolean checkDescriptionLength(String description) {
         return description != null && description.codePointCount(0, description.length()) > 255;
     }
+
+    @Override
+    public void sendListenerEvent(ListenerEventType listenerEventType, DsListenerEvent listenerEvent, List<ListenerPluginInstance> listenerPluginInstances) {
+        String content = JSONUtils.toJsonString(listenerEvent);
+        List<ListenerEvent> events = Lists.newArrayListWithExpectedSize(listenerPluginInstances.size());
+        for (ListenerPluginInstance instance: listenerPluginInstances){
+            ListenerEvent event = new ListenerEvent();
+            event.setContent(content);
+            event.setEventType(listenerEventType);
+            event.setPluginInstanceId(instance.getId());
+            events.add(event);
+        }
+        listenerEventMapper.batchInsert(events);
+    }
+
+    @Override
+    public List<ListenerPluginInstance> needSendListenerEvent(ListenerEventType listenerEventType) {
+        LambdaQueryWrapper<ListenerPluginInstance> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.select(ListenerPluginInstance::getId, ListenerPluginInstance::getListenerEventTypes);
+        List<ListenerPluginInstance> listenerPluginInstances =
+                listenerPluginInstanceMapper.selectList(queryWrapper)
+                        .stream()
+                        .filter(x -> Arrays.stream(x.getListenerEventTypes().split(","))
+                                .map(Integer::parseInt).collect(toSet())
+                                .contains(listenerEventType.getCode()))
+                        .collect(Collectors.toList());
+        return listenerPluginInstances;
+    }
+
 }

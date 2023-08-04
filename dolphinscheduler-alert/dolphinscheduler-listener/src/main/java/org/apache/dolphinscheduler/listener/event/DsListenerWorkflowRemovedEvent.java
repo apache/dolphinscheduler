@@ -40,40 +40,4 @@ public class DsListenerWorkflowRemovedEvent extends DsListenerEvent {
     private Long processDefinitionCode;
     @JsonProperty("processName")
     private String processName;
-    @JsonProperty("processType")
-    private CommandType processType;
-    @JsonProperty("processState")
-    private WorkflowExecutionStatus processState;
-    @JsonProperty("recovery")
-    private Flag recovery;
-    @JsonProperty("runTimes")
-    private Integer runTimes;
-    @JsonProperty("processStartTime")
-    private Date processStartTime;
-    @JsonProperty("processEndTime")
-    private Date processEndTime;
-    @JsonProperty("processHost")
-    private String processHost;
-    @JsonProperty("taskCode")
-    private Long taskCode;
-    @JsonProperty("taskName")
-    private String taskName;
-    @JsonProperty("event")
-    private AlertEvent event;
-    @JsonProperty("warnLevel")
-    private AlertWarnLevel warnLevel;
-    @JsonProperty("taskType")
-    private String taskType;
-    @JsonProperty("retryTimes")
-    private Integer retryTimes;
-    @JsonProperty("taskState")
-    private TaskExecutionStatus taskState;
-    @JsonProperty("taskStartTime")
-    private Date taskStartTime;
-    @JsonProperty("taskEndTime")
-    private Date taskEndTime;
-    @JsonProperty("taskHost")
-    private String taskHost;
-    @JsonProperty("logPath")
-    private String logPath;
 }
