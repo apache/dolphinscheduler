@@ -303,6 +303,7 @@ public class ProcessServiceImpl implements ProcessService {
     @Autowired
     private TriggerRelationService triggerRelationService;
     /**
+     * todo: split this method
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
      *
      * @param host    host
@@ -311,8 +312,8 @@ public class ProcessServiceImpl implements ProcessService {
      */
     @Override
     @Transactional
-    public ProcessInstance handleCommand(String host,
-                                         Command command) throws CronParseException, CodeGenerateException {
+    public @Nullable ProcessInstance handleCommand(String host,
+                                                   Command command) throws CronParseException, CodeGenerateException {
         ProcessInstance processInstance = constructProcessInstance(command, host);
         // cannot construct process instance, return null
         if (processInstance == null) {
@@ -332,6 +333,7 @@ public class ProcessServiceImpl implements ProcessService {
                 setSubProcessParam(processInstance);
                 triggerRelationService.saveProcessInstanceTrigger(command.getId(), processInstance.getId());
                 deleteCommandWithCheck(command.getId());
+                // todo: this is a bad design to return null here, whether trigger the task
                 return null;
             }
         } else {
