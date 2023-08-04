@@ -31,7 +31,7 @@ spec:
     metadata:
       labels:
         {{- include "dolphinscheduler.master.labels" . | nindent 8 }}
-      {{- if .Values.master.annotations .Values.conf.auto  }}
+      {{- if or .Values.master.annotations .Values.conf.auto  }}
       annotations:
         {{- if .Values.conf.auto }}
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
