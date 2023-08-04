@@ -53,7 +53,6 @@ public class ProcessUtilsTest {
         int processId2 = 2000;
         String exceptPidsStr2 = "2000 2100 2101";
         String command2;
-        MockedStatic<OSUtils> osUtilsMockedStatic2 = Mockito.mockStatic(OSUtils.class);
         if (SystemUtils.IS_OS_MAC) {
             command2 = String.format("%s -sp %d", TaskConstants.PSTREE, processId2);
         } else if (SystemUtils.IS_OS_LINUX) {
@@ -61,7 +60,7 @@ public class ProcessUtilsTest {
         } else {
             command2 = String.format("%s -p %d", TaskConstants.PSTREE, processId2);
         }
-        osUtilsMockedStatic2.when(() -> OSUtils.exeCmd(command2)).thenReturn(pids2);
+        osUtilsMockedStatic.when(() -> OSUtils.exeCmd(command2)).thenReturn(pids2);
         String actualPidsStr2 = ProcessUtils.getPidsStr(processId2);
         Assertions.assertEquals(exceptPidsStr2, actualPidsStr2);
 
@@ -70,7 +69,6 @@ public class ProcessUtilsTest {
         int processId3 = 5000;
         String exceptPidsStr3 = "5000 6000 7000 7100";
         String command3;
-        MockedStatic<OSUtils> osUtilsMockedStatic3 = Mockito.mockStatic(OSUtils.class);
         if (SystemUtils.IS_OS_MAC) {
             command3 = String.format("%s -sp %d", TaskConstants.PSTREE, processId3);
         } else if (SystemUtils.IS_OS_LINUX) {
@@ -78,7 +76,7 @@ public class ProcessUtilsTest {
         } else {
             command3 = String.format("%s -p %d", TaskConstants.PSTREE, processId3);
         }
-        osUtilsMockedStatic3.when(() -> OSUtils.exeCmd(command3)).thenReturn(pids3);
+        osUtilsMockedStatic.when(() -> OSUtils.exeCmd(command3)).thenReturn(pids3);
         String actualPidsStr3 = ProcessUtils.getPidsStr(processId2);
         Assertions.assertEquals(exceptPidsStr3, actualPidsStr3);
     }
