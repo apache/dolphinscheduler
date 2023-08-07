@@ -24,7 +24,7 @@ export default {
   port: 8080,
   domain: 'dolphinscheduler.apache.org',
   copyToDist: ['asset', 'img', 'file', '.asf.yaml', 'sitemap.xml', '.nojekyll', '.htaccess', 'googled0df7b96f277a143.html'],
-  docsLatest: '3.1.7',
+  docsLatest: '3.1.8',
   defaultSearch: 'google', // default search engine
   defaultLanguage: 'en-us',
   'en-us': {
@@ -45,7 +45,7 @@ export default {
         children: [
           {
             key: 'docs0',
-            text: 'latest(3.1.7)',
+            text: 'latest(3.1.8)',
             link: '/en-us/docs/latest/user_doc/about/introduction.html',
           },
           {
@@ -173,7 +173,7 @@ export default {
         children: [
           {
             key: 'docs0',
-            text: '最新版本latest(3.1.7)',
+            text: '最新版本latest(3.1.8)',
             link: '/zh-cn/docs/latest/user_doc/about/introduction.html',
           },
           {
