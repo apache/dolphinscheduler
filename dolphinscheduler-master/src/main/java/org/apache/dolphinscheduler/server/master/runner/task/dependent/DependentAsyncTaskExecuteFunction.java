@@ -103,6 +103,7 @@ public class DependentAsyncTaskExecuteFunction implements AsyncTaskExecuteFuncti
             log.info("The Dependent result is: {}", dependResult);
             if (dependResult == DependResult.SUCCESS) {
                 dependentParameters.setVarPool(JSONUtils.toJsonString(dependVarPoolPropertyMap.values()));
+                log.info("Set dependentParameters varPool: {}", dependentParameters.getVarPool());
                 return AsyncTaskExecutionStatus.SUCCESS;
             } else {
                 return AsyncTaskExecutionStatus.FAILED;

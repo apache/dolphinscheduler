@@ -316,8 +316,6 @@ public class DependentExecute {
      * @return
      */
     private void mergeVarPool(DependentItem dependentItem) {
-        log.info("dependItemVarPoolPropertyMap:{}, dependTaskVarPoolPropertyMap:{}",
-                dependItemVarPoolPropertyMap.toString(), dependTaskVarPoolPropertyMap.toString());
         if (dependentItem.getParameterPassing() && !dependItemVarPoolPropertyMap.isEmpty()) {
             addTaskVarPool(dependItemVarPoolPropertyMap, dependItemVarPoolEndTimeMap, dependTaskVarPoolPropertyMap,
                     dependTaskVarPoolEndTimeMap);
