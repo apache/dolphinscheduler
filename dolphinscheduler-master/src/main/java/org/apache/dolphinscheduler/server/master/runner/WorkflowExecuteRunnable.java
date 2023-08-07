@@ -85,6 +85,7 @@ import org.apache.dolphinscheduler.server.master.rpc.MasterRpcClient;
 import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnableFactory;
 import org.apache.dolphinscheduler.server.master.utils.TaskUtils;
+import org.apache.dolphinscheduler.server.master.utils.WorkflowInstanceUtils;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
@@ -96,6 +97,7 @@ import org.apache.dolphinscheduler.service.queue.PeerTaskInstancePriorityQueue;
 import org.apache.dolphinscheduler.service.utils.DagHelper;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -432,7 +434,8 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                     taskInstance.getTaskCode(),
                     taskInstance.getState());
             this.updateProcessInstanceState();
-
+            // log the taskInstance in detail after task is finished
+            log.info(WorkflowInstanceUtils.logTaskInstanceInDetail(taskInstance));
             sendTaskLogOnMasterToRemoteIfNeeded(taskInstance);
         } catch (Exception ex) {
             log.error("Task finish failed, get a exception, will remove this taskInstance from completeTaskSet", ex);
@@ -758,6 +761,8 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
             // release task group
             processService.releaseAllTaskGroup(workflowInstance.getId());
         }
+        // Log the workflowInstance in detail
+        log.info(WorkflowInstanceUtils.logWorkflowInstanceInDetails(workflowInstance));
     }
 
     public void checkSerialProcess(ProcessDefinition processDefinition) {
@@ -784,6 +789,16 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
             return;
         }
         Map<String, Object> cmdParam = new HashMap<>();
+        // write the parameters of the nextProcessInstance to command
+        if (StringUtils.isNotEmpty(nextProcessInstance.getCommandParam())) {
+            Map<String, String> commandStartParamsMap = JSONUtils.toMap(nextProcessInstance.getCommandParam());
+            if (MapUtils.isNotEmpty(commandStartParamsMap)) {
+                Map<String, String> paramsMap = JSONUtils.toMap(commandStartParamsMap.get(CMD_PARAM_START_PARAMS));
+                if (MapUtils.isNotEmpty(paramsMap)) {
+                    cmdParam.put(CMD_PARAM_START_PARAMS, JSONUtils.toJsonString(paramsMap));
+                }
+            }
+        }
         cmdParam.put(CMD_PARAM_RECOVER_PROCESS_ID_STRING, nextInstanceId);
         Command command = new Command();
         command.setCommandType(CommandType.RECOVER_SERIAL_WAIT);
