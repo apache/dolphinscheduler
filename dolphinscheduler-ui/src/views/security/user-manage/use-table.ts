@@ -60,10 +60,8 @@ export function useTable() {
     state.itemCount = total
   }
 
-  const updateList = (initPage = true) => {
-    if (initPage) {
-      state.page = 1
-    }
+  const updateList = () => {
+    state.page = 1
     getList()
   }
 
@@ -72,7 +70,7 @@ export function useTable() {
     if (state.list.length === 1 && state.page > 1) {
       --state.page
     }
-    updateList(false)
+    getList()
   }
 
   const onOperationClick = (

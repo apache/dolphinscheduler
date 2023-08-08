@@ -45,10 +45,8 @@ export function useTable() {
     data.itemCount = listRes.total
   }
 
-  const updateList = (initPage = true) => {
-    if (initPage) {
-      data.page = 1
-    }
+  const updateList = () => {
+    data.page = 1
     getList()
   }
 
@@ -57,7 +55,7 @@ export function useTable() {
     if (data.list.length === 1 && data.page > 1) {
       --data.page
     }
-    updateList(false)
+    getList()
   }
 
   const changePage = (page: number) => {
