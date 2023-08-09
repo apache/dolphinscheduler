@@ -849,6 +849,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                         }
                     }
 
+                    processService.packageTaskInstance(task, workflowInstance);
                     validTaskMap.put(task.getTaskCode(), task.getId());
                     taskInstanceMap.put(task.getId(), task);
                     taskCodeInstanceMap.put(task.getTaskCode(), task);
