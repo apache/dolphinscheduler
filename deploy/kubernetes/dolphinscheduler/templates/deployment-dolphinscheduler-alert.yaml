@@ -34,9 +34,14 @@ spec:
     metadata:
       labels:
         {{- include "dolphinscheduler.alert.labels" . | nindent 8 }}
-      {{- if .Values.alert.annotations }}
+      {{- if or .Values.alert.annotations .Values.conf.auto }}
       annotations:
+        {{- if .Values.conf.auto }}
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- end }}
+        {{- if .Values.alert.annotations }}
         {{- toYaml .Values.alert.annotations | nindent 8 }}
+        {{- end }}
       {{- end }}
     spec:
       serviceAccountName: {{ template "dolphinscheduler.fullname" . }}
