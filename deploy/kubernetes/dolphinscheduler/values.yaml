@@ -141,6 +141,9 @@ security:
         truststorepassword: ""
 
 conf:
+  # auto restart, if true, all components will be restarted automatically after the common configuration is updated. if false, you need to restart the components manually. default is false
+  auto: false
+  # common configuration
   common:
     # user data local directory path, please make sure the directory exists and have read write permissions
     data.basedir.path: /tmp/dolphinscheduler
@@ -180,6 +183,18 @@ conf:
 
     # oss bucket endpoint, required if you set resource.storage.type=OSS
     resource.alibaba.cloud.oss.endpoint: https://oss-cn-hangzhou.aliyuncs.com
+
+    # azure storage account name, required if you set resource.storage.type=ABS
+    resource.azure.client.id: minioadmin
+
+    # azure storage account key, required if you set resource.storage.type=ABS
+    resource.azure.client.secret: minioadmin
+
+    # azure storage subId, required if you set resource.storage.type=ABS
+    resource.azure.subId: minioadmin
+
+    # azure storage tenantId, required if you set resource.storage.type=ABS
+    resource.azure.tenant.id: minioadmin
 
     # if resource.storage.type=HDFS, the user must have the permission to create directories under the HDFS root path
     resource.hdfs.root.user: hdfs
