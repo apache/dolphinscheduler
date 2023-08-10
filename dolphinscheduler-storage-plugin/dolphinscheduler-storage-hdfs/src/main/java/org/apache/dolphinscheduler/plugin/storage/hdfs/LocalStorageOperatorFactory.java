@@ -26,7 +26,7 @@ import com.google.auto.service.AutoService;
 @AutoService(StorageOperateFactory.class)
 public class LocalStorageOperatorFactory implements StorageOperateFactory {
 
-    private static final String LOCAL_DEFAULT_FS = "file:///";
+    private static final String LOCAL_DEFAULT_FS = "file:/";
 
     @Override
     public StorageOperate createStorageOperate() {
