@@ -1074,7 +1074,6 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         newTaskInstance.setProcessInstance(workflowInstance);
         newTaskInstance.setRetryTimes(taskInstance.getRetryTimes());
         newTaskInstance.setState(taskInstance.getState());
-        newTaskInstance.setPid(taskInstance.getPid());
         newTaskInstance.setAppLink(taskInstance.getAppLink());
         newTaskInstance.setVarPool(taskInstance.getVarPool());
         return newTaskInstance;
@@ -1284,15 +1283,18 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
     private void submitPostNode(Long parentNodeCode) throws StateEventHandleException {
         ProcessInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
         DAG<Long, TaskNode, TaskNodeRelation> dag = workflowExecuteContext.getWorkflowGraph().getDag();
-
+        //获取需要运行的任务节点
         Set<Long> submitTaskNodeList =
                 DagHelper.parsePostNodes(parentNodeCode, skipTaskNodeMap, dag, getCompleteTaskInstanceMap());
         List<TaskInstance> taskInstances = new ArrayList<>();
         for (Long taskNode : submitTaskNodeList) {
             TaskNode taskNodeObject = dag.getNode(taskNode);
+            //查看这个任务实例是否存在
             Optional<TaskInstance> existTaskInstanceOptional = getTaskInstance(taskNodeObject.getCode());
             if (existTaskInstanceOptional.isPresent()) {
+                //任务实例存在就尝试接管
                 TaskInstance existTaskInstance = existTaskInstanceOptional.get();
+                //检查任务实例的状态是否为"RUNNING_EXECUTION"或"DISPATCH"
                 if (existTaskInstance.getState() == TaskExecutionStatus.RUNNING_EXECUTION
                         || existTaskInstance.getState() == TaskExecutionStatus.DISPATCH) {
                     // try to take over task instance
@@ -1300,9 +1302,11 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                         log.info("Success take over task {}", existTaskInstance.getName());
                         continue;
                     } else {
-                        // set the task instance state to fault tolerance
+                        // set the task instance state to fault tolerance  设置为需要失败重试
                         existTaskInstance.setFlag(Flag.NO);
                         existTaskInstance.setState(TaskExecutionStatus.NEED_FAULT_TOLERANCE);
+                        //validTaskMap中移除该任务
+                        //接着，通过调用cloneTolerantTaskInstance()方法克隆一个容错的任务实例。同时，打印一条日志，指示该任务无法被接管，并将生成一个容错的任务实例。
                         validTaskMap.remove(existTaskInstance.getTaskCode());
                         taskInstanceDao.updateById(existTaskInstance);
                         existTaskInstance = cloneTolerantTaskInstance(existTaskInstance);
@@ -1310,13 +1314,14 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                                 existTaskInstance.getName());
                     }
                 }
-                //如果任务可以重试
+//                如果任务可以重试
                 if (existTaskInstance.taskCanRetry()) {
                     //如果任务需要容错处理 并且又是 shell 或者 yarn任务  则需要进行修改任务执行
                     if (existTaskInstance.getState().isNeedFaultTolerance() && (Objects.nonNull(existTaskInstance.getPid()) || existTaskInstance.getAppLink() != null)) {
-                        log.info("TaskInstance of  Linux process or Yarn application execute fault tolerance.");
+                        log.info("TaskInstance of  Linux process or Yarn application execute fault tolerance judge.");
                         //设置任务的标志以指示不需要重试
                         existTaskInstance.setFlag(Flag.NO);
+                        existTaskInstance.setState(TaskExecutionStatus.NEED_FAULT_TOLERANCE);
                         //在数据库中更新任务实例
                         taskInstanceDao.updateById(existTaskInstance);
 
@@ -1328,6 +1333,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                 }
                 taskInstances.add(existTaskInstance);
             } else {
+                //不存在就新建
                 taskInstances.add(createTaskInstance(workflowInstance, taskNodeObject));
             }
         }

@@ -19,11 +19,14 @@ package org.apache.dolphinscheduler.plugin.task.api;
 
 import static org.apache.dolphinscheduler.common.constants.Constants.EMPTY_STRING;
 import static org.apache.dolphinscheduler.common.constants.Constants.SLEEP_TIME_MILLIS;
+import static org.apache.dolphinscheduler.common.constants.Constants.APPID_COLLECT;
+import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_COLLECT_WAY;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.*;
 
 import org.apache.dolphinscheduler.common.constants.TenantConstants;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptor;
@@ -39,6 +42,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -124,16 +128,32 @@ public abstract class AbstractCommandExecutor {
             result.setExitStatusCode(EXIT_CODE_KILL);
             return result;
         }
-        // add task failure retry judgement
-        //if(需要任务失败重试的任务实例)
-        //获取当前任务的进程id
-        int pid = taskRequest.getProcessId();
-        if(isProcessRunning(pid) == true){
-            result.setExitStatusCode(RUNNING_CODE);
-            cancelApplication();
-            return result;
+        // the task instance needs fault tolerance
+        if(Objects.nonNull(taskRequest.getProcessId()) || StringUtils.isNotEmpty(taskRequest.getAppIds())){
+
+            int pid = taskRequest.getProcessId();
+            // Yarn task is determined by parsing whether the task log contains the content of the application
+            String applicationId  = String.join(TaskConstants.COMMA, LogUtils.getAppIds(taskRequest.getLogPath(), taskRequest.getAppInfoPath(),
+                    PropertyUtils.getString(APPID_COLLECT, DEFAULT_COLLECT_WAY)));
+            boolean isRunningTaskFaultTolerance = false;
+            if(applicationId.isEmpty()){
+                // not a Yarn task
+                isRunningTaskFaultTolerance = isProcessRunning(pid);
+            }else {
+                // is a Yarn task
+                isRunningTaskFaultTolerance = isApplicationRunning(applicationId);
+            }
+            //determines whether the task is running
+            if(Boolean.TRUE.equals(isRunningTaskFaultTolerance)){
+                logger.warn(
+                        "Can not recover tolerance fault task instance: {} , the task may be running and does not need to be repeated",
+                        taskInstanceId);
+                result.setExitStatusCode(EXIT_CODE_KILL);
+                cancelApplication();
+                return result;
+            }
         }
-        //初始化一个iShellInterceptorBuilder对象，该对象负责构建任务执行的shell拦截器配置。使用taskRequest对象中的executePath和taskAppId属性设置shell目录和名称。
+
         iShellInterceptorBuilder = iShellInterceptorBuilder
                 .shellDirectory(taskRequest.getExecutePath())
                 .shellName(taskRequest.getTaskAppId());
@@ -402,49 +422,96 @@ public abstract class AbstractCommandExecutor {
 
         return processId;
     }
+
     /**
-     * determines whether the task that failure retry is in a normal execution state
+     * determines whether the process is running
      *
      * @param pid process_id
-     * @return
+     * @return boolean
      */
     public boolean isProcessRunning(int pid) throws Exception {
+
         String processPath = String.valueOf(pid);
 
-        // 构建shell命令   命令使用ps -ef来列出所有的进程，并使用grep过滤器来匹配给定的进程执行路径。
+        // build shell commands, use ps-ef to list all processes, and use GREP filters to match the process id
         String[] command = { "/bin/sh", "-c", "ps -ef | grep " + processPath };
-        //使用 ProcessBuilder 类来创建一个新的进程，并设置其命令行参数为上面构造的命令
+
+        // use the ProcessBuilder class to create a new process and set its command
         ProcessBuilder processBuilder = new ProcessBuilder(command);
 
-        // 执行shell命令  ProcessBuilder类的start()方法执行shell命令，并返回一个Process对象，它代表了正在执行的进程。
-        // 启动进程，并等待其执行完毕
+        // start the process
         Process process = processBuilder.start();
 
-        // 读取命令的输出  获取进程的标准输入流
-        //使用BufferedReader从Process对象的输入流中命令的输出。
+        // reads the output of the command and gets the standard input stream for the process
         BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
         String line;
         StringBuilder output = new StringBuilder();
-        //循环读取进程的标准输入流中的每一行内容
+        // reads each line in the process input stream
         while ((line = reader.readLine()) != null) {
-            //将每一行内容追加到 StringBuilder 对象中
             output.append(line);
         }
         try {
-            //命令执行完成后，可以使用waitFor()方法获取命令的退出码。如果为0（表示成功），并且输出结果中包含要查找的进程名，则说明进程存在。
+            // gets the exit code for the command.
             int exitCode = process.waitFor();
+            // if the exit code is 0, and the output contains process id, the process exists.
             if (exitCode == 0 && output.toString().contains(processPath)) {
-                // 进程正在运行  不需要进行失败重试
+                // process is running
                 return true;
             } else {
-                // 进程不在运行
                 return false;
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         return false;
+    }
+
+    /**
+     * determine if the yarn task is running
+     *
+     * @param applicationId applicationId
+     * @return boolean
+     */
+    public boolean isApplicationRunning(String applicationId ) throws Exception {
+
+        // build shell commands, use yarn application -status applicationId
+        String[] command = {"/bin/bash", "-c", "yarn application -status " + applicationId};
+
+        // use the ProcessBuilder class to create a new process and set its command
+        ProcessBuilder processBuilder = new ProcessBuilder(command);
+
+        // start the process
+        Process process = processBuilder.start();
+
+        // reads the output of the command and gets the standard input stream for the process
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+        String line;
+        String state = null;
+        // reads each line in the process input stream
+        while ((line = reader.readLine()) != null) {
+            // get the yarn task running status
+            if (line.contains("State")) {
+                state = line.split(":")[1].trim();
+                break;
+            }
+        }
+        try {
+            // gets the exit code for the command.
+            int exitCode = process.waitFor();
+            // if the exit code is 0, and the yarn task is running
+            if (exitCode == 0 && state.equals("RUNNING")) {
+                // process is running
+                return true;
+            } else {
+                return false;
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return false;
+
     }
 
 }
