@@ -25,6 +25,8 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 
+import java.util.Map;
+
 public class SwitchTaskChannel implements TaskChannel {
 
     @Override
@@ -39,7 +41,17 @@ public class SwitchTaskChannel implements TaskChannel {
 
     @Override
     public AbstractParameters parseParameters(ParametersNode parametersNode) {
-        return JSONUtils.parseObject(parametersNode.getTaskParams(), SwitchParameters.class);
+        String taskParams = parametersNode.getTaskParams();
+        Map map = JSONUtils.parseObject(taskParams, Map.class);
+        Object switchResult = map.get("switchResult");
+        if (switchResult instanceof String) {
+            Map switchResultConfig = JSONUtils.parseObject(switchResult.toString(), Map.class);
+            map.put("switchResult", switchResultConfig);
+            taskParams = JSONUtils.toJsonString(map);
+        }
+        SwitchParameters switchParameters = JSONUtils.parseObject(taskParams, SwitchParameters.class);
+        return switchParameters;
+//        return JSONUtils.parseObject(parametersNode.getTaskParams(), SwitchParameters.class);
     }
 
     @Override
