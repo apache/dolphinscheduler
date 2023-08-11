@@ -59,6 +59,7 @@ import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.FileUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.utils.relation_sort.RelationDefinitionImport;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ConditionType;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
@@ -1098,11 +1099,15 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             putMsg(result, Status.DATA_IS_NULL, "fileContent");
             return result;
         }
-        for (DagDataSchedule dagDataSchedule : dagDataScheduleList) {
-            if (!checkAndImport(loginUser, projectCode, result, dagDataSchedule, EMPTY_STRING)) {
-                return result;
-            }
-        }
+//        for (DagDataSchedule dagDataSchedule : dagDataScheduleList) {
+//            if (!checkAndImport(loginUser, projectCode, result, dagDataSchedule, EMPTY_STRING)) {
+//                return result;
+//            }
+//        }
+//        return result;
+
+        RelationDefinitionImport relationDefinitionImport = new RelationDefinitionImport(dagDataScheduleList);
+        relationDefinitionImport.doImport(dagDataSchedule -> checkAndImport(loginUser, projectCode, result, dagDataSchedule, EMPTY_STRING));
         return result;
     }
 
