@@ -112,7 +112,7 @@ security:
         trust-store: "/ldapkeystore.jks"
         trust-store-password: ""
     oauth2:
-      enable: false
+      enable: true
       provider:
         github:
           authorizationUri: ""
@@ -123,7 +123,7 @@ security:
           userInfoUri: ""
           callbackUrl: ""
           iconUri: ""
-          provider: gihub
+          provider: github
         google:
           authorizationUri: ""
           redirectUri: ""
