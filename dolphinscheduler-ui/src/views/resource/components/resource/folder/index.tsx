@@ -22,7 +22,7 @@ import Modal from '@/components/modal'
 import { noSpace } from '@/utils/trim'
 import { useForm } from './use-form'
 import { useFolder } from './use-folder'
-import { ResourceType } from "@/views/resource/components/resource/types";
+import { ResourceType } from '@/views/resource/components/resource/types'
 
 const props = {
   show: {
@@ -80,15 +80,6 @@ export default defineComponent({
               v-model={[this.folderForm.name, 'value']}
               placeholder={t('resource.file.enter_name_tips')}
               class='input-directory-name'
-            />
-          </NFormItem>
-          <NFormItem label={t('resource.file.description')} path='description'>
-            <NInput
-              allowInput={this.trim}
-              type='textarea'
-              v-model={[this.folderForm.description, 'value']}
-              placeholder={t('resource.file.enter_description_tips')}
-              class='input-description'
             />
           </NFormItem>
         </NForm>

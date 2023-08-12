@@ -18,12 +18,12 @@
 package org.apache.dolphinscheduler.server.master.processor;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.command.WorkflowExecutingDataRequestCommand;
-import org.apache.dolphinscheduler.remote.command.WorkflowExecutingDataResponseCommand;
+import org.apache.dolphinscheduler.remote.command.Message;
+import org.apache.dolphinscheduler.remote.command.MessageType;
+import org.apache.dolphinscheduler.remote.command.workflow.WorkflowExecutingDataRequest;
+import org.apache.dolphinscheduler.remote.command.workflow.WorkflowExecutingDataResponse;
 import org.apache.dolphinscheduler.remote.dto.WorkflowExecuteDto;
-import org.apache.dolphinscheduler.remote.processor.NettyRequestProcessor;
+import org.apache.dolphinscheduler.remote.processor.MasterRpcProcessor;
 import org.apache.dolphinscheduler.server.master.service.ExecutingService;
 
 import java.util.Optional;
@@ -33,7 +33,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.base.Preconditions;
 import io.netty.channel.Channel;
 
 /**
@@ -41,26 +40,28 @@ import io.netty.channel.Channel;
  */
 @Component
 @Slf4j
-public class WorkflowExecutingDataRequestProcessor implements NettyRequestProcessor {
+public class WorkflowExecutingDataRequestProcessor implements MasterRpcProcessor {
 
     @Autowired
     private ExecutingService executingService;
 
     @Override
-    public void process(Channel channel, Command command) {
-        Preconditions.checkArgument(CommandType.WORKFLOW_EXECUTING_DATA_REQUEST == command.getType(),
-                String.format("invalid command type: %s", command.getType()));
-
-        WorkflowExecutingDataRequestCommand requestCommand =
-                JSONUtils.parseObject(command.getBody(), WorkflowExecutingDataRequestCommand.class);
+    public void process(Channel channel, Message message) {
+        WorkflowExecutingDataRequest requestCommand =
+                JSONUtils.parseObject(message.getBody(), WorkflowExecutingDataRequest.class);
 
         log.info("received command, processInstanceId:{}", requestCommand.getProcessInstanceId());
 
         Optional<WorkflowExecuteDto> workflowExecuteDtoOptional =
                 executingService.queryWorkflowExecutingData(requestCommand.getProcessInstanceId());
 
-        WorkflowExecutingDataResponseCommand responseCommand = new WorkflowExecutingDataResponseCommand();
+        WorkflowExecutingDataResponse responseCommand = new WorkflowExecutingDataResponse();
         workflowExecuteDtoOptional.ifPresent(responseCommand::setWorkflowExecuteDto);
-        channel.writeAndFlush(responseCommand.convert2Command(command.getOpaque()));
+        channel.writeAndFlush(responseCommand.convert2Command(message.getOpaque()));
+    }
+
+    @Override
+    public MessageType getCommandType() {
+        return MessageType.WORKFLOW_EXECUTING_DATA_REQUEST;
     }
 }

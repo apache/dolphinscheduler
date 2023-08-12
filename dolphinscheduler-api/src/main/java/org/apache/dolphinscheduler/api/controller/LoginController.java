@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.controller;
 
 import static org.apache.dolphinscheduler.api.enums.Status.IP_IS_EMPTY;
+import static org.apache.dolphinscheduler.api.enums.Status.NOT_SUPPORT_SSO;
 import static org.apache.dolphinscheduler.api.enums.Status.SIGN_OUT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.USER_LOGIN_FAILURE;
 
@@ -26,6 +27,7 @@ import org.apache.dolphinscheduler.api.configuration.OAuth2Configuration;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.security.Authenticator;
+import org.apache.dolphinscheduler.api.security.impl.AbstractSsoAuthenticator;
 import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -43,15 +45,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.UUID;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -135,6 +140,26 @@ public class LoginController extends BaseController {
         }
 
         return result;
+    }
+
+    /**
+     * sso login
+     *
+     * @return sso server url
+     */
+    @Operation(summary = "sso login", description = "SSO_LOGIN_NOTES")
+    @GetMapping(value = "/login/sso")
+    @ApiException(NOT_SUPPORT_SSO)
+    public Result ssoLogin(HttpServletRequest request) {
+        if (authenticator instanceof AbstractSsoAuthenticator) {
+            String randomState = UUID.randomUUID().toString();
+            HttpSession session = request.getSession();
+            if (session.getAttribute(Constants.SSO_LOGIN_USER_STATE) == null) {
+                session.setAttribute(Constants.SSO_LOGIN_USER_STATE, randomState);
+            }
+            return Result.success(((AbstractSsoAuthenticator) authenticator).getSignInUrl(randomState));
+        }
+        return Result.success();
     }
 
     /**

@@ -33,6 +33,8 @@
         <module>dolphinscheduler-storage-s3</module>
         <module>dolphinscheduler-storage-hdfs</module>
         <module>dolphinscheduler-storage-oss</module>
+        <module>dolphinscheduler-storage-gcs</module>
+        <module>dolphinscheduler-storage-abs</module>
     </modules>
 
     <dependencyManagement>

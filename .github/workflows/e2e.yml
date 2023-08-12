@@ -67,7 +67,7 @@ jobs:
           ./mvnw -B clean install \
           -Dmaven.test.skip \
           -Dmaven.javadoc.skip \
-          -Dcheckstyle.skip=true \
+          -Dspotless.skip=true \
           -Pdocker,release -Ddocker.tag=ci \
           -pl dolphinscheduler-standalone-server -am
       - name: Export Docker Images
@@ -120,6 +120,46 @@ jobs:
             class: org.apache.dolphinscheduler.e2e.cases.ClickhouseDataSourceE2ETest
           - name: PostgresDataSource
             class: org.apache.dolphinscheduler.e2e.cases.PostgresDataSourceE2ETest
+    env:
+      RECORDING_PATH: /tmp/recording-${{ matrix.case.name }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Cache local Maven repository
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
+      - uses: actions/download-artifact@v2
+        name: Download Docker Images
+        with:
+          name: standalone-image
+          path: /tmp
+      - name: Load Docker Images
+        run: |
+          docker load -i /tmp/standalone-image.tar
+      - name: Run Test
+        run: |
+          ./mvnw -B -f dolphinscheduler-e2e/pom.xml -am \
+            -DfailIfNoTests=false \
+            -Dtest=${{ matrix.case.class }} test
+      - uses: actions/upload-artifact@v2
+        if: always()
+        name: Upload Recording
+        with:
+          name: recording-${{ matrix.case.name }}
+          path: ${{ env.RECORDING_PATH }}
+          retention-days: 1
+  e2e-optional:
+    name: ${{ matrix.case.name }}
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      matrix:
+        case:
           - name: SqlServerDataSource
             class: org.apache.dolphinscheduler.e2e.cases.SqlServerDataSourceE2ETest
           - name: HiveDataSource
@@ -143,7 +183,7 @@ jobs:
           path: /tmp
       - name: Load Docker Images
         run: |
-            docker load -i /tmp/standalone-image.tar
+          docker load -i /tmp/standalone-image.tar
       - name: Run Test
         run: |
           ./mvnw -B -f dolphinscheduler-e2e/pom.xml -am \

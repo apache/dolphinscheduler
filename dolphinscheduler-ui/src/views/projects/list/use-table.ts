@@ -82,7 +82,10 @@ export function useTable() {
             ButtonLink,
             {
               onClick: () => {
-                router.push({ path: `/projects/${row.code}` })
+                router.push({
+                  path: `/projects/${row.code}`,
+                  query: { projectName: row.name }
+                })
               }
             },
             {

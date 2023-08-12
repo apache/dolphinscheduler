@@ -34,11 +34,13 @@ public class WorkerHeartBeat implements HeartBeat {
     private double memoryUsage;
     private double loadAverage;
     private double availablePhysicalMemorySize;
-    private double maxCpuloadAvg;
     private double reservedMemory;
     private double diskAvailable;
     private int serverStatus;
     private int processId;
+
+    private String host;
+    private int port;
 
     private int workerHostWeight; // worker host weight
     private int workerWaitingTaskCount; // worker waiting task count

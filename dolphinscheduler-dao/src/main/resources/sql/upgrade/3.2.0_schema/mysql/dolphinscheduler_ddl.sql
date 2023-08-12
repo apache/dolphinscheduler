@@ -56,30 +56,6 @@ delimiter ;
 CALL uc_dolphin_T_t_ds_error_command_R_test_flag;
 DROP PROCEDURE uc_dolphin_T_t_ds_error_command_R_test_flag;
 
--- uc_dolphin_T_t_ds_datasource_R_test_flag_bind_test_id
-drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_datasource_R_test_flag_bind_test_id;
-delimiter d//
-CREATE PROCEDURE uc_dolphin_T_t_ds_datasource_R_test_flag_bind_test_id()
-BEGIN
-       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
-           WHERE TABLE_NAME='t_ds_datasource'
-           AND TABLE_SCHEMA=(SELECT DATABASE())
-           AND COLUMN_NAME ='test_flag')
-           and NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
-           WHERE TABLE_NAME='t_ds_datasource'
-           AND TABLE_SCHEMA=(SELECT DATABASE())
-           AND COLUMN_NAME ='bind_test_id')
-   THEN
-ALTER TABLE t_ds_datasource ADD `test_flag` tinyint(4) DEFAULT null COMMENT 'test flag：0 normal, 1 testDataSource';
-ALTER TABLE t_ds_datasource ADD `bind_test_id` int DEFAULT null COMMENT 'bind testDataSource id';
-END IF;
-END;
-
-d//
-
-delimiter ;
-CALL uc_dolphin_T_t_ds_datasource_R_test_flag_bind_test_id;
-DROP PROCEDURE uc_dolphin_T_t_ds_datasource_R_test_flag_bind_test_id;
 
 -- uc_dolphin_T_t_ds_process_instance_R_test_flag
 drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_process_instance_R_test_flag;
@@ -234,7 +210,7 @@ delimiter ;
 CALL add_t_ds_task_instance_idx_cache_key;
 DROP PROCEDURE add_t_ds_task_instance_idx_cache_key;
 
--- ALTER TABLE `t_ds_process_instance` ADD column `project_code`, `process_definition_name`, `executor_name`, `tenant_code`;
+-- ALTER TABLE `t_ds_process_instance` ADD column `project_code`, `executor_name`, `tenant_code`;
 drop PROCEDURE if EXISTS add_t_ds_process_instance_add_project_code;
 delimiter d//
 CREATE PROCEDURE add_t_ds_process_instance_add_project_code()
@@ -266,7 +242,7 @@ delimiter ;
 CALL add_t_ds_process_instance_add_project_code;
 DROP PROCEDURE add_t_ds_process_instance_add_project_code;
 
--- ALTER TABLE `t_ds_task_instance` ADD column `project_code`, `process_definition_name`, `executor_name`, `tenant_code`;
+-- ALTER TABLE `t_ds_task_instance` ADD column `project_code`, `process_definition_name`, `executor_name`
 drop PROCEDURE if EXISTS add_t_ds_task_instance_add_project_code;
 delimiter d//
 CREATE PROCEDURE add_t_ds_task_instance_add_project_code()
@@ -319,7 +295,6 @@ alter table t_ds_relation_project_user CONVERT TO CHARACTER SET utf8 COLLATE utf
 alter table t_ds_relation_resources_user CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;
 alter table t_ds_relation_udfs_user CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;
 alter table t_ds_resources CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;
-alter table t_ds_relation_resources_task CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;
 alter table t_ds_schedules CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;
 alter table t_ds_session CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;
 alter table t_ds_task_instance CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin;
@@ -354,3 +329,86 @@ alter table t_ds_trigger_relation CONVERT TO CHARACTER SET utf8 COLLATE utf8_bin
 ALTER TABLE `t_ds_alert`
     MODIFY `title` varchar (512) null comment 'title';
 
+ALTER TABLE `t_ds_command` MODIFY `worker_group` varchar(255)  COMMENT 'worker group';
+ALTER TABLE `t_ds_error_command` MODIFY `worker_group` varchar(255)  COMMENT 'worker group';
+ALTER TABLE `t_ds_process_definition_log` MODIFY `name` varchar(255) DEFAULT NULL COMMENT 'process definition name';
+ALTER TABLE `t_ds_task_definition` MODIFY `name` varchar(255) DEFAULT NULL COMMENT 'task definition name';
+ALTER TABLE `t_ds_task_definition` MODIFY `worker_group` varchar(255) DEFAULT NULL COMMENT 'worker grouping';
+ALTER TABLE `t_ds_task_definition_log` MODIFY `name` varchar(255) DEFAULT NULL COMMENT 'task definition name';
+ALTER TABLE `t_ds_task_definition_log` MODIFY `worker_group` varchar(255) DEFAULT NULL COMMENT 'worker grouping';
+ALTER TABLE `t_ds_process_task_relation` MODIFY `name` varchar(255) DEFAULT NULL COMMENT 'relation name';
+ALTER TABLE `t_ds_process_task_relation_log` MODIFY `name` varchar(255) DEFAULT NULL COMMENT 'relation name';
+ALTER TABLE `t_ds_process_instance` MODIFY `worker_group` varchar(255) DEFAULT NULL COMMENT 'worker group id';
+ALTER TABLE `t_ds_project` MODIFY `name` varchar(255) DEFAULT NULL COMMENT 'project name';
+ALTER TABLE `t_ds_schedules` MODIFY `worker_group` varchar(255) DEFAULT '' COMMENT 'worker group id';
+ALTER TABLE `t_ds_task_instance` MODIFY `worker_group` varchar(255) DEFAULT NULL COMMENT 'worker group id';
+ALTER TABLE `t_ds_udfs` MODIFY `func_name` varchar(255) NOT NULL COMMENT 'UDF function name';
+ALTER TABLE `t_ds_version` MODIFY `version` varchar(63) NOT NULL;
+ALTER TABLE `t_ds_plugin_define` MODIFY `plugin_name` varchar(255) NOT NULL COMMENT 'the name of plugin eg: email';
+ALTER TABLE `t_ds_plugin_define` MODIFY `plugin_type` varchar(63) NOT NULL COMMENT 'plugin type . alert=alert plugin, job=job plugin';
+ALTER TABLE `t_ds_alert_plugin_instance` MODIFY `instance_name` varchar(255) DEFAULT NULL COMMENT 'alert instance name';
+ALTER TABLE `t_ds_dq_comparison_type` MODIFY `type` varchar(255) NOT NULL;
+ALTER TABLE `t_ds_dq_comparison_type` MODIFY `name` varchar(255) DEFAULT NULL;
+ALTER TABLE `t_ds_dq_rule` MODIFY `name` varchar(255) DEFAULT NULL;
+ALTER TABLE `t_ds_environment` MODIFY `name` varchar(255) NOT NULL COMMENT 'environment name';
+ALTER TABLE `t_ds_task_group_queue` MODIFY `task_name` varchar(255) DEFAULT NULL COMMENT 'TaskInstance name';
+ALTER TABLE `t_ds_task_group` MODIFY `name` varchar(255) DEFAULT NULL COMMENT 'task_group name';
+ALTER TABLE `t_ds_k8s` MODIFY `k8s_name` varchar(255) DEFAULT NULL;
+ALTER TABLE `t_ds_k8s_namespace` MODIFY `namespace` varchar(255) DEFAULT NULL;
+ALTER TABLE `t_ds_cluster` MODIFY `name`        varchar(255) NOT NULL COMMENT 'cluster name';
+
+-- tenant improvement
+DROP PROCEDURE if EXISTS add_improvement_workflow_run_tenant;
+delimiter d//
+CREATE PROCEDURE add_improvement_workflow_run_tenant()
+BEGIN
+   IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_command'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='tenant_code')
+   THEN
+ALTER TABLE t_ds_command ADD `tenant_code` varchar(64) DEFAULT 'default' COMMENT 'tenant code';
+END IF;
+   IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_error_command'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='tenant_code')
+   THEN
+ALTER TABLE t_ds_error_command ADD `tenant_code` varchar(64) DEFAULT 'default' COMMENT 'tenant code';
+END IF;
+   IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_schedules'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='tenant_code')
+   THEN
+ALTER TABLE t_ds_schedules ADD `tenant_code` varchar(64) DEFAULT 'default' COMMENT 'tenant code';
+END IF;
+END;
+d//
+delimiter ;
+CALL add_improvement_workflow_run_tenant;
+DROP PROCEDURE add_improvement_workflow_run_tenant;
+
+-- uc_dolphin_T_t_ds_relation_sub_workflow
+drop PROCEDURE if EXISTS uc_dolphin_T_t_ds_relation_sub_workflow;
+delimiter d//
+CREATE PROCEDURE uc_dolphin_T_t_ds_relation_sub_workflow()
+BEGIN
+       IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_relation_sub_workflow'
+           AND TABLE_SCHEMA=(SELECT DATABASE()))
+   THEN
+CREATE TABLE `t_ds_relation_sub_workflow` (
+    `id` bigint NOT NULL AUTO_INCREMENT,
+    `parent_workflow_instance_id` bigint  NOT NULL,
+    `parent_task_code` bigint  NOT NULL,
+    `sub_workflow_instance_id` bigint  NOT NULL,
+    PRIMARY KEY (`id`),
+    KEY `idx_parent_workflow_instance_id` (`parent_workflow_instance_id`),
+    KEY `idx_parent_task_code` (`parent_task_code`),
+    KEY `idx_sub_workflow_instance_id` (`sub_workflow_instance_id`)
+);
+END IF;
+END;
+
+d//

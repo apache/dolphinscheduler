@@ -21,19 +21,27 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 
 @UtilityClass
+@Slf4j
 public class RemoteLogHandlerFactory {
 
     public RemoteLogHandler getRemoteLogHandler() {
         if (!RemoteLogUtils.isRemoteLoggingEnable()) {
             return null;
         }
-        if (!"OSS".equals(PropertyUtils.getUpperCaseString(Constants.REMOTE_LOGGING_TARGET))) {
-            return null;
+
+        String target = PropertyUtils.getUpperCaseString(Constants.REMOTE_LOGGING_TARGET);
+        if ("OSS".equals(target)) {
+            return OssRemoteLogHandler.getInstance();
+        } else if ("S3".equals(target)) {
+            return S3RemoteLogHandler.getInstance();
+        } else if ("GCS".equals(target)) {
+            return GcsRemoteLogHandler.getInstance();
         }
-        OssRemoteLogHandler ossRemoteLogHandler = new OssRemoteLogHandler();
-        ossRemoteLogHandler.init();
-        return ossRemoteLogHandler;
+
+        log.error("No suitable remote logging target for {}", target);
+        return null;
     }
 }

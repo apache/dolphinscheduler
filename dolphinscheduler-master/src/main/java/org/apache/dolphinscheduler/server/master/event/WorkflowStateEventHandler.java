@@ -35,9 +35,10 @@ public class WorkflowStateEventHandler implements StateEventHandler {
     public boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable,
                                     StateEvent stateEvent) throws StateEventHandleException {
         WorkflowStateEvent workflowStateEvent = (WorkflowStateEvent) stateEvent;
-        measureProcessState(workflowStateEvent);
-        ProcessInstance processInstance = workflowExecuteRunnable.getProcessInstance();
+        ProcessInstance processInstance =
+                workflowExecuteRunnable.getWorkflowExecuteContext().getWorkflowInstance();
         ProcessDefinition processDefinition = processInstance.getProcessDefinition();
+        measureProcessState(workflowStateEvent, processInstance.getProcessDefinitionCode().toString());
 
         log.info(
                 "Handle workflow instance state event, the current workflow instance state {} will be changed to {}",
@@ -57,6 +58,9 @@ public class WorkflowStateEventHandler implements StateEventHandler {
             return true;
         }
         if (workflowStateEvent.getStatus().isFinished()) {
+            if (workflowStateEvent.getType().equals(StateEventType.PROCESS_SUBMIT_FAILED)) {
+                workflowExecuteRunnable.updateProcessInstanceState(workflowStateEvent);
+            }
             workflowExecuteRunnable.endProcess();
         }
         if (processInstance.getState().isReadyStop()) {
@@ -71,19 +75,20 @@ public class WorkflowStateEventHandler implements StateEventHandler {
         return StateEventType.PROCESS_STATE_CHANGE;
     }
 
-    private void measureProcessState(WorkflowStateEvent processStateEvent) {
+    private void measureProcessState(WorkflowStateEvent processStateEvent, String processDefinitionCode) {
         if (processStateEvent.getStatus().isFinished()) {
-            ProcessInstanceMetrics.incProcessInstanceByState("finish");
+            ProcessInstanceMetrics.incProcessInstanceByStateAndProcessDefinitionCode("finish", processDefinitionCode);
         }
         switch (processStateEvent.getStatus()) {
             case STOP:
-                ProcessInstanceMetrics.incProcessInstanceByState("stop");
+                ProcessInstanceMetrics.incProcessInstanceByStateAndProcessDefinitionCode("stop", processDefinitionCode);
                 break;
             case SUCCESS:
-                ProcessInstanceMetrics.incProcessInstanceByState("success");
+                ProcessInstanceMetrics.incProcessInstanceByStateAndProcessDefinitionCode("success",
+                        processDefinitionCode);
                 break;
             case FAILURE:
-                ProcessInstanceMetrics.incProcessInstanceByState("fail");
+                ProcessInstanceMetrics.incProcessInstanceByStateAndProcessDefinitionCode("fail", processDefinitionCode);
                 break;
             default:
                 break;

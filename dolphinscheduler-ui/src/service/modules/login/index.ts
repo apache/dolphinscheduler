@@ -26,6 +26,13 @@ export function login(data: LoginReq): any {
   })
 }
 
+export function ssoLoginUrl(): any {
+  return axios({
+    url: '/login/sso',
+    method: 'get'
+  })
+}
+
 export function getOauth2Provider(): any {
   return axios({
     url: '/oauth2-provider',

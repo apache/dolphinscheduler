@@ -22,12 +22,7 @@ export function useFormField(forms: Array<any>) {
   const model: any = {}
 
   const setField = (value: string, type: string): Ref<null | string> => {
-    return ref(value ?
-      value :
-      type === 'select' ?
-        null :
-        ''
-    )
+    return ref(value ? value : type === 'select' ? null : '')
   }
 
   forms.forEach((f: any) => {

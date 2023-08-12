@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
 import org.apache.dolphinscheduler.server.master.rpc.MasterRPCServer;
+import org.apache.dolphinscheduler.server.master.rpc.MasterRpcClient;
 import org.apache.dolphinscheduler.server.master.runner.EventExecuteService;
 import org.apache.dolphinscheduler.server.master.runner.FailoverExecuteThread;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerBootstrap;
@@ -73,6 +74,9 @@ public class MasterServer implements IStoppable {
     @Autowired
     private MasterRPCServer masterRPCServer;
 
+    @Autowired
+    private MasterRpcClient masterRpcClient;
+
     public static void main(String[] args) {
         Thread.currentThread().setName(Constants.THREAD_NAME_MASTER_SERVER);
         SpringApplication.run(MasterServer.class);
@@ -85,6 +89,7 @@ public class MasterServer implements IStoppable {
     public void run() throws SchedulerException {
         // init rpc server
         this.masterRPCServer.start();
+        this.masterRpcClient.start();
 
         // install task plugin
         this.taskPluginManager.loadPlugin();
@@ -93,7 +98,6 @@ public class MasterServer implements IStoppable {
         this.masterRegistryClient.start();
         this.masterRegistryClient.setRegistryStoppable(this);
 
-        this.masterSchedulerBootstrap.init();
         this.masterSchedulerBootstrap.start();
 
         this.eventExecuteService.start();
@@ -126,6 +130,7 @@ public class MasterServer implements IStoppable {
                 SchedulerApi closedSchedulerApi = schedulerApi;
                 MasterSchedulerBootstrap closedSchedulerBootstrap = masterSchedulerBootstrap;
                 MasterRPCServer closedRpcServer = masterRPCServer;
+                MasterRpcClient closedRpcClient = masterRpcClient;
                 MasterRegistryClient closedMasterRegistryClient = masterRegistryClient;
                 // close spring Context and will invoke method with @PreDestroy annotation to destroy beans.
                 // like ServerNodeManager,HostManager,TaskResponseService,CuratorZookeeperClient,etc

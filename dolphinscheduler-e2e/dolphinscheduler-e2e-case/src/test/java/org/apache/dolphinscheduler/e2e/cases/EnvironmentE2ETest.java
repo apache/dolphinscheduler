@@ -21,16 +21,13 @@ package org.apache.dolphinscheduler.e2e.cases;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
 
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
-import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.apache.dolphinscheduler.e2e.pages.security.EnvironmentPage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
-import org.apache.dolphinscheduler.e2e.pages.security.WorkerGroupPage;
 
-import org.junit.jupiter.api.AfterAll;
+import org.testcontainers.shaded.org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -68,7 +65,7 @@ class EnvironmentE2ETest {
         final EnvironmentPage page = new EnvironmentPage(browser);
         page.create(environmentName, environmentConfig, environmentDesc, environmentWorkerGroup);
 
-        await().untilAsserted(() -> {
+        Awaitility.await().untilAsserted(() -> {
             browser.navigate().refresh();
             assertThat(page.environmentList())
                     .as("Environment list should contain newly-created environment")
@@ -83,7 +80,7 @@ class EnvironmentE2ETest {
         final EnvironmentPage page = new EnvironmentPage(browser);
         page.create(environmentName, environmentConfig, environmentDesc, environmentWorkerGroup);
 
-        await().untilAsserted(() ->
+        Awaitility.await().untilAsserted(() ->
                 assertThat(browser.findElement(By.tagName("body")).getText())
                         .contains("already exists")
         );
@@ -97,7 +94,7 @@ class EnvironmentE2ETest {
         final EnvironmentPage page = new EnvironmentPage(browser);
         page.update(environmentName, editEnvironmentName, editEnvironmentConfig, editEnvironmentDesc, editEnvironmentWorkerGroup);
 
-        await().untilAsserted(() -> {
+        Awaitility.await().untilAsserted(() -> {
             browser.navigate().refresh();
             assertThat(page.environmentList())
                     .as("Environment list should contain newly-modified environment")
@@ -113,7 +110,7 @@ class EnvironmentE2ETest {
 
         page.delete(editEnvironmentName);
 
-        await().untilAsserted(() -> {
+        Awaitility.await().untilAsserted(() -> {
             browser.navigate().refresh();
 
             assertThat(

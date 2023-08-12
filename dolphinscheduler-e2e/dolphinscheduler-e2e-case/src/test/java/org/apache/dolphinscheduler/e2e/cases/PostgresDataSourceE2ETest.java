@@ -21,12 +21,14 @@
 package org.apache.dolphinscheduler.e2e.cases;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
 
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.datasource.DataSourcePage;
 
+import java.time.Duration;
+
+import org.testcontainers.shaded.org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -65,7 +67,6 @@ public class PostgresDataSourceE2ETest {
 
     private static final String jdbcParams = "";
 
-    private static final int testFlag = 1;
 
     @BeforeAll
     public static void setup() {
@@ -79,12 +80,12 @@ public class PostgresDataSourceE2ETest {
     void testCreatePostgresDataSource() {
         final DataSourcePage page = new DataSourcePage(browser);
 
-        page.createDataSource(dataSourceType, dataSourceName, dataSourceDescription, ip, port, userName, pgPassword, database, jdbcParams, testFlag);
+        page.createDataSource(dataSourceType, dataSourceName, dataSourceDescription, ip, port, userName, pgPassword, database, jdbcParams);
 
-        new WebDriverWait(page.driver(), 10).until(ExpectedConditions.invisibilityOfElementLocated(
+        new WebDriverWait(page.driver(), Duration.ofSeconds(20)).until(ExpectedConditions.invisibilityOfElementLocated(
                 new By.ByClassName("dialog-create-data-source")));
 
-        await().untilAsserted(() -> assertThat(page.dataSourceItemsList())
+        Awaitility.await().untilAsserted(() -> assertThat(page.dataSourceItemsList())
             .as("DataSource list should contain newly-created database")
             .extracting(WebElement::getText)
             .anyMatch(it -> it.contains(dataSourceName)));
@@ -97,7 +98,7 @@ public class PostgresDataSourceE2ETest {
 
         page.delete(dataSourceName);
 
-        await().untilAsserted(() -> {
+        Awaitility.await().untilAsserted(() -> {
             browser.navigate().refresh();
 
             assertThat(

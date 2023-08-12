@@ -17,23 +17,30 @@
 
 package org.apache.dolphinscheduler.plugin.task.spark;
 
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.NAMESPACE_NAME;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.UNIQUE_LABEL_NAME;
+import static org.apache.dolphinscheduler.plugin.task.spark.SparkConstants.DRIVER_LABEL_CONF;
+import static org.apache.dolphinscheduler.plugin.task.spark.SparkConstants.SPARK_KUBERNETES_NAMESPACE;
+import static org.apache.dolphinscheduler.plugin.task.spark.SparkConstants.SPARK_ON_K8S_MASTER_PREFIX;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ArgsUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -44,6 +51,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import io.fabric8.kubernetes.client.Config;
 
 public class SparkTask extends AbstractYarnTask {
 
@@ -75,21 +85,12 @@ public class SparkTask extends AbstractYarnTask {
         if (!sparkParameters.checkParameters()) {
             throw new RuntimeException("spark task params is not valid");
         }
-        sparkParameters.setQueue(taskExecutionContext.getQueue());
 
-        if (sparkParameters.getProgramType() != ProgramType.SQL) {
-            setMainJarName();
-        }
         log.info("Initialize spark task params {}", JSONUtils.toPrettyJsonString(sparkParameters));
     }
 
-    /**
-     * create command
-     *
-     * @return command
-     */
     @Override
-    protected String buildCommand() {
+    protected String getScript() {
         /**
          * (1) spark-submit [options] <app jar | python file> [app arguments]
          * (2) spark-sql [options] -f <filename>
@@ -110,15 +111,13 @@ public class SparkTask extends AbstractYarnTask {
         // populate spark options
         args.addAll(populateSparkOptions());
 
-        // replace placeholder, and combining local and global parameters
-        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+        // replace placeholder
+        return args.stream().collect(Collectors.joining(" "));
+    }
 
-        String command =
-                ParameterUtils.convertParameterPlaceholders(String.join(" ", args), ParamUtils.convert(paramsMap));
-
-        log.info("spark task command: {}", command);
-
-        return command;
+    @Override
+    protected Map<String, String> getProperties() {
+        return ParameterUtils.convert(taskExecutionContext.getPrepareParamsMap());
     }
 
     /**
@@ -132,8 +131,15 @@ public class SparkTask extends AbstractYarnTask {
 
         String deployMode = StringUtils.isNotEmpty(sparkParameters.getDeployMode()) ? sparkParameters.getDeployMode()
                 : SparkConstants.DEPLOY_MODE_LOCAL;
+
+        boolean onNativeKubernetes = StringUtils.isNotEmpty(sparkParameters.getNamespace());
+
+        String masterUrl = onNativeKubernetes ? SPARK_ON_K8S_MASTER_PREFIX +
+                Config.fromKubeconfig(taskExecutionContext.getK8sTaskExecutionContext().getConfigYaml()).getMasterUrl()
+                : SparkConstants.SPARK_ON_YARN;
+
         if (!SparkConstants.DEPLOY_MODE_LOCAL.equals(deployMode)) {
-            args.add(SparkConstants.SPARK_ON_YARN);
+            args.add(masterUrl);
             args.add(SparkConstants.DEPLOY_MODE);
         }
         args.add(deployMode);
@@ -155,11 +161,11 @@ public class SparkTask extends AbstractYarnTask {
 
         String others = sparkParameters.getOthers();
         if (!SparkConstants.DEPLOY_MODE_LOCAL.equals(deployMode)
-                && (StringUtils.isEmpty(others) || !others.contains(SparkConstants.SPARK_QUEUE))) {
-            String queue = sparkParameters.getQueue();
-            if (StringUtils.isNotEmpty(queue)) {
-                args.add(SparkConstants.SPARK_QUEUE);
-                args.add(queue);
+                && (StringUtils.isEmpty(others) || !others.contains(SparkConstants.SPARK_YARN_QUEUE))) {
+            String yarnQueue = sparkParameters.getYarnQueue();
+            if (StringUtils.isNotEmpty(yarnQueue)) {
+                args.add(SparkConstants.SPARK_YARN_QUEUE);
+                args.add(yarnQueue);
             }
         }
 
@@ -168,9 +174,16 @@ public class SparkTask extends AbstractYarnTask {
             args.add(others);
         }
 
+        // add driver label for spark on native kubernetes
+        if (onNativeKubernetes) {
+            args.add(String.format(DRIVER_LABEL_CONF, UNIQUE_LABEL_NAME, taskExecutionContext.getTaskAppId()));
+            args.add(String.format(SPARK_KUBERNETES_NAMESPACE,
+                    JSONUtils.toMap(sparkParameters.getNamespace()).get(NAMESPACE_NAME)));
+        }
+
         ResourceInfo mainJar = sparkParameters.getMainJar();
         if (programType != ProgramType.SQL) {
-            args.add(mainJar.getRes());
+            args.add(taskExecutionContext.getResources().get(mainJar.getResourceName()));
         }
 
         String mainArgs = sparkParameters.getMainArgs();
@@ -180,8 +193,28 @@ public class SparkTask extends AbstractYarnTask {
 
         // bin/spark-sql -f fileName
         if (ProgramType.SQL == programType) {
+            String sqlContent = "";
+            String resourceFileName = "";
             args.add(SparkConstants.SQL_FROM_FILE);
-            args.add(generateScriptFile());
+            if (SparkConstants.TYPE_FILE.equals(sparkParameters.getSqlExecutionType())) {
+                final List<ResourceInfo> resourceInfos = sparkParameters.getResourceList();
+                if (resourceInfos.size() > 1) {
+                    log.warn("more than 1 files detected, use the first one by default");
+                }
+
+                try {
+                    resourceFileName = resourceInfos.get(0).getResourceName();
+                    sqlContent = FileUtils.readFileToString(
+                            new File(String.format("%s/%s", taskExecutionContext.getExecutePath(), resourceFileName)),
+                            StandardCharsets.UTF_8);
+                } catch (IOException e) {
+                    log.error("read sql content from file {} error ", resourceFileName, e);
+                    throw new TaskException("read sql content error", e);
+                }
+            } else {
+                sqlContent = sparkParameters.getRawScript();
+            }
+            args.add(generateScriptFile(sqlContent));
         }
         return args;
     }
@@ -189,36 +222,31 @@ public class SparkTask extends AbstractYarnTask {
     private void populateSparkResourceDefinitions(List<String> args) {
         int driverCores = sparkParameters.getDriverCores();
         if (driverCores > 0) {
-            args.add(SparkConstants.DRIVER_CORES);
-            args.add(String.format("%d", driverCores));
+            args.add(String.format(SparkConstants.DRIVER_CORES, driverCores));
         }
 
         String driverMemory = sparkParameters.getDriverMemory();
         if (StringUtils.isNotEmpty(driverMemory)) {
-            args.add(SparkConstants.DRIVER_MEMORY);
-            args.add(driverMemory);
+            args.add(String.format(SparkConstants.DRIVER_MEMORY, driverMemory));
         }
 
         int numExecutors = sparkParameters.getNumExecutors();
         if (numExecutors > 0) {
-            args.add(SparkConstants.NUM_EXECUTORS);
-            args.add(String.format("%d", numExecutors));
+            args.add(String.format(SparkConstants.NUM_EXECUTORS, numExecutors));
         }
 
         int executorCores = sparkParameters.getExecutorCores();
         if (executorCores > 0) {
-            args.add(SparkConstants.EXECUTOR_CORES);
-            args.add(String.format("%d", executorCores));
+            args.add(String.format(SparkConstants.EXECUTOR_CORES, executorCores));
         }
 
         String executorMemory = sparkParameters.getExecutorMemory();
         if (StringUtils.isNotEmpty(executorMemory)) {
-            args.add(SparkConstants.EXECUTOR_MEMORY);
-            args.add(executorMemory);
+            args.add(String.format(SparkConstants.EXECUTOR_MEMORY, executorMemory));
         }
     }
 
-    private String generateScriptFile() {
+    private String generateScriptFile(String sqlContent) {
         String scriptFileName = String.format("%s/%s_node.sql", taskExecutionContext.getExecutePath(),
                 taskExecutionContext.getTaskAppId());
 
@@ -226,10 +254,9 @@ public class SparkTask extends AbstractYarnTask {
         Path path = file.toPath();
 
         if (!Files.exists(path)) {
-            String script = replaceParam(sparkParameters.getRawScript());
-            sparkParameters.setRawScript(script);
+            String script = replaceParam(sqlContent);
 
-            log.info("raw script : {}", sparkParameters.getRawScript());
+            log.info("raw script : {}", script);
             log.info("task execute path : {}", taskExecutionContext.getExecutePath());
 
             Set<PosixFilePermission> perms = PosixFilePermissions.fromString(RWXR_XR_X);
@@ -243,7 +270,7 @@ public class SparkTask extends AbstractYarnTask {
                     }
                     Files.createFile(path, attr);
                 }
-                Files.write(path, sparkParameters.getRawScript().getBytes(), StandardOpenOption.APPEND);
+                Files.write(path, script.getBytes(), StandardOpenOption.APPEND);
             } catch (IOException e) {
                 throw new RuntimeException("generate spark sql script error", e);
             }
@@ -254,19 +281,10 @@ public class SparkTask extends AbstractYarnTask {
 
     private String replaceParam(String script) {
         script = script.replaceAll("\\r\\n", System.lineSeparator());
-        // replace placeholder, and combining local and global parameters
+        // replace placeholder
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
-        script = ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
+        script = ParameterUtils.convertParameterPlaceholders(script, ParameterUtils.convert(paramsMap));
         return script;
-    }
-
-    @Override
-    protected void setMainJarName() {
-        // main jar
-        ResourceInfo mainJar = sparkParameters.getMainJar();
-        String resourceName = getResourceNameOfMainJar(mainJar);
-        mainJar.setRes(resourceName);
-        sparkParameters.setMainJar(mainJar);
     }
 
     @Override

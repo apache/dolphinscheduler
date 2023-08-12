@@ -2,7 +2,9 @@
 
 ## Overview
 
-DataX task type for executing DataX programs. For DataX nodes, the worker will execute `${DATAX_HOME}/bin/datax.py` to analyze the input json file.
+DataX task type for executing DataX programs. For DataX nodes, the worker will execute `${DATAX_LAUNCHER}` to analyze the input json file.
+
+Please set environment name `PYTHON_LAUNCHER` before you run datax task, some of datax release version only support `python2.7`
 
 ## Create Task
 

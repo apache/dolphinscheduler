@@ -22,5 +22,6 @@ export default {
   userPassword: 'Password',
   userPassword_tips: 'Please enter your password',
   login: 'Login',
-  otherwayLogin: 'login by otherways'
+  otherwayLogin: 'login by otherways',
+  ssoLogin: 'SSO Login'
 }

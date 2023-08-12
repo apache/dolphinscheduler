@@ -20,11 +20,8 @@ import ResourceListModal from '../components/resource'
 
 export default defineComponent({
   name: 'File',
-  setup() {
-  },
+  setup() {},
   render() {
-    return <ResourceListModal
-      resourceType={'FILE'}
-    />
+    return <ResourceListModal resourceType={'FILE'} />
   }
 })

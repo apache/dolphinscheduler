@@ -23,6 +23,7 @@ const TYPES = [
   'radio',
   'editor',
   'custom-parameters',
+  'custom-labels',
   'switch',
   'input-number',
   'select',

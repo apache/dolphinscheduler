@@ -117,7 +117,7 @@ export function useSwitch(
       type: 'select',
       field: 'nextNode',
       span: 24,
-      name: t('project.node.switch_branch_flow'),
+      name: t('project.node.switch_branch_flow_default'),
       props: {
         loading: loading
       },

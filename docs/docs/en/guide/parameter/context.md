@@ -14,8 +14,9 @@ DolphinScheduler allows parameter transfer between tasks. Currently, transfer di
 * [SQL](../task/sql.md)
 * [Procedure](../task/stored-procedure.md)
 * [Python](../task/python.md)
+* [SubProcess](../task/sub-process.md)
 
-When defining an upstream node, if there is a need to transmit the result of that node to a dependency related downstream node. You need to set an `OUT` direction parameter to [Custom Parameters] of the [Current Node Settings]. At present, we mainly focus on the SQL and shell nodes to pass parameters downstream.
+When defining an upstream node, if there is a need to transmit the result of that node to a dependency related downstream node. You need to set an `OUT` direction parameter to [Custom Parameters] of the [Current Node Settings]. If it is a SubProcess node, there is no need to set a parameter in [Current Node Settings], but an `OUT` direction parameter needs to be set in the workflow definition of the subprocess.
 
 The value of upstream parameter can be updated in downstream node in the same way as [setting parameter](#create-a-shell-task-and-set-parameters).
 
@@ -60,7 +61,7 @@ When the SHELL task is completed, we can use the output passed upstream as the q
 
 Click on the Save workflow icon and set the global parameters output and value.
 
-![context-parameter03](../../../../img/new_ui/dev/parameter/context_parameter04.png)
+![context-parameter04](../../../../img/new_ui/dev/parameter/context_parameter04.png)
 
 #### View results
 
@@ -88,4 +89,30 @@ Use `print('${setValue(key=%s)}' % value)`, DolphinScheduler will capture the `$
 
 For example
 
-![img.png](../../../../img/new_ui/dev/parameter/python_context_param.png)
+![python_context_param](../../../../img/new_ui/dev/parameter/python_context_param.png)
+
+#### Pass parameter from SubProcess task to downstream
+
+In the workflow definition of the subprocess, define `OUT` direction parameters as output parameters, and these parameters can be passed to the downstream tasks of the subprocess node.
+
+Create an A task in the workflow definition of the subprocess, add var1 and var2 parameters to the custom parameters, and write the following script:
+
+![context-subprocess01](../../../../img/new_ui/dev/parameter/context-subprocess01.png)
+
+Save the subprocess_example1 workflow and set the global parameters var1.
+
+![context-subprocess02](../../../../img/new_ui/dev/parameter/context-subprocess02.png)
+
+Create a sub_process task in a new workflow, and use the subprocess_example1 workflow as the sub-node.
+
+![context-subprocess03](../../../../img/new_ui/dev/parameter/context-subprocess03.png)
+
+Create a shell task as a downstream task of the sub_process task, and write the following script:
+
+![context-subprocess04](../../../../img/new_ui/dev/parameter/context-subprocess04.png)
+
+Save the workflow and run it. The result of the downstream task is as follows:
+
+![context-subprocess05](../../../../img/new_ui/dev/parameter/context-subprocess05.png)
+
+Although the two parameters var1 and var2 are output in the A task, only the `OUT` parameter var1 is defined in the workflow definition, and the downstream task successfully outputs var1. It proves that the var1 parameter is passed in the workflow with reference to the expected value.

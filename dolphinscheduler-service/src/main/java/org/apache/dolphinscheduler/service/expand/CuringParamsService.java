@@ -86,4 +86,6 @@ public interface CuringParamsService {
      * @return
      */
     Map<String, Property> preBuildBusinessParams(ProcessInstance processInstance);
+
+    Map<String, Property> getProjectParameterMap(long projectCode);
 }

@@ -20,9 +20,9 @@ package org.apache.dolphinscheduler.server.master.runner;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.cache.StreamTaskInstanceExecCacheManager;
-import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 
 import java.util.concurrent.TimeUnit;
 
@@ -78,11 +78,12 @@ public class EventExecuteService extends BaseDaemonThread {
     private void workflowEventHandler() {
         for (WorkflowExecuteRunnable workflowExecuteThread : this.processInstanceExecCacheManager.getAll()) {
             try {
-                LoggerUtils.setWorkflowInstanceIdMDC(workflowExecuteThread.getProcessInstance().getId());
+                LogUtils.setWorkflowInstanceIdMDC(
+                        workflowExecuteThread.getWorkflowExecuteContext().getWorkflowInstance().getId());
                 workflowExecuteThreadPool.executeEvent(workflowExecuteThread);
 
             } finally {
-                LoggerUtils.removeWorkflowInstanceIdMDC();
+                LogUtils.removeWorkflowInstanceIdMDC();
             }
         }
     }
@@ -90,11 +91,11 @@ public class EventExecuteService extends BaseDaemonThread {
     private void streamTaskEventHandler() {
         for (StreamTaskExecuteRunnable streamTaskExecuteRunnable : streamTaskInstanceExecCacheManager.getAll()) {
             try {
-                LoggerUtils.setTaskInstanceIdMDC(streamTaskExecuteRunnable.getTaskInstance().getId());
+                LogUtils.setTaskInstanceIdMDC(streamTaskExecuteRunnable.getTaskInstance().getId());
                 streamTaskExecuteThreadPool.executeEvent(streamTaskExecuteRunnable);
 
             } finally {
-                LoggerUtils.removeWorkflowInstanceIdMDC();
+                LogUtils.removeWorkflowInstanceIdMDC();
             }
         }
     }

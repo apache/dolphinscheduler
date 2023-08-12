@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.storage.hdfs;
 
+import static org.apache.dolphinscheduler.common.constants.Constants.EMPTY_STRING;
 import static org.apache.dolphinscheduler.common.constants.Constants.FOLDER_SEPARATOR;
 import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_S_S;
 import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_TYPE_FILE;
@@ -55,7 +56,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
@@ -68,7 +68,6 @@ import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.base.Joiner;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -141,7 +140,7 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
             // first get key from core-site.xml hdfs-site.xml ,if null ,then try to get from properties file
             // the default is the local file system
             if (StringUtils.isNotBlank(defaultFS)) {
-                Map<String, String> fsRelatedProps = PropertyUtils.getPrefixedProperties("fs.");
+                Map<String, String> fsRelatedProps = PropertyUtils.getByPrefix("fs.");
                 configuration.set(Constants.HDFS_DEFAULT_FS, defaultFS);
                 fsRelatedProps.forEach((key, value) -> configuration.set(key, value));
             } else {
@@ -182,9 +181,9 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
      * @return DefaultFS
      */
     public String getDefaultFS() {
-        String defaultFS = getConfiguration().get(Constants.FS_DEFAULT_FS);
+        String defaultFS = hdfsProperties.getDefaultFS();
         if (StringUtils.isBlank(defaultFS)) {
-            defaultFS = hdfsProperties.getDefaultFS();
+            defaultFS = getConfiguration().get(Constants.HDFS_DEFAULT_FS);
         }
         return defaultFS;
     }
@@ -297,28 +296,14 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
     }
 
     @Override
-    public String getResourceFileName(String tenantCode, String fullName) {
+    public String getResourceFullName(String tenantCode, String fullName) {
         return getHdfsResourceFileName(tenantCode, fullName);
     }
 
     @Override
-    public String getResourceFileName(String fullName) {
-        // here is a quick fix here to get fileName. We get the resource upload path and
-        // get the index of the first appearance of resource upload path. The index is put
-        // in the start index of the substring function and get the result substring containing
-        // tenantcode and "resource" directory and the fileName.
-        // Then we split the result substring
-        // with "/" and join all elements except the first two elements because they are
-        // tenantCode and "resource" directory.
-        String resourceUploadPath =
-                RESOURCE_UPLOAD_PATH.endsWith(FOLDER_SEPARATOR) ? StringUtils.chop(RESOURCE_UPLOAD_PATH)
-                        : RESOURCE_UPLOAD_PATH;
-        // +1 because we want to skip the "/" after resource upload path as well.
-        String pathContainingTenantNResource = fullName.substring(
-                fullName.indexOf(resourceUploadPath)
-                        + resourceUploadPath.length() + 1);
-        String[] fileNameArr = pathContainingTenantNResource.split(FOLDER_SEPARATOR);
-        return Joiner.on(FOLDER_SEPARATOR).join(Arrays.stream(fileNameArr).skip(2).collect(Collectors.toList()));
+    public String getResourceFileName(String tenantCode, String fullName) {
+        String resDir = getResDir(tenantCode);
+        return fullName.replaceFirst(resDir, "");
     }
 
     @Override
@@ -327,9 +312,9 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
     }
 
     @Override
-    public void download(String bucketName, String srcHdfsFilePath, String dstFile, boolean deleteSource,
+    public void download(String tenantCode, String srcHdfsFilePath, String dstFile,
                          boolean overwrite) throws IOException {
-        copyHdfsToLocal(srcHdfsFilePath, dstFile, deleteSource, overwrite);
+        copyHdfsToLocal(srcHdfsFilePath, dstFile, false, overwrite);
     }
 
     /**
@@ -472,7 +457,11 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
         // TODO: add hdfs prefix getFile
         List<StorageEntity> storageEntityList = new ArrayList<>();
         try {
-            FileStatus[] fileStatuses = fs.listStatus(new Path(path));
+            Path filePath = new Path(path);
+            if (!fs.exists(filePath)) {
+                return storageEntityList;
+            }
+            FileStatus[] fileStatuses = fs.listStatus(filePath);
 
             // transform FileStatusArray into the StorageEntity List
             for (FileStatus fileStatus : fileStatuses) {
@@ -489,7 +478,6 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
                     entity.setFileName(fileName);
                     entity.setFullName(fullName);
                     entity.setDirectory(true);
-                    entity.setDescription("");
                     entity.setUserName(tenantCode);
                     entity.setType(type);
                     entity.setSize(fileStatus.getLen());
@@ -511,7 +499,6 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
                     entity.setFileName(fileName);
                     entity.setFullName(fullName);
                     entity.setDirectory(false);
-                    entity.setDescription("");
                     entity.setUserName(tenantCode);
                     entity.setType(type);
                     entity.setSize(fileStatus.getLen());
@@ -554,7 +541,6 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
             entity.setFileName(fileName);
             entity.setFullName(fullName);
             entity.setDirectory(fileStatus.isDirectory());
-            entity.setDescription("");
             entity.setUserName(tenantCode);
             entity.setType(type);
             entity.setSize(fileStatus.getLen());
@@ -615,13 +601,16 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
      * @return hdfs resource dir
      */
     public static String getHdfsDir(ResourceType resourceType, String tenantCode) {
-        String hdfsDir = "";
-        if (resourceType.equals(ResourceType.FILE)) {
-            hdfsDir = getHdfsResDir(tenantCode);
-        } else if (resourceType.equals(ResourceType.UDF)) {
-            hdfsDir = getHdfsUdfDir(tenantCode);
+        switch (resourceType) {
+            case UDF:
+                return getHdfsUdfDir(tenantCode);
+            case FILE:
+                return getHdfsResDir(tenantCode);
+            case ALL:
+                return getHdfsDataBasePath();
+            default:
+                return EMPTY_STRING;
         }
-        return hdfsDir;
     }
 
     @Override
@@ -752,9 +741,10 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
     private static final class YarnHAAdminUtils {
 
         /**
-         *  get active resourcemanager node
+         * get active resourcemanager node
+         *
          * @param protocol http protocol
-         * @param rmIds yarn ha ids
+         * @param rmIds    yarn ha ids
          * @return yarn active node
          */
         public static String getActiveRMName(String protocol, String rmIds) {

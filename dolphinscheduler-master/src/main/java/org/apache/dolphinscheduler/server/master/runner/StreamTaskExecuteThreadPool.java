@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.service.utils.LoggerUtils;
 
 import javax.annotation.PostConstruct;
 
@@ -61,16 +61,16 @@ public class StreamTaskExecuteThreadPool extends ThreadPoolTaskExecutor {
 
             @Override
             public void onFailure(Throwable ex) {
-                LoggerUtils.setTaskInstanceIdMDC(taskInstanceId);
+                LogUtils.setTaskInstanceIdMDC(taskInstanceId);
                 log.error("Stream task instance events handle failed", ex);
-                LoggerUtils.removeTaskInstanceIdMDC();
+                LogUtils.removeTaskInstanceIdMDC();
             }
 
             @Override
             public void onSuccess(Object result) {
-                LoggerUtils.setTaskInstanceIdMDC(taskInstanceId);
+                LogUtils.setTaskInstanceIdMDC(taskInstanceId);
                 log.info("Stream task instance is finished.");
-                LoggerUtils.removeTaskInstanceIdMDC();
+                LogUtils.removeTaskInstanceIdMDC();
             }
         });
     }

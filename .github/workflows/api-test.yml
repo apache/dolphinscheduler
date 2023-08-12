@@ -67,7 +67,7 @@ jobs:
           ./mvnw -B clean install \
           -Dmaven.test.skip \
           -Dmaven.javadoc.skip \
-          -Dcheckstyle.skip=true \
+          -Dspotless.skip=true \
           -Pdocker,release -Ddocker.tag=ci \
           -pl dolphinscheduler-standalone-server -am
       - name: Export Docker Images
@@ -90,6 +90,18 @@ jobs:
         case:
           - name: Tenant
             class: org.apache.dolphinscheduler.api.test.cases.TenantAPITest
+          - name: WorkerGroup
+            class: org.apache.dolphinscheduler.api.test.cases.WorkerGroupAPITest
+          - name: Project
+            class: org.apache.dolphinscheduler.api.test.cases.ProjectAPITest
+          - name: Workflow
+            class: org.apache.dolphinscheduler.api.test.cases.ProcessDefinitionAPITest
+          - name: Scheduler
+            class: org.apache.dolphinscheduler.api.test.cases.SchedulerAPITest
+          - name: Executor
+            class: org.apache.dolphinscheduler.api.test.cases.ExecutorAPITest
+          - name: ProcessInstance
+            class: org.apache.dolphinscheduler.api.test.cases.ProcessInstanceAPITest
     env:
       RECORDING_PATH: /tmp/recording-${{ matrix.case.name }}
     steps:
@@ -114,7 +126,7 @@ jobs:
         run: |
           ./mvnw -B -f dolphinscheduler-api-test/pom.xml -am \
             -DfailIfNoTests=false \
-            -Dcheckstyle.skip=false \
+            -Dspotless.skip=false \
             -Dtest=${{ matrix.case.class }} test
       - uses: actions/upload-artifact@v2
         if: always()
