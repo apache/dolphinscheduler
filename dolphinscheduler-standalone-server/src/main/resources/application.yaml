@@ -106,6 +106,32 @@ security:
         email-attribute: mail
         # action when ldap user is not exist (supported types: CREATE,DENY)
         not-exist-action: CREATE
+    oauth2:
+      enable: false
+      provider:
+        github:
+          authorizationUri: ""
+          redirectUri: ""
+          clientId: ""
+          clientSecret: ""
+          tokenUri: ""
+          userInfoUri: ""
+          callbackUrl: ""
+          iconUri: ""
+          provider: gihub
+        google:
+          authorizationUri: ""
+          redirectUri: ""
+          clientId: ""
+          clientSecret: ""
+          tokenUri: ""
+          userInfoUri: ""
+          callbackUrl: ""
+          iconUri: ""
+          provider: google
+
+
+
 
 # Traffic control, if you turn on this config, the maximum number of request/s will be limited.
 # global max request number per second

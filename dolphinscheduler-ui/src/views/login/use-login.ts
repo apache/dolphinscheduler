@@ -16,22 +16,24 @@
  */
 
 import { useRouter } from 'vue-router'
-import { login } from '@/service/modules/login'
+import { clearCookie, getOauth2Provider, login } from '@/service/modules/login'
 import { getUserInfo } from '@/service/modules/users'
 import { useUserStore } from '@/store/user/user'
 import type { Router } from 'vue-router'
-import type { LoginRes } from '@/service/modules/login/types'
+import { useRoute } from 'vue-router'
+import type { LoginRes, OAuth2Provider } from '@/service/modules/login/types'
 import type { UserInfoRes } from '@/service/modules/users/types'
 import { useRouteStore } from '@/store/route/route'
 import { useTimezoneStore } from '@/store/timezone/timezone'
 import cookies from 'js-cookie'
+import { reactive, ref } from 'vue'
 
 export function useLogin(state: any) {
   const router: Router = useRouter()
   const userStore = useUserStore()
   const routeStore = useRouteStore()
   const timezoneStore = useTimezoneStore()
-
+  const route = useRoute()
   const handleLogin = () => {
     state.loginFormRef.validate(async (valid: any) => {
       if (!valid) {
@@ -53,7 +55,49 @@ export function useLogin(state: any) {
     })
   }
 
+
+
+  const handleGetOAuth2Provider = () => {
+    getOauth2Provider().then((res: Array<OAuth2Provider> | []) => {
+      oauth2Providers.value = res
+    })
+  }
+
+  const oauth2Providers = ref()
+
+  const gotoOAuth2Page = async (oauth2Provider: OAuth2Provider) => {
+    await clearCookie()
+    window.location.href = `${oauth2Provider.authorizationUri}?client_id=${oauth2Provider.clientId}` +
+      `&redirect_uri=${oauth2Provider.redirectUri}?provider=${oauth2Provider.provider}`
+  }
+
+  const handleRedirect = async () => {
+    debugger
+    const authType = route.query.authType
+    if (authType && authType == 'oauth2') {
+      const sessionId = route.query.sessionId
+      if (sessionId) {
+        cookies.set('sessionId', String(sessionId), { path: '/' })
+        const userInfoRes: UserInfoRes = await getUserInfo()
+        await userStore.setUserInfo(userInfoRes)
+        const timezone = userInfoRes.timeZone ? userInfoRes.timeZone : 'UTC'
+        await timezoneStore.setTimezone(timezone)
+        router.push('home')
+      }
+      const error = route.query.error
+      if (error) {
+        window.$message.error(error)
+      }
+
+    }
+
+  }
+
   return {
-    handleLogin
+    handleLogin,
+    handleGetOAuth2Provider,
+    gotoOAuth2Page,
+    oauth2Providers,
+    handleRedirect
   }
 }

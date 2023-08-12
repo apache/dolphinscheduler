@@ -25,3 +25,17 @@ export function login(data: LoginReq): any {
     data
   })
 }
+
+export function getOauth2Provider(): any {
+  return axios({
+    url: '/oauth2-provider',
+    method: 'get',
+  })
+}
+
+export function clearCookie(): any {
+  return axios({
+    url: '/cookies',
+    method: 'delete',
+  })
+}

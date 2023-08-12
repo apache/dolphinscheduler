@@ -21,5 +21,6 @@ export default {
   userName_tips: '请输入用户名',
   userPassword: '密码',
   userPassword_tips: '请输入密码',
-  login: '登录'
+  login: '登录',
+  otherwayLogin: '其他方式登录'
 }

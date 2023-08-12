@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, getCurrentInstance, toRefs, withKeys } from 'vue'
+import { defineComponent, getCurrentInstance, toRefs, withKeys, onMounted } from 'vue'
 import styles from './index.module.scss'
 import {
   NInput,
@@ -23,7 +23,10 @@ import {
   NSwitch,
   NForm,
   NFormItem,
-  useMessage
+  useMessage,
+  NSpace,
+  NDivider,
+  NImage
 } from 'naive-ui'
 import { useForm } from './use-form'
 import { useTranslate } from './use-translate'
@@ -31,15 +34,16 @@ import { useLogin } from './use-login'
 import { useLocalesStore } from '@/store/locales/locales'
 import { useThemeStore } from '@/store/theme/theme'
 import cookies from 'js-cookie'
+import { OAuth2Provider } from '@/service/modules/login/types'
+
 
 const login = defineComponent({
   name: 'login',
   setup() {
     window.$message = useMessage()
-
     const { state, t, locale } = useForm()
     const { handleChange } = useTranslate(locale)
-    const { handleLogin } = useLogin(state)
+    const { handleLogin, handleGetOAuth2Provider, oauth2Providers, gotoOAuth2Page, handleRedirect } = useLogin(state)
     const localesStore = useLocalesStore()
     const themeStore = useThemeStore()
 
@@ -47,17 +51,24 @@ const login = defineComponent({
       themeStore.setDarkTheme()
     }
 
+    onMounted(() => {
+      handleRedirect()
+    })
+
+
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
     cookies.set('language', localesStore.getLocales, { path: '/' })
-
+    handleGetOAuth2Provider()
     return {
       t,
       handleChange,
       handleLogin,
       ...toRefs(state),
       localesStore,
-      trim
+      trim,
+      oauth2Providers,
+      gotoOAuth2Page
     }
   },
   render() {
@@ -126,6 +137,15 @@ const login = defineComponent({
             >
               {this.t('login.login')}
             </NButton>
+            {this.oauth2Providers.length > 0 ? <NDivider >
+              {this.t('login.otherwayLogin')}
+            </NDivider> : <div></div>}
+
+            <NSpace class={styles['oauth2-provider']} justify="center">
+              {this.oauth2Providers?.map((e: OAuth2Provider) => {
+                return (e.iconUri ? <div onClick={() => this.gotoOAuth2Page(e)}><NImage preview-disabled width="30" src={e.iconUri}></NImage> </div> : <NButton onClick={() => this.gotoOAuth2Page(e)}>{e.provider}</NButton>)
+              })}
+            </NSpace>
           </div>
         </div>
       </div>
