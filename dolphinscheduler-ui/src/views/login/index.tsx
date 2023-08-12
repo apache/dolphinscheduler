@@ -177,6 +177,7 @@ const login = defineComponent({
                 {this.t('login.ssoLogin')}
               </NButton>
             </a>
+          </div>
             {this.oauth2Providers.length > 0 ? <NDivider >
               {this.t('login.otherwayLogin')}
             </NDivider> : <div></div>}
@@ -186,7 +187,6 @@ const login = defineComponent({
                 return (e.iconUri ? <div onClick={() => this.gotoOAuth2Page(e)}><NImage preview-disabled width="30" src={e.iconUri}></NImage> </div> : <NButton onClick={() => this.gotoOAuth2Page(e)}>{e.provider}</NButton>)
               })}
             </NSpace>
-          </div>
         </div>
       </div>
     )

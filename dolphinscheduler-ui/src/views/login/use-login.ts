@@ -73,7 +73,7 @@ export function useLogin(state: any) {
     })
   }
 
-  const oauth2Providers = ref()
+  const oauth2Providers = ref<Array<OAuth2Provider> | []>([])
 
   const gotoOAuth2Page = async (oauth2Provider: OAuth2Provider) => {
     await clearCookie()
