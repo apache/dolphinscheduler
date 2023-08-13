@@ -22,7 +22,9 @@ import org.apache.dolphinscheduler.common.enums.TaskEventType;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.TaskInstanceUtils;
-import org.apache.dolphinscheduler.remote.command.task.TaskExecuteRunningMessageAck;
+import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.worker.ITaskInstanceExecutionEventAckListener;
+import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceExecutionRunningEventAck;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
@@ -107,14 +109,11 @@ public class TaskRunningEventHandler implements TaskEventHandler {
 
     private void sendAckToWorker(TaskEvent taskEvent) {
         // If event handle success, send ack to worker to otherwise the worker will retry this event
-        TaskExecuteRunningMessageAck taskExecuteRunningMessageAck =
-                new TaskExecuteRunningMessageAck(
-                        true,
-                        taskEvent.getTaskInstanceId(),
-                        masterConfig.getMasterAddress(),
-                        taskEvent.getWorkerAddress(),
-                        System.currentTimeMillis());
-        taskEvent.getChannel().writeAndFlush(taskExecuteRunningMessageAck.convert2Command());
+        ITaskInstanceExecutionEventAckListener instanceExecutionEventAckListener =
+                SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+                        .getProxyClient(taskEvent.getWorkerAddress(), ITaskInstanceExecutionEventAckListener.class);
+        instanceExecutionEventAckListener.handleTaskInstanceExecutionRunningEventAck(
+                TaskInstanceExecutionRunningEventAck.success(taskEvent.getTaskInstanceId()));
     }
 
     @Override

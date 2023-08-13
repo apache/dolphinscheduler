@@ -22,6 +22,7 @@ import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_WOR
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
+import org.apache.dolphinscheduler.common.enums.TaskEventType;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -31,6 +32,12 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.master.transportor.StreamingTaskTriggerRequest;
+import org.apache.dolphinscheduler.extract.worker.ITaskInstanceExecutionEventAckListener;
+import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceExecutionFinishEventAck;
+import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceExecutionInfoEventAck;
+import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceExecutionRunningEventAck;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
@@ -42,8 +49,6 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
-import org.apache.dolphinscheduler.remote.command.task.TaskExecuteRunningMessageAck;
-import org.apache.dolphinscheduler.remote.command.task.TaskExecuteStartMessage;
 import org.apache.dolphinscheduler.server.master.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.cache.StreamTaskInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
@@ -103,7 +108,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
 
     protected ProcessDefinition processDefinition;
 
-    protected TaskExecuteStartMessage taskExecuteStartMessage;
+    protected StreamingTaskTriggerRequest taskExecuteStartMessage;
 
     protected TaskExecutionContextFactory taskExecutionContextFactory;
 
@@ -114,7 +119,8 @@ public class StreamTaskExecuteRunnable implements Runnable {
 
     private TaskRunnableStatus taskRunnableStatus = TaskRunnableStatus.CREATED;
 
-    public StreamTaskExecuteRunnable(TaskDefinition taskDefinition, TaskExecuteStartMessage taskExecuteStartMessage) {
+    public StreamTaskExecuteRunnable(TaskDefinition taskDefinition,
+                                     StreamingTaskTriggerRequest taskExecuteStartMessage) {
         this.processService = SpringApplicationContext.getBean(ProcessService.class);
         this.masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
         this.workerTaskDispatcher = SpringApplicationContext.getBean(WorkerTaskDispatcher.class);
@@ -466,14 +472,27 @@ public class StreamTaskExecuteRunnable implements Runnable {
 
     private void sendAckToWorker(TaskEvent taskEvent) {
         // If event handle success, send ack to worker to otherwise the worker will retry this event
-        TaskExecuteRunningMessageAck taskExecuteRunningMessageAck =
-                new TaskExecuteRunningMessageAck(
-                        true,
-                        taskEvent.getTaskInstanceId(),
-                        masterConfig.getMasterAddress(),
-                        taskEvent.getWorkerAddress(),
-                        System.currentTimeMillis());
-        taskEvent.getChannel().writeAndFlush(taskExecuteRunningMessageAck.convert2Command());
+        ITaskInstanceExecutionEventAckListener instanceExecutionEventAckListener =
+                SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+                        .getProxyClient(taskEvent.getWorkerAddress(), ITaskInstanceExecutionEventAckListener.class);
+        if (taskEvent.getEvent() == TaskEventType.RUNNING) {
+            log.error("taskEvent.getChannel() is null, taskEvent:{}", taskEvent);
+            instanceExecutionEventAckListener.handleTaskInstanceExecutionRunningEventAck(
+                    TaskInstanceExecutionRunningEventAck.success(taskEvent.getTaskInstanceId()));
+            return;
+        }
+        if (taskEvent.getEvent() == TaskEventType.RESULT) {
+            instanceExecutionEventAckListener.handleTaskInstanceExecutionFinishEventAck(
+                    TaskInstanceExecutionFinishEventAck.success(taskEvent.getTaskInstanceId()));
+            return;
+        }
+
+        if (taskEvent.getEvent() == TaskEventType.UPDATE_PID) {
+            instanceExecutionEventAckListener.handleTaskInstanceExecutionInfoEventAck(
+                    TaskInstanceExecutionInfoEventAck.success(taskEvent.getTaskInstanceId()));
+            return;
+        }
+        log.warn("SendAckToWorker error, get an unknown event: {}", taskEvent);
     }
 
     private enum TaskRunnableStatus {

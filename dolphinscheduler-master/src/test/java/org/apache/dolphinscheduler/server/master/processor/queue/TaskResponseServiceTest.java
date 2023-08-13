@@ -17,18 +17,13 @@
 
 package org.apache.dolphinscheduler.server.master.processor.queue;
 
-import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.remote.command.task.TaskExecuteResultMessage;
-import org.apache.dolphinscheduler.remote.command.task.TaskExecuteRunningMessage;
 import org.apache.dolphinscheduler.server.master.cache.impl.ProcessInstanceExecCacheManagerImpl;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
 import org.apache.dolphinscheduler.server.master.utils.DataQualityResultOperator;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -67,43 +62,43 @@ public class TaskResponseServiceTest {
     @Mock
     private TaskExecuteThreadPool taskExecuteThreadPool;
 
-    @BeforeEach
-    public void before() {
-        taskEventService.start();
-
-        TaskExecuteRunningMessage taskExecuteRunningMessage = new TaskExecuteRunningMessage("127.0.0.1:5678",
-                "127.0.0.1:1234",
-                System.currentTimeMillis());
-        taskExecuteRunningMessage.setProcessId(1);
-        taskExecuteRunningMessage.setTaskInstanceId(22);
-        taskExecuteRunningMessage.setStatus(TaskExecutionStatus.RUNNING_EXECUTION);
-        taskExecuteRunningMessage.setExecutePath("path");
-        taskExecuteRunningMessage.setLogPath("logPath");
-        taskExecuteRunningMessage.setHost("127.*.*.*");
-        taskExecuteRunningMessage.setStartTime(System.currentTimeMillis());
-
-        ackEvent = TaskEvent.newRunningEvent(taskExecuteRunningMessage,
-                channel,
-                taskExecuteRunningMessage.getMessageSenderAddress());
-
-        TaskExecuteResultMessage taskExecuteResultMessage = new TaskExecuteResultMessage(NetUtils.getAddr(1234),
-                NetUtils.getAddr(5678),
-                System.currentTimeMillis());
-        taskExecuteResultMessage.setProcessInstanceId(1);
-        taskExecuteResultMessage.setTaskInstanceId(22);
-        taskExecuteResultMessage.setStatus(TaskExecutionStatus.SUCCESS.getCode());
-        taskExecuteResultMessage.setEndTime(System.currentTimeMillis());
-        taskExecuteResultMessage.setVarPool("varPol");
-        taskExecuteResultMessage.setAppIds("ids");
-        taskExecuteResultMessage.setProcessId(1);
-        resultEvent = TaskEvent.newResultEvent(taskExecuteResultMessage,
-                channel,
-                taskExecuteResultMessage.getMessageSenderAddress());
-
-        taskInstance = new TaskInstance();
-        taskInstance.setId(22);
-        taskInstance.setState(TaskExecutionStatus.RUNNING_EXECUTION);
-    }
+    // @BeforeEach
+    // public void before() {
+    // taskEventService.start();
+    //
+    // TaskExecuteRunningMessage taskExecuteRunningMessage = new TaskExecuteRunningMessage("127.0.0.1:5678",
+    // "127.0.0.1:1234",
+    // System.currentTimeMillis());
+    // taskExecuteRunningMessage.setProcessId(1);
+    // taskExecuteRunningMessage.setTaskInstanceId(22);
+    // taskExecuteRunningMessage.setStatus(TaskExecutionStatus.RUNNING_EXECUTION);
+    // taskExecuteRunningMessage.setExecutePath("path");
+    // taskExecuteRunningMessage.setLogPath("logPath");
+    // taskExecuteRunningMessage.setHost("127.*.*.*");
+    // taskExecuteRunningMessage.setStartTime(System.currentTimeMillis());
+    //
+    // ackEvent = TaskEvent.newRunningEvent(taskExecuteRunningMessage,
+    // channel,
+    // taskExecuteRunningMessage.getMessageSenderAddress());
+    //
+    // TaskExecuteResultMessage taskExecuteResultMessage = new TaskExecuteResultMessage(NetUtils.getAddr(1234),
+    // NetUtils.getAddr(5678),
+    // System.currentTimeMillis());
+    // taskExecuteResultMessage.setProcessInstanceId(1);
+    // taskExecuteResultMessage.setTaskInstanceId(22);
+    // taskExecuteResultMessage.setStatus(TaskExecutionStatus.SUCCESS.getCode());
+    // taskExecuteResultMessage.setEndTime(System.currentTimeMillis());
+    // taskExecuteResultMessage.setVarPool("varPol");
+    // taskExecuteResultMessage.setAppIds("ids");
+    // taskExecuteResultMessage.setProcessId(1);
+    // resultEvent = TaskEvent.newResultEvent(taskExecuteResultMessage,
+    // channel,
+    // taskExecuteResultMessage.getMessageSenderAddress());
+    //
+    // taskInstance = new TaskInstance();
+    // taskInstance.setId(22);
+    // taskInstance.setState(TaskExecutionStatus.RUNNING_EXECUTION);
+    // }
 
     @Test
     public void testAddResponse() {

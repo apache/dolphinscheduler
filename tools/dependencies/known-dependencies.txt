@@ -277,7 +277,6 @@ py4j-0.10.9.jar
 quartz-2.3.2.jar
 re2j-1.1.jar
 reactive-streams-1.0.4.jar
-reflections-0.10.2.jar
 regions-2.17.282.jar
 reload4j-1.2.18.3.jar
 sdk-core-2.17.282.jar

@@ -299,10 +299,8 @@ public abstract class AbstractCommandExecutor {
         ExecutorService getOutputLogService = ThreadUtils
                 .newSingleDaemonScheduledExecutorService("ResolveOutputLog-thread-" + taskRequest.getTaskName());
         getOutputLogService.submit(() -> {
-            try (
-                    final LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
-                            LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());
-                    BufferedReader inReader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+            try (BufferedReader inReader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());
                 String line;
                 while ((line = inReader.readLine()) != null) {
                     if (line.startsWith("${setValue(") || line.startsWith("#{setValue(")) {
@@ -316,6 +314,8 @@ public abstract class AbstractCommandExecutor {
             } catch (Exception e) {
                 logger.error("Parse var pool error", e);
                 processLogOutputIsSuccess = true;
+            } finally {
+                LogUtils.removeTaskInstanceLogFullPathMDC();
             }
         });
 
@@ -324,9 +324,8 @@ public abstract class AbstractCommandExecutor {
         ExecutorService parseProcessOutputExecutorService = ThreadUtils
                 .newSingleDaemonScheduledExecutorService("TaskInstanceLogOutput-thread-" + taskRequest.getTaskName());
         taskOutputFuture = parseProcessOutputExecutorService.submit(() -> {
-            try (
-                    final LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
-                            LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());) {
+            try {
+                LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());
                 while (logBuffer.size() > 1 || !processLogOutputIsSuccess || !podLogOutputIsFinished) {
                     if (logBuffer.size() > 1) {
                         logHandler.accept(logBuffer);
@@ -338,6 +337,8 @@ public abstract class AbstractCommandExecutor {
                 }
             } catch (Exception e) {
                 logger.error("Output task log error", e);
+            } finally {
+                LogUtils.removeTaskInstanceLogFullPathMDC();
             }
         });
         parseProcessOutputExecutorService.shutdown();

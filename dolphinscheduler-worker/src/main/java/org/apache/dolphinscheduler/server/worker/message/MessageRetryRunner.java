@@ -20,9 +20,8 @@ package org.apache.dolphinscheduler.server.worker.message;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
+import org.apache.dolphinscheduler.extract.master.transportor.ITaskInstanceExecutionEvent;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.remote.command.BaseMessage;
-import org.apache.dolphinscheduler.remote.command.MessageType;
 
 import org.apache.commons.collections4.MapUtils;
 
@@ -57,9 +56,10 @@ public class MessageRetryRunner extends BaseDaemonThread {
 
     @Lazy
     @Autowired
-    private List<MessageSender> messageSenders;
+    private List<TaskInstanceExecutionEventSender> messageSenders;
 
-    private final Map<MessageType, MessageSender<BaseMessage>> messageSenderMap = new HashMap<>();
+    private final Map<ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType, TaskInstanceExecutionEventSender<ITaskInstanceExecutionEvent>> messageSenderMap =
+            new HashMap<>();
 
     private final Map<Integer, List<TaskInstanceMessage>> needToRetryMessages = new ConcurrentHashMap<>();
 
@@ -74,15 +74,17 @@ public class MessageRetryRunner extends BaseDaemonThread {
         log.info("Message retry runner started");
     }
 
-    public void addRetryMessage(int taskInstanceId, @NonNull MessageType messageType, BaseMessage baseMessage) {
+    public void addRetryMessage(int taskInstanceId, @NonNull ITaskInstanceExecutionEvent iTaskInstanceExecutionEvent) {
         needToRetryMessages.computeIfAbsent(taskInstanceId, k -> Collections.synchronizedList(new ArrayList<>()))
-                .add(TaskInstanceMessage.of(taskInstanceId, messageType, baseMessage));
+                .add(TaskInstanceMessage.of(taskInstanceId, iTaskInstanceExecutionEvent.getEventType(),
+                        iTaskInstanceExecutionEvent));
     }
 
-    public void removeRetryMessage(int taskInstanceId, @NonNull MessageType messageType) {
+    public void removeRetryMessage(int taskInstanceId,
+                                   @NonNull ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType eventType) {
         List<TaskInstanceMessage> taskInstanceMessages = needToRetryMessages.get(taskInstanceId);
         if (taskInstanceMessages != null) {
-            taskInstanceMessages.remove(TaskInstanceMessage.of(taskInstanceId, messageType, null));
+            taskInstanceMessages.remove(TaskInstanceMessage.of(taskInstanceId, eventType, null));
         }
     }
 
@@ -94,7 +96,7 @@ public class MessageRetryRunner extends BaseDaemonThread {
         List<TaskInstanceMessage> taskInstanceMessages = this.needToRetryMessages.get(taskInstanceId);
         if (taskInstanceMessages != null) {
             taskInstanceMessages.forEach(taskInstanceMessage -> {
-                taskInstanceMessage.getMessage().setMessageReceiverAddress(messageReceiverHost);
+                taskInstanceMessage.getEvent().setHost(messageReceiverHost);
             });
         }
     }
@@ -120,13 +122,14 @@ public class MessageRetryRunner extends BaseDaemonThread {
                     LogUtils.setTaskInstanceIdMDC(taskInstanceId);
                     try {
                         for (TaskInstanceMessage taskInstanceMessage : taskInstanceMessages) {
-                            MessageType messageType = taskInstanceMessage.getMessageType();
-                            BaseMessage message = taskInstanceMessage.getMessage();
-                            if (now - message.getMessageSendTime() > MESSAGE_RETRY_WINDOW) {
-                                log.info("Begin retry send message to master, message: {}", message);
-                                message.setMessageSendTime(now);
-                                messageSenderMap.get(messageType).sendMessage(message);
-                                log.info("Success send message to master, message: {}", message);
+                            ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType eventType =
+                                    taskInstanceMessage.getEventType();
+                            ITaskInstanceExecutionEvent event = taskInstanceMessage.getEvent();
+                            if (now - event.getEventSendTime() > MESSAGE_RETRY_WINDOW) {
+                                log.info("Begin retry send message to master, event: {}", event);
+                                event.setEventSendTime(now);
+                                messageSenderMap.get(eventType).sendEvent(event);
+                                log.info("Success send message to master, event: {}", event);
                             }
                         }
                     } catch (Exception e) {
@@ -157,14 +160,16 @@ public class MessageRetryRunner extends BaseDaemonThread {
     public static class TaskInstanceMessage {
 
         private long taskInstanceId;
-        private MessageType messageType;
-        private BaseMessage message;
+        private ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType eventType;
+        private ITaskInstanceExecutionEvent event;
 
-        public static TaskInstanceMessage of(long taskInstanceId, MessageType messageType, BaseMessage message) {
+        public static TaskInstanceMessage of(long taskInstanceId,
+                                             ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType eventType,
+                                             ITaskInstanceExecutionEvent event) {
             TaskInstanceMessage taskInstanceMessage = new TaskInstanceMessage();
             taskInstanceMessage.setTaskInstanceId(taskInstanceId);
-            taskInstanceMessage.setMessageType(messageType);
-            taskInstanceMessage.setMessage(message);
+            taskInstanceMessage.setEventType(eventType);
+            taskInstanceMessage.setEvent(event);
             return taskInstanceMessage;
         }
 
@@ -177,12 +182,12 @@ public class MessageRetryRunner extends BaseDaemonThread {
                 return false;
             }
             TaskInstanceMessage that = (TaskInstanceMessage) o;
-            return taskInstanceId == that.taskInstanceId && messageType == that.messageType;
+            return taskInstanceId == that.taskInstanceId && eventType == that.eventType;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hashCode(taskInstanceId, messageType);
+            return Objects.hashCode(taskInstanceId, eventType);
         }
     }
 }

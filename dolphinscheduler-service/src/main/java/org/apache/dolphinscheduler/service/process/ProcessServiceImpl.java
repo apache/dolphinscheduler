@@ -115,6 +115,11 @@ import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.DqRuleUtils;
+import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.master.IMasterLogService;
+import org.apache.dolphinscheduler.extract.master.ITaskInstanceExecutionEventListener;
+import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstanceStateChangeEvent;
+import org.apache.dolphinscheduler.extract.worker.IWorkerLogService;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -125,15 +130,12 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SubProcessParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.TaskTimeoutParameter;
-import org.apache.dolphinscheduler.remote.command.workflow.WorkflowStateEventChangeRequest;
-import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
-import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.plugin.task.api.utils.TaskUtils;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
-import org.apache.dolphinscheduler.service.log.LogClient;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.utils.ClusterConfUtils;
 import org.apache.dolphinscheduler.service.utils.DagHelper;
@@ -271,9 +273,6 @@ public class ProcessServiceImpl implements ProcessService {
     private ProcessTaskRelationLogMapper processTaskRelationLogMapper;
 
     @Autowired
-    StateEventCallbackService stateEventCallbackService;
-
-    @Autowired
     private EnvironmentMapper environmentMapper;
 
     @Autowired
@@ -293,9 +292,6 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Autowired
     private CuringParamsService curingGlobalParamsService;
-
-    @Autowired
-    private LogClient logClient;
 
     @Autowired
     private CommandService commandService;
@@ -391,12 +387,14 @@ public class ProcessServiceImpl implements ProcessService {
                 boolean update = processInstanceDao.updateById(info);
                 // determine whether the process is normal
                 if (update) {
-                    WorkflowStateEventChangeRequest workflowStateEventChangeRequest =
-                            new WorkflowStateEventChangeRequest(
-                                    info.getId(), 0, info.getState(), info.getId(), 0);
                     try {
-                        Host host = new Host(info.getHost());
-                        stateEventCallbackService.sendResult(host, workflowStateEventChangeRequest.convert2Command());
+                        final ITaskInstanceExecutionEventListener iTaskInstanceExecutionEventListener =
+                                SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+                                        .getProxyClient(info.getHost(), ITaskInstanceExecutionEventListener.class);
+                        final WorkflowInstanceStateChangeEvent workflowInstanceStateChangeEvent =
+                                new WorkflowInstanceStateChangeEvent(info.getId(), 0, info.getState(), info.getId(), 0);
+                        iTaskInstanceExecutionEventListener
+                                .onWorkflowInstanceInstanceStateChange(workflowInstanceStateChangeEvent);
                     } catch (Exception e) {
                         log.error("sendResultError", e);
                     }
@@ -517,7 +515,15 @@ public class ProcessServiceImpl implements ProcessService {
             if (StringUtils.isEmpty(taskInstance.getHost()) || StringUtils.isEmpty(taskLogPath)) {
                 continue;
             }
-            logClient.removeTaskLog(Host.of(taskInstance.getHost()), taskLogPath);
+            if (TaskUtils.isLogicTask(taskInstance.getTaskType())) {
+                IMasterLogService masterLogService = SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+                        .getProxyClient(taskInstance.getHost(), IMasterLogService.class);
+                masterLogService.removeLogicTaskInstanceLog(taskLogPath);
+            } else {
+                IWorkerLogService iWorkerLogService = SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+                        .getProxyClient(taskInstance.getHost(), IWorkerLogService.class);
+                iWorkerLogService.removeTaskInstanceLog(taskLogPath);
+            }
         }
     }
 

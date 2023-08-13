@@ -19,12 +19,17 @@ package org.apache.dolphinscheduler.server.master.runner.dispatcher;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.base.utils.Host;
+import org.apache.dolphinscheduler.extract.worker.ITaskInstanceOperator;
+import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceDispatchRequest;
+import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceDispatchResponse;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.WorkerGroupNotFoundException;
 import org.apache.dolphinscheduler.server.master.dispatch.host.HostManager;
+import org.apache.dolphinscheduler.server.master.exception.TaskDispatchException;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
-import org.apache.dolphinscheduler.server.master.rpc.MasterRpcClient;
 import org.apache.dolphinscheduler.server.master.runner.BaseTaskDispatcher;
 import org.apache.dolphinscheduler.server.master.runner.execute.TaskExecuteRunnable;
 
@@ -42,10 +47,29 @@ public class WorkerTaskDispatcher extends BaseTaskDispatcher {
 
     public WorkerTaskDispatcher(TaskEventService taskEventService,
                                 MasterConfig masterConfig,
-                                MasterRpcClient masterRpcClient,
                                 HostManager hostManager) {
-        super(taskEventService, masterConfig, masterRpcClient);
+        super(taskEventService, masterConfig);
         this.hostManager = checkNotNull(hostManager);
+    }
+
+    @Override
+    protected void doDispatch(TaskExecuteRunnable taskExecuteRunnable) throws TaskDispatchException {
+        TaskExecutionContext taskExecutionContext = taskExecuteRunnable.getTaskExecutionContext();
+        try {
+            ITaskInstanceOperator taskInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+                    .getProxyClient(taskExecutionContext.getHost(), ITaskInstanceOperator.class);
+            TaskInstanceDispatchResponse taskInstanceDispatchResponse = taskInstanceOperator
+                    .dispatchTask(new TaskInstanceDispatchRequest(taskExecuteRunnable.getTaskExecutionContext()));
+            if (!taskInstanceDispatchResponse.isDispatchSuccess()) {
+                throw new TaskDispatchException(String.format("Dispatch task to %s failed, response is: %s",
+                        taskExecutionContext.getHost(), taskInstanceDispatchResponse));
+            }
+        } catch (TaskDispatchException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new TaskDispatchException(String.format("Dispatch task to %s failed",
+                    taskExecutionContext.getHost()), e);
+        }
     }
 
     @Override

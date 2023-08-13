@@ -57,18 +57,17 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.TaskCacheUtils;
+import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.master.ILogicTaskInstanceOperator;
+import org.apache.dolphinscheduler.extract.master.transportor.TaskInstanceWakeupRequest;
+import org.apache.dolphinscheduler.extract.worker.transportor.UpdateWorkflowHostRequest;
+import org.apache.dolphinscheduler.extract.worker.transportor.UpdateWorkflowHostResponse;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.remote.command.Message;
-import org.apache.dolphinscheduler.remote.command.task.TaskWakeupRequest;
-import org.apache.dolphinscheduler.remote.command.task.WorkflowHostChangeRequest;
-import org.apache.dolphinscheduler.remote.command.task.WorkflowHostChangeResponse;
-import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
-import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.server.master.event.StateEventHandleError;
@@ -78,10 +77,8 @@ import org.apache.dolphinscheduler.server.master.event.StateEventHandler;
 import org.apache.dolphinscheduler.server.master.event.StateEventHandlerManager;
 import org.apache.dolphinscheduler.server.master.event.TaskStateEvent;
 import org.apache.dolphinscheduler.server.master.event.WorkflowStateEvent;
-import org.apache.dolphinscheduler.server.master.exception.TaskExecuteRunnableCreateException;
 import org.apache.dolphinscheduler.server.master.graph.IWorkflowGraph;
 import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
-import org.apache.dolphinscheduler.server.master.rpc.MasterRpcClient;
 import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnableFactory;
 import org.apache.dolphinscheduler.server.master.utils.TaskUtils;
@@ -142,8 +139,6 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
     private final TaskInstanceDao taskInstanceDao;
 
     private final ProcessAlertManager processAlertManager;
-
-    private final MasterRpcClient masterRpcClient;
 
     private final IWorkflowExecuteContext workflowExecuteContext;
 
@@ -232,7 +227,6 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                                    @NonNull CommandService commandService,
                                    @NonNull ProcessService processService,
                                    @NonNull ProcessInstanceDao processInstanceDao,
-                                   @NonNull MasterRpcClient masterRpcClient,
                                    @NonNull ProcessAlertManager processAlertManager,
                                    @NonNull MasterConfig masterConfig,
                                    @NonNull StateWheelExecuteThread stateWheelExecuteThread,
@@ -243,7 +237,6 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         this.commandService = commandService;
         this.processInstanceDao = processInstanceDao;
         this.workflowExecuteContext = workflowExecuteContext;
-        this.masterRpcClient = masterRpcClient;
         this.masterConfig = masterConfig;
         this.processAlertManager = processAlertManager;
         this.stateWheelExecuteThread = stateWheelExecuteThread;
@@ -449,7 +442,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
      * release task group
      *
      */
-    public void releaseTaskGroup(TaskInstance taskInstance) throws RemotingException, InterruptedException {
+    public void releaseTaskGroup(TaskInstance taskInstance) throws InterruptedException {
         ProcessInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
         // todo: use Integer
         if (taskInstance.getTaskGroupId() <= 0) {
@@ -473,9 +466,10 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         } else {
             ProcessInstance processInstance =
                     processService.findProcessInstanceById(nextTaskInstance.getProcessInstanceId());
-            masterRpcClient.sendSyncCommand(
-                    Host.of(processInstance.getHost()),
-                    new TaskWakeupRequest(processInstance.getId(), nextTaskInstance.getId()).convert2Command());
+            ILogicTaskInstanceOperator taskInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+                    .getProxyClient(processInstance.getHost(), ILogicTaskInstanceOperator.class);
+            taskInstanceOperator.wakeupTaskInstance(
+                    new TaskInstanceWakeupRequest(processInstance.getId(), nextTaskInstance.getId()));
         }
         log.info("Success send wakeup message to next taskInstance: {}", nextTaskInstance.getId());
     }
@@ -829,9 +823,8 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                     taskInstanceDao.queryValidTaskListByWorkflowInstanceId(workflowInstance.getId(),
                             workflowInstance.getTestFlag());
             for (TaskInstance task : validTaskInstanceList) {
-                try (
-                        final LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
-                                LogUtils.setWorkflowAndTaskInstanceIDMDC(task.getProcessInstanceId(), task.getId());) {
+                try {
+                    LogUtils.setWorkflowAndTaskInstanceIDMDC(task.getProcessInstanceId(), task.getId());
                     log.info(
                             "Check the taskInstance from a exist workflowInstance, existTaskInstanceCode: {}, taskInstanceStatus: {}",
                             task.getTaskCode(),
@@ -881,6 +874,8 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                     if (task.getState().isFailure()) {
                         errorTaskMap.put(task.getTaskCode(), task.getId());
                     }
+                } finally {
+                    LogUtils.removeWorkflowAndTaskInstanceIdMDC();
                 }
             }
             clearDataIfExecuteTask();
@@ -947,9 +942,8 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
             }
             // 2. create task execute runnable
             // in a dag, only one taskInstance is valid per taskCode, so need to set the old taskInstance invalid
-            try (
-                    LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
-                            LogUtils.setTaskInstanceIdMDC(taskInstance.getId())) {
+            try {
+                LogUtils.setTaskInstanceIdMDC(taskInstance.getId());
                 DefaultTaskExecuteRunnable taskExecuteRunnable =
                         defaultTaskExecuteRunnableFactory.createTaskExecuteRunnable(taskInstance);
                 if (validTaskMap.containsKey(taskInstance.getTaskCode())) {
@@ -992,6 +986,8 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
 
                 stateWheelExecuteThread.addTask4TimeoutCheck(workflowInstance, taskInstance);
                 return true;
+            } finally {
+                LogUtils.removeTaskInstanceIdMDC();
             }
         } catch (Exception e) {
             log.error("Submit standby task {} error", taskInstance.getName(), e);
@@ -1389,21 +1385,15 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
             return false;
         }
         try {
-            Message message =
-                    masterRpcClient.sendSyncCommand(Host.of(taskInstance.getHost()),
-                            new WorkflowHostChangeRequest(taskInstance.getId(), masterConfig.getMasterAddress())
-                                    .convert2Command());
-            if (message == null) {
+            org.apache.dolphinscheduler.extract.worker.ITaskInstanceOperator iTaskInstanceOperator =
+                    SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+                            .getProxyClient(taskInstance.getHost(),
+                                    org.apache.dolphinscheduler.extract.worker.ITaskInstanceOperator.class);
+            UpdateWorkflowHostResponse updateWorkflowHostResponse = iTaskInstanceOperator.updateWorkflowInstanceHost(
+                    new UpdateWorkflowHostRequest(taskInstance.getId(), masterConfig.getMasterAddress()));
+            if (!updateWorkflowHostResponse.isSuccess()) {
                 log.error(
-                        "Takeover task instance failed, the worker {} might not be alive, will try to create a new task instance",
-                        taskInstance.getHost());
-                return false;
-            }
-            WorkflowHostChangeResponse workflowHostChangeResponse =
-                    JSONUtils.parseObject(message.getBody(), WorkflowHostChangeResponse.class);
-            if (workflowHostChangeResponse == null || !workflowHostChangeResponse.isSuccess()) {
-                log.error(
-                        "Takeover task instance failed, receive a failed response from worker: {}, will try to create a new task instance",
+                        "Takeover TaskInstance failed, receive a failed response from worker: {}, will try to create a new TaskInstance",
                         taskInstance.getHost());
                 return false;
             }
@@ -1417,9 +1407,9 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
             stateWheelExecuteThread.addTask4TimeoutCheck(workflowInstance, taskInstance);
             stateWheelExecuteThread.addTask4RetryCheck(workflowInstance, taskInstance);
             return true;
-        } catch (RemotingException | InterruptedException | TaskExecuteRunnableCreateException e) {
+        } catch (Exception e) {
             log.error(
-                    "Takeover task instance failed, the worker {} might not be alive, will try to create a new task instance",
+                    "Takeover TaskInstance failed, the worker {} might not be alive, will try to create a new TaskInstance",
                     taskInstance.getHost(), e);
             return false;
         }
@@ -1872,9 +1862,8 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
             if (taskInstanceId == null || taskInstanceId.equals(0)) {
                 continue;
             }
-            try (
-                    final LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
-                            LogUtils.setWorkflowAndTaskInstanceIDMDC(workflowInstance.getId(), taskInstanceId)) {
+            try {
+                LogUtils.setWorkflowAndTaskInstanceIDMDC(workflowInstance.getId(), taskInstanceId);
                 TaskInstance taskInstance = taskInstanceDao.queryById(taskInstanceId);
                 if (taskInstance == null || taskInstance.getState().isFinished()) {
                     continue;
@@ -1890,6 +1879,8 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                             .build();
                     this.addStateEvent(taskStateEvent);
                 }
+            } finally {
+                LogUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
         }
     }
