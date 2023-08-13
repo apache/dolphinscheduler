@@ -45,7 +45,7 @@ public class StreamTaskExecuteThreadPool extends ThreadPoolTaskExecutor {
         this.setDaemon(true);
         this.setThreadNamePrefix("StreamTaskExecuteThread-");
         this.setMaxPoolSize(masterConfig.getExecThreads());
-        this.setCorePoolSize(masterConfig.getExecThreads());
+        this.setCorePoolSize(masterConfig.getPreExecThreads());
     }
 
     /**

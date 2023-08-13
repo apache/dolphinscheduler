@@ -68,7 +68,7 @@ public class TaskExecuteThreadPool extends ThreadPoolTaskExecutor {
         this.setDaemon(true);
         this.setThreadNamePrefix("Task-Execute-Thread-");
         this.setMaxPoolSize(masterConfig.getExecThreads());
-        this.setCorePoolSize(masterConfig.getExecThreads());
+        this.setCorePoolSize(masterConfig.getPreExecThreads());
         taskEventHandlerList.forEach(
                 taskEventHandler -> taskEventHandlerMap.put(taskEventHandler.getHandleEventType(), taskEventHandler));
     }

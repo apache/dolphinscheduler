@@ -83,7 +83,7 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
         this.setDaemon(true);
         this.setThreadNamePrefix("WorkflowExecuteThread-");
         this.setMaxPoolSize(masterConfig.getExecThreads());
-        this.setCorePoolSize(masterConfig.getExecThreads());
+        this.setCorePoolSize(masterConfig.getPreExecThreads());
     }
 
     /**
