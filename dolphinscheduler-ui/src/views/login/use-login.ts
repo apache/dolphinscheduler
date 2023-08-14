@@ -81,9 +81,8 @@ export function useLogin(state: any) {
   }
 
   const handleRedirect = async () => {
-    debugger
     const authType = route.query.authType
-    if (authType && authType == 'oauth2') {
+    if (authType && authType === 'oauth2') {
       const sessionId = route.query.sessionId
       if (sessionId) {
         cookies.set('sessionId', String(sessionId), { path: '/' })
@@ -97,9 +96,7 @@ export function useLogin(state: any) {
       if (error) {
         window.$message.error(error)
       }
-
     }
-
   }
 
   return {

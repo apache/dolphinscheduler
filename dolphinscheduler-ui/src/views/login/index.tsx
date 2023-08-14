@@ -41,7 +41,7 @@ import { useLocalesStore } from '@/store/locales/locales'
 import { useThemeStore } from '@/store/theme/theme'
 import cookies from 'js-cookie'
 import { ssoLoginUrl } from '@/service/modules/login'
-import { OAuth2Provider } from '@/service/modules/login/types'
+import type { OAuth2Provider } from '@/service/modules/login/types'
 
 
 const login = defineComponent({
@@ -178,9 +178,9 @@ const login = defineComponent({
               </NButton>
             </a>
           </div>
-            {this.oauth2Providers.length > 0 ? <NDivider >
+            {this.oauth2Providers.length > 0 && <NDivider >
               {this.t('login.otherwayLogin')}
-            </NDivider> : <div></div>}
+            </NDivider>}
 
             <NSpace class={styles['oauth2-provider']} justify="center">
               {this.oauth2Providers?.map((e: OAuth2Provider) => {
