@@ -15,11 +15,29 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.enums;
+package org.apache.dolphinscheduler.plugin.storage.obs;
 
-/**
- * data base types
- */
-public enum ResUploadType {
-    LOCAL, HDFS, S3, OSS, GCS, ABS, OBS, NONE
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperateFactory;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageType;
+
+import com.google.auto.service.AutoService;
+
+@AutoService({StorageOperateFactory.class})
+public class ObsStorageOperatorFactory implements StorageOperateFactory {
+
+    public ObsStorageOperatorFactory() {
+    }
+
+    @Override
+    public StorageOperate createStorageOperate() {
+        ObsStorageOperator ossOperator = new ObsStorageOperator();
+        ossOperator.init();
+        return ossOperator;
+    }
+
+    @Override
+    public StorageType getStorageOperate() {
+        return StorageType.OBS;
+    }
 }
