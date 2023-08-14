@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -30,6 +30,8 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import java.util.Map;
 
+import javax.servlet.http.Cookie;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -39,8 +41,6 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-
-import javax.servlet.http.Cookie;
 
 /**
  * login controller test
@@ -88,14 +88,14 @@ public class LoginControllerTest extends AbstractControllerTest {
     @Test
     public void testClearCookie() throws Exception {
         MvcResult mvcResult = mockMvc.perform(delete("/cookies")
-                        .header("sessionId", sessionId)
-                        .cookie(new Cookie("sessionId",sessionId)))
+                .header("sessionId", sessionId)
+                .cookie(new Cookie("sessionId", sessionId)))
                 .andExpect(status().isOk())
                 .andReturn();
         MockHttpServletResponse response = mvcResult.getResponse();
         Cookie[] cookies = response.getCookies();
         for (Cookie cookie : cookies) {
-            Assertions.assertEquals(cookie.getMaxAge(),0);
+            Assertions.assertEquals(cookie.getMaxAge(), 0);
             Assertions.assertNull(cookie.getValue());
         }
     }
