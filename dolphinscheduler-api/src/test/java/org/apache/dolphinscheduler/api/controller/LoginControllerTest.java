@@ -91,7 +91,7 @@ public class LoginControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testClearCookie() throws Exception {
+    void testClearCookie() throws Exception {
         MvcResult mvcResult = mockMvc.perform(delete("/cookies")
                 .header("sessionId", sessionId)
                 .cookie(new Cookie("sessionId", sessionId)))
@@ -106,7 +106,7 @@ public class LoginControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testGetOauth2Provider() throws Exception {
+    void testGetOauth2Provider() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/oauth2-provider"))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -115,7 +115,7 @@ public class LoginControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testOauth2Redirect() throws Exception {
+    void testOauth2Redirect() throws Exception {
         String tokenResult = "{\"access_token\":\"test-token\"}";
         String userInfoResult = "{\"login\":\"username\"}";
         MockedStatic<OkHttpUtils> okHttpUtilsMockedStatic = Mockito.mockStatic(OkHttpUtils.class);
@@ -135,7 +135,7 @@ public class LoginControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testOauth2RedirectError() throws Exception {
+    void testOauth2RedirectError() throws Exception {
         MockedStatic<OkHttpUtils> okHttpUtilsMockedStatic = Mockito.mockStatic(OkHttpUtils.class);
         okHttpUtilsMockedStatic.when(() -> OkHttpUtils.post(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
                 .thenThrow(new RuntimeException("oauth error"));
