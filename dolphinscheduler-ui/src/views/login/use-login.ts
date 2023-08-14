@@ -15,19 +15,18 @@
  * limitations under the License.
  */
 
-import { useRouter } from 'vue-router'
+import { useRouter,useRoute } from 'vue-router'
 import { clearCookie, getOauth2Provider, login } from '@/service/modules/login'
 import { getUserInfo } from '@/service/modules/users'
 import { useUserStore } from '@/store/user/user'
 import type { Router } from 'vue-router'
-import { useRoute } from 'vue-router'
 import type { LoginRes, OAuth2Provider } from '@/service/modules/login/types'
 import type { UserInfoRes } from '@/service/modules/users/types'
 import { useRouteStore } from '@/store/route/route'
 import { useTimezoneStore } from '@/store/timezone/timezone'
 import cookies from 'js-cookie'
 import { queryBaseDir } from '@/service/modules/resources'
-import { reactive, ref } from 'vue'
+import { ref } from 'vue'
 
 export function useLogin(state: any) {
   const router: Router = useRouter()
