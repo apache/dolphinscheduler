@@ -115,6 +115,7 @@
         <casdoor.version>1.6.0</casdoor.version>
         <azure-sdk-bom.version>1.2.10</azure-sdk-bom.version>
         <protobuf.version>3.17.2</protobuf.version>
+        <esdk-obs.version>3.23.3</esdk-obs.version>
         <system-lambda.version>1.2.1</system-lambda.version>
     </properties>
 
@@ -896,6 +897,23 @@
                 <artifactId>protobuf-java</artifactId>
                 <version>${protobuf.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>com.huaweicloud</groupId>
+                <artifactId>esdk-obs-java-bundle</artifactId>
+                <version>${esdk-obs.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.logging.log4j</groupId>
+                        <artifactId>log4j-core</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.logging.log4j</groupId>
+                        <artifactId>log4j-api</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
             <dependency>
                 <groupId>com.github.stefanbirkner</groupId>
                 <artifactId>system-lambda</artifactId>
