@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -34,9 +35,12 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+
+import javax.servlet.http.Cookie;
 
 /**
  * login controller test
@@ -85,9 +89,21 @@ public class LoginControllerTest extends AbstractControllerTest {
     public void testClearCookie() throws Exception {
         MvcResult mvcResult = mockMvc.perform(delete("/cookies")
                         .header("sessionId", sessionId)
-                        .cookie())
+                        .cookie(new Cookie("sessionId",sessionId)))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+        Cookie[] cookies = response.getCookies();
+        for (Cookie cookie : cookies) {
+            Assertions.assertEquals(cookie.getMaxAge(),0);
+            Assertions.assertNull(cookie.getValue());
+        }
+    }
+
+    @Test
+    public void testGetOauth2Provider() throws Exception {
+        MvcResult mvcResult = mockMvc.perform(get("/oauth2-provider"))
+                .andExpect(status().isOk())
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
