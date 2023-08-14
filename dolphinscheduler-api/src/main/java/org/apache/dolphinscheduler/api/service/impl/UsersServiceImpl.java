@@ -1086,6 +1086,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             user.setTimeZone(TimeZone.getDefault().toZoneId().getId());
         }
 
+        // remove password
+        user.setUserPassword(null);
+
         result.put(Constants.DATA_LIST, user);
 
         putMsg(result, Status.SUCCESS);
