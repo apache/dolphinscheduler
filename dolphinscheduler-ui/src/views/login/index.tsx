@@ -43,7 +43,6 @@ import cookies from 'js-cookie'
 import { ssoLoginUrl } from '@/service/modules/login'
 import type { OAuth2Provider } from '@/service/modules/login/types'
 
-
 const login = defineComponent({
   name: 'login',
   setup() {
