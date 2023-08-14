@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -78,5 +79,17 @@ public class LoginControllerTest extends AbstractControllerTest {
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testClearCookie() throws Exception {
+        MvcResult mvcResult = mockMvc.perform(delete("/cookies")
+                        .header("sessionId", sessionId)
+                        .cookie())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
     }
 }
