@@ -199,21 +199,13 @@ public class DependentAsyncTaskExecuteFunction implements AsyncTaskExecuteFuncti
             if (dependResult == DependResult.SUCCESS) {
                 Map<String, Property> varPoolPropertyMap = dependentExecute.getDependTaskVarPoolPropertyMap();
                 Map<String, Long> varPoolEndTimeMap = dependentExecute.getDependTaskVarPoolEndTimeMap();
-                calculateDependVarPool(varPoolPropertyMap, varPoolEndTimeMap, dependVarPoolEndTimeMap);
+                dependentExecute.addTaskVarPool(varPoolPropertyMap, varPoolEndTimeMap, dependVarPoolPropertyMap,
+                        dependVarPoolEndTimeMap);
             }
             dependResultList.add(dependResult);
         }
         return DependentUtils.getDependResultForRelation(this.dependentParameters.getRelation(),
                 dependResultList);
-    }
-
-    // merge the dependentTask VarPool into dependVarPoolPropertyMap
-    private void calculateDependVarPool(Map<String, Property> varPoolPropertyMap, Map<String, Long> varPoolEndTimeMap,
-                                        Map<String, Long> dependVarPoolEndTimeMap) {
-        if (!varPoolPropertyMap.isEmpty()) {
-            DependentExecute.addTaskVarPool(varPoolPropertyMap, varPoolEndTimeMap, dependVarPoolPropertyMap,
-                    dependVarPoolEndTimeMap);
-        }
     }
 
     private boolean isAllDependentTaskFinished() {
