@@ -301,7 +301,7 @@ public class DependentExecute {
             if (dependResult != DependResult.WAITING && dependResult != DependResult.FAILED) {
                 dependResultMap.put(dependentItem.getKey(), dependResult);
                 if (dependentItem.getParameterPassing() && !dependItemVarPoolPropertyMap.isEmpty()) {
-                    addTaskVarPool(dependItemVarPoolPropertyMap, dependItemVarPoolEndTimeMap,
+                    DependentUtils.addTaskVarPool(dependItemVarPoolPropertyMap, dependItemVarPoolEndTimeMap,
                             dependTaskVarPoolPropertyMap, dependTaskVarPoolEndTimeMap);
                 }
             }
@@ -310,32 +310,6 @@ public class DependentExecute {
             dependResultList.add(dependResult);
         }
         return DependentUtils.getDependResultForRelation(this.relation, dependResultList);
-    }
-
-    /**
-     * add varPool from dependItemVarPoolMap to dependTaskVarPoolMap
-     *
-     * @param dependItemVarPoolPropertyMap dependItemVarPoolPropertyMap
-     * @param dependItemVarPoolEndTimeMap dependItemVarPoolEndTimeMap
-     * @param dependTaskVarPoolPropertyMap dependTaskVarPoolPropertyMap
-     * @param dependTaskVarPoolEndTimeMap dependTaskVarPoolEndTimeMap
-     */
-    public void addTaskVarPool(Map<String, Property> dependItemVarPoolPropertyMap,
-                               Map<String, Long> dependItemVarPoolEndTimeMap,
-                               Map<String, Property> dependTaskVarPoolPropertyMap,
-                               Map<String, Long> dependTaskVarPoolEndTimeMap) {
-        dependItemVarPoolPropertyMap.forEach((prop, property) -> {
-            Long itemEndTime = dependItemVarPoolEndTimeMap.get(prop);
-            if (dependTaskVarPoolPropertyMap.containsKey(prop)) {
-                if (itemEndTime < dependTaskVarPoolEndTimeMap.get(prop)) {
-                    dependTaskVarPoolPropertyMap.put(prop, property);
-                    dependTaskVarPoolEndTimeMap.put(prop, itemEndTime);
-                }
-            } else {
-                dependTaskVarPoolPropertyMap.put(prop, property);
-                dependTaskVarPoolEndTimeMap.put(prop, itemEndTime);
-            }
-        });
     }
 
     /**
