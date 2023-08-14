@@ -25,6 +25,8 @@ import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_VI
 import static org.apache.dolphinscheduler.common.constants.Constants.UTF_8;
 import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYYMMDDHHMMSS;
 
+import org.apache.dolphinscheduler.common.constants.TenantConstants;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -35,12 +37,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.nio.file.attribute.UserPrincipal;
+import java.nio.file.attribute.UserPrincipalLookupService;
 import java.util.Set;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedInputStream;
@@ -321,6 +326,29 @@ public class FileUtils {
         }
 
         return crcString;
+    }
+
+    public static void setFileOwner(Path path, String tenant) {
+        try {
+            if (TenantConstants.DEFAULT_TENANT_CODE.equals(tenant)) {
+                log.debug("The current tenant: {} is the default tenant, no need to set the owner for file: {}", tenant,
+                        path);
+                return;
+            }
+            UserPrincipalLookupService userPrincipalLookupService =
+                    FileSystems.getDefault().getUserPrincipalLookupService();
+            UserPrincipal tenantPrincipal = userPrincipalLookupService.lookupPrincipalByName(tenant);
+            Files.setOwner(path, tenantPrincipal);
+        } catch (IOException e) {
+            log.error("Set file: {} owner to: {} failed", path, tenant, e);
+        }
+    }
+
+    public static void createDirectoryIfNotPresent(Path path) throws IOException {
+        if (Files.exists(path)) {
+            return;
+        }
+        Files.createDirectories(path);
     }
 
     /**

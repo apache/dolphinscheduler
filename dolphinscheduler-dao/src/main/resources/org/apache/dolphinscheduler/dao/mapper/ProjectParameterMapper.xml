@@ -53,7 +53,7 @@
         select
         <include refid="baseSql"/>
         from t_ds_project_parameter
-        where 1=1
+        where project_code = #{projectCode}
         <if test="projectParameterIds != null and projectParameterIds.size() > 0">
             and id  in
             <foreach item="id" index="index" collection="projectParameterIds" open="(" separator="," close=")">
@@ -65,7 +65,14 @@
             OR param_value LIKE concat('%', #{searchName}, '%')
             )
         </if>
-        order by id desc
+        order by update_time desc
+    </select>
+
+    <select id="queryByProjectCode" resultType="org.apache.dolphinscheduler.dao.entity.ProjectParameter">
+        select
+        <include refid="baseSql"/>
+        from t_ds_project_parameter
+        where project_code = #{projectCode}
     </select>
 
 </mapper>

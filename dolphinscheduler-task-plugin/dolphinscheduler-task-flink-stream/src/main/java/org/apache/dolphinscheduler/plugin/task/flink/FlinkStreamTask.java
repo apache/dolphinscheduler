@@ -23,12 +23,13 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.stream.StreamTask;
-import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class FlinkStreamTask extends FlinkTask implements StreamTask {
 
@@ -56,7 +57,6 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
         if (flinkParameters == null || !flinkParameters.checkParameters()) {
             throw new RuntimeException("flink task params is not valid");
         }
-        flinkParameters.setQueue(taskExecutionContext.getQueue());
 
         FileUtils.generateScriptFile(taskExecutionContext, flinkParameters);
     }
@@ -67,15 +67,15 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
      * @return command
      */
     @Override
-    protected String buildCommand() {
+    protected String getScript() {
         // flink run/run-application [OPTIONS] <jar-file> <arguments>
         List<String> args = FlinkArgsUtils.buildRunCommandLine(taskExecutionContext, flinkParameters);
+        return args.stream().collect(Collectors.joining(" "));
+    }
 
-        String command = ParameterUtils
-                .convertParameterPlaceholders(String.join(" ", args), taskExecutionContext.getDefinedParams());
-
-        log.info("flink task command : {}", command);
-        return command;
+    @Override
+    protected Map<String, String> getProperties() {
+        return taskExecutionContext.getDefinedParams();
     }
 
     @Override

@@ -56,13 +56,28 @@ export function useK8s(model: { [field: string]: any }): IJsonItem[] {
       type: 'input',
       field: 'image',
       name: t('project.node.image'),
+      span: 18,
       props: {
         placeholder: t('project.node.image_tips')
       },
       validate: {
         trigger: ['input', 'blur'],
-        message: t('project.node.min_memory_tips')
+        required: true,
+        message: t('project.node.image_tips')
       }
+    },
+    {
+      type: 'select',
+      field: 'imagePullPolicy',
+      name: t('project.node.image_pull_policy'),
+      span: 6,
+      options: IMAGE_PULL_POLICY_LIST,
+      validate: {
+        trigger: ['input', 'blur'],
+        required: true,
+        message: t('project.node.image_pull_policy_tips')
+      },
+      value: 'IfNotPresent'
     },
     {
       type: 'input',
@@ -93,3 +108,19 @@ export function useK8s(model: { [field: string]: any }): IJsonItem[] {
     ...useCustomParams({ model, field: 'localParams', isSimple: true })
   ]
 }
+
+
+export const IMAGE_PULL_POLICY_LIST = [
+  {
+    value: 'IfNotPresent',
+    label: 'IfNotPresent'
+  },
+  {
+    value: 'Always',
+    label: 'Always'
+  },
+  {
+    value: 'Never',
+    label: 'Never'
+  }
+]

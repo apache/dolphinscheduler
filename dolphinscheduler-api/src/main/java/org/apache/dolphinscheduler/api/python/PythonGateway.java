@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.api.python;
 
-import org.apache.dolphinscheduler.api.configuration.PythonGatewayConfiguration;
+import org.apache.dolphinscheduler.api.configuration.ApiConfig;
 import org.apache.dolphinscheduler.api.dto.EnvironmentDto;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
+import org.apache.dolphinscheduler.common.enums.ExecutionOrder;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
@@ -94,6 +95,7 @@ public class PythonGateway {
 
     private static final TaskDependType DEFAULT_TASK_DEPEND_TYPE = TaskDependType.TASK_POST;
     private static final RunMode DEFAULT_RUN_MODE = RunMode.RUN_MODE_SERIAL;
+    private static final ExecutionOrder DEFAULT_EXECUTION_ORDER = ExecutionOrder.DESC_ORDER;
     private static final int DEFAULT_DRY_RUN = 0;
     private static final int DEFAULT_TEST_FLAG = 0;
     private static final ComplementDependentMode COMPLEMENT_DEPENDENT_MODE = ComplementDependentMode.OFF_MODE;
@@ -143,7 +145,7 @@ public class PythonGateway {
     private DataSourceMapper dataSourceMapper;
 
     @Autowired
-    private PythonGatewayConfiguration pythonGatewayConfiguration;
+    private ApiConfig apiConfig;
 
     @Autowired
     private ProjectUserMapper projectUserMapper;
@@ -405,7 +407,8 @@ public class PythonGateway {
                 DEFAULT_TEST_FLAG,
                 COMPLEMENT_DEPENDENT_MODE,
                 processDefinition.getVersion(),
-                false);
+                false,
+                DEFAULT_EXECUTION_ORDER);
     }
 
     // side object
@@ -686,13 +689,14 @@ public class PythonGateway {
 
     @PostConstruct
     public void init() {
-        if (pythonGatewayConfiguration.isEnabled()) {
+        if (apiConfig.getPythonGateway().isEnabled()) {
             this.start();
         }
     }
 
     private void start() {
         try {
+            ApiConfig.PythonGatewayConfiguration pythonGatewayConfiguration = apiConfig.getPythonGateway();
             InetAddress gatewayHost = InetAddress.getByName(pythonGatewayConfiguration.getGatewayServerAddress());
             GatewayServerBuilder serverBuilder = new GatewayServer.GatewayServerBuilder()
                     .entryPoint(this)

@@ -34,13 +34,9 @@ import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.UserPrincipal;
-import java.nio.file.attribute.UserPrincipalLookupService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -97,9 +93,9 @@ public class TaskExecutionCheckerUtils {
             taskExecutionContext.setExecutePath(execLocalPath);
             taskExecutionContext.setAppInfoPath(FileUtils.getAppInfoPath(execLocalPath));
             Path executePath = Paths.get(taskExecutionContext.getExecutePath());
-            createDirectory(executePath);
-            if (!TenantConstants.DEFAULT_TENANT_CODE.equals(taskExecutionContext.getTenantCode())) {
-                setOwner(executePath, taskExecutionContext.getTenantCode());
+            FileUtils.createDirectoryIfNotPresent(executePath);
+            if (OSUtils.isSudoEnable()) {
+                FileUtils.setFileOwner(executePath, taskExecutionContext.getTenantCode());
             }
         } catch (Throwable ex) {
             throw new TaskException("Cannot create process execute dir", ex);
@@ -126,10 +122,10 @@ public class TaskExecutionCheckerUtils {
             if (notExist) {
                 downloadFiles.add(Pair.of(fullName, fileName));
             } else {
-                log.info("file : {} exists ", resFile.getName());
+                log.warn("Resource file : {} already exists will not download again ", resFile.getName());
             }
         });
-        if (!downloadFiles.isEmpty() && !PropertyUtils.getResUploadStartupState()) {
+        if (!downloadFiles.isEmpty() && !PropertyUtils.isResourceStorageStartup()) {
             throw new StorageOperateNoConfiguredException("Storage service config does not exist!");
         }
 
@@ -141,8 +137,11 @@ public class TaskExecutionCheckerUtils {
                     log.info("get resource file from path:{}", fullName);
 
                     long resourceDownloadStartTime = System.currentTimeMillis();
-                    storageOperate.download(actualTenant, fullName,
-                            execLocalPath + File.separator + fileName, true);
+                    storageOperate.download(actualTenant, fullName, execLocalPath + File.separator + fileName, true);
+                    if (OSUtils.isSudoEnable()) {
+                        FileUtils.setFileOwner(Paths.get(execLocalPath, fileName),
+                                taskExecutionContext.getTenantCode());
+                    }
                     WorkerServerMetrics
                             .recordWorkerResourceDownloadTime(System.currentTimeMillis() - resourceDownloadStartTime);
                     WorkerServerMetrics.recordWorkerResourceDownloadSize(
@@ -156,29 +155,4 @@ public class TaskExecutionCheckerUtils {
         }
     }
 
-    private static void createDirectory(Path filePath) {
-        if (Files.exists(filePath)) {
-            return;
-        }
-        try {
-            Files.createDirectories(filePath);
-        } catch (IOException e) {
-            throw new TaskException("Create directory " + filePath + " failed ", e);
-        }
-    }
-
-    private static void setOwner(Path filePath, String tenant) {
-        try {
-            if (!OSUtils.isSudoEnable()) {
-                // we need to open sudo, then we can change the owner.
-                return;
-            }
-            UserPrincipalLookupService userPrincipalLookupService =
-                    FileSystems.getDefault().getUserPrincipalLookupService();
-            UserPrincipal tenantPrincipal = userPrincipalLookupService.lookupPrincipalByName(tenant);
-            Files.setOwner(filePath, tenantPrincipal);
-        } catch (IOException e) {
-            throw new TaskException("Set tenant directory " + filePath + " permission failed, tenant: " + tenant, e);
-        }
-    }
 }

@@ -251,6 +251,10 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/parameter/local.html',
                             },
                             {
+                                title: 'Project-level Parameter',
+                                link: '/en-us/docs/dev/user_doc/guide/parameter/project-parameter.html',
+                            },
+                            {
                                 title: 'Parameter Context',
                                 link: '/en-us/docs/dev/user_doc/guide/parameter/context.html',
                             },
@@ -354,6 +358,10 @@ export default {
                             {
                                 title: 'HANA',
                                 link: '/en-us/docs/dev/user_doc/guide/datasource/hana.html',
+                            },
+                            {
+                                title: 'doris',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/doris.html',
                             }
                         ],
                     },
@@ -976,6 +984,10 @@ export default {
                                 link: '/zh-cn/docs/dev/user_doc/guide/parameter/local.html',
                             },
                             {
+                                title: '项目级别参数',
+                                link: '/zh-cn/docs/dev/user_doc/guide/parameter/project-parameter.html',
+                            },
+                            {
                                 title: '参数传递',
                                 link: '/zh-cn/docs/dev/user_doc/guide/parameter/context.html',
                             },
@@ -1059,6 +1071,10 @@ export default {
                             {
                                 title: 'HANA',
                                 link: '/zh-cn/docs/dev/user_doc/guide/datasource/hana.html',
+                            },
+                            {
+                                title: 'Doris',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/doris.html',
                             }
                         ],
                     },

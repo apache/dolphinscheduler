@@ -97,6 +97,7 @@ public class K8sTask extends AbstractK8sTask {
                 .setNodeSelectorRequirements(convertToNodeSelectorRequirements(k8sTaskParameters.getNodeSelectors()));
         k8sTaskMainParameters.setCommand(k8sTaskParameters.getCommand());
         k8sTaskMainParameters.setArgs(k8sTaskParameters.getArgs());
+        k8sTaskMainParameters.setImagePullPolicy(k8sTaskParameters.getImagePullPolicy());
         return JSONUtils.toJsonString(k8sTaskMainParameters);
     }
 

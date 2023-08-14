@@ -30,6 +30,7 @@
             <includes>
                 <include>*.yaml</include>
                 <include>*.xml</include>
+                <include>swagger.properties</include>
             </includes>
             <outputDirectory>conf</outputDirectory>
         </fileSet>

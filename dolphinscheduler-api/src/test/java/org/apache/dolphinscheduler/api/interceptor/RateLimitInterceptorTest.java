@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.api.interceptor;
 
-import org.apache.dolphinscheduler.api.configuration.TrafficConfiguration;
+import org.apache.dolphinscheduler.api.configuration.ApiConfig;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,14 +39,14 @@ public class RateLimitInterceptorTest {
     public void testPreHandleWithoutControl() throws ExecutionException {
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-        RateLimitInterceptor rateLimitInterceptor = new RateLimitInterceptor(new TrafficConfiguration());
+        RateLimitInterceptor rateLimitInterceptor = new RateLimitInterceptor(new ApiConfig.TrafficConfiguration());
         Assertions.assertTrue(rateLimitInterceptor.preHandle(request, response, null));
         Assertions.assertTrue(rateLimitInterceptor.preHandle(request, response, null));
     }
 
     @Test
     public void testPreHandleWithTenantLevenControl() throws ExecutionException {
-        TrafficConfiguration trafficConfiguration = new TrafficConfiguration();
+        ApiConfig.TrafficConfiguration trafficConfiguration = new ApiConfig.TrafficConfiguration();
         trafficConfiguration.setTenantSwitch(true);
         Map<String, Integer> map = new HashMap<>();
         map.put("tenant1", 2);
@@ -70,7 +70,7 @@ public class RateLimitInterceptorTest {
 
     @Test
     public void testPreHandleWithGlobalControl() throws ExecutionException {
-        TrafficConfiguration trafficConfiguration = new TrafficConfiguration();
+        ApiConfig.TrafficConfiguration trafficConfiguration = new ApiConfig.TrafficConfiguration();
         trafficConfiguration.setTenantSwitch(true);
         trafficConfiguration.setGlobalSwitch(true);
         trafficConfiguration.setMaxGlobalQpsRate(3);
