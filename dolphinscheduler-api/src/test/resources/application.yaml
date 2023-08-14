@@ -91,12 +91,12 @@ security:
       enable: true
       provider:
         github:
-          authorizationUri: ""
-          redirectUri: ""
+          authorizationUri: http://oauth2-test
+          redirectUri: http://oauth2-test
           clientId: ""
           clientSecret: ""
-          tokenUri: ""
-          userInfoUri: ""
+          tokenUri: http://oauth2-token-url-test
+          userInfoUri: http://oauth2-user-info-url-test
           callbackUrl: ""
           iconUri: ""
           provider: github

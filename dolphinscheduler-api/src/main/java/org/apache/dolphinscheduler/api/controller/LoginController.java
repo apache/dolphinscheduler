@@ -220,7 +220,6 @@ public class LoginController extends BaseController {
         OAuth2Configuration.OAuth2ClientProperties oAuth2ClientProperties =
                 oAuth2Configuration.getProvider().get(provider);
         try {
-
             Map<String, String> tokenRequestHeader = new HashMap<>();
             tokenRequestHeader.put("Accept", "application/json");
             Map<String, Object> requestBody = new HashMap<>(16);
