@@ -849,6 +849,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                         }
                     }
 
+                    processService.packageTaskInstance(task, workflowInstance);
                     validTaskMap.put(task.getTaskCode(), task.getId());
                     taskInstanceMap.put(task.getId(), task);
                     taskCodeInstanceMap.put(task.getTaskCode(), task);
@@ -1291,10 +1292,13 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
             Optional<TaskInstance> existTaskInstanceOptional = getTaskInstance(taskNodeObject.getCode());
             if (existTaskInstanceOptional.isPresent()) {
                 TaskInstance existTaskInstance = existTaskInstanceOptional.get();
-                if (existTaskInstance.getState() == TaskExecutionStatus.RUNNING_EXECUTION
-                        || existTaskInstance.getState() == TaskExecutionStatus.DISPATCH) {
+                TaskExecutionStatus state = existTaskInstance.getState();
+                if (state == TaskExecutionStatus.RUNNING_EXECUTION
+                        || state == TaskExecutionStatus.DISPATCH
+                        || state == TaskExecutionStatus.SUBMITTED_SUCCESS) {
                     // try to take over task instance
-                    if (tryToTakeOverTaskInstance(existTaskInstance)) {
+                    if (state != TaskExecutionStatus.SUBMITTED_SUCCESS
+                            && tryToTakeOverTaskInstance(existTaskInstance)) {
                         log.info("Success take over task {}", existTaskInstance.getName());
                         continue;
                     } else {
