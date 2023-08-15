@@ -46,7 +46,8 @@ public final class RegisterListenerPluginProcessor implements NettyRequestProces
         RegisterListenerPluginRequest request =
                 JsonSerializer.deserialize(message.getBody(), RegisterListenerPluginRequest.class);
 
-        log.info("Received command : {}, {}, {}", request.getCommandType().name(),request.getFileName(), request.getClassPath());
+        log.info("Received command : {}, {}, {}", request.getCommandType().name(), request.getFileName(),
+                request.getClassPath());
 
         ListenerResponse listenerResponse = listenerPluginService.registerListenerPlugin(
                 request.getFileName(),

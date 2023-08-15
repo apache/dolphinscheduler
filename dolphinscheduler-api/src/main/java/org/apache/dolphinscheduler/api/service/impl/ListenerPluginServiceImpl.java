@@ -1,7 +1,24 @@
+/*
+ * Licensed to Apache Software Foundation (ASF) under one or more contributor
+ * license agreements. See the NOTICE file distributed with
+ * this work for additional information regarding copyright
+ * ownership. Apache Software Foundation (ASF) licenses this file to you under
+ * the Apache License, Version 2.0 (the "License"); you may
+ * not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package org.apache.dolphinscheduler.api.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.rpc.ApiRpcClient;
 import org.apache.dolphinscheduler.api.service.ListenerPluginService;
@@ -18,27 +35,37 @@ import org.apache.dolphinscheduler.dao.mapper.PluginDefineMapper;
 import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
-import org.apache.dolphinscheduler.remote.command.listener.*;
+import org.apache.dolphinscheduler.remote.command.listener.CreateListenerPluginInstanceRequest;
+import org.apache.dolphinscheduler.remote.command.listener.ListenerResponse;
+import org.apache.dolphinscheduler.remote.command.listener.RegisterListenerPluginRequest;
+import org.apache.dolphinscheduler.remote.command.listener.RemoveListenerPluginInstanceRequest;
+import org.apache.dolphinscheduler.remote.command.listener.RemoveListenerPluginRequest;
+import org.apache.dolphinscheduler.remote.command.listener.UpdateListenerPluginInstanceRequest;
+import org.apache.dolphinscheduler.remote.command.listener.UpdateListenerPluginRequest;
 import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-/**
- * @author wxn
- * @date 2023/8/1
- */
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
 @Service
 @Slf4j
 public class ListenerPluginServiceImpl extends BaseServiceImpl implements ListenerPluginService {
@@ -70,7 +97,8 @@ public class ListenerPluginServiceImpl extends BaseServiceImpl implements Listen
         }
         Host alertServerAddress = alertServerAddressOptional.get();
         try {
-            RegisterListenerPluginRequest request = new RegisterListenerPluginRequest(StringUtils.replace(file.getOriginalFilename(), ".jar",""), classPath, file.getBytes());
+            RegisterListenerPluginRequest request = new RegisterListenerPluginRequest(
+                    StringUtils.replace(file.getOriginalFilename(), ".jar", ""), classPath, file.getBytes());
             ListenerResponse response =
                     apiRpcClient.sendListenerMessageSync(alertServerAddress, request.convert2Command());
             if (response.isSuccess()) {
@@ -100,7 +128,8 @@ public class ListenerPluginServiceImpl extends BaseServiceImpl implements Listen
         }
         Host alertServerAddress = alertServerAddressOptional.get();
         try {
-            UpdateListenerPluginRequest request = new UpdateListenerPluginRequest(id, StringUtils.replace(file.getOriginalFilename(), ".jar",""), classPath, file.getBytes());
+            UpdateListenerPluginRequest request = new UpdateListenerPluginRequest(id,
+                    StringUtils.replace(file.getOriginalFilename(), ".jar", ""), classPath, file.getBytes());
             ListenerResponse response =
                     apiRpcClient.sendListenerMessageSync(alertServerAddress, request.convert2Command());
             if (response.isSuccess()) {
@@ -138,12 +167,12 @@ public class ListenerPluginServiceImpl extends BaseServiceImpl implements Listen
     }
 
     @Override
-    public Result listPluginPaging(String searchVal, Integer pageNo, Integer pageSize){
+    public Result listPluginPaging(String searchVal, Integer pageNo, Integer pageSize) {
         Result result = new Result();
         PageInfo<PluginDefine> pageInfo = new PageInfo<>(pageNo, pageSize);
         LambdaQueryWrapper<PluginDefine> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(PluginDefine::getPluginType, PluginType.LISTENER.getDesc());
-        if (StringUtils.isNotEmpty(searchVal)){
+        if (StringUtils.isNotEmpty(searchVal)) {
             queryWrapper.like(PluginDefine::getPluginName, searchVal);
         }
         queryWrapper.orderByDesc(PluginDefine::getUpdateTime);
@@ -157,7 +186,7 @@ public class ListenerPluginServiceImpl extends BaseServiceImpl implements Listen
     }
 
     @Override
-    public Result listPluginList(){
+    public Result listPluginList() {
         LambdaQueryWrapper<PluginDefine> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(PluginDefine::getPluginType, PluginType.LISTENER.getDesc());
         queryWrapper.orderByDesc(PluginDefine::getUpdateTime);
@@ -176,7 +205,8 @@ public class ListenerPluginServiceImpl extends BaseServiceImpl implements Listen
         Host alertServerAddress = alertServerAddressOptional.get();
         try {
             CreateListenerPluginInstanceRequest request =
-                    new CreateListenerPluginInstanceRequest(pluginDefineId, instanceName, pluginInstanceParams, listenerEventTypes);
+                    new CreateListenerPluginInstanceRequest(pluginDefineId, instanceName, pluginInstanceParams,
+                            listenerEventTypes);
             ListenerResponse response =
                     apiRpcClient.sendListenerMessageSync(alertServerAddress, request.convert2Command());
             if (response.isSuccess()) {
@@ -201,7 +231,8 @@ public class ListenerPluginServiceImpl extends BaseServiceImpl implements Listen
         Host alertServerAddress = alertServerAddressOptional.get();
         try {
             UpdateListenerPluginInstanceRequest request =
-                    new UpdateListenerPluginInstanceRequest(instanceId, instanceName, pluginInstanceParams, listenerEventTypes);
+                    new UpdateListenerPluginInstanceRequest(instanceId, instanceName, pluginInstanceParams,
+                            listenerEventTypes);
             ListenerResponse response =
                     apiRpcClient.sendListenerMessageSync(alertServerAddress, request.convert2Command());
             if (response.isSuccess()) {
@@ -239,11 +270,11 @@ public class ListenerPluginServiceImpl extends BaseServiceImpl implements Listen
     }
 
     @Override
-    public Result listInstancePaging(String searchVal, Integer pageNo, Integer pageSize){
+    public Result listInstancePaging(String searchVal, Integer pageNo, Integer pageSize) {
         Result result = new Result();
         PageInfo<ListenerInstanceVO> pageInfo = new PageInfo<>(pageNo, pageSize);
         LambdaQueryWrapper<ListenerPluginInstance> queryWrapper = new LambdaQueryWrapper<>();
-        if (StringUtils.isNotEmpty(searchVal)){
+        if (StringUtils.isNotEmpty(searchVal)) {
             queryWrapper.like(ListenerPluginInstance::getInstanceName, searchVal);
         }
         queryWrapper.orderByDesc(ListenerPluginInstance::getUpdateTime);
@@ -257,7 +288,7 @@ public class ListenerPluginServiceImpl extends BaseServiceImpl implements Listen
     }
 
     @Override
-    public boolean checkExistPluginInstanceName(String instanceName){
+    public boolean checkExistPluginInstanceName(String instanceName) {
         return listenerPluginInstanceMapper.existInstanceName(instanceName) == Boolean.TRUE;
     }
 
@@ -279,15 +310,15 @@ public class ListenerPluginServiceImpl extends BaseServiceImpl implements Listen
         return true;
     }
 
-    private List<ListenerInstanceVO> buildListenerInstanceVoList(List<ListenerPluginInstance> listenerPluginInstances){
+    private List<ListenerInstanceVO> buildListenerInstanceVoList(List<ListenerPluginInstance> listenerPluginInstances) {
         List<ListenerInstanceVO> listenerInstanceVOS = new ArrayList<>();
-        if (CollectionUtils.isEmpty(listenerPluginInstances)){
+        if (CollectionUtils.isEmpty(listenerPluginInstances)) {
             return listenerInstanceVOS;
         }
         LambdaQueryWrapper<PluginDefine> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(PluginDefine::getPluginType, PluginType.LISTENER.getDesc());
         List<PluginDefine> listenerPlugins = pluginDefineMapper.selectList(queryWrapper);
-        if (CollectionUtils.isEmpty(listenerPlugins)){
+        if (CollectionUtils.isEmpty(listenerPlugins)) {
             return listenerInstanceVOS;
         }
         Map<Integer, PluginDefine> pluginDefineMap =
@@ -297,14 +328,17 @@ public class ListenerPluginServiceImpl extends BaseServiceImpl implements Listen
             listenerInstanceVO.setId(listenerPluginInstance.getId());
             listenerInstanceVO.setPluginDefineId(listenerPluginInstance.getPluginDefineId());
             PluginDefine pluginDefine = pluginDefineMap.get(listenerPluginInstance.getPluginDefineId());
-            if (Objects.isNull(pluginDefine)){
+            if (Objects.isNull(pluginDefine)) {
                 return;
             }
             listenerInstanceVO.setListenerPluginName(pluginDefine.getPluginName());
             listenerInstanceVO.setInstanceName(listenerPluginInstance.getInstanceName());
-            listenerInstanceVO.setPluginInstanceParams(parseToPluginUiParams(listenerPluginInstance.getPluginInstanceParams(), pluginDefine.getPluginParams()));
+            listenerInstanceVO.setPluginInstanceParams(parseToPluginUiParams(
+                    listenerPluginInstance.getPluginInstanceParams(), pluginDefine.getPluginParams()));
             List<String> eventTypes =
-                    Arrays.stream(listenerPluginInstance.getListenerEventTypes().split(",")).map(eventTypeCode -> ListenerEventType.of(Integer.parseInt(eventTypeCode)).getDescp()).collect(Collectors.toList());
+                    Arrays.stream(listenerPluginInstance.getListenerEventTypes().split(","))
+                            .map(eventTypeCode -> ListenerEventType.of(Integer.parseInt(eventTypeCode)).getDescp())
+                            .collect(Collectors.toList());
             listenerInstanceVO.setListenerEventTypes(eventTypes);
             listenerInstanceVO.setCreateTime(listenerPluginInstance.getCreateTime());
             listenerInstanceVO.setUpdateTime(listenerPluginInstance.getUpdateTime());

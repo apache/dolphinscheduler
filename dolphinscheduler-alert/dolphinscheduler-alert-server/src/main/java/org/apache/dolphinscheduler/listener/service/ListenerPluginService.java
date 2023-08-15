@@ -1,9 +1,25 @@
+/*
+ * Licensed to Apache Software Foundation (ASF) under one or more contributor
+ * license agreements. See the NOTICE file distributed with
+ * this work for additional information regarding copyright
+ * ownership. Apache Software Foundation (ASF) licenses this file to you under
+ * the Apache License, Version 2.0 (the "License"); you may
+ * not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package org.apache.dolphinscheduler.listener.service;
 
 import org.apache.dolphinscheduler.common.utils.FileUtils;
-import org.apache.dolphinscheduler.listener.enums.ListenerEventPostServiceStatus;
-import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
-import org.apache.dolphinscheduler.listener.plugin.ListenerPlugin;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ListenerEvent;
 import org.apache.dolphinscheduler.dao.entity.ListenerPluginInstance;
@@ -11,6 +27,9 @@ import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 import org.apache.dolphinscheduler.dao.mapper.ListenerEventMapper;
 import org.apache.dolphinscheduler.dao.mapper.ListenerPluginInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.PluginDefineMapper;
+import org.apache.dolphinscheduler.listener.enums.ListenerEventPostServiceStatus;
+import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
+import org.apache.dolphinscheduler.listener.plugin.ListenerPlugin;
 import org.apache.dolphinscheduler.listener.util.ClassLoaderUtil;
 import org.apache.dolphinscheduler.remote.command.listener.ListenerResponse;
 import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
@@ -21,7 +40,12 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -44,37 +68,25 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
-/**
- * @author wxn
- * @date 2023/5/14
- */
 @Component
 @Slf4j
 public class ListenerPluginService implements ApplicationContextAware, ApplicationListener<ContextRefreshedEvent> {
 
-    private DefaultListableBeanFactory defaultListableBeanFactory;
-
-    private ApplicationContext applicationContext;
-
-    @Resource
-    private PluginDefineMapper pluginDefineMapper;
-
-    @Resource
-    private ListenerPluginInstanceMapper pluginInstanceMapper;
-
-    @Resource
-    private ListenerEventMapper listenerEventMapper;
-
-    @Resource
-    private ClassLoaderUtil classLoaderUtil;
-
     // TODO: 先写死
     private final String path = "/root/program/dolphinscheduler/test-plugins/plugin/";
-
     private final ConcurrentHashMap<Integer, ListenerPlugin> listenerPlugins = new ConcurrentHashMap<>();
-
     private final ConcurrentHashMap<Integer, ListenerInstancePostService> listenerInstancePostServices =
             new ConcurrentHashMap<>();
+    private DefaultListableBeanFactory defaultListableBeanFactory;
+    private ApplicationContext applicationContext;
+    @Resource
+    private PluginDefineMapper pluginDefineMapper;
+    @Resource
+    private ListenerPluginInstanceMapper pluginInstanceMapper;
+    @Resource
+    private ListenerEventMapper listenerEventMapper;
+    @Resource
+    private ClassLoaderUtil classLoaderUtil;
 
     @Override
     public void setApplicationContext(@NotNull ApplicationContext applicationContext) throws BeansException {
@@ -118,7 +130,7 @@ public class ListenerPluginService implements ApplicationContextAware, Applicati
     }
 
     public ListenerResponse registerListenerPlugin(String originalFileName, String classPath, byte[] pluginJar) {
-        String fileName = String.format("%s@%s.jar", originalFileName,UUID.randomUUID());
+        String fileName = String.format("%s@%s.jar", originalFileName, UUID.randomUUID());
         String filePath = path + fileName;
         boolean success = true;
         try {
@@ -147,8 +159,8 @@ public class ListenerPluginService implements ApplicationContextAware, Applicati
         } catch (Exception e) {
             success = false;
             return ListenerResponse.fail("failed when register listener plugin：" + e.getMessage());
-        }finally {
-            if (!success){
+        } finally {
+            if (!success) {
                 FileUtils.deleteFile(filePath);
             }
         }
@@ -178,7 +190,7 @@ public class ListenerPluginService implements ApplicationContextAware, Applicati
             classLoaderUtil.removeJarFile(plugin.getPluginLocation());
             defaultListableBeanFactory.removeBeanDefinition(plugin.getPluginClassName());
             // 安装新的plugin
-            String fileName = String.format("%s@%s.jar", originalFileName,UUID.randomUUID());
+            String fileName = String.format("%s@%s.jar", originalFileName, UUID.randomUUID());
             String filePath = path + fileName;
             File dest = new File(filePath);
             Files.write(dest.toPath(), pluginJar);
@@ -251,7 +263,8 @@ public class ListenerPluginService implements ApplicationContextAware, Applicati
         listenerPluginInstance.setInstanceName(instanceName);
         listenerPluginInstance.setPluginInstanceParams(paramsMapJson);
         listenerPluginInstance.setPluginDefineId(pluginDefineId);
-        listenerPluginInstance.setListenerEventTypes(StringUtils.join(listenerEventTypes.stream().map(ListenerEventType::getCode).collect(Collectors.toSet()), ","));
+        listenerPluginInstance.setListenerEventTypes(StringUtils
+                .join(listenerEventTypes.stream().map(ListenerEventType::getCode).collect(Collectors.toSet()), ","));
         pluginInstanceMapper.insert(listenerPluginInstance);
         ListenerInstancePostService listenerInstancePostService = new ListenerInstancePostService(
                 listenerPlugins.get(pluginDefineId), listenerPluginInstance, listenerEventMapper);
@@ -274,7 +287,8 @@ public class ListenerPluginService implements ApplicationContextAware, Applicati
         listenerPluginInstance.setInstanceName(instanceName);
         String paramsMapJson = parsePluginParamsMap(pluginInstanceParams);
         listenerPluginInstance.setPluginInstanceParams(paramsMapJson);
-        listenerPluginInstance.setListenerEventTypes(StringUtils.join(listenerEventTypes.stream().map(ListenerEventType::getCode).collect(Collectors.toSet()), ","));
+        listenerPluginInstance.setListenerEventTypes(StringUtils
+                .join(listenerEventTypes.stream().map(ListenerEventType::getCode).collect(Collectors.toSet()), ","));
         listenerPluginInstance.setUpdateTime(new Date());
         pluginInstanceMapper.updateById(listenerPluginInstance);
         instancePostService.updateListenerPluginInstance(listenerPluginInstance);

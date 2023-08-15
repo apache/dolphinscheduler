@@ -43,7 +43,6 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LOCAL_PA
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SQL;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.dolphinscheduler.api.dto.DagDataSchedule;
 import org.apache.dolphinscheduler.api.dto.ScheduleParam;
 import org.apache.dolphinscheduler.api.dto.treeview.Instance;
@@ -82,8 +81,34 @@ import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.*;
-import org.apache.dolphinscheduler.dao.mapper.*;
+import org.apache.dolphinscheduler.dao.entity.DagData;
+import org.apache.dolphinscheduler.dao.entity.DataSource;
+import org.apache.dolphinscheduler.dao.entity.DependentSimplifyDefinition;
+import org.apache.dolphinscheduler.dao.entity.ListenerPluginInstance;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
+import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.TaskMainInfo;
+import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.UserWithProcessDefinitionCode;
+import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
 import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionLogDao;
@@ -159,52 +184,37 @@ import com.google.common.collect.Lists;
 public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements ProcessDefinitionService {
 
     private static final String RELEASESTATE = "releaseState";
-
+    @Autowired
+    TaskDefinitionLogMapper taskDefinitionLogMapper;
     @Autowired
     private ProjectMapper projectMapper;
-
     @Autowired
     private ProjectService projectService;
-
     @Autowired
     private UserMapper userMapper;
-
     @Autowired
     private ProcessDefinitionLogMapper processDefinitionLogMapper;
-
     @Autowired
     private ProcessDefinitionMapper processDefinitionMapper;
-
     @Autowired
     private ProcessDefinitionDao processDefinitionDao;
-
     @Autowired
     private ProcessDefinitionLogDao processDefinitionLogDao;
     @Lazy
     @Autowired
     private ProcessInstanceService processInstanceService;
-
     @Autowired
     private TaskInstanceMapper taskInstanceMapper;
-
     @Autowired
     private ScheduleMapper scheduleMapper;
-
     @Autowired
     private ProcessService processService;
-
     @Autowired
     private TaskDefinitionLogDao taskDefinitionLogDao;
-
     @Autowired
     private ProcessTaskRelationMapper processTaskRelationMapper;
-
     @Autowired
     private ProcessTaskRelationLogMapper processTaskRelationLogMapper;
-
-    @Autowired
-    TaskDefinitionLogMapper taskDefinitionLogMapper;
-
     @Lazy
     @Autowired
     private TaskDefinitionService taskDefinitionService;
@@ -286,10 +296,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                         globalParams, locations, timeout, loginUser.getId());
         processDefinition.setExecutionType(executionType);
         result = createDagDefine(loginUser, taskRelationList, processDefinition, taskDefinitionLogs, otherParamsJson);
-        if (result.get(Constants.STATUS) == Status.SUCCESS){
+        if (result.get(Constants.STATUS) == Status.SUCCESS) {
             List<ListenerPluginInstance> instances =
                     needSendListenerEvent(ListenerEventType.WORKFLOW_ADDED);
-            if (CollectionUtils.isNotEmpty(instances)){
+            if (CollectionUtils.isNotEmpty(instances)) {
                 DsListenerWorkflowAddedEvent event = new DsListenerWorkflowAddedEvent();
                 event.setProjectId(project.getId());
                 event.setProjectCode(projectCode);
@@ -803,10 +813,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         result = updateDagDefine(loginUser, taskRelationList, processDefinition, processDefinitionDeepCopy,
                 taskDefinitionLogs, otherParamsJson);
         // TODO: 封装逻辑待讨论
-        if (result.get(Constants.STATUS) == Status.SUCCESS){
+        if (result.get(Constants.STATUS) == Status.SUCCESS) {
             List<ListenerPluginInstance> instances =
                     needSendListenerEvent(ListenerEventType.WORKFLOW_UPDATE);
-            if (CollectionUtils.isNotEmpty(instances)){
+            if (CollectionUtils.isNotEmpty(instances)) {
                 DsListenerWorkflowUpdateEvent event = new DsListenerWorkflowUpdateEvent();
                 event.setProjectId(project.getId());
                 event.setProjectCode(projectCode);
@@ -1086,7 +1096,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         List<ListenerPluginInstance> instances =
                 needSendListenerEvent(ListenerEventType.WORKFLOW_REMOVED);
-        if (CollectionUtils.isNotEmpty(instances)){
+        if (CollectionUtils.isNotEmpty(instances)) {
             DsListenerWorkflowRemovedEvent event = new DsListenerWorkflowRemovedEvent();
             event.setProjectId(project.getId());
             event.setProjectCode(project.getCode());

@@ -606,83 +606,83 @@
                     </dependency>
                 </dependencies>
             </plugin>
-<!--            <plugin>-->
-<!--                <groupId>com.diffplug.spotless</groupId>-->
-<!--                <artifactId>spotless-maven-plugin</artifactId>-->
-<!--                <version>${spotless.version}</version>-->
-<!--                <configuration>-->
-<!--                    <skip>${spotless.skip}</skip>-->
-<!--                    <java>-->
-<!--                        <eclipse>-->
-<!--                            <file>style/spotless_dolphinscheduler_formatter.xml</file>-->
-<!--                        </eclipse>-->
-<!--                        <removeUnusedImports />-->
-<!--                        <importOrder>-->
-<!--                            <file>style/eclipse.importorder</file>-->
-<!--                        </importOrder>-->
-<!--                        <replaceRegex>-->
-<!--                            <name>Remove wildcard imports</name>-->
-<!--                            <searchRegex>import\s+(static)*\s*[^\*\s]+\*;(\r\n|\r|\n)</searchRegex>-->
-<!--                            <replacement>$1</replacement>-->
-<!--                        </replaceRegex>-->
-<!--                        <replaceRegex>-->
-<!--                            <name>Block powermock</name>-->
-<!--                            <searchRegex>import\s+org\.powermock\.[^\*\s]*(|\*);(\r\n|\r|\n)</searchRegex>-->
-<!--                            <replacement>$1</replacement>-->
-<!--                        </replaceRegex>-->
-<!--                        <replaceRegex>-->
-<!--                            <name>Block jUnit4 imports</name>-->
-<!--                            <searchRegex>import\s+org\.junit\.[^jupiter][^\*\s]*(|\*);(\r\n|\r|\n)</searchRegex>-->
-<!--                            <replacement>$1</replacement>-->
-<!--                        </replaceRegex>-->
-<!--                        <replaceRegex>-->
-<!--                            <name>Block kubernetes-client</name>-->
-<!--                            <searchRegex>import\s+io\.kubernetes\.client\.[^\*\s]*(|\*);(\r\n|\r|\n)</searchRegex>-->
-<!--                            <replacement>$1</replacement>-->
-<!--                        </replaceRegex>-->
-<!--                    </java>-->
-<!--                    <pom>-->
-<!--                        <sortPom>-->
-<!--                            <encoding>UTF-8</encoding>-->
-<!--                            <nrOfIndentSpace>4</nrOfIndentSpace>-->
-<!--                            <keepBlankLines>true</keepBlankLines>-->
-<!--                            <indentBlankLines>false</indentBlankLines>-->
-<!--                            <indentSchemaLocation>true</indentSchemaLocation>-->
-<!--                            <spaceBeforeCloseEmptyElement>true</spaceBeforeCloseEmptyElement>-->
-<!--                            <sortModules>false</sortModules>-->
-<!--                            <sortExecutions>false</sortExecutions>-->
-<!--                            <predefinedSortOrder>custom_1</predefinedSortOrder>-->
-<!--                            <expandEmptyElements>false</expandEmptyElements>-->
-<!--                            <sortProperties>false</sortProperties>-->
-<!--                        </sortPom>-->
-<!--                        <replace>-->
-<!--                            <name>Leading blank line</name>-->
-<!--                            <search>project</search>-->
-<!--                            <replacement>project</replacement>-->
-<!--                        </replace>-->
-<!--                    </pom>-->
-<!--                    <markdown>-->
-<!--                        <includes>-->
-<!--                            <include>docs/**/*.md</include>-->
-<!--                        </includes>-->
-<!--                        <excludes>-->
-<!--                            <exclude>**/.github/**/*.md</exclude>-->
-<!--                        </excludes>-->
-<!--                        <flexmark />-->
-<!--                    </markdown>-->
-<!--                    <upToDateChecking>-->
-<!--                        <enabled>true</enabled>-->
-<!--                    </upToDateChecking>-->
-<!--                </configuration>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <goals>-->
-<!--                            <goal>check</goal>-->
-<!--                        </goals>-->
-<!--                        <phase>compile</phase>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--            </plugin>-->
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>${spotless.version}</version>
+                <configuration>
+                    <skip>${spotless.skip}</skip>
+                    <java>
+                        <eclipse>
+                            <file>style/spotless_dolphinscheduler_formatter.xml</file>
+                        </eclipse>
+                        <removeUnusedImports />
+                        <importOrder>
+                            <file>style/eclipse.importorder</file>
+                        </importOrder>
+                        <replaceRegex>
+                            <name>Remove wildcard imports</name>
+                            <searchRegex>import\s+(static)*\s*[^\*\s]+\*;(\r\n|\r|\n)</searchRegex>
+                            <replacement>$1</replacement>
+                        </replaceRegex>
+                        <replaceRegex>
+                            <name>Block powermock</name>
+                            <searchRegex>import\s+org\.powermock\.[^\*\s]*(|\*);(\r\n|\r|\n)</searchRegex>
+                            <replacement>$1</replacement>
+                        </replaceRegex>
+                        <replaceRegex>
+                            <name>Block jUnit4 imports</name>
+                            <searchRegex>import\s+org\.junit\.[^jupiter][^\*\s]*(|\*);(\r\n|\r|\n)</searchRegex>
+                            <replacement>$1</replacement>
+                        </replaceRegex>
+                        <replaceRegex>
+                            <name>Block kubernetes-client</name>
+                            <searchRegex>import\s+io\.kubernetes\.client\.[^\*\s]*(|\*);(\r\n|\r|\n)</searchRegex>
+                            <replacement>$1</replacement>
+                        </replaceRegex>
+                    </java>
+                    <pom>
+                        <sortPom>
+                            <encoding>UTF-8</encoding>
+                            <nrOfIndentSpace>4</nrOfIndentSpace>
+                            <keepBlankLines>true</keepBlankLines>
+                            <indentBlankLines>false</indentBlankLines>
+                            <indentSchemaLocation>true</indentSchemaLocation>
+                            <spaceBeforeCloseEmptyElement>true</spaceBeforeCloseEmptyElement>
+                            <sortModules>false</sortModules>
+                            <sortExecutions>false</sortExecutions>
+                            <predefinedSortOrder>custom_1</predefinedSortOrder>
+                            <expandEmptyElements>false</expandEmptyElements>
+                            <sortProperties>false</sortProperties>
+                        </sortPom>
+                        <replace>
+                            <name>Leading blank line</name>
+                            <search>project</search>
+                            <replacement>project</replacement>
+                        </replace>
+                    </pom>
+                    <markdown>
+                        <includes>
+                            <include>docs/**/*.md</include>
+                        </includes>
+                        <excludes>
+                            <exclude>**/.github/**/*.md</exclude>
+                        </excludes>
+                        <flexmark />
+                    </markdown>
+                    <upToDateChecking>
+                        <enabled>true</enabled>
+                    </upToDateChecking>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <phase>compile</phase>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>cobertura-maven-plugin</artifactId>

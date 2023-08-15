@@ -109,7 +109,7 @@ public class PluginDefine {
 
     public void setPluginLocation(String pluginLocation) {
         this.pluginLocation = pluginLocation;
-        if (Objects.nonNull(pluginLocation)){
+        if (Objects.nonNull(pluginLocation)) {
             String[] split = pluginLocation.split("/");
             this.originalFileName = split[split.length - 1].split("@")[0] + ".jar";
         }

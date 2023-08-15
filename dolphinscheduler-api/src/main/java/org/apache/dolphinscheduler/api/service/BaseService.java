@@ -23,13 +23,13 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.dao.entity.ListenerPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
+import org.apache.dolphinscheduler.listener.event.DsListenerEvent;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
-import org.apache.dolphinscheduler.listener.event.DsListenerEvent;
 import org.slf4j.Logger;
 
 /**
@@ -128,7 +128,8 @@ public interface BaseService {
      * @param listenerEventType
      * @param listenerEvent listener
      */
-    void sendListenerEvent(ListenerEventType listenerEventType, DsListenerEvent listenerEvent, List<ListenerPluginInstance> listenerPluginInstances);
+    void sendListenerEvent(ListenerEventType listenerEventType, DsListenerEvent listenerEvent,
+                           List<ListenerPluginInstance> listenerPluginInstances);
 
     /**
      * check if where are listener instances listen to given event type

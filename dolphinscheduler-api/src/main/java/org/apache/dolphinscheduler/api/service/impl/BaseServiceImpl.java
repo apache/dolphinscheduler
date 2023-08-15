@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.google.common.collect.Lists;
+import static java.util.stream.Collectors.toSet;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
@@ -32,24 +32,28 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ListenerEvent;
 import org.apache.dolphinscheduler.dao.entity.ListenerPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
-
-import org.apache.commons.lang3.StringUtils;
-
-import java.text.MessageFormat;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.dolphinscheduler.dao.mapper.ListenerEventMapper;
 import org.apache.dolphinscheduler.dao.mapper.ListenerPluginInstanceMapper;
 import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
 import org.apache.dolphinscheduler.listener.event.DsListenerEvent;
-import org.apache.dolphinscheduler.listener.event.DsListenerWorkflowAddedEvent;
+
+import org.apache.commons.lang3.StringUtils;
+
+import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static java.util.stream.Collectors.toSet;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.google.common.collect.Lists;
 
 /**
  * base service impl
@@ -222,10 +226,11 @@ public class BaseServiceImpl implements BaseService {
     }
 
     @Override
-    public void sendListenerEvent(ListenerEventType listenerEventType, DsListenerEvent listenerEvent, List<ListenerPluginInstance> listenerPluginInstances) {
+    public void sendListenerEvent(ListenerEventType listenerEventType, DsListenerEvent listenerEvent,
+                                  List<ListenerPluginInstance> listenerPluginInstances) {
         String content = JSONUtils.toJsonString(listenerEvent);
         List<ListenerEvent> events = Lists.newArrayListWithExpectedSize(listenerPluginInstances.size());
-        for (ListenerPluginInstance instance: listenerPluginInstances){
+        for (ListenerPluginInstance instance : listenerPluginInstances) {
             ListenerEvent event = new ListenerEvent();
             event.setContent(content);
             event.setEventType(listenerEventType);

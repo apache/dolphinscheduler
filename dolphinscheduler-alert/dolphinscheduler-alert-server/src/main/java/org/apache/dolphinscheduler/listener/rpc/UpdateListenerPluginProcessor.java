@@ -46,7 +46,8 @@ public final class UpdateListenerPluginProcessor implements NettyRequestProcesso
         UpdateListenerPluginRequest request =
                 JsonSerializer.deserialize(message.getBody(), UpdateListenerPluginRequest.class);
 
-        log.info("Received command : {}, {},{},{}", request.getPluginId(), request.getFileName(), request.getClassPath(), request.getPluginJar());
+        log.info("Received command : {}, {},{},{}", request.getPluginId(), request.getFileName(),
+                request.getClassPath(), request.getPluginJar());
 
         ListenerResponse listenerResponse = listenerPluginService.updateListenerPlugin(
                 request.getPluginId(),
