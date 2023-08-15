@@ -320,7 +320,7 @@ public class DagHelper {
                 log.error("taskNode {} is null, please check dag", subsequent);
                 continue;
             }
-            if (isTaskNodeNeedSkip(taskNode, skipTaskNodeList)) {
+            if (isTaskNodeNeedSkip(taskNode, skipTaskNodeList,completeTaskList)) {
                 setTaskNodeSkip(subsequent, dag, completeTaskList, skipTaskNodeList);
                 continue;
             }
@@ -340,12 +340,15 @@ public class DagHelper {
      * if all of the task dependence are skipped, skip it too.
      */
     private static boolean isTaskNodeNeedSkip(TaskNode taskNode,
-                                              Map<Long, TaskNode> skipTaskNodeList) {
+                                              Map<Long, TaskNode> skipTaskNodeList, Map<Long, TaskInstance> completeTaskList) {
         if (CollectionUtils.isEmpty(taskNode.getDepList())) {
             return false;
         }
         for (Long depNode : taskNode.getDepList()) {
             if (!skipTaskNodeList.containsKey(depNode)) {
+                return false;
+            }
+            if(completeTaskList.containsKey(depNode)){
                 return false;
             }
         }
@@ -475,7 +478,7 @@ public class DagHelper {
         Collection<Long> postNodeList = dag.getSubsequentNodes(skipNodeCode);
         for (Long post : postNodeList) {
             TaskNode postNode = dag.getNode(post);
-            if (isTaskNodeNeedSkip(postNode, skipTaskNodeList)) {
+            if (isTaskNodeNeedSkip(postNode, skipTaskNodeList, completeTaskList)) {
                 setTaskNodeSkip(post, dag, completeTaskList, skipTaskNodeList);
             }
         }
@@ -494,7 +497,7 @@ public class DagHelper {
         Collection<Long> postNodeList = dag.getSubsequentNodes(skipNodeCode);
         for (Long post : postNodeList) {
             TaskNode postNode = dag.getNode(post);
-            if (isTaskNodeNeedSkip(postNode, skipTaskNodeList)) {
+            if (isTaskNodeNeedSkip(postNode, skipTaskNodeList, completeTaskList)) {
                 setTaskNodeSkip(post, dag, completeTaskList, skipTaskNodeList);
             }
         }
