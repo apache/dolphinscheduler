@@ -29,13 +29,12 @@ import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.ListenerEvent;
 import org.apache.dolphinscheduler.dao.entity.ListenerPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ListenerEventMapper;
 import org.apache.dolphinscheduler.dao.mapper.ListenerPluginInstanceMapper;
 import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
-import org.apache.dolphinscheduler.listener.event.DsListenerEvent;
+import org.apache.dolphinscheduler.listener.event.ListenerEvent;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -226,12 +225,13 @@ public class BaseServiceImpl implements BaseService {
     }
 
     @Override
-    public void sendListenerEvent(ListenerEventType listenerEventType, DsListenerEvent listenerEvent,
+    public void sendListenerEvent(ListenerEventType listenerEventType, ListenerEvent listenerEvent,
                                   List<ListenerPluginInstance> listenerPluginInstances) {
         String content = JSONUtils.toJsonString(listenerEvent);
-        List<ListenerEvent> events = Lists.newArrayListWithExpectedSize(listenerPluginInstances.size());
+        List<org.apache.dolphinscheduler.dao.entity.ListenerEvent> events = Lists.newArrayListWithExpectedSize(listenerPluginInstances.size());
         for (ListenerPluginInstance instance : listenerPluginInstances) {
-            ListenerEvent event = new ListenerEvent();
+            org.apache.dolphinscheduler.dao.entity.ListenerEvent
+                    event = new org.apache.dolphinscheduler.dao.entity.ListenerEvent();
             event.setContent(content);
             event.setEventType(listenerEventType);
             event.setPluginInstanceId(instance.getId());

@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.dao.entity.ListenerPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
-import org.apache.dolphinscheduler.listener.event.DsListenerEvent;
+import org.apache.dolphinscheduler.listener.event.ListenerEvent;
 
 import java.util.Date;
 import java.util.List;
@@ -128,7 +128,7 @@ public interface BaseService {
      * @param listenerEventType
      * @param listenerEvent listener
      */
-    void sendListenerEvent(ListenerEventType listenerEventType, DsListenerEvent listenerEvent,
+    void sendListenerEvent(ListenerEventType listenerEventType, ListenerEvent listenerEvent,
                            List<ListenerPluginInstance> listenerPluginInstances);
 
     /**

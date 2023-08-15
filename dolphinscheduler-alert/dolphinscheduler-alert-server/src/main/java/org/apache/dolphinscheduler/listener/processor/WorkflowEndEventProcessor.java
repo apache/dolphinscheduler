@@ -22,7 +22,7 @@ package org.apache.dolphinscheduler.listener.processor;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ListenerEvent;
 import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
-import org.apache.dolphinscheduler.listener.event.DsListenerWorkflowEndEvent;
+import org.apache.dolphinscheduler.listener.event.WorkflowEndListenerEvent;
 import org.apache.dolphinscheduler.listener.plugin.ListenerPlugin;
 
 import com.google.auto.service.AutoService;
@@ -37,8 +37,8 @@ public class WorkflowEndEventProcessor implements ListenerEventProcessor {
 
     @Override
     public void process(ListenerPlugin plugin, ListenerEvent event) {
-        DsListenerWorkflowEndEvent dsListenerEvent =
-                JSONUtils.parseObject(event.getContent(), DsListenerWorkflowEndEvent.class);
+        WorkflowEndListenerEvent dsListenerEvent =
+                JSONUtils.parseObject(event.getContent(), WorkflowEndListenerEvent.class);
         dsListenerEvent.setListenerInstanceParams(event.getParams());
         plugin.onWorkflowEnd(dsListenerEvent);
     }

@@ -39,7 +39,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class DsListenerWorkflowStartEvent extends DsListenerEvent {
+public class WorkflowStartListenerEvent extends ListenerEvent {
 
     @JsonProperty("projectId")
     private Integer projectId;

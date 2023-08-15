@@ -19,6 +19,10 @@
 
 package org.apache.dolphinscheduler.listener.event;
 
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+
+import java.util.Date;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -30,17 +34,30 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class DsListenerMasterDownEvent extends DsListenerEvent {
+public class TaskFailListenerEvent extends ListenerEvent {
 
-    /**
-     * server type :master or worker
-     */
-    @JsonProperty("type")
-    String type;
+    @JsonProperty("taskInstanceId")
+    private int taskInstanceId;
+    @JsonProperty("taskName")
+    private String taskName;
+    @JsonProperty("taskType")
+    private String taskType;
+    @JsonProperty("processDefinitionId")
+    private int processDefinitionId;
+    @JsonProperty("processDefinitionName")
+    private String processDefinitionName;
+    @JsonProperty("processInstanceId")
+    private int processInstanceId;
+    @JsonProperty("processInstanceName")
+    private String processInstanceName;
+    @JsonProperty("state")
+    private TaskExecutionStatus state;
+    @JsonProperty("startTime")
+    private Date startTime;
+    @JsonProperty("endTime")
+    private Date endTime;
     @JsonProperty("host")
-    String host;
-    @JsonProperty("event")
-    String event;
-    @JsonProperty("warningLevel")
-    String warningLevel;
+    private String host;
+    @JsonProperty("logPath")
+    private String logPath;
 }

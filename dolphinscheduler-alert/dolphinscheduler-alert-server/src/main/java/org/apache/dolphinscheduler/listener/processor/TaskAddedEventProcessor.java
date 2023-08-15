@@ -22,7 +22,7 @@ package org.apache.dolphinscheduler.listener.processor;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ListenerEvent;
 import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
-import org.apache.dolphinscheduler.listener.event.DsListenerTaskAddedEvent;
+import org.apache.dolphinscheduler.listener.event.TaskCreateListenerEvent;
 import org.apache.dolphinscheduler.listener.plugin.ListenerPlugin;
 
 import com.google.auto.service.AutoService;
@@ -37,8 +37,8 @@ public class TaskAddedEventProcessor implements ListenerEventProcessor {
 
     @Override
     public void process(ListenerPlugin plugin, ListenerEvent event) {
-        DsListenerTaskAddedEvent dsListenerEvent =
-                JSONUtils.parseObject(event.getContent(), DsListenerTaskAddedEvent.class);
+        TaskCreateListenerEvent dsListenerEvent =
+                JSONUtils.parseObject(event.getContent(), TaskCreateListenerEvent.class);
         dsListenerEvent.setListenerInstanceParams(event.getParams());
         plugin.onTaskAdded(dsListenerEvent);
     }

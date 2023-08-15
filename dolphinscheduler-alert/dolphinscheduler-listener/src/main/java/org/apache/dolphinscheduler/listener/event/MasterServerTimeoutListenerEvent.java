@@ -30,7 +30,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class DsListenerMasterTimeoutEvent extends DsListenerEvent {
+public class MasterServerTimeoutListenerEvent extends ListenerEvent {
 
     /**
      * server type :master or worker

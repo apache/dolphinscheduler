@@ -22,7 +22,7 @@ package org.apache.dolphinscheduler.listener.processor;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ListenerEvent;
 import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
-import org.apache.dolphinscheduler.listener.event.DsListenerWorkflowRemovedEvent;
+import org.apache.dolphinscheduler.listener.event.WorkflowRemoveListenerEvent;
 import org.apache.dolphinscheduler.listener.plugin.ListenerPlugin;
 
 import com.google.auto.service.AutoService;
@@ -37,8 +37,8 @@ public class WorkflowRemovedEventProcessor implements ListenerEventProcessor {
 
     @Override
     public void process(ListenerPlugin plugin, ListenerEvent event) {
-        DsListenerWorkflowRemovedEvent dsListenerEvent =
-                JSONUtils.parseObject(event.getContent(), DsListenerWorkflowRemovedEvent.class);
+        WorkflowRemoveListenerEvent dsListenerEvent =
+                JSONUtils.parseObject(event.getContent(), WorkflowRemoveListenerEvent.class);
         dsListenerEvent.setListenerInstanceParams(event.getParams());
         plugin.onWorkflowRemoved(dsListenerEvent);
     }

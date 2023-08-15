@@ -19,20 +19,20 @@
 
 package org.apache.dolphinscheduler.listener.plugin;
 
-import org.apache.dolphinscheduler.listener.event.DsListenerMasterDownEvent;
-import org.apache.dolphinscheduler.listener.event.DsListenerMasterTimeoutEvent;
-import org.apache.dolphinscheduler.listener.event.DsListenerTaskAddedEvent;
-import org.apache.dolphinscheduler.listener.event.DsListenerTaskEndEvent;
-import org.apache.dolphinscheduler.listener.event.DsListenerTaskFailEvent;
-import org.apache.dolphinscheduler.listener.event.DsListenerTaskRemovedEvent;
-import org.apache.dolphinscheduler.listener.event.DsListenerTaskStartEvent;
-import org.apache.dolphinscheduler.listener.event.DsListenerTaskUpdateEvent;
-import org.apache.dolphinscheduler.listener.event.DsListenerWorkflowAddedEvent;
-import org.apache.dolphinscheduler.listener.event.DsListenerWorkflowEndEvent;
-import org.apache.dolphinscheduler.listener.event.DsListenerWorkflowFailEvent;
-import org.apache.dolphinscheduler.listener.event.DsListenerWorkflowRemovedEvent;
-import org.apache.dolphinscheduler.listener.event.DsListenerWorkflowStartEvent;
-import org.apache.dolphinscheduler.listener.event.DsListenerWorkflowUpdateEvent;
+import org.apache.dolphinscheduler.listener.event.MasterServerDownListenerEvent;
+import org.apache.dolphinscheduler.listener.event.MasterServerTimeoutListenerEvent;
+import org.apache.dolphinscheduler.listener.event.TaskCreateListenerEvent;
+import org.apache.dolphinscheduler.listener.event.TaskEndListenerEvent;
+import org.apache.dolphinscheduler.listener.event.TaskFailListenerEvent;
+import org.apache.dolphinscheduler.listener.event.TaskRemoveListenerEvent;
+import org.apache.dolphinscheduler.listener.event.TaskStartListenerEvent;
+import org.apache.dolphinscheduler.listener.event.TaskUpdateListenerEvent;
+import org.apache.dolphinscheduler.listener.event.WorkflowCreateListenerEvent;
+import org.apache.dolphinscheduler.listener.event.WorkflowEndListenerEvent;
+import org.apache.dolphinscheduler.listener.event.WorkflowFailListenerEvent;
+import org.apache.dolphinscheduler.listener.event.WorkflowRemoveListenerEvent;
+import org.apache.dolphinscheduler.listener.event.WorkflowStartListenerEvent;
+import org.apache.dolphinscheduler.listener.event.WorkflowUpdateListenerEvent;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 
 import java.util.List;
@@ -46,57 +46,57 @@ public interface ListenerPlugin {
     /**
      * api: master/worker 失连/超时
      */
-    default void onMasterDown(DsListenerMasterDownEvent masterDownEvent) {
+    default void onMasterDown(MasterServerDownListenerEvent masterDownEvent) {
     }
 
-    default void onMasterTimeout(DsListenerMasterTimeoutEvent masterTimeoutEvent) {
+    default void onMasterTimeout(MasterServerTimeoutListenerEvent masterTimeoutEvent) {
     }
 
     /**
      * api：工作流创建/修改/删除等
      */
-    default void onWorkflowAdded(DsListenerWorkflowAddedEvent workflowAddedEvent) {
+    default void onWorkflowAdded(WorkflowCreateListenerEvent workflowAddedEvent) {
     }
 
-    default void onWorkflowUpdate(DsListenerWorkflowUpdateEvent workflowUpdateEvent) {
+    default void onWorkflowUpdate(WorkflowUpdateListenerEvent workflowUpdateEvent) {
     }
 
-    default void onWorkflowRemoved(DsListenerWorkflowRemovedEvent workflowRemovedEvent) {
+    default void onWorkflowRemoved(WorkflowRemoveListenerEvent workflowRemovedEvent) {
     }
 
     /**
      * master：工作流开始/结束/失败等
      */
-    default void onWorkflowStart(DsListenerWorkflowStartEvent workflowStartEvent) {
+    default void onWorkflowStart(WorkflowStartListenerEvent workflowStartEvent) {
     }
 
-    default void onWorkflowEnd(DsListenerWorkflowEndEvent workflowEndEvent) {
+    default void onWorkflowEnd(WorkflowEndListenerEvent workflowEndEvent) {
     }
 
-    default void onWorkflowFail(DsListenerWorkflowFailEvent workflowErrorEvent) {
+    default void onWorkflowFail(WorkflowFailListenerEvent workflowErrorEvent) {
     }
 
     /**
      * api：任务创建/修改/删除等
      */
-    default void onTaskAdded(DsListenerTaskAddedEvent taskAddedEvent) {
+    default void onTaskAdded(TaskCreateListenerEvent taskAddedEvent) {
     }
 
-    default void onTaskUpdate(DsListenerTaskUpdateEvent taskUpdateEvent) {
+    default void onTaskUpdate(TaskUpdateListenerEvent taskUpdateEvent) {
     }
 
-    default void onTaskRemoved(DsListenerTaskRemovedEvent taskRemovedEvent) {
+    default void onTaskRemoved(TaskRemoveListenerEvent taskRemovedEvent) {
     }
 
     /**
      * worker：任务开始/结束/失败等
      */
-    default void onTaskStart(DsListenerTaskStartEvent taskStartEvent) {
+    default void onTaskStart(TaskStartListenerEvent taskStartEvent) {
     }
 
-    default void onTaskEnd(DsListenerTaskEndEvent taskEndEvent) {
+    default void onTaskEnd(TaskEndListenerEvent taskEndEvent) {
     }
 
-    default void onTaskFail(DsListenerTaskFailEvent taskErrorEvent) {
+    default void onTaskFail(TaskFailListenerEvent taskErrorEvent) {
     }
 }

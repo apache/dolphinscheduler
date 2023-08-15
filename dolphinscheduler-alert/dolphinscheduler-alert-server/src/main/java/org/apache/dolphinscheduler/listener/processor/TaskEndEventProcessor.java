@@ -22,7 +22,7 @@ package org.apache.dolphinscheduler.listener.processor;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ListenerEvent;
 import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
-import org.apache.dolphinscheduler.listener.event.DsListenerTaskEndEvent;
+import org.apache.dolphinscheduler.listener.event.TaskEndListenerEvent;
 import org.apache.dolphinscheduler.listener.plugin.ListenerPlugin;
 
 import com.google.auto.service.AutoService;
@@ -37,8 +37,8 @@ public class TaskEndEventProcessor implements ListenerEventProcessor {
 
     @Override
     public void process(ListenerPlugin plugin, ListenerEvent event) {
-        DsListenerTaskEndEvent dsListenerEvent =
-                JSONUtils.parseObject(event.getContent(), DsListenerTaskEndEvent.class);
+        TaskEndListenerEvent dsListenerEvent =
+                JSONUtils.parseObject(event.getContent(), TaskEndListenerEvent.class);
         dsListenerEvent.setListenerInstanceParams(event.getParams());
         plugin.onTaskEnd(dsListenerEvent);
     }

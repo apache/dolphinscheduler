@@ -22,7 +22,7 @@ package org.apache.dolphinscheduler.listener.processor;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ListenerEvent;
 import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
-import org.apache.dolphinscheduler.listener.event.DsListenerMasterTimeoutEvent;
+import org.apache.dolphinscheduler.listener.event.MasterServerTimeoutListenerEvent;
 import org.apache.dolphinscheduler.listener.plugin.ListenerPlugin;
 
 import com.google.auto.service.AutoService;
@@ -37,8 +37,8 @@ public class MasterServerTimeoutEventProcessor implements ListenerEventProcessor
 
     @Override
     public void process(ListenerPlugin plugin, ListenerEvent event) {
-        DsListenerMasterTimeoutEvent dsListenerEvent =
-                JSONUtils.parseObject(event.getContent(), DsListenerMasterTimeoutEvent.class);
+        MasterServerTimeoutListenerEvent dsListenerEvent =
+                JSONUtils.parseObject(event.getContent(), MasterServerTimeoutListenerEvent.class);
         dsListenerEvent.setListenerInstanceParams(event.getParams());
         plugin.onMasterTimeout(dsListenerEvent);
     }

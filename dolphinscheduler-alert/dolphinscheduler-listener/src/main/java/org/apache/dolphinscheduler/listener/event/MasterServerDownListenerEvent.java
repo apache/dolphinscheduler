@@ -19,16 +19,28 @@
 
 package org.apache.dolphinscheduler.listener.event;
 
-import java.util.Map;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class DsListenerEvent {
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    protected Map<String, String> listenerInstanceParams;
+@Data
+@EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor
+@NoArgsConstructor
+public class MasterServerDownListenerEvent extends ListenerEvent {
+
+    /**
+     * server type :master or worker
+     */
+    @JsonProperty("type")
+    String type;
+    @JsonProperty("host")
+    String host;
+    @JsonProperty("event")
+    String event;
+    @JsonProperty("warningLevel")
+    String warningLevel;
 }

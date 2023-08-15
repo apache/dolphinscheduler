@@ -114,9 +114,9 @@ import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
-import org.apache.dolphinscheduler.listener.event.DsListenerWorkflowAddedEvent;
-import org.apache.dolphinscheduler.listener.event.DsListenerWorkflowRemovedEvent;
-import org.apache.dolphinscheduler.listener.event.DsListenerWorkflowUpdateEvent;
+import org.apache.dolphinscheduler.listener.event.WorkflowCreateListenerEvent;
+import org.apache.dolphinscheduler.listener.event.WorkflowRemoveListenerEvent;
+import org.apache.dolphinscheduler.listener.event.WorkflowUpdateListenerEvent;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.SqlType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
@@ -300,7 +300,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             List<ListenerPluginInstance> instances =
                     needSendListenerEvent(ListenerEventType.WORKFLOW_ADDED);
             if (CollectionUtils.isNotEmpty(instances)) {
-                DsListenerWorkflowAddedEvent event = new DsListenerWorkflowAddedEvent();
+                WorkflowCreateListenerEvent event = new WorkflowCreateListenerEvent();
                 event.setProjectId(project.getId());
                 event.setProjectCode(projectCode);
                 event.setProjectName(project.getName());
@@ -817,7 +817,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             List<ListenerPluginInstance> instances =
                     needSendListenerEvent(ListenerEventType.WORKFLOW_UPDATE);
             if (CollectionUtils.isNotEmpty(instances)) {
-                DsListenerWorkflowUpdateEvent event = new DsListenerWorkflowUpdateEvent();
+                WorkflowUpdateListenerEvent event = new WorkflowUpdateListenerEvent();
                 event.setProjectId(project.getId());
                 event.setProjectCode(projectCode);
                 event.setProjectName(project.getName());
@@ -1097,7 +1097,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         List<ListenerPluginInstance> instances =
                 needSendListenerEvent(ListenerEventType.WORKFLOW_REMOVED);
         if (CollectionUtils.isNotEmpty(instances)) {
-            DsListenerWorkflowRemovedEvent event = new DsListenerWorkflowRemovedEvent();
+            WorkflowRemoveListenerEvent event = new WorkflowRemoveListenerEvent();
             event.setProjectId(project.getId());
             event.setProjectCode(project.getCode());
             event.setProjectName(project.getName());

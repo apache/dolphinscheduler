@@ -34,7 +34,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class DsListenerTaskAddedEvent extends DsListenerEvent {
+public class TaskEndListenerEvent extends ListenerEvent {
 
     @JsonProperty("taskInstanceId")
     private int taskInstanceId;

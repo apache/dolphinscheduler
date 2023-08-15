@@ -19,10 +19,6 @@
 
 package org.apache.dolphinscheduler.listener.event;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-
-import java.util.Date;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -34,30 +30,20 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class DsListenerTaskRemovedEvent extends DsListenerEvent {
+public class WorkflowUpdateListenerEvent extends ListenerEvent {
 
-    @JsonProperty("taskInstanceId")
-    private int taskInstanceId;
-    @JsonProperty("taskName")
-    private String taskName;
-    @JsonProperty("taskType")
-    private String taskType;
-    @JsonProperty("processDefinitionId")
-    private int processDefinitionId;
-    @JsonProperty("processDefinitionName")
-    private String processDefinitionName;
-    @JsonProperty("processInstanceId")
-    private int processInstanceId;
-    @JsonProperty("processInstanceName")
-    private String processInstanceName;
-    @JsonProperty("state")
-    private TaskExecutionStatus state;
-    @JsonProperty("startTime")
-    private Date startTime;
-    @JsonProperty("endTime")
-    private Date endTime;
-    @JsonProperty("host")
-    private String host;
-    @JsonProperty("logPath")
-    private String logPath;
+    @JsonProperty("projectId")
+    private Integer projectId;
+    @JsonProperty("projectCode")
+    private Long projectCode;
+    @JsonProperty("projectName")
+    private String projectName;
+    @JsonProperty("owner")
+    private String owner;
+    @JsonProperty("processId")
+    private Integer processId;
+    @JsonProperty("processDefinitionCode")
+    private Long processDefinitionCode;
+    @JsonProperty("processName")
+    private String processName;
 }

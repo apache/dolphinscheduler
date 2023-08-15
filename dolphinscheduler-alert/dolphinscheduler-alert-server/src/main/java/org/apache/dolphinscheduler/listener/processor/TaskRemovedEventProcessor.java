@@ -22,7 +22,7 @@ package org.apache.dolphinscheduler.listener.processor;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ListenerEvent;
 import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
-import org.apache.dolphinscheduler.listener.event.DsListenerTaskRemovedEvent;
+import org.apache.dolphinscheduler.listener.event.TaskRemoveListenerEvent;
 import org.apache.dolphinscheduler.listener.plugin.ListenerPlugin;
 
 import com.google.auto.service.AutoService;
@@ -37,8 +37,8 @@ public class TaskRemovedEventProcessor implements ListenerEventProcessor {
 
     @Override
     public void process(ListenerPlugin plugin, ListenerEvent event) {
-        DsListenerTaskRemovedEvent dsListenerEvent =
-                JSONUtils.parseObject(event.getContent(), DsListenerTaskRemovedEvent.class);
+        TaskRemoveListenerEvent dsListenerEvent =
+                JSONUtils.parseObject(event.getContent(), TaskRemoveListenerEvent.class);
         dsListenerEvent.setListenerInstanceParams(event.getParams());
         plugin.onTaskRemoved(dsListenerEvent);
     }

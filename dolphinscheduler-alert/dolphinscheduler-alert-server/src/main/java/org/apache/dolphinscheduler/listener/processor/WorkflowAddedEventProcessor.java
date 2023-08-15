@@ -22,7 +22,7 @@ package org.apache.dolphinscheduler.listener.processor;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ListenerEvent;
 import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
-import org.apache.dolphinscheduler.listener.event.DsListenerWorkflowAddedEvent;
+import org.apache.dolphinscheduler.listener.event.WorkflowCreateListenerEvent;
 import org.apache.dolphinscheduler.listener.plugin.ListenerPlugin;
 
 import com.google.auto.service.AutoService;
@@ -37,8 +37,8 @@ public class WorkflowAddedEventProcessor implements ListenerEventProcessor {
 
     @Override
     public void process(ListenerPlugin plugin, ListenerEvent event) {
-        DsListenerWorkflowAddedEvent dsListenerEvent =
-                JSONUtils.parseObject(event.getContent(), DsListenerWorkflowAddedEvent.class);
+        WorkflowCreateListenerEvent dsListenerEvent =
+                JSONUtils.parseObject(event.getContent(), WorkflowCreateListenerEvent.class);
         dsListenerEvent.setListenerInstanceParams(event.getParams());
         plugin.onWorkflowAdded(dsListenerEvent);
     }
