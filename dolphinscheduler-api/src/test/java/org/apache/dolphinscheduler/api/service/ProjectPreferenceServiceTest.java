@@ -96,7 +96,7 @@ public class ProjectPreferenceServiceTest {
 
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
         Mockito.when(projectService.hasProjectAndWritePerm(Mockito.any(), Mockito.any(), Mockito.any(Result.class)))
-            .thenReturn(true);
+                .thenReturn(true);
 
         Mockito.when(projectPreferenceMapper.selectOne(Mockito.any())).thenReturn(getProjectPreference());
         Result result = projectPreferenceService.enableProjectPreference(loginUser, projectCode, 1);

@@ -137,18 +137,19 @@ public class ProjectPreferenceServiceImpl extends BaseServiceImpl
         }
 
         ProjectPreference projectPreference = projectPreferenceMapper
-            .selectOne(new QueryWrapper<ProjectPreference>().lambda().eq(ProjectPreference::getProjectCode,
-                projectCode));
+                .selectOne(new QueryWrapper<ProjectPreference>().lambda().eq(ProjectPreference::getProjectCode,
+                        projectCode));
 
         putMsg(result, Status.SUCCESS);
-        if (Objects.nonNull(projectPreference) && projectPreference.getState()!=state) {
+        if (Objects.nonNull(projectPreference) && projectPreference.getState() != state) {
             projectPreference.setState(state);
             projectPreference.setUpdateTime(new Date());
 
             if (projectPreferenceMapper.updateById(projectPreference) > 0) {
                 log.info("The state of the project preference is updated and id is :{}", projectPreference.getId());
             } else {
-                log.error("Failed to update the state of the project preference, projectCode:{}.", projectPreference.getProjectCode());
+                log.error("Failed to update the state of the project preference, projectCode:{}.",
+                        projectPreference.getProjectCode());
                 putMsg(result, Status.UPDATE_PROJECT_PREFERENCE_STATE_ERROR);
             }
         }
