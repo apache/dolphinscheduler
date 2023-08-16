@@ -25,10 +25,14 @@ import * as Fields from '@/views/projects/task/components/node/fields'
 import { Router, useRouter } from 'vue-router'
 import {
   queryProjectPreferenceByProjectCode,
-  updateProjectPreference
+  updateProjectPreference,
+  updateProjectPreferenceState
 } from '@/service/modules/projects-preference'
 import { useI18n } from 'vue-i18n'
-import { UpdateProjectPreferenceReq } from '@/service/modules/projects-preference/types'
+import {
+  UpdateProjectPreferenceReq,
+  UpdateProjectPreferenceStateReq
+} from '@/service/modules/projects-preference/types'
 import { useWarningType } from '@/views/projects/preference/components/use-warning-type'
 import { useTenant } from '@/views/projects/preference/components/use-tenant'
 import { useAlertGroup } from '@/views/projects/preference/components/use-alert-group'
@@ -44,6 +48,7 @@ export function useForm() {
   const elementsRef = ref([]) as Ref<IFormItem[]>
   const rulesRef = ref({})
   const formProps = ref({})
+  const stateRef = ref(0)
 
   formProps.value = {
     labelPlacement: 'left',
@@ -75,6 +80,7 @@ export function useForm() {
       const result = await queryProjectPreferenceByProjectCode(projectCode)
       if (result?.preferences) {
         setValues(JSON.parse(result.preferences))
+        stateRef.value = result.state
       }
     }
   }
@@ -88,6 +94,16 @@ export function useForm() {
       projectPreferences: JSON.stringify(data.model)
     } as UpdateProjectPreferenceReq
     updateProjectPreference(requestData, projectCode).then(() => {
+      window.$message.success(t('project.preference.success'))
+    })
+  }
+
+  const handleUpdateState = (value: number) => {
+    const requestData = {
+      state: value
+    } as UpdateProjectPreferenceStateReq
+
+    updateProjectPreferenceState(requestData, projectCode).then(() => {
       window.$message.success(t('project.preference.success'))
     })
   }
@@ -129,8 +145,10 @@ export function useForm() {
     elementsRef,
     rulesRef,
     model: data.model,
+    stateRef,
     formProps,
     t,
-    handleUpdate
+    handleUpdate,
+    handleUpdateState
   }
 }
