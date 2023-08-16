@@ -154,21 +154,21 @@ security:
       enable: true
       provider:
         github:
-          # 设置provider的授权地址，例如https://github.com/login/oauth/authorize
+          # Set the provider authorization address, for example:https://github.com/login/oauth/authorize
           authorizationUri: ""
-          # dolphinscheduler的后端重定向接口地址，例如http://127.0.0.1:12345/dolphinscheduler/redirect/login/oauth2
+          # dolphinscheduler backend redirection interface address, for example :http://127.0.0.1:12345/dolphinscheduler/redirect/login/oauth2
           redirectUri: ""
-          # oauth2的 clientId
+          #  clientId
           clientId: ""
-          # oauth2的 clientSecret
+          # client secret
           clientSecret: ""
-          # 设置provider的请求token的地址
+          # Set the provider's request token address
           tokenUri: ""
-          # 设置provider的请求用户信息的地址
+          # Set the provider address for requesting user information
           userInfoUri: ""
-          # 登录成功后的重定向地址, http://{ip}:{port}/login
+          # Redirect address after successful login, http://{ip}:{port}/login
           callbackUrl: ""
-          # 登录页跳转按钮的图片url，不填写则会展示一个文字按钮
+          # The image url of the login page jump button, if not filled, a text button will be displayed
           iconUri: ""
           provider: github
         google:
