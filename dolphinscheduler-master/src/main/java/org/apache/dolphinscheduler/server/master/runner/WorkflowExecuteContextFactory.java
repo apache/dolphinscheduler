@@ -29,6 +29,8 @@ import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
+import java.util.Optional;
+
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,21 +52,22 @@ public class WorkflowExecuteContextFactory {
     @Autowired
     private MasterConfig masterConfig;
 
-    public IWorkflowExecuteContext createWorkflowExecuteRunnableContext(Command command) throws Exception {
-        ProcessInstance workflowInstance = createWorkflowInstance(command);
+    public Optional<IWorkflowExecuteContext> createWorkflowExecuteRunnableContext(Command command) throws Exception {
+        Optional<ProcessInstance> workflowInstanceOptional = createWorkflowInstance(command);
+        if (!workflowInstanceOptional.isPresent()) {
+            return Optional.empty();
+        }
+        ProcessInstance workflowInstance = workflowInstanceOptional.get();
         ProcessDefinition workflowDefinition = processService.findProcessDefinition(
                 workflowInstance.getProcessDefinitionCode(), workflowInstance.getProcessDefinitionVersion());
         workflowInstance.setProcessDefinition(workflowDefinition);
 
         IWorkflowGraph workflowGraph = workflowGraphFactory.createWorkflowGraph(workflowInstance);
 
-        return new WorkflowExecuteContext(
-                workflowDefinition,
-                workflowInstance,
-                workflowGraph);
+        return Optional.of(new WorkflowExecuteContext(workflowDefinition, workflowInstance, workflowGraph));
     }
 
-    private ProcessInstance createWorkflowInstance(Command command) throws CronParseException {
+    private Optional<ProcessInstance> createWorkflowInstance(Command command) throws CronParseException {
         long commandTransformStartTime = System.currentTimeMillis();
         // Note: this check is not safe, the slot may change after command transform.
         // We use the database transaction in `handleCommand` so that we can guarantee the command will
@@ -76,10 +79,9 @@ public class WorkflowExecuteContextFactory {
             throw new RuntimeException("Slot check failed the current state: " + slotCheckState);
         }
         ProcessInstance processInstance = processService.handleCommand(masterConfig.getMasterAddress(), command);
-        log.info("Master handle command {} end, create process instance {}", command.getId(), processInstance.getId());
         ProcessInstanceMetrics
                 .recordProcessInstanceGenerateTime(System.currentTimeMillis() - commandTransformStartTime);
-        return processInstance;
+        return Optional.ofNullable(processInstance);
     }
 
     private SlotCheckState slotCheck(Command command) {

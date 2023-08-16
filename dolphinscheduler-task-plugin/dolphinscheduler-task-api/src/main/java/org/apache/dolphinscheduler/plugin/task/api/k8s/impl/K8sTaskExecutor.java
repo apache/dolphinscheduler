@@ -198,7 +198,11 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                         final LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
                                 LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath())) {
                     log.info("event received : job:{} action:{}", job.getMetadata().getName(), action);
-                    if (action != Action.ADDED) {
+                    if (action == Action.DELETED) {
+                        log.error("[K8sJobExecutor-{}] fail in k8s", job.getMetadata().getName());
+                        taskResponse.setExitStatusCode(EXIT_CODE_FAILURE);
+                        countDownLatch.countDown();
+                    } else if (action != Action.ADDED) {
                         int jobStatus = getK8sJobStatus(job);
                         log.info("job {} status {}", job.getMetadata().getName(), jobStatus);
                         if (jobStatus == TaskConstants.RUNNING_CODE) {
