@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.controller;
 
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROJECT_PREFERENCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROJECT_PREFERENCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROJECT_PREFERENCE_STATE_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -81,13 +82,13 @@ public class ProjectPreferenceController extends BaseController {
     }
 
 
-    @Operation(summary = "enableProjectPreference", description = "UPDATE_PROJECT_PREFERENCE_NOTES")
+    @Operation(summary = "enableProjectPreference", description = "UPDATE_PROJECT_PREFERENCE_STATE_NOTES")
     @Parameters({
-        @Parameter(name = "enableState", description = "ENABLE_STATE", schema = @Schema(implementation = String.class)),
+        @Parameter(name = "state", description = "PROJECT_PREFERENCES_STATE", schema = @Schema(implementation = String.class)),
     })
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(UPDATE_PROJECT_PREFERENCE_ERROR)
+    @ApiException(UPDATE_PROJECT_PREFERENCE_STATE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result enableProjectPreference(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
         @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
