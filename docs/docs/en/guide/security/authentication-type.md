@@ -148,9 +148,9 @@ Dolphinscheduler can support multiple OAuth2 providers. You only need to enable 
 ```yaml
 security:
   authentication:
-    …… # 省略
+    …… # omit
     oauth2:
-      # 将enable设置为true 开启oauth2登录模式
+      # Set enable to true to enable oauth2 login mode
       enable: true
       provider:
         github:
