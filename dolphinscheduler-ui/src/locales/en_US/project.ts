@@ -909,6 +909,8 @@ export default {
     preference_manage: 'Project Preference Management',
     instruction_tips: 'The settings below will affect all workflows and tasks under this project.When creating the workflow or task, these preferences will be the default value of their components.',
     success: 'Success',
-    submit: 'Submit'
+    submit: 'Submit',
+    enabled: 'Enabled',
+    disabled: 'Disabled'
   },
 }

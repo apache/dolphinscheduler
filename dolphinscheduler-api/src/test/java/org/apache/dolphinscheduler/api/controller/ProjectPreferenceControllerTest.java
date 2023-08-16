@@ -64,6 +64,17 @@ public class ProjectPreferenceControllerTest {
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
     }
 
+    @Test
+    public void testEnableProjectPreference() {
+        User loginUser = getGeneralUser();
+
+        Mockito.when(
+                projectPreferenceService.enableProjectPreference(Mockito.any(), Mockito.anyLong(), Mockito.anyInt()))
+                .thenReturn(getSuccessResult());
+        Result result = projectPreferenceController.enableProjectPreference(loginUser, 1, 1);
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
+    }
+
     private User getGeneralUser() {
         User loginUser = new User();
         loginUser.setUserType(UserType.GENERAL_USER);

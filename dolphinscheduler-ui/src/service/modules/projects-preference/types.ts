@@ -24,11 +24,16 @@ interface UpdateProjectPreferenceReq extends ProjectPreferenceReq {
   code: number
 }
 
+interface UpdateProjectPreferenceStateReq {
+  state: number
+}
+
 interface ProjectPreferenceRes {
   id: number
   code: number
   projectCode: number
   preferences: string
+  state: number
   createTime: string
   updateTime: string
 }
@@ -36,5 +41,6 @@ interface ProjectPreferenceRes {
 export {
   ProjectPreferenceRes,
   ProjectPreferenceReq,
-  UpdateProjectPreferenceReq
+  UpdateProjectPreferenceReq,
+  UpdateProjectPreferenceStateReq
 }

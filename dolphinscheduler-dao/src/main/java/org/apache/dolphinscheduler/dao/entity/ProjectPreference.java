@@ -50,6 +50,9 @@ public class ProjectPreference {
     @TableField("user_id")
     private Integer userId;
 
+    @TableField("state")
+    private int state;
+
     private Date createTime;
 
     private Date updateTime;

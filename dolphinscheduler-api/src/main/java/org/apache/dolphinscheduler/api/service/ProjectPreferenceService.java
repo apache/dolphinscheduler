@@ -25,4 +25,6 @@ public interface ProjectPreferenceService {
     Result updateProjectPreference(User loginUser, long projectCode, String preferences);
 
     Result queryProjectPreferenceByProjectCode(User loginUser, long projectCode);
+
+    Result enableProjectPreference(User loginUser, long projectCode, int state);
 }

@@ -122,7 +122,7 @@ const NodeDetailModal = defineComponent({
 
     const initProjectPreferences = (projectCode: number) => {
       queryProjectPreferenceByProjectCode(projectCode).then((result: any) => {
-        if (result?.preferences) {
+        if (result?.preferences && result.state === 1) {
           projectPreferences.value = JSON.parse(result.preferences)
         }
       })

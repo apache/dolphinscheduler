@@ -618,6 +618,7 @@ CREATE TABLE t_ds_project_preference
     project_code bigint NOT NULL,
     preferences varchar(512) NOT NULL,
     user_id int DEFAULT NULL ,
+    state int default 1,
     create_time timestamp DEFAULT CURRENT_TIMESTAMP ,
     update_time timestamp DEFAULT CURRENT_TIMESTAMP ,
     PRIMARY KEY (id)
