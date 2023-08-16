@@ -99,7 +99,6 @@ export function useForm() {
   }
 
   const handleUpdateState = (value: number) => {
-    console.log(value)
     const requestData = {
       state: value
     } as UpdateProjectPreferenceStateReq

@@ -35,8 +35,6 @@ const PreferenceForm = defineComponent({
       handleUpdateState
     } = useForm()
 
-    console.log(stateRef.value)
-
     return () => (
       <div>
         <div style={{ marginLeft: '30px' }}>
