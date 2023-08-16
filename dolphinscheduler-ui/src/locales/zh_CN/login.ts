@@ -22,6 +22,6 @@ export default {
   userPassword: '密码',
   userPassword_tips: '请输入密码',
   login: '登录',
-  otherwayLogin: '其他方式登录',
+  loginWithOAuth2: '通过OAuth2登录',
   ssoLogin: '单点登录'
 }

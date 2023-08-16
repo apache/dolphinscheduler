@@ -112,28 +112,28 @@ security:
         trust-store: "/ldapkeystore.jks"
         trust-store-password: ""
     oauth2:
-      enable: false
+      enable: true
       provider:
         github:
-          authorizationUri: ""
-          redirectUri: ""
-          clientId: ""
-          clientSecret: ""
-          tokenUri: ""
-          userInfoUri: ""
-          callbackUrl: ""
+          authorizationUri: "https://github.com/login/oauth/authorize"
+          redirectUri: "http://localhost:12345/dolphinscheduler/redirect/login/oauth2"
+          clientId: "1ff451e5ecbb0c004066"
+          clientSecret: "2fdf46aa671d048eaaec41a82f2e8da109decc20"
+          tokenUri: "https://github.com/login/oauth/access_token"
+          userInfoUri: "https://api.github.com/user"
+          callbackUrl: "http://localhost:5173/login"
           iconUri: ""
           provider: github
-        google:
-          authorizationUri: ""
-          redirectUri: ""
-          clientId: ""
-          clientSecret: ""
-          tokenUri: ""
-          userInfoUri: ""
-          callbackUrl: ""
+        gitee:
+          authorizationUri: "https://gitee.com/oauth/authorize"
+          redirectUri: "http://127.0.0.1:12345/dolphinscheduler/redirect/login/oauth2"
+          clientId: "9a5a4fe3844e25ba43971c6450943b437a1276681af853564e35586701f867ff"
+          clientSecret: "195b885ce724a0993b0d9a18e7f8f596f09d69e9204a8c2eef0885f82e171399"
+          tokenUri: "https://gitee.com/oauth/token?grant_type=authorization_code"
+          userInfoUri: "https://gitee.com/api/v5/user"
+          callbackUrl: "http://127.0.0.1:5173/login"
           iconUri: ""
-          provider: google
+          provider: gitee
 
 
 

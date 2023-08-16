@@ -178,7 +178,7 @@ const login = defineComponent({
             </a>
           </div>
             {this.oauth2Providers.length > 0 && <NDivider >
-              {this.t('login.otherwayLogin')}
+              {this.t('login.loginWithOAuth2')}
             </NDivider>}
 
             <NSpace class={styles['oauth2-provider']} justify="center">

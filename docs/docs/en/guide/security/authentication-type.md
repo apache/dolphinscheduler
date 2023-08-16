@@ -1,6 +1,6 @@
 # Authentication Type
 
-* So far we support three authentication types, Apache DolphinScheduler password, LDAP and Casdoor SSO.
+* So far we support three authentication types, Apache DolphinScheduler password, LDAP,Casdoor SSO and OAuth2.
 
 ## Change Authentication Type
 
@@ -30,6 +30,29 @@ security:
         # jks file absolute path && password
         trust-store: "/ldapkeystore.jks"
         trust-store-password: "password"
+    oauth2:
+      enable: false
+      provider:
+        github:
+          authorizationUri: ""
+          redirectUri: ""
+          clientId: ""
+          clientSecret: ""
+          tokenUri: ""
+          userInfoUri: ""
+          callbackUrl: ""
+          iconUri: ""
+          provider: github
+        google:
+          authorizationUri: ""
+          redirectUri: ""
+          clientId: ""
+          clientSecret: ""
+          tokenUri: ""
+          userInfoUri: ""
+          callbackUrl: ""
+          iconUri: ""
+          provider: google
 ```
 
 For detailed explanation of specific fields, please see: [Api-server related configuration](../../architecture/configuration.md)
@@ -110,3 +133,66 @@ casdoor:
   redirect-url: http://localhost:5173/login 
 ```
 
+## OAuth2
+
+Dolphinscheduler can support multiple OAuth2 providers. You only need to enable Oauth2 in the configuration file and configure the DolphinScheduler.
+
+### Step1. Create Client Credentials
+
+![create-client -credentials-1](../../../../img/security/authentication/create-client -credentials-1.jpeg)
+
+![create-client-credentials-2](../../../../img/security/authentication/create-client-credentials-2.png)
+
+### Step2.Enable OAuth2 Login In The Api's Configuration File
+
+```yaml
+security:
+  authentication:
+    …… # 省略
+    oauth2:
+      # 将enable设置为true 开启oauth2登录模式
+      enable: true
+      provider:
+        github:
+          # 设置provider的授权地址，例如https://github.com/login/oauth/authorize
+          authorizationUri: ""
+          # dolphinscheduler的后端重定向接口地址，例如http://127.0.0.1:12345/dolphinscheduler/redirect/login/oauth2
+          redirectUri: ""
+          # oauth2的 clientId
+          clientId: ""
+          # oauth2的 clientSecret
+          clientSecret: ""
+          # 设置provider的请求token的地址
+          tokenUri: ""
+          # 设置provider的请求用户信息的地址
+          userInfoUri: ""
+          # 登录成功后的重定向地址, http://{ip}:{port}/login
+          callbackUrl: ""
+          # 登录页跳转按钮的图片url，不填写则会展示一个文字按钮
+          iconUri: ""
+          provider: github
+        google:
+          authorizationUri: ""
+          redirectUri: ""
+          clientId: ""
+          clientSecret: ""
+          tokenUri: ""
+          userInfoUri: ""
+          callbackUrl: ""
+          iconUri: ""
+          provider: google
+        gitee:
+          authorizationUri: "https://gitee.com/oauth/authorize"
+          redirectUri: "http://127.0.0.1:12345/dolphinscheduler/redirect/login/oauth2"
+          clientId: ""
+          clientSecret: ""
+          tokenUri: "https://gitee.com/oauth/token?grant_type=authorization_code"
+          userInfoUri: "https://gitee.com/api/v5/user"
+          callbackUrl: "http://127.0.0.1:5173/login"
+          iconUri: ""
+          provider: gitee
+```
+
+### Step.3 Login With OAuth2
+
+![login-with-oauth2](../../../../img/security/authentication/login-with-oauth2.png)
