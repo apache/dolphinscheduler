@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.controller;
 
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROJECT_PREFERENCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROJECT_PREFERENCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROJECT_PREFERENCE_STATE_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -33,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -77,6 +79,20 @@ public class ProjectPreferenceController extends BaseController {
     public Result queryProjectPreferenceByProjectCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                       @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
         return projectPreferenceService.queryProjectPreferenceByProjectCode(loginUser, projectCode);
+    }
+
+    @Operation(summary = "enableProjectPreference", description = "UPDATE_PROJECT_PREFERENCE_STATE_NOTES")
+    @Parameters({
+            @Parameter(name = "state", description = "PROJECT_PREFERENCES_STATE", schema = @Schema(implementation = String.class)),
+    })
+    @PostMapping
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(UPDATE_PROJECT_PREFERENCE_STATE_ERROR)
+    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
+    public Result enableProjectPreference(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                          @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                          @RequestParam(value = "state", required = true) int state) {
+        return projectPreferenceService.enableProjectPreference(loginUser, projectCode, state);
     }
 
 }
