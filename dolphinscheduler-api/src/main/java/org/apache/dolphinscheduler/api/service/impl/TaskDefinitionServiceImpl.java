@@ -25,6 +25,7 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_DEFINITION;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_SWITCH_TO_THIS_VERSION;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.dolphinscheduler.api.dto.task.TaskCreateRequest;
 import org.apache.dolphinscheduler.api.dto.task.TaskFilterRequest;
 import org.apache.dolphinscheduler.api.dto.task.TaskUpdateRequest;
@@ -59,6 +60,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskMainInfo;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
@@ -74,15 +76,7 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -122,6 +116,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
 
     @Autowired
     private ProcessTaskRelationMapper processTaskRelationMapper;
+
+    @Autowired
+    private ProcessTaskRelationLogMapper processTaskRelationLogMapper;
 
     @Autowired
     private ProcessTaskRelationLogDao processTaskRelationLogDao;
@@ -795,6 +792,39 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                             projectCode, taskCode);
                     putMsg(result, Status.PROCESS_TASK_RELATION_BATCH_UPDATE_ERROR);
                     throw new ServiceException(Status.PROCESS_TASK_RELATION_BATCH_UPDATE_ERROR);
+                }
+            }
+        }
+        //update t_ds_process_task_relation_log
+        LambdaQueryWrapper<ProcessTaskRelationLog> wrapper1 = new LambdaQueryWrapper<>();
+        LambdaQueryWrapper<ProcessTaskRelationLog> wrapper2 = new LambdaQueryWrapper<>();
+        wrapper1.eq(ProcessTaskRelationLog::getPreTaskCode,taskDefinitionToUpdate.getCode())
+                .eq(ProcessTaskRelationLog::getPreTaskVersion,version-1);
+        wrapper2.eq(ProcessTaskRelationLog::getPostTaskCode,taskDefinitionToUpdate.getCode())
+                .eq(ProcessTaskRelationLog::getPostTaskVersion,version-1);
+        List<ProcessTaskRelationLog> processTaskRelationLogPres = processTaskRelationLogMapper.selectList(wrapper1);
+        List<ProcessTaskRelationLog> processTaskRelationLogPosts = processTaskRelationLogMapper.selectList(wrapper2);
+        List<ProcessTaskRelationLog> processTaskRelationLogs = new LinkedList<>(processTaskRelationLogPres);
+        processTaskRelationLogs.addAll(processTaskRelationLogPosts);
+        if (CollectionUtils.isNotEmpty(processTaskRelationLogs)) {
+            for (ProcessTaskRelationLog processTaskRelationLog : processTaskRelationLogs) {
+                ProcessTaskRelationLog newLog = new ProcessTaskRelationLog(processTaskRelationLog);
+                Date date = new Date();
+                newLog.setOperator(loginUser.getId());
+                newLog.setOperateTime(date);
+                newLog.setCreateTime(date);
+                newLog.setUpdateTime(date);
+                if (taskCode == processTaskRelationLog.getPreTaskCode()) {
+                    newLog.setPreTaskVersion(taskDefinitionToUpdate.getVersion());
+                } else if (taskCode == processTaskRelationLog.getPostTaskCode()) {
+                    newLog.setPostTaskVersion(taskDefinitionToUpdate.getVersion());
+                }
+                int count = processTaskRelationLogMapper.updateById(newLog);
+                if (count != 1) {
+                    log.error("insert process task relation log error, projectCode:{}, taskDefinitionCode:{}.",
+                            projectCode, taskCode);
+                    putMsg(result, Status.PROCESS_TASK_RELATION_LOG_INSERT_ERROR);
+                    throw new ServiceException(Status.PROCESS_TASK_RELATION_LOG_INSERT_ERROR);
                 }
             }
         }
