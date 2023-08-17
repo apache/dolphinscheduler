@@ -1,6 +1,6 @@
 # 认证方式
 
-* 目前我们支持三种认证方式，Apache DolphinScheduler自身账号密码登录，LDAP,通过Casdoor实现的SSO登录和通过Oauth2授权登录，并且oauth2授权登录方式可以和其他认证方式同时存在 。
+* 目前我们支持三种认证方式，Apache DolphinScheduler自身账号密码登录，LDAP,通过Casdoor实现的SSO登录和通过Oauth2授权登录，并且oauth2授权登录方式可以和其他认证方式同时使用。
 
 ## 修改认证方式
 
@@ -135,7 +135,7 @@ dolphinscheduler可以同时支持多种OAuth2的provider，只需要在配置�
 
 ### 步骤1. 获取OAuth2客户端凭据
 
-![create-client -credentials-1](../../../../img/security/authentication/create-client -credentials-1.jpeg)
+![create-client-credentials-1](../../../../img/security/authentication/create-client-credentials-1.png)
 
 ![create-client-credentials-2](../../../../img/security/authentication/create-client-credentials-2.png)
 

@@ -1,6 +1,6 @@
 # Authentication Type
 
-* So far we support three authentication types, Apache DolphinScheduler password, LDAP,Casdoor SSO and OAuth2.
+* So far we support three authentication types, Apache DolphinScheduler password, LDAP,Casdoor SSO and OAuth2，the OAuth2 authorization login mode can be used with other authentication modes.
 
 ## Change Authentication Type
 
@@ -135,11 +135,11 @@ casdoor:
 
 ## OAuth2
 
-Dolphinscheduler can support multiple OAuth2 providers. You only need to enable Oauth2 in the configuration file and configure the DolphinScheduler.
+Dolphinscheduler can support multiple OAuth2 providers.
 
 ### Step1. Create Client Credentials
 
-![create-client -credentials-1](../../../../img/security/authentication/create-client -credentials-1.jpeg)
+![create-client-credentials-1](../../../../img/security/authentication/create-client-credentials-1.png)
 
 ![create-client-credentials-2](../../../../img/security/authentication/create-client-credentials-2.png)
 
