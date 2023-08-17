@@ -76,7 +76,12 @@ public final class ProcessUtils {
     /**
      * Expression of PID recognition in Windows scene
      */
-    private static final Pattern WINDOWSATTERN = Pattern.compile("(\\d+)");
+    private static final Pattern WINDOWSPATTERN = Pattern.compile("(\\d+)");
+
+    /**
+     * Expression of PID recognition in Linux scene
+     */
+    private static final Pattern LINUXPATTERN = Pattern.compile("\\((\\d+)\\)");
 
     /**
      * kill tasks according to different task types.
@@ -117,12 +122,19 @@ public final class ProcessUtils {
         // pstree pid get sub pids
         if (SystemUtils.IS_OS_MAC) {
             String pids = OSUtils.exeCmd(String.format("%s -sp %d", TaskConstants.PSTREE, processId));
-            if (null != pids) {
+            if (StringUtils.isNotEmpty(pids)) {
                 mat = MACPATTERN.matcher(pids);
+            }
+        } else if (SystemUtils.IS_OS_LINUX) {
+            String pids = OSUtils.exeCmd(String.format("%s -p %d", TaskConstants.PSTREE, processId));
+            if (StringUtils.isNotEmpty(pids)) {
+                mat = LINUXPATTERN.matcher(pids);
             }
         } else {
             String pids = OSUtils.exeCmd(String.format("%s -p %d", TaskConstants.PSTREE, processId));
-            mat = WINDOWSATTERN.matcher(pids);
+            if (StringUtils.isNotEmpty(pids)) {
+                mat = WINDOWSPATTERN.matcher(pids);
+            }
         }
 
         if (null != mat) {
@@ -218,5 +230,4 @@ public final class ProcessUtils {
                 .getPodLogWatcher(
                         new KubernetesApplicationManagerContext(k8sTaskExecutionContext, taskAppId, containerName));
     }
-
 }
