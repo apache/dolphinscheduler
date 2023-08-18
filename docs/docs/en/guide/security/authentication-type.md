@@ -1,6 +1,6 @@
 # Authentication Type
 
-* So far we support three authentication types, Apache DolphinScheduler password, LDAP,Casdoor SSO and OAuth2，the OAuth2 authorization login mode can be used with other authentication modes.
+* So far we support four authentication types, Apache DolphinScheduler password, LDAP, Casdoor SSO and OAuth2，the OAuth2 authorization login mode can be used with other authentication modes.
 
 ## Change Authentication Type
 

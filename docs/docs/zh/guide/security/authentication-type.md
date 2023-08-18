@@ -1,6 +1,6 @@
 # 认证方式
 
-* 目前我们支持三种认证方式，Apache DolphinScheduler自身账号密码登录，LDAP,通过Casdoor实现的SSO登录和通过Oauth2授权登录，并且oauth2授权登录方式可以和其他认证方式同时使用。
+* 目前我们支持四种认证方式，Apache DolphinScheduler自身账号密码登录，LDAP, 通过Casdoor实现的SSO登录和通过Oauth2授权登录，并且oauth2授权登录方式可以和其他认证方式同时使用。
 
 ## 修改认证方式
 
