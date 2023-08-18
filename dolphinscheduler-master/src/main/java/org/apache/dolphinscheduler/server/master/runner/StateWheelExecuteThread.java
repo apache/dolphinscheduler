@@ -141,7 +141,8 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
                     processInstanceTimeoutCheckList.remove(processInstanceId);
                     continue;
                 }
-                ProcessInstance processInstance = workflowExecuteThread.getProcessInstance();
+                ProcessInstance processInstance =
+                        workflowExecuteThread.getWorkflowExecuteContext().getWorkflowInstance();
                 if (processInstance == null) {
                     log.warn("Check workflow timeout failed, the workflowInstance is null");
                     continue;
@@ -284,7 +285,8 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
 
                 Optional<TaskInstance> taskInstanceOptional =
                         workflowExecuteThread.getRetryTaskInstanceByTaskCode(taskCode);
-                ProcessInstance processInstance = workflowExecuteThread.getProcessInstance();
+                ProcessInstance processInstance =
+                        workflowExecuteThread.getWorkflowExecuteContext().getWorkflowInstance();
 
                 if (processInstance.getState().isReadyStop()) {
                     log.warn(

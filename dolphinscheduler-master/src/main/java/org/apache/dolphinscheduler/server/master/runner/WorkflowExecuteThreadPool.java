@@ -31,6 +31,8 @@ import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheM
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.server.master.event.TaskStateEvent;
+import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecuteRunnableHolder;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.Map;
@@ -74,7 +76,7 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
     /**
      * multi-thread filter, avoid handling workflow at the same time
      */
-    private ConcurrentHashMap<String, WorkflowExecuteRunnable> multiThreadFilterMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Integer, WorkflowExecuteRunnable> multiThreadFilterMap = new ConcurrentHashMap<>();
 
     @PostConstruct
     private void init() {
@@ -106,22 +108,26 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
         if (!workflowExecuteThread.isStart() || workflowExecuteThread.eventSize() == 0) {
             return;
         }
-        if (multiThreadFilterMap.containsKey(workflowExecuteThread.getKey())) {
+        IWorkflowExecuteContext workflowExecuteRunnableContext =
+                workflowExecuteThread.getWorkflowExecuteContext();
+        Integer workflowInstanceId = workflowExecuteRunnableContext.getWorkflowInstance().getId();
+
+        if (multiThreadFilterMap.containsKey(workflowInstanceId)) {
             log.debug("The workflow has been executed by another thread");
             return;
         }
-        multiThreadFilterMap.put(workflowExecuteThread.getKey(), workflowExecuteThread);
-        int processInstanceId = workflowExecuteThread.getProcessInstance().getId();
+        multiThreadFilterMap.put(workflowInstanceId, workflowExecuteThread);
         ListenableFuture<?> future = this.submitListenable(workflowExecuteThread::handleEvents);
         future.addCallback(new ListenableFutureCallback() {
 
             @Override
             public void onFailure(Throwable ex) {
-                LogUtils.setWorkflowInstanceIdMDC(processInstanceId);
+                LogUtils.setWorkflowInstanceIdMDC(workflowInstanceId);
                 try {
                     log.error("Workflow instance events handle failed", ex);
-                    notifyProcessChanged(workflowExecuteThread.getProcessInstance());
-                    multiThreadFilterMap.remove(workflowExecuteThread.getKey());
+                    notifyProcessChanged(
+                            workflowExecuteThread.getWorkflowExecuteContext().getWorkflowInstance());
+                    multiThreadFilterMap.remove(workflowInstanceId);
                 } finally {
                     LogUtils.removeWorkflowInstanceIdMDC();
                 }
@@ -130,19 +136,22 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
             @Override
             public void onSuccess(Object result) {
                 try {
-                    LogUtils.setWorkflowInstanceIdMDC(workflowExecuteThread.getProcessInstance().getId());
+                    LogUtils.setWorkflowInstanceIdMDC(
+                            workflowExecuteThread.getWorkflowExecuteContext().getWorkflowInstance().getId());
                     if (workflowExecuteThread.workFlowFinish() && workflowExecuteThread.eventSize() == 0) {
                         stateWheelExecuteThread
-                                .removeProcess4TimeoutCheck(workflowExecuteThread.getProcessInstance().getId());
-                        processInstanceExecCacheManager.removeByProcessInstanceId(processInstanceId);
-                        notifyProcessChanged(workflowExecuteThread.getProcessInstance());
+                                .removeProcess4TimeoutCheck(workflowExecuteThread.getWorkflowExecuteContext()
+                                        .getWorkflowInstance().getId());
+                        processInstanceExecCacheManager.removeByProcessInstanceId(workflowInstanceId);
+                        notifyProcessChanged(
+                                workflowExecuteThread.getWorkflowExecuteContext().getWorkflowInstance());
                         log.info("Workflow instance is finished.");
                     }
                 } catch (Exception e) {
                     log.error("Workflow instance is finished, but notify changed error", e);
                 } finally {
                     // make sure the process has been removed from multiThreadFilterMap
-                    multiThreadFilterMap.remove(workflowExecuteThread.getKey());
+                    multiThreadFilterMap.remove(workflowInstanceId);
                     LogUtils.removeWorkflowInstanceIdMDC();
                 }
             }
@@ -160,6 +169,7 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
         for (Map.Entry<ProcessInstance, TaskInstance> entry : fatherMaps.entrySet()) {
             ProcessInstance processInstance = entry.getKey();
             TaskInstance taskInstance = entry.getValue();
+            crossWorkflowParameterPassing(finishProcessInstance, taskInstance);
             String address = NetUtils.getAddr(masterConfig.getListenPort());
             try (
                     final LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
@@ -172,6 +182,20 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
                     this.notifyProcess(finishProcessInstance, processInstance, taskInstance);
                 }
             }
+        }
+    }
+
+    private void crossWorkflowParameterPassing(ProcessInstance finishProcessInstance, TaskInstance taskInstance) {
+        try {
+            MasterTaskExecuteRunnable masterTaskExecuteRunnable =
+                    MasterTaskExecuteRunnableHolder.getMasterTaskExecuteRunnable(taskInstance.getId());
+            masterTaskExecuteRunnable.getILogicTask().getTaskParameters()
+                    .setVarPool(finishProcessInstance.getVarPool());
+            log.info("Cross workflow parameter passing success, finishProcessInstanceId: {}, taskInstanceId: {}",
+                    finishProcessInstance.getId(), taskInstance.getId());
+        } catch (Exception ex) {
+            log.error("Cross workflow parameter passing error, finishProcessInstanceId: {}, taskInstanceId: {}",
+                    finishProcessInstance.getId(), taskInstance.getId(), ex);
         }
     }
 

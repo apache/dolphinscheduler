@@ -30,6 +30,7 @@ github:
     - workflow-schedule
     - powerful-data-pipelines
     - data-pipelines
+  dependabot_updates: false
   enabled_merge_buttons:
     squash: true
     merge: false
@@ -37,6 +38,8 @@ github:
   protected_branches:
     dev:
       required_status_checks:
+        # strict means "Require branches to be up to date before merging".
+        strict: true
         contexts:
           - Build
           - Unit Test

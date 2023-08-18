@@ -221,10 +221,17 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     audience-annotations 0.12.0: https://mvnrepository.com/artifact/org.apache.yetus/audience-annotations/0.12.0, Apache 2.0
     avro 1.7.7: https://github.com/apache/avro, Apache 2.0
     bonecp 0.8.0.RELEASE: https://github.com/wwadge/bonecp, Apache 2.0
+    bucket4j-core 6.2.0: https://mvnrepository.com/artifact/com.github.vladimir-bukhtoyarov/bucket4j-core, Apache 2.0
     byte-buddy 1.9.16: https://mvnrepository.com/artifact/net.bytebuddy/byte-buddy/1.9.16, Apache 2.0
     caffeine 2.9.3: https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine/2.9.3, Apache 2.0
     classmate 1.5.1: https://mvnrepository.com/artifact/com.fasterxml/classmate/1.5.1, Apache 2.0
     clickhouse-jdbc 0.4.6: https://mvnrepository.com/artifact/com.clickhouse/clickhouse-jdbc/0.4.6, Apache 2.0
+    client-java 13.0.2: https://mvnrepository.com/artifact/io.kubernetes/client-java/13.0.2, Apache 2.0
+    client-java-api 13.0.2: https://mvnrepository.com/artifact/io.kubernetes/client-java-api/13.0.2, Apache 2.0
+    client-java-api-fluent 13.0.2: https://mvnrepository.com/artifact/io.kubernetes/client-java-api-fluent/13.0.2, Apache 2.0
+    client-java-extended 13.0.2: https://mvnrepository.com/artifact/io.kubernetes/client-java-extended/13.0.2, Apache 2.0
+    client-java-proto 13.0.2: https://mvnrepository.com/artifact/io.kubernetes/client-java-proto/13.0.2, Apache 2.0
+    client-java-spring-integration 13.0.2: https://mvnrepository.com/artifact/io.kubernetes/client-java-spring-integration/13.0.2, Apache 2.0
     databend-jdbc 0.0.7 https://mvnrepository.com/artifact/com.databend/databend-jdbc/0.0.7 Apache 2.0
     lz4-java 1.4.0: https://mvnrepository.com/artifact/org.lz4/lz4-java/1.4.0, Apache 2.0
     commons-beanutils 1.9.4 https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils/1.9.4, Apache 2.0
@@ -308,6 +315,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     jna 5.10.0: https://mvnrepository.com/artifact/net.java.dev.jna/jna/5.10.0,  Apache 2.0 and LGPL 2.1
     jna-platform 5.10.0: https://mvnrepository.com/artifact/net.java.dev.jna/jna-platform/5.10.0, Apache 2.0 and LGPL 2.1
     joda-time 2.10.13: https://github.com/JodaOrg/joda-time, Apache 2.0
+    jose4j 0.7.8: https://mvnrepository.com/artifact/org.bitbucket.b_c/jose4j, Apache 2.0
     jpam 1.1: https://mvnrepository.com/artifact/net.sf.jpam/jpam/1.1, Apache 2.0
     json 1.8: https://mvnrepository.com/artifact/com.tdunning/json, Apache 2.0
     json-path 2.7.0: https://github.com/json-path/JsonPath, Apache 2.0
@@ -376,6 +384,9 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     spring-context 5.3.22: https://mvnrepository.com/artifact/org.springframework/spring-context/5.3.22, Apache 2.0
     spring-context-support 5.3.13: https://mvnrepository.com/artifact/org.springframework/spring-context-support/5.3.13, Apache 2.0
     spring-core 5.3.22: https://mvnrepository.com/artifact/org.springframework/spring-core/5.3.22, Apache 2.0
+    spring-cloud-kubernetes-client-autoconfig 2.1.3: https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-kubernetes-client-autoconfig, Apache 2.0
+    spring-cloud-kubernetes-client-config 2.1.3: https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-kubernetes-client-config, Apache 2.0
+    spring-cloud-starter-kubernetes-client-config 2.1.3: https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-kubernetes-client-config, Apache 2.0
     spring-expression 5.3.13: https://mvnrepository.com/artifact/org.springframework/spring-expression/5.3.13, Apache 2.0
     springdoc-openapi-ui 1.6.9: https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-ui/1.6.9, Apache 2.0
     springdoc-openapi-common 1.6.9: https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-common/1.6.9, Apache 2.0
@@ -385,6 +396,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     spring-tx 5.3.22: https://mvnrepository.com/artifact/org.springframework/spring-tx/5.3.22, Apache 2.0
     spring-web 5.3.13: https://mvnrepository.com/artifact/org.springframework/spring-web/5.3.13, Apache 2.0
     spring-webmvc 5.3.13: https://mvnrepository.com/artifact/org.springframework/spring-webmvc/5.3.13, Apache 2.0
+    swagger-annotations 1.6.2: https://mvnrepository.com/artifact/io.swagger/swagger-annotations/1.6.2, Apache 2.0
     swagger-annotations 2.2.0: https://mvnrepository.com/artifact/io.swagger/swagger-annotations/2.2.0, Apache 2.0
     swagger-models 2.2.0: https://mvnrepository.com/artifact/io.swagger/swagger-models/2.2.0, Apache 2.0
     swagger-core 2.2.0: https://mvnrepository.com/artifact/io.swagger/swagger-core/2.2.0, Apache 2.0
@@ -555,6 +567,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     casdoor-spring-boot-starter 1.6.0  https://mvnrepository.com/artifact/org.casbin/casdoor-spring-boot-starter/1.6.0  Apache 2.0
     org.apache.oltu.oauth2.client 1.0.2  https://mvnrepository.com/artifact/org.apache.oltu.oauth2/org.apache.oltu.oauth2.client/1.0.2  Apache 2.0
     org.apache.oltu.oauth2.common 1.0.2  https://mvnrepository.com/artifact/org.apache.oltu.oauth2/org.apache.oltu.oauth2.common/1.0.2  Apache 2.0
+    esdk-obs-java-bundle 3.23.3 https://mvnrepository.com/artifact/com.huaweicloud/esdk-obs-java-bundle/3.23.3  Apache 2.0
 
 
 
@@ -578,7 +591,6 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     jsch 0.1.42: https://mvnrepository.com/artifact/com.jcraft/jsch/0.1.42, BSD
     leveldbjni-all 1.8: https://mvnrepository.com/artifact/org.fusesource.leveldbjni/leveldbjni-all/1.8, BSD 3-clause
     postgresql 42.4.1: https://mvnrepository.com/artifact/org.postgresql/postgresql/42.4.1, BSD 2-clause
-    protobuf-java 2.5.0: https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java/2.5.0, BSD 2-clause
     paranamer 2.3: https://mvnrepository.com/artifact/com.thoughtworks.paranamer/paranamer/2.3, BSD
     re2j 1.1: https://github.com/google/re2j/blob/re2j-1.1/LICENSE, BSD 3-clause
     stax2-api 4.2.1: https://mvnrepository.com/artifact/org.codehaus.woodstox/stax2-api/4.2.1, BSD
@@ -648,8 +660,11 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     oshi-core 6.1.1: https://mvnrepository.com/artifact/com.github.oshi/oshi-core/6.1.1, MIT
     unirest-java 3.7.04-standalone: https://mvnrepository.com/artifact/com.konghq/unirest-java/3.7.04, MIT
     classgraph 4.8.83: https://mvnrepository.com/artifact/io.github.classgraph/classgraph, MIT
-    bcpkix-jdk15on 1.68: https://mvnrepository.com/artifact/org.bouncycastle/bcpkix-jdk15on, MIT
-    bcprov-jdk15on 1.68: https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on, MIT
+    bcpkix-jdk15on 1.69: https://mvnrepository.com/artifact/org.bouncycastle/bcpkix-jdk15on, MIT
+    bcprov-jdk15on 1.69: https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on, MIT
+    bcprov-ext-jdk15on 1.69: https://mvnrepository.com/artifact/org.bouncycastle/bcprov-ext-jdk15on, MIT
+    bcutil-jdk15on 1.69: https://mvnrepository.com/artifact/org.bouncycastle/bcutil-jdk15on, MIT
+    gson-fire 1.8.5.jar: https://mvnrepository.com/artifact/io.gsonfire/gson-fire/1.8.5, MIT
     reactive-streams 1.0.4: https://mvnrepository.com/artifact/org.reactivestreams/reactive-streams/1.0.4, MIT
     webjars-locator-core 0.50: https://mvnrepository.com/artifact/org.webjars/webjars-locator-core/0.50, MIT
     azure-core 1.36.0: https://mvnrepository.com/artifact/com.azure/azure-core/1.36.0, MIT

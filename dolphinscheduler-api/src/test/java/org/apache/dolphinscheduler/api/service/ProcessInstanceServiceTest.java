@@ -745,9 +745,9 @@ public class ProcessInstanceServiceTest {
                 processInstance.getProcessDefinitionVersion())).thenReturn(new ProcessDefinitionLog());
         when(processInstanceMapper.queryDetailById(1)).thenReturn(processInstance);
         when(taskInstanceMapper.queryByInstanceIdAndName(Mockito.anyInt(), Mockito.any())).thenReturn(taskInstance);
-        DAG<String, TaskNode, TaskNodeRelation> graph = new DAG<>();
-        for (int i = 1; i <= 7; ++i) {
-            graph.addNode(i + "", new TaskNode());
+        DAG<Long, TaskNode, TaskNodeRelation> graph = new DAG<>();
+        for (long i = 1; i <= 7; ++i) {
+            graph.addNode(i, new TaskNode());
         }
 
         when(processService.genDagGraph(Mockito.any(ProcessDefinition.class)))
