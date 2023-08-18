@@ -56,6 +56,13 @@ public abstract class PriorityTaskExecuteRunnable implements TaskExecuteRunnable
 
     @Override
     public int compareTo(@NotNull TaskExecuteRunnable other) {
+        // the smaller dispatch fail times, the higher priority
+        int dispatchFailTimesCompareResult = taskExecutionContext.getDispatchFailTimes()
+                - other.getTaskExecutionContext().getDispatchFailTimes();
+        if (dispatchFailTimesCompareResult != 0) {
+            return dispatchFailTimesCompareResult;
+        }
+
         int workflowInstancePriorityCompareResult = workflowInstance.getProcessInstancePriority().getCode()
                 - other.getWorkflowInstance().getProcessInstancePriority().getCode();
         if (workflowInstancePriorityCompareResult != 0) {
@@ -67,7 +74,7 @@ public abstract class PriorityTaskExecuteRunnable implements TaskExecuteRunnable
         }
         int taskInstancePriorityCompareResult = taskInstance.getTaskInstancePriority().getCode()
                 - other.getTaskInstance().getTaskInstancePriority().getCode();
-        if (taskInstancePriorityCompareResult > 0) {
+        if (taskInstancePriorityCompareResult != 0) {
             return taskInstancePriorityCompareResult;
         }
         // larger number, higher priority
