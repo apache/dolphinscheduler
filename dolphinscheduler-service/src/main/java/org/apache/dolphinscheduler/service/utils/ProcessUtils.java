@@ -171,7 +171,7 @@ public class ProcessUtils {
             Thread.sleep(Constants.SLEEP_TIME_MILLIS);
             Host host = Host.of(taskExecutionContext.getHost());
             List<String> appIds = logClient.getAppIds(host.getIp(), host.getPort(), taskExecutionContext.getLogPath(),
-                    taskExecutionContext.getAppInfoPath());
+                    taskExecutionContext.getAppInfoPath(), taskExecutionContext.getTaskInstanceId());
             if (CollectionUtils.isNotEmpty(appIds)) {
                 taskExecutionContext.setAppIds(String.join(TaskConstants.COMMA, appIds));
                 if (StringUtils.isEmpty(taskExecutionContext.getExecutePath())) {
