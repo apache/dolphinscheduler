@@ -210,8 +210,9 @@ public class LogClient implements AutoCloseable {
         }
     }
 
-    public @Nullable List<String> getAppIds(@NonNull String host, int port, @NonNull String taskLogFilePath,
-                                            @NonNull String taskAppInfoPath) throws RemotingException, InterruptedException {
+    public @Nullable List<String> getAppIds(@NonNull String host, int port, String taskLogFilePath,
+                                            String taskAppInfoPath,
+                                            int taskInstanceId) throws RemotingException, InterruptedException {
         log.info("Begin to get appIds from worker: {}:{} taskLogPath: {}, taskAppInfoPath: {}", host, port,
                 taskLogFilePath, taskAppInfoPath);
         final Host workerAddress = new Host(host, port);
@@ -220,7 +221,7 @@ public class LogClient implements AutoCloseable {
             appIds = LogUtils.getAppIds(taskLogFilePath, taskAppInfoPath,
                     PropertyUtils.getString(APPID_COLLECT, DEFAULT_COLLECT_WAY));
         } else {
-            final Message message = new GetAppIdRequest(taskLogFilePath, taskAppInfoPath).convert2Command();
+            final Message message = new GetAppIdRequest(taskInstanceId, taskLogFilePath).convert2Command();
             Message response = this.client.sendSync(workerAddress, message, LOG_REQUEST_TIMEOUT);
             if (response != null) {
                 GetAppIdResponse responseCommand =

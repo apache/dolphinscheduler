@@ -22,6 +22,8 @@ import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_COL
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.remote.command.Message;
 import org.apache.dolphinscheduler.remote.command.MessageType;
@@ -44,7 +46,9 @@ public class GetAppIdProcessor extends BaseLogProcessor implements NettyRequestP
     public void process(Channel channel, Message message) {
         GetAppIdRequest getAppIdRequest =
                 JSONUtils.parseObject(message.getBody(), GetAppIdRequest.class);
-        String appInfoPath = getAppIdRequest.getAppInfoPath();
+        TaskExecutionContext taskExecutionContext =
+                TaskExecutionContextCacheManager.getByTaskInstanceId(getAppIdRequest.getTaskInstanceId());
+        String appInfoPath = taskExecutionContext.getAppInfoPath();
         String logPath = getAppIdRequest.getLogPath();
         List<String> appIds = LogUtils.getAppIds(logPath, appInfoPath,
                 PropertyUtils.getString(APPID_COLLECT, DEFAULT_COLLECT_WAY));
