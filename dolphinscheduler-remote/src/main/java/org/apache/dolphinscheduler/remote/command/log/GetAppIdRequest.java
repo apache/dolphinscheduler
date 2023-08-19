@@ -29,9 +29,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class GetAppIdRequest implements RequestMessageBuilder {
 
-    private String logPath;
+    private int taskInstanceId;
 
-    private String appInfoPath;
+    private String logPath;
 
     @Override
     public MessageType getCommandType() {
