@@ -262,4 +262,13 @@ public class TaskExecutionContext implements Serializable {
     private int testFlag;
 
     private boolean logBufferEnable;
+
+    /**
+     * dispatch fail times
+     */
+    private int dispatchFailTimes;
+
+    public void increaseDispatchFailTimes() {
+        this.dispatchFailTimes++;
+    }
 }
