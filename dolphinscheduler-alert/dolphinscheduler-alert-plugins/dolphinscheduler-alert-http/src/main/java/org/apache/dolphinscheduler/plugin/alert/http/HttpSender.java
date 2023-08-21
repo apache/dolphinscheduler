@@ -104,12 +104,12 @@ public final class HttpSender {
     }
 
     private void createHttpRequest(String msg) throws MalformedURLException, URISyntaxException {
-        if (REQUEST_TYPE_POST.equals(requestType)) {
+        if (REQUEST_TYPE_POST.equalsIgnoreCase(requestType)) {
             httpRequest = new HttpPost(url);
             setHeader();
             //POST request add param in request body
             setMsgInRequestBody(msg);
-        } else if (REQUEST_TYPE_GET.equals(requestType)) {
+        } else if (REQUEST_TYPE_GET.equalsIgnoreCase(requestType)) {
             //GET request add param in url
             setMsgInUrl(msg);
             URL unencodeUrl = new URL(url);
