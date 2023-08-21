@@ -71,7 +71,7 @@ public class LogUtils {
      * @param fetchWay    fetch way
      * @return application id list.
      */
-    public List<String> getAppIds(@NonNull String logPath, @NonNull String appInfoPath, String fetchWay) {
+    public List<String> getAppIds(String logPath, String appInfoPath, String fetchWay) {
         if (!StringUtils.isEmpty(fetchWay) && fetchWay.equals("aop")) {
             log.info("Start finding appId in {}, fetch way: {} ", appInfoPath, fetchWay);
             return getAppIdsFromAppInfoFile(appInfoPath);
@@ -142,7 +142,11 @@ public class LogUtils {
                 .orElse(null);
     }
 
-    public List<String> getAppIdsFromAppInfoFile(@NonNull String appInfoPath) {
+    public List<String> getAppIdsFromAppInfoFile(String appInfoPath) {
+        if (StringUtils.isEmpty(appInfoPath)) {
+            log.warn("appInfoPath is empty");
+            return Collections.emptyList();
+        }
         File appInfoFile = new File(appInfoPath);
         if (!appInfoFile.exists() || !appInfoFile.isFile()) {
             return Collections.emptyList();
