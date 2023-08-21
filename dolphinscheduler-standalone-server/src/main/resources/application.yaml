@@ -111,6 +111,32 @@ security:
         # jks file absolute path && password
         trust-store: "/ldapkeystore.jks"
         trust-store-password: ""
+    oauth2:
+      enable: false
+      provider:
+        github:
+          authorizationUri: "https://github.com/login/oauth/authorize"
+          redirectUri: "http://localhost:12345/dolphinscheduler/redirect/login/oauth2"
+          clientId: ""
+          clientSecret: ""
+          tokenUri: "https://github.com/login/oauth/access_token"
+          userInfoUri: "https://api.github.com/user"
+          callbackUrl: "http://localhost:5173/login"
+          iconUri: ""
+          provider: github
+        gitee:
+          authorizationUri: "https://gitee.com/oauth/authorize"
+          redirectUri: "http://127.0.0.1:12345/dolphinscheduler/redirect/login/oauth2"
+          clientId: ""
+          clientSecret: ""
+          tokenUri: "https://gitee.com/oauth/token?grant_type=authorization_code"
+          userInfoUri: "https://gitee.com/api/v5/user"
+          callbackUrl: "http://127.0.0.1:5173/login"
+          iconUri: ""
+          provider: gitee
+
+
+
 
 
 master:

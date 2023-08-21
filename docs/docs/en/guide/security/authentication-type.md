@@ -1,6 +1,6 @@
 # Authentication Type
 
-* So far we support three authentication types, Apache DolphinScheduler password, LDAP and Casdoor SSO.
+* So far we support four authentication types, Apache DolphinScheduler password, LDAP, Casdoor SSO and OAuth2，the OAuth2 authorization login mode can be used with other authentication modes.
 
 ## Change Authentication Type
 
@@ -30,6 +30,29 @@ security:
         # jks file absolute path && password
         trust-store: "/ldapkeystore.jks"
         trust-store-password: "password"
+    oauth2:
+      enable: false
+      provider:
+        github:
+          authorizationUri: ""
+          redirectUri: ""
+          clientId: ""
+          clientSecret: ""
+          tokenUri: ""
+          userInfoUri: ""
+          callbackUrl: ""
+          iconUri: ""
+          provider: github
+        google:
+          authorizationUri: ""
+          redirectUri: ""
+          clientId: ""
+          clientSecret: ""
+          tokenUri: ""
+          userInfoUri: ""
+          callbackUrl: ""
+          iconUri: ""
+          provider: google
 ```
 
 For detailed explanation of specific fields, please see: [Api-server related configuration](../../architecture/configuration.md)
@@ -110,3 +133,66 @@ casdoor:
   redirect-url: http://localhost:5173/login 
 ```
 
+## OAuth2
+
+Dolphinscheduler can support multiple OAuth2 providers.
+
+### Step1. Create Client Credentials
+
+![create-client-credentials-1](../../../../img/security/authentication/create-client-credentials-1.png)
+
+![create-client-credentials-2](../../../../img/security/authentication/create-client-credentials-2.png)
+
+### Step2.Enable OAuth2 Login In The Api's Configuration File
+
+```yaml
+security:
+  authentication:
+    …… # omit
+    oauth2:
+      # Set enable to true to enable oauth2 login mode
+      enable: true
+      provider:
+        github:
+          # Set the provider authorization address, for example:https://github.com/login/oauth/authorize
+          authorizationUri: ""
+          # dolphinscheduler backend redirection interface address, for example :http://127.0.0.1:12345/dolphinscheduler/redirect/login/oauth2
+          redirectUri: ""
+          #  clientId
+          clientId: ""
+          # client secret
+          clientSecret: ""
+          # Set the provider's request token address
+          tokenUri: ""
+          # Set the provider address for requesting user information
+          userInfoUri: ""
+          # Redirect address after successful login, http://{ip}:{port}/login
+          callbackUrl: ""
+          # The image url of the login page jump button, if not filled, a text button will be displayed
+          iconUri: ""
+          provider: github
+        google:
+          authorizationUri: ""
+          redirectUri: ""
+          clientId: ""
+          clientSecret: ""
+          tokenUri: ""
+          userInfoUri: ""
+          callbackUrl: ""
+          iconUri: ""
+          provider: google
+        gitee:
+          authorizationUri: "https://gitee.com/oauth/authorize"
+          redirectUri: "http://127.0.0.1:12345/dolphinscheduler/redirect/login/oauth2"
+          clientId: ""
+          clientSecret: ""
+          tokenUri: "https://gitee.com/oauth/token?grant_type=authorization_code"
+          userInfoUri: "https://gitee.com/api/v5/user"
+          callbackUrl: "http://127.0.0.1:5173/login"
+          iconUri: ""
+          provider: gitee
+```
+
+### Step.3 Login With OAuth2
+
+![login-with-oauth2](../../../../img/security/authentication/login-with-oauth2.png)
