@@ -25,6 +25,7 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_DEFINITION;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_SWITCH_TO_THIS_VERSION;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.dolphinscheduler.api.dto.task.TaskCreateRequest;
 import org.apache.dolphinscheduler.api.dto.task.TaskFilterRequest;
 import org.apache.dolphinscheduler.api.dto.task.TaskUpdateRequest;
@@ -504,6 +505,18 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             List<ProcessTaskRelation> relationList = processTaskRelations.stream()
                     .filter(r -> r.getPostTaskCode() != taskCode).collect(Collectors.toList());
             updateDag(loginUser, processDefinitionCode, relationList, Lists.newArrayList());
+            /**
+             * if relationList is empty,The process_task_relation corresponding to this task will not be deleted,
+             * which will cause the task to be deleted in the task definition panel, but the workflow cannot be deleted.
+             */
+            //delete process_task_relation
+            if (relationList.size()==0){
+                LambdaQueryWrapper<ProcessTaskRelation> wrapper = new LambdaQueryWrapper<>();
+                wrapper.eq(ProcessTaskRelation::getPreTaskCode,taskCode)
+                        .or()
+                        .eq(ProcessTaskRelation::getPostTaskCode,taskCode);
+                processTaskRelationMapper.delete(wrapper);
+            }
         }
     }
 
