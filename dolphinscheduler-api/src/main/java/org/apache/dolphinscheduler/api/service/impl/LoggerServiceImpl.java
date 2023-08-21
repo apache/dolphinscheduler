@@ -280,7 +280,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
                 host,
                 Constants.SYSTEM_LINE_SEPARATOR).getBytes(StandardCharsets.UTF_8);
 
-        byte[] logBytes = null;
+        byte[] logBytes = new byte[0];
         if (TaskUtils.isLogicTask(taskInstance.getTaskType())) {
             IMasterLogService masterLogService = SingletonJdkDynamicRpcClientProxyFactory.getInstance()
                     .getProxyClient(taskInstance.getHost(), IMasterLogService.class);

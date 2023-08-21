@@ -38,5 +38,6 @@ public interface IWorkerLogService {
     @RpcMethod
     GetAppIdResponse getAppId(GetAppIdRequest getAppIdRequest);
 
+    @RpcMethod
     void removeTaskInstanceLog(String taskInstanceLogAbsolutePath);
 }

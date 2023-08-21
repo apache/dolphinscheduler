@@ -27,25 +27,27 @@ import java.util.concurrent.BlockingQueue;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
 public class GlobalTaskInstanceDispatchQueue {
 
-    @Autowired
-    private WorkerConfig workerConfig;
+    private final WorkerConfig workerConfig;
 
-    private final BlockingQueue<TaskExecutionContext> blockingQueue =
-            new ArrayBlockingQueue<>(workerConfig.getExecThreads());
+    private final BlockingQueue<TaskExecutionContext> blockingQueue;
+
+    public GlobalTaskInstanceDispatchQueue(WorkerConfig workerConfig) {
+        this.workerConfig = workerConfig;
+        this.blockingQueue = new ArrayBlockingQueue<>(workerConfig.getExecThreads());
+    }
 
     public boolean addDispatchTask(TaskExecutionContext taskExecutionContext) {
         if (workerConfig.getTaskExecuteThreadsFullPolicy() == TaskExecuteThreadsFullPolicy.CONTINUE) {
             return blockingQueue.offer(taskExecutionContext);
         }
 
-        if (blockingQueue.size() > workerConfig.getExecThreads()) {
+        if (blockingQueue.size() > getQueueSize()) {
             log.warn("Wait submit queue is full, will retry submit task later");
             WorkerServerMetrics.incWorkerSubmitQueueIsFullCount();
             return false;
@@ -59,6 +61,10 @@ public class GlobalTaskInstanceDispatchQueue {
 
     public void clearTask() {
         blockingQueue.clear();
+    }
+
+    public int getQueueSize() {
+        return workerConfig.getExecThreads();
     }
 
 }
