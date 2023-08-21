@@ -413,9 +413,6 @@ public enum Status {
     WORKFLOW_INSTANCE_IS_NOT_FINISHED(50071, "the workflow instance is not finished, can not do this operation",
             "工作流实例未结束，不能执行此操作"),
 
-    PROCESS_TASK_RELATION_LOG_INSERT_ERROR(50072,"insert process task relation log error",
-            "对工作流_任务关系日志表新增日志失败"),
-
     TASK_PARALLELISM_PARAMS_ERROR(50080, "task parallelism parameter is not valid", "任务并行度参数无效"),
     TASK_COMPLEMENT_DATA_DATE_ERROR(50081, "The range of date for complementing date is not valid", "补数选择的日期范围无效"),
 
