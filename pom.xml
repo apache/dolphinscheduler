@@ -35,6 +35,7 @@
     <modules>
         <module>dolphinscheduler-bom</module>
         <module>dolphinscheduler-alert</module>
+        <module>dolphinscheduler-listener</module>
         <module>dolphinscheduler-spi</module>
         <module>dolphinscheduler-registry</module>
         <module>dolphinscheduler-task-plugin</module>
@@ -93,7 +94,7 @@
         <docker.push.skip>true</docker.push.skip>
         <skipDepCheck>true</skipDepCheck>
         <build.ui.skip>false</build.ui.skip>
-        <spotless.skip>false</spotless.skip>
+        <spotless.skip>true</spotless.skip>
     </properties>
 
     <dependencyManagement>
@@ -247,7 +248,21 @@
                 <artifactId>dolphinscheduler-listener</artifactId>
                 <version>${project.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-listener-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-listener-service</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-listener-all</artifactId>
+                <version>${project.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>

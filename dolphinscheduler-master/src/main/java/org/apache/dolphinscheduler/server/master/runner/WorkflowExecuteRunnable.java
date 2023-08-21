@@ -28,6 +28,7 @@ import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.C
 import static org.apache.dolphinscheduler.common.constants.Constants.COMMA;
 import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_WORKER_GROUP;
 import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYY_MM_DD_HH_MM_SS;
+import org.apache.dolphinscheduler.listener.service.ListenerEventPublishService;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_BLOCKING;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.DataType.VARCHAR;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.Direct.IN;
@@ -146,6 +147,8 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
 
     private final IWorkflowExecuteContext workflowExecuteContext;
 
+    private final ListenerEventPublishService listenerEventPublishService;
+
     private WorkflowRunnableStatus workflowRunnableStatus = WorkflowRunnableStatus.CREATED;
 
     /**
@@ -237,6 +240,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                                    @NonNull StateWheelExecuteThread stateWheelExecuteThread,
                                    @NonNull CuringParamsService curingParamsService,
                                    @NonNull TaskInstanceDao taskInstanceDao,
+                                   @NonNull ListenerEventPublishService listenerEventPublishService,
                                    @NonNull DefaultTaskExecuteRunnableFactory defaultTaskExecuteRunnableFactory) {
         this.processService = processService;
         this.commandService = commandService;
@@ -248,6 +252,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         this.stateWheelExecuteThread = stateWheelExecuteThread;
         this.curingParamsService = curingParamsService;
         this.taskInstanceDao = taskInstanceDao;
+        this.listenerEventPublishService = listenerEventPublishService;
         this.defaultTaskExecuteRunnableFactory = defaultTaskExecuteRunnableFactory;
         TaskMetrics.registerTaskPrepared(readyToSubmitTaskQueue::size);
     }
@@ -376,10 +381,22 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         }
     }
 
+    public void processRunning(){
+        ProcessInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
+        ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(workflowInstance.getId());
+        this.listenerEventPublishService.publishWorkflowStartListenerEvent(workflowInstance, projectUser);
+    }
+
     public void processTimeout() {
         ProcessInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
         ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(workflowInstance.getId());
         this.processAlertManager.sendProcessTimeoutAlert(workflowInstance, projectUser);
+    }
+
+    public void taskRunning(TaskInstance taskInstance){
+        ProcessInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
+        ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(workflowInstance.getId());
+        listenerEventPublishService.publishTaskStartListenerEvent(workflowInstance, taskInstance, projectUser);
     }
 
     public void taskTimeout(TaskInstance taskInstance) {
@@ -408,6 +425,8 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                 if (!workflowInstance.isBlocked()) {
                     submitPostNode(taskInstance.getTaskCode());
                 }
+                ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(workflowInstance.getId());
+                listenerEventPublishService.publishTaskEndListenerEvent(workflowInstance, taskInstance, projectUser);
             } else if (taskInstance.taskCanRetry() && !workflowInstance.getState().isReadyStop()) {
                 // retry task
                 log.info("Retry taskInstance taskInstance state: {}", taskInstance.getState());
@@ -425,6 +444,8 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                         killAllTasks();
                     }
                 }
+                ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(workflowInstance.getId());
+                listenerEventPublishService.publishTaskFailListenerEvent(workflowInstance, taskInstance, projectUser);
             } else if (taskInstance.getState().isFinished()) {
                 // todo: when the task instance type is pause, then it should not in completeTaskSet
                 completeTaskSet.add(taskInstance.getTaskCode());
@@ -754,6 +775,9 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         processAlertManager.sendAlertProcessInstance(workflowInstance, getValidTaskList(), projectUser);
         if (workflowInstance.getState().isSuccess()) {
             processAlertManager.closeAlert(workflowInstance);
+            listenerEventPublishService.publishWorkflowEndListenerEvent(workflowInstance,projectUser);
+        }else {
+            listenerEventPublishService.publishWorkflowFailListenerEvent(workflowInstance, projectUser);
         }
         if (checkTaskQueue()) {
             // release task group

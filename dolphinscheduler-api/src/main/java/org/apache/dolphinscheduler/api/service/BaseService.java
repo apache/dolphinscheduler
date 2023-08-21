@@ -21,10 +21,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
-import org.apache.dolphinscheduler.dao.entity.ListenerPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
-import org.apache.dolphinscheduler.listener.event.ListenerEvent;
 
 import java.util.Date;
 import java.util.List;
@@ -123,18 +120,4 @@ public interface BaseService {
      */
     boolean checkDescriptionLength(String description);
 
-    /**
-     * send
-     * @param listenerEventType
-     * @param listenerEvent listener
-     */
-    void sendListenerEvent(ListenerEventType listenerEventType, ListenerEvent listenerEvent,
-                           List<ListenerPluginInstance> listenerPluginInstances);
-
-    /**
-     * check if where are listener instances listen to given event type
-     * @param listenerEventType listen event type
-     * @return listener instances(with id only) if exist, empty list otherwise
-     */
-    List<ListenerPluginInstance> needSendListenerEvent(ListenerEventType listenerEventType);
 }

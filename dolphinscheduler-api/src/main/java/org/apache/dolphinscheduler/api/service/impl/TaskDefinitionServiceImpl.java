@@ -190,6 +190,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                 .join(taskDefinitionLogs.stream().map(TaskDefinition::getCode).collect(Collectors.toList()), ","));
         putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, resData);
+        taskDefinitionLogs.forEach(x->{
+            listenerEventPublishService.publishTaskCreateListenerEvent(x);
+        });
         return result;
     }
 
@@ -505,6 +508,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                     .filter(r -> r.getPostTaskCode() != taskCode).collect(Collectors.toList());
             updateDag(loginUser, processDefinitionCode, relationList, Lists.newArrayList());
         }
+        listenerEventPublishService.publishTaskDeleteListenerEvent(taskDefinition);
     }
 
     public void updateDag(User loginUser, long processDefinitionCode,
@@ -573,6 +577,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         log.info("Update task definition complete, projectCode:{}, taskDefinitionCode:{}.", projectCode, taskCode);
         result.put(Constants.DATA_LIST, taskCode);
         putMsg(result, Status.SUCCESS);
+        listenerEventPublishService.publishTaskUpdateListenerEvent(taskDefinitionToUpdate);
         return result;
     }
 
@@ -1326,4 +1331,5 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         // delete task workflow relation
         processTaskRelationService.deleteByWorkflowDefinitionCode(workflowDefinitionCode, workflowDefinitionVersion);
     }
+
 }

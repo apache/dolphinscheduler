@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import static java.util.stream.Collectors.toSet;
-
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
@@ -28,31 +26,21 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.ListenerPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ListenerEventMapper;
-import org.apache.dolphinscheduler.dao.mapper.ListenerPluginInstanceMapper;
-import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
-import org.apache.dolphinscheduler.listener.event.ListenerEvent;
+import org.apache.dolphinscheduler.listener.service.ListenerEventPublishService;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.MessageFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.google.common.collect.Lists;
 
 /**
  * base service impl
@@ -64,10 +52,7 @@ public class BaseServiceImpl implements BaseService {
     protected ResourcePermissionCheckService resourcePermissionCheckService;
 
     @Autowired
-    private ListenerPluginInstanceMapper listenerPluginInstanceMapper;
-
-    @Autowired
-    private ListenerEventMapper listenerEventMapper;
+    protected ListenerEventPublishService listenerEventPublishService;
 
     @Override
     public void permissionPostHandle(AuthorizationType authorizationType, Integer userId, List<Integer> ids,
@@ -223,35 +208,4 @@ public class BaseServiceImpl implements BaseService {
     public boolean checkDescriptionLength(String description) {
         return description != null && description.codePointCount(0, description.length()) > 255;
     }
-
-    @Override
-    public void sendListenerEvent(ListenerEventType listenerEventType, ListenerEvent listenerEvent,
-                                  List<ListenerPluginInstance> listenerPluginInstances) {
-        String content = JSONUtils.toJsonString(listenerEvent);
-        List<org.apache.dolphinscheduler.dao.entity.ListenerEvent> events = Lists.newArrayListWithExpectedSize(listenerPluginInstances.size());
-        for (ListenerPluginInstance instance : listenerPluginInstances) {
-            org.apache.dolphinscheduler.dao.entity.ListenerEvent
-                    event = new org.apache.dolphinscheduler.dao.entity.ListenerEvent();
-            event.setContent(content);
-            event.setEventType(listenerEventType);
-            event.setPluginInstanceId(instance.getId());
-            events.add(event);
-        }
-        listenerEventMapper.batchInsert(events);
-    }
-
-    @Override
-    public List<ListenerPluginInstance> needSendListenerEvent(ListenerEventType listenerEventType) {
-        LambdaQueryWrapper<ListenerPluginInstance> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.select(ListenerPluginInstance::getId, ListenerPluginInstance::getListenerEventTypes);
-        List<ListenerPluginInstance> listenerPluginInstances =
-                listenerPluginInstanceMapper.selectList(queryWrapper)
-                        .stream()
-                        .filter(x -> Arrays.stream(x.getListenerEventTypes().split(","))
-                                .map(Integer::parseInt).collect(toSet())
-                                .contains(listenerEventType.getCode()))
-                        .collect(Collectors.toList());
-        return listenerPluginInstances;
-    }
-
 }

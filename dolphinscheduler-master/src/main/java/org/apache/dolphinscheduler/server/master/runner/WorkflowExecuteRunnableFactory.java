@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.listener.service.ListenerEventPublishService;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.exception.WorkflowCreateException;
 import org.apache.dolphinscheduler.server.master.rpc.MasterRpcClient;
@@ -75,6 +76,9 @@ public class WorkflowExecuteRunnableFactory {
     @Autowired
     private WorkflowExecuteContextFactory workflowExecuteContextFactory;
 
+    @Autowired
+    private ListenerEventPublishService listenerEventPublishService;
+
     public WorkflowExecuteRunnable createWorkflowExecuteRunnable(Command command) throws WorkflowCreateException {
         try {
             IWorkflowExecuteContext workflowExecuteRunnableContext =
@@ -90,6 +94,7 @@ public class WorkflowExecuteRunnableFactory {
                     stateWheelExecuteThread,
                     curingGlobalParamsService,
                     taskInstanceDao,
+                    listenerEventPublishService,
                     defaultTaskExecuteRunnableFactory);
         } catch (Exception ex) {
             throw new WorkflowCreateException("Create workflow execute runnable failed", ex);

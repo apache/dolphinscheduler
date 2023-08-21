@@ -325,8 +325,7 @@ export default {
     delete_confirm: 'Are you sure you want to delete this instance?',
   },
   listener_event: {
-    master_down: 'MASTER DOWN',
-    master_timeout: 'MASTER TIMEOUT',
+    server_down: 'SERVER DOWN',
     workflow_added: 'WORKFLOW ADDED',
     workflow_update: 'WORKFLOW UPDATE',
     workflow_removed: 'WORKFLOW REMOVED',

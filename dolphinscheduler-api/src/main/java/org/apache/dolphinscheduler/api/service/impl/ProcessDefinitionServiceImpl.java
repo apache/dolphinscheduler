@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import static java.util.stream.Collectors.toSet;
+import org.apache.commons.beanutils.BeanUtils;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TASK_DEFINITION_MOVE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.VERSION_LIST;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_BATCH_COPY;
@@ -39,6 +40,7 @@ import static org.apache.dolphinscheduler.common.constants.Constants.EMPTY_STRIN
 import static org.apache.dolphinscheduler.common.constants.Constants.GLOBAL_PARAMS;
 import static org.apache.dolphinscheduler.common.constants.Constants.IMPORT_SUFFIX;
 import static org.apache.dolphinscheduler.common.constants.Constants.LOCAL_PARAMS;
+import org.apache.dolphinscheduler.listener.event.TaskCreateListenerEvent;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LOCAL_PARAMS_LIST;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SQL;
@@ -297,19 +299,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         processDefinition.setExecutionType(executionType);
         result = createDagDefine(loginUser, taskRelationList, processDefinition, taskDefinitionLogs, otherParamsJson);
         if (result.get(Constants.STATUS) == Status.SUCCESS) {
-            List<ListenerPluginInstance> instances =
-                    needSendListenerEvent(ListenerEventType.WORKFLOW_ADDED);
-            if (CollectionUtils.isNotEmpty(instances)) {
-                WorkflowCreateListenerEvent event = new WorkflowCreateListenerEvent();
-                event.setProjectId(project.getId());
-                event.setProjectCode(projectCode);
-                event.setProjectName(project.getName());
-                event.setOwner(loginUser.getUserName());
-                event.setProcessId(processDefinition.getId());
-                event.setProcessDefinitionCode(processDefinitionCode);
-                event.setProcessName(name);
-                sendListenerEvent(ListenerEventType.WORKFLOW_ADDED, event, instances);
-            }
+            listenerEventPublishService.publishWorkflowCreateListenerEvent(processDefinition);
         }
         return result;
     }
@@ -812,21 +802,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         processDefinition.setExecutionType(executionType);
         result = updateDagDefine(loginUser, taskRelationList, processDefinition, processDefinitionDeepCopy,
                 taskDefinitionLogs, otherParamsJson);
-        // TODO: 封装逻辑待讨论
         if (result.get(Constants.STATUS) == Status.SUCCESS) {
-            List<ListenerPluginInstance> instances =
-                    needSendListenerEvent(ListenerEventType.WORKFLOW_UPDATE);
-            if (CollectionUtils.isNotEmpty(instances)) {
-                WorkflowUpdateListenerEvent event = new WorkflowUpdateListenerEvent();
-                event.setProjectId(project.getId());
-                event.setProjectCode(projectCode);
-                event.setProjectName(project.getName());
-                event.setOwner(loginUser.getUserName());
-                event.setProcessId(processDefinition.getId());
-                event.setProcessDefinitionCode(processDefinition.getCode());
-                event.setProcessName(name);
-                sendListenerEvent(ListenerEventType.WORKFLOW_UPDATE, event, instances);
-            }
+            listenerEventPublishService.publishWorkflowUpdateListenerEvent(processDefinition);
         }
         return result;
     }
@@ -1094,20 +1071,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         metricsCleanUpService.cleanUpWorkflowMetricsByDefinitionCode(String.valueOf(code));
         log.info("Success delete workflow definition workflowDefinitionCode: {}", code);
 
-        List<ListenerPluginInstance> instances =
-                needSendListenerEvent(ListenerEventType.WORKFLOW_REMOVED);
-        if (CollectionUtils.isNotEmpty(instances)) {
-            WorkflowRemoveListenerEvent event = new WorkflowRemoveListenerEvent();
-            event.setProjectId(project.getId());
-            event.setProjectCode(project.getCode());
-            event.setProjectName(project.getName());
-            event.setOwner(loginUser.getUserName());
-            event.setProcessId(processDefinition.getId());
-            event.setProcessDefinitionCode(processDefinition.getCode());
-            event.setProcessName(processDefinition.getName());
-            sendListenerEvent(ListenerEventType.WORKFLOW_REMOVED, event, instances);
-        }
-
+        listenerEventPublishService.publishWorkflowDeleteListenerEvent(project, processDefinition);
     }
 
     /**

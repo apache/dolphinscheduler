@@ -52,7 +52,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-listener</artifactId>
+            <artifactId>dolphinscheduler-listener-common</artifactId>
         </dependency>
         <dependency>
             <groupId>io.netty</groupId>

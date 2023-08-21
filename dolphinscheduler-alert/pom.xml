@@ -31,7 +31,6 @@
     <modules>
         <module>dolphinscheduler-alert-plugins</module>
         <module>dolphinscheduler-alert-server</module>
-        <module>dolphinscheduler-listener</module>
     </modules>
 
     <dependencyManagement>

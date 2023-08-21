@@ -29,6 +29,7 @@ import javax.annotation.PreDestroy;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.dolphinscheduler.listener.service.ListenerPluginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -49,6 +50,8 @@ public class AlertServer {
     private AlertPluginManager alertPluginManager;
     @Autowired
     private AlertRegistryClient alertRegistryClient;
+    @Autowired
+    private ListenerPluginService listenerPluginService;
 
     public static void main(String[] args) {
         Thread.currentThread().setName(Constants.THREAD_NAME_ALERT_SERVER);

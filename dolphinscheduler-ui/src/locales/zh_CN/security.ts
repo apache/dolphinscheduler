@@ -325,8 +325,7 @@ export default {
     delete_confirm: '确定删除该插件吗?'
   },
   listener_event: {
-    master_down: 'MASTER节点宕机',
-    master_timeout: 'MASTER节点超时',
+    server_down: '服务器宕机',
     workflow_added: '新增工作流',
     workflow_update: '更新工作流',
     workflow_removed: '删除工作流',

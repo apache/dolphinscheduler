@@ -18,12 +18,16 @@
 package org.apache.dolphinscheduler.server.master.registry;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.AlertEvent;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
+import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
+import org.apache.dolphinscheduler.listener.event.ServerDownListenerEvent;
+import org.apache.dolphinscheduler.listener.service.ListenerEventPublishService;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.Event.Type;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
@@ -107,6 +111,9 @@ public class ServerNodeManager implements InitializingBean {
     @Autowired
     private MasterConfig masterConfig;
 
+    @Autowired
+    private ListenerEventPublishService listenerEventPublishService;
+
     private final List<WorkerInfoChangeListener> workerInfoChangeListeners = new ArrayList<>();
 
     private volatile int currentSlot = 0;
@@ -184,6 +191,12 @@ public class ServerNodeManager implements InitializingBean {
                         log.info("Worker: {} added, currentNode : {}", path, workerAddress);
                     } else if (type == Type.REMOVE) {
                         log.info("Worker node : {} down.", path);
+                        ServerDownListenerEvent serverDownListenerEvent = new ServerDownListenerEvent();
+                        serverDownListenerEvent.setListenerEventType(ListenerEventType.SERVER_DOWN);
+                        serverDownListenerEvent.setType("WORKER");
+                        serverDownListenerEvent.setEvent("SERVER DOWN");
+                        serverDownListenerEvent.setHost(path);
+                        listenerEventPublishService.publish(serverDownListenerEvent);
                         alertDao.sendServerStoppedAlert(1, path, "WORKER");
                     } else if (type == Type.UPDATE) {
                         syncSingleWorkerNodeInfo(workerAddress, JSONUtils.parseObject(data, WorkerHeartBeat.class));

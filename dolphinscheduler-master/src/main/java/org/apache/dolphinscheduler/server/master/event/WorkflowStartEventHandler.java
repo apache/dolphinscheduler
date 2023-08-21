@@ -67,6 +67,7 @@ public class WorkflowStartEventHandler implements WorkflowEventHandler {
                         if (processInstance.getTimeout() > 0) {
                             stateWheelExecuteThread.addProcess4TimeoutCheck(processInstance);
                         }
+                        workflowExecuteRunnable.processRunning();
                     } else if (WorkflowStartStatus.FAILED == workflowStartStatus) {
                         log.error(
                                 "Failed to submit the workflow instance, will resend the workflow start event: {}",
