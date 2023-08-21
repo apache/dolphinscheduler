@@ -85,6 +85,7 @@ import org.apache.dolphinscheduler.server.master.rpc.MasterRpcClient;
 import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnableFactory;
 import org.apache.dolphinscheduler.server.master.utils.TaskUtils;
+import org.apache.dolphinscheduler.server.master.utils.WorkflowInstanceUtils;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
@@ -433,7 +434,8 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                     taskInstance.getTaskCode(),
                     taskInstance.getState());
             this.updateProcessInstanceState();
-
+            // log the taskInstance in detail after task is finished
+            log.info(WorkflowInstanceUtils.logTaskInstanceInDetail(taskInstance));
             sendTaskLogOnMasterToRemoteIfNeeded(taskInstance);
         } catch (Exception ex) {
             log.error("Task finish failed, get a exception, will remove this taskInstance from completeTaskSet", ex);
@@ -759,6 +761,8 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
             // release task group
             processService.releaseAllTaskGroup(workflowInstance.getId());
         }
+        // Log the workflowInstance in detail
+        log.info(WorkflowInstanceUtils.logWorkflowInstanceInDetails(workflowInstance));
     }
 
     public void checkSerialProcess(ProcessDefinition processDefinition) {
@@ -845,6 +849,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                         }
                     }
 
+                    processService.packageTaskInstance(task, workflowInstance);
                     validTaskMap.put(task.getTaskCode(), task.getId());
                     taskInstanceMap.put(task.getId(), task);
                     taskCodeInstanceMap.put(task.getTaskCode(), task);
@@ -1287,10 +1292,13 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
             Optional<TaskInstance> existTaskInstanceOptional = getTaskInstance(taskNodeObject.getCode());
             if (existTaskInstanceOptional.isPresent()) {
                 TaskInstance existTaskInstance = existTaskInstanceOptional.get();
-                if (existTaskInstance.getState() == TaskExecutionStatus.RUNNING_EXECUTION
-                        || existTaskInstance.getState() == TaskExecutionStatus.DISPATCH) {
+                TaskExecutionStatus state = existTaskInstance.getState();
+                if (state == TaskExecutionStatus.RUNNING_EXECUTION
+                        || state == TaskExecutionStatus.DISPATCH
+                        || state == TaskExecutionStatus.SUBMITTED_SUCCESS) {
                     // try to take over task instance
-                    if (tryToTakeOverTaskInstance(existTaskInstance)) {
+                    if (state != TaskExecutionStatus.SUBMITTED_SUCCESS
+                            && tryToTakeOverTaskInstance(existTaskInstance)) {
                         log.info("Success take over task {}", existTaskInstance.getName());
                         continue;
                     } else {
