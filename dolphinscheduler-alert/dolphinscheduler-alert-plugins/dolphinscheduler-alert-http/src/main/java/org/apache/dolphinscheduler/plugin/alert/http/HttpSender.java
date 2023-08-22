@@ -34,10 +34,12 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -107,13 +109,14 @@ public final class HttpSender {
         if (REQUEST_TYPE_POST.equalsIgnoreCase(requestType)) {
             httpRequest = new HttpPost(url);
             setHeader();
-            //POST request add param in request body
+            // POST request add param in request body
             setMsgInRequestBody(msg);
         } else if (REQUEST_TYPE_GET.equalsIgnoreCase(requestType)) {
-            //GET request add param in url
+            // GET request add param in url
             setMsgInUrl(msg);
             URL unencodeUrl = new URL(url);
-            URI uri = new URI(unencodeUrl.getProtocol(), unencodeUrl.getHost(), unencodeUrl.getPath(), unencodeUrl.getQuery(), null);
+            URI uri = new URI(unencodeUrl.getProtocol(), unencodeUrl.getHost() + ":" + unencodeUrl.getPort(),
+                    unencodeUrl.getPath(), unencodeUrl.getQuery(), null);
 
             httpRequest = new HttpGet(uri);
             setHeader();
@@ -127,11 +130,15 @@ public final class HttpSender {
 
         if (StringUtils.isNotBlank(contentField)) {
             String type = "&";
-            //check splice char is & or ?
+            // check splice char is & or ?
             if (!url.contains(URL_SPLICE_CHAR)) {
                 type = URL_SPLICE_CHAR;
             }
-            url = String.format("%s%s%s=%s", url, type, contentField, msg);
+            try {
+                url = String.format("%s%s%s=%s", url, type, contentField, URLEncoder.encode(msg, DEFAULT_CHARSET));
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -156,7 +163,7 @@ public final class HttpSender {
     private void setMsgInRequestBody(String msg) {
         try {
             ObjectNode objectNode = JSONUtils.parseObject(bodyParams);
-            //set msg content field
+            // set msg content field
             objectNode.put(contentField, msg);
             StringEntity entity = new StringEntity(JSONUtils.toJsonString(objectNode), DEFAULT_CHARSET);
             ((HttpPost) httpRequest).setEntity(entity);
