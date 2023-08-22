@@ -84,7 +84,7 @@ jobs:
           kind_node_image="kindest/node:v1.23.17"
           echo "Kubernetes version: ${kind_node_image}"
           kind create cluster --name dolphinscheduler --image ${kind_node_image}
-          kubectl version --short
+          kubectl version
           kubectl get all --all-namespaces
       - name: Load images
         run: |

@@ -23,27 +23,40 @@ import static org.apache.dolphinscheduler.api.enums.Status.SIGN_OUT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.USER_LOGIN_FAILURE;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
+import org.apache.dolphinscheduler.api.configuration.OAuth2Configuration;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.security.Authenticator;
 import org.apache.dolphinscheduler.api.security.impl.AbstractSsoAuthenticator;
 import org.apache.dolphinscheduler.api.service.SessionService;
+import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.OkHttpUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
@@ -63,6 +76,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "LOGIN_TAG")
 @RestController
 @RequestMapping("")
+@Slf4j
 public class LoginController extends BaseController {
 
     @Autowired
@@ -70,6 +84,12 @@ public class LoginController extends BaseController {
 
     @Autowired
     private Authenticator authenticator;
+
+    @Autowired(required = false)
+    private OAuth2Configuration oAuth2Configuration;
+
+    @Autowired
+    private UsersService usersService;
 
     /**
      * login
@@ -159,5 +179,85 @@ public class LoginController extends BaseController {
         // clear session
         request.removeAttribute(Constants.SESSION_USER);
         return success();
+    }
+
+    @DeleteMapping("cookies")
+    public void clearCookieSessionId(HttpServletRequest request, HttpServletResponse response) {
+        Cookie[] cookies = request.getCookies();
+        for (Cookie cookie : cookies) {
+            cookie.setMaxAge(0);
+            cookie.setValue(null);
+            response.addCookie(cookie);
+        }
+        response.setStatus(HttpStatus.SC_OK);
+    }
+
+    @Operation(summary = "getOauth2Provider", description = "GET_OAUTH2_PROVIDER")
+    @GetMapping("oauth2-provider")
+    public Result<List<OAuth2Configuration.OAuth2ClientProperties>> oauth2Provider() {
+        if (oAuth2Configuration == null) {
+            return Result.success(new ArrayList<>());
+        }
+
+        Collection<OAuth2Configuration.OAuth2ClientProperties> values = oAuth2Configuration.getProvider().values();
+        List<OAuth2Configuration.OAuth2ClientProperties> providers = values.stream().map(e -> {
+            OAuth2Configuration.OAuth2ClientProperties oAuth2ClientProperties =
+                    new OAuth2Configuration.OAuth2ClientProperties();
+            oAuth2ClientProperties.setAuthorizationUri(e.getAuthorizationUri());
+            oAuth2ClientProperties.setRedirectUri(e.getRedirectUri());
+            oAuth2ClientProperties.setClientId(e.getClientId());
+            oAuth2ClientProperties.setProvider(e.getProvider());
+            oAuth2ClientProperties.setIconUri(e.getIconUri());
+            return oAuth2ClientProperties;
+        }).collect(Collectors.toList());
+        return Result.success(providers);
+    }
+
+    @SneakyThrows
+    @Operation(summary = "redirectToOauth2", description = "REDIRECT_TO_OAUTH2_LOGIN")
+    @GetMapping("redirect/login/oauth2")
+    public void loginByAuth2(@RequestParam String code, @RequestParam String provider,
+                             HttpServletRequest request, HttpServletResponse response) {
+        OAuth2Configuration.OAuth2ClientProperties oAuth2ClientProperties =
+                oAuth2Configuration.getProvider().get(provider);
+        try {
+            Map<String, String> tokenRequestHeader = new HashMap<>();
+            tokenRequestHeader.put("Accept", "application/json");
+            Map<String, Object> requestBody = new HashMap<>(16);
+            requestBody.put("client_secret", oAuth2ClientProperties.getClientSecret());
+            HashMap<String, Object> requestParamsMap = new HashMap<>();
+            requestParamsMap.put("client_id", oAuth2ClientProperties.getClientId());
+            requestParamsMap.put("code", code);
+            requestParamsMap.put("grant_type", "authorization_code");
+            requestParamsMap.put("redirect_uri",
+                    String.format("%s?provider=%s", oAuth2ClientProperties.getRedirectUri(), provider));
+            String tokenJsonStr = OkHttpUtils.post(oAuth2ClientProperties.getTokenUri(), tokenRequestHeader,
+                    requestParamsMap, requestBody);
+            String accessToken = JSONUtils.getNodeString(tokenJsonStr, "access_token");
+            Map<String, String> userInfoRequestHeaders = new HashMap<>();
+            userInfoRequestHeaders.put("Accept", "application/json");
+            Map<String, Object> userInfoQueryMap = new HashMap<>();
+            userInfoQueryMap.put("access_token", accessToken);
+            userInfoRequestHeaders.put("Authorization", "Bearer " + accessToken);
+            String userInfoJsonStr =
+                    OkHttpUtils.get(oAuth2ClientProperties.getUserInfoUri(), userInfoRequestHeaders, userInfoQueryMap);
+            String username = JSONUtils.getNodeString(userInfoJsonStr, "login");
+            User user = usersService.getUserByUserName(username);
+            if (user == null) {
+                user = usersService.createUser(username, null, null, 0, null, null, 1);
+            }
+            String sessionId = sessionService.createSession(user, null);
+            if (sessionId == null) {
+                log.error("Failed to create session, userName:{}.", user.getUserName());
+            }
+            response.setStatus(HttpStatus.SC_MOVED_TEMPORARILY);
+            response.sendRedirect(String.format("%s?sessionId=%s&authType=%s", oAuth2ClientProperties.getCallbackUrl(),
+                    sessionId, "oauth2"));
+        } catch (Exception ex) {
+            log.error(ex.getMessage(), ex);
+            response.setStatus(HttpStatus.SC_MOVED_TEMPORARILY);
+            response.sendRedirect(String.format("%s?authType=%s&error=%s", oAuth2ClientProperties.getCallbackUrl(),
+                    "oauth2", "oauth2 auth error"));
+        }
     }
 }
