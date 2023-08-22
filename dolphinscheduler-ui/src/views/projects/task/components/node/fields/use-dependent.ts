@@ -230,7 +230,8 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
     }))
     taskList.unshift({
       value: 0,
-      label: 'ALL'
+      label: 'ALL',
+      filterLabel: 'ALL'
     })
     taskCache[processCode] = taskList
     return taskList
