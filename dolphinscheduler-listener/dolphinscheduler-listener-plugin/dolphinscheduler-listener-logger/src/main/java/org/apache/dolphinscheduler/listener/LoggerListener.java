@@ -17,6 +17,12 @@
 
 package org.apache.dolphinscheduler.listener;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Map;
+import java.util.logging.Logger;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.listener.event.ListenerEvent;
 import org.apache.dolphinscheduler.listener.event.ServerDownListenerEvent;
 import org.apache.dolphinscheduler.listener.event.TaskCreateListenerEvent;
@@ -45,14 +51,14 @@ import lombok.extern.slf4j.Slf4j;
 public class LoggerListener implements ListenerPlugin {
     @Override
     public String name() {
-        return "TestLoggerListener";
+        return "LoggerListener";
     }
 
     @Override
     public List<PluginParams> params() {
         List<PluginParams> paramsList = new ArrayList<>();
-        InputParam param1 = InputParam.newBuilder("param1", "testParam1")
-                .setPlaceholder("please input param1")
+        InputParam param1 = InputParam.newBuilder("logFile", "log_file")
+                .setPlaceholder("please input log file")
                 .addValidate(Validate.newBuilder()
                         .setRequired(true)
                         .build())
@@ -63,89 +69,78 @@ public class LoggerListener implements ListenerPlugin {
 
     @Override
     public void onServerDown(ServerDownListenerEvent serverDownListenerEvent) {
-        String param1 = getParam1(serverDownListenerEvent);
-        log.info("TestLoggerListener2.0(param1:{}): master server {} down!",param1,  serverDownListenerEvent.getHost());
+        printLogIntoFile(serverDownListenerEvent.getListenerInstanceParams(), JSONUtils.toJsonString(serverDownListenerEvent));
     }
 
 
     @Override
     public void onWorkflowAdded(WorkflowCreateListenerEvent workflowCreateEvent) {
-        String param1 = getParam1(workflowCreateEvent);
-        log.info("TestLoggerListener2.0(param1:{}): workflow added {}",param1, workflowCreateEvent.getProjectCode());
+        printLogIntoFile(workflowCreateEvent.getListenerInstanceParams(), JSONUtils.toJsonString(workflowCreateEvent));
     }
 
     @Override
     public void onWorkflowUpdate(WorkflowUpdateListenerEvent workflowUpdateEvent) {
-        String param1 = getParam1(workflowUpdateEvent);
-        log.info("TestLoggerListener2.0(param1:{}): workflow update {}",param1, workflowUpdateEvent.getProjectCode());
+        printLogIntoFile(workflowUpdateEvent.getListenerInstanceParams(), JSONUtils.toJsonString(workflowUpdateEvent));
     }
 
     @Override
     public void onWorkflowRemoved(WorkflowRemoveListenerEvent workflowRemovedEvent) {
-        String param1 = getParam1(workflowRemovedEvent);
-        log.info("TestLoggerListener2.0(param1:{}): workflow deleted {}",param1, workflowRemovedEvent.getProcessName());
+        printLogIntoFile(workflowRemovedEvent.getListenerInstanceParams(), JSONUtils.toJsonString(workflowRemovedEvent));
     }
 
     @Override
     public void onWorkflowStart(WorkflowStartListenerEvent workflowStartEvent) {
-        String param1 = getParam1(workflowStartEvent);
-        log.info("TestLoggerListener2.0(param1:{}): workflow start {}",param1, workflowStartEvent.getProcessName());
-
+        printLogIntoFile(workflowStartEvent.getListenerInstanceParams(), JSONUtils.toJsonString(workflowStartEvent));
     }
 
     @Override
     public void onWorkflowEnd(WorkflowEndListenerEvent workflowEndEvent) {
-        String param1 = getParam1(workflowEndEvent);
-        log.info("TestLoggerListener2.0(param1:{}): workflow end {}",param1, workflowEndEvent.getProcessName());
+        printLogIntoFile(workflowEndEvent.getListenerInstanceParams(), JSONUtils.toJsonString(workflowEndEvent));
     }
 
     @Override
     public void onWorkflowFail(WorkflowFailListenerEvent workflowErrorEvent) {
-        String param1 = getParam1(workflowErrorEvent);
-        log.info("TestLoggerListener2.0(param1:{}): workflow error {}",param1, workflowErrorEvent.getProcessName());
+        printLogIntoFile(workflowErrorEvent.getListenerInstanceParams(), JSONUtils.toJsonString(workflowErrorEvent));
     }
 
     @Override
     public void onTaskAdded(TaskCreateListenerEvent taskAddedEvent) {
-        String param1 = getParam1(taskAddedEvent);
-        log.info("TestLoggerListener2.0(param1:{}): task added {}",param1, taskAddedEvent.getName());
-
+        printLogIntoFile(taskAddedEvent.getListenerInstanceParams(), JSONUtils.toJsonString(taskAddedEvent));
     }
 
     @Override
     public void onTaskUpdate(TaskUpdateListenerEvent taskUpdateEvent) {
-        String param1 = getParam1(taskUpdateEvent);
-        log.info("TestLoggerListener2.0(param1:{}): task update {}",param1, taskUpdateEvent.getName());
-
+        printLogIntoFile(taskUpdateEvent.getListenerInstanceParams(), JSONUtils.toJsonString(taskUpdateEvent));
     }
 
     @Override
     public void onTaskRemoved(TaskRemoveListenerEvent taskRemovedEvent) {
-        String param1 = getParam1(taskRemovedEvent);
-        log.info("TestLoggerListener2.0(param1:{}): task delete {}",param1, taskRemovedEvent.getTaskName());
-
+        printLogIntoFile(taskRemovedEvent.getListenerInstanceParams(), JSONUtils.toJsonString(taskRemovedEvent));
     }
 
     @Override
     public void onTaskStart(TaskStartListenerEvent taskStartEvent) {
-        String param1 = getParam1(taskStartEvent);
-        log.info("TestLoggerListener2.0(param1:{}): task start {}",param1, taskStartEvent.getTaskName());
+        printLogIntoFile(taskStartEvent.getListenerInstanceParams(), JSONUtils.toJsonString(taskStartEvent));
     }
 
     @Override
     public void onTaskEnd(TaskEndListenerEvent taskEndEvent) {
-        String param1 = getParam1(taskEndEvent);
-        log.info("TestLoggerListener2.0(param1:{}): task end {}",param1, taskEndEvent.getTaskName());
-
+        printLogIntoFile(taskEndEvent.getListenerInstanceParams(), JSONUtils.toJsonString(taskEndEvent));
     }
 
     @Override
     public void onTaskFail(TaskFailListenerEvent taskErrorEvent) {
-        String param1 = getParam1(taskErrorEvent);
-        log.info("TestLoggerListener2.0(param1:{}): task error {}",param1, taskErrorEvent.getTaskName());
+        printLogIntoFile(taskErrorEvent.getListenerInstanceParams(), JSONUtils.toJsonString(taskErrorEvent));
     }
 
-    private String getParam1(ListenerEvent event){
-        return event.getListenerInstanceParams().get("param1");
+    private void printLogIntoFile(Map<String, String> listenerInstanceParams, String content) {
+        String logFile = listenerInstanceParams.get("logFile");
+        try(BufferedWriter writer = new BufferedWriter(new FileWriter(logFile, true))) {
+            writer.write(content);
+            writer.newLine(); // 添加换行
+        }catch (Exception e){
+            throw new RuntimeException(e);
+        }
     }
+
 }

@@ -27,6 +27,7 @@
     <name>${project.artifactId}</name>
     <packaging>pom</packaging>
     <modules>
+        <module>dolphinscheduler-listener-kafka</module>
         <module>dolphinscheduler-listener-logger</module>
         <module>dolphinscheduler-listener-all</module>
     </modules>

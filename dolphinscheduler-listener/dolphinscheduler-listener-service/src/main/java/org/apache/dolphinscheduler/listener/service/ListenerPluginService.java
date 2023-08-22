@@ -159,6 +159,7 @@ public class ListenerPluginService implements ApplicationContextAware, Applicati
             return ListenerResponse.fail("cannot load class：" + e.getMessage());
         } catch (Exception e) {
             success = false;
+            log.error(e.getMessage(), e);
             return ListenerResponse.fail("failed when register listener plugin：" + e.getMessage());
         } finally {
             if (!success) {
@@ -218,6 +219,7 @@ public class ListenerPluginService implements ApplicationContextAware, Applicati
             log.error(e.getMessage(), e);
             return ListenerResponse.fail("failed when remove jar：" + e.getMessage());
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return ListenerResponse.fail("failed when register listener plugin：" + e.getMessage());
         }
 
@@ -248,6 +250,7 @@ public class ListenerPluginService implements ApplicationContextAware, Applicati
             log.error(e.getMessage(), e);
             return ListenerResponse.fail("failed when remove jar：" + e.getMessage());
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return ListenerResponse.fail("failed when register listener plugin：" + e.getMessage());
         }
         return ListenerResponse.success();
@@ -327,8 +330,6 @@ public class ListenerPluginService implements ApplicationContextAware, Applicati
     }
 
     private ListenerPlugin getListenerPluginFromJar(String filePath, String classPath) throws Exception {
-        log.error("--------------------------------------------");
-        log.error(filePath);
         ClassLoader classLoader = classLoaderUtil.getClassLoader(filePath);
         Class<?> clazz = null;
         clazz = classLoader.loadClass(classPath);

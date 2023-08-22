@@ -102,7 +102,7 @@ public class ListenerInstancePostService extends Thread {
                 event.setLog(e.toString());
                 event.setUpdateTime(new Date());
                 listenerEventConsumer.update(event);
-                continue;
+                break;
             }
             log.info("listener event {} post successfully, delete", event.getId());
             listenerEventConsumer.delete(event);

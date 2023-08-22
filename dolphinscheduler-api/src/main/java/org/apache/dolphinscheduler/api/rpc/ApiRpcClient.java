@@ -32,7 +32,7 @@ public class ApiRpcClient {
 
     private final NettyRemotingClient nettyRemotingClient;
 
-    private static final long DEFAULT_TIME_OUT_MILLS = 10_000L;
+    private static final long DEFAULT_TIME_OUT_MILLS = 60_000L;
 
     public ApiRpcClient() {
         this.nettyRemotingClient = new NettyRemotingClient(new NettyClientConfig());
