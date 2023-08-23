@@ -37,7 +37,6 @@ import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.graph.IWorkflowGraph;
-import org.apache.dolphinscheduler.server.master.rpc.MasterRpcClient;
 import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnableFactory;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
@@ -127,7 +126,6 @@ public class WorkflowExecuteRunnableTest {
 
         stateWheelExecuteThread = Mockito.mock(StateWheelExecuteThread.class);
         curingGlobalParamsService = Mockito.mock(CuringParamsService.class);
-        MasterRpcClient masterRpcClient = Mockito.mock(MasterRpcClient.class);
         ProcessAlertManager processAlertManager = Mockito.mock(ProcessAlertManager.class);
         WorkflowExecuteContext workflowExecuteContext = Mockito.mock(WorkflowExecuteContext.class);
         Mockito.when(workflowExecuteContext.getWorkflowInstance()).thenReturn(processInstance);
@@ -141,7 +139,6 @@ public class WorkflowExecuteRunnableTest {
                         commandService,
                         processService,
                         processInstanceDao,
-                        masterRpcClient,
                         processAlertManager,
                         config,
                         stateWheelExecuteThread,

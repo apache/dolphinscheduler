@@ -26,6 +26,12 @@ import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.log.SensitiveDataConverter;
 import org.apache.dolphinscheduler.common.log.remote.RemoteLogUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.extract.alert.IAlertOperator;
+import org.apache.dolphinscheduler.extract.alert.request.AlertSendRequest;
+import org.apache.dolphinscheduler.extract.alert.request.AlertSendResponse;
+import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.base.utils.Host;
+import org.apache.dolphinscheduler.extract.master.transportor.ITaskInstanceExecutionEvent;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
@@ -41,14 +47,9 @@ import org.apache.dolphinscheduler.plugin.task.api.log.TaskInstanceLogHeader;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
-import org.apache.dolphinscheduler.remote.command.MessageType;
-import org.apache.dolphinscheduler.remote.command.alert.AlertSendRequest;
-import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
-import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
-import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcClient;
 import org.apache.dolphinscheduler.server.worker.utils.TaskExecutionCheckerUtils;
 import org.apache.dolphinscheduler.server.worker.utils.TaskFilesTransferUtils;
 
@@ -75,7 +76,6 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
     protected final WorkerMessageSender workerMessageSender;
     protected final TaskPluginManager taskPluginManager;
     protected final @Nullable StorageOperate storageOperate;
-    protected final WorkerRpcClient workerRpcClient;
     protected final WorkerRegistryClient workerRegistryClient;
 
     protected @Nullable AbstractTask task;
@@ -84,14 +84,12 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
                                         @NonNull TaskExecutionContext taskExecutionContext,
                                         @NonNull WorkerConfig workerConfig,
                                         @NonNull WorkerMessageSender workerMessageSender,
-                                        @NonNull WorkerRpcClient workerRpcClient,
                                         @NonNull TaskPluginManager taskPluginManager,
                                         @Nullable StorageOperate storageOperate,
                                         @NonNull WorkerRegistryClient workerRegistryClient) {
         this.taskExecutionContext = taskExecutionContext;
         this.workerConfig = workerConfig;
         this.workerMessageSender = workerMessageSender;
-        this.workerRpcClient = workerRpcClient;
         this.taskPluginManager = taskPluginManager;
         this.storageOperate = storageOperate;
         this.workerRegistryClient = workerRegistryClient;
@@ -121,7 +119,8 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
         taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.FAILURE);
         taskExecutionContext.setEndTime(System.currentTimeMillis());
-        workerMessageSender.sendMessageWithRetry(taskExecutionContext, MessageType.TASK_EXECUTE_RESULT_MESSAGE);
+        workerMessageSender.sendMessageWithRetry(taskExecutionContext,
+                ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType.FINISH);
         log.info("Get a exception when execute the task, will send the task status: {} to master: {}",
                 TaskExecutionStatus.FAILURE.name(), taskExecutionContext.getHost());
 
@@ -158,7 +157,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
                 taskExecutionContext.setEndTime(System.currentTimeMillis());
                 TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
                 workerMessageSender.sendMessageWithRetry(taskExecutionContext,
-                        MessageType.TASK_EXECUTE_RESULT_MESSAGE);
+                        ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType.FINISH);
                 log.info(
                         "The current execute mode is dry run, will stop the subsequent process and set the taskInstance status to success");
                 return;
@@ -204,7 +203,8 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
 
     protected void beforeExecute() {
         taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.RUNNING_EXECUTION);
-        workerMessageSender.sendMessageWithRetry(taskExecutionContext, MessageType.TASK_EXECUTE_RUNNING_MESSAGE);
+        workerMessageSender.sendMessageWithRetry(taskExecutionContext,
+                ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType.RUNNING);
         log.info("Send task status {} master: {}", TaskExecutionStatus.RUNNING_EXECUTION.name(),
                 taskExecutionContext.getHost());
 
@@ -249,20 +249,20 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         }
         Host alertServerAddress = alertServerAddressOptional.get();
 
-        TaskExecutionStatus status = task.getExitStatus();
         TaskAlertInfo taskAlertInfo = task.getTaskAlertInfo();
-        int strategy =
-                status == TaskExecutionStatus.SUCCESS ? WarningType.SUCCESS.getCode() : WarningType.FAILURE.getCode();
-        AlertSendRequest alertCommand = new AlertSendRequest(
+        AlertSendRequest alertSendRequest = new AlertSendRequest(
                 taskAlertInfo.getAlertGroupId(),
                 taskAlertInfo.getTitle(),
                 taskAlertInfo.getContent(),
-                strategy);
+                task.getExitStatus() == TaskExecutionStatus.SUCCESS ? WarningType.SUCCESS.getCode()
+                        : WarningType.FAILURE.getCode());
         try {
-            workerRpcClient.send(alertServerAddress, alertCommand.convert2Command());
-            log.info("Send alert to: {} successfully", alertServerAddress);
-        } catch (RemotingException e) {
-            log.error("Send alert to: {} failed, alertCommand: {}", alertServerAddress, alertCommand, e);
+            IAlertOperator alertOperator = SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+                    .getProxyClient(alertServerAddress.getAddress(), IAlertOperator.class);
+            AlertSendResponse alertSendResponse = alertOperator.sendAlert(alertSendRequest);
+            log.info("Send alert to: {} successfully, response: {}", alertServerAddress, alertSendResponse);
+        } catch (Exception e) {
+            log.error("Send alert: {} to: {} failed", alertSendRequest, alertServerAddress, e);
         }
     }
 
@@ -278,7 +278,8 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
         log.info("Upload output files: {} successfully",
                 TaskFilesTransferUtils.getFileLocalParams(taskExecutionContext, Direct.OUT));
 
-        workerMessageSender.sendMessageWithRetry(taskExecutionContext, MessageType.TASK_EXECUTE_RESULT_MESSAGE);
+        workerMessageSender.sendMessageWithRetry(taskExecutionContext,
+                ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType.FINISH);
         log.info("Send task execute status: {} to master : {}", taskExecutionContext.getCurrentExecutionStatus().name(),
                 taskExecutionContext.getHost());
     }

@@ -18,13 +18,12 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.metrics.ApiServerMetrics;
-import org.apache.dolphinscheduler.api.rpc.ApiRpcClient;
 import org.apache.dolphinscheduler.api.service.MetricsCleanUpService;
 import org.apache.dolphinscheduler.common.model.Server;
+import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.master.IWorkflowInstanceService;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
-import org.apache.dolphinscheduler.remote.command.workflow.WorkflowMetricsCleanUpRequest;
-import org.apache.dolphinscheduler.remote.utils.Host;
 
 import java.util.List;
 
@@ -38,25 +37,26 @@ import org.springframework.stereotype.Service;
 public class MetricsCleanUpServiceImpl implements MetricsCleanUpService {
 
     @Autowired
-    private ApiRpcClient apiRpcClient;
-
-    @Autowired
     private RegistryClient registryClient;
 
     @Override
-    public void cleanUpWorkflowMetricsByDefinitionCode(String workflowDefinitionCode) {
-        WorkflowMetricsCleanUpRequest workflowMetricsCleanUpRequest = new WorkflowMetricsCleanUpRequest();
-        workflowMetricsCleanUpRequest.setProcessDefinitionCode(workflowDefinitionCode);
+    public void cleanUpWorkflowMetricsByDefinitionCode(Long workflowDefinitionCode) {
         List<Server> masterNodeList = registryClient.getServerList(RegistryNodeType.MASTER);
         for (Server server : masterNodeList) {
-            try {
-                final String host = String.format("%s:%s", server.getHost(), server.getPort());
-                apiRpcClient.send(Host.of(host), workflowMetricsCleanUpRequest.convert2Command());
-            } catch (Exception e) {
-                log.error(
-                        "Fail to clean up workflow related metrics on {} when deleting workflow definition {}, error message {}",
-                        server.getHost(), workflowDefinitionCode, e.getMessage());
-            }
+            cleanUpWorkflowMetrics(server, workflowDefinitionCode);
+        }
+    }
+
+    private void cleanUpWorkflowMetrics(Server server, Long workflowDefinitionCode) {
+        try {
+            IWorkflowInstanceService iWorkflowInstanceService =
+                    SingletonJdkDynamicRpcClientProxyFactory.getInstance().getProxyClient(
+                            String.format("%s:%s", server.getHost(), server.getPort()), IWorkflowInstanceService.class);
+            iWorkflowInstanceService.clearWorkflowMetrics(workflowDefinitionCode);
+        } catch (Exception e) {
+            log.error(
+                    "Fail to clean up workflow related metrics on {} when deleting workflow definition {}, error message {}",
+                    server.getHost(), workflowDefinitionCode, e.getMessage());
         }
     }
 
