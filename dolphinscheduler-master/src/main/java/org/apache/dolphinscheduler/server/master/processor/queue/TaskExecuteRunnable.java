@@ -50,9 +50,8 @@ public class TaskExecuteRunnable implements Runnable {
         while (!this.events.isEmpty()) {
             // we handle the task event belongs to one task serial, so if the event comes in wrong order,
             TaskEvent event = this.events.peek();
-            try (
-                    final LogUtils.MDCAutoClosableContext mdcAutoClosableContext = LogUtils
-                            .setWorkflowAndTaskInstanceIDMDC(event.getProcessInstanceId(), event.getTaskInstanceId())) {
+            try {
+                LogUtils.setWorkflowAndTaskInstanceIDMDC(event.getProcessInstanceId(), event.getTaskInstanceId());
                 log.info("Handle task event begin: {}", event);
                 taskEventHandlerMap.get(event.getEvent()).handleTaskEvent(event);
                 events.remove(event);
@@ -69,6 +68,8 @@ public class TaskExecuteRunnable implements Runnable {
                 log.error("Handle task event error, get a unknown exception, this event will be removed, event: {}",
                         event, unknownException);
                 events.remove(event);
+            } finally {
+                LogUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
         }
     }

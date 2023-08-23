@@ -22,37 +22,37 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.server.master.runner.operator.TaskOperatorManager;
+import org.apache.dolphinscheduler.server.master.runner.operator.TaskExecuteRunnableOperatorManager;
 
 public class DefaultTaskExecuteRunnable extends PriorityTaskExecuteRunnable {
 
-    private final TaskOperatorManager taskOperatorManager;
+    private final TaskExecuteRunnableOperatorManager taskExecuteRunnableOperatorManager;
 
     public DefaultTaskExecuteRunnable(ProcessInstance workflowInstance,
                                       TaskInstance taskInstance,
                                       TaskExecutionContext taskExecutionContext,
-                                      TaskOperatorManager taskOperatorManager) {
+                                      TaskExecuteRunnableOperatorManager taskExecuteRunnableOperatorManager) {
         super(workflowInstance, taskInstance, taskExecutionContext);
-        this.taskOperatorManager = checkNotNull(taskOperatorManager);
+        this.taskExecuteRunnableOperatorManager = checkNotNull(taskExecuteRunnableOperatorManager);
     }
 
     @Override
     public void dispatch() {
-        taskOperatorManager.getTaskDispatchOperator().handle(this);
+        taskExecuteRunnableOperatorManager.getTaskDispatchOperator(this).operate(this);
     }
 
     @Override
     public void kill() {
-        taskOperatorManager.getTaskKillOperator().handle(this);
+        taskExecuteRunnableOperatorManager.getTaskKillOperator(this).operate(this);
     }
 
     @Override
     public void pause() {
-        taskOperatorManager.getTaskPauseOperator().handle(this);
+        taskExecuteRunnableOperatorManager.getTaskPauseOperator(this).operate(this);
     }
 
     @Override
     public void timeout() {
-        taskOperatorManager.getTaskTimeoutOperator().handle(this);
+        taskExecuteRunnableOperatorManager.getTaskTimeoutOperator(this).operate(this);
     }
 }

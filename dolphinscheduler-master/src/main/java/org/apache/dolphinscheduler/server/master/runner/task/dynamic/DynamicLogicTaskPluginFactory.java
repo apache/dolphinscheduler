@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.server.master.rpc.MasterRpcClient;
 import org.apache.dolphinscheduler.server.master.runner.task.ILogicTaskPluginFactory;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.subworkflow.SubWorkflowService;
@@ -54,14 +53,11 @@ public class DynamicLogicTaskPluginFactory implements ILogicTaskPluginFactory<Dy
     @Autowired
     SubWorkflowService subWorkflowService;
 
-    @Autowired
-    private MasterRpcClient masterRpcClient;
-
     @Override
     public DynamicLogicTask createLogicTask(TaskExecutionContext taskExecutionContext) {
         return new DynamicLogicTask(taskExecutionContext, processInstanceDao, taskInstanceDao, subWorkflowService,
                 processService,
-                masterRpcClient, processDefineMapper, commandMapper);
+                processDefineMapper, commandMapper);
 
     }
 

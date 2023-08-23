@@ -22,11 +22,11 @@ import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.master.ITaskInstanceExecutionEventListener;
+import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstanceStateChangeEvent;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.remote.command.workflow.WorkflowStateEventChangeRequest;
-import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
-import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.event.StateEvent;
@@ -66,9 +66,6 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
 
     @Autowired
     private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
-
-    @Autowired
-    private StateEventCallbackService stateEventCallbackService;
 
     @Autowired
     private StateWheelExecuteThread stateWheelExecuteThread;
@@ -171,9 +168,8 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
             TaskInstance taskInstance = entry.getValue();
             crossWorkflowParameterPassing(finishProcessInstance, taskInstance);
             String address = NetUtils.getAddr(masterConfig.getListenPort());
-            try (
-                    final LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
-                            LogUtils.setWorkflowAndTaskInstanceIDMDC(processInstance.getId(), taskInstance.getId())) {
+            try {
+                LogUtils.setWorkflowAndTaskInstanceIDMDC(processInstance.getId(), taskInstance.getId());
                 if (processInstance.getHost().equalsIgnoreCase(address)) {
                     log.info("Process host is local master, will notify it");
                     this.notifyMyself(processInstance, taskInstance);
@@ -181,6 +177,8 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
                     log.info("Process host is remote master, will notify it");
                     this.notifyProcess(finishProcessInstance, processInstance, taskInstance);
                 }
+            } finally {
+                LogUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
         }
     }
@@ -227,10 +225,13 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
                     taskInstance.getName(), taskInstance.getId());
             return;
         }
-        WorkflowStateEventChangeRequest workflowStateEventChangeRequest = new WorkflowStateEventChangeRequest(
+        ITaskInstanceExecutionEventListener iTaskInstanceExecutionEventListener =
+                SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+                        .getProxyClient(processInstanceHost, ITaskInstanceExecutionEventListener.class);
+
+        WorkflowInstanceStateChangeEvent workflowInstanceStateChangeEvent = new WorkflowInstanceStateChangeEvent(
                 finishProcessInstance.getId(), 0, finishProcessInstance.getState(), processInstance.getId(),
                 taskInstance.getId());
-        Host host = new Host(processInstanceHost);
-        stateEventCallbackService.sendResult(host, workflowStateEventChangeRequest.convert2Command());
+        iTaskInstanceExecutionEventListener.onWorkflowInstanceInstanceStateChange(workflowInstanceStateChangeEvent);
     }
 }

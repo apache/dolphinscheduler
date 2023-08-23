@@ -25,7 +25,6 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
-import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcClient;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -40,8 +39,6 @@ public class DefaultWorkerDelayTaskExecuteRunnableTest {
     private String masterAddress = "localhost:5678";
 
     private WorkerMessageSender workerMessageSender = Mockito.mock(WorkerMessageSender.class);
-
-    private WorkerRpcClient alertClientService = Mockito.mock(WorkerRpcClient.class);
 
     private TaskPluginManager taskPluginManager = Mockito.mock(TaskPluginManager.class);
 
@@ -61,7 +58,6 @@ public class DefaultWorkerDelayTaskExecuteRunnableTest {
                 taskExecutionContext,
                 workerConfig,
                 workerMessageSender,
-                alertClientService,
                 taskPluginManager,
                 storageOperate,
                 workerRegistryClient);
@@ -86,7 +82,6 @@ public class DefaultWorkerDelayTaskExecuteRunnableTest {
                 taskExecutionContext,
                 workerConfig,
                 workerMessageSender,
-                alertClientService,
                 taskPluginManager,
                 storageOperate,
                 workerRegistryClient);

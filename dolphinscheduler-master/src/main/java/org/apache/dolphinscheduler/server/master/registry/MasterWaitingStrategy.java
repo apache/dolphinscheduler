@@ -27,7 +27,7 @@ import org.apache.dolphinscheduler.registry.api.StrategyType;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEventQueue;
-import org.apache.dolphinscheduler.server.master.rpc.MasterRPCServer;
+import org.apache.dolphinscheduler.server.master.rpc.MasterRpcServer;
 import org.apache.dolphinscheduler.server.master.runner.StateWheelExecuteThread;
 
 import java.time.Duration;
@@ -51,7 +51,7 @@ public class MasterWaitingStrategy implements MasterConnectStrategy {
     @Autowired
     private RegistryClient registryClient;
     @Autowired
-    private MasterRPCServer masterRPCServer;
+    private MasterRpcServer masterRPCServer;
     @Autowired
     private WorkflowEventQueue workflowEventQueue;
     @Autowired

@@ -29,7 +29,6 @@ bcprov-jdk15on-1.69.jar
 bcutil-jdk15on-1.69.jar
 bonecp-0.8.0.RELEASE.jar
 bucket4j-core-6.2.0.jar
-byte-buddy-1.9.16.jar
 caffeine-2.9.3.jar
 checker-qual-3.12.0.jar
 checker-qual-3.19.0.jar
@@ -133,7 +132,6 @@ jakarta.websocket-api-1.1.2.jar
 jakarta.xml.bind-api-2.3.3.jar
 jamon-runtime-2.3.1.jar
 janino-3.0.16.jar
-javassist-3.28.0-GA.jar
 javax.activation-api-1.2.0.jar
 javax.annotation-api-1.3.2.jar
 javax.el-3.0.0.jar
@@ -269,15 +267,10 @@ postgresql-42.4.1.jar
 presto-jdbc-0.238.1.jar
 profiles-2.17.282.jar
 protocol-core-2.17.282.jar
-protostuff-api-1.7.2.jar
-protostuff-collectionschema-1.7.2.jar
-protostuff-core-1.7.2.jar
-protostuff-runtime-1.7.2.jar
 py4j-0.10.9.jar
 quartz-2.3.2.jar
 re2j-1.1.jar
 reactive-streams-1.0.4.jar
-reflections-0.10.2.jar
 regions-2.17.282.jar
 reload4j-1.2.18.3.jar
 sdk-core-2.17.282.jar

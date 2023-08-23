@@ -19,10 +19,10 @@ package org.apache.dolphinscheduler.server.master.processor.queue;
 
 import org.apache.dolphinscheduler.common.enums.TaskEventType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.extract.master.transportor.TaskInstanceExecutionFinishEvent;
+import org.apache.dolphinscheduler.extract.master.transportor.TaskInstanceExecutionInfoEvent;
+import org.apache.dolphinscheduler.extract.master.transportor.TaskInstanceExecutionRunningEvent;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.remote.command.task.TaskExecuteResultMessage;
-import org.apache.dolphinscheduler.remote.command.task.TaskExecuteRunningMessage;
-import org.apache.dolphinscheduler.remote.command.task.TaskUpdateRuntimeMessage;
 
 import java.util.Date;
 
@@ -30,7 +30,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import io.netty.channel.Channel;
 
 @Data
 @Builder
@@ -95,11 +94,6 @@ public class TaskEvent {
 
     private int cacheTaskInstanceId;
 
-    /**
-     * channel
-     */
-    private Channel channel;
-
     private int processInstanceId;
 
     public static TaskEvent newDispatchEvent(int processInstanceId, int taskInstanceId, String workerAddress) {
@@ -111,7 +105,7 @@ public class TaskEvent {
         return event;
     }
 
-    public static TaskEvent newRunningEvent(TaskExecuteRunningMessage command, Channel channel, String workerAddress) {
+    public static TaskEvent newRunningEvent(TaskInstanceExecutionRunningEvent command) {
         TaskEvent event = new TaskEvent();
         event.setProcessInstanceId(command.getProcessInstanceId());
         event.setTaskInstanceId(command.getTaskInstanceId());
@@ -120,13 +114,12 @@ public class TaskEvent {
         event.setExecutePath(command.getExecutePath());
         event.setLogPath(command.getLogPath());
         event.setAppIds(command.getAppIds());
-        event.setChannel(channel);
-        event.setWorkerAddress(workerAddress);
+        event.setWorkerAddress(command.getHost());
         event.setEvent(TaskEventType.RUNNING);
         return event;
     }
 
-    public static TaskEvent newResultEvent(TaskExecuteResultMessage command, Channel channel, String workerAddress) {
+    public static TaskEvent newResultEvent(TaskInstanceExecutionFinishEvent command) {
         TaskEvent event = new TaskEvent();
         event.setProcessInstanceId(command.getProcessInstanceId());
         event.setTaskInstanceId(command.getTaskInstanceId());
@@ -138,8 +131,7 @@ public class TaskEvent {
         event.setProcessId(command.getProcessId());
         event.setAppIds(command.getAppIds());
         event.setVarPool(command.getVarPool());
-        event.setChannel(channel);
-        event.setWorkerAddress(workerAddress);
+        event.setWorkerAddress(command.getHost());
         event.setEvent(TaskEventType.RESULT);
         return event;
     }
@@ -153,14 +145,13 @@ public class TaskEvent {
         return event;
     }
 
-    public static TaskEvent newUpdatePidEvent(TaskUpdateRuntimeMessage command, Channel channel, String workerAddress) {
+    public static TaskEvent newUpdatePidEvent(TaskInstanceExecutionInfoEvent command) {
         TaskEvent event = new TaskEvent();
         event.setProcessInstanceId(command.getProcessInstanceId());
         event.setTaskInstanceId(command.getTaskInstanceId());
         event.setStartTime(DateUtils.timeStampToDate(command.getStartTime()));
         event.setLogPath(command.getLogPath());
-        event.setChannel(channel);
-        event.setWorkerAddress(workerAddress);
+        event.setWorkerAddress(command.getHost());
         event.setEvent(TaskEventType.UPDATE_PID);
         return event;
     }

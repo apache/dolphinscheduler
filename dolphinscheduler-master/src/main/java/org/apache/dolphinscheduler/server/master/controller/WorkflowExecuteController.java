@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.controller;
 
-import org.apache.dolphinscheduler.remote.dto.WorkflowExecuteDto;
+import org.apache.dolphinscheduler.extract.master.dto.WorkflowExecuteDto;
 import org.apache.dolphinscheduler.server.master.service.ExecutingService;
 
 import java.util.Optional;

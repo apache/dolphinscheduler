@@ -67,7 +67,6 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
-import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.process.TriggerRelationService;
@@ -161,9 +160,6 @@ public class ExecuteFunctionServiceTest {
     @Mock
     private ProcessDefinitionService processDefinitionService;
 
-    @Mock
-    private StateEventCallbackService stateEventCallbackService;
-
     private int processDefinitionId = 1;
 
     private int processDefinitionVersion = 1;
@@ -256,13 +252,6 @@ public class ExecuteFunctionServiceTest {
                 .thenReturn(1);
         Mockito.when(processService.findRelationByCode(processDefinitionCode, processDefinitionVersion))
                 .thenReturn(processTaskRelations);
-    }
-
-    @Test
-    public void testForceStartTaskInstance() {
-
-        Map<String, Object> result = executorService.forceStartTaskInstance(loginUser, taskQueueId);
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     /**

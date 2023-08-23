@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.host;
 
-import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.extract.base.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.WorkerGroupNotFoundException;
 
 import java.util.Optional;

@@ -86,9 +86,8 @@ public class WorkflowEventLooper extends BaseDaemonThread implements AutoCloseab
                 Thread.currentThread().interrupt();
                 break;
             }
-            try (
-                    LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
-                            LogUtils.setWorkflowInstanceIdMDC(workflowEvent.getWorkflowInstanceId())) {
+            try {
+                LogUtils.setWorkflowInstanceIdMDC(workflowEvent.getWorkflowInstanceId());
                 log.info("Begin to handle WorkflowEvent: {}", workflowEvent);
                 WorkflowEventHandler workflowEventHandler =
                         workflowEventHandlerMap.get(workflowEvent.getWorkflowEventType());
@@ -108,6 +107,8 @@ public class WorkflowEventLooper extends BaseDaemonThread implements AutoCloseab
                         unknownException);
                 workflowEventQueue.addEvent(workflowEvent);
                 ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
+            } finally {
+                LogUtils.removeWorkflowInstanceIdMDC();
             }
         }
     }

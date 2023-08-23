@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.api.service;
 
 public interface MetricsCleanUpService {
 
-    void cleanUpWorkflowMetricsByDefinitionCode(String workflowDefinitionCode);
+    void cleanUpWorkflowMetricsByDefinitionCode(Long workflowDefinitionCode);
 
     void cleanUpApiResponseTimeMetricsByUserId(int userId);
 

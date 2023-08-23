@@ -40,7 +40,6 @@ import org.apache.dolphinscheduler.server.master.runner.IWorkflowExecuteContext;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.log.LogClient;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.ArrayList;
@@ -87,9 +86,6 @@ public class FailoverServiceTest {
     @Mock
     private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
 
-    @Mock
-    private LogClient logClient;
-
     private static int masterPort = 5678;
     private static int workerPort = 1234;
 
@@ -116,7 +112,6 @@ public class FailoverServiceTest {
                 processService,
                 workflowExecuteThreadPool,
                 cacheManager,
-                logClient,
                 taskInstanceDao);
 
         failoverService = new FailoverService(masterFailoverService, workerFailoverService);

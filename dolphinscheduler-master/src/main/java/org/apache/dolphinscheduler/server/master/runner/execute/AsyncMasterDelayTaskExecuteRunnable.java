@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.master.runner.execute;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
-import org.apache.dolphinscheduler.server.master.runner.message.MasterMessageSenderManager;
+import org.apache.dolphinscheduler.server.master.runner.message.LogicTaskInstanceExecutionEventSenderManager;
 import org.apache.dolphinscheduler.server.master.runner.task.IAsyncLogicTask;
 import org.apache.dolphinscheduler.server.master.runner.task.LogicTaskPluginFactoryBuilder;
 
@@ -32,9 +32,9 @@ public class AsyncMasterDelayTaskExecuteRunnable extends MasterDelayTaskExecuteR
 
     public AsyncMasterDelayTaskExecuteRunnable(TaskExecutionContext taskExecutionContext,
                                                LogicTaskPluginFactoryBuilder logicTaskPluginFactoryBuilder,
-                                               MasterMessageSenderManager masterMessageSenderManager,
+                                               LogicTaskInstanceExecutionEventSenderManager logicTaskInstanceExecutionEventSenderManager,
                                                AsyncMasterTaskDelayQueue asyncTaskDelayQueue) {
-        super(taskExecutionContext, logicTaskPluginFactoryBuilder, masterMessageSenderManager);
+        super(taskExecutionContext, logicTaskPluginFactoryBuilder, logicTaskInstanceExecutionEventSenderManager);
         this.asyncMasterTaskDelayQueue = asyncTaskDelayQueue;
     }
 

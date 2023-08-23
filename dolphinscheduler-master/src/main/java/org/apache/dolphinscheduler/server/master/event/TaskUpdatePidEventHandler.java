@@ -21,7 +21,9 @@ import org.apache.dolphinscheduler.common.enums.TaskEventType;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.TaskInstanceUtils;
-import org.apache.dolphinscheduler.remote.command.task.TaskUpdateRuntimeAckMessage;
+import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.worker.ITaskInstanceExecutionEventAckListener;
+import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceExecutionInfoEventAck;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
@@ -50,7 +52,7 @@ public class TaskUpdatePidEventHandler implements TaskEventHandler {
         int processInstanceId = taskEvent.getProcessInstanceId();
 
         WorkflowExecuteRunnable workflowExecuteRunnable =
-                this.processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
+                processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
         if (workflowExecuteRunnable == null) {
             sendAckToWorker(taskEvent);
             throw new TaskEventHandleError(
@@ -91,9 +93,11 @@ public class TaskUpdatePidEventHandler implements TaskEventHandler {
 
     private void sendAckToWorker(TaskEvent taskEvent) {
         // If event handle success, send ack to worker to otherwise the worker will retry this event
-        TaskUpdateRuntimeAckMessage taskUpdateRuntimeAckMessage =
-                new TaskUpdateRuntimeAckMessage(true, taskEvent.getTaskInstanceId());
-        taskEvent.getChannel().writeAndFlush(taskUpdateRuntimeAckMessage.convert2Command());
+        ITaskInstanceExecutionEventAckListener instanceExecutionEventAckListener =
+                SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+                        .getProxyClient(taskEvent.getWorkerAddress(), ITaskInstanceExecutionEventAckListener.class);
+        instanceExecutionEventAckListener.handleTaskInstanceExecutionInfoEventAck(
+                TaskInstanceExecutionInfoEventAck.success(taskEvent.getTaskInstanceId()));
     }
 
     @Override

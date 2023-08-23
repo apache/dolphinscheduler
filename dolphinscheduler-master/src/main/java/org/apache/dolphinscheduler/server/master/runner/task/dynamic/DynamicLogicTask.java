@@ -30,16 +30,15 @@ import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.master.ITaskInstanceExecutionEventListener;
+import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstanceStateChangeEvent;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.DynamicInputParameter;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DynamicParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
-import org.apache.dolphinscheduler.remote.command.workflow.WorkflowStateEventChangeRequest;
-import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
-import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
-import org.apache.dolphinscheduler.server.master.rpc.MasterRpcClient;
 import org.apache.dolphinscheduler.server.master.runner.execute.AsyncTaskExecuteFunction;
 import org.apache.dolphinscheduler.server.master.runner.task.BaseAsyncLogicTask;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -78,8 +77,6 @@ public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
 
     private TaskInstance taskInstance;
 
-    private final MasterRpcClient masterRpcClient;
-
     private boolean haveBeenCanceled = false;
 
     public DynamicLogicTask(TaskExecutionContext taskExecutionContext,
@@ -87,7 +84,6 @@ public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
                             TaskInstanceDao taskInstanceDao,
                             SubWorkflowService subWorkflowService,
                             ProcessService processService,
-                            MasterRpcClient masterRpcClient,
                             ProcessDefinitionMapper processDefineMapper,
                             CommandMapper commandMapper) {
         super(taskExecutionContext,
@@ -96,7 +92,6 @@ public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
         this.processInstanceDao = processInstanceDao;
         this.subWorkflowService = subWorkflowService;
         this.processService = processService;
-        this.masterRpcClient = masterRpcClient;
         this.processDefineMapper = processDefineMapper;
         this.commandMapper = commandMapper;
 
@@ -280,7 +275,7 @@ public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
                 sendToSubProcess(taskExecutionContext, subProcessInstance);
                 log.info("Success send [{}] request to SubWorkflow's master: {}", stopStatus,
                         subProcessInstance.getHost());
-            } catch (RemotingException e) {
+            } catch (Exception e) {
                 throw new MasterTaskExecuteException(
                         String.format("Send stop request to SubWorkflow's master: %s failed",
                                 subProcessInstance.getHost()),
@@ -289,16 +284,17 @@ public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
         }
     }
 
-    private void sendToSubProcess(TaskExecutionContext taskExecutionContext,
-                                  ProcessInstance subProcessInstance) throws RemotingException {
-        WorkflowStateEventChangeRequest stateEventChangeCommand = new WorkflowStateEventChangeRequest(
+    private void sendToSubProcess(TaskExecutionContext taskExecutionContext, ProcessInstance subProcessInstance) {
+        final ITaskInstanceExecutionEventListener iTaskInstanceExecutionEventListener =
+                SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+                        .getProxyClient(subProcessInstance.getHost(), ITaskInstanceExecutionEventListener.class);
+        final WorkflowInstanceStateChangeEvent workflowInstanceStateChangeEvent = new WorkflowInstanceStateChangeEvent(
                 taskExecutionContext.getProcessInstanceId(),
                 taskExecutionContext.getTaskInstanceId(),
                 subProcessInstance.getState(),
                 subProcessInstance.getId(),
                 0);
-        Host host = new Host(subProcessInstance.getHost());
-        masterRpcClient.send(host, stateEventChangeCommand.convert2Command());
+        iTaskInstanceExecutionEventListener.onWorkflowInstanceInstanceStateChange(workflowInstanceStateChangeEvent);
     }
 
     public boolean isCancel() {

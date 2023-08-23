@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
 
-import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.extract.base.utils.Host;
 
 /**
  * host worker

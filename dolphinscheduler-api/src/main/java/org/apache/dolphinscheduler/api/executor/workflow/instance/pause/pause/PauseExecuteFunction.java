@@ -20,24 +20,20 @@ package org.apache.dolphinscheduler.api.executor.workflow.instance.pause.pause;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.executor.ExecuteFunction;
 import org.apache.dolphinscheduler.api.executor.ExecuteRuntimeException;
-import org.apache.dolphinscheduler.api.rpc.ApiRpcClient;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
-import org.apache.dolphinscheduler.remote.command.workflow.WorkflowStateEventChangeRequest;
-import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
-import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.master.ITaskInstanceExecutionEventListener;
+import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstanceStateChangeEvent;
 
 public class PauseExecuteFunction implements ExecuteFunction<PauseExecuteRequest, PauseExecuteResult> {
 
     private final ProcessInstanceDao processInstanceDao;
 
-    private final ApiRpcClient apiRpcClient;
-
-    public PauseExecuteFunction(ProcessInstanceDao processInstanceDao, ApiRpcClient apiRpcClient) {
+    public PauseExecuteFunction(ProcessInstanceDao processInstanceDao) {
         this.processInstanceDao = processInstanceDao;
-        this.apiRpcClient = apiRpcClient;
     }
 
     @Override
@@ -59,15 +55,18 @@ public class PauseExecuteFunction implements ExecuteFunction<PauseExecuteRequest
                             "The workflow instance: %s pause failed, due to update the workflow instance status in DB failed",
                             workflowInstance.getName()));
         }
-        WorkflowStateEventChangeRequest workflowStateEventChangeRequest = new WorkflowStateEventChangeRequest(
-                workflowInstance.getId(), 0, workflowInstance.getState(), workflowInstance.getId(), 0);
         try {
-            apiRpcClient.send(Host.of(workflowInstance.getHost()), workflowStateEventChangeRequest.convert2Command());
-        } catch (RemotingException e) {
+            // todo: direct call the workflow instance pause method
+            ITaskInstanceExecutionEventListener iTaskInstanceExecutionEventListener =
+                    SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+                            .getProxyClient(workflowInstance.getHost(), ITaskInstanceExecutionEventListener.class);
+            iTaskInstanceExecutionEventListener.onWorkflowInstanceInstanceStateChange(
+                    new WorkflowInstanceStateChangeEvent(
+                            workflowInstance.getId(), 0, workflowInstance.getState(), workflowInstance.getId(), 0));
+        } catch (Exception e) {
             throw new ExecuteRuntimeException(
                     String.format(
-                            "The workflow instance: %s pause failed, due to send rpc request to master: %s failed",
-                            workflowInstance.getName(), workflowInstance.getHost()),
+                            "WorkflowInstance: %s pause failed", workflowInstance.getName()),
                     e);
         }
         return new PauseExecuteResult(workflowInstance);

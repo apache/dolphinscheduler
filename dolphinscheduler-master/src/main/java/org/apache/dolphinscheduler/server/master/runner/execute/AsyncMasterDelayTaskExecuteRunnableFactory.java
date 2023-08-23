@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.server.master.runner.execute;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.server.master.runner.message.MasterMessageSenderManager;
+import org.apache.dolphinscheduler.server.master.runner.message.LogicTaskInstanceExecutionEventSenderManager;
 import org.apache.dolphinscheduler.server.master.runner.task.LogicTaskPluginFactoryBuilder;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ public class AsyncMasterDelayTaskExecuteRunnableFactory
     private LogicTaskPluginFactoryBuilder logicTaskPluginFactoryBuilder;
 
     @Autowired
-    private MasterMessageSenderManager masterMessageSenderManager;
+    private LogicTaskInstanceExecutionEventSenderManager logicTaskInstanceExecutionEventSenderManager;
 
     @Autowired
     private AsyncMasterTaskDelayQueue asyncTaskDelayQueue;
@@ -42,7 +42,7 @@ public class AsyncMasterDelayTaskExecuteRunnableFactory
     public AsyncMasterDelayTaskExecuteRunnable createWorkerTaskExecuteRunnable(TaskExecutionContext taskExecutionContext) {
         return new AsyncMasterDelayTaskExecuteRunnable(taskExecutionContext,
                 logicTaskPluginFactoryBuilder,
-                masterMessageSenderManager,
+                logicTaskInstanceExecutionEventSenderManager,
                 asyncTaskDelayQueue);
     }
 

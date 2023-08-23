@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.executor.ExecuteContext;
 import org.apache.dolphinscheduler.api.executor.ExecuteFunction;
 import org.apache.dolphinscheduler.api.executor.ExecuteFunctionBuilder;
-import org.apache.dolphinscheduler.api.rpc.ApiRpcClient;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 
 import java.util.concurrent.CompletableFuture;
@@ -36,12 +35,10 @@ public class StopExecuteFunctionBuilder implements ExecuteFunctionBuilder<StopRe
 
     @Autowired
     private ProcessInstanceDao processInstanceDao;
-    @Autowired
-    private ApiRpcClient apiRpcClient;
 
     @Override
     public CompletableFuture<ExecuteFunction<StopRequest, StopResult>> createWorkflowInstanceExecuteFunction(ExecuteContext executeContext) {
-        return CompletableFuture.completedFuture(new StopExecuteFunction(processInstanceDao, apiRpcClient));
+        return CompletableFuture.completedFuture(new StopExecuteFunction(processInstanceDao));
     }
 
     @Override

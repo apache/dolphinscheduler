@@ -17,10 +17,9 @@
 
 package org.apache.dolphinscheduler.server.master.runner.dispatcher;
 
-import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.extract.base.utils.Host;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
-import org.apache.dolphinscheduler.server.master.rpc.MasterRpcClient;
 import org.apache.dolphinscheduler.server.master.runner.execute.TaskExecuteRunnable;
 
 import org.junit.jupiter.api.Assertions;
@@ -37,11 +36,10 @@ public class MasterTaskDispatcherTest {
         TaskEventService taskEventService = Mockito.mock(TaskEventService.class);
         MasterConfig masterConfig = Mockito.mock(MasterConfig.class);
         Mockito.when(masterConfig.getMasterAddress()).thenReturn("localhost:5678");
-        MasterRpcClient masterRpcClient = Mockito.mock(MasterRpcClient.class);
         TaskExecuteRunnable taskExecuteRunnable = Mockito.mock(TaskExecuteRunnable.class);
 
         MasterTaskDispatcher masterTaskDispatcher =
-                new MasterTaskDispatcher(taskEventService, masterConfig, masterRpcClient);
+                new MasterTaskDispatcher(taskEventService, masterConfig);
         Host taskInstanceDispatchHost = masterTaskDispatcher.getTaskInstanceDispatchHost(taskExecuteRunnable)
                 .orElseThrow(() -> new IllegalArgumentException("Cannot get the "));
         Assertions.assertEquals(masterConfig.getMasterAddress(), taskInstanceDispatchHost.getAddress());

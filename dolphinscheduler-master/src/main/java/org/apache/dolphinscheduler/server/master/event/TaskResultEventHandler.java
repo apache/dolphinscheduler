@@ -22,7 +22,9 @@ import org.apache.dolphinscheduler.common.enums.TaskEventType;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.TaskInstanceUtils;
-import org.apache.dolphinscheduler.remote.command.task.TaskExecuteResultMessageAck;
+import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.worker.ITaskInstanceExecutionEventAckListener;
+import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceExecutionFinishEventAck;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
@@ -35,8 +37,6 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import io.netty.channel.Channel;
 
 @Component
 public class TaskResultEventHandler implements TaskEventHandler {
@@ -115,17 +115,11 @@ public class TaskResultEventHandler implements TaskEventHandler {
     }
 
     public void sendAckToWorker(TaskEvent taskEvent) {
-        Channel channel = taskEvent.getChannel();
-        if (channel == null) {
-            return;
-        }
-        // we didn't set the receiver address, since the ack doen's need to retry
-        TaskExecuteResultMessageAck taskExecuteAckMessage = new TaskExecuteResultMessageAck(true,
-                taskEvent.getTaskInstanceId(),
-                masterConfig.getMasterAddress(),
-                taskEvent.getWorkerAddress(),
-                System.currentTimeMillis());
-        channel.writeAndFlush(taskExecuteAckMessage.convert2Command());
+        ITaskInstanceExecutionEventAckListener instanceExecutionEventAckListener =
+                SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+                        .getProxyClient(taskEvent.getWorkerAddress(), ITaskInstanceExecutionEventAckListener.class);
+        instanceExecutionEventAckListener.handleTaskInstanceExecutionFinishEventAck(
+                TaskInstanceExecutionFinishEventAck.success(taskEvent.getTaskInstanceId()));
     }
 
     @Override

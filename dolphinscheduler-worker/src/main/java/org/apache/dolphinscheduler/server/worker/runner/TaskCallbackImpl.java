@@ -17,11 +17,11 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
+import org.apache.dolphinscheduler.extract.master.transportor.ITaskInstanceExecutionEvent;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
-import org.apache.dolphinscheduler.remote.command.MessageType;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
 
 import lombok.Builder;
@@ -52,7 +52,8 @@ public class TaskCallbackImpl implements TaskCallBack {
 
         log.info("send remote application info {}", applicationInfo);
         taskExecutionContext.setAppIds(applicationInfo.getAppIds());
-        workerMessageSender.sendMessageWithRetry(taskExecutionContext, MessageType.TASK_EXECUTE_RUNNING_MESSAGE);
+        workerMessageSender.sendMessageWithRetry(taskExecutionContext,
+                ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType.RUNNING_INFO);
     }
 
     @Override
@@ -64,7 +65,8 @@ public class TaskCallbackImpl implements TaskCallBack {
             return;
         }
 
-        workerMessageSender.sendMessageWithRetry(taskExecutionContext, MessageType.TASK_UPDATE_RUNTIME_MESSAGE);
+        workerMessageSender.sendMessageWithRetry(taskExecutionContext,
+                ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType.RUNNING_INFO);
     }
 
 }

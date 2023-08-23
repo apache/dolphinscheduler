@@ -17,10 +17,15 @@
 
 package org.apache.dolphinscheduler.server.master.runner.dispatcher;
 
-import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.base.utils.Host;
+import org.apache.dolphinscheduler.extract.master.ILogicTaskInstanceOperator;
+import org.apache.dolphinscheduler.extract.master.transportor.LogicTaskDispatchRequest;
+import org.apache.dolphinscheduler.extract.master.transportor.LogicTaskDispatchResponse;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.exception.TaskDispatchException;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
-import org.apache.dolphinscheduler.server.master.rpc.MasterRpcClient;
 import org.apache.dolphinscheduler.server.master.runner.BaseTaskDispatcher;
 import org.apache.dolphinscheduler.server.master.runner.execute.TaskExecuteRunnable;
 
@@ -37,10 +42,29 @@ public class MasterTaskDispatcher extends BaseTaskDispatcher {
     private final Optional<Host> masterTaskExecuteHost;
 
     public MasterTaskDispatcher(TaskEventService taskEventService,
-                                MasterConfig masterConfig,
-                                MasterRpcClient masterRpcClient) {
-        super(taskEventService, masterConfig, masterRpcClient);
+                                MasterConfig masterConfig) {
+        super(taskEventService, masterConfig);
         masterTaskExecuteHost = Optional.of(Host.of(masterConfig.getMasterAddress()));
+    }
+
+    @Override
+    protected void doDispatch(TaskExecuteRunnable taskExecuteRunnable) throws TaskDispatchException {
+        TaskExecutionContext taskExecutionContext = taskExecuteRunnable.getTaskExecutionContext();
+        try {
+            ILogicTaskInstanceOperator taskInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+                    .getProxyClient(taskExecutionContext.getHost(), ILogicTaskInstanceOperator.class);
+            LogicTaskDispatchResponse logicTaskDispatchResponse = taskInstanceOperator
+                    .dispatchLogicTask(new LogicTaskDispatchRequest(taskExecuteRunnable.getTaskExecutionContext()));
+            if (!logicTaskDispatchResponse.isDispatchSuccess()) {
+                throw new TaskDispatchException(String.format("Dispatch LogicTask to %s failed, response is: %s",
+                        taskExecutionContext.getHost(), logicTaskDispatchResponse));
+            }
+        } catch (TaskDispatchException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new TaskDispatchException(String.format("Dispatch task to %s failed",
+                    taskExecutionContext.getHost()), e);
+        }
     }
 
     @Override

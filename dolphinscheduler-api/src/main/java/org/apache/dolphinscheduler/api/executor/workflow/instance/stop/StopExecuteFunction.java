@@ -20,14 +20,13 @@ package org.apache.dolphinscheduler.api.executor.workflow.instance.stop;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.executor.ExecuteFunction;
 import org.apache.dolphinscheduler.api.executor.ExecuteRuntimeException;
-import org.apache.dolphinscheduler.api.rpc.ApiRpcClient;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
-import org.apache.dolphinscheduler.remote.command.workflow.WorkflowStateEventChangeRequest;
-import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
-import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.master.ITaskInstanceExecutionEventListener;
+import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstanceStateChangeEvent;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,12 +34,9 @@ import lombok.extern.slf4j.Slf4j;
 public class StopExecuteFunction implements ExecuteFunction<StopRequest, StopResult> {
 
     private final ProcessInstanceDao processInstanceDao;
-    // todo: Use ApiRpcClient instead of NettyRemotingClient
-    private final ApiRpcClient apiRpcClient;
 
-    public StopExecuteFunction(ProcessInstanceDao processInstanceDao, ApiRpcClient apiRpcClient) {
+    public StopExecuteFunction(ProcessInstanceDao processInstanceDao) {
         this.processInstanceDao = processInstanceDao;
-        this.apiRpcClient = apiRpcClient;
     }
 
     @Override
@@ -60,17 +56,17 @@ public class StopExecuteFunction implements ExecuteFunction<StopRequest, StopRes
         if (processInstanceDao.updateById(workflowInstance)) {
             log.info("Workflow instance {} ready to stop success, will call master to stop the workflow instance",
                     workflowInstance.getName());
-            // todo: Use specific stop command instead of WorkflowStateEventChangeCommand
-            WorkflowStateEventChangeRequest workflowStateEventChangeRequest = new WorkflowStateEventChangeRequest(
-                    workflowInstance.getId(), 0, workflowInstance.getState(), workflowInstance.getId(), 0);
             try {
-                apiRpcClient.send(Host.of(workflowInstance.getHost()),
-                        workflowStateEventChangeRequest.convert2Command());
-            } catch (RemotingException e) {
+                // todo: direct call the workflow instance stop method
+                ITaskInstanceExecutionEventListener iTaskInstanceExecutionEventListener =
+                        SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+                                .getProxyClient(workflowInstance.getHost(), ITaskInstanceExecutionEventListener.class);
+                iTaskInstanceExecutionEventListener.onWorkflowInstanceInstanceStateChange(
+                        new WorkflowInstanceStateChangeEvent(
+                                workflowInstance.getId(), 0, workflowInstance.getState(), workflowInstance.getId(), 0));
+            } catch (Exception e) {
                 throw new ExecuteRuntimeException(
-                        String.format("Workflow instance: %s stop failed, due to send request to master: %s failed",
-                                workflowInstance.getName(), workflowInstance.getHost()),
-                        e);
+                        String.format("WorkflowInstance: %s stop failed", workflowInstance.getName()), e);
             }
             // todo: use async and inject the completeFuture in the result.
             return new StopResult(workflowInstance);

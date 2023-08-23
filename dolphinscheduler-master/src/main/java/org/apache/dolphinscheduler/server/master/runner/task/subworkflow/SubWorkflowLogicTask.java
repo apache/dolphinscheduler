@@ -22,14 +22,13 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.master.ITaskInstanceExecutionEventListener;
+import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstanceStateChangeEvent;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SubProcessParameters;
-import org.apache.dolphinscheduler.remote.command.workflow.WorkflowStateEventChangeRequest;
-import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
-import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
-import org.apache.dolphinscheduler.server.master.rpc.MasterRpcClient;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.execute.AsyncTaskExecuteFunction;
 import org.apache.dolphinscheduler.server.master.runner.task.BaseAsyncLogicTask;
@@ -44,18 +43,15 @@ public class SubWorkflowLogicTask extends BaseAsyncLogicTask<SubProcessParameter
     public static final String TASK_TYPE = "SUB_PROCESS";
     private final ProcessInstanceExecCacheManager processInstanceExecCacheManager;
     private final ProcessInstanceDao processInstanceDao;
-    private final MasterRpcClient masterRpcClient;
 
     public SubWorkflowLogicTask(TaskExecutionContext taskExecutionContext,
                                 ProcessInstanceExecCacheManager processInstanceExecCacheManager,
-                                ProcessInstanceDao processInstanceDao,
-                                MasterRpcClient masterRpcClient) {
+                                ProcessInstanceDao processInstanceDao) {
         super(taskExecutionContext,
                 JSONUtils.parseObject(taskExecutionContext.getTaskParams(), new TypeReference<SubProcessParameters>() {
                 }));
         this.processInstanceExecCacheManager = processInstanceExecCacheManager;
         this.processInstanceDao = processInstanceDao;
-        this.masterRpcClient = masterRpcClient;
     }
 
     @Override
@@ -95,7 +91,7 @@ public class SubWorkflowLogicTask extends BaseAsyncLogicTask<SubProcessParameter
         try {
             sendToSubProcess(taskExecutionContext, subProcessInstance);
             log.info("Success send pause request to SubWorkflow's master: {}", subProcessInstance.getHost());
-        } catch (RemotingException e) {
+        } catch (Exception e) {
             throw new MasterTaskExecuteException(String.format("Send pause request to SubWorkflow's master: %s failed",
                     subProcessInstance.getHost()), e);
         }
@@ -132,20 +128,22 @@ public class SubWorkflowLogicTask extends BaseAsyncLogicTask<SubProcessParameter
         try {
             sendToSubProcess(taskExecutionContext, subProcessInstance);
             log.info("Success send kill request to SubWorkflow's master: {}", subProcessInstance.getHost());
-        } catch (RemotingException e) {
+        } catch (Exception e) {
             log.error("Send kill request to SubWorkflow's master: {} failed", subProcessInstance.getHost(), e);
         }
     }
 
     private void sendToSubProcess(TaskExecutionContext taskExecutionContext,
-                                  ProcessInstance subProcessInstance) throws RemotingException {
-        WorkflowStateEventChangeRequest stateEventChangeCommand = new WorkflowStateEventChangeRequest(
+                                  ProcessInstance subProcessInstance) {
+        final ITaskInstanceExecutionEventListener iTaskInstanceExecutionEventListener =
+                SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+                        .getProxyClient(subProcessInstance.getHost(), ITaskInstanceExecutionEventListener.class);
+        final WorkflowInstanceStateChangeEvent workflowInstanceStateChangeEvent = new WorkflowInstanceStateChangeEvent(
                 taskExecutionContext.getProcessInstanceId(),
                 taskExecutionContext.getTaskInstanceId(),
                 subProcessInstance.getState(),
                 subProcessInstance.getId(),
                 0);
-        Host host = new Host(subProcessInstance.getHost());
-        masterRpcClient.send(host, stateEventChangeCommand.convert2Command());
+        iTaskInstanceExecutionEventListener.onWorkflowInstanceInstanceStateChange(workflowInstanceStateChangeEvent);
     }
 }

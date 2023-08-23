@@ -18,10 +18,15 @@
 package org.apache.dolphinscheduler.api.aspect;
 
 import org.apache.dolphinscheduler.common.enums.CacheType;
-import org.apache.dolphinscheduler.remote.command.cache.CacheExpireRequest;
-import org.apache.dolphinscheduler.service.cache.CacheNotifyService;
+import org.apache.dolphinscheduler.common.model.Server;
+import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.master.IMasterCacheService;
+import org.apache.dolphinscheduler.extract.master.transportor.CacheExpireRequest;
+import org.apache.dolphinscheduler.registry.api.RegistryClient;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.service.cache.impl.CacheKeyGenerator;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Method;
@@ -65,7 +70,7 @@ public class CacheEvictAspect {
     private CacheKeyGenerator cacheKeyGenerator;
 
     @Autowired
-    private CacheNotifyService cacheNotifyService;
+    private RegistryClient registryClient;
 
     @Pointcut("@annotation(org.springframework.cache.annotation.CacheEvict)")
     public void cacheEvictPointCut() {
@@ -96,7 +101,7 @@ public class CacheEvictAspect {
                 }
             }
             if (StringUtils.isNotEmpty(cacheKey)) {
-                cacheNotifyService.notifyMaster(new CacheExpireRequest(cacheType, cacheKey).convert2Command());
+                notifyMaster(cacheType, cacheKey);
             }
         }
 
@@ -133,5 +138,22 @@ public class CacheEvictAspect {
             throw new RuntimeException("parseKey error");
         }
         return obj.toString();
+    }
+
+    private void notifyMaster(CacheType cacheType, String cacheKey) {
+        try {
+            List<Server> serverList = registryClient.getServerList(RegistryNodeType.MASTER);
+            if (CollectionUtils.isEmpty(serverList)) {
+                return;
+            }
+            for (Server server : serverList) {
+                IMasterCacheService masterCacheService = SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+                        .getProxyClient(server.getHost() + ":" + server.getPort(), IMasterCacheService.class);
+                masterCacheService.cacheExpire(new CacheExpireRequest(cacheType, cacheKey));
+            }
+        } catch (Exception e) {
+            log.error("notify master error", e);
+        }
+
     }
 }

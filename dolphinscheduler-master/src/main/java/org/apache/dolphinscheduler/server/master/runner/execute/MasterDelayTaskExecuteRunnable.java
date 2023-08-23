@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.master.runner.execute;
 
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.server.master.runner.message.MasterMessageSenderManager;
+import org.apache.dolphinscheduler.server.master.runner.message.LogicTaskInstanceExecutionEventSenderManager;
 import org.apache.dolphinscheduler.server.master.runner.task.LogicTaskPluginFactoryBuilder;
 
 import java.util.concurrent.Delayed;
@@ -29,8 +29,8 @@ public abstract class MasterDelayTaskExecuteRunnable extends MasterTaskExecuteRu
 
     public MasterDelayTaskExecuteRunnable(TaskExecutionContext taskExecutionContext,
                                           LogicTaskPluginFactoryBuilder logicTaskPluginFactoryBuilder,
-                                          MasterMessageSenderManager masterMessageSenderManager) {
-        super(taskExecutionContext, logicTaskPluginFactoryBuilder, masterMessageSenderManager);
+                                          LogicTaskInstanceExecutionEventSenderManager logicTaskInstanceExecutionEventSenderManager) {
+        super(taskExecutionContext, logicTaskPluginFactoryBuilder, logicTaskInstanceExecutionEventSenderManager);
     }
 
     @Override
