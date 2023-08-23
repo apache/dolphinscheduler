@@ -656,7 +656,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             WorkflowInstanceStateChangeEvent workflowStateEventChangeRequest = new WorkflowInstanceStateChangeEvent(
                     processInstance.getId(), 0, processInstance.getState(), processInstance.getId(), 0);
             ITaskInstanceExecutionEventListener iTaskInstanceExecutionEventListener =
-                    SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+                    SingletonJdkDynamicRpcClientProxyFactory
                             .getProxyClient(processInstance.getHost(), ITaskInstanceExecutionEventListener.class);
             iTaskInstanceExecutionEventListener.onWorkflowInstanceInstanceStateChange(workflowStateEventChangeRequest);
             putMsg(result, Status.SUCCESS);
@@ -684,7 +684,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         taskGroupQueue.setForceStart(Flag.YES.getCode());
         processService.updateTaskGroupQueue(taskGroupQueue);
         log.info("Sending force start command to master: {}.", processInstance.getHost());
-        ILogicTaskInstanceOperator iLogicTaskInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+        ILogicTaskInstanceOperator iLogicTaskInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory
                 .getProxyClient(processInstance.getHost(), ILogicTaskInstanceOperator.class);
         iLogicTaskInstanceOperator.forceStartTaskInstance(
                 new TaskInstanceForceStartRequest(processInstance.getId(), taskGroupQueue.getTaskId()));
@@ -1152,7 +1152,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             log.error("Process instance does not exist, processInstanceId:{}.", processInstanceId);
             return null;
         }
-        IWorkflowInstanceService iWorkflowInstanceService = SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+        IWorkflowInstanceService iWorkflowInstanceService = SingletonJdkDynamicRpcClientProxyFactory
                 .getProxyClient(processInstance.getHost(), IWorkflowInstanceService.class);
         return iWorkflowInstanceService.getWorkflowExecutingData(processInstanceId);
     }
@@ -1189,7 +1189,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         taskExecuteStartMessage.setStartParams(startParams);
         taskExecuteStartMessage.setDryRun(dryRun);
 
-        IStreamingTaskOperator streamingTaskOperator = SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+        IStreamingTaskOperator streamingTaskOperator = SingletonJdkDynamicRpcClientProxyFactory
                 .getProxyClient(server.getHost() + ":" + server.getPort(), IStreamingTaskOperator.class);
         StreamingTaskTriggerResponse streamingTaskTriggerResponse =
                 streamingTaskOperator.triggerStreamingTask(taskExecuteStartMessage);

@@ -15,18 +15,15 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.extract.base.client;
+package org.apache.dolphinscheduler.microbench.rpc;
 
-import org.apache.dolphinscheduler.extract.base.NettyRemotingClientFactory;
-import org.apache.dolphinscheduler.extract.base.config.NettyClientConfig;
+import org.apache.dolphinscheduler.extract.base.RpcMethod;
+import org.apache.dolphinscheduler.extract.base.RpcService;
 
-public class SingletonJdkDynamicRpcClientProxyFactory {
+@RpcService
+public interface IService {
 
-    private static final JdkDynamicRpcClientProxyFactory INSTANCE = new JdkDynamicRpcClientProxyFactory(
-            NettyRemotingClientFactory.buildNettyRemotingClient(new NettyClientConfig()));
-
-    public static <T> T getProxyClient(String serverAddress, Class<T> clazz) {
-        return INSTANCE.getProxyClient(serverAddress, clazz);
-    }
+    @RpcMethod
+    String ping(String pingRequest);
 
 }

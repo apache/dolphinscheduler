@@ -33,7 +33,7 @@ public class TaskInstanceExecutionFinishEventSender
     @Override
     public void sendEvent(TaskInstanceExecutionFinishEvent taskInstanceExecutionFinishEvent) {
         ITaskInstanceExecutionEventListener iTaskInstanceExecutionEventListener =
-                SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+                SingletonJdkDynamicRpcClientProxyFactory
                         .getProxyClient(taskInstanceExecutionFinishEvent.getHost(),
                                 ITaskInstanceExecutionEventListener.class);
         iTaskInstanceExecutionEventListener.onTaskInstanceExecutionFinish(taskInstanceExecutionFinishEvent);
