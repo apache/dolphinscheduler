@@ -17,9 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.am;
 
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SLEEP_TIME_MILLIS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.UNIQUE_LABEL_NAME;
 
 import org.apache.dolphinscheduler.common.enums.ResourceManagerType;
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -38,9 +40,11 @@ import com.google.auto.service.AutoService;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodList;
 import io.fabric8.kubernetes.client.Config;
-import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.fabric8.kubernetes.client.dsl.FilterWatchListDeletable;
+import io.fabric8.kubernetes.client.dsl.LogWatch;
+import io.fabric8.kubernetes.client.dsl.PodResource;
 
 @Slf4j
 @AutoService(ApplicationManager.class)
@@ -51,6 +55,8 @@ public class KubernetesApplicationManager implements ApplicationManager {
     private static final String FINISH = "Succeeded";
     private static final String FAILED = "Failed";
     private static final String UNKNOWN = "Unknown";
+
+    private static final int MAX_RETRY_TIMES = 10;
 
     /**
      * cache k8s client for same task
@@ -64,7 +70,8 @@ public class KubernetesApplicationManager implements ApplicationManager {
 
         boolean isKill;
         String labelValue = kubernetesApplicationManagerContext.getLabelValue();
-        FilterWatchListDeletable<Pod, PodList> watchList = getDriverPod(kubernetesApplicationManagerContext);
+        FilterWatchListDeletable<Pod, PodList, PodResource> watchList =
+                getListenPod(kubernetesApplicationManagerContext);
         try {
             if (getApplicationStatus(kubernetesApplicationManagerContext, watchList).isFailure()) {
                 log.error("Driver pod is in FAILED or UNKNOWN status.");
@@ -94,17 +101,24 @@ public class KubernetesApplicationManager implements ApplicationManager {
      * @param kubernetesApplicationManagerContext
      * @return
      */
-    private FilterWatchListDeletable<Pod, PodList> getDriverPod(KubernetesApplicationManagerContext kubernetesApplicationManagerContext) {
+    private FilterWatchListDeletable<Pod, PodList, PodResource> getListenPod(KubernetesApplicationManagerContext kubernetesApplicationManagerContext) {
         KubernetesClient client = getClient(kubernetesApplicationManagerContext);
         String labelValue = kubernetesApplicationManagerContext.getLabelValue();
-        FilterWatchListDeletable<Pod, PodList> watchList =
-                client.pods()
-                        .inNamespace(kubernetesApplicationManagerContext.getK8sTaskExecutionContext().getNamespace())
-                        .withLabel(UNIQUE_LABEL_NAME, labelValue);
-        List<Pod> podList = watchList.list().getItems();
-        if (podList.size() != 1) {
-            log.warn("Expected driver pod 1, but get {}.", podList.size());
+        List<Pod> podList = null;
+        FilterWatchListDeletable<Pod, PodList, PodResource> watchList = null;
+        int retryTimes = 0;
+        while (CollectionUtils.isEmpty(podList) && retryTimes < MAX_RETRY_TIMES) {
+            watchList = client.pods()
+                    .inNamespace(kubernetesApplicationManagerContext.getK8sTaskExecutionContext().getNamespace())
+                    .withLabel(UNIQUE_LABEL_NAME, labelValue);
+            podList = watchList.list().getItems();
+            if (!CollectionUtils.isEmpty(podList)) {
+                break;
+            }
+            ThreadUtils.sleep(SLEEP_TIME_MILLIS);
+            retryTimes += 1;
         }
+
         return watchList;
     }
 
@@ -118,7 +132,8 @@ public class KubernetesApplicationManager implements ApplicationManager {
         K8sTaskExecutionContext k8sTaskExecutionContext =
                 kubernetesApplicationManagerContext.getK8sTaskExecutionContext();
         return cacheClientMap.computeIfAbsent(kubernetesApplicationManagerContext.getLabelValue(),
-                key -> new DefaultKubernetesClient(Config.fromKubeconfig(k8sTaskExecutionContext.getConfigYaml())));
+                key -> new KubernetesClientBuilder()
+                        .withConfig(Config.fromKubeconfig(k8sTaskExecutionContext.getConfigYaml())).build());
     }
 
     public void removeCache(String cacheKey) {
@@ -146,11 +161,11 @@ public class KubernetesApplicationManager implements ApplicationManager {
      * @throws TaskException
      */
     private TaskExecutionStatus getApplicationStatus(KubernetesApplicationManagerContext kubernetesApplicationManagerContext,
-                                                     FilterWatchListDeletable<Pod, PodList> watchList) throws TaskException {
+                                                     FilterWatchListDeletable<Pod, PodList, PodResource> watchList) throws TaskException {
         String phase;
         try {
             if (Objects.isNull(watchList)) {
-                watchList = getDriverPod(kubernetesApplicationManagerContext);
+                watchList = getListenPod(kubernetesApplicationManagerContext);
             }
             List<Pod> driverPod = watchList.list().getItems();
             if (!driverPod.isEmpty()) {
@@ -170,27 +185,35 @@ public class KubernetesApplicationManager implements ApplicationManager {
     }
 
     /**
-     * collect pod's log
+     * get pod's log watcher
      *
      * @param kubernetesApplicationManagerContext
      * @return
      */
-    public String collectPodLog(KubernetesApplicationManagerContext kubernetesApplicationManagerContext) {
+    public LogWatch getPodLogWatcher(KubernetesApplicationManagerContext kubernetesApplicationManagerContext) {
         KubernetesClient client = getClient(kubernetesApplicationManagerContext);
-        FilterWatchListDeletable<Pod, PodList> watchList = getDriverPod(kubernetesApplicationManagerContext);
-        List<Pod> driverPod = watchList.list().getItems();
-        if (CollectionUtils.isEmpty(driverPod)) {
-            return "The driver pod does not exist.";
+        boolean podIsReady = false;
+        Pod pod = null;
+        while (!podIsReady) {
+            FilterWatchListDeletable<Pod, PodList, PodResource> watchList =
+                    getListenPod(kubernetesApplicationManagerContext);
+            List<Pod> podList = watchList == null ? null : watchList.list().getItems();
+            if (CollectionUtils.isEmpty(podList)) {
+                return null;
+            }
+            pod = podList.get(0);
+            String phase = pod.getStatus().getPhase();
+            if (phase.equals(PENDING) || phase.equals(UNKNOWN)) {
+                ThreadUtils.sleep(SLEEP_TIME_MILLIS);
+            } else {
+                podIsReady = true;
+            }
         }
-        Pod driver = driverPod.get(0);
-        String driverPodName = driver.getMetadata().getName();
-        String logs = client.pods()
-                .inNamespace(kubernetesApplicationManagerContext.getK8sTaskExecutionContext().getNamespace())
-                .withName(driverPodName).getLog();
 
-        // delete driver pod only after successful execution
-        killApplication(kubernetesApplicationManagerContext);
-        return logs;
+        return client.pods().inNamespace(pod.getMetadata().getNamespace())
+                .withName(pod.getMetadata().getName())
+                .inContainer(kubernetesApplicationManagerContext.getContainerName())
+                .watchLog();
     }
 
 }

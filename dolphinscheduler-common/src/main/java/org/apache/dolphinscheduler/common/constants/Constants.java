@@ -35,14 +35,8 @@ public final class Constants {
      */
     public static final String COMMON_PROPERTIES_PATH = "/common.properties";
 
-    /**
-     * registry properties
-     */
     public static final String REGISTRY_DOLPHINSCHEDULER_MASTERS = "/nodes/master";
     public static final String REGISTRY_DOLPHINSCHEDULER_WORKERS = "/nodes/worker";
-    public static final String REGISTRY_DOLPHINSCHEDULER_NODE = "/nodes";
-    public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_MASTERS = "/lock/masters";
-    public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_MASTERS = "/lock/failover/masters";
 
     public static final String FORMAT_SS = "%s%s";
     public static final String FORMAT_S_S = "%s/%s";
@@ -143,6 +137,19 @@ public final class Constants {
     public static final String ALIBABA_CLOUD_OSS_BUCKET_NAME = "resource.alibaba.cloud.oss.bucket.name";
     public static final String ALIBABA_CLOUD_OSS_END_POINT = "resource.alibaba.cloud.oss.endpoint";
 
+    public static final String GOOGLE_CLOUD_STORAGE_BUCKET_NAME = "resource.google.cloud.storage.bucket.name";
+
+    public static final String GOOGLE_CLOUD_STORAGE_CREDENTIAL = "resource.google.cloud.storage.credential";
+
+    public static final String AZURE_BLOB_STORAGE_CONNECTION_STRING = "resource.azure.blob.storage.connection.string";
+
+    public static final String AZURE_BLOB_STORAGE_CONTAINER_NAME = "resource.azure.blob.storage.container.name";
+
+    public static final String AZURE_BLOB_STORAGE_ACCOUNT_NAME = "resource.azure.blob.storage.account.name";
+
+    public static final String HUAWEI_CLOUD_OBS_BUCKET_NAME = "resource.huawei.cloud.obs.bucket.name";
+    public static final String HUAWEI_CLOUD_OBS_END_POINT = "resource.huawei.cloud.obs.endpoint";
+
     /**
      * fetch applicationId way
      */
@@ -224,7 +231,7 @@ public final class Constants {
     public static final int HTTP_CONNECTION_REQUEST_TIMEOUT = 60 * 1000;
 
     /**
-     * httpclient soceket time out
+     * httpclient socket time out
      */
     public static final int SOCKET_TIMEOUT = 60 * 1000;
 
@@ -299,7 +306,7 @@ public final class Constants {
     public static final int DEFAULT_WORKER_HOST_WEIGHT = 100;
 
     /**
-     * time unit secong to minutes
+     * time unit second to minutes
      */
     public static final int SEC_2_MINUTES_TIME_UNIT = 60;
 
@@ -478,13 +485,6 @@ public final class Constants {
     public static final String BLOCKING_CONDITION = "blockingCondition";
     public static final String ALERT_WHEN_BLOCKING = "alertWhenBlocking";
 
-    /**
-     * master/worker server use for zk
-     */
-    public static final String MASTER_TYPE = "master";
-    public static final String WORKER_TYPE = "worker";
-    public static final String DELETE_OP = "delete";
-    public static final String ADD_OP = "add";
     public static final String ALIAS = "alias";
     public static final String CONTENT = "content";
     public static final String DEPENDENT_SPLIT = ":||";
@@ -540,6 +540,11 @@ public final class Constants {
      * loginUserFromKeytab path
      */
     public static final String LOGIN_USER_KEY_TAB_PATH = "login.user.keytab.path";
+
+    /**
+     * sso.login.user.state
+     */
+    public static final String SSO_LOGIN_USER_STATE = "sso.login.user.state";
 
     public static final String WORKFLOW_INSTANCE_ID_MDC_KEY = "workflowInstanceId";
     public static final String TASK_INSTANCE_ID_MDC_KEY = "taskInstanceId";
@@ -658,18 +663,6 @@ public final class Constants {
      * system line separator
      */
     public static final String SYSTEM_LINE_SEPARATOR = System.getProperty("line.separator");
-
-    /**
-     * network interface preferred
-     */
-    public static final String DOLPHIN_SCHEDULER_NETWORK_INTERFACE_PREFERRED =
-            "dolphin.scheduler.network.interface.preferred";
-
-    /**
-     * network IP gets priority, default inner outer
-     */
-    public static final String DOLPHIN_SCHEDULER_NETWORK_PRIORITY_STRATEGY =
-            "dolphin.scheduler.network.priority.strategy";
 
     /**
      * exec shell scripts
@@ -821,7 +814,6 @@ public final class Constants {
     /**
      * remote logging for OSS
      */
-
     public static final String REMOTE_LOGGING_OSS_ACCESS_KEY_ID = "remote.logging.oss.access.key.id";
 
     public static final String REMOTE_LOGGING_OSS_ACCESS_KEY_SECRET = "remote.logging.oss.access.key.secret";
@@ -829,4 +821,35 @@ public final class Constants {
     public static final String REMOTE_LOGGING_OSS_BUCKET_NAME = "remote.logging.oss.bucket.name";
 
     public static final String REMOTE_LOGGING_OSS_ENDPOINT = "remote.logging.oss.endpoint";
+
+    /**
+     * remote logging for S3
+     */
+    public static final String REMOTE_LOGGING_S3_ACCESS_KEY_ID = "remote.logging.s3.access.key.id";
+
+    public static final String REMOTE_LOGGING_S3_ACCESS_KEY_SECRET = "remote.logging.s3.access.key.secret";
+
+    public static final String REMOTE_LOGGING_S3_BUCKET_NAME = "remote.logging.s3.bucket.name";
+
+    public static final String REMOTE_LOGGING_S3_ENDPOINT = "remote.logging.s3.endpoint";
+
+    public static final String REMOTE_LOGGING_S3_REGION = "remote.logging.s3.region";
+
+    /**
+     * remote logging for GCS
+     */
+    public static final String REMOTE_LOGGING_GCS_CREDENTIAL = "remote.logging.google.cloud.storage.credential";
+
+    public static final String REMOTE_LOGGING_GCS_BUCKET_NAME = "remote.logging.google.cloud.storage.bucket.name";
+
+    /**
+     * data quality
+     */
+    public static final String DATABASES_QUERY = "show databases";
+    public static final String DATABASES_QUERY_PG = "SELECT datname FROM pg_database";
+
+    /**
+     * K8S sensitive param
+     */
+    public static final String K8S_CONFIG_REGEX = "(?<=((?i)configYaml(\" : \"))).*?(?=(\",\\n))";
 }

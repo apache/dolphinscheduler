@@ -84,7 +84,7 @@ public class DataSourceUtils {
 
     public static DataSourceProcessor getDatasourceProcessor(DbType dbType) {
         Map<String, DataSourceProcessor> dataSourceProcessorMap =
-                DataSourceProcessorProvider.getInstance().getDataSourceProcessorMap();
+                DataSourceProcessorProvider.getDataSourceProcessorMap();
         if (!dataSourceProcessorMap.containsKey(dbType.name())) {
             throw new IllegalArgumentException("illegal datasource type");
         }

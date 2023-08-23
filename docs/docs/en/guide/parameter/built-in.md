@@ -2,11 +2,20 @@
 
 ## Basic Built-in Parameter
 
-|      Variable      |   Declaration Method    |                                           Meaning                                           |
-|--------------------|-------------------------|---------------------------------------------------------------------------------------------|
-| system.biz.date    | `${system.biz.date}`    | The day before the schedule time of the daily scheduling instance, the format is `yyyyMMdd` |
-| system.biz.curdate | `${system.biz.curdate}` | The schedule time of the daily scheduling instance, the format is `yyyyMMdd`                |
-| system.datetime    | `${system.datetime}`    | The schedule time of the daily scheduling instance, the format is `yyyyMMddHHmmss`          |
+|            Variable             |          Declaration Method          |                                           Meaning                                           |
+|---------------------------------|--------------------------------------|---------------------------------------------------------------------------------------------|
+| system.biz.date                 | `${system.biz.date}`                 | The day before the schedule time of the daily scheduling instance, the format is `yyyyMMdd` |
+| system.biz.curdate              | `${system.biz.curdate}`              | The schedule time of the daily scheduling instance, the format is `yyyyMMdd`                |
+| system.datetime                 | `${system.datetime}`                 | The schedule time of the daily scheduling instance, the format is `yyyyMMddHHmmss`          |
+| system.task.execute.path        | `${system.task.execute.path}`        | The absolute path of current executing task                                                 |
+| system.task.instance.id         | `${system.task.instance.id}`         | The instance id of current task                                                             |
+| system.task.definition.name     | `${system.task.definition.name}`     | The definition name of current task                                                         |
+| system.task.definition.code     | `${system.task.definition.code}`     | The definition code of current task                                                         |
+| system.workflow.instance.id     | `${system.workflow.instance.id}`     | The instance id of the workflow to which current task belongs                               |
+| system.workflow.definition.name | `${system.workflow.definition.name}` | The definition name of the workflow to which current task belongs                           |
+| system.workflow.definition.code | `${system.workflow.definition.code}` | The definition code of the workflow to which current task belongs                           |
+| system.project.name             | `${system.project.name}`             | The name of the project to which current task belongs                                       |
+| system.project.code             | `${system.project.code}`             | The code of the project to which current task belongs                                       |
 
 ## Extended Built-in Parameter
 

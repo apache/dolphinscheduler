@@ -21,13 +21,13 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class FlinkTask extends AbstractYarnTask {
 
@@ -60,8 +60,6 @@ public class FlinkTask extends AbstractYarnTask {
         if (flinkParameters == null || !flinkParameters.checkParameters()) {
             throw new RuntimeException("flink task params is not valid");
         }
-        flinkParameters.setQueue(taskExecutionContext.getQueue());
-        setMainJarName();
 
         FileUtils.generateScriptFile(taskExecutionContext, flinkParameters);
     }
@@ -72,29 +70,15 @@ public class FlinkTask extends AbstractYarnTask {
      * @return command
      */
     @Override
-    protected String buildCommand() {
+    protected String getScript() {
         // flink run/run-application [OPTIONS] <jar-file> <arguments>
         List<String> args = FlinkArgsUtils.buildRunCommandLine(taskExecutionContext, flinkParameters);
-
-        String command = ParameterUtils
-                .convertParameterPlaceholders(String.join(" ", args), taskExecutionContext.getDefinedParams());
-
-        log.info("flink task command : {}", command);
-        return command;
+        return args.stream().collect(Collectors.joining(" "));
     }
 
     @Override
-    protected void setMainJarName() {
-        if (flinkParameters.getProgramType() == ProgramType.SQL) {
-            log.info("The current flink job type is SQL, will no need to set main jar");
-            return;
-        }
-
-        ResourceInfo mainJar = flinkParameters.getMainJar();
-        String resourceName = getResourceNameOfMainJar(mainJar);
-        mainJar.setRes(resourceName);
-        flinkParameters.setMainJar(mainJar);
-        log.info("Success set flink jar: {}", resourceName);
+    protected Map<String, String> getProperties() {
+        return taskExecutionContext.getDefinedParams();
     }
 
     @Override

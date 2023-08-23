@@ -22,6 +22,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_COD
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
+import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceProcessorProvider;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
@@ -32,7 +33,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
@@ -96,11 +97,10 @@ public class ProcedureTask extends AbstractTask {
                 procedureParameters.getLocalParams());
 
         DbType dbType = DbType.valueOf(procedureParameters.getType());
-        DataSourceProcessor dataSourceProcessor =
-                DataSourceProcessorProvider.getInstance().getDataSourceProcessor(dbType);
+        DataSourceProcessor dataSourceProcessor = DataSourceProcessorProvider.getDataSourceProcessor(dbType);
         ConnectionParam connectionParams =
                 dataSourceProcessor.createConnectionParams(procedureTaskExecutionContext.getConnectionParams());
-        try (Connection connection = dataSourceProcessor.getConnection(connectionParams)) {
+        try (Connection connection = DataSourceClientProvider.getAdHocConnection(dbType, connectionParams)) {
             Map<Integer, Property> sqlParamsMap = new HashMap<>();
             Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap() == null ? Maps.newHashMap()
                     : taskExecutionContext.getPrepareParamsMap();
@@ -137,7 +137,6 @@ public class ProcedureTask extends AbstractTask {
     }
 
     private String formatSql(Map<Integer, Property> sqlParamsMap, Map<String, Property> paramsMap) {
-        // combining local and global parameters
         setSqlParamsMap(procedureParameters.getMethod(), rgex, sqlParamsMap, paramsMap,
                 taskExecutionContext.getTaskInstanceId());
         return procedureParameters.getMethod().replaceAll(rgex, "?");

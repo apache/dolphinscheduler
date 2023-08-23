@@ -96,6 +96,16 @@ public interface DataSourceProcessor {
     Connection getConnection(ConnectionParam connectionParam) throws ClassNotFoundException, SQLException, IOException;
 
     /**
+     * test connection, use for not jdbc datasource
+     *
+     * @param connectionParam connectionParam
+     * @return true if connection is valid
+     */
+    default boolean testConnection(ConnectionParam connectionParam) {
+        return false;
+    }
+
+    /**
      * @return {@link DbType}
      */
     DbType getDbType();

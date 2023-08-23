@@ -20,8 +20,7 @@ package org.apache.dolphinscheduler.server.master.dispatch.context;
 import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_WORKER_GROUP;
 
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.remote.command.Command;
-import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.extract.base.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
 
 import lombok.AllArgsConstructor;
@@ -35,15 +34,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ExecutionContext {
 
-    /**
-     * host
-     */
     private Host host;
-
-    /**
-     * command
-     */
-    private Command command;
 
     private TaskInstance taskInstance;
 
@@ -54,12 +45,11 @@ public class ExecutionContext {
      */
     private String workerGroup;
 
-    public ExecutionContext(Command command, ExecutorType executorType, TaskInstance taskInstance) {
-        this(command, executorType, DEFAULT_WORKER_GROUP, taskInstance);
+    public ExecutionContext(ExecutorType executorType, TaskInstance taskInstance) {
+        this(executorType, DEFAULT_WORKER_GROUP, taskInstance);
     }
 
-    public ExecutionContext(Command command, ExecutorType executorType, String workerGroup, TaskInstance taskInstance) {
-        this.command = command;
+    public ExecutionContext(ExecutorType executorType, String workerGroup, TaskInstance taskInstance) {
         this.executorType = executorType;
         this.workerGroup = workerGroup;
         this.taskInstance = taskInstance;

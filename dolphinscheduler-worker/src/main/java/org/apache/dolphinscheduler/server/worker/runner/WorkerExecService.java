@@ -52,7 +52,7 @@ public class WorkerExecService {
         this.execService = execService;
         this.listeningExecutorService = MoreExecutors.listeningDecorator(this.execService);
         this.taskExecuteThreadMap = taskExecuteThreadMap;
-        WorkerServerMetrics.registerWorkerRunningTaskGauge(taskExecuteThreadMap::size);
+        WorkerServerMetrics.registerWorkerTaskTotalGauge(taskExecuteThreadMap::size);
     }
 
     public void submit(final WorkerTaskExecuteRunnable taskExecuteThread) {
@@ -84,6 +84,10 @@ public class WorkerExecService {
      */
     public int getThreadPoolQueueSize() {
         return ((ThreadPoolExecutor) this.execService).getQueue().size();
+    }
+
+    public int getActiveExecThreadCount() {
+        return ((ThreadPoolExecutor) this.execService).getActiveCount();
     }
 
     public Map<Integer, WorkerTaskExecuteRunnable> getTaskExecuteThreadMap() {

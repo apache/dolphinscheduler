@@ -45,7 +45,7 @@ public enum Status {
     LOGIN_SESSION_FAILED(10014, "create session failed!", "创建session失败"),
     DATASOURCE_EXIST(10015, "data source name already exists", "数据源名称已存在"),
     DATASOURCE_CONNECT_FAILED(10016, "data source connection failed", "建立数据源连接失败"),
-    TENANT_NOT_EXIST(10017, "tenant not exists", "租户不存在"),
+    TENANT_NOT_EXIST(10017, "tenant [{0}] not exists", "租户[{0}]不存在"),
     PROJECT_NOT_FOUND(10018, "project {0} not found ", "项目[{0}]不存在"),
     PROJECT_ALREADY_EXISTS(10019, "project {0} already exists", "项目名称[{0}]已存在"),
     TASK_INSTANCE_NOT_EXISTS(10020, "task instance {0} does not exist", "任务实例[{0}]不存在"),
@@ -263,11 +263,40 @@ public enum Status {
     QUERY_TASK_INSTANCE_ERROR(10205, "query task instance error", "查询任务实例错误"),
     EXECUTE_NOT_DEFINE_TASK(10206, "please save and try again",
             "请先保存后再执行"),
+
+    DELETE_QUEUE_BY_ID_ERROR(10307, "delete queue by id error", "删除队列错误"),
+    DELETE_QUEUE_BY_ID_FAIL_USERS(10308, "delete queue by id fail, for there are {0} users using it",
+            "删除队列失败，有[{0}]个用户正在使用"),
+    DELETE_TENANT_BY_ID_FAIL_TENANTS(10309, "delete queue by id fail, for there are {0} tenants using it",
+            "删除队列失败，有[{0}]个租户正在使用"),
     START_NODE_NOT_EXIST_IN_LAST_PROCESS(10207, "this node {0} does not exist in the latest process definition",
             "该节点 {0} 不存在于最新的流程定义中"),
     LIST_AZURE_DATA_FACTORY_ERROR(10208, "list azure data factory error", "查询AZURE数据工厂列表错误"),
     LIST_AZURE_RESOURCE_GROUP_ERROR(10209, "list azure resource group error", "查询AZURE资源组列表错误"),
     LIST_AZURE_DATA_FACTORY_PIPELINE_ERROR(10210, "list azure data factory pipeline error", "查询AZURE数据工厂pipeline列表错误"),
+    NOT_SUPPORT_SSO(10211, "Not support SSO login.", "不支持SSO登录"),
+    STATE_CODE_ERROR(10212, "state inconsistency or state and code not pair", "状态码前后不一致或状态码和code不匹配"),
+
+    TASK_INSTANCE_NOT_DYNAMIC_TASK(10213, "task instance {0} is not dynamic", "任务实例[{0}]不是Dynamic类型"),
+
+    CREATE_PROJECT_PARAMETER_ERROR(10214, "create project parameter error", "创建项目参数错误"),
+
+    UPDATE_PROJECT_PARAMETER_ERROR(10215, "update project parameter error", "更新项目参数错误"),
+
+    DELETE_PROJECT_PARAMETER_ERROR(10216, "delete project parameter error {0}", "删除项目参数错误 {0}"),
+
+    QUERY_PROJECT_PARAMETER_ERROR(10217, "query project parameter error", "查询项目参数错误"),
+
+    PROJECT_PARAMETER_ALREADY_EXISTS(10218, "project parameter {0} already exists", "项目参数[{0}]已存在"),
+
+    PROJECT_PARAMETER_NOT_EXISTS(10219, "project parameter {0} not exists", "项目参数[{0}]不存在"),
+
+    PROJECT_PARAMETER_CODE_EMPTY(10220, "project parameter code empty", "项目参数code为空"),
+    CREATE_PROJECT_PREFERENCE_ERROR(10300, "create project preference error", "创建项目偏好设置错误"),
+
+    UPDATE_PROJECT_PREFERENCE_ERROR(10301, "update project preference error", "更新项目偏好设置错误"),
+    QUERY_PROJECT_PREFERENCE_ERROR(10302, "query project preference error", "查询项目偏好设置错误"),
+    UPDATE_PROJECT_PREFERENCE_STATE_ERROR(10303, "Failed to update the state of the project preference", "更新项目偏好设置错误"),
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),
     UDF_FUNCTION_EXISTS(20002, "UDF function already exists", "UDF函数已存在"),
@@ -395,6 +424,9 @@ public enum Status {
     WORKFLOW_INSTANCE_IS_NOT_FINISHED(50071, "the workflow instance is not finished, can not do this operation",
             "工作流实例未结束，不能执行此操作"),
 
+    TASK_PARALLELISM_PARAMS_ERROR(50080, "task parallelism parameter is not valid", "任务并行度参数无效"),
+    TASK_COMPLEMENT_DATA_DATE_ERROR(50081, "The range of date for complementing date is not valid", "补数选择的日期范围无效"),
+
     HDFS_NOT_STARTUP(60001, "hdfs not startup", "hdfs未启用"),
     STORAGE_NOT_STARTUP(60002, "storage not startup", "存储未启用"),
     S3_CANNOT_RENAME(60003, "directory cannot be renamed", "S3无法重命名文件夹"),
@@ -461,6 +493,7 @@ public enum Status {
     GET_DATASOURCE_OPTIONS_ERROR(1200017, "get datasource options error", "获取数据源Options错误"),
     GET_DATASOURCE_TABLES_ERROR(1200018, "get datasource tables error", "获取数据源表列表错误"),
     GET_DATASOURCE_TABLE_COLUMNS_ERROR(1200019, "get datasource table columns error", "获取数据源表列名错误"),
+    GET_DATASOURCE_DATABASES_ERROR(1200035, "get datasource databases error", "获取数据库列表错误"),
 
     CREATE_CLUSTER_ERROR(120020, "create cluster error", "创建集群失败"),
     CLUSTER_NAME_EXISTS(120021, "this cluster name [{0}] already exists", "集群名称[{0}]已经存在"),

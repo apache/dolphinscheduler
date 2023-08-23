@@ -17,22 +17,19 @@
 
 package org.apache.dolphinscheduler.server.master.registry;
 
-import static org.apache.dolphinscheduler.common.constants.Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
-import static org.apache.dolphinscheduler.common.constants.Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
-
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
+import org.apache.dolphinscheduler.extract.base.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.Event.Type;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
-import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.WorkerGroupNotFoundException;
 import org.apache.dolphinscheduler.service.queue.MasterPriorityQueue;
@@ -140,11 +137,8 @@ public class ServerNodeManager implements InitializingBean {
                 masterConfig.getWorkerGroupRefreshInterval().getSeconds(),
                 TimeUnit.SECONDS);
 
-        // init MasterNodeListener listener
-        registryClient.subscribe(REGISTRY_DOLPHINSCHEDULER_MASTERS, new MasterDataListener());
-
-        // init WorkerNodeListener listener
-        registryClient.subscribe(REGISTRY_DOLPHINSCHEDULER_WORKERS, new WorkerDataListener());
+        registryClient.subscribe(RegistryNodeType.MASTER.getRegistryPath(), new MasterDataListener());
+        registryClient.subscribe(RegistryNodeType.WORKER.getRegistryPath(), new WorkerDataListener());
     }
 
     class WorkerNodeInfoAndGroupDbSyncTask implements Runnable {
@@ -238,11 +232,11 @@ public class ServerNodeManager implements InitializingBean {
         currentSlot = 0;
         totalSlot = 0;
         this.masterNodes.clear();
-        String nodeLock = Constants.REGISTRY_DOLPHINSCHEDULER_LOCK_MASTERS;
+        String nodeLock = RegistryNodeType.MASTER_NODE_LOCK.getRegistryPath();
         try {
             registryClient.getLock(nodeLock);
             Collection<String> currentNodes = registryClient.getMasterNodesDirectly();
-            List<Server> masterNodeList = registryClient.getServerList(NodeType.MASTER);
+            List<Server> masterNodeList = registryClient.getServerList(RegistryNodeType.MASTER);
             syncMasterNodes(currentNodes, masterNodeList);
         } catch (Exception e) {
             log.error("update master nodes error", e);
@@ -255,7 +249,7 @@ public class ServerNodeManager implements InitializingBean {
     private void updateWorkerNodes() {
         workerGroupWriteLock.lock();
         try {
-            Map<String, String> workerNodeMaps = registryClient.getServerMaps(NodeType.WORKER);
+            Map<String, String> workerNodeMaps = registryClient.getServerMaps(RegistryNodeType.WORKER);
             for (Map.Entry<String, String> entry : workerNodeMaps.entrySet()) {
                 workerNodeInfo.put(entry.getKey(), JSONUtils.parseObject(entry.getValue(), WorkerHeartBeat.class));
             }

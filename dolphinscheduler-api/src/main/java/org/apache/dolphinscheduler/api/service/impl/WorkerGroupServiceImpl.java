@@ -26,7 +26,6 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
-import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -39,6 +38,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -187,7 +187,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         if (Strings.isNullOrEmpty(workerGroup.getAddrList())) {
             return null;
         }
-        Map<String, String> serverMaps = registryClient.getServerMaps(NodeType.WORKER);
+        Map<String, String> serverMaps = registryClient.getServerMaps(RegistryNodeType.WORKER);
         for (String addr : workerGroup.getAddrList().split(Constants.COMMA)) {
             if (!serverMaps.containsKey(addr)) {
                 return addr;
@@ -292,11 +292,11 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         } else {
             workerGroups = workerGroupMapper.queryAllWorkerGroup();
         }
-        Optional<Boolean> containDefaultWorkerGroups = workerGroups.stream()
-                .map(workerGroup -> Constants.DEFAULT_WORKER_GROUP.equals(workerGroup.getName())).findAny();
-        if (!containDefaultWorkerGroups.isPresent() || !containDefaultWorkerGroups.get()) {
+        boolean containDefaultWorkerGroups = workerGroups.stream()
+                .anyMatch(workerGroup -> Constants.DEFAULT_WORKER_GROUP.equals(workerGroup.getName()));
+        if (!containDefaultWorkerGroups) {
             // there doesn't exist a default WorkerGroup, we will add all worker to the default worker group.
-            Set<String> activeWorkerNodes = registryClient.getServerNodeSet(NodeType.WORKER);
+            Set<String> activeWorkerNodes = registryClient.getServerNodeSet(RegistryNodeType.WORKER);
             WorkerGroup defaultWorkerGroup = new WorkerGroup();
             defaultWorkerGroup.setName(Constants.DEFAULT_WORKER_GROUP);
             defaultWorkerGroup.setAddrList(String.join(Constants.COMMA, activeWorkerNodes));
@@ -363,7 +363,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     @Override
     public Map<String, Object> getWorkerAddressList() {
         Map<String, Object> result = new HashMap<>();
-        Set<String> serverNodeList = registryClient.getServerNodeSet(NodeType.WORKER);
+        Set<String> serverNodeList = registryClient.getServerNodeSet(RegistryNodeType.WORKER);
         result.put(Constants.DATA_LIST, serverNodeList);
         putMsg(result, Status.SUCCESS);
         return result;

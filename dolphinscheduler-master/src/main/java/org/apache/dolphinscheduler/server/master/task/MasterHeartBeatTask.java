@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.model.BaseHeartBeatTask;
 import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
@@ -53,14 +54,14 @@ public class MasterHeartBeatTask extends BaseHeartBeatTask<MasterHeartBeat> {
         return MasterHeartBeat.builder()
                 .startupTime(ServerLifeCycleManager.getServerStartupTime())
                 .reportTime(System.currentTimeMillis())
-                .cpuUsage(OSUtils.cpuUsage())
-                .loadAverage(OSUtils.loadAverage())
+                .cpuUsage(OSUtils.cpuUsagePercentage())
                 .availablePhysicalMemorySize(OSUtils.availablePhysicalMemorySize())
-                .maxCpuloadAvg(masterConfig.getMaxCpuLoadAvg())
                 .reservedMemory(masterConfig.getReservedMemory())
-                .memoryUsage(OSUtils.memoryUsage())
+                .memoryUsage(OSUtils.memoryUsagePercentage())
                 .diskAvailable(OSUtils.diskAvailable())
                 .processId(processId)
+                .host(NetUtils.getHost())
+                .port(masterConfig.getListenPort())
                 .build();
     }
 

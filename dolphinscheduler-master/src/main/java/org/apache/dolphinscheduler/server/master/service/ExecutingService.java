@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.server.master.service;
 
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.remote.dto.TaskInstanceExecuteDto;
-import org.apache.dolphinscheduler.remote.dto.WorkflowExecuteDto;
+import org.apache.dolphinscheduler.extract.master.dto.TaskInstanceExecuteDto;
+import org.apache.dolphinscheduler.extract.master.dto.WorkflowExecuteDto;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 
@@ -55,7 +55,8 @@ public class ExecutingService {
         }
         try {
             WorkflowExecuteDto workflowExecuteDto = new WorkflowExecuteDto();
-            BeanUtils.copyProperties(workflowExecuteDto, workflowExecuteRunnable.getProcessInstance());
+            BeanUtils.copyProperties(workflowExecuteDto,
+                    workflowExecuteRunnable.getWorkflowExecuteContext().getWorkflowInstance());
             List<TaskInstanceExecuteDto> taskInstanceList = Lists.newArrayList();
             if (CollectionUtils.isNotEmpty(workflowExecuteRunnable.getAllTaskInstances())) {
                 for (TaskInstance taskInstance : workflowExecuteRunnable.getAllTaskInstances()) {

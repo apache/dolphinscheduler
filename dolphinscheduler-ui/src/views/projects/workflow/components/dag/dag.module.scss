@@ -107,6 +107,9 @@ $bgLight: #ffffff;
     &.icon-sub_process {
       background-image: url('/images/task-icons/sub_process.png');
     }
+    &.icon-dynamic {
+      background-image: url('/images/task-icons/dynamic.png');
+    }
     &.icon-data_quality {
       background-image: url('/images/task-icons/data_quality.png');
     }
@@ -207,6 +210,9 @@ $bgLight: #ffffff;
     &.icon-data_factory {
       background-image: url('/images/task-icons/data_factory.png');
     }
+    &.icon-remoteshell {
+      background-image: url('/images/task-icons/remoteshell.png');
+    }
   }
 
   &:hover {
@@ -216,6 +222,9 @@ $bgLight: #ffffff;
       }
       &.icon-sub_process {
         background-image: url('/images/task-icons/sub_process_hover.png');
+      }
+      &.icon-dynamic {
+        background-image: url('/images/task-icons/dynamic_hover.png');
       }
       &.icon-data_quality {
         background-image: url('/images/task-icons/data_quality_hover.png');
@@ -316,6 +325,9 @@ $bgLight: #ffffff;
       }
       &.icon-data_factory {
         background-image: url('/images/task-icons/data_factory_hover.png');
+      }
+      &.icon-remoteshell {
+        background-image: url('/images/task-icons/remoteshell_hover.png');
       }
     }
   }

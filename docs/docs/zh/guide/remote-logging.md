@@ -10,7 +10,7 @@ Apache DolphinScheduler支持将任务日志传输到远端存储上。当配置
 ```properties
 # 是否开启远程日志存储
 remote.logging.enable=true
-# 任务日志写入的远端存储，目前仅支持OSS
+# 任务日志写入的远端存储，目前支持OSS, S3, GCS
 remote.logging.target=OSS
 # 任务日志在远端存储上的目录
 remote.logging.base.dir=logs
@@ -33,3 +33,47 @@ remote.logging.oss.bucket.name=<bucket.name>
 remote.logging.oss.endpoint=<endpoint>
 ```
 
+## 将任务日志写入[Amazon S3](https://aws.amazon.com/cn/s3/)
+
+配置`common.propertis`如下：
+
+```properties
+# s3 access key id, required if you set remote.logging.target=S3
+remote.logging.s3.access.key.id=<access.key.id>
+# s3 access key secret, required if you set remote.logging.target=S3
+remote.logging.s3.access.key.secret=<access.key.secret>
+# s3 bucket name, required if you set remote.logging.target=S3
+remote.logging.s3.bucket.name=<bucket.name>
+# s3 endpoint, required if you set remote.logging.target=S3
+remote.logging.s3.endpoint=<endpoint>
+# s3 region, required if you set remote.logging.target=S3
+remote.logging.s3.region=<region>
+```
+
+## 将任务日志写入[Google Cloud Storage (GCS)](https://cloud.google.com/storage)
+
+配置`common.propertis`如下：
+
+```properties
+# the location of the google cloud credential, required if you set remote.logging.target=GCS
+remote.logging.google.cloud.storage.credential=/path/to/credential
+# gcs bucket name, required if you set remote.logging.target=GCS
+remote.logging.google.cloud.storage.bucket.name=<your-bucket>
+```
+
+## 将任务日志写入[Azure Blob Storage (ABS)](https://azure.microsoft.com/en-us/products/storage/blobs)
+
+配置`common.propertis`如下：
+
+```properties
+# abs container name, required if you set resource.storage.type=ABS
+resource.azure.blob.storage.container.name=<your-container>
+# abs account name, required if you set resource.storage.type=ABS
+resource.azure.blob.storage.account.name=<your-account-name>
+# abs connection string, required if you set resource.storage.type=ABS
+resource.azure.blob.storage.connection.string=<your-connection-string>
+```
+
+### 注意事项
+
+由于Azure Blob Storage不支持空目录单独存在，因此资源目录下会有空文件`<no name>`。但是并不影响Dolphinscheduler资源中心上的文件展示。

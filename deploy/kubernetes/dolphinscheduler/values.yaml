@@ -43,6 +43,7 @@ postgresql:
   postgresqlUsername: "root"
   postgresqlPassword: "root"
   postgresqlDatabase: "dolphinscheduler"
+  driverClassName: "org.postgresql.Driver"
   params: "characterEncoding=utf8"
   persistence:
     enabled: false
@@ -51,6 +52,7 @@ postgresql:
 
 mysql:
   enabled: false
+  driverClassName: "com.mysql.cj.jdbc.Driver"
   auth:
     username: "ds"
     password: "ds"
@@ -82,6 +84,7 @@ externalDatabase:
   password: "root"
   database: "dolphinscheduler"
   params: "characterEncoding=utf8"
+  driverClassName: "org.postgresql.Driver"
 
 ## If not exists external registry, the zookeeper registry will be used by default.
 zookeeper:
@@ -94,17 +97,58 @@ zookeeper:
     size: "20Gi"
     storageClass: "-"
 
+etcd:
+  enabled: false
+  endpoints: ""
+  namespace: "dolphinscheduler"
+  user: ""
+  passWord: ""
+  authority: ""
+  # Please create a new folder: deploy/kubernetes/dolphinscheduler/etcd-certs
+  ssl:
+    enabled: false
+    certFile: "etcd-certs/ca.crt"
+    keyCertChainFile: "etcd-certs/client.crt"
+    keyFile: "etcd-certs/client.pem"
+
 ## If exists external registry and set zookeeper.enable value to false, the external registry will be used.
 externalRegistry:
   registryPluginName: "zookeeper"
   registryServers: "127.0.0.1:2181"
 
+security:
+  authentication:
+    type: PASSWORD
+    ldap:
+      urls: ldap://ldap.forumsys.com:389/
+      basedn: dc=example,dc=com
+      username: cn=read-only-admin,dc=example,dc=com
+      password: password
+      user:
+        admin: read-only-admin
+        identityattribute: uid
+        emailattribute: mail
+        notexistaction: CREATE
+      ssl:
+        enable: false
+        # do not change this value
+        truststore: "/opt/ldapkeystore.jks"
+        # if you use macOS, please run `base64 -b 0 -i /path/to/your.jks`
+        # if you use Linux, please run `base64 -w 0 /path/to/your.jks`
+        # if you use Windows, please run `certutil -f -encode /path/to/your.jks`
+        # Then copy the base64 content to below field in one line
+        jksbase64content: ""
+        truststorepassword: ""
+
 conf:
+  # auto restart, if true, all components will be restarted automatically after the common configuration is updated. if false, you need to restart the components manually. default is false
+  auto: false
+  # common configuration
   common:
     # user data local directory path, please make sure the directory exists and have read write permissions
     data.basedir.path: /tmp/dolphinscheduler
 
-    # resource storage type: HDFS, S3, NONE
+    # resource storage type: HDFS, S3, OSS, GCS, ABS, NONE
     resource.storage.type: S3
 
     # resource store on HDFS/S3 path, resource file will store to this base path, self configuration, please make sure the directory exists on hdfs and have read write permissions. "/dolphinscheduler" is recommended
@@ -139,6 +183,18 @@ conf:
 
     # oss bucket endpoint, required if you set resource.storage.type=OSS
     resource.alibaba.cloud.oss.endpoint: https://oss-cn-hangzhou.aliyuncs.com
+
+    # azure storage account name, required if you set resource.storage.type=ABS
+    resource.azure.client.id: minioadmin
+
+    # azure storage account key, required if you set resource.storage.type=ABS
+    resource.azure.client.secret: minioadmin
+
+    # azure storage subId, required if you set resource.storage.type=ABS
+    resource.azure.subId: minioadmin
+
+    # azure storage tenantId, required if you set resource.storage.type=ABS
+    resource.azure.tenant.id: minioadmin
 
     # if resource.storage.type=HDFS, the user must have the permission to create directories under the HDFS root path
     resource.hdfs.root.user: hdfs
@@ -220,11 +276,11 @@ common:
     HADOOP_HOME: "/opt/soft/hadoop"
     HADOOP_CONF_DIR: "/opt/soft/hadoop/etc/hadoop"
     SPARK_HOME: "/opt/soft/spark"
-    PYTHON_HOME: "/usr/bin/python"
+    PYTHON_LAUNCHER: "/usr/bin/python/bin/python3"
     JAVA_HOME: "/opt/java/openjdk"
     HIVE_HOME: "/opt/soft/hive"
     FLINK_HOME: "/opt/soft/flink"
-    DATAX_HOME: "/opt/soft/datax"
+    DATAX_LAUNCHER: "/opt/soft/datax/bin/datax.py"
   ## Shared storage persistence mounted into api, master and worker, such as Hadoop, Spark, Flink and DataX binary package
   sharedStoragePersistence:
     enabled: false
@@ -310,10 +366,25 @@ master:
     MASTER_TASK_COMMIT_RETRYTIMES: "5"
     MASTER_TASK_COMMIT_INTERVAL: "1s"
     MASTER_STATE_WHEEL_INTERVAL: "5s"
-    MASTER_MAX_CPU_LOAD_AVG: "-1"
+    MASTER_MAX_CPU_LOAD_AVG: "1"
     MASTER_RESERVED_MEMORY: "0.3"
     MASTER_FAILOVER_INTERVAL: "10m"
     MASTER_KILL_APPLICATION_WHEN_HANDLE_FAILOVER: "true"
+  service:
+    # annotations may need to be set when want to scrapy metrics by prometheus but not install prometheus operator
+    annotations: {}
+    # serviceMonitor for prometheus operator
+    serviceMonitor:
+      # -- Enable or disable master serviceMonitor
+      enabled: false
+      # -- @param serviceMonitor.interval interval at which metrics should be scraped
+      interval: 15s
+      # -- @param serviceMonitor.path path of the metrics endpoint
+      path: /actuator/prometheus
+      # -- @param serviceMonitor.labels ServiceMonitor extra labels
+      labels: {}
+      # -- @param serviceMonitor.annotations ServiceMonitor annotations
+      annotations: {}
 
 worker:
   ## PodManagementPolicy controls how pods are created during initial scale up, when replacing pods on nodes, or when scaling down.
@@ -382,7 +453,7 @@ worker:
       storageClassName: "-"
       storage: "20Gi"
   env:
-    WORKER_MAX_CPU_LOAD_AVG: "-1"
+    WORKER_MAX_CPU_LOAD_AVG: "1"
     WORKER_RESERVED_MEMORY: "0.3"
     WORKER_EXEC_THREADS: "100"
     WORKER_HEARTBEAT_INTERVAL: "10s"
@@ -415,6 +486,21 @@ worker:
     #         - type: Percent
     #           value: 100
     #           periodSeconds: 15
+  service:
+    # annotations may need to be set when want to scrapy metrics by prometheus but not install prometheus operator
+    annotations: {}
+    # serviceMonitor for prometheus operator
+    serviceMonitor:
+      # -- Enable or disable worker serviceMonitor
+      enabled: false
+      # -- @param serviceMonitor.interval interval at which metrics should be scraped
+      interval: 15s
+      # -- @param serviceMonitor.path path of the metrics endpoint
+      path: /actuator/prometheus
+      # -- @param serviceMonitor.labels ServiceMonitor extra labels
+      labels: {}
+      # -- @param serviceMonitor.annotations ServiceMonitor annotations
+      annotations: {}
 
 
 alert:
@@ -429,18 +515,18 @@ alert:
   ## You can use annotations to attach arbitrary non-identifying metadata to objects.
   ## Clients such as tools and libraries can retrieve this metadata.
   annotations: {}
+  ## Affinity is a group of affinity scheduling rules. If specified, the pod's scheduling constraints.
+  ## More info: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#affinity-v1-core
+  affinity: {}
   ## NodeSelector is a selector which must be true for the pod to fit on a node.
   ## Selector which must match a node's labels for the pod to be scheduled on that node.
   ## More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
-  affinity: {}
-  ## Compute Resources required by this container. Cannot be updated.
-  ## More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container
   nodeSelector: {}
   ## Tolerations are appended (excluding duplicates) to pods running with this RuntimeClass during admission,
   ## effectively unioning the set of nodes tolerated by the pod and the RuntimeClass.
   tolerations: []
-  ## Affinity is a group of affinity scheduling rules. If specified, the pod's scheduling constraints.
-  ## More info: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#affinity-v1-core
+  ## Compute Resources required by this container. Cannot be updated.
+  ## More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container
   resources: {}
   # resources:
   #   limits:
@@ -477,6 +563,22 @@ alert:
     storage: "20Gi"
   env:
     JAVA_OPTS: "-Xms512m -Xmx512m -Xmn256m"
+  service:
+    # annotations may need to be set when want to scrapy metrics by prometheus but not install prometheus operator
+    annotations: {}
+    # serviceMonitor for prometheus operator
+    serviceMonitor:
+      # -- Enable or disable alert-server serviceMonitor
+      enabled: false
+      # -- @param serviceMonitor.interval interval at which metrics should be scraped
+      interval: 15s
+      # -- @param serviceMonitor.path path of the metrics endpoint
+      path: /actuator/prometheus
+      # -- @param serviceMonitor.labels ServiceMonitor extra labels
+      labels: {}
+      # -- @param serviceMonitor.annotations ServiceMonitor annotations
+      annotations: {}
+
 
 api:
   ## Number of desired pods. This is a pointer to distinguish between explicit zero and not specified. Defaults to 1.
@@ -490,18 +592,18 @@ api:
   ## You can use annotations to attach arbitrary non-identifying metadata to objects.
   ## Clients such as tools and libraries can retrieve this metadata.
   annotations: {}
+  ## Affinity is a group of affinity scheduling rules. If specified, the pod's scheduling constraints.
+  ## More info: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#affinity-v1-core
+  affinity: {}
   ## NodeSelector is a selector which must be true for the pod to fit on a node.
   ## Selector which must match a node's labels for the pod to be scheduled on that node.
   ## More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
-  affinity: {}
-  ## Compute Resources required by this container. Cannot be updated.
-  ## More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container
   nodeSelector: {}
   ## Tolerations are appended (excluding duplicates) to pods running with this RuntimeClass during admission,
   ## effectively unioning the set of nodes tolerated by the pod and the RuntimeClass.
   tolerations: []
-  ## Affinity is a group of affinity scheduling rules. If specified, the pod's scheduling constraints.
-  ## More info: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.17/#affinity-v1-core
+  ## Compute Resources required by this container. Cannot be updated.
+  ## More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container
   resources: {}
   # resources:
   #   limits:
@@ -554,6 +656,18 @@ api:
     ## annotations may need to be set when service.type is LoadBalancer
     ## service.beta.kubernetes.io/aws-load-balancer-ssl-cert: arn:aws:acm:us-east-1:EXAMPLE_CERT
     annotations: {}
+    # serviceMonitor for prometheus operator
+    serviceMonitor:
+      # -- Enable or disable api-server serviceMonitor
+      enabled: false
+      # -- @param serviceMonitor.interval interval at which metrics should be scraped
+      interval: 15s
+      # -- @param serviceMonitor.path path of the metrics endpoint
+      path: /dolphinscheduler/actuator/prometheus
+      # -- @param serviceMonitor.labels ServiceMonitor extra labels
+      labels: {}
+      # -- @param serviceMonitor.annotations ServiceMonitor annotations
+      annotations: {}
   env:
     JAVA_OPTS: "-Xms512m -Xmx512m -Xmn256m"
 

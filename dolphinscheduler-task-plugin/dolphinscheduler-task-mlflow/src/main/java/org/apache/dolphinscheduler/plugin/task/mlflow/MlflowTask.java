@@ -21,6 +21,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_COD
 
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
@@ -29,9 +30,9 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.OSUtils;
+import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
+import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilderFactory;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -39,6 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * shell task
@@ -111,12 +113,15 @@ public class MlflowTask extends AbstractTask {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             // construct process
-            String command = buildCommand();
-            TaskResponse commandExecuteResult = shellCommandExecutor.run(command, taskCallBack);
+            IShellInterceptorBuilder<?, ?> shellActuatorBuilder = ShellInterceptorBuilderFactory.newBuilder()
+                    .properties(ParameterUtils.convert(getParamsMap()))
+                    .appendScript(buildCommand());
+            TaskResponse commandExecuteResult = shellCommandExecutor.run(shellActuatorBuilder, taskCallBack);
             int exitCode;
             if (mlflowParameters.getIsDeployDocker()) {
                 exitCode = checkDockerHealth();
@@ -166,7 +171,6 @@ public class MlflowTask extends AbstractTask {
      */
     private String buildCommandForMlflowProjects() {
 
-        Map<String, Property> paramsMap = getParamsMap();
         List<String> args = new ArrayList<>();
         args.add(
                 String.format(MlflowConstants.EXPORT_MLFLOW_TRACKING_URI_ENV, mlflowParameters.getMlflowTrackingUri()));
@@ -220,8 +224,7 @@ public class MlflowTask extends AbstractTask {
             runCommand = runCommand + " " + versionString;
         }
         args.add(runCommand);
-
-        return ParameterUtils.convertParameterPlaceholders(String.join("\n", args), ParamUtils.convert(paramsMap));
+        return args.stream().collect(Collectors.joining("\n"));
     }
 
     /**
@@ -229,7 +232,6 @@ public class MlflowTask extends AbstractTask {
      */
     protected String buildCommandForMlflowModels() {
 
-        Map<String, Property> paramsMap = getParamsMap();
         List<String> args = new ArrayList<>();
         args.add(
                 String.format(MlflowConstants.EXPORT_MLFLOW_TRACKING_URI_ENV, mlflowParameters.getMlflowTrackingUri()));
@@ -248,12 +250,10 @@ public class MlflowTask extends AbstractTask {
             args.add(String.format(MlflowConstants.DOCKER_RUN, containerName, mlflowParameters.getDeployPort(),
                     imageName));
         }
-
-        return ParameterUtils.convertParameterPlaceholders(String.join("\n", args), ParamUtils.convert(paramsMap));
+        return args.stream().collect(Collectors.joining("\n"));
     }
 
     private Map<String, Property> getParamsMap() {
-        // replace placeholder, and combining local and global parameters
         return taskExecutionContext.getPrepareParamsMap();
 
     }

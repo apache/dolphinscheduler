@@ -28,6 +28,7 @@ export default {
     actions: 'Operation',
     edit_tenant: 'Edit Tenant',
     tenant_code_tips: 'Please enter the operating system tenant',
+    tenant_code_invalid_tips: 'The tenant code is invalid.',
     queue_name_tips: 'Please select queue',
     description_tips: 'Please enter a description',
     delete_confirm: 'Delete?',
@@ -76,6 +77,8 @@ export default {
     update_time: 'Update Time',
     operation: 'Operation',
     edit: 'Edit',
+    delete: 'Delete',
+    delete_confirm: 'Delete?',
     queue_name_tips: 'Please enter your queue name',
     queue_value_tips: 'Please enter your queue value'
   },
@@ -143,6 +146,7 @@ export default {
     delete_confirm: 'Are you sure to delete?',
     delete_confirm_tip:
       'Deleting user is a dangerous operation，please be careful',
+    reset_password: 'Reset Password',
     project: 'Project',
     resource: 'Resource',
     file_resource: 'File Resource',
@@ -152,7 +156,7 @@ export default {
     namespace: 'Namespace',
     revoke_auth: 'Revoke',
     grant_read: 'Grant Read',
-    grant_all:'Grant All',
+    grant_all: 'Grant All',
     authorize_project: 'Project Authorize',
     authorize_resource: 'Resource Authorize',
     authorize_namespace: 'Namespace Authorize',
@@ -164,6 +168,7 @@ export default {
     user_password: 'Password',
     user_password_tips:
       'Please enter a password containing letters and numbers with a length between 6 and 20',
+    confirm_password_tips: 'The both of password and confirm password are not same.',
     user_type: 'User Type',
     ordinary_user: 'Ordinary users',
     administrator: 'Administrator',

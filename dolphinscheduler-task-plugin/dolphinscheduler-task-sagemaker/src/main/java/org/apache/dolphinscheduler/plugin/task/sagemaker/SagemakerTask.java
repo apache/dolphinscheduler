@@ -29,8 +29,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -166,9 +165,8 @@ public class SagemakerTask extends AbstractRemoteTask {
     }
 
     private String parseRequstJson(String requestJson) {
-        // combining local and global parameters
         Map<String, Property> paramsMap = taskRequest.getPrepareParamsMap();
-        return ParameterUtils.convertParameterPlaceholders(requestJson, ParamUtils.convert(paramsMap));
+        return ParameterUtils.convertParameterPlaceholders(requestJson, ParameterUtils.convert(paramsMap));
     }
 
     protected AmazonSageMaker createClient() {

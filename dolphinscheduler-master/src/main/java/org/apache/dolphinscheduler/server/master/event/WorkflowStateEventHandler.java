@@ -35,7 +35,8 @@ public class WorkflowStateEventHandler implements StateEventHandler {
     public boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable,
                                     StateEvent stateEvent) throws StateEventHandleException {
         WorkflowStateEvent workflowStateEvent = (WorkflowStateEvent) stateEvent;
-        ProcessInstance processInstance = workflowExecuteRunnable.getProcessInstance();
+        ProcessInstance processInstance =
+                workflowExecuteRunnable.getWorkflowExecuteContext().getWorkflowInstance();
         ProcessDefinition processDefinition = processInstance.getProcessDefinition();
         measureProcessState(workflowStateEvent, processInstance.getProcessDefinitionCode().toString());
 

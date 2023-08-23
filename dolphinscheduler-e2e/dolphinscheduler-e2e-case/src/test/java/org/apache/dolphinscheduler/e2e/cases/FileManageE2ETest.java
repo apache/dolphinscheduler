@@ -21,7 +21,6 @@ package org.apache.dolphinscheduler.e2e.cases;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
 
 import org.apache.dolphinscheduler.e2e.core.Constants;
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
@@ -40,6 +39,7 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Comparator;
 
+import org.testcontainers.shaded.org.awaitility.Awaitility;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
@@ -90,15 +90,15 @@ public class FileManageE2ETest {
                 .goToTab(TenantPage.class)
                 .create(tenant);
 
-        await().untilAsserted(() -> assertThat(tenantPage.tenantList())
-                .as("Tenant list should contain newly-created tenant")
-                .extracting(WebElement::getText)
-                .anyMatch(it -> it.contains(tenant)));
+        Awaitility.await().untilAsserted(() -> assertThat(tenantPage.tenantList())
+            .as("Tenant list should contain newly-created tenant")
+            .extracting(WebElement::getText)
+            .anyMatch(it -> it.contains(tenant)));
 
         UserPage userPage = tenantPage.goToNav(SecurityPage.class)
             .goToTab(UserPage.class);
 
-        new WebDriverWait(userPage.driver(), 20).until(ExpectedConditions.visibilityOfElementLocated(
+        new WebDriverWait(userPage.driver(), Duration.ofSeconds(20)).until(ExpectedConditions.visibilityOfElementLocated(
                 new By.ByClassName("name")));
 
         userPage.update(user, user, email, phone, tenant)
@@ -122,9 +122,9 @@ public class FileManageE2ETest {
     void testCreateDirectory() {
         final FileManagePage page = new FileManagePage(browser);
 
-        page.createDirectory(testDirectoryName, "test_desc");
+        page.createDirectory(testDirectoryName);
 
-        await().untilAsserted(() -> assertThat(page.fileList())
+        Awaitility.await().untilAsserted(() -> assertThat(page.fileList())
                 .as("File list should contain newly-created file")
                 .extracting(WebElement::getText)
                 .anyMatch(it -> it.contains(testDirectoryName)));
@@ -135,9 +135,9 @@ public class FileManageE2ETest {
     void testCancelCreateDirectory() {
         final FileManagePage page = new FileManagePage(browser);
 
-        page.cancelCreateDirectory(testDirectoryName, "test_desc");
+        page.cancelCreateDirectory(testDirectoryName);
 
-        await().untilAsserted(() -> assertThat(page.fileList())
+        Awaitility.await().untilAsserted(() -> assertThat(page.fileList())
             .as("File list should contain newly-created file")
             .extracting(WebElement::getText)
             .anyMatch(it -> it.contains(testDirectoryName)));
@@ -199,7 +199,7 @@ public class FileManageE2ETest {
             .goToTab(FileManagePage.class)
             .delete(testDirectoryName);
 
-        await().untilAsserted(() -> {
+        Awaitility.await().untilAsserted(() -> {
             browser.navigate().refresh();
 
             assertThat(
@@ -218,7 +218,7 @@ public class FileManageE2ETest {
 
         page.createFile(testFileName, scripts);
 
-        await().untilAsserted(() -> assertThat(page.fileList())
+        Awaitility.await().untilAsserted(() -> assertThat(page.fileList())
             .as("File list should contain newly-created file")
             .extracting(WebElement::getText)
             .anyMatch(it -> it.contains(testFileName)));
@@ -231,7 +231,7 @@ public class FileManageE2ETest {
 
         page.rename(testFileName, testRenameFileName);
 
-        await().untilAsserted(() -> {
+        Awaitility.await().untilAsserted(() -> {
             browser.navigate().refresh();
 
             assertThat(page.fileList())
@@ -249,7 +249,7 @@ public class FileManageE2ETest {
 
         page.editFile(testRenameFileName, scripts);
 
-        await().untilAsserted(() -> assertThat(page.fileList())
+        Awaitility.await().untilAsserted(() -> assertThat(page.fileList())
             .as("File list should contain newly-created file")
             .extracting(WebElement::getText)
             .anyMatch(it -> it.contains(testRenameFileName)));
@@ -262,7 +262,7 @@ public class FileManageE2ETest {
 
         page.delete(testRenameFileName);
 
-        await().untilAsserted(() -> {
+        Awaitility.await().untilAsserted(() -> {
             browser.navigate().refresh();
 
             assertThat(
@@ -285,9 +285,9 @@ public class FileManageE2ETest {
 
         page.uploadFile(testUnder1GBFilePath.toFile().getAbsolutePath());
 
-        new WebDriverWait(browser, 10).until(ExpectedConditions.invisibilityOfElementLocated(By.id("fileUpdateDialog")));
+        new WebDriverWait(browser, Duration.ofSeconds(20)).until(ExpectedConditions.invisibilityOfElementLocated(By.id("fileUpdateDialog")));
 
-        await().untilAsserted(() -> {
+        Awaitility.await().untilAsserted(() -> {
             assertThat(page.fileList())
                 .as("File list should contain newly-created file")
                 .extracting(WebElement::getText)
@@ -304,7 +304,7 @@ public class FileManageE2ETest {
 
         File file = Constants.HOST_CHROME_DOWNLOAD_PATH.resolve(testUnder1GBFileName).toFile();
 
-        await().untilAsserted(() -> {
+        Awaitility.await().untilAsserted(() -> {
             assert file.exists();
         });
     }

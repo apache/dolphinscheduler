@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.api.dto.schedule.ScheduleUpdateRequest;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.impl.SchedulerServiceImpl;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.Environment;
@@ -39,6 +40,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
+import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -95,6 +97,9 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
 
     @Mock
     private EnvironmentMapper environmentMapper;
+
+    @Mock
+    private TenantMapper tenantMapper;
 
     protected static User user;
     protected Exception exception;
@@ -185,6 +190,7 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         ScheduleCreateRequest scheduleCreateRequest = new ScheduleCreateRequest();
         scheduleCreateRequest.setProcessDefinitionCode(processDefinitionCode);
         scheduleCreateRequest.setEnvironmentCode(environmentCode);
+        scheduleCreateRequest.setTenantCode(Constants.DEFAULT);
 
         // error process definition not exists
         exception = Assertions.assertThrows(ServiceException.class,
@@ -238,6 +244,14 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         String badCrontab = "0 0 123 * * ? *";
         scheduleCreateRequest.setStartTime(startTime);
         scheduleCreateRequest.setCrontab(badCrontab);
+        exception = Assertions.assertThrows(ServiceException.class,
+                () -> schedulerService.createSchedulesV2(user, scheduleCreateRequest));
+        Assertions.assertEquals(Status.SCHEDULE_CRON_CHECK_FAILED.getCode(), ((ServiceException) exception).getCode());
+
+        // error schedule crontab
+        String badCrontab2 = "0 0 13/0 * * ? *";
+        scheduleCreateRequest.setStartTime(startTime);
+        scheduleCreateRequest.setCrontab(badCrontab2);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> schedulerService.createSchedulesV2(user, scheduleCreateRequest));
         Assertions.assertEquals(Status.SCHEDULE_CRON_CHECK_FAILED.getCode(), ((ServiceException) exception).getCode());

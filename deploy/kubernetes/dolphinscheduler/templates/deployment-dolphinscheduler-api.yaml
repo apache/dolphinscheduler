@@ -34,9 +34,14 @@ spec:
     metadata:
       labels:
         {{- include "dolphinscheduler.api.labels" . | nindent 8 }}
-      {{- if .Values.api.annotations }}
+      {{- if or .Values.api.annotations .Values.conf.auto }}
       annotations:
+        {{- if .Values.conf.auto }}
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- end }}
+        {{- if .Values.api.annotations }}
         {{- toYaml .Values.api.annotations | nindent 8 }}
+        {{- end }}
       {{- end }}
     spec:
       serviceAccountName: {{ template "dolphinscheduler.fullname" . }}
@@ -72,6 +77,7 @@ spec:
               value: {{ .Values.timezone }}
             {{- include "dolphinscheduler.database.env_vars" . | nindent 12 }}
             {{- include "dolphinscheduler.registry.env_vars" . | nindent 12 }}
+            {{- include "dolphinscheduler.security.env_vars" . | nindent 12 }}
             {{ range $key, $value :=  .Values.api.env }}
             - name: {{ $key }}
               value: {{ $value | quote }}
@@ -111,6 +117,8 @@ spec:
               subPath: common_properties
             {{- include "dolphinscheduler.sharedStorage.volumeMount" . | nindent 12 }}
             {{- include "dolphinscheduler.fsFileResource.volumeMount" . | nindent 12 }}
+            {{- include "dolphinscheduler.ldap.ssl.volumeMount" . | nindent 12 }}
+            {{- include "dolphinscheduler.etcd.ssl.volumeMount" . | nindent 12 }}
       volumes:
         - name: {{ include "dolphinscheduler.fullname" . }}-api
           {{- if .Values.api.persistentVolumeClaim.enabled }}
@@ -124,3 +132,5 @@ spec:
             name: {{ include "dolphinscheduler.fullname" . }}-configs
         {{- include "dolphinscheduler.sharedStorage.volume" . | nindent 8 }}
         {{- include "dolphinscheduler.fsFileResource.volume" . | nindent 8 }}
+        {{- include "dolphinscheduler.ldap.ssl.volume" . | nindent 8 }}
+        {{- include "dolphinscheduler.etcd.ssl.volume" . | nindent 8 }}

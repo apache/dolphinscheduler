@@ -43,7 +43,6 @@
         <module>dolphinscheduler-aop</module>
         <module>dolphinscheduler-dao</module>
         <module>dolphinscheduler-dist</module>
-        <module>dolphinscheduler-remote</module>
         <module>dolphinscheduler-service</module>
         <module>dolphinscheduler-microbench</module>
         <module>dolphinscheduler-data-quality</module>
@@ -56,6 +55,7 @@
         <module>dolphinscheduler-ui</module>
         <module>dolphinscheduler-scheduler-plugin</module>
         <module>dolphinscheduler-storage-plugin</module>
+        <module>dolphinscheduler-extract</module>
     </modules>
 
     <properties>
@@ -92,6 +92,8 @@
         <docker.build.skip>true</docker.build.skip>
         <docker.push.skip>true</docker.push.skip>
         <skipDepCheck>true</skipDepCheck>
+        <build.ui.skip>false</build.ui.skip>
+        <spotless.skip>false</spotless.skip>
     </properties>
 
     <dependencyManagement>
@@ -142,11 +144,7 @@
                 <artifactId>dolphinscheduler-dao</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-remote</artifactId>
-                <version>${project.version}</version>
-            </dependency>
+
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-service</artifactId>
@@ -183,17 +181,6 @@
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-alert-all</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-registry-api</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-registry-all</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -249,6 +236,26 @@
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-storage-all</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-extract-base</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-extract-master</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-extract-worker</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-extract-alert</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -615,6 +622,7 @@
                 <artifactId>spotless-maven-plugin</artifactId>
                 <version>${spotless.version}</version>
                 <configuration>
+                    <skip>${spotless.skip}</skip>
                     <java>
                         <eclipse>
                             <file>style/spotless_dolphinscheduler_formatter.xml</file>
@@ -636,6 +644,11 @@
                         <replaceRegex>
                             <name>Block jUnit4 imports</name>
                             <searchRegex>import\s+org\.junit\.[^jupiter][^\*\s]*(|\*);(\r\n|\r|\n)</searchRegex>
+                            <replacement>$1</replacement>
+                        </replaceRegex>
+                        <replaceRegex>
+                            <name>Block kubernetes-client</name>
+                            <searchRegex>import\s+io\.kubernetes\.client\.[^\*\s]*(|\*);(\r\n|\r|\n)</searchRegex>
                             <replacement>$1</replacement>
                         </replaceRegex>
                     </java>

@@ -23,6 +23,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.COMMA;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SET_K8S;
 
 import org.apache.dolphinscheduler.common.enums.ResourceManagerType;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
@@ -49,6 +50,7 @@ import java.util.regex.Pattern;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import io.fabric8.kubernetes.client.dsl.LogWatch;
 
 @Slf4j
 public final class ProcessUtils {
@@ -74,7 +76,12 @@ public final class ProcessUtils {
     /**
      * Expression of PID recognition in Windows scene
      */
-    private static final Pattern WINDOWSATTERN = Pattern.compile("(\\d+)");
+    private static final Pattern WINDOWSPATTERN = Pattern.compile("(\\d+)");
+
+    /**
+     * Expression of PID recognition in Linux scene
+     */
+    private static final Pattern LINUXPATTERN = Pattern.compile("\\((\\d+)\\)");
 
     /**
      * kill tasks according to different task types.
@@ -115,12 +122,19 @@ public final class ProcessUtils {
         // pstree pid get sub pids
         if (SystemUtils.IS_OS_MAC) {
             String pids = OSUtils.exeCmd(String.format("%s -sp %d", TaskConstants.PSTREE, processId));
-            if (null != pids) {
+            if (StringUtils.isNotEmpty(pids)) {
                 mat = MACPATTERN.matcher(pids);
+            }
+        } else if (SystemUtils.IS_OS_LINUX) {
+            String pids = OSUtils.exeCmd(String.format("%s -p %d", TaskConstants.PSTREE, processId));
+            if (StringUtils.isNotEmpty(pids)) {
+                mat = LINUXPATTERN.matcher(pids);
             }
         } else {
             String pids = OSUtils.exeCmd(String.format("%s -p %d", TaskConstants.PSTREE, processId));
-            mat = WINDOWSATTERN.matcher(pids);
+            if (StringUtils.isNotEmpty(pids)) {
+                mat = WINDOWSPATTERN.matcher(pids);
+            }
         }
 
         if (null != mat) {
@@ -133,19 +147,21 @@ public final class ProcessUtils {
     }
 
     /**
-     * cacel k8s / yarn application
+     * cancel k8s / yarn application
      *
      * @param taskExecutionContext
      * @return
      */
     public static void cancelApplication(TaskExecutionContext taskExecutionContext) {
         try {
-            if (Objects.nonNull(taskExecutionContext.getK8sTaskExecutionContext()) &&
-                    !TASK_TYPE_SET_K8S.contains(taskExecutionContext.getTaskType())) {
-                applicationManagerMap.get(ResourceManagerType.KUBERNETES)
-                        .killApplication(new KubernetesApplicationManagerContext(
-                                taskExecutionContext.getK8sTaskExecutionContext(),
-                                taskExecutionContext.getTaskAppId()));
+            if (Objects.nonNull(taskExecutionContext.getK8sTaskExecutionContext())) {
+                if (!TASK_TYPE_SET_K8S.contains(taskExecutionContext.getTaskType())) {
+                    // Set empty container name for Spark on K8S task
+                    applicationManagerMap.get(ResourceManagerType.KUBERNETES)
+                            .killApplication(new KubernetesApplicationManagerContext(
+                                    taskExecutionContext.getK8sTaskExecutionContext(),
+                                    taskExecutionContext.getTaskAppId(), ""));
+                }
             } else {
                 String host = taskExecutionContext.getHost();
                 String executePath = taskExecutionContext.getExecutePath();
@@ -170,6 +186,7 @@ public final class ProcessUtils {
                 }
                 if (CollectionUtils.isEmpty(appIds)) {
                     log.info("The appId is empty");
+                    return;
                 }
                 ApplicationManager applicationManager = applicationManagerMap.get(ResourceManagerType.YARN);
                 applicationManager.killApplication(new YarnApplicationManagerContext(executePath, tenantCode, appIds));
@@ -194,7 +211,7 @@ public final class ProcessUtils {
         KubernetesApplicationManager applicationManager =
                 (KubernetesApplicationManager) applicationManagerMap.get(ResourceManagerType.KUBERNETES);
         return applicationManager
-                .getApplicationStatus(new KubernetesApplicationManagerContext(k8sTaskExecutionContext, taskAppId));
+                .getApplicationStatus(new KubernetesApplicationManagerContext(k8sTaskExecutionContext, taskAppId, ""));
     }
 
     /**
@@ -204,12 +221,13 @@ public final class ProcessUtils {
      * @param taskAppId
      * @return
      */
-    public static String getPodLog(K8sTaskExecutionContext k8sTaskExecutionContext, String taskAppId) {
+    public static LogWatch getPodLogWatcher(K8sTaskExecutionContext k8sTaskExecutionContext, String taskAppId,
+                                            String containerName) {
         KubernetesApplicationManager applicationManager =
                 (KubernetesApplicationManager) applicationManagerMap.get(ResourceManagerType.KUBERNETES);
 
         return applicationManager
-                .collectPodLog(new KubernetesApplicationManagerContext(k8sTaskExecutionContext, taskAppId));
+                .getPodLogWatcher(
+                        new KubernetesApplicationManagerContext(k8sTaskExecutionContext, taskAppId, containerName));
     }
-
 }

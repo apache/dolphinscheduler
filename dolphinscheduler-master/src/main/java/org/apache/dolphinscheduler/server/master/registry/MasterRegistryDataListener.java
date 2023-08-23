@@ -17,13 +17,10 @@
 
 package org.apache.dolphinscheduler.server.master.registry;
 
-import static org.apache.dolphinscheduler.common.constants.Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
-import static org.apache.dolphinscheduler.common.constants.Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
-
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import lombok.extern.slf4j.Slf4j;
@@ -46,9 +43,9 @@ public class MasterRegistryDataListener implements SubscribeListener {
             return;
         }
         // monitor master
-        if (path.startsWith(REGISTRY_DOLPHINSCHEDULER_MASTERS + Constants.SINGLE_SLASH)) {
+        if (path.startsWith(RegistryNodeType.MASTER.getRegistryPath() + Constants.SINGLE_SLASH)) {
             handleMasterEvent(event);
-        } else if (path.startsWith(REGISTRY_DOLPHINSCHEDULER_WORKERS + Constants.SINGLE_SLASH)) {
+        } else if (path.startsWith(RegistryNodeType.WORKER.getRegistryPath() + Constants.SINGLE_SLASH)) {
             // monitor worker
             handleWorkerEvent(event);
         }
@@ -61,7 +58,7 @@ public class MasterRegistryDataListener implements SubscribeListener {
                 log.info("master node added : {}", path);
                 break;
             case REMOVE:
-                masterRegistryClient.removeMasterNodePath(path, NodeType.MASTER, true);
+                masterRegistryClient.removeMasterNodePath(path, RegistryNodeType.MASTER, true);
 
                 break;
             default:
@@ -77,7 +74,7 @@ public class MasterRegistryDataListener implements SubscribeListener {
                 break;
             case REMOVE:
                 log.info("worker node deleted : {}", path);
-                masterRegistryClient.removeWorkerNodePath(path, NodeType.WORKER, true);
+                masterRegistryClient.removeWorkerNodePath(path, RegistryNodeType.WORKER, true);
                 break;
             default:
                 break;
