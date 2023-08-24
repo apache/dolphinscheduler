@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.api.controller.v2;
 
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_ACCESS_TOKEN_ERROR;
 
-import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.controller.BaseController;
 import org.apache.dolphinscheduler.api.dto.CreateTokenRequest;
 import org.apache.dolphinscheduler.api.dto.CreateTokenResponse;
@@ -66,7 +65,6 @@ public class AccessTokenV2Controller extends BaseController {
     @ResponseStatus(HttpStatus.CREATED)
     @Parameter(name = "createTokenRequest", description = "createTokenRequest", required = true, schema = @Schema(implementation = CreateTokenRequest.class))
     @ApiException(CREATE_ACCESS_TOKEN_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public CreateTokenResponse createToken(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @RequestBody CreateTokenRequest createTokenRequest) {
         Result result = accessTokenService.createToken(loginUser,

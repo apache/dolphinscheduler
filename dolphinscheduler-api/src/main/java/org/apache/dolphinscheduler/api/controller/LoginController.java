@@ -22,7 +22,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.NOT_SUPPORT_SSO;
 import static org.apache.dolphinscheduler.api.enums.Status.SIGN_OUT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.USER_LOGIN_FAILURE;
 
-import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.configuration.OAuth2Configuration;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -107,7 +106,6 @@ public class LoginController extends BaseController {
     })
     @PostMapping(value = "/login")
     @ApiException(USER_LOGIN_FAILURE)
-    @AccessLogAnnotation(ignoreRequestArgs = {"userPassword", "request", "response"})
     public Result login(@RequestParam(value = "userName") String userName,
                         @RequestParam(value = "userPassword") String userPassword,
                         HttpServletRequest request,
@@ -171,7 +169,6 @@ public class LoginController extends BaseController {
     @Operation(summary = "signOut", description = "SIGNOUT_NOTES")
     @PostMapping(value = "/signOut")
     @ApiException(SIGN_OUT_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = {"loginUser", "request"})
     public Result signOut(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                           HttpServletRequest request) {
         String ip = getClientIpAddress(request);

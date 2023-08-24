@@ -26,7 +26,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_UNAUTHORIZED_NA
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_K8S_NAMESPACE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_K8S_NAMESPACE_ERROR;
 
-import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.K8sNamespaceService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -85,7 +84,6 @@ public class K8sNamespaceController extends BaseController {
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_K8S_NAMESPACE_LIST_PAGING_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryNamespaceListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @RequestParam(value = "searchVal", required = false) String searchVal,
                                            @RequestParam("pageSize") Integer pageSize,
@@ -120,7 +118,6 @@ public class K8sNamespaceController extends BaseController {
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_K8S_NAMESPACE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result createNamespace(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam(value = "namespace") String namespace,
                                   @RequestParam(value = "clusterCode") Long clusterCode,
@@ -149,7 +146,6 @@ public class K8sNamespaceController extends BaseController {
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(UPDATE_K8S_NAMESPACE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result updateNamespace(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @PathVariable(value = "id") int id,
                                   @RequestParam(value = "userName", required = false) String userName,
@@ -177,7 +173,6 @@ public class K8sNamespaceController extends BaseController {
     @PostMapping(value = "/verify")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(VERIFY_K8S_NAMESPACE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result verifyNamespace(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam(value = "namespace") String namespace,
                                   @RequestParam(value = "clusterCode") Long clusterCode) {
@@ -199,7 +194,6 @@ public class K8sNamespaceController extends BaseController {
     @PostMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_K8S_NAMESPACE_BY_ID_ERROR)
-    @AccessLogAnnotation
     public Result delNamespaceById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @RequestParam(value = "id") int id) {
         Map<String, Object> result = k8sNamespaceService.deleteNamespaceById(loginUser, id);
@@ -220,7 +214,6 @@ public class K8sNamespaceController extends BaseController {
     @GetMapping(value = "/unauth-namespace")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_UNAUTHORIZED_NAMESPACE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryUnauthorizedNamespace(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                              @RequestParam("userId") Integer userId) {
         Map<String, Object> result = k8sNamespaceService.queryUnauthorizedNamespace(loginUser, userId);
@@ -241,7 +234,6 @@ public class K8sNamespaceController extends BaseController {
     @GetMapping(value = "/authed-namespace")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_AUTHORIZED_NAMESPACE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryAuthorizedNamespace(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @RequestParam("userId") Integer userId) {
         Map<String, Object> result = k8sNamespaceService.queryAuthorizedNamespace(loginUser, userId);
@@ -258,7 +250,6 @@ public class K8sNamespaceController extends BaseController {
     @GetMapping(value = "/available-list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_CAN_USE_K8S_NAMESPACE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryAvailableNamespaceList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         List<K8sNamespace> result = k8sNamespaceService.queryNamespaceAvailable(loginUser);
         return success(result);

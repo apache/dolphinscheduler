@@ -21,7 +21,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.ADD_TASK_TYPE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_TASK_TYPE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.LIST_TASK_TYPE_ERROR;
 
-import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.dto.FavTaskDto;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -69,7 +68,6 @@ public class FavTaskController extends BaseController {
     @GetMapping(value = "/taskTypes")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LIST_TASK_TYPE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result listTaskType(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         List<FavTaskDto> favTaskList = favTaskService.getFavTaskList(loginUser);
         return success(Status.SUCCESS.getMsg(), favTaskList);
@@ -85,7 +83,6 @@ public class FavTaskController extends BaseController {
     @DeleteMapping(value = "/{taskType}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_TASK_TYPE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteFavTask(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @PathVariable("taskType") String taskType) {
         boolean b = favTaskService.deleteFavTask(loginUser, taskType);
@@ -102,7 +99,6 @@ public class FavTaskController extends BaseController {
     @PostMapping(value = "/{taskType}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(ADD_TASK_TYPE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result addFavTask(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                              @PathVariable("taskType") String taskType) {
         int i = favTaskService.addFavTask(loginUser, taskType);
