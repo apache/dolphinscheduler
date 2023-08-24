@@ -36,8 +36,6 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-        <junit.version>5.7.2</junit.version>
         <selenium.version>3.141.59</selenium.version>
         <lombok.version>1.18.24</lombok.version>
         <assertj-core.version>3.23.1</assertj-core.version>
