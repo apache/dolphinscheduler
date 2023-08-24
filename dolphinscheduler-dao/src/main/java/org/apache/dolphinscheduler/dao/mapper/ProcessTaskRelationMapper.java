@@ -225,4 +225,12 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
 
     void deleteByWorkflowDefinitionCode(@Param("workflowDefinitionCode") long workflowDefinitionCode,
                                         @Param("workflowDefinitionVersion") int workflowDefinitionVersion);
+
+    /**
+     * process task relation by taskCode
+     *
+     * @param taskCode taskCode
+     * @return ProcessTaskRelation
+     */
+    List<ProcessTaskRelation> queryProcessTaskRelationByTaskCode(@Param("taskCode") long taskCode);
 }

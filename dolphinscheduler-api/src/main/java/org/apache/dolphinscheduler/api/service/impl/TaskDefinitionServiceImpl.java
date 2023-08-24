@@ -51,6 +51,7 @@ import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.Project;
@@ -58,6 +59,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskMainInfo;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
@@ -140,6 +142,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
 
     @Autowired
     private ProcessDefinitionService processDefinitionService;
+
+    @Autowired
+    private ProcessDefinitionLogMapper processDefinitionLogMapper;
 
     /**
      * create task definition
@@ -781,21 +786,51 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                     projectCode, taskCode, taskDefinitionToUpdate.getVersion());
         // update process task relation
         List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper
-                .queryByTaskCode(taskDefinitionToUpdate.getCode());
+                .queryProcessTaskRelationByTaskCode(taskDefinitionToUpdate.getCode());
         if (CollectionUtils.isNotEmpty(processTaskRelations)) {
+            ProcessTaskRelation taskRelation = processTaskRelations.get(0);
+            int processDefinitionVersion = processDefinitionLogMapper.queryMaxVersionForDefinition(taskRelation.getProcessDefinitionCode())  + 1;
+            long processDefinitionCode = taskRelation.getProcessDefinitionCode();
             for (ProcessTaskRelation processTaskRelation : processTaskRelations) {
                 if (taskCode == processTaskRelation.getPreTaskCode()) {
                     processTaskRelation.setPreTaskVersion(version);
                 } else if (taskCode == processTaskRelation.getPostTaskCode()) {
                     processTaskRelation.setPostTaskVersion(version);
                 }
-                int count = processTaskRelationMapper.updateProcessTaskRelationTaskVersion(processTaskRelation);
-                if (count != 1) {
+                processTaskRelation.setProcessDefinitionVersion(processDefinitionVersion);
+                int update_2 = processTaskRelationMapper.updateProcessTaskRelationTaskVersion(processTaskRelation);
+                if (update_2 != 1) {
                     log.error("batch update process task relation error, projectCode:{}, taskDefinitionCode:{}.",
                             projectCode, taskCode);
                     putMsg(result, Status.PROCESS_TASK_RELATION_BATCH_UPDATE_ERROR);
                     throw new ServiceException(Status.PROCESS_TASK_RELATION_BATCH_UPDATE_ERROR);
                 }
+                ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog(processTaskRelation);
+                processTaskRelationLog.setOperator(loginUser.getId());
+                processTaskRelationLog.setId(null);
+                processTaskRelationLog.setOperateTime(now);
+                int insert_2 = processTaskRelationLogDao.insert(processTaskRelationLog);
+                if (insert_2 != 1) {
+                    log.error("batch update process task relation error, projectCode:{}, taskDefinitionCode:{}.",
+                            projectCode, taskCode);
+                    putMsg(result, Status.CREATE_PROCESS_TASK_RELATION_LOG_ERROR);
+                    throw new ServiceException(Status.CREATE_PROCESS_TASK_RELATION_LOG_ERROR);
+                }
+            }
+            ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
+            processDefinition.setVersion(processDefinitionVersion);
+            processDefinition.setUpdateTime(now);
+            processDefinition.setUserId(loginUser.getId());
+            // update process definition
+            int update_3 = processDefinitionMapper.updateById(processDefinition);
+            ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog(processDefinition);
+            processDefinitionLog.setOperateTime(now);
+            processDefinitionLog.setId(null);
+            processDefinitionLog.setOperator(loginUser.getId());
+            int insert_3 = processDefinitionLogMapper.insert(processDefinitionLog);
+            if ((update_3 & insert_3) != 1) {
+                putMsg(result, Status.UPDATE_PROCESS_DEFINITION_ERROR);
+                throw new ServiceException(Status.UPDATE_PROCESS_DEFINITION_ERROR);
             }
         }
         return taskDefinitionToUpdate;
