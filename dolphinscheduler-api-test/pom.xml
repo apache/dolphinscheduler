@@ -24,7 +24,6 @@
         <artifactId>dolphinscheduler</artifactId>
         <version>dev-SNAPSHOT</version>
     </parent>
-<!--    <groupId>org.apache.dolphinscheduler</groupId>-->
     <artifactId>dolphinscheduler-api-test</artifactId>
     <packaging>pom</packaging>
     <version>dev-SNAPSHOT</version>
