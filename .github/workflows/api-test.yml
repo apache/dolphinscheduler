@@ -31,7 +31,7 @@ concurrency:
 jobs:
   get-runner:
     name get a runner to use for this workflow
-    if: ${{ always() }}
+    if: always()
     runs-on: ubuntu-latest
     outputs:
       RUNNER: ${{ runner.name }}
