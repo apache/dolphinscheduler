@@ -72,7 +72,8 @@ jobs:
       - uses: actions/cache@v3
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-maven
+          key: ${{ runner.os }}-maven-unit-test
+          restore-keys: ${{ runner.os }}-maven-
 
       - name: Run Unit tests
         run: ./mvnw clean verify -B -Dmaven.test.skip=false -Dspotless.skip=true
