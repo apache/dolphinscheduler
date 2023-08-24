@@ -43,13 +43,13 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-
-import lombok.extern.slf4j.Slf4j;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 @Slf4j
@@ -83,7 +83,8 @@ public class ProcessInstanceAPITest {
     public static void setup() {
         LoginPage loginPage = new LoginPage();
         HttpResponse loginHttpResponse = loginPage.login(username, password);
-        sessionId = JSONUtils.convertValue(loginHttpResponse.getBody().getData(), LoginResponseData.class).getSessionId();
+        sessionId =
+                JSONUtils.convertValue(loginHttpResponse.getBody().getData(), LoginResponseData.class).getSessionId();
         processInstancePage = new ProcessInstancePage(sessionId);
         executorPage = new ExecutorPage(sessionId);
         processDefinitionPage = new ProcessDefinitionPage(sessionId);
@@ -107,24 +108,30 @@ public class ProcessInstanceAPITest {
             HttpResponse createProjectResponse = projectPage.createProject(loginUser, "project-test");
             HttpResponse queryAllProjectListResponse = projectPage.queryAllProjectList(loginUser);
             Assertions.assertTrue(queryAllProjectListResponse.getBody().getSuccess());
-            projectCode = (long) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllProjectListResponse.getBody().getData()).get(0)).get("code");
+            projectCode = (long) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllProjectListResponse
+                    .getBody().getData()).get(0)).get("code");
 
             // upload test workflow definition json
             ClassLoader classLoader = getClass().getClassLoader();
             File file = new File(classLoader.getResource("workflow-json/test.json").getFile());
             CloseableHttpResponse importProcessDefinitionResponse = processDefinitionPage
-                .importProcessDefinition(loginUser, projectCode, file);
+                    .importProcessDefinition(loginUser, projectCode, file);
             String data = EntityUtils.toString(importProcessDefinitionResponse.getEntity());
             Assertions.assertTrue(data.contains("\"success\":true"));
 
             // get workflow definition code
-            HttpResponse queryAllProcessDefinitionByProjectCodeResponse = processDefinitionPage.queryAllProcessDefinitionByProjectCode(loginUser, projectCode);
+            HttpResponse queryAllProcessDefinitionByProjectCodeResponse =
+                    processDefinitionPage.queryAllProcessDefinitionByProjectCode(loginUser, projectCode);
             Assertions.assertTrue(queryAllProcessDefinitionByProjectCodeResponse.getBody().getSuccess());
-            Assertions.assertTrue(queryAllProcessDefinitionByProjectCodeResponse.getBody().getData().toString().contains("hello world"));
-            processDefinitionCode = (long) ((LinkedHashMap<String, Object>) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllProcessDefinitionByProjectCodeResponse.getBody().getData()).get(0)).get("processDefinition")).get("code");
+            Assertions.assertTrue(queryAllProcessDefinitionByProjectCodeResponse.getBody().getData().toString()
+                    .contains("hello world"));
+            processDefinitionCode =
+                    (long) ((LinkedHashMap<String, Object>) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllProcessDefinitionByProjectCodeResponse
+                            .getBody().getData()).get(0)).get("processDefinition")).get("code");
 
             // release test workflow
-            HttpResponse releaseProcessDefinitionResponse = processDefinitionPage.releaseProcessDefinition(loginUser, projectCode, processDefinitionCode, ReleaseState.ONLINE);
+            HttpResponse releaseProcessDefinitionResponse = processDefinitionPage.releaseProcessDefinition(loginUser,
+                    projectCode, processDefinitionCode, ReleaseState.ONLINE);
             Assertions.assertTrue(releaseProcessDefinitionResponse.getBody().getSuccess());
 
             // trigger workflow instance
@@ -132,17 +139,21 @@ public class ProcessInstanceAPITest {
             Date date = new Date();
             String scheduleTime = String.format("%s,%s", formatter.format(date), formatter.format(date));
             log.info("use current time {} as scheduleTime", scheduleTime);
-            HttpResponse startProcessInstanceResponse = executorPage.startProcessInstance(loginUser, projectCode, processDefinitionCode, scheduleTime, FailureStrategy.END, WarningType.NONE);
+            HttpResponse startProcessInstanceResponse = executorPage.startProcessInstance(loginUser, projectCode,
+                    processDefinitionCode, scheduleTime, FailureStrategy.END, WarningType.NONE);
             Assertions.assertTrue(startProcessInstanceResponse.getBody().getSuccess());
             // make sure process instance has completed and successfully persisted into db
             Thread.sleep(5000);
 
             // query workflow instance by trigger code
             triggerCode = (long) startProcessInstanceResponse.getBody().getData();
-            HttpResponse queryProcessInstancesByTriggerCodeResponse = processInstancePage.queryProcessInstancesByTriggerCode(loginUser, projectCode, triggerCode);
+            HttpResponse queryProcessInstancesByTriggerCodeResponse =
+                    processInstancePage.queryProcessInstancesByTriggerCode(loginUser, projectCode, triggerCode);
             Assertions.assertTrue(queryProcessInstancesByTriggerCodeResponse.getBody().getSuccess());
-            processInstanceId = (int) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryProcessInstancesByTriggerCodeResponse.getBody().getData()).get(0)).get("id");
-        }  catch (Exception e) {
+            processInstanceId =
+                    (int) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryProcessInstancesByTriggerCodeResponse
+                            .getBody().getData()).get(0)).get("id");
+        } catch (Exception e) {
             log.error("failed", e);
             Assertions.fail();
         }
@@ -151,7 +162,8 @@ public class ProcessInstanceAPITest {
     @Test
     @Order(2)
     public void testQueryProcessInstanceList() {
-        HttpResponse queryProcessInstanceListResponse = processInstancePage.queryProcessInstanceList(loginUser, projectCode, 1, 10);
+        HttpResponse queryProcessInstanceListResponse =
+                processInstancePage.queryProcessInstanceList(loginUser, projectCode, 1, 10);
         Assertions.assertTrue(queryProcessInstanceListResponse.getBody().getSuccess());
         Assertions.assertTrue(queryProcessInstanceListResponse.getBody().getData().toString().contains("test_import"));
     }
@@ -159,7 +171,8 @@ public class ProcessInstanceAPITest {
     @Test
     @Order(3)
     public void testQueryTaskListByProcessId() {
-        HttpResponse queryTaskListByProcessIdResponse = processInstancePage.queryTaskListByProcessId(loginUser, projectCode, processInstanceId);
+        HttpResponse queryTaskListByProcessIdResponse =
+                processInstancePage.queryTaskListByProcessId(loginUser, projectCode, processInstanceId);
         Assertions.assertTrue(queryTaskListByProcessIdResponse.getBody().getSuccess());
         Assertions.assertTrue(queryTaskListByProcessIdResponse.getBody().getData().toString().contains("test_import"));
     }
@@ -167,7 +180,8 @@ public class ProcessInstanceAPITest {
     @Test
     @Order(4)
     public void testQueryProcessInstanceById() {
-        HttpResponse queryProcessInstanceByIdResponse = processInstancePage.queryProcessInstanceById(loginUser, projectCode, processInstanceId);
+        HttpResponse queryProcessInstanceByIdResponse =
+                processInstancePage.queryProcessInstanceById(loginUser, projectCode, processInstanceId);
         Assertions.assertTrue(queryProcessInstanceByIdResponse.getBody().getSuccess());
         Assertions.assertTrue(queryProcessInstanceByIdResponse.getBody().getData().toString().contains("test_import"));
     }
@@ -175,10 +189,12 @@ public class ProcessInstanceAPITest {
     @Test
     @Order(5)
     public void testDeleteProcessInstanceById() {
-        HttpResponse deleteProcessInstanceByIdResponse = processInstancePage.deleteProcessInstanceById(loginUser, projectCode, processInstanceId);
+        HttpResponse deleteProcessInstanceByIdResponse =
+                processInstancePage.deleteProcessInstanceById(loginUser, projectCode, processInstanceId);
         Assertions.assertTrue(deleteProcessInstanceByIdResponse.getBody().getSuccess());
 
-        HttpResponse queryProcessInstanceListResponse = processInstancePage.queryProcessInstanceList(loginUser, projectCode, 1, 10);
+        HttpResponse queryProcessInstanceListResponse =
+                processInstancePage.queryProcessInstanceList(loginUser, projectCode, 1, 10);
         Assertions.assertTrue(queryProcessInstanceListResponse.getBody().getSuccess());
         Assertions.assertFalse(queryProcessInstanceListResponse.getBody().getData().toString().contains("test_import"));
     }

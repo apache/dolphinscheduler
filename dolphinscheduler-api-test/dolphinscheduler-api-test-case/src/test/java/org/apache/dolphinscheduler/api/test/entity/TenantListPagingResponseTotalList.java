@@ -29,6 +29,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class TenantListPagingResponseTotalList {
+
     private Date createTime;
 
     private Date updateTime;

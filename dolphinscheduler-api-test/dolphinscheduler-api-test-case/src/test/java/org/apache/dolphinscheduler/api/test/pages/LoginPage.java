@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class LoginPage {
+
     public HttpResponse login(String username, String password) {
         Map<String, Object> params = new HashMap<>();
 

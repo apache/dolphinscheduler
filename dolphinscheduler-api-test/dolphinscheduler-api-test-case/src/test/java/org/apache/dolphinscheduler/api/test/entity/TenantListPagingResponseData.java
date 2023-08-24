@@ -29,6 +29,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class TenantListPagingResponseData {
+
     private Integer currentPage;
 
     private Integer pageSize;

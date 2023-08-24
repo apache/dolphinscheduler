@@ -28,17 +28,18 @@ import org.apache.dolphinscheduler.api.test.pages.LoginPage;
 import org.apache.dolphinscheduler.api.test.pages.security.TenantPage;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
-import lombok.extern.slf4j.Slf4j;
-
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 @Slf4j
 public class TenantAPITest {
+
     private static final String tenant = System.getProperty("user.name");
 
     private static final String user = "admin";
@@ -54,7 +55,8 @@ public class TenantAPITest {
         LoginPage loginPage = new LoginPage();
         HttpResponse loginHttpResponse = loginPage.login(user, password);
 
-        sessionId = JSONUtils.convertValue(loginHttpResponse.getBody().getData(), LoginResponseData.class).getSessionId();
+        sessionId =
+                JSONUtils.convertValue(loginHttpResponse.getBody().getData(), LoginResponseData.class).getSessionId();
     }
 
     @AfterAll
@@ -90,7 +92,9 @@ public class TenantAPITest {
         HttpResponse createTenantHttpResponse = tenantPage.getTenantListPaging(sessionId, 1, 10, "");
         boolean result = false;
 
-        for (TenantListPagingResponseTotalList tenantListPagingResponseTotalList : JSONUtils.convertValue(createTenantHttpResponse.getBody().getData(), TenantListPagingResponseData.class).getTotalList()) {
+        for (TenantListPagingResponseTotalList tenantListPagingResponseTotalList : JSONUtils
+                .convertValue(createTenantHttpResponse.getBody().getData(), TenantListPagingResponseData.class)
+                .getTotalList()) {
             if (tenantListPagingResponseTotalList.getTenantCode().equals(tenant)) {
                 result = true;
                 existTenantId = tenantListPagingResponseTotalList.getId();

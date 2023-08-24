@@ -23,6 +23,15 @@ import org.apache.dolphinscheduler.api.test.core.Constants;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponseBody;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicHeader;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.HashMap;
@@ -38,17 +47,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.util.EntityUtils;
-
 
 @Slf4j
 public class RequestClient {
@@ -70,10 +68,10 @@ public class RequestClient {
 
         log.info("GET request to {}, Headers: {}", requestUrl, headersBuilder);
         Request request = new Request.Builder()
-            .url(requestUrl)
-            .headers(headersBuilder)
-            .get()
-            .build();
+                .url(requestUrl)
+                .headers(headersBuilder)
+                .get()
+                .build();
 
         Response response = this.httpClient.newCall(request).execute();
 
@@ -121,10 +119,10 @@ public class RequestClient {
         RequestBody requestBody = FormBody.create(MediaType.parse(Constants.REQUEST_CONTENT_TYPE), getParams(params));
         log.info("POST request to {}, Headers: {}, Params: {}", requestUrl, headersBuilder, params);
         Request request = new Request.Builder()
-            .headers(headersBuilder)
-            .url(requestUrl)
-            .post(requestBody)
-            .build();
+                .headers(headersBuilder)
+                .url(requestUrl)
+                .post(requestBody)
+                .build();
         Response response = this.httpClient.newCall(request).execute();
         int responseCode = response.code();
         HttpResponseBody responseData = null;
@@ -152,10 +150,10 @@ public class RequestClient {
         RequestBody requestBody = FormBody.create(MediaType.parse(Constants.REQUEST_CONTENT_TYPE), getParams(params));
         log.info("PUT request to {}, Headers: {}, Params: {}", requestUrl, headersBuilder, params);
         Request request = new Request.Builder()
-            .headers(headersBuilder)
-            .url(requestUrl)
-            .put(requestBody)
-            .build();
+                .headers(headersBuilder)
+                .url(requestUrl)
+                .put(requestBody)
+                .build();
         Response response = this.httpClient.newCall(request).execute();
         int responseCode = response.code();
         HttpResponseBody responseData = null;
@@ -171,17 +169,17 @@ public class RequestClient {
         return httpResponse;
     }
 
-    public CloseableHttpResponse postWithFile(String url, Map<String, String> headers, Map<String, Object> params, File file) {
+    public CloseableHttpResponse postWithFile(String url, Map<String, String> headers, Map<String, Object> params,
+                                              File file) {
         try {
             Headers headersBuilder = Headers.of(headers);
             MultipartEntityBuilder builder = MultipartEntityBuilder.create();
             builder.addTextBody("json", getParams(params), ContentType.MULTIPART_FORM_DATA);
             builder.addBinaryBody(
-                "file",
-                new FileInputStream(file),
-                ContentType.APPLICATION_OCTET_STREAM,
-                file.getName()
-            );
+                    "file",
+                    new FileInputStream(file),
+                    ContentType.APPLICATION_OCTET_STREAM,
+                    file.getName());
             HttpEntity multipart = builder.build();
             String requestUrl = String.format("%s%s", Constants.DOLPHINSCHEDULER_API_URL, url);
             log.info("POST request to {}, Headers: {}, Params: {}", requestUrl, headersBuilder, params);
@@ -199,7 +197,6 @@ public class RequestClient {
         return null;
     }
 
-
     @SneakyThrows
     public HttpResponse delete(String url, Map<String, String> headers, Map<String, Object> params) {
         if (headers == null) {
@@ -214,10 +211,10 @@ public class RequestClient {
 
         log.info("DELETE request to {}, Headers: {}, Params: {}", requestUrl, headersBuilder, params);
         Request request = new Request.Builder()
-            .headers(headersBuilder)
-            .url(requestUrl)
-            .delete()
-            .build();
+                .headers(headersBuilder)
+                .url(requestUrl)
+                .delete()
+                .build();
 
         Response response = this.httpClient.newCall(request).execute();
 

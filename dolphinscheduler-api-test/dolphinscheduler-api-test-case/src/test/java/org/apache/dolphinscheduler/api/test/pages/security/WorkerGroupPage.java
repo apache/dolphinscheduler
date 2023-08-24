@@ -19,8 +19,6 @@
 
 package org.apache.dolphinscheduler.api.test.pages.security;
 
-import lombok.AllArgsConstructor;
-
 import org.apache.dolphinscheduler.api.test.core.Constants;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.utils.RequestClient;
@@ -29,13 +27,15 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import java.util.HashMap;
 import java.util.Map;
 
+import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class WorkerGroupPage {
 
     private String sessionId;
 
-    public HttpResponse saveWorkerGroup(User loginUser, int id, String name, String addrList, String description, String otherParamsJson) {
+    public HttpResponse saveWorkerGroup(User loginUser, int id, String name, String addrList, String description,
+                                        String otherParamsJson) {
         Map<String, Object> params = new HashMap<>();
         params.put("loginUser", loginUser);
         params.put("id", id);
@@ -95,6 +95,5 @@ public class WorkerGroupPage {
         RequestClient requestClient = new RequestClient();
         return requestClient.get("/worker-groups/worker-address-list", headers, params);
     }
-
 
 }
