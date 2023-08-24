@@ -72,7 +72,7 @@ jobs:
       - uses: actions/cache@v3
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-unit-test
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-unit-test
           restore-keys: ${{ runner.os }}-maven-
 
       - name: Run Unit tests
