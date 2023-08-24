@@ -30,7 +30,7 @@ concurrency:
 
 jobs:
   get-runner:
-    name get a runner to use for this workflow
+    name: get a runner to use for this workflow
     if: always()
     runs-on: ubuntu-latest
     outputs:
