@@ -29,14 +29,6 @@ concurrency:
 
 
 jobs:
-  get-runner:
-    name: get a runner to use for this workflow
-    if: always()
-    runs-on: ubuntu-latest
-    outputs:
-      RUNNER: ${{ runner.name }}
-    steps:
-      - run: echo "selected runner = ${{ runner.name }}"
   paths-filter:
     name: API-Test-Path-Filter
     runs-on: ubuntu-latest
@@ -52,9 +44,9 @@ jobs:
               - '!(docs/**)'
   build:
     name: API-Test-Build
-    needs: [ paths-filter, get-runner ]
+    needs: paths-filter
     if: ${{ (needs.paths-filter.outputs.not-ignore == 'true') || (github.event_name == 'push') }}
-    runs-on: ${{needs.get-runner.outputs.RUNNER}}
+    runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v2
@@ -90,8 +82,8 @@ jobs:
           retention-days: 1
   api-test:
     name: ${{ matrix.case.name }}
-    needs: [ build, get-runner ]
-    runs-on: ${{needs.get-runner.outputs.RUNNER}}
+    needs: build
+    runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
       matrix:
