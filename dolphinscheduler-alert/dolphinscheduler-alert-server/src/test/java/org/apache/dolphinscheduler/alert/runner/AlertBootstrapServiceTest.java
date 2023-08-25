@@ -31,7 +31,7 @@ import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
-import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponse;
+import org.apache.dolphinscheduler.extract.alert.request.AlertSendResponse;
 
 import java.util.ArrayList;
 import java.util.List;
