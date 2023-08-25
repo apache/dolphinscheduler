@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.datax;
 
 import static org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils.decodePassword;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
+import static org.apache.dolphinscheduler.spi.enums.DbType.DORIS;
 
 import org.apache.dolphinscheduler.common.log.SensitiveDataConverter;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -234,7 +235,6 @@ public class DataxTask extends AbstractTask {
      * @return collection of datax job config JSONObject
      */
     private List<ObjectNode> buildDataxJobContentJson() {
-
         BaseConnectionParam dataSourceCfg = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
                 dataxTaskExecutionContext.getSourcetype(),
                 dataxTaskExecutionContext.getSourceConnectionParams());
@@ -242,6 +242,31 @@ public class DataxTask extends AbstractTask {
         BaseConnectionParam dataTargetCfg = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
                 dataxTaskExecutionContext.getTargetType(),
                 dataxTaskExecutionContext.getTargetConnectionParams());
+
+        ObjectNode reader;
+        ObjectNode writer;
+
+        switch (dataxTaskExecutionContext.getSourcetype()) {
+            default:
+                reader = buildDataxJobContentJsonDefaultReader(dataSourceCfg);
+        }
+
+        switch (dataxTaskExecutionContext.getTargetType()) {
+            case DORIS:
+            default:
+                writer = buildDataxJobContentJsonDefaultWrite(dataSourceCfg, dataTargetCfg);
+        }
+
+        List<ObjectNode> contentList = new ArrayList<>();
+        ObjectNode content = JSONUtils.createObjectNode();
+        content.set("reader", reader);
+        content.set("writer", writer);
+        contentList.add(content);
+
+        return contentList;
+    }
+
+    private ObjectNode buildDataxJobContentJsonDefaultReader(BaseConnectionParam dataSourceCfg) {
 
         List<ObjectNode> readerConnArr = new ArrayList<>();
         ObjectNode readerConn = JSONUtils.createObjectNode();
@@ -264,6 +289,12 @@ public class DataxTask extends AbstractTask {
         ObjectNode reader = JSONUtils.createObjectNode();
         reader.put("name", DataxUtils.getReaderPluginName(dataxTaskExecutionContext.getSourcetype()));
         reader.set("parameter", readerParam);
+
+        return reader;
+    }
+
+    private ObjectNode buildDataxJobContentJsonDefaultWrite(BaseConnectionParam dataSourceCfg,
+                                                            BaseConnectionParam dataTargetCfg) {
 
         List<ObjectNode> writerConnArr = new ArrayList<>();
         ObjectNode writerConn = JSONUtils.createObjectNode();
@@ -306,14 +337,7 @@ public class DataxTask extends AbstractTask {
         ObjectNode writer = JSONUtils.createObjectNode();
         writer.put("name", DataxUtils.getWriterPluginName(dataxTaskExecutionContext.getTargetType()));
         writer.set("parameter", writerParam);
-
-        List<ObjectNode> contentList = new ArrayList<>();
-        ObjectNode content = JSONUtils.createObjectNode();
-        content.set("reader", reader);
-        content.set("writer", writer);
-        contentList.add(content);
-
-        return contentList;
+        return writer;
     }
 
     /**
