@@ -32,10 +32,12 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.dolphinscheduler.plugin.task.api.model.DateInterval;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -171,4 +173,13 @@ public class TaskInstanceDaoImpl extends BaseDao<TaskInstance, TaskInstanceMappe
         return mybatisMapper.findByWorkflowInstanceId(workflowInstanceId);
     }
 
+    @Override
+    public List<TaskInstance> queryLastTaskInstanceListIntervalByTaskCodes(Set<Long> taskCodes, DateInterval dateInterval, int testFlag) {
+        return mybatisMapper.findLastTaskInstances(taskCodes, dateInterval.getStartTime(), dateInterval.getEndTime(), testFlag);
+    }
+
+    @Override
+    public TaskInstance queryLastTaskInstanceIntervalByTaskCode(long depTaskCode, DateInterval dateInterval, int testFlag) {
+        return mybatisMapper.findLastTaskInstance(depTaskCode, dateInterval.getStartTime(), dateInterval.getEndTime(), testFlag);
+    }
 }
