@@ -40,7 +40,7 @@ public class LogicTaskExecuteRunnablePauseOperator extends BaseTaskExecuteRunnab
                     taskInstance.getName());
             return;
         }
-        final ILogicTaskInstanceOperator taskInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+        final ILogicTaskInstanceOperator taskInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory
                 .getProxyClient(taskInstance.getHost(), ILogicTaskInstanceOperator.class);
         final LogicTaskPauseRequest logicTaskPauseRequest = new LogicTaskPauseRequest(taskInstance.getId());
         final LogicTaskPauseResponse logicTaskPauseResponse =

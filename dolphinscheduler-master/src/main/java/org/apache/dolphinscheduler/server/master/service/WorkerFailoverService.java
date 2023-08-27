@@ -274,7 +274,7 @@ public class WorkerFailoverService {
                     .create();
             // only kill yarn/k8s job if exists , the local thread has exited
             log.info("TaskInstance failover begin kill the task related yarn or k8s job");
-            IWorkerLogService iWorkerLogService = SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+            IWorkerLogService iWorkerLogService = SingletonJdkDynamicRpcClientProxyFactory
                     .getProxyClient(taskInstance.getHost(), IWorkerLogService.class);
             GetAppIdResponse getAppIdResponse =
                     iWorkerLogService.getAppId(new GetAppIdRequest(taskInstance.getId(), taskInstance.getLogPath()));

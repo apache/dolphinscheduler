@@ -226,7 +226,7 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
             return;
         }
         ITaskInstanceExecutionEventListener iTaskInstanceExecutionEventListener =
-                SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+                SingletonJdkDynamicRpcClientProxyFactory
                         .getProxyClient(processInstanceHost, ITaskInstanceExecutionEventListener.class);
 
         WorkflowInstanceStateChangeEvent workflowInstanceStateChangeEvent = new WorkflowInstanceStateChangeEvent(

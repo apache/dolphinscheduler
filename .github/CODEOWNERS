@@ -33,7 +33,7 @@
 /dolphinscheduler-master/ @caishunfeng @SbloodyS @ruanwenjun
 /dolphinscheduler-worker/ @caishunfeng @SbloodyS @ruanwenjun
 /dolphinscheduler-service/ @caishunfeng
-/dolphinscheduler-remote/ @caishunfeng
+/dolphinscheduler-extract/ @caishunfeng @ruanwenjun
 /dolphinscheduler-spi/ @caishunfeng
 /dolphinscheduler-task-plugin/ @caishunfeng @SbloodyS @zhuangchong
 /dolphinscheduler-tools/ @caishunfeng @SbloodyS @zhongjiajie @EricGao888

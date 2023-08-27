@@ -47,7 +47,7 @@ public class LogicTaskExecuteRunnableTimeoutOperator extends BaseTaskExecuteRunn
         }
 
         final ILogicTaskInstanceOperator iLogicTaskInstanceOperator =
-                SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+                SingletonJdkDynamicRpcClientProxyFactory
                         .getProxyClient(taskInstance.getHost(), ILogicTaskInstanceOperator.class);
 
         final LogicTaskKillRequest taskInstanceKillRequest = new LogicTaskKillRequest(taskInstance.getId());

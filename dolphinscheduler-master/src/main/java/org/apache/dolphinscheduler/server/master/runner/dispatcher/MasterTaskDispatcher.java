@@ -51,7 +51,7 @@ public class MasterTaskDispatcher extends BaseTaskDispatcher {
     protected void doDispatch(TaskExecuteRunnable taskExecuteRunnable) throws TaskDispatchException {
         TaskExecutionContext taskExecutionContext = taskExecuteRunnable.getTaskExecutionContext();
         try {
-            ILogicTaskInstanceOperator taskInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+            ILogicTaskInstanceOperator taskInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory
                     .getProxyClient(taskExecutionContext.getHost(), ILogicTaskInstanceOperator.class);
             LogicTaskDispatchResponse logicTaskDispatchResponse = taskInstanceOperator
                     .dispatchLogicTask(new LogicTaskDispatchRequest(taskExecuteRunnable.getTaskExecutionContext()));

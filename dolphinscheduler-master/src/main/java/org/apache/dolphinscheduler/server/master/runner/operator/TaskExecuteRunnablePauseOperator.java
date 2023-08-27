@@ -48,7 +48,7 @@ public class TaskExecuteRunnablePauseOperator implements TaskExecuteRunnableOper
             log.info("The TaskInstance: {} host is null, no need to pauseRemoteTaskInstance", taskInstance.getName());
             return;
         }
-        final ITaskInstanceOperator taskInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+        final ITaskInstanceOperator taskInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory
                 .getProxyClient(taskInstance.getHost(), ITaskInstanceOperator.class);
         final TaskInstancePauseRequest taskInstancePauseRequest = new TaskInstancePauseRequest(taskInstance.getId());
         final TaskInstancePauseResponse taskInstancePauseResponse =

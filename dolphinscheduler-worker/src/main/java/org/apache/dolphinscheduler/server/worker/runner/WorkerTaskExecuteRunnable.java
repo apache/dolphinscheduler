@@ -257,7 +257,7 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
                 task.getExitStatus() == TaskExecutionStatus.SUCCESS ? WarningType.SUCCESS.getCode()
                         : WarningType.FAILURE.getCode());
         try {
-            IAlertOperator alertOperator = SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+            IAlertOperator alertOperator = SingletonJdkDynamicRpcClientProxyFactory
                     .getProxyClient(alertServerAddress.getAddress(), IAlertOperator.class);
             AlertSendResponse alertSendResponse = alertOperator.sendAlert(alertSendRequest);
             log.info("Send alert to: {} successfully, response: {}", alertServerAddress, alertSendResponse);

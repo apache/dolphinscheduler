@@ -34,7 +34,7 @@ public class LogicTaskInstanceExecuteRunningEventSender
     @Override
     public void sendMessage(TaskInstanceExecutionRunningEvent taskInstanceExecutionRunningEvent) {
         ITaskInstanceExecutionEventListener iTaskInstanceExecutionEventListener =
-                SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+                SingletonJdkDynamicRpcClientProxyFactory
                         .getProxyClient(taskInstanceExecutionRunningEvent.getHost(),
                                 ITaskInstanceExecutionEventListener.class);
         iTaskInstanceExecutionEventListener.onTaskInstanceExecutionRunning(taskInstanceExecutionRunningEvent);

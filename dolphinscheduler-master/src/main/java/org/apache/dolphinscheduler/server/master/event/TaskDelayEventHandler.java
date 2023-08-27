@@ -114,7 +114,7 @@ public class TaskDelayEventHandler implements TaskEventHandler {
     private void sendAckToWorker(TaskEvent taskEvent) {
         // If event handle success, send ack to worker to otherwise the worker will retry this event
         ITaskInstanceExecutionEventAckListener instanceExecutionEventAckListener =
-                SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+                SingletonJdkDynamicRpcClientProxyFactory
                         .getProxyClient(taskEvent.getWorkerAddress(), ITaskInstanceExecutionEventAckListener.class);
         instanceExecutionEventAckListener.handleTaskInstanceExecutionRunningEventAck(
                 TaskInstanceExecutionRunningEventAck.success(taskEvent.getTaskInstanceId()));

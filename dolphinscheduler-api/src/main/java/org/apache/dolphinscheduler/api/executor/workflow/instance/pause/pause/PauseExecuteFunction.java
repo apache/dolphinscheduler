@@ -58,7 +58,7 @@ public class PauseExecuteFunction implements ExecuteFunction<PauseExecuteRequest
         try {
             // todo: direct call the workflow instance pause method
             ITaskInstanceExecutionEventListener iTaskInstanceExecutionEventListener =
-                    SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+                    SingletonJdkDynamicRpcClientProxyFactory
                             .getProxyClient(workflowInstance.getHost(), ITaskInstanceExecutionEventListener.class);
             iTaskInstanceExecutionEventListener.onWorkflowInstanceInstanceStateChange(
                     new WorkflowInstanceStateChangeEvent(

@@ -473,7 +473,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
     private void sendAckToWorker(TaskEvent taskEvent) {
         // If event handle success, send ack to worker to otherwise the worker will retry this event
         ITaskInstanceExecutionEventAckListener instanceExecutionEventAckListener =
-                SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+                SingletonJdkDynamicRpcClientProxyFactory
                         .getProxyClient(taskEvent.getWorkerAddress(), ITaskInstanceExecutionEventAckListener.class);
         if (taskEvent.getEvent() == TaskEventType.RUNNING) {
             log.error("taskEvent.getChannel() is null, taskEvent:{}", taskEvent);

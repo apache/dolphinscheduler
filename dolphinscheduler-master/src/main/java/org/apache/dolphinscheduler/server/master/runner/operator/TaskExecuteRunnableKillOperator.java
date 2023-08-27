@@ -43,7 +43,7 @@ public class TaskExecuteRunnableKillOperator extends BaseTaskExecuteRunnableKill
             log.info("TaskInstance {} host is empty, no need to killRemoteTask", taskInstance.getName());
             return;
         }
-        ITaskInstanceOperator taskInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+        ITaskInstanceOperator taskInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory
                 .getProxyClient(taskInstance.getHost(), ITaskInstanceOperator.class);
         TaskInstanceKillRequest taskInstanceKillRequest = new TaskInstanceKillRequest(taskInstance.getId());
         TaskInstanceKillResponse taskInstanceKillResponse = taskInstanceOperator.killTask(taskInstanceKillRequest);

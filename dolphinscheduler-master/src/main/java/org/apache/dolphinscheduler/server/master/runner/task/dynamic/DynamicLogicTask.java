@@ -286,7 +286,7 @@ public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
 
     private void sendToSubProcess(TaskExecutionContext taskExecutionContext, ProcessInstance subProcessInstance) {
         final ITaskInstanceExecutionEventListener iTaskInstanceExecutionEventListener =
-                SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+                SingletonJdkDynamicRpcClientProxyFactory
                         .getProxyClient(subProcessInstance.getHost(), ITaskInstanceExecutionEventListener.class);
         final WorkflowInstanceStateChangeEvent workflowInstanceStateChangeEvent = new WorkflowInstanceStateChangeEvent(
                 taskExecutionContext.getProcessInstanceId(),

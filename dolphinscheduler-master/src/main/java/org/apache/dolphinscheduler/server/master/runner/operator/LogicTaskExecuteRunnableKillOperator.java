@@ -45,7 +45,7 @@ public class LogicTaskExecuteRunnableKillOperator extends BaseTaskExecuteRunnabl
                     taskInstance.getName());
             return;
         }
-        final ILogicTaskInstanceOperator taskInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+        final ILogicTaskInstanceOperator taskInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory
                 .getProxyClient(taskInstance.getHost(), ILogicTaskInstanceOperator.class);
         final LogicTaskKillRequest logicTaskKillRequest = new LogicTaskKillRequest(taskInstance.getId());
         final LogicTaskKillResponse logicTaskKillResponse = taskInstanceOperator.killLogicTask(logicTaskKillRequest);
