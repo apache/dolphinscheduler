@@ -40,6 +40,7 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -132,8 +133,14 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
                 commands.parallelStream()
                         .forEach(command -> {
                             try {
-                                WorkflowExecuteRunnable workflowExecuteRunnable =
+                                Optional<WorkflowExecuteRunnable> workflowExecuteRunnableOptional =
                                         workflowExecuteRunnableFactory.createWorkflowExecuteRunnable(command);
+                                if (!workflowExecuteRunnableOptional.isPresent()) {
+                                    log.warn(
+                                            "The command execute success, will not trigger a WorkflowExecuteRunnable, this workflowInstance might be in serial mode");
+                                    return;
+                                }
+                                WorkflowExecuteRunnable workflowExecuteRunnable = workflowExecuteRunnableOptional.get();
                                 ProcessInstance processInstance = workflowExecuteRunnable
                                         .getWorkflowExecuteContext().getWorkflowInstance();
                                 if (processInstanceExecCacheManager.contains(processInstance.getId())) {
