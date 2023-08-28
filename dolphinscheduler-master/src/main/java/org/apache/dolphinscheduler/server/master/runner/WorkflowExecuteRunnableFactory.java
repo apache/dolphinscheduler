@@ -19,17 +19,17 @@ package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
-import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.listener.service.ListenerEventPublishService;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.exception.WorkflowCreateException;
-import org.apache.dolphinscheduler.server.master.rpc.MasterRpcClient;
 import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnableFactory;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -50,9 +50,6 @@ public class WorkflowExecuteRunnableFactory {
     private ProcessInstanceDao processInstanceDao;
 
     @Autowired
-    private MasterRpcClient masterRpcClient;
-
-    @Autowired
     private ProcessAlertManager processAlertManager;
 
     @Autowired
@@ -68,9 +65,6 @@ public class WorkflowExecuteRunnableFactory {
     private MasterConfig masterConfig;
 
     @Autowired
-    private TaskDefinitionLogDao taskDefinitionLogDao;
-
-    @Autowired
     private DefaultTaskExecuteRunnableFactory defaultTaskExecuteRunnableFactory;
 
     @Autowired
@@ -79,23 +73,22 @@ public class WorkflowExecuteRunnableFactory {
     @Autowired
     private ListenerEventPublishService listenerEventPublishService;
 
-    public WorkflowExecuteRunnable createWorkflowExecuteRunnable(Command command) throws WorkflowCreateException {
+    public Optional<WorkflowExecuteRunnable> createWorkflowExecuteRunnable(Command command) throws WorkflowCreateException {
         try {
-            IWorkflowExecuteContext workflowExecuteRunnableContext =
+            Optional<IWorkflowExecuteContext> workflowExecuteRunnableContextOptional =
                     workflowExecuteContextFactory.createWorkflowExecuteRunnableContext(command);
-            return new WorkflowExecuteRunnable(
-                    workflowExecuteRunnableContext,
+            return workflowExecuteRunnableContextOptional.map(iWorkflowExecuteContext -> new WorkflowExecuteRunnable(
+                    iWorkflowExecuteContext,
                     commandService,
                     processService,
                     processInstanceDao,
-                    masterRpcClient,
                     processAlertManager,
                     masterConfig,
                     stateWheelExecuteThread,
                     curingGlobalParamsService,
                     taskInstanceDao,
                     listenerEventPublishService,
-                    defaultTaskExecuteRunnableFactory);
+                    defaultTaskExecuteRunnableFactory));
         } catch (Exception ex) {
             throw new WorkflowCreateException("Create workflow execute runnable failed", ex);
         }

@@ -141,6 +141,9 @@ security:
         truststorepassword: ""
 
 conf:
+  # auto restart, if true, all components will be restarted automatically after the common configuration is updated. if false, you need to restart the components manually. default is false
+  auto: false
+  # common configuration
   common:
     # user data local directory path, please make sure the directory exists and have read write permissions
     data.basedir.path: /tmp/dolphinscheduler

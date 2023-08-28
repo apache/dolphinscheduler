@@ -18,7 +18,7 @@
 import { defineComponent } from 'vue'
 import Form from '@/components/form'
 import { useForm } from './use-form'
-import { NButton, NDivider, NSpace } from 'naive-ui'
+import { NButton, NDivider, NSpace, NSwitch } from 'naive-ui'
 
 const PreferenceForm = defineComponent({
   name: 'PreferenceForm',
@@ -28,36 +28,56 @@ const PreferenceForm = defineComponent({
       elementsRef,
       rulesRef,
       model,
+      stateRef,
       formProps,
       t,
-      handleUpdate
+      handleUpdate,
+      handleUpdateState
     } = useForm()
 
     return () => (
       <div>
-        <div style={{ margin: '30px' }}>
-          {t('project.preference.instruction_tips')}
+        <div style={{ marginLeft: '30px' }}>
+          <NSwitch
+            size={'large'}
+            round={false}
+            v-model:value={stateRef.value}
+            checkedValue={1}
+            uncheckedValue={0}
+            onUpdateValue={handleUpdateState}
+          >
+            {{
+              checked: () => t('project.preference.enabled'),
+              unchecked: () => t('project.preference.disabled')
+            }}
+          </NSwitch>
         </div>
-        <NDivider />
-        <Form
-          ref={formRef}
-          meta={{
-            model,
-            rules: rulesRef.value,
-            elements: elementsRef.value,
-            ...formProps.value
-          }}
-          layout={{
-            xGap: 10
-          }}
-          style={{ marginLeft: '150px' }}
-        />
-        <NDivider />
-        <NSpace justify='end'>
-          <NButton type='info' onClick={handleUpdate}>
-            {t('project.preference.submit')}
-          </NButton>
-        </NSpace>
+        <div>
+          <div style={{ margin: '30px' }}>
+            {t('project.preference.instruction_tips')}
+          </div>
+          <NDivider />
+          <Form
+            ref={formRef}
+            meta={{
+              model,
+              disabled: stateRef.value === 1 ? false : true,
+              rules: rulesRef.value,
+              elements: elementsRef.value,
+              ...formProps.value
+            }}
+            layout={{
+              xGap: 10
+            }}
+            style={{ marginLeft: '150px' }}
+          />
+          <NDivider />
+          <NSpace justify='center'>
+            <NButton v-show={stateRef.value} type='info' onClick={handleUpdate}>
+              {t('project.preference.submit')}
+            </NButton>
+          </NSpace>
+        </div>
       </div>
     )
   }
