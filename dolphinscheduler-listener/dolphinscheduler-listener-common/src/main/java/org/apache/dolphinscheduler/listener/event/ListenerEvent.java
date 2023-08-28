@@ -19,17 +19,19 @@
 
 package org.apache.dolphinscheduler.listener.event;
 
+import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
+
 import java.util.Map;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ListenerEvent {
+
     protected ListenerEventType listenerEventType;
 
     protected Map<String, String> listenerInstanceParams;

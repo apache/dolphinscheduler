@@ -19,26 +19,23 @@
 
 package org.apache.dolphinscheduler.listener.event;
 
-import java.util.List;
-import java.util.Map;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -220,7 +217,7 @@ public class TaskUpdateListenerEvent extends ListenerEvent {
      */
     private Date operateTime;
 
-    public TaskUpdateListenerEvent(TaskDefinitionLog taskDefinitionLog){
+    public TaskUpdateListenerEvent(TaskDefinitionLog taskDefinitionLog) {
         this.setCode(taskDefinitionLog.getCode());
         this.setVersion(taskDefinitionLog.getVersion());
         this.setName(taskDefinitionLog.getName());

@@ -20,10 +20,10 @@
 package org.apache.dolphinscheduler.listener.processor;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.listener.service.jdbc.JdbcListenerEvent;
 import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
 import org.apache.dolphinscheduler.listener.event.TaskUpdateListenerEvent;
 import org.apache.dolphinscheduler.listener.plugin.ListenerPlugin;
+import org.apache.dolphinscheduler.listener.service.jdbc.JdbcListenerEvent;
 
 import com.google.auto.service.AutoService;
 

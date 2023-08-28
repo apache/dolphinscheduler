@@ -22,8 +22,6 @@
 
 package org.apache.dolphinscheduler.listener.service;
 
-import java.util.Date;
-import java.util.List;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
@@ -34,14 +32,6 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
 import org.apache.dolphinscheduler.listener.event.ListenerEvent;
-
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-
-import javax.annotation.PostConstruct;
-
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.dolphinscheduler.listener.event.TaskCreateListenerEvent;
 import org.apache.dolphinscheduler.listener.event.TaskEndListenerEvent;
 import org.apache.dolphinscheduler.listener.event.TaskFailListenerEvent;
@@ -54,12 +44,23 @@ import org.apache.dolphinscheduler.listener.event.WorkflowFailListenerEvent;
 import org.apache.dolphinscheduler.listener.event.WorkflowRemoveListenerEvent;
 import org.apache.dolphinscheduler.listener.event.WorkflowStartListenerEvent;
 import org.apache.dolphinscheduler.listener.event.WorkflowUpdateListenerEvent;
+
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+
+import javax.annotation.PostConstruct;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
 public class ListenerEventPublishService {
+
     private final BlockingQueue<ListenerEvent> listenerEventQueue = new LinkedBlockingQueue<>();
 
     @Autowired
@@ -94,21 +95,25 @@ public class ListenerEventPublishService {
         }
     }
 
-    public void publishWorkflowCreateListenerEvent(ProcessDefinition processDefinition, List<TaskDefinitionLog> taskDefinitionLogs, List<ProcessTaskRelationLog> processTaskRelationLogs){
+    public void publishWorkflowCreateListenerEvent(ProcessDefinition processDefinition,
+                                                   List<TaskDefinitionLog> taskDefinitionLogs,
+                                                   List<ProcessTaskRelationLog> processTaskRelationLogs) {
         WorkflowCreateListenerEvent event = new WorkflowCreateListenerEvent(processDefinition);
         event.setTaskDefinitionLogs(taskDefinitionLogs);
         event.setTaskRelationList(processTaskRelationLogs);
         this.publish(event);
     }
 
-    public void publishWorkflowUpdateListenerEvent(ProcessDefinition processDefinition, List<TaskDefinitionLog> taskDefinitionLogs, List<ProcessTaskRelationLog> processTaskRelationLogs){
+    public void publishWorkflowUpdateListenerEvent(ProcessDefinition processDefinition,
+                                                   List<TaskDefinitionLog> taskDefinitionLogs,
+                                                   List<ProcessTaskRelationLog> processTaskRelationLogs) {
         WorkflowUpdateListenerEvent event = new WorkflowUpdateListenerEvent(processDefinition);
         event.setTaskDefinitionLogs(taskDefinitionLogs);
         event.setTaskRelationList(processTaskRelationLogs);
         this.publish(event);
     }
 
-    public void publishWorkflowDeleteListenerEvent(Project project, ProcessDefinition processDefinition){
+    public void publishWorkflowDeleteListenerEvent(Project project, ProcessDefinition processDefinition) {
         WorkflowRemoveListenerEvent event = new WorkflowRemoveListenerEvent();
         event.setListenerEventType(ListenerEventType.WORKFLOW_REMOVED);
         event.setProjectId(project.getId());
@@ -122,7 +127,7 @@ public class ListenerEventPublishService {
         this.publish(event);
     }
 
-    public void publishWorkflowStartListenerEvent(ProcessInstance processInstance, ProjectUser projectUser){
+    public void publishWorkflowStartListenerEvent(ProcessInstance processInstance, ProjectUser projectUser) {
         WorkflowStartListenerEvent event = new WorkflowStartListenerEvent();
         event.setListenerEventType(ListenerEventType.WORKFLOW_START);
         event.setProjectCode(projectUser.getProjectCode());
@@ -139,7 +144,7 @@ public class ListenerEventPublishService {
         this.publish(event);
     }
 
-    public void publishWorkflowEndListenerEvent(ProcessInstance processInstance, ProjectUser projectUser){
+    public void publishWorkflowEndListenerEvent(ProcessInstance processInstance, ProjectUser projectUser) {
         WorkflowEndListenerEvent event = new WorkflowEndListenerEvent();
         event.setListenerEventType(ListenerEventType.WORKFLOW_END);
         event.setProjectCode(projectUser.getProjectCode());
@@ -159,7 +164,7 @@ public class ListenerEventPublishService {
     }
 
     public void publishWorkflowFailListenerEvent(ProcessInstance processInstance,
-                                                 ProjectUser projectUser){
+                                                 ProjectUser projectUser) {
         WorkflowFailListenerEvent event = new WorkflowFailListenerEvent();
         event.setListenerEventType(ListenerEventType.WORKFLOW_FAIL);
         event.setProjectCode(projectUser.getProjectCode());
@@ -178,17 +183,17 @@ public class ListenerEventPublishService {
         this.publish(event);
     }
 
-    public void publishTaskCreateListenerEvent(TaskDefinitionLog taskDefinitionLog){
+    public void publishTaskCreateListenerEvent(TaskDefinitionLog taskDefinitionLog) {
         TaskCreateListenerEvent event = new TaskCreateListenerEvent(taskDefinitionLog);
         this.publish(event);
     }
 
-    public void publishTaskUpdateListenerEvent(TaskDefinitionLog taskDefinitionToUpdate){
+    public void publishTaskUpdateListenerEvent(TaskDefinitionLog taskDefinitionToUpdate) {
         TaskUpdateListenerEvent event = new TaskUpdateListenerEvent(taskDefinitionToUpdate);
         this.publish(event);
     }
 
-    public void publishTaskDeleteListenerEvent(TaskDefinition taskDefinition){
+    public void publishTaskDeleteListenerEvent(TaskDefinition taskDefinition) {
         TaskRemoveListenerEvent event = new TaskRemoveListenerEvent();
         event.setListenerEventType(ListenerEventType.TASK_REMOVED);
         event.setTaskCode(taskDefinition.getCode());
@@ -202,7 +207,7 @@ public class ListenerEventPublishService {
 
     public void publishTaskStartListenerEvent(ProcessInstance processInstance,
                                               TaskInstance taskInstance,
-                                              ProjectUser projectUser){
+                                              ProjectUser projectUser) {
         TaskStartListenerEvent event = new TaskStartListenerEvent();
         event.setListenerEventType(ListenerEventType.TASK_START);
         event.setProjectCode(projectUser.getProjectCode());
@@ -224,7 +229,7 @@ public class ListenerEventPublishService {
 
     public void publishTaskEndListenerEvent(ProcessInstance processInstance,
                                             TaskInstance taskInstance,
-                                            ProjectUser projectUser){
+                                            ProjectUser projectUser) {
         TaskEndListenerEvent event = new TaskEndListenerEvent();
         event.setListenerEventType(ListenerEventType.TASK_END);
         event.setProjectCode(projectUser.getProjectCode());
@@ -246,7 +251,7 @@ public class ListenerEventPublishService {
 
     public void publishTaskFailListenerEvent(ProcessInstance processInstance,
                                              TaskInstance taskInstance,
-                                             ProjectUser projectUser){
+                                             ProjectUser projectUser) {
         TaskFailListenerEvent event = new TaskFailListenerEvent();
         event.setListenerEventType(ListenerEventType.TASK_FAIL);
         event.setProjectCode(projectUser.getProjectCode());

@@ -46,6 +46,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class LoggerListener implements ListenerPlugin {
+
     @Override
     public String name() {
         return "LoggerListener";
@@ -66,9 +67,9 @@ public class LoggerListener implements ListenerPlugin {
 
     @Override
     public void onServerDown(ServerDownListenerEvent serverDownListenerEvent) {
-        printLogIntoFile(serverDownListenerEvent.getListenerInstanceParams(), JSONUtils.toJsonString(serverDownListenerEvent));
+        printLogIntoFile(serverDownListenerEvent.getListenerInstanceParams(),
+                JSONUtils.toJsonString(serverDownListenerEvent));
     }
-
 
     @Override
     public void onWorkflowAdded(WorkflowCreateListenerEvent workflowCreateEvent) {
@@ -82,7 +83,8 @@ public class LoggerListener implements ListenerPlugin {
 
     @Override
     public void onWorkflowRemoved(WorkflowRemoveListenerEvent workflowRemovedEvent) {
-        printLogIntoFile(workflowRemovedEvent.getListenerInstanceParams(), JSONUtils.toJsonString(workflowRemovedEvent));
+        printLogIntoFile(workflowRemovedEvent.getListenerInstanceParams(),
+                JSONUtils.toJsonString(workflowRemovedEvent));
     }
 
     @Override
@@ -132,10 +134,10 @@ public class LoggerListener implements ListenerPlugin {
 
     private void printLogIntoFile(Map<String, String> listenerInstanceParams, String content) {
         String logFile = listenerInstanceParams.get("logFile");
-        try(BufferedWriter writer = new BufferedWriter(new FileWriter(logFile, true))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(logFile, true))) {
             writer.write(content);
             writer.newLine();
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

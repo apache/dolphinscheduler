@@ -42,6 +42,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TaskCreateListenerEvent extends ListenerEvent {
+
     /**
      * id
      */
@@ -215,8 +216,8 @@ public class TaskCreateListenerEvent extends ListenerEvent {
      * operate time
      */
     private Date operateTime;
-    
-    public TaskCreateListenerEvent(TaskDefinitionLog taskDefinitionLog){
+
+    public TaskCreateListenerEvent(TaskDefinitionLog taskDefinitionLog) {
         this.setCode(taskDefinitionLog.getCode());
         this.setVersion(taskDefinitionLog.getVersion());
         this.setName(taskDefinitionLog.getName());

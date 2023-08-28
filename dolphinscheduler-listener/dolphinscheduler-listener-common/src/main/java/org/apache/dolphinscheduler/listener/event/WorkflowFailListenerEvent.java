@@ -35,6 +35,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class WorkflowFailListenerEvent extends ListenerEvent {
+
     private Long projectCode;
     private String projectName;
     private String owner;

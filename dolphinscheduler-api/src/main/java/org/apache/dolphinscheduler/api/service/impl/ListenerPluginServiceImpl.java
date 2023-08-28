@@ -27,7 +27,6 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.LISTENER_PLUGIN_UPDATE;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.rpc.ApiRpcClient;
 import org.apache.dolphinscheduler.api.service.ListenerPluginService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -41,17 +40,20 @@ import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ListenerPluginInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.PluginDefineMapper;
+import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.base.utils.Host;
+import org.apache.dolphinscheduler.extract.listener.IListenerInstanceOperator;
+import org.apache.dolphinscheduler.extract.listener.IListenerPluginOperator;
+import org.apache.dolphinscheduler.extract.listener.request.CreateListenerPluginInstanceRequest;
+import org.apache.dolphinscheduler.extract.listener.request.ListenerResponse;
+import org.apache.dolphinscheduler.extract.listener.request.RegisterListenerPluginRequest;
+import org.apache.dolphinscheduler.extract.listener.request.RemoveListenerPluginInstanceRequest;
+import org.apache.dolphinscheduler.extract.listener.request.RemoveListenerPluginRequest;
+import org.apache.dolphinscheduler.extract.listener.request.UpdateListenerPluginInstanceRequest;
+import org.apache.dolphinscheduler.extract.listener.request.UpdateListenerPluginRequest;
 import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
-import org.apache.dolphinscheduler.remote.command.listener.CreateListenerPluginInstanceRequest;
-import org.apache.dolphinscheduler.remote.command.listener.ListenerResponse;
-import org.apache.dolphinscheduler.remote.command.listener.RegisterListenerPluginRequest;
-import org.apache.dolphinscheduler.remote.command.listener.RemoveListenerPluginInstanceRequest;
-import org.apache.dolphinscheduler.remote.command.listener.RemoveListenerPluginRequest;
-import org.apache.dolphinscheduler.remote.command.listener.UpdateListenerPluginInstanceRequest;
-import org.apache.dolphinscheduler.remote.command.listener.UpdateListenerPluginRequest;
-import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -83,9 +85,6 @@ public class ListenerPluginServiceImpl extends BaseServiceImpl implements Listen
     private RegistryClient registryClient;
 
     @Autowired
-    private ApiRpcClient apiRpcClient;
-
-    @Autowired
     private PluginDefineMapper pluginDefineMapper;
 
     @Autowired
@@ -111,8 +110,9 @@ public class ListenerPluginServiceImpl extends BaseServiceImpl implements Listen
         try {
             RegisterListenerPluginRequest request = new RegisterListenerPluginRequest(
                     StringUtils.replace(file.getOriginalFilename(), ".jar", ""), classPath, file.getBytes());
-            ListenerResponse response =
-                    apiRpcClient.sendListenerMessageSync(alertServerAddress, request.convert2Command());
+            IListenerPluginOperator listenerPluginOperator = SingletonJdkDynamicRpcClientProxyFactory
+                    .getProxyClient(alertServerAddress.getAddress(), IListenerPluginOperator.class);
+            ListenerResponse response = listenerPluginOperator.registerListenerPlugin(request);
             if (response.isSuccess()) {
                 return Result.success();
             } else {
@@ -145,8 +145,9 @@ public class ListenerPluginServiceImpl extends BaseServiceImpl implements Listen
         try {
             UpdateListenerPluginRequest request = new UpdateListenerPluginRequest(id,
                     StringUtils.replace(file.getOriginalFilename(), ".jar", ""), classPath, file.getBytes());
-            ListenerResponse response =
-                    apiRpcClient.sendListenerMessageSync(alertServerAddress, request.convert2Command());
+            IListenerPluginOperator listenerPluginOperator = SingletonJdkDynamicRpcClientProxyFactory
+                    .getProxyClient(alertServerAddress.getAddress(), IListenerPluginOperator.class);
+            ListenerResponse response = listenerPluginOperator.updateListenerPlugin(request);
             if (response.isSuccess()) {
                 return Result.success();
             } else {
@@ -171,8 +172,9 @@ public class ListenerPluginServiceImpl extends BaseServiceImpl implements Listen
         Host alertServerAddress = alertServerAddressOptional.get();
         try {
             RemoveListenerPluginRequest request = new RemoveListenerPluginRequest(id);
-            ListenerResponse response =
-                    apiRpcClient.sendListenerMessageSync(alertServerAddress, request.convert2Command());
+            IListenerPluginOperator listenerPluginOperator = SingletonJdkDynamicRpcClientProxyFactory
+                    .getProxyClient(alertServerAddress.getAddress(), IListenerPluginOperator.class);
+            ListenerResponse response = listenerPluginOperator.removeListenerPlugin(request);
             if (response.isSuccess()) {
                 return Result.success();
             } else {
@@ -213,7 +215,8 @@ public class ListenerPluginServiceImpl extends BaseServiceImpl implements Listen
     }
 
     @Override
-    public Result createListenerInstance(User loginUser, int pluginDefineId, String instanceName, String pluginInstanceParams,
+    public Result createListenerInstance(User loginUser, int pluginDefineId, String instanceName,
+                                         String pluginInstanceParams,
                                          List<ListenerEventType> listenerEventTypes) {
         if (!canOperatorPermissions(loginUser, null, AuthorizationType.LISTENER_INSTANCE, LISTENER_INSTANCE_CREATE)) {
             return Result.errorWithArgs(Status.USER_NO_OPERATION_PERM);
@@ -228,8 +231,9 @@ public class ListenerPluginServiceImpl extends BaseServiceImpl implements Listen
             CreateListenerPluginInstanceRequest request =
                     new CreateListenerPluginInstanceRequest(pluginDefineId, instanceName, pluginInstanceParams,
                             listenerEventTypes);
-            ListenerResponse response =
-                    apiRpcClient.sendListenerMessageSync(alertServerAddress, request.convert2Command());
+            IListenerInstanceOperator listenerInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory
+                    .getProxyClient(alertServerAddress.getAddress(), IListenerInstanceOperator.class);
+            ListenerResponse response = listenerInstanceOperator.createListenerInstance(request);
             if (response.isSuccess()) {
                 return Result.success();
             } else {
@@ -242,7 +246,8 @@ public class ListenerPluginServiceImpl extends BaseServiceImpl implements Listen
     }
 
     @Override
-    public Result updateListenerInstance(User loginUser, int instanceId, String instanceName, String pluginInstanceParams,
+    public Result updateListenerInstance(User loginUser, int instanceId, String instanceName,
+                                         String pluginInstanceParams,
                                          List<ListenerEventType> listenerEventTypes) {
         if (!canOperatorPermissions(loginUser, null, AuthorizationType.LISTENER_INSTANCE, LISTENER_INSTANCE_UPDATE)) {
             return Result.errorWithArgs(Status.USER_NO_OPERATION_PERM);
@@ -257,8 +262,9 @@ public class ListenerPluginServiceImpl extends BaseServiceImpl implements Listen
             UpdateListenerPluginInstanceRequest request =
                     new UpdateListenerPluginInstanceRequest(instanceId, instanceName, pluginInstanceParams,
                             listenerEventTypes);
-            ListenerResponse response =
-                    apiRpcClient.sendListenerMessageSync(alertServerAddress, request.convert2Command());
+            IListenerInstanceOperator listenerInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory
+                    .getProxyClient(alertServerAddress.getAddress(), IListenerInstanceOperator.class);
+            ListenerResponse response = listenerInstanceOperator.updateListenerInstance(request);
             if (response.isSuccess()) {
                 return Result.success();
             } else {
@@ -283,8 +289,9 @@ public class ListenerPluginServiceImpl extends BaseServiceImpl implements Listen
         Host alertServerAddress = alertServerAddressOptional.get();
         try {
             RemoveListenerPluginInstanceRequest request = new RemoveListenerPluginInstanceRequest(id);
-            ListenerResponse response =
-                    apiRpcClient.sendListenerMessageSync(alertServerAddress, request.convert2Command());
+            IListenerInstanceOperator listenerInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory
+                    .getProxyClient(alertServerAddress.getAddress(), IListenerInstanceOperator.class);
+            ListenerResponse response = listenerInstanceOperator.removeListenerInstance(request);
             if (response.isSuccess()) {
                 return Result.success();
             } else {

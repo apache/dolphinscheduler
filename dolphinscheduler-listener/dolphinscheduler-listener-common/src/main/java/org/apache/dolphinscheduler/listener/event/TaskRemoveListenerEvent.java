@@ -19,8 +19,6 @@
 
 package org.apache.dolphinscheduler.listener.event;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-
 import java.util.Date;
 
 import lombok.AllArgsConstructor;
@@ -28,13 +26,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 @Data
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
 public class TaskRemoveListenerEvent extends ListenerEvent {
+
     private long taskCode;
     private String taskName;
     private String taskType;

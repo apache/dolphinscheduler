@@ -28,7 +28,6 @@ import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.C
 import static org.apache.dolphinscheduler.common.constants.Constants.COMMA;
 import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_WORKER_GROUP;
 import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYY_MM_DD_HH_MM_SS;
-import org.apache.dolphinscheduler.listener.service.ListenerEventPublishService;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_BLOCKING;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.DataType.VARCHAR;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.Direct.IN;
@@ -64,6 +63,7 @@ import org.apache.dolphinscheduler.extract.master.transportor.TaskInstanceWakeup
 import org.apache.dolphinscheduler.extract.worker.ITaskInstanceOperator;
 import org.apache.dolphinscheduler.extract.worker.transportor.UpdateWorkflowHostRequest;
 import org.apache.dolphinscheduler.extract.worker.transportor.UpdateWorkflowHostResponse;
+import org.apache.dolphinscheduler.listener.service.ListenerEventPublishService;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -376,7 +376,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         }
     }
 
-    public void processRunning(){
+    public void processRunning() {
         ProcessInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
         ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(workflowInstance.getId());
         this.listenerEventPublishService.publishWorkflowStartListenerEvent(workflowInstance, projectUser);
@@ -388,7 +388,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         this.processAlertManager.sendProcessTimeoutAlert(workflowInstance, projectUser);
     }
 
-    public void taskRunning(TaskInstance taskInstance){
+    public void taskRunning(TaskInstance taskInstance) {
         ProcessInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
         ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(workflowInstance.getId());
         listenerEventPublishService.publishTaskStartListenerEvent(workflowInstance, taskInstance, projectUser);
@@ -420,7 +420,8 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                 if (!workflowInstance.isBlocked()) {
                     submitPostNode(taskInstance.getTaskCode());
                 }
-                ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(workflowInstance.getId());
+                ProjectUser projectUser =
+                        processService.queryProjectWithUserByProcessInstanceId(workflowInstance.getId());
                 listenerEventPublishService.publishTaskEndListenerEvent(workflowInstance, taskInstance, projectUser);
             } else if (taskInstance.taskCanRetry() && !workflowInstance.getState().isReadyStop()) {
                 // retry task
@@ -439,7 +440,8 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                         killAllTasks();
                     }
                 }
-                ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(workflowInstance.getId());
+                ProjectUser projectUser =
+                        processService.queryProjectWithUserByProcessInstanceId(workflowInstance.getId());
                 listenerEventPublishService.publishTaskFailListenerEvent(workflowInstance, taskInstance, projectUser);
             } else if (taskInstance.getState().isFinished()) {
                 // todo: when the task instance type is pause, then it should not in completeTaskSet
@@ -772,8 +774,8 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         processAlertManager.sendAlertProcessInstance(workflowInstance, getValidTaskList(), projectUser);
         if (workflowInstance.getState().isSuccess()) {
             processAlertManager.closeAlert(workflowInstance);
-            listenerEventPublishService.publishWorkflowEndListenerEvent(workflowInstance,projectUser);
-        }else {
+            listenerEventPublishService.publishWorkflowEndListenerEvent(workflowInstance, projectUser);
+        } else {
             listenerEventPublishService.publishWorkflowFailListenerEvent(workflowInstance, projectUser);
         }
         if (checkTaskQueue()) {

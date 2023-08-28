@@ -28,6 +28,7 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
 
 @Getter
 public enum ListenerEventType {
+
     SERVER_DOWN(0, "SERVER_DOWN"),
     WORKFLOW_ADDED(1, "WORKFLOW_ADDED"),
     WORKFLOW_UPDATE(2, "WORKFLOW_UPDATE"),

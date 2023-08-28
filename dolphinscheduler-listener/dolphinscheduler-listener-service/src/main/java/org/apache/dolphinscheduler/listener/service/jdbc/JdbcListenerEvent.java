@@ -22,7 +22,6 @@
 
 package org.apache.dolphinscheduler.listener.service.jdbc;
 
-
 import org.apache.dolphinscheduler.listener.enums.ListenerEventPostStatus;
 import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
 

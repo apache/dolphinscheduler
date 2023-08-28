@@ -163,7 +163,7 @@ public class WorkflowUpdateListenerEvent extends ListenerEvent {
      */
     List<ProcessTaskRelationLog> taskRelationList;
 
-    public WorkflowUpdateListenerEvent(ProcessDefinition processDefinition){
+    public WorkflowUpdateListenerEvent(ProcessDefinition processDefinition) {
         this.setListenerEventType(ListenerEventType.WORKFLOW_UPDATE);
         this.setId(processDefinition.getId());
         this.setCode(processDefinition.getCode());

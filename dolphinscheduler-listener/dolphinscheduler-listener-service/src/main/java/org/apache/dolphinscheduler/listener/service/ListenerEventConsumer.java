@@ -22,10 +22,12 @@
 
 package org.apache.dolphinscheduler.listener.service;
 
-import java.util.List;
 import org.apache.dolphinscheduler.listener.service.jdbc.JdbcListenerEvent;
 
+import java.util.List;
+
 public interface ListenerEventConsumer {
+
     List<JdbcListenerEvent> take(int listenerInstanceId);
     void update(JdbcListenerEvent jdbcListenerEvent);
     void delete(JdbcListenerEvent jdbcListenerEvent);

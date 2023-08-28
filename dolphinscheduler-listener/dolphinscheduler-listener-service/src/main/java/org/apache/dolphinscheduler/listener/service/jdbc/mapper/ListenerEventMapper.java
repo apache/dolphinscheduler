@@ -23,6 +23,7 @@
 package org.apache.dolphinscheduler.listener.service.jdbc.mapper;
 
 import org.apache.dolphinscheduler.listener.service.jdbc.JdbcListenerEvent;
+
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 
@@ -37,8 +38,9 @@ public interface ListenerEventMapper extends BaseMapper<JdbcListenerEvent> {
             "        values",
             "        <foreach collection='jdbcListenerEvents' item='jdbcListenerEvent' separator=','>",
             "            (#{jdbcListenerEvent.content},#{jdbcListenerEvent.postStatus}," +
-            "            #{jdbcListenerEvent.eventType},#{jdbcListenerEvent.log},#{jdbcListenerEvent.pluginInstanceId})" +
-            "        </foreach>",
+                    "            #{jdbcListenerEvent.eventType},#{jdbcListenerEvent.log},#{jdbcListenerEvent.pluginInstanceId})"
+                    +
+                    "        </foreach>",
             "</script>"})
     int batchInsert(@Param("jdbcListenerEvents") List<JdbcListenerEvent> jdbcListenerEvents);
 }

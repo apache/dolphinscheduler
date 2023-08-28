@@ -21,6 +21,7 @@ package org.apache.dolphinscheduler.listener.event;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 
 import java.util.Date;
 
@@ -28,13 +29,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
 public class WorkflowStartListenerEvent extends ListenerEvent {
+
     private Long projectCode;
     private String projectName;
     private String owner;

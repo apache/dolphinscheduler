@@ -28,13 +28,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 @Data
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
 public class TaskEndListenerEvent extends ListenerEvent {
+
     private long projectCode;
     private String projectName;
     private String owner;

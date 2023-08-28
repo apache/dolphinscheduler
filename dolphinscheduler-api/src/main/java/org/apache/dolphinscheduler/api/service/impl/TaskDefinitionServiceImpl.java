@@ -190,7 +190,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                 .join(taskDefinitionLogs.stream().map(TaskDefinition::getCode).collect(Collectors.toList()), ","));
         putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, resData);
-        taskDefinitionLogs.forEach(x->{
+        taskDefinitionLogs.forEach(x -> {
             listenerEventPublishService.publishTaskCreateListenerEvent(x);
         });
         return result;
@@ -1331,5 +1331,4 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         // delete task workflow relation
         processTaskRelationService.deleteByWorkflowDefinitionCode(workflowDefinitionCode, workflowDefinitionVersion);
     }
-
 }

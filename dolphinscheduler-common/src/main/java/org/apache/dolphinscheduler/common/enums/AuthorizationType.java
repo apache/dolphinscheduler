@@ -65,7 +65,7 @@ public enum AuthorizationType {
     DATA_QUALITY(16, "data quality"),
     TASK_GROUP(17, "task group"),
     LISTENER_PLUGIN(18, "listener plugin"),
-    LISTENER_INSTANCE(19, "listener instance")
+    LISTENER_INSTANCE(19, "listener instance"),
     ;
 
     AuthorizationType(int code, String descp) {

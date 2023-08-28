@@ -51,6 +51,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class KafkaListener implements ListenerPlugin {
+
     private final Map<String, KafkaProducer<String, String>> kafkaProducers = new HashMap<>();
 
     @Override
@@ -94,86 +95,101 @@ public class KafkaListener implements ListenerPlugin {
 
     @Override
     public void onServerDown(ServerDownListenerEvent serverDownListenerEvent) {
-        sendEvent(serverDownListenerEvent.getListenerInstanceParams(), ServerDownListenerEvent.class.getSimpleName(), JSONUtils.toJsonString(serverDownListenerEvent));
+        sendEvent(serverDownListenerEvent.getListenerInstanceParams(), ServerDownListenerEvent.class.getSimpleName(),
+                JSONUtils.toJsonString(serverDownListenerEvent));
     }
-
 
     @Override
     public void onWorkflowAdded(WorkflowCreateListenerEvent workflowCreateEvent) {
-        sendEvent(workflowCreateEvent.getListenerInstanceParams(), WorkflowCreateListenerEvent.class.getSimpleName(), JSONUtils.toJsonString(workflowCreateEvent));
+        sendEvent(workflowCreateEvent.getListenerInstanceParams(), WorkflowCreateListenerEvent.class.getSimpleName(),
+                JSONUtils.toJsonString(workflowCreateEvent));
     }
 
     @Override
     public void onWorkflowUpdate(WorkflowUpdateListenerEvent workflowUpdateEvent) {
-        sendEvent(workflowUpdateEvent.getListenerInstanceParams(), WorkflowUpdateListenerEvent.class.getSimpleName(), JSONUtils.toJsonString(workflowUpdateEvent));
+        sendEvent(workflowUpdateEvent.getListenerInstanceParams(), WorkflowUpdateListenerEvent.class.getSimpleName(),
+                JSONUtils.toJsonString(workflowUpdateEvent));
     }
 
     @Override
     public void onWorkflowRemoved(WorkflowRemoveListenerEvent workflowRemovedEvent) {
-        sendEvent(workflowRemovedEvent.getListenerInstanceParams(), WorkflowRemoveListenerEvent.class.getSimpleName(), JSONUtils.toJsonString(workflowRemovedEvent));
+        sendEvent(workflowRemovedEvent.getListenerInstanceParams(), WorkflowRemoveListenerEvent.class.getSimpleName(),
+                JSONUtils.toJsonString(workflowRemovedEvent));
     }
 
     @Override
     public void onWorkflowStart(WorkflowStartListenerEvent workflowStartEvent) {
-        sendEvent(workflowStartEvent.getListenerInstanceParams(), WorkflowStartListenerEvent.class.getSimpleName(), JSONUtils.toJsonString(workflowStartEvent));
+        sendEvent(workflowStartEvent.getListenerInstanceParams(), WorkflowStartListenerEvent.class.getSimpleName(),
+                JSONUtils.toJsonString(workflowStartEvent));
 
     }
 
     @Override
     public void onWorkflowEnd(WorkflowEndListenerEvent workflowEndEvent) {
-        sendEvent(workflowEndEvent.getListenerInstanceParams(), WorkflowEndListenerEvent.class.getSimpleName(), JSONUtils.toJsonString(workflowEndEvent));
+        sendEvent(workflowEndEvent.getListenerInstanceParams(), WorkflowEndListenerEvent.class.getSimpleName(),
+                JSONUtils.toJsonString(workflowEndEvent));
     }
 
     @Override
     public void onWorkflowFail(WorkflowFailListenerEvent workflowErrorEvent) {
-        sendEvent(workflowErrorEvent.getListenerInstanceParams(), WorkflowFailListenerEvent.class.getSimpleName(), JSONUtils.toJsonString(workflowErrorEvent));
+        sendEvent(workflowErrorEvent.getListenerInstanceParams(), WorkflowFailListenerEvent.class.getSimpleName(),
+                JSONUtils.toJsonString(workflowErrorEvent));
     }
 
     @Override
     public void onTaskAdded(TaskCreateListenerEvent taskAddedEvent) {
-        sendEvent(taskAddedEvent.getListenerInstanceParams(), TaskCreateListenerEvent.class.getSimpleName(), JSONUtils.toJsonString(taskAddedEvent));
+        sendEvent(taskAddedEvent.getListenerInstanceParams(), TaskCreateListenerEvent.class.getSimpleName(),
+                JSONUtils.toJsonString(taskAddedEvent));
     }
 
     @Override
     public void onTaskUpdate(TaskUpdateListenerEvent taskUpdateEvent) {
-        sendEvent(taskUpdateEvent.getListenerInstanceParams(), TaskUpdateListenerEvent.class.getSimpleName(), JSONUtils.toJsonString(taskUpdateEvent));
+        sendEvent(taskUpdateEvent.getListenerInstanceParams(), TaskUpdateListenerEvent.class.getSimpleName(),
+                JSONUtils.toJsonString(taskUpdateEvent));
     }
 
     @Override
     public void onTaskRemoved(TaskRemoveListenerEvent taskRemovedEvent) {
-        sendEvent(taskRemovedEvent.getListenerInstanceParams(), TaskRemoveListenerEvent.class.getSimpleName(), JSONUtils.toJsonString(taskRemovedEvent));
+        sendEvent(taskRemovedEvent.getListenerInstanceParams(), TaskRemoveListenerEvent.class.getSimpleName(),
+                JSONUtils.toJsonString(taskRemovedEvent));
     }
 
     @Override
     public void onTaskStart(TaskStartListenerEvent taskStartEvent) {
-        sendEvent(taskStartEvent.getListenerInstanceParams(), TaskStartListenerEvent.class.getSimpleName(), JSONUtils.toJsonString(taskStartEvent));
+        sendEvent(taskStartEvent.getListenerInstanceParams(), TaskStartListenerEvent.class.getSimpleName(),
+                JSONUtils.toJsonString(taskStartEvent));
     }
 
     @Override
     public void onTaskEnd(TaskEndListenerEvent taskEndEvent) {
-        sendEvent(taskEndEvent.getListenerInstanceParams(), TaskEndListenerEvent.class.getSimpleName(), JSONUtils.toJsonString(taskEndEvent));
+        sendEvent(taskEndEvent.getListenerInstanceParams(), TaskEndListenerEvent.class.getSimpleName(),
+                JSONUtils.toJsonString(taskEndEvent));
     }
 
     @Override
     public void onTaskFail(TaskFailListenerEvent taskErrorEvent) {
-        sendEvent(taskErrorEvent.getListenerInstanceParams(), TaskFailListenerEvent.class.getSimpleName(), JSONUtils.toJsonString(taskErrorEvent));
+        sendEvent(taskErrorEvent.getListenerInstanceParams(), TaskFailListenerEvent.class.getSimpleName(),
+                JSONUtils.toJsonString(taskErrorEvent));
     }
 
-    private void sendEvent(Map<String, String> listenerInstanceParams, String key, String value){
+    private void sendEvent(Map<String, String> listenerInstanceParams, String key, String value) {
         String uniqueId = uniqueId(listenerInstanceParams);
-        if (!kafkaProducers.containsKey(uniqueId)){
+        if (!kafkaProducers.containsKey(uniqueId)) {
             String kafkaBroker = listenerInstanceParams.get("servers");
             String username = listenerInstanceParams.get("username");
             String password = listenerInstanceParams.get("password");
             Map<String, Object> configurations = new HashMap<>();
-            //TODO: when use username/password, throws exception:  Unable to find LoginModule class: org.apache.kafka.common.security.plain.PlainLoginModule
+            // TODO: when use username/password, throws exception: Unable to find LoginModule class:
+            // org.apache.kafka.common.security.plain.PlainLoginModule
             configurations.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBroker);
             configurations.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
             configurations.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
             if (StringUtils.isNotEmpty(username) && StringUtils.isNotEmpty(password)) {
-                configurations.put("sasl.jaas.config",String.format( "org.apache.kafka.common.security.plain.PlainLoginModule required username='%s' password='%s';", username, password));
-                configurations.put("security.protocol","SASL_PLAINTEXT");
-                configurations.put("sasl.mechanism","PLAIN");
+                configurations.put("sasl.jaas.config", String.format(
+                        "org.apache.kafka.common.security.plain.PlainLoginModule required username='%s' password='%s';",
+                        username, password));
+                configurations.put("security.protocol", "SASL_PLAINTEXT");
+                configurations.put("sasl.mechanism", "PLAIN");
             }
             KafkaProducer<String, String> producer = new KafkaProducer<>(configurations);
             kafkaProducers.put(uniqueId, producer);
@@ -188,7 +204,7 @@ public class KafkaListener implements ListenerPlugin {
         });
     }
 
-    private String uniqueId(Map<String, String> listenerInstanceParams){
+    private String uniqueId(Map<String, String> listenerInstanceParams) {
         String kafkaBroker = listenerInstanceParams.get("servers");
         String topic = listenerInstanceParams.get("topic");
         String username = listenerInstanceParams.getOrDefault("username", "foo");

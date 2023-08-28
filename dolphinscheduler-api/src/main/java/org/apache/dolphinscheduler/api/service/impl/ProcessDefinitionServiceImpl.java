@@ -179,37 +179,52 @@ import com.google.common.collect.Lists;
 public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements ProcessDefinitionService {
 
     private static final String RELEASESTATE = "releaseState";
-    @Autowired
-    TaskDefinitionLogMapper taskDefinitionLogMapper;
+
     @Autowired
     private ProjectMapper projectMapper;
+
     @Autowired
     private ProjectService projectService;
+
     @Autowired
     private UserMapper userMapper;
+
     @Autowired
     private ProcessDefinitionLogMapper processDefinitionLogMapper;
+
     @Autowired
     private ProcessDefinitionMapper processDefinitionMapper;
+
     @Autowired
     private ProcessDefinitionDao processDefinitionDao;
+
     @Autowired
     private ProcessDefinitionLogDao processDefinitionLogDao;
     @Lazy
     @Autowired
     private ProcessInstanceService processInstanceService;
+
     @Autowired
     private TaskInstanceMapper taskInstanceMapper;
+
     @Autowired
     private ScheduleMapper scheduleMapper;
+
     @Autowired
     private ProcessService processService;
+
     @Autowired
     private TaskDefinitionLogDao taskDefinitionLogDao;
+
     @Autowired
     private ProcessTaskRelationMapper processTaskRelationMapper;
+
     @Autowired
     private ProcessTaskRelationLogMapper processTaskRelationLogMapper;
+
+    @Autowired
+    TaskDefinitionLogMapper taskDefinitionLogMapper;
+
     @Lazy
     @Autowired
     private TaskDefinitionService taskDefinitionService;
@@ -292,7 +307,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         processDefinition.setExecutionType(executionType);
         result = createDagDefine(loginUser, taskRelationList, processDefinition, taskDefinitionLogs, otherParamsJson);
         if (result.get(Constants.STATUS) == Status.SUCCESS) {
-            listenerEventPublishService.publishWorkflowCreateListenerEvent(processDefinition, taskDefinitionLogs, taskRelationList);
+            listenerEventPublishService.publishWorkflowCreateListenerEvent(processDefinition, taskDefinitionLogs,
+                    taskRelationList);
         }
         return result;
     }
@@ -796,7 +812,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         result = updateDagDefine(loginUser, taskRelationList, processDefinition, processDefinitionDeepCopy,
                 taskDefinitionLogs, otherParamsJson);
         if (result.get(Constants.STATUS) == Status.SUCCESS) {
-            listenerEventPublishService.publishWorkflowUpdateListenerEvent(processDefinition, taskDefinitionLogs, taskRelationList);
+            listenerEventPublishService.publishWorkflowUpdateListenerEvent(processDefinition, taskDefinitionLogs,
+                    taskRelationList);
         }
         return result;
     }

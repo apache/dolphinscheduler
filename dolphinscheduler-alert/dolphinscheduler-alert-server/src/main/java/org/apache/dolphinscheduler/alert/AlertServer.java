@@ -24,12 +24,12 @@ import org.apache.dolphinscheduler.alert.service.AlertBootstrapService;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.listener.service.ListenerPluginService;
 
 import javax.annotation.PreDestroy;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.apache.dolphinscheduler.listener.service.ListenerPluginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;

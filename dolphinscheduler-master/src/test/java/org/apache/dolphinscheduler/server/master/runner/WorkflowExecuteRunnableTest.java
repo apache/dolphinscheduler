@@ -35,6 +35,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.listener.service.ListenerEventPublishService;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.graph.IWorkflowGraph;
 import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnableFactory;
@@ -82,6 +83,9 @@ public class WorkflowExecuteRunnableTest {
     private TaskInstanceDao taskInstanceDao;
 
     private TaskDefinitionLogDao taskDefinitionLogDao;
+
+    private ListenerEventPublishService listenerEventPublishService;
+
     private ProcessService processService;
 
     private CommandService commandService;
@@ -113,6 +117,7 @@ public class WorkflowExecuteRunnableTest {
         processInstance = Mockito.mock(ProcessInstance.class);
         taskInstanceDao = Mockito.mock(TaskInstanceDao.class);
         taskDefinitionLogDao = Mockito.mock(TaskDefinitionLogDao.class);
+        listenerEventPublishService = Mockito.mock(ListenerEventPublishService.class);
         defaultTaskExecuteRunnableFactory = Mockito.mock(DefaultTaskExecuteRunnableFactory.class);
         workflowExecuteContextFactory = Mockito.mock(WorkflowExecuteContextFactory.class);
 
@@ -144,6 +149,7 @@ public class WorkflowExecuteRunnableTest {
                         stateWheelExecuteThread,
                         curingGlobalParamsService,
                         taskInstanceDao,
+                        listenerEventPublishService,
                         defaultTaskExecuteRunnableFactory));
     }
 

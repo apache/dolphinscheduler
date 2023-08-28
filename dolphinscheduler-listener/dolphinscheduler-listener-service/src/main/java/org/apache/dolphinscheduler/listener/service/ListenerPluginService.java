@@ -21,17 +21,17 @@ package org.apache.dolphinscheduler.listener.service;
 
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.listener.service.jdbc.JdbcListenerEvent;
 import org.apache.dolphinscheduler.dao.entity.ListenerPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
-import org.apache.dolphinscheduler.listener.service.jdbc.mapper.ListenerEventMapper;
 import org.apache.dolphinscheduler.dao.mapper.ListenerPluginInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.PluginDefineMapper;
+import org.apache.dolphinscheduler.extract.listener.request.ListenerResponse;
 import org.apache.dolphinscheduler.listener.enums.ListenerEventPostServiceStatus;
 import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
 import org.apache.dolphinscheduler.listener.plugin.ListenerPlugin;
+import org.apache.dolphinscheduler.listener.service.jdbc.JdbcListenerEvent;
+import org.apache.dolphinscheduler.listener.service.jdbc.mapper.ListenerEventMapper;
 import org.apache.dolphinscheduler.listener.util.ClassLoaderUtil;
-import org.apache.dolphinscheduler.remote.command.listener.ListenerResponse;
 import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -72,7 +72,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 @Slf4j
 public class ListenerPluginService implements ApplicationContextAware, ApplicationListener<ContextRefreshedEvent> {
 
-    private final String basePath = System.getProperty("user.dir").replace(File.separator + "bin", "") + File.separator + "libs";
+    private final String basePath =
+            System.getProperty("user.dir").replace(File.separator + "bin", "") + File.separator + "libs";
     private final ConcurrentHashMap<Integer, ListenerPlugin> listenerPlugins = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Integer, ListenerInstancePostService> listenerInstancePostServices =
             new ConcurrentHashMap<>();
@@ -106,7 +107,8 @@ public class ListenerPluginService implements ApplicationContextAware, Applicati
         for (PluginDefine pluginDefine : pluginDefines) {
             try {
                 ListenerPlugin plugin =
-                        getListenerPluginFromJar(getPluginJarPath(pluginDefine.getPluginLocation()), pluginDefine.getPluginClassName());
+                        getListenerPluginFromJar(getPluginJarPath(pluginDefine.getPluginLocation()),
+                                pluginDefine.getPluginClassName());
                 listenerPlugins.put(pluginDefine.getId(), plugin);
                 log.info("init listener plugin {}", pluginDefine.getPluginName());
             } catch (Exception e) {
@@ -123,7 +125,8 @@ public class ListenerPluginService implements ApplicationContextAware, Applicati
                 continue;
             }
             ListenerInstancePostService listenerInstancePostService =
-                    new ListenerInstancePostService(listenerPlugins.get(pluginId), pluginInstance, listenerEventConsumer);
+                    new ListenerInstancePostService(listenerPlugins.get(pluginId), pluginInstance,
+                            listenerEventConsumer);
             listenerInstancePostService.start();
             listenerInstancePostServices.put(pluginInstance.getId(), listenerInstancePostService);
             log.info("init listener instance {}：", pluginInstance.getInstanceName());
@@ -339,7 +342,7 @@ public class ListenerPluginService implements ApplicationContextAware, Applicati
         return (ListenerPlugin) applicationContext.getBean(clazz.getName());
     }
 
-    private String getPluginJarPath(String pluginJarName){
+    private String getPluginJarPath(String pluginJarName) {
         return basePath + File.separator + pluginJarName;
     }
 

@@ -22,12 +22,12 @@ package org.apache.dolphinscheduler.listener.service;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.listener.service.jdbc.JdbcListenerEvent;
 import org.apache.dolphinscheduler.dao.entity.ListenerPluginInstance;
 import org.apache.dolphinscheduler.listener.enums.ListenerEventPostServiceStatus;
 import org.apache.dolphinscheduler.listener.enums.ListenerEventPostStatus;
 import org.apache.dolphinscheduler.listener.plugin.ListenerPlugin;
 import org.apache.dolphinscheduler.listener.processor.ListenerEventProcessorManager;
+import org.apache.dolphinscheduler.listener.service.jdbc.JdbcListenerEvent;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -39,6 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ListenerInstancePostService extends Thread {
+
     private final ListenerEventConsumer listenerEventConsumer;
     private volatile ListenerEventPostServiceStatus status;
     @Getter

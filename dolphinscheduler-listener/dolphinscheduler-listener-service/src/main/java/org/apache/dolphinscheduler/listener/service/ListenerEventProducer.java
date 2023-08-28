@@ -25,5 +25,6 @@ package org.apache.dolphinscheduler.listener.service;
 import org.apache.dolphinscheduler.listener.event.ListenerEvent;
 
 public interface ListenerEventProducer {
+
     void save(ListenerEvent listenerEvent);
 }

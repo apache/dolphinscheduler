@@ -24,8 +24,8 @@
         <version>dev-SNAPSHOT</version>
     </parent>
     <artifactId>dolphinscheduler-listener-plugin</artifactId>
-    <name>${project.artifactId}</name>
     <packaging>pom</packaging>
+    <name>${project.artifactId}</name>
     <modules>
         <module>dolphinscheduler-listener-kafka</module>
         <module>dolphinscheduler-listener-logger</module>

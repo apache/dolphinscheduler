@@ -163,7 +163,7 @@ public class WorkflowCreateListenerEvent extends ListenerEvent {
      */
     List<ProcessTaskRelationLog> taskRelationList;
 
-    public WorkflowCreateListenerEvent(ProcessDefinition processDefinition){
+    public WorkflowCreateListenerEvent(ProcessDefinition processDefinition) {
         this.setListenerEventType(ListenerEventType.WORKFLOW_ADDED);
         this.setId(processDefinition.getId());
         this.setCode(processDefinition.getCode());

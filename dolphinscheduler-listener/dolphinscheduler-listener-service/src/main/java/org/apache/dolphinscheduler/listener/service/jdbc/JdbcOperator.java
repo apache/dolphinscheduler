@@ -22,45 +22,49 @@
 
 package org.apache.dolphinscheduler.listener.service.jdbc;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toSet;
-import javax.annotation.Resource;
+
 import org.apache.dolphinscheduler.dao.entity.ListenerPluginInstance;
 import org.apache.dolphinscheduler.dao.mapper.ListenerPluginInstanceMapper;
 import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
 import org.apache.dolphinscheduler.listener.service.jdbc.mapper.ListenerEventMapper;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+
 @Component
 @ConditionalOnProperty(prefix = "listener", name = "type", havingValue = "jdbc")
 public class JdbcOperator {
+
     @Autowired
     private ListenerEventMapper listenerEventMapper;
     @Autowired
     private ListenerPluginInstanceMapper listenerPluginInstanceMapper;
 
-    public List<JdbcListenerEvent> getJdbcListenerEventListByInstanceId(int listenerInstanceId){
+    public List<JdbcListenerEvent> getJdbcListenerEventListByInstanceId(int listenerInstanceId) {
         LambdaQueryWrapper<JdbcListenerEvent> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(JdbcListenerEvent::getPluginInstanceId, listenerInstanceId)
                 .last("limit 100");
         List<JdbcListenerEvent> eventList = listenerEventMapper.selectList(wrapper);
         return eventList;
     }
-    
-    public void updateListenerEvent(JdbcListenerEvent jdbcListenerEvent){
+
+    public void updateListenerEvent(JdbcListenerEvent jdbcListenerEvent) {
         listenerEventMapper.updateById(jdbcListenerEvent);
     }
 
-    public void deleteListenerEvent(JdbcListenerEvent jdbcListenerEvent){
+    public void deleteListenerEvent(JdbcListenerEvent jdbcListenerEvent) {
         listenerEventMapper.deleteById(jdbcListenerEvent);
     }
 
-    public List<ListenerPluginInstance> getListenerPluginInstanceByEventType(ListenerEventType listenerEventType){
+    public List<ListenerPluginInstance> getListenerPluginInstanceByEventType(ListenerEventType listenerEventType) {
         LambdaQueryWrapper<ListenerPluginInstance> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.select(ListenerPluginInstance::getId, ListenerPluginInstance::getListenerEventTypes);
         List<ListenerPluginInstance> listenerPluginInstances =
@@ -73,7 +77,7 @@ public class JdbcOperator {
         return listenerPluginInstances;
     }
 
-    public void batchInsertListenerEvent(List<JdbcListenerEvent> jdbcListenerEvents){
+    public void batchInsertListenerEvent(List<JdbcListenerEvent> jdbcListenerEvents) {
         listenerEventMapper.batchInsert(jdbcListenerEvents);
     }
 

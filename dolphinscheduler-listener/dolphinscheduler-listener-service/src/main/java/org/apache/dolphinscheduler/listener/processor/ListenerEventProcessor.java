@@ -19,9 +19,9 @@
 
 package org.apache.dolphinscheduler.listener.processor;
 
-import org.apache.dolphinscheduler.listener.service.jdbc.JdbcListenerEvent;
 import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
 import org.apache.dolphinscheduler.listener.plugin.ListenerPlugin;
+import org.apache.dolphinscheduler.listener.service.jdbc.JdbcListenerEvent;
 import org.apache.dolphinscheduler.spi.plugin.PrioritySPI;
 import org.apache.dolphinscheduler.spi.plugin.SPIIdentify;
 
