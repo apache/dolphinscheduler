@@ -35,7 +35,7 @@ public class TaskInstanceExecutionRunningEventSender
     @Override
     public void sendEvent(TaskInstanceExecutionRunningEvent taskInstanceExecutionRunningEvent) {
         ITaskInstanceExecutionEventListener iTaskInstanceExecutionEventListener =
-                SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+                SingletonJdkDynamicRpcClientProxyFactory
                         .getProxyClient(taskInstanceExecutionRunningEvent.getHost(),
                                 ITaskInstanceExecutionEventListener.class);
         iTaskInstanceExecutionEventListener.onTaskInstanceExecutionRunning(taskInstanceExecutionRunningEvent);

@@ -242,6 +242,9 @@ server:
     mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json,application/xml
   jetty:
     max-http-form-post-size: 5000000
+    accesslog:
+      enabled: true
+      custom-format: '%{client}a - %u %t "%r" %s %O %{ms}Tms'
 
 management:
   endpoints:

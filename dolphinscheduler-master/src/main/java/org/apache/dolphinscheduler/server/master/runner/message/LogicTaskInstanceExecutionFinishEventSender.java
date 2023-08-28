@@ -32,9 +32,9 @@ public class LogicTaskInstanceExecutionFinishEventSender
     @Override
     public void sendMessage(TaskInstanceExecutionFinishEvent message) {
         ITaskInstanceExecutionEventListener iTaskInstanceExecutionEventListener =
-                SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+                SingletonJdkDynamicRpcClientProxyFactory
                         .getProxyClient(message.getHost(), ITaskInstanceExecutionEventListener.class);
-        iTaskInstanceExecutionEventListener.onTaskInstanceExecutionFinish(new TaskInstanceExecutionFinishEvent());
+        iTaskInstanceExecutionEventListener.onTaskInstanceExecutionFinish(message);
     }
 
     @Override
