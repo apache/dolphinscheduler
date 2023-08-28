@@ -35,7 +35,7 @@ public class TaskInstanceExecutionInfoUpdateEventSender
     @Override
     public void sendEvent(TaskInstanceExecutionInfoEvent taskInstanceExecutionInfoEvent) {
         ITaskInstanceExecutionEventListener iTaskInstanceExecutionEventListener =
-                SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+                SingletonJdkDynamicRpcClientProxyFactory
                         .getProxyClient(taskInstanceExecutionInfoEvent.getHost(),
                                 ITaskInstanceExecutionEventListener.class);
         iTaskInstanceExecutionEventListener.onTaskInstanceExecutionInfoUpdate(taskInstanceExecutionInfoEvent);

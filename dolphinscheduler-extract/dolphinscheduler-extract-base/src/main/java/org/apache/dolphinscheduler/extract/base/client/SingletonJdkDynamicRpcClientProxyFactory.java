@@ -20,17 +20,13 @@ package org.apache.dolphinscheduler.extract.base.client;
 import org.apache.dolphinscheduler.extract.base.NettyRemotingClientFactory;
 import org.apache.dolphinscheduler.extract.base.config.NettyClientConfig;
 
-public class SingletonJdkDynamicRpcClientProxyFactory extends JdkDynamicRpcClientProxyFactory {
+public class SingletonJdkDynamicRpcClientProxyFactory {
 
-    private static final SingletonJdkDynamicRpcClientProxyFactory INSTANCE =
-            new SingletonJdkDynamicRpcClientProxyFactory();
+    private static final JdkDynamicRpcClientProxyFactory INSTANCE = new JdkDynamicRpcClientProxyFactory(
+            NettyRemotingClientFactory.buildNettyRemotingClient(new NettyClientConfig()));
 
-    private SingletonJdkDynamicRpcClientProxyFactory() {
-        super(NettyRemotingClientFactory.buildNettyRemotingClient(new NettyClientConfig()));
-    }
-
-    public static SingletonJdkDynamicRpcClientProxyFactory getInstance() {
-        return INSTANCE;
+    public static <T> T getProxyClient(String serverAddress, Class<T> clazz) {
+        return INSTANCE.getProxyClient(serverAddress, clazz);
     }
 
 }
