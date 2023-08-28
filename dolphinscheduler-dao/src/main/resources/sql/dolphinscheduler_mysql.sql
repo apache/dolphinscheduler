@@ -2118,8 +2118,6 @@ CREATE TABLE `t_ds_relation_sub_workflow` (
 
 CREATE TABLE `t_ds_listener_event`  (
     `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
-    `title` varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT 'title',
-    `sign` char(40) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT 'sign=sha1(content)',
     `content` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT 'Message content (can be email, can be SMS. Mail is stored in JSON map, and SMS is string)',
     `post_status` tinyint(4) NULL DEFAULT 0 COMMENT '0:wait running,1:failed',
     `event_type` int(11) NULL DEFAULT NULL,
@@ -2129,15 +2127,14 @@ CREATE TABLE `t_ds_listener_event`  (
     `update_time` datetime(0) NULL DEFAULT NULL COMMENT 'update time',
     PRIMARY KEY (`id`),
     INDEX `idx_status`(`post_status`) USING BTREE,
-    INDEX `idx_sign`(`sign`) USING BTREE,
     INDEX `idx_instance`(`plugin_instance_id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 CREATE TABLE `t_ds_listener_plugin_instance`  (
       `id` int(11) NOT NULL AUTO_INCREMENT,
-      `instance_name` varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT 'alert instance name',
+      `instance_name` varchar(200) NOT NULL COMMENT 'alert instance name',
       `plugin_define_id` int(11) NOT NULL,
-      `plugin_instance_params` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT 'plugin instance params. Also contain the params value which user input in web ui.',
+      `plugin_instance_params` text COMMENT 'plugin instance params. Also contain the params value which user input in web ui.',
       `listener_event_types` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL,
       `create_time` timestamp(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
       `update_time` timestamp(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0),

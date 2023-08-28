@@ -88,6 +88,9 @@ registry:
     block-until-connected: 600ms
     digest: ~
 
+listener:
+  type: jdbc
+
 security:
   authentication:
     # Authentication types (supported types: PASSWORD,LDAP,CASDOOR_SSO)

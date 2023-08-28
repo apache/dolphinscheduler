@@ -41,6 +41,12 @@ public class ApiFuncIdentificationConstant {
     public static final String ALART_INSTANCE_CREATE = "security:alert-plugin:create";
     public static final String ALERT_PLUGIN_UPDATE = "security:alert-plugin:update";
     public static final String ALERT_PLUGIN_DELETE = "security:alert-plugin:delete";
+    public static final String LISTENER_PLUGIN_CREATE = "security:listener-instance:create";
+    public static final String LISTENER_PLUGIN_UPDATE = "security:listener-instance:update";
+    public static final String LISTENER_PLUGIN_DELETE = "security:listener-instance:delete";
+    public static final String LISTENER_INSTANCE_CREATE = "security:listener-instance:create";
+    public static final String LISTENER_INSTANCE_UPDATE = "security:listener-instance:update";
+    public static final String LISTENER_INSTANCE_DELETE = "security:listener-instance:delete";
     public static final String WORKER_GROUP_CREATE = "security:worker-group:create";
     public static final String WORKER_GROUP_EDIT = "security:worker-group:update";
     public static final String WORKER_GROUP_DELETE = "security:worker-group:delete";

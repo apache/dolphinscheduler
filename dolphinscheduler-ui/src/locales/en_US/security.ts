@@ -294,6 +294,7 @@ export default {
     update_plugin: 'Update Listener Plugin',
     plugin_name: 'Plugin Name',
     plugin_file_name: 'Plugin Jar File',
+    upload_file: 'Upload File',
     plugin_class_name: 'Plugin Class Name',
     create_time: 'Create Time',
     update_time: 'Update Time',

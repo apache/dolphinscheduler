@@ -294,6 +294,7 @@ export default {
     update_plugin: '更新插件',
     plugin_name: '插件名称',
     plugin_file_name: '插件jar包',
+    upload_file: '上传文件',
     plugin_class_name: '插件类名',
     create_time: '创建时间',
     update_time: '更新时间',

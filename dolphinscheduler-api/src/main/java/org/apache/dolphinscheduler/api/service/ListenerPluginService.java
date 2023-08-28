@@ -20,6 +20,7 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
 
 import java.util.List;
@@ -28,23 +29,23 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface ListenerPluginService {
 
-    Result registerListenerPlugin(MultipartFile file, String classPath);
+    Result registerListenerPlugin(User loginUser, MultipartFile file, String classPath);
 
-    Result updateListenerPlugin(int id, MultipartFile file, String classPath);
+    Result updateListenerPlugin(User loginUser, int id, MultipartFile file, String classPath);
 
-    Result removeListenerPlugin(int id);
+    Result removeListenerPlugin(User loginUser, int id);
 
     Result listPluginPaging(String searchVal, Integer pageNo, Integer pageSize);
 
     Result listPluginList();
 
-    Result createListenerInstance(int pluginDefineId, String instanceName, String pluginInstanceParams,
+    Result createListenerInstance(User loginUser, int pluginDefineId, String instanceName, String pluginInstanceParams,
                                   List<ListenerEventType> listenerEventTypes);
 
-    Result updateListenerInstance(int instanceId, String instanceName, String pluginInstanceParams,
+    Result updateListenerInstance(User loginUser, int instanceId, String instanceName, String pluginInstanceParams,
                                   List<ListenerEventType> listenerEventType);
 
-    Result removeListenerInstance(int id);
+    Result removeListenerInstance(User loginUser, int id);
 
     Result listInstancePaging(String searchVal, Integer pageNo, Integer pageSize);
 

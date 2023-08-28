@@ -17,13 +17,7 @@
 
 package org.apache.dolphinscheduler.listener;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Map;
-import java.util.logging.Logger;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.listener.event.ListenerEvent;
 import org.apache.dolphinscheduler.listener.event.ServerDownListenerEvent;
 import org.apache.dolphinscheduler.listener.event.TaskCreateListenerEvent;
 import org.apache.dolphinscheduler.listener.event.TaskEndListenerEvent;
@@ -42,8 +36,11 @@ import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
 import org.apache.dolphinscheduler.spi.params.input.InputParam;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -137,7 +134,7 @@ public class LoggerListener implements ListenerPlugin {
         String logFile = listenerInstanceParams.get("logFile");
         try(BufferedWriter writer = new BufferedWriter(new FileWriter(logFile, true))) {
             writer.write(content);
-            writer.newLine(); // 添加换行
+            writer.newLine();
         }catch (Exception e){
             throw new RuntimeException(e);
         }

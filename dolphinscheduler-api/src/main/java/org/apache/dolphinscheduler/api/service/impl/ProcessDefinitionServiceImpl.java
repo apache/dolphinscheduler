@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import static java.util.stream.Collectors.toSet;
-import org.apache.commons.beanutils.BeanUtils;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TASK_DEFINITION_MOVE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.VERSION_LIST;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_BATCH_COPY;
@@ -40,7 +39,6 @@ import static org.apache.dolphinscheduler.common.constants.Constants.EMPTY_STRIN
 import static org.apache.dolphinscheduler.common.constants.Constants.GLOBAL_PARAMS;
 import static org.apache.dolphinscheduler.common.constants.Constants.IMPORT_SUFFIX;
 import static org.apache.dolphinscheduler.common.constants.Constants.LOCAL_PARAMS;
-import org.apache.dolphinscheduler.listener.event.TaskCreateListenerEvent;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LOCAL_PARAMS_LIST;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SQL;
@@ -86,7 +84,6 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.DagData;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.DependentSimplifyDefinition;
-import org.apache.dolphinscheduler.dao.entity.ListenerPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -115,10 +112,6 @@ import org.apache.dolphinscheduler.dao.model.PageListingResult;
 import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
-import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
-import org.apache.dolphinscheduler.listener.event.WorkflowCreateListenerEvent;
-import org.apache.dolphinscheduler.listener.event.WorkflowRemoveListenerEvent;
-import org.apache.dolphinscheduler.listener.event.WorkflowUpdateListenerEvent;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.SqlType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
@@ -299,7 +292,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         processDefinition.setExecutionType(executionType);
         result = createDagDefine(loginUser, taskRelationList, processDefinition, taskDefinitionLogs, otherParamsJson);
         if (result.get(Constants.STATUS) == Status.SUCCESS) {
-            listenerEventPublishService.publishWorkflowCreateListenerEvent(processDefinition);
+            listenerEventPublishService.publishWorkflowCreateListenerEvent(processDefinition, taskDefinitionLogs, taskRelationList);
         }
         return result;
     }
@@ -803,7 +796,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         result = updateDagDefine(loginUser, taskRelationList, processDefinition, processDefinitionDeepCopy,
                 taskDefinitionLogs, otherParamsJson);
         if (result.get(Constants.STATUS) == Status.SUCCESS) {
-            listenerEventPublishService.publishWorkflowUpdateListenerEvent(processDefinition);
+            listenerEventPublishService.publishWorkflowUpdateListenerEvent(processDefinition, taskDefinitionLogs, taskRelationList);
         }
         return result;
     }

@@ -19,21 +19,23 @@
 
 package org.apache.dolphinscheduler.listener.event;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -150,6 +152,16 @@ public class WorkflowUpdateListenerEvent extends ListenerEvent {
      * execution type
      */
     private ProcessExecutionTypeEnum executionType;
+
+    /**
+     * task definitions
+     */
+    List<TaskDefinitionLog> taskDefinitionLogs;
+
+    /**
+     *
+     */
+    List<ProcessTaskRelationLog> taskRelationList;
 
     public WorkflowUpdateListenerEvent(ProcessDefinition processDefinition){
         this.setListenerEventType(ListenerEventType.WORKFLOW_UPDATE);

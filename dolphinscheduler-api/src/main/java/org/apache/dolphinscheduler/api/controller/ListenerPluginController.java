@@ -19,8 +19,15 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_ALERT_PLUGIN_INSTANCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.LIST_PAGING_ALERT_GROUP_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.CREATE_LISTENER_PLUGIN_INSTANCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.DELETE_LISTENER_PLUGIN_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.DELETE_LISTENER_PLUGIN_INSTANCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.LIST_LISTENER_PLUGIN_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.LIST_PAGING_LISTENER_PLUGIN_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.LIST_PAGING_LISTENER_PLUGIN_INSTANCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.REGISTER_LISTENER_PLUGIN_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_LISTENER_PLUGIN_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_LISTENER_PLUGIN_INSTANCE_ERROR;
 
 import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -72,11 +79,12 @@ public class ListenerPluginController extends BaseController {
     })
     @PostMapping("/plugin")
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiException(CREATE_ALERT_PLUGIN_INSTANCE_ERROR)
+    @ApiException(REGISTER_LISTENER_PLUGIN_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result registerPlugin(@RequestParam("pluginJar") MultipartFile file,
+    public Result registerPlugin(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                 @RequestParam("pluginJar") MultipartFile file,
                                  @RequestParam("classPath") String classPath) {
-        return listenerPluginService.registerListenerPlugin(file, classPath);
+        return listenerPluginService.registerListenerPlugin(loginUser, file, classPath);
     }
 
     @Operation(summary = "updateListenerPlugin", description = "UPDATE_LISTENER_PLUGIN_NOTES")
@@ -87,12 +95,13 @@ public class ListenerPluginController extends BaseController {
     })
     @PutMapping("/plugin/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(CREATE_ALERT_PLUGIN_INSTANCE_ERROR)
+    @ApiException(UPDATE_LISTENER_PLUGIN_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result updatePlugin(@PathVariable("id") int id,
+    public Result updatePlugin(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                               @PathVariable("id") int id,
                                @RequestParam("pluginJar") MultipartFile file,
                                @RequestParam("classPath") String classPath) {
-        return listenerPluginService.updateListenerPlugin(id, file, classPath);
+        return listenerPluginService.updateListenerPlugin(loginUser, id, file, classPath);
     }
 
     @Operation(summary = "removeListenerPlugin", description = "REMOVE_LISTENER_PLUGIN_NOTES")
@@ -101,10 +110,11 @@ public class ListenerPluginController extends BaseController {
     })
     @DeleteMapping("/plugin/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(CREATE_ALERT_PLUGIN_INSTANCE_ERROR)
+    @ApiException(DELETE_LISTENER_PLUGIN_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result removePlugin(@PathVariable("id") int id) {
-        return listenerPluginService.removeListenerPlugin(id);
+    public Result removePlugin(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                               @PathVariable("id") int id) {
+        return listenerPluginService.removeListenerPlugin(loginUser, id);
     }
 
     @Operation(summary = "queryListenerPluginPaging", description = "QUERY_LISTENER_PLUGIN_LIST_PAGING_NOTES")
@@ -115,7 +125,7 @@ public class ListenerPluginController extends BaseController {
     })
     @GetMapping("/plugin")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(LIST_PAGING_ALERT_GROUP_ERROR)
+    @ApiException(LIST_PAGING_LISTENER_PLUGIN_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result listListenerPluginPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @RequestParam(value = "searchVal", required = false) String searchVal,
@@ -132,7 +142,7 @@ public class ListenerPluginController extends BaseController {
     @Operation(summary = "listListenerPlugin", description = "LIST_LISTENER_PLUGINNOTES")
     @GetMapping("/plugin/list")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(LIST_PAGING_ALERT_GROUP_ERROR)
+    @ApiException(LIST_LISTENER_PLUGIN_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result listListenerPluginPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         return listenerPluginService.listPluginList();
@@ -167,13 +177,14 @@ public class ListenerPluginController extends BaseController {
     })
     @PostMapping("/instance")
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiException(CREATE_ALERT_PLUGIN_INSTANCE_ERROR)
+    @ApiException(CREATE_LISTENER_PLUGIN_INSTANCE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result createPluginInstance(@RequestParam(value = "pluginDefineId") int pluginDefineId,
+    public Result createPluginInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                       @RequestParam(value = "pluginDefineId") int pluginDefineId,
                                        @RequestParam(value = "instanceName") String instanceName,
                                        @RequestParam(value = "instanceParams") String pluginInstanceParams,
                                        @RequestParam(value = "listenerEventTypes") List<ListenerEventType> listenerEventTypes) {
-        return listenerPluginService.createListenerInstance(pluginDefineId, instanceName, pluginInstanceParams,
+        return listenerPluginService.createListenerInstance(loginUser, pluginDefineId, instanceName, pluginInstanceParams,
                 listenerEventTypes);
     }
 
@@ -187,13 +198,14 @@ public class ListenerPluginController extends BaseController {
     })
     @PutMapping("/instance/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(CREATE_ALERT_PLUGIN_INSTANCE_ERROR)
+    @ApiException(UPDATE_LISTENER_PLUGIN_INSTANCE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result updatePluginInstance(@PathVariable(value = "id") int id,
+    public Result updatePluginInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                       @PathVariable(value = "id") int id,
                                        @RequestParam(value = "instanceName") String instanceName,
                                        @RequestParam(value = "instanceParams") String pluginInstanceParams,
                                        @RequestParam(value = "listenerEventTypes") List<ListenerEventType> listenerEventTypes) {
-        return listenerPluginService.updateListenerInstance(id, instanceName, pluginInstanceParams, listenerEventTypes);
+        return listenerPluginService.updateListenerInstance(loginUser, id, instanceName, pluginInstanceParams, listenerEventTypes);
     }
 
     @Operation(summary = "removeListenerPluginInstance", description = "REMOVE_LISTENER_PLUGIN_INSTANCE_NOTES")
@@ -202,10 +214,11 @@ public class ListenerPluginController extends BaseController {
     })
     @DeleteMapping("/instance/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(CREATE_ALERT_PLUGIN_INSTANCE_ERROR)
+    @ApiException(DELETE_LISTENER_PLUGIN_INSTANCE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result removePluginInstance(@PathVariable(value = "id") int id) {
-        return listenerPluginService.removeListenerInstance(id);
+    public Result removePluginInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                       @PathVariable(value = "id") int id) {
+        return listenerPluginService.removeListenerInstance(loginUser, id);
     }
 
     @Operation(summary = "queryListenerPluginInstancePaging", description = "QUERY_LISTENER_PLUGIN_INSTANCE_LIST_PAGING_NOTES")
@@ -216,7 +229,7 @@ public class ListenerPluginController extends BaseController {
     })
     @GetMapping("/instance")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(LIST_PAGING_ALERT_GROUP_ERROR)
+    @ApiException(LIST_PAGING_LISTENER_PLUGIN_INSTANCE_ERROR)
     @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result listListenerInstancePaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                              @RequestParam(value = "searchVal", required = false) String searchVal,

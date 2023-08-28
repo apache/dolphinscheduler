@@ -19,17 +19,26 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.LISTENER_INSTANCE_CREATE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.LISTENER_INSTANCE_DELETE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.LISTENER_INSTANCE_UPDATE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.LISTENER_PLUGIN_CREATE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.LISTENER_PLUGIN_DELETE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.LISTENER_PLUGIN_UPDATE;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.rpc.ApiRpcClient;
 import org.apache.dolphinscheduler.api.service.ListenerPluginService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.api.vo.ListenerInstanceVO;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.PluginType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ListenerPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
+import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ListenerPluginInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.PluginDefineMapper;
 import org.apache.dolphinscheduler.listener.enums.ListenerEventType;
@@ -83,7 +92,10 @@ public class ListenerPluginServiceImpl extends BaseServiceImpl implements Listen
     private ListenerPluginInstanceMapper listenerPluginInstanceMapper;
 
     @Override
-    public Result registerListenerPlugin(MultipartFile file, String classPath) {
+    public Result registerListenerPlugin(User loginUser, MultipartFile file, String classPath) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.LISTENER_PLUGIN, LISTENER_PLUGIN_CREATE)) {
+            return Result.errorWithArgs(Status.USER_NO_OPERATION_PERM);
+        }
         if (!checkPluginJar(file)) {
             return Result.errorWithArgs(Status.INTERNAL_SERVER_ERROR_ARGS, "plugin jar is empty or has wrong type");
         }
@@ -114,7 +126,10 @@ public class ListenerPluginServiceImpl extends BaseServiceImpl implements Listen
     }
 
     @Override
-    public Result updateListenerPlugin(int id, MultipartFile file, String classPath) {
+    public Result updateListenerPlugin(User loginUser, int id, MultipartFile file, String classPath) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.LISTENER_PLUGIN, LISTENER_PLUGIN_UPDATE)) {
+            return Result.errorWithArgs(Status.USER_NO_OPERATION_PERM);
+        }
         if (!checkPluginJar(file)) {
             return Result.errorWithArgs(Status.INTERNAL_SERVER_ERROR_ARGS, "plugin jar is empty or has wrong type");
         }
@@ -144,7 +159,10 @@ public class ListenerPluginServiceImpl extends BaseServiceImpl implements Listen
     }
 
     @Override
-    public Result removeListenerPlugin(int id) {
+    public Result removeListenerPlugin(User loginUser, int id) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.LISTENER_PLUGIN, LISTENER_PLUGIN_DELETE)) {
+            return Result.errorWithArgs(Status.USER_NO_OPERATION_PERM);
+        }
         Optional<Host> alertServerAddressOptional = getAlertServerAddress();
         if (!alertServerAddressOptional.isPresent()) {
             log.error("Cannot get alert server address, please check the alert server is running");
@@ -195,8 +213,11 @@ public class ListenerPluginServiceImpl extends BaseServiceImpl implements Listen
     }
 
     @Override
-    public Result createListenerInstance(int pluginDefineId, String instanceName, String pluginInstanceParams,
+    public Result createListenerInstance(User loginUser, int pluginDefineId, String instanceName, String pluginInstanceParams,
                                          List<ListenerEventType> listenerEventTypes) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.LISTENER_INSTANCE, LISTENER_INSTANCE_CREATE)) {
+            return Result.errorWithArgs(Status.USER_NO_OPERATION_PERM);
+        }
         Optional<Host> alertServerAddressOptional = getAlertServerAddress();
         if (!alertServerAddressOptional.isPresent()) {
             log.error("Cannot get alert server address, please check the alert server is running");
@@ -221,8 +242,11 @@ public class ListenerPluginServiceImpl extends BaseServiceImpl implements Listen
     }
 
     @Override
-    public Result updateListenerInstance(int instanceId, String instanceName, String pluginInstanceParams,
+    public Result updateListenerInstance(User loginUser, int instanceId, String instanceName, String pluginInstanceParams,
                                          List<ListenerEventType> listenerEventTypes) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.LISTENER_INSTANCE, LISTENER_INSTANCE_UPDATE)) {
+            return Result.errorWithArgs(Status.USER_NO_OPERATION_PERM);
+        }
         Optional<Host> alertServerAddressOptional = getAlertServerAddress();
         if (!alertServerAddressOptional.isPresent()) {
             log.error("Cannot get alert server address, please check the alert server is running");
@@ -247,7 +271,10 @@ public class ListenerPluginServiceImpl extends BaseServiceImpl implements Listen
     }
 
     @Override
-    public Result removeListenerInstance(int id) {
+    public Result removeListenerInstance(User loginUser, int id) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.LISTENER_INSTANCE, LISTENER_INSTANCE_DELETE)) {
+            return Result.errorWithArgs(Status.USER_NO_OPERATION_PERM);
+        }
         Optional<Host> alertServerAddressOptional = getAlertServerAddress();
         if (!alertServerAddressOptional.isPresent()) {
             log.error("Cannot get alert server address, please check the alert server is running");

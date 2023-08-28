@@ -19,6 +19,7 @@
 
 package org.apache.dolphinscheduler.listener.service;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.listener.service.jdbc.JdbcListenerEvent;
@@ -66,16 +67,16 @@ public class ListenerInstancePostService extends Thread {
                 if (status == ListenerEventPostServiceStatus.RUN) {
                     List<JdbcListenerEvent> eventList = listenerEventConsumer.take(listenerPluginInstance.getId());
                     if (CollectionUtils.isEmpty(eventList)) {
-                        log.info("There is not waiting listener events");
+                        log.debug("There is not waiting listener events");
                         continue;
                     }
                     this.post(eventList);
                 }
             } catch (Exception e) {
-                log.error("Alert sender thread meet an exception", e);
+                log.error("Listener post thread meet an exception", e);
             } finally {
                 try {
-                    Thread.sleep(10000);
+                    Thread.sleep(Constants.SLEEP_TIME_MILLIS * 5L);
                 } catch (final InterruptedException interruptedException) {
                     Thread.currentThread().interrupt();
                     log.error("Current thread sleep error", interruptedException);
@@ -104,7 +105,7 @@ public class ListenerInstancePostService extends Thread {
                 listenerEventConsumer.update(event);
                 break;
             }
-            log.info("listener event {} post successfully, delete", event.getId());
+            log.debug("listener event {} post successfully, delete", event.getId());
             listenerEventConsumer.delete(event);
         }
     }

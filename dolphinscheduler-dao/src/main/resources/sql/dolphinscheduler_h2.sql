@@ -1078,6 +1078,8 @@ CREATE TABLE t_ds_plugin_define
     plugin_name   varchar(255) NOT NULL,
     plugin_type   varchar(100) NOT NULL,
     plugin_params text,
+    plugin_location varchar(255),
+    plugin_class_name varchar(255),
     create_time   timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     update_time   timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
@@ -2140,3 +2142,30 @@ CREATE TABLE t_ds_relation_sub_workflow (
     INDEX idx_parent_task_code (parent_task_code),
     INDEX idx_sub_workflow_instance_id (sub_workflow_instance_id)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+
+DROP TABLE IF EXISTS t_ds_listener_event;
+CREATE TABLE t_ds_listener_event
+(
+    id BIGINT AUTO_INCREMENT NOT NULL,
+    content       text,
+    post_status  tinyint(4) DEFAULT '0',
+    event_type  tinyint(4) NOT NULL,
+    log           text,
+    plugin_instance_id int(11) DEFAULT NULL,
+    create_time   datetime    DEFAULT NULL,
+    update_time   datetime    DEFAULT NULL,
+    PRIMARY KEY (id)
+);
+
+DROP TABLE IF EXISTS t_ds_listener_plugin_instance;
+CREATE TABLE t_ds_listener_plugin_instance
+(
+    id BIGINT AUTO_INCREMENT NOT NULL,
+    instance_name varchar(200) NOT NULL,
+    plugin_instance_params  text,
+    listener_event_types  text,
+    create_time   datetime    DEFAULT NULL,
+    update_time   datetime    DEFAULT NULL,
+    PRIMARY KEY (id)
+);

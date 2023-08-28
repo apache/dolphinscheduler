@@ -83,6 +83,9 @@ registry:
     block-until-connected: 600ms
     digest: ~
 
+listener:
+  type: jdbc
+
 master:
   listen-port: 5678
   # master fetch command num

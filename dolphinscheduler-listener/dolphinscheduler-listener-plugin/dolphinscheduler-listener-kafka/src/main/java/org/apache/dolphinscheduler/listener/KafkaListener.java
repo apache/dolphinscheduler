@@ -51,6 +51,8 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class KafkaListener implements ListenerPlugin {
+    private final Map<String, KafkaProducer<String, String>> kafkaProducers = new HashMap<>();
+
     @Override
     public String name() {
         return "KafkaListener";
@@ -158,27 +160,39 @@ public class KafkaListener implements ListenerPlugin {
     }
 
     private void sendEvent(Map<String, String> listenerInstanceParams, String key, String value){
+        String uniqueId = uniqueId(listenerInstanceParams);
+        if (!kafkaProducers.containsKey(uniqueId)){
+            String kafkaBroker = listenerInstanceParams.get("servers");
+            String username = listenerInstanceParams.get("username");
+            String password = listenerInstanceParams.get("password");
+            Map<String, Object> configurations = new HashMap<>();
+            //TODO: when use username/password, throws exception:  Unable to find LoginModule class: org.apache.kafka.common.security.plain.PlainLoginModule
+            configurations.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBroker);
+            configurations.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+            configurations.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+            if (StringUtils.isNotEmpty(username) && StringUtils.isNotEmpty(password)) {
+                configurations.put("sasl.jaas.config",String.format( "org.apache.kafka.common.security.plain.PlainLoginModule required username='%s' password='%s';", username, password));
+                configurations.put("security.protocol","SASL_PLAINTEXT");
+                configurations.put("sasl.mechanism","PLAIN");
+            }
+            KafkaProducer<String, String> producer = new KafkaProducer<>(configurations);
+            kafkaProducers.put(uniqueId, producer);
+
+        }
+        KafkaProducer<String, String> producer = kafkaProducers.get(uniqueId);
+        String topic = listenerInstanceParams.get("topic");
+        producer.send(new ProducerRecord<>(topic, key, value), (recordMetadata, e) -> {
+            if (e != null) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    private String uniqueId(Map<String, String> listenerInstanceParams){
         String kafkaBroker = listenerInstanceParams.get("servers");
         String topic = listenerInstanceParams.get("topic");
-        String username = listenerInstanceParams.get("username");
-        String password = listenerInstanceParams.get("password");
-        Map<String, Object> configurations = new HashMap<>();
-        //TODO: when use username/password, throws exception:  Unable to find LoginModule class: org.apache.kafka.common.security.plain.PlainLoginModule
-        configurations.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBroker);
-        configurations.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        configurations.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        if (StringUtils.isNotEmpty(username) && StringUtils.isNotEmpty(password)) {
-            configurations.put("sasl.jaas.config",String.format( "org.apache.kafka.common.security.plain.PlainLoginModule required username='%s' password='%s';", username, password));
-            configurations.put("security.protocol","SASL_PLAINTEXT");
-            configurations.put("sasl.mechanism","PLAIN");
-        }
-        try (KafkaProducer<String, String> producer = new KafkaProducer<>(configurations)) {
-            producer.send(new ProducerRecord<>(topic, key, value), (recordMetadata, e) -> {
-                if (e != null) {
-                    throw new RuntimeException(e);
-                }
-            });
-        }
-
+        String username = listenerInstanceParams.getOrDefault("username", "foo");
+        String password = listenerInstanceParams.getOrDefault("password", "foo");
+        return String.format("broker=%s&topic=%s&username=%s&password=%s", kafkaBroker, topic, username, password);
     }
 }

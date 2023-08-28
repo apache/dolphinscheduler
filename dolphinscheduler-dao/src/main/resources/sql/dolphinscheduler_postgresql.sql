@@ -1052,6 +1052,8 @@ CREATE TABLE t_ds_plugin_define (
   plugin_name varchar(255) NOT NULL,
   plugin_type varchar(63) NOT NULL,
   plugin_params text NULL,
+  plugin_location varchar(255),
+  plugin_class_name varchar(255),
   create_time timestamp NULL,
   update_time timestamp NULL,
   CONSTRAINT t_ds_plugin_define_pk PRIMARY KEY (id),
@@ -2102,3 +2104,33 @@ CREATE INDEX idx_parent_workflow_instance_id ON t_ds_relation_sub_workflow (pare
 CREATE INDEX idx_parent_task_code ON t_ds_relation_sub_workflow (parent_task_code);
 CREATE INDEX idx_sub_workflow_instance_id ON t_ds_relation_sub_workflow (sub_workflow_instance_id);
 
+-- ----------------------------
+-- Table structure for t_ds_listener_plugin_instance
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_listener_plugin_instance;
+CREATE TABLE t_ds_listener_plugin_instance (
+   id        serial      NOT NULL,
+   instance_name varchar(200) NOT NULL,
+   plugin_define_id int NOT NULL,
+   plugin_instance_params text,
+   listener_event_types text,
+   create_time timestamp DEFAULT NULL,
+   update_time timestamp DEFAULT NULL,
+   PRIMARY KEY (id)
+);
+
+-- ----------------------------
+-- Table structure for t_ds_listener_plugin_instance
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_listener_event;
+CREATE TABLE t_ds_listener_event (
+   id        serial      NOT NULL,
+   content text NOT NULL,
+   post_status int NOT NULL,
+   event_type int NOT NULL,
+   log text,
+   plugin_instance_id int NOT NULL,
+   create_time timestamp DEFAULT NULL,
+   update_time timestamp DEFAULT NULL,
+   PRIMARY KEY (id)
+);

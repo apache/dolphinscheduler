@@ -115,6 +115,9 @@ registry:
     block-until-connected: 600ms
     digest: ~
 
+listener:
+  type: jdbc
+
 api:
   audit-enable: false
   # Traffic control, if you turn on this config, the maximum number of request/s will be limited.

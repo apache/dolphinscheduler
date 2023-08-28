@@ -43,6 +43,8 @@ public enum AuthorizationType {
      * 15 TENANT;
      * 16 USER;
      * 17 Data_Quality;
+     * 18 LISTENER_PLUGIN;
+     * 19 LISTENER_INSTANCE;
      */
     RESOURCE_FILE_ID(0, "resource file id"),
     RESOURCE_FILE_NAME(1, "resource file name"),
@@ -62,6 +64,8 @@ public enum AuthorizationType {
     TENANT(15, "tenant"),
     DATA_QUALITY(16, "data quality"),
     TASK_GROUP(17, "task group"),
+    LISTENER_PLUGIN(18, "listener plugin"),
+    LISTENER_INSTANCE(19, "listener instance")
     ;
 
     AuthorizationType(int code, String descp) {

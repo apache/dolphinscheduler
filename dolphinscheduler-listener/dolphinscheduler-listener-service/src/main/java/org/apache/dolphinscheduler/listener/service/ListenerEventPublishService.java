@@ -26,6 +26,7 @@ import java.util.Date;
 import java.util.List;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -93,13 +94,17 @@ public class ListenerEventPublishService {
         }
     }
 
-    public void publishWorkflowCreateListenerEvent(ProcessDefinition processDefinition){
+    public void publishWorkflowCreateListenerEvent(ProcessDefinition processDefinition, List<TaskDefinitionLog> taskDefinitionLogs, List<ProcessTaskRelationLog> processTaskRelationLogs){
         WorkflowCreateListenerEvent event = new WorkflowCreateListenerEvent(processDefinition);
+        event.setTaskDefinitionLogs(taskDefinitionLogs);
+        event.setTaskRelationList(processTaskRelationLogs);
         this.publish(event);
     }
 
-    public void publishWorkflowUpdateListenerEvent(ProcessDefinition processDefinition){
+    public void publishWorkflowUpdateListenerEvent(ProcessDefinition processDefinition, List<TaskDefinitionLog> taskDefinitionLogs, List<ProcessTaskRelationLog> processTaskRelationLogs){
         WorkflowUpdateListenerEvent event = new WorkflowUpdateListenerEvent(processDefinition);
+        event.setTaskDefinitionLogs(taskDefinitionLogs);
+        event.setTaskRelationList(processTaskRelationLogs);
         this.publish(event);
     }
 

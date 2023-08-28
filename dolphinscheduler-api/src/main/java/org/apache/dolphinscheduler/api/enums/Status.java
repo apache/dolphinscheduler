@@ -568,7 +568,17 @@ public enum Status {
     DESCRIPTION_TOO_LONG_ERROR(1400004, "description is too long error", "描述过长"),
     DELETE_WORKER_GROUP_BY_ID_FAIL_ENV(1400005,
             "delete worker group fail, for there are [{0}] enviroments using:{1}", "删除工作组失败，有 [{0}] 个环境正在使用：{1}"),
-    ALERT_NOT_EXISTS(1400006, "alert server does not exist", "alert server不存在"),;
+    ALERT_NOT_EXISTS(1400006, "alert server does not exist", "alert server不存在"),
+    REGISTER_LISTENER_PLUGIN_ERROR(150001, "register listener plugin error", "注册监听器插件错误"),
+    UPDATE_LISTENER_PLUGIN_ERROR(150002, "update listener plugin error", "更新监听器插件错误"),
+    DELETE_LISTENER_PLUGIN_ERROR(150003, "delete listener plugin error", "删除监听器插件错误"),
+    LIST_PAGING_LISTENER_PLUGIN_ERROR(150004, "list paging listener plugin error", "分页查询监听器插件错误"),
+    LIST_LISTENER_PLUGIN_ERROR(150005, "list listener plugin error", "查询监听器插件错误"),
+    CREATE_LISTENER_PLUGIN_INSTANCE_ERROR(150006, "create listener plugin instance error", "创建监听器实例错误"),
+    UPDATE_LISTENER_PLUGIN_INSTANCE_ERROR(150007, "update listener plugin instance error", "更新监听器实例错误"),
+    DELETE_LISTENER_PLUGIN_INSTANCE_ERROR(150008, "delete listener plugin instance error", "删除监听器实例错误"),
+    LIST_PAGING_LISTENER_PLUGIN_INSTANCE_ERROR(150009, "list paging listener plugin instance error", "分页查询监听器插件错误"),
+    ;
     private final int code;
     private final String enMsg;
     private final String zhMsg;
