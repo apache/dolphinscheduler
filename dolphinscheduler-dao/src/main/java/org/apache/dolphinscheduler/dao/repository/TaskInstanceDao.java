@@ -96,7 +96,8 @@ public interface TaskInstanceDao extends IDao<TaskInstance> {
      * @param testFlag test flag
      * @return task instance list
      */
-    List<TaskInstance> queryLastTaskInstanceListIntervalByTaskCodes(Set<Long> taskCodes, DateInterval dateInterval, int testFlag);
+    List<TaskInstance> queryLastTaskInstanceListIntervalByTaskCodes(Set<Long> taskCodes, DateInterval dateInterval,
+                                                                    int testFlag);
 
     /**
      * find last task instance corresponding to taskCode in the date interval

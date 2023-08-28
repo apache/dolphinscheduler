@@ -162,7 +162,6 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
 
     List<TaskInstance> findByWorkflowInstanceId(@Param("workflowInstanceId") Integer workflowInstanceId);
 
-
     /**
      * find last task instance list in the date interval
      *

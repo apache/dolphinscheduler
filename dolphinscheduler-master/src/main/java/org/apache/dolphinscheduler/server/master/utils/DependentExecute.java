@@ -22,7 +22,11 @@ import static org.apache.dolphinscheduler.plugin.task.api.parameters.DependentPa
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
-import org.apache.dolphinscheduler.dao.entity.*;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
@@ -35,6 +39,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.DependentUtils;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -46,7 +51,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 
 /**
  * dependent item execute
@@ -85,7 +89,8 @@ public class DependentExecute {
     /**
      * task definition log dao
      */
-    private final TaskDefinitionLogDao taskDefinitionLogDao = SpringApplicationContext.getBean(TaskDefinitionLogDao.class);
+    private final TaskDefinitionLogDao taskDefinitionLogDao =
+            SpringApplicationContext.getBean(TaskDefinitionLogDao.class);
 
     /**
      * task definition dao
@@ -143,7 +148,8 @@ public class DependentExecute {
             } else if (dependentItem.getDepTaskCode() == Constants.DEPENDENT_ALL_TASK_CODE) {
                 result = dependResultByAllTaskOfProcessInstance(processInstance, dateInterval, testFlag);
             } else {
-                result = dependResultBySingleTaskInstance(processInstance, dependentItem.getDepTaskCode(), dateInterval, testFlag);
+                result = dependResultBySingleTaskInstance(processInstance, dependentItem.getDepTaskCode(), dateInterval,
+                        testFlag);
             }
             if (result != DependResult.SUCCESS) {
                 break;
@@ -164,7 +170,8 @@ public class DependentExecute {
         if (processInstance.getState().isSuccess()) {
             return DependResult.SUCCESS;
         }
-        log.warn("The dependent workflow did not execute successfully, so return depend failed. processCode: {}, processName: {}",
+        log.warn(
+                "The dependent workflow did not execute successfully, so return depend failed. processCode: {}, processName: {}",
                 processInstance.getProcessDefinitionCode(), processInstance.getName());
         return DependResult.FAILED;
     }
@@ -174,7 +181,8 @@ public class DependentExecute {
      *
      * @return
      */
-    private DependResult dependResultByAllTaskOfProcessInstance(ProcessInstance processInstance, DateInterval dateInterval, int testFlag) {
+    private DependResult dependResultByAllTaskOfProcessInstance(ProcessInstance processInstance,
+                                                                DateInterval dateInterval, int testFlag) {
         if (!processInstance.getState().isFinished()) {
             log.info("Wait for the dependent workflow to complete, processCode: {}, processInstanceId: {}.",
                     processInstance.getProcessDefinitionCode(), processInstance.getId());
@@ -191,19 +199,23 @@ public class DependentExecute {
                             .collect(Collectors.toMap(TaskDefinitionLog::getCode, TaskDefinitionLog::getName));
 
             List<TaskInstance> taskInstanceList =
-                    taskInstanceDao.queryLastTaskInstanceListIntervalByTaskCodes(taskDefinitionCodeMap.keySet(), dateInterval, testFlag);
+                    taskInstanceDao.queryLastTaskInstanceListIntervalByTaskCodes(taskDefinitionCodeMap.keySet(),
+                            dateInterval, testFlag);
             Map<Long, TaskExecutionStatus> taskExecutionStatusMap =
-                    taskInstanceList.stream().filter(taskInstance -> taskInstance.getTaskExecuteType() != TaskExecuteType.STREAM)
+                    taskInstanceList.stream()
+                            .filter(taskInstance -> taskInstance.getTaskExecuteType() != TaskExecuteType.STREAM)
                             .collect(Collectors.toMap(TaskInstance::getTaskCode, TaskInstance::getState));
 
             for (Long taskCode : taskDefinitionCodeMap.keySet()) {
                 if (!taskExecutionStatusMap.containsKey(taskCode)) {
-                    log.warn("The task of the workflow is not being executed, taskCode: {}, processInstanceId: {}, processName: {}.",
+                    log.warn(
+                            "The task of the workflow is not being executed, taskCode: {}, processInstanceId: {}, processName: {}.",
                             taskCode, processInstance.getProcessDefinitionCode(), processInstance.getName());
                     return DependResult.FAILED;
                 } else {
                     if (!taskExecutionStatusMap.get(taskCode).isSuccess()) {
-                        log.warn("The task of the workflow is not being executed successfully, taskCode: {}, processInstanceId: {}, processName: {}.",
+                        log.warn(
+                                "The task of the workflow is not being executed successfully, taskCode: {}, processInstanceId: {}, processName: {}.",
                                 taskCode, processInstance.getProcessDefinitionCode(), processInstance.getName());
                         return DependResult.FAILED;
                     }
@@ -258,7 +270,8 @@ public class DependentExecute {
      * @param testFlag test flag
      * @return depend result
      */
-    private DependResult dependResultBySingleTaskInstance(ProcessInstance processInstance, long depTaskCode, DateInterval dateInterval, int testFlag) {
+    private DependResult dependResultBySingleTaskInstance(ProcessInstance processInstance, long depTaskCode,
+                                                          DateInterval dateInterval, int testFlag) {
         TaskInstance taskInstance =
                 taskInstanceDao.queryLastTaskInstanceIntervalByTaskCode(depTaskCode, dateInterval, testFlag);
 
@@ -266,12 +279,14 @@ public class DependentExecute {
             TaskDefinition taskDefinition = taskDefinitionDao.queryByCode(depTaskCode);
 
             if (taskDefinition == null) {
-                log.error("The dependent task definition can not be find, so return depend failed, taskCode: {}", depTaskCode);
+                log.error("The dependent task definition can not be find, so return depend failed, taskCode: {}",
+                        depTaskCode);
                 return DependResult.FAILED;
             }
 
             if (taskDefinition.getFlag() == Flag.NO) {
-                log.info("The dependent task is a forbidden task, so return depend success. Task code: {}, task name: {}",
+                log.info(
+                        "The dependent task is a forbidden task, so return depend success. Task code: {}, task name: {}",
                         taskDefinition.getCode(), taskDefinition.getName());
                 return DependResult.SUCCESS;
             }
@@ -285,7 +300,8 @@ public class DependentExecute {
             return DependResult.FAILED;
         } else {
             if (TaskExecuteType.STREAM == taskInstance.getTaskExecuteType()) {
-                log.info("The dependent task is a streaming task, so return depend success. Task code: {}, task name: {}.",
+                log.info(
+                        "The dependent task is a streaming task, so return depend success. Task code: {}, task name: {}.",
                         taskInstance.getTaskCode(), taskInstance.getName());
                 return DependResult.SUCCESS;
             }
@@ -334,6 +350,9 @@ public class DependentExecute {
         } else if (state.isSuccess()) {
             return DependResult.SUCCESS;
         } else {
+            log.warn(
+                    "The dependent task were not executed successfully, so return depend failed. Task code: {}, task name: {}.",
+                    taskInstance.getTaskCode(), taskInstance.getName());
             return DependResult.FAILED;
         }
     }
