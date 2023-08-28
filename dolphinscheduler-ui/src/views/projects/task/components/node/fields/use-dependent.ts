@@ -279,7 +279,6 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
             itemListOptions.value[itemIndex] = {}
 
             if (!dependItem.dependentType) {
-              console.log("++++++++")
               if (dependItem.depTaskCode == 0)
                 dependItem.dependentType = 'DEPENDENT_ON_WORKFLOW'
               else
