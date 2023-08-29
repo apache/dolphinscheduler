@@ -36,7 +36,7 @@ public class TaskInstanceExecutionInfoUpdateEventSender
     public void sendEvent(TaskInstanceExecutionInfoEvent taskInstanceExecutionInfoEvent) {
         ITaskInstanceExecutionEventListener iTaskInstanceExecutionEventListener =
                 SingletonJdkDynamicRpcClientProxyFactory
-                        .getProxyClient(taskInstanceExecutionInfoEvent.getHost(),
+                        .getProxyClient(taskInstanceExecutionInfoEvent.getWorkflowInstanceHost(),
                                 ITaskInstanceExecutionEventListener.class);
         iTaskInstanceExecutionEventListener.onTaskInstanceExecutionInfoUpdate(taskInstanceExecutionInfoEvent);
     }
@@ -46,7 +46,8 @@ public class TaskInstanceExecutionInfoUpdateEventSender
         TaskInstanceExecutionInfoEvent taskUpdatePidRequest = new TaskInstanceExecutionInfoEvent();
         taskUpdatePidRequest.setTaskInstanceId(taskExecutionContext.getTaskInstanceId());
         taskUpdatePidRequest.setProcessInstanceId(taskExecutionContext.getProcessInstanceId());
-        taskUpdatePidRequest.setHost(taskExecutionContext.getHost());
+        taskUpdatePidRequest.setWorkflowInstanceHost(taskExecutionContext.getWorkflowInstanceHost());
+        taskUpdatePidRequest.setTaskInstanceHost(taskExecutionContext.getHost());
         taskUpdatePidRequest.setStartTime(taskExecutionContext.getStartTime());
         return taskUpdatePidRequest;
     }

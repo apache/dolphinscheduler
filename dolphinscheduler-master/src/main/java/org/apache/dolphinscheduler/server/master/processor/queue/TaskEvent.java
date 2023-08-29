@@ -114,7 +114,7 @@ public class TaskEvent {
         event.setExecutePath(command.getExecutePath());
         event.setLogPath(command.getLogPath());
         event.setAppIds(command.getAppIds());
-        event.setWorkerAddress(command.getHost());
+        event.setWorkerAddress(command.getTaskInstanceHost());
         event.setEvent(TaskEventType.RUNNING);
         return event;
     }
@@ -131,7 +131,7 @@ public class TaskEvent {
         event.setProcessId(command.getProcessId());
         event.setAppIds(command.getAppIds());
         event.setVarPool(command.getVarPool());
-        event.setWorkerAddress(command.getHost());
+        event.setWorkerAddress(command.getTaskInstanceHost());
         event.setEvent(TaskEventType.RESULT);
         return event;
     }
@@ -151,7 +151,7 @@ public class TaskEvent {
         event.setTaskInstanceId(command.getTaskInstanceId());
         event.setStartTime(DateUtils.timeStampToDate(command.getStartTime()));
         event.setLogPath(command.getLogPath());
-        event.setWorkerAddress(command.getHost());
+        event.setWorkerAddress(command.getTaskInstanceHost());
         event.setEvent(TaskEventType.UPDATE_PID);
         return event;
     }

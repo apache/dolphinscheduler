@@ -36,7 +36,7 @@ public class TaskInstanceExecutionRunningEventSender
     public void sendEvent(TaskInstanceExecutionRunningEvent taskInstanceExecutionRunningEvent) {
         ITaskInstanceExecutionEventListener iTaskInstanceExecutionEventListener =
                 SingletonJdkDynamicRpcClientProxyFactory
-                        .getProxyClient(taskInstanceExecutionRunningEvent.getHost(),
+                        .getProxyClient(taskInstanceExecutionRunningEvent.getWorkflowInstanceHost(),
                                 ITaskInstanceExecutionEventListener.class);
         iTaskInstanceExecutionEventListener.onTaskInstanceExecutionRunning(taskInstanceExecutionRunningEvent);
     }
@@ -48,7 +48,8 @@ public class TaskInstanceExecutionRunningEventSender
         taskExecuteRunningMessage.setProcessInstanceId(taskExecutionContext.getProcessInstanceId());
         taskExecuteRunningMessage.setStatus(taskExecutionContext.getCurrentExecutionStatus());
         taskExecuteRunningMessage.setLogPath(taskExecutionContext.getLogPath());
-        taskExecuteRunningMessage.setHost(taskExecutionContext.getHost());
+        taskExecuteRunningMessage.setWorkflowInstanceHost(taskExecutionContext.getWorkflowInstanceHost());
+        taskExecuteRunningMessage.setTaskInstanceHost(taskExecutionContext.getHost());
         taskExecuteRunningMessage.setStartTime(taskExecutionContext.getStartTime());
         taskExecuteRunningMessage.setExecutePath(taskExecutionContext.getExecutePath());
         taskExecuteRunningMessage.setAppIds(taskExecutionContext.getAppIds());

@@ -34,7 +34,9 @@ public class TaskInstanceExecutionRunningEvent implements ITaskInstanceExecution
 
     private long startTime;
 
-    private String host;
+    private String taskInstanceHost;
+
+    private String workflowInstanceHost;
 
     private TaskExecutionStatus status;
 

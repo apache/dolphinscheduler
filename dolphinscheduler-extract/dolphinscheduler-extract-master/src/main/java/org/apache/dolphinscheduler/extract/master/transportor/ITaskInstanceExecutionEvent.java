@@ -27,7 +27,13 @@ public interface ITaskInstanceExecutionEvent {
 
     void setEventSendTime(long eventSendTime);
 
-    void setHost(String host);
+    void setWorkflowInstanceHost(String host);
+
+    String getWorkflowInstanceHost();
+
+    void setTaskInstanceHost(String host);
+
+    String getTaskInstanceHost();
 
     TaskInstanceExecutionEventType getEventType();
 

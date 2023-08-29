@@ -32,7 +32,9 @@ public class TaskInstanceExecutionInfoEvent implements ITaskInstanceExecutionEve
 
     private long startTime;
 
-    private String host;
+    private String workflowInstanceHost;
+
+    private String taskInstanceHost;
 
     private String logPath;
 
