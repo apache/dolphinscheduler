@@ -37,7 +37,7 @@ import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.AlertSendStatus;
-import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponse;
+import org.apache.dolphinscheduler.extract.alert.request.AlertSendResponse;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;

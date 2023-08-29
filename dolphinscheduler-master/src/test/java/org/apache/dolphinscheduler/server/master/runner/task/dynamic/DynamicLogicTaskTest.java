@@ -27,7 +27,6 @@ import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.DynamicInputParameter;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DynamicParameters;
-import org.apache.dolphinscheduler.server.master.rpc.MasterRpcClient;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.subworkflow.SubWorkflowService;
 
@@ -62,9 +61,6 @@ class DynamicLogicTaskTest {
     private ProcessService processService;
 
     @Mock
-    private MasterRpcClient masterRpcClient;
-
-    @Mock
     private ProcessDefinitionMapper processDefineMapper;
 
     @Mock
@@ -94,7 +90,6 @@ class DynamicLogicTaskTest {
                 taskInstanceDao,
                 subWorkflowService,
                 processService,
-                masterRpcClient,
                 processDefineMapper,
                 commandMapper);
     }
@@ -126,7 +121,6 @@ class DynamicLogicTaskTest {
                 taskInstanceDao,
                 subWorkflowService,
                 processService,
-                masterRpcClient,
                 processDefineMapper,
                 commandMapper);
 
