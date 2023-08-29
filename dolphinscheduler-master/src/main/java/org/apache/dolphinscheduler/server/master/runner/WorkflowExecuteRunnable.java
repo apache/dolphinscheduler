@@ -60,6 +60,7 @@ import org.apache.dolphinscheduler.dao.utils.TaskCacheUtils;
 import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
 import org.apache.dolphinscheduler.extract.master.ILogicTaskInstanceOperator;
 import org.apache.dolphinscheduler.extract.master.transportor.TaskInstanceWakeupRequest;
+import org.apache.dolphinscheduler.extract.worker.ITaskInstanceOperator;
 import org.apache.dolphinscheduler.extract.worker.transportor.UpdateWorkflowHostRequest;
 import org.apache.dolphinscheduler.extract.worker.transportor.UpdateWorkflowHostResponse;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
@@ -466,7 +467,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         } else {
             ProcessInstance processInstance =
                     processService.findProcessInstanceById(nextTaskInstance.getProcessInstanceId());
-            ILogicTaskInstanceOperator taskInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+            ILogicTaskInstanceOperator taskInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory
                     .getProxyClient(processInstance.getHost(), ILogicTaskInstanceOperator.class);
             taskInstanceOperator.wakeupTaskInstance(
                     new TaskInstanceWakeupRequest(processInstance.getId(), nextTaskInstance.getId()));
@@ -1385,10 +1386,9 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
             return false;
         }
         try {
-            org.apache.dolphinscheduler.extract.worker.ITaskInstanceOperator iTaskInstanceOperator =
-                    SingletonJdkDynamicRpcClientProxyFactory.getInstance()
-                            .getProxyClient(taskInstance.getHost(),
-                                    org.apache.dolphinscheduler.extract.worker.ITaskInstanceOperator.class);
+            ITaskInstanceOperator iTaskInstanceOperator =
+                    SingletonJdkDynamicRpcClientProxyFactory
+                            .getProxyClient(taskInstance.getHost(), ITaskInstanceOperator.class);
             UpdateWorkflowHostResponse updateWorkflowHostResponse = iTaskInstanceOperator.updateWorkflowInstanceHost(
                     new UpdateWorkflowHostRequest(taskInstance.getId(), masterConfig.getMasterAddress()));
             if (!updateWorkflowHostResponse.isSuccess()) {

@@ -23,7 +23,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_LIST_PAGIN
 import static org.apache.dolphinscheduler.api.enums.Status.TASK_SAVEPOINT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.TASK_STOP_ERROR;
 
-import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.controller.BaseController;
 import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceListPagingResponse;
 import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceQueryRequest;
@@ -90,7 +89,6 @@ public class TaskInstanceV2Controller extends BaseController {
     @GetMapping(consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TASK_LIST_PAGING_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public TaskInstanceListPagingResponse queryTaskListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                               @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                               TaskInstanceQueryRequest taskInstanceQueryReq) {
@@ -125,7 +123,6 @@ public class TaskInstanceV2Controller extends BaseController {
     @PostMapping(value = "/{id}/savepoint")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(TASK_SAVEPOINT_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<Object> taskSavePoint(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                         @PathVariable(value = "id") Integer id) {
@@ -147,7 +144,6 @@ public class TaskInstanceV2Controller extends BaseController {
     @PostMapping(value = "/{id}/stop")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(TASK_STOP_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<Object> stopTask(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                    @PathVariable(value = "id") Integer id) {
@@ -169,7 +165,6 @@ public class TaskInstanceV2Controller extends BaseController {
     @PostMapping(value = "/{id}/force-success", consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
     @ApiException(FORCE_TASK_SUCCESS_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public TaskInstanceSuccessResponse forceTaskSuccess(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                         @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                         @PathVariable(value = "id") Integer id) {
@@ -192,7 +187,6 @@ public class TaskInstanceV2Controller extends BaseController {
     @PostMapping(value = "/{taskInstanceId}", consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TASK_INSTANCE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public TaskInstance queryTaskInstanceByCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                 @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                 @PathVariable(value = "taskInstanceId") Long taskInstanceId) {

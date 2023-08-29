@@ -147,7 +147,7 @@ public class CacheEvictAspect {
                 return;
             }
             for (Server server : serverList) {
-                IMasterCacheService masterCacheService = SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+                IMasterCacheService masterCacheService = SingletonJdkDynamicRpcClientProxyFactory
                         .getProxyClient(server.getHost() + ":" + server.getPort(), IMasterCacheService.class);
                 masterCacheService.cacheExpire(new CacheExpireRequest(cacheType, cacheKey));
             }
