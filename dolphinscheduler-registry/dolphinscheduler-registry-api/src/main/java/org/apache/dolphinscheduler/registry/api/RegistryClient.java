@@ -210,7 +210,8 @@ public class RegistryClient {
     }
 
     public boolean isWorkerPath(String path) {
-        return path != null && path.startsWith(Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS) && !path.equals(Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS);
+        return path != null && path.startsWith(Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS)
+                && !path.equals(Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS);
     }
 
     public Collection<String> getChildrenKeys(final String key) {
