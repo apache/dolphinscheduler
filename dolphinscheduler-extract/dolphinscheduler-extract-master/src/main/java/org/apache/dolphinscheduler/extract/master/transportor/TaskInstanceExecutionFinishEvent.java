@@ -34,7 +34,9 @@ public class TaskInstanceExecutionFinishEvent implements ITaskInstanceExecutionE
 
     private long startTime;
 
-    private String host;
+    private String taskInstanceHost;
+
+    private String workflowInstanceHost;
 
     private String logPath;
 
