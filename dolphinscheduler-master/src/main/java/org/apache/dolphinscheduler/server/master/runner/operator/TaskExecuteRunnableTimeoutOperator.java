@@ -45,7 +45,7 @@ public class TaskExecuteRunnableTimeoutOperator extends BaseTaskExecuteRunnableT
             return;
         }
 
-        final ITaskInstanceOperator iTaskInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+        final ITaskInstanceOperator iTaskInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory
                 .getProxyClient(taskInstance.getHost(), ITaskInstanceOperator.class);
 
         final TaskInstanceKillRequest taskInstanceKillRequest = new TaskInstanceKillRequest(taskInstance.getId());

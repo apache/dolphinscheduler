@@ -15,21 +15,13 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.aspect;
+package org.apache.dolphinscheduler.microbench.rpc;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+public class IServiceImpl implements IService {
 
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
-public @interface AccessLogAnnotation {
+    @Override
+    public String ping(String pingRequest) {
+        return "I get " + pingRequest + ", I am Pong!";
+    }
 
-    // ignore request args
-    String[] ignoreRequestArgs() default {"loginUser"};
-
-    boolean ignoreRequest() default false;
 }
