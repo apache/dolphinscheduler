@@ -15,6 +15,7 @@
  * limitations under the License.
 */
 
-ALTER TABLE "t_ds_process_definition" DROP "tenant_id";
-ALTER TABLE "t_ds_process_definition_log" DROP "tenant_id";
-ALTER TABLE "t_ds_process_instance" DROP "tenant_id";
+ALTER TABLE "t_ds_process_definition" DROP COLUMN IF EXISTS "tenant_id";
+ALTER TABLE "t_ds_process_definition_log" DROP COLUMN IF EXISTS "tenant_id";
+ALTER TABLE "t_ds_process_instance" DROP COLUMN IF EXISTS "tenant_id";
+ALTER TABLE "t_ds_fav_task" DROP COLUMN IF EXISTS "task_name";

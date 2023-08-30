@@ -14,9 +14,3 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-
--- rename columns
--- ALTER TABLE IF EXISTS t_ds_fav_task RENAME COLUMN task_name TO task_type;
-
--- add column
-ALTER TABLE t_ds_worker_group ADD COLUMN IF NOT EXISTS description varchar(255) DEFAULT NULL;
