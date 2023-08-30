@@ -2165,7 +2165,7 @@ CREATE TABLE t_ds_listener_plugin_instance
     id BIGINT AUTO_INCREMENT NOT NULL,
     instance_name varchar(200) NOT NULL,
     plugin_instance_params  text,
-    listener_event_types  text,
+    listener_event_types  text NOT NULL,
     create_time   datetime    DEFAULT NULL,
     update_time   datetime    DEFAULT NULL,
     PRIMARY KEY (id)

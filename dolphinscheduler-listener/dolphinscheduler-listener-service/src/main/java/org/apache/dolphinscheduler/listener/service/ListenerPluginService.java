@@ -274,6 +274,8 @@ public class ListenerPluginService implements ApplicationContextAware, Applicati
         listenerPluginInstance.setPluginDefineId(pluginDefineId);
         listenerPluginInstance.setListenerEventTypes(StringUtils
                 .join(listenerEventTypes.stream().map(ListenerEventType::getCode).collect(Collectors.toSet()), ","));
+        listenerPluginInstance.setCreateTime(new Date());
+        listenerPluginInstance.setUpdateTime(new Date());
         pluginInstanceMapper.insert(listenerPluginInstance);
         ListenerInstancePostService listenerInstancePostService = new ListenerInstancePostService(
                 listenerPlugins.get(pluginDefineId), listenerPluginInstance, listenerEventConsumer);

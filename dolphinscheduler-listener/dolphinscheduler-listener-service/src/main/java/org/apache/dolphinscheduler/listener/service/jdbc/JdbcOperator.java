@@ -51,6 +51,7 @@ public class JdbcOperator {
     public List<JdbcListenerEvent> getJdbcListenerEventListByInstanceId(int listenerInstanceId) {
         LambdaQueryWrapper<JdbcListenerEvent> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(JdbcListenerEvent::getPluginInstanceId, listenerInstanceId)
+                .orderByAsc(JdbcListenerEvent::getCreateTime)
                 .last("limit 100");
         List<JdbcListenerEvent> eventList = listenerEventMapper.selectList(wrapper);
         return eventList;

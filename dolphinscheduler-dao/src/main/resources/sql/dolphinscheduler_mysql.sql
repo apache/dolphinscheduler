@@ -2119,13 +2119,13 @@ CREATE TABLE `t_ds_relation_sub_workflow` (
 
 CREATE TABLE `t_ds_listener_event`  (
     `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
-    `content` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT 'Message content (can be email, can be SMS. Mail is stored in JSON map, and SMS is string)',
+    `content` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT 'Message content (stored in JSON map)',
     `post_status` tinyint(4) NULL DEFAULT 0 COMMENT '0:wait running,1:failed',
     `event_type` int(11) NULL DEFAULT NULL,
     `log` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT 'log',
     `plugin_instance_id` int(11) NULL DEFAULT NULL COMMENT 'alert group id',
-    `create_time` datetime(0) NULL DEFAULT NULL COMMENT 'create time',
-    `update_time` datetime(0) NULL DEFAULT NULL COMMENT 'update time',
+    `create_time` datetime NULL DEFAULT NULL COMMENT 'create time',
+    `update_time` datetime NULL DEFAULT NULL COMMENT 'update time',
     PRIMARY KEY (`id`),
     INDEX `idx_status`(`post_status`) USING BTREE,
     INDEX `idx_instance`(`plugin_instance_id`) USING BTREE
@@ -2133,11 +2133,11 @@ CREATE TABLE `t_ds_listener_event`  (
 
 CREATE TABLE `t_ds_listener_plugin_instance`  (
       `id` int(11) NOT NULL AUTO_INCREMENT,
-      `instance_name` varchar(200) NOT NULL COMMENT 'alert instance name',
+      `instance_name` varchar(200) NOT NULL COMMENT 'LISTENER instance name',
       `plugin_define_id` int(11) NOT NULL,
       `plugin_instance_params` text COMMENT 'plugin instance params. Also contain the params value which user input in web ui.',
-      `listener_event_types` text CHARACTER SET utf8 COLLATE utf8_general_ci NULL,
-      `create_time` timestamp(0) NULL DEFAULT CURRENT_TIMESTAMP(0),
-      `update_time` timestamp(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0),
+      `listener_event_types` text CHARACTER SET utf8 COLLATE utf8_general_ci,
+      `create_time` datetime NULL DEFAULT NULL COMMENT 'create time',
+      `update_time` datetime NULL DEFAULT NULL  COMMENT 'update time',
       PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;

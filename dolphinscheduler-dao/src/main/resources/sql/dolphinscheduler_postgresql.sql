@@ -2106,6 +2106,22 @@ CREATE INDEX idx_parent_task_code ON t_ds_relation_sub_workflow (parent_task_cod
 CREATE INDEX idx_sub_workflow_instance_id ON t_ds_relation_sub_workflow (sub_workflow_instance_id);
 
 -- ----------------------------
+-- Table structure for t_ds_listener_event
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_listener_event;
+CREATE TABLE t_ds_listener_event (
+   id        serial      NOT NULL,
+   content text NOT NULL,
+   post_status int DEFAULT '0',
+   event_type int NOT NULL,
+   log text,
+   plugin_instance_id int NOT NULL,
+   create_time timestamp DEFAULT NULL,
+   update_time timestamp DEFAULT NULL,
+   PRIMARY KEY (id)
+);
+
+-- ----------------------------
 -- Table structure for t_ds_listener_plugin_instance
 -- ----------------------------
 DROP TABLE IF EXISTS t_ds_listener_plugin_instance;
@@ -2115,22 +2131,6 @@ CREATE TABLE t_ds_listener_plugin_instance (
    plugin_define_id int NOT NULL,
    plugin_instance_params text,
    listener_event_types text,
-   create_time timestamp DEFAULT NULL,
-   update_time timestamp DEFAULT NULL,
-   PRIMARY KEY (id)
-);
-
--- ----------------------------
--- Table structure for t_ds_listener_plugin_instance
--- ----------------------------
-DROP TABLE IF EXISTS t_ds_listener_event;
-CREATE TABLE t_ds_listener_event (
-   id        serial      NOT NULL,
-   content text NOT NULL,
-   post_status int NOT NULL,
-   event_type int NOT NULL,
-   log text,
-   plugin_instance_id int NOT NULL,
    create_time timestamp DEFAULT NULL,
    update_time timestamp DEFAULT NULL,
    PRIMARY KEY (id)

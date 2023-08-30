@@ -34,11 +34,11 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 public interface ListenerEventMapper extends BaseMapper<JdbcListenerEvent> {
 
     @Insert({"<script>",
-            "        insert into t_ds_listener_event ( content, post_status, event_type, log, plugin_instance_id)",
+            "        insert into t_ds_listener_event ( content, post_status, event_type, log, plugin_instance_id, create_time, update_time)",
             "        values",
             "        <foreach collection='jdbcListenerEvents' item='jdbcListenerEvent' separator=','>",
             "            (#{jdbcListenerEvent.content},#{jdbcListenerEvent.postStatus}," +
-                    "            #{jdbcListenerEvent.eventType},#{jdbcListenerEvent.log},#{jdbcListenerEvent.pluginInstanceId})"
+                    "            #{jdbcListenerEvent.eventType},#{jdbcListenerEvent.log},#{jdbcListenerEvent.pluginInstanceId}, #{jdbcListenerEvent.createTime}, #{jdbcListenerEvent.updateTime})"
                     +
                     "        </foreach>",
             "</script>"})
