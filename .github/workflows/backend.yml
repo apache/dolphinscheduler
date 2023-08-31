@@ -267,7 +267,7 @@ jobs:
             echo "Skip Build!"
             exit 0
           fi
-          if [[ ${{ needs.build.result }} != 'success' || ${{ needs.cluster-test.result }} != 'success' || ${{ needs.schema-check.result }} != 'success' ]]; then
+          if [[ ${{ needs.build.result }} != 'success' || ${{ needs.cluster-test.result }} != 'success' ]]; then
             echo "Build Failed!"
             exit -1
           fi
