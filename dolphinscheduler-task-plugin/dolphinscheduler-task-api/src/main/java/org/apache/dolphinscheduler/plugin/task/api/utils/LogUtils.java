@@ -188,30 +188,30 @@ public class LogUtils {
         return MDC.get(TASK_INSTANCE_LOG_FULL_PATH_MDC_KEY);
     }
 
-    public static MDCAutoClosableContext setTaskInstanceLogFullPathMDC(String taskInstanceLogFullPath) {
+    public static void setTaskInstanceLogFullPathMDC(String taskInstanceLogFullPath) {
+        if (taskInstanceLogFullPath == null) {
+            log.warn("taskInstanceLogFullPath is null");
+            return;
+        }
         MDC.put(TASK_INSTANCE_LOG_FULL_PATH_MDC_KEY, taskInstanceLogFullPath);
-        return new MDCAutoClosableContext(LogUtils::removeTaskInstanceLogFullPathMDC);
     }
 
     public static void removeTaskInstanceLogFullPathMDC() {
         MDC.remove(TASK_INSTANCE_LOG_FULL_PATH_MDC_KEY);
     }
 
-    public static MDCAutoClosableContext setWorkflowAndTaskInstanceIDMDC(Integer workflowInstanceId,
-                                                                         Integer taskInstanceId) {
+    public static void setWorkflowAndTaskInstanceIDMDC(Integer workflowInstanceId,
+                                                       Integer taskInstanceId) {
         MDC.put(Constants.WORKFLOW_INSTANCE_ID_MDC_KEY, String.valueOf(workflowInstanceId));
         MDC.put(Constants.TASK_INSTANCE_ID_MDC_KEY, String.valueOf(taskInstanceId));
-        return new MDCAutoClosableContext(LogUtils::removeWorkflowAndTaskInstanceIdMDC);
     }
 
-    public static MDCAutoClosableContext setWorkflowInstanceIdMDC(Integer workflowInstanceId) {
+    public static void setWorkflowInstanceIdMDC(Integer workflowInstanceId) {
         MDC.put(Constants.WORKFLOW_INSTANCE_ID_MDC_KEY, String.valueOf(workflowInstanceId));
-        return new MDCAutoClosableContext(LogUtils::removeWorkflowInstanceIdMDC);
     }
 
-    public static MDCAutoClosableContext setTaskInstanceIdMDC(Integer taskInstanceId) {
+    public static void setTaskInstanceIdMDC(Integer taskInstanceId) {
         MDC.put(Constants.TASK_INSTANCE_ID_MDC_KEY, String.valueOf(taskInstanceId));
-        return new MDCAutoClosableContext(LogUtils::removeTaskInstanceIdMDC);
     }
 
     public static void removeWorkflowAndTaskInstanceIdMDC() {
