@@ -13,39 +13,4 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-
-package org.apache.dolphinscheduler.extract.master.transportor;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class TaskInstanceExecutionInfoEvent implements ITaskInstanceExecutionEvent {
-
-    private int taskInstanceId;
-
-    private int processInstanceId;
-
-    private long startTime;
-
-    private String workflowInstanceHost;
-
-    private String taskInstanceHost;
-
-    private String logPath;
-
-    private int processId;
-
-    private long eventCreateTime;
-
-    private long eventSendTime;
-
-    @Override
-    public TaskInstanceExecutionEventType getEventType() {
-        return TaskInstanceExecutionEventType.RUNNING_INFO;
-    }
-}
+*/
