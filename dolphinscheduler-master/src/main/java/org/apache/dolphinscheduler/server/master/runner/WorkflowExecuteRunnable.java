@@ -1897,7 +1897,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         TaskInstance task;
         while ((task = readyToSubmitTaskQueue.peek()) != null) {
             // stop tasks which is retrying if forced success happens
-            if (task.taskCanRetry()) {
+            if (task.getId() != null && task.taskCanRetry()) {
                 TaskInstance retryTask = taskInstanceDao.queryById(task.getId());
                 if (retryTask != null && retryTask.getState().isForceSuccess()) {
                     task.setState(retryTask.getState());
