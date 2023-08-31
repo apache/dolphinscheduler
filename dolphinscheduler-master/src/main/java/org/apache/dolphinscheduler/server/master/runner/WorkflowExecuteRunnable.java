@@ -82,6 +82,7 @@ import org.apache.dolphinscheduler.server.master.graph.IWorkflowGraph;
 import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
 import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnableFactory;
+import org.apache.dolphinscheduler.server.master.runner.execute.TaskExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.utils.TaskUtils;
 import org.apache.dolphinscheduler.server.master.utils.WorkflowInstanceUtils;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
@@ -122,6 +123,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.BeanUtils;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -983,7 +985,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                     }
                 }
                 // 4. submit to dispatch queue
-                taskExecuteRunnable.dispatch();
+                tryToDispatchTaskInstance(taskInstance, taskExecuteRunnable);
 
                 stateWheelExecuteThread.addTask4TimeoutCheck(workflowInstance, taskInstance);
                 return true;
@@ -993,6 +995,35 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         } catch (Exception e) {
             log.error("Submit standby task {} error", taskInstance.getName(), e);
             return false;
+        }
+    }
+
+    /**
+     * Sometimes (such as pause), if the task instance status has already been finished,
+     * there is no need to dispatch it
+     */
+    @VisibleForTesting
+    void tryToDispatchTaskInstance(TaskInstance taskInstance, TaskExecuteRunnable taskExecuteRunnable) {
+        if (!taskInstance.getState().isFinished()) {
+            taskExecuteRunnable.dispatch();
+        } else {
+            if (workflowExecuteContext.getWorkflowInstance().isBlocked()) {
+                TaskStateEvent processBlockEvent = TaskStateEvent.builder()
+                        .processInstanceId(workflowExecuteContext.getWorkflowInstance().getId())
+                        .taskInstanceId(taskInstance.getId())
+                        .status(taskInstance.getState())
+                        .type(StateEventType.PROCESS_BLOCKED)
+                        .build();
+                this.stateEvents.add(processBlockEvent);
+            }
+
+            TaskStateEvent taskStateChangeEvent = TaskStateEvent.builder()
+                    .processInstanceId(workflowExecuteContext.getWorkflowInstance().getId())
+                    .taskInstanceId(taskInstance.getId())
+                    .status(taskInstance.getState())
+                    .type(StateEventType.TASK_STATE_CHANGE)
+                    .build();
+            this.stateEvents.add(taskStateChangeEvent);
         }
     }
 
