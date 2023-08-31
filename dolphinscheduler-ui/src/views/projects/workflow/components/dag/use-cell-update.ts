@@ -58,9 +58,10 @@ export function useCellUpdate(options: Options) {
    */
   function setNodeFillColor(id: string, color: string) {
     const node = graph.value?.getCellById(id)
-    if (node) {
-      node.attr('rect/fill', color)
+    if (!node) {
+      return false
     }
+    node.attr('rect/fill', color)
   }
 
   /**
