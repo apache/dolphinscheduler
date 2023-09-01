@@ -15,19 +15,8 @@
  * limitations under the License.
 */
 
---- rename t_ds_fav_task task_name to task_type
-DO $$
-DECLARE
-v_schema varchar;
-BEGIN
-    v_schema =current_schema();
-  IF EXISTS(SELECT *
-    FROM information_schema.columns
-    WHERE table_name='t_ds_fav_task' and column_name='task_name')
-  then
-   EXECUTE 'ALTER TABLE IF EXISTS ' || quote_ident(v_schema) ||'.t_ds_fav_task RENAME COLUMN task_name TO task_type';
-END IF;
-END $$;
+-- rename columns
+-- ALTER TABLE IF EXISTS t_ds_fav_task RENAME COLUMN task_name TO task_type;
 
---- add column
+-- add column
 ALTER TABLE t_ds_worker_group ADD COLUMN IF NOT EXISTS description varchar(255) DEFAULT NULL;
