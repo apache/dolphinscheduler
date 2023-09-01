@@ -210,11 +210,11 @@ public class RegistryClient {
     }
 
     public boolean isMasterPath(String path) {
-        return path != null && path.startsWith(RegistryNodeType.MASTER.getRegistryPath());
+        return path != null && path.startsWith(RegistryNodeType.MASTER.getRegistryPath() + Constants.SINGLE_SLASH);
     }
 
     public boolean isWorkerPath(String path) {
-        return path != null && path.startsWith(RegistryNodeType.WORKER.getRegistryPath());
+        return path != null && path.startsWith(RegistryNodeType.WORKER.getRegistryPath() + Constants.SINGLE_SLASH);
     }
 
     public Collection<String> getChildrenKeys(final String key) {
