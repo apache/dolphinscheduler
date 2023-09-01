@@ -75,11 +75,10 @@ public class AsyncMasterTaskDelayQueueLooper extends BaseDaemonThread implements
                 break;
             }
             final TaskExecutionContext taskExecutionContext = asyncTaskExecutionContext.getTaskExecutionContext();
-            try (
-                    LogUtils.MDCAutoClosableContext mdcAutoClosableContext = LogUtils.setWorkflowAndTaskInstanceIDMDC(
-                            taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId());
-                    LogUtils.MDCAutoClosableContext mdcAutoClosableContext1 =
-                            LogUtils.setTaskInstanceLogFullPathMDC(taskExecutionContext.getLogPath())) {
+            try {
+                LogUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(),
+                        taskExecutionContext.getTaskInstanceId());
+                LogUtils.setTaskInstanceLogFullPathMDC(taskExecutionContext.getLogPath());
 
                 if (MasterTaskExecutionContextHolder
                         .getTaskExecutionContext(taskExecutionContext.getTaskInstanceId()) == null) {
@@ -118,6 +117,9 @@ public class AsyncMasterTaskDelayQueueLooper extends BaseDaemonThread implements
                         LogUtils.removeTaskInstanceIdMDC();
                     }
                 });
+            } finally {
+                LogUtils.removeTaskInstanceLogFullPathMDC();
+                LogUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
         }
         log.info("AsyncMasterTaskDelayQueueLooper closed...");

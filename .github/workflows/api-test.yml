@@ -60,7 +60,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-api-test
           restore-keys: ${{ runner.os }}-maven-
       - name: Build Image
         run: |
@@ -68,8 +68,7 @@ jobs:
           -Dmaven.test.skip \
           -Dmaven.javadoc.skip \
           -Dspotless.skip=true \
-          -Pdocker,release -Ddocker.tag=ci \
-          -pl dolphinscheduler-standalone-server -am
+          -Pdocker,release -Ddocker.tag=ci
       - name: Export Docker Images
         run: |
           docker save apache/dolphinscheduler-standalone-server:ci -o /tmp/standalone-image.tar \
@@ -112,7 +111,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-api-test
           restore-keys: ${{ runner.os }}-maven-
       - uses: actions/download-artifact@v2
         name: Download Docker Images

@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.server.master.runner.execute;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.log.TaskInstanceLogHeader;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
-import org.apache.dolphinscheduler.server.master.runner.message.MasterMessageSenderManager;
+import org.apache.dolphinscheduler.server.master.runner.message.LogicTaskInstanceExecutionEventSenderManager;
 import org.apache.dolphinscheduler.server.master.runner.task.ISyncLogicTask;
 import org.apache.dolphinscheduler.server.master.runner.task.LogicTaskPluginFactoryBuilder;
 
@@ -31,8 +31,8 @@ public class SyncMasterDelayTaskExecuteRunnable extends MasterDelayTaskExecuteRu
 
     public SyncMasterDelayTaskExecuteRunnable(TaskExecutionContext taskExecutionContext,
                                               LogicTaskPluginFactoryBuilder logicTaskPluginFactoryBuilder,
-                                              MasterMessageSenderManager masterMessageSenderManager) {
-        super(taskExecutionContext, logicTaskPluginFactoryBuilder, masterMessageSenderManager);
+                                              LogicTaskInstanceExecutionEventSenderManager logicTaskInstanceExecutionEventSenderManager) {
+        super(taskExecutionContext, logicTaskPluginFactoryBuilder, logicTaskInstanceExecutionEventSenderManager);
     }
 
     @Override
