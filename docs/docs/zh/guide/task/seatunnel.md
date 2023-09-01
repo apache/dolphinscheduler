@@ -26,11 +26,11 @@
 - SEATUNNEL_ENGINE
 - 部署方式：指定部署模式，`cluster` `local`
 
-          > 点击 [这里](https://seatunnel.apache.org/docs/2.1.2/command/usage) 获取更多关于`Apache SeaTunnel command` 使用的信息
+          > 点击 [这里](https://seatunnel.apache.org/docs/2.3.3/command/usage) 获取更多关于`Apache SeaTunnel command` 使用的信息
 
 - 自定义配置：支持自定义配置或从资源中心选择配置文件
 
-  > 点击 [这里](https://seatunnel.apache.org/docs/2.1.2/concept/config) 获取更多关于`Apache SeaTunnel config` 文件介绍
+  > 点击 [这里](https://seatunnel.apache.org/docs/2.3.3/concept/config) 获取更多关于`Apache SeaTunnel config` 文件介绍
 
 - 脚本：在任务节点那自定义配置信息，包括四部分：`env` `source` `transform` `sink`
 
@@ -76,4 +76,10 @@ sink {
 }
 
 ```
+
+### 支持 SeaTunnel 版本
+
+- 2.3.1
+- 2.3.2
+- 2.3.3
 
