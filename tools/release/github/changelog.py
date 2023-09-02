@@ -51,6 +51,7 @@ class Changelog:
         self.improvements = []
         self.documents = []
         self.chores = []
+        self.others = []
 
     def generate(self) -> str:
         """Generate changelog."""
@@ -76,6 +77,9 @@ class Changelog:
             final.append(detail)
         if self.chores:
             detail = f"## Chore{self.changelog_prefix}{self._convert(self.chores)}{self.changelog_suffix}"
+            final.append(detail)
+        if self.others:
+            detail = f"## Others{self.changelog_prefix}{self._convert(self.others)}{self.changelog_suffix}"
             final.append(detail)
         return "\n".join(final)
 
@@ -105,11 +109,7 @@ class Changelog:
             elif self._is_chore(pr):
                 self.chores.append(pr)
             else:
-                raise KeyError(
-                    "There must at least one of labels `feature|bug|improvement|document|chore`"
-                    "but it do not, pr: %s",
-                    pr["html_url"],
-                )
+                self.others.append(pr)
 
     def _is_feature(self, pr: Dict) -> bool:
         """Belong to feature pull requests."""
