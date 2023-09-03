@@ -2,9 +2,9 @@ package org.apache.dolphinscheduler.plugin.alert.webhook;
 
 public final class WebHookAlertConstants {
 
-    public static final String NAME_WEBHOOK_URL = "$t('webhook')";
+    public static final String NAME_WEBHOOK_URL = "webhook";
 
-    public static final String WEBHOOK_URL = "webhook";
+    public static final String WEBHOOK_URL = "$t('webhook')";
 
     static final String CHARSET = "UTF-8";
 

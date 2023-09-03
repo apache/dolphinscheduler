@@ -32,7 +32,7 @@ public final class WebHookSender {
     private final String webHookURL;
 
     public WebHookSender(Map<String, String> paramsMap) {
-        webHookURL = paramsMap.get(WebHookAlertConstants.WEBHOOK_URL);
+        webHookURL = paramsMap.get(WebHookAlertConstants.NAME_WEBHOOK_URL);
         showType = paramsMap.get(AlertConstants.NAME_SHOW_TYPE);
     }
 
@@ -46,7 +46,7 @@ public final class WebHookSender {
         String data = markdownByAlert(title, content);
         if (null == webHookURL) {
             alertResult = new AlertResult();
-            alertResult.setMessage("send webhook alert fail, get webhook is null ");
+            alertResult.setMessage("send webhook alert fail, webhook URL is null ");
             alertResult.setStatus(ALERT_STATUS);
             return alertResult;
         }
