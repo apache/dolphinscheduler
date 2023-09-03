@@ -6,7 +6,7 @@ import org.apache.dolphinscheduler.alert.api.AlertResult;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class WebHookSenderTest {
@@ -19,6 +19,6 @@ public class WebHookSenderTest {
         paramsMap.put(AlertConstants.NAME_SHOW_TYPE, "text");
         WebHookSender webHookSender = new WebHookSender(paramsMap);
         AlertResult alertResult = webHookSender.send("title", "content");
-        Assert.assertEquals("true", alertResult.getStatus());
+        Assertions.assertEquals("true", alertResult.getStatus());
     }
 }
