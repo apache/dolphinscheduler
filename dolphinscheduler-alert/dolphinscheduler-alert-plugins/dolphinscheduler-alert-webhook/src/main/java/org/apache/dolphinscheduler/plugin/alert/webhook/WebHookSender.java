@@ -1,26 +1,28 @@
 package org.apache.dolphinscheduler.plugin.alert.webhook;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.alert.api.AlertConstants;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public final class WebHookSender {
+
     private static final Logger logger = LoggerFactory.getLogger(WebHookSender.class);
 
     private static final String ALERT_STATUS = "false";
@@ -123,7 +125,6 @@ public final class WebHookSender {
         alertResult.setMessage(sendMsgResponse.getErrmsg());
         return alertResult;
     }
-
 
     /**
      * Determine the mardown style based on the show type of the alert

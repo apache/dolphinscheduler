@@ -10,7 +10,6 @@ public class WebHookMessage {
     private Map<String, String> text;
     private Map<String, String> markdown;
 
-
     public String getMsgtype() {
         return msgtype;
     }

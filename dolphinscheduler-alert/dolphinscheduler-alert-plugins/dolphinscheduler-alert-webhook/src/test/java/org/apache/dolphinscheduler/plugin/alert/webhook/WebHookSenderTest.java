@@ -2,11 +2,12 @@ package org.apache.dolphinscheduler.plugin.alert.webhook;
 
 import org.apache.dolphinscheduler.alert.api.AlertConstants;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
-import org.junit.Assert;
-import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.junit.Assert;
+import org.junit.jupiter.api.Test;
 
 public class WebHookSenderTest {
 
