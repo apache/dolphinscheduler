@@ -122,7 +122,7 @@ public class DataxTaskTest {
         Assertions.assertTrue(delete);
 
         Assertions.assertEquals(dataxTask.buildCommand("/tmp/execution/app-id_job.json", null),
-                "python2.7 ${DATAX_HOME}/bin/datax.py  --jvm=\"-Xms1G -Xmx1G\"  /tmp/execution/app-id_job.json");
+                "${PYTHON_LAUNCHER} ${DATAX_LAUNCHER} --jvm=\"-Xms1G -Xmx1G\"  /tmp/execution/app-id_job.json");
     }
 
     @Test
@@ -157,7 +157,7 @@ public class DataxTaskTest {
         Assertions.assertTrue(delete);
 
         Assertions.assertEquals(dataxTask.buildCommand("/tmp/execution/app-id_job.json", createPrepareParamsMap()),
-                "python2.7 ${DATAX_HOME}/bin/datax.py  --jvm=\"-Xms1G -Xmx1G\" -p \"-DDT='DT' -DDS='DS'\" /tmp/execution/app-id_job.json");
+                "${PYTHON_LAUNCHER} ${DATAX_LAUNCHER} --jvm=\"-Xms1G -Xmx1G\" -p \"-DDT='DT' -DDS='DS'\" /tmp/execution/app-id_job.json");
     }
 
     @Test
@@ -204,12 +204,9 @@ public class DataxTaskTest {
         try (
                 MockedStatic<DataSourceClientProvider> mockedStaticDataSourceClientProvider =
                         mockStatic(DataSourceClientProvider.class)) {
-            DataSourceClientProvider clientProvider = mock(DataSourceClientProvider.class);
-            when(DataSourceClientProvider.getInstance()).thenReturn(clientProvider);
-            mockedStaticDataSourceClientProvider.when(DataSourceClientProvider::getInstance).thenReturn(clientProvider);
 
             Connection connection = mock(Connection.class);
-            when(clientProvider.getConnection(Mockito.any(), Mockito.any())).thenReturn(connection);
+            when(DataSourceClientProvider.getAdHocConnection(Mockito.any(), Mockito.any())).thenReturn(connection);
 
             PreparedStatement stmt = mock(PreparedStatement.class);
             when(connection.prepareStatement(anyString())).thenReturn(stmt);
@@ -237,7 +234,7 @@ public class DataxTaskTest {
         DataxParameters dataXParameters = createDataxParameters();
         dataXParameters.setXms(3);
         dataXParameters.setXmx(4);
-        Assertions.assertEquals(dataxTask.loadJvmEnv(dataXParameters), " --jvm=\"-Xms3G -Xmx4G\" ");
+        Assertions.assertEquals(dataxTask.loadJvmEnv(dataXParameters), "--jvm=\"-Xms3G -Xmx4G\" ");
     }
 
     private DataxParameters createDataxParameters() {

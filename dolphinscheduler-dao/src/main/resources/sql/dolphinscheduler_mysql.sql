@@ -694,6 +694,7 @@ CREATE TABLE `t_ds_project_preference` (
    `project_code` bigint(20) NOT NULL COMMENT 'project code',
    `preferences` varchar(512) NOT NULL COMMENT 'project preferences',
    `user_id` int(11) DEFAULT NULL COMMENT 'creator id',
+   `state` int(11) DEFAULT '1' comment '1 means enabled, 0 means disabled',
    `create_time` datetime NOT NULL COMMENT 'create time',
    `update_time` datetime DEFAULT NULL COMMENT 'update time',
    PRIMARY KEY (`id`),
@@ -1042,7 +1043,7 @@ CREATE TABLE `t_ds_version` (
 -- ----------------------------
 -- Records of t_ds_version
 -- ----------------------------
-INSERT IGNORE INTO `t_ds_version` VALUES ('1', '2.0.2');
+INSERT IGNORE INTO `t_ds_version` VALUES ('1', '3.3.0');
 
 
 -- ----------------------------

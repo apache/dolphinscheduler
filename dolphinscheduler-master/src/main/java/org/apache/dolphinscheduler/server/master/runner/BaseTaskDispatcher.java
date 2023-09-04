@@ -21,20 +21,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.apache.dolphinscheduler.common.enums.TaskEventType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.extract.base.utils.Host;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.remote.command.Message;
-import org.apache.dolphinscheduler.remote.command.task.TaskDispatchRequest;
-import org.apache.dolphinscheduler.remote.command.task.TaskDispatchResponse;
-import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
-import org.apache.dolphinscheduler.remote.utils.Host;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.WorkerGroupNotFoundException;
 import org.apache.dolphinscheduler.server.master.exception.TaskDispatchException;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
-import org.apache.dolphinscheduler.server.master.rpc.MasterRpcClient;
 import org.apache.dolphinscheduler.server.master.runner.dispatcher.TaskDispatcher;
 import org.apache.dolphinscheduler.server.master.runner.execute.TaskExecuteRunnable;
 
@@ -48,14 +42,11 @@ public abstract class BaseTaskDispatcher implements TaskDispatcher {
 
     protected final TaskEventService taskEventService;
     protected final MasterConfig masterConfig;
-    protected final MasterRpcClient masterRpcClient;
 
     protected BaseTaskDispatcher(TaskEventService taskEventService,
-                                 MasterConfig masterConfig,
-                                 MasterRpcClient masterRpcClient) {
+                                 MasterConfig masterConfig) {
         this.taskEventService = checkNotNull(taskEventService);
         this.masterConfig = checkNotNull(masterConfig);
-        this.masterRpcClient = checkNotNull(masterRpcClient);
     }
 
     @Override
@@ -78,30 +69,9 @@ public abstract class BaseTaskDispatcher implements TaskDispatcher {
         addDispatchEvent(taskExecuteRunnable);
     }
 
-    protected abstract Optional<Host> getTaskInstanceDispatchHost(TaskExecuteRunnable taskExecutionContext) throws TaskDispatchException, WorkerGroupNotFoundException;
+    protected abstract void doDispatch(TaskExecuteRunnable taskExecuteRunnable) throws TaskDispatchException;
 
-    protected void doDispatch(TaskExecuteRunnable taskExecuteRunnable) throws TaskDispatchException {
-        TaskExecutionContext taskExecutionContext = taskExecuteRunnable.getTaskExecutionContext();
-        TaskDispatchRequest taskDispatchRequest = new TaskDispatchRequest(taskExecutionContext);
-        try {
-            Message message = masterRpcClient.sendSyncCommand(Host.of(taskExecutionContext.getHost()),
-                    taskDispatchRequest.convert2Command());
-            TaskDispatchResponse taskDispatchResponse =
-                    JSONUtils.parseObject(message.getBody(), TaskDispatchResponse.class);
-            if (!taskDispatchResponse.isDispatchSuccess()) {
-                throw new TaskDispatchException(String.format("Dispatch task to %s failed, response is: %s",
-                        taskExecutionContext.getHost(), taskDispatchResponse));
-            }
-        } catch (InterruptedException e) {
-            // This exception should only happen when we close the server.
-            Thread.currentThread().interrupt();
-            throw new TaskDispatchException(String.format("Dispatch task to %s failed, get response failed",
-                    taskExecutionContext.getHost()), e);
-        } catch (RemotingException e) {
-            throw new TaskDispatchException(String.format("Dispatch task to %s failed",
-                    taskExecutionContext.getHost()), e);
-        }
-    }
+    protected abstract Optional<Host> getTaskInstanceDispatchHost(TaskExecuteRunnable taskExecutionContext) throws TaskDispatchException, WorkerGroupNotFoundException;
 
     protected void addDispatchEvent(TaskExecuteRunnable taskExecuteRunnable) {
         TaskExecutionContext taskExecutionContext = taskExecuteRunnable.getTaskExecutionContext();

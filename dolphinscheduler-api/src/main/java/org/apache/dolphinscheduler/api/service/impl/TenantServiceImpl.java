@@ -161,7 +161,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         tenantMapper.insert(tenant);
 
         // if storage startup
-        if (PropertyUtils.getResUploadStartupState()) {
+        if (PropertyUtils.isResourceStorageStartup()) {
             storageOperate.createTenantDirIfNotExists(tenantCode);
         }
         permissionPostHandle(AuthorizationType.TENANT, loginUser.getId(), Collections.singletonList(tenant.getId()),
@@ -234,7 +234,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         // updateProcessInstance tenant
         // if the tenant code is modified, the original resource needs to be copied to the new tenant.
         if (!Objects.equals(existsTenant.getTenantCode(), updateTenant.getTenantCode())
-                && PropertyUtils.getResUploadStartupState()) {
+                && PropertyUtils.isResourceStorageStartup()) {
             storageOperate.createTenantDirIfNotExists(tenantCode);
         }
         int update = tenantMapper.updateById(updateTenant);
@@ -293,7 +293,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         }
 
         // if resource upload startup
-        if (PropertyUtils.getResUploadStartupState()) {
+        if (PropertyUtils.isResourceStorageStartup()) {
             storageOperate.deleteTenant(tenant.getTenantCode());
         }
 

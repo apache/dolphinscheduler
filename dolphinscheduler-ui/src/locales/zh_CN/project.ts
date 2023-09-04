@@ -823,7 +823,7 @@ export default {
     pytorch_python_path: 'python项目地址',
     pytorch_is_create_environment: '是否创建新环境',
     pytorch_python_command: 'python命令路径',
-    pytorch_python_command_tips: '若为空，则使用$PYTHON_HOME',
+    pytorch_python_command_tips: '若为空，则使用$PYTHON_LAUNCHER',
     pytorch_python_env_tool: 'python环境管理工具',
     pytorch_requirements: '依赖文件',
     pytorch_conda_python_version: 'python版本',
@@ -883,6 +883,8 @@ export default {
     preference_manage: '项目偏好管理',
     instruction_tips: '下面这些项目偏好配置将影响这个项目下的所有工作流和任务。当创建工作流和任务时，这些配置将影响组件中的默认选项',
     success: '成功',
-    submit: '提交'
+    submit: '提交',
+    enabled: '启用',
+    disabled: '未启用'
   },
 }

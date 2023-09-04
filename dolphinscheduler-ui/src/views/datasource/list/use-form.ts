@@ -401,6 +401,11 @@ export const datasourceType: IDataBaseOptionKeys = {
     value: 'HANA',
     label: 'HANA',
     defaultPort: 30015
+  },
+  DORIS: {
+    value: 'DORIS',
+    label: 'DORIS',
+    defaultPort: 9030
   }
 }
 

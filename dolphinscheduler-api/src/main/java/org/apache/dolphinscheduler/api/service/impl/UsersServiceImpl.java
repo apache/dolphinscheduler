@@ -185,7 +185,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         Tenant tenant = tenantMapper.queryById(tenantId);
         // resource upload startup
-        if (PropertyUtils.getResUploadStartupState()) {
+        if (PropertyUtils.isResourceStorageStartup()) {
             storageOperate.createTenantDirIfNotExists(tenant.getTenantCode());
         }
 
@@ -1085,6 +1085,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         if (StringUtils.isEmpty(user.getTimeZone())) {
             user.setTimeZone(TimeZone.getDefault().toZoneId().getId());
         }
+
+        // remove password
+        user.setUserPassword(null);
 
         result.put(Constants.DATA_LIST, user);
 

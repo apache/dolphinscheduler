@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-version: "2.1"
+version: "3.8"
 
 services:
   dolphinscheduler:
@@ -23,8 +23,8 @@ services:
     environment:
       MASTER_MAX_CPU_LOAD_AVG: 100
       WORKER_TENANT_AUTO_CREATE: 'true'
-    expose:
-      - 12345
+    ports:
+      - "12345:12345"
     networks:
       - e2e
     volumes:
@@ -33,7 +33,7 @@ services:
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:12345/actuator/health" ]
       interval: 5s
-      timeout: 60s
+      timeout: 5s
       retries: 120
     depends_on:
       mysql:
@@ -46,12 +46,12 @@ services:
       MYSQL_ROOT_PASSWORD: 123456
     networks:
       - e2e
-    expose:
-      - 3306
+    ports:
+      - "3306:3306"
     healthcheck:
       test: mysqladmin ping -h 127.0.0.1 -u root --password=$$MYSQL_ROOT_PASSWORD
       interval: 5s
-      timeout: 60s
+      timeout: 5s
       retries: 120
 
 networks:

@@ -54,7 +54,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import com.alibaba.druid.sql.ast.SQLStatement;
@@ -74,14 +73,13 @@ public class DataxTask extends AbstractTask {
     /**
      * jvm parameters
      */
-    public static final String JVM_PARAM = " --jvm=\"-Xms%sG -Xmx%sG\" ";
+    public static final String JVM_PARAM = "--jvm=\"-Xms%sG -Xmx%sG\" ";
 
     public static final String CUSTOM_PARAM = " -D%s='%s'";
     /**
-     * python process(datax only supports version 2.7 by default)
      * todo: Create a shell script to execute the datax task, and read the python version from the env, so we can support multiple versions of datax python
      */
-    private static final String DATAX_PYTHON = Optional.ofNullable(System.getenv("DATAX_PYTHON")).orElse("python2.7");
+    private static final String PYTHON_LAUNCHER = "${PYTHON_LAUNCHER}";
 
     /**
      * select all
@@ -95,7 +93,7 @@ public class DataxTask extends AbstractTask {
     /**
      * datax path
      */
-    private static final String DATAX_PATH = "${DATAX_HOME}/bin/datax.py";
+    private static final String DATAX_LAUNCHER = "${DATAX_LAUNCHER}";
     /**
      * datax channel count
      */
@@ -380,9 +378,9 @@ public class DataxTask extends AbstractTask {
      */
     protected String buildCommand(String jobConfigFilePath, Map<String, Property> paramsMap) {
         // datax python command
-        return DATAX_PYTHON +
+        return PYTHON_LAUNCHER +
                 " " +
-                DATAX_PATH +
+                DATAX_LAUNCHER +
                 " " +
                 loadJvmEnv(dataXParameters) +
                 addCustomParameters(paramsMap) +
@@ -522,7 +520,7 @@ public class DataxTask extends AbstractTask {
 
         try (
                 Connection connection =
-                        DataSourceClientProvider.getInstance().getConnection(sourceType, baseDataSource);
+                        DataSourceClientProvider.getAdHocConnection(sourceType, baseDataSource);
                 PreparedStatement stmt = connection.prepareStatement(sql);
                 ResultSet resultSet = stmt.executeQuery()) {
 

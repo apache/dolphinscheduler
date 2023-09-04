@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.api.k8s;
 
 import org.apache.dolphinscheduler.dao.entity.Cluster;
 import org.apache.dolphinscheduler.dao.mapper.ClusterMapper;
-import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +56,7 @@ public class K8sManagerTest {
     }
 
     @Test
-    public void getK8sClient() throws RemotingException {
+    public void getK8sClient() {
         Mockito.when(clusterMapper.selectList(Mockito.any())).thenReturn(getClusterList());
 
         KubernetesClient result = k8sManager.getK8sClient(1L);

@@ -24,6 +24,7 @@ import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_SS;
 import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_S_S;
 import static org.apache.dolphinscheduler.common.constants.Constants.JAR;
 import static org.apache.dolphinscheduler.common.constants.Constants.PERIOD;
+import static org.apache.dolphinscheduler.common.enums.ResUploadType.HDFS;
 
 import org.apache.dolphinscheduler.api.dto.resources.DeleteDataTransferResponse;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
@@ -241,7 +242,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         // check resource name exists
         String userResRootPath = ResourceType.UDF.equals(type) ? storageOperate.getUdfDir(tenantCode)
                 : storageOperate.getResDir(tenantCode);
-        String currDirNFileName = !currentDir.contains(userResRootPath) ? userResRootPath + name : currentDir + name;
+        String currDirNFileName = getOnlineCreatePath(currentDir, userResRootPath) + name;
 
         try {
             if (checkResourceExists(currDirNFileName)) {
@@ -374,9 +375,9 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             throw new ServiceException((String.format("Get file status fail, resource path: %s", resourceFullName)));
         }
 
-        if (!PropertyUtils.getResUploadStartupState()) {
+        if (!PropertyUtils.isResourceStorageStartup()) {
             log.error("Storage does not start up, resource upload startup state: {}.",
-                    PropertyUtils.getResUploadStartupState());
+                    PropertyUtils.isResourceStorageStartup());
             putMsg(result, Status.STORAGE_NOT_STARTUP);
             return result;
         }
@@ -561,7 +562,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         String baseDir = isAdmin(loginUser) ? storageOperate.getDir(ResourceType.ALL, tenantCode)
                 : storageOperate.getDir(type, tenantCode);
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)
-                || (StringUtils.isNotBlank(fullName) && !StringUtils.startsWith(fullName, baseDir))) {
+                || isMatchBaseDir(fullName, baseDir)) {
             log.error("current user does not have permission");
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
@@ -1206,13 +1207,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         String name = fileName.trim() + "." + nameSuffix;
 
-        String fullName = "";
         String userResRootPath = storageOperate.getResDir(tenantCode);
-        if (!currentDir.contains(userResRootPath)) {
-            fullName = userResRootPath + name;
-        } else {
-            fullName = currentDir + name;
-        }
+        String fullName = getOnlineCreatePath(currentDir, userResRootPath) + name;
 
         result = verifyResourceName(fullName, type, loginUser);
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
@@ -1258,9 +1254,9 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         Result<Object> result = new Result<>();
         putMsg(result, Status.SUCCESS);
         // if resource upload startup
-        if (!PropertyUtils.getResUploadStartupState()) {
+        if (!PropertyUtils.isResourceStorageStartup()) {
             log.error("Storage does not start up, resource upload startup state: {}.",
-                    PropertyUtils.getResUploadStartupState());
+                    PropertyUtils.isResourceStorageStartup());
             putMsg(result, Status.STORAGE_NOT_STARTUP);
             return result;
         }
@@ -1420,9 +1416,9 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     public org.springframework.core.io.Resource downloadResource(User loginUser,
                                                                  String fullName) throws IOException {
         // if resource upload startup
-        if (!PropertyUtils.getResUploadStartupState()) {
+        if (!PropertyUtils.isResourceStorageStartup()) {
             log.warn("Storage does not start up, resource upload startup state: {}.",
-                    PropertyUtils.getResUploadStartupState());
+                    PropertyUtils.isResourceStorageStartup());
             throw new ServiceException("hdfs not startup");
         }
 
@@ -1820,6 +1816,35 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         return true;
+    }
+
+    private boolean isLocal(String baseDir) {
+        return storageOperate.returnStorageType() == HDFS && baseDir.startsWith("file:///");
+    }
+
+    /**
+     * Check whether the full name is in the correct base directory. Local storage full path with value `file:/path/to/file`
+     * instead of of `file:///path/to/file`
+     */
+    private boolean isMatchBaseDir(String fullName,
+                                   String baseDir) {
+        if (isLocal(baseDir)) {
+            String midBaseDir = baseDir.replace("file:///", "file:/");
+            return (StringUtils.isNotBlank(fullName) && !StringUtils.startsWith(fullName, midBaseDir));
+        }
+        return (StringUtils.isNotBlank(fullName) && !StringUtils.startsWith(fullName, baseDir));
+    }
+
+    /**
+     * Get online create path. Local storage full path with value `file:/path/to/file` instead of `file:///path/to/file`
+     */
+    private String getOnlineCreatePath(String currentDir,
+                                       String userResRootPath) {
+        if (isLocal(userResRootPath)) {
+            String midUserResRootPath = userResRootPath.replace("file:///", "file:/");
+            return currentDir.contains(midUserResRootPath) ? currentDir : userResRootPath;
+        }
+        return currentDir.contains(userResRootPath) ? currentDir : userResRootPath;
     }
 
     private String getTenantCode(User user) {
