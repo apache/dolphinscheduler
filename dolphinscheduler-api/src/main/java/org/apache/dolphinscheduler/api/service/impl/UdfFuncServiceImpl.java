@@ -264,7 +264,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         try {
             doesResExist = storageOperate.exists(fullName);
         } catch (Exception e) {
-            log.error("udf resource checking error", fullName);
+            log.error("udf resource :{} checking error", fullName, e);
             result.setCode(Status.RESOURCE_NOT_EXIST.getCode());
             result.setMsg(Status.RESOURCE_NOT_EXIST.getMsg());
             return result;
