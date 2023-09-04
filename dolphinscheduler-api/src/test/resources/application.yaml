@@ -87,6 +87,9 @@ security:
         # jks file absolute path && password
         trust-store: "/ldapkeystore.jks"
         trust-store-password: "password"
+    casdoor:
+      user:
+        admin: ""
     oauth2:
       enable: true
       provider:

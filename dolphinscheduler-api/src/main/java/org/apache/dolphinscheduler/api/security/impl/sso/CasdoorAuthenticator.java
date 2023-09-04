@@ -42,6 +42,8 @@ public class CasdoorAuthenticator extends AbstractSsoAuthenticator {
     private CasdoorAuthService casdoorAuthService;
     @Value("${casdoor.redirect-url}")
     private String redirectUrl;
+    @Value("${security.authentication.casdoor.user.admin:#{null}}")
+    private String adminUserName;
 
     @Override
     public User login(String state, String code, String extra) {
@@ -66,10 +68,15 @@ public class CasdoorAuthenticator extends AbstractSsoAuthenticator {
             // check if user exist
             user = usersService.getUserByUserName(casdoorUser.getName());
             if (user == null) {
-                user = usersService.createUser(UserType.GENERAL_USER, casdoorUser.getName(), casdoorUser.getEmail());
+                user = usersService.createUser(getUserType(casdoorUser.getName()), casdoorUser.getName(),
+                        casdoorUser.getEmail());
             }
         }
         return user;
+    }
+
+    public UserType getUserType(String userName) {
+        return adminUserName.equalsIgnoreCase(userName) ? UserType.ADMIN_USER : UserType.GENERAL_USER;
     }
 
     @Override

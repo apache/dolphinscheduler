@@ -55,7 +55,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
         "casdoor.certificate=public-key",
         "casdoor.organization-name=built-in",
         "casdoor.application-name=app-built-in",
-        "casdoor.redirect-url=http://localhost:8888/view/login/index.html"
+        "casdoor.redirect-url=http://localhost:8888/view/login/index.html",
+        "security.authentication.casdoor.user.admin=admin"
 })
 public class CasdoorAuthenticatorTest extends AbstractControllerTest {
 
