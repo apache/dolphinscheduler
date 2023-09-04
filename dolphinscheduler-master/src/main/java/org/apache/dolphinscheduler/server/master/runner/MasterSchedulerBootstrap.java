@@ -33,7 +33,7 @@ import org.apache.dolphinscheduler.server.master.exception.MasterException;
 import org.apache.dolphinscheduler.server.master.exception.WorkflowCreateException;
 import org.apache.dolphinscheduler.server.master.metrics.MasterServerMetrics;
 import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
-import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
+import org.apache.dolphinscheduler.server.master.registry.MasterActiveManager;
 import org.apache.dolphinscheduler.service.command.CommandService;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -73,7 +73,7 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
     private WorkflowEventLooper workflowEventLooper;
 
     @Autowired
-    private ServerNodeManager serverNodeManager;
+    private MasterActiveManager masterActiveManager;
 
     @Autowired
     private MasterTaskExecutorBootstrap masterTaskExecutorBootstrap;
@@ -171,8 +171,8 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
     private List<Command> findCommands() throws MasterException {
         try {
             long scheduleStartTime = System.currentTimeMillis();
-            int thisMasterSlot = serverNodeManager.getSlot();
-            int masterCount = serverNodeManager.getMasterSize();
+            int thisMasterSlot = masterActiveManager.getSlot();
+            int masterCount = masterActiveManager.getMasterSize();
             if (masterCount <= 0) {
                 log.warn("Master count: {} is invalid, the current slot: {}", masterCount, thisMasterSlot);
                 return Collections.emptyList();

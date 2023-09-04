@@ -86,6 +86,7 @@ public class RegistryClient {
             Server server = new Server();
             switch (registryNodeType) {
                 case MASTER:
+                case ACTIVE:
                     MasterHeartBeat masterHeartBeat = JSONUtils.parseObject(heartBeatJson, MasterHeartBeat.class);
                     server.setCreateTime(new Date(masterHeartBeat.getStartupTime()));
                     server.setLastHeartbeatTime(new Date(masterHeartBeat.getReportTime()));
@@ -233,6 +234,7 @@ public class RegistryClient {
         registry.put(RegistryNodeType.MASTER.getRegistryPath(), EMPTY, false);
         registry.put(RegistryNodeType.WORKER.getRegistryPath(), EMPTY, false);
         registry.put(RegistryNodeType.ALERT_SERVER.getRegistryPath(), EMPTY, false);
+        registry.put(RegistryNodeType.ACTIVE.getRegistryPath(), EMPTY, false);
     }
 
     private Collection<String> getServerNodes(RegistryNodeType nodeType) {

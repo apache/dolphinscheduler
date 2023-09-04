@@ -99,6 +99,8 @@ public class MasterConfig implements Validator {
 
     private Duration workerGroupRefreshInterval = Duration.ofSeconds(10L);
 
+    private MasterActiveConfig masterActiveConfig = new MasterActiveConfig();
+
     // ip:listenPort
     private String masterAddress;
 
@@ -181,5 +183,6 @@ public class MasterConfig implements Validator {
         log.info("Master config: masterAddress -> {} ", masterAddress);
         log.info("Master config: masterRegistryPath -> {} ", masterRegistryPath);
         log.info("Master config: workerGroupRefreshInterval -> {} ", workerGroupRefreshInterval);
+        log.info("Master config: masterActiveConfig -> {} ", masterActiveConfig);
     }
 }

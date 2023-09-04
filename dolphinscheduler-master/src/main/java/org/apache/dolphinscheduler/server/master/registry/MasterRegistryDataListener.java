@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.registry;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
@@ -32,8 +33,11 @@ public class MasterRegistryDataListener implements SubscribeListener {
 
     private final MasterRegistryClient masterRegistryClient;
 
+    private final AlertDao alertDao;
+
     public MasterRegistryDataListener() {
         masterRegistryClient = SpringApplicationContext.getBean(MasterRegistryClient.class);
+        alertDao = SpringApplicationContext.getBean(AlertDao.class);
     }
 
     @Override
@@ -58,6 +62,7 @@ public class MasterRegistryDataListener implements SubscribeListener {
                 log.info("master node added : {}", path);
                 break;
             case REMOVE:
+                alertDao.sendServerStoppedAlert(1, path, "MASTER");
                 masterRegistryClient.removeMasterNodePath(path, RegistryNodeType.MASTER, true);
 
                 break;

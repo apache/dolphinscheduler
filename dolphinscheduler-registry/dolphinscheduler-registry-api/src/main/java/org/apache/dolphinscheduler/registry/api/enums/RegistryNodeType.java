@@ -31,6 +31,8 @@ public enum RegistryNodeType {
     WORKER("Worker", "/nodes/worker"),
     ALERT_SERVER("AlertServer", "/nodes/alert-server"),
     ALERT_LOCK("AlertNodeLock", "/lock/alert"),
+    // now it is only useful when MasterActiveStrategy is resource
+    ACTIVE("Active", "/active/master"),
     ;
 
     private final String name;

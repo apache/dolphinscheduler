@@ -57,11 +57,14 @@ public class MasterRegistryClient implements AutoCloseable {
     @Autowired
     private MasterConnectStrategy masterConnectStrategy;
 
+    @Autowired
+    private MasterActiveManager masterActiveManager;
+
     private MasterHeartBeatTask masterHeartBeatTask;
 
     public void start() {
         try {
-            this.masterHeartBeatTask = new MasterHeartBeatTask(masterConfig, registryClient);
+            this.masterHeartBeatTask = new MasterHeartBeatTask(masterConfig, registryClient, masterActiveManager);
             // master registry
             registry();
             registryClient.addConnectionStateListener(
@@ -80,6 +83,7 @@ public class MasterRegistryClient implements AutoCloseable {
     public void close() {
         // TODO unsubscribe MasterRegistryDataListener
         deregister();
+        masterActiveManager.inactive();
     }
 
     /**

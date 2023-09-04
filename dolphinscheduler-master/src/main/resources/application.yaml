@@ -116,6 +116,13 @@ master:
     # The max waiting time to reconnect to registry if you set the strategy to waiting
     max-waiting-time: 100s
   worker-group-refresh-interval: 10s
+  master-active-config:
+    # the master active strategy: register, resource
+    strategy: register
+    # when cpu less than it, the master is active
+    cpu-load-avg-active: 1
+    # when reserved memory more than it, the master is active
+    reserved-memory-active: 0.4
 
 server:
   port: 5679

@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.registry.MasterActiveManager;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -40,13 +41,17 @@ public class MasterHeartBeatTask extends BaseHeartBeatTask<MasterHeartBeat> {
 
     private final int processId;
 
+    private final MasterActiveManager masterActiveManager;
+
     public MasterHeartBeatTask(@NonNull MasterConfig masterConfig,
-                               @NonNull RegistryClient registryClient) {
+                               @NonNull RegistryClient registryClient,
+                               @NonNull MasterActiveManager masterActiveManager) {
         super("MasterHeartBeatTask", masterConfig.getHeartbeatInterval().toMillis());
         this.masterConfig = masterConfig;
         this.registryClient = registryClient;
         this.heartBeatPath = masterConfig.getMasterRegistryPath();
         this.processId = OSUtils.getProcessID();
+        this.masterActiveManager = masterActiveManager;
     }
 
     @Override
@@ -69,6 +74,7 @@ public class MasterHeartBeatTask extends BaseHeartBeatTask<MasterHeartBeat> {
     public void writeHeartBeat(MasterHeartBeat masterHeartBeat) {
         String masterHeartBeatJson = JSONUtils.toJsonString(masterHeartBeat);
         registryClient.persistEphemeral(heartBeatPath, masterHeartBeatJson);
+        masterActiveManager.checkSelfState(masterHeartBeat);
         log.debug("Success write master heartBeatInfo into registry, masterRegistryPath: {}, heartBeatInfo: {}",
                 heartBeatPath, masterHeartBeatJson);
     }
