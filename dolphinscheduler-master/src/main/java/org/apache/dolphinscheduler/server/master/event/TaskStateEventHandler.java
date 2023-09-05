@@ -90,6 +90,7 @@ public class TaskStateEventHandler implements StateEventHandler {
             if (iTaskProcessor.taskInstance().getState().isFinished()) {
                 if (iTaskProcessor.taskInstance().getState() != task.getState()) {
                     task.setState(iTaskProcessor.taskInstance().getState());
+                    task.setEndTime(iTaskProcessor.taskInstance().getEndTime());
                 }
                 workflowExecuteRunnable.taskFinished(task);
             }
