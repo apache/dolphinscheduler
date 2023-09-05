@@ -31,12 +31,10 @@ export function useRename(state: any) {
     if (state.saving) return
     state.saving = true
     try {
-      await updateResource(
-        {
-          ...state.renameForm,
-          tenantCode: state.renameForm.user_name,
-        }
-      )
+      await updateResource({
+        ...state.renameForm,
+        tenantCode: state.renameForm.user_name
+      })
       window.$message.success(t('resource.file.success'))
       state.saving = false
       emit('updateList')

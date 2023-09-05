@@ -21,5 +21,5 @@ package org.apache.dolphinscheduler.common.enums;
  * data base types
  */
 public enum ResUploadType {
-    LOCAL, HDFS, S3, OSS, NONE
+    LOCAL, HDFS, S3, OSS, GCS, ABS, OBS, NONE
 }

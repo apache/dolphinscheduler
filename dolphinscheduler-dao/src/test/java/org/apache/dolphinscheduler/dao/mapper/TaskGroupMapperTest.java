@@ -20,9 +20,7 @@ package org.apache.dolphinscheduler.dao.mapper;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.TaskGroup;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -88,12 +86,8 @@ public class TaskGroupMapperTest extends BaseDaoTest {
     public void testQueryTaskGroupPaging() {
         TaskGroup taskGroup = insertOne();
         Page<TaskGroup> page = new Page(1, 3);
-        List<Integer> ids = new ArrayList<>();
-        ids.add(1);
-        ids.add(2);
         IPage<TaskGroup> taskGroupIPage = taskGroupMapper.queryTaskGroupPaging(
                 page,
-                ids,
                 taskGroup.getName(), taskGroup.getStatus());
 
         Assertions.assertEquals(taskGroupIPage.getTotal(), 1);

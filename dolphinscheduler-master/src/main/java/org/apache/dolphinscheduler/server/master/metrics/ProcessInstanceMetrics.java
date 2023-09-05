@@ -90,12 +90,12 @@ public class ProcessInstanceMetrics {
                 .increment();
     }
 
-    public void cleanUpProcessInstanceCountMetricsByDefinitionCode(final String processDefinitionCode) {
+    public void cleanUpProcessInstanceCountMetricsByDefinitionCode(final Long processDefinitionCode) {
         for (final String state : processInstanceStates) {
             final Counter counter = Metrics.globalRegistry.counter(
                     "ds.workflow.instance.count",
                     "state", state,
-                    "process.definition.code", processDefinitionCode);
+                    "process.definition.code", String.valueOf(processDefinitionCode));
             Metrics.globalRegistry.remove(counter);
         }
     }

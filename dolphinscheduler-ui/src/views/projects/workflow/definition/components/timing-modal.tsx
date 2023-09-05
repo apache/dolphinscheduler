@@ -47,9 +47,11 @@ import {
   NThing,
   NPopover
 } from 'naive-ui'
+import { Router, useRouter } from 'vue-router'
 import { ArrowDownOutlined, ArrowUpOutlined } from '@vicons/antd'
 import { timezoneList } from '@/common/timezone'
 import Crontab from '@/components/crontab'
+import { queryProjectPreferenceByProjectCode } from '@/service/modules/projects-preference'
 
 const props = {
   row: {
@@ -74,22 +76,37 @@ export default defineComponent({
     const crontabRef = ref()
     const parallelismRef = ref(false)
     const { t } = useI18n()
+    const router: Router = useRouter()
+
     const { timingState } = useForm()
     const {
       variables,
       handleCreateTiming,
       handleUpdateTiming,
       getWorkerGroups,
+      getTenantList,
       getAlertGroups,
       getEnvironmentList,
       getPreviewSchedule
     } = useModal(timingState, ctx)
+
+    const projectCode = Number(router.currentRoute.value.params.projectCode)
 
     const environmentOptions = computed(() =>
       variables.environmentList.filter((item: any) =>
         item.workerGroups?.includes(timingState.timingForm.workerGroup)
       )
     )
+
+    const projectPreferences = ref({} as any)
+
+    const initProjectPreferences = (projectCode: number) => {
+      queryProjectPreferenceByProjectCode(projectCode).then((result: any) => {
+        if (result?.preferences && result.state === 1) {
+          projectPreferences.value = JSON.parse(result.preferences)
+        }
+      })
+    }
 
     const hideModal = () => {
       ctx.emit('update:show')
@@ -185,18 +202,88 @@ export default defineComponent({
       })
     }
 
+    const containValueInOptions = (
+      options: Array<any>,
+      findingValue: string
+    ): boolean => {
+      for (let { value } of options) {
+        if (findingValue === value) {
+          return true
+        }
+      }
+      return false
+    }
+
+    const restructureTimingForm = (timingForm: any) => {
+      if (projectPreferences.value?.taskPriority) {
+        timingForm.processInstancePriority =
+          projectPreferences.value.taskPriority
+      }
+      if (projectPreferences.value?.warningType) {
+        timingForm.warningType = projectPreferences.value.warningType
+      }
+      if (projectPreferences.value?.workerGroup) {
+        if (
+          containValueInOptions(
+            variables.workerGroups,
+            projectPreferences.value.workerGroup
+          )
+        ) {
+          timingForm.workerGroup = projectPreferences.value.workerGroup
+        }
+      }
+      if (projectPreferences.value?.tenant) {
+        if (
+          containValueInOptions(
+            variables.tenantList,
+            projectPreferences.value.tenant
+          )
+        ) {
+          timingForm.tenantCode = projectPreferences.value.tenant
+        }
+      }
+      if (
+        projectPreferences.value?.environmentCode &&
+        variables?.environmentList
+      ) {
+        if (
+          containValueInOptions(
+            variables.environmentList,
+            projectPreferences.value.environmentCode
+          )
+        ) {
+          timingForm.environmentCode = projectPreferences.value.environmentCode
+        }
+      }
+      if (projectPreferences.value?.alertGroup && variables?.alertGroups) {
+        if (
+          containValueInOptions(
+            variables.alertGroups,
+            projectPreferences.value.alertGroup
+          )
+        ) {
+          timingForm.warningGroupId = projectPreferences.value.alertGroup
+        }
+      }
+    }
+
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
     onMounted(() => {
       getWorkerGroups()
+      getTenantList()
       getAlertGroups()
       getEnvironmentList()
+      initProjectPreferences(projectCode)
     })
 
     watch(
       () => props.row,
       () => {
-        if (!props.row.crontab) return
+        if (!props.row.crontab) {
+          restructureTimingForm(timingState.timingForm)
+          return
+        }
 
         timingState.timingForm.startEndTime = [
           new Date(props.row.startTime),
@@ -209,6 +296,7 @@ export default defineComponent({
         timingState.timingForm.processInstancePriority =
           props.row.processInstancePriority
         timingState.timingForm.workerGroup = props.row.workerGroup
+        timingState.timingForm.tenantCode = props.row.tenantCode
         initWarningGroup()
         initEnvironment()
       }
@@ -295,18 +383,22 @@ export default defineComponent({
           </NFormItem>
           <NFormItem label=' ' showFeedback={false}>
             <NList>
-              <NListItem>
-                <NThing
-                  description={t('project.workflow.next_five_execution_times')}
-                >
-                  {this.schedulePreviewList.map((item: string) => (
-                    <NSpace>
-                      {item}
-                      <br />
-                    </NSpace>
-                  ))}
-                </NThing>
-              </NListItem>
+              {this.schedulePreviewList.length > 0 ? (
+                <NListItem>
+                  <NThing
+                    description={t(
+                      'project.workflow.next_five_execution_times'
+                    )}
+                  >
+                    {this.schedulePreviewList.map((item: string) => (
+                      <NSpace>
+                        {item}
+                        <br />
+                      </NSpace>
+                    ))}
+                  </NThing>
+                </NListItem>
+              ) : null}
             </NList>
           </NFormItem>
           <NFormItem
@@ -369,6 +461,15 @@ export default defineComponent({
             />
           </NFormItem>
           <NFormItem
+            label={t('project.workflow.tenant_code')}
+            path='tenantCode'
+          >
+            <NSelect
+              options={this.tenantList}
+              v-model:value={this.timingForm.tenantCode}
+            />
+          </NFormItem>
+          <NFormItem
             label={t('project.workflow.environment_name')}
             path='environmentCode'
           >
@@ -378,17 +479,19 @@ export default defineComponent({
               clearable
             />
           </NFormItem>
-          {this.timingForm.warningType !== 'NONE' && ( <NFormItem
-            label={t('project.workflow.alarm_group')}
-            path='warningGroupId'
-          >
-            <NSelect
-              options={this.alertGroups}
-              placeholder={t('project.workflow.please_choose')}
-              v-model:value={this.timingForm.warningGroupId}
-              clearable
-            />
-          </NFormItem> )}
+          {this.timingForm.warningType !== 'NONE' && (
+            <NFormItem
+              label={t('project.workflow.alarm_group')}
+              path='warningGroupId'
+            >
+              <NSelect
+                options={this.alertGroups}
+                placeholder={t('project.workflow.please_choose')}
+                v-model:value={this.timingForm.warningGroupId}
+                clearable
+              />
+            </NFormItem>
+          )}
         </NForm>
       </Modal>
     )

@@ -31,9 +31,14 @@ spec:
     metadata:
       labels:
         {{- include "dolphinscheduler.master.labels" . | nindent 8 }}
-      {{- if .Values.master.annotations }}
+      {{- if or .Values.master.annotations .Values.conf.auto  }}
       annotations:
+        {{- if .Values.conf.auto }}
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- end }}
+        {{- if .Values.master.annotations }}
         {{- toYaml .Values.master.annotations | nindent 8 }}
+        {{- end }}
       {{- end }}
     spec:
       serviceAccountName: {{ template "dolphinscheduler.fullname" . }}
@@ -60,6 +65,8 @@ spec:
           ports:
             - containerPort: 5678
               name: "master-port"
+            - containerPort: 5679
+              name: "actuator-port"
           env:
             - name: TZ
               value: {{ .Values.timezone }}
@@ -105,6 +112,7 @@ spec:
             - name: config-volume
               mountPath: /opt/dolphinscheduler/conf/common.properties
               subPath: common_properties
+            {{- include "dolphinscheduler.etcd.ssl.volumeMount" . | nindent 12 }}
       volumes:
         - name: {{ include "dolphinscheduler.fullname" . }}-master
           {{- if .Values.master.persistentVolumeClaim.enabled }}
@@ -117,6 +125,7 @@ spec:
         - name: config-volume
           configMap:
             name: {{ include "dolphinscheduler.fullname" . }}-configs
+        {{- include "dolphinscheduler.etcd.ssl.volume" . | nindent 8 }}
   {{- if .Values.master.persistentVolumeClaim.enabled }}
   volumeClaimTemplates:
     - metadata:

@@ -22,6 +22,7 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.service.MetricsCleanUpService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -129,6 +130,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Autowired
     private K8sNamespaceUserMapper k8sNamespaceUserMapper;
 
+    @Autowired
+    private MetricsCleanUpService metricsCleanUpService;
+
     /**
      * create user, only system admin have permission
      *
@@ -181,7 +185,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         Tenant tenant = tenantMapper.queryById(tenantId);
         // resource upload startup
-        if (PropertyUtils.getResUploadStartupState()) {
+        if (PropertyUtils.isResourceStorageStartup()) {
             storageOperate.createTenantDirIfNotExists(tenant.getTenantCode());
         }
 
@@ -224,7 +228,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     }
 
     /***
-     * create User for ldap login
+     * create User for ldap and sso login
      */
     @Override
     @Transactional
@@ -522,6 +526,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         accessTokenMapper.deleteAccessTokenByUserId(id);
 
         if (userMapper.deleteById(id) > 0) {
+            metricsCleanUpService.cleanUpApiResponseTimeMetricsByUserId(id);
             log.info("User is deleted and id is :{}.", id);
             putMsg(result, Status.SUCCESS);
             return result;
@@ -1071,10 +1076,18 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             }
         }
 
+        Tenant tenant = tenantMapper.selectById(user.getTenantId());
+        if (tenant != null) {
+            user.setTenantCode(tenant.getTenantCode());
+        }
+
         // add system default timezone if not user timezone
         if (StringUtils.isEmpty(user.getTimeZone())) {
             user.setTimeZone(TimeZone.getDefault().toZoneId().getId());
         }
+
+        // remove password
+        user.setUserPassword(null);
 
         result.put(Constants.DATA_LIST, user);
 
@@ -1326,7 +1339,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "two passwords are not same");
             return result;
         }
-        User user = createUser(userName, userPassword, email, 1, "", "", Flag.NO.ordinal());
+        User user = createUser(userName, userPassword, email, -1, "", "", Flag.NO.ordinal());
         putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, user);
         return result;

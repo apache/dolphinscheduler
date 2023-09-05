@@ -21,6 +21,7 @@ import static org.mockito.ArgumentMatchers.eq;
 
 import org.apache.dolphinscheduler.api.dto.resources.DeleteDataTransferResponse;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ResourcesServiceImpl;
@@ -47,6 +48,8 @@ import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -126,6 +129,10 @@ public class ResourcesServiceTest {
 
     private MockedStatic<PropertyUtils> mockedStaticPropertyUtils;
 
+    private MockedStatic<Paths> mockedStaticPaths;
+
+    private MockedStatic<java.nio.file.Files> filesMockedStatic;
+
     private Throwable exception;
 
     @BeforeEach
@@ -136,6 +143,8 @@ public class ResourcesServiceTest {
                 Mockito.mockStatic(org.apache.dolphinscheduler.api.utils.FileUtils.class);
 
         mockedStaticPropertyUtils = Mockito.mockStatic(PropertyUtils.class);
+        mockedStaticPaths = Mockito.mockStatic(Paths.class);
+        filesMockedStatic = Mockito.mockStatic(java.nio.file.Files.class);
     }
 
     @AfterEach
@@ -144,39 +153,40 @@ public class ResourcesServiceTest {
         mockedStaticFiles.close();
         mockedStaticDolphinschedulerFileUtils.close();
         mockedStaticPropertyUtils.close();
+        mockedStaticPaths.close();
+        filesMockedStatic.close();
     }
 
     @Test
     public void testCreateResource() {
-        Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
+        Mockito.when(PropertyUtils.isResourceStorageStartup()).thenReturn(false);
         User user = new User();
         user.setId(1);
         user.setUserType(UserType.GENERAL_USER);
 
         // CURRENT_LOGIN_USER_TENANT_NOT_EXIST
-        MockMultipartFile mockMultipartFile = new MockMultipartFile("test.pdf", "test.pdf", "pdf", "test".getBytes());
-        Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
+        Mockito.when(PropertyUtils.isResourceStorageStartup()).thenReturn(true);
         Mockito.when(userMapper.selectById(user.getId())).thenReturn(getUser());
         Mockito.when(tenantMapper.queryById(1)).thenReturn(null);
-        Result result = resourcesService.createResource(user, "ResourcesServiceTest", "ResourcesServiceTest",
-                ResourceType.FILE, mockMultipartFile, "/");
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST.getMsg(), result.getMsg());
+        Assertions.assertThrows(ServiceException.class,
+                () -> resourcesService.createResource(user, "ResourcesServiceTest",
+                        ResourceType.FILE, new MockMultipartFile("test.pdf", "test.pdf", "pdf", "test".getBytes()),
+                        "/"));
         // set tenant for user
         user.setTenantId(1);
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
 
         // HDFS_NOT_STARTUP
-        Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
-        result = resourcesService.createResource(user, "ResourcesServiceTest", "ResourcesServiceTest",
+        Mockito.when(PropertyUtils.isResourceStorageStartup()).thenReturn(false);
+        Result<Object> result = resourcesService.createResource(user, "ResourcesServiceTest",
                 ResourceType.FILE, null, "/");
         logger.info(result.toString());
         Assertions.assertEquals(Status.STORAGE_NOT_STARTUP.getMsg(), result.getMsg());
 
         // RESOURCE_FILE_IS_EMPTY
-        mockMultipartFile = new MockMultipartFile("test.pdf", "".getBytes());
-        Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
-        result = resourcesService.createResource(user, "ResourcesServiceTest", "ResourcesServiceTest",
+        MockMultipartFile mockMultipartFile = new MockMultipartFile("test.pdf", "".getBytes());
+        Mockito.when(PropertyUtils.isResourceStorageStartup()).thenReturn(true);
+        result = resourcesService.createResource(user, "ResourcesServiceTest",
                 ResourceType.FILE, mockMultipartFile, "/");
         logger.info(result.toString());
         Assertions.assertEquals(Status.RESOURCE_FILE_IS_EMPTY.getMsg(), result.getMsg());
@@ -185,7 +195,7 @@ public class ResourcesServiceTest {
         mockMultipartFile = new MockMultipartFile("test.pdf", "test.pdf", "pdf", "test".getBytes());
         Mockito.when(Files.getFileExtension("test.pdf")).thenReturn("pdf");
         Mockito.when(Files.getFileExtension("ResourcesServiceTest.jar")).thenReturn("jar");
-        result = resourcesService.createResource(user, "ResourcesServiceTest.jar", "ResourcesServiceTest",
+        result = resourcesService.createResource(user, "ResourcesServiceTest.jar",
                 ResourceType.FILE, mockMultipartFile, "/");
         logger.info(result.toString());
         Assertions.assertEquals(Status.RESOURCE_SUFFIX_FORBID_CHANGE.getMsg(), result.getMsg());
@@ -194,7 +204,7 @@ public class ResourcesServiceTest {
         mockMultipartFile = new MockMultipartFile("ResourcesServiceTest.pdf", "ResourcesServiceTest.pdf",
                 "pdf", "test".getBytes());
         Mockito.when(Files.getFileExtension("ResourcesServiceTest.pdf")).thenReturn("pdf");
-        result = resourcesService.createResource(user, "ResourcesServiceTest.pdf", "ResourcesServiceTest",
+        result = resourcesService.createResource(user, "ResourcesServiceTest.pdf",
                 ResourceType.UDF, mockMultipartFile, "/");
         logger.info(result.toString());
         Assertions.assertEquals(Status.UDF_RESOURCE_SUFFIX_NOT_JAR.getMsg(), result.getMsg());
@@ -205,7 +215,7 @@ public class ResourcesServiceTest {
         Mockito.when(Files.getFileExtension(tooLongFileName)).thenReturn("pdf");
         // '/databasePath/tenantCode/RESOURCE/'
         Mockito.when(storageOperate.getResDir("123")).thenReturn("/dolphinscheduler/123/resources/");
-        result = resourcesService.createResource(user, tooLongFileName, tooLongFileName, ResourceType.FILE,
+        result = resourcesService.createResource(user, tooLongFileName, ResourceType.FILE,
                 mockMultipartFile, "/");
         logger.info(result.toString());
         Assertions.assertEquals(Status.RESOURCE_FULL_NAME_TOO_LONG_ERROR.getMsg(), result.getMsg());
@@ -213,12 +223,12 @@ public class ResourcesServiceTest {
 
     @Test
     public void testCreateDirecotry() {
-        Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
+        Mockito.when(PropertyUtils.isResourceStorageStartup()).thenReturn(false);
         User user = new User();
         user.setId(1);
         user.setUserType(UserType.GENERAL_USER);
         // HDFS_NOT_STARTUP
-        Result result = resourcesService.createDirectory(user, "directoryTest", "directory test",
+        Result result = resourcesService.createDirectory(user, "directoryTest",
                 ResourceType.FILE, -1, "/");
         logger.info(result.toString());
         Assertions.assertEquals(Status.STORAGE_NOT_STARTUP.getMsg(), result.getMsg());
@@ -228,24 +238,18 @@ public class ResourcesServiceTest {
         user.setTenantId(1);
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
         Mockito.when(userMapper.selectById(user.getId())).thenReturn(getUser());
-        Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
+        Mockito.when(PropertyUtils.isResourceStorageStartup()).thenReturn(true);
         Mockito.when(storageOperate.getResDir("123")).thenReturn("/dolphinscheduler/123/resources/");
         try {
             Mockito.when(storageOperate.exists("/dolphinscheduler/123/resources/directoryTest")).thenReturn(true);
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
         }
-        Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
+        Mockito.when(PropertyUtils.isResourceStorageStartup()).thenReturn(true);
         Mockito.when(resourcesMapper.existResource("/directoryTest", 0)).thenReturn(true);
-        result = resourcesService.createDirectory(user, "directoryTest", "directory test", ResourceType.FILE, -1, "/");
+        result = resourcesService.createDirectory(user, "directoryTest", ResourceType.FILE, -1, "/");
         logger.info(result.toString());
         Assertions.assertEquals(Status.RESOURCE_EXIST.getMsg(), result.getMsg());
-        // Description_Lingth_ERROR
-        result = resourcesService.createDirectory(user, "directoryTest",
-                "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
-                ResourceType.FILE, -1, "/");
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.DESCRIPTION_TOO_LONG_ERROR.getMsg(), result.getMsg());
     }
 
     @Test
@@ -256,19 +260,19 @@ public class ResourcesServiceTest {
         user.setUserType(UserType.GENERAL_USER);
         user.setTenantId(1);
 
-        Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
+        Mockito.when(PropertyUtils.isResourceStorageStartup()).thenReturn(false);
         Mockito.when(userMapper.selectById(user.getId())).thenReturn(getUser());
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
         Mockito.when(storageOperate.getResDir("123")).thenReturn("/dolphinscheduler/123/resources/");
 
         // HDFS_NOT_STARTUP
         Result result = resourcesService.updateResource(user, "ResourcesServiceTest",
-                "123", "ResourcesServiceTest", "", ResourceType.FILE, null);
+                "123", "ResourcesServiceTest", ResourceType.FILE, null);
         logger.info(result.toString());
         Assertions.assertEquals(Status.STORAGE_NOT_STARTUP.getMsg(), result.getMsg());
 
         // USER_NO_OPERATION_PERM
-        Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
+        Mockito.when(PropertyUtils.isResourceStorageStartup()).thenReturn(true);
         user.setUserType(UserType.GENERAL_USER);
         // tenant who have access to resource is 123,
         Tenant tenantWNoPermission = new Tenant();
@@ -277,7 +281,7 @@ public class ResourcesServiceTest {
         result = resourcesService.updateResource(user,
                 "/dolphinscheduler/123/resources/ResourcesServiceTest",
                 "123",
-                "ResourcesServiceTest", "", ResourceType.FILE, null);
+                "ResourcesServiceTest", ResourceType.FILE, null);
         logger.info(result.toString());
         Assertions.assertEquals(Status.NO_CURRENT_OPERATING_PERMISSION.getMsg(), result.getMsg());
 
@@ -295,7 +299,7 @@ public class ResourcesServiceTest {
                     "123", ResourceType.FILE)).thenReturn(getStorageEntityResource());
             result = resourcesService.updateResource(user, "/dolphinscheduler/123/resources/ResourcesServiceTest",
                     "123",
-                    "ResourcesServiceTest", "", ResourceType.FILE, null);
+                    "ResourcesServiceTest", ResourceType.FILE, null);
             logger.info(result.toString());
             Assertions.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
         } catch (Exception e) {
@@ -322,22 +326,21 @@ public class ResourcesServiceTest {
                     "/dolphinscheduler/123/resources/ResourcesServiceTest1.jar", e);
         }
         result = resourcesService.updateResource(user, "/dolphinscheduler/123/resources/ResourcesServiceTest1.jar",
-                "123", "ResourcesServiceTest2.jar", "", ResourceType.UDF, null);
+                "123", "ResourcesServiceTest2.jar", ResourceType.UDF, null);
         logger.info(result.toString());
         Assertions.assertEquals(Status.RESOURCE_EXIST.getMsg(), result.getMsg());
 
         // TENANT_NOT_EXIST
         Mockito.when(tenantMapper.queryById(Mockito.anyInt())).thenReturn(null);
-        result = resourcesService.updateResource(user, "ResourcesServiceTest1.jar",
-                "", "ResourcesServiceTest", "", ResourceType.UDF, null);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST.getMsg(), result.getMsg());
+        Assertions.assertThrows(ServiceException.class,
+                () -> resourcesService.updateResource(user, "ResourcesServiceTest1.jar",
+                        "", "ResourcesServiceTest", ResourceType.UDF, null));
 
         // SUCCESS
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
 
         result = resourcesService.updateResource(user, "/dolphinscheduler/123/resources/ResourcesServiceTest1.jar",
-                "123", "ResourcesServiceTest1.jar", "", ResourceType.UDF, null);
+                "123", "ResourcesServiceTest1.jar", ResourceType.UDF, null);
         logger.info(result.toString());
         Assertions.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
     }
@@ -414,47 +417,40 @@ public class ResourcesServiceTest {
     }
 
     @Test
-    public void testDelete() {
+    public void testDelete() throws Exception {
 
         User loginUser = new User();
         loginUser.setId(0);
         loginUser.setUserType(UserType.GENERAL_USER);
-        Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
-        try {
-            // HDFS_NOT_STARTUP
-            Result result = resourcesService.delete(loginUser, "", "");
-            logger.info(result.toString());
-            Assertions.assertEquals(Status.STORAGE_NOT_STARTUP.getMsg(), result.getMsg());
+        Mockito.when(PropertyUtils.isResourceStorageStartup()).thenReturn(false);
+        // HDFS_NOT_STARTUP
+        Result result = resourcesService.delete(loginUser, "", "");
+        logger.info(result.toString());
+        Assertions.assertEquals(Status.STORAGE_NOT_STARTUP.getMsg(), result.getMsg());
 
-            // TENANT_NOT_EXIST
-            Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
-            loginUser.setUserType(UserType.ADMIN_USER);
-            loginUser.setTenantId(2);
-            Mockito.when(userMapper.selectById(loginUser.getId())).thenReturn(loginUser);
-            result = resourcesService.delete(loginUser, "", "");
-            logger.info(result.toString());
-            Assertions.assertEquals(Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST.getMsg(), result.getMsg());
+        // TENANT_NOT_EXIST
+        Mockito.when(PropertyUtils.isResourceStorageStartup()).thenReturn(true);
+        loginUser.setUserType(UserType.ADMIN_USER);
+        loginUser.setTenantId(2);
+        Mockito.when(userMapper.selectById(loginUser.getId())).thenReturn(loginUser);
+        Assertions.assertThrows(ServiceException.class, () -> resourcesService.delete(loginUser, "", ""));
 
-            // RESOURCE_NOT_EXIST
-            Mockito.when(tenantMapper.queryById(Mockito.anyInt())).thenReturn(getTenant());
-            Mockito.when(storageOperate.getFileStatus("/dolphinscheduler/123/resources/ResourcesServiceTest",
-                    null, "123", null))
-                    .thenReturn(getStorageEntityResource());
-            result = resourcesService.delete(loginUser, "/dolphinscheduler/123/resources/ResNotExist", "123");
-            logger.info(result.toString());
-            Assertions.assertEquals(Status.RESOURCE_NOT_EXIST.getMsg(), result.getMsg());
+        // RESOURCE_NOT_EXIST
+        Mockito.when(tenantMapper.queryById(Mockito.anyInt())).thenReturn(getTenant());
+        Mockito.when(storageOperate.getFileStatus("/dolphinscheduler/123/resources/ResourcesServiceTest",
+                null, "123", null))
+                .thenReturn(getStorageEntityResource());
+        result = resourcesService.delete(loginUser, "/dolphinscheduler/123/resources/ResNotExist", "123");
+        logger.info(result.toString());
+        Assertions.assertEquals(Status.RESOURCE_NOT_EXIST.getMsg(), result.getMsg());
 
-            // SUCCESS
-            loginUser.setTenantId(1);
-            result = resourcesService.delete(loginUser, "/dolphinscheduler/123/resources/ResourcesServiceTest",
-                    "123");
-            logger.info(result.toString());
-            Assertions.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
+        // SUCCESS
+        loginUser.setTenantId(1);
+        result = resourcesService.delete(loginUser, "/dolphinscheduler/123/resources/ResourcesServiceTest",
+                "123");
+        logger.info(result.toString());
+        Assertions.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
 
-        } catch (Exception e) {
-            logger.error("delete error", e);
-            Assertions.assertTrue(false);
-        }
     }
 
     @Test
@@ -486,7 +482,7 @@ public class ResourcesServiceTest {
 
     @Test
     public void testReadResource() {
-        Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
+        Mockito.when(PropertyUtils.isResourceStorageStartup()).thenReturn(false);
 
         // HDFS_NOT_STARTUP
         Result result = resourcesService.readResource(getUser(), "", "", 1, 10);
@@ -494,7 +490,7 @@ public class ResourcesServiceTest {
         Assertions.assertEquals(Status.STORAGE_NOT_STARTUP.getMsg(), result.getMsg());
 
         // RESOURCE_NOT_EXIST
-        Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
+        Mockito.when(PropertyUtils.isResourceStorageStartup()).thenReturn(true);
         Mockito.when(userMapper.selectById(getUser().getId())).thenReturn(getUser());
         Mockito.when(tenantMapper.queryById(getUser().getTenantId())).thenReturn(getTenant());
         result = resourcesService.readResource(getUser(), "", "", 1, 10);
@@ -503,7 +499,7 @@ public class ResourcesServiceTest {
 
         // RESOURCE_SUFFIX_NOT_SUPPORT_VIEW
         Mockito.when(FileUtils.getResourceViewSuffixes()).thenReturn("class");
-        Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
+        Mockito.when(PropertyUtils.isResourceStorageStartup()).thenReturn(true);
         result = resourcesService.readResource(getUser(), "", "", 1, 10);
         logger.info(result.toString());
         Assertions.assertEquals(Status.RESOURCE_SUFFIX_NOT_SUPPORT_VIEW.getMsg(), result.getMsg());
@@ -519,9 +515,8 @@ public class ResourcesServiceTest {
         // TENANT_NOT_EXIST
         Mockito.when(userMapper.selectById(getUser().getId())).thenReturn(getUser());
         Mockito.when(tenantMapper.queryById(getUser().getTenantId())).thenReturn(null);
-        result = resourcesService.readResource(getUser(), "", "", 1, 10);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST.getMsg(), result.getMsg());
+        Assertions.assertThrows(ServiceException.class,
+                () -> resourcesService.readResource(getUser(), "", "", 1, 10));
 
         // SUCCESS
         Mockito.when(userMapper.selectById(getUser().getId())).thenReturn(getUser());
@@ -540,22 +535,22 @@ public class ResourcesServiceTest {
 
     @Test
     public void testOnlineCreateResource() {
-        Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
+        Mockito.when(PropertyUtils.isResourceStorageStartup()).thenReturn(false);
         User user = getUser();
         user.setId(1);
         Mockito.when(userMapper.selectById(user.getId())).thenReturn(getUser());
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
 
         // HDFS_NOT_STARTUP
-        Result result = resourcesService.onlineCreateResource(user, ResourceType.FILE, "test", "jar", "desc", "content",
+        Result result = resourcesService.onlineCreateResource(user, ResourceType.FILE, "test", "jar", "content",
                 "/");
         logger.info(result.toString());
         Assertions.assertEquals(Status.STORAGE_NOT_STARTUP.getMsg(), result.getMsg());
 
         // RESOURCE_SUFFIX_NOT_SUPPORT_VIEW
-        Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
+        Mockito.when(PropertyUtils.isResourceStorageStartup()).thenReturn(true);
         Mockito.when(FileUtils.getResourceViewSuffixes()).thenReturn("class");
-        result = resourcesService.onlineCreateResource(user, ResourceType.FILE, "test", "jar", "desc", "content",
+        result = resourcesService.onlineCreateResource(user, ResourceType.FILE, "test", "jar", "content",
                 "/");
         logger.info(result.toString());
         Assertions.assertEquals(Status.RESOURCE_SUFFIX_NOT_SUPPORT_VIEW.getMsg(), result.getMsg());
@@ -565,7 +560,7 @@ public class ResourcesServiceTest {
         Mockito.when(storageOperate.getResDir("123")).thenReturn("/dolphinscheduler/123/resources/");
         Mockito.when(FileUtils.getUploadFilename(Mockito.anyString(), Mockito.anyString())).thenReturn("test");
         Mockito.when(FileUtils.writeContent2File(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
-        result = resourcesService.onlineCreateResource(user, ResourceType.FILE, "test", "jar", "desc", "content",
+        result = resourcesService.onlineCreateResource(user, ResourceType.FILE, "test", "jar", "content",
                 "/");
         logger.info(result.toString());
         Assertions.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
@@ -573,7 +568,7 @@ public class ResourcesServiceTest {
 
     @Test
     public void testCreateOrUpdateResource() throws Exception {
-        Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
+        Mockito.when(PropertyUtils.isResourceStorageStartup()).thenReturn(false);
         User user = getUser();
         Mockito.when(userMapper.queryByUserNameAccurately(user.getUserName())).thenReturn(getUser());
 
@@ -597,7 +592,7 @@ public class ResourcesServiceTest {
 
     @Test
     public void testUpdateResourceContent() {
-        Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
+        Mockito.when(PropertyUtils.isResourceStorageStartup()).thenReturn(false);
 
         // HDFS_NOT_STARTUP
         Result result = resourcesService.updateResourceContent(getUser(), "", "", "content");
@@ -605,7 +600,7 @@ public class ResourcesServiceTest {
         Assertions.assertEquals(Status.STORAGE_NOT_STARTUP.getMsg(), result.getMsg());
 
         // RESOURCE_NOT_EXIST
-        Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
+        Mockito.when(PropertyUtils.isResourceStorageStartup()).thenReturn(true);
         Mockito.when(userMapper.selectById(getUser().getId())).thenReturn(getUser());
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
 
@@ -624,7 +619,7 @@ public class ResourcesServiceTest {
         Assertions.assertEquals(Status.RESOURCE_NOT_EXIST.getMsg(), result.getMsg());
 
         // RESOURCE_SUFFIX_NOT_SUPPORT_VIEW
-        Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
+        Mockito.when(PropertyUtils.isResourceStorageStartup()).thenReturn(true);
         Mockito.when(FileUtils.getResourceViewSuffixes()).thenReturn("class");
         try {
             Mockito.when(storageOperate.getFileStatus("", "", "123", ResourceType.FILE))
@@ -646,9 +641,8 @@ public class ResourcesServiceTest {
         // TENANT_NOT_EXIST
         Mockito.when(userMapper.selectById(getUser().getId())).thenReturn(getUser());
         Mockito.when(tenantMapper.queryById(1)).thenReturn(null);
-        result = resourcesService.updateResourceContent(getUser(), "", "123", "content");
-        logger.info(result.toString());
-        Assertions.assertTrue(Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST.getCode() == result.getCode());
+        Assertions.assertThrows(ServiceException.class,
+                () -> resourcesService.updateResourceContent(getUser(), "", "123", "content"));
 
         // SUCCESS
         try {
@@ -674,11 +668,14 @@ public class ResourcesServiceTest {
 
     @Test
     public void testDownloadResource() {
-        Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(true);
+        Mockito.when(PropertyUtils.isResourceStorageStartup()).thenReturn(true);
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
         Mockito.when(userMapper.selectById(1)).thenReturn(getUser());
         org.springframework.core.io.Resource resourceMock = Mockito.mock(org.springframework.core.io.Resource.class);
+        Path path = Mockito.mock(Path.class);
+        Mockito.when(Paths.get(Mockito.any())).thenReturn(path);
         try {
+            Mockito.when(java.nio.file.Files.size(Mockito.any())).thenReturn(1L);
             // resource null
             org.springframework.core.io.Resource resource = resourcesService.downloadResource(getUser(), "");
             Assertions.assertNull(resource);
@@ -891,7 +888,7 @@ public class ResourcesServiceTest {
     @Test
     public void testCatFile() {
 
-        Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
+        Mockito.when(PropertyUtils.isResourceStorageStartup()).thenReturn(false);
 
         // SUCCESS
         try {
@@ -902,6 +899,24 @@ public class ResourcesServiceTest {
             logger.error("hadoop error", e);
         }
     }
+
+    @Test
+    void testQueryBaseDir() {
+        User user = getUser();
+        Mockito.when(userMapper.selectById(user.getId())).thenReturn(getUser());
+        Mockito.when(tenantMapper.queryById(user.getTenantId())).thenReturn(getTenant());
+        Mockito.when(storageOperate.getDir(ResourceType.FILE, "123")).thenReturn("/dolphinscheduler/123/resources/");
+        try {
+            Mockito.when(storageOperate.getFileStatus(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
+                    Mockito.any())).thenReturn(getStorageEntityResource());
+        } catch (Exception e) {
+            logger.error(e.getMessage() + " Resource path: {}", "/dolphinscheduler/123/resources/ResourcesServiceTest",
+                    e);
+        }
+        Result<Object> result = resourcesService.queryResourceBaseDir(user, ResourceType.FILE);
+        Assertions.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
+    }
+
     private List<Resource> getResourceList() {
 
         List<Resource> resources = new ArrayList<>();
@@ -944,7 +959,6 @@ public class ResourcesServiceTest {
         entity.setAlias("ResourcesServiceTest");
         entity.setFileName("ResourcesServiceTest");
         entity.setDirectory(false);
-        entity.setDescription("");
         entity.setUserName("123");
         entity.setType(ResourceType.FILE);
         entity.setFullName("/dolphinscheduler/123/resources/ResourcesServiceTest");
@@ -994,7 +1008,6 @@ public class ResourcesServiceTest {
         entity.setAlias("ResourcesServiceTest1.jar");
         entity.setFileName("ResourcesServiceTest1.jar");
         entity.setDirectory(false);
-        entity.setDescription("");
         entity.setUserName("123");
         entity.setType(ResourceType.UDF);
         entity.setFullName("/dolphinscheduler/123/resources/ResourcesServiceTest1.jar");

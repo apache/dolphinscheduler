@@ -16,7 +16,10 @@
  */
 
 import { reactive } from 'vue'
-import { queryDynamicTaskCategories, queryDynamicTaskResourceList } from '@/service/modules/dynamic-dag'
+import {
+  queryDynamicTaskCategories,
+  queryDynamicTaskResourceList
+} from '@/service/modules/dynamic-dag'
 
 export function useSidebar() {
   const variables = reactive({

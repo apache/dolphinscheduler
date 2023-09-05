@@ -17,27 +17,26 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.k8s;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
-
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.utils.K8sUtils;
 
 import org.slf4j.Logger;
+import org.yaml.snakeyaml.Yaml;
 
 public abstract class AbstractK8sTaskExecutor {
 
     protected Logger log;
     protected TaskExecutionContext taskRequest;
     protected K8sUtils k8sUtils;
-    protected StringBuilder logStringBuffer;
+    protected Yaml yaml;
 
     protected AbstractK8sTaskExecutor(Logger log, TaskExecutionContext taskRequest) {
         this.log = log;
         this.taskRequest = taskRequest;
         this.k8sUtils = new K8sUtils();
-        this.logStringBuffer = new StringBuilder();
+        this.yaml = new Yaml();
     }
 
     public abstract TaskResponse run(String k8sParameterStr) throws Exception;
@@ -47,14 +46,6 @@ public abstract class AbstractK8sTaskExecutor {
     public void waitTimeout(Boolean timeout) throws TaskException {
         if (Boolean.TRUE.equals(timeout)) {
             throw new TaskException("K8sTask is timeout");
-        }
-    }
-
-    public void flushLog(TaskResponse taskResponse) {
-        if (logStringBuffer.length() != 0 && taskResponse.getExitStatusCode() == EXIT_CODE_FAILURE) {
-            log.error(logStringBuffer.toString());
-        } else if (logStringBuffer.length() != 0) {
-            log.info(logStringBuffer.toString());
         }
     }
 

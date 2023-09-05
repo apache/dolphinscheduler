@@ -17,11 +17,11 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
+import org.apache.dolphinscheduler.extract.master.transportor.ITaskInstanceExecutionEvent;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
-import org.apache.dolphinscheduler.remote.command.CommandType;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
 
 import lombok.Builder;
@@ -33,11 +33,11 @@ public class TaskCallbackImpl implements TaskCallBack {
 
     private final WorkerMessageSender workerMessageSender;
 
-    private final String masterAddress;
+    private final TaskExecutionContext taskExecutionContext;
 
-    public TaskCallbackImpl(WorkerMessageSender workerMessageSender, String masterAddress) {
+    public TaskCallbackImpl(WorkerMessageSender workerMessageSender, TaskExecutionContext taskExecutionContext) {
         this.workerMessageSender = workerMessageSender;
-        this.masterAddress = masterAddress;
+        this.taskExecutionContext = taskExecutionContext;
     }
 
     @Override
@@ -52,7 +52,8 @@ public class TaskCallbackImpl implements TaskCallBack {
 
         log.info("send remote application info {}", applicationInfo);
         taskExecutionContext.setAppIds(applicationInfo.getAppIds());
-        workerMessageSender.sendMessageWithRetry(taskExecutionContext, masterAddress, CommandType.TASK_EXECUTE_RUNNING);
+        workerMessageSender.sendMessageWithRetry(taskExecutionContext,
+                ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType.RUNNING_INFO);
     }
 
     @Override
@@ -64,7 +65,8 @@ public class TaskCallbackImpl implements TaskCallBack {
             return;
         }
 
-        workerMessageSender.sendMessageWithRetry(taskExecutionContext, masterAddress, CommandType.TASK_UPDATE_PID);
+        workerMessageSender.sendMessageWithRetry(taskExecutionContext,
+                ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType.RUNNING_INFO);
     }
 
 }

@@ -36,7 +36,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.SWITCH_PROCESS_DEFINI
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROCESS_DEFINITION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR;
 
-import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
@@ -98,7 +97,6 @@ public class ProcessDefinitionController extends BaseController {
      * @param globalParams globalParams
      * @param locations locations for nodes
      * @param timeout timeout
-     * @param tenantCode tenantCode
      * @param taskRelationJson relation json for nodes
      * @param taskDefinitionJson taskDefinitionJson
      * @param otherParamsJson otherParamsJson handle other params
@@ -114,7 +112,6 @@ public class ProcessDefinitionController extends BaseController {
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_PROCESS_DEFINITION_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result createProcessDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                           @RequestParam(value = "name", required = true) String name,
@@ -122,14 +119,13 @@ public class ProcessDefinitionController extends BaseController {
                                           @RequestParam(value = "globalParams", required = false, defaultValue = "[]") String globalParams,
                                           @RequestParam(value = "locations", required = false) String locations,
                                           @RequestParam(value = "timeout", required = false, defaultValue = "0") int timeout,
-                                          @RequestParam(value = "tenantCode", required = true) String tenantCode,
                                           @RequestParam(value = "taskRelationJson", required = true) String taskRelationJson,
                                           @RequestParam(value = "taskDefinitionJson", required = true) String taskDefinitionJson,
                                           @RequestParam(value = "otherParamsJson", required = false) String otherParamsJson,
                                           @RequestParam(value = "executionType", defaultValue = "PARALLEL") ProcessExecutionTypeEnum executionType) {
         Map<String, Object> result = processDefinitionService.createProcessDefinition(loginUser, projectCode, name,
                 description, globalParams,
-                locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson, otherParamsJson, executionType);
+                locations, timeout, taskRelationJson, taskDefinitionJson, otherParamsJson, executionType);
         return returnDataList(result);
     }
 
@@ -150,7 +146,6 @@ public class ProcessDefinitionController extends BaseController {
     @PostMapping(value = "/batch-copy")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(BATCH_COPY_PROCESS_DEFINITION_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result copyProcessDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                         @RequestParam(value = "codes", required = true) String codes,
@@ -176,7 +171,6 @@ public class ProcessDefinitionController extends BaseController {
     @PostMapping(value = "/batch-move")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(BATCH_MOVE_PROCESS_DEFINITION_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result moveProcessDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                         @RequestParam(value = "codes", required = true) String codes,
@@ -201,7 +195,6 @@ public class ProcessDefinitionController extends BaseController {
     @GetMapping(value = "/verify-name")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result verifyProcessDefinitionName(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                               @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                               @RequestParam(value = "name", required = true) String name,
@@ -222,7 +215,6 @@ public class ProcessDefinitionController extends BaseController {
      * @param globalParams globalParams
      * @param locations locations for nodes
      * @param timeout timeout
-     * @param tenantCode tenantCode
      * @param taskRelationJson relation json for nodes
      * @param taskDefinitionJson taskDefinitionJson
      * @param otherParamsJson otherParamsJson handle other params
@@ -240,7 +232,6 @@ public class ProcessDefinitionController extends BaseController {
     @PutMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_PROCESS_DEFINITION_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result updateProcessDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                           @RequestParam(value = "name", required = true) String name,
@@ -249,7 +240,6 @@ public class ProcessDefinitionController extends BaseController {
                                           @RequestParam(value = "globalParams", required = false, defaultValue = "[]") String globalParams,
                                           @RequestParam(value = "locations", required = false) String locations,
                                           @RequestParam(value = "timeout", required = false, defaultValue = "0") int timeout,
-                                          @RequestParam(value = "tenantCode", required = true) String tenantCode,
                                           @RequestParam(value = "taskRelationJson", required = true) String taskRelationJson,
                                           @RequestParam(value = "taskDefinitionJson", required = true) String taskDefinitionJson,
                                           @RequestParam(value = "otherParamsJson", required = false) String otherParamsJson,
@@ -258,7 +248,7 @@ public class ProcessDefinitionController extends BaseController {
 
         Map<String, Object> result = processDefinitionService.updateProcessDefinition(loginUser, projectCode, name,
                 code, description, globalParams,
-                locations, timeout, tenantCode, taskRelationJson, taskDefinitionJson, otherParamsJson, executionType);
+                locations, timeout, taskRelationJson, taskDefinitionJson, otherParamsJson, executionType);
         // If the update fails, the result will be returned directly
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return returnDataList(result);
@@ -290,7 +280,6 @@ public class ProcessDefinitionController extends BaseController {
     @GetMapping(value = "/{code}/versions")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROCESS_DEFINITION_VERSIONS_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryProcessDefinitionVersions(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                  @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                  @RequestParam(value = "pageNo") int pageNo,
@@ -324,7 +313,6 @@ public class ProcessDefinitionController extends BaseController {
     @GetMapping(value = "/{code}/versions/{version}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(SWITCH_PROCESS_DEFINITION_VERSION_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result switchProcessDefinitionVersion(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                  @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                  @PathVariable(value = "code") long code,
@@ -351,7 +339,6 @@ public class ProcessDefinitionController extends BaseController {
     @DeleteMapping(value = "/{code}/versions/{version}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_PROCESS_DEFINITION_VERSION_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteProcessDefinitionVersion(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                  @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                  @PathVariable(value = "code") long code,
@@ -379,7 +366,6 @@ public class ProcessDefinitionController extends BaseController {
     @PostMapping(value = "/{code}/release")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(RELEASE_PROCESS_DEFINITION_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result releaseProcessDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                            @PathVariable(value = "code", required = true) long code,
@@ -404,7 +390,6 @@ public class ProcessDefinitionController extends BaseController {
     @GetMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_DETAIL_OF_PROCESS_DEFINITION_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryProcessDefinitionByCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                @PathVariable(value = "code", required = true) long code) {
@@ -428,7 +413,6 @@ public class ProcessDefinitionController extends BaseController {
     @GetMapping(value = "/query-by-name")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_DETAIL_OF_PROCESS_DEFINITION_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<ProcessDefinition> queryProcessDefinitionByName(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                   @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                                   @RequestParam("name") String name) {
@@ -448,7 +432,6 @@ public class ProcessDefinitionController extends BaseController {
     @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROCESS_DEFINITION_LIST)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryProcessDefinitionList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                              @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
         Map<String, Object> result = processDefinitionService.queryProcessDefinitionList(loginUser, projectCode);
@@ -466,7 +449,6 @@ public class ProcessDefinitionController extends BaseController {
     @GetMapping(value = "/simple-list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROCESS_DEFINITION_LIST)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryProcessDefinitionSimpleList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                    @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
         Map<String, Object> result = processDefinitionService.queryProcessDefinitionSimpleList(loginUser, projectCode);
@@ -496,7 +478,6 @@ public class ProcessDefinitionController extends BaseController {
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROCESS_DEFINITION_LIST_PAGING_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<PageInfo<ProcessDefinition>> queryProcessDefinitionListPaging(
                                                                                 @Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                                 @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
@@ -535,7 +516,6 @@ public class ProcessDefinitionController extends BaseController {
     @GetMapping(value = "/{code}/view-tree")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(ENCAPSULATION_TREEVIEW_STRUCTURE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result viewTree(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                            @PathVariable("code") long code,
@@ -604,8 +584,8 @@ public class ProcessDefinitionController extends BaseController {
     @GetMapping(value = "/query-process-definition-list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(GET_TASKS_LIST_BY_PROCESS_DEFINITION_ID_ERROR)
-    public Result getProcessListByProjectCodes(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                               @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
+    public Result getProcessListByProjectCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                              @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
         Map<String, Object> result = processDefinitionService.queryProcessDefinitionListByProjectCode(projectCode);
         return returnDataList(result);
     }
@@ -640,7 +620,6 @@ public class ProcessDefinitionController extends BaseController {
     @DeleteMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_PROCESS_DEFINE_BY_CODE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteProcessDefinitionByCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                 @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                 @PathVariable("code") long workflowDefinitionCode) {
@@ -663,7 +642,6 @@ public class ProcessDefinitionController extends BaseController {
     @PostMapping(value = "/batch-delete")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(BATCH_DELETE_PROCESS_DEFINE_BY_CODES_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result batchDeleteProcessDefinitionByCodes(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                       @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                       @RequestParam("codes") String codes) {
@@ -687,7 +665,6 @@ public class ProcessDefinitionController extends BaseController {
     })
     @PostMapping(value = "/batch-export")
     @ResponseBody
-    @AccessLogAnnotation(ignoreRequestArgs = {"loginUser", "response"})
     public void batchExportProcessDefinitionByCodes(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                     @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                     @RequestParam("codes") String codes,
@@ -710,7 +687,6 @@ public class ProcessDefinitionController extends BaseController {
     @GetMapping(value = "/all")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROCESS_DEFINITION_LIST)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryAllProcessDefinitionByProjectCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                          @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
         Map<String, Object> result =
@@ -732,7 +708,6 @@ public class ProcessDefinitionController extends BaseController {
     })
     @PostMapping(value = "/import")
     @ApiException(IMPORT_PROCESS_DEFINE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = {"loginUser", "file"})
     public Result importProcessDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                           @RequestParam("file") MultipartFile file) {
@@ -754,7 +729,6 @@ public class ProcessDefinitionController extends BaseController {
      * @param description description
      * @param globalParams globalParams
      * @param timeout timeout
-     * @param tenantCode tenantCode
      * @param scheduleJson scheduleJson
      * @return process definition code
      */
@@ -767,19 +741,17 @@ public class ProcessDefinitionController extends BaseController {
     @PostMapping(value = "/empty")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(CREATE_PROCESS_DEFINITION_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result createEmptyProcessDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                @RequestParam(value = "name", required = true) String name,
                                                @RequestParam(value = "description", required = false) String description,
                                                @RequestParam(value = "globalParams", required = false, defaultValue = "[]") String globalParams,
                                                @RequestParam(value = "timeout", required = false, defaultValue = "0") int timeout,
-                                               @RequestParam(value = "tenantCode", required = true) String tenantCode,
                                                @RequestParam(value = "scheduleJson", required = false) String scheduleJson,
                                                @RequestParam(value = "executionType", defaultValue = "PARALLEL") ProcessExecutionTypeEnum executionType) {
         return returnDataList(processDefinitionService.createEmptyProcessDefinition(loginUser, projectCode, name,
                 description, globalParams,
-                timeout, tenantCode, scheduleJson, executionType));
+                timeout, scheduleJson, executionType));
     }
 
     /**
@@ -792,7 +764,6 @@ public class ProcessDefinitionController extends BaseController {
      * @param description description
      * @param globalParams globalParams
      * @param timeout timeout
-     * @param tenantCode tenantCode
      * @param scheduleJson scheduleJson
      * @param executionType executionType
      * @param releaseState releaseState
@@ -810,7 +781,6 @@ public class ProcessDefinitionController extends BaseController {
     @PutMapping(value = "/{code}/basic-info")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_PROCESS_DEFINITION_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result updateProcessDefinitionBasicInfo(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                    @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                    @RequestParam(value = "name", required = true) String name,
@@ -818,14 +788,13 @@ public class ProcessDefinitionController extends BaseController {
                                                    @RequestParam(value = "description", required = false) String description,
                                                    @RequestParam(value = "globalParams", required = false, defaultValue = "[]") String globalParams,
                                                    @RequestParam(value = "timeout", required = false, defaultValue = "0") int timeout,
-                                                   @RequestParam(value = "tenantCode", required = true) String tenantCode,
                                                    @RequestParam(value = "scheduleJson", required = false) String scheduleJson,
                                                    @RequestParam(value = "otherParamsJson", required = false) String otherParamsJson,
                                                    @RequestParam(value = "executionType", defaultValue = "PARALLEL") ProcessExecutionTypeEnum executionType,
                                                    @RequestParam(value = "releaseState", required = false, defaultValue = "OFFLINE") ReleaseState releaseState) {
         Map<String, Object> result = processDefinitionService.updateProcessDefinitionBasicInfo(loginUser, projectCode,
                 name, code, description, globalParams,
-                timeout, tenantCode, scheduleJson, otherParamsJson, executionType);
+                timeout, scheduleJson, otherParamsJson, executionType);
         // If the update fails, the result will be returned directly
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return returnDataList(result);
@@ -856,7 +825,6 @@ public class ProcessDefinitionController extends BaseController {
     @PostMapping(value = "/{code}/release-workflow")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(RELEASE_PROCESS_DEFINITION_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result releaseWorkflowAndSchedule(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                              @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                              @PathVariable(value = "code", required = true) long code,
@@ -879,7 +847,6 @@ public class ProcessDefinitionController extends BaseController {
     @GetMapping(value = "/{code}/view-variables")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROCESS_DEFINITION_ALL_VARIABLES_ERROR)
-    @AccessLogAnnotation
     public Result viewVariables(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                 @PathVariable("code") Long code) {

@@ -215,7 +215,7 @@ git push "${GH_REMOTE}" "${VERSION}"-release
 
 ```shell
 # 运行发版校验
-mvn release:prepare -Prelease -Darguments="-Dmaven.test.skip=true -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true -Dspotless.check.skip=true" -DautoVersionSubmodules=true -DdryRun=true -Dusername="${GH_USERNAME}"
+mvn release:prepare -Prelease -Darguments="-Dmaven.test.skip=true -Dspotless.skip=true -Dmaven.javadoc.skip=true -Dspotless.check.skip=true" -DautoVersionSubmodules=true -DdryRun=true -Dusername="${GH_USERNAME}"
 ```
 
 - `-Prelease`: 选择 release 的 profile，这个 profile 会打包所有源码、jar 文件以及可执行二进制包。
@@ -233,7 +233,7 @@ mvn release:clean
 然后准备执行发布。
 
 ```shell
-mvn release:prepare -Prelease -Darguments="-Dmaven.test.skip=true -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true  -Dspotless.check.skip=true" -DautoVersionSubmodules=true -DpushChanges=false -Dusername="${GH_USERNAME}"
+mvn release:prepare -Prelease -Darguments="-Dmaven.test.skip=true -Dspotless.skip=true -Dmaven.javadoc.skip=true  -Dspotless.check.skip=true" -DautoVersionSubmodules=true -DpushChanges=false -Dusername="${GH_USERNAME}"
 ```
 
 和上一步演练的命令基本相同，去掉了 `-DdryRun=true` 参数。
@@ -262,7 +262,7 @@ git push "${GH_REMOTE}" --tags
 #### 部署发布
 
 ```shell
-mvn release:perform -Prelease -Darguments="-Dmaven.test.skip=true -Dcheckstyle.skip=true -Dmaven.javadoc.skip=true -Dspotless.check.skip=true" -DautoVersionSubmodules=true -Dusername="${GH_USERNAME}"
+mvn release:perform -Prelease -Darguments="-Dmaven.test.skip=true -Dspotless.skip=true -Dmaven.javadoc.skip=true -Dspotless.check.skip=true" -DautoVersionSubmodules=true -Dusername="${GH_USERNAME}"
 ```
 
 执行完该命令后，待发布版本会自动上传到 Apache 的临时筹备仓库(staging repository)。你可以通过访问 [apache staging repositories](https://repository.apache.org/#stagingRepositories)
@@ -320,7 +320,7 @@ cp -f "${SOURCE_CODE_DIR}"/dolphinscheduler-dist/target/*.tar.gz "${SVN_DIR_DEV}
 cp -f "${SOURCE_CODE_DIR}"/dolphinscheduler-dist/target/*.tar.gz.asc "${SVN_DIR_DEV}/${VERSION}"
 
 # Create sign
-cd "${SVN_DIR_DEV}"
+cd "${SVN_DIR_DEV}/${VERSION}"
 shasum -a 512 apache-dolphinscheduler-"${VERSION}"-src.tar.gz >> apache-dolphinscheduler-"${VERSION}"-src.tar.gz.sha512
 shasum -b -a 512 apache-dolphinscheduler-"${VERSION}"-bin.tar.gz >> apache-dolphinscheduler-"${VERSION}"-bin.tar.gz.sha512
 
@@ -332,7 +332,8 @@ gpg --verify apache-dolphinscheduler-"${VERSION}"-src.tar.gz.asc
 gpg --verify apache-dolphinscheduler-"${VERSION}"-bin.tar.gz.asc
 
 # Commit to Apache SVN
-svn add *
+cd "${SVN_DIR_DEV}"
+svn add "${VERSION}"
 svn --username="${A_USERNAME}" commit -m "release ${VERSION}"
 ```
 

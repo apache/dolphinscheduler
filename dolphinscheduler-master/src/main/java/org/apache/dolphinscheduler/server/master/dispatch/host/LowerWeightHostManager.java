@@ -19,8 +19,7 @@ package org.apache.dolphinscheduler.server.master.dispatch.host;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
-import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
+import org.apache.dolphinscheduler.extract.base.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.WorkerGroupNotFoundException;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostWeight;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostWorker;
@@ -70,20 +69,13 @@ public class LowerWeightHostManager extends CommonHostManager {
         serverNodeManager.addWorkerInfoChangeListener(new WorkerWeightListener());
     }
 
-    /**
-     * select host
-     *
-     * @param context context
-     * @return host
-     * @throws WorkerGroupNotFoundException If the worker group not found
-     */
     @Override
-    public Host select(ExecutionContext context) throws WorkerGroupNotFoundException {
-        Set<HostWeight> workerHostWeights = getWorkerHostWeights(context.getWorkerGroup());
+    public Optional<Host> select(String workerGroup) throws WorkerGroupNotFoundException {
+        Set<HostWeight> workerHostWeights = getWorkerHostWeights(workerGroup);
         if (CollectionUtils.isNotEmpty(workerHostWeights)) {
-            return selector.select(workerHostWeights).getHost();
+            return Optional.ofNullable(selector.select(workerHostWeights).getHost());
         }
-        return new Host();
+        return Optional.empty();
     }
 
     @Override

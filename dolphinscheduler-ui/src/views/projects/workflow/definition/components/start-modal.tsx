@@ -82,6 +82,7 @@ export default defineComponent({
       variables,
       handleStartDefinition,
       getWorkerGroups,
+      getTenantList,
       getAlertGroups,
       getEnvironmentList,
       getStartParamsList
@@ -92,7 +93,7 @@ export default defineComponent({
     }
 
     const handleStart = () => {
-      handleStartDefinition(props.row.code,props.row.version)
+      handleStartDefinition(props.row.code, props.row.version)
     }
 
     const generalWarningTypeListOptions = () => [
@@ -195,6 +196,7 @@ export default defineComponent({
 
     onMounted(() => {
       getWorkerGroups()
+      getTenantList()
       getAlertGroups()
       getEnvironmentList()
     })
@@ -312,6 +314,16 @@ export default defineComponent({
             />
           </NFormItem>
           <NFormItem
+            label={t('project.workflow.tenant_code')}
+            path='tenantCode'
+          >
+            <NSelect
+              options={this.tenantList}
+              v-model:value={this.startForm.tenantCode}
+            />
+          </NFormItem>
+
+          <NFormItem
             label={t('project.workflow.environment_name')}
             path='environmentCode'
           >
@@ -323,17 +335,19 @@ export default defineComponent({
               clearable
             />
           </NFormItem>
-          {this.startForm.warningType !== 'NONE' && (<NFormItem
-            label={t('project.workflow.alarm_group')}
-            path='warningGroupId'
-          >
-            <NSelect
-              options={this.alertGroups}
-              placeholder={t('project.workflow.please_choose')}
-              v-model:value={this.startForm.warningGroupId}
-              clearable
-            />
-          </NFormItem>)}
+          {this.startForm.warningType !== 'NONE' && (
+            <NFormItem
+              label={t('project.workflow.alarm_group')}
+              path='warningGroupId'
+            >
+              <NSelect
+                options={this.alertGroups}
+                placeholder={t('project.workflow.please_choose')}
+                v-model:value={this.startForm.warningGroupId}
+                clearable
+              />
+            </NFormItem>
+          )}
           <NFormItem
             label={t('project.workflow.complement_data')}
             path='complement_data'
@@ -366,6 +380,25 @@ export default defineComponent({
                     </NSpace>
                   </NRadioGroup>
                 </NFormItem>
+                {this.startForm.complementDependentMode === 'ALL_DEPENDENT' && (
+                  <NFormItem
+                    label={t('project.workflow.all_level_dependent')}
+                    path='allLevelDependent'
+                  >
+                    <NRadioGroup
+                      v-model:value={this.startForm.allLevelDependent}
+                    >
+                      <NSpace>
+                        <NRadio value={'false'}>
+                          {t('project.workflow.close')}
+                        </NRadio>
+                        <NRadio value={'true'}>
+                          {t('project.workflow.open')}
+                        </NRadio>
+                      </NSpace>
+                    </NRadioGroup>
+                  </NFormItem>
+                )}
                 <NFormItem
                   label={t('project.workflow.mode_of_execution')}
                   path='runMode'
@@ -399,6 +432,21 @@ export default defineComponent({
                     />
                   </NFormItem>
                 )}
+                <NFormItem
+                    label={t('project.workflow.order_of_execution')}
+                    path='executionOrder'
+                >
+                  <NRadioGroup v-model:value={this.startForm.executionOrder}>
+                    <NSpace>
+                      <NRadio value={'DESC_ORDER'}>
+                        {t('project.workflow.descending_order')}
+                      </NRadio>
+                      <NRadio value={'ASC_ORDER'}>
+                        {t('project.workflow.ascending_order')}
+                      </NRadio>
+                    </NSpace>
+                  </NRadioGroup>
+                </NFormItem>
                 <NFormItem
                   label={t('project.workflow.schedule_date')}
                   path={

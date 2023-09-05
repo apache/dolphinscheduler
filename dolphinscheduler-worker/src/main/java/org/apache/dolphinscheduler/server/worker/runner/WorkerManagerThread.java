@@ -20,8 +20,8 @@ package org.apache.dolphinscheduler.server.worker.runner;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
-import org.apache.dolphinscheduler.server.worker.config.TaskExecuteThreadsFullPolicy;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.metrics.WorkerServerMetrics;
 
@@ -96,20 +96,7 @@ public class WorkerManagerThread implements Runnable {
     }
 
     public boolean offer(WorkerDelayTaskExecuteRunnable workerDelayTaskExecuteRunnable) {
-        if (workerConfig.getTaskExecuteThreadsFullPolicy() == TaskExecuteThreadsFullPolicy.CONTINUE) {
-            return waitSubmitQueue.offer(workerDelayTaskExecuteRunnable);
-        }
-
-        if (waitSubmitQueue.size() > workerExecThreads) {
-            log.warn("Wait submit queue is full, will retry submit task later");
-            WorkerServerMetrics.incWorkerSubmitQueueIsFullCount();
-            // if waitSubmitQueue is full, it will wait 1s, then try add
-            ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
-            if (waitSubmitQueue.size() > workerExecThreads) {
-                return false;
-            }
-        }
-        return waitSubmitQueue.offer(workerDelayTaskExecuteRunnable);
+        return waitSubmitQueue.add(workerDelayTaskExecuteRunnable);
     }
 
     public void start() {
@@ -122,6 +109,12 @@ public class WorkerManagerThread implements Runnable {
 
     @Override
     public void run() {
+        WorkerServerMetrics.registerWorkerCpuUsageGauge(OSUtils::cpuUsagePercentage);
+        WorkerServerMetrics.registerWorkerMemoryAvailableGauge(OSUtils::availablePhysicalMemorySize);
+        WorkerServerMetrics.registerWorkerMemoryUsageGauge(OSUtils::memoryUsagePercentage);
+        WorkerServerMetrics.registerWorkerExecuteQueueSizeGauge(workerExecService::getThreadPoolQueueSize);
+        WorkerServerMetrics.registerWorkerActiveExecuteThreadGauge(workerExecService::getActiveExecThreadCount);
+
         Thread.currentThread().setName("Worker-Execute-Manager-Thread");
         while (!ServerLifeCycleManager.isStopped()) {
             try {

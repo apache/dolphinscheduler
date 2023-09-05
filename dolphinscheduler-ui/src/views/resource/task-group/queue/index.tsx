@@ -40,7 +40,7 @@ import { SelectMixedOption } from 'naive-ui/lib/select/src/interface'
 import { useRouter } from 'vue-router'
 import FormModal from '@/views/resource/task-group/queue/components/form-modal'
 import Card from '@/components/card'
-import Search from "@/components/input-search";
+import Search from '@/components/input-search'
 import type { Ref } from 'vue'
 import type { Router } from 'vue-router'
 
@@ -177,16 +177,16 @@ const taskGroupQueue = defineComponent({
               placeholder={t('resource.task_group_queue.task_group_name')}
             />
             <Search
-                v-model:value={this.searchParamRef.processName}
-                placeholder={t(
-                    'resource.task_group_queue.workflow_instance_name'
-                )}
+              v-model:value={this.searchParamRef.processName}
+              placeholder={t(
+                'resource.task_group_queue.workflow_instance_name'
+              )}
               onSearch={onSearch}
             ></Search>
             <Search
-                v-model:value={this.searchParamRef.instanceName}
-                placeholder={t('resource.task_group_queue.task_instance_name')}
-                onSearch ={onSearch}
+              v-model:value={this.searchParamRef.instanceName}
+              placeholder={t('resource.task_group_queue.task_instance_name')}
+              onSearch={onSearch}
             ></Search>
             <NButton size='small' type='primary' onClick={onSearch}>
               <NIcon>

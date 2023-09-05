@@ -1,102 +1,75 @@
-Dolphin Scheduler Official Website
-[dolphinscheduler.apache.org](https://dolphinscheduler.apache.org)
-==================================================================
+# Apache Dolphinscheduler
 
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
 [![codecov](https://codecov.io/gh/apache/dolphinscheduler/branch/dev/graph/badge.svg)]()
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=apache-dolphinscheduler&metric=alert_status)](https://sonarcloud.io/dashboard?id=apache-dolphinscheduler)
 [![Twitter Follow](https://img.shields.io/twitter/follow/dolphinschedule.svg?style=social&label=Follow)](https://twitter.com/dolphinschedule)
 [![Slack Status](https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social)](https://s.apache.org/dolphinscheduler-slack)
-
-[![Stargazers over time](https://starchart.cc/apache/dolphinscheduler.svg)](https://starchart.cc/apache/dolphinscheduler)
-
-[![CN doc](https://img.shields.io/badge/文档-中文版-blue.svg)](README_zh_CN.md)
 [![EN doc](https://img.shields.io/badge/document-English-blue.svg)](README.md)
 
-## 设计特点
+## 关于
 
 一个分布式易扩展的可视化 DAG 工作流任务调度系统。致力于解决数据处理流程中错综复杂的依赖关系，使调度系统在数据处理流程中`开箱即用`。
 
-其主要目标如下：
+DolphinScheduler 的主要特性如下：
 
-- 以 DAG 图的方式将 Task 按照任务的依赖关系关联起来，可实时可视化监控任务的运行状态
-- 支持丰富的任务类型：Shell、MR、Spark、SQL(mysql、oceanbase、postgresql、hive、sparksql)、Python、Sub_Process、Procedure 等
-- 支持工作流定时调度、依赖调度、手动调度、手动暂停/停止/恢复，同时支持失败重试/告警、从指定节点恢复失败、Kill 任务等操作
-- 支持工作流优先级、任务优先级及任务的故障转移及任务超时告警/失败
-- 支持工作流全局参数及节点自定义参数设置
-- 支持资源文件的在线上传/下载，管理等，支持在线文件创建、编辑
-- 支持任务日志在线查看及滚动、在线下载日志等
-- 实现集群 HA，通过 Zookeeper 实现 Master 集群和 Worker 集群去中心化
-- 支持对`Master/Worker` cpu load，memory，cpu 在线查看
-- 支持工作流运行历史树形/甘特图展示、支持任务状态统计、流程状态统计
-- 支持补数
-- 支持多租户
-- 支持国际化
-- 还有更多等待伙伴们探索
+- 易于部署，提供四种部署方式，包括Standalone、Cluster、Docker和Kubernetes
+- 易于使用，可以通过四种方式创建和管理工作流，包括Web UI、[Python SDK](https://dolphinscheduler.apache.org/python/main/index.html)、Yaml文件和Open API
+- 高可靠高可用，多主多从的去中心化架构，原生支持横向扩展
+- 高性能，性能比其他编排平台快N倍，每天可支持千万级任务
+- Cloud Native，DolphinScheduler支持编排多云/数据中心工作流，支持自定义任务类型
+- 对工作流和工作流实例（包括任务）进行版本控制
+- 工作流和任务的多种状态控制，支持随时暂停/停止/恢复它们
+- 多租户支持
+- 其他如回填支持（Web UI 原生），包括项目、资源和数据源的权限控制
+
+## 快速开始
+
+- 如果想要体验
+    - [standalone 启动](https://dolphinscheduler.apache.org/zh-cn/docs/3.1.5/guide/installation/standalone)
+    - [Docker 启动](https://dolphinscheduler.apache.org/zh-cn/docs/3.1.5/guide/start/docker)
+- 想 Kubernetes 部署
+    - [Kubernetes 部署](https://dolphinscheduler.apache.org/zh-cn/docs/3.1.5/guide/installation/kubernetes)
 
 ## 系统部分截图
 
-![dag](./images/zh_CN/dag.png)
-![data-source](./images/zh_CN/data-source.png)
-![home](./images/zh_CN/home.png)
-![master](./images/zh_CN/master.png)
-![workflow-tree](./images/zh_CN/workflow-tree.png)
+* **主页**：项目和工作流概览，包括最新的工作流实例和任务实例状态统计。
+![home](images/home.png)
 
-## 近期研发计划
+* **工作流定义**： 通过拖拉拽创建和管理工作流，轻松构建和维护复杂的工作流。
+![workflow-definition](images/workflow-definition.png)
 
-DolphinScheduler 的工作计划：<a href="https://github.com/apache/dolphinscheduler/projects/1" target="_blank">研发计划</a> ，其中 In Develop 卡片下是正在研发的功能，TODO 卡片是待做事项(包括 feature ideas)
+* **工作流树状图**： 抽象的树形结构可以更清晰地理解任务之间的关系
+![workflow-tree](images/workflow-tree.png)
+
+* **数据源**： 支持管理多种外部数据源，为MySQL、PostgreSQL、Hive、Trino等，并提供统一的数据访问能力。
+![data-source](images/data-source.png)
+
+* **监控**：实时查看master、worker和数据库的状态，包括服务器资源使用情况和负载情况，无需登录服务器即可快速进行健康检查。
+![monitor](images/monitor.png)
+
+## 建议和报告 bugs
+
+根据 [这个步骤](https://github.com/apache/dolphinscheduler/issues/new/choose) 来报告你的 bug 或者提交建议。
 
 ## 参与贡献
 
-非常欢迎大家来参与贡献，贡献流程请参考：
-[[参与贡献](docs/docs/zh/contribute/join/contribute.md)]
-
-## 快速试用 Docker
-
-请参考官方文档: [快速试用 Docker 部署](https://dolphinscheduler.apache.org/zh-cn/docs/3.1.2/guide/start/docker)
-
-## 快速试用 Kubernetes
-
-请参考官方文档: [快速试用 Kubernetes 部署](https://dolphinscheduler.apache.org/zh-cn/docs/3.1.2/guide/installation/kubernetes)
-
-## 如何构建
-
-```bash
-./mvnw clean install -Prelease
-```
-
-### 构建不同版本的 Zookeeper 依赖
-
-默认支持 Zookeeper Server 3.8.0。
-```bash
-# 默认 Zookeeper Client 3.8.0
-./mvnw clean install -Prelease
-# 构建支持 Zookeeper 3.4.6+
-./mvnw clean install -Prelease -Dzk-3.4
-```
-
-制品:
-
-```
-dolphinscheduler-dist/target/apache-dolphinscheduler-${latest.release.version}-bin.tar.gz: DolphinScheduler 二进制包
-dolphinscheduler-dist/target/apache-dolphinscheduler-${latest.release.version}-src.tar.gz: DolphinScheduler 源代码包
-```
-
-## 感谢
-
-Dolphin Scheduler 使用了很多优秀的开源项目，比如 google 的 guava、grpc，netty，quartz，以及 apache 的众多开源项目等等，
-正是由于站在这些开源项目的肩膀上，才有 Dolphin Scheduler 的诞生的可能。对此我们对使用的所有开源软件表示非常的感谢！我们也希望自己不仅是开源的受益者，也能成为开源的贡献者,也希望对开源有同样热情和信念的伙伴加入进来，一起为开源献出一份力！
-
-## 获得帮助
-
-1. 提交 [issue](https://github.com/apache/dolphinscheduler/issues/new/choose)
-2. [加入 slack 群](https://s.apache.org/dolphinscheduler-slack) 并在频道 `#troubleshooting` 中提问
+社区欢迎大家贡献，请参考此页面了解更多：[如何贡献](docs/docs/zh/contribute/join/contribute.md)，如果你是首次贡献 DolphinScheduler，在[这里](https://github.com/apache/dolphinscheduler/contribute)可以找到good first issue
 
 ## 社区
 
-1. 通过[该申请链接](https://s.apache.org/dolphinscheduler-slack)加入 slack channel
-2. 关注[Apache Dolphin Scheduler 的 Twitter 账号](https://twitter.com/dolphinschedule)获取实时动态
+欢迎通过以方式加入社区：
 
-## 版权
+- 加入 [DolphinScheduler Slack](https://s.apache.org/dolphinscheduler-slack)
+- 关注 [DolphinScheduler Twitter](https://twitter.com/dolphinschedule) 来获取最新消息
+- 订阅 DolphinScheduler 邮件列表, 用户订阅 users@dolphinscheduler.apache.org 开发者请订阅 dev@dolphinscheduler.apache.org
 
-请参考 [LICENSE](https://github.com/apache/dolphinscheduler/blob/dev/LICENSE) 文件.
+# Landscapes
+
+<p align="center">
+<br/><br/>
+<img src="https://landscape.cncf.io/images/left-logo.svg" width="150"/>&nbsp;&nbsp;<img src="https://landscape.cncf.io/images/right-logo.svg" width="200"/>
+<br/><br/>
+DolphinScheduler enriches the <a href="https://landscape.cncf.io/?landscape=observability-and-analysis&license=apache-license-2-0">CNCF CLOUD NATIVE Landscape.</a >
+
+</p >
