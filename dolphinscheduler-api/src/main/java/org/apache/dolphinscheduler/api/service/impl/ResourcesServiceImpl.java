@@ -24,7 +24,6 @@ import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_SS;
 import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_S_S;
 import static org.apache.dolphinscheduler.common.constants.Constants.JAR;
 import static org.apache.dolphinscheduler.common.constants.Constants.PERIOD;
-import static org.apache.dolphinscheduler.common.enums.ResUploadType.HDFS;
 
 import org.apache.dolphinscheduler.api.dto.resources.DeleteDataTransferResponse;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
@@ -242,7 +241,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         // check resource name exists
         String userResRootPath = ResourceType.UDF.equals(type) ? storageOperate.getUdfDir(tenantCode)
                 : storageOperate.getResDir(tenantCode);
-        String currDirNFileName = getOnlineCreatePath(currentDir, userResRootPath) + name;
+        String currDirNFileName = !currentDir.contains(userResRootPath) ? userResRootPath + name : currentDir + name;
 
         try {
             if (checkResourceExists(currDirNFileName)) {
@@ -562,7 +561,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         String baseDir = isAdmin(loginUser) ? storageOperate.getDir(ResourceType.ALL, tenantCode)
                 : storageOperate.getDir(type, tenantCode);
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)
-                || isMatchBaseDir(fullName, baseDir)) {
+                || (StringUtils.isNotBlank(fullName) && !StringUtils.startsWith(fullName, baseDir))) {
             log.error("current user does not have permission");
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
@@ -1207,8 +1206,13 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         String name = fileName.trim() + "." + nameSuffix;
 
+        String fullName = "";
         String userResRootPath = storageOperate.getResDir(tenantCode);
-        String fullName = getOnlineCreatePath(currentDir, userResRootPath) + name;
+        if (!currentDir.contains(userResRootPath)) {
+            fullName = userResRootPath + name;
+        } else {
+            fullName = currentDir + name;
+        }
 
         result = verifyResourceName(fullName, type, loginUser);
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
@@ -1816,35 +1820,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         return true;
-    }
-
-    private boolean isLocal(String baseDir) {
-        return storageOperate.returnStorageType() == HDFS && baseDir.startsWith("file:///");
-    }
-
-    /**
-     * Check whether the full name is in the correct base directory. Local storage full path with value `file:/path/to/file`
-     * instead of of `file:///path/to/file`
-     */
-    private boolean isMatchBaseDir(String fullName,
-                                   String baseDir) {
-        if (isLocal(baseDir)) {
-            String midBaseDir = baseDir.replace("file:///", "file:/");
-            return (StringUtils.isNotBlank(fullName) && !StringUtils.startsWith(fullName, midBaseDir));
-        }
-        return (StringUtils.isNotBlank(fullName) && !StringUtils.startsWith(fullName, baseDir));
-    }
-
-    /**
-     * Get online create path. Local storage full path with value `file:/path/to/file` instead of `file:///path/to/file`
-     */
-    private String getOnlineCreatePath(String currentDir,
-                                       String userResRootPath) {
-        if (isLocal(userResRootPath)) {
-            String midUserResRootPath = userResRootPath.replace("file:///", "file:/");
-            return currentDir.contains(midUserResRootPath) ? currentDir : userResRootPath;
-        }
-        return currentDir.contains(userResRootPath) ? currentDir : userResRootPath;
     }
 
     private String getTenantCode(User user) {
