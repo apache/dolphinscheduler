@@ -42,7 +42,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
   const router: Router = useRouter()
   const nodeStore = useTaskNodeStore()
-
+   // debugger;
   const dependentResult = nodeStore.getDependentResult
   const TasksStateConfig = tasksState(t)
   const projectList = ref([] as IRenderOption[])
@@ -230,9 +230,10 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
     if (!item || router.currentRoute.value.name !== 'workflow-instance-detail')
       return null
     const key = `${item.definitionCode}-${item.depTaskCode}-${item.cycle}-${item.dateValue}`
-    const state: ITaskState = dependentResult[key]
-    return h(NIcon, { size: 24, color: TasksStateConfig[state].color }, () =>
-      h(TasksStateConfig[state].icon)
+    const state: ITaskState = dependentResult[key];
+    // debugger;
+    return h(NIcon, { size: 24, color: TasksStateConfig[state]?.color }, () =>
+      h(TasksStateConfig[state]?.icon)
     )
   }
 
@@ -419,7 +420,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
               }
             }
           }),
-          (j = 0) => ({
+          (j = 0) => ( {
             type: 'custom',
             field: 'state',
             span: 2,

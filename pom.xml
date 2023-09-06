@@ -638,12 +638,12 @@
                     </dependency>
                 </dependencies>
             </plugin>
-            <plugin>
+<!--            <plugin>
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>
                 <version>${spotless.version}</version>
                 <configuration>
-                    <!-- optional: limit format enforcement to just the files changed by this feature branch -->
+                    &lt;!&ndash; optional: limit format enforcement to just the files changed by this feature branch &ndash;&gt;
                     <ratchetFrom>HEAD</ratchetFrom>
                     <java>
                         <eclipse>
@@ -694,7 +694,7 @@
                         <phase>compile</phase>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin>-->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>cobertura-maven-plugin</artifactId>

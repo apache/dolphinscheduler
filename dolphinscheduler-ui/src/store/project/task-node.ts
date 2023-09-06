@@ -59,6 +59,7 @@ export const useTaskNodeStore = defineStore({
       return this.name
     },
     getDependentResult(): DependentResultType {
+       // debugger;
       return this.dependentResult
     }
   },
@@ -130,11 +131,13 @@ export const useTaskNodeStore = defineStore({
       this.name = name
     },
     updateDependentResult(dependentResult: BDependentResultType) {
+       // debugger;
       const result = {} as DependentResultType
       for (const [key, value] of Object.entries(dependentResult)) {
         result[key] = value === 'FAILED' ? 'FAILURE' : value
       }
-      this.dependentResult = result
+       // debugger;
+      this.dependentResult = result;
     },
     init() {
       this.preTaskOptions = []

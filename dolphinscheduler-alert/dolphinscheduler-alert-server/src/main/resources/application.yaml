@@ -22,8 +22,8 @@ spring:
   banner:
     charset: UTF-8
   datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://127.0.0.1:5432/dolphinscheduler
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.11.129:3306/dolphinscheduler
     username: root
     password: root
     hikari:
@@ -77,6 +77,6 @@ spring:
       on-profile: mysql
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler
+    url: jdbc:mysql://192.168.11.129:3306/dolphinscheduler
     username: root
     password: root

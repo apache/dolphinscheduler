@@ -356,6 +356,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             return result;
         }
         List<TaskInstance> taskInstanceList = processService.findValidTaskListByProcessId(processId);
+        // wanggang
         addDependResultForTaskList(taskInstanceList);
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put(PROCESS_INSTANCE_STATE, processInstance.getState().toString());
@@ -368,8 +369,10 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
 
     /**
      * add dependent result for dependent task
+     * wangang 代码调整
      */
     private void addDependResultForTaskList(List<TaskInstance> taskInstanceList) throws IOException {
+       // Map<String, DependResult> allResultMap = new HashMap<>();
         for (TaskInstance taskInstance : taskInstanceList) {
             if (TASK_TYPE_DEPENDENT.equalsIgnoreCase(taskInstance.getTaskType())) {
                 Result<ResponseTaskLog> logResult = loggerService.queryLog(
@@ -377,6 +380,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
                 if (logResult.getCode() == Status.SUCCESS.ordinal()) {
                     String log = logResult.getData().getMessage();
                     Map<String, DependResult> resultMap = parseLogForDependentResult(log);
+//                    allResultMap.putAll(resultMap);
                     taskInstance.setDependentResult(JSONUtils.toJsonString(resultMap));
                 }
             }

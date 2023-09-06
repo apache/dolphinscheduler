@@ -105,6 +105,7 @@ export function renderCustomParameters(
   rules: { [key: string]: FormItemRule | FormItemRule[] }[]
 ) {
   const mergedItem = isFunction(item) ? item() : item
+     // debugger;
   const { field, children = [] } = mergedItem
   const { defaultValue, ruleItem } = getDefaultValue(children)
   rules.push(ruleItem)
