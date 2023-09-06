@@ -35,6 +35,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
@@ -501,16 +502,17 @@ public class DataSourceServiceTest {
         ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(postgreSqlDatasourceParam);
 
         try (
-                MockedStatic<DataSourceClientProvider> mockedStaticDataSourceClientProvider =
-                        Mockito.mockStatic(DataSourceClientProvider.class)) {
-            DataSourceClientProvider clientProvider = Mockito.mock(DataSourceClientProvider.class);
+                MockedStatic<DataSourceUtils> mockedStaticDataSourceClientProvider =
+                        Mockito.mockStatic(DataSourceUtils.class)) {
+            DataSourceProcessor dataSourceProcessor = Mockito.mock(DataSourceProcessor.class);
+
+            Mockito.when(DataSourceUtils.getDatasourceProcessor(Mockito.any())).thenReturn(dataSourceProcessor);
+            Mockito.when(dataSourceProcessor.checkDataSourceConnectivity(Mockito.any())).thenReturn(false);
 
             Result result = dataSourceService.checkConnection(dataSourceType, connectionParam);
             Assertions.assertEquals(Status.CONNECTION_TEST_FAILURE.getCode(), result.getCode().intValue());
 
-            Connection connection = Mockito.mock(Connection.class);
-            Mockito.when(DataSourceClientProvider.getAdHocConnection(Mockito.any(), Mockito.any()))
-                    .thenReturn(connection);
+            Mockito.when(dataSourceProcessor.checkDataSourceConnectivity(Mockito.any())).thenReturn(true);
             result = dataSourceService.checkConnection(dataSourceType, connectionParam);
             Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         }
