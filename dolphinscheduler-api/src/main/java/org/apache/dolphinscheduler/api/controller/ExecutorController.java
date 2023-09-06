@@ -80,7 +80,7 @@ import io.swagger.annotations.ApiParam;
 @RequestMapping("projects/{projectCode}/executors")
 public class ExecutorController extends BaseController {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProcessInstanceController.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExecutorController.class);
 
     @Autowired
     private ExecutorService execService;
