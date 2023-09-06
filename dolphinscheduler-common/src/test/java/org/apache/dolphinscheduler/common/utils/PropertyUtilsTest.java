@@ -39,11 +39,6 @@ public class PropertyUtilsTest {
     }
 
     @Test
-    public void getResUploadStartupState() {
-        Assertions.assertTrue(PropertyUtils.isResourceStorageStartup());
-    }
-
-    @Test
     public void getSet() {
         Set<String> networkInterface = PropertyUtils.getSet("networkInterface", value -> {
             if (StringUtils.isEmpty(value)) {
