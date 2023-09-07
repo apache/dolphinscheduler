@@ -19,7 +19,7 @@ can be viewed in the README of plugin under Module dolphinscheduler-registry-plu
 
 ### dolphinscheduler-registry-all
 
-This module is used for exporting the implemention of registry.
+This module is used for exporting the implementation of registry.
 If you want to add new registry,you should add the dependency in the pom.xml
 
 ### dolphinscheduler-registry-api
