@@ -21,13 +21,11 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
-import org.apache.dolphinscheduler.plugin.datasource.ssh.SSHUtils;
+import org.apache.dolphinscheduler.plugin.datasource.ssh.SshClientWrapper;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.sshd.client.SshClient;
-import org.apache.sshd.client.session.ClientSession;
 
 import java.sql.Connection;
 import java.text.MessageFormat;
@@ -114,15 +112,21 @@ public class SSHDataSourceProcessor implements DataSourceProcessor {
     }
 
     @Override
-    public boolean testConnection(ConnectionParam connectionParam) {
+    public boolean checkDataSourceConnectivity(ConnectionParam connectionParam) {
         SSHConnectionParam baseConnectionParam = (SSHConnectionParam) connectionParam;
-        SshClient client = SshClient.setUpDefaultClient();
-        client.start();
-        try {
-            ClientSession session = SSHUtils.getSession(client, baseConnectionParam);
-            return session.auth().verify().isSuccess();
+        try (
+                SshClientWrapper sshClientWrapper = new SshClientWrapper(
+                        baseConnectionParam.getHost(),
+                        baseConnectionParam.getPort(),
+                        baseConnectionParam.getUser(),
+                        baseConnectionParam.getPassword(),
+                        baseConnectionParam.getPublicKey())) {
+
+            return sshClientWrapper.isAuth();
         } catch (Exception e) {
+            log.error("ssh test connection failed", e);
             return false;
+
         }
     }
 
