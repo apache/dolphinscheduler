@@ -168,9 +168,9 @@ export function useTaskEdit(options: Options) {
       processDefinition.value.taskDefinitionList.map((task) => {
         if (task.code === currTask.value?.code) {
           setNodeName(task.code + '', taskDef.name)
-          let fillColor = '#f3f3f5'
-          if (task.flag === 'NO') {
-            fillColor = '#ffffff'
+          let fillColor = '#ffffff'
+          if (task.flag === 'YES') {
+            fillColor = '#f3f3f5'
           }
           setNodeFillColor(task.code + '', fillColor)
 
