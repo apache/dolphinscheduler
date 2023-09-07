@@ -116,7 +116,7 @@ public class TaskResultEventHandler implements TaskEventHandler {
 
     public void sendAckToWorker(TaskEvent taskEvent) {
         ITaskInstanceExecutionEventAckListener instanceExecutionEventAckListener =
-                SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+                SingletonJdkDynamicRpcClientProxyFactory
                         .getProxyClient(taskEvent.getWorkerAddress(), ITaskInstanceExecutionEventAckListener.class);
         instanceExecutionEventAckListener.handleTaskInstanceExecutionFinishEventAck(
                 TaskInstanceExecutionFinishEventAck.success(taskEvent.getTaskInstanceId()));

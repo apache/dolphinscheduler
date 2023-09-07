@@ -15,29 +15,15 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.aspect;
+package org.apache.dolphinscheduler.microbench.rpc;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.apache.dolphinscheduler.extract.base.RpcMethod;
+import org.apache.dolphinscheduler.extract.base.RpcService;
 
-/**
- * @author Hua Jiang
- */
+@RpcService
+public interface IService {
 
-public class AccessLogAspectTest {
-
-    private AccessLogAspect accessLogAspect = new AccessLogAspect();
-
-    @Test
-    public void testHandleSensitiveData() {
-        String data =
-                "userPassword='7ad2410b2f4c074479a8937a28a22b8f', email='xxx@qq.com', database='null', userName='root', password='root', other='null'";
-        String expected =
-                "userPassword='********************************', email='xxx@qq.com', database='null', userName='root', password='****', other='null'";
-
-        String actual = accessLogAspect.handleSensitiveData(data);
-
-        Assertions.assertEquals(expected, actual);
-    }
+    @RpcMethod
+    String ping(String pingRequest);
 
 }

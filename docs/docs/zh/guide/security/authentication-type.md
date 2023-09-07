@@ -30,6 +30,9 @@ security:
         # jks file absolute path && password
         trust-store: "/ldapkeystore.jks"
         trust-store-password: "password"
+    casdoor:
+      user:
+        admin: ""
     oauth2:
       enable: false
       provider:
@@ -53,6 +56,19 @@ security:
           callbackUrl: ""
           iconUri: ""
           provider: google
+casdoor:
+   # Your Casdoor server url
+   endpoint: ""
+   client-id: ""
+   client-secret: ""
+   # The certificate may be multi-line, you can use `|-` for ease
+   certificate: ""
+   # Your organization name added in Casdoor
+   organization-name: ""
+   # Your application name added in Casdoor
+   application-name: ""
+   # Doplhinscheduler login url
+   redirect-url: ""
 ```
 
 具体字段解释详见：[Api-server相关配置](../../architecture/configuration.md)
