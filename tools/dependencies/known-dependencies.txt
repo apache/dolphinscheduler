@@ -281,7 +281,7 @@ simpleclient_tracer_common-0.15.0.jar
 simpleclient_tracer_otel-0.15.0.jar
 simpleclient_tracer_otel_agent-0.15.0.jar
 slf4j-api-1.7.36.jar
-snakeyaml-1.33.jar
+snakeyaml-2.2.jar
 snappy-java-1.1.10.1.jar
 spring-aop-5.3.22.jar
 spring-beans-5.3.22.jar

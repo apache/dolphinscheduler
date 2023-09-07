@@ -360,7 +360,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     poi-ooxml-schemas-4.1.2: https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml-schemas/4.1.2, Apache 2.0
     quartz 2.3.2: https://mvnrepository.com/artifact/org.quartz-scheduler/quartz/2.3.2, Apache 2.0
     reload4j 1.2.18.3: https://mvnrepository.com/artifact/ch.qos.reload4j/reload4j/1.2.18.3, Apache 2.0
-    snakeyaml 1.33: https://mvnrepository.com/artifact/org.yaml/snakeyaml/1.33, Apache 2.0
+    snakeyaml 2.2: https://mvnrepository.com/artifact/org.yaml/snakeyaml/2.2, Apache 2.0
     snappy-java 1.1.8.4: https://github.com/xerial/snappy-java, Apache 2.0
     SparseBitSet 1.2: https://mvnrepository.com/artifact/com.zaxxer/SparseBitSet/1.2, Apache 2.0
     spring-aop 5.3.13: https://mvnrepository.com/artifact/org.springframework/spring-aop/5.3.13, Apache 2.0

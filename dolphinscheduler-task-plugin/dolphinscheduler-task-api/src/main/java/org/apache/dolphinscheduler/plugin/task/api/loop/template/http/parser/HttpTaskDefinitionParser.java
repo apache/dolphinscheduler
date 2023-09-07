@@ -31,8 +31,10 @@ import java.io.IOException;
 
 import lombok.NonNull;
 
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.inspector.TagInspector;
 
 import com.google.common.base.Preconditions;
 
@@ -60,7 +62,11 @@ public class HttpTaskDefinitionParser implements TaskDefinitionParser<HttpLoopTa
     }
 
     protected @NonNull LoopTaskYamlDefinition parseYamlConfigFile(@NonNull String yamlConfigFile) throws IOException {
-        Yaml yaml = new Yaml(new Constructor(LoopTaskYamlDefinition.class));
+        LoaderOptions loaderoptions = new LoaderOptions();
+        TagInspector taginspector =
+                tag -> tag.getClassName().equals(LoopTaskYamlDefinition.class.getName());
+        loaderoptions.setTagInspector(taginspector);
+        Yaml yaml = new Yaml(new Constructor(LoopTaskYamlDefinition.class, loaderoptions));
         try (FileReader fileReader = new FileReader(yamlConfigFile)) {
             return yaml.load(fileReader);
         }

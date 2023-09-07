@@ -96,7 +96,7 @@
         <snappy.version>1.1.10.1</snappy.version>
         <spark.version>3.2.2</spark.version>
         <janino.version>3.0.16</janino.version>
-        <snakeyaml.version>1.33</snakeyaml.version>
+        <snakeyaml.version>2.2</snakeyaml.version>
         <htrace.version>4.1.1</htrace.version>
         <datasync.version>2.17.282</datasync.version>
         <springdoc-openapi-ui.version>1.6.9</springdoc-openapi-ui.version>
