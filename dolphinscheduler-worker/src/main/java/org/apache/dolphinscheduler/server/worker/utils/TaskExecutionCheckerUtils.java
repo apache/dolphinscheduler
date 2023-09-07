@@ -18,10 +18,8 @@
 package org.apache.dolphinscheduler.server.worker.utils;
 
 import org.apache.dolphinscheduler.common.constants.TenantConstants;
-import org.apache.dolphinscheduler.common.exception.StorageOperateNoConfiguredException;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -125,9 +123,6 @@ public class TaskExecutionCheckerUtils {
                 log.warn("Resource file : {} already exists will not download again ", resFile.getName());
             }
         });
-        if (!downloadFiles.isEmpty() && !PropertyUtils.isResourceStorageStartup()) {
-            throw new StorageOperateNoConfiguredException("Storage service config does not exist!");
-        }
 
         if (CollectionUtils.isNotEmpty(downloadFiles)) {
             for (Pair<String, String> fileDownload : downloadFiles) {

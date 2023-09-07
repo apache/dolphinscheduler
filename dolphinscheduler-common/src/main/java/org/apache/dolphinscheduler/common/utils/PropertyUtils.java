@@ -18,11 +18,9 @@
 package org.apache.dolphinscheduler.common.utils;
 
 import static org.apache.dolphinscheduler.common.constants.Constants.COMMON_PROPERTIES_PATH;
-import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_STORAGE_TYPE;
 
 import org.apache.dolphinscheduler.common.config.IPropertyDelegate;
 import org.apache.dolphinscheduler.common.config.ImmutablePriorityPropertyDelegate;
-import org.apache.dolphinscheduler.common.enums.ResUploadType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -54,12 +52,6 @@ public class PropertyUtils {
     public static String getUpperCaseString(String key) {
         String val = getString(key);
         return Strings.isNullOrEmpty(val) ? val : val.toUpperCase();
-    }
-
-    public static boolean isResourceStorageStartup() {
-        String resourceStorageType = getString(RESOURCE_STORAGE_TYPE, ResUploadType.NONE.name());
-        ResUploadType resUploadType = ResUploadType.valueOf(resourceStorageType.toUpperCase());
-        return resUploadType != ResUploadType.NONE;
     }
 
     public static Integer getInt(String key) {

@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UdfType;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
@@ -102,13 +101,6 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         if (checkDescriptionLength(desc)) {
             log.warn("Parameter description is too long.");
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
-            return result;
-        }
-        // if resource upload startup
-        if (!PropertyUtils.isResourceStorageStartup()) {
-            log.error("Storage does not start up, resource upload startup state: {}.",
-                    PropertyUtils.isResourceStorageStartup());
-            putMsg(result, Status.HDFS_NOT_STARTUP);
             return result;
         }
 
@@ -239,14 +231,6 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
             log.error("UDF function does not exist, udfFuncId:{}.", udfFuncId);
             result.setCode(Status.UDF_FUNCTION_NOT_EXIST.getCode());
             result.setMsg(Status.UDF_FUNCTION_NOT_EXIST.getMsg());
-            return result;
-        }
-
-        // if resource upload startup
-        if (!PropertyUtils.isResourceStorageStartup()) {
-            log.error("Storage does not start up, resource upload startup state: {}.",
-                    PropertyUtils.isResourceStorageStartup());
-            putMsg(result, Status.HDFS_NOT_STARTUP);
             return result;
         }
 

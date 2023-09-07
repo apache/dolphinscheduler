@@ -28,7 +28,9 @@ public class HdfsStorageOperatorFactory implements StorageOperateFactory {
 
     @Override
     public StorageOperate createStorageOperate() {
-        return HdfsStorageOperator.getInstance();
+        HdfsStorageOperator hdfsOperator = new HdfsStorageOperator();
+        hdfsOperator.init();
+        return hdfsOperator;
     }
 
     @Override

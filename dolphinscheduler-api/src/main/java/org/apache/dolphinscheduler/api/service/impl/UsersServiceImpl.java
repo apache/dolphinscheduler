@@ -32,7 +32,6 @@ import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.DatasourceUser;
 import org.apache.dolphinscheduler.dao.entity.K8sNamespaceUser;
@@ -184,10 +183,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         User user = createUser(userName, userPassword, email, tenantId, phone, queue, state);
 
         Tenant tenant = tenantMapper.queryById(tenantId);
-        // resource upload startup
-        if (PropertyUtils.isResourceStorageStartup()) {
-            storageOperate.createTenantDirIfNotExists(tenant.getTenantCode());
-        }
+        storageOperate.createTenantDirIfNotExists(tenant.getTenantCode());
 
         log.info("User is created and id is {}.", user.getId());
         result.put(Constants.DATA_LIST, user);

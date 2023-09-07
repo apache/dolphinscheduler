@@ -61,33 +61,18 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 
 @Slf4j
 public class HdfsStorageOperator implements Closeable, StorageOperate {
 
     private static HdfsStorageProperties hdfsProperties = new HdfsStorageProperties();
     private static final String HADOOP_UTILS_KEY = "HADOOP_UTILS_KEY";
-
-    private static final LoadingCache<String, HdfsStorageOperator> cache = CacheBuilder
-            .newBuilder()
-            .expireAfterWrite(HdfsStorageProperties.getKerberosExpireTime(), TimeUnit.HOURS)
-            .build(new CacheLoader<String, HdfsStorageOperator>() {
-
-                @Override
-                public HdfsStorageOperator load(String key) {
-                    return new HdfsStorageOperator(hdfsProperties);
-                }
-            });
 
     private volatile boolean yarnEnabled = false;
 
@@ -103,10 +88,6 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
         hdfsProperties = hdfsStorageProperties;
         init();
         initHdfsPath();
-    }
-
-    public static HdfsStorageOperator getInstance() {
-        return cache.getUnchecked(HADOOP_UTILS_KEY);
     }
 
     /**
@@ -127,7 +108,7 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
     /**
      * init hadoop configuration
      */
-    private void init() throws NullPointerException {
+    public void init() throws NullPointerException {
         try {
             configuration = new HdfsConfiguration();
 
@@ -267,8 +248,8 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
 
     @Override
     public void createTenantDirIfNotExists(String tenantCode) throws IOException {
-        getInstance().mkdir(tenantCode, getHdfsResDir(tenantCode));
-        getInstance().mkdir(tenantCode, getHdfsUdfDir(tenantCode));
+        mkdir(tenantCode, getHdfsResDir(tenantCode));
+        mkdir(tenantCode, getHdfsUdfDir(tenantCode));
     }
 
     @Override

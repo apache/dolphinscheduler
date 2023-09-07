@@ -80,8 +80,8 @@ data.basedir.path=/tmp/dolphinscheduler
 # resource view suffixs
 #resource.view.suffixs=txt,log,sh,bat,conf,cfg,py,java,sql,xml,hql,properties,json,yml,yaml,ini,js
 
-# resource storage type: LOCAL, HDFS, S3, OSS, GCS, ABS, OBS, NONE
-resource.storage.type=NONE
+# resource storage type: LOCAL, HDFS, S3, OSS, GCS, ABS, OBS
+resource.storage.type=LOCAL
 # resource store on HDFS/S3/OSS path, resource file will store to this base path, self configuration, please make sure the directory exists on hdfs and have read write permissions. "/dolphinscheduler" is recommended
 resource.storage.upload.base.path=/tmp/dolphinscheduler
 

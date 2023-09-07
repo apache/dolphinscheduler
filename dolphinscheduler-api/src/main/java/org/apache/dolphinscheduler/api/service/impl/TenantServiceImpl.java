@@ -31,7 +31,6 @@ import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
@@ -160,10 +159,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         createTenantValid(tenant);
         tenantMapper.insert(tenant);
 
-        // if storage startup
-        if (PropertyUtils.isResourceStorageStartup()) {
-            storageOperate.createTenantDirIfNotExists(tenantCode);
-        }
+        storageOperate.createTenantDirIfNotExists(tenantCode);
         permissionPostHandle(AuthorizationType.TENANT, loginUser.getId(), Collections.singletonList(tenant.getId()),
                 log);
         result.put(Constants.DATA_LIST, tenant);
@@ -233,8 +229,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
 
         // updateProcessInstance tenant
         // if the tenant code is modified, the original resource needs to be copied to the new tenant.
-        if (!Objects.equals(existsTenant.getTenantCode(), updateTenant.getTenantCode())
-                && PropertyUtils.isResourceStorageStartup()) {
+        if (!Objects.equals(existsTenant.getTenantCode(), updateTenant.getTenantCode())) {
             storageOperate.createTenantDirIfNotExists(tenantCode);
         }
         int update = tenantMapper.updateById(updateTenant);
@@ -292,10 +287,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             throw new ServiceException(Status.DELETE_TENANT_BY_ID_FAIL_USERS, userList.size());
         }
 
-        // if resource upload startup
-        if (PropertyUtils.isResourceStorageStartup()) {
-            storageOperate.deleteTenant(tenant.getTenantCode());
-        }
+        storageOperate.deleteTenant(tenant.getTenantCode());
 
         int delete = tenantMapper.deleteById(id);
         if (delete > 0) {
