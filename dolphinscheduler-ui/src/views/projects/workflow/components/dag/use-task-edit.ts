@@ -170,7 +170,7 @@ export function useTaskEdit(options: Options) {
           setNodeName(task.code + '', taskDef.name)
           let fillColor = '#ffffff'
           if (task.flag === 'YES') {
-            fillColor = '#f3f3f5'
+            fillColor = 'var(--custom-disable-bg)'
           }
           setNodeFillColor(task.code + '', fillColor)
 

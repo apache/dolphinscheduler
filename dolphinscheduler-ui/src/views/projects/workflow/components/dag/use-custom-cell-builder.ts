@@ -103,7 +103,7 @@ export function useCustomCellBuilder() {
           text: truncation
         },
         rect: {
-          fill: flag === 'NO' ? '#f3f3f5' : '#ffffff'
+          fill: flag === 'NO' ? 'var(--custom-disable-bg)' : '#ffffff'
         }
       }
     }
