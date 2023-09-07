@@ -219,7 +219,8 @@ public class CuringParamsServiceImpl implements CuringParamsService {
                 if (timeFunctionNeedExpand(val)) {
                     val = timeFunctionExtension(taskInstance.getProcessInstanceId(), timeZone, val);
                 } else {
-                    // handle some chain parameter assign, such as `{"var1": "${var2}", "var2": 1}` should be convert to `{"var1": 1, "var2": 1}`
+                    // handle some chain parameter assign, such as `{"var1": "${var2}", "var2": 1}` should be convert to
+                    // `{"var1": 1, "var2": 1}`
                     val = convertParameterPlaceholders(val, prepareParamsMap);
                 }
                 property.setValue(val);
