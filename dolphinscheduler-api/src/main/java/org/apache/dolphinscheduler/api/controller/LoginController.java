@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.OkHttpUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -244,7 +245,7 @@ public class LoginController extends BaseController {
             String username = JSONUtils.getNodeString(userInfoJsonStr, "login");
             User user = usersService.getUserByUserName(username);
             if (user == null) {
-                user = usersService.createUser(username, null, null, 0, null, null, 1);
+                user = usersService.createUser(UserType.GENERAL_USER, username, null);
             }
             String sessionId = sessionService.createSession(user, null);
             if (sessionId == null) {
