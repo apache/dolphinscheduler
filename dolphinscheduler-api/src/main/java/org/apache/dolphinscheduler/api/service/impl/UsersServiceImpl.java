@@ -224,7 +224,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     }
 
     /***
-     * create User for ldap and sso login
+     * create User for ldap、Casdoor SSO and OAuth2.0 login
      */
     @Override
     @Transactional
@@ -238,6 +238,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         user.setUserType(userType);
         user.setCreateTime(now);
         user.setUpdateTime(now);
+        user.setTenantId(-1);
         user.setQueue("");
         user.setState(Flag.YES.getCode());
 
