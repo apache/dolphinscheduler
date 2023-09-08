@@ -100,7 +100,7 @@ body:
       options:
         - dev
         - 3.1.x
-        - 3.2.0-prepare
+        - 3.2.x
     validations:
       required: true
 
