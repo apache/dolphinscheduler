@@ -18,21 +18,28 @@
 package org.apache.dolphinscheduler.plugin.alert.webhook;
 
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
-import org.apache.dolphinscheduler.alert.api.AlertData;
-import org.apache.dolphinscheduler.alert.api.AlertInfo;
-import org.apache.dolphinscheduler.alert.api.AlertResult;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 
-import java.util.Map;
+import java.util.List;
 
-public class WebHookAlertChannel implements AlertChannel {
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-    @Override
-    public AlertResult process(AlertInfo alertInfo) {
-        AlertData alertData = alertInfo.getAlertData();
-        Map<String, String> paramsMap = alertInfo.getAlertParams();
-        if (null == paramsMap) {
-            return new AlertResult("false", "webhook params is null");
-        }
-        return new WebHookSender(paramsMap).send(alertData.getTitle(), alertData.getContent());
+public class WeChatWeChatWebHookAlertChannelFactoryTest {
+
+    @Test
+    public void testGetParams() {
+        WeChatWebHookAlertChannelFactory weChatWebHookAlertChannelFactory = new WeChatWebHookAlertChannelFactory();
+        List<PluginParams> params = weChatWebHookAlertChannelFactory.params();
+        JSONUtils.toJsonString(params);
+        Assertions.assertEquals(2, params.size());
+    }
+
+    @Test
+    public void testCreate() {
+        WeChatWebHookAlertChannelFactory weChatWebHookAlertChannelFactory = new WeChatWebHookAlertChannelFactory();
+        AlertChannel alertChannel = weChatWebHookAlertChannelFactory.create();
+        Assertions.assertNotNull(alertChannel);
     }
 }

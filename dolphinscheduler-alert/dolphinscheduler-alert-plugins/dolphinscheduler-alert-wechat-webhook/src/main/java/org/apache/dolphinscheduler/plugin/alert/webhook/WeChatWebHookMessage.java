@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.alert.api.ShowType;
 
 import java.util.Map;
 
-public class WebHookMessage {
+public class WeChatWebHookMessage {
 
     private String msgtype;
     private Map<String, String> text;
@@ -51,7 +51,7 @@ public class WebHookMessage {
         this.markdown = markdown;
     }
 
-    public WebHookMessage(String msgtype, Map<String, String> contentMap) {
+    public WeChatWebHookMessage(String msgtype, Map<String, String> contentMap) {
         this.msgtype = msgtype;
         if (msgtype.equals(ShowType.MARKDOWN.getDescp())) {
             this.markdown = contentMap;

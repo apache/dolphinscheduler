@@ -33,7 +33,7 @@ import java.util.List;
 import com.google.auto.service.AutoService;
 
 @AutoService(AlertChannelFactory.class)
-public final class WebHookAlertChannelFactory implements AlertChannelFactory {
+public final class WeChatWebHookAlertChannelFactory implements AlertChannelFactory {
 
     @Override
     public String name() {
@@ -43,7 +43,7 @@ public final class WebHookAlertChannelFactory implements AlertChannelFactory {
     @Override
     public List<PluginParams> params() {
         InputParam url =
-                InputParam.newBuilder(WebHookAlertConstants.NAME_WEBHOOK_URL, WebHookAlertConstants.WEBHOOK_URL)
+                InputParam.newBuilder(WeChatWebHookAlertConstants.NAME_WEBHOOK_URL, WeChatWebHookAlertConstants.WEBHOOK_URL)
                         .setPlaceholder("input request webhook URL")
                         .addValidate(Validate.newBuilder()
                                 .setRequired(true)
@@ -62,6 +62,6 @@ public final class WebHookAlertChannelFactory implements AlertChannelFactory {
 
     @Override
     public AlertChannel create() {
-        return new WebHookAlertChannel();
+        return new WeChatWebHookAlertChannel();
     }
 }

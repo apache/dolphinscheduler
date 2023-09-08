@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.alert.webhook;
 
-public final class WebHookAlertConstants {
+public final class WeChatWebHookAlertConstants {
 
     public static final String NAME_WEBHOOK_URL = "webhook";
 
@@ -27,7 +27,7 @@ public final class WebHookAlertConstants {
 
     static final String CONTENT_KEY = "content";
 
-    private WebHookAlertConstants() {
+    private WeChatWebHookAlertConstants() {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }
 }

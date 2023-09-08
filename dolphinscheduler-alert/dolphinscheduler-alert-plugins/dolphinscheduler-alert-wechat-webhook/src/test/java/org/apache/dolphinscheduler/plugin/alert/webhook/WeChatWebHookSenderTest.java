@@ -26,16 +26,16 @@ import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class WebHookSenderTest {
+public class WeChatWebHookSenderTest {
 
     @Test
     public void sendTest() {
         Map<String, String> paramsMap = new HashMap<>();
-        paramsMap.put(WebHookAlertConstants.WEBHOOK_URL, "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxxx");
-        paramsMap.put(WebHookAlertConstants.CONTENT_KEY, "test webhook msg send");
+        paramsMap.put(WeChatWebHookAlertConstants.WEBHOOK_URL, "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxxx");
+        paramsMap.put(WeChatWebHookAlertConstants.CONTENT_KEY, "test webhook msg send");
         paramsMap.put(AlertConstants.NAME_SHOW_TYPE, "text");
-        WebHookSender webHookSender = new WebHookSender(paramsMap);
-        AlertResult alertResult = webHookSender.send("title", "content");
+        WeChatWebHookSender weChatWebHookSender = new WeChatWebHookSender(paramsMap);
+        AlertResult alertResult = weChatWebHookSender.send("title", "content");
         Assertions.assertEquals("true", alertResult.getStatus());
     }
 }

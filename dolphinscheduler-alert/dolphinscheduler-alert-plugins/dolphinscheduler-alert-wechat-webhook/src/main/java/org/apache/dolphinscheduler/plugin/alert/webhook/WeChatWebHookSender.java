@@ -38,9 +38,9 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class WebHookSender {
+public final class WeChatWebHookSender {
 
-    private static final Logger logger = LoggerFactory.getLogger(WebHookSender.class);
+    private static final Logger logger = LoggerFactory.getLogger(WeChatWebHookSender.class);
 
     private static final String ALERT_STATUS = "false";
 
@@ -48,8 +48,8 @@ public final class WebHookSender {
 
     private final String webHookURL;
 
-    public WebHookSender(Map<String, String> paramsMap) {
-        webHookURL = paramsMap.get(WebHookAlertConstants.NAME_WEBHOOK_URL);
+    public WeChatWebHookSender(Map<String, String> paramsMap) {
+        webHookURL = paramsMap.get(WeChatWebHookAlertConstants.NAME_WEBHOOK_URL);
         showType = paramsMap.get(AlertConstants.NAME_SHOW_TYPE);
     }
 
@@ -69,9 +69,9 @@ public final class WebHookSender {
         }
 
         Map<String, String> contentMap = new HashMap<>();
-        contentMap.put(WebHookAlertConstants.CONTENT_KEY, data);
-        WebHookMessage webHookMessage = new WebHookMessage(showType, contentMap);
-        String msgJson = JSONUtils.toJsonString(webHookMessage);
+        contentMap.put(WeChatWebHookAlertConstants.CONTENT_KEY, data);
+        WeChatWebHookMessage weChatWebHookMessage = new WeChatWebHookMessage(showType, contentMap);
+        String msgJson = JSONUtils.toJsonString(weChatWebHookMessage);
         try {
             return checkSendResult(post(webHookURL, msgJson));
         } catch (Exception e) {
@@ -86,12 +86,12 @@ public final class WebHookSender {
     private static String post(String url, String data) throws IOException {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpPost httpPost = new HttpPost(url);
-            httpPost.setEntity(new StringEntity(data, WebHookAlertConstants.CHARSET));
+            httpPost.setEntity(new StringEntity(data, WeChatWebHookAlertConstants.CHARSET));
             CloseableHttpResponse response = httpClient.execute(httpPost);
             String resp;
             try {
                 HttpEntity entity = response.getEntity();
-                resp = EntityUtils.toString(entity, WebHookAlertConstants.CHARSET);
+                resp = EntityUtils.toString(entity, WeChatWebHookAlertConstants.CHARSET);
                 EntityUtils.consume(entity);
             } finally {
                 response.close();

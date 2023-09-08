@@ -24,7 +24,7 @@
         <artifactId>dolphinscheduler-alert-plugins</artifactId>
         <version>dev-SNAPSHOT</version>
     </parent>
-    <artifactId>dolphinscheduler-alert-webhook</artifactId>
+    <artifactId>dolphinscheduler-alert-wechat-webhook</artifactId>
     <packaging>jar</packaging>
     <dependencies>
         <dependency>
