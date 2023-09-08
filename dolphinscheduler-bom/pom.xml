@@ -29,7 +29,7 @@
 
     <properties>
         <netty.version>4.1.53.Final</netty.version>
-        <spring-boot.version>2.7.3</spring-boot.version>
+        <spring-boot.version>2.7.11</spring-boot.version>
         <spring-ldap.version>2.4.1</spring-ldap.version>
         <java-websocket.version>1.5.1</java-websocket.version>
         <mybatis-plus.version>3.5.2</mybatis-plus.version>
@@ -49,7 +49,7 @@
         <commons-collections4.version>4.3</commons-collections4.version>
         <httpclient.version>4.5.13</httpclient.version>
         <httpcore.version>4.4.15</httpcore.version>
-        <jackson.version>2.13.4</jackson.version>
+        <jackson.version>2.15.0</jackson.version>
         <protostuff.version>1.7.2</protostuff.version>
         <byte-buddy.version>1.9.16</byte-buddy.version>
         <logback.version>1.2.11</logback.version>
