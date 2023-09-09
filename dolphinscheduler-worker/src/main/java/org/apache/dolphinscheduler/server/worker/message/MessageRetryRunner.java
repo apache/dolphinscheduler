@@ -96,7 +96,7 @@ public class MessageRetryRunner extends BaseDaemonThread {
         List<TaskInstanceMessage> taskInstanceMessages = this.needToRetryMessages.get(taskInstanceId);
         if (taskInstanceMessages != null) {
             taskInstanceMessages.forEach(taskInstanceMessage -> {
-                taskInstanceMessage.getEvent().setHost(messageReceiverHost);
+                taskInstanceMessage.getEvent().setWorkflowInstanceHost(messageReceiverHost);
             });
         }
     }
