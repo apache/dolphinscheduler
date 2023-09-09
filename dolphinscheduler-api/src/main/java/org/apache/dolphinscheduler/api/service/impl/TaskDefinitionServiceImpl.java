@@ -789,7 +789,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                 .queryProcessTaskRelationByTaskCode(taskDefinitionToUpdate.getCode());
         if (CollectionUtils.isNotEmpty(processTaskRelations)) {
             ProcessTaskRelation taskRelation = processTaskRelations.get(0);
-            int processDefinitionVersion = processDefinitionLogMapper.queryMaxVersionForDefinition(taskRelation.getProcessDefinitionCode())  + 1;
+            int processDefinitionVersion =
+                    processDefinitionLogMapper.queryMaxVersionForDefinition(taskRelation.getProcessDefinitionCode())
+                            + 1;
             long processDefinitionCode = taskRelation.getProcessDefinitionCode();
             for (ProcessTaskRelation processTaskRelation : processTaskRelations) {
                 if (taskCode == processTaskRelation.getPreTaskCode()) {
