@@ -290,7 +290,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
             return result;
         }
         IStreamingTaskInstanceOperator streamingTaskInstanceOperator =
-                SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+                SingletonJdkDynamicRpcClientProxyFactory
                         .getProxyClient(taskInstance.getHost(), IStreamingTaskInstanceOperator.class);
         TaskInstanceTriggerSavepointResponse taskInstanceTriggerSavepointResponse =
                 streamingTaskInstanceOperator.triggerSavepoint(new TaskInstanceTriggerSavepointRequest(taskInstanceId));
@@ -322,7 +322,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         }
 
         // todo: we only support streaming task for now
-        ITaskInstanceOperator iTaskInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+        ITaskInstanceOperator iTaskInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory
                 .getProxyClient(taskInstance.getHost(), ITaskInstanceOperator.class);
         TaskInstanceKillResponse taskInstanceKillResponse =
                 iTaskInstanceOperator.killTask(new TaskInstanceKillRequest(taskInstanceId));
@@ -381,11 +381,11 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
             // delete log
             if (StringUtils.isNotEmpty(taskInstance.getLogPath())) {
                 if (TaskUtils.isLogicTask(taskInstance.getTaskType())) {
-                    IMasterLogService masterLogService = SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+                    IMasterLogService masterLogService = SingletonJdkDynamicRpcClientProxyFactory
                             .getProxyClient(taskInstance.getHost(), IMasterLogService.class);
                     masterLogService.removeLogicTaskInstanceLog(taskInstance.getLogPath());
                 } else {
-                    IWorkerLogService workerLogService = SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+                    IWorkerLogService workerLogService = SingletonJdkDynamicRpcClientProxyFactory
                             .getProxyClient(taskInstance.getHost(), IWorkerLogService.class);
                     workerLogService.removeTaskInstanceLog(taskInstance.getLogPath());
                 }
