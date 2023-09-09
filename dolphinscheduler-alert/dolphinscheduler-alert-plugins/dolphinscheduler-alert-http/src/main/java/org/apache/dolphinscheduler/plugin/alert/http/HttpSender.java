@@ -32,10 +32,12 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -111,12 +113,12 @@ public final class HttpSender {
     }
 
     private void createHttpRequest(String msg) throws MalformedURLException, URISyntaxException {
-        if (REQUEST_TYPE_POST.equals(requestType)) {
+        if (REQUEST_TYPE_POST.equalsIgnoreCase(requestType)) {
             httpRequest = new HttpPost(url);
             setHeader();
             // POST request add param in request body
             setMsgInRequestBody(msg);
-        } else if (REQUEST_TYPE_GET.equals(requestType)) {
+        } else if (REQUEST_TYPE_GET.equalsIgnoreCase(requestType)) {
             // GET request add param in url
             setMsgInUrl(msg);
             URL unencodeUrl = new URL(url);
@@ -139,7 +141,11 @@ public final class HttpSender {
             if (!url.contains(URL_SPLICE_CHAR)) {
                 type = URL_SPLICE_CHAR;
             }
-            url = String.format("%s%s%s=%s", url, type, contentField, msg);
+            try {
+                url = String.format("%s%s%s=%s", url, type, contentField, URLEncoder.encode(msg, DEFAULT_CHARSET));
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
